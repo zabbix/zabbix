@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Alcatel Timetra TiMOS SNMPv2</template>
          <name>Template Net Alcatel Timetra TiMOS SNMPv2</name>
-         <description>Template Net Alcatel Timetra TiMOS version: 0.13
+         <description>Template Net Alcatel Timetra TiMOS version: 0.14
 MIBs used:
 TIMETRA-SYSTEM-MIB
 SNMPv2-MIB
@@ -364,7 +364,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -508,7 +508,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -546,7 +546,7 @@ Current status of the Fan tray.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.fan.status[tmnxChassisFanOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Alcatel Timetra TiMOS SNMPv2:sensor.fan.status[tmnxChassisFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPINDEX}: Fan is in critical state</name>
