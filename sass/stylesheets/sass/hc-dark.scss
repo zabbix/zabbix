@@ -124,9 +124,9 @@ $var-icons: (
 }
 
 $form-icon-btn: (
-	help: url(../img/icon-sprite.svg) no-repeat -168px -726px,
+	help: url(../img/icon-sprite.svg) no-repeat -318px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -201px -834px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -168px -617px
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -317px -617px
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
@@ -237,6 +237,19 @@ ul.top-nav-icons {
 			border: 1px solid $main-subnav-bg-color !important;
 		}
 	}
+}
+
+.add-child-btn {
+	background: url(../img/icon-sprite.svg) no-repeat -359px -551px !important;
+}
+.edit-item-btn {
+	background: url(../img/icon-sprite.svg) no-repeat -359px -478px !important;
+}
+.import-items-btn {
+	background: url(../img/icon-sprite.svg) no-repeat -359px -515px !important;
+}
+.drag-icon {
+	background: url(../img/icon-sprite.svg) no-repeat -318px -762px !important;
 }
 
 // COLORS AND GENERAL

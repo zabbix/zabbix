@@ -220,6 +220,19 @@ ul.top-nav-icons {
 	}
 }
 
+.add-child-btn {
+	background: url(../img/icon-sprite.svg) no-repeat -206px -551px !important;
+}
+.edit-item-btn {
+	background: url(../img/icon-sprite.svg) no-repeat -206px -478px !important;
+}
+.import-items-btn {
+	background: url(../img/icon-sprite.svg) no-repeat -206px -515px !important;
+}
+.drag-icon {
+	background: url(../img/icon-sprite.svg) no-repeat -165px -762px !important;
+}
+
 // COLORS AND GENERAL
 .top-subnav a {
 	&.selected {
