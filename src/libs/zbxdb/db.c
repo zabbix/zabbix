@@ -2219,7 +2219,7 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 {
 	SQLCHAR		tmp_message[SQL_MAX_MESSAGE_LENGTH + 1], sqlstate[SQL_SQLSTATE_SIZE + 1];
 	char		*message = NULL;
-	SQLINTEGER	sqlcode;
+	SQLINTEGER	sqlcode = 0;
 	SQLSMALLINT	rec_nr = 1;
 	size_t		message_alloc = 0, message_offset = 0;
 
