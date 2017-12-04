@@ -4965,8 +4965,8 @@ svg {
 			}
 
 			&.ui-sortable-helper {
-				background: #f7f7f7;
-				border-color: #d7dadc;
+				background: $ui-sortable-helper-background-color;
+				border-color: $ui-sortable-helper-border-color;
 				border-width: 1px;
 				border-style: solid;
 
@@ -4985,11 +4985,11 @@ svg {
 		}
 
 		.highlighted-parent > .tree-row {
-			background: #f9f9f9;
+			background: $ui-highlighted-parent-background-color;
 		}
 
 		.placeholder {
-			background-color: #ebeef0;
+			background-color: $ui-placeholder-background-color;
 			-webkit-animation: fadein .5s;
 			-moz-animation: fadein .5s;
 			-ms-animation: fadein .5s;

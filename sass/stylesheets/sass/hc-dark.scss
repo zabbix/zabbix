@@ -33,6 +33,10 @@ $ui-bg-color: #000;
 $ui-bg-selected-color: #ddd;
 $ui-hover-color: #222;
 $ui-border-color: #444;
+$ui-placeholder-background-color: lighten($ui-hover-color, 10%);
+$ui-highlighted-parent-background-color: lighten($ui-hover-color, 20%);
+$ui-sortable-helper-background-color: $ui-bg-color;
+$ui-sortable-helper-border-color: $ui-border-color;
 
 $action-hover-color: #454545;
 $action-border-color: #666;
