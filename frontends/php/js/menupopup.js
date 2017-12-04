@@ -935,23 +935,7 @@ jQuery(function($) {
 			menuPopup.data('is-active', false);
 			menuPopup.fadeOut(0);
 
-			var menu = null,
-				indx;
-			$(overlays_stack).each(function(i, item) {
-				if (item.dialogueid === 'contextmenu') {
-					menu = item,
-					indx = i;
-					return;
-				}
-			});
-
-			if (menu) {
-				// Focus UI element that was clicked to open an overlay.
-				jQuery(menu.element).focus();
-
-				// Remove dialogue from the stack.
-				overlays_stack.splice(indx, 1);
-			}
+			removeFromOverlaysStack('contextmenu');
 		}
 	}
 

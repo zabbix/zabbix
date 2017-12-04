@@ -526,23 +526,7 @@ function overlayDialogueDestroy(dialogueid) {
 		jQuery('body').css({'overflow': ''});
 		jQuery('body[style=""]').removeAttr('style');
 
-		var dialog,
-			indx;
-		jQuery(overlays_stack).each(function(i, item) {
-			if (item.dialogueid === dialogueid) {
-				dialog = item,
-				indx = i;
-				return;
-			}
-		});
-
-		if (dialog) {
-			// Focus UI element that was clicked to open an overlay.
-			jQuery(dialog.element).focus();
-
-			// Remove dialogue from the stack.
-			overlays_stack.splice(indx, 1);
-		}
+		removeFromOverlaysStack(dialogueid);
 	}
 }
 

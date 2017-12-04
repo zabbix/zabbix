@@ -117,24 +117,7 @@ calendar.prototype = {
 		this.clndr_calendar.hide();
 		this.visible = 0;
 
-		var clndrid = this.id.toString(),
-			overlay = null,
-			indx;
-		jQuery(overlays_stack).each(function(i, item) {
-			if (item.dialogueid === clndrid) {
-				overlay = item,
-				indx = i;
-				return;
-			}
-		});
-
-		if (overlay) {
-			// Focus UI element that was clicked to open an overlay.
-			jQuery(overlay.element).focus();
-
-			// Remove dialogue from the stack.
-			overlays_stack.splice(indx, 1);
-		}
+		removeFromOverlaysStack(this.id.toString());
 	},
 
 	clndrshow: function(top, left, trigger_elmnt) {

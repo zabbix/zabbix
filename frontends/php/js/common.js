@@ -507,6 +507,32 @@ function closeDialogHandler(event) {
 	}
 }
 
+/*
+ * Removed overlay from overlays stack and sets focus to source element.
+ *
+ * @param {string} dialogueid	Id of dialogue, that is beeing closed.
+ */
+function removeFromOverlaysStack(dialogueid) {
+	var overlay = null,
+		index;
+
+	jQuery(overlays_stack).each(function(i, item) {
+		if (item.dialogueid === dialogueid) {
+			overlay = item,
+			index = i;
+			return;
+		}
+	});
+
+	if (overlay) {
+		// Focus UI element that was clicked to open an overlay.
+		jQuery(overlay.element).focus();
+
+		// Remove dialogue from the stack.
+		overlays_stack.splice(index, 1);
+	}
+}
+
 /**
  * Reload content of Modal Overlay dialogue without closing it.
  *

@@ -545,24 +545,7 @@ var hintBox = {
 
 	deleteHint: function(target) {
 		if (typeof target.hintboxid !== 'undefined') {
-			var overlay,
-				indx;
-
-			jQuery(overlays_stack).each(function(i, item) {
-				if (item.dialogueid === target.hintboxid) {
-					overlay = item,
-					indx = i;
-					return;
-				}
-			});
-
-			if (overlay) {
-				// Focus UI element that was clicked to open an overlay.
-				jQuery(overlay.element).focus();
-
-				// Remove dialogue from the stack.
-				overlays_stack.splice(indx, 1);
-			}
+			removeFromOverlaysStack(target.hintboxid);
 		}
 
 		if (target.hintBoxItem) {
@@ -599,23 +582,7 @@ function hide_color_picker() {
 	curr_lbl = null;
 	curr_txt = null;
 
-	var pckr = null,
-		indx;
-	jQuery(overlays_stack).each(function(i, item) {
-		if (item.dialogueid === 'color_picker') {
-			pckr = item,
-			indx = i;
-			return;
-		}
-	});
-
-	if (pckr) {
-		// Focus UI element that was clicked to open an overlay.
-		jQuery(pckr.element).focus();
-
-		// Remove dialogue from the stack.
-		overlays_stack.splice(indx, 1);
-	}
+	removeFromOverlaysStack('color_picker');
 }
 
 function show_color_picker(id, event) {
