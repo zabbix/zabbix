@@ -400,21 +400,26 @@ function PopUp(action, options, dialogueid) {
 			overlayDialogue(ovelay_properties);
 		},
 		success: function(resp) {
-			var buttons = resp.buttons !== null ? resp.buttons : [];
+			if (typeof resp.errors !== 'undefined') {
+				ovelay_properties['content'] = resp.errors;
+			}
+			else {
+				var buttons = resp.buttons !== null ? resp.buttons : [];
 
-			buttons.push({
-				'title': t('Cancel'),
-				'class': 'btn-alt',
-				'action': function() {}
-			});
+				buttons.push({
+					'title': t('Cancel'),
+					'class': 'btn-alt',
+					'action': function() {}
+				});
 
-			ovelay_properties['title'] = resp.header;
-			ovelay_properties['content'] = resp.body;
-			ovelay_properties['controls'] = resp.controls;
-			ovelay_properties['buttons'] = buttons;
+				ovelay_properties['title'] = resp.header;
+				ovelay_properties['content'] = resp.body;
+				ovelay_properties['controls'] = resp.controls;
+				ovelay_properties['buttons'] = buttons;
 
-			if (typeof resp.script_inline !== 'undefined') {
-				ovelay_properties['script_inline'] = resp.script_inline;
+				if (typeof resp.script_inline !== 'undefined') {
+					ovelay_properties['script_inline'] = resp.script_inline;
+				}
 			}
 
 			overlayDialogue(ovelay_properties);
@@ -581,8 +586,8 @@ function validate_media(formname) {
 		success: function(ret) {
 			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
+			if (typeof ret.errors !== 'undefined') {
+				jQuery(ret.errors).insertBefore(jQuery(form));
 			}
 			else {
 				add_media(ret.dstfrm, ret.media, ret.mediatypeid, ret.sendto, ret.period, ret.active, ret.severity);
@@ -612,8 +617,8 @@ function validate_trigger_expression(formname, dialogueid) {
 		success: function(ret) {
 			jQuery(window.document.forms[formname]).parent().find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(window.document.forms[formname]));
+			if (typeof ret.errors !== 'undefined') {
+				jQuery(ret.errors).insertBefore(jQuery(window.document.forms[formname]));
 			}
 			else {
 				var form = window.document.forms[ret.dstfrm];
@@ -657,8 +662,8 @@ function validate_httpstep(formname, dialogueid) {
 		success: function(ret) {
 			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
+			if (typeof ret.errors !== 'undefined') {
+				jQuery(ret.errors).insertBefore(jQuery(form));
 			}
 			else {
 				if (typeof ret.params.stepid !== 'undefined') {

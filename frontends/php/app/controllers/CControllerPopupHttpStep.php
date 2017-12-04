@@ -49,7 +49,14 @@ class CControllerPopupHttpStep extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -87,6 +94,8 @@ class CControllerPopupHttpStep extends CController {
 		}
 
 		if ($this->getInput('validate', false)) {
+			$output = [];
+
 			// Validate if step names are unique.
 			if (($page_options['stepid'] >= 0 && $page_options['name'] !== $page_options['old_name'])
 					|| $page_options['stepid'] < 0) {
@@ -99,45 +108,45 @@ class CControllerPopupHttpStep extends CController {
 
 			// Return collected error messages.
 			if (($messages = getMessages()) !== null) {
-				echo (new CJson())->encode(['messages' => $messages->toString()]);
-				exit;
+				$output['errors'] = $messages->toString();
+			}
+			else {
+				// Return valid response.
+				$params = [
+					'name' => $page_options['name'],
+					'timeout' => $page_options['timeout'],
+					'url' => $page_options['url'],
+					'post_type' => $page_options['post_type'],
+					'posts' => $page_options['posts'],
+					'pairs' => $page_options['pairs'],
+					'required' => $page_options['required'],
+					'status_codes' => $page_options['status_codes'],
+					'follow_redirects' => $page_options['follow_redirects'],
+					'retrieve_mode' => $page_options['retrieve_mode']
+				];
+
+				if ($page_options['stepid'] >= 0) {
+					$params['stepid'] = $page_options['stepid'];
+				}
+
+				$output = [
+					'dstfrm' => $page_options['dstfrm'],
+					'list_name' => $page_options['list_name'],
+					'params' => $params
+				];
 			}
 
-			// Return valid response.
-			$params = [
-				'name' => $page_options['name'],
-				'timeout' => $page_options['timeout'],
-				'url' => $page_options['url'],
-				'post_type' => $page_options['post_type'],
-				'posts' => $page_options['posts'],
-				'pairs' => $page_options['pairs'],
-				'required' => $page_options['required'],
-				'status_codes' => $page_options['status_codes'],
-				'follow_redirects' => $page_options['follow_redirects'],
-				'retrieve_mode' => $page_options['retrieve_mode']
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
+		}
+		else {
+			$data = [
+				'title' => _('Step of web scenario'),
+				'options' => $page_options
 			];
 
-			if ($page_options['stepid'] >= 0) {
-				$params['stepid'] = $page_options['stepid'];
-			}
-
-			echo (new CJson())->encode([
-				'dstfrm' => $page_options['dstfrm'],
-				'list_name' => $page_options['list_name'],
-				'params' => $params
-			]);
-			exit;
+			$this->setResponse(new CControllerResponseData($data));
 		}
-
-		$data = [
-			'title' => _('Step of web scenario'),
-			'options' => $page_options
-		];
-
-		if (($messages = getMessages()) !== null) {
-			$data['messages'] = $messages->toString();
-		}
-
-		$this->setResponse(new CControllerResponseData($data));
 	}
 }
