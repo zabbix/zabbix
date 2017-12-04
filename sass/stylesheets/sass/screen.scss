@@ -4985,13 +4985,8 @@ tr.cursor-move {
 			}
 		}
 
-		.highliglted-parent > .tree-row {
+		.highlighted-parent > .tree-row {
 			background: #f9f9f9;
-		}
-
-		.sortable-item-placeholder {
-			background: #f5f5f5;
-			height: 33px;
 		}
 
 		.placeholder {
@@ -5001,10 +4996,6 @@ tr.cursor-move {
 			-ms-animation: fadein .5s;
 			-o-animation: fadein .5s;
 			animation: fadein .5s;
-		}
-
-		.drop-hover > .row {
-			background: #faebd7;
 		}
 	}
 }
