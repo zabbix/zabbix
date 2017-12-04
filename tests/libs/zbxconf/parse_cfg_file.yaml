@@ -30,7 +30,7 @@ files:
     LoadModule=dummy.so
     StartDBSyncers=4
     Include= db.conf # DB credentials
-    LoadModule=smArty.so
+    LoadModule=smarty.so
     #LoadModule=beauty.so
   db.conf: |
     DBPassword=r3ally_$tr0ng_pa$$w0rd
