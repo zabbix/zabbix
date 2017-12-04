@@ -272,7 +272,7 @@ class CEvent extends CApiService {
 					$host_groups_to_check = array_intersect_key($tag_filter, $host_groups);
 
 					$allowed_triggerids = [];
-var_dump($host_groups_to_check);
+
 					if ($host_groups_to_check) {
 						$triggers = API::Trigger()->get([
 							'output' => ['triggerid'],
@@ -321,7 +321,7 @@ var_dump($host_groups_to_check);
 								$pre_usrgrpid = $db_tag_filter['usrgrpid'];
 
 								$unused_groups = array_diff_key($tag_filter, $used_groups);
-								var_dump($unused_groups);
+
 								foreach ($unused_groups as $unused_group) {
 									unset($tag_filter[$unused_group]);
 								}
