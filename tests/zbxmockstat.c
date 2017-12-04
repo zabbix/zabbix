@@ -17,22 +17,41 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYDATA_H
-#define ZABBIX_PROXYDATA_H
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
 
-#include "comms.h"
-#include "zbxjson.h"
+#include "common.h"
 
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
+int	__wrap_stat(const char *pathname, struct stat *buf)
+{
+	zbx_mock_error_t	error;
+	zbx_mock_handle_t	handle;
 
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts);
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts);
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts);
+	if (ZBX_MOCK_SUCCESS == (error = zbx_mock_file(pathname, &handle)))
+	{
+		buf->st_mode = S_IFMT & S_IFREG;
+		return 0;
+	}
 
-int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info);
+	if (ZBX_MOCK_NO_PARAMETER != error)
+	{
+		fail_msg("Error during path \"%s\" lookup among files: %s", pathname,
+				zbx_mock_error_string(error));
+	}
 
-int	init_proxy_history_lock(char **error);
-void	free_proxy_history_lock(void);
+	if (0)	/* directory lookup is not implemented */
+	{
+		buf->st_mode = S_IFMT & S_IFDIR;
+		return 0;
+	}
 
-#endif
+	errno = ENOENT;	/* No such file or directory */
+	return -1;
+}
+
+int	__wrap___xstat(int ver, const char *pathname, struct stat *buf)
+{
+	ZBX_UNUSED(ver);
+
+	return __wrap_stat(pathname, buf);
+}

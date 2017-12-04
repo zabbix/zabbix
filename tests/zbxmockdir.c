@@ -17,22 +17,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYDATA_H
-#define ZABBIX_PROXYDATA_H
+/* make sure that __wrap_*() prototypes match unwrapped counterparts */
 
-#include "comms.h"
-#include "zbxjson.h"
+#define opendir	__wrap_opendir
+#define readdir	__wrap_readdir
+#include <dirent.h>
+#undef opendir
+#undef readdir
 
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
 
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts);
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts);
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts);
+#include "common.h"
 
-int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info);
+DIR	*__wrap_opendir(const char *name)
+{
+	ZBX_UNUSED(name);
 
-int	init_proxy_history_lock(char **error);
-void	free_proxy_history_lock(void);
+	errno = ENOENT;
+	return NULL;
+}
 
-#endif
+struct dirent	*__wrap_readdir(DIR *dirp)
+{
+	ZBX_UNUSED(dirp);
+
+	errno = EBADF;
+	return NULL;
+}
