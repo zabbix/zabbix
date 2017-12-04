@@ -1053,6 +1053,7 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
+FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
 INDEX		|1		|source,object,objectid,clock
 INDEX		|2		|source,object,clock
 
@@ -1383,6 +1384,7 @@ FIELD		|r_clock	|t_time		|'0'	|NOT NULL	|0
 FIELD		|r_ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
 FIELD		|userid		|t_id		|	|NULL		|0			|-|users
+FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
 INDEX		|1		|source,object,objectid
 INDEX		|2		|r_clock
 
@@ -1588,4 +1590,4 @@ INDEX		|6		|value_sysmapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050003	|3050003
+ROW		|3050011	|3050011
