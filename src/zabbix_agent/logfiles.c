@@ -447,18 +447,94 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
 	for (i = 0; i < logfiles_num; i++)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
-				ZBX_FS_UI64 " seq:%d incomplete:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64 " ino_lo:"
-				ZBX_FS_UI64
+				ZBX_FS_UI64 " seq:%d copy_of:%d incomplete:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64
+				" ino_lo:" ZBX_FS_UI64
 				" md5size:%d md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
-				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].incomplete, logfiles[i].dev,
-				logfiles[i].ino_hi, logfiles[i].ino_lo, logfiles[i].md5size, logfiles[i].md5buf[0],
-				logfiles[i].md5buf[1], logfiles[i].md5buf[2], logfiles[i].md5buf[3],
-				logfiles[i].md5buf[4], logfiles[i].md5buf[5], logfiles[i].md5buf[6],
-				logfiles[i].md5buf[7], logfiles[i].md5buf[8], logfiles[i].md5buf[9],
-				logfiles[i].md5buf[10], logfiles[i].md5buf[11], logfiles[i].md5buf[12],
-				logfiles[i].md5buf[13], logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
+				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].copy_of,
+				logfiles[i].incomplete, logfiles[i].dev, logfiles[i].ino_hi, logfiles[i].ino_lo,
+				logfiles[i].md5size, logfiles[i].md5buf[0], logfiles[i].md5buf[1],
+				logfiles[i].md5buf[2], logfiles[i].md5buf[3], logfiles[i].md5buf[4],
+				logfiles[i].md5buf[5], logfiles[i].md5buf[6], logfiles[i].md5buf[7],
+				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
+				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
+				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: compare_file_places                                              *
+ *                                                                            *
+ * Purpose: compare device numbers and inode numbers of 2 files               *
+ *                                                                            *
+ * Parameters: old     - [IN] details of the 1st log file                     *
+ *             new     - [IN] details of the 2nd log file                     *
+ *             use_ino - [IN] 0 - do not use inodes in comparison,            *
+ *                            1 - use up to 64-bit inodes in comparison,      *
+ *                            2 - use 128-bit inodes in comparison.           *
+ *                                                                            *
+ * Return value: ZBX_FILE_PLACE_SAME - both files have the same place         *
+ *               ZBX_FILE_PLACE_OTHER - files reside in different places      *
+ *               ZBX_FILE_PLACE_UNKNOWN - cannot compare places (no inodes)   *
+ *                                                                            *
+ ******************************************************************************/
+static int	compare_file_places(const struct st_logfile *old, const struct st_logfile *new, int use_ino)
+{
+	if (1 == use_ino || 2 == use_ino)
+	{
+		if (old->ino_lo != new->ino_lo || old->dev != new->dev || (2 == use_ino && old->ino_hi != new->ino_hi))
+			return ZBX_FILE_PLACE_OTHER;
+		else
+			return ZBX_FILE_PLACE_SAME;
+	}
+
+	return ZBX_FILE_PLACE_UNKNOWN;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: open_file_helper                                                 *
+ *                                                                            *
+ * Purpose: open specified file for reading                                   *
+ *                                                                            *
+ * Parameters: pathname - [IN] full pathname of file                          *
+ *             err_msg  - [IN/OUT] error message why file could not be opened *
+ *                                                                            *
+ * Return value: file descriptor on success or -1 on error                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	open_file_helper(const char *pathname, char **err_msg)
+{
+	int	fd;
+
+	if (-1 == (fd = zbx_open(pathname, O_RDONLY)))
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", pathname, zbx_strerror(errno));
+
+	return fd;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: close_file_helper                                                *
+ *                                                                            *
+ * Purpose: close specified file                                              *
+ *                                                                            *
+ * Parameters: fd       - [IN] file descriptor to close                       *
+ *             pathname - [IN] pathname of file, used for error reporting     *
+ *             err_msg  - [IN/OUT] error message why file could not be closed *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	close_file_helper(int fd, const char *pathname, char **err_msg)
+{
+	if (0 == close(fd))
+		return SUCCEED;
+
+	*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", pathname, zbx_strerror(errno));
+
+	return FAIL;
 }
 
 /******************************************************************************
