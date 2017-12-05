@@ -139,8 +139,11 @@ static int	DBpatch_3050006(void)
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
-		return FAIL;
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			return FAIL;
+	}
 
 	zbx_free(sql);
 
@@ -173,8 +176,11 @@ static int	DBpatch_3050007(void)
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
-		return FAIL;
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			return FAIL;
+	}
 
 	zbx_free(sql);
 
