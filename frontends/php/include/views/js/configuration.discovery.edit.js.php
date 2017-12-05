@@ -45,8 +45,7 @@
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 							->setAriaRequired()
 							->setAttribute('maxlength', 255)
-					]))
-						->setId('newCheckPortsRow')
+					]))->setId('newCheckPortsRow')
 				)
 				->addRow(
 					(new CRow([
@@ -55,8 +54,7 @@
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAriaRequired()
 							->setAttribute('maxlength', 255)
-					]))
-						->setId('newCheckCommunityRow')
+					]))->setId('newCheckCommunityRow')
 				)
 				->addRow(
 					(new CRow([
@@ -65,8 +63,7 @@
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAriaRequired()
 							->setAttribute('maxlength', 255)
-					]))
-						->setId('newCheckKeyRow')
+					]))->setId('newCheckKeyRow')
 				)
 				->addRow(
 					(new CRow([
@@ -75,8 +72,7 @@
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAriaRequired()
 							->setAttribute('maxlength', 512)
-					]))
-						->setId('new_check_snmp_oid_row')
+					]))->setId('new_check_snmp_oid_row')
 				)
 				->addRow(
 					(new CRow([
@@ -84,8 +80,7 @@
 						(new CTextBox('snmpv3_contextname'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAttribute('maxlength', 255)
-					]))
-						->setId('newCheckContextRow')
+					]))->setId('newCheckContextRow')
 				)
 				->addRow(
 					(new CRow([
@@ -93,8 +88,7 @@
 						(new CTextBox('snmpv3_securityname'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAttribute('maxlength', 64)
-					]))
-						->setId('newCheckSecNameRow')
+					]))->setId('newCheckSecNameRow')
 				)
 				->addRow(
 					(new CRow([
@@ -104,8 +98,7 @@
 							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
 							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
 						])
-					]))
-						->setId('newCheckSecLevRow')
+					]))->setId('newCheckSecLevRow')
 				)
 				->addRow(
 					(new CRow([
@@ -115,8 +108,7 @@
 							->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 							->setAriaRequired()
 							->setModern(true)
-					]))
-						->setId('newCheckAuthProtocolRow')
+					]))->setId('newCheckAuthProtocolRow')
 				)
 				->addRow(
 					(new CRow([
@@ -124,8 +116,7 @@
 						(new CTextBox('snmpv3_authpassphrase'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAttribute('maxlength', 64)
-					]))
-						->setId('newCheckAuthPassRow')
+					]))->setId('newCheckAuthPassRow')
 				)
 				->addRow(
 					(new CRow([
@@ -135,8 +126,7 @@
 							->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 							->setAriaRequired()
 							->setModern(true)
-					]))
-						->setId('newCheckPrivProtocolRow')
+					]))->setId('newCheckPrivProtocolRow')
 				)
 				->addRow(
 					(new CRow([
@@ -146,19 +136,16 @@
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAriaRequired()
 							->setAttribute('maxlength', 64)
-					]))
-						->setId('newCheckPrivPassRow')
-				)
-			->addClass('ZBX_STYLE_TABLE_FORMS_SEPARATOR')
-			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
-			,
+					]))->setId('newCheckPrivPassRow')
+				),
 			(new CHorList([
 				(new CButton('add_new_dcheck', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
 				(new CButton('cancel_new_dcheck', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 			]))
 		]))
-	))
-		->setId('new_check_form')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+	))->setId('new_check_form')
 ?>
 </script>
 <script type="text/javascript">
