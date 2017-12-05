@@ -709,7 +709,7 @@
 				dstfrm: 'action.edit',
 				dstfld1: 'new_ack_operation_opcommand_scriptid',
 				dstfld2: 'new_ack_operation_opcommand_script'
-			}, event.target);
+			}, null, event.target);
 			});
 
 		processTypeOfCalculation();
