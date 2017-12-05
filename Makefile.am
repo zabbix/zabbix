@@ -108,10 +108,30 @@ WRAP_DB_FUNCS = \
 	-Wl,--wrap=DBexecute_multiple_query \
 	-Wl,--wrap=DBfree_result
 
+WRAP_IO_FUNCS = \
+	-Wl,--wrap=fopen \
+	-Wl,--wrap=fclose \
+	-Wl,--wrap=fgets
+
+WRAP_FS_FUNCS = \
+	-Wl,--wrap=opendir \
+	-Wl,--wrap=readdir \
+	-Wl,--wrap=stat \
+	-Wl,--wrap=__xstat
+
+WRAP_EXIT = \
+	-Wl,--wrap=exit
+
+COMMON_WRAP_FUNCS = \
+	$(WRAP_DB_FUNCS) \
+	$(WRAP_IO_FUNCS) \
+	$(WRAP_FS_FUNCS) \
+	$(WRAP_EXIT)
+
 tests:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS)" LIBS="$(LIBS) -lcmocka" && \
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
 	./tests_run.pl
 endif
 

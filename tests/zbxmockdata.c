@@ -17,392 +17,430 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <stdio.h>
-#include "zbxtests.h"
+#include <yaml.h>
+
+#include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-char			*curr_wrapped_function = NULL;
-zbx_test_case_t		*test_case = NULL;
+#include "common.h"
+#include "zbxalgo.h"
 
+static zbx_vector_ptr_t		handle_pool;		/* a place to store handles provided to mock data user */
+static zbx_vector_str_t		string_pool;		/* a place to store strings provided to mock data user */
+static yaml_document_t		test_case;		/* parsed YAML document with test case data */
+static const yaml_node_t	*in = NULL;		/* pointer to "in" section of test case document */
+static const yaml_node_t	*out = NULL;		/* pointer to "out" section of test case document */
+static const yaml_node_t	*db_data = NULL;	/* pointer to "db data" section of test case document */
+static const yaml_node_t	*files = NULL;		/* pointer to "files" section of test case document */
+static const yaml_node_t	*exit_code = NULL;	/* pointer to "exit code" section of test case document */
+
+typedef struct
+{
+	const yaml_node_t	*node;	/* node of test_case document handle is associated with */
+	const yaml_node_item_t	*item;	/* current iterator position for vector handle */
+}
+zbx_mock_pool_handle_t;
+
+typedef enum
+{
+	ZBX_MOCK_IN,		/* parameter from "in" section of test case data */
+	ZBX_MOCK_OUT,		/* parameter from "out" section of test case data */
+	ZBX_MOCK_DB_DATA,	/* data source from "db data" section of test case data */
+	ZBX_MOCK_FILES		/* file contents from "files" section of test case data */
+}
+zbx_mock_parameter_t;
+
+static const char	*zbx_yaml_error_string(yaml_error_type_t error)
+{
+	switch (error)
+	{
+		case YAML_NO_ERROR:
+			return "No error is produced.";
+		case YAML_MEMORY_ERROR:
+			return "Cannot allocate or reallocate a block of memory.";
+		case YAML_READER_ERROR:
+			return "Cannot read or decode the input stream.";
+		case YAML_SCANNER_ERROR:
+			return "Cannot scan the input stream.";
+		case YAML_PARSER_ERROR:
+			return "Cannot parse the input stream.";
+		case YAML_COMPOSER_ERROR:
+			return "Cannot compose a YAML document.";
+		case YAML_WRITER_ERROR:
+			return "Cannot write to the output stream.";
+		case YAML_EMITTER_ERROR:
+			return "Cannot emit a YAML stream.";
+		default:
+			return "Unknown error.";
+	}
+}
+
+static int	zbx_yaml_scalar_cmp(const char *str, const yaml_node_t *node)
+{
+	if (YAML_SCALAR_NODE != node->type)
+		fail_msg("Internal error: scalar comparison of nonscalar node.");
+
+	return strncmp(str, (const char *)node->data.scalar.value, node->data.scalar.length);
+}
+
+/* TODO: validate that keys in "in", "out", "db data" are scalars; validate "db data" */
 int	zbx_mock_data_init(void **state)
 {
-	char 			line[MAX_STRING_LEN], *tmp, *p;
-	int			idx_str, line_type = ZBX_TEST_DATA_TYPE_UNKNOWN;
-	zbx_test_datasource_t	*curr_ds = NULL;
-	zbx_test_data_t		*curr_data = NULL;
-	zbx_test_function_t	*curr_func = NULL;
-	zbx_test_row_t		*curr_row = NULL;
+	yaml_parser_t	parser;
 
 	ZBX_UNUSED(state);
 
-	test_case = malloc(sizeof(zbx_test_case_t));
+	yaml_parser_initialize(&parser);
+	yaml_parser_set_input_file(&parser, stdin);
 
-	test_case->datasources = malloc(TEST_MAX_DATASOURCE_NUM * sizeof(zbx_test_datasource_t));
-	test_case->datasource_num = 0;
-
-	test_case->functions = malloc(TEST_MAX_FUNCTION_NUM * sizeof(zbx_test_function_t));
-	test_case->function_num = 0;
-
-	test_case->in_params.data_num = 0;
-	test_case->out_params.data_num = 0;
-
-	while (fgets(line, MAX_STRING_LEN, stdin) != NULL)
+	if (0 != yaml_parser_load(&parser, &test_case))
 	{
-		idx_str = 0;
-		tmp = strdup(line);
-		zbx_rtrim(tmp, "\r\n");
+		const yaml_node_t	*root;
 
-		p = strtok(tmp,"|");
-		while (p != NULL)
+		if (NULL != (root = yaml_document_get_root_node(&test_case)))
 		{
-			if (0 == idx_str) /* data type identification */
+			yaml_document_t	tmp;
+
+			if (0 != yaml_parser_load(&parser, &tmp))
 			{
-				if (0 == strcmp(p, "DB_DATA"))
+				if (NULL == yaml_document_get_root_node(&tmp))
 				{
-					curr_ds = &test_case->datasources[test_case->datasource_num];
-					curr_ds->field_names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
-					curr_ds->field_num = 0;
+					if (YAML_MAPPING_NODE == root->type)
+					{
+						const yaml_node_pair_t	*pair;
 
-					test_case->datasource_num++;
+						for (pair = root->data.mapping.pairs.start;
+								pair < root->data.mapping.pairs.top; pair++)
+						{
+							const yaml_node_t	*key;
 
-					line_type = ZBX_TEST_DATA_TYPE_DB_DATA;
-				}
-				else if (0 == strcmp(p, "FUNCTION"))
-				{
-					curr_func = &test_case->functions[test_case->function_num];
-					curr_func->data.data_num = 0;
-					test_case->function_num++;
+							key = yaml_document_get_node(&test_case, pair->key);
 
-					line_type = ZBX_TEST_DATA_TYPE_FUNCTION;
-				}
-				else if (0 == strcmp(p, "IN_NAMES"))
-				{
-					curr_data = &test_case->in_params;
-					curr_data->names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
-					curr_data->data_num = 0;
+							if (YAML_SCALAR_NODE == key->type)
+							{
+								if (0 == zbx_yaml_scalar_cmp("in", key))
+								{
+									in = yaml_document_get_node(&test_case,
+											pair->value);
 
-					line_type = ZBX_TEST_DATA_TYPE_IN_PARAM;
-				}
-				else if (0 == strcmp(p, "OUT_NAMES"))
-				{
-					curr_data = &test_case->out_params;
-					curr_data->names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
-					curr_data->data_num = 0;
+									if (YAML_MAPPING_NODE != in->type)
+									{
+										printf("\"in\" is not a mapping.\n");
+										break;
+									}
+								}
+								else if (0 == zbx_yaml_scalar_cmp("out", key))
+								{
+									out = yaml_document_get_node(&test_case,
+											pair->value);
 
-					line_type = ZBX_TEST_DATA_TYPE_OUT_PARAM;
-				}
-				else if (0 == strcmp(p, "IN_VALUES"))
-				{
-					curr_data = &test_case->in_params;
-					curr_data->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
+									if (YAML_MAPPING_NODE != out->type)
+									{
+										printf("\"out\" is not a mapping.\n");
+										break;
+									}
+								}
+								else if (0 == zbx_yaml_scalar_cmp("db data", key))
+								{
+									db_data = yaml_document_get_node(&test_case,
+											pair->value);
 
-					line_type = ZBX_TEST_DATA_TYPE_IN_VALUE;
-				}
-				else if (0 == strcmp(p, "OUT_VALUES"))
-				{
-					curr_data = &test_case->out_params;
-					curr_data->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
+									if (YAML_MAPPING_NODE != db_data->type)
+									{
+										printf("\"db data\" is not a mapping.\n");
+										break;
+									}
+								}
+								else if (0 == zbx_yaml_scalar_cmp("files", key))
+								{
+									files = yaml_document_get_node(&test_case,
+											pair->value);
 
-					line_type = ZBX_TEST_DATA_TYPE_OUT_VALUE;
-				}
-				else if (0 == strcmp(p, "FIELDS"))
-				{
-					curr_ds->rows =  malloc(TEST_MAX_ROW_NUM * sizeof(zbx_test_row_t *));
-					curr_ds->row_num = 0;
+									if (YAML_MAPPING_NODE != files->type)
+									{
+										printf("\"files\" is not a mapping.\n");
+										break;
+									}
+								}
+								else if (0 == zbx_yaml_scalar_cmp("exit code", key))
+								{
+									exit_code = yaml_document_get_node(&test_case,
+											pair->value);
 
-					line_type = ZBX_TEST_DATA_TYPE_DB_FIELD;
-				}
-				else if (0 == strcmp(p, "ROW"))
-				{
-					curr_row = &curr_ds->rows[curr_ds->row_num];
-					curr_row->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
-					curr_row->value_num = 0;
+									if (YAML_SCALAR_NODE != exit_code->type)
+									{
+										printf("\"exit code\" is not a scalar.\n");
+										break;
+									}
 
-					curr_ds->row_num++;
+									if (0 != zbx_yaml_scalar_cmp("success", exit_code) &&
+											0 != zbx_yaml_scalar_cmp("failure", exit_code))
+									{
+										printf("Invalid value \"%.*s\" of"
+												" \"exit code\".\n",
+												(int)exit_code->data.scalar.length,
+												exit_code->data.scalar.value);
+										break;
+									}
+								}
+								else if (0 != zbx_yaml_scalar_cmp("test case", key))
+								{
+									printf("Unexpected key \"%.*s\" in mapping.\n",
+											(int)key->data.scalar.length,
+											key->data.scalar.value);
+									break;
+								}
 
-					line_type = ZBX_TEST_DATA_TYPE_DB_ROW;
-				}
-				else if (0 == strcmp(p, "FUNC_OUT_PARAMS"))
-				{
-					curr_data = &curr_func->data;
-					curr_data->names = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
-					curr_data->data_num = 0;
+								continue;
+							}
+							else
+								printf("Non-scalar key in mapping.\n");
 
-					line_type = ZBX_TEST_DATA_TYPE_FUNC_OUT;
-				}
-				else if (0 == strcmp(p, "FUNC_OUT_VALUES"))
-				{
-					curr_data = &curr_func->data;
-					curr_data->values = (char **)malloc(TEST_MAX_DATA_NUM * sizeof(char *));
-					curr_data->data_num = 0;
+							break;
+						}
 
-					line_type = ZBX_TEST_DATA_TYPE_FUNC_VALUE;
+						if (pair >= root->data.mapping.pairs.top)
+						{
+							yaml_parser_delete(&parser);
+							zbx_vector_ptr_create(&handle_pool);
+							zbx_vector_str_create(&string_pool);
+							return 0;
+						}
+					}
+					else
+						printf("Document is not a mapping.\n");
 				}
 				else
 				{
-					line_type = ZBX_TEST_DATA_TYPE_UNKNOWN;
+					printf("Stream contains multiple documents.\n");
+					yaml_document_delete(&tmp);
 				}
 			}
-			else if (0 < idx_str) /* filling in data */
-			{
-				switch (line_type)
-				{
-					case ZBX_TEST_DATA_TYPE_DB_DATA:
-						if (1 == idx_str && NULL != curr_data)
-							curr_ds->source_name = strdup(p);
-						break;
-					case ZBX_TEST_DATA_TYPE_FUNCTION:
-						if (1 == idx_str && NULL != curr_func)
-							curr_func->name = strdup(p);
-						break;
-					case ZBX_TEST_DATA_TYPE_IN_PARAM:
-					case ZBX_TEST_DATA_TYPE_OUT_PARAM:
-					case ZBX_TEST_DATA_TYPE_FUNC_OUT:
-						if (NULL != curr_data && NULL != curr_data->names)
-							curr_data->names[idx_str - 1] = strdup(p);
-						break;
-					case ZBX_TEST_DATA_TYPE_IN_VALUE:
-					case ZBX_TEST_DATA_TYPE_OUT_VALUE:
-					case ZBX_TEST_DATA_TYPE_FUNC_VALUE:
-						if (NULL != curr_data && NULL != curr_data->values)
-						{
-							curr_data->values[idx_str - 1] = strdup(p);
-							curr_data->data_num++;
-						}
-						break;
-					case ZBX_TEST_DATA_TYPE_DB_FIELD:
-						if (NULL != curr_ds && NULL != curr_ds->field_names)
-						{
-							curr_ds->field_names[idx_str - 1] = strdup(p);
-							curr_ds->field_num++;
-						}
-						break;
-					case ZBX_TEST_DATA_TYPE_DB_ROW:
-						if (NULL != curr_row && NULL != curr_row->values)
-						{
-							curr_row->values[idx_str - 1] = strdup(p);
-							curr_row->value_num++;
-						}
-						break;
-					default:
-						break;
-				}
-			}
+			else
+				printf("Cannot parse input: %s\n", zbx_yaml_error_string(parser.error));
 
-			p = strtok(NULL, "|");
-			idx_str++;
+			yaml_document_delete(&test_case);
 		}
-		free(tmp);
+		else
+			printf("Stream contains no documents.\n");
 	}
+	else
+		printf("Cannot parse input: %s\n", zbx_yaml_error_string(parser.error));
 
-	return 0;
+	yaml_parser_delete(&parser);
+	*state = NULL;
+	return -1;
+}
+
+static zbx_mock_handle_t	zbx_mock_handle_alloc(const yaml_node_t *node)
+{
+	zbx_mock_handle_t	handleid;
+	zbx_mock_pool_handle_t	*handle = NULL;
+
+	handleid = (zbx_mock_handle_t)handle_pool.values_num;
+	handle = zbx_malloc(handle, sizeof(zbx_mock_pool_handle_t));
+	handle->node = node;
+	handle->item = (YAML_SEQUENCE_NODE == node->type ? node->data.sequence.items.start : NULL);
+	zbx_vector_ptr_append(&handle_pool, handle);
+
+	return handleid;
 }
 
 int	zbx_mock_data_free(void **state)
 {
-	int			n1, n2, n3;
-
 	ZBX_UNUSED(state);
 
-	for (n1 = 0; n1 < test_case->datasource_num; n1++)
-	{
-		free(test_case->datasources[n1].source_name);
-
-		for (n2 = 0; n2 < test_case->datasources[n1].field_num; n2++)
-			free(test_case->datasources[n1].field_names[n2]);
-
-		for (n2 = 0; n2 < test_case->datasources[n1].row_num; n2++)
-		{
-			for (n3 = 0; n3 < test_case->datasources[n1].rows[n2].value_num; n3++)
-				free(test_case->datasources[n1].rows[n2].values[n3]);
-		}
-	}
-
-	free(test_case->datasources);
-
-	for (n1 = 0; n1 < test_case->in_params.data_num; n1++)
-	{
-		free(test_case->in_params.names[n1]);
-		free(test_case->in_params.values[n1]);
-	}
-
-	free(test_case->in_params.names);
-	free(test_case->in_params.values);
-
-	for (n1 = 0; n1 < test_case->out_params.data_num; n1++)
-	{
-		free(test_case->out_params.names[n1]);
-		free(test_case->out_params.values[n1]);
-	}
-
-	free(test_case->out_params.names);
-	free(test_case->out_params.values);
-
-	for (n1 = 0; n1 < test_case->function_num; n1++)
-	{
-		free(test_case->functions[n1].name);
-
-		for (n2 = 0; n2 < test_case->functions[n1].data.data_num; n2++)
-		{
-			free(test_case->functions[n1].data.names[n2]);
-			free(test_case->functions[n1].data.values[n2]);
-		}
-
-		free(test_case->functions[n1].data.names);
-		free(test_case->functions[n1].data.values);
-
-		free(test_case->functions);
-	}
-
-	free(test_case);
+	zbx_vector_str_clear_ext(&string_pool, zbx_ptr_free);
+	zbx_vector_ptr_clear_ext(&handle_pool, zbx_ptr_free);
+	zbx_vector_str_destroy(&string_pool);
+	zbx_vector_ptr_destroy(&handle_pool);
+	yaml_document_delete(&test_case);
 
 	return 0;
 }
 
-void	debug_print_cases(zbx_test_case_t *test_case)
+const char	*zbx_mock_error_string(zbx_mock_error_t error)
 {
-	int n1, n2, n3;
-
-	printf("in_params.data_num %d\n", test_case->in_params.data_num);
-	for (n1 = 0; n1 < test_case->in_params.data_num; n1++)
+	switch (error)
 	{
-		printf("	in_params.name[%d]: %s\n", n1, test_case->in_params.names[n1]);
-		printf("	in_params.value[%d]: %s\n", n1, test_case->in_params.values[n1]);
+		case ZBX_MOCK_SUCCESS:
+			return "No error, actually.";
+		case ZBX_MOCK_INVALID_HANDLE:
+			return "Provided handle wasn't created properly or its lifetime has expired.";
+		case ZBX_MOCK_NO_PARAMETER:
+			return "No parameter with a given name available in test case data.";
+		case ZBX_MOCK_NO_EXIT_CODE:
+			return "No exit code provided in test case data.";
+		case ZBX_MOCK_NOT_AN_OBJECT:
+			return "Provided handle is not an object handle.";
+		case ZBX_MOCK_NO_SUCH_MEMBER:
+			return "Object has no member associated with provided key.";
+		case ZBX_MOCK_NOT_A_VECTOR:
+			return "Provided handle is not a vector handle.";
+		case ZBX_MOCK_END_OF_VECTOR:
+			return "Vector iteration reached its end.";
+		case ZBX_MOCK_NOT_A_STRING:
+			return "Provided handle is not a string handle.";
+		case ZBX_MOCK_INTERNAL_ERROR:
+			return "Internal error, please report to maintainers.";
+		default:
+			return "Unknown error.";
+	}
+}
+
+static zbx_mock_error_t	zbx_mock_parameter(zbx_mock_parameter_t type, const char *name, zbx_mock_handle_t *parameter)
+{
+	const yaml_node_t	*source;
+	const yaml_node_pair_t	*pair;
+
+	switch (type)
+	{
+		case ZBX_MOCK_IN:
+			source = in;
+			break;
+		case ZBX_MOCK_OUT:
+			source = out;
+			break;
+		case ZBX_MOCK_DB_DATA:
+			source = db_data;
+			break;
+		case ZBX_MOCK_FILES:
+			source = files;
+			break;
+		default:
+			return ZBX_MOCK_INTERNAL_ERROR;
 	}
 
-	printf("out_params.data_num %d\n", test_case->out_params.data_num);
-	for (n1 = 0; n1 <  test_case->out_params.data_num; n1++)
-	{
-		printf("	out_params.name[%d]: %s\n", n1, test_case->out_params.names[n1]);
-		printf("	out_params.value[%d]: %s\n", n1, test_case->out_params.values[n1]);
-	}
+	if (NULL == source)
+		return ZBX_MOCK_NO_PARAMETER;
 
-	printf("datasource_num %d\n", test_case->datasource_num);
-	for (n1 = 0; n1 < test_case->datasource_num; n1++)
-	{
-		printf("	datasources[%d].source_name: %s\n", n1, test_case->datasources[n1].source_name);
-		printf("	datasources[%d].field_num: %d\n", n1, test_case->datasources[n1].field_num);
+	if (YAML_MAPPING_NODE != source->type)
+		return ZBX_MOCK_INTERNAL_ERROR;
 
-		for (n2 = 0; n2 <  test_case->datasources[n1].field_num; n2++)
+	for (pair = source->data.mapping.pairs.start; pair < source->data.mapping.pairs.top; pair++)
+	{
+		const yaml_node_t	*key;
+
+		key = yaml_document_get_node(&test_case, pair->key);
+
+		if (YAML_SCALAR_NODE != key->type)
+			return ZBX_MOCK_INTERNAL_ERROR;
+
+		if (0 == zbx_yaml_scalar_cmp(name, key))
 		{
-			printf("		datasources.field_name[%d]: %s\n", n2,
-				test_case->datasources[n1].field_names[n2]);
-		}
-
-		for (n2 = 0; n2 < test_case->datasources[n1].row_num; n2++)
-		{
-			for (n3 = 0; n3 < test_case->datasources[n1].rows[n2].value_num; n3++)
-			{
-				printf("		datasources.row[%d].value[%d]: %s\n", n2, n3,
-					test_case->datasources[n1].rows[n2].values[n3]);
-			}
-		}
-	}
-
-	printf("function_num %d\n", test_case->function_num);
-	for (n1 = 0; n1 < test_case->function_num; n1++)
-	{
-		printf("	functions[%d]: %s\n", n1, test_case->functions[n1].name);
-
-		for (n2 = 0; n2 < test_case->functions[n1].data.data_num; n2++)
-		{
-			printf("		functions.name[%d]: %s\n", n2,
-					test_case->functions[n1].data.names[n2]);
-			printf("		functions.value[%d]: %s\n", n2,
-					test_case->functions[n1].data.values[n2]);
-		}
-	}
-}
-
-char	*get_in_param_by_index(int idx)
-{
-	if (idx >= test_case->in_params.data_num)
-	{
-		fail_msg("Cannot find in_param by index=%d", idx);
-		return NULL;
-	}
-
-	return test_case->in_params.values[idx];
-}
-
-char	*get_out_param_by_index(int idx)
-{
-	if (idx >= test_case->out_params.data_num)
-	{
-		fail_msg("Cannot find out_param by index=%d", idx);
-		return NULL;
-	}
-
-	return test_case->out_params.values[idx];
-}
-
-char	*get_in_param_by_name(char *name)
-{
-	int		i;
-
-	for (i = 0; i < test_case->in_params.data_num; i++)
-	{
-		if (0 == strcmp(test_case->in_params.names[i], name))
-			return test_case->in_params.values[i];
-	}
-
-	fail_msg("Cannot find in_param by name='%s'", name);
-
-	return NULL;
-}
-
-char	*get_out_param_by_name(char *name)
-{
-	int		i;
-
-	for (i = 0; i < test_case->out_params.data_num; i++)
-	{
-		if (0 == strcmp(test_case->out_params.names[i], name))
-			return test_case->out_params.values[i];
-	}
-
-	fail_msg("Cannot find out_param by name='%s'", name);
-
-	return NULL;
-}
-
-char	*get_out_func_param_by_index(int idx)
-{
-	int		i;
-
-	for (i = 0; i < test_case->function_num; i++)
-	{
-		if (0 == strcmp(test_case->functions[i].name, curr_wrapped_function))
-		{
-			if (test_case->functions[i].data.data_num > idx)
-				goto out;
-
-			return test_case->functions[i].data.values[idx];
-		}
-	}
-out:
-	fail_msg("Cannot find out_func_param by index=%d", idx);
-
-	return NULL;
-}
-
-char	*get_out_func_param_by_name(char *name)
-{
-	int		i, n;
-
-	for (i = 0; i < test_case->function_num; i++)
-	{
-		if (0 == strcmp(test_case->functions[i].name, curr_wrapped_function))
-		{
-			for (n = 0; n < test_case->functions[i].data.data_num; n++)
-			{
-				if (0 == strcmp(test_case->functions[i].data.names[n], name))
-					return test_case->functions[i].data.values[n];
-			}
+			*parameter = zbx_mock_handle_alloc(yaml_document_get_node(&test_case, pair->value));
+			return ZBX_MOCK_SUCCESS;
 		}
 	}
 
-	fail_msg("Cannot find out_func_param by name='%s'", name);
+	return ZBX_MOCK_NO_PARAMETER;
+}
 
-	return NULL;
+zbx_mock_error_t	zbx_mock_in_parameter(const char *name, zbx_mock_handle_t *parameter)
+{
+	return zbx_mock_parameter(ZBX_MOCK_IN, name, parameter);
+}
+
+zbx_mock_error_t	zbx_mock_out_parameter(const char *name, zbx_mock_handle_t *parameter)
+{
+	return zbx_mock_parameter(ZBX_MOCK_OUT, name, parameter);
+}
+
+zbx_mock_error_t	zbx_mock_db_rows(const char *data_source, zbx_mock_handle_t *rows)
+{
+	return zbx_mock_parameter(ZBX_MOCK_DB_DATA, data_source, rows);
+}
+
+zbx_mock_error_t	zbx_mock_file(const char *path, zbx_mock_handle_t *file)
+{
+	return zbx_mock_parameter(ZBX_MOCK_FILES, path, file);
+}
+
+zbx_mock_error_t	zbx_mock_exit_code(int *status)
+{
+	if (NULL == exit_code)
+		return ZBX_MOCK_NO_EXIT_CODE;
+
+	if (0 == zbx_yaml_scalar_cmp("success", exit_code))
+		*status = EXIT_SUCCESS;
+	else if (0 == zbx_yaml_scalar_cmp("failure", exit_code))
+		*status = EXIT_FAILURE;
+	else
+		return ZBX_MOCK_INTERNAL_ERROR;
+
+	return ZBX_MOCK_SUCCESS;
+}
+
+zbx_mock_error_t	zbx_mock_object_member(zbx_mock_handle_t object, const char *name, zbx_mock_handle_t *member)
+{
+	const zbx_mock_pool_handle_t	*handle;
+	const yaml_node_pair_t		*pair;
+
+	if (0 > object || object >= (zbx_mock_handle_t)handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[object];
+
+	if (YAML_MAPPING_NODE != handle->node->type)
+		return ZBX_MOCK_NOT_AN_OBJECT;
+
+	for (pair = handle->node->data.mapping.pairs.start; pair < handle->node->data.mapping.pairs.top; pair++)
+	{
+		const yaml_node_t	*key;
+
+		key = yaml_document_get_node(&test_case, pair->key);
+
+		if (YAML_SCALAR_NODE != key->type)	/* deep validation that every key of every mapping in test */
+			continue;			/* case document is scalar would be an overkill, just skip */
+
+		if (0 == zbx_yaml_scalar_cmp(name, key))
+		{
+			*member = zbx_mock_handle_alloc(yaml_document_get_node(&test_case, pair->value));
+			return ZBX_MOCK_SUCCESS;
+		}
+	}
+
+	return ZBX_MOCK_NO_SUCH_MEMBER;
+}
+
+zbx_mock_error_t	zbx_mock_vector_element(zbx_mock_handle_t vector, zbx_mock_handle_t *element)
+{
+	zbx_mock_pool_handle_t	*handle;
+
+	if (0 > vector || vector >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[vector];
+
+	if (YAML_SEQUENCE_NODE != handle->node->type)
+		return ZBX_MOCK_NOT_A_VECTOR;
+
+	if (handle->item >= handle->node->data.sequence.items.top)
+		return ZBX_MOCK_END_OF_VECTOR;
+
+	*element = zbx_mock_handle_alloc(yaml_document_get_node(&test_case, *handle->item++));
+	return ZBX_MOCK_SUCCESS;
+}
+
+zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value)
+{
+	const zbx_mock_pool_handle_t	*handle;
+	char				*tmp = NULL;
+
+	if (0 > string || string >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[string];
+
+	if (YAML_SCALAR_NODE != handle->node->type ||
+			NULL != memchr(handle->node->data.scalar.value, '\0', handle->node->data.scalar.length))
+	{
+		return ZBX_MOCK_NOT_A_STRING;
+	}
+
+	tmp = zbx_malloc(tmp, handle->node->data.scalar.length + 1);
+	memcpy(tmp, handle->node->data.scalar.value, handle->node->data.scalar.length);
+	tmp[handle->node->data.scalar.length] = '\0';
+	*value = tmp;
+	return ZBX_MOCK_SUCCESS;
 }

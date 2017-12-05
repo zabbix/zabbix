@@ -11,7 +11,7 @@
       <template>
          <template>Template Module HOST-RESOURCES-MIB SNMPv1</template>
          <name>Template Module HOST-RESOURCES-MIB SNMPv1</name>
-         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.13
+         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.14
 MIBs used:
 HOST-RESOURCES-MIB</description>
          <groups>
@@ -241,8 +241,8 @@ The average, over the last minute, of the percentage of time that this processor
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB
 The size, in bytes, of the data objects allocated from this pool.
-	  		 If this entry is monitoring sectors, blocks, buffers, or packets, for example,
-	  		 this number will commonly be greater than one.  Otherwise this number will typically be one.</description>
+If this entry is monitoring sectors, blocks, buffers, or packets, for example,
+this number will commonly be greater than one.  Otherwise this number will typically be one.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>

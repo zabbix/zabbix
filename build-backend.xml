@@ -36,6 +36,7 @@
 
 	<!-- Cppcheck static analysis target -->
 	<target name="cppcheck-static-analysis">
+		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<exec executable="scan-build" failonerror="on">
 			<arg line="./configure"/>
 			<arg line="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent --with-ldap --with-libcurl"/>

@@ -412,11 +412,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		}
 		$mmenu_entry = (new CListItem(
 			(new CLink($menu['label']))
+				->onClick('javascript: MMenu.mouseOver(\''.$label.'\');')
+				->onKeyup('javascript: MMenu.keyUp(\''.$label.'\', event);')
 				->setAttribute('tabindex', 0)
 		))
 			->addClass($menu_class)
 			->setId($label);
-		$mmenu_entry->onClick('javascript: MMenu.mouseOver(\''.$label.'\');');
+
 		array_push($main_menu, $mmenu_entry);
 	}
 

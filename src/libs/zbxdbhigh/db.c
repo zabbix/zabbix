@@ -173,7 +173,11 @@ void	DBbegin(void)
  ******************************************************************************/
 int	DBcommit(void)
 {
-	DBtxn_operation(zbx_db_commit);
+	if (ZBX_DB_OK > zbx_db_commit())
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
+		DBrollback();
+	}
 
 	return zbx_db_txn_end_error();
 }
@@ -191,7 +195,13 @@ int	DBcommit(void)
  ******************************************************************************/
 void	DBrollback(void)
 {
-	DBtxn_operation(zbx_db_rollback);
+	if (ZBX_DB_OK > zbx_db_rollback())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
+
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+	}
 }
 
 /******************************************************************************
@@ -206,9 +216,9 @@ void	DBrollback(void)
 void	DBend(int ret)
 {
 	if (SUCCEED == ret)
-		DBtxn_operation(zbx_db_commit);
+		DBcommit();
 	else
-		DBtxn_operation(zbx_db_rollback);
+		DBrollback();
 }
 
 #ifdef HAVE_ORACLE
@@ -1461,7 +1471,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		ts.sec = autoreg_host->now;
 
 		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0);
+				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 	}
 
 	if (0 != new)

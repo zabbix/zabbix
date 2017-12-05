@@ -137,7 +137,10 @@ else {
 	]);
 
 	foreach ($db_users as $user_data) {
-		$header[] = (new CColHeader(getUserFullname($user_data)))->addClass('vertical_rotation');
+		$full_name = getUserFullname($user_data);
+		$header[] = (new CColHeader($full_name))
+			->addClass('vertical_rotation')
+			->setTitle($full_name);
 		$users[] = $user_data['userid'];
 	}
 
@@ -199,7 +202,7 @@ else {
 	}
 
 	// time till
-	$maxTime = ($year == $currentYear) ? time() : mktime(0, 0, 0, 1, 1, $year + 1);
+	$maxTime = ($year == $currentYear || $period === 'yearly') ? time() : mktime(0, 0, 0, 1, 1, $year + 1);
 
 	// fetch alerts
 	$alerts = [];

@@ -42,5 +42,6 @@ typedef struct
 } zbx_file_descriptor_t;
 
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_DIR_H */

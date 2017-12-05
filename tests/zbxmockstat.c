@@ -17,39 +17,41 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../../zbxtests.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
-#include "../../../src/zabbix_server/taskmanager/taskmanager.h"
 
-extern char	*curr_wrapped_function;
+#include "common.h"
 
-void	__wrap_DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in,
-		zbx_vector_uint64_t *triggerids_out)
+int	__wrap_stat(const char *pathname, struct stat *buf)
 {
-	zbx_uint64_t	triggerid;
+	zbx_mock_error_t	error;
+	zbx_mock_handle_t	handle;
 
-	ZBX_UNUSED(triggerids_in);
+	if (ZBX_MOCK_SUCCESS == (error = zbx_mock_file(pathname, &handle)))
+	{
+		buf->st_mode = S_IFMT & S_IFREG;
+		return 0;
+	}
 
-	curr_wrapped_function = "DCconfig_lock_triggers_by_triggerids";
+	if (ZBX_MOCK_NO_PARAMETER != error)
+	{
+		fail_msg("Error during path \"%s\" lookup among files: %s", pathname,
+				zbx_mock_error_string(error));
+	}
 
-	ZBX_STR2UINT64(triggerid, get_out_func_param_by_name("triggerids"));
-	zbx_vector_uint64_append(triggerids_out, triggerid);
+	if (0)	/* directory lookup is not implemented */
+	{
+		buf->st_mode = S_IFMT & S_IFDIR;
+		return 0;
+	}
+
+	errno = ENOENT;	/* No such file or directory */
+	return -1;
 }
 
-void	__wrap_DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
+int	__wrap___xstat(int ver, const char *pathname, struct stat *buf)
 {
-}
+	ZBX_UNUSED(ver);
 
-void	zbx_mock_test_entry(void **state)
-{
-	int	ret, taskid, res;
-
-	ZBX_UNUSED(state);
-
-	taskid = atoi(get_in_param_by_name("taskid"));
-	ret = tm_try_task_close_problem(taskid);
-	res = atoi(get_out_param_by_name("return"));
-
-	assert_int_equal(ret, res);
+	return __wrap_stat(pathname, buf);
 }

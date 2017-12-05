@@ -38,12 +38,12 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
+static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
 	const char	*__function_name = "connect_to_proxy";
 
 	int		ret = FAIL;
-	char		*tls_arg1, *tls_arg2;
+	const char	*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d conn:%u", __function_name, proxy->addr,
 			proxy->port, timeout, (unsigned int)proxy->tls_connect);
@@ -63,11 +63,19 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 			tls_arg1 = proxy->tls_psk_identity;
 			tls_arg2 = proxy->tls_psk;
 			break;
+#else
+		case ZBX_TCP_SEC_TLS_CERT:
+		case ZBX_TCP_SEC_TLS_PSK:
+			zabbix_log(LOG_LEVEL_ERR, "TLS connection is configured to be used with passive proxy \"%s\""
+					" but support for TLS was not compiled into %s.", proxy->host,
+					get_program_type_string(program_type));
+			goto out;
 #endif
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto out;
 	}
+
 	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout,
 			proxy->tls_connect, tls_arg1, tls_arg2)))
 	{
@@ -80,7 +88,7 @@ out:
 	return ret;
 }
 
-static int	send_data_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, const char *data)
+static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data)
 {
 	const char	*__function_name = "send_data_to_proxy";
 
@@ -100,7 +108,7 @@ static int	send_data_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, const char *d
 	return ret;
 }
 
-static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_socket_t *sock)
+static int	recv_data_from_proxy(const DC_PROXY *proxy, zbx_socket_t *sock)
 {
 	const char	*__function_name = "recv_data_from_proxy";
 	int		ret;
@@ -150,7 +158,7 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts, int tasks)
+static int	get_data_from_proxy(const DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts, int tasks)
 {
 	const char	*__function_name = "get_data_from_proxy";
 
@@ -768,13 +776,13 @@ out:
  ******************************************************************************/
 static int	process_proxy(void)
 {
-	const char		*__function_name = "process_proxy";
+	const char	*__function_name = "process_proxy";
 
-	DC_PROXY		proxy;
-	int			num, i, more;
-	char			*port = NULL;
-	time_t			now, last_access;
-	unsigned char		update_nextcheck;
+	DC_PROXY	proxy;
+	int		num, i, more;
+	char		*port = NULL;
+	time_t		now, last_access;
+	unsigned char	update_nextcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

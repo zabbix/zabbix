@@ -323,10 +323,7 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_dc_get_active_proxy_by_name(host, proxy, error))
-		return FAIL;
-
-	return SUCCEED;
+	return zbx_dc_get_active_proxy_by_name(host, proxy, error);
 }
 
 /******************************************************************************

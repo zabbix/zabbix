@@ -1,0 +1,114 @@
+# NOTE: underlying mocks for filesystem allow only files in "Include=...", no directories, no patterns
+---
+test case: valid configuration file
+in:
+  configuration file: foo.conf
+  validation: strict
+  parameters:
+    - name: StartDBSyncers
+      type: numeric
+      mandatory: no
+      min: 1
+      max: 100
+      expect: 4
+    - name: DBPassword
+      type: string
+      mandatory: yes
+      expect: 'r3ally_$tr0ng_pa$$w0rd'
+    - name: Server
+      type: string list
+      mandatory: yes
+      expect: [1.2.3.4, 5.6.7.8, localhost]
+    - name: LoadModule
+      type: multi string
+      mandatory: no
+      expect: [dummy.so, smarty.so]
+files:
+  foo.conf: |
+    # whitespace should not matter
+    Server = 1.2.3.4    ,  5.6.7.8    ,     localhost
+    LoadModule=dummy.so
+    StartDBSyncers=4
+    Include= db.conf # DB credentials
+    LoadModule=smarty.so
+    #LoadModule=beauty.so
+  db.conf: |
+    DBPassword=r3ally_$tr0ng_pa$$w0rd
+---
+test case: recursive self inclusion
+in:
+  configuration file: file.conf
+  validation: strict
+  parameters: []
+exit code: failure
+files:
+  file.conf: |
+    Include=file.conf
+---
+test case: recursive inclusion loop
+in:
+  configuration file: foo.conf
+  validation: strict
+  parameters: []
+exit code: failure
+files:
+  foo.conf: |
+    Include=bar.conf
+  bar.conf: |
+    Include=foo.conf
+---
+test case: maximum allowed inclusion levels
+in:
+  configuration file: 1.conf
+  validation: strict
+  parameters: []
+files:
+  1.conf: |
+    Include=2.conf
+  2.conf: |
+    Include=3.conf
+  3.conf: |
+    Include=4.conf
+  4.conf: |
+    Include=5.conf
+  5.conf: |
+    Include=6.conf
+  6.conf: |
+    Include=7.conf
+  7.conf: |
+    Include=8.conf
+  8.conf: |
+    Include=9.conf
+  9.conf: |
+    Include=10.conf
+  10.conf: |
+---
+test case: too many inclusion levels
+in:
+  configuration file: 1.conf
+  validation: strict
+  parameters: []
+exit code: failure
+files:
+  1.conf: |
+    Include=2.conf
+  2.conf: |
+    Include=3.conf
+  3.conf: |
+    Include=4.conf
+  4.conf: |
+    Include=5.conf
+  5.conf: |
+    Include=6.conf
+  6.conf: |
+    Include=7.conf
+  7.conf: |
+    Include=8.conf
+  8.conf: |
+    Include=9.conf
+  9.conf: |
+    Include=10.conf
+  10.conf: |
+    Include=11.conf
+  11.conf: |
+...
