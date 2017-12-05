@@ -602,8 +602,8 @@ function overlayDialogue(params) {
 
 	var center_overlay_dialog = function() {
 			overlay_dialogue.css({
-				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).width()) / 2) + 'px',
-				'top': Math.round((jQuery(window).height() - jQuery(overlay_dialogue).height()) / 2) + 'px'
+				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).outerWidth()) / 2) + 'px',
+				'top': Math.round((jQuery(window).height() - jQuery(overlay_dialogue).outerHeight()) / 2) + 'px'
 			});
 		},
 		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
