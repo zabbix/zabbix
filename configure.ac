@@ -1586,9 +1586,9 @@ dnl *****************************************************************
 AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/Makefile
 	tests/libs/Makefile
+	tests/libs/zbxconf/Makefile
 	tests/libs/zbxdbhigh/Makefile
-	tests/zabbix_server/Makefile
-	tests/zabbix_server/taskmanager/Makefile
+	tests/libs/zbxsysinfo/Makefile
 )])
 
 AC_OUTPUT([

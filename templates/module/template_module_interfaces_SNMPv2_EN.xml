@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Interfaces SNMPv2</template>
          <name>Template Module Interfaces SNMPv2</name>
-         <description>Template Interfaces version: 0.13
+         <description>Template Interfaces version: 0.14
 MIBs used:
 IF-MIB</description>
          <groups>
@@ -457,7 +457,7 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                      <privatekey/>
                      <port/>
                      <description>MIB: IF-MIB
-The type of interface.  
+The type of interface.
 Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
 through updating the syntax of the IANAifType textual convention.</description>
                      <inventory_link>0</inventory_link>

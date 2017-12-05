@@ -14,7 +14,7 @@
       <template>
          <template>Template Module Brocade_Foundry Performance SNMPv2</template>
          <name>Template Module Brocade_Foundry Performance SNMPv2</name>
-         <description>Template Module Brocade_Foundry Performance version: 0.13
+         <description>Template Module Brocade_Foundry Performance version: 0.14
 MIBs used:
 FOUNDRY-SN-AGENT-MIB</description>
          <groups>
@@ -127,7 +127,7 @@ For NI platforms, refer to snAgentBrdMemoryUtil100thPercent</description>
       <template>
          <template>Template Net Brocade_Foundry Nonstackable SNMPv2</template>
          <name>Template Net Brocade_Foundry Nonstackable SNMPv2</name>
-         <description>Template Net Brocade_Foundry Nonstackable version: 0.13
+         <description>Template Net Brocade_Foundry Nonstackable version: 0.14
 Overview: For devices(old Foundry devices, MLXe and so on) that doesn't support Stackable SNMP Tables: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table -
 FOUNDRY-SN-AGENT-MIB::snChasFanTable, snChasPwrSupplyTable,snAgentTempTable are used instead.
 For example:
@@ -284,7 +284,7 @@ The version of the running software in the form'major.minor.maintenance[letters]
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -321,7 +321,7 @@ The version of the running software in the form'major.minor.maintenance[letters]
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>PSU {#PSU_INDEX}: Power supply is in critical state</name>
@@ -335,6 +335,29 @@ Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>PSU {#PSU_INDEX}: Power supply is not in normal state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>PSU {#PSU_INDEX}: Power supply is in critical state</name>
+                           <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -384,7 +407,7 @@ Please check the power supply unit for errors</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -421,7 +444,7 @@ Please check the power supply unit for errors</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Fan {#FAN_INDEX}: Fan is in critical state</name>
@@ -435,6 +458,29 @@ Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Fan {#FAN_INDEX}: Fan is not in normal state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Fan {#FAN_INDEX}: Fan is in critical state</name>
+                           <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -486,7 +532,7 @@ Please check the fan unit</description>
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -586,43 +632,6 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <jmx_endpoint/>
             </discovery_rule>
             <discovery_rule>
-               <name>Chassis Discovery</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.1991.1.1.1.4.1.1.1]</snmp_oid>
-               <key>chassis.discovery</key>
-               <delay>3600</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
-               <lifetime>30d</lifetime>
-               <description>snChasUnitIndex: The index to chassis table.</description>
-               <item_prototypes/>
-               <trigger_prototypes/>
-               <graph_prototypes/>
-               <host_prototypes/>
-               <jmx_endpoint/>
-            </discovery_rule>
-            <discovery_rule>
                <name>Temperature Discovery Chassis</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -666,7 +675,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -831,7 +840,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
       <template>
          <template>Template Net Brocade_Foundry Stackable SNMPv2</template>
          <name>Template Net Brocade_Foundry Stackable SNMPv2</name>
-         <description>Template Brocade_Foundry Stackable version: 0.13
+         <description>Template Brocade_Foundry Stackable version: 0.14
 Overview: For devices(most of the IronWare Brocade devices) that support Stackable SNMP Tables in FOUNDRY-SN-AGENT-MIB: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table - so objects from all Stack members are provided.
 
 MIBs used:
@@ -947,7 +956,7 @@ The version of the running software in the form 'major.minor.maintenance[letters
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -984,7 +993,7 @@ The version of the running software in the form 'major.minor.maintenance[letters
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state</name>
@@ -998,6 +1007,29 @@ Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is not in normal state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state</name>
+                           <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -1047,7 +1079,7 @@ Please check the power supply unit for errors</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -1084,7 +1116,7 @@ Please check the power supply unit for errors</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state</name>
@@ -1098,6 +1130,29 @@ Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is not in normal state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state</name>
+                           <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -1149,7 +1204,7 @@ Please check the fan unit</description>
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>

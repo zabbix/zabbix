@@ -4767,6 +4767,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			],
 		],
 	],
 	'trends' => [
@@ -6323,6 +6329,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
 			],
 		],
 	],

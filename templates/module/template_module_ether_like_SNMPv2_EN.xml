@@ -11,7 +11,7 @@
       <template>
          <template>Template Module EtherLike-MIB SNMPv2</template>
          <name>Template Module EtherLike-MIB SNMPv2</name>
-         <description>Template EtherLike-MIB (duplex control only) version: 0.13
+         <description>Template EtherLike-MIB (duplex control only) version: 0.14
 MIBs used:
 EtherLike-MIB</description>
          <groups>

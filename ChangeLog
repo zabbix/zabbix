@@ -1,6 +1,13 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F.....S. [ZBXNEXT-4108] implemented search of problems by trigger name (abs, miks)
+..F....... [ZBXNEXT-4143] implemented keybord interaction in top navigation (miks)
+...G...... [ZBXNEXT-1567] added item "vfs.dir.count" for counting directory entries (valdis)
+..F....... [ZBXNEXT-4135] added tooltips for vertical labels (Oleg)
+..F....... [ZBXNEXT-4146] added icons for error and success messages (Andzs)
+..F....... [ZBXNEXT-4156] added option to view graphs items data and multiple items graph data as table (gcalenko, Ivo)
+..F....... [ZBXNEXT-4160] reworked monitoring Discovery screen to show hint info right in the table cell (miks)
 ....I..... [ZBXNEXT-761] added rules to make dbschema.c, schema.sql and data.sql from schema.tmpl, data.tmpl and templates.tmpl if there is a need to (gleb)
 ..F.I..... [ZBXNEXT-4186] added ability to adjust colors for new graph items in graph creation form according selected theme (gcalenko, Sasha)
 ..F....... [ZBXNEXT-4145] fixed appearance of host column based on number of hosts specified in filter (miks)
@@ -13,6 +20,9 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+.......PS. [ZBX-12251] fixed possibility of trigger status getting stuck in PROBLEM or OK state due to transaction error in history synchronization, added deadlock to a list of recoverable errors (vso, wiper)
+..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
+....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
 ...G...PS. [ZBX-12983] fixed compilation warnings under Windows (valdis)
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
@@ -23,9 +33,38 @@ Bug fixes:
 Changes for 3.4.5rc1
 
 New features:
+..F.....S. [ZBXNEXT-4002] implemented support for elasticsearch as history storage (abs, vjaceslavs, wiper)
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+.........T [ZBXNEXT-4223] performed network templates cleanup (vitaly)
+........S. [ZBX-12974] fixed TLS connection to passive proxy error handling (gleb, valdis)
+..F....... [ZBX-12714] fixed overflow property of svg (vjaceslavs)
+.......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
+..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
+........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
+.......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
+...G...... [ZBX-8054] relieved windows agent of dependency on MFC (valdis)
+..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
+....I..... [ZBX-12798] added --with-libpcre-lib configure option (valdis)
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
+..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
+..F....... [ZBX-12948] fixed percentile visibility in dashboard graph widgets (gcalenko)
+A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
+........S. [ZBX-13061] fixed memory leak in preprocessing manager (wiper)
+....I..... [ZBX-12232] fixed mysql m4 configuration script for mariadb C connector (abs)
+..F....... [ZBX-12663] fixed retaining the scrollbar position on page reload (Ivo)
+..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
+..F....... [ZBX-13016] fixed warning message shown by deprecated PHP 7.2 function create_function() (Sasha)
+..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
+........S. [ZBX-13027] fixed floating range validation during conversion from uint64 to float (wiper)
+........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
+........S. [ZBX-11426] fixed potentially incorrect delete procedure for problems and events (abs)
+........S. [ZBX-8049] fixed zabbix[java,,ping] to stay supported when java gateway is down (valdis)
+....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
+........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
+.......P.. [ZBX-12971] fixed Zabbix proxy not to send same host availability more than once (vso)
+........S. [ZBX-12800] fixed incorrect trigger dependency calculation when processing dependent triggers in the same history syncer batch (wiper)
 A......... [ZBX-10754] fixed inheritance of template properties in web scenarios (miks)
 ..F....... [ZBX-12926] fixed translation string on administration general housekeeping page (gcalenko)
 ..F....... [ZBX-12738] added missing key "vfs.dir.size" for active agent in item edit form (gcalenko)
@@ -33,6 +72,7 @@ A......... [ZBX-10754] fixed inheritance of template properties in web scenarios
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
 ........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
 ..F....... [ZBX-11051] fixed displaying highest severity when dashboard filter options contain unacknowledged only (Ivo)
+...G...... [ZBX-10710] fixed CPU guest time utilization accounting in Linux (valdis)
 ........S. [ZBX-12978] improved performance of preprocessor manager, alert manager/worker, IPMI manager/poller by reducing frequency of log rotation checks that handle stdout/stderr (vso)
 ........S. [ZBX-12936] improved SQL performance by updating proxy last access in bulks (vso)
 .....J.... [ZBX-12705] added check for collisions and unsupported characters in macro names in jmx.discovery (vjaceslavs)
@@ -54,7 +94,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
-..F....... [DEV-593] fixed multiple security issues (miks)
+..F....... [ZBX-13133] fixed multiple security issues (miks)
 ........S. [ZBX-12874] fixed target list to be meaningless if custom set of commands is executed on zabbix server (vso)
 ........S. [ZBX-12936] fixed update proxy lastaccess value when receiving data (valdis)
 .......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
@@ -141,8 +181,8 @@ Changes for 3.4.2rc1
 
 New features:
 A.F....... [ZBXNEXT-4091] improved permission schema of the dashboards for normal administrators (Sasha)
-.........T [ZBXNEXT-4099] removed starting point from all OIDs; shortened old IOS Cisco templates names (vso, vzhuravlev)
-.........T [ZBXNEXT-4067] added preprocessing_queue item/graph/screen widget in Template App Zabbix Server (vso, vzhuravlev)
+.........T [ZBXNEXT-4099] removed starting point from all OIDs; shortened old IOS Cisco templates names (vso, vitaly)
+.........T [ZBXNEXT-4067] added preprocessing_queue item/graph/screen widget in Template App Zabbix Server (vso, vitaly)
 A.F....... [ZBXNEXT-4084] renamed action acknowledgment operation 'Notify all who left acknowledgement and comments' to 'Notify all involved' (gcalenko)
 ........S. [ZBXNEXT-4084] added users who received notifications regarding the problem to 'Notify all involved' acknowledgment operation recipient list (wiper)
 A.F....... [ZBX-1357] enabled Turkish translation to be displayed by default (zalex_ua)
@@ -155,7 +195,7 @@ Bug fixes:
 ...G...PS. [ZBX-12718] fixed crash when using item of log value type as master item for dependent items (wiper)
 .......P.. [ZBX-12720] fixed processing of log keys with non log value types for items monitored by proxies (wiper)
 ..F....... [ZBX-12530] fixed non well formed numeric value encaunteration in slideshow; implemented getBBox workaround for Firefox (miks)
-.........T [ZBX-12688] fixed false positives on 'High bandwidth usage' trigger in Template_Module_Interfaces_* templates (vso, vzhuravlev)
+.........T [ZBX-12688] fixed false positives on 'High bandwidth usage' trigger in Template_Module_Interfaces_* templates (vso, vitaly)
 .......PS. [ZBX-11675] fixed crash that could occur during connection failures to MySQL (Sergejs, vso)
 ..F....... [ZBX-12617] fixed sorting by host name for items on availability report page (gcalenko)
 A......... [ZBX-12699] added support of strings in "sortfield" and "sortorder" parameters, and added sorting by "name" for dashboard.get() (Sasha)
@@ -231,7 +271,7 @@ Bug fixes:
 ..F....... [ZBXNEXT-3987] fixed wrong response and error message when invalid or unavailable dashboardid has been requested (miks)
 ..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andžs, Ivo)
 A.F....... [ZBX-12430] fixed error when linking one template to another in template edit form (gcalenko)
-.........T [ZBXNEXT-3920] fixed extra new lines in Templates (vso, vzhuravlev)
+.........T [ZBXNEXT-3920] fixed extra new lines in Templates (vso, vitaly)
 ..F....... [ZBX-12588] fixed clock and map widget scaling on Safari (Ivo)
 .......PS. [ZBX-12574] fixed crash when linking templates with web scenarios during auto registration (vso)
 ..F....... [ZBX-12433] fixed XML import of web scenarios (vjaceslavs)
@@ -259,7 +299,7 @@ Changes for 3.4.0rc1
 
 New features:
 A......... [ZBXNEXT-2102] improved performance of event.get() and problem.get() methods with "selectTags" option (Sasha)
-....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vzhuravlev, vso)
+....I....T [ZBXNEXT-3920] added Templates for some of the most common applications and devices (vso, vitaly)
 ..F....... [ZBXNEXT-2102] implemented dashboard widget linking in both directions (miks)
 ..F....... [ZBXNEXT-2102] implemented option 'Show unavailable maps' in navigation tree widget (miks)
 
@@ -293,7 +333,7 @@ New features:
 ..F....... [ZBXNEXT-2102] implemented validation for empty fields in widget configuration forms (Sasha)
 ..F....... [ZBXNEXT-2102] added placeholder on empty dashboard (vmurzins)
 A.FG...PS. [ZBXNEXT-3006] implemented support of bulk metric collection for dependent items data population (gcalenko, vjaceslavs, wiper)
-....I..... [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta) (vzhuravlev)
+....I....T [ZBXNEXT-3725] updated templates for network devices to new version (internal version 0.10beta) (vitaly)
 
 Bug fixes:
 ....I..... [ZBXNEXT-3006] fixed libevent build depenedencies (wiper)
@@ -339,7 +379,7 @@ Changes for 3.4.0alpha1
 New features:
 A.F.I..... [ZBXNEXT-2102] added support of multiple dashboards; implemented API for dashboards (pavels, maximt, miks, Sasha, vmurzins)
 ..F..J.... [ZBXNEXT-1223] implemented jmx discovery item (vjaceslavs)
-A.F.....S. [ZBXNEXT-2442] implemented parallel alert processing (gcalenko, wiper)
+A.F.....S. [ZBXNEXT-2442] implemented parallel alert processing, removed database watchdog process, moved its tasks to alerter process (gcalenko, wiper)
 A.F.....S. [ZBXNEXT-3863] added jsonpath based item pre-processing option (Ivo, wiper)
 A.F.....S. [ZBXNEXT-3864] added xmlpath based item pre-processing option (Ivo, wiper)
 ...G...... [ZBXNEXT-3930] improved log monitoring by adjusting formula to process 10 times more new lines than set in MaxLinesPerSecond (vso)
@@ -390,7 +430,7 @@ A.F....... [ZBXNEXT-3570] removed the deprecated "isReadable" and "isWritable" m
 ..F....... [ZBX-10777] made checkboxes and radio buttons look the same across all browsers (asaveljevs, Pavel)
 A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 bytes; thanks to Patrick Hemmer for patch (Cemeris, Gunars, Oleg, Sasha, viktors)
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
-....I..... [ZBXNEXT-3725] added templates for network devices (internal version 0.8beta) (vzhuravlev)
+....I....T [ZBXNEXT-3725] added templates for network devices (internal version 0.8beta) (vitaly)
 
 Bug fixes:
 ........S. [ZBX-12296] added type hinting for item preprocessor numeric conversions based on item value type (wiper)
@@ -416,6 +456,17 @@ Changes for 3.2.11rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
+.......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
+..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
+..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
+A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
+..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
+..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
+........S. [ZBX-12975] fixed possibility of foreign key constraint failure due to events being removed before trigger data storage period expires (vso)
+........S. [ZBX-11426] fixed potentially incorrect delete procedure for problems and events (abs)
+........S. [ZBX-12800] fixed incorrect trigger dependency calculation when processing dependent triggers in the same history syncer batch (wiper)
 .......P.. [ZBX-12117] fixed proxy passing zeros to history export modules instead of actual numeric values (gleb)
 ..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
@@ -434,7 +485,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
-..F....... [DEV-593] fixed multiple security issues (miks)
+..F....... [ZBX-13133] fixed multiple security issues (miks)
 ........S. [ZBX-11658] fixed error message in case no items were found for aggregated check (gleb)
 .......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
 ...G...... [ZBX-11902] fixed CPU count for LPAR partitions in IBM AIX (abs)
@@ -971,6 +1022,22 @@ Changes for 3.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13042] fixed unclickable template link on host items list page (gcalenko)
+.......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
+..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
+..F....... [ZBX-12884] fixed misleading permissions visualization in user form for host groups and hosts lists (gcalenko)
+........S. [ZBX-12887] fixed alert error message visibility to unrelated users (valdis)
+.......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
+...G...... [ZBX-8054] relieved windows agent of dependency on MFC (valdis)
+..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
+..F....... [ZBX-12897] fixed error causing empty list in popup window when opened from page having host group filter (gcalenko)
+....I..... [ZBX-12232] fixed mysql m4 configuration script for mariadb C connector (abs)
+..F....... [ZBX-12247] fixed multiselect not showing results for read-only objects in screen configuration (Ivo)
+..F....... [ZBX-13016] fixed warning message shown by deprecated PHP 7.2 function create_function() (Sasha)
+..F....... [ZBX-12130] fixed max length validation in textarea fields (Ivo)
+........S. [ZBX-8049] fixed zabbix[java,,ping] to stay supported when java gateway is down (valdis)
+........S. [ZBX-12971] fixed possibility of host availability being stuck in unknown state when monitoring though proxy (vso)
 A.F....... [ZBX-12655] added filter on event details page to show messages sent to users only from same groups (gcalenko)
 ..F....... [ZBX-12856] fixed wrong default value for host filter when adding dependent trigger in trigger edit form (gcalenko)
 ........S. [ZBX-9567] added missing fields to webscenario data handling (valdis)
@@ -990,7 +1057,7 @@ New features:
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
 Bug fixes:
-..F....... [DEV-593] fixed multiple security issues (miks)
+..F....... [ZBX-13133] fixed multiple security issues (miks)
 .......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
 ...G...... [ZBX-11902] fixed CPU count for LPAR partitions in IBM AIX (abs)
 ...G...... [ZBX-12260] fixed windows agent to support UTF-16LE, UCS-2, UCS-2LE encodings (vso)
@@ -2778,7 +2845,9 @@ Changes for 2.2.21rc1
 New features:
 
 Bug fixes:
-..F....... [DEV-593] fixed multiple security issues (miks)
+..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
+..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
+..F....... [ZBX-13133] fixed multiple security issues (miks)
 .......PS. [ZBX-12854] fixed crash of VMware collector with DebugLevel=4 (gleb)
 
 --------------------------------------------------------------------------------

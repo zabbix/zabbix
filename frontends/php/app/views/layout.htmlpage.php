@@ -54,7 +54,7 @@ function local_generateHeader($data) {
 	}
 
 	if ((array_key_exists('https', $_SERVER) && ($_SERVER['https'] == 1 || $_SERVER['https'] === 'on'))
-			|| $_SERVER['SERVER_PORT'] == 443) {
+			|| (array_key_exists('SERVER_PORT', $_SERVER) && $_SERVER['SERVER_PORT'] == 443)) {
 		header('strict-transport-security: max-age=31557600');
 	}
 
