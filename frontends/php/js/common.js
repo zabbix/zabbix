@@ -388,19 +388,23 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 		'buttons': [],
 		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
 	};
-	var url = new Curl('zabbix.php');
+	var url = new Curl('zabbix.php'),
+		xhr = new window.XMLHttpRequest();
 
 	url.setArgument('action', action);
 	jQuery.each(options, function(key, value) {
 		url.setArgument(key, value);
 	});
 
-	jQuery.ajax({
+	xhr = jQuery.ajax({
 		url: url.getUrl(),
 		type: 'get',
 		dataType: 'json',
 		beforeSend: function() {
-			overlayDialogue(ovelay_properties, trigger_elmnt);
+			overlayDialogue(ovelay_properties, trigger_elmnt, xhr);
+		},
+		xhr: function() {
+			return xhr;
 		},
 		success: function(resp) {
 			var buttons = resp.buttons !== null ? resp.buttons : [];
@@ -433,8 +437,10 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
  * @param {string} dialogueid	Unique overlay element identifier.
  * @param {object} element		UI element which must be focused when overlay UI element will be closed.
  * @param {object} type			Type of overlay UI element.
+ * @param {object} xhr			(optional) XHR request used to load content. Used to abort loading. Currently used with
+ *								type 'popup' only.
  */
-function addToOverlaysStack(id, element, type) {
+function addToOverlaysStack(id, element, type, xhr) {
 	var index = null,
 		id = id.toString();
 
@@ -450,7 +456,8 @@ function addToOverlaysStack(id, element, type) {
 		overlays_stack.push({
 			dialogueid: id,
 			element: element,
-			type: type
+			type: type,
+			xhr: xhr
 		});
 	}
 	else {
@@ -475,7 +482,7 @@ function closeDialogHandler(event) {
 			switch (dialog.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(dialog.dialogueid);
+					overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
 					break;
 
 				// Close overlay hintbox.

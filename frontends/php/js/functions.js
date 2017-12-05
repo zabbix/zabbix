@@ -519,9 +519,14 @@ function stripslashes(str) {
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid	Dialogue identifier to identify dialogue.
+ * @param {object} xhr			(optional) XHR request that must be aborted.
  */
-function overlayDialogueDestroy(dialogueid) {
+function overlayDialogueDestroy(dialogueid, xhr) {
 	if (typeof dialogueid !== 'undefined') {
+		if (typeof xhr !== 'undefined') {
+			xhr.abort();
+		}
+
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
 		jQuery('body').css({'overflow': ''});
 		jQuery('body[style=""]').removeAttr('style');
@@ -564,10 +569,11 @@ function getOverlayDialogueId() {
  *												or create a new one if value is not set.
  * @param string   params.script_inline         (optional) Custom javascript code to execute when initializing dialog.
  * @param {object} trigger_elmnt				(optional) UI element which triggered opening of overlay dialogue.
+ * @param {object} xhr							(optional) XHR request used to load content. Used to abort loading.
  *
  * @return {bool}
  */
-function overlayDialogue(params, trigger_elmnt) {
+function overlayDialogue(params, trigger_elmnt, xhr) {
 	var button_focused = null,
 		cancel_action = null,
 		overlay_dialogue = null,
@@ -692,7 +698,7 @@ function overlayDialogue(params, trigger_elmnt) {
 			}
 
 			setTimeout(function() {
-				overlayDialogueDestroy(params.dialogueid);
+				overlayDialogueDestroy(params.dialogueid, xhr);
 			});
 
 			return false;
@@ -700,7 +706,7 @@ function overlayDialogue(params, trigger_elmnt) {
 	}
 
 	if (typeof trigger_elmnt !== 'undefined') {
-		addToOverlaysStack(params.dialogueid, trigger_elmnt, 'popup');
+		addToOverlaysStack(params.dialogueid, trigger_elmnt, 'popup', xhr);
 	}
 
 	if (typeof params.class !== 'undefined') {
