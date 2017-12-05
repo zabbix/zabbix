@@ -27,6 +27,8 @@
 
 #ifndef HAVE_SQLITE3
 
+extern unsigned char program_type;
+
 static int	DBpatch_3050000(void)
 {
 	const ZBX_FIELD	field = {"proxy_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -252,6 +254,47 @@ static int	DBpatch_3050012(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050013(void)
+{
+	int		i;
+	const char	*columns = "graphthemeid,theme,backgroundcolor,graphcolor,gridcolor,maingridcolor,gridbordercolor,"
+			"textcolor,highlightcolor,leftpercentilecolor,rightpercentilecolor,nonworktimecolor,colorpalette";
+	const char	*values[] = {
+		"3,'hc-light','FFFFFF','FFFFFF','555555','000000','333333','000000','333333','000000','000000','F3F3F3',"
+			"'1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,89ABF8,7EC25C,"
+			"274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4'",
+		"4,'hc-dark','000000','000000','666666','888888','4F4F4F','FFFFFF','FFFFFF','FFFFFF','FFFFFF','121212',"
+			"'199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,AC41A5,89ABF8,7EC25C,"
+			"3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4'",
+		NULL
+	};
+
+	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	{
+		for (i = 0; NULL != values[i]; i++)
+		{
+			if (ZBX_DB_OK > DBexecute("insert into graph_theme (%s) values (%s)", columns, values[i]))
+				return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050014(void)
+{
+	int		res;
+	const char	*colorpalette = "199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,"
+			"AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4";
+
+	res = DBexecute("update graph_theme set colorpalette='%s' where theme='dark-theme'", colorpalette);
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -271,5 +314,7 @@ DBPATCH_ADD(3050009, 0, 1)
 DBPATCH_ADD(3050010, 0, 1)
 DBPATCH_ADD(3050011, 0, 1)
 DBPATCH_ADD(3050012, 0, 1)
+DBPATCH_ADD(3050013, 0, 1)
+DBPATCH_ADD(3050014, 0, 1)
 
 DBPATCH_END()
