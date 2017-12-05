@@ -45,10 +45,11 @@
  *                                                                            *
  * Purpose: separates given string to two parts by given delimiter in string  *
  *                                                                            *
- * Parameters: str - the string to split                                      *
- *             del - pointer to a character in the string                     *
- *             part1 - pointer to buffer for the first part with delimiter    *
- *             part2 - pointer to buffer for the second part                  *
+ * Parameters:                                                                *
+ *     str -   [IN] a not-empty string to split                               *
+ *     del -   [IN] pointer to a character in the string                      *
+ *     part1 - [OUT] pointer to buffer for the first part with delimiter      *
+ *     part2 - [OUT] pointer to buffer for the second part                    *
  *                                                                            *
  * Return value: SUCCEED - on splitting without errors                        *
  *               FAIL - on splitting with errors                              *
@@ -61,13 +62,8 @@
 static int	split_string(const char *str, const char *del, char **part1, char **part2)
 {
 	const char	*__function_name = "split_string";
-	size_t		str_length = 0, part1_length = 0, part2_length = 0;
+	size_t		str_length, part1_length, part2_length;
 	int		ret = FAIL;
-
-	assert(NULL != str && '\0' != *str);
-	assert(NULL != del && '\0' != *del);
-	assert(NULL != part1 && NULL == *part1);	/* target 1 must be empty */
-	assert(NULL != part2 && NULL == *part2);	/* target 2 must be empty */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s' del:'%s'", __function_name, str, del);
 
@@ -102,26 +98,28 @@ out:
  *                                                                            *
  * Function: split_filename                                                   *
  *                                                                            *
- * Purpose: separates filename to directory and to file name pattern (regexp) *
+ * Purpose: separates full-path file name into directory and file name regexp *
+ *          parts                                                             *
  *                                                                            *
- * Parameters: filename  - [IN] first parameter of logrt[] or logrt.count[]   *
- *                         item                                               *
- *             directory - [IN/OUT] directory part of the 'filename'          *
- *             format    - [IN/OUT] file name pattern part                    *
- *             err_msg   - [IN/OUT] error message why an item became          *
- *                         NOTSUPPORTED                                       *
+ * Parameters:                                                                *
+ *     filename        - [IN] first parameter of logrt[] or logrt.count[]     *
+ *                       item                                                 *
+ *     directory       - [IN/OUT] directory part of the 'filename'            *
+ *     filename_regexp - [IN/OUT] file name regular expression part           *
+ *     err_msg         - [IN/OUT] error message why an item became            *
+ *                       NOTSUPPORTED                                         *
  *                                                                            *
  * Return value: SUCCEED - on successful splitting                            *
  *               FAIL - on unable to split sensibly                           *
  *                                                                            *
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
- * Comments: Allocates memory for "directory" and "format" only on success.   *
- *           On fail, memory, allocated for "directory" and "format",         *
- *           is freed.                                                        *
+ * Comments: Allocates memory for "directory" and "filename_regexp" only on   *
+ *           SUCCEED. On FAIL memory, allocated for "directory" and           *
+ *           "filename_regexp" is freed.                                      *
  *                                                                            *
  ******************************************************************************/
-static int	split_filename(const char *filename, char **directory, char **format, char **err_msg)
+static int	split_filename(const char *filename, char **directory, char **filename_regexp, char **err_msg)
 {
 	const char	*__function_name = "split_filename";
 	const char	*separator = NULL;
@@ -139,7 +137,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 	}
 
 #ifdef _WINDOWS
-	/* special processing for Windows, since PATH part cannot be simply divided from REGEXP part (file format) */
+	/* special processing for Windows, since directory name cannot be simply separated from file name regexp */
 	for (sz = strlen(filename) - 1, separator = &filename[sz]; separator >= filename; separator--)
 	{
 		if (PATH_SEPARATOR != *separator)
@@ -149,7 +147,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() %*s", __function_name, separator - filename + 1, "^");
 
 		/* separator must be relative delimiter of the original filename */
-		if (FAIL == split_string(filename, separator, directory, format))
+		if (FAIL == split_string(filename, separator, directory, filename_regexp))
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot split path by \"%c\".", PATH_SEPARATOR);
 			goto out;
@@ -162,7 +160,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 		{
 			*err_msg = zbx_strdup(*err_msg, "Directory path is too long.");
 			zbx_free(*directory);
-			zbx_free(*format);
+			zbx_free(*filename_regexp);
 			goto out;
 		}
 
@@ -184,7 +182,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot find directory '%s'", *directory);
 		zbx_free(*directory);
-		zbx_free(*format);
+		zbx_free(*filename_regexp);
 	}
 
 	if (separator < filename)
@@ -199,7 +197,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 		goto out;
 	}
 
-	if (SUCCEED != split_string(filename, separator, directory, format))
+	if (SUCCEED != split_string(filename, separator, directory, filename_regexp))
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot split path by \"%c\".", PATH_SEPARATOR);
 		goto out;
@@ -209,7 +207,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain directory information: %s", zbx_strerror(errno));
 		zbx_free(*directory);
-		zbx_free(*format);
+		zbx_free(*filename_regexp);
 		goto out;
 	}
 
@@ -217,15 +215,15 @@ static int	split_filename(const char *filename, char **directory, char **format,
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Base path \"%s\" is not a directory.", *directory);
 		zbx_free(*directory);
-		zbx_free(*format);
+		zbx_free(*filename_regexp);
 		goto out;
 	}
 #endif	/* _WINDOWS */
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s directory:'%s' format:'%s'", __function_name, zbx_result_string(ret),
-			*directory, *format);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s directory:'%s' filename_regexp:'%s'", __function_name,
+			zbx_result_string(ret), *directory, *filename_regexp);
 
 	return ret;
 }
