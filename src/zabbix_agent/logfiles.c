@@ -33,6 +33,11 @@
 #define ZBX_SAME_FILE_NO	0
 #define ZBX_SAME_FILE_YES	1
 #define ZBX_SAME_FILE_RETRY	2
+#define ZBX_SAME_FILE_COPY	3
+
+#define ZBX_FILE_PLACE_UNKNOWN	-1	/* cannot compare file device and inode numbers */
+#define ZBX_FILE_PLACE_OTHER	0	/* both files have different device or inode numbers */
+#define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
 /******************************************************************************
  *                                                                            *

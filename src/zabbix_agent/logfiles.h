@@ -23,6 +23,9 @@
 #include "zbxregexp.h"
 #include "md5.h"
 
+#define ZBX_LOG_ROTATION_LOGRT	0	/* pure rotation model */
+#define ZBX_LOG_ROTATION_LOGCPT	1	/* copy-truncate rotation model */
+
 struct	st_logfile
 {
 	char		*filename;
@@ -32,6 +35,8 @@ struct	st_logfile
 	int		retry;
 	int		incomplete;	/* 0 - the last record ends with a newline, 1 - the last record contains */
 					/* no newline at the end */
+	int		copy_of;	/* '-1' - the file is not a copy. '0 <= copy_of' - this file is a copy of */
+					/* the file with index 'copy_of' in the old log file list. */
 	zbx_uint64_t	dev;		/* ID of device containing file */
 	zbx_uint64_t	ino_lo;		/* UNIX: inode number. Microsoft Windows: nFileIndexLow or FileId.LowPart */
 	zbx_uint64_t	ino_hi;		/* Microsoft Windows: nFileIndexHigh or FileId.HighPart */
