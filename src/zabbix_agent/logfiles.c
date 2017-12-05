@@ -2499,7 +2499,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 
 	while (i < logfiles_num)
 	{
-		if (0 == logfiles[i].incomplete && (logfiles[i].size != logfiles[i].processed_size ||
+		if (NULL != logfiles && 0 == logfiles[i].incomplete && (logfiles[i].size != logfiles[i].processed_size ||
 				0 == logfiles[i].seq))
 		{
 			if (start_idx != i)

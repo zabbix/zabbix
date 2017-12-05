@@ -1063,9 +1063,17 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 	if (NULL == (query = procstat_get_query(procstat_ref.addr, procname, username, cmdline, flags)))
 	{
 		if (procstat_queries_num(procstat_ref.addr) == PROCSTAT_MAX_QUERIES)
+		{
 			*errmsg = zbx_strdup(*errmsg, "Maximum number of queries reached.");
+		}
+		else if (0 == ((zbx_procstat_header_t *)procstat_ref.addr)->size_allocated)
+		{
+			*errmsg = zbx_strdup(*errmsg, "Shared memory not ready for use.");
+		}
 		else
+		{
 			procstat_add(procname, username, cmdline, flags);
+		}
 
 		goto out;
 	}

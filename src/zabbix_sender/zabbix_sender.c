@@ -1004,7 +1004,7 @@ int	main(int argc, char **argv)
 	char			*in_line = NULL, hostname[MAX_STRING_LEN], key[MAX_STRING_LEN], *key_value = NULL,
 				clock[32], *error = NULL;
 	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL,
-				timestamp;
+				timestamp = 0;
 	size_t			in_line_alloc = MAX_BUFFER_LEN, key_value_alloc = 0;
 	double			last_send = 0;
 	const char		*p;
