@@ -992,7 +992,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 	inventory_value = zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
 
 	inventory_value->hostid = item->host.hostid;
-	inventory_value->link = item->inventory_link - 1;
+	inventory_value->idx = item->inventory_link - 1;
 	inventory_value->field_name = inventory_field;
 	inventory_value->value = zbx_strdup(NULL, value);
 

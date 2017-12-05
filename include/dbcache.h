@@ -333,7 +333,7 @@ zbx_config_t;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	unsigned char	link;
+	unsigned char	idx;
 	const char	*field_name;
 	char		*value;
 }

@@ -10888,7 +10888,7 @@ void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
 				continue;
 		}
 
-		value = &host_inventory->values[inventory_value->link];
+		value = &host_inventory->values[inventory_value->idx];
 
 		DCstrpool_replace((NULL != *value ? 1 : 0), value, inventory_value->value);
 	}
