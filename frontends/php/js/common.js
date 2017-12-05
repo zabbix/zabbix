@@ -492,7 +492,7 @@ function closeDialogHandler(event) {
 
 				// Close context menu overlays.
 				case 'contextmenu':
-					jQuery('.action-menu.action-menu-top:visible').menuPopup('close');
+					jQuery('.action-menu.action-menu-top:visible').menuPopup('close', dialog.element);
 					break;
 
 				// Close overlay time picker.

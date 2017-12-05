@@ -930,8 +930,8 @@ jQuery(function($) {
 		}
 	};
 
-	function closeMenuPopup(event, menuPopup) {
-		if (!menuPopup.is(event.target) && menuPopup.has(event.target).length === 0) {
+	function closeMenuPopup(trigger_elmnt, menuPopup) {
+		if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 			menuPopup.data('is-active', false);
 			menuPopup.fadeOut(0);
 
@@ -941,10 +941,6 @@ jQuery(function($) {
 
 	var methods = {
 		init: function(sections, event) {
-			if (!event) {
-				event = window.event;
-			}
-
 			var opener = $(this),
 				id = opener.data('menu-popup-id'),
 				menuPopup = $('#' + id),
@@ -1050,8 +1046,8 @@ jQuery(function($) {
 				closeMenuPopup(e, menuPopup);
 			});
 		},
-		close: function() {
-			closeMenuPopup(window.event, jQuery(this));
+		close: function(trigger_elmnt) {
+			closeMenuPopup(trigger_elmnt, jQuery(this));
 		}
 	};
 
