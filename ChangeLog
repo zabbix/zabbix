@@ -1019,8 +1019,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.14rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-13042] fixed unclickable template link on host items list page (gcalenko)
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
