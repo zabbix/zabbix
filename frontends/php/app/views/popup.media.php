@@ -62,6 +62,7 @@ $output = [
 			'title' => ($options['media'] !== -1) ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return validate_media("media_form");'
 		]
 	]

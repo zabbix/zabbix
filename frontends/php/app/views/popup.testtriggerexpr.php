@@ -103,6 +103,8 @@ $output = [
 			'title' => _('Test'),
 			'enabled' => $allowed_testing,
 			'class' => '',
+			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return reloadPopup(document.forms["expression_testing_from"], "popup.testtriggerexpr");'
 		]
 	]

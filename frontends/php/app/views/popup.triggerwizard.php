@@ -193,6 +193,7 @@ $output['buttons'] = [
 		'title' => array_key_exists('triggerid', $options) ? _('Update') : _('Add'),
 		'class' => '',
 		'keepOpen' => true,
+		'isSubmit' => true,
 		'action' => 'return validateTriggerWizard("'.$form->getName().'", '.
 						'jQuery(window.document.forms["'.$form->getName().'"]).closest("[data-dialogueid]")'.
 							'.attr("data-dialogueid"));'

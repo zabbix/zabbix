@@ -151,6 +151,7 @@ $output['buttons'] = [
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
 		'class' => '',
 		'keepOpen' => true,
+		'isSubmit' => true,
 		'action' => 'return validate_httpstep("http_step", '.
 					'jQuery(window.document.forms["http_step"]).closest("[data-dialogueid]").attr("data-dialogueid"));'
 	]

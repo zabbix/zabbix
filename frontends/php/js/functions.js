@@ -624,7 +624,8 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
 		body_mutation_observer = new body_mutation_observer(function(mutation) {
 			center_overlay_dialog();
-		});
+		}),
+		submit_btn = null;
 
 	jQuery.each(params.buttons, function(index, obj) {
 		var button = jQuery('<button>', {
@@ -642,6 +643,10 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 
 			return false;
 		});
+
+		if (!submit_btn && ('isSubmit' in obj) && obj.isSubmit === true) {
+			submit_btn = button;
+		}
 
 		if ('class' in obj) {
 			button.addClass(obj.class);
@@ -702,6 +707,15 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			});
 
 			return false;
+		});
+	}
+
+	if (submit_btn) {
+		jQuery('.overlay-dialogue-body form', overlay_dialogue).on('keydown', function(event) {
+			if (event.which === 13) {
+				event.preventDefault();
+				submit_btn.trigger('click');
+			}
 		});
 	}
 
