@@ -2276,6 +2276,47 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 	}
 }
 
+static int	files_have_same_md5_sum(const struct st_logfile *log1, const struct st_logfile *log2)
+{
+	if (-1 != log1->md5size && -1 != log2->md5size && log1->md5size == log2->md5size &&
+			0 == memcmp(log1->md5buf, log2->md5buf, sizeof(log1->md5buf)))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num, int i)
+{
+	/* There is a special case when the latest log file is copied to other file but not yet truncated. */
+	/* So there are two files and we don't know which one will stay as the copy and which one will be  */
+	/* truncated. Similar cases: the latest log file is copied but never truncated or is copied multiple */
+	/* times. */
+
+	int	j;
+
+	for (j = i + 1; j < logfiles_num; j++)
+	{
+		if (SUCCEED == files_have_same_md5_sum(logfiles + i, logfiles + j))
+		{
+			/* logfiles[i] and logfiles[j] are original and copy (or vice versa). */
+			/* If logfiles[i] has been at least partially processed then transfer its */
+			/* processed size to logfiles[j], too. */
+
+			if (0 < logfiles[i].processed_size)
+			{
+				logfiles[j].processed_size = MIN(logfiles[i].processed_size, logfiles[j].size);
+
+				zabbix_log(LOG_LEVEL_DEBUG, "handle_multiple_copies() file '%s' processed_size:"
+						ZBX_FS_UI64 " transferred to" " file '%s' processed_size:" ZBX_FS_UI64,
+						logfiles[i].filename, logfiles[i].processed_size,
+						logfiles[j].filename, logfiles[j].processed_size);
+			}
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: calculate_delay                                                  *
@@ -2806,6 +2847,14 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	/* from now assume success - it could be that there is nothing to do */
 	ret = SUCCEED;
 
+	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
+	{
+		int	k;
+
+		for (k = 0; k < logfiles_num - 1; k++)
+			handle_multiple_copies(logfiles, logfiles_num, k);
+	}
+
 	if (0.0f != max_delay)
 	{
 		if (0.0 != *start_time)
@@ -2871,6 +2920,9 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			/* the current checking. In the next check the file will be marked in the list of old files */
 			/* and we will know where we left off. */
 			logfiles[i].seq = seq++;
+
+			if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
+				handle_multiple_copies(logfiles, logfiles_num, i);
 
 			if (SUCCEED != ret)
 				break;
