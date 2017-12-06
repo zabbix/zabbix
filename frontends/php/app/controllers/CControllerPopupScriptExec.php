@@ -44,12 +44,10 @@ class CControllerPopupScriptExec extends CController {
 	}
 
 	protected function checkPermissions() {
-		$db_hosts = API::Host()->get([
+		return (bool) API::Host()->get([
 			'output' => [],
 			'hostids' => $this->getInput('hostid')
 		]);
-
-		return (bool) $db_hosts;
 	}
 
 	protected function doAction() {
