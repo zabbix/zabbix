@@ -1,3 +1,6 @@
+SUBDIRS = \
+	linux
+
 if SERVER
 SERVER_tests = parse_item_key
 endif
@@ -93,7 +96,7 @@ process_SOURCES = \
 	../../../src/zabbix_agent/listener.c \
 	../../../src/zabbix_agent/procstat.c \
 	../../zbxmocktest.h
-	
+
 process_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
@@ -116,7 +119,7 @@ process_LDADD = \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
-	
+
 process_WRAP_FUNCS = \
 	-Wl,--wrap=SYSTEM_LOCALTIME \
 	-Wl,--wrap=WEB_PAGE_GET \
