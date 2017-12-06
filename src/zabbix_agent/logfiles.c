@@ -992,61 +992,67 @@ static int	is_uniq_col(const char *arr, int n_rows, int n_cols, int col)
 
 /******************************************************************************
  *                                                                            *
- * Function: resolve_old2new                                                  *
+ * Function: is_old2new_unique_mapping                                        *
  *                                                                            *
- * Purpose: resolve non-unique mappings                                       *
+ * Purpose: check if 'old2new' array has only unique mappings                 *
  *                                                                            *
  * Parameters:                                                                *
  *          old2new - [IN] two dimensional array of possible mappings         *
  *          num_old - [IN] number of elements in the old file list            *
  *          num_new - [IN] number of elements in the new file list            *
  *                                                                            *
+ * Return value: SUCCEED - all mappings are unique,                           *
+ *               FAIL - there are non-unique mappings                         *
+ *                                                                            *
  ******************************************************************************/
-static void	resolve_old2new(char *old2new, int num_old, int num_new)
+static int	is_old2new_unique_mapping(const char *old2new, int num_old, int num_new)
 {
-	int	i, j, ones;
-	char	*p, *protected_rows = NULL, *protected_cols = NULL;
+	int	i;
 
 	/* Is there 1:1 mapping in both directions between files in the old and the new list ? */
-	/* In this case every row and column has not more than one element '1'. */
+	/* In this case every row and column has not more than one element '1' or '2', others are '0'. */
 	/* This is expected on UNIX (using inode numbers) and MS Windows (using FileID on NTFS, ReFS) */
-
-	p = old2new;
+	/* unless 'copytruncate' rotation type is combined with multiple log file copies. */
 
 	for (i = 0; i < num_old; i++)		/* loop over rows (old files) */
 	{
-		ones = 0;
-
-		for (j = 0; j < num_new; j++)	/* loop over columns (new files) */
-		{
-			if ('1' == *p++)
-			{
-				if (2 == ++ones)
-					goto non_unique;
-			}
-		}
+		if (-1 == is_uniq_row(old2new, num_new, i))
+			return FAIL;
 	}
 
-	for (i = 0; i < num_new; i++)		/* loop over columns */
+	for (i = 0; i < num_new; i++)		/* loop over columns (new files) */
 	{
-		p = old2new + i;
-		ones = 0;
-
-		for (j = 0; j < num_old; j++)	/* loop over rows */
-		{
-			if ('1' == *p)
-			{
-				if (2 == ++ones)
-					goto non_unique;
-			}
-			p += num_new;
-		}
+		if (-1 == is_uniq_col(old2new, num_old, num_new, i))
+			return FAIL;
 	}
 
-	return;
-non_unique:
-	/* This is expected on MS Windows using FAT32 and other file systems where inodes or file indexes */
-	/* are either not preserved if a file is renamed or are not applicable. */
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: resolve_old2new                                                  *
+ *                                                                            *
+ * Purpose: resolve non-unique mappings                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *           old2new - [IN] two dimensional array of possible mappings        *
+ *           num_old - [IN] number of elements in the old file list           *
+ *           num_new - [IN] number of elements in the new file list           *
+ *                                                                            *
+ ******************************************************************************/
+static void	resolve_old2new(char *old2new, int num_old, int num_new)
+{
+	int	i, j;
+	char	*p, *protected_rows = NULL, *protected_cols = NULL;
+
+	if (SUCCEED == is_old2new_unique_mapping(old2new, num_old, num_new))
+		return;
+
+	/* Non-unique mapping is expected: */
+	/*   - on MS Windows using FAT32 and other file systems where inodes or file indexes are either not */
+	/*     preserved if a file is renamed or are not applicable, */
+	/*   - in 'copytruncate' rotation mode if multiple copies of log files are present. */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "resolve_old2new(): non-unique mapping");
 
