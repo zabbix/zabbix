@@ -2198,6 +2198,84 @@ static void	adjust_mtime_to_clock(int *mtime)
 	}
 }
 
+static int	is_swap_required(const struct st_logfile *old, struct st_logfile *new, int use_ino, int idx)
+{
+	int	is_same_place;
+
+	/* if the 1st file is not processed at all while the 2nd file was processed (at least partially) */
+	/* then swap them */
+	if (0 == new[idx].seq && 0 < new[idx + 1].seq)
+		return SUCCEED;
+
+	/* if the 2nd file is not a copy of some other file then no need to swap */
+	if (-1 == new[idx + 1].copy_of)
+		return FAIL;
+
+	/* The 2nd file is a copy. But is it a copy of the 1st file ? */
+
+	/* On file systems with inodes or file indices if a file is copied and truncated, we assume that */
+	/* there is a high possibility that the truncated file has the same inode (index) as before. */
+
+	if (NULL == old)	/* cannot consult the old file list */
+		return FAIL;
+
+	is_same_place = compare_file_places(old + new[idx + 1].copy_of, new + idx, use_ino);
+
+	if (ZBX_FILE_PLACE_SAME == is_same_place && new[idx].seq >= new[idx + 1].seq)
+		return SUCCEED;
+
+	/* The last attempt - compare file names. It is less reliable as file rotation can change file names. */
+	if (ZBX_FILE_PLACE_OTHER == is_same_place || ZBX_FILE_PLACE_UNKNOWN == is_same_place)
+	{
+		if (0 == strcmp((old + new[idx + 1].copy_of)->filename, (new + idx)->filename))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static void	swap_logfile_array_elements(struct st_logfile *array, int idx1, int idx2)
+{
+	struct st_logfile	*p1 = array + idx1;
+	struct st_logfile	*p2 = array + idx2;
+	struct st_logfile	tmp;
+
+	memcpy(&tmp, p1, sizeof(struct st_logfile));
+	memcpy(p1, p2, sizeof(struct st_logfile));
+	memcpy(p2, &tmp, sizeof(struct st_logfile));
+}
+
+static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, struct st_logfile *logfiles,
+		int logfiles_num, int use_ino, int *start_idx)
+{
+	int	i;
+
+	/* There is a special case when within 1 second of time:       */
+	/*   1. a log file ORG.log is copied to other file COPY.log,   */
+	/*   2. the original file ORG.log is truncated,                */
+	/*   3. new records are appended to the original file ORG.log, */
+	/*   4. both files ORG.log and COPY.log have the same 'mtime'. */
+	/* Now in the list 'logfiles' the file ORG.log precedes the COPY.log because if 'mtime' is the same   */
+	/* then add_logfile() function sorts files by name in descending order. This would lead to an error - */
+	/* processing ORG.log before COPY.log. We need to correct the order by swapping ORG.log and COPY.log  */
+	/* elements in the 'logfiles' list. */
+
+	for (i = 0; i < logfiles_num - 1; i++)
+	{
+		if (logfiles[i].mtime == logfiles[i + 1].mtime &&
+				SUCCEED == is_swap_required(logfiles_old, logfiles, use_ino, i))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "ensure_order_if_mtimes_equal() swapping files '%s' and '%s'",
+					logfiles[i].filename, logfiles[i + 1].filename);
+
+			swap_logfile_array_elements(logfiles, i, i + 1);
+
+			if (*start_idx == i + 1)
+				*start_idx = i;
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: calculate_delay                                                  *
@@ -2702,6 +2780,9 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		destroy_logfile_list(&logfiles, &logfiles_alloc, &logfiles_num);
 		goto out;
 	}
+
+	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
+		ensure_order_if_mtimes_equal(*logfiles_old, logfiles, logfiles_num, *use_ino, &start_idx);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
