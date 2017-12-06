@@ -1050,6 +1050,27 @@ static void	resolve_old2new(int rotation_type, char *old2new, int num_old, int n
 				}
 			}
 		}
+
+		if (ZBX_LOG_ROTATION_LOGCPT == rotation_type)
+		{
+			for (i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
+			{
+				if ('1' == protected_rows[i])
+					continue;
+
+				p = old2new + i * num_new;	/* the first element of the current row */
+
+				for (j = 0; j < num_new; j++)
+				{
+					if ('2' == p[j] && '1' != protected_cols[j])
+					{
+						cross_out(old2new, num_old, num_new, i, j, protected_rows,
+								protected_cols);
+						break;
+					}
+				}
+			}
+		}
 	}
 	else	/* tall array */
 	{
@@ -1099,6 +1120,27 @@ static void	resolve_old2new(int rotation_type, char *old2new, int num_old, int n
 				{
 					cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
 					break;
+				}
+			}
+		}
+
+		if (ZBX_LOG_ROTATION_LOGCPT == rotation_type)
+		{
+			for (i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
+			{
+				if ('1' == protected_rows[i])
+					continue;
+
+				p = old2new + i * num_new;	/* the first element of the current row */
+
+				for (j = num_new - 1; j >= 0; j--)
+				{
+					if ('2' == p[j] && '1' != protected_cols[j])
+					{
+						cross_out(old2new, num_old, num_new, i, j, protected_rows,
+								protected_cols);
+						break;
+					}
 				}
 			}
 		}
