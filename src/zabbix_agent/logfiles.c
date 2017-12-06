@@ -787,7 +787,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old, const struct st_log
  *          cross point and protected columns and protected rows              *
  *                                                                            *
  * Parameters:                                                                *
- *          arr    - [IN] two dimensional array                               *
+ *          arr    - [IN/OUT] two dimensional array                           *
  *          n_rows - [IN] number of rows in the array                         *
  *          n_cols - [IN] number of columns in the array                      *
  *          row    - [IN] number of cross point row                           *
@@ -812,7 +812,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old, const struct st_log
  *         1 1 0 1                                                            *
  *                                                                            *
  ******************************************************************************/
-static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, char *p_rows, char *p_cols)
+static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const char *p_rows, const char *p_cols)
 {
 	int	i;
 	char	*p;
@@ -958,6 +958,58 @@ static int	is_old2new_unique_mapping(const char *old2new, int num_old, int num_n
 	return SUCCEED;
 }
 
+static void	cross_out_from_top_left_corner(char compare_with, char *old2new, int num_old, int num_new,
+		const char *protected_rows, const char *protected_cols)
+{
+	char	*p;
+	int	i;
+
+	for (i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
+	{
+		int	j;
+
+		if ('1' == protected_rows[i])
+			continue;
+
+		p = old2new + i * num_new;	/* the first element of the current row */
+
+		for (j = 0; j < num_new; j++)
+		{
+			if (compare_with == p[j] && '1' != protected_cols[j])
+			{
+				cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
+				break;
+			}
+		}
+	}
+}
+
+static void	cross_out_from_bottom_right_corner(char compare_with, char *old2new, int num_old, int num_new,
+		const char *protected_rows, const char * protected_cols)
+{
+	char	*p;
+	int	i;
+
+	for (i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
+	{
+		int	j;
+
+		if ('1' == protected_rows[i])
+			continue;
+
+		p = old2new + i * num_new;	/* the first element of the current row */
+
+		for (j = num_new - 1; j >= 0; j--)
+		{
+			if (compare_with == p[j] && '1' != protected_cols[j])
+			{
+				cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
+				break;
+			}
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: resolve_old2new                                                  *
@@ -973,8 +1025,8 @@ static int	is_old2new_unique_mapping(const char *old2new, int num_old, int num_n
  ******************************************************************************/
 static void	resolve_old2new(int rotation_type, char *old2new, int num_old, int num_new)
 {
-	int	i, j;
-	char	*p, *protected_rows = NULL, *protected_cols = NULL;
+	int	i;
+	char	*protected_rows = NULL, *protected_cols = NULL;
 
 	if (SUCCEED == is_old2new_unique_mapping(old2new, num_old, num_new))
 		return;
@@ -1034,43 +1086,10 @@ static void	resolve_old2new(int rotation_type, char *old2new, int num_old, int n
 		 *                                                                                                  *
 		 ****************************************************************************************************/
 
-		for (i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
-		{
-			if ('1' == protected_rows[i])
-				continue;
-
-			p = old2new + i * num_new;	/* the first element of the current row */
-
-			for (j = 0; j < num_new; j++)
-			{
-				if ('1' == p[j] && '1' != protected_cols[j])
-				{
-					cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
-					break;
-				}
-			}
-		}
+		cross_out_from_top_left_corner('1', old2new, num_old, num_new, protected_rows, protected_cols);
 
 		if (ZBX_LOG_ROTATION_LOGCPT == rotation_type)
-		{
-			for (i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
-			{
-				if ('1' == protected_rows[i])
-					continue;
-
-				p = old2new + i * num_new;	/* the first element of the current row */
-
-				for (j = 0; j < num_new; j++)
-				{
-					if ('2' == p[j] && '1' != protected_cols[j])
-					{
-						cross_out(old2new, num_old, num_new, i, j, protected_rows,
-								protected_cols);
-						break;
-					}
-				}
-			}
-		}
+			cross_out_from_top_left_corner('2', old2new, num_old, num_new, protected_rows, protected_cols);
 	}
 	else	/* tall array */
 	{
@@ -1107,42 +1126,12 @@ static void	resolve_old2new(int rotation_type, char *old2new, int num_old, int n
 		 *                                                                                                  *
 		 ****************************************************************************************************/
 
-		for (i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
-		{
-			if ('1' == protected_rows[i])
-				continue;
-
-			p = old2new + i * num_new;	/* the first element of the current row */
-
-			for (j = num_new - 1; j >= 0; j--)
-			{
-				if ('1' == p[j] && '1' != protected_cols[j])
-				{
-					cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
-					break;
-				}
-			}
-		}
+		cross_out_from_bottom_right_corner('1', old2new, num_old, num_new, protected_rows, protected_cols);
 
 		if (ZBX_LOG_ROTATION_LOGCPT == rotation_type)
 		{
-			for (i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
-			{
-				if ('1' == protected_rows[i])
-					continue;
-
-				p = old2new + i * num_new;	/* the first element of the current row */
-
-				for (j = num_new - 1; j >= 0; j--)
-				{
-					if ('2' == p[j] && '1' != protected_cols[j])
-					{
-						cross_out(old2new, num_old, num_new, i, j, protected_rows,
-								protected_cols);
-						break;
-					}
-				}
-			}
+			cross_out_from_bottom_right_corner('2', old2new, num_old, num_new, protected_rows,
+					protected_cols);
 		}
 	}
 
