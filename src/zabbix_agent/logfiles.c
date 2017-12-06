@@ -2179,6 +2179,25 @@ out:
 	return ret;
 }
 
+static void	adjust_mtime_to_clock(int *mtime)
+{
+	time_t	now;
+
+	/* Adjust 'mtime' if the system clock has been set back in time. */
+	/* Setting the clock ahead of time is harmless in our case. */
+
+	if (*mtime > (now = time(NULL)))
+	{
+		int	old_mtime;
+
+		old_mtime = *mtime;
+		*mtime = (int)now;
+
+		zabbix_log(LOG_LEVEL_WARNING, "System clock has been set back in time. Setting agent mtime %d "
+				"seconds back.", (int)(old_mtime - now));
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: calculate_delay                                                  *
@@ -2575,18 +2594,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			" mtime:%d", __function_name, ZBX_METRIC_FLAG_LOG_LOGRT & flags,
 			ZBX_METRIC_FLAG_LOG_COUNT & flags, filename, *lastlogsize, *mtime);
 
-	/* Minimize data loss if the system clock has been set back in time. */
-	/* Setting the clock ahead of time is harmless in our case. */
-	if (*mtime > (now = time(NULL)))
-	{
-		int	old_mtime;
-
-		old_mtime = *mtime;
-		*mtime = (int)now;
-
-		zabbix_log(LOG_LEVEL_WARNING, "System clock has been set back in time. Setting agent mtime %d "
-				"seconds back.", (int)(old_mtime - now));
-	}
+	adjust_mtime_to_clock(mtime);
 
 	if (SUCCEED != make_logfile_list(flags, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
 			err_msg))
