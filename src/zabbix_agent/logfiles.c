@@ -1290,14 +1290,14 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 static int	find_old2new(char *old2new, int num_new, int i_old)
 {
 	int	i;
-	char	*p;
-
-	p = old2new + i_old * num_new;
+	char	*p = old2new + i_old * num_new;
 
 	for (i = 0; i < num_new; i++)		/* loop over columns (new files) on i_old-th row */
 	{
-		if ('1' == *p++)
+		if ('1' == *p || '2' == *p)
 			return i;
+
+		p++;
 	}
 
 	return -1;
@@ -1315,8 +1315,6 @@ static int	find_old2new(char *old2new, int num_new, int i_old)
  *             filename - name of a logfile (with full path)                  *
  *             st - structure returned by stat()                              *
  *                                                                            *
- * Return value: none                                                         *
- *                                                                            *
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1329,7 +1327,6 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d size:" ZBX_FS_UI64, __function_name, filename,
 			(int)st->st_mtime, (zbx_uint64_t)st->st_size);
 
-	/* must be done in any case */
 	if (*logfiles_alloc == *logfiles_num)
 	{
 		*logfiles_alloc += 64;
@@ -1392,6 +1389,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	(*logfiles)[i].md5size = -1;
 	(*logfiles)[i].seq = 0;
 	(*logfiles)[i].incomplete = 0;
+	(*logfiles)[i].copy_of = -1;
 #ifndef _WINDOWS
 	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
 	(*logfiles)[i].ino_lo = (zbx_uint64_t)st->st_ino;
