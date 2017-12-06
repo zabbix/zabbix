@@ -909,29 +909,30 @@ static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, char 
  *                                                                            *
  * Function: is_uniq_row                                                      *
  *                                                                            *
- * Purpose: check if there is only one element '1' in the given row           *
+ * Purpose: check if there is only one element '1' or '2' in the given row    *
  *                                                                            *
  * Parameters:                                                                *
  *          arr    - [IN] two dimensional array                               *
  *          n_cols - [IN] number of columns in the array                      *
  *          row    - [IN] number of row to search                             *
  *                                                                            *
- * Return value: number of column where the '1' element was found or          *
- *               -1 if there are zero or multiple '1' elements in the row     *
+ * Return value: number of column where the element '1' or '2' was found or   *
+ *               -1 if there are zero or multiple elements '1' or '2' in the  *
+ *               row                                                          *
  *                                                                            *
  ******************************************************************************/
 static int	is_uniq_row(const char *arr, int n_cols, int row)
 {
-	int		i, ones = 0, ret = -1;
+	int		i, mappings = 0, ret = -1;
 	const char	*p;
 
 	p = arr + row * n_cols;			/* point to the first element of the 'row' */
 
 	for (i = 0; i < n_cols; i++)
 	{
-		if ('1' == *p++)
+		if ('1' == *p || '2' == *p)
 		{
-			if (2 == ++ones)
+			if (2 == ++mappings)
 			{
 				ret = -1;	/* non-unique mapping in the row */
 				break;
@@ -939,6 +940,8 @@ static int	is_uniq_row(const char *arr, int n_cols, int row)
 
 			ret = i;
 		}
+
+		p++;
 	}
 
 	return ret;
@@ -948,7 +951,7 @@ static int	is_uniq_row(const char *arr, int n_cols, int row)
  *                                                                            *
  * Function: is_uniq_col                                                      *
  *                                                                            *
- * Purpose: check if there is only one element '1' in the given column        *
+ * Purpose: check if there is only one element '1' or '2' in the given column *
  *                                                                            *
  * Parameters:                                                                *
  *          arr    - [IN] two dimensional array                               *
@@ -956,22 +959,23 @@ static int	is_uniq_row(const char *arr, int n_cols, int row)
  *          n_cols - [IN] number of columns in the array                      *
  *          col    - [IN] number of column to search                          *
  *                                                                            *
- * Return value: number of row where the '1' element was found or             *
- *               -1 if there are zero or multiple '1' elements in the column  *
+ * Return value: number of column where the element '1' or '2 ' was found or  *
+ *               -1 if there are zero or multiple elements '1' or '2' in the  *
+ *               row                                                          *
  *                                                                            *
  ******************************************************************************/
 static int	is_uniq_col(const char *arr, int n_rows, int n_cols, int col)
 {
-	int		i, ones = 0, ret = -1;
+	int		i, mappings = 0, ret = -1;
 	const char	*p;
 
 	p = arr + col;				/* point to the top element of the 'col' */
 
 	for (i = 0; i < n_rows; i++)
 	{
-		if ('1' == *p)
+		if ('1' == *p || '2' == *p)
 		{
-			if (2 == ++ones)
+			if (2 == ++mappings)
 			{
 				ret = -1;	/* non-unique mapping in the column */
 				break;
