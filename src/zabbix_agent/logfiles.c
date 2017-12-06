@@ -2269,12 +2269,8 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 	char   		buf[32 * ZBX_KIBIBYTE];		/* buffer must be of size multiple of 4 as some character */
 							/* encodings use 4 bytes for every character */
 
-	if (-1 == (fd = zbx_open(logfile->filename, O_RDONLY)))
-	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", logfile->filename,
-				zbx_strerror(errno));
+	if (-1 == (fd = open_file_helper(logfile->filename, err_msg)))
 		return FAIL;
-	}
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
@@ -2389,12 +2385,8 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 		}
 	}
 out:
-	if (0 != close(fd))
-	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", logfile->filename,
-				zbx_strerror(errno));
+	if (SUCCEED != close_file_helper(fd, logfile->filename, err_msg))
 		ret = FAIL;
-	}
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
