@@ -336,6 +336,12 @@ a {
 }
 
 // SEVERITY STATUSES
+td.na-bg {
+	~ td.na-bg {
+		border-left: none;
+	}
+}
+
 .na-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
@@ -347,17 +353,17 @@ a {
 .list-table .na-bg,
 .dashbrd-widget .list-table .na-bg,
 .dashbrd-grid-widget-content .list-table .na-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 	color: $font-color;
 }
 
 .overlay-dialogue .list-table .na-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 }
 
 .na-bg:before {
 	content: "";
-	width: 42px;
+	width: 34px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -372,7 +378,7 @@ a {
 	width: 22px;
 	height: 18px;
 	top: 5px;
-	left: 10px;
+	left: 6px;
 	position: absolute;
 }
 
@@ -387,6 +393,12 @@ a {
 	background-color: $ui-bg-selected-color !important;
 }
 
+td.normal-bg {
+	~ td.normal-bg {
+		border-left: none;
+	}
+}
+
 .normal-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
@@ -398,17 +410,17 @@ a {
 .list-table .normal-bg,
 .dashbrd-widget .list-table .normal-bg,
 .dashbrd-grid-widget-content .list-table .normal-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 	color: $font-color;
 }
 
 .overlay-dialogue .list-table .normal-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 }
 
 .normal-bg:before {
 	content: "";
-	width: 42px;
+	width: 34px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -423,12 +435,18 @@ a {
 	width: 22px;
 	height: 18px;
 	top: 5px;
-	left: 10px;
+	left: 6px;
 	position: absolute;
 }
 
 .normal-bg.blink-hidden:after{
 	content: none;
+}
+
+td.info-bg {
+	~ td.info-bg {
+		border-left: none;
+	}
 }
 
 .info-bg {
@@ -442,17 +460,17 @@ a {
 .list-table .info-bg,
 .dashbrd-widget .list-table .info-bg,
 .dashbrd-grid-widget-content .list-table .info-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 	color: $font-color;
 }
 
 .overlay-dialogue .list-table .info-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 }
 
 .info-bg:before {
 	content: "";
-	width: 42px;
+	width: 34px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -466,7 +484,7 @@ a {
 	width: 22px;
 	height: 18px;
 	top: 5px;
-	left: 10px;
+	left: 6px;
 	position: absolute;
 }
 
@@ -481,6 +499,12 @@ a {
 	background-color: $ui-bg-selected-color !important;
 }
 
+td.average-bg {
+	~ td.average-bg {
+		border-left: none;
+	}
+}
+
 .average-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
@@ -492,17 +516,17 @@ a {
 .list-table .average-bg,
 .dashbrd-widget .list-table .average-bg,
 .dashbrd-grid-widget-content .list-table .average-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 	color: $font-color;
 }
 
 .overlay-dialogue .list-table .average-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 }
 
 .average-bg:before {
 	content: "";
-	width: 42px;
+	width: 34px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -516,7 +540,7 @@ a {
 	width: 22px;
 	height: 18px;
 	top: 5px;
-	left: 10px;
+	left: 6px;
 	position: absolute;
 }
 
@@ -531,6 +555,12 @@ a {
 	background-color: $ui-bg-selected-color !important;
 }
 
+td.warning-bg {
+	~ td.warning-bg {
+		border-left: none;
+	}
+}
+
 .warning-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
@@ -542,17 +572,17 @@ a {
 .list-table .warning-bg,
 .dashbrd-widget .list-table .warning-bg,
 .dashbrd-grid-widget-content .list-table .warning-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 	color: $font-color;
 }
 
 .overlay-dialogue .list-table .warning-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 }
 
 .warning-bg:before {
 	content: "";
-	width: 42px;
+	width: 34px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -566,7 +596,7 @@ a {
 	width: 22px;
 	height: 18px;
 	top: 5px;
-	left: 10px;
+	left: 6px;
 	position: absolute;
 }
 
@@ -581,6 +611,12 @@ a {
 	background-color: $ui-bg-selected-color !important;
 }
 
+td.high-bg {
+	~ td.high-bg {
+		border-left: none;
+	}
+}
+
 .high-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
@@ -592,17 +628,17 @@ a {
 .list-table .high-bg,
 .dashbrd-widget .list-table .high-bg,
 .dashbrd-grid-widget-content .list-table .high-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 	color: $font-color;
 }
 
 .overlay-dialogue .list-table .high-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 }
 
 .high-bg:before {
 	content: "";
-	width: 42px;
+	width: 34px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -616,7 +652,7 @@ a {
 	width: 22px;
 	height: 18px;
 	top: 5px;
-	left: 10px;
+	left: 6px;
 	position: absolute;
 }
 
@@ -631,6 +667,12 @@ a {
 	background-color: $ui-bg-selected-color !important;
 }
 
+td.disaster-bg {
+	~ td.disaster-bg {
+		border-left: none;
+	}
+}
+
 .disaster-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
@@ -642,17 +684,17 @@ a {
 .list-table .disaster-bg,
 .dashbrd-widget .list-table .disaster-bg,
 .dashbrd-grid-widget-content .list-table .disaster-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 	color: $font-color;
 }
 
 .overlay-dialogue .list-table .disaster-bg {
-	padding-left: 50px;
+	padding-left: 42px;
 }
 
 .disaster-bg:before {
 	content: "";
-	width: 42px;
+	width: 34px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -666,7 +708,7 @@ a {
 	width: 22px;
 	height: 18px;
 	top: 5px;
-	left: 10px;
+	left: 6px;
 	position: absolute;
 }
 
@@ -682,18 +724,18 @@ a {
 }
 
 .notif-body li {
-	padding: 0 0 10px 50px;
+	padding: 0 0 10px 42px;
 }
 
 .notif-indic {
-	width: 44px;
+	width: 34px;
 	height: 27px;
 	position: relative;
-	margin: 0 0 0 -50px;
+	margin: 0 0 0 -42px;
 }
 
 .notif-indic-container {
-	margin: 0 0 0 -50px;
+	margin: 0 0 0 -42px;
 }
 
 // ERROR MESSAGES
