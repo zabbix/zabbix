@@ -26,7 +26,6 @@
 #include "ipc.h"
 #include "mutexs.h"
 #include "memalloc.h"
-#include "strpool.h"
 #include "zbxserver.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
@@ -548,6 +547,59 @@ static ZBX_DC_HOST	*DCfind_proxy(const char *host)
 		return NULL;
 	else
 		return host_p->host_ptr;
+}
+
+/* private strpool functions */
+
+#define	REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
+
+static zbx_hash_t	__config_strpool_hash(const void *data)
+{
+	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
+}
+
+static int	__config_strpool_compare(const void *d1, const void *d2)
+{
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
+}
+
+static const char	*zbx_strpool_intern(const char *str)
+{
+	void		*record;
+	zbx_uint32_t	*refcount;
+
+	record = zbx_hashset_search(&config->strpool, str - REFCOUNT_FIELD_SIZE);
+
+	if (NULL == record)
+	{
+		record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
+				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE);
+		*(zbx_uint32_t *)record = 0;
+	}
+
+	refcount = (zbx_uint32_t *)record;
+	(*refcount)++;
+
+	return (char *)record + REFCOUNT_FIELD_SIZE;
+}
+
+static void	zbx_strpool_release(const char *str)
+{
+	zbx_uint32_t	*refcount;
+
+	refcount = (zbx_uint32_t *)(str - REFCOUNT_FIELD_SIZE);
+	if (0 == --(*refcount))
+		zbx_hashset_remove(&config->strpool, str - REFCOUNT_FIELD_SIZE);
+}
+
+static const char	*zbx_strpool_acquire(const char *str)
+{
+	zbx_uint32_t	*refcount;
+
+	refcount = (zbx_uint32_t *)(str - REFCOUNT_FIELD_SIZE);
+	(*refcount)++;
+
+	return str;
 }
 
 static int	DCstrpool_replace(int found, const char **curr, const char *new)
@@ -4404,7 +4456,6 @@ void	DCsync_configuration(unsigned char mode)
 				correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 				corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, total, total2,
 				update_sec;
-	const zbx_strpool_t	*strpool;
 
 	zbx_dbsync_t		config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync,
 				items_sync, triggers_sync, tdep_sync, func_sync, expr_sync, action_sync, action_op_sync,
@@ -4710,8 +4761,6 @@ void	DCsync_configuration(unsigned char mode)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		strpool = zbx_strpool_info();
-
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
 				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec;
@@ -4897,13 +4946,9 @@ void	DCsync_configuration(unsigned char mode)
 				100 * ((double)config_mem->free_size / config_mem->orig_size));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
-				strpool->hashset->num_data, strpool->hashset->num_slots);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() strpoolfree: " ZBX_FS_DBL "%%", __function_name,
-				100 * ((double)strpool->mem_info->free_size / strpool->mem_info->orig_size));
+				config->strpool.num_data, config->strpool.num_slots);
 
 		zbx_mem_dump_stats(config_mem);
-		zbx_mem_dump_stats(strpool->mem_info);
 	}
 
 	config->status->last_update = 0;
@@ -5238,22 +5283,17 @@ int	init_configuration_cache(char **error)
 	const char	*__function_name = "init_configuration_cache";
 
 	int		i, ret;
-	size_t		config_size;
-	size_t		strpool_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_UI64, __function_name, CONFIG_CONF_CACHE_SIZE);
-
-	strpool_size = (size_t)(CONFIG_CONF_CACHE_SIZE * 0.15);
-	config_size = CONFIG_CONF_CACHE_SIZE - strpool_size;
 
 	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_mem_create(&config_mem, config_size, "configuration cache", "CacheSize", 0, error)))
+	if (SUCCEED != (ret = zbx_mem_create(&config_mem, CONFIG_CONF_CACHE_SIZE, "configuration cache",
+			"CacheSize", 0, error)))
+	{
 		goto out;
-
-	if (SUCCEED != (ret = zbx_strpool_create(strpool_size, error)))
-		goto out;
+	}
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
@@ -5317,6 +5357,8 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash, __config_interface_addr_compare);
 	CREATE_HASHSET_EXT(config->regexps, 0, __config_regexp_hash, __config_regexp_compare);
+
+	CREATE_HASHSET_EXT(config->strpool, 100, __config_strpool_hash, __config_strpool_compare);
 
 	zbx_vector_uint64_create_ext(&config->locked_lld_ruleids,
 			__config_mem_malloc_func,
@@ -8315,25 +8357,19 @@ void	*DCconfig_get_stats(int request)
 	static zbx_uint64_t	value_uint;
 	static double		value_double;
 
-	const zbx_mem_info_t	*strpool_mem;
-
-	strpool_mem = zbx_strpool_info()->mem_info;
-
 	switch (request)
 	{
 		case ZBX_CONFSTATS_BUFFER_TOTAL:
-			value_uint = config_mem->orig_size + strpool_mem->orig_size;
+			value_uint = config_mem->orig_size;
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_USED:
-			value_uint = (config_mem->orig_size + strpool_mem->orig_size) -
-					(config_mem->free_size + strpool_mem->free_size);
+			value_uint = config_mem->orig_size - config_mem->free_size;
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_FREE:
-			value_uint = config_mem->free_size + strpool_mem->free_size;
+			value_uint = config_mem->free_size;
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_PFREE:
-			value_double = 100.0 * ((double)(config_mem->free_size + strpool_mem->free_size) /
-							(config_mem->orig_size + strpool_mem->orig_size));
+			value_double = 100.0 * ((double)(config_mem->free_size) / (config_mem->orig_size));
 			return &value_double;
 		default:
 			return NULL;
