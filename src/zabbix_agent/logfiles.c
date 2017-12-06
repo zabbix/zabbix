@@ -2524,6 +2524,77 @@ static zbx_uint64_t	calculate_remaining_bytes(struct st_logfile *logfiles, int l
 	return remaining_bytes;
 }
 
+static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfiles_old, int logfiles_num_old,
+		struct st_logfile *logfiles, int logfiles_num, int use_ino, int *seq, int *start_idx,
+		zbx_uint64_t *lastlogsize, char **err_msg)
+{
+	char	*old2new;
+	int	i, max_old_seq = 0, old_last;
+
+	if (NULL == (old2new = create_old2new_and_copy_of(rotation_type, logfiles_old, logfiles_num_old,
+			logfiles, logfiles_num, use_ino, err_msg)))
+	{
+		return FAIL;
+	}
+
+	/* transfer data about fully and partially processed files from the old file list to the new list */
+	for (i = 0; i < logfiles_num_old; i++)
+	{
+		int	j;
+
+		if (0 < logfiles_old[i].processed_size && 0 == logfiles_old[i].incomplete &&
+				-1 != (j = find_old2new(old2new, logfiles_num, i)))
+		{
+			if (logfiles_old[i].size == logfiles_old[i].processed_size
+					&& logfiles_old[i].size == logfiles[j].size)
+			{
+				/* the file was fully processed during the previous check and must be ignored */
+				/* during this check */
+				logfiles[j].processed_size = logfiles[j].size;
+				logfiles[j].seq = (*seq)++;
+			}
+			else
+			{
+				/* the file was not fully processed during the previous check or has grown */
+				logfiles[j].processed_size = logfiles_old[i].processed_size;
+			}
+		}
+		else if (1 == logfiles_old[i].incomplete && -1 != (j = find_old2new(old2new, logfiles_num, i)))
+		{
+			if (logfiles_old[i].size < logfiles[j].size)
+			{
+				/* The file was not fully processed because of incomplete last record */
+				/* but it has grown. Try to process it further. */
+				logfiles[j].incomplete = 0;
+			}
+			else
+				logfiles[j].incomplete = 1;
+
+			logfiles[j].processed_size = logfiles_old[i].processed_size;
+		}
+
+		/* find the last file processed (fully or partially) in the previous check */
+		if (max_old_seq < logfiles_old[i].seq)
+		{
+			max_old_seq = logfiles_old[i].seq;
+			old_last = i;
+		}
+	}
+
+	/* find the first file to continue from in the new file list */
+	if (0 < max_old_seq && -1 == (*start_idx = find_old2new(old2new, logfiles_num, old_last)))
+	{
+		/* Cannot find the successor of the last processed file from the previous check. */
+		/* 'lastlogsize' does not apply in this case. */
+		*lastlogsize = 0;
+		*start_idx = 0;
+	}
+
+	zbx_free(old2new);
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: process_logrt                                                    *
@@ -2586,9 +2657,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		int rotation_type)
 {
 	const char		*__function_name = "process_logrt";
-	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
-				max_old_seq = 0, old_last, from_first_file = 1, last_processed, limit_reached = 0;
-	char			*old2new = NULL;
+	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
+				from_first_file = 1, last_processed, limit_reached = 0;
 	struct st_logfile	*logfiles = NULL;
 	zbx_uint64_t		processed_bytes_sum = 0;
 
@@ -2625,76 +2695,13 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	else
 		start_idx = 0;
 
-	if (0 < *logfiles_num_old && 0 < logfiles_num)
+	if (0 < *logfiles_num_old && 0 < logfiles_num && SUCCEED != update_new_list_from_old(rotation_type,
+			*logfiles_old, *logfiles_num_old, logfiles, logfiles_num, *use_ino, &seq, &start_idx,
+			lastlogsize, err_msg))
 	{
-		/* set up a mapping array from old files to new files */
-		old2new = zbx_malloc(old2new, (size_t)logfiles_num * (size_t)(*logfiles_num_old) * sizeof(char));
-
-		if (SUCCEED != setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num,
-				*use_ino, err_msg))
-		{
-			destroy_logfile_list(&logfiles, &logfiles_alloc, &logfiles_num);
-			zbx_free(old2new);
-			goto out;
-		}
-
-		if (1 < *logfiles_num_old || 1 < logfiles_num)
-			resolve_old2new(old2new, *logfiles_num_old, logfiles_num);
-
-		/* Transfer data about fully and partially processed files from the old file list to the new list. */
-		for (i = 0; i < *logfiles_num_old; i++)
-		{
-			if (0 < (*logfiles_old)[i].processed_size && 0 == (*logfiles_old)[i].incomplete &&
-					-1 != (j = find_old2new(old2new, logfiles_num, i)))
-			{
-				if ((*logfiles_old)[i].size == (*logfiles_old)[i].processed_size
-						&& (*logfiles_old)[i].size == logfiles[j].size)
-				{
-					/* the file was fully processed during the previous check and must be ignored */
-					/* during this check */
-					logfiles[j].processed_size = logfiles[j].size;
-					logfiles[j].seq = seq++;
-				}
-				else
-				{
-					/* the file was not fully processed during the previous check or has grown */
-					logfiles[j].processed_size = (*logfiles_old)[i].processed_size;
-				}
-			}
-			else if (1 == (*logfiles_old)[i].incomplete &&
-					-1 != (j = find_old2new(old2new, logfiles_num, i)))
-			{
-				if ((*logfiles_old)[i].size < logfiles[j].size)
-				{
-					/* The file was not fully processed because of incomplete last record */
-					/* but it has grown. Try to process it further. */
-					logfiles[j].incomplete = 0;
-				}
-				else
-					logfiles[j].incomplete = 1;
-
-				logfiles[j].processed_size = (*logfiles_old)[i].processed_size;
-			}
-
-			/* find the last file processed (fully or partially) in the previous check */
-			if (max_old_seq < (*logfiles_old)[i].seq)
-			{
-				max_old_seq = (*logfiles_old)[i].seq;
-				old_last = i;
-			}
-		}
-
-		/* find the first file to continue from in the new file list */
-		if (0 < max_old_seq && -1 == (start_idx = find_old2new(old2new, logfiles_num, old_last)))
-		{
-			/* Cannot find the successor of the last processed file from the previous check. */
-			/* 'lastlogsize' does not apply in this case. */
-			*lastlogsize = 0;
-			start_idx = 0;
-		}
+		destroy_logfile_list(&logfiles, &logfiles_alloc, &logfiles_num);
+		goto out;
 	}
-
-	zbx_free(old2new);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
