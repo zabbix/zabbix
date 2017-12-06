@@ -277,7 +277,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	/*
 	 * list and host (template) name
 	 */
-	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
+	$list = (new CList())
+		->setAttribute('aria-role', 'navigation')
+		->setAttribute('aria-label', _('Breadcrumbs'))
+		->addClass(ZBX_STYLE_OBJECT_GROUP);
 
 	if ($is_template) {
 		$template = new CSpan(
@@ -503,6 +506,8 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
  */
 function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 	$list = (new CList())
+		->setAttribute('aria-role', 'navigation')
+		->setAttribute('aria-label', _('Breadcrumbs'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 		->addItem([
 			(new CSpan())->addItem(new CLink(_('All maps'), 'sysmaps.php')),

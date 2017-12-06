@@ -64,7 +64,10 @@ $top_menu = (new CDiv())
 			->addClass(ZBX_STYLE_HEADER_LOGO)
 	)
 	->addItem(
-		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
+		(new CList($data['menu']['main_menu']))
+			->addClass(ZBX_STYLE_TOP_NAV)
+			->setAttribute('aria-role', 'navigation')
+			->setAttribute('aria-label', _('Main navigation'))
 	)
 	->addItem($icons)
 	->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
@@ -79,6 +82,8 @@ $sub_menu_div = (new CDiv())
 foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 	$sub_menu_row = (new CList())
 		->addClass(ZBX_STYLE_TOP_SUBNAV)
+		->setAttribute('aria-role', 'navigation')
+		->setAttribute('aria-label', _('Sub navigation'))
 		->setId('sub_'.$label);
 
 	foreach ($sub_menu as $id => $sub_page) {

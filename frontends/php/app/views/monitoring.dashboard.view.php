@@ -121,6 +121,8 @@ else {
 			)
 		)
 		->addItem((new CList())
+			->setAttribute('aria-role', 'navigation')
+			->setAttribute('aria-label', _('Breadcrumbs'))
 			->addItem($breadcrumbs)
 			->addClass(ZBX_STYLE_OBJECT_GROUP)
 		)

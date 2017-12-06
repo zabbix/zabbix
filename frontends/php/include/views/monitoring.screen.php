@@ -22,6 +22,8 @@
 $widget = (new CWidget())
 	->setTitle(_('Screens'))
 	->addItem((new CList())
+	->setAttribute('aria-role', 'navigation')
+	->setAttribute('aria-label', _('Breadcrumbs'))
 	->addClass(ZBX_STYLE_OBJECT_GROUP)
 	->addItem([
 		(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
