@@ -257,6 +257,41 @@ ul.top-nav-icons {
 }
 
 // COLORS AND GENERAL
+
+a {
+	&:link {
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+	}
+	&:visited {
+		border-bottom: 1px solid $link-hover-color;
+	}
+	&:hover {
+		border-bottom: 1px solid $link-hover-color;
+	}
+}
+
+.link-action {
+	border-bottom: 1px dotted rgba($link-color, 0.5);
+	cursor: pointer;
+
+	&:link {
+		border-bottom: 1px dotted rgba($link-hover-color, 0.5);
+	}
+
+	&:visited {
+		border-bottom: 1px dotted rgba($link-hover-color, 0.5);
+	}
+
+	&:hover {
+		border-bottom: 1px dotted $link-hover-color;
+	}
+
+	&:active {
+		border-bottom: 1px dotted $link-hover-color;
+	}
+}
+
+
 .top-subnav a {
 	&.selected {
 		font-weight: bold;
@@ -306,11 +341,12 @@ ul.top-nav-icons {
 }
 
 .na-bg .link-action {
-	margin-left: 40px;
 	color: $font-color;
 }
 
-.list-table .na-bg {
+.list-table .na-bg,
+.dashbrd-widget .list-table .na-bg,
+.dashbrd-grid-widget-content .list-table .na-bg {
 	padding-left: 50px;
 	color: $font-color;
 }
@@ -327,6 +363,7 @@ ul.top-nav-icons {
 	left: 0;
 	bottom: 0;
 	background-color: #59db8f;
+	min-height: 28px;
 }
 
 .na-bg:after {
@@ -355,11 +392,12 @@ ul.top-nav-icons {
 }
 
 .normal-bg .link-action {
-	margin-left: 40px;
 	color: $font-color;
 }
 
-.list-table .normal-bg {
+.list-table .normal-bg,
+.dashbrd-widget .list-table .normal-bg,
+.dashbrd-grid-widget-content .list-table .normal-bg {
 	padding-left: 50px;
 	color: $font-color;
 }
@@ -376,6 +414,7 @@ ul.top-nav-icons {
 	left: 0;
 	bottom: 0;
 	background-color: $alt-green;
+	min-height: 28px;
 }
 
 .normal-bg:after {
@@ -393,31 +432,16 @@ ul.top-nav-icons {
 }
 
 .info-bg {
-	input[type="radio"] {
-		&:checked + label {
-			@extend .radio-segmented;
-		}
-	}
-}
-
-.info-bg {
-	input[type="radio"] {
-		&:checked + label {
-			@extend .radio-segmented;
-		}
-	}
-}
-
-.info-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
 .info-bg .link-action {
-	margin-left: 40px;
 	color: $font-color;
 }
 
-.list-table .info-bg {
+.list-table .info-bg,
+.dashbrd-widget .list-table .info-bg,
+.dashbrd-grid-widget-content .list-table .info-bg {
 	padding-left: 50px;
 	color: $font-color;
 }
@@ -433,6 +457,7 @@ ul.top-nav-icons {
 	top: 0;
 	left: 0;
 	bottom: 0;
+	min-height: 28px;
 }
 
 .info-bg:after {
@@ -461,11 +486,12 @@ ul.top-nav-icons {
 }
 
 .average-bg .link-action {
-	margin-left: 40px;
 	color: $font-color;
 }
 
-.list-table .average-bg {
+.list-table .average-bg,
+.dashbrd-widget .list-table .average-bg,
+.dashbrd-grid-widget-content .list-table .average-bg {
 	padding-left: 50px;
 	color: $font-color;
 }
@@ -481,6 +507,7 @@ ul.top-nav-icons {
 	top: 0;
 	left: 0;
 	bottom: 0;
+	min-height: 28px;
 }
 
 .average-bg:after {
@@ -509,11 +536,12 @@ ul.top-nav-icons {
 }
 
 .warning-bg .link-action {
-	margin-left: 40px;
 	color: $font-color;
 }
 
-.list-table .warning-bg {
+.list-table .warning-bg,
+.dashbrd-widget .list-table .warning-bg,
+.dashbrd-grid-widget-content .list-table .warning-bg {
 	padding-left: 50px;
 	color: $font-color;
 }
@@ -529,6 +557,7 @@ ul.top-nav-icons {
 	top: 0;
 	left: 0;
 	bottom: 0;
+	min-height: 28px;
 }
 
 .warning-bg:after {
@@ -557,11 +586,12 @@ ul.top-nav-icons {
 }
 
 .high-bg .link-action {
-	margin-left: 40px;
 	color: $font-color;
 }
 
-.list-table .high-bg {
+.list-table .high-bg,
+.dashbrd-widget .list-table .high-bg,
+.dashbrd-grid-widget-content .list-table .high-bg {
 	padding-left: 50px;
 	color: $font-color;
 }
@@ -577,6 +607,7 @@ ul.top-nav-icons {
 	top: 0;
 	left: 0;
 	bottom: 0;
+	min-height: 28px;
 }
 
 .high-bg:after {
@@ -605,11 +636,12 @@ ul.top-nav-icons {
 }
 
 .disaster-bg .link-action {
-	margin-left: 40px;
 	color: $font-color;
 }
 
-.list-table .disaster-bg {
+.list-table .disaster-bg,
+.dashbrd-widget .list-table .disaster-bg,
+.dashbrd-grid-widget-content .list-table .disaster-bg {
 	padding-left: 50px;
 	color: $font-color;
 }
@@ -625,6 +657,7 @@ ul.top-nav-icons {
 	top: 0;
 	left: 0;
 	bottom: 0;
+	min-height: 28px;
 }
 
 .disaster-bg:after {
