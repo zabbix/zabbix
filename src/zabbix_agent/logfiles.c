@@ -2512,6 +2512,17 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
 	return adjust_position_after_jump(&logfiles[jumped_to], lastlogsize, min_size, encoding, err_msg);
 }
 
+static zbx_uint64_t	calculate_remaining_bytes(struct st_logfile *logfiles, int logfiles_num)
+{
+	zbx_uint64_t	remaining_bytes = 0;
+	int		i;
+
+	for (i = 0; i < logfiles_num; i++)
+			remaining_bytes += logfiles[i].size - logfiles[i].processed_size;
+
+	return remaining_bytes;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: process_logrt                                                    *
@@ -2579,7 +2590,6 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	zbx_uint64_t		processed_bytes_sum = 0;
-	double			delay;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flags:0x%02x filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, (unsigned int)flags, filename, *lastlogsize, *mtime);
@@ -2711,23 +2721,28 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	{
 		if (0.0 != *start_time)
 		{
-			zbx_uint64_t	remaining_bytes = 0;
+			zbx_uint64_t	remaining_bytes;
 
-			/* calculate number of remaining bytes */
-
-			for (j = 0; j < logfiles_num; j++)
-				remaining_bytes += logfiles[j].size - logfiles[j].processed_size;
-
-			/* calculate delay and jump if necessary */
-
-			if (0 != remaining_bytes && (double)max_delay < (delay = calculate_delay(*processed_bytes,
-					remaining_bytes, zbx_time() - *start_time)))
+			if (0 != (remaining_bytes = calculate_remaining_bytes(logfiles, logfiles_num)))
 			{
-				if (SUCCEED == (ret = jump_ahead(key, logfiles, logfiles_num, &last_processed, &seq,
-						lastlogsize, mtime, encoding, err_msg, remaining_bytes, delay,
-						max_delay)))
+				/* calculate delay and jump if necessary */
+
+				double	delay;
+
+				if ((double)max_delay < (delay = calculate_delay(*processed_bytes, remaining_bytes,
+						zbx_time() - *start_time)))
 				{
-					*jumped = 1;
+					zbx_uint64_t	bytes_to_jump;
+
+					bytes_to_jump = (zbx_uint64_t)((double)remaining_bytes *
+							(delay - (double)max_delay) / delay);
+
+					if (SUCCEED == (ret = jump_ahead(key, logfiles, logfiles_num,
+							&last_processed, &seq, lastlogsize, mtime, encoding,
+							bytes_to_jump, err_msg)))
+					{
+						*jumped = 1;
+					}
 				}
 			}
 		}
