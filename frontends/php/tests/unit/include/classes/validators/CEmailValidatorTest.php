@@ -39,9 +39,11 @@ class CEmailValidatorTest extends PHPUnit_Framework_TestCase {
 			['___-___@example.com', true, null],
 			['admin@another-example.com', true, null],
 			['Administrator <admin@example.com>', true, null],
+			['Имя Фамилия <admin@example.com>', true, null],
 			['much."more\ unusual"@example.com', true, null],
 			['very."(),:;<>[]".VERY."very@\\very".unusual@strange.example.com', true, null],
 			// Invalid e-mails.
+			['Имя Фамилия <Имя.Фамилия@example.com>', false, 'Invalid email address "Имя Фамилия <Имя.Фамилия@example.com>".'],
 			['plainaddress', false, 'Invalid email address "plainaddress".'],
 			['email@example', false, 'Invalid email address "email@example".'],
 			['example.com', false, 'Invalid email address "example.com".'],
