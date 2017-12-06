@@ -2238,6 +2238,54 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 	return delay;
 }
 
+static void	jump_remaining_bytes_logrt(struct st_logfile *logfiles, int logfiles_num, const char *key,
+		int start_from, zbx_uint64_t bytes_to_jump, int *seq, zbx_uint64_t *lastlogsize, int *mtime,
+		int *jumped_to)
+{
+	int	first_pass = 1;
+	int	i = start_from;		/* enter the loop with index of the last file processed, */
+					/* later continue the loop from the start */
+
+	while (i < logfiles_num)
+	{
+		if (logfiles[i].size != logfiles[i].processed_size)
+		{
+			zbx_uint64_t	bytes_jumped, new_processed_size;
+
+			bytes_jumped = MIN(bytes_to_jump, logfiles[i].size - logfiles[i].processed_size);
+			new_processed_size = logfiles[i].processed_size + bytes_jumped;
+
+			zabbix_log(LOG_LEVEL_WARNING, "item:\"%s\" logfile:\"%s\" skipping " ZBX_FS_UI64 " bytes (from"
+					" byte " ZBX_FS_UI64 " to byte " ZBX_FS_UI64 ") to meet maxdelay", key,
+					logfiles[i].filename, bytes_jumped, logfiles[i].processed_size,
+					new_processed_size);
+
+			logfiles[i].processed_size = new_processed_size;
+			*lastlogsize = new_processed_size;
+			*mtime = logfiles[i].mtime;
+
+			logfiles[i].seq = (*seq)++;
+
+			bytes_to_jump -= bytes_jumped;
+
+			*jumped_to = i;
+		}
+
+		if (0 == bytes_to_jump)
+			break;
+
+		if (0 != first_pass)
+		{
+			/* 'start_from' element was processed, now proceed from the beginning of file list */
+			first_pass = 0;
+			i = 0;
+			continue;
+		}
+
+		i++;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: adjust_position_after_jump                                       *
@@ -2416,79 +2464,32 @@ out:
  * Purpose: move forward to a new position in the log file list               *
  *                                                                            *
  * Parameters:                                                                *
- *     key             - [IN] item key for logging                            *
- *     logfiles        - [IN/OUT] list of log files                           *
- *     logfiles_num    - [IN] number of elements in 'logfiles'                *
- *     jump_from_to    - [IN/OUT] on input - number of element where to start *
- *                       jump, on output - number of element we jumped into   *
- *     seq             - [IN/OUT] sequence number of last processed file      *
- *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
- *     mtime           - [IN/OUT] last modification time of the file          *
- *     encoding        - [IN] text string describing encoding                 *
- *     err_msg         - [IN/OUT] error message                               *
- *     remaining_bytes - [IN] number of remaining bytes in all logfiles       *
- *     delay           - [IN] calculated delay is seconds                     *
- *     max_delay       - [IN] "maxdelay" parameter in log[], logrt[],         *
- *                            log.count[] and logrt.count[] items             *
+ *     key           - [IN] item key for logging                              *
+ *     logfiles      - [IN/OUT] list of log files                             *
+ *     logfiles_num  - [IN] number of elements in 'logfiles'                  *
+ *     jump_from_to  - [IN/OUT] on input - number of element where to start   *
+ *                     jump, on output - number of element we jumped into     *
+ *     seq           - [IN/OUT] sequence number of last processed file        *
+ *     lastlogsize   - [IN/OUT] offset from the beginning of the file         *
+ *     mtime         - [IN/OUT] last modification time of the file            *
+ *     encoding      - [IN] text string describing encoding                   *
+ *     bytes_to_jump - [IN] number of bytes to jump ahead                     *
+ *     err_msg       - [IN/OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED or FAIL (with error message allocated in 'err_msg')  *
  *                                                                            *
  ******************************************************************************/
-static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num, int *jump_from_to,
-		int *seq, zbx_uint64_t *lastlogsize, int *mtime, const char *encoding, char **err_msg,
-		zbx_uint64_t remaining_bytes, double delay, float max_delay)
+static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num,
+		int *jump_from_to, int *seq, zbx_uint64_t *lastlogsize, int *mtime, const char *encoding,
+		zbx_uint64_t bytes_to_jump, char **err_msg)
 {
-	zbx_uint64_t	bytes_to_jump, bytes_jumped = 0, lastlogsize_org, min_size;
-	int		i, first_pass = 1,
-			jumped_to = -1;		/* number of file in 'logfiles' list we jumped to */
-
-	/* calculate jump */
-	bytes_to_jump = (zbx_uint64_t)((double)remaining_bytes * (delay - (double)max_delay) / delay);
-
-	/* enter the loop with index of the last file processed, later continue the loop from the start */
-	i = *jump_from_to;
+	zbx_uint64_t	lastlogsize_org, min_size;
+	int		jumped_to = -1;		/* number of file in 'logfiles' list we jumped to */
 
 	lastlogsize_org = *lastlogsize;
 
-	while (i < logfiles_num)
-	{
-		if (logfiles[i].size != logfiles[i].processed_size)
-		{
-			zbx_uint64_t	new_processed_size;
-
-			bytes_jumped = MIN(bytes_to_jump, logfiles[i].size - logfiles[i].processed_size);
-			new_processed_size = logfiles[i].processed_size + bytes_jumped;
-
-			zabbix_log(LOG_LEVEL_WARNING, "item:\"%s\" logfile:\"%s\" skipping " ZBX_FS_UI64 " bytes (from"
-					" byte " ZBX_FS_UI64 " to byte " ZBX_FS_UI64 ") to meet maxdelay", key,
-					logfiles[i].filename, bytes_jumped, logfiles[i].processed_size,
-					new_processed_size);
-
-			logfiles[i].processed_size = new_processed_size;
-			*lastlogsize = new_processed_size;
-			*mtime = logfiles[i].mtime;
-
-			logfiles[i].seq = (*seq)++;
-
-			bytes_to_jump -= bytes_jumped;
-
-			jumped_to = i;
-		}
-
-		if (0 == bytes_to_jump)
-			break;
-
-		if (0 != first_pass)
-		{
-			first_pass = 0;
-
-			/* now proceed from the beginning of the file list */
-			i = 0;
-			continue;
-		}
-
-		i++;
-	}
+	jump_remaining_bytes_logrt(logfiles, logfiles_num, key, *jump_from_to, bytes_to_jump, seq, lastlogsize,
+			mtime, &jumped_to);
 
 	if (-1 == jumped_to)		/* no actual jump took place, no need to modify 'jump_from_to' */
 		return SUCCEED;
