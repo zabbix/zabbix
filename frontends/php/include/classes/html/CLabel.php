@@ -32,7 +32,7 @@ class CLabel extends CTag {
 	/**
 	 * Allow to add visual 'asterisk' mark to label.
 	 *
-	 * @param bool $asterisk_visible    Define is label marked with asterisk or not.
+	 * @param bool $add_asterisk  Define is label marked with asterisk or not.
 	 *
 	 * @return CLabel
 	 */

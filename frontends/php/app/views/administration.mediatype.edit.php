@@ -35,30 +35,27 @@ $mediaTypeForm = (new CForm())
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid']);
 
-// create form list
-$nameTextBox = (new CTextBox('description', $data['description'], false, 100))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAriaRequired()
-	->setAttribute('autofocus', 'autofocus');
-$mediaTypeFormList = (new CFormList())
-	->addRow((new CLabel(_('Name'), 'description'))->setAsteriskMark(), $nameTextBox);
-
-// append type to form list
-$cmbType = new CComboBox('type', $data['type'], null, [
-	MEDIA_TYPE_EMAIL => _('Email'),
-	MEDIA_TYPE_EXEC => _('Script'),
-	MEDIA_TYPE_SMS => _('SMS'),
-	MEDIA_TYPE_JABBER => _('Jabber')
-]);
-$cmbType->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]);
-$cmbTypeRow = [$cmbType->setAriaRequired()];
-$ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
-	->setId('eztext_link')
-	->setTarget('_blank');
-$cmbTypeRow[] = $ez_texting_link;
-
-$mediaTypeFormList
-	->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(), $cmbTypeRow)
+// Create form list.
+$mediatype_formlist = (new CFormList())
+	->addRow((new CLabel(_('Name'), 'description'))->setAsteriskMark(),
+		(new CTextBox('description', $data['description'], false, 100))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(), [
+		(new CComboBox('type', $data['type'], null, [
+			MEDIA_TYPE_EMAIL => _('Email'),
+			MEDIA_TYPE_EXEC => _('Script'),
+			MEDIA_TYPE_SMS => _('SMS'),
+			MEDIA_TYPE_JABBER => _('Jabber')
+		]))
+			->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')])
+			->setAriaRequired(),
+		(new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
+			->setId('eztext_link')
+			->setTarget('_blank')
+	])
 	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
 		(new CTextBox('smtp_server', $data['smtp_server']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -122,22 +119,22 @@ $exec_params_table->addRow([(new CButton('exec_param_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-$mediaTypeFormList->addRow(_('Script parameters'),
+$mediatype_formlist->addRow(_('Script parameters'),
 	(new CDiv($exec_params_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	'row_exec_params'
 );
 
-$mediaTypeFormList->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteriskMark(),
+$mediatype_formlist->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteriskMark(),
 	(new CTextBox('gsm_modem', $data['gsm_modem']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired()
 );
 
-// create password field
-if ($data['passwd'] != '') {
-	$passwdField = [
+// Create password field.
+if ($data['passwd'] !== '') {
+	$passwd_field = [
 		(new CButton('chPass_btn', _('Change password')))
 			->onClick('this.style.display="none"; $("passwd").show().focus();'),
 		(new CPassBox('passwd', $data['passwd']))
@@ -147,11 +144,11 @@ if ($data['passwd'] != '') {
 	];
 }
 else {
-	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+	$passwd_field = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // append password field to form list
-$mediaTypeFormList
+$mediatype_formlist
 	->addRow((new CLabel(_('Jabber identifier'), 'jabber_username'))->setAsteriskMark(),
 		(new CTextBox('jabber_username', $data['jabber_username']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -162,7 +159,9 @@ $mediaTypeFormList
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Password'), 'passwd'))->setAsteriskMark($data['passwd'] != ''), $passwdField)
+	->addRow((new CLabel(_('Password'), 'passwd'))->setAsteriskMark($data['passwd'] !== ''),
+		$passwd_field
+	)
 	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [
 		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
@@ -170,7 +169,7 @@ $mediaTypeFormList
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
 	);
-$tabs->addTab('mediaTab', _('Media type'), $mediaTypeFormList);
+$tabs->addTab('mediaTab', _('Media type'), $mediatype_formlist);
 
 // media options tab
 $max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;

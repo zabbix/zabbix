@@ -181,7 +181,7 @@ $httpAuthenticationFormList
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
-$stepsTable = (new CTable())
+$steps_table = (new CTable())
 	->setId('httpStepTable')
 	->setHeader([
 		(new CColHeader())->setWidth('15'),
@@ -240,7 +240,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 			->setAttribute('remove_step', $stepid);
 	}
 
-	$stepsTable->addRow(
+	$steps_table->addRow(
 		(new CRow([
 			$dragHandler,
 			$numSpan,
@@ -257,15 +257,15 @@ foreach ($this->data['steps'] as $stepid => $step) {
 }
 
 if (!$this->data['templated']) {
-	$stepsTable->addRow(
+	$steps_table->addRow(
 		(new CCol(
 			(new CButton('add_step', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 		))->setColSpan(8)
 	);
 }
 
-$httpStepFormList->addRow((new CLabel(_('Steps'), $stepsTable->getId()))->setAsteriskMark(),
-	(new CDiv($stepsTable))
+$httpStepFormList->addRow((new CLabel(_('Steps'), $steps_table->getId()))->setAsteriskMark(),
+	(new CDiv($steps_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAriaRequired()
 );

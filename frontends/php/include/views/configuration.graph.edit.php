@@ -302,7 +302,7 @@ else {
 }
 
 // Append items to form list.
-$itemsTable = (new CTable())
+$items_table = (new CTable())
 	->setId('itemsTable')
 	->setHeader([
 		(new CColHeader())->setWidth(15),
@@ -326,7 +326,7 @@ $itemsTable = (new CTable())
 		$readonly ? null : (new CColHeader(_('Action')))->setWidth(50)
 	]);
 
-$itemsTable->addRow(
+$items_table->addRow(
 	(new CRow(
 		$readonly
 			? null
@@ -371,8 +371,8 @@ foreach ($this->data['items'] as $n => $item) {
 }
 
 $graphFormList->addRow(
-	(new CLabel(_('Items'), $itemsTable->getId()))->setAsteriskMark(),
-	(new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	(new CLabel(_('Items'), $items_table->getId()))->setAsteriskMark(),
+	(new CDiv($items_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 // Append tabs to form.

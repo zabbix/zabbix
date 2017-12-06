@@ -48,7 +48,7 @@ $servicesFormList = (new CFormList('servicesFormList'))
 
 // append parent link to form list
 $servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setAsteriskMark(), [
-	(new CTextBox('parent_name', $this->data['parentname'], true, 128))
+	(new CTextBox('parent_name', $data['parentname'], true, 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -61,10 +61,8 @@ $servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setA
 
 // append algorithm to form list
 $servicesFormList->addRow(
-	(new CLabel(_('Status calculation algorithm'), 'algorithm'))
-		->setAsteriskMark(),
-	(new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorithm()))
-		->setAriaRequired()
+	(new CLabel(_('Status calculation algorithm'), 'algorithm'))->setAsteriskMark(),
+	(new CComboBox('algorithm', $data['algorithm'], null, serviceAlgorithm()))->setAriaRequired()
 );
 
 // append SLA to form list
@@ -94,7 +92,7 @@ $servicesFormList->addRow(_('Trigger'), [
 			'&with_triggers=1");'
 		)
 ]);
-$servicesFormList->addRow((new CLabel(_('Sort order (0->999)')))->setAsteriskMark(),
+$servicesFormList->addRow((new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
 	(new CTextBox('sortorder', $this->data['sortorder'], false, 3))
 		->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		->setAriaRequired()
@@ -202,12 +200,11 @@ $servicesTimeFormList->addRow(_('Service times'),
 $serviceTimeTable = (new CTable())
 	->addRow([
 		(new CLabel(_('Period type'), 'new_service_time[type]'))->setAsteriskMark(),
-		(new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'submit()', [
+		(new CComboBox('new_service_time[type]', $data['new_service_time']['type'], 'submit()', [
 			SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
 			SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
 			SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
-		]))
-			->setAriaRequired()
+		]))->setAriaRequired()
 	]);
 
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {

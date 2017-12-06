@@ -200,7 +200,10 @@ $correlation_tab
 // Operations tab.
 $operation_tab = new CFormList('operationlist');
 
-$operations_table = (new CTable())->setAttribute('style', 'width: 100%;')->setHeader([_('Details'), _('Action')]);
+$operations_table = (new CTable())
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Details'), _('Action')])
+	->setId('operations_table');
 
 if ($data['correlation']['operations']) {
 	foreach ($data['correlation']['operations'] as $operationid => $operation) {
@@ -222,8 +225,8 @@ if ($data['correlation']['operations']) {
 
 $operation_tab
 	->addRow(
-		(new CLabel(_('Operations'), 'operations_table'))->setAsteriskMark(),
-		(new CDiv([$operations_table->setId('operations_table')]))
+		(new CLabel(_('Operations'), $operations_table->getId()))->setAsteriskMark(),
+		(new CDiv([$operations_table]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	)

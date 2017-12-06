@@ -78,7 +78,8 @@ if (!$this->data['is_profile']) {
 				'parameters' => 'srctbl=usrgrp&dstfrm='.$userForm->getName().'&dstfld1=user_groups_&srcfld1=usrgrpid'.
 					'&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	);
 }
@@ -395,7 +396,7 @@ if (!$data['is_profile']) {
 		$userForm->addVar('user_type', $data['user_type']);
 	}
 	else {
-		$permissionsFormList->addRow((new CLabel(_('User type'), $userTypeComboBox->getId()))->setAsteriskMark(),
+		$permissionsFormList->addRow((new CLabel(_('User type'), 'user_type'))->setAsteriskMark(),
 			$userTypeComboBox->setAriaRequired()
 		);
 	}

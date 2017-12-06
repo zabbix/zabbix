@@ -708,10 +708,7 @@ if (!empty($data['new_operation'])) {
 			zbx_add_post_js($js_insert);
 
 			$new_operation_formlist
-				->addRow('',
-					(new CLabel(_('At least one user or user group must be selected.')))
-						->setAsteriskMark()
-				)
+				->addRow('', (new CLabel(_('At least one user or user group must be selected.')))->setAsteriskMark())
 				->addRow(_('Send to User groups'),
 					(new CDiv($usrgrpList))
 						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -861,18 +858,6 @@ if (!empty($data['new_operation'])) {
 					->setId('opCmdList')
 			);
 
-			// type
-			$typeComboBox = new CComboBox('new_operation[opcommand][type]',
-				$data['new_operation']['opcommand']['type'],
-				'showOpTypeForm('.ACTION_OPERATION.')',	[
-					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
-					ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
-					ZBX_SCRIPT_TYPE_SSH => _('SSH'),
-					ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
-					ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-				]
-			);
-
 			$userScript = [
 				new CVar('new_operation[opcommand][scriptid]', $data['new_operation']['opcommand']['scriptid']),
 				(new CTextBox('new_operation[opcommand][script]', $data['new_operation']['opcommand']['script'], true))
@@ -882,87 +867,103 @@ if (!empty($data['new_operation'])) {
 				(new CButton('select_operation_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 			];
 
-			$new_operation_formlist->addRow(
-				(new CLabel(_('Type'), $typeComboBox->getId()))->setAsteriskMark(),
-				$typeComboBox->setAriaRequired()
-			);
-			$new_operation_formlist->addRow(
-				(new CLabel(_('Script name'), 'new_operation_opcommand_script'))->setAsteriskMark(),
-				(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
-			);
-
-			// script
-			$new_operation_formlist->addRow(
-				(new CLabel(_('Execute on'), 'new_operation[opcommand][execute_on]'))->setAsteriskMark(),
-				(new CRadioButtonList('new_operation[opcommand][execute_on]',
-					(int) $data['new_operation']['opcommand']['execute_on']
-				))
-					->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-					->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
-					->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-					->setAriaRequired()
-					->setModern(true)
-			);
-
-			// ssh
-			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]',
-				$data['new_operation']['opcommand']['authtype'],
-				'showOpTypeAuth('.ACTION_OPERATION.')', [
-					ITEM_AUTHTYPE_PASSWORD => _('Password'),
-					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-				]
-			);
-
-			$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
-			$new_operation_formlist->addRow(
-				(new CLabel(_('User name'), 'new_operation[opcommand][username]'))->setAsteriskMark(),
-				(new CTextBox('new_operation[opcommand][username]', $data['new_operation']['opcommand']['username']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setAriaRequired()
-			);
-			$new_operation_formlist->addRow(
-				(new CLabel(_('Public key file'), 'new_operation[opcommand][publickey]'))->setAsteriskMark(),
-				(new CTextBox('new_operation[opcommand][publickey]', $data['new_operation']['opcommand']['publickey']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setAriaRequired()
-			);
-			$new_operation_formlist->addRow(
-				(new CLabel(_('Private key file'), 'new_operation[opcommand][privatekey]'))->setAsteriskMark(),
-				(new CTextBox('new_operation[opcommand][privatekey]', $data['new_operation']['opcommand']['privatekey']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setAriaRequired()
-			);
-			$new_operation_formlist->addRow(_('Password'),
-				(new CTextBox('new_operation[opcommand][password]', $data['new_operation']['opcommand']['password']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
-
-			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
-			$passphraseCB = (new CTextBox('new_operation[opcommand][password]', $data['new_operation']['opcommand']['password']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setId('new_operation_opcommand_passphrase');
-			$new_operation_formlist->addRow(_('Key passphrase'), $passphraseCB);
-
-			// ssh && telnet
-			$new_operation_formlist->addRow(_('Port'),
-				(new CTextBox('new_operation[opcommand][port]', $data['new_operation']['opcommand']['port']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
-
-			// command
-			$new_operation_formlist->addRow(
-				(new CLabel(_('Commands'), 'new_operation[opcommand][command]'))->setAsteriskMark(),
-				(new CTextArea('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired()
-			);
-			$new_operation_formlist->addRow(
-				(new CLabel(_('Commands'), 'new_operation[opcommand][command]'))->setAsteriskMark(),
-				(new CTextBox('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setId('new_operation_opcommand_command_ipmi')
-					->setAriaRequired()
-			);
+			$new_operation_formlist
+				// type
+				->addRow(
+					(new CLabel(_('Type'), 'new_operation[opcommand][type]'))->setAsteriskMark(),
+					(new CComboBox('new_operation[opcommand][type]',
+						$data['new_operation']['opcommand']['type'],
+						'showOpTypeForm('.ACTION_OPERATION.')',	[
+							ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
+							ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
+							ZBX_SCRIPT_TYPE_SSH => _('SSH'),
+							ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
+							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
+						]
+					))->setAriaRequired()
+				)
+				->addRow(
+					(new CLabel(_('Script name'), 'new_operation_opcommand_script'))->setAsteriskMark(),
+					(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
+				)
+				// script
+				->addRow(
+					(new CLabel(_('Execute on'), 'new_operation[opcommand][execute_on]'))->setAsteriskMark(),
+					(new CRadioButtonList('new_operation[opcommand][execute_on]',
+						(int) $data['new_operation']['opcommand']['execute_on']
+					))
+						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+						->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
+						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+						->setAriaRequired()
+						->setModern(true)
+				)
+				// ssh
+				->addRow(_('Authentication method'),
+					new CComboBox('new_operation[opcommand][authtype]',
+						$data['new_operation']['opcommand']['authtype'],
+						'showOpTypeAuth('.ACTION_OPERATION.')', [
+							ITEM_AUTHTYPE_PASSWORD => _('Password'),
+							ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+						]
+					)
+				)
+				->addRow(
+					(new CLabel(_('User name'), 'new_operation[opcommand][username]'))->setAsteriskMark(),
+					(new CTextBox('new_operation[opcommand][username]',
+						$data['new_operation']['opcommand']['username']
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
+				)
+				->addRow(
+					(new CLabel(_('Public key file'), 'new_operation[opcommand][publickey]'))->setAsteriskMark(),
+					(new CTextBox('new_operation[opcommand][publickey]',
+						$data['new_operation']['opcommand']['publickey']
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
+				)
+				->addRow(
+					(new CLabel(_('Private key file'), 'new_operation[opcommand][privatekey]'))->setAsteriskMark(),
+					(new CTextBox('new_operation[opcommand][privatekey]',
+						$data['new_operation']['opcommand']['privatekey']
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
+				)
+				->addRow(_('Password'),
+					(new CTextBox('new_operation[opcommand][password]',
+						$data['new_operation']['opcommand']['password']
+					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
+				->addRow(_('Key passphrase'),
+					(new CTextBox('new_operation[opcommand][password]',
+						$data['new_operation']['opcommand']['password']
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setId('new_operation_opcommand_passphrase')
+				)
+				// ssh && telnet
+				->addRow(_('Port'),
+					(new CTextBox('new_operation[opcommand][port]', $data['new_operation']['opcommand']['port']))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				// command
+				->addRow(
+					(new CLabel(_('Commands'), 'new_operation[opcommand][command]'))->setAsteriskMark(),
+					(new CTextArea('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired()
+				)
+				->addRow(
+					(new CLabel(_('Commands'), 'new_operation[opcommand][command]'))->setAsteriskMark(),
+					(new CTextBox('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setId('new_operation_opcommand_command_ipmi')
+						->setAriaRequired()
+				);
 			break;
 
 		case OPERATION_TYPE_HOST_ADD:
@@ -1612,7 +1613,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				);
 
 				// type
-				$typeComboBox = new CComboBox('new_recovery_operation[opcommand][type]',
+				$typeComboBox = (new CComboBox('new_recovery_operation[opcommand][type]',
 					$data['new_recovery_operation']['opcommand']['type'],
 					'showOpTypeForm('.ACTION_RECOVERY_OPERATION.')', [
 						ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
@@ -1621,7 +1622,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 						ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
 					]
-				);
+				))->setAriaRequired();
 
 				$userScript = [
 					new CVar('new_recovery_operation[opcommand][scriptid]',
@@ -1638,8 +1639,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				];
 
 				$new_operation_formlist->addRow(
-					(new CLabel(_('Type'), $typeComboBox->getId()))->setAsteriskMark(),
-					$typeComboBox->setAriaRequired()
+					(new CLabel(_('Type'), 'new_recovery_operation[opcommand][type]'))->setAsteriskMark(),
+					$typeComboBox
 				);
 				$new_operation_formlist->addRow(
 					(new CLabel(_('Script name'), 'new_recovery_operation[opcommand][script]'))->setAsteriskMark(),
@@ -2078,15 +2079,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				)
 				->addRow(
 					(new CLabel(_('Type'), 'new_ack_operation[opcommand][type]'))->setAsteriskMark(),
-					(new CComboBox('new_ack_operation[opcommand][type]', $data['new_ack_operation']['opcommand']['type'],
+					(new CComboBox('new_ack_operation[opcommand][type]',
+						$data['new_ack_operation']['opcommand']['type'],
 						'showOpTypeForm('.ACTION_ACKNOWLEDGE_OPERATION.')', [
 							ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 							ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
 							ZBX_SCRIPT_TYPE_SSH => _('SSH'),
 							ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-					]))
-						->setAriaRequired()
+					]))->setAriaRequired()
 				)
 				->addRow(
 					(new CLabel(_('Script name'), 'new_ack_operation[opcommand][script]'))->setAsteriskMark(),

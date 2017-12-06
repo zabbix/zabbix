@@ -76,8 +76,7 @@ $itemFormList->addRow(
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
-	$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))
-		->setAriaRequired();
+	$interfaces_combobox = (new CComboBox('interfaceid', $data['interfaceid']))->setAriaRequired();
 
 	// Set up interface groups sorted by priority.
 	$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
@@ -100,7 +99,7 @@ if (!empty($this->data['interfaces'])) {
 		$interface_groups[$interface['type']]->addItem($option);
 	}
 	foreach ($interface_groups as $interface_group) {
-		$interfacesComboBox->addItem($interface_group);
+		$interfaces_combobox->addItem($interface_group);
 	}
 
 	$span = (new CSpan(_('No interface found')))
@@ -108,8 +107,8 @@ if (!empty($this->data['interfaces'])) {
 		->setId('interface_not_defined')
 		->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow((new CLabel(_('Host interface'), $interfacesComboBox->getId()))->setAsteriskMark(),
-		[$interfacesComboBox, $span], 'interface_row'
+	$itemFormList->addRow((new CLabel(_('Host interface'), 'interfaceid'))->setAsteriskMark(),
+		[$interfaces_combobox, $span], 'interface_row'
 	);
 	$itemForm->addVar('selectedInterfaceId', $data['interfaceid']);
 }

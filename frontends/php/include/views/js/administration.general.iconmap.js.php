@@ -3,28 +3,21 @@
 	(new CRow([
 		(new CCol(
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-		))
-			->addClass(ZBX_STYLE_TD_DRAG_ICON),
-		new CCol(
-			(new CSpan('#0:'))->addClass('rowNum')
-		),
-		new CCol(
-			(new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]', null, null, $data['inventoryList']))
-				->setId('iconmap_mappings_#{iconmappingid}_inventory_link')
-				->setAttribute('autocomplete', 'off')
-		),
-		new CCol((
-			(new CTextBox('iconmap[mappings][#{iconmappingid}][expression]', '', false, 64))
-				->setId('iconmap_mappings_#{iconmappingid}_expression')
-				->setAriaRequired()
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		)),
-		new CCol(
-			(new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', null, null, $data['iconList']))
-				->setId('iconmap_mappings_#{iconmappingid}_iconid')
-				->addClass('mappingIcon')
-				->setAttribute('autocomplete', 'off')
-		),
+		))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+		(new CSpan('#0:'))->addClass('rowNum'),
+		(new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]', null, null, $data['inventoryList']))
+			->setId('iconmap_mappings_#{iconmappingid}_inventory_link')
+			->setAttribute('autocomplete', 'off')
+			->setAriaRequired(),
+		(new CTextBox('iconmap[mappings][#{iconmappingid}][expression]', '', false, 64))
+			->setId('iconmap_mappings_#{iconmappingid}_expression')
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', null, null, $data['iconList']))
+			->setId('iconmap_mappings_#{iconmappingid}_iconid')
+			->addClass('mappingIcon')
+			->setAttribute('autocomplete', 'off')
+			->setAriaRequired(),
 		(new CCol(
 			(new CImg('imgstore.php?iconid='.$data['default_imageid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 				'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'))
@@ -32,13 +25,12 @@
 				->setAttribute('data-image-full', 'imgstore.php?iconid='.$data['default_imageid'])
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->addClass('preview')
-		))
-			->addStyle('vertical-align: middle'),
+		))->addStyle('vertical-align: middle'),
 		(new CCol(
 			(new CButton('remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK.' removeMapping')
-		))
-			->addClass(ZBX_STYLE_NOWRAP)
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('remove_mapping')
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]))
 		->setId('iconmapidRow_#{iconmappingid}')
 		->addClass('sortable')
@@ -88,7 +80,7 @@
 		});
 
 		iconMapTable.find('tbody')
-			.on('click', '.removeMapping', function() {
+			.on('click', '.remove_mapping', function() {
 				$(this).parent().parent().remove();
 
 				if (iconMapTable.find('tr.sortable').length < 2) {

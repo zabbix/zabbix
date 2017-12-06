@@ -84,7 +84,7 @@ $templateList = (new CFormList('hostlist'))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-$groupsTB = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
+$groups_tweenbox = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
 
 if ($data['form'] === 'update') {
 	// Add existing template groups to list and, depending on permissions show name as enabled or disabled.
@@ -93,7 +93,7 @@ if ($data['form'] === 'update') {
 
 	foreach ($data['groupsAll'] as $group) {
 		if (isset($data['groupIds'][$group['groupid']])) {
-			$groupsTB->addItem($group['groupid'], $group['name'], true,
+			$groups_tweenbox->addItem($group['groupid'], $group['name'], true,
 				isset($data['groupsAllowed'][$group['groupid']])
 			);
 			$groupsInList[] = $group['groupid'];
@@ -103,7 +103,7 @@ if ($data['form'] === 'update') {
 	// Add other host groups that user has permissions to, if not yet added to list.
 	foreach ($data['groupsAllowed'] as $group) {
 		if (!in_array($group['groupid'], $groupsInList)) {
-			$groupsTB->addItem($group['groupid'], $group['name']);
+			$groups_tweenbox->addItem($group['groupid'], $group['name']);
 		}
 	}
 }
@@ -114,12 +114,12 @@ else {
 	 */
 
 	foreach ($data['groupsAllowed'] as $group) {
-		$groupsTB->addItem($group['groupid'], $group['name']);
+		$groups_tweenbox->addItem($group['groupid'], $group['name']);
 	}
 }
 
-$templateList->addRow((new CLabel(_('Groups'), 'groups_left'))->setAsteriskMark(),
-	$groupsTB->get(_('In groups'), _('Other groups'))
+$templateList->addRow((new CLabel(_('Groups'), 'groups'))->setAsteriskMark(),
+	$groups_tweenbox->get(_('In groups'), _('Other groups'))
 );
 
 // FORM ITEM : new group text box [  ]

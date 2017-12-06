@@ -103,14 +103,14 @@ $maintenanceFormList->addRow(_('Description'),
  * Maintenance period tab
  */
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
-$maintenancePeriodTable = (new CTable())
+$maintenance_period_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')])
 	->setId('maintenance_periods')
 	->setAriaRequired();
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
-	$maintenancePeriodTable->addRow([
+	$maintenance_period_table->addRow([
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
 		shedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
@@ -143,9 +143,10 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
-$periodsDiv = (new CDiv($maintenancePeriodTable))
+$periodsDiv = (new CDiv($maintenance_period_table))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
+
 if (!isset($_REQUEST['new_timeperiod'])) {
 	$periodsDiv->addItem(
 		(new CSimpleButton(_('New')))
@@ -153,7 +154,9 @@ if (!isset($_REQUEST['new_timeperiod'])) {
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 }
-$maintenancePeriodFormList->addRow((new CLabel(_('Periods'), 'maintenance_periods'))->setAsteriskMark(), $periodsDiv);
+$maintenancePeriodFormList->addRow(
+	(new CLabel(_('Periods'), $maintenance_period_table->getId()))->setAsteriskMark(), $periodsDiv
+);
 
 if (isset($_REQUEST['new_timeperiod'])) {
 	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {

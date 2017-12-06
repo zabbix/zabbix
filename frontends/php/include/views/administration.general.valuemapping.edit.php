@@ -50,7 +50,8 @@ $table = (new CTable())
 
 foreach ($data['mappings'] as $i => $mapping) {
 	$table->addRow([
-		(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired(),
 		'&rArr;',
 		(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))

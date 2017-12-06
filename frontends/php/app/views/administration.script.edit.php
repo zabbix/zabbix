@@ -42,7 +42,6 @@ $scriptFormList = (new CFormList())
 		(new CRadioButtonList('type', (int) $data['type']))
 			->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
 			->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
-			->setAttribute('role', 'radiogroup')
 			->setAriaRequired()
 			->setModern(true)
 	)
@@ -51,7 +50,6 @@ $scriptFormList = (new CFormList())
 			->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 			->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-			->setAttribute('role', 'radiogroup')
 			->setAriaRequired()
 			->setModern(true)
 	)
@@ -62,7 +60,8 @@ $scriptFormList = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Command'), 'commandipmi'))->setAsteriskMark(),
-		(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('commandipmi', $data['commandipmi']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(_('Description'),
@@ -102,8 +101,7 @@ $scriptFormList
 		(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'] == 1)
 	);
 
-$confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
-$scriptFormList->addRow($confirmationLabel, [
+$scriptFormList->addRow(new CLabel(_('Confirmation text'), 'confirmation'), [
 	(new CTextBox('confirmation', $data['confirmation']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	SPACE,
 	(new CButton('testConfirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)

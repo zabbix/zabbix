@@ -373,8 +373,7 @@ else {
 			ITEM_VALUE_TYPE_STR => _('Character'),
 			ITEM_VALUE_TYPE_LOG => _('Log'),
 			ITEM_VALUE_TYPE_TEXT => _('Text')
-		]))
-			->setAriaRequired()
+		]))->setAriaRequired()
 	);
 }
 

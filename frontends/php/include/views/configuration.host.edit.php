@@ -74,23 +74,22 @@ $hostList->addRow(_('Visible name'),
 );
 
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	// groups for normal hosts
-	$groupsTB = new CTweenBox($frmHost, 'groups', $data['groups'], 10);
+	// Groups for normal hosts.
+	$groups_tweenbox = new CTweenBox($frmHost, 'groups', $data['groups'], 10);
 
 	foreach ($data['groupsAll'] as $group) {
 		if (in_array($group['groupid'], $data['groups'])) {
-			$groupsTB->addItem($group['groupid'], $group['name'], null,
+			$groups_tweenbox->addItem($group['groupid'], $group['name'], null,
 				array_key_exists($group['groupid'], $data['groupsAllowed'])
 			);
 		}
 		elseif (array_key_exists($group['groupid'], $data['groupsAllowed'])) {
-			$groupsTB->addItem($group['groupid'], $group['name']);
+			$groups_tweenbox->addItem($group['groupid'], $group['name']);
 		}
 	}
 
 	$hostList->addRow(
-		(new CLabel(_('Groups'), 'id'))->setAsteriskMark(),
-		$groupsTB->get(_('In groups'), _('Other groups'))
+		(new CLabel(_('Groups'), 'groups'))->setAsteriskMark(), $groups_tweenbox->get(_('In groups'), _('Other groups'))
 	);
 
 	$new_group = (new CTextBox('newgroup', $data['newgroup']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
@@ -104,17 +103,19 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 }
 else {
-	// groups for discovered hosts
-	$groupBox = new CListBox(null, null, 10);
-	$groupBox->setEnabled(false);
+	// Groups for discovered hosts.
+	$group_box = (new CListBox(null, null, 10))
+		->setEnabled(false)
+		->setId('host_groups');
+
 	foreach ($data['groupsAll'] as $group) {
 		if (in_array($group['groupid'], $data['groups'])) {
-			$groupBox->addItem($group['groupid'], $group['name'], null,
+			$group_box->addItem($group['groupid'], $group['name'], null,
 				array_key_exists($group['groupid'], $data['groupsAllowed'])
 			);
 		}
 	}
-	$hostList->addRow((new CLabel(_('Groups'), 'host_groups'))->setAsteriskMark(), $groupBox->setId('host_groups'));
+	$hostList->addRow((new CLabel(_('Groups'), $group_box->getId()))->setAsteriskMark(), $group_box);
 	$hostList->addVar('groups', $data['groups']);
 }
 
