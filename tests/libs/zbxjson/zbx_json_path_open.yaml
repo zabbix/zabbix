@@ -1,0 +1,263 @@
+# Invalid JSON paths
+
+---
+test case: Invalid path ""
+in:
+  path: ""
+out:
+  components:
+    - class: fail
+---
+test case: Invalid path $
+in:
+  path: $
+out:
+  components:
+    - class: fail
+---
+test case: Invalid path $.
+in:
+  path: $.
+out:
+  components:
+    - class: fail
+---
+test case: Invalid path $['a'
+in:
+  path: $['a'
+out:
+  components:
+    - class: fail
+---
+test case: Invalid path $[a']"
+in:
+  path: $[a']"
+out:
+  components:
+    - class: fail
+---
+test case: Invalid path $['a'
+in:
+  path: $['a'
+out:
+  components:
+    - class: fail
+---
+test case: Invalid path $['']
+in:
+  path: $['']
+out:
+  components:
+    - class: fail
+---
+test case: Invalid path $.a[]
+in:
+  path: $.a[]
+out:
+  components:
+    - class: dot
+      value: a
+    - class: fail
+---
+test case: Invalid path $.a[1
+in:
+  path: $.a[1
+out:
+  components:
+    - class: dot
+      value: a
+    - class: fail
+---
+test case: Invalid path $['a'][]
+in:
+  path: $['a'][]
+out:
+  components:
+    - class: bracket
+      value: a
+    - class: fail
+---
+test case: Invalid path $['a'][1
+in:
+  path: $['a'][1
+out:
+  components:
+    - class: bracket
+      value: a
+    - class: fail
+---
+test case: Invalid path $.a.
+in:
+  path: $.a.
+out:
+  components:
+    - class: dot
+      value: a
+  result: fail
+---
+test case: Invalid path $.['a']
+in:
+  path: $.['a']
+out:
+  components:
+    - class: fail
+
+# Valid JSON paths
+
+---
+test case: Valid path $.a
+in:
+  path: $.a
+out:
+  components:
+    - class: dot
+      value: a
+  result: ok
+---
+test case: Valid path $['a']
+in:
+  path: $['a']
+out:
+  components:
+    - class: bracket
+      value: a
+---
+test case: Valid path $[ 'a' ]
+in:
+  path: $[ 'a' ]
+out:
+  components:
+    - class: bracket
+      value: a
+---
+test case: Valid path $["a"]
+in:
+  path: $["a"]
+out:
+  components:
+    - class: bracket
+      value: a
+---
+test case: Valid path $.a.b
+in:
+  path: $.a.b
+out:
+  components:
+    - class: dot
+      value: a
+    - class: dot
+      value: b
+---
+test case: Valid path $['a'].b
+in:
+  path: $['a'].b
+out:
+  components:
+    - class: bracket
+      value: a
+    - class: dot
+      value: b
+---
+test case: Valid path $['a']['b']
+in:
+  path: $['a']['b']
+out:
+  components:
+    - class: bracket
+      value: a
+    - class: bracket
+      value: b
+---
+test case: Valid path $.a['b']
+in:
+  path: $.a['b']
+out:
+  components:
+    - class: dot
+      value: a
+    - class: bracket
+      value: b
+---
+test case: Valid path $.a[0]
+in:
+  path: $.a[0]
+out:
+  components:
+    - class: dot
+      value: a
+    - class: index
+      value: 0
+---
+test case: Valid path $.a[0].b[1]
+in:
+  path: $.a[0].b[1]
+out:
+  components:
+    - class: dot
+      value: a
+    - class: index
+      value: 0
+    - class: dot
+      value: b
+    - class: index
+      value: 1
+---
+test case: Valid path $.a[1000]
+in:
+  path: $.a[1000]
+out:
+  components:
+    - class: dot
+      value: a
+    - class: index
+      value: 1000
+---
+test case: Valid path $.a[ 1 ]
+in:
+  path: $.a[ 1 ]
+out:
+  components:
+    - class: dot
+      value: a
+    - class: index
+      value: 1
+---
+test case: Valid path $['a'][2]
+in:
+  path: $['a'][2]
+out:
+  components:
+    - class: bracket
+      value: a
+    - class: index
+      value: 2
+---
+test case: Valid path $['a'][2]['b'][3]
+in:
+  path: $['a'][2]['b'][3]
+out:
+  components:
+    - class: bracket
+      value: a
+    - class: index
+      value: 2
+    - class: bracket
+      value: b
+    - class: index
+      value: 3
+---
+test case: Valid path $[1][2]
+in:
+  path: $[1][2]
+out:
+  components:
+    - class: index
+      value: 1
+    - class: index
+      value: 2
+...
+
+
+
+
+
