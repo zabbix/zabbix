@@ -2519,7 +2519,7 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
  * Purpose: Find new records in logfiles                                      *
  *                                                                            *
  * Parameters:                                                                *
- *     flags            - [IN] metric flags to check item type: log, logrt,   *
+ *     flags            - [IN] bit flags with item type: log, logrt,          *
  *                        log.count or logrt.count                            *
  *     filename         - [IN] logfile name (regular expression with a path)  *
  *     lastlogsize      - [IN/OUT] offset from the beginning of the file      *
@@ -2578,13 +2578,11 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				max_old_seq = 0, old_last, from_first_file = 1, last_processed, limit_reached = 0;
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
-	time_t			now;
-	zbx_uint64_t		processed_bytes_sum = 0, processed_bytes_tmp = 0, remaining_bytes = 0;
+	zbx_uint64_t		processed_bytes_sum = 0;
 	double			delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d is_count:%d filename:'%s' lastlogsize:" ZBX_FS_UI64
-			" mtime:%d", __function_name, ZBX_METRIC_FLAG_LOG_LOGRT & flags,
-			ZBX_METRIC_FLAG_LOG_COUNT & flags, filename, *lastlogsize, *mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flags:0x%02x filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
+			__function_name, (unsigned int)flags, filename, *lastlogsize, *mtime);
 
 	adjust_mtime_to_clock(mtime);
 
@@ -2602,14 +2600,19 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		goto out;
 	}
 
-	start_idx = (1 == *skip_old_data ? logfiles_num - 1 : 0);
-
-	/* mark files to be skipped as processed (in case of 'skip_old_data' was set) */
-	for (i = 0; i < start_idx; i++)
+	if (1 == *skip_old_data)
 	{
-		logfiles[i].processed_size = logfiles[i].size;
-		logfiles[i].seq = seq++;
+		start_idx = logfiles_num - 1;
+
+		/* mark files to be skipped as processed (except the last one) */
+		for (i = 0; i < start_idx; i++)
+		{
+			logfiles[i].processed_size = logfiles[i].size;
+			logfiles[i].seq = seq++;
+		}
 	}
+	else
+		start_idx = 0;
 
 	if (0 < *logfiles_num_old && 0 < logfiles_num)
 	{
@@ -2708,6 +2711,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	{
 		if (0.0 != *start_time)
 		{
+			zbx_uint64_t	remaining_bytes = 0;
+
 			/* calculate number of remaining bytes */
 
 			for (j = 0; j < logfiles_num; j++)
@@ -2738,6 +2743,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		if (0 == logfiles[i].incomplete && (logfiles[i].size != logfiles[i].processed_size ||
 				0 == logfiles[i].seq))
 		{
+			zbx_uint64_t	processed_bytes_tmp = 0;
+
 			if (start_idx != i)
 				*lastlogsize = logfiles[i].processed_size;
 
