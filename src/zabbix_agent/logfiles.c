@@ -2056,8 +2056,8 @@ out:
  *          records to Zabbix server                                          *
  *                                                                            *
  * Parameters:                                                                *
- *     flags           - [IN] metric flags to check item type: log, logrt,    *
- *                       log.count or logrt.count                             *
+ *     flags           - [IN] bit flags with item type: log, logrt, log.count *
+ *                       or logrt.count                                       *
  *     filename        - [IN] logfile name                                    *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
  *     mtime           - [IN] file modification time for reporting to server  *
@@ -2132,11 +2132,8 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		goto out;
 	}
 
-	if (-1 == (f = zbx_open(filename, O_RDONLY)))
-	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", filename, zbx_strerror(errno));
+	if (-1 == (f = open_file_helper(filename, err_msg)))
 		goto out;
-	}
 
 	l_size = *lastlogsize;
 
@@ -2168,11 +2165,8 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 				l_size, filename, zbx_strerror(errno));
 	}
 
-	if (0 != close(f))
-	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", filename, zbx_strerror(errno));
+	if (SUCCEED != close_file_helper(f, filename, err_msg))
 		ret = FAIL;
-	}
 out:
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
