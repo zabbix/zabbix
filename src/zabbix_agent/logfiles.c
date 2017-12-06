@@ -2519,7 +2519,7 @@ static zbx_uint64_t	calculate_remaining_bytes(struct st_logfile *logfiles, int l
 	int		i;
 
 	for (i = 0; i < logfiles_num; i++)
-			remaining_bytes += logfiles[i].size - logfiles[i].processed_size;
+		remaining_bytes += logfiles[i].size - logfiles[i].processed_size;
 
 	return remaining_bytes;
 }
