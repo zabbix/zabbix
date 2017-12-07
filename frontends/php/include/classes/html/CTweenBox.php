@@ -80,7 +80,7 @@ class CTweenBox {
 		$grp_tab = (new CTable())
 			->addClass('tweenBoxTable')
 			->setAttribute('name', $this->name)
-			->setId($this->id)
+			->setId(zbx_formatDomId($this->name))
 			->setCellSpacing(0)
 			->setCellPadding(0);
 
