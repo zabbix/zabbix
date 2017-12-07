@@ -31,7 +31,7 @@ int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, i
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_handle_t	components, component;
-	const char		*path, *next = NULL, *component_class, *component_value;
+	const char		*path, *next = NULL, *component_class, *component_value, *result;
 	zbx_mock_error_t	err;
 	zbx_strloc_t		loc;
 	int			type, ret;
@@ -40,24 +40,23 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	zbx_mock_get_parameter_string("in.path", &path);
+	zbx_mock_get_parameter_string("out.result", &result);
 	zbx_mock_get_parameter_handle("out.components", &components);
 
 	buffer = zbx_malloc(NULL, strlen(path) + 1);
 
-	do
+	while (1)
 	{
+		if (SUCCEED != (ret = zbx_jsonpath_next(path, &next, &loc, &type)))
+		{
+			zbx_mock_assert_streq("Return value", result, "fail");
+			break;
+		}
+
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_vector_element(components, &component)))
 			fail_msg("Too many path components parsed");
 
 		zbx_mock_get_object_member_string(component, "class", &component_class);
-
-		if (SUCCEED != (ret = zbx_jsonpath_next(path, &next, &loc, &type)))
-		{
-			zbx_mock_assert_streq("Return value", component_class, "fail");
-			break;
-		}
-		else
-			zbx_mock_assert_strne("Return value", component_class, "fail");
 
 		switch (type)
 		{
@@ -77,8 +76,13 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_mock_get_object_member_string(component, "value", &component_value);
 		zbx_mock_assert_streq("Component value", component_value, buffer);
+
+		if ('\0' == *next)
+		{
+			zbx_mock_assert_streq("Return value", result, "ok");
+			break;
+		}
 	}
-	while ('\0' != *next);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(components, &component))
 		fail_msg("Not enough path components parsed");
