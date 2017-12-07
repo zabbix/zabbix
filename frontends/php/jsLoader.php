@@ -87,7 +87,6 @@ $availableJScripts = [
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
-	'tr_logform.js' => 'pages/',
 ];
 
 $tranStrings = [
@@ -120,9 +119,6 @@ $tranStrings = [
 		'Cancel' => _('Cancel'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation')
-	],
-	'tr_logform.js' => [
-		'S_REMOVE' => _('Remove')
 	],
 	'class.calendar.js' => [
 		'S_JANUARY' => _('January'),
