@@ -45,13 +45,20 @@ $servicesFormList = (new CFormList('servicesFormList'))
 	);
 
 // append parent link to form list
+$parent_service_popup_options = [
+	'pservices' => '1'
+];
+if ($this->data['service']['serviceid']) {
+	$parent_service_popup_options['serviceid'] = $this->data['service']['serviceid'];
+}
 $servicesFormList->addRow(_('Parent service'), [
 	(new CTextBox('parent_name', $this->data['parentname'], true, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select_parent', _x('Change', 'verb')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("services.php?pservices=1'.url_param('serviceid').
-			'&parentid="+this.form.parentid.value);'
+		->onClick('return PopUp("popup.services",jQuery.extend('.
+			CJs::encodeJson($parent_service_popup_options).
+				',{parentid: this.form.parentid.value}));'
 		)
 ]);
 
@@ -76,15 +83,17 @@ $servicesFormList->addRow(_('Trigger'), [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.php?'.
-			'dstfrm='.$servicesForm->getName().
-			'&dstfld1=triggerid'.
-			'&dstfld2=trigger'.
-			'&srctbl=triggers'.
-			'&srcfld1=triggerid'.
-			'&srcfld2=description'.
-			'&real_hosts=1'.
-			'&with_triggers=1");'
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'triggers',
+				'srcfld1' => 'triggerid',
+				'srcfld2' => 'description',
+				'dstfrm' => $servicesForm->getName(),
+				'dstfld1' => 'triggerid',
+				'dstfld2' => 'trigger',
+				'real_hosts' => '1',
+				'with_triggers' => '1'
+			]).');'
 		)
 ]);
 $servicesFormList->addRow(_('Sort order (0->999)'), (new CTextBox('sortorder', $this->data['sortorder'], false, 3))
@@ -121,13 +130,22 @@ foreach ($this->data['children'] as $child) {
 	);
 }
 $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
+
+$dep_service_popup_options = [
+	'cservices' => '1'
+];
+if ($this->data['service']['serviceid']) {
+	$dep_service_popup_options['serviceid'] = $this->data['service']['serviceid'];
+}
+
 $servicesDependenciesFormList->addRow(
 	_('Depends on'),
 	(new CDiv([
 		$servicesChildTable,
 		(new CButton('add_child_service', _('Add')))
-			->onClick('return PopUp("services.php?cservices=1'.url_param('serviceid').
-				'&parentid="+this.form.parentid.value);'
+			->onClick('return PopUp("popup.services",jQuery.extend('.
+				CJs::encodeJson($dep_service_popup_options).
+					',{parentid: this.form.parentid.value}));'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]))
