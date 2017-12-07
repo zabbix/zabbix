@@ -2243,7 +2243,7 @@ int	DCsync_history(int sync_type, int *total_num)
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
 	int				history_num, candidate_num, next_sync = 0, history_float_num,
-					history_integer_num, history_string_num, history_text_num, history_log_num, ret = 0,
+					history_integer_num, history_string_num, history_text_num, history_log_num, ret,
 					txn_error;
 	time_t				sync_start, now;
 	zbx_vector_uint64_t		triggerids;
