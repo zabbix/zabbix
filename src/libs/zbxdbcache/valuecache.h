@@ -22,6 +22,7 @@
 
 #include "zbxtypes.h"
 #include "zbxalgo.h"
+#include "zbxhistory.h"
 
 /*
  * The Value Cache provides read caching of item historical data residing in history
@@ -55,16 +56,6 @@
  *   with zbx_vc_lock()/zbx_vc_unlock() functions.
  *
  */
-
-/* the item history value */
-typedef struct
-{
-	zbx_timespec_t	timestamp;
-	history_value_t	value;
-}
-zbx_history_record_t;
-
-ZBX_VECTOR_DECL(history_record, zbx_history_record_t);
 
 #define ZBX_VC_MODE_NORMAL	0
 #define ZBX_VC_MODE_LOWMEM	1
@@ -100,16 +91,5 @@ int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 		const history_value_t *value);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
-
-void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type);
-
-void	zbx_history_record_clear(zbx_history_record_t *value, int value_type);
-
-void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value, int value_type);
-
-/* In most cases zbx_history_record_vector_destroy() function should be used to free the  */
-/* value vector filled by zbx_vc_get_value* functions. This define simply better          */
-/* mirrors the vector creation function to vector destroying function.                    */
-#define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector)
 
 #endif	/* ZABBIX_VALUECACHE_H */

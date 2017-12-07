@@ -41,6 +41,13 @@ define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 // by default set to 86400 seconds (24 hours)
 define('ZBX_HISTORY_PERIOD', 86400);
 
+define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
+define('ZBX_HISTORY_SOURCE_SQL',		'sql');
+
+define('ELASTICSEARCH_RESPONSE_PLAIN',			0);
+define('ELASTICSEARCH_RESPONSE_AGGREGATION',	1);
+define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
+
 define('ZBX_WIDGET_ROWS', 20);
 
 define('ZBX_FONTPATH',				realpath('fonts')); // where to search for font (GD > 2.0.18)
