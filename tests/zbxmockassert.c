@@ -62,3 +62,30 @@ void	__zbx_mock_assert_uint64eq(const char *file, int line, const char *prefix_m
 	}
 }
 
+void	__zbx_mock_assert_uint64ne(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
+		zbx_uint64_t return_value)
+{
+	if (return_value == expected_value)
+	{
+		_FAIL(file, line, prefix_msg, "Expected not \"" ZBX_FS_UI64 "\" while got \"" ZBX_FS_UI64 "\"\n",
+				expected_value, return_value);
+	}
+}
+
+void	__zbx_mock_assert_inteq(const char *file, int line, const char *prefix_msg, int expected_value,
+		int return_value)
+{
+	if (return_value != expected_value)
+	{
+		_FAIL(file, line, prefix_msg, "Expected \"%d\" while got \"%d\"\n", expected_value, return_value);
+	}
+}
+
+void	__zbx_mock_assert_intne(const char *file, int line, const char *prefix_msg, int expected_value,
+		int return_value)
+{
+	if (return_value == expected_value)
+	{
+		_FAIL(file, line, prefix_msg, "Expected not \"%d\" while got \"%d\"\n", expected_value, return_value);
+	}
+}

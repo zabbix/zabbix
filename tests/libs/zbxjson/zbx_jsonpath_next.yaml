@@ -109,7 +109,7 @@ test case: Valid path $.a
 in:
   path: $.a
 out:
-  result: ok
+  result: succeed
   components:
     - class: dot
       value: a
@@ -118,7 +118,7 @@ test case: Valid path $['a']
 in:
   path: $['a']
 out:
-  result: ok
+  result: succeed
   components:
     - class: bracket
       value: a
@@ -127,7 +127,7 @@ test case: Valid path $[ 'a' ]
 in:
   path: $[ 'a' ]
 out:
-  result: ok
+  result: succeed
   components:
     - class: bracket
       value: a
@@ -136,7 +136,7 @@ test case: Valid path $["a"]
 in:
   path: $["a"]
 out:
-  result: ok
+  result: succeed
   components:
     - class: bracket
       value: a
@@ -145,7 +145,7 @@ test case: Valid path $.a.b
 in:
   path: $.a.b
 out:
-  result: ok
+  result: succeed
   components:
     - class: dot
       value: a
@@ -156,7 +156,7 @@ test case: Valid path $['a'].b
 in:
   path: $['a'].b
 out:
-  result: ok
+  result: succeed
   components:
     - class: bracket
       value: a
@@ -167,7 +167,7 @@ test case: Valid path $['a']['b']
 in:
   path: $['a']['b']
 out:
-  result: ok
+  result: succeed
   components:
     - class: bracket
       value: a
@@ -178,7 +178,7 @@ test case: Valid path $.a['b']
 in:
   path: $.a['b']
 out:
-  result: ok
+  result: succeed
   components:
     - class: dot
       value: a
@@ -189,7 +189,7 @@ test case: Valid path $.a[0]
 in:
   path: $.a[0]
 out:
-  result: ok
+  result: succeed
   components:
     - class: dot
       value: a
@@ -200,7 +200,7 @@ test case: Valid path $.a[0].b[1]
 in:
   path: $.a[0].b[1]
 out:
-  result: ok
+  result: succeed
   components:
     - class: dot
       value: a
@@ -215,7 +215,7 @@ test case: Valid path $.a[1000]
 in:
   path: $.a[1000]
 out:
-  result: ok
+  result: succeed
   components:
     - class: dot
       value: a
@@ -226,7 +226,7 @@ test case: Valid path $.a[ 1 ]
 in:
   path: $.a[ 1 ]
 out:
-  result: ok
+  result: succeed
   components:
     - class: dot
       value: a
@@ -237,7 +237,7 @@ test case: Valid path $['a'][2]
 in:
   path: $['a'][2]
 out:
-  result: ok
+  result: succeed
   components:
     - class: bracket
       value: a
@@ -248,7 +248,7 @@ test case: Valid path $['a'][2]['b'][3]
 in:
   path: $['a'][2]['b'][3]
 out:
-  result: ok
+  result: succeed
   components:
     - class: bracket
       value: a
@@ -263,7 +263,7 @@ test case: Valid path $[1][2]
 in:
   path: $[1][2]
 out:
-  result: ok
+  result: succeed
   components:
     - class: index
       value: 1

@@ -79,7 +79,7 @@ void	zbx_mock_test_entry(void **state)
 
 		if ('\0' == *next)
 		{
-			zbx_mock_assert_streq("Return value", result, "ok");
+			zbx_mock_assert_streq("Return value", result, "succeed");
 			break;
 		}
 	}
