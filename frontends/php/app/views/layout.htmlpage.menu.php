@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$icons = (new CList())
+$user_navigation = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
 		(new CForm('get', 'search.php'))
@@ -28,12 +28,17 @@ $icons = (new CList())
 					->addClass(ZBX_STYLE_SEARCH),
 				(new CSubmitButton(SPACE))->addClass(ZBX_STYLE_BTN_SEARCH)
 			])
-	)
-	->addItem(
-		(new CLink('Share', 'https://share.zabbix.com/'))
-			->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
-			->setAttribute('target', '_blank')
-			->setTitle(_('Zabbix Share'))
+			->setAttribute('role', 'search')
+	);
+$user_menu = (new CList())
+	->setAttribute('role', 'navigation')
+	->setAttribute('aria-label', _('User menu'))
+	->addItem((new CListItem(
+			(new CLink('Share', 'https://share.zabbix.com/'))
+				->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
+				->setAttribute('target', '_blank')
+				->setTitle(_('Zabbix Share'))
+		))->addStyle('padding-left: 0')
 	)
 	->addItem(
 		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.4/'))
@@ -43,19 +48,21 @@ $icons = (new CList())
 	);
 
 if (!$data['user']['is_guest']) {
-	$icons->addItem(
+	$user_menu->addItem(
 		(new CLink(SPACE, 'profile.php'))
 			->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
 			->setTitle(getUserFullname($data['user']))
 	);
 }
 
-$icons->addItem(
+$user_menu->addItem(
 	(new CLink(SPACE, 'index.php?reconnect=1'))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setTitle(_('Sign out'))
 		->addSID()
 );
+
+$user_navigation->addItem($user_menu);
 
 // 1st level menu
 $top_menu = (new CDiv())
@@ -66,10 +73,10 @@ $top_menu = (new CDiv())
 	->addItem(
 		(new CList($data['menu']['main_menu']))
 			->addClass(ZBX_STYLE_TOP_NAV)
-			->setAttribute('aria-role', 'navigation')
+			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _('Main navigation'))
 	)
-	->addItem($icons)
+	->addItem($user_navigation)
 	->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
 	->setId('mmenu');
 
@@ -82,7 +89,7 @@ $sub_menu_div = (new CDiv())
 foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 	$sub_menu_row = (new CList())
 		->addClass(ZBX_STYLE_TOP_SUBNAV)
-		->setAttribute('aria-role', 'navigation')
+		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Sub navigation'))
 		->setId('sub_'.$label);
 
@@ -127,6 +134,5 @@ if ($data['server_name'] !== '') {
 			->addItem($top_menu)
 			->addItem($sub_menu_div)
 			->addClass(ZBX_STYLE_NAV)
-			->setAttribute('role', 'navigation')
 	)
 	->show();

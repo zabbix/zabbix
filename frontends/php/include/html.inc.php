@@ -277,10 +277,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	/*
 	 * list and host (template) name
 	 */
-	$list = (new CList())
-		->setAttribute('aria-role', 'navigation')
-		->setAttribute('aria-label', _('Breadcrumbs'))
-		->addClass(ZBX_STYLE_OBJECT_GROUP);
+	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
+	$breadcrumbs = (new CListItem(''))
+		->setAttribute('role', 'navigation')
+		->setAttribute('aria-label', _('Breadcrumbs'));
 
 	if ($is_template) {
 		$template = new CSpan(
@@ -291,7 +291,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$template->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$list->addItem([
+		$breadcrumbs->addItem([
 			new CSpan(
 				new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid'))
 			),
@@ -300,6 +300,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		]);
 
 		$db_host['hostid'] = $db_host['templateid'];
+		$list->addItem($breadcrumbs);
 	}
 	else {
 		$proxy_name = '';
@@ -338,11 +339,12 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$host->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$list->addItem([
+		$breadcrumbs->addItem([
 			new CSpan(new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid'))),
 			'/',
 			$host
 		]);
+		$list->addItem($breadcrumbs);
 		$list->addItem($status);
 		$list->addItem(getHostAvailabilityTable($db_host));
 
@@ -352,6 +354,9 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 	}
 
+	$content_menu = (new CList())
+		->setAttribute('role', 'navigation')
+		->setAttribute('aria-label', _('Content menu'));
 	/*
 	 * the count of rows
 	 */
@@ -364,7 +369,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'applications') {
 			$applications->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($applications);
+		$content_menu->addItem($applications);
 
 		// items
 		$items = new CSpan([
@@ -374,7 +379,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'items') {
 			$items->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($items);
+		$content_menu->addItem($items);
 
 		// triggers
 		$triggers = new CSpan([
@@ -384,7 +389,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'triggers') {
 			$triggers->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($triggers);
+		$content_menu->addItem($triggers);
 
 		// graphs
 		$graphs = new CSpan([
@@ -394,7 +399,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'graphs') {
 			$graphs->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($graphs);
+		$content_menu->addItem($graphs);
 
 		// screens
 		if ($is_template) {
@@ -405,7 +410,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			if ($current_element == 'screens') {
 				$screens->addClass(ZBX_STYLE_SELECTED);
 			}
-			$list->addItem($screens);
+			$content_menu->addItem($screens);
 		}
 
 		// discovery rules
@@ -416,7 +421,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'discoveries') {
 			$lld_rules->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($lld_rules);
+		$content_menu->addItem($lld_rules);
 
 		// web scenarios
 		$http_tests = new CSpan([
@@ -426,7 +431,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'web') {
 			$http_tests->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($http_tests);
+		$content_menu->addItem($http_tests);
 	}
 	else {
 		$discovery_rule = (new CSpan())->addItem(
@@ -456,7 +461,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'items') {
 			$item_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($item_prototypes);
+		$content_menu->addItem($item_prototypes);
 
 		// trigger prototypes
 		$trigger_prototypes = new CSpan([
@@ -468,7 +473,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'triggers') {
 			$trigger_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($trigger_prototypes);
+		$content_menu->addItem($trigger_prototypes);
 
 		// graph prototypes
 		$graph_prototypes = new CSpan([
@@ -478,7 +483,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		if ($current_element == 'graphs') {
 			$graph_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
-		$list->addItem($graph_prototypes);
+		$content_menu->addItem($graph_prototypes);
 
 		// host prototypes
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
@@ -489,9 +494,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			if ($current_element == 'hosts') {
 				$host_prototypes->addClass(ZBX_STYLE_SELECTED);
 			}
-			$list->addItem($host_prototypes);
+			$content_menu->addItem($host_prototypes);
 		}
 	}
+
+	$list->addItem($content_menu);
 
 	return $list;
 }
@@ -506,7 +513,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
  */
 function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 	$list = (new CList())
-		->setAttribute('aria-role', 'navigation')
+		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 		->addItem([

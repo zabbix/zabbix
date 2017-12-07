@@ -22,19 +22,19 @@
 $widget = (new CWidget())
 	->setTitle(_('Screens'))
 	->addItem((new CList())
-	->setAttribute('aria-role', 'navigation')
-	->setAttribute('aria-label', _('Breadcrumbs'))
-	->addClass(ZBX_STYLE_OBJECT_GROUP)
-	->addItem([
-		(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
-		'/',
-		(new CSpan())
-			->addClass(ZBX_STYLE_SELECTED)
-			->addItem(
-				new CLink($data['screen']['name'], 'screens.php?elementid='.$data['screen']['screenid'].
-					'&fullscreen='.$data['fullscreen']
+		->setAttribute('role', 'navigation')
+		->setAttribute('aria-label', _('Breadcrumbs'))
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addItem([
+			(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
+			'/',
+			(new CSpan())
+				->addClass(ZBX_STYLE_SELECTED)
+				->addItem(
+					new CLink($data['screen']['name'], 'screens.php?elementid='.$data['screen']['screenid'].
+						'&fullscreen='.$data['fullscreen']
+					)
 				)
-			)
 	]))
 	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 

@@ -31,7 +31,7 @@ class CFilter extends CTag {
 	private $show_buttons = true;
 
 	public function __construct($filterid) {
-		parent::__construct('div', true);
+		parent::__construct(null);
 		$this->addClass(ZBX_STYLE_FILTER_CONTAINER);
 		$this->setId('filter-space');
 		$this->filterid = $filterid;
@@ -158,13 +158,15 @@ class CFilter extends CTag {
 		return $buttons;
 	}
 
-	protected function startToString() {
-		$ret = $this->getHeader()->toString();
-		$ret .= parent::startToString();
-		return $ret;
-	}
-
-	protected function endToString() {
+	/**
+	 * Return filter toggle button and filter body with footer wrapped in additinal div element having "role" and
+	 * "aria-label" attributes set.
+	 *
+	 * @param bool $destroy  Should destroy method to be called.
+	 *
+	 * @return string
+	 */
+	public function toString($destroy = true) {
 		$this->form->addItem($this->getTable());
 
 		if ($this->show_buttons) {
@@ -179,9 +181,15 @@ class CFilter extends CTag {
 			$this->form->addItem($this->footer);
 		}
 
-		$ret = $this->form->toString();
+		$wrapper = (new CDiv([
+				$this->getHeader(),
+				(new CDiv([$this->items, $this->form]))
+					->addClass($this->attributes['class'])
+					->setId($this->attributes['id'])
+			]))
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Filter'));
 
-		$ret .= parent::endToString();
-		return $ret;
+		return $wrapper->toString($destroy);
 	}
 }
