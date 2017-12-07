@@ -881,13 +881,16 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 {
 	ZBX_DC_TREND	*trends_tmp;
 
-	trends_tmp = zbx_malloc(NULL, trends_num * sizeof(ZBX_DC_TREND));
-	memcpy(trends_tmp, trends, trends_num * sizeof(ZBX_DC_TREND));
+	if (0 != trends_num)
+	{
+		trends_tmp = zbx_malloc(NULL, trends_num * sizeof(ZBX_DC_TREND));
+		memcpy(trends_tmp, trends, trends_num * sizeof(ZBX_DC_TREND));
 
-	while (0 < trends_num)
-		DBflush_trends(trends_tmp, &trends_num, trends_diff);
+		while (0 < trends_num)
+			DBflush_trends(trends_tmp, &trends_num, trends_diff);
 
-	zbx_free(trends_tmp);
+		zbx_free(trends_tmp);
+	}
 }
 
 /******************************************************************************
