@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Interfaces Simple SNMPv2</template>
          <name>Template Module Interfaces Simple SNMPv2</name>
-         <description>Template Interfaces Simple (no ifXTable) version: 0.13
+         <description>Template Interfaces Simple (no ifXTable) version: 0.14
 MIBs used:
 IF-MIB</description>
          <groups>
@@ -504,7 +504,7 @@ through updating the syntax of the IANAifType textual convention.</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: IF-MIB
- An estimate of the interface's current bandwidth in bits per second.
+An estimate of the interface's current bandwidth in bits per second.
 For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,
 this object should contain the nominal bandwidth.
 If the bandwidth of the interface is greater than the maximum value reportable by this object then
