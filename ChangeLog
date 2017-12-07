@@ -1,6 +1,8 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-4127] implemented popup displaying in overlay dialogues (miks)
+...GI..PS. [ZBXNEXT-1520] increased the maximum Hosts/DNS name character length from 63 to 255 (greg, Sergejs)
 ..F.....S. [ZBXNEXT-4108] implemented search of problems by trigger name (abs, miks)
 ..F....... [ZBXNEXT-4143] implemented keybord interaction in top navigation (miks)
 ...G...... [ZBXNEXT-1567] added item "vfs.dir.count" for counting directory entries (valdis)
@@ -452,8 +454,6 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 
 --------------------------------------------------------------------------------
 Changes for 3.2.11rc1
-
-New features:
 
 Bug fixes:
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
@@ -1018,8 +1018,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.14rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-13042] fixed unclickable template link on host items list page (gcalenko)
@@ -2841,8 +2839,6 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 
 --------------------------------------------------------------------------------
 Changes for 2.2.21rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)

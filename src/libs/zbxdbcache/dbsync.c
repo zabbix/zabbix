@@ -1270,6 +1270,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
 	unsigned char		value_type, type, history, trends;
+	int			history_sec = 0;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
@@ -1297,11 +1298,20 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		return FAIL;
 
 	if (ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
+	{
 		history = (0 != dbsync_env.cache->config->hk.history);
+		history_sec = dbsync_env.cache->config->hk.history;
+	}
 	else
+	{
+		is_time_suffix(dbrow[31], &history_sec, ZBX_LENGTH_UNLIMITED);
 		history = zbx_time2bool(dbrow[31]);
+	}
 
 	if (item->history != history)
+		return FAIL;
+
+	if (history_sec != item->history_sec)
 		return FAIL;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[33], item->inventory_link))

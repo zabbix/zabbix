@@ -455,8 +455,16 @@ $newTemplateTable = (new CTable())
 			'objectName' => 'templates',
 			'ignored' => $ignoredTemplates,
 			'popup' => [
-				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1&templateid='.$data['templateid']
+				'parameters' => [
+					'srctbl' => 'templates',
+					'srcfld1' => 'hostid',
+					'srcfld2' => 'host',
+					'dstfrm' => $frmHost->getName(),
+					'dstfld1' => 'add_templates_',
+					'templated_hosts' => '1',
+					'multiselect' => '1',
+					'templateid' => $data['templateid']
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])

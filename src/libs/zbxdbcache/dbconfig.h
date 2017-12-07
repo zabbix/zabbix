@@ -84,6 +84,7 @@ typedef struct
 	int			lastclock;
 	int			mtime;
 	int			data_expected_from;
+	int			history_sec;
 	unsigned char		history;
 	unsigned char		type;
 	unsigned char		value_type;

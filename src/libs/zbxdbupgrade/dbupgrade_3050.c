@@ -139,8 +139,11 @@ static int	DBpatch_3050006(void)
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
-		return FAIL;
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			return FAIL;
+	}
 
 	zbx_free(sql);
 
@@ -173,8 +176,11 @@ static int	DBpatch_3050007(void)
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
-		return FAIL;
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			return FAIL;
+	}
 
 	zbx_free(sql);
 
@@ -252,6 +258,40 @@ static int	DBpatch_3050012(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050013(void)
+{
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("interface", &field, NULL);
+}
+
+static int	DBpatch_3050014(void)
+{
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_dhistory", &field, NULL);
+}
+
+static int	DBpatch_3050015(void)
+{
+	const ZBX_FIELD	field = {"listen_dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("autoreg_host", &field, NULL);
+}
+
+static int	DBpatch_3050016(void)
+{
+	const ZBX_FIELD	field = {"listen_dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_autoreg_host", &field, NULL);
+}
+
+static int	DBpatch_3050017(void)
+{
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("dservices", &field, NULL);
+}
 #endif
 
 DBPATCH_START(3050)
@@ -271,5 +311,10 @@ DBPATCH_ADD(3050009, 0, 1)
 DBPATCH_ADD(3050010, 0, 1)
 DBPATCH_ADD(3050011, 0, 1)
 DBPATCH_ADD(3050012, 0, 1)
+DBPATCH_ADD(3050013, 0, 1)
+DBPATCH_ADD(3050014, 0, 1)
+DBPATCH_ADD(3050015, 0, 1)
+DBPATCH_ADD(3050016, 0, 1)
+DBPATCH_ADD(3050017, 0, 1)
 
 DBPATCH_END()

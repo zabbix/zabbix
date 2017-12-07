@@ -2352,9 +2352,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		ZBX_DBROW2UINT64(item->interfaceid, row[25]);
 
 		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
+		{
+			item->history_sec = config->config->hk.history;
 			item->history = (0 != config->config->hk.history);
+		}
 		else
+		{
+			is_time_suffix(row[31], &(item->history_sec), ZBX_LENGTH_UNLIMITED);
 			item->history = zbx_time2bool(row[31]);
+		}
 
 		ZBX_STR2UCHAR(item->inventory_link, row[33]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[34]);
@@ -5810,6 +5816,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
+	dst_item->history_sec = src_item->history_sec;
 
 	dst_item->error = zbx_strdup(NULL, src_item->error);
 

@@ -879,7 +879,7 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *parameters, time
 			result.ui64 += values.values[i].value.ui64;
 	}
 
-	zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
+	zbx_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
 	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
@@ -1034,7 +1034,7 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, tim
 	{
 		if (arg1 <= values.values_num)
 		{
-			zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[arg1 - 1].value,
+			zbx_history_value2str(value, MAX_BUFFER_LEN, &values.values[arg1 - 1].value,
 					item->value_type);
 			ret = SUCCEED;
 		}
@@ -1132,7 +1132,7 @@ static int	evaluate_MIN(char *value, DC_ITEM *item, const char *parameters, time
 					index = i;
 			}
 		}
-		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
+		zbx_history_value2str(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
 
 		ret = SUCCEED;
 	}
@@ -1231,7 +1231,7 @@ static int	evaluate_MAX(char *value, DC_ITEM *item, const char *parameters, time
 					index = i;
 			}
 		}
-		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
+		zbx_history_value2str(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
 
 		ret = SUCCEED;
 	}
@@ -1352,7 +1352,7 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *parameter
 		else
 			index = (int)ceil(values.values_num * (percentage / 100));
 
-		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index - 1].value, item->value_type);
+		zbx_history_value2str(value, MAX_BUFFER_LEN, &values.values[index - 1].value, item->value_type);
 
 		ret = SUCCEED;
 	}
@@ -1463,7 +1463,7 @@ static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *parameters, ti
 			result.dbl = values.values[index_max].value.dbl - values.values[index_min].value.dbl;
 		}
 
-		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
+		zbx_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
 
 		ret = SUCCEED;
 	}

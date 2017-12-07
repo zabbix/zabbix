@@ -69,7 +69,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestAssertElementPresentId('ip');
 		$this->zbxTestAssertAttribute('//input[@id=\'ip\']', 'maxlength', '64');
 		$this->zbxTestAssertElementPresentId('dns');
-		$this->zbxTestAssertAttribute('//input[@id=\'dns\']', 'maxlength', '64');
+		$this->zbxTestAssertAttribute('//input[@id=\'dns\']', 'maxlength', '255');
 		$this->zbxTestAssertElementPresentId('port');
 		$this->zbxTestAssertAttribute('//input[@id=\'port\']', 'maxlength', '64');
 		$this->zbxTestAssertElementPresentId('proxy_hostids_left');
