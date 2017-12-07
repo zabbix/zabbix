@@ -1283,7 +1283,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	}
 	else
 	{
-		is_time_suffix(dbrow[31], &history_sec, ZBX_LENGTH_UNLIMITED);
+		if (SUCCEED != is_time_suffix(dbrow[31], &history_sec, ZBX_LENGTH_UNLIMITED))
+			return FAIL;
+
 		history = zbx_time2bool(dbrow[31]);
 	}
 
