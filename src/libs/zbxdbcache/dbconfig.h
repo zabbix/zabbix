@@ -84,6 +84,7 @@ typedef struct
 	int			lastclock;
 	int			mtime;
 	int			data_expected_from;
+	int			history_sec;
 	unsigned char		history;
 	unsigned char		type;
 	unsigned char		value_type;
@@ -599,6 +600,7 @@ typedef struct
 {
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
+	int			proxy_lastaccess_ts;
 	int			sync_ts;
 
 	zbx_hashset_t		items;

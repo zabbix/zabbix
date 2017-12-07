@@ -613,8 +613,15 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 				'objectName' => 'templates',
 				'ignored' => $ignoredTemplates,
 				'popup' => [
-					'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-						'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'templates',
+						'srcfld1' => 'hostid',
+						'srcfld2' => 'host',
+						'dstfrm' => $frmHost->getName(),
+						'dstfld1' => 'add_templates_',
+						'templated_hosts' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		])
@@ -743,7 +750,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
 		$link = (new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']))
-			->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
+			->setTitle(_s('This field is automatically populated by item "%s".', $name));
 
 		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {

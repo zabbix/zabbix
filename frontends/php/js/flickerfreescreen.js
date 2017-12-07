@@ -60,6 +60,11 @@
 			var screen = this.screens[id], ajaxParams;
 
 			switch (screen.resourcetype) {
+				case 17:
+					// SCREEN_RESOURCE_HISTORY
+					ajaxParams = ['mode', 'pageFile', 'page'];
+					break;
+
 				case 21:
 					// SCREEN_RESOURCE_HTTPTEST_DETAILS
 					ajaxParams = ['mode', 'resourcetype', 'profileIdx2'];
@@ -162,18 +167,29 @@
 					else {
 						ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
 
-						for (var i = 0; i < screen.data.itemids.length; i++) {
-							ajaxUrl.setArgument(
-								'itemids[' + screen.data.itemids[i] + ']',
-								empty(screen.data.itemids[i]) ? null : screen.data.itemids[i]
-							);
+						if ('itemids' in screen.data) {
+							for (var i = 0; i < screen.data.itemids.length; i++) {
+								ajaxUrl.setArgument(
+									'itemids[' + screen.data.itemids[i] + ']',
+									empty(screen.data.itemids[i]) ? null : screen.data.itemids[i]
+								);
+							}
+						}
+						else {
+							ajaxUrl.setArgument('graphid', screen.data.graphid);
 						}
 
-						ajaxUrl.setArgument('action', empty(screen.data.action) ? null : screen.data.action);
-						ajaxUrl.setArgument('filter', empty(screen.data.filter) ? null : screen.data.filter);
-						ajaxUrl.setArgument('filter_task', empty(screen.data.filterTask)
-							? null : screen.data.filterTask);
-						ajaxUrl.setArgument('mark_color', empty(screen.data.markColor) ? null : screen.data.markColor);
+						jQuery.each({
+							'filter': screen.data.filter,
+							'filter_task': screen.data.filterTask,
+							'mark_color': screen.data.markColor,
+							'page': screen.data.page,
+							'action': screen.data.action
+						}, function (ajax_key, value) {
+							if (!empty(value)) {
+								ajaxUrl.setArgument(ajax_key, value);
+							}
+						});
 
 						this.refreshHtml(id, ajaxUrl);
 					}

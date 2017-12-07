@@ -11,7 +11,7 @@
       <template>
          <template>Template Net TP-LINK SNMPv2</template>
          <name>Template Net TP-LINK SNMPv2</name>
-         <description>Template Net TP-LINK JetStream version: 0.13
+         <description>Template Net TP-LINK JetStream version: 0.14
 Overview: Link to MIBs: http://www.tp-linkru.com/download/T2600G-28TS.html#MIBs_Files
 Sample device overview page: http://www.tp-linkru.com/products/details/cat-39_T2600G-28TS.html#overview
 emulation page(web): http://www.tp-linkru.com/resources/simulator/T2600G-28TS(UN)_1.0/Index.htm

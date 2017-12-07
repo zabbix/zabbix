@@ -48,12 +48,17 @@ if (!$data['is_profile']) {
 	$userFormList->addRow(_('Alias'), (new CTextBox('alias', $this->data['alias']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
+		->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
 	);
 	$userFormList->addRow(_x('Name', 'user first name'),
-		(new CTextBox('name', $this->data['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('name', $this->data['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
 	);
 	$userFormList->addRow(_('Surname'),
-		(new CTextBox('surname', $this->data['surname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('surname', $this->data['surname']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))
 	);
 }
 
@@ -72,8 +77,13 @@ if (!$this->data['is_profile']) {
 			'objectName' => 'usersGroups',
 			'data' => $user_groups,
 			'popup' => [
-				'parameters' => 'srctbl=usrgrp&dstfrm='.$userForm->getName().'&dstfld1=user_groups_&srcfld1=usrgrpid'.
-					'&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'usrgrp',
+					'dstfrm' => $userForm->getName(),
+					'dstfld1' => 'user_groups_',
+					'srcfld1' => 'usrgrpid',
+					'multiselect' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
@@ -213,14 +223,15 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
 		}
 
-		$mediaUrl = 'popup_media.php'.
-			'?dstfrm='.$userForm->getName().
-			'&media='.$id.
-			'&mediatypeid='.$media['mediatypeid'].
-			'&sendto='.urlencode($media['sendto']).
-			'&period='.$media['period'].
-			'&severity='.$media['severity'].
-			'&active='.$media['active'];
+		$popup_options = [
+			'dstfrm' => $userForm->getName(),
+			'media' => $id,
+			'mediatypeid' => $media['mediatypeid'],
+			'sendto' => urlencode($media['sendto']),
+			'period' => $media['period'],
+			'severity' => $media['severity'],
+			'active' => $media['active']
+		];
 
 		$mediaSeverity = [];
 
@@ -247,7 +258,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("'.$mediaUrl.'");'),
+							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).');'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$id.');')
@@ -261,7 +272,11 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 		(new CDiv([
 			$mediaTableInfo,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");')
+				->onClick('return PopUp("popup.media",'.
+					CJs::encodeJson([
+						'dstfrm' => $userForm->getName()
+					]).');'
+				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

@@ -90,7 +90,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
 		$this->zbxTestClickButton('usergroup.massdisable');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		if ($cannotDisable) {
 			$this->zbxTestTextPresent('User cannot add himself to a disabled group or a group with disabled GUI access.');
@@ -126,7 +126,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
 		$this->zbxTestClickButton('usergroup.massenable');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('User group enabled');
 
@@ -151,7 +151,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
 		$this->zbxTestClickButton('usergroup.massenabledebug');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Debug mode updated');
@@ -177,7 +177,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
 		$this->zbxTestClickButton('usergroup.massdisabledebug');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Debug mode updated');

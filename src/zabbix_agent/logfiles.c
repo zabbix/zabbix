@@ -61,8 +61,8 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 
 	assert(NULL != str && '\0' != *str);
 	assert(NULL != del && '\0' != *del);
-	assert(NULL != part1 && '\0' == *part1);	/* target 1 must be empty */
-	assert(NULL != part2 && '\0' == *part2);	/* target 2 must be empty */
+	assert(NULL != part1 && NULL == *part1);	/* target 1 must be empty */
+	assert(NULL != part2 && NULL == *part2);	/* target 2 must be empty */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s' del:'%s'", __function_name, str, del);
 

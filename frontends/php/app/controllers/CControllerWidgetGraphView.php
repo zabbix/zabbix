@@ -323,6 +323,17 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			}
 
 			$time_control_data['src'] = $graph_src->getUrl();
+
+			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+				$item_graph_url = (new CUrl('charts.php'))->setArgument('graphid', $resourceid);
+			}
+			else {
+				$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+			}
+			$item_graph_url
+				->setArgument('period', $timeline['period'])
+				->setArgument('stime', $timeline['stime'])
+				->setArgument('isNow', $timeline['isNow']);
 		}
 
 		$this->setResponse(new CControllerResponseData([
@@ -333,6 +344,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				'timestamp' => time(),
 				'unavailable_object' => $unavailable_object
 			],
+			'item_graph_url' => $unavailable_object ? '' : $item_graph_url,
 			'widget' => [
 				'uniqueid' => $uniqueid,
 				'initial_load' => (int) $this->getInput('initial_load', 0),

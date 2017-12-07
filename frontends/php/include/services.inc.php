@@ -267,7 +267,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'))
 			))
 				->addClass(ZBX_STYLE_PROGRESS_BAR_CONTAINER)
-				->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
+				->setTitle(_s('Only the last 20%% of the indicator is displayed.'));
 
 			$sla2 = (new CSpan(sprintf('%.4f', $sla_bad)))
 				->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
@@ -525,25 +525,17 @@ function sortServices(array &$services) {
 		['field' => 'name', 'order' => ZBX_SORT_UP]
 	];
 
-	// Put dependent services in separate array just to avoid them to be sorted before right time.
-	$dependent_services = [];
-	foreach ($services as $serviceid => $service) {
-		if ($service['parent']) {
-			$dependent_services[$serviceid] = $service;
-			unset($services[$serviceid]);
-		}
-	}
-
 	// Sort first level entries.
 	CArrayHelper::sort($services, $sort_options);
-	$services += $dependent_services;
 
 	// Sort dependencies.
 	foreach ($services as &$service) {
 		if ($service['dependencies']) {
-			$service['dependencies'] = array_map(function($dependent_item) use($services) {
-				return $dependent_item + ['name' => $services[$dependent_item['serviceid']]['name']];
-			}, $service['dependencies']);
+			foreach ($service['dependencies'] as &$dependent_item) {
+				$dependent_item['name'] = $services[$dependent_item['serviceid']]['name'];
+				$dependent_item['sortorder'] = $services[$dependent_item['serviceid']]['sortorder'];
+			}
+			unset($dependent_item);
 
 			CArrayHelper::sort($service['dependencies'], $sort_options);
 		}

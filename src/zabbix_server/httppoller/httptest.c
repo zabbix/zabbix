@@ -33,26 +33,25 @@
 
 typedef struct
 {
+	long	rspcode;
+	double	total_time;
+	double	speed_download;
+}
+zbx_httpstat_t;
+
+extern int	CONFIG_HTTPPOLLER_FORKS;
+
+#ifdef HAVE_LIBCURL
+
+typedef struct
+{
 	char	*data;
 	size_t	allocated;
 	size_t	offset;
 }
 zbx_httppage_t;
 
-typedef struct
-{
-	long	rspcode;
-	double	total_time;
-	double	speed_download;
-	double	test_total_time;
-	int	test_last_step;
-}
-zbx_httpstat_t;
-
-extern int	CONFIG_HTTPPOLLER_FORKS;
 extern char	*CONFIG_SOURCE_IP;
-
-#ifdef HAVE_LIBCURL
 
 extern char	*CONFIG_SSL_CA_LOCATION;
 extern char	*CONFIG_SSL_CERT_LOCATION;

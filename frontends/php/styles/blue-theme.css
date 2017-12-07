@@ -2266,25 +2266,29 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5); }
   .overlay-dialogue.modal {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    overflow: hidden;
-    -webkit-transform: translate(-50%, -50%);
-    -moz-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%); }
+    overflow: hidden; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;
       max-height: calc(100vh - 190px);
       max-width: inherit;
       margin: 0 0 10px 0; }
+    .overlay-dialogue.modal .overlay-dialogue-controls {
+      text-align: right;
+      padding: 0px 0px 10px 0px; }
+      .overlay-dialogue.modal .overlay-dialogue-controls li {
+        display: inline;
+        padding-left: 10px; }
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
       top: -12px;
       right: -8px; }
+  .overlay-dialogue.modal-popup {
+    max-width: 1024px;
+    min-width: 650px; }
   .overlay-dialogue .list-table {
+    white-space: normal;
     border: none; }
   .overlay-dialogue .table-paging {
     border: none;
@@ -2754,11 +2758,18 @@ td.active-bg {
   background-color: #fcf7c2; }
 
 .msg-good {
-  color: #2a502c;
-  border: 1px solid #a5d6a7;
-  background-color: #c5e3c6; }
+  color: #1f2c33;
+  border: 2px solid #a5d6a7;
+  background-color: #fff;
+  text-align: left; }
   .msg-good .link-action {
-    color: #2a502c; }
+    color: #2a502c;
+    margin-right: 10px;
+    font-size: 0.85em; }
+    .msg-good .link-action .arrow-up {
+      border-bottom-color: #2a502c; }
+    .msg-good .link-action .arrow-down {
+      border-top-color: #2a502c; }
   .msg-good .overlay-close-btn {
     color: #768d99; }
   .msg-good ul {
@@ -2768,12 +2779,40 @@ td.active-bg {
     color: #2a502c;
     border-color: #a5d6a7; }
 
+.msg-good:before {
+  content: "";
+  background-color: #a5d6a7;
+  float: left;
+  width: 61px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute; }
+
+.msg-good:after {
+  content: "";
+  background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
+  width: 27px;
+  height: 25px;
+  top: 0;
+  left: 0;
+  position: absolute;
+  margin-left: 16px;
+  margin-top: 2px; }
+
 .msg-bad {
-  color: #93201e;
-  border: 1px solid #ed9898;
-  background-color: #fccacf; }
+  color: #1f2c33;
+  border: 2px solid #ed9898;
+  background-color: #fff;
+  text-align: left; }
   .msg-bad .link-action {
-    color: #93201e; }
+    color: #93201e;
+    margin-right: 10px;
+    font-size: 0.85em; }
+    .msg-bad .link-action .arrow-up {
+      border-bottom-color: #93201e; }
+    .msg-bad .link-action .arrow-down {
+      border-top-color: #93201e; }
   .msg-bad .overlay-close-btn {
     color: #768d99; }
   .msg-bad ul {
@@ -2783,9 +2822,31 @@ td.active-bg {
     color: #93201e;
     border-color: #ed9898; }
 
+.msg-bad:before {
+  content: "";
+  background-color: #ed9898;
+  float: left;
+  width: 61px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute; }
+
+.msg-bad:after {
+  content: "";
+  background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+  width: 27px;
+  height: 25px;
+  top: 0;
+  left: 0;
+  position: absolute;
+  margin-left: 16px;
+  margin-top: 2px; }
+
 .msg-details {
   font-size: 1em;
-  text-align: left; }
+  text-align: left;
+  font-weight: normal; }
   .msg-details .link-action {
     position: absolute;
     top: 7px;
@@ -2797,7 +2858,7 @@ td.active-bg {
     padding: 0 5px 0 0;
     overflow-y: auto; }
     .msg-details ul li {
-      margin: .5em 0 .5em 1em; }
+      margin: 0 0 0 1em; }
       .msg-details ul li::before {
         content: '\2013';
         float: left;
@@ -2807,7 +2868,8 @@ td.active-bg {
     .msg-details ul.msg-details-border {
       margin: 8px 0 0 0;
       border-top-width: 1px;
-      border-top-style: dashed; }
+      border-top-style: dashed;
+      padding-top: 0.5em; }
 
 .msg-buttons {
   text-align: right;
@@ -2817,10 +2879,11 @@ td.active-bg {
 
 .msg-good, .msg-bad {
   font-size: 1.167em;
-  padding: 7px 20px 7px 15px;
-  margin: 0 0 12px 0;
-  text-align: center;
+  padding: 6px 10px 6px 75px;
+  text-align: left;
+  vertical-align: middle;
   position: relative;
+  margin-bottom: 10px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
@@ -2830,14 +2893,39 @@ td.active-bg {
 .msg-bad-global {
   display: none;
   position: fixed;
-  bottom: 0;
   z-index: 10000;
-  width: 100%;
-  padding: 5px 5px;
-  text-align: center;
-  color: #593c00;
+  text-align: left;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  vertical-align: middle;
+  font-size: 1.167em;
+  color: #1f2c33;
+  border: 2px solid #ffc859;
+  background-color: #fff;
+  margin: 0 10px 0 10px;
+  padding: 6px 10px 6px 75px; }
+
+.msg-bad-global:before {
+  content: "";
   background-color: #ffc859;
-  border-top: 1px solid #ffc040; }
+  float: left;
+  width: 61px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute; }
+
+.msg-bad-global:after {
+  content: "";
+  background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+  width: 27px;
+  height: 25px;
+  top: 0;
+  left: 0;
+  position: absolute;
+  margin-left: 16px;
+  margin-top: 2px; }
 
 .msg-global {
   text-align: left;
@@ -3133,6 +3221,9 @@ tr.cursor-move td * {
 
 .clock-lines {
   fill: #acbbc2; }
+
+svg {
+  overflow: hidden; }
 
 .sysmap {
   height: 100%;

@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Netgear Fastpath SNMPv2</template>
          <name>Template Net Netgear Fastpath SNMPv2</name>
-         <description>Template Net Netgear Fastpath version: 0.13
+         <description>Template Net Netgear Fastpath version: 0.14
 Overview: https://kb.netgear.com/24352/MIBs-for-Smart-switches
 
 MIBs used:
@@ -162,7 +162,7 @@ The total memory freed for utilization.</description>
                <privatekey/>
                <port/>
                <description>MIB: FASTPATH-SWITCHING-MIB
- The total Memory allocated for the tasks</description>
+The total Memory allocated for the tasks</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -387,7 +387,7 @@ Serial number of the switch</description>
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -574,7 +574,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -612,7 +612,7 @@ The status of fan</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Netgear Fastpath SNMPv2:sensor.fan.status[boxServicesFanItemState.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"failed"}</expression>
+                     <expression>{Template Net Netgear Fastpath SNMPv2:sensor.fan.status[boxServicesFanItemState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Fan is in critical state</name>
@@ -675,7 +675,7 @@ Please check the fan unit</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -713,7 +713,7 @@ The status of power supply</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Netgear Fastpath SNMPv2:sensor.psu.status[boxServicesPowSupplyItemState.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"failed"}</expression>
+                     <expression>{Template Net Netgear Fastpath SNMPv2:sensor.psu.status[boxServicesPowSupplyItemState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"failed"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Power supply is in critical state</name>

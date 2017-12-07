@@ -113,7 +113,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, char *tls_arg1, char *tls_arg2);
+		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
 
 #define ZBX_TCP_PROTOCOL		0x01
 #define ZBX_TCP_COMPONENT_VERSION	0x02
