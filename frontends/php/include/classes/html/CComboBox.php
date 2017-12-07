@@ -105,6 +105,19 @@ class CComboBox extends CTag {
 		}
 		return $this;
 	}
+
+	/**
+	 * Set with of the combo box.
+	 *
+	 * @param int $value  Width in pixels of the element.
+	 *
+	 * @return CComboBox
+	 */
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+
+		return $this;
+	}
 }
 
 class COptGroup extends CTag {
