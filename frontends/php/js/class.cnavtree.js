@@ -342,6 +342,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 			}
 
 			$('.highlighted-parent').removeClass('highlighted-parent');
+			this.placeholder.removeClass('sortable-error');
 
 			if (this.changing_parent) {
 				clearTimeout(this.changing_parent);
@@ -399,9 +400,11 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 			if (this.options.max_depth != 0 && (this.options.max_depth < levels
 					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth)
 			) {
+				this.placeholder.addClass('sortable-error');
 				this.beyondMaxLevels = levels - this.options.max_depth;
 			}
 			else {
+				this.placeholder.removeClass('sortable-error');
 				this.beyondMaxLevels = 0;
 			}
 		},

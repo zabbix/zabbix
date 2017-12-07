@@ -4982,6 +4982,11 @@ svg {
 			&.closed > ul {
 				display: none;
 			}
+
+			.sortable-error {
+				border-color: transparent;
+				background: #fbe3e4;
+			}
 		}
 
 		.highlighted-parent > .tree-row {
