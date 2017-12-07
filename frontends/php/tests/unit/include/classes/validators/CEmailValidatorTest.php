@@ -32,18 +32,15 @@ class CEmailValidatorTest extends PHPUnit_Framework_TestCase {
 			['firstname.lastname@example.com', true, null],
 			['firstname+lastname@example.com', true, null],
 			['firstname-lastname@example.com', true, null],
-			['<firstname-lastname@example.com>', true, null],
 			['1234567890@example.com', true, null],
 			['email@[127.0.0.1]', true, null],
 			['"email"@example.com', true, null],
 			['___-___@example.com', true, null],
 			['admin@another-example.com', true, null],
 			['Administrator <admin@example.com>', true, null],
-			['Имя Фамилия <admin@example.com>', true, null],
 			['much."more\ unusual"@example.com', true, null],
 			['very."(),:;<>[]".VERY."very@\\very".unusual@strange.example.com', true, null],
 			// Invalid e-mails.
-			['Имя Фамилия <Имя.Фамилия@example.com>', false, 'Invalid email address "Имя Фамилия <Имя.Фамилия@example.com>".'],
 			['plainaddress', false, 'Invalid email address "plainaddress".'],
 			['email@example', false, 'Invalid email address "email@example".'],
 			['example.com', false, 'Invalid email address "example.com".'],
@@ -65,8 +62,6 @@ class CEmailValidatorTest extends PHPUnit_Framework_TestCase {
 			['just"not"right@example.com', false, 'Invalid email address "just"not"right@example.com".'],
 			['this\ is"really"not\allowed@example.com', false, 'Invalid email address "this\ is"really"not\allowed@example.com".'],
 			['Administrator <admin@example.com>, a, b, c', false, 'Invalid email address "Administrator <admin@example.com>, a, b, c".'],
-			['<firstname.lastname@example.com>,<admin@another-example.com>', false, 'Invalid email address "<firstname.lastname@example.com>,<admin@another-example.com>".'],
-			['<firstname.lastname><firstname.lastname@example.com>', false, 'Invalid email address "<firstname.lastname><firstname.lastname@example.com>".'],
 		];
 	}
 
