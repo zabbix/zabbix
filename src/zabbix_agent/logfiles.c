@@ -888,9 +888,9 @@ static int	is_uniq_row(const char *arr, int n_cols, int row)
  *          n_cols - [IN] number of columns in the array                      *
  *          col    - [IN] number of column to search                          *
  *                                                                            *
- * Return value: number of column where the element '1' or '2 ' was found or  *
+ * Return value: number of row where the element '1' or '2 ' was found or     *
  *               -1 if there are zero or multiple elements '1' or '2' in the  *
- *               row                                                          *
+ *               column                                                       *
  *                                                                            *
  ******************************************************************************/
 static int	is_uniq_col(const char *arr, int n_rows, int n_cols, int col)
