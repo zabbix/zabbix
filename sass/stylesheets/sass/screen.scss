@@ -3937,16 +3937,6 @@ td.normal-bg {
 	@extend td.na-bg;
 }
 
-.active-bg {
-	color: darken($alt-green,45%);
-	@extend .green-bg;
-}
-
-td.active-bg {
-	color: darken($alt-green,45%);
-	@extend .active-bg;
-}
-
 .info-bg {
 	color: darken($alt-dark-blue,45%);
 

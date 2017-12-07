@@ -179,7 +179,7 @@ class CScreenDiscovery extends CScreenBase {
 							'type' => $htype,
 							'class' => $hclass,
 							'host' => $hostName,
-							'time' => $htime,
+							'time' => $htime
 						];
 					}
 
@@ -188,7 +188,7 @@ class CScreenDiscovery extends CScreenBase {
 						$time = 'lastdown';
 					}
 					else {
-						$class = ZBX_STYLE_ACTIVE_BG;
+						$class = '';
 						$time = 'lastup';
 					}
 
@@ -235,10 +235,17 @@ class CScreenDiscovery extends CScreenBase {
 				];
 
 				foreach ($services as $name => $foo) {
-					$row[] = array_key_exists($name, $h_data['services'])
-						? (new CCol(zbx_date2age($h_data['services'][$name]['time'])))
-							->addClass($h_data['services'][$name]['class'])
-						: '';
+					$service_status = '';
+
+					if (array_key_exists($name, $h_data['services'])) {
+						$service_status = new CCol(zbx_date2age($h_data['services'][$name]['time']));
+
+						if ($h_data['services'][$name]['class'] !== '') {
+							$service_status->addClass($h_data['services'][$name]['class']);
+						}
+					}
+
+					$row[] = $service_status;
 				}
 				$table->addRow($row);
 			}
