@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-4137] removed green background from cells (Oleg)
 ..F....... [ZBXNEXT-4157] added map status summary to be readable by screen reader software (gcalenko)
 ..F....... [ZBXNEXT-4127] implemented popup displaying in overlay dialogues (miks)
 ...GI..PS. [ZBXNEXT-1520] increased the maximum Hosts/DNS name character length from 63 to 255 (greg, Sergejs)
