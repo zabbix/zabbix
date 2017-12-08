@@ -4876,7 +4876,6 @@ void	DCsync_configuration(unsigned char mode)
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
-	config->proxy_lastaccess_ts = time(NULL);
 
 	FINISH_SYNC;
 out:
@@ -5346,6 +5345,7 @@ int	init_configuration_cache(char **error)
 
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
+	config->proxy_lastaccess_ts = time(NULL);
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
