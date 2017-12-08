@@ -36,6 +36,7 @@ Bug fixes:
 Changes for 3.4.5rc2
 
 Bug fixes:
+........S. [ZBX-13149] fixed possible crash in history syncer when processing deleted item (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.5rc1
