@@ -188,16 +188,23 @@ class CEvent extends CApiService {
 					);
 
 					$tag_filters_tmp = [];
+					$allowed_triggers = [];
 
 					while ($db_tag_filter = DBfetch($db_tag_filters)) {
-						$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
-							'tag' => $db_tag_filter['tag'],
-							'value' => $db_tag_filter['value']
-						];
+						if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === '') {
+							$allowed_triggers = array_merge($allowed_triggers,
+								$group_triggers[$db_tag_filter['groupid']]
+							);
+						}
+						else {
+							$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
+								'tag' => $db_tag_filter['tag'],
+								'value' => $db_tag_filter['value']
+							];
+						}
 					}
 
 					$tag_filters = [];
-					$allowed_triggers = [];
 
 					foreach ($userGroups as $usrgrpid) {
 						if (array_key_exists($usrgrpid, $tag_filters_tmp)) {
