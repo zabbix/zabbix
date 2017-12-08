@@ -384,9 +384,6 @@ static int	tm_process_tasks(int now)
 			case ZBX_TM_TASK_ACKNOWLEDGE:
 				zbx_vector_uint64_append(&ack_taskids, taskid);
 				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				break;
 		}
 
 	}
