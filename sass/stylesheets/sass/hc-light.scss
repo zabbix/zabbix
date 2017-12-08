@@ -305,6 +305,9 @@ a {
 	}
 }
 
+.disabled {
+	@include opacity(0.5);
+}
 
 // SEVERITY STATUSES
 td.na-bg {

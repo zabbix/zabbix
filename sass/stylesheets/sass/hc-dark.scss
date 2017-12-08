@@ -129,7 +129,7 @@ $var-icons: (
 
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -318px -726px,
-	cal: url(../img/icon-sprite.svg) no-repeat -201px -834px,
+	cal: url(../img/icon-sprite.svg) no-repeat -354px -834px,
 	wzrd-action: url(../img/icon-sprite.svg) no-repeat -317px -617px
 );
 
@@ -333,6 +333,14 @@ a {
 	&:active {
 	background-color: $red !important;
 	}
+}
+
+.tag {
+	color: $ui-bg-color;
+}
+
+.disabled {
+	@include opacity(0.6);
 }
 
 // SEVERITY STATUSES
