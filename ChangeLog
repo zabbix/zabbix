@@ -1030,6 +1030,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.14rc2
 
 Bug fixes:
+..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.14rc1
