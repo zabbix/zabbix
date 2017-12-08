@@ -712,6 +712,36 @@ content: "";
 	margin: 0 0 0 -42px;
 }
 
+.inactive-bg {
+	background-color: rgba(0, 0, 0, 0.0) !important;
+}
+
+.inactive-bg:before {
+	content: "";
+	width: 34px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	min-height: 28px;
+	background-color: $alt-red;
+}
+
+.inactive-bg:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -256px -411px;
+	width: 22px;
+	height: 18px;
+	top: 5px;
+	left: 6px;
+	position: absolute;
+}
+
+.list-table .inactive-bg {
+	padding-left: 42px;
+	color: $font-color !important;
+}
+
 // ERROR MESSAGES
 .msg-bad {
 	.link-action {
