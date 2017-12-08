@@ -29,6 +29,7 @@ $buttons = array_key_exists('buttons', $data)
 echo '<body lang="'.CWebUser::getLang().'">';
 
 (new CDiv(new CWarning($data['header'], $data['messages'], $buttons)))
+	->setAttribute('role', 'main')
 	->addClass(ZBX_STYLE_ARTICLE)
 	->show();
 

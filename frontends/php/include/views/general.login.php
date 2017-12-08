@@ -74,6 +74,7 @@ global $ZBX_SERVER_NAME;
 			->addClass(ZBX_STYLE_LINK_ALT)
 	]))->addClass(ZBX_STYLE_SIGNIN_LINKS)
 ]))
+	->setAttribute('role', 'main')
 	->addClass(ZBX_STYLE_ARTICLE)
 	->show();
 

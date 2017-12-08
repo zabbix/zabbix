@@ -38,7 +38,7 @@
 		<link rel="stylesheet" type="text/css" href="styles/<?= ZBX_DEFAULT_THEME ?>.css" />
 	</head>
 	<body lang="en">
-		<div class="<?= ZBX_STYLE_ARTICLE ?>">
+		<div class="<?= ZBX_STYLE_ARTICLE ?>" role="main">
 			<div class="<?= ZBX_STYLE_BROWSER_WARNING_CONTAINER ?>">
 				<h2 class="<?= ZBX_STYLE_RED ?>">You are using an outdated browser.</h2>
 				<p>Zabbix frontend is built on advanced, modern technologies and does not support old browsers. It is highly recommended that you choose and install a modern browser. It is free of charge and only takes a couple of minutes.</p>
@@ -70,7 +70,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="<?= ZBX_STYLE_FOOTER ?>">
+		<div class="<?= ZBX_STYLE_FOOTER ?>" role="contentinfo">
 			&copy; <?= ZABBIX_COPYRIGHT_FROM ?>&ndash;<?= ZABBIX_COPYRIGHT_TO ?>, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
 		</div>
 	</body>

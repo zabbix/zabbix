@@ -817,7 +817,9 @@ function makePageFooter($with_version = true)
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->setAttribute('target', '_blank')
-	]))->addClass(ZBX_STYLE_FOOTER);
+	]))
+	->setAttribute('role', 'contentinfo')
+	->addClass(ZBX_STYLE_FOOTER);
 }
 
 /**

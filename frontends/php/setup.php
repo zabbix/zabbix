@@ -115,6 +115,7 @@ $sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_
 
 (new CTag('body', true, [(new CDiv([$ZBX_SETUP_WIZARD, $sub_footer]))->addClass(ZBX_STYLE_ARTICLE), makePageFooter()]))
 	->setAttribute('lang', CWebUser::getLang())
+	->setAttribute('role', 'main')
 	->show();
 ?>
 </html>
