@@ -24,6 +24,7 @@ class CWarning extends CDiv {
 	public function __construct($header, $messages = [], $buttons = []) {
 		parent::__construct($header);
 		$this->addClass(ZBX_STYLE_MSG_BAD);
+		$this->setAttribute('role', 'status');
 		$this->addClass('msg-global');
 		if ($messages) {
 			parent::addItem(

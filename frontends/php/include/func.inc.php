@@ -1823,6 +1823,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	}
 
 	$msg_box = (new CDiv())->addClass($class)
+		->setAttribute('role', 'status')
 		->addItem($link_details) // Details link should be in front of title
 		->addItem($title)
 		->addItem($msg_details);

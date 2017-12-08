@@ -598,7 +598,8 @@ function overlayDialogue(params) {
 
 	var overlay_dialogue = jQuery('<div>', {
 		id: 'overlay_dialogue',
-		class: 'overlay-dialogue modal'
+		class: 'overlay-dialogue modal',
+		role: 'dialog'
 	})
 		.append(
 			jQuery('<button>', {
@@ -619,7 +620,7 @@ function overlayDialogue(params) {
 		.append(
 			jQuery('<div>', {
 				class: 'dashbrd-widget-head'
-			}).append(jQuery('<h4>').text(params.title))
+			}).append(jQuery('<h4 id="dashbrd-widget-head-title">').text(params.title))
 		)
 		.append(
 			jQuery('<div>', {

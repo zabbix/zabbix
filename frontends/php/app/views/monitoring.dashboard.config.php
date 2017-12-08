@@ -21,6 +21,8 @@
 
 $form = (new CForm('post'))
 	->cleanItems()
+	->setAttribute('role', 'form')
+	->setAttribute('aria-labeledby', 'dashbrd-widget-head-title')
 	->setId('widget_dialogue_form')
 	->setName('widget_dialogue_form');
 $jq_templates = [];
