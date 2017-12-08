@@ -25,28 +25,38 @@
 
 #define FAIL_PARAM(NAME, MOCK_ERR)	fail_msg("Cannot get \"%s\": %s", NAME, zbx_mock_error_string(MOCK_ERR))
 
-static zbx_mock_error_t	get_out_parameter(const char *name, const char **value);
+static void	get_out_parameter(const char *name, const char **value);
 
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	error;
 	AGENT_REQUEST		request;
 	AGENT_RESULT		result;
-	const char		*expected_string, *actual_string;
+	const char		*expected_json, *expected_error, *expected_string, *actual_string;
 	char			**p_result;
 	int			expected_ret, actual_ret;
 
 	ZBX_UNUSED(state);
 
-	if (ZBX_MOCK_NO_PARAMETER == (error = get_out_parameter("json", &expected_string)))
+	get_out_parameter("json", &expected_json);
+	get_out_parameter("error", &expected_error);
+
+	if (NULL == expected_json)
 	{
-		if (ZBX_MOCK_NO_PARAMETER == (error = get_out_parameter("error", &expected_string)))
+		if (NULL == expected_error)
 			fail_msg("Invalid test case data: expected \"json\" or \"error\" out parameter");
 
 		expected_ret = SYSINFO_RET_FAIL;
+		expected_string = expected_error;
 	}
 	else
+	{
+		if (NULL != expected_error)
+			fail_msg("Invalid test case data: expected only one of \"json\" and \"error\" out parameters");
+
 		expected_ret = SYSINFO_RET_OK;
+		expected_string = expected_json;
+	}
 
 	/* NET_IF_DISCOVERY() does not use request */
 	actual_ret = NET_IF_DISCOVERY(&request, &result);
@@ -72,16 +82,16 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Unexpected result string: expected \"%s\", got \"%s\"", expected_string, actual_string);
 }
 
-/* returns ZBX_MOCK_SUCCESS or ZBX_MOCK_NO_PARAMETER */
-static zbx_mock_error_t	get_out_parameter(const char *name, const char **value)
+/* fails on error, sets *value to NULL if parameter not found */
+static void	get_out_parameter(const char *name, const char **value)
 {
 	zbx_mock_handle_t	handle;
 	zbx_mock_error_t	error;
+
+	*value = NULL;
 
 	if (ZBX_MOCK_NO_PARAMETER != (error = zbx_mock_out_parameter(name, &handle)) && ZBX_MOCK_SUCCESS != error)
 		FAIL_PARAM(name, error);
 	else if (ZBX_MOCK_SUCCESS == error && ZBX_MOCK_SUCCESS != (error = zbx_mock_string(handle, value)))
 		FAIL_PARAM(name, error);
-
-	return error;
 }
