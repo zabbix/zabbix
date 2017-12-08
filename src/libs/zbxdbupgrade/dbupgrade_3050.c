@@ -317,7 +317,7 @@ static int	DBpatch_3050018(void)
 	if (ZBX_DB_OK <= DBexecute(
 			"insert into graph_theme"
 			" values (3,'hc-light','FFFFFF','FFFFFF','555555','000000','333333','000000','333333',"
-				"'000000','000000','F3F3F3','" ZBX_COLORPALETTE_LIGHT "')"))
+				"'000000','000000','EBEBEB','" ZBX_COLORPALETTE_LIGHT "')"))
 	{
 		return SUCCEED;
 	}
