@@ -89,6 +89,8 @@ $link-hover-color: #fff;
 $link-active-color: #f8f8f8;
 $link-visited-color: #f8f8f8;
 
+$link-alt-underline-color: #818181;
+
 $link-main-nav-color: rgba(#fff, 0.8);
 $link-main-nav-hover-color: rgba(#fff, 1);
 $link-main-nav-active-color: rgba(#fff, 1);
@@ -271,26 +273,41 @@ a {
 }
 
 .link-action {
-	border-bottom: 1px dotted rgba($link-color, 0.5);
-	cursor: pointer;
-
-	&:link {
-		border-bottom: 1px dotted rgba($link-hover-color, 0.5);
-	}
-
-	&:visited {
-		border-bottom: 1px dotted rgba($link-hover-color, 0.5);
-	}
-
 	&:hover {
+		color: $link-hover-color;
 		border-bottom: 1px dotted $link-hover-color;
 	}
 
 	&:active {
+		color: $link-hover-color;
 		border-bottom: 1px dotted $link-hover-color;
 	}
 }
 
+.link-alt {
+	&:link {
+		border-bottom: 1px solid $link-alt-underline-color;
+	}
+
+	&:visited {
+		border-bottom: 1px solid $link-alt-underline-color;
+	}
+
+	&:hover {
+		color: $link-hover-color;
+		border-bottom: 1px solid $link-hover-color;
+	}
+
+	&:focus {
+		color: $link-hover-color;
+		border-bottom: 1px solid $link-hover-color;
+	}
+
+	&:active {
+		color: $link-active-color;
+		border-bottom: 1px solid $link-active-color;
+	}
+}
 
 .top-subnav a {
 	&.selected {
@@ -355,7 +372,7 @@ td.na-bg {
 }
 
 .na-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .na-bg,
@@ -412,7 +429,7 @@ td.normal-bg {
 }
 
 .normal-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .normal-bg,
@@ -462,7 +479,7 @@ td.info-bg {
 }
 
 .info-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .info-bg,
@@ -518,7 +535,7 @@ td.average-bg {
 }
 
 .average-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .average-bg,
@@ -574,7 +591,7 @@ td.warning-bg {
 }
 
 .warning-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .warning-bg,
@@ -630,7 +647,7 @@ td.high-bg {
 }
 
 .high-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .high-bg,
@@ -686,7 +703,7 @@ td.disaster-bg {
 }
 
 .disaster-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .disaster-bg,

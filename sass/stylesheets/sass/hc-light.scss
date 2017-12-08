@@ -87,6 +87,8 @@ $link-hover-color: #000;
 $link-active-color: #555;
 $link-visited-color: #555;
 
+$link-alt-underline-color: #808080;
+
 $link-main-nav-color: rgba(#000, 0.8);
 $link-main-nav-hover-color: rgba(#000, 1);
 $link-main-nav-active-color: rgba(#000, 1);
@@ -239,27 +241,6 @@ ul.top-nav-icons {
 
 // COLORS AND GENERAL
 
-.link-action {
-	border-bottom: 1px dotted rgba($link-color, 0.5);
-	cursor: pointer;
-
-	&:link {
-		border-bottom: 1px dotted rgba($link-hover-color, 0.5);
-	}
-
-	&:visited {
-		border-bottom: 1px dotted rgba($link-hover-color, 0.5);
-	}
-
-	&:hover {
-		border-bottom: 1px dotted $link-hover-color;
-	}
-
-	&:active {
-		border-bottom: 1px dotted $link-hover-color;
-	}
-}
-
 a {
 	&:link {
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
@@ -269,6 +250,43 @@ a {
 	}
 	&:hover {
 		border-bottom: 1px solid $link-hover-color;
+	}
+}
+
+.link-action {
+	&:hover {
+		color: $link-hover-color;
+		border-bottom: 1px dotted $link-hover-color;
+	}
+
+	&:active {
+		color: $link-hover-color;
+		border-bottom: 1px dotted $link-hover-color;
+	}
+}
+
+.link-alt {
+	&:link {
+		border-bottom: 1px solid $link-alt-underline-color;
+	}
+
+	&:visited {
+		border-bottom: 1px solid $link-alt-underline-color;
+	}
+
+	&:hover {
+		color: $link-hover-color;
+		border-bottom: 1px solid $link-hover-color;
+	}
+
+	&:focus {
+		color: $link-hover-color;
+		border-bottom: 1px solid $link-hover-color;
+	}
+
+	&:active {
+		color: $link-active-color;
+		border-bottom: 1px solid $link-active-color;
 	}
 }
 
@@ -321,7 +339,7 @@ td.na-bg {
 }
 
 .na-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .na-bg,
@@ -378,7 +396,7 @@ td.normal-bg {
 }
 
 .normal-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .normal-bg,
@@ -428,7 +446,7 @@ td.info-bg {
 }
 
 .info-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .info-bg,
@@ -484,7 +502,7 @@ td.average-bg {
 }
 
 .average-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .average-bg,
@@ -540,7 +558,7 @@ td.warning-bg {
 }
 
 .warning-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .warning-bg,
@@ -596,7 +614,7 @@ td.high-bg {
 }
 
 .high-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .high-bg,
@@ -652,7 +670,7 @@ td.disaster-bg {
 }
 
 .disaster-bg .link-action {
-	color: $font-color;
+	color: $link-color;
 }
 
 .list-table .disaster-bg,

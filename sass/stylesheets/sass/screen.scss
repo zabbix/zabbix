@@ -3954,7 +3954,6 @@ td.normal-bg {
 }
 
 td.active-bg {
-	color: darken($alt-green,45%);
 	@extend .active-bg;
 }
 
