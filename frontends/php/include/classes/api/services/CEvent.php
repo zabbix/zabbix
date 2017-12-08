@@ -282,10 +282,10 @@ class CEvent extends CApiService {
 
 					$tag_filters_tmp = [];
 
-					$no_check_groups = [];
+					$skip_groups = [];
 					while ($db_tag_filter = DBfetch($db_tag_filters)) {
 						if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === '') {
-							$no_check_groups[$db_tag_filter['groupid']] = true;
+							$skip_groups[$db_tag_filter['groupid']] = true;
 						}
 						else {
 							$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
@@ -309,7 +309,7 @@ class CEvent extends CApiService {
 							}
 						}
 						else {
-							$no_check_groups = array_merge($no_check_groups, array_keys($rights[$usrgrpid]));
+							$skip_groups += $rights[$usrgrpid];
 						}
 					}
 
@@ -380,7 +380,7 @@ class CEvent extends CApiService {
 						' WHERE e.objectid=f.triggerid'.
 							' AND f.itemid=i.itemid'.
 							' AND i.hostid=hgg.hostid'.
-							' AND '.dbConditionInt('hgg.groupid', array_keys($no_check_groups)).
+							' AND '.dbConditionInt('hgg.groupid', array_keys($skip_groups)).
 						')'.
 						' OR '.dbConditionInt('e.objectid', $allowed_triggers).
 					')';
