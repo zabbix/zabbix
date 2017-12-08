@@ -425,7 +425,7 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 	zbx_history_record_vector_create(&values);
 
 	/* first try to find value in the requested second */
-	vc_db_read_values_by_time(itemid, value_type, &values, 1, ts->sec, queries);
+	(void)vc_db_read_values_by_time(itemid, value_type, &values, 1, ts->sec, queries);
 	zbx_vector_history_record_sort(&values, (zbx_compare_func_t)vc_history_record_compare_desc_func);
 
 	if (0 == values.values_num || 0 > zbx_timespec_compare(ts, &values.values[values.values_num - 1].timestamp))

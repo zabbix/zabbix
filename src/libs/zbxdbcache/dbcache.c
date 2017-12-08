@@ -2385,7 +2385,7 @@ int	DCsync_history(int sync_type, int *total_num)
 			DCmass_prepare_history(history, items, errcodes, history_num, &item_diff, &inventory_values);
 
 			/* process values only if they were successfully stored by the history backend */
-			if (FAIL != DBmass_add_history(history, history_num))
+			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
 				/* trigger calculation requires up to date information */
 				/* in configuration and value caches                   */
@@ -2455,7 +2455,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		*total_num += history_num;
 		candidate_num = history_items.values_num;
 
-		if (ZBX_DB_OK == ret)
+		if (SUCCEED == ret)
 		{
 			DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 					history_integer, &history_integer_num, history_string, &history_string_num,
