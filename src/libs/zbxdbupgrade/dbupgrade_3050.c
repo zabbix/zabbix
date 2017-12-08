@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "zbxtasks.h"
 
 /*
  * 4.0 development database patches
@@ -115,76 +116,17 @@ static int	DBpatch_3050005(void)
 
 static int	DBpatch_3050006(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*description, *sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t	triggerid;
+	zbx_db_insert_t	db_insert;
+	int		ret;
 
-	if (NULL == (result = DBselect("select triggerid,description from triggers")))
-		return FAIL;
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_UPDATE_EVENTNAMES, ZBX_TM_STATUS_NEW,
+			time(NULL));
+	zbx_db_insert_autoincrement(&db_insert, "taskid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		description = DBdyn_escape_string(row[1]);
-		ZBX_STR2UINT64(triggerid, row[0]);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set name='%s' where object=%d"
-				" and objectid=%d and source=%d;\n", description, EVENT_OBJECT_TRIGGER,
-				triggerid, EVENT_SOURCE_TRIGGERS);
-		zbx_free(description);
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			return FAIL;
-	}
-
-	zbx_free(sql);
-
-	return SUCCEED;
-}
-
-static int	DBpatch_3050007(void)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*description, *sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t	triggerid;
-
-	if (NULL == (result = DBselect("select triggerid,description from triggers")))
-		return FAIL;
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		description = DBdyn_escape_string(row[1]);
-		ZBX_STR2UINT64(triggerid, row[0]);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update problem set name='%s' where object=%d"
-				" and objectid=%d and source=%d;\n", description, EVENT_OBJECT_TRIGGER,
-				triggerid, EVENT_SOURCE_TRIGGERS);
-		zbx_free(description);
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			return FAIL;
-	}
-
-	zbx_free(sql);
-
-	return SUCCEED;
+	return ret;
 }
 
 #define	ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME	"Cannot calculate trigger expression."
@@ -305,7 +247,6 @@ DBPATCH_ADD(3050003, 0, 1)
 DBPATCH_ADD(3050004, 0, 1)
 DBPATCH_ADD(3050005, 0, 1)
 DBPATCH_ADD(3050006, 0, 1)
-DBPATCH_ADD(3050007, 0, 1)
 DBPATCH_ADD(3050008, 0, 1)
 DBPATCH_ADD(3050009, 0, 1)
 DBPATCH_ADD(3050010, 0, 1)
