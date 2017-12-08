@@ -74,6 +74,8 @@ else {
 			->addVar('action', 'dashboard.view')
 			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->addItem((new CList())
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Content controls'))
 				// $item_groupid and $item_hostid will be hidden, when 'Edit Dashboard' will be clicked.
 				->addItem($item_groupid)
 				->addItem($item_hostid)

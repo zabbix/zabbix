@@ -67,6 +67,8 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CComboBox('config', $config, 'submit();', [
 				QUEUE_OVERVIEW => _('Overview'),
 				QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),

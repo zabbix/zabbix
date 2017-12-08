@@ -25,7 +25,11 @@ $widget = (new CWidget())
 	->setTitle(_('GUI'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.gui.php')))
+		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem(makeAdministrationGeneralMenu('adm.gui.php'))
+		)
 	);
 
 $guiTab = (new CFormList())

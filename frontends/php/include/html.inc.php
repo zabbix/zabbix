@@ -278,7 +278,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	 * list and host (template) name
 	 */
 	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
-	$breadcrumbs = (new CListItem())
+	$breadcrumbs = (new CListItem(null))
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'));
 

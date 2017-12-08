@@ -55,9 +55,17 @@ else {
 			$screenComboBox->addItem('host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$screen['screenid'], $screen['name']);
 		}
 
-		$screenWidget->setControls((new CList())
-			->addItem($screenComboBox)
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+		$screenWidget->setControls((new CForm('get'))
+			->addItem((new CList())
+				->setAttribute('role', 'form')
+				->setAttribute('aria-label', _('Main filter'))
+				->addItem($screenComboBox)
+			)
+			->addItem((new CList())
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Content controls'))
+				->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+			)
 		);
 	}
 

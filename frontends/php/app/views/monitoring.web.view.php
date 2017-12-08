@@ -29,6 +29,8 @@ $this->addJsFile('flickerfreescreen.js');
 		->addVar('action', 'web.view')
 		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
 			->addItem([
 				new CLabel(_('Group'), 'groupid'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -39,6 +41,10 @@ $this->addJsFile('flickerfreescreen.js');
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$data['pageFilter']->getHostsCB()
 			])
+		)
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	)

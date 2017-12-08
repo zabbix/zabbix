@@ -25,7 +25,11 @@ $widget = (new CWidget())
 	->setTitle(_('Trigger severities'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerseverities.php')))
+		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem(makeAdministrationGeneralMenu('adm.triggerseverities.php'))
+		)
 	);
 
 $severityTab = (new CFormList())

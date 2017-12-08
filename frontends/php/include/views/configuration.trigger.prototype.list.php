@@ -24,7 +24,11 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
-		->addItem((new CList())->addItem(new CSubmit('form', _('Create trigger prototype'))))
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
+			->addItem(new CSubmit('form', _('Create trigger prototype')))
+		)
 	)
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 

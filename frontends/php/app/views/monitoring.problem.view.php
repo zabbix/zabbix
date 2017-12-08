@@ -278,6 +278,8 @@ if ($data['action'] == 'problem.view') {
 				->addVar('page', $data['page'])
 				->addItem(
 					(new CList())
+						->setAttribute('role', 'navigation')
+						->setAttribute('aria-label', _('Content controls'))
 						->addItem(new CRedirectButton(_('Export to CSV'),
 							(new CUrl('zabbix.php'))
 								->setArgument('action', 'problem.view.csv')

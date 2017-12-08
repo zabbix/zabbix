@@ -30,11 +30,17 @@ $widget = (new CWidget())
 			->addVar('action', 'discovery.view')
 			->addVar('fullscreen', $data['fullscreen'])
 			->addItem((new CList())
+				->setAttribute('role', 'form')
+				->setAttribute('aria-label', _('Main filter'))
 				->addItem([
 					new CLabel(_('Discovery rule'), 'druleid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$data['pageFilter']->getDiscoveryCB()
 				])
+			)
+			->addItem((new CList())
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Content controls'))
 				->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 			)
 	);

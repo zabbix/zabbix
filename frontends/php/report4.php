@@ -81,7 +81,9 @@ else {
 		$minYear = date('Y');
 	}
 
-	$controls = new CList();
+	$controls = (new CList())
+		->setAttribute('role', 'form')
+		->setAttribute('aria-label', _('Main filter'));
 
 	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
 	$cmbMedia->addItem(0, _('all'));

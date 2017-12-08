@@ -25,7 +25,11 @@ $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.regexps.php')))
+		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem(makeAdministrationGeneralMenu('adm.regexps.php'))
+		)
 	);
 
 $form = (new CForm())

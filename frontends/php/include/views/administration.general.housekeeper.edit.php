@@ -25,7 +25,11 @@ $widget = (new CWidget())
 	->setTitle(_('Housekeeping'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.housekeeper.php')))
+		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem(makeAdministrationGeneralMenu('adm.housekeeper.php'))
+		)
 	);
 
 $houseKeeperTab = (new CFormList())

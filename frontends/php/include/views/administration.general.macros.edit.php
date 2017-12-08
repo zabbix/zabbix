@@ -25,7 +25,11 @@ $widget = (new CWidget())
 	->setTitle(_('Macros'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.macros.php')))
+		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem(makeAdministrationGeneralMenu('adm.macros.php'))
+		)
 	);
 
 $table = (new CTable())

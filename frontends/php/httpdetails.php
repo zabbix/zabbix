@@ -75,6 +75,8 @@ $details_screen = CScreenBuilder::getScreen([
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
 			->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
 		)

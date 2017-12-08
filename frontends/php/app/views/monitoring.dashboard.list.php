@@ -34,6 +34,8 @@ $create_button = new CRedirectButton(_('Create dashboard'),
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setControls((new CForm())
+		->setAttribute('role', 'navigation')
+		->setAttribute('aria-label', _('Content controls'))
 		->cleanItems()
 		->addItem($create_button)
 		->addItem((new CList())

@@ -34,22 +34,28 @@ $this->addJsFile('class.svg.map.js');
 			->addVar('fullscreen', $data['fullscreen'])
 			->addItem(
 				(new CList())
+					->setAttribute('role', 'form')
+					->setAttribute('aria-label', _('Main filter'))
 					->addItem([
 						new CLabel(_('Minimum severity'), 'severity_min'),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						$data['pageFilter']->getSeveritiesMinCB()
 					])
-					->addItem($data['map']['editable']
-						? (new CButton('edit', _('Edit map')))
-							->onClick('redirect("sysmap.php?sysmapid='.$data['map']['sysmapid'].'")')
-						: null
-					)
-					->addItem(get_icon('favourite', [
-						'fav' => 'web.favorite.sysmapids',
-						'elname' => 'sysmapid',
-						'elid' => $data['map']['sysmapid']
-					]))
-					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			)
+			->addItem((new CList())
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Content controls'))
+				->addItem($data['map']['editable']
+					? (new CButton('edit', _('Edit map')))
+						->onClick('redirect("sysmap.php?sysmapid='.$data['map']['sysmapid'].'")')
+					: null
+				)
+				->addItem(get_icon('favourite', [
+					'fav' => 'web.favorite.sysmapids',
+					'elname' => 'sysmapid',
+					'elid' => $data['map']['sysmapid']
+				]))
+				->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 			)
 	)
 	->addItem(

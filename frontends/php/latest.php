@@ -316,6 +316,8 @@ if ($filter['hostids']) {
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setControls((new CList())
+		->setAttribute('role', 'navigation')
+		->setAttribute('aria-label', _('Content controls'))
 		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
 	);
 

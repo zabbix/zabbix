@@ -23,13 +23,20 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
 			->addItem([
 				new CLabel(_('Group'), 'groupid'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$this->data['pageFilter']->getGroupsCB()
 			])
+		)
+		->addItem((new Clist())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
 			->addItem(new CSubmit('form', _('Create maintenance period')))
-		))
+		)
+	)
 	->addItem((new CFilter('web.maintenance.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),
 			(new CTextBox('filter_name', $data['filter']['name']))

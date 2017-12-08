@@ -21,6 +21,8 @@
 $widget = (new CWidget())->setTitle(_('Service availability report').': '.$data['service']['name']);
 
 $controls = (new CList())
+	->setAttribute('role', 'form')
+	->setAttribute('aria-label', _('Main filter'))
 	->addItem([
 		new CLabel(_('Period'), 'period'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -44,8 +46,6 @@ if ($data['period'] != 'yearly') {
 	]);
 }
 
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
-
 $widget->setControls(
 	(new CForm())
 		->cleanItems()
@@ -54,6 +54,11 @@ $widget->setControls(
 		->addVar('serviceid', $data['service']['serviceid'])
 		->addVar('fullscreen', $data['fullscreen'])
 		->addItem($controls)
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+		)
 );
 
 $header = [

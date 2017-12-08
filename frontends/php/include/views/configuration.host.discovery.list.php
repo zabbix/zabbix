@@ -23,7 +23,11 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addVar('hostid', $this->data['hostid'])
-		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
+			->addItem(new CSubmit('form', _('Create discovery rule')))
+		)
 	)
 	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 

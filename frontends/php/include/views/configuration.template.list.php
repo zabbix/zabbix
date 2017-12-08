@@ -25,16 +25,22 @@ $widget = (new CWidget())
 		->cleanItems()
 		->addItem(
 			(new CList())
+				->setAttribute('role', 'form')
+				->setAttribute('aria-label', _('Main filter'))
 				->addItem([
 					new CLabel(_('Group'), 'groupid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$data['pageFilter']->getGroupsCB()
 				])
-				->addItem(new CSubmit('form', _('Create template')))
-				->addItem(
-					(new CButton('form', _('Import')))
-						->onClick('redirect("conf.import.php?rules_preset=template")')
-				)
+		)
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
+			->addItem(new CSubmit('form', _('Create template')))
+			->addItem(
+				(new CButton('form', _('Import')))
+					->onClick('redirect("conf.import.php?rules_preset=template")')
+			)
 		)
 	)
 	->addItem((new CFilter('web.templates.filter.state'))

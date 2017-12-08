@@ -32,7 +32,11 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addVar('hostid', $this->data['hostid'])
-		->addItem((new CList())->addItem($create_button))
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
+			->addItem($create_button)
+		)
 	);
 
 if (!empty($this->data['hostid'])) {

@@ -25,7 +25,11 @@ $widget = (new CWidget())
 	->setTitle(_('Trigger displaying options'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php')))
+		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php'))
+		)
 	);
 
 $triggerDOFormList = (new CFormList())

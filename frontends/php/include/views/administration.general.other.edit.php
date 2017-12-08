@@ -23,7 +23,11 @@ $widget = (new CWidget())
 	->setTitle(_('Other configuration parameters'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.other.php')))
+		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem(makeAdministrationGeneralMenu('adm.other.php'))
+		)
 	);
 
 $otherTab = new CFormList();

@@ -30,11 +30,17 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
 			->addItem([
 				new CLabel(_('User group'), 'filter_usrgrpid'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$userGroupComboBox
 			])
+		)
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
 			->addItem(new CSubmit('form', _('Create user')))
 		)
 	)

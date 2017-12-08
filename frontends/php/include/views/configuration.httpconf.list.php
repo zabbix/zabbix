@@ -43,6 +43,8 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
 			->addItem([
 				new CLabel(_('Group'), 'groupid'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -53,6 +55,10 @@ $widget = (new CWidget())
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$this->data['pageFilter']->getHostsCB()
 			])
+		)
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
 			->addItem($create_button)
 		)
 	);

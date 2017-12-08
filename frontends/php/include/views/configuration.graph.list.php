@@ -25,7 +25,11 @@ if (!empty($this->data['parent_discoveryid'])) {
 		->setControls((new CForm('get'))
 			->cleanItems()
 			->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
-			->addItem((new CList())->addItem(new CSubmit('form', _('Create graph prototype'))))
+			->addItem((new CList())
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Content controls'))
+				->addItem(new CSubmit('form', _('Create graph prototype')))
+			)
 		)
 		->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
@@ -42,6 +46,8 @@ else {
 		->setControls((new CForm('get'))
 			->cleanItems()
 			->addItem((new CList())
+				->setAttribute('role', 'form')
+				->setAttribute('aria-label', _('Main filter'))
 				->addItem([
 					new CLabel(_('Group'), 'groupid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -52,6 +58,10 @@ else {
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$this->data['pageFilter']->getHostsCB()
 				])
+			)
+			->addItem((new CList())
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Content controls'))
 				->addItem($create_button)
 			)
 		);

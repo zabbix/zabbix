@@ -23,12 +23,18 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())
+			->setAttribute('role', 'form')
+			->setAttribute('aria-label', _('Main filter'))
 			->addItem(
 				new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
 					'screens.php' => _('Screens'),
 					'slides.php' => _('Slide shows')
 				])
 			)
+		)
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
 			->addItem(new CSubmit('form', _('Create slide show')))
 		)
 	);

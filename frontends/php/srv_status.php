@@ -161,12 +161,18 @@ else {
 				->cleanItems()
 				->addVar('fullscreen', $_REQUEST['fullscreen'])
 				->addItem((new CList())
+					->setAttribute('role', 'form')
+					->setAttribute('aria-label', _('Main filter'))
 					->addItem([
 						new CLabel(_('Period'), 'period'),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						$period_combo
 					])
-					->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+				)
+				->addItem((new CList())
+					->setAttribute('role', 'navigation')
+					->setAttribute('aria-label', _('Content controls'))
+					->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
 				)
 			)
 			->addItem(BR())

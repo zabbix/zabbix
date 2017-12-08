@@ -162,6 +162,8 @@ if ($triggerData) {
 
 	$reportWidget->setControls(
 		(new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Content controls'))
 			->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))
 			->addItem($triggerData['description'])
 	);
@@ -175,6 +177,8 @@ if ($triggerData) {
 }
 elseif (isset($_REQUEST['filter_hostid'])) {
 	$headerForm = (new CForm('get'))->addItem((new CList())
+		->setAttribute('role', 'form')
+		->setAttribute('aria-label', _('Main filter'))
 		->addItem([
 			new CLabel(_('Mode'), 'mode'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

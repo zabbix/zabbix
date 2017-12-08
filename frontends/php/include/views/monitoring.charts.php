@@ -19,6 +19,8 @@
 **/
 
 $controls = (new CList())
+	->setAttribute('role', 'form')
+	->setAttribute('aria-label', _('Main filter'))
 	->addItem([
 		new CLabel(_('Group'), 'groupid'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -40,12 +42,18 @@ $controls = (new CList())
 		(new CComboBox('action', $data['action'], 'submit()', $data['actions']))->setEnabled((bool) $data['graphid'])
 	]);
 
+$content_control = (new CList())
+	->setAttribute('role', 'navigation')
+	->setAttribute('aria-label', _('Content controls'));
+
 if ($this->data['graphid']) {
-	$controls->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid']]));
-	$controls->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
+	$content_control->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid',
+		'elid' => $this->data['graphid']])
+	);
+	$content_control->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
 }
 
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+$content_control->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
@@ -54,6 +62,7 @@ $chartsWidget = (new CWidget())
 		->addVar('fullscreen', $this->data['fullscreen'])
 		->addVar('page', 1)
 		->addItem($controls)
+		->addItem($content_control)
 	);
 
 $filterForm = (new CFilter('web.charts.filter.state'))->addNavigator();

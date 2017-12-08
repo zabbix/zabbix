@@ -19,32 +19,33 @@
 **/
 
 $widget = (new CWidget())->setTitle(_('Screens'));
+$form = (new CForm('get'))->cleanItems();
 
-$controls = new CList();
-
-if (!$data['templateid']) {
-	$controls->addItem(
-		new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
-			'screens.php' => _('Screens'),
-			'slides.php' => _('Slide shows')
-		])
-	);
-}
-
-$controls->addItem(new CSubmit('form', _('Create screen')));
-
-$createForm = (new CForm('get'))->cleanItems();
+$content_control = (new CList())
+	->setAttribute('role', 'navigation')
+	->setAttribute('aria-label', _('Content controls'))
+	->addItem(new CSubmit('form', _('Create screen')));
 
 if ($data['templateid']) {
-	$createForm->addVar('templateid', $data['templateid']);
+	$form->addVar('templateid', $data['templateid']);
 	$widget->addItem(get_header_host_table('screens', $data['templateid']));
 }
 else {
-	$controls->addItem((new CButton('form', _('Import')))->onClick('redirect("screen.import.php?rules_preset=screen")'));
+	$form->addItem((new CList())
+		->setAttribute('role', 'form')
+		->setAttribute('aria-label', _('Main filter'))
+		->addItem(
+			new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+				'screens.php' => _('Screens'),
+				'slides.php' => _('Slide shows')
+			])
+		)
+	);
+	$content_control->addItem((new CButton('form', _('Import')))->onClick('redirect("screen.import.php?rules_preset=screen")'));
 }
 
-$createForm->addItem($controls);
-$widget->setControls($createForm);
+$form->addItem($content_control);
+$widget->setControls($form);
 
 // filter
 if (!$data['templateid']) {
