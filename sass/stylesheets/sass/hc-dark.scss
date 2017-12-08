@@ -211,6 +211,9 @@ $icon-widget-btn: (
 .list-table {
 	thead th {
 		border-color: lighten($table-border-color, 3%) !important;
+		&.a {
+		font-weight:bold
+		}
 	}
 }
 
