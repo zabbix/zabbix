@@ -33,6 +33,7 @@ void	zbx_mock_test_entry(void **state)
 	AGENT_REQUEST		request;
 	AGENT_RESULT		result;
 	const char		*expected_string, *actual_string;
+	char			**p_result;
 	int			expected_ret, actual_ret;
 
 	ZBX_UNUSED(state);
@@ -57,11 +58,16 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (SYSINFO_RET_OK == actual_ret)
-		actual_string = *GET_STR_RESULT(&result);
+		p_result = GET_STR_RESULT(&result);
 	else if (SYSINFO_RET_FAIL == actual_ret)
-		actual_string = *GET_MSG_RESULT(&result);
+		p_result = GET_MSG_RESULT(&result);
 	else
 		fail_msg("Unsupported return code from NET_IF_DISCOVERY(): %d", actual_ret);
+
+	if (NULL == p_result)
+		fail_msg("NULL result in AGENT_RESULT while expected \"%s\"", expected_string);
+
+	actual_string = *p_result;
 
 	if (0 != strcmp(expected_string, actual_string))
 		fail_msg("Unexpected result string: expected \"%s\", got \"%s\"", expected_string, actual_string);
