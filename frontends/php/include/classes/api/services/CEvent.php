@@ -275,11 +275,17 @@ class CEvent extends CApiService {
 
 					$tag_filters_tmp = [];
 
+					$no_check_groups = [];
 					while ($db_tag_filter = DBfetch($db_tag_filters)) {
-						$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
-							'tag' => $db_tag_filter['tag'],
-							'value' => $db_tag_filter['value']
-						];
+						if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === '') {
+							$no_check_groups[$db_tag_filter['groupid']] = true;
+						}
+						else {
+							$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
+								'tag' => $db_tag_filter['tag'],
+								'value' => $db_tag_filter['value']
+							];
+						}
 					}
 
 					$tag_filters = [];
@@ -364,7 +370,7 @@ class CEvent extends CApiService {
 						' WHERE e.objectid=f.triggerid'.
 							' AND f.itemid=i.itemid'.
 							' AND i.hostid=hgg.hostid'.
-							' AND '.dbConditionInt('hgg.groupid', array_keys($group_triggers)).
+							' AND '.dbConditionInt('hgg.groupid', array_keys($no_check_groups)).
 						')'.
 						' OR '.dbConditionInt('e.objectid', $allowed_triggers).
 					')';
