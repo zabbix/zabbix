@@ -53,16 +53,15 @@ void	zbx_mock_test_entry(void **state)
 
 	if (actual_ret != expected_ret)
 	{
-		fail_msg("Unexpected return code from NET_IF_DISCOVERY(): expected %d, got %d", expected_ret,
-				actual_ret);
+		fail_msg("Unexpected return code from NET_IF_DISCOVERY(): expected %s, got %s",
+				zbx_sysinfo_ret_string(expected_ret), zbx_sysinfo_ret_string(actual_ret));
 	}
 
+	/* we know the return code is one of these */
 	if (SYSINFO_RET_OK == actual_ret)
 		p_result = GET_STR_RESULT(&result);
-	else if (SYSINFO_RET_FAIL == actual_ret)
-		p_result = GET_MSG_RESULT(&result);
 	else
-		fail_msg("Unsupported return code from NET_IF_DISCOVERY(): %d", actual_ret);
+		p_result = GET_MSG_RESULT(&result);
 
 	if (NULL == p_result)
 		fail_msg("NULL result in AGENT_RESULT while expected \"%s\"", expected_string);
