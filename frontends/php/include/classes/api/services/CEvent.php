@@ -308,6 +308,9 @@ class CEvent extends CApiService {
 								}
 							}
 						}
+						else {
+							$no_check_groups = array_merge($no_check_groups, array_keys($rights[$usrgrpid]));
+						}
 					}
 
 					foreach ($rights as $usrgrpid => $right) {
