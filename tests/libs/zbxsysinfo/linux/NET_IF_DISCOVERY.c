@@ -37,8 +37,6 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	if ()
-
 	if (ZBX_MOCK_NO_PARAMETER == (error = get_out_parameter("json", &expected_string)))
 	{
 		if (ZBX_MOCK_NO_PARAMETER == (error = get_out_parameter("error", &expected_string)))
