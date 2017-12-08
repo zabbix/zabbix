@@ -364,7 +364,7 @@ class CEvent extends CApiService {
 						' WHERE e.objectid=f.triggerid'.
 							' AND f.itemid=i.itemid'.
 							' AND i.hostid=hgg.hostid'.
-							' AND '.dbConditionInt('hgg.groupid', array_keys($allowed_host_groups)).
+							' AND '.dbConditionInt('hgg.groupid', array_keys($group_triggers)).
 						')'.
 						' OR '.dbConditionInt('e.objectid', $allowed_triggers).
 					')';
