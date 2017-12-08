@@ -151,7 +151,6 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	$description_style = getSeverityStyle($trigger['priority'], $value == TRIGGER_VALUE_TRUE);
 	$description = (new CCol([
 		(new CSpan($problem['name']))
 			->setHint(
@@ -159,8 +158,13 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				true
 			)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-	]))
-		->addClass($description_style);
+	]));
+
+	$description_style = getSeverityStyle($trigger['priority']);
+
+	if ($value == TRIGGER_VALUE_TRUE) {
+		$description->addClass($description_style);
+	}
 
 	if (!$show_recovery_data) {
 		// blinking
