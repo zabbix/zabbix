@@ -805,6 +805,9 @@ td.disaster-bg {
 		.arrow-down {
 			border-top-color: $light-red;
 		}
+		&:hover {
+		color: $link-hover-color;
+		}
 	}
 
 	button {
@@ -821,6 +824,9 @@ td.disaster-bg {
 		}
 		.arrow-down {
 			border-top-color: $light-green;
+		}
+		&:hover {
+		color: $link-hover-color;
 		}
 	}
 

@@ -771,6 +771,9 @@ content: "";
 		.arrow-down {
 			border-top-color: $red;
 		}
+		&:hover {
+		color: $link-hover-color;
+		}
 	}
 }
 
@@ -783,6 +786,9 @@ content: "";
 		}
 		.arrow-down {
 			border-top-color: $green;
+		}
+		&:hover {
+		color: $link-hover-color;
 		}
 	}
 }
