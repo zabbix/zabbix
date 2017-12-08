@@ -59,7 +59,6 @@ zbx_err_codes_t;
 #endif
 
 int		zabbix_open_log(int type, int level, const char *filename, char **error);
-void		zabbix_errlog(zbx_err_codes_t err, ...);
 void		__zbx_zabbix_log(int level, const char *fmt, ...);
 void		zabbix_close_log(void);
 #ifndef _WINDOWS

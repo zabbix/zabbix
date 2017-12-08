@@ -231,7 +231,7 @@ if ($items) {
 
 	if ($items) {
 		// get history
-		$history = Manager::History()->getLast($items, 2, ZBX_HISTORY_PERIOD);
+		$history = Manager::History()->getLastValues($items, 2, ZBX_HISTORY_PERIOD);
 
 		// filter items without history
 		if (!$filter['showWithoutData']) {

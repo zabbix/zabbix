@@ -1,6 +1,10 @@
 Changes for 4.0.0alpha1
 
 New features:
+........S. [ZBXNEXT-970] added more detailed error information to notification message when DB is unavailable (viktors)
+..F....... [ZBXNEXT-4137] removed green background from cells (Oleg)
+..F....... [ZBXNEXT-4157] added map status summary to be readable by screen reader software (gcalenko)
+..F....... [ZBXNEXT-4127] implemented popup displaying in overlay dialogues (miks)
 ...GI..PS. [ZBXNEXT-1520] increased the maximum Hosts/DNS name character length from 63 to 255 (greg, Sergejs)
 ..F.....S. [ZBXNEXT-4108] implemented search of problems by trigger name (abs, miks)
 ..F....... [ZBXNEXT-4143] implemented keybord interaction in top navigation (miks)
@@ -29,6 +33,13 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.5rc2
+
+Bug fixes:
+........S. [ZBX-13153] fixed possibility that proxy last access updates are lost during cache reload (vso)
+........S. [ZBX-13149] fixed possible crash in history syncer when processing deleted item (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.5rc1

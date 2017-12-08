@@ -2627,7 +2627,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   font-size: 0.917em;
   line-height: 1em;
   display: inline-block; }
-  .progress-bar-bg.green-bg, .progress-bar-bg.normal-bg, .progress-bar-bg.active-bg {
+  .progress-bar-bg.green-bg, .progress-bar-bg.normal-bg {
     background-color: #34af67; }
   .progress-bar-bg.red-bg {
     background-color: #d64e4e; }
@@ -2718,7 +2718,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -moz-border-radius: 2px;
   border-radius: 2px; }
 
-.green-bg, .normal-bg, .active-bg, td.active-bg {
+.green-bg, .normal-bg {
   background-color: #59db8f; }
 
 .red-bg {
@@ -2737,12 +2737,6 @@ td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg,
   background-color: #97aab3; }
 
 .normal-bg {
-  color: #0e4123; }
-
-.active-bg, td.active-bg {
-  color: #0e4123; }
-
-td.active-bg {
   color: #0e4123; }
 
 .info-bg, .info-bg input[type="radio"]:checked + label {

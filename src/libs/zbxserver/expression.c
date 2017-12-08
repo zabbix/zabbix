@@ -1330,7 +1330,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
-			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)
@@ -1392,7 +1392,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
-			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)
