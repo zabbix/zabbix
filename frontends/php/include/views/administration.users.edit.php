@@ -227,7 +227,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			'dstfrm' => $userForm->getName(),
 			'media' => $id,
 			'mediatypeid' => $media['mediatypeid'],
-			'sendto' => urlencode($media['sendto']),
+			'sendto' => $media['sendto'],
 			'period' => $media['period'],
 			'severity' => $media['severity'],
 			'active' => $media['active']
