@@ -23,6 +23,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#define FAIL_PARAM(NAME, MOCK_ERR)	fail_msg("Cannot get \"%s\": %s", NAME, zbx_mock_error_string(MOCK_ERR))
+
 /* returns ZBX_MOCK_SUCCESS or ZBX_MOCK_NO_PARAMETER */
 static zbx_mock_error_t	get_out_parameter(const char *name, const char **value)
 {
@@ -30,9 +32,9 @@ static zbx_mock_error_t	get_out_parameter(const char *name, const char **value)
 	zbx_mock_error_t	error;
 
 	if (ZBX_MOCK_NO_PARAMETER != (error = zbx_mock_out_parameter(name, &handle)) && ZBX_MOCK_SUCCESS != error)
-		fail_msg("Cannot get \"%s\": %s", name, zbx_mock_error_string(error));
+		FAIL_PARAM(name, error);
 	else if (ZBX_MOCK_SUCCESS == error && ZBX_MOCK_SUCCESS != (error = zbx_mock_string(handle, value)))
-		fail_msg("Cannot get \"%s\": %s", name, zbx_mock_error_string(error));
+		FAIL_PARAM(name, error);
 
 	return error;
 }
