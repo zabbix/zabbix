@@ -49,7 +49,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	int		i, ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key);
 
 	init_request(&request);
 
@@ -80,7 +80,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		zbx_free(param_esc);
 	}
 
-	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT, ZBX_EXIT_CODE_CHECKS_DISABLED))
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 

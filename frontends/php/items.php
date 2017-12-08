@@ -748,7 +748,7 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	if ($items) {
 		DBstart();
 
-		$result = deleteHistoryByItemIds([$itemId]);
+		$result = Manager::History()->deleteHistory([$itemId]);
 
 		if ($result) {
 			$item = reset($items);
@@ -1096,7 +1096,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 	if ($items) {
 		DBstart();
 
-		$result = deleteHistoryByItemIds($itemIds);
+		$result = Manager::History()->deleteHistory($itemIds);
 
 		if ($result) {
 			foreach ($items as $item) {
@@ -1178,6 +1178,10 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 			$step['params'] = explode("\n", $step['params']);
 		}
 		unset($step);
+
+		if ($item['type'] != ITEM_TYPE_JMX) {
+			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		}
 
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_item_options = [
@@ -1362,6 +1366,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	if (!$data['delay_flex']) {
 		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
 	}
+
+	$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 
 	// render view
 	$itemView = new CView('configuration.item.massupdate', $data);

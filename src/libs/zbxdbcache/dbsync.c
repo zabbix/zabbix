@@ -541,6 +541,12 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[34], host->tls_dc_psk->tls_psk))
 			return FAIL;
 	}
+
+	if (FAIL == dbsync_compare_str(dbrow[35], host->proxy_address))
+		return FAIL;
+#else
+	if (FAIL == dbsync_compare_str(dbrow[31], host->proxy_address))
+		return FAIL;
 #endif
 	if (FAIL == dbsync_compare_uchar(dbrow[29], host->tls_connect))
 		return FAIL;
@@ -610,7 +616,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
 				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept"
-				",tls_issuer,tls_subject,tls_psk_identity,tls_psk"
+				",tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -621,7 +627,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 35, NULL);
+	dbsync_prepare(sync, 36, NULL);
 #else
 	if (NULL == (result = DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
@@ -629,7 +635,8 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"errors_from,available,disable_until,snmp_errors_from,"
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept"
+				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept,"
+				"proxy_address"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -640,7 +647,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 31, NULL);
+	dbsync_prepare(sync, 32, NULL);
 #endif
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
@@ -1242,6 +1249,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
 	unsigned char		value_type, type, history, trends;
+	int			history_sec = 0;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
@@ -1269,11 +1277,22 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		return FAIL;
 
 	if (ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
+	{
 		history = (0 != dbsync_env.cache->config->hk.history);
+		history_sec = dbsync_env.cache->config->hk.history;
+	}
 	else
+	{
+		if (SUCCEED != is_time_suffix(dbrow[31], &history_sec, ZBX_LENGTH_UNLIMITED))
+			return FAIL;
+
 		history = zbx_time2bool(dbrow[31]);
+	}
 
 	if (item->history != history)
+		return FAIL;
+
+	if (history_sec != item->history_sec)
 		return FAIL;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[33], item->inventory_link))

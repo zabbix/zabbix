@@ -135,9 +135,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	if ($problem['r_eventid'] != 0) {
 		if ($problem['correlationid'] != 0) {
 			$info_icons[] = makeInformationIcon(
-				array_key_exists($problem['correlationid'], $data['correlations'])
+				array_key_exists($problem['correlationid'], $data['data']['correlations'])
 					? _s('Resolved by correlation rule "%1$s".',
-						$data['correlations'][$problem['correlationid']]['name']
+						$data['data']['correlations'][$problem['correlationid']]['name']
 					)
 					: _('Resolved by correlation rule.')
 			);
@@ -153,9 +153,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$description_style = getSeverityStyle($trigger['priority'], $value == TRIGGER_VALUE_TRUE);
 	$description = (new CCol([
-		(new CSpan(CMacrosResolverHelper::resolveEventDescription(
-			$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-		)))
+		(new CSpan($problem['name']))
 			->setHint(
 				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
 				true

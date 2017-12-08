@@ -540,7 +540,8 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestTabSwitch('Media');
 		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToWindow('zbx_popup');
+		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('type', $data)) {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);

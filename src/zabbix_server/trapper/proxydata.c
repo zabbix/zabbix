@@ -97,12 +97,14 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	if (SUCCEED != (status = zbx_proxy_check_permissions(&proxy, sock, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
-				proxy.host, sock->peer, error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
+				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
 		goto out;
 	}
 
 	zbx_proxy_update_version(&proxy, jp);
+
+	update_proxy_lastaccess(proxy.hostid, time(NULL));
 
 	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
 	{
@@ -225,10 +227,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
 			{
 				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
-
-				DBbegin();
 				zbx_tm_save_tasks(&tasks);
-				DBcommit();
 			}
 		}
 
@@ -304,10 +303,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
 			{
 				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
-
-				DBbegin();
 				zbx_tm_save_tasks(&tasks);
-				DBcommit();
 			}
 		}
 
@@ -327,14 +323,12 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-void	init_proxy_history_lock(void)
+int	init_proxy_history_lock(char **error)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE) &&
-			FAIL == zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, NULL))
-	{
-		zbx_error("Unable to create mutex for passive proxy history");
-		exit(EXIT_FAILURE);
-	}
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+		return zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, error);
+
+	return SUCCEED;
 }
 
 void	free_proxy_history_lock(void)

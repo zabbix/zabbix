@@ -84,12 +84,9 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->verifyHash();
 	}
 
-	public function testPageAdministrationGeneralRegexp_backup_1() {
-		DBsave_tables('regexps');
-	}
-
 	/**
 	 * @dataProvider allRegexps
+	 * @backup-once regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
@@ -97,7 +94,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckboxSelect('regexpids_'.$regexp['regexpid']);
 		$this->zbxTestClickButton('regexp.massdelete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('Regular expression deleted');
 
@@ -106,27 +103,17 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->verifyHash();
 	}
 
-	public function testPageAdministrationGeneralRegexp_restore_1() {
-		DBrestore_tables('regexps');
-	}
-
-	public function testPageAdministrationGeneralRegexp_backup_2() {
-		DBsave_tables('regexps');
-	}
-
+	/**
+	 * @backup-once regexps
+	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckboxSelect('all_regexps');
 		$this->zbxTestClickButton('regexp.massdelete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('Regular expressions deleted');
 
 		$this->assertEquals(0, DBcount('SELECT NULL FROM regexps'));
 	}
-
-	public function testPageAdministrationGeneralRegexp_restore_2() {
-		DBrestore_tables('regexps');
-	}
-
 }

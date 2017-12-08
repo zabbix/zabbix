@@ -79,12 +79,11 @@ class testPageMaintenance extends CWebTest {
 	}
 
 	/**
-	* @dataProvider allMaintenances
-	*/
+	 * @dataProvider allMaintenances
+	 * @backup maintenances
+	 */
 	public function testPageMaintenance_MassDelete($maintenance) {
 		$maintenanceid = $maintenance['maintenanceid'];
-
-		DBsave_tables('maintenances');
 
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -92,7 +91,7 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestCheckboxSelect('maintenanceids_'.$maintenanceid);
 		$this->zbxTestClickButton('maintenance.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestTextPresent('Maintenance deleted');
 
@@ -106,8 +105,5 @@ class testPageMaintenance extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 		$sql = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid)";
 		$this->assertEquals(0, DBcount($sql));
-
-		DBrestore_tables('maintenances');
 	}
-
 }

@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup triggers
  */
 class testFormTriggerPrototype extends CWebTest {
 
@@ -74,13 +76,6 @@ class testFormTriggerPrototype extends CWebTest {
 	 * @var string
 	 */
 	protected $itemKey = 'item-prototype-reuse';
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormTriggerPrototype_Setup() {
-		DBsave_tables('triggers');
-	}
 
 	// Returns layout data
 	public static function layout() {
@@ -927,17 +922,10 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
 			$this->zbxTestClickButton('triggerprototype.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototypes deleted');
 			$this->assertEquals(0, DBcount("SELECT triggerid FROM triggers where description = '".$description."'"));
 		}
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormTriggerPrototype_Teardown() {
-		DBrestore_tables('triggers');
 	}
 }

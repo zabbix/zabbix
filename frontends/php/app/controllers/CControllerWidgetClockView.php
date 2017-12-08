@@ -55,7 +55,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 					$name = $item['hosts'][0]['name'];
 					unset($items, $item['hosts']);
 
-					$last_value = Manager::History()->getLast([$item]);
+					$last_value = Manager::History()->getLastValues([$item]);
 
 					if ($last_value) {
 						$last_value = $last_value[$item['itemid']][0];

@@ -28,7 +28,10 @@
 #include "dbcache.h"
 #include "discovery.h"
 #include "zbxalgo.h"
+#include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+
+extern char	*CONFIG_SERVER;
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED  	(HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -113,7 +116,8 @@ static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
  *                                                                            *
  * Function: zbx_proxy_check_permissions                                      *
  *                                                                            *
- * Purpose: checks proxy connection permissions (encryption configuration)    *
+ * Purpose: check proxy connection permissions (encryption configuration and  *
+ *          if peer proxy address is allowed)                                 *
  *                                                                            *
  * Parameters:                                                                *
  *     proxy   - [IN] the proxy data                                          *
@@ -129,7 +133,14 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
+#endif
+	if ('\0' != *proxy->proxy_address && FAIL == zbx_tcp_check_allowed_peers(sock, proxy->proxy_address))
+	{
+		*error = zbx_strdup(*error, "connection is not allowed");
+		return FAIL;
+	}
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
@@ -312,10 +323,7 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_dc_get_active_proxy_by_name(host, proxy, error))
-		return FAIL;
-
-	return SUCCEED;
+	return zbx_dc_get_active_proxy_by_name(host, proxy, error);
 }
 
 /******************************************************************************
@@ -341,6 +349,16 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req)
 {
 	char	*msg = NULL;
+
+	if (FAIL == zbx_tcp_check_allowed_peers(sock, CONFIG_SERVER))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server is not allowed: %s", req, zbx_socket_strerror());
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", CONFIG_TIMEOUT);
+
+		return FAIL;
+	}
 
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
@@ -373,13 +391,63 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 
 /******************************************************************************
  *                                                                            *
+ * Function: db_update_proxies_lastaccess                                     *
+ *                                                                            *
+ * Purpose: updates proxy last access timestamp in database                   *
+ *                                                                            *
+ * Parameter: proxy_diff - [IN] last access updates for proxies               *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_update_proxies_lastaccess(const zbx_vector_uint64_pair_t *proxy_diff)
+{
+	char	*sql;
+	size_t	sql_alloc = 256, sql_offset = 0;
+	int	i;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	DBbegin();
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < proxy_diff->values_num; i++)
+	{
+		zbx_uint64_pair_t	pair = proxy_diff->values[i];
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts"
+				" set lastaccess=%d"
+				" where hostid=" ZBX_FS_UI64 ";\n",
+				pair.second, pair.first);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	DBcommit();
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: update_proxy_lastaccess                                          *
  *                                                                            *
  ******************************************************************************/
 void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access)
 {
-	DBexecute("update hosts set lastaccess=%d where hostid=" ZBX_FS_UI64, last_access, hostid);
-	zbx_dc_update_proxy_lastaccess(hostid, last_access);
+	zbx_vector_uint64_pair_t	proxy_diff;
+
+	zbx_vector_uint64_pair_create(&proxy_diff);
+
+	zbx_dc_update_proxy_lastaccess(hostid, last_access, &proxy_diff);
+
+	if (0 != proxy_diff.values_num)
+		db_update_proxies_lastaccess(&proxy_diff);
+
+	zbx_vector_uint64_pair_destroy(&proxy_diff);
 }
 
 /******************************************************************************

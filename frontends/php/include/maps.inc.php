@@ -1051,6 +1051,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'latelyChanged' => false,
 			'ack' => true
 		];
+		$info[$selementId]['aria_label'] = '';
 
 		/*
 		 * If user has no rights to see the details of particular selement, add only info that is needed to render map
@@ -1142,6 +1143,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 		elseif ($sysmap['expandproblem'] == SYSMAP_SINGLE_PROBLEM && $i['problem']) {
 			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
 			$i['expandproblem'] = SYSMAP_SINGLE_PROBLEM;
+			$critical_triggerid = $lastProblemId;
 		}
 		// Number of problems and expand most critical one.
 		elseif ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL && $i['problem']) {
@@ -1195,12 +1197,21 @@ function getSelementsInfo($sysmap, array $options = []) {
 				}
 
 				$info[$selementId] = getTriggersInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId]['triggerid'] = $critical_triggerid;
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_IMAGE:
 				$info[$selementId] = getImagesInfo($selement);
 				break;
 		}
+
+		if ($i['problem'] > 0) {
+			$info[$selementId]['aria_label'] = $i['problem'] > 1
+				? _n('%1$s problem', '%1$s problems', $i['problem'])
+				: CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
+		}
+
+		$info[$selementId]['problems_total'] = $i['problem'];
 	}
 
 	if ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {

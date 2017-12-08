@@ -28,7 +28,8 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 
 		$this->setType(WIDGET_DISCOVERY_STATUS);
 		$this->setValidationRules([
-			'name' => 'string'
+			'name' => 'string',
+			'fields' => 'json'
 		]);
 	}
 

@@ -455,7 +455,7 @@
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
 			'content_width': widget['content_body'].width(),
-			'content_height': widget['content_body'].height() - 10 // -10 is added to avoid scrollbar
+			'content_height': widget['content_body'].height() - 4 // -4 is added to avoid scrollbar
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -593,7 +593,7 @@
 				}
 				else {
 					// No errors, proceed with update.
-					overlayDialogueDestroy();
+					overlayDialogueDestroy('widgetConfg');
 
 					if (widget === null) {
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
@@ -712,7 +712,8 @@
 					'class': 'btn-alt',
 					'action': function() {}
 				}
-			]
+			],
+			'dialogueid': 'widgetConfg'
 		});
 
 		var overlay_dialogue = $('#overlay_dialogue');
@@ -831,7 +832,7 @@
 				}
 				else if ('errors' in resp) {
 					// Error returned.
-					dashbaordAddMessages(resp.errors);
+					dashboardAddMessages(resp.errors);
 				}
 			},
 			complete: function() {

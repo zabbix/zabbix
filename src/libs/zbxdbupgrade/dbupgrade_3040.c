@@ -39,6 +39,28 @@ static int	DBpatch_3040001(void)
 	return DBpatch_3020001();
 }
 
+static int	DBpatch_3040002(void)
+{
+	return DBdrop_foreign_key("sessions", 1);
+}
+
+static int	DBpatch_3040003(void)
+{
+	return DBdrop_index("sessions", "sessions_1");
+}
+
+static int	DBpatch_3040004(void)
+{
+	return DBcreate_index("sessions", "sessions_1", "userid,status,lastaccess", 0);
+}
+
+static int	DBpatch_3040005(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sessions", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(3040)
@@ -47,5 +69,9 @@ DBPATCH_START(3040)
 
 DBPATCH_ADD(3040000, 0, 1)
 DBPATCH_ADD(3040001, 0, 0)
+DBPATCH_ADD(3040002, 0, 0)
+DBPATCH_ADD(3040003, 0, 0)
+DBPATCH_ADD(3040004, 0, 0)
+DBPATCH_ADD(3040005, 0, 0)
 
 DBPATCH_END()

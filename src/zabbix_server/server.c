@@ -65,6 +65,7 @@
 #include "setproctitle.h"
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"
+#include "zbxhistory.h"
 
 #ifdef ZBX_CUNIT
 #include "../libs/zbxcunit/zbxcunit.h"
@@ -170,6 +171,7 @@ int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
+char	*CONFIG_SERVER			= NULL;		/* not used in zabbix_server, required for linking */
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
@@ -257,6 +259,8 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
+char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
+char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -435,6 +439,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
 		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
+
+	if (NULL == CONFIG_HISTORY_STORAGE_OPTS)
+		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "unum,float,char,log,text");
 #endif
 
 #ifdef HAVE_SQLITE3
@@ -493,7 +500,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", CONFIG_SSL_CERT_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("HistoryStorageURL", CONFIG_HISTORY_STORAGE_URL, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
 #endif
+
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_VMWARE_FORKS, "VMware support"));
 
@@ -683,6 +693,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			100},
 		{"StartPreprocessors",		&CONFIG_PREPROCESSOR_FORKS,		TYPE_INT,
 			PARM_OPT,	1,			1000},
+		{"HistoryStorageURL",		&CONFIG_HISTORY_STORAGE_URL,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HistoryStorageTypes",		&CONFIG_HISTORY_STORAGE_OPTS,		TYPE_STRING_LIST,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -961,6 +975,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_create_itservices_lock(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IT services lock: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_history_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}

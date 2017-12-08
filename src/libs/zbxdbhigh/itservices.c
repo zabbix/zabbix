@@ -621,16 +621,16 @@ out:
  *              service alarm queue into database.                            *
  *                                                                            *
  ******************************************************************************/
-static int	its_flush_updates(zbx_vector_ptr_t *updates)
+static int	its_flush_updates(const zbx_vector_ptr_t *updates)
 {
-	const char		*__function_name = "its_flush_updates";
+	const char			*__function_name = "its_flush_updates";
 
-	int			i, j, k, ret = FAIL;
-	zbx_status_update_t	*update;
-	zbx_itservices_t	itservices;
-	zbx_vector_ptr_t	alarms;
-	zbx_itservice_index_t	*index;
-	zbx_vector_uint64_t	triggerids;
+	int				i, j, k, ret = FAIL;
+	const zbx_status_update_t	*update;
+	zbx_itservices_t		itservices;
+	zbx_vector_ptr_t		alarms;
+	zbx_itservice_index_t		*index;
+	zbx_vector_uint64_t		triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -718,14 +718,14 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff)
+int	DBupdate_itservices(const zbx_vector_ptr_t *trigger_diff)
 {
-	const char		*__function_name = "DBupdate_itservices";
+	const char			*__function_name = "DBupdate_itservices";
 
-	int			ret = SUCCEED;
-	zbx_vector_ptr_t	updates;
-	int			i;
-	zbx_trigger_diff_t	*diff;
+	int				ret = SUCCEED;
+	zbx_vector_ptr_t		updates;
+	int				i;
+	const zbx_trigger_diff_t	*diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -746,7 +746,13 @@ int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff)
 	{
 		LOCK_ITSERVICES;
 
-		ret = its_flush_updates(&updates);
+		do
+		{
+			DBbegin();
+
+			ret = its_flush_updates(&updates);
+		}
+		while (ZBX_DB_DOWN == DBcommit());
 
 		UNLOCK_ITSERVICES;
 

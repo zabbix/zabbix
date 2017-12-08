@@ -35,6 +35,7 @@ class CControllerProxyEdit extends CController {
 			'ip' =>				'db       interface.ip',
 			'useip' =>			'db       interface.useip      |in 0,1',
 			'port' =>			'db       interface.port',
+			'proxy_address' =>	'db       hosts.proxy_address',
 			'proxy_hostids' =>	'array_db hosts.hostid',
 			'description' =>	'db       hosts.description',
 			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
@@ -88,6 +89,7 @@ class CControllerProxyEdit extends CController {
 			'ip' => '127.0.0.1',
 			'useip' => '1',
 			'port' => '10051',
+			'proxy_address' => '',
 			'proxy_hostids' => [],
 			'description' => '',
 			'tls_accept' => HOST_ENCRYPTION_NONE,
@@ -104,8 +106,8 @@ class CControllerProxyEdit extends CController {
 			$data['proxyid'] = $this->getInput('proxyid');
 
 			$proxies = API::Proxy()->get([
-				'output' => ['host', 'status', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-					'tls_psk_identity', 'tls_psk'
+				'output' => ['host', 'status', 'proxy_address', 'description', 'tls_connect', 'tls_accept',
+					'tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'
 				],
 				'selectHosts' => ['hostid'],
 				'selectInterface' => ['interfaceid', 'dns', 'ip', 'useip', 'port'],
@@ -115,6 +117,7 @@ class CControllerProxyEdit extends CController {
 
 			$data['host'] = $proxy['host'];
 			$data['status'] = $proxy['status'];
+			$data['proxy_address'] = $proxy['proxy_address'];
 			$data['tls_accept'] = $proxy['tls_accept'];
 			$data['tls_connect'] = $proxy['tls_connect'];
 			$data['tls_issuer'] = $proxy['tls_issuer'];
@@ -139,6 +142,7 @@ class CControllerProxyEdit extends CController {
 		$data['ip'] = $this->getInput('ip', $data['ip']);
 		$data['useip'] = $this->getInput('useip', $data['useip']);
 		$data['port'] = $this->getInput('port', $data['port']);
+		$data['proxy_address'] = $this->getInput('proxy_address', $data['proxy_address']);
 		$data['proxy_hostids'] = $this->getInput('proxy_hostids', $data['proxy_hostids']);
 		$data['description'] = $this->getInput('description', $data['description']);
 		$data['tls_accept'] = $this->getInput('tls_accept', $data['tls_accept']);

@@ -121,7 +121,7 @@ function getSystemStatusData(array $filter, array $config) {
 	unset($group);
 
 	$options = [
-		'output' => ['eventid', 'objectid', 'clock', 'ns'],
+		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
 		'source' => EVENT_SOURCE_TRIGGERS,
@@ -153,7 +153,7 @@ function getSystemStatusData(array $filter, array $config) {
 		}
 
 		$options = [
-			'output' => ['description', 'expression', 'priority'],
+			'output' => ['priority'],
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['name'],
 			'triggerids' => array_keys($triggerids),
@@ -409,9 +409,7 @@ function make_status_of_zbx() {
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		$server_details = isset($ZBX_SERVER, $ZBX_SERVER_PORT)
-			? $ZBX_SERVER.':'.$ZBX_SERVER_PORT
-			: _('Zabbix server IP or port is not set!');
+		$server_details = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
 	}
 	else {
 		$server_details = '';
@@ -423,12 +421,13 @@ function make_status_of_zbx() {
 
 	$table->addRow([
 		_('Zabbix server is running'),
-		(new CSpan($status !== false ? _('Yes') : _('No')))
-			->addClass($status !== false ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+		(new CSpan($status['is_running'] ? _('Yes') : _('No')))
+			->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
 		$server_details
 	]);
-	$table->addRow([_('Number of hosts (enabled/disabled/templates)'), $status !== false ? $status['hosts_count'] : '',
-		$status !== false
+	$table->addRow([_('Number of hosts (enabled/disabled/templates)'),
+		$status['has_status'] ? $status['hosts_count'] : '',
+		$status['has_status']
 			? [
 				(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
 				(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED), ' / ',
@@ -437,9 +436,9 @@ function make_status_of_zbx() {
 			: ''
 	]);
 	$title = (new CSpan(_('Number of items (enabled/disabled/not supported)')))
-		->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
-	$table->addRow([$title, $status !== false ? $status['items_count'] : '',
-		$status !== false
+		->setTitle(_('Only items assigned to enabled hosts are counted'));
+	$table->addRow([$title, $status['has_status'] ? $status['items_count'] : '',
+		$status['has_status']
 			? [
 				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
 				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
@@ -448,9 +447,9 @@ function make_status_of_zbx() {
 			: ''
 	]);
 	$title = (new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
-		->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
-	$table->addRow([$title, $status !== false ? $status['triggers_count'] : '',
-		$status !== false
+		->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
+	$table->addRow([$title, $status['has_status'] ? $status['triggers_count'] : '',
+		$status['has_status']
 			? [
 				$status['triggers_count_enabled'], ' / ',
 				$status['triggers_count_disabled'], ' [',
@@ -459,12 +458,12 @@ function make_status_of_zbx() {
 			]
 			: ''
 	]);
-	$table->addRow([_('Number of users (online)'), $status !== false ? $status['users_count'] : '',
-		$status !== false ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
+	$table->addRow([_('Number of users (online)'), $status['has_status'] ? $status['users_count'] : '',
+		$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
 	]);
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$table->addRow([_('Required server performance, new values per second'),
-			($status !== false && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '', ''
+			($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '', ''
 		]);
 	}
 
@@ -791,10 +790,6 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 
 		$hosts = zbx_objectValues($trigger['hosts'], 'name');
 
-		$description = CMacrosResolverHelper::resolveEventDescription(
-			$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-		);
-
 		// ack
 		if ($config['event_ack_enable']) {
 			$problem['acknowledged'] = $problem['acknowledges'] ? EVENT_ACKNOWLEDGED : EVENT_NOT_ACKNOWLEDGED;
@@ -806,7 +801,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 
 		$table->addRow([
 			implode(', ', $hosts),
-			getSeverityCell($trigger['priority'], null, $description),
+			getSeverityCell($trigger['priority'], null, $problem['name']),
 			zbx_date2age($problem['clock']),
 			$ack,
 			array_key_exists($problem['eventid'], $actions)

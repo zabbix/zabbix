@@ -37,6 +37,7 @@ $userGroupFormList = (new CFormList())
 		(new CTextBox('gname', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', DB::getFieldLength('usrgrp', 'name'))
 	);
 
 // append groups to form list
@@ -133,8 +134,13 @@ $new_permissions_table = (new CTable())
 			'objectName' => 'hostGroup',
 			'styles' => ['margin-top' => '-.3em'],
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$userGroupForm->getName().
-					'&dstfld1=groupids_&srcfld1=groupid&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $userGroupForm->getName(),
+					'dstfld1' => 'groupids_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(

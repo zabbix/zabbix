@@ -261,13 +261,19 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		DBstart();
 
 		// filter only normal and discovery created hosts
-		$hosts = API::Host()->get([
+		$options = [
 			'output' => ['hostid'],
 			'hostids' => $hostIds,
 			'selectInventory' => ['inventory_mode'],
 			'selectGroups' => ['groupid'],
 			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
-		]);
+		];
+
+		if (array_key_exists('templates', $visible) && !hasRequest('mass_replace_tpls')) {
+			$options['selectParentTemplates'] = ['templateid'];
+		}
+
+		$hosts = API::Host()->get($options);
 
 		$properties = [
 			'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'description'
@@ -412,6 +418,14 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			else {
 				unset($host['groups']);
 			}
+
+			if ($templateids && array_key_exists('parentTemplates', $host)) {
+				$host['templates'] = array_unique(
+					array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'))
+				);
+			}
+
+			unset($host['parentTemplates']);
 
 			$host = array_merge($host, $newValues);
 		}

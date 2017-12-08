@@ -20,11 +20,10 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup trigger_depends
+ */
 class testTriggerDependencies extends CWebTest {
-
-	public function testTriggerDependenciesFromHost_backup() {
-		DBsave_tables('trigger_depends');
-	}
 
 	/**
 	* @dataProvider testTriggerDependenciesFromHost_SimpleTestProvider
@@ -53,9 +52,5 @@ class testTriggerDependencies extends CWebTest {
 			['10001', 'Cannot add dependency from a host to a template.'],
 			['10081', 'Trigger updated']
 		];
-	}
-
-	public function testTriggerDependenciesFromHost_restore() {
-		DBrestore_tables('trigger_depends');
 	}
 }

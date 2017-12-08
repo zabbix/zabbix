@@ -1070,6 +1070,8 @@ footer, .footer {
     padding: 5px 0 5px 10px;
     vertical-align: middle;
     width: 85%; }
+    .table-forms .table-forms-td-right.has-before {
+      padding-top: 0px; }
     .table-forms .table-forms-td-right td {
       padding: 5px 5px 5px 0;
       position: relative; }
@@ -1156,7 +1158,9 @@ footer, .footer {
     border: 1px solid #4f4f4f;
     -webkit-transition: background-color 0.2s ease-out;
     -moz-transition: background-color 0.2s ease-out;
-    transition: background-color 0.2s ease-out; }
+    transition: background-color 0.2s ease-out;
+    line-height: 1.2em;
+    display: inline-block; }
   .radio-segmented input[type="radio"] {
     position: absolute !important;
     top: auto !important;
@@ -2291,25 +2295,29 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
   .overlay-dialogue.modal {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    overflow: hidden;
-    -webkit-transform: translate(-50%, -50%);
-    -moz-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%); }
+    overflow: hidden; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;
       max-height: calc(100vh - 190px);
       max-width: inherit;
       margin: 0 0 10px 0; }
+    .overlay-dialogue.modal .overlay-dialogue-controls {
+      text-align: right;
+      padding: 0px 0px 10px 0px; }
+      .overlay-dialogue.modal .overlay-dialogue-controls li {
+        display: inline;
+        padding-left: 10px; }
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
       top: -12px;
       right: -8px; }
+  .overlay-dialogue.modal-popup {
+    max-width: 1024px;
+    min-width: 650px; }
   .overlay-dialogue .list-table {
+    white-space: normal;
     border: none; }
   .overlay-dialogue .table-paging {
     border: none;
@@ -2779,11 +2787,18 @@ td.active-bg {
   background-color: #2f280a; }
 
 .msg-good {
-  color: #2f9f5e;
-  border: 1px solid #344e3f;
-  background-color: #32453a; }
+  color: #f2f2f2;
+  border: 2px solid #344e3f;
+  background-color: #2b2b2b;
+  text-align: left; }
   .msg-good .link-action {
-    color: #2f9f5e; }
+    color: #2f9f5e;
+    margin-right: 10px;
+    font-size: 0.85em; }
+    .msg-good .link-action .arrow-up {
+      border-bottom-color: #2f9f5e; }
+    .msg-good .link-action .arrow-down {
+      border-top-color: #2f9f5e; }
   .msg-good .overlay-close-btn {
     color: #737373; }
   .msg-good ul {
@@ -2793,12 +2808,40 @@ td.active-bg {
     color: #2f9f5e;
     border-color: #344e3f; }
 
+.msg-good:before {
+  content: "";
+  background-color: #344e3f;
+  float: left;
+  width: 61px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute; }
+
+.msg-good:after {
+  content: "";
+  background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
+  width: 27px;
+  height: 25px;
+  top: 0;
+  left: 0;
+  position: absolute;
+  margin-left: 16px;
+  margin-top: 2px; }
+
 .msg-bad {
-  color: #ae2929;
-  border: 1px solid #503434;
-  background-color: #473232; }
+  color: #f2f2f2;
+  border: 2px solid #503434;
+  background-color: #2b2b2b;
+  text-align: left; }
   .msg-bad .link-action {
-    color: #ae2929; }
+    color: #ae2929;
+    margin-right: 10px;
+    font-size: 0.85em; }
+    .msg-bad .link-action .arrow-up {
+      border-bottom-color: #ae2929; }
+    .msg-bad .link-action .arrow-down {
+      border-top-color: #ae2929; }
   .msg-bad .overlay-close-btn {
     color: #737373; }
   .msg-bad ul {
@@ -2808,9 +2851,31 @@ td.active-bg {
     color: #ae2929;
     border-color: #503434; }
 
+.msg-bad:before {
+  content: "";
+  background-color: #503434;
+  float: left;
+  width: 61px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute; }
+
+.msg-bad:after {
+  content: "";
+  background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+  width: 27px;
+  height: 25px;
+  top: 0;
+  left: 0;
+  position: absolute;
+  margin-left: 16px;
+  margin-top: 2px; }
+
 .msg-details {
   font-size: 1em;
-  text-align: left; }
+  text-align: left;
+  font-weight: normal; }
   .msg-details .link-action {
     position: absolute;
     top: 7px;
@@ -2822,7 +2887,7 @@ td.active-bg {
     padding: 0 5px 0 0;
     overflow-y: auto; }
     .msg-details ul li {
-      margin: .5em 0 .5em 1em; }
+      margin: 0 0 0 1em; }
       .msg-details ul li::before {
         content: '\2013';
         float: left;
@@ -2832,7 +2897,8 @@ td.active-bg {
     .msg-details ul.msg-details-border {
       margin: 8px 0 0 0;
       border-top-width: 1px;
-      border-top-style: dashed; }
+      border-top-style: dashed;
+      padding-top: 0.5em; }
 
 .msg-buttons {
   text-align: right;
@@ -2842,10 +2908,11 @@ td.active-bg {
 
 .msg-good, .msg-bad {
   font-size: 1.167em;
-  padding: 7px 20px 7px 15px;
-  margin: 0 0 12px 0;
-  text-align: center;
+  padding: 6px 10px 6px 75px;
+  text-align: left;
+  vertical-align: middle;
   position: relative;
+  margin-bottom: 10px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
@@ -2855,14 +2922,39 @@ td.active-bg {
 .msg-bad-global {
   display: none;
   position: fixed;
-  bottom: 0;
   z-index: 10000;
-  width: 100%;
-  padding: 5px 5px;
-  text-align: center;
-  color: #593c00;
+  text-align: left;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  vertical-align: middle;
+  font-size: 1.167em;
+  color: #f2f2f2;
+  border: 2px solid #ffc859;
+  background-color: #2b2b2b;
+  margin: 0 10px 0 10px;
+  padding: 6px 10px 6px 75px; }
+
+.msg-bad-global:before {
+  content: "";
   background-color: #ffc859;
-  border-top: 1px solid #ffc040; }
+  float: left;
+  width: 61px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute; }
+
+.msg-bad-global:after {
+  content: "";
+  background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+  width: 27px;
+  height: 25px;
+  top: 0;
+  left: 0;
+  position: absolute;
+  margin-left: 16px;
+  margin-top: 2px; }
 
 .msg-global {
   text-align: left;
@@ -3158,6 +3250,9 @@ tr.cursor-move td * {
 
 .clock-lines {
   fill: #4f4f4f; }
+
+svg {
+  overflow: hidden; }
 
 .sysmap {
   height: 100%;

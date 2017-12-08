@@ -21,6 +21,9 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+/**
+ * @backup items
+ */
 class testFormDiscoveryRule extends CWebTest {
 
 	/**
@@ -50,14 +53,6 @@ class testFormDiscoveryRule extends CWebTest {
 	 * @var string
 	 */
 	protected $keyInheritance = 'discovery-rule-inheritance1';
-
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormDiscoveryRule_Setup() {
-		DBsave_tables('items');
-	}
 
 	// Returns layout data
 	public static function layout() {
@@ -357,7 +352,7 @@ class testFormDiscoveryRule extends CWebTest {
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType), false
 					);
 					$dbInterfaces = reset($dbInterfaces);
 					if ($dbInterfaces != null) {
@@ -1763,18 +1758,11 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
 			$this->zbxTestClickButton('discoveryrule.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
 			$this->assertEquals(0, DBcount($sql), 'Discovery rule has not been deleted from DB.');
 		}
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormDiscoveryRule_Teardown() {
-		DBrestore_tables('items');
 	}
 }

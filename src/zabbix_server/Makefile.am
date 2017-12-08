@@ -19,6 +19,7 @@ SUBDIRS = \
 	vmware \
 	taskmanager \
 	ipmi \
+	odbc \
 	scripts \
 	preprocessor
 
@@ -52,6 +53,7 @@ zabbix_server_LDADD = \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
 	ipmi/libipmi.a \
+	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -60,6 +62,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \

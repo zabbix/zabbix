@@ -24,6 +24,7 @@
 #include "zbxself.h"
 #include "valuecache.h"
 #include "proxy.h"
+#include "preproc.h"
 
 #include "../vmware/vmware.h"
 
@@ -173,7 +174,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	const char	*tmp, *tmp1;
 	char		*error = NULL;
 
-	init_result(result);
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key(item->key, &request))
@@ -454,7 +454,13 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		zbx_alarm_off();
 
 		if (SUCCEED != res)
+		{
+			tmp1 = get_rparam(&request, 2);
+			/* the default error code "NOTSUPPORTED" renders nodata() trigger function nonfunctional */
+			if (NULL != tmp1 && 0 == strcmp(tmp1, "ping"))
+				ret = GATEWAY_ERROR;
 			goto out;
+		}
 	}
 	else if (0 == strcmp(tmp, "process"))			/* zabbix["process",<type>,<mode>,<state>] */
 	{

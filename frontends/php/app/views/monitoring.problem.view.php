@@ -36,9 +36,10 @@ $options = [
 			'hostids' => $data['filter']['hostids'],
 			'application' => $data['filter']['application'],
 			'triggerids' => $data['filter']['triggerids'],
-			'problem' => $data['filter']['problem'],
+			'name' => $data['filter']['name'],
 			'severity' => $data['filter']['severity'],
 			'inventory' => $data['filter']['inventory'],
+			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
 			'maintenance' => $data['filter']['maintenance'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
@@ -93,8 +94,13 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hostGroup',
 				'data' => $data['filter']['groups'],
 				'popup' => [
-					'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=filter_groupids_'.
-						'&srcfld1=groupid&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'host_groups',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_groupids_',
+						'srcfld1' => 'groupid',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -104,8 +110,14 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
-					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=filter_hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'hosts',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_hostids_',
+						'srcfld1' => 'hostid',
+						'real_hosts' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -114,16 +126,15 @@ if ($data['action'] == 'problem.view') {
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
-				->onClick('return PopUp("'.
-					(new CUrl('popup.php'))
-						->setArgument('srctbl', 'applications')
-						->setArgument('srcfld1', 'name')
-						->setArgument('dstfrm', 'zbx_filter')
-						->setArgument('dstfld1', 'filter_application')
-						->setArgument('with_applications', '1')
-						->setArgument('real_hosts', '1')
-						->getUrl().
-					'");'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_application',
+						'with_applications' => '1',
+						'real_hosts' => '1'
+					]).');'
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])
@@ -136,13 +147,21 @@ if ($data['action'] == 'problem.view') {
 				],
 				'data' => $data['filter']['triggers'],
 				'popup' => [
-					'parameters' => 'srctbl=triggers&srcfld1=triggerid&dstfrm=zbx_filter&dstfld1=filter_triggerids_'.
-						'&monitored_hosts=1&with_monitored_triggers=1&multiselect=1&noempty=1'
+					'parameters' => [
+						'srctbl' => 'triggers',
+						'srcfld1' => 'triggerid',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_triggerids_',
+						'monitored_hosts' => '1',
+						'with_monitored_triggers' => '1',
+						'multiselect' => '1',
+						'noempty' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Problem'),
-			(new CTextBox('filter_problem', $data['filter']['problem']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Minimum trigger severity'),
 			new CComboBox('filter_severity', $data['filter']['severity'], null, $data['filter']['severities'])
@@ -196,17 +215,31 @@ if ($data['action'] == 'problem.view') {
 
 	$filter_tags = $data['filter']['tags'];
 	if (!$filter_tags) {
-		$filter_tags = [['tag' => '', 'value' => '']];
+		$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 	}
 
 	$filter_tags_table = new CTable();
 	$filter_tags_table->setId('filter-tags');
+
+	$filter_tags_table->addRow(
+		(new CCol(
+			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
+				->addValue(_('AND'), TAG_EVAL_TYPE_AND)
+				->addValue(_('OR'), TAG_EVAL_TYPE_OR)
+				->setModern(true)
+		))->setColSpan(4)
+	);
+
 	$i = 0;
 	foreach ($filter_tags as $tag) {
 		$filter_tags_table->addRow([
 			(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
+				->addValue(_('Like'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
 			(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),

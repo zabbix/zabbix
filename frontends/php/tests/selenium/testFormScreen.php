@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup screens
+ */
 class testFormScreen extends CWebTest {
 	public $testscreen = 'Test screen (clock)';
 	public $new_screen_name = 'Changed screen name';
@@ -27,10 +30,6 @@ class testFormScreen extends CWebTest {
 	public $cloned_screen = 'Cloned screen';
 	public $testscreen_history = 'Test screen (history of actions)';
 	public $testscreen_ = 'Test screen (simple graph)';
-
-	public function testFormScreen_backup() {
-		DBsave_tables('screens');
-	}
 
 	public static function create() {
 		return [
@@ -140,7 +139,7 @@ class testFormScreen extends CWebTest {
 
 		if (isset($data['owner'])) {
 			$this->zbxTestClickXpathWait("//button[text()='Select']");
-			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+			$this->zbxTestSwitchToWindow('zbx_popup');
 			$this->zbxTestClickLinkTextWait($data['owner']);
 			$this->webDriver->switchTo()->window('');
 		}
@@ -218,7 +217,7 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickXpathWait("//a[text()='$this->testscreen_history']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen deleted');
 		$this->assertEquals(0, DBcount("SELECT screenid FROM screens WHERE name='$this->testscreen_history'"));
 	}
@@ -242,9 +241,4 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Change');
 		$this->assertFalse($this->zbxTestCheckboxSelected('dynamic'));
 	}
-
-	public function testFormScreen_restore() {
-		DBrestore_tables('screens');
-	}
-
 }

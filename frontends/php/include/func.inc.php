@@ -101,7 +101,7 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS);
+	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS, true);
 	$_COOKIE[$name] = $value;
 }
 
@@ -331,6 +331,17 @@ function zbxAddSecondsToUnixtime($sec, $unixtime) {
 }
 
 /*************** CONVERTING ******************/
+/**
+ * Convert the Windows new line (CR+LF) to Linux style line feed (LF).
+ *
+ * @param string $string  Input string that will be converted.
+ *
+ * @return string
+ */
+function CRLFtoLF($string) {
+	return str_replace("\r\n", "\n", $string);
+}
+
 function rgb2hex($color) {
 	$HEX = [
 		dechex($color[0]),
@@ -1054,17 +1065,6 @@ function natksort(&$array) {
 	return true;
 }
 
-function asort_by_key(&$array, $key) {
-	if (!is_array($array)) {
-		error(_('Incorrect type of asort_by_key.'));
-		return [];
-	}
-	$key = htmlspecialchars($key);
-	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-
-	return $array;
-}
-
 // recursively sort an array by key
 function zbx_rksort(&$array, $flags = null) {
 	if (is_array($array)) {
@@ -1786,16 +1786,24 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
 {
 	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
-	$msg_box = (new CDiv($title))->addClass($class);
+	$msg_details = null;
+	$link_details = null;
 
 	if ($messages) {
-		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS);
-
 		if ($title !== null) {
-			$link = (new CSpan(_('Details')))
+			$link_details = (new CSpan())
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->onClick('javascript: showHide($(this).next(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));');
-			$msg_details->addItem($link);
+				->addItem(_('Details'))
+				->addItem(' ') // space
+				->addItem((new CSpan())
+					->setId('details-arrow')
+					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
+				)
+				->onClick('javascript: '.
+					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
+						'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));'.
+					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'
+				);
 		}
 
 		$list = new CList();
@@ -1811,16 +1819,19 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 				$list->addItem($message_part);
 			}
 		}
-		$msg_details->addItem($list);
-
-		$msg_box->addItem($msg_details);
+		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
 	}
+
+	$msg_box = (new CDiv())->addClass($class)
+		->addItem($link_details) // Details link should be in front of title
+		->addItem($title)
+		->addItem($msg_details);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
 			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
-			->setAttribute('title', _('Close')));
+			->setTitle(_('Close')));
 	}
 
 	return $msg_box;
@@ -1863,14 +1874,14 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 	$ZBX_MESSAGES = [];
 
-	if (!ZBX_SHOW_SQL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$filtered_messages = [];
 		$generic_exists = false;
 
 		foreach ($messages as $message) {
-			if (array_key_exists('sql_error', $message) && $message['sql_error'] === true) {
+			if (array_key_exists('src', $message) && ($message['src'] === 'sql' || $message['src'] === 'php')) {
 				if (!$generic_exists) {
-					$message['message'] = _('SQL error. Please contact Zabbix administrator.');
+					$message['message'] = _('System error occurred. Please contact Zabbix administrator.');
 					$filtered_messages[] = $message;
 					$generic_exists = true;
 				}
@@ -1978,7 +1989,13 @@ function info($msgs) {
 	}
 }
 
-function error($msgs) {
+/*
+ * Add an error to global message array.
+ *
+ * @param string | array $msg	Error message text.
+ * @param string		 $src	The source of error message.
+ */
+function error($msgs, $src = '') {
 	global $ZBX_MESSAGES;
 
 	if (!isset($ZBX_MESSAGES)) {
@@ -1988,7 +2005,11 @@ function error($msgs) {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg];
+		$ZBX_MESSAGES[] = [
+			'type' => 'error',
+			'message' => $msg,
+			'src' => $src
+		];
 	}
 }
 
@@ -2003,21 +2024,6 @@ function error_group($data) {
 	foreach (zbx_toArray($data['msgs']) as $msg) {
 		error($data['header'] . ' ' . $msg);
 	}
-}
-
-/**
- * Add SQL error message to global messages array.
- *
- * @param string $msg		Error message text.
- */
-function sqlError($msg) {
-	global $ZBX_MESSAGES;
-
-	if (!isset($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = [];
-	}
-
-	$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg, 'sql_error' => true];
 }
 
 function clear_messages($count = null) {
@@ -2076,14 +2082,28 @@ function parse_period($str) {
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
+	$status = [
+		'is_running' => false,
+		'has_status' => false
+	];
 
-	if ($server_status === false) {
-		return false;
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+	$status['is_running'] = $server->isRunning(get_cookie('zbx_sessionid'));
+
+	if ($status['is_running'] === false) {
+		return $status;
 	}
 
-	$status = [
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
+	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
+	$status['has_status'] = (bool) $server_status;
+
+	if ($server_status === false) {
+		error($server->getError());
+		return $status;
+	}
+
+	$status += [
 		'triggers_count_disabled' => 0,
 		'triggers_count_off' => 0,
 		'triggers_count_on' => 0,
@@ -2397,7 +2417,9 @@ function getUserGraphTheme() {
 		'gridbordercolor' => 'ACBBC2',
 		'nonworktimecolor' => 'EBEBEB',
 		'leftpercentilecolor' => '429E47',
-		'righttpercentilecolor' => 'E33734'
+		'righttpercentilecolor' => 'E33734',
+		'colorpalette' => '1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,'.
+			'89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4'
 	];
 }
 
@@ -2416,7 +2438,7 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	}
 
 	// Don't show the call to this handler function.
-	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
+	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
 }
 
 /**

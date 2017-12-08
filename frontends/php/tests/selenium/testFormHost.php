@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup hosts
+ */
 class testFormHost extends CWebTest {
 	public $host = 'Test host 001';
 	public $host_tmp = 'Test host 001A';
@@ -29,10 +32,6 @@ class testFormHost extends CWebTest {
 	public $host_fullcloned = 'Test host 001 full cloned';
 	public $host_fullcloned_visible = 'Test host 001 full cloned (visible)';
 	public $host_for_template = 'Visible host for template linkage';
-
-	public function testFormHost_backup() {
-		DBsave_tables('hosts');
-	}
 
 	public function testFormHost_Layout() {
 		$this->zbxTestLogin('hosts.php?form=1');
@@ -186,7 +185,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_cloned_visible);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
@@ -215,7 +214,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_fullcloned_visible);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
@@ -244,7 +243,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_tmp);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
@@ -378,9 +377,5 @@ class testFormHost extends CWebTest {
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('applications.php?hostid='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
-	}
-
-	public function testFormHost_restore() {
-		DBrestore_tables('hosts');
 	}
 }

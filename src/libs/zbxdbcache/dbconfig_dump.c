@@ -131,6 +131,8 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 					host->tls_dc_psk->refcount);
 		}
 #endif
+		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", host->proxy_address);
+
 		for (j = 0; j < host->interfaces_v.values_num; j++)
 		{
 			ZBX_DC_INTERFACE	*interface = host->interfaces_v.values[j];

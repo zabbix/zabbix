@@ -68,11 +68,11 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 
 		if ($map_mapid) {
 			$maps = API::Map()->get([
-				'sysmapids' => [$map_mapid],
-				'output' => API_OUTPUT_EXTEND
+				'output' => [],
+				'sysmapids' => [$map_mapid]
 			]);
 
-			if (($map = reset($maps)) === false) {
+			if (!$maps) {
 				$map_mapid = 0;
 			}
 		}
@@ -100,7 +100,30 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 								&& $selement['permission'] >= PERM_READ) {
 							if (($element = reset($selement['elements'])) !== false) {
 								$maps_relations[$submap['sysmapid']][] = $element['sysmapid'];
-								$maps_found[] = $element['sysmapid'];
+
+								$maps_depth = $this->getInput('depth', 0) + 1;
+								$base_mapid = $submap['sysmapid'];
+
+								/*
+								 * Looking for parent mapid simply walking back through the hierarchy and counting steps
+								 * in $maps_depth.
+								 */
+								while (array_key_exists($base_mapid, $maps_relations)) {
+									foreach ($maps_relations as $next_base_mapid => $list) {
+										if (in_array($base_mapid, $list)) {
+											$base_mapid = $next_base_mapid;
+											$maps_depth++;
+											continue 2;
+										}
+									}
+
+									// not found
+									$base_mapid = null;
+								}
+
+								if (WIDGET_NAVIGATION_TREE_MAX_DEPTH >= $maps_depth) {
+									$maps_found[] = $element['sysmapid'];
+								}
 							}
 						}
 					}

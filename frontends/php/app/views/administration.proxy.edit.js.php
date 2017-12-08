@@ -3,6 +3,9 @@
 		// proxy mode: active or passive
 		$('#status').change(function() {
 			$('#ip').closest('li').toggle($('input[name=status]:checked').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>);
+			$('#proxy_address')
+				.closest('li')
+				.toggle($('input[name=status]:checked').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>);
 
 			toggleEncryptionFields();
 		});

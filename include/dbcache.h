@@ -43,6 +43,9 @@
 
 #define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
 
+#define ZBX_TRIGGER_DEPENDENCY_FAIL		1
+#define ZBX_TRIGGER_DEPENDENCY_UNRESOLVED	2
+
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
 extern int	CONFIG_TIMEOUT;
@@ -156,6 +159,7 @@ typedef struct
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char			*units;
 	char			*delay;
+	int			history_sec;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
@@ -233,7 +237,7 @@ DC_TRIGGER;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	char            host[HOST_HOST_LEN_MAX];
+	char		host[HOST_HOST_LEN_MAX];
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
 	int		proxy_tasks_nextcheck;
@@ -252,6 +256,7 @@ typedef struct
 	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
+	char		proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
 }
 DC_PROXY;
 
@@ -401,6 +406,34 @@ typedef struct
 }
 zbx_correlation_rules_t;
 
+/* value_avg_t structure is used for item average value trend calculations. */
+/*                                                                          */
+/* For double values the average value is calculated on the fly with the    */
+/* following formula: avg = (dbl * count + value) / (count + 1) and stored  */
+/* into dbl member.                                                         */
+/* For uint64 values the item values are summed into ui64 member and the    */
+/* average value is calculated before flushing trends to database:          */
+/* avg = ui64 / count                                                       */
+typedef union
+{
+	double		dbl;
+	zbx_uint128_t	ui64;
+}
+value_avg_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	history_value_t	value_min;
+	value_avg_t	value_avg;
+	history_value_t	value_max;
+	int		clock;
+	int		num;
+	int		disable_from;
+	unsigned char	value_type;
+}
+ZBX_DC_TREND;
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -409,6 +442,20 @@ typedef struct
 	unsigned char		value_type;
 }
 zbx_item_history_value_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	history_value_t	value;
+	zbx_uint64_t	lastlogsize;
+	zbx_timespec_t	ts;
+	int		mtime;
+	unsigned char	value_type;
+	unsigned char	flags;		/* see ZBX_DC_FLAG_* */
+	unsigned char	state;
+	int		ttl;		/* time-to-live of the history value */
+}
+ZBX_DC_HISTORY;
 
 /* item queue data */
 typedef struct
@@ -680,13 +727,17 @@ typedef struct
 zbx_agent_value_t;
 
 void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
-void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess);
+void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess, zbx_vector_uint64_pair_t *proxy_diff);
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
 
-/* item preprocessing support */
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
-		zbx_timespec_t *ts, unsigned char state, char *error);
-void	zbx_preprocessor_flush();
-zbx_uint64_t	zbx_preprocessor_get_queue_size();
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	unsigned char		status;
+	zbx_vector_uint64_t	masterids;
+}
+zbx_trigger_dep_t;
+
+void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
 #endif

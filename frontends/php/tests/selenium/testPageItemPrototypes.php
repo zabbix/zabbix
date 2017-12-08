@@ -64,15 +64,9 @@ class testPageItemPrototypes extends CWebTest {
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
+	 * @dataProvider data
+	 * @backup-once triggers
 	 */
-	public function testPageItemPrototypes_Setup() {
-		DBsave_tables('triggers');
-	}
-
-	/**
-	* @dataProvider data
-	*/
 	public function testPageItemPrototypes_SimpleDelete($data) {
 		$itemid = $data['itemid'];
 		$drule = $data['d_name'];
@@ -82,7 +76,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
 		$this->zbxTestClickButton('itemprototype.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
@@ -90,20 +84,6 @@ class testPageItemPrototypes extends CWebTest {
 
 		$sql = 'SELECT null FROM items WHERE itemid='.$itemid;
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageItemPrototypes_Teardown() {
-		DBrestore_tables('triggers');
-	}
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testPageItemPrototypes_SetupMass() {
-		DBsave_tables('triggers');
 	}
 
 	// Returns all discovery rules
@@ -119,24 +99,24 @@ class testPageItemPrototypes extends CWebTest {
 	}
 
 	/**
-	* @dataProvider rule
-	*/
+	 * @dataProvider rule
+	 * @backup-once triggers
+	 */
 	public function testPageItemPrototypes_MassDelete($rule) {
 		$itemid = $rule['itemid'];
 		$druleid = $rule['parent_itemid'];
 		$drule = $rule['d_name'];
 		$hostid = $rule['hostid'];
 
-		$itemids = DBdata('select itemid from item_discovery where parent_itemid='.$druleid);
+		$itemids = DBdata('select itemid from item_discovery where parent_itemid='.$druleid, false);
 		$itemids = zbx_objectValues($itemids, 'itemid');
-
 
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('itemprototype.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
@@ -144,12 +124,5 @@ class testPageItemPrototypes extends CWebTest {
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('itemid', $itemids);
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageItemPrototypes_TeardownMass() {
-		DBrestore_tables('triggers');
 	}
 }

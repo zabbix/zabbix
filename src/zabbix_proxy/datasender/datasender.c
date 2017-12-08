@@ -43,10 +43,9 @@ extern int		server_num, process_num;
 #define ZBX_DATASENDER_TASKS_RECV		0x0020
 #define ZBX_DATASENDER_TASKS_REQUEST		0x8000
 
-#define ZBX_DATASENDER_DB_UPDATE	(ZBX_DATASENDER_AVAILABILITY | ZBX_DATASENDER_HISTORY |		\
-					ZBX_DATASENDER_DISCOVERY | ZBX_DATASENDER_AUTOREGISTRATION |	\
-					ZBX_DATASENDER_TASKS | ZBX_DATASENDER_TASKS_RECV)
-
+#define ZBX_DATASENDER_DB_UPDATE	(ZBX_DATASENDER_HISTORY | ZBX_DATASENDER_DISCOVERY |		\
+					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
+					ZBX_DATASENDER_TASKS_RECV)
 
 /******************************************************************************
  *                                                                            *
@@ -65,7 +64,7 @@ static int	proxy_data_sender(int *more, int now)
 	zbx_socket_t		sock;
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_tasks;
-	int			ret = FAIL, availability_ts = 0, history_records = 0, discovery_records = 0,
+	int			ret = FAIL, availability_ts, history_records = 0, discovery_records = 0,
 				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
@@ -143,7 +142,8 @@ static int	proxy_data_sender(int *more, int now)
 		}
 		else
 		{
-			zbx_set_availability_diff_ts(availability_ts);
+			if (0 != (flags & ZBX_DATASENDER_AVAILABILITY))
+				zbx_set_availability_diff_ts(availability_ts);
 
 			if (SUCCEED == zbx_json_open(sock.buffer, &jp))
 			{
@@ -164,10 +164,7 @@ static int	proxy_data_sender(int *more, int now)
 				if (0 != (flags & ZBX_DATASENDER_TASKS_RECV))
 				{
 					zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
-
-					DBbegin();
 					zbx_tm_save_tasks(&tasks);
-					DBcommit();
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
