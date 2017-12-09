@@ -240,7 +240,7 @@ out:
  *     md5buf   - [OUT] output buffer, MD5_DIGEST_SIZE-bytes long, where the  *
  *                calculated MD5 sum is placed                                *
  *     filename - [IN] file name, used in error logging                       *
- *     err_msg  - [IN/OUT] error message why an item became NOTSUPPORTED      *
+ *     err_msg  - [IN/OUT] error message why FAIL-ed                          *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -2309,10 +2309,50 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 
 static int	files_have_same_md5_sum(const struct st_logfile *log1, const struct st_logfile *log2)
 {
-	if (-1 != log1->md5size && -1 != log2->md5size && log1->md5size == log2->md5size &&
-			0 == memcmp(log1->md5buf, log2->md5buf, sizeof(log1->md5buf)))
+	if (-1 == log1->md5size || -1 == log2->md5size)
+		return FAIL;
+
+	if (log1->md5size == log2->md5size)	/* this works for empty files, too */
 	{
-		return SUCCEED;
+		if (0 == memcmp(log1->md5buf, log2->md5buf, sizeof(log1->md5buf)))
+			return SUCCEED;
+		else
+			return FAIL;
+	}
+
+	/* we have MD5 sums, but they are calculated from blocks of different sizes */
+
+	if (0 < log1->md5size && 0 < log2->md5size)
+	{
+		const struct st_logfile	*file_smaller, *file_larger;
+		int			fd, ret = FAIL;
+		char			*err_msg = NULL;		/* required, but not used */
+		md5_byte_t		md5tmp[MD5_DIGEST_SIZE];
+
+		if (log1->md5size < log2->md5size)
+		{
+			file_smaller = log1;
+			file_larger = log2;
+		}
+		else
+		{
+			file_smaller = log2;
+			file_larger = log1;
+		}
+
+		if (-1 == (fd = zbx_open(file_larger->filename, O_RDONLY)))
+			return FAIL;
+
+		if (SUCCEED == file_start_md5(fd, file_smaller->md5size, md5tmp, "", &err_msg))
+		{
+			if (0 == memcmp(file_smaller->md5buf, md5tmp, sizeof(md5tmp)))
+				ret = SUCCEED;
+		}
+
+		zbx_free(err_msg);
+		close(fd);
+
+		return ret;
 	}
 
 	return FAIL;
