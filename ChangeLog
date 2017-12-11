@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+A......... [ZBXNEXT-4247] removed deprecated API methods: user.updareProfile, user.addMedia, user.updateMedia, user.deleteMedia, usergroup.massAdd, usergroup.massUpdate and usermedia.get (Sasha)
 ........S. [ZBXNEXT-970] added more detailed error information to notification message when DB is unavailable (viktors)
 ..F....... [ZBXNEXT-4137] removed green background from cells (Oleg)
 ..F....... [ZBXNEXT-4157] added map status summary to be readable by screen reader software (gcalenko)
