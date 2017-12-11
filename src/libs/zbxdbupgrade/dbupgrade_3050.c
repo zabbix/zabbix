@@ -257,7 +257,7 @@ static int	DBpatch_3050018(void)
 
 static int	DBpatch_3050019(void)
 {
-	int		res;
+	int	res;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
