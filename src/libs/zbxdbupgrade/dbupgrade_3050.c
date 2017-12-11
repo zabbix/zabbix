@@ -116,24 +116,6 @@ static int	DBpatch_3050005(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050006(void)
-{
-	zbx_db_insert_t	db_insert;
-	int		ret;
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", NULL);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_UPDATE_EVENTNAMES, ZBX_TM_STATUS_NEW,
-			time(NULL));
-	zbx_db_insert_autoincrement(&db_insert, "taskid");
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	return ret;
-}
-
 #define	ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME	"Cannot calculate trigger expression."
 #define	ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME	"Cannot obtain item value."
 
@@ -254,6 +236,24 @@ static int	DBpatch_3050017(void)
 
 	return DBmodify_field_type("dservices", &field, NULL);
 }
+
+static int	DBpatch_3050018(void)
+{
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_UPDATE_EVENTNAMES, ZBX_TM_STATUS_NEW,
+			time(NULL));
+	zbx_db_insert_autoincrement(&db_insert, "taskid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
 #endif
 
 DBPATCH_START(3050)
@@ -266,7 +266,6 @@ DBPATCH_ADD(3050002, 0, 1)
 DBPATCH_ADD(3050003, 0, 1)
 DBPATCH_ADD(3050004, 0, 1)
 DBPATCH_ADD(3050005, 0, 1)
-DBPATCH_ADD(3050006, 0, 1)
 DBPATCH_ADD(3050008, 0, 1)
 DBPATCH_ADD(3050009, 0, 1)
 DBPATCH_ADD(3050010, 0, 1)
@@ -277,5 +276,6 @@ DBPATCH_ADD(3050014, 0, 1)
 DBPATCH_ADD(3050015, 0, 1)
 DBPATCH_ADD(3050016, 0, 1)
 DBPATCH_ADD(3050017, 0, 1)
+DBPATCH_ADD(3050018, 0, 1)
 
 DBPATCH_END()
