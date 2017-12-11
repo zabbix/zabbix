@@ -78,7 +78,7 @@ class CControllerPopupMedia extends CController {
 			'mediatypeid' => $this->getInput('mediatypeid', 0),
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),
 			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL),
-			'sendto_emails' => array_values($this->getInput('sendto_emails', [])),
+			'sendto_emails' => array_values($this->getInput('sendto_emails', [''])),
 			'type' => $this->getInput('type', '')
 		];
 
@@ -159,11 +159,6 @@ class CControllerPopupMedia extends CController {
 				$db_mediatype = $db_mediatype['description'];
 			}
 			unset($db_mediatype);
-
-			// Popuplate with one empty field.
-			if (!$page_options['sendto_emails']) {
-				$page_options['sendto_emails'][] = '';
-			}
 
 			$data = [
 				'title' => _('Media'),
