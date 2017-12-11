@@ -36,7 +36,7 @@ typedef struct
 	zbx_uint64_t opackets;
 	zbx_uint64_t oerr;
 	zbx_uint64_t odrop;
-	zbx_uint64_t colls;
+	zbx_uint64_t ocolls;
 	zbx_uint64_t ofifo;
 	zbx_uint64_t ocarrier;
 	zbx_uint64_t ocompressed;
@@ -253,7 +253,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 				&result->oerr,		/* errs */
 				&result->odrop,		/* drop */
 				&result->ofifo,		/* fifo (overruns)*/
-				&result->colls,		/* colls (collisions) */
+				&result->ocolls,	/* colls (collisions) */
 				&result->ocarrier,	/* carrier */
 				&result->ocompressed))	/* compressed */
 		{
@@ -480,7 +480,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "overruns"))
 		SET_UI64_RESULT(result, ns.ofifo);
 	else if (0 == strcmp(mode, "collisions"))
-		SET_UI64_RESULT(result, ns.colls);
+		SET_UI64_RESULT(result, ns.ocolls);
 	else if (0 == strcmp(mode, "carrier"))
 		SET_UI64_RESULT(result, ns.ocarrier);
 	else if (0 == strcmp(mode, "compressed"))
@@ -554,7 +554,7 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_UI64_RESULT(result, ns.colls);
+	SET_UI64_RESULT(result, ns.ocolls);
 
 	return SYSINFO_RET_OK;
 }
