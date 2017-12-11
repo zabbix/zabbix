@@ -100,6 +100,10 @@ class CControllerPopupMedia extends CController {
 				error(_s('Incorrect value for field "%1$s": cannot be empty.', 'sendto'));
 			}
 
+			if (!parse_period($page_options['period'])) {
+				error(_s('Field "%1$s" is not correct: %2$s', _('When active'), _('a time period is expected')));
+			}
+
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
 			}
