@@ -260,6 +260,15 @@ ul.top-nav-icons {
 
 // COLORS AND GENERAL
 
+.radio-segmented {
+	input[type="radio"] {
+
+		&:checked[disabled] + label {
+			background-color: #595959 !important;
+		}
+	}
+}
+
 a {
 	&:link {
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);

@@ -241,8 +241,13 @@ ul.top-nav-icons {
 
 // COLORS AND GENERAL
 
-.radio-segmented input[type="radio"]:checked[disabled] + label {
-	background-color: red !important;
+.radio-segmented {
+	input[type="radio"] {
+
+		&:checked[disabled] + label {
+			background-color: #d3d3d3 !important;
+		}
+	}
 }
 
 a {
