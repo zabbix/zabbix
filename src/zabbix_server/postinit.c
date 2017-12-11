@@ -25,6 +25,10 @@
 #include "postinit.h"
 #include "valuecache.h"
 
+#define ZBX_HIST_MACRO_NONE		(-1)
+#define ZBX_HIST_MACRO_ITEM_VALUE	0
+#define ZBX_HIST_MACRO_ITEM_LASTVALUE	1
+
 /******************************************************************************
  *                                                                            *
  * Function: get_trigger_count                                                *
@@ -57,21 +61,43 @@ static int	get_trigger_count()
  * Purpose: checks if this is historical macro that cannot be expanded for    *
  *          bulk event name update                                            *
  *                                                                            *
- * Parameters: macro - [IN] the macro name                                    *
+ * Parameters: macro      - [IN] the macro name                               *
  *                                                                            *
- * Return value: SUCCEED - historical macro                                   *
- *               FAIL - otherwise                                             *
+ * Return value: ZBX_HIST_MACRO_* defines                                     *
  *                                                                            *
  ******************************************************************************/
 static int	is_historical_macro(const char *macro)
 {
 	if (0 == strncmp(macro, "ITEM.VALUE", ZBX_CONST_STRLEN("ITEM.VALUE")))
-		return SUCCEED;
+		return ZBX_HIST_MACRO_ITEM_VALUE;
 
 	if (0 == strncmp(macro, "ITEM.LASTVALUE", ZBX_CONST_STRLEN("ITEM.LASTVALUE")))
-		return SUCCEED;
+		return ZBX_HIST_MACRO_ITEM_LASTVALUE;
 
-	return FAIL;
+	return ZBX_HIST_MACRO_NONE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: convert_historical_macro                                         *
+ *                                                                            *
+ * Purpose: translates historical macro to lld macro format                   *
+ *                                                                            *
+ * Parameters: macro - [IN] the macro type (see ZBX_HIST_MACRO_* defines)     *
+ *                                                                            *
+ * Return value: the macro                                                    *
+ *                                                                            *
+ * Comments: Some of the macros can be converted to different name.           *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*convert_historical_macro(int macro)
+{
+	/* When expanding macros for old events ITEM.LASTVALUE macro would */
+	/* always expand to one (latest) value. Expanding it as ITEM.VALUE */
+	/* makes more sense in this case.                                  */
+	const char	*macros[] = {"#ITEM.VALUE", "#ITEM.VALUE"};
+
+	return macros[macro];
 }
 
 /******************************************************************************
@@ -88,10 +114,13 @@ static int	is_historical_macro(const char *macro)
  * Return value: SUCCEED - the macros were expanded successfully              *
  *               FAIL - otherwise                                             *
  *                                                                            *
+ * Comments: Some historical macros might be replaced with other macros to    *
+ *           better match the trigger name at event creation time.            *
+ *                                                                            *
  ******************************************************************************/
 static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 {
-	int		pos = 0, macro_len;
+	int		pos = 0, macro_len, macro_type;
 	zbx_token_t	token;
 	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset;
 	char		*replace;
@@ -110,17 +139,14 @@ static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 		{
 			macro = trigger->description + token.data.macro.name.l;
 
-			if (SUCCEED == is_historical_macro(macro))
+			if (ZBX_HIST_MACRO_NONE != (macro_type = is_historical_macro(macro)))
 			{
 				macro_len = token.data.macro.name.r - token.data.macro.name.l + 1;
-				replace_offset = 0;
-				zbx_chrcpy_alloc(&replace, &replace_alloc, &replace_offset, '#');
-				zbx_strncpy_alloc(&replace, &replace_alloc, &replace_offset, macro,  macro_len);
+				macro = convert_historical_macro(macro_type);
 
-				pos += zbx_replace_mem_dyn(&trigger->description, &name_alloc, &name_len,
-						token.data.macro.name.l, macro_len, replace, replace_offset);
+				token.token.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc, &name_len,
+						token.data.macro.name.l, macro_len, macro, strlen(macro));
 				*historical = 1;
-				continue;
 			}
 		}
 		pos = token.token.r;
@@ -151,9 +177,9 @@ static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 					replace_offset = 0;
 					zbx_strncpy_alloc(&replace, &replace_alloc, &replace_offset, macro, macro_len);
 
-					pos += zbx_replace_mem_dyn(&trigger->description, &name_alloc, &name_len,
-							token.token.l + 1, macro_len + 1, replace, replace_offset);
-					continue;
+					token.token.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc,
+							&name_len, token.token.l + 1, macro_len + 1, replace,
+							replace_offset);
 				}
 			}
 			pos = token.token.r;
@@ -246,6 +272,8 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
 	char		*name, *name_esc;
 	int		ret = SUCCEED;
 
+	memset(&event, 0, sizeof(DB_EVENT));
+
 	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns,name"
 			" from events"
 			" where source=%d"
@@ -264,7 +292,7 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
 		event.value = atoi(row[5]);
 		event.acknowledged = atoi(row[6]);
 		event.ns = atoi(row[7]);
-		event.name = zbx_strdup(NULL, row[8]);
+		event.name = row[8];
 
 		event.trigger = *trigger;
 
