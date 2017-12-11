@@ -108,7 +108,7 @@ static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
 	apply_diskstat(device, now, dstat);
 }
 
-void	collect_stats_diskdevices()
+void	collect_stats_diskdevices(void)
 {
 	int	i;
 

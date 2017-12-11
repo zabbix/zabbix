@@ -762,7 +762,7 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t i
  * Comments: sqlite3 does not use CONFIG_MAX_HOUSEKEEPER_DELETE, deletes all  *
  *                                                                            *
  ******************************************************************************/
-static int	housekeeping_cleanup()
+static int	housekeeping_cleanup(void)
 {
 	const char		*__function_name = "housekeeping_cleanup";
 

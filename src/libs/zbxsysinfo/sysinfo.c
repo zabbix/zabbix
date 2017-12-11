@@ -163,7 +163,7 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 	return ret;
 }
 
-void	init_metrics()
+void	init_metrics(void)
 {
 	int	i;
 	char	error[MAX_STRING_LEN];
@@ -224,7 +224,7 @@ void	init_metrics()
 #endif
 }
 
-void	free_metrics()
+void	free_metrics(void)
 {
 	if (NULL != commands)
 	{
