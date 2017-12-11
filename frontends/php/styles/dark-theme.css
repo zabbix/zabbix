@@ -2299,12 +2299,22 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       max-height: calc(100vh - 190px);
       max-width: inherit;
       margin: 0 0 10px 0; }
+    .overlay-dialogue.modal .overlay-dialogue-controls {
+      text-align: right;
+      padding: 0px 0px 10px 0px; }
+      .overlay-dialogue.modal .overlay-dialogue-controls li {
+        display: inline;
+        padding-left: 10px; }
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
       top: -12px;
       right: -8px; }
+  .overlay-dialogue.modal-popup {
+    max-width: 1024px;
+    min-width: 650px; }
   .overlay-dialogue .list-table {
+    white-space: normal;
     border: none; }
   .overlay-dialogue .table-paging {
     border: none;
@@ -2617,7 +2627,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   font-size: 0.917em;
   line-height: 1em;
   display: inline-block; }
-  .progress-bar-bg.green-bg, .progress-bar-bg.normal-bg, .progress-bar-bg.active-bg {
+  .progress-bar-bg.green-bg, .progress-bar-bg.normal-bg {
     background-color: #34af67; }
   .progress-bar-bg.red-bg {
     background-color: #d64e4e; }
@@ -2708,7 +2718,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -moz-border-radius: 2px;
   border-radius: 2px; }
 
-.green-bg, .normal-bg, .active-bg, td.active-bg {
+.green-bg, .normal-bg {
   background-color: #59db8f; }
 
 .red-bg {
@@ -2727,12 +2737,6 @@ td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg,
   background-color: #97aab3; }
 
 .normal-bg {
-  color: #0e4123; }
-
-.active-bg, td.active-bg {
-  color: #0e4123; }
-
-td.active-bg {
   color: #0e4123; }
 
 .info-bg, .info-bg input[type="radio"]:checked + label {

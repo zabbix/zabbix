@@ -3242,6 +3242,15 @@ $form-icon-btn: (
 			max-width: inherit;
 			margin: 0 0 10px 0;
 		}
+		.overlay-dialogue-controls {
+			text-align: right;
+			padding: 0px 0px 10px 0px;
+
+			li {
+				display: inline;
+				padding-left: 10px;
+			}
+		}
 		& > .overlay-close-btn {
 			position: relative;
 			float: right;
@@ -3250,7 +3259,13 @@ $form-icon-btn: (
 		}
 	}
 
+	&.modal-popup {
+		max-width: 1024px;
+		min-width: 650px;
+	}
+
 	.list-table {
+		white-space: normal;
 		border: none;
 
 		th {
@@ -3946,15 +3961,6 @@ td.log-na-bg {
 
 td.normal-bg {
 	@extend td.na-bg;
-}
-
-.active-bg {
-	color: darken($alt-green,45%);
-	@extend .green-bg;
-}
-
-td.active-bg {
-	@extend .active-bg;
 }
 
 .info-bg {

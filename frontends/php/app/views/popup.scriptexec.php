@@ -19,15 +19,17 @@
 **/
 
 
-return (new CWidget())
-	->setTitle($data['name'])
-	->addItem(
-		(new CForm())
-			->addItem(
-				(new CTabView())->addTab('scriptTab', null,
-					(new CPre(
-						(new CList([bold($data['command']), SPACE, $data['message']]))
-					))
-				)
+echo (new CJson())->encode([
+	'header' => $data['title'],
+	'body' => (new CForm())
+		->addItem([
+			$data['errors'],
+			(new CTabView())->addTab('scriptTab', null,
+				(new CPre(
+					(new CList([bold($data['command']), SPACE, $data['message']]))
+				))
 			)
-	);
+		])
+		->toString(),
+	'buttons' => null
+]);

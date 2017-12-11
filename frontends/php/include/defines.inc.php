@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha1');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050019);
+define('ZABBIX_DB_VERSION',		3050024);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -40,6 +40,13 @@ define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 // the maximum period to display history data for the latest data and item overview pages in seconds
 // by default set to 86400 seconds (24 hours)
 define('ZBX_HISTORY_PERIOD', 86400);
+
+define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
+define('ZBX_HISTORY_SOURCE_SQL',		'sql');
+
+define('ELASTICSEARCH_RESPONSE_PLAIN',			0);
+define('ELASTICSEARCH_RESPONSE_AGGREGATION',	1);
+define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
 define('ZBX_WIDGET_ROWS', 20);
 
@@ -111,7 +118,7 @@ define('ZBX_SHOW_SQL_ERRORS',	true);
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
-define('ZBX_SHOW_TECHNICAL_ERRORS', false);
+define('ZBX_SHOW_TECHNICAL_ERRORS', !false);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -1281,7 +1288,6 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
-define('ZBX_STYLE_ACTIVE_BG', 'active-bg');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ARTICLE', 'article');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');

@@ -123,8 +123,11 @@ static int	DBpatch_3050006(void)
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
-		return FAIL;
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			return FAIL;
+	}
 
 	zbx_free(sql);
 
@@ -157,8 +160,11 @@ static int	DBpatch_3050007(void)
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
-		return FAIL;
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			return FAIL;
+	}
 
 	zbx_free(sql);
 
@@ -238,10 +244,45 @@ static int	DBpatch_3050012(void)
 
 static int	DBpatch_3050013(void)
 {
-	return DBdrop_table("graph_theme");
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("interface", &field, NULL);
 }
 
 static int	DBpatch_3050014(void)
+{
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_dhistory", &field, NULL);
+}
+
+static int	DBpatch_3050015(void)
+{
+	const ZBX_FIELD	field = {"listen_dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("autoreg_host", &field, NULL);
+}
+
+static int	DBpatch_3050016(void)
+{
+	const ZBX_FIELD	field = {"listen_dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_autoreg_host", &field, NULL);
+}
+
+static int	DBpatch_3050017(void)
+{
+	const ZBX_FIELD	field = {"dns", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("dservices", &field, NULL);
+}
+
+static int	DBpatch_3050018(void)
+{
+	return DBdrop_table("graph_theme");
+}
+
+static int	DBpatch_3050019(void)
 {
 	const ZBX_TABLE table =
 		{"graph_theme",	"graphthemeid",	0,
@@ -267,7 +308,7 @@ static int	DBpatch_3050014(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050015(void)
+static int	DBpatch_3050020(void)
 {
 	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
 }
@@ -277,7 +318,7 @@ static int	DBpatch_3050015(void)
 #define ZBX_COLORPALETTE_DARK	"199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,"	\
 				"AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4"
 
-static int	DBpatch_3050016(void)
+static int	DBpatch_3050021(void)
 {
 	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
 		return SUCCEED;
@@ -293,7 +334,7 @@ static int	DBpatch_3050016(void)
 	return FAIL;
 }
 
-static int	DBpatch_3050017(void)
+static int	DBpatch_3050022(void)
 {
 	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
 		return SUCCEED;
@@ -309,7 +350,7 @@ static int	DBpatch_3050017(void)
 	return FAIL;
 }
 
-static int	DBpatch_3050018(void)
+static int	DBpatch_3050023(void)
 {
 	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
 		return SUCCEED;
@@ -325,7 +366,7 @@ static int	DBpatch_3050018(void)
 	return FAIL;
 }
 
-static int	DBpatch_3050019(void)
+static int	DBpatch_3050024(void)
 {
 	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
 		return SUCCEED;
@@ -368,5 +409,10 @@ DBPATCH_ADD(3050016, 0, 1)
 DBPATCH_ADD(3050017, 0, 1)
 DBPATCH_ADD(3050018, 0, 1)
 DBPATCH_ADD(3050019, 0, 1)
+DBPATCH_ADD(3050020, 0, 1)
+DBPATCH_ADD(3050021, 0, 1)
+DBPATCH_ADD(3050022, 0, 1)
+DBPATCH_ADD(3050023, 0, 1)
+DBPATCH_ADD(3050024, 0, 1)
 
 DBPATCH_END()

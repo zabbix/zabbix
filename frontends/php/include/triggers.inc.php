@@ -108,16 +108,21 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  * @param array|null  $config       array of configuration parameters to get trigger severity name; can be omitted
  *                                  if $text is not null
  * @param string|null $text         trigger severity name
- * @param bool        $forceNormal  true to return 'normal' class, false to return corresponding severity class
+ * @param bool        $force_normal  true to return 'normal' class, false to return corresponding severity class
  *
  * @return CCol
  */
-function getSeverityCell($severity, array $config = null, $text = null, $forceNormal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
 
-	return (new CCol($text))->addClass(getSeverityStyle($severity, !$forceNormal));
+	if ($force_normal) {
+		return new CCol($text);
+	}
+	else {
+		return (new CCol($text))->addClass(getSeverityStyle($severity));
+	}
 }
 
 /**

@@ -1309,7 +1309,7 @@ class CHttpTestManager {
 				' AND '.dbConditionInt('hti.httptestid', $httpTestIds)
 		));
 
-		$history = Manager::History()->getLast($httpItems, 1, ZBX_HISTORY_PERIOD);
+		$history = Manager::History()->getLastValues($httpItems, 1, ZBX_HISTORY_PERIOD);
 
 		$data = [];
 

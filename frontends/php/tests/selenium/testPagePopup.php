@@ -22,9 +22,9 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPagePopup extends CWebTest {
 	private $urlPopupProxies =
-			'popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host&dstfrm=form&dstfld1=fld1&dstfld2=fld2';
+			'zabbix.php?action=popup.generic&srctbl=proxies&srcfld1=hostid&srcfld2=host&dstfrm=form&dstfld1=fld1&dstfld2=fld2';
 	private $urlPopupApplications =
-			'popup.php?srctbl=applications&srcfld1=name&dstfrm=form&dstfld1=fld1';
+			'zabbix.php?action=popup.generic&srctbl=applications&srcfld1=name&dstfrm=form&dstfld1=fld1';
 
 	public function testPagePopupProxies_CheckLayout() {
 		$this->authenticate();
