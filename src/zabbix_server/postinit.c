@@ -113,14 +113,11 @@ static const char	*convert_historical_macro(int macro)
  *             historical - [OUT] 1 - trigger name contains historical macros *
  *                                0 - otherwise                               *
  *                                                                            *
- * Return value: SUCCEED - the macros were expanded successfully              *
- *               FAIL - otherwise                                             *
- *                                                                            *
  * Comments: Some historical macros might be replaced with other macros to    *
  *           better match the trigger name at event creation time.            *
  *                                                                            *
  ******************************************************************************/
-static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
+static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 {
 	int		pos = 0, macro_len, macro_type;
 	zbx_token_t	token;
@@ -129,7 +126,7 @@ static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 	const char	*macro;
 	DB_EVENT	event;
 
-	*historical = 0;
+	*historical = FAIL;
 
 	replace = zbx_malloc(NULL, replace_alloc);
 
@@ -148,7 +145,7 @@ static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 
 				token.token.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc, &name_len,
 						token.data.macro.name.l, macro_len, macro, strlen(macro));
-				*historical = 1;
+				*historical = SUCCEED;
 			}
 		}
 		pos = token.token.r;
@@ -162,7 +159,7 @@ static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 	substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &trigger->description,
 			MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
-	if (1 == *historical)
+	if (SUCCEED == *historical)
 	{
 		pos = 0;
 		name_alloc = name_len = strlen(trigger->description) + 1;
@@ -173,7 +170,7 @@ static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 			{
 				macro = trigger->description + token.data.lld_macro.name.l;
 
-				if (SUCCEED == is_historical_macro(macro))
+				if (ZBX_HIST_MACRO_NONE != is_historical_macro(macro))
 				{
 					macro_len = token.data.lld_macro.name.r - token.data.lld_macro.name.l + 1;
 					replace_offset = 0;
@@ -189,8 +186,6 @@ static int	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 	}
 
 	zbx_free(replace);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -382,7 +377,7 @@ static int	update_event_names()
 
 		preprocess_trigger_name(&trigger, &historical);
 
-		if (0 == historical)
+		if (FAIL == historical)
 			ret = process_event_bulk_update(&trigger, &sql, &sql_alloc, &sql_offset);
 		else
 			ret = process_event_update(&trigger, &sql, &sql_alloc, &sql_offset);
