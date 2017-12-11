@@ -47,8 +47,10 @@ static int	get_trigger_count()
 	int		triggers_num;
 
 	result = DBselect("select count(*) from triggers");
-	row = DBfetch(result);
-	triggers_num = atoi(row[0]);
+	if (NULL != (row = DBfetch(result)))
+		triggers_num = atoi(row[0]);
+	else
+		triggers_num = 0;
 	DBfree_result(result);
 
 	return triggers_num;
