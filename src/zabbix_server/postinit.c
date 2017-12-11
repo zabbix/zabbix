@@ -354,6 +354,9 @@ static int	update_event_names()
 
 	triggers_num = get_trigger_count();
 
+	if (0 == triggers_num)
+		goto out;
+
 	sql = zbx_malloc(NULL, sql_alloc);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -384,7 +387,7 @@ static int	update_event_names()
 
 		zbx_db_trigger_clean(&trigger);
 
-		processed_num = 0;
+		processed_num++;
 
 		if (last_completed != (completed = 100.0 * processed_num / triggers_num))
 		{
@@ -405,6 +408,7 @@ static int	update_event_names()
 
 	zbx_free(sql);
 
+out:
 	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_WARNING, "event name update completed");
 	else
