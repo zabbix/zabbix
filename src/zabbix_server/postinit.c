@@ -198,7 +198,6 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
  *             sql        - [IN/OUT] the sql query                            *
  *             sql_alloc  - [IN/OUT] the sql query size                       *
  *             sql_offset - [IN/OUT] the sql query length                     *
- *                                0 - otherwise                               *
  *                                                                            *
  * Return value: SUCCEED - the update was successful                          *
  *               FAIL - otherwise                                             *
@@ -222,7 +221,7 @@ static int	process_event_bulk_update(const DB_TRIGGER *trigger, char **sql, size
 				" and objectid=" ZBX_FS_UI64 ";\n",
 			name_esc, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid);
 
-	if(SUCCEED == (ret = DBexecute_overflowed_sql(sql, sql_alloc, sql_offset)))
+	if (SUCCEED == (ret = DBexecute_overflowed_sql(sql, sql_alloc, sql_offset)))
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 				"update problem"
@@ -237,7 +236,7 @@ static int	process_event_bulk_update(const DB_TRIGGER *trigger, char **sql, size
 
 	zbx_free(name_esc);
 
-	return  ret;
+	return ret;
 }
 
 /******************************************************************************
@@ -251,7 +250,6 @@ static int	process_event_bulk_update(const DB_TRIGGER *trigger, char **sql, size
  *             sql        - [IN/OUT] the sql query                            *
  *             sql_alloc  - [IN/OUT] the sql query size                       *
  *             sql_offset - [IN/OUT] the sql query length                     *
- *                                0 - otherwise                               *
  *                                                                            *
  * Return value: SUCCEED - the update was successful                          *
  *               FAIL - otherwise                                             *
@@ -349,9 +347,7 @@ static int	update_event_names()
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting event name update forced by database upgrade");
 
-	triggers_num = get_trigger_count();
-
-	if (0 == triggers_num)
+	if (0 == (triggers_num = get_trigger_count()))
 		goto out;
 
 	sql = zbx_malloc(NULL, sql_alloc);
@@ -404,7 +400,6 @@ static int	update_event_names()
 	DBfree_result(result);
 
 	zbx_free(sql);
-
 out:
 	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_WARNING, "event name update completed");
