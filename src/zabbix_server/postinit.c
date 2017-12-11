@@ -40,7 +40,7 @@
  * Return value: The total number of triggers on system.                      *
  *                                                                            *
  ******************************************************************************/
-static int	get_trigger_count()
+static int	get_trigger_count(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -336,7 +336,7 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	update_event_names()
+static int	update_event_names(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
