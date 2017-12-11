@@ -228,29 +228,15 @@ class CEvent extends CApiService {
 						'preservekeys' => true
 					]);
 
-					// Get rights.
-					$db_rights = DBselect(
-						'SELECT r.groupid,r.id'.
-						' FROM rights r'.
-						' WHERE '.dbConditionInt('r.groupid', $userGroups).
-							' AND '.dbConditionInt('r.id', array_keys($host_groups))
-					);
-
-					$rights = [];
-
-					while ($db_right = DBfetch($db_rights)) {
-						$rights[$db_right['groupid']][$db_right['id']] = true;
-					}
-
 					// Get tag filter.
 					$db_tag_filters = DBselect(
-						'SELECT tf.groupid,tf.tag,tf.value,tf.usrgrpid'.
+						'SELECT tf.groupid,tf.tag,tf.value'.
 						' FROM tag_filter tf'.
 						' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
 							' AND '.dbConditionInt('tf.groupid', array_keys($host_groups))
 					);
 
-					$tag_filters_tmp = [];
+					$tag_filters = [];
 
 					$skip_groups = [];
 					while ($db_tag_filter = DBfetch($db_tag_filters)) {
@@ -258,40 +244,16 @@ class CEvent extends CApiService {
 							$skip_groups[$db_tag_filter['groupid']] = true;
 						}
 						else {
-							$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
+							$tag_filters[$db_tag_filter['groupid']][] = [
 								'tag' => $db_tag_filter['tag'],
 								'value' => $db_tag_filter['value']
 							];
 						}
 					}
 
-					$tag_filters = [];
-					$allowed_triggers = [];
-					$allowed_host_groups = [];
-
-					foreach ($userGroups as $usrgrpid) {
-						if (array_key_exists($usrgrpid, $tag_filters_tmp)) {
-							foreach ($tag_filters_tmp[$usrgrpid] as $groupid => $tag_filter) {
-								if (array_key_exists($groupid, $rights[$usrgrpid])) {
-									$tag_filters[$groupid] = $tag_filter;
-									unset($rights[$usrgrpid][$groupid]);
-								}
-							}
-						}
-						else {
-							if (array_key_exists($usrgrpid, $rights)) {
-								$skip_groups += $rights[$usrgrpid];
-							}
-						}
-					}
-
-					foreach ($rights as $usrgrpid => $right) {
-						foreach ($right as $groupid => $value) {
-							if (array_key_exists($groupid, $host_groups)) {
-								$allowed_triggers = array_merge($allowed_triggers, $host_groups[$groupid]);
-								$allowed_host_groups[$groupid] = true;
-								unset($host_groups[$groupid], $tag_filters[$groupid]);
-							}
+					foreach ($host_groups as $groupid => $value) {
+						if (!array_key_exists($groupid, $tag_filters)) {
+							$skip_groups[$groupid] = true;
 						}
 					}
 
@@ -322,6 +284,8 @@ class CEvent extends CApiService {
 								$group_triggers[$group['groupid']][$trigger['triggerid']] = $trigger['triggerid'];
 							}
 						}
+
+						$allowed_triggers = [];
 
 						foreach ($tag_filters as $groupid => $tag_filter) {
 							$triggerids = $group_triggers[$groupid];
