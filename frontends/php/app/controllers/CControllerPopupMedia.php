@@ -89,6 +89,11 @@ class CControllerPopupMedia extends CController {
 			if ($page_options['type'] == MEDIA_TYPE_EMAIL) {
 				$email_validator = new CEmailValidator();
 
+				$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
+				if (!$page_options['sendto_emails']) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
+				}
+
 				foreach ($page_options['sendto_emails'] as $email) {
 					if (!$email_validator->validate($email)) {
 						error($email_validator->getError());
@@ -97,7 +102,7 @@ class CControllerPopupMedia extends CController {
 				}
 			}
 			elseif ($page_options['sendto'] === '') {
-				error(_s('Incorrect value for field "%1$s": cannot be empty.', 'sendto'));
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
 			}
 
 			if (!parse_period($page_options['period'])) {
