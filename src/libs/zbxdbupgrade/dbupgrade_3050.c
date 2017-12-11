@@ -22,6 +22,8 @@
 #include "dbupgrade.h"
 #include "zbxtasks.h"
 
+extern unsigned char	program_type;
+
 /*
  * 4.0 development database patches
  */
@@ -119,6 +121,9 @@ static int	DBpatch_3050006(void)
 	zbx_db_insert_t	db_insert;
 	int		ret;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", NULL);
 	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_UPDATE_EVENTNAMES, ZBX_TM_STATUS_NEW,
 			time(NULL));
@@ -137,6 +142,9 @@ static int	DBpatch_3050008(void)
 	int		res;
 	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", trdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, EVENT_STATUS_PROBLEM);
 
@@ -150,6 +158,9 @@ static int	DBpatch_3050009(void)
 {
 	int		res;
 	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d ", trdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER);
@@ -165,6 +176,9 @@ static int	DBpatch_3050010(void)
 	int		res;
 	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, EVENT_STATUS_PROBLEM);
 
@@ -179,6 +193,9 @@ static int	DBpatch_3050011(void)
 	int		res;
 	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM);
 
@@ -191,6 +208,9 @@ static int	DBpatch_3050011(void)
 static int	DBpatch_3050012(void)
 {
 	int		res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	res = DBexecute("update profiles set idx='web.problem.filter.name' where idx='web.problem.filter.problem'");
 
