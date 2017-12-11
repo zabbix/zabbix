@@ -309,7 +309,9 @@ class CEvent extends CApiService {
 							}
 						}
 						else {
-							$skip_groups += $rights[$usrgrpid];
+							if (array_key_exists($usrgrpid, $rights)) {
+								$skip_groups += $rights[$usrgrpid];
+							}
 						}
 					}
 
