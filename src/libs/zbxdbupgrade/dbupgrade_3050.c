@@ -320,7 +320,7 @@ static int	DBpatch_3050020(void)
 
 static int	DBpatch_3050021(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -336,7 +336,7 @@ static int	DBpatch_3050021(void)
 
 static int	DBpatch_3050022(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -352,7 +352,7 @@ static int	DBpatch_3050022(void)
 
 static int	DBpatch_3050023(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -368,7 +368,7 @@ static int	DBpatch_3050023(void)
 
 static int	DBpatch_3050024(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
