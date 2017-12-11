@@ -256,7 +256,6 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 				&result->colls,		/* colls (collisions) */
 				&result->ocarrier,	/* carrier */
 				&result->ocompressed))	/* compressed */
-
 		{
 			if (0 == strcmp(name, if_name))
 			{
@@ -480,7 +479,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, ns.odrop);
 	else if (0 == strcmp(mode, "overruns"))
 		SET_UI64_RESULT(result, ns.ofifo);
-	else if (0 == strcmp(mode, "colls"))
+	else if (0 == strcmp(mode, "collisions"))
 		SET_UI64_RESULT(result, ns.colls);
 	else if (0 == strcmp(mode, "carrier"))
 		SET_UI64_RESULT(result, ns.ocarrier);
