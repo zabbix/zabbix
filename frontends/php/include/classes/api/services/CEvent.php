@@ -165,30 +165,16 @@ class CEvent extends CApiService {
 						}
 					}
 
-					// Get rights.
-					$db_rights = DBselect(
-						'SELECT r.groupid,r.id'.
-						' FROM rights r'.
-						' WHERE '.dbConditionInt('r.groupid', $userGroups).
-							' AND '.dbConditionInt('r.id', array_keys($group_triggers))
-					);
-
-					$rights = [];
-
-					while ($db_right = DBfetch($db_rights)) {
-						$rights[$db_right['groupid']][$db_right['id']] = true;
-					}
-
 					// Get tag filter.
 					$db_tag_filters = DBselect(
-						'SELECT tf.groupid,tf.tag,tf.value,tf.usrgrpid'.
+						'SELECT tf.groupid,tf.tag,tf.value'.
 						' FROM tag_filter tf'.
 						' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
 							' AND '.dbConditionInt('tf.groupid', array_keys($group_triggers))
 					);
 
-					$tag_filters_tmp = [];
 					$allowed_triggers = [];
+					$tag_filters = [];
 
 					while ($db_tag_filter = DBfetch($db_tag_filters)) {
 						if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === '') {
@@ -197,32 +183,16 @@ class CEvent extends CApiService {
 							);
 						}
 						else {
-							$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
+							$tag_filters[$db_tag_filter['groupid']][] = [
 								'tag' => $db_tag_filter['tag'],
 								'value' => $db_tag_filter['value']
 							];
 						}
 					}
 
-					$tag_filters = [];
-
-					foreach ($userGroups as $usrgrpid) {
-						if (array_key_exists($usrgrpid, $tag_filters_tmp)) {
-							foreach ($tag_filters_tmp[$usrgrpid] as $groupid => $tag_filter) {
-								if (array_key_exists($groupid, $rights[$usrgrpid])) {
-									$tag_filters[$groupid] = $tag_filter;
-									unset($rights[$usrgrpid][$groupid]);
-								}
-							}
-						}
-					}
-
-					foreach ($rights as $usrgrpid => $right) {
-						foreach ($right as $groupid => $value) {
-							if (array_key_exists($groupid, $group_triggers)) {
-								$allowed_triggers = array_merge($allowed_triggers, $group_triggers[$groupid]);
-								unset($group_triggers[$groupid], $tag_filters[$groupid]);
-							}
+					foreach ($group_triggers as $groupid => $value) {
+						if (!array_key_exists($groupid, $tag_filters)) {
+							$allowed_triggers = array_merge($allowed_triggers, $group_triggers[$groupid]);
 						}
 					}
 
