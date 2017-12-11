@@ -958,58 +958,6 @@ static int	is_old2new_unique_mapping(const char *old2new, int num_old, int num_n
 	return SUCCEED;
 }
 
-static void	cross_out_from_top_left_corner(char compare_with, char *old2new, int num_old, int num_new,
-		const char *protected_rows, const char *protected_cols)
-{
-	char	*p;
-	int	i;
-
-	for (i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
-	{
-		int	j;
-
-		if ('1' == protected_rows[i])
-			continue;
-
-		p = old2new + i * num_new;	/* the first element of the current row */
-
-		for (j = 0; j < num_new; j++)
-		{
-			if (compare_with == p[j] && '1' != protected_cols[j])
-			{
-				cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
-				break;
-			}
-		}
-	}
-}
-
-static void	cross_out_from_bottom_right_corner(char compare_with, char *old2new, int num_old, int num_new,
-		const char *protected_rows, const char * protected_cols)
-{
-	char	*p;
-	int	i;
-
-	for (i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
-	{
-		int	j;
-
-		if ('1' == protected_rows[i])
-			continue;
-
-		p = old2new + i * num_new;	/* the first element of the current row */
-
-		for (j = num_new - 1; j >= 0; j--)
-		{
-			if (compare_with == p[j] && '1' != protected_cols[j])
-			{
-				cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
-				break;
-			}
-		}
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: resolve_old2new                                                  *
@@ -1023,7 +971,7 @@ static void	cross_out_from_bottom_right_corner(char compare_with, char *old2new,
  *           num_new - [IN] number of elements in the new file list           *
  *                                                                            *
  ******************************************************************************/
-static void	resolve_old2new(int rotation_type, char *old2new, int num_old, int num_new)
+static void	resolve_old2new(char *old2new, int num_old, int num_new)
 {
 	int	i;
 	char	*protected_rows = NULL, *protected_cols = NULL;
@@ -1086,10 +1034,25 @@ static void	resolve_old2new(int rotation_type, char *old2new, int num_old, int n
 		 *                                                                                                  *
 		 ****************************************************************************************************/
 
-		cross_out_from_top_left_corner('1', old2new, num_old, num_new, protected_rows, protected_cols);
+		for (i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
+		{
+			char	*p;
+			int	j;
 
-		if (ZBX_LOG_ROTATION_LOGCPT == rotation_type)
-			cross_out_from_top_left_corner('2', old2new, num_old, num_new, protected_rows, protected_cols);
+			if ('1' == protected_rows[i])
+				continue;
+
+			p = old2new + i * num_new;	/* the first element of the current row */
+
+			for (j = 0; j < num_new; j++)
+			{
+				if (('1' == p[j] || '2' == p[j]) && '1' != protected_cols[j])
+				{
+					cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
+					break;
+				}
+			}
+		}
 	}
 	else	/* tall array */
 	{
@@ -1126,12 +1089,24 @@ static void	resolve_old2new(int rotation_type, char *old2new, int num_old, int n
 		 *                                                                                                  *
 		 ****************************************************************************************************/
 
-		cross_out_from_bottom_right_corner('1', old2new, num_old, num_new, protected_rows, protected_cols);
-
-		if (ZBX_LOG_ROTATION_LOGCPT == rotation_type)
+		for (i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
 		{
-			cross_out_from_bottom_right_corner('2', old2new, num_old, num_new, protected_rows,
-					protected_cols);
+			char	*p;
+			int	j;
+
+			if ('1' == protected_rows[i])
+				continue;
+
+			p = old2new + i * num_new;	/* the first element of the current row */
+
+			for (j = num_new - 1; j >= 0; j--)
+			{
+				if (('1' == p[j] || '2' == p[j]) && '1' != protected_cols[j])
+				{
+					cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
+					break;
+				}
+			}
 		}
 	}
 
@@ -1226,8 +1201,8 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 		p += (size_t)num_new;
 	}
 
-	if (1 < num_old || 1 < num_new)
-		resolve_old2new(rotation_type, old2new, num_old, num_new);
+	if (ZBX_LOG_ROTATION_LOGRT == rotation_type && (1 < num_old || 1 < num_new))
+		resolve_old2new(old2new, num_old, num_new);
 
 	return old2new;
 }
@@ -2375,7 +2350,7 @@ static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num
 			/* If logfiles[i] has been at least partially processed then transfer its */
 			/* processed size to logfiles[j], too. */
 
-			if (0 < logfiles[i].processed_size)
+			if (logfiles[j].processed_size < logfiles[i].processed_size)
 			{
 				logfiles[j].processed_size = MIN(logfiles[i].processed_size, logfiles[j].size);
 
@@ -2383,6 +2358,15 @@ static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num
 						ZBX_FS_UI64 " transferred to" " file '%s' processed_size:" ZBX_FS_UI64,
 						logfiles[i].filename, logfiles[i].processed_size,
 						logfiles[j].filename, logfiles[j].processed_size);
+			}
+			else if (logfiles[i].processed_size < logfiles[j].processed_size)
+			{
+				logfiles[i].processed_size = MIN(logfiles[j].processed_size, logfiles[i].size);
+
+				zabbix_log(LOG_LEVEL_DEBUG, "handle_multiple_copies() file '%s' processed_size:"
+						ZBX_FS_UI64 " transferred to" " file '%s' processed_size:" ZBX_FS_UI64,
+						logfiles[j].filename, logfiles[j].processed_size,
+						logfiles[i].filename, logfiles[i].processed_size);
 			}
 		}
 	}
@@ -2746,7 +2730,8 @@ static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfil
 			else
 			{
 				/* the file was not fully processed during the previous check or has grown */
-				logfiles[j].processed_size = logfiles_old[i].processed_size;
+				if (logfiles[j].processed_size < logfiles_old[i].processed_size)
+					logfiles[j].processed_size = MIN(logfiles[j].size, logfiles_old[i].processed_size);
 			}
 		}
 		else if (1 == logfiles_old[i].incomplete && -1 != (j = find_old2new(old2new, logfiles_num, i)))
@@ -2760,7 +2745,8 @@ static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfil
 			else
 				logfiles[j].incomplete = 1;
 
-			logfiles[j].processed_size = logfiles_old[i].processed_size;
+			if (logfiles[j].processed_size < logfiles_old[i].processed_size)
+				logfiles[j].processed_size = MIN(logfiles[j].size, logfiles_old[i].processed_size);
 		}
 
 		/* find the last file processed (fully or partially) in the previous check */
@@ -2894,7 +2880,14 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	}
 
 	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
+	{
+		int	k;
+
 		ensure_order_if_mtimes_equal(*logfiles_old, logfiles, logfiles_num, *use_ino, &start_idx);
+
+		for (k = 0; k < logfiles_num - 1; k++)
+			handle_multiple_copies(logfiles, logfiles_num, k);
+	}
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
@@ -2917,14 +2910,6 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 
 	/* from now assume success - it could be that there is nothing to do */
 	ret = SUCCEED;
-
-	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
-	{
-		int	k;
-
-		for (k = 0; k < logfiles_num - 1; k++)
-			handle_multiple_copies(logfiles, logfiles_num, k);
-	}
 
 	if (0.0f != max_delay)
 	{
@@ -2993,7 +2978,12 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			logfiles[i].seq = seq++;
 
 			if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
-				handle_multiple_copies(logfiles, logfiles_num, i);
+			{
+				int	k;
+
+				for (k = 0; k < logfiles_num - 1; k++)
+					handle_multiple_copies(logfiles, logfiles_num, k);
+			}
 
 			if (SUCCEED != ret)
 				break;
