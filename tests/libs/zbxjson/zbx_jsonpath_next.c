@@ -54,7 +54,12 @@ void	zbx_mock_test_entry(void **state)
 		}
 
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_vector_element(components, &component)))
-			fail_msg("Too many path components parsed");
+		{
+			if (ZBX_MOCK_END_OF_VECTOR == err || ZBX_MOCK_NOT_A_VECTOR == err)
+				fail_msg("Too many path components parsed");
+			else
+				fail_msg("Cannot get vector element: %s", zbx_mock_error_string(err));
+		}
 
 		zbx_mock_get_object_member_string(component, "class", &component_class);
 
@@ -84,8 +89,15 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	if (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(components, &component))
-		fail_msg("Not enough path components parsed");
+	err = zbx_mock_vector_element(components, &component);
+
+	if (ZBX_MOCK_END_OF_VECTOR != err && ZBX_MOCK_NOT_A_VECTOR != err)
+	{
+		if (ZBX_MOCK_SUCCESS == err)
+			fail_msg("Too many path components parsed");
+		else
+			fail_msg("Cannot get vector element: %s", zbx_mock_error_string(err));
+	}
 
 	zbx_free(buffer);
 }
