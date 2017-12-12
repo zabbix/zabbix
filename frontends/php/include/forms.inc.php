@@ -132,19 +132,29 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 	if (!empty($data['user_medias'])) {
 		$mediaTypeDescriptions = [];
 		$dbMediaTypes = DBselect(
-			'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
+			'SELECT mt.mediatypeid,mt.type,mt.description FROM media_type mt WHERE '.
 				dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 		);
 		while ($dbMediaType = DBfetch($dbMediaTypes)) {
-			$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
+			$mediaTypeDescriptions[$dbMediaType['mediatypeid']]['description'] = $dbMediaType['description'];
+			$mediaTypeDescriptions[$dbMediaType['mediatypeid']]['mediatype'] = $dbMediaType['type'];
 		}
 
 		foreach ($data['user_medias'] as &$media) {
-			$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']];
+			$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']]['description'];
+			$media['mediatype'] = $mediaTypeDescriptions[$media['mediatypeid']]['mediatype'];
+			$media['send_to_sort_field'] = is_array($media['sendto'])
+				? implode(', ', $media['sendto'])
+				: $media['sendto'];
 		}
 		unset($media);
 
-		CArrayHelper::sort($data['user_medias'], ['description', 'sendto']);
+		CArrayHelper::sort($data['user_medias'], ['description', 'send_to_sort_field']);
+
+		foreach ($data['user_medias'] as &$media) {
+			unset($media['send_to_sort_field']);
+		}
+		unset($media);
 	}
 
 	// set user rights
@@ -340,8 +350,13 @@ function getItemFilterForm(&$items) {
 			],
 			'data' => $groupFilter,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
-					'&srcfld1=groupid&writeonly=1'
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'filter_groupid',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
@@ -393,8 +408,13 @@ function getItemFilterForm(&$items) {
 			],
 			'data' => $hostFilterData,
 			'popup' => [
-				'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
-					'&srcfld1=hostid&writeonly=1'
+				'parameters' => [
+					'srctbl' => 'host_templates',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'filter_hostid',
+					'srcfld1' => 'hostid',
+					'writeonly' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
@@ -418,12 +438,19 @@ function getItemFilterForm(&$items) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton(null, _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick(
-					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
-						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-						'&with_applications=1'.
-						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
-						.', 0, 0, "application");')
+				->onClick('return PopUp("popup.generic",jQuery.extend('.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'filter_application',
+						'with_applications' => '1'
+					]).
+					',(jQuery("input[name=\'filter_hostid\']").length > 0)'.
+						' ? {hostid: jQuery("input[name=\'filter_hostid\']").val()}'.
+						' : {}'.
+					'));'
+				)
 		]
 	);
 	$filterColumn2->addRow(_('SNMP community'),

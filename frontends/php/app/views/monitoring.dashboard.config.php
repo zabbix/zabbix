@@ -73,8 +73,13 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'hostGroup',
 			'data' => $data['captions']['ms']['groups'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
-					'&srcfld1=groupid&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => $field->getName().'_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
+				]
 			],
 			'add_post_js' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
@@ -91,8 +96,13 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'hosts',
 			'data' => $data['captions']['ms']['hosts'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
-					'&srcfld1=hostid&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'hosts',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => $field->getName().'_',
+					'srcfld1' => 'hostid',
+					'multiselect' => '1'
+				]
 			],
 			'add_post_js' => false
 		]))
@@ -125,7 +135,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getName().'");')
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson($field->getPopupOptions($form->getName())).');')
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {

@@ -1330,7 +1330,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
-			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)
@@ -1392,7 +1392,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
-			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)
@@ -3661,10 +3661,15 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUE) || 0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				{
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
 				}
 			}
 		}
