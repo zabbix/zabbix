@@ -39,8 +39,8 @@ void	zbx_mock_test_entry(void **state)
 	{
 		fail_msg("Cannot get expected key from test case data: %s", zbx_mock_error_string(error));
 	}
-	else if (ZBX_MOCK_SUCCESS != error || ZBX_MOCK_SUCCESS != (
-			error = zbx_mock_string(expected_param_value_handle, &expected_param_value_string)))
+	else if (ZBX_MOCK_SUCCESS != error || ZBX_MOCK_SUCCESS != (error = zbx_mock_string(expected_param_value_handle,
+			&expected_param_value_string)))
 	{
 		fail_msg("Cannot get expected parameters from test case data: %s", zbx_mock_error_string(error));
 	}
