@@ -61,7 +61,7 @@ typedef struct
 #elif defined(HAVE_OPENSSL)
 	SSL_CTX			*ctx_cert;
 	SSL_CTX			*ctx_psk;
-	char			*psk_identity_for_cb;
+	const char		*psk_identity_for_cb;
 	size_t			psk_identity_len_for_cb;
 	char			*psk_for_cb;
 	size_t			psk_len_for_cb;

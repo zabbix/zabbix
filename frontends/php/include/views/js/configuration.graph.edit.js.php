@@ -96,6 +96,8 @@
 </tr>
 </script>
 <script type="text/javascript">
+	colorPalette.setThemeColors(<?= CJs::encodeJson(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
+
 	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
 		var item = {
 				number: number,
@@ -167,10 +169,10 @@
 	}
 
 	function getOnlyHostParam() {
-		<?php if ($this->data['is_template']): ?>
-			return '&only_hostid=<?= $this->data['hostid'] ?>';
+		<?php if ($data['is_template']): ?>
+			return {'only_hostid':'<?= $data['hostid'] ?>'};
 		<?php else: ?>
-			return '&real_hosts=1';
+			return {'real_hosts':'1'};
 		<?php endif ?>
 	}
 
@@ -179,14 +181,34 @@
 		var size = jQuery('#itemsTable tr.sortable').length;
 
 		for (var i = 0; i < size; i++) {
-			var nameLink = 'PopUp("popup.php?writeonly=1&numeric=1&dstfrm=graphForm'
-				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name'
-				+ (jQuery('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>
-					? '&srctbl=item_prototypes&parent_discoveryid=<?= $this->data['parent_discoveryid'] ?>'
-						+ '&srcfld3=flags&dstfld3=items_' + i + '_flags'
-					: '&srctbl=items')
-				+ '<?= !empty($this->data['normal_only']) ? '&normal_only=1' : '' ?>'
-				+ '&srcfld1=itemid&srcfld2=name" + getOnlyHostParam())';
+			var popup_options = {
+				srcfld1: 'itemid',
+				srcfld2: 'name',
+				dstfrm: 'graphForm',
+				dstfld1: 'items_' + i + '_itemid',
+				dstfld2: 'items_' + i + '_name',
+				numeric: 1,
+				writeonly: 1
+			};
+			if (jQuery('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
+				popup_options['srctbl'] = 'item_prototypes',
+				popup_options['srcfld3'] = 'flags',
+				popup_options['dstfld3'] = 'items_' + i + '_flags',
+				popup_options['parent_discoveryid'] = '<?= $data['parent_discoveryid'] ?>';
+			}
+			else {
+				popup_options['srctbl'] = 'items';
+			}
+			<?php if ($data['normal_only'] !== ''): ?>
+				popup_options['normal_only'] = '1';
+			<?php endif ?>
+			<?php if (!$data['parent_discoveryid'] && $data['groupid'] && $data['hostid']): ?>
+				popup_options['groupid'] = '<?= $data['groupid'] ?>',
+				popup_options['hostid'] = '<?= $data['hostid'] ?>';
+			<?php endif ?>
+
+			var nameLink = 'PopUp("popup.generic",'
+				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()));';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
 	}

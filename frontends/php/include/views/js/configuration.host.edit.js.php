@@ -18,7 +18,11 @@
 		</ul>
 	</td>
 	<td class="interface-dns">
-		<input name="interfaces[#{iface.interfaceid}][dns]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_DNS_WIDTH ?>px" maxlength="64" value="#{iface.dns}">
+		<?= (new CTextBox('interfaces[#{iface.interfaceid}][dns]', '#{iface.dns}', false,
+				DB::getFieldLength('interface', 'dns'))
+			)
+				->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
+		?>
 	</td>
 	<?= (new CCol(
 			(new CRadioButtonList('interfaces[#{iface.interfaceid}][useip]', null))

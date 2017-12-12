@@ -87,7 +87,12 @@ $scriptFormList
 		'objectName' => 'hostGroup',
 		'data' => $data['hostgroup'],
 		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
+			'parameters' => [
+				'srctbl' => 'host_groups',
+				'dstfrm' => $scriptForm->getName(),
+				'dstfld1' => 'groupid',
+				'srcfld1' => 'groupid'
+			]
 		]]))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
 	->addRow((new CLabel(_('Required host permissions'), 'host_access'))->setAsteriskMark(),

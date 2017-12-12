@@ -204,8 +204,15 @@ $groupList->addRow(
 		'data' => $groups,
 		'disabled' => (bool) $hostPrototype['templateid'],
 		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
-				'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
+			'parameters' => [
+				'srctbl' => 'host_groups',
+				'dstfrm' => $frmHost->getName(),
+				'dstfld1' => 'group_links_',
+				'srcfld1' => 'groupid',
+				'writeonly' => '1',
+				'multiselect' => '1',
+				'normal_only' => '1'
+			]
 		]
 	]))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -305,8 +312,15 @@ else {
 				'objectName' => 'templates',
 				'ignored' => $ignoreTemplates,
 				'popup' => [
-					'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-						'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'templates',
+						'srcfld1' => 'hostid',
+						'srcfld2' => 'host',
+						'dstfrm' => $frmHost->getName(),
+						'dstfld1' => 'add_templates_',
+						'templated_hosts' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		])

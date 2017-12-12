@@ -39,6 +39,7 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
 	)
 	->addRow((new CLabel(_('Maintenance type'), 'maintenance_type'))->setAsteriskMark(),
 		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))

@@ -32,7 +32,13 @@ $multiselect = (new CMultiSelect([
 	'objectName' => 'users',
 	'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
 	'popup' => [
-		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+		'parameters' => [
+			'srctbl' => 'users',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid',
+			'srcfld1' => 'userid',
+			'srcfld2' => 'fullname'
+		]
 	],
 	'callPostEvent' => true
 ]))

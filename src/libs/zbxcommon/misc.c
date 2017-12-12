@@ -433,7 +433,7 @@ int	zbx_day_in_month(int year, int mon)
  * Author: Eugene Grigorjev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
+void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -472,7 +472,7 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -512,7 +512,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -532,7 +532,7 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 	exit(EXIT_FAILURE);
 }
 
-char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
+char	*zbx_strdup2(const char *filename, int line, char *old, const char *str)
 {
 	int	retry;
 	char	*ptr = NULL;
@@ -874,7 +874,7 @@ int	zbx_check_time_period(const char *period, time_t time, int *res)
 	tm = localtime(&time);
 
 	next = strchr(period, ';');
-	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : next - period)))
+	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : (int)(next - period))))
 	{
 		if (SUCCEED == check_time_period(tp, tm))
 			res_total = SUCCEED;	/* no short-circuits, validate all periods before return */
@@ -936,7 +936,7 @@ static int	flexible_interval_parse(zbx_flexible_interval_t *interval, const char
 	for (ptr = text; 0 < len && '\0' != *ptr && '/' != *ptr; len--, ptr++)
 		;
 
-	if (SUCCEED != is_time_suffix(text, &interval->delay, ptr - text))
+	if (SUCCEED != is_time_suffix(text, &interval->delay, (int)(ptr - text)))
 		return FAIL;
 
 	if (0 >= len-- || '/' != *ptr++)
@@ -1626,7 +1626,7 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
 static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t now)
 {
 	struct tm	tm_start, tm;
-	int		nextcheck = 0, current_nextcheck;
+	time_t		nextcheck = 0, current_nextcheck;
 
 	tm_start = *(localtime(&now));
 	tm_start.tm_isdst = -1;
@@ -1677,7 +1677,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 	int				ret;
 
 	if (SUCCEED != (ret = is_time_suffix(interval_str, simple_interval,
-			(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str))))
+			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str))))
 	{
 		interval_type = "update";
 		goto out;
@@ -1698,7 +1698,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 			new_interval = zbx_malloc(NULL, sizeof(zbx_flexible_interval_t));
 
 			if (SUCCEED != (ret = flexible_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : delim - interval_str))))
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)))))
 			{
 				zbx_free(new_interval);
 				interval_type = "flexible";
@@ -1716,7 +1716,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
 
 			if (SUCCEED != (ret = scheduler_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : delim - interval_str))))
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)))))
 			{
 				zbx_free(new_interval);
 				interval_type = "scheduling";
@@ -1733,7 +1733,8 @@ out:
 		if (NULL != error)
 		{
 			*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
-					(NULL == delim ? (int)strlen(interval_str) : delim - interval_str), interval_str);
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
+					interval_str);
 		}
 
 		flexible_interval_free(flexible);
@@ -1863,7 +1864,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 		}
 
 		if (0 != scheduled_check && scheduled_check < nextcheck)
-			nextcheck = scheduled_check;
+			nextcheck = (int)scheduled_check;
 	}
 
 	return nextcheck;

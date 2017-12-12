@@ -72,7 +72,11 @@ var PageRefresh = {
 
 		this.delayLeft -= 1000;
 		if (this.delayLeft < 0) {
-			location.replace(location.href);
+			if (IE || ED) {
+				sessionStorage.scrollTop = jQuery(window).scrollTop();
+			}
+
+			location.reload();
 		}
 		else {
 			this.timeout = setTimeout('PageRefresh.check()', 1000);
@@ -107,10 +111,84 @@ var MMenu = {
 	timeout_reset:	null,
 	timeout_change:	null,
 
+	init: function() {
+		// Detects when none of the selected elements are focused.
+		var elems = jQuery('.top-nav a, .top-subnav a').on('keydown', function(event) {
+			clearTimeout(this.timeout_reset);
+
+			if (event.which == 9) {
+				setTimeout(function() {
+					if (elems.toArray().indexOf(document.querySelector(':focus')) == -1) {
+						clearTimeout(this.timeout_reset);
+						this.timeout_reset = setTimeout(function() {
+							if (elems.toArray().indexOf(document.querySelector(':focus')) == -1){
+								MMenu.showSubMenu(MMenu.def_label)
+							}
+						}, 2500);
+					}
+				});
+			}
+		});
+
+		if (SF) {
+			var nav_elems = jQuery('.top-subnav a, .search, .btn-search, .top-nav-zbbshare, .top-nav-help, .top-nav-profile, .top-nav-signout')
+					.on('keydown', function(event) {
+				if (event.which == 9) {
+					var visible_subnav_elems = nav_elems.filter(function() {
+						return jQuery(this).is(':visible');
+					});
+					var current = visible_subnav_elems.toArray().indexOf(this);
+
+					if (event.shiftKey && current > 0) {
+						visible_subnav_elems.get(current - 1).focus();
+					}
+					else if (!event.shiftKey && visible_subnav_elems.length > current + 1) {
+						visible_subnav_elems.get(current + 1).focus();
+					}
+					else if (event.shiftKey && current == 0) {
+						// Find the previous :focusable element to focus.
+						var active_element_index = jQuery('*', 'body').toArray().indexOf(document.activeElement),
+							prev_element = null;
+
+						jQuery('*', 'body').each(function(i) {
+							if (active_element_index > i && jQuery(this).is(':focusable')) {
+								prev_element = this;
+							};
+						});
+
+						if (prev_element) {
+							prev_element.focus();
+						}
+					}
+					else if (current + 1 == visible_subnav_elems.length) {
+						// If this is the last item in the sub-menu list, focus next :focusable element.
+						var active_element_index = jQuery('*', 'body').toArray().indexOf(document.activeElement);
+
+						jQuery('*', 'body').filter(function(i) {
+							return (i > active_element_index && jQuery(this).is(':focusable'));
+						}).get(0).focus();
+					}
+
+					event.preventDefault();
+
+					return false;
+				}
+			});
+		}
+	},
+
 	mouseOver: function(show_label) {
 		clearTimeout(this.timeout_reset);
 		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 10);
 		PageRefresh.restart();
+	},
+
+	keyUp: function(show_label, event) {
+		if (event.which == 13) {
+			clearTimeout(this.timeout_reset);
+			this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
+			PageRefresh.restart();
+		}
 	},
 
 	submenu_mouseOver: function() {
@@ -124,11 +202,17 @@ var MMenu = {
 		this.timeout_reset = setTimeout('MMenu.showSubMenu("' + this.def_label + '")', 2500);
 	},
 
-	showSubMenu: function(show_label) {
-		var sub_menu = $('sub_' + show_label);
+	showSubMenu: function(show_label, focus_subitem) {
+		var sub_menu = $('sub_' + show_label),
+			focus_subitem = focus_subitem || false;
+
 		if (sub_menu !== null) {
 			$(show_label).className = 'selected';
 			sub_menu.show();
+
+			if (focus_subitem) {
+				jQuery('li:first > a', sub_menu).focus();
+			}
 
 			for (var key in this.menus) {
 				if (key == show_label) {
@@ -309,24 +393,26 @@ var jqBlink = {
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function() {
-		var objects = jQuery('.blink');
+		// Right after page refresh, all blinking elements should be visible.
+		if (this.secondsSinceInit > 0) {
+			var objects = jQuery('.blink');
 
-		// maybe some of the objects should not blink any more?
-		objects = this.filterOutNonBlinking(objects);
+			// maybe some of the objects should not blink any more?
+			objects = this.filterOutNonBlinking(objects);
 
-		// changing visibility state
-		fun = this.shown ? 'removeClass' : 'addClass';
-		jQuery.each(objects, function() {
-			if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
-				jQuery(this)[fun](jQuery(this).data('toggleClass'));
-			}
-			else {
-				jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
-			}
-		})
+			// changing visibility state
+			jQuery.each(objects, function() {
+				if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
+					jQuery(this).toggleClass(jQuery(this).data('toggleClass'));
+				}
+				else {
+					jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
+				}
+			})
 
-		// reversing the value of indicator attribute
-		this.shown = !this.shown;
+			// reversing the value of indicator attribute
+			this.shown = !this.shown;
+		}
 
 		// I close my eyes only for a moment, and a moment's gone
 		this.secondsSinceInit += this.blinkInterval / 1000;
@@ -346,7 +432,13 @@ var jqBlink = {
 			if (typeof obj.data('timeToBlink') !== 'undefined') {
 				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
 
-				return shouldBlink || !that.shown;
+				if (shouldBlink || !that.shown) {
+					return true;
+				}
+				else {
+					obj.removeClass('blink');
+					return false;
+				}
 			}
 			else {
 				// no time-to-blink attribute, should blink forever
@@ -968,4 +1060,8 @@ jQuery(function ($) {
 			verticalHeaderTables[table.attr('id')] = table;
 		});
 	};
+
+	if ((IE || ED) && typeof sessionStorage.scrollTop !== 'undefined') {
+		$(window).scrollTop(sessionStorage.scrollTop);
+	}
 });

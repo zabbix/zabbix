@@ -25,7 +25,7 @@
 class CClockWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data);
+		parent::__construct($data, WIDGET_CLOCK);
 
 		// Time type field
 		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), [

@@ -183,7 +183,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickLinkTextWait($newVmName);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
@@ -210,7 +210,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickLinkText($this->valuemapWithMultipleMappings);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$this->valuemapWithMultipleMappings.'\'';

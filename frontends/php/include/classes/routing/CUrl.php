@@ -69,6 +69,8 @@ class CUrl {
 		$this->arguments = $_GET;
 
 		$this->formatQuery();
+
+		return $this;
 	}
 
 	public function formatArguments($query = null) {
@@ -93,6 +95,7 @@ class CUrl {
 		}
 		$this->formatQuery();
 	}
+
 	/**
 	 * Return relative url.
 	 *

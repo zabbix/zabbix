@@ -208,6 +208,16 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			if (!$resourceid) {
 				$unavailable_object = true;
 			}
+			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+				$items = API::Item()->get([
+					'output' => [],
+					'itemids' => $resourceid,
+					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
+					'webitems' => true
+				]);
+
+				$unavailable_object = !$items;
+			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get graph, used below
 				$graph = API::Graph()->get([
@@ -219,23 +229,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				if (!$graph) {
 					$unavailable_object = true;
 				}
-			}
-		}
-
-		if (!$unavailable_object && $fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-			$item = API::Item()->get([
-				'itemids' => $resourceid,
-				'output' => ['type', 'name', 'hostid', 'key_'],
-				'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
-				'selectHosts' => ['name'],
-				'webitems' => true
-			]);
-
-			if ($item) {
-				$item = reset($item);
-			}
-			else {
-				$unavailable_object = true;
 			}
 		}
 
@@ -330,6 +323,17 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			}
 
 			$time_control_data['src'] = $graph_src->getUrl();
+
+			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+				$item_graph_url = (new CUrl('charts.php'))->setArgument('graphid', $resourceid);
+			}
+			else {
+				$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+			}
+			$item_graph_url
+				->setArgument('period', $timeline['period'])
+				->setArgument('stime', $timeline['stime'])
+				->setArgument('isNow', $timeline['isNow']);
 		}
 
 		$this->setResponse(new CControllerResponseData([
@@ -340,6 +344,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				'timestamp' => time(),
 				'unavailable_object' => $unavailable_object
 			],
+			'item_graph_url' => $unavailable_object ? '' : $item_graph_url,
 			'widget' => [
 				'uniqueid' => $uniqueid,
 				'initial_load' => (int) $this->getInput('initial_load', 0),

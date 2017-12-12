@@ -343,48 +343,6 @@ void	zabbix_close_log(void)
 	}
 }
 
-void	zabbix_errlog(zbx_err_codes_t err, ...)
-{
-	const char	*msg;
-	char		*s = NULL;
-	va_list		ap;
-
-	switch (err)
-	{
-		case ERR_Z3001:
-			msg = "connection to database '%s' failed: [%d] %s";
-			break;
-		case ERR_Z3002:
-			msg = "cannot create database '%s': [%d] %s";
-			break;
-		case ERR_Z3003:
-			msg = "no connection to the database";
-			break;
-		case ERR_Z3004:
-			msg = "cannot close database: [%d] %s";
-			break;
-		case ERR_Z3005:
-			msg = "query failed: [%d] %s [%s]";
-			break;
-		case ERR_Z3006:
-			msg = "fetch failed: [%d] %s";
-			break;
-		case ERR_Z3007:
-			msg = "query failed: [%d] %s";
-			break;
-		default:
-			msg = "unknown error";
-	}
-
-	va_start(ap, err);
-	s = zbx_dvsprintf(s, msg, ap);
-	va_end(ap);
-
-	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", err, s);
-
-	zbx_free(s);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zabbix_check_log_level                                           *
@@ -595,9 +553,9 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 int	zbx_get_log_type(const char *logtype)
 {
 	const char	*logtypes[] = {ZBX_OPTION_LOGTYPE_SYSTEM, ZBX_OPTION_LOGTYPE_FILE, ZBX_OPTION_LOGTYPE_CONSOLE};
-	size_t		i;
+	int		i;
 
-	for (i = 0; i < ARRSIZE(logtypes); i++)
+	for (i = 0; i < (int)ARRSIZE(logtypes); i++)
 	{
 		if (0 == strcmp(logtype, logtypes[i]))
 			return i + 1;

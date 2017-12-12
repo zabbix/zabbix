@@ -1089,7 +1089,11 @@ AC_ARG_ENABLE(ipv6,[  --enable-ipv6           Turn on support of IPv6],
 esac],
 [ipv6=no])
 
+AM_CONDITIONAL([DBSCHEMA], [test -d create])
+
 AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
+
+AM_CONDITIONAL([ZBXCMOCKA], [test -d tests/])
 
 have_db="no"
 have_unixodbc="no"
@@ -1579,9 +1583,22 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
+AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
+	tests/Makefile
+	tests/libs/Makefile
+	tests/libs/zbxconf/Makefile
+	tests/libs/zbxdbhigh/Makefile
+	tests/libs/zbxsysinfo/Makefile
+)])
+
 AC_OUTPUT([
 	Makefile
 	database/Makefile
+	database/ibm_db2/Makefile
+	database/mysql/Makefile
+	database/oracle/Makefile
+	database/postgresql/Makefile
+	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
 	src/libs/Makefile
@@ -1624,6 +1641,7 @@ AC_OUTPUT([
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxipcservice/Makefile
+	src/libs/zbxhistory/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile

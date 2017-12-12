@@ -471,7 +471,7 @@ function getMenuPopupRefresh(options) {
 	});
 
 	return [{
-		label: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
+		label: options.multiplier ? t('Refresh interval multiplier') : t('Refresh interval'),
 		items: items
 	}];
 }
@@ -723,15 +723,11 @@ function getMenuPopupTriggerLog(options) {
 	items[items.length] = {
 		label: t('Create trigger'),
 		clickCallback: function() {
-			openWinCentered(
-				'tr_logform.php?sform=1&itemid=' + options.itemid,
-				'TriggerLog',
-				1000,
-				700,
-				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
-			);
-
 			jQuery(this).closest('.action-menu').fadeOut(100);
+
+			return PopUp('popup.triggerwizard', {
+				itemid: options.itemid
+			});
 		}
 	};
 
@@ -747,15 +743,12 @@ function getMenuPopupTriggerLog(options) {
 			triggers[triggers.length] = {
 				label: trigger.name,
 				clickCallback: function() {
-					openWinCentered(
-						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
-						'TriggerLog',
-						1000,
-						700,
-						'titlebar=no, resizable=yes, scrollbars=yes'
-					);
-
 					jQuery(this).closest('.action-menu').fadeOut(100);
+
+					return PopUp('popup.triggerwizard', {
+						itemid: options.itemid,
+						triggerid: trigger.id
+					});
 				}
 			};
 		});

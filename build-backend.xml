@@ -36,6 +36,11 @@
 
 	<!-- Cppcheck static analysis target -->
 	<target name="cppcheck-static-analysis">
+		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="scan-build" failonerror="on">
+			<arg line="./configure"/>
+			<arg line="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent --with-ldap --with-libcurl"/>
+		</exec>
 		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">
 			<arg line="--enable=all"/>
 			<arg line="-j4"/>
@@ -53,30 +58,38 @@
 	</target>
 
 	<!-- Clang Static Analyzer target with various configuration parameters -->
-	<target name="clang-static-analyzer" depends="init,init-conf-options">
+	<target name="clang-static-analyzer" depends="init-conf-options">
 		<delete dir="clang-scan-build-reports"/>
+		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
-		<for list="${conf.list}" param="name" delimiter=",">
-			<sequential>
+<!--		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>-->
 				<exec executable="scan-build" failonerror="on">
 					<arg line="./configure"/>
-					<arg line="${@{name}}"/>
+<!--					<arg line="${@{name}}"/>-->
+					<arg line="--enable-agent"/>
 				</exec>
-				<exec executable="make" failonerror="on">
-					<arg line="-s"/>
-					<arg line="-j5"/>
-					<arg line="clean"/>
-				</exec>
-				<exec executable="scan-build" failonerror="on">
-					<arg line="-o"/>
-					<arg line="./clang-scan-build-reports"/>
-					<arg line="make"/>
-					<arg line="-s"/>
-					<arg line="-j5"/>
-				</exec>
-			</sequential>
-		</for>
+				<trycatch>
+					<try>
+						<exec executable="scan-build" failonerror="on">
+							<arg line="-o"/>
+							<arg line="./clang-scan-build-reports"/>
+							<arg line="make"/>
+							<arg line="-s"/>
+							<arg line="-j5"/>
+						</exec>
+					</try>
+					<finally>
+						<exec executable="make" failonerror="on">
+							<arg line="-s"/>
+							<arg line="-j5"/>
+							<arg line="clean"/>
+						</exec>
+					</finally>
+				</trycatch>
+<!--			</sequential>
+		</for>-->
 	</target>
 
 	<!-- Static analysis container target -->
@@ -98,6 +111,7 @@
 		<attribute name="args"/>
 		<attribute name="cc" default="gcc"/>
 		<attribute name="target" default=""/>
+		<attribute name="post-action" default=""/>
 		<sequential>
 			<!-- initialize cflags depending on used compiler -->
 			<local name="common.cflags"/>
@@ -122,16 +136,30 @@
 				<arg line="--prefix=$(pwd)/install"/>
 				<arg line="CFLAGS=&quot;${common.cflags} ${cc.cflags}&quot;"/>
 			</exec>
-			<exec executable="make" failonerror="on">
-				<arg line="-s"/>
-				<arg line="-j5"/>
-				<arg line="clean"/>
-			</exec>
-			<exec executable="make" failonerror="on">
-				<arg line="-s"/>
-				<arg line="-j5"/>
-				<arg line="@{target}"/>
-			</exec>
+			<trycatch>
+				<try>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="@{target}"/>
+					</exec>
+					<if>
+						<not >
+							<equals arg1="@{post-action}" arg2=""/>
+						</not>
+						<then>
+							<antcall target="@{post-action}"/>
+						</then>
+					</if>
+				</try>
+				<finally>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="clean"/>
+					</exec>
+				</finally>
+			</trycatch>
 		</sequential>
 	</macrodef>
 
@@ -205,6 +233,9 @@
 			</sequential>
 		</for>
 	</target>
+	
+	<!-- Target "make-gcc" cannot have "init" dependency because it brakes "build-dist" -->
+	<target name="init-make-gcc" depends="init,make-gcc"/>
 
 	<target name="make-clang">
 		<!-- Build Zabbix with clang -->
@@ -212,18 +243,18 @@
 			<make cc="clang" args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
+	
+	<target name="make-db-mysql" unless="${with.mysql}">
+		<!-- Build Zabbix with postgresql database -->
+		<sequential>
+			<make args="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
+		</sequential>
+	</target>
 
 	<target name="make-db-postgresql" unless="${with.postgresql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
 			<make args="--enable-server --enable-agent --enable-proxy --with-postgresql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		</sequential>
-	</target>
-
-	<target name="make-db-mysql" unless="${with.mysql}">
-		<!-- Build Zabbix with postgresql database -->
-		<sequential>
-			<make args="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
 
@@ -243,17 +274,30 @@
 
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
-
-	<target name="unit-test" depends="init">
-		<!-- Build Zabbix with C unit tests -->
+	
+	<target name="mock-tests" depends="init">
+		<!-- Build Zabbix server and proxy with C mock tests -->
 		<sequential>
-			<make args="--enable-server --with-mysql --with-libxml2" target="test"/>
+			<make args="--enable-server --enable-proxy --with-mysql --with-libxml2" target="tests"/>
+		</sequential>
+	</target>
+	
+	<target name="run-unit-test">
+		<!-- Run C unit tests -->
+		<sequential>
 			<exec executable="src/zabbix_server/zabbix_server" failonerror="on">
 				<arg line="-t"/>
 				<arg line="-obackend"/>
 			</exec>
 		</sequential>
 	</target>
+	
+	<target name="unit-test" depends="init">
+		<!-- Build Zabbix with C unit tests -->
+		<make args="--enable-server --with-mysql --with-libxml2" target="test" post-action="run-unit-test"/>
+	</target>
+	
+	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
 	<target name="make-dist" depends="init">
 		<!-- Create & build Zabbix distribution -->
@@ -273,8 +317,6 @@
 			<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true" />
 		</sequential>
 	</target>
-
-	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
 	<target name="build" depends="init,make-clang,make-dist"/>
 </project>

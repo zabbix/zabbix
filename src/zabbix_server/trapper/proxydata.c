@@ -104,6 +104,8 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	zbx_proxy_update_version(&proxy, jp);
 
+	update_proxy_lastaccess(proxy.hostid, time(NULL));
+
 	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
@@ -321,14 +323,12 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-void	init_proxy_history_lock(void)
+int	init_proxy_history_lock(char **error)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE) &&
-			FAIL == zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, NULL))
-	{
-		zbx_error("Unable to create mutex for passive proxy history");
-		exit(EXIT_FAILURE);
-	}
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+		return zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, error);
+
+	return SUCCEED;
 }
 
 void	free_proxy_history_lock(void)

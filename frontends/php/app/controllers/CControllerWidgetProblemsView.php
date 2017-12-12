@@ -44,8 +44,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'groupids' => getSubGroups($fields['groupids']),
 			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
 			'hostids' => $fields['hostids'],
-			'problem' => $fields['problem'],
+			'name' => $fields['problem'],
 			'severities' => $fields['severities'],
+			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
 			'maintenance' => $fields['maintenance'],
 			'unacknowledged' => $fields['unacknowledged']
@@ -125,10 +126,10 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				return ['host', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_NAME_ASC:
-				return ['problem', ZBX_SORT_UP];
+				return ['name', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_NAME_DESC:
-				return ['problem', ZBX_SORT_DOWN];
+				return ['name', ZBX_SORT_DOWN];
 		}
 	}
 }

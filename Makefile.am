@@ -34,30 +34,38 @@ dist-hook:
 	rm -f $(top_distdir)/sass/*.html
 	rm -rf $(top_distdir)/sass/img_source
 
+if DBSCHEMA
 dbschema_ibm_db2:
-	create/bin/gen_data.pl ibm_db2 > database/ibm_db2/data.sql
-	create/bin/gen_schema.pl ibm_db2 > database/ibm_db2/schema.sql
+	cd database/ibm_db2 && \
+	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_mysql:
-	create/bin/gen_data.pl mysql > database/mysql/data.sql
-	create/bin/gen_schema.pl mysql > database/mysql/schema.sql
+	cd database/mysql && \
+	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_oracle:
-	create/bin/gen_data.pl oracle > database/oracle/data.sql
-	create/bin/gen_schema.pl oracle > database/oracle/schema.sql
+	cd database/oracle && \
+	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_postgresql:
-	create/bin/gen_data.pl postgresql > database/postgresql/data.sql
-	create/bin/gen_schema.pl postgresql > database/postgresql/schema.sql
+	cd database/postgresql && \
+	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_sqlite3:
-	create/bin/gen_data.pl sqlite3 > database/sqlite3/data.sql
-	create/bin/gen_schema.pl sqlite3 > database/sqlite3/schema.sql
+	cd database/sqlite3 && \
+	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_c:
-	create/bin/gen_schema.pl c > src/libs/zbxdbhigh/dbschema.c
+	cd src/libs/zbxdbhigh && \
+	$(MAKE) $(AM_MAKEFLAGS) dbschema.c
 
 dbschema: dbschema_ibm_db2 dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_sqlite3 dbschema_c
+endif
 
 gettext:
 	frontends/php/locale/make_mo.sh
@@ -70,6 +78,14 @@ css_theme_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
 	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
 
+css_hc_light:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-light.scss frontends/php/styles/hc-light.css
+	cp frontends/php/styles/hc-light.css sass/stylesheets/hc-light.css
+
+css_hc_dark:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-dark.scss frontends/php/styles/hc-dark.css
+	cp frontends/php/styles/hc-dark.css sass/stylesheets/hc-dark.css
+
 css_icons:
 	cp sass/img/icon-sprite.svg frontends/php/img/
 	cp sass/img/browser-sprite.png frontends/php/img/
@@ -81,7 +97,7 @@ css_icons:
 	cp sass/touch-icon-192x192.png frontends/php/img/
 	cp sass/favicon.ico frontends/php/
 
-css: css_theme_blue css_theme_dark css_icons
+css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
 ## CUnit test support
 TESTDIR = src
@@ -89,4 +105,42 @@ TESTDIR = src
 test:
 	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
 
-.PHONY: test
+## cmocka test support
+if ZBXCMOCKA
+WRAP_DB_FUNCS = \
+	-Wl,--wrap=zbx_db_vselect \
+	-Wl,--wrap=zbx_db_fetch \
+	-Wl,--wrap=__zbx_DBexecute \
+	-Wl,--wrap=DBbegin \
+	-Wl,--wrap=DBcommit \
+	-Wl,--wrap=DBexecute_multiple_query \
+	-Wl,--wrap=DBfree_result
+
+WRAP_IO_FUNCS = \
+	-Wl,--wrap=fopen \
+	-Wl,--wrap=fclose \
+	-Wl,--wrap=fgets
+
+WRAP_FS_FUNCS = \
+	-Wl,--wrap=opendir \
+	-Wl,--wrap=readdir \
+	-Wl,--wrap=stat \
+	-Wl,--wrap=__xstat
+
+WRAP_EXIT = \
+	-Wl,--wrap=exit
+
+COMMON_WRAP_FUNCS = \
+	$(WRAP_DB_FUNCS) \
+	$(WRAP_IO_FUNCS) \
+	$(WRAP_FS_FUNCS) \
+	$(WRAP_EXIT)
+
+tests:
+	$(MAKE) $(AM_MAKEFLAGS) && \
+	cd tests && \
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
+	./tests_run.pl
+endif
+
+.PHONY: test tests

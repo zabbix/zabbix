@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha1');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050000);
+define('ZABBIX_DB_VERSION',		3050028);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -40,6 +40,13 @@ define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 // the maximum period to display history data for the latest data and item overview pages in seconds
 // by default set to 86400 seconds (24 hours)
 define('ZBX_HISTORY_PERIOD', 86400);
+
+define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
+define('ZBX_HISTORY_SOURCE_SQL',		'sql');
+
+define('ELASTICSEARCH_RESPONSE_PLAIN',			0);
+define('ELASTICSEARCH_RESPONSE_AGGREGATION',	1);
+define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
 define('ZBX_WIDGET_ROWS', 20);
 
@@ -111,6 +118,8 @@ define('ZBX_SHOW_SQL_ERRORS',	true);
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
+define('ZBX_SHOW_TECHNICAL_ERRORS', false);
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_XML',					2);
@@ -145,6 +154,7 @@ define('O_NO',		2);
 
 define('P_SYS',					0x0001);
 define('P_UNSET_EMPTY',			0x0002);
+define('P_CRLF',				0x0004);
 define('P_ACT',					0x0010);
 define('P_NZERO',				0x0020);
 define('P_NO_TRIM',				0x0040);
@@ -851,6 +861,12 @@ define('EVENT_OBJECT_AUTOREGHOST',		3);
 define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 
+// Problem and event tag constants.
+define('TAG_EVAL_TYPE_AND',		0);
+define('TAG_EVAL_TYPE_OR',		1);
+define('TAG_OPERATOR_LIKE',		0);
+define('TAG_OPERATOR_EQUAL',	1);
+
 define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
 define('GRAPH_YAXIS_TYPE_FIXED',		1);
 define('GRAPH_YAXIS_TYPE_ITEM_VALUE',	2);
@@ -1272,7 +1288,6 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
-define('ZBX_STYLE_ACTIVE_BG', 'active-bg');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ARTICLE', 'article');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
@@ -1464,6 +1479,7 @@ define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
 define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
+define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
@@ -1500,3 +1516,15 @@ if (function_exists('bcscale')) {
 
 // Maximum number of tags to display in events list.
 define('EVENTS_LIST_TAGS_COUNT', 3);
+
+// HTTP headers
+/*
+ * Value of HTTP X-Frame-options header.
+ *
+ * Supported options:
+ *  - SAMEORIGIN (string) - compatible with rfc7034.
+ *  - DENY (string) - compatible with rfc7034.
+ *  - a list (string) of comma-separated hostnames. If hostname is not between allowed, the SAMEORIGIN option is used.
+ *  - null - disable X-Frame-options header.
+ */
+define('X_FRAME_OPTIONS', 'SAMEORIGIN');

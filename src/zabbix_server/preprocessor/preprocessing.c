@@ -55,7 +55,7 @@ static int			cached_values	= 0;
  * Parameters: message - [OUT] IPC message, can be NULL for buffer size       *
  *                             calculations                                   *
  *             fields  - [IN]  the definition of data to be packed            *
- *             result  - [IN]  field count                                    *
+ *             count   - [IN]  field count                                    *
  *                                                                            *
  * Return value: size of packed data                                          *
  *                                                                            *
@@ -596,11 +596,11 @@ void	zbx_preprocessor_unpack_result(zbx_variant_t *value, zbx_item_history_value
  *                                                                            *
  * Purpose: sends command to preprocessor manager                             *
  *                                                                            *
- * Parameters: code     - [IN] message code                                  *
- *             data     - [IN] message data                                  *
- *             size     - [IN] message data size                             *
- *             response - [OUT] response message (can be NULL if response is *
- *                              not requested)                               *
+ * Parameters: code     - [IN] message code                                   *
+ *             data     - [IN] message data                                   *
+ *             size     - [IN] message data size                              *
+ *             response - [OUT] response message (can be NULL if response is  *
+ *                              not requested)                                *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size,

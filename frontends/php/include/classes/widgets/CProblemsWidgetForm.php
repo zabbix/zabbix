@@ -25,7 +25,7 @@
 class CProblemsWidgetForm extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data);
+		parent::__construct($data, WIDGET_PROBLEMS);
 
 		$this->data = self::convertDottedKeys($this->data);
 
@@ -83,8 +83,22 @@ class CProblemsWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_severities;
 
-		// tags
-		$field_tags = new CWidgetFieldTags('tags', _('Tags'));
+		// Tag evalype (AND/OR).
+		$field_evaltype = (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+			TAG_EVAL_TYPE_AND => _('AND'),
+			TAG_EVAL_TYPE_OR => _('OR')
+		]))
+			->setDefault(TAG_EVAL_TYPE_AND)
+			->setModern(true);
+
+		if (array_key_exists('evaltype', $this->data)) {
+			$field_evaltype->setValue($this->data['evaltype']);
+		}
+
+		$this->fields[] = $field_evaltype;
+
+		// Tags array: tag, operator and value. No label, because it belongs to previous group.
+		$field_tags = new CWidgetFieldTags('tags', '');
 
 		if (array_key_exists('tags', $this->data)) {
 			$field_tags->setValue($this->data['tags']);

@@ -93,7 +93,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataEvents(array $options) {
 		return API::Event()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns'],
+			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
@@ -125,7 +125,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataProblems(array $options) {
 		return API::Problem()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns'],
+			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'sortfield' => ['eventid'],
@@ -150,7 +150,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param string $filter['inventory'][]['field']
 	 * @param string $filter['inventory'][]['value']
 	 * @param string $filter['application']           (optional)
-	 * @param string $filter['problem']               (optional)
+	 * @param string $filter['name']				  (optional)
 	 * @param int    $filter['show']                  TRIGGERS_OPTION_*
 	 * @param int    $filter['stime']                 (optional) usable together with 'period' and only for
 	 *                                                           TRIGGERS_OPTION_ALL
@@ -241,19 +241,7 @@ class CScreenProblem extends CScreenBase {
 			$filter_hostids = null;
 		}
 
-		if (array_key_exists('problem', $filter) && $filter['problem'] !== '') {
-			$triggerids = array_keys(API::Trigger()->get([
-				'output' => [],
-				'groupids' => $filter_groupids,
-				'hostids' => $filter_hostids,
-				'applicationids' => $filter_applicationids,
-				'search' => ['description' => $filter['problem']],
-				'preservekeys' => true
-			]));
-
-			$filter_triggerids = ($filter_triggerids !== null)
-				? array_intersect($filter_triggerids, $triggerids)
-				: $triggerids;
+		if (array_key_exists('name', $filter) && $filter['name'] !== '') {
 			$filter_groupids = null;
 			$filter_hostids = null;
 			$filter_applicationids = null;
@@ -276,6 +264,11 @@ class CScreenProblem extends CScreenBase {
 				'eventid_till' => $eventid_till,
 				'limit' => $config['search_limit'] + 1
 			];
+
+			if (array_key_exists('name', $filter) && $filter['name'] !== '') {
+				$options['search']['name'] = $filter['name'];
+			}
+
 			if ($filter['show'] == TRIGGERS_OPTION_ALL) {
 				if (array_key_exists('stime', $filter) && array_key_exists('period', $filter)) {
 					$options['time_from'] = $filter['stime'];
@@ -304,6 +297,9 @@ class CScreenProblem extends CScreenBase {
 					&& $config['event_ack_enable']) {
 				$options['acknowledged'] = false;
 			}
+			if (array_key_exists('evaltype', $filter)) {
+				$options['evaltype'] = $filter['evaltype'];
+			}
 			if (array_key_exists('tags', $filter) && $filter['tags']) {
 				$options['tags'] = $filter['tags'];
 			}
@@ -328,9 +324,7 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression',
-							'priority', 'url', 'flags'
-						],
+						'output' => ['priority', 'url', 'flags', 'expression'],
 						'selectHosts' => ['hostid', 'name', 'status'],
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 						'triggerids' => array_keys($triggerids),
@@ -338,6 +332,10 @@ class CScreenProblem extends CScreenBase {
 						'skipDependent' => true,
 						'preservekeys' => true
 					];
+
+					if (array_key_exists('details', $filter) && $filter['details'] == 1) {
+						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
+					}
 					if ($get_comments) {
 						$options['output'][] = 'comments';
 					}
@@ -417,14 +415,9 @@ class CScreenProblem extends CScreenBase {
 				];
 				break;
 
-			case 'problem':
-				foreach ($data['problems'] as &$problem) {
-					$problem['description'] = $data['triggers'][$problem['objectid']]['description'];
-				}
-				unset($problem);
-
+			case 'name':
 				$sort_fields = [
-					['field' => 'description', 'order' => $sortorder],
+					['field' => 'name', 'order' => $sortorder],
 					['field' => 'objectid', 'order' => $sortorder],
 					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
 					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
@@ -758,7 +751,7 @@ class CScreenProblem extends CScreenBase {
 					_('Status'),
 					_('Info'),
 					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
-					make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder'], $link),
+					make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
 					_('Duration'),
 					$this->config['event_ack_enable'] ? _('Ack') : null,
 					_('Actions'),
@@ -855,9 +848,7 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$description = [
-					(new CSpan(CMacrosResolverHelper::resolveEventDescription(
-						$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-					)))
+					(new CSpan($problem['name']))
 						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
 						->addClass(ZBX_STYLE_LINK_ACTION)
 				];
@@ -979,9 +970,7 @@ class CScreenProblem extends CScreenBase {
 						: '',
 					$value_str,
 					implode(', ', $hosts),
-					CMacrosResolverHelper::resolveEventDescription(
-						$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-					),
+					$problem['name'],
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),

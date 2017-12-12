@@ -75,8 +75,13 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'hostGroup',
 			'data' => $data['captions']['ms']['groups'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
-					'&srcfld1=groupid&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => $field->getName().'_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
+				]
 			],
 			'add_post_js' => false
 		]))
@@ -97,8 +102,13 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'hosts',
 			'data' => $data['captions']['ms']['hosts'][$field->getName()],
 			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1='.$field->getName().'_'.
-					'&srcfld1=hostid&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'hosts',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => $field->getName().'_',
+					'srcfld1' => 'hostid',
+					'multiselect' => '1'
+				]
 			],
 			'add_post_js' => false
 		]))
@@ -136,7 +146,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('javascript: return PopUp("'.$field->getPopupUrl().'&dstfrm='.$form->getName().'");')
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson($field->getPopupOptions($form->getName())).');')
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {
@@ -190,7 +201,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$tags = $field->getValue();
 
 		if (!$tags) {
-			$tags = [['tag' => '', 'value' => '']];
+			$tags = [['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']];
 		}
 
 		$tags_table = (new CTable())->setId('tags_table');
@@ -202,6 +213,10 @@ foreach ($data['dialogue']['fields'] as $field) {
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired($aria_required),
+				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
+					->addValue(_('Like'), TAG_OPERATOR_LIKE)
+					->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+					->setModern(true),
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -233,6 +248,10 @@ foreach ($data['dialogue']['fields'] as $field) {
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAriaRequired($aria_required),
+			(new CRadioButtonList($field->getName().'[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
+				->addValue(_('Like'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
 			(new CTextBox($field->getName().'[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -246,7 +265,10 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->addClass('form_row')
 			->toString();
 
-		$js_scripts[] = 'jQuery("#tags_table").dynamicRows({template: "#tag-row"});';
+		// Add dynamic row script and fix the distance between AND/OR buttons and tag inputs below them.
+		$js_scripts[] = 'var tags_table = jQuery("#tags_table");'.
+			'tags_table.dynamicRows({template: "#tag-row"});'.
+			'tags_table.parent().addClass("has-before");';
 	}
 }
 

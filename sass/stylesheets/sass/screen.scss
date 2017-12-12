@@ -461,8 +461,8 @@ ul.top-nav-icons {
 
 	&.selected {
 		color: $link-main-subnav-active-color;
-		padding: 8px 0 5px 0;
-		border-bottom: 3px solid lighten($main-subnav-bg-color, 20%);
+		padding: 8px 0 4px 0;
+		border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
 	}
 }
 
@@ -1517,6 +1517,10 @@ footer {
 		vertical-align: middle;
 		width: 85%;
 
+		&.has-before {
+			padding-top: 0px;
+		}
+
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
@@ -1643,6 +1647,8 @@ footer {
 		padding: 4px 11px;
 		border: 1px solid $form-border-color;
 		@include transition(background-color .2s ease-out);
+		line-height: 1.2em;
+		display: inline-block;
 	}
 
 	input[type="radio"] {
@@ -3238,10 +3244,7 @@ $form-icon-btn: (
 
 	&.modal {
 		position: fixed;
-		top: 50%;
-		left: 50%;
 		overflow: hidden;
-		@include transform(translate(-50%, -50%));
 
 		.overlay-dialogue-body {
 			overflow: auto;
@@ -3249,6 +3252,15 @@ $form-icon-btn: (
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
 			margin: 0 0 10px 0;
+		}
+		.overlay-dialogue-controls {
+			text-align: right;
+			padding: 0px 0px 10px 0px;
+
+			li {
+				display: inline;
+				padding-left: 10px;
+			}
 		}
 		& > .overlay-close-btn {
 			position: relative;
@@ -3258,7 +3270,13 @@ $form-icon-btn: (
 		}
 	}
 
+	&.modal-popup {
+		max-width: 1024px;
+		min-width: 650px;
+	}
+
 	.list-table {
+		white-space: normal;
 		border: none;
 
 		th {
@@ -3921,6 +3939,11 @@ a.teal {
 		}
 	}
 }
+
+.na-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.na-bg {
 	border-left: none;
 
@@ -3933,6 +3956,7 @@ td.na-bg {
 	color: darken($alt-blue-grey,45%);
 	background-color: $alt-blue-grey;
 }
+
 td.log-na-bg {
 	@extend td.na-bg;
 }
@@ -3941,18 +3965,13 @@ td.log-na-bg {
 	color: darken($alt-green,45%);
 	@extend .green-bg;
 }
+
+.normal-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.normal-bg {
 	@extend td.na-bg;
-}
-
-.active-bg {
-	color: darken($alt-green,45%);
-	@extend .green-bg;
-}
-
-td.active-bg {
-	color: darken($alt-green,45%);
-	@extend .active-bg;
 }
 
 .info-bg {
@@ -3964,6 +3983,11 @@ td.active-bg {
 		}
 	}
 }
+
+.info-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.info-bg {
 	@extend td.na-bg;
 }
@@ -3985,6 +4009,11 @@ td.log-info-bg {
 		}
 	}
 }
+
+.average-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -3998,6 +4027,11 @@ td.average-bg {
 		}
 	}
 }
+
+.warning-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.warning-bg {
 	@extend td.na-bg;
 }
@@ -4020,6 +4054,11 @@ td.log-warning-bg {
 		}
 	}
 }
+
+.high-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.high-bg {
 	@extend td.na-bg;
 }
@@ -4041,6 +4080,11 @@ td.log-high-bg {
 		}
 	}
 }
+
+.disaster-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.disaster-bg {
 	@extend td.na-bg;
 }
@@ -4067,13 +4111,24 @@ td.inactive-bg {
 }
 
 .msg-good {
-	color: darken(desaturate($green, 10%), 20%);
-	border: 1px solid $light-green;
-	background-color: $lighter-green;
+	color: $font-color;
+	border: 2px solid $light-green;
+	background-color: $ui-bg-color;
+	text-align: left;
+
 	@extend %msg;
 
 	.link-action {
 		color: darken(desaturate($green, 10%), 20%);
+		margin-right: 10px;
+		font-size: $font-msg-reset-size;
+
+		.arrow-up {
+			border-bottom-color: darken(desaturate($green, 10%), 20%);
+		}
+		.arrow-down {
+			border-top-color: darken(desaturate($green, 10%), 20%);
+		}
 	}
 
 	.overlay-close-btn {
@@ -4091,14 +4146,48 @@ td.inactive-bg {
 	}
 }
 
+.msg-good:before {
+	content: "";
+	background-color: $light-green;
+	float: left;
+	width: 61px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	position: absolute;
+}
+
+.msg-good:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
+	width: 27px;
+	height: 25px;
+	top: 0;
+	left: 0;
+	position: absolute;
+	margin-left: 16px;
+	margin-top: 2px;
+}
+
 .msg-bad {
-	color: darken(desaturate($red, 10%), 20%);
-	border: 1px solid $light-red;
-	background-color: $lighter-red;
+	color: $font-color;
+	border: 2px solid $light-red;
+	background-color: $ui-bg-color;
+	text-align: left;
+
 	@extend %msg;
 
 	.link-action {
 		color: darken(desaturate($red, 10%), 20%);
+		margin-right: 10px;
+		font-size: $font-msg-reset-size;
+
+		.arrow-up {
+			border-bottom-color: darken(desaturate($red, 10%), 20%);
+		}
+		.arrow-down {
+			border-top-color: darken(desaturate($red, 10%), 20%);
+		}
 	}
 
 	.overlay-close-btn {
@@ -4116,9 +4205,33 @@ td.inactive-bg {
 	}
 }
 
+.msg-bad:before {
+	content: "";
+	background-color: $light-red;
+	float: left;
+	width: 61px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	position: absolute;
+}
+
+.msg-bad:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+	width: 27px;
+	height: 25px;
+	top: 0;
+	left: 0;
+	position: absolute;
+	margin-left: 16px;
+	margin-top: 2px;
+}
+
 .msg-details {
 	font-size: $font-form-size;
 	text-align: left;
+	font-weight: normal;
 
 	.link-action {
 		position: absolute;
@@ -4135,7 +4248,7 @@ td.inactive-bg {
 		@extend %webkit-scrollbar;
 
 		li {
-			margin: .5em 0 .5em 1em;
+			margin: 0 0 0 1em;
 
 			&::before {
 				content: '\2013';
@@ -4152,6 +4265,7 @@ td.inactive-bg {
 			margin: 8px 0 0 0;
 			border-top-width: 1px;
 			border-top-style: dashed;
+			padding-top: 0.5em;
 		}
 	}
 }
@@ -4167,10 +4281,11 @@ td.inactive-bg {
 
 %msg {
 	font-size: $font-top-nav-size;
-	padding: 7px 20px 7px 15px;
-	margin: 0 0 12px 0;
-	text-align: center;
+	padding: 6px 10px 6px 75px;
+	text-align: left;
+	vertical-align: middle;
 	position: relative;
+	margin-bottom: 10px;
 	@include border-radius(2px);
 
 	.overlay-close-btn {
@@ -4181,14 +4296,41 @@ td.inactive-bg {
 .msg-bad-global {
 	display: none;
 	position: fixed;
-	bottom: 0;
 	z-index: 10000;
-	width: 100%;
-	padding: 5px 5px;
-	text-align: center;
-	color: darken($alt-yellow,50%);
+	text-align: left;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	vertical-align: middle;
+	font-size: $font-top-nav-size;
+	color: $font-color;
+	border: 2px solid $alt-yellow;
+	background-color: $ui-bg-color;
+	margin: 0 10px 0 10px;
+	padding: 6px 10px 6px 75px;
+}
+
+.msg-bad-global:before {
+	content: "";
 	background-color: $alt-yellow;
-	border-top: 1px solid darken($alt-yellow,5%);
+	float: left;
+	width: 61px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	position: absolute;
+}
+
+.msg-bad-global:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+	width: 27px;
+	height: 25px;
+	top: 0;
+	left: 0;
+	position: absolute;
+	margin-left: 16px;
+	margin-top: 2px;
 }
 
 .msg-global {
@@ -4451,7 +4593,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar-thumb {
 		background-color: $scrollbar-thumb-color;
-		border: 1px solid darken($scrollbar-thumb-color,5%);
+		border: 1px solid darken($scrollbar-thumb-color, $scrollbar-thumb-color-darken);
 	}
 }
 
@@ -4570,6 +4712,10 @@ tr.cursor-move {
 
 .clock-lines {
 	fill: $clock-lines-color;
+}
+
+svg {
+	overflow: hidden;
 }
 
 .sysmap {
@@ -4835,19 +4981,14 @@ tr.cursor-move {
 			}
 
 			&.ui-sortable-helper {
-				background: #f7f7f7;
-				border-color: #d7dadc;
+				background: $ui-sortable-helper-background-color;
+				border-color: $ui-sortable-helper-border-color;
 				border-width: 1px;
 				border-style: solid;
 
 				.tools {
 					display: none;
 				}
-			}
-
-			&.sortable-error {
-				border-color: transparent;
-				background: #fbe3e4;
 			}
 
 			&.opened > ul {
@@ -4857,28 +4998,24 @@ tr.cursor-move {
 			&.closed > ul {
 				display: none;
 			}
+
+			.sortable-error {
+				border-color: transparent;
+				background: rgba($red, 0.2);
+			}
 		}
 
-		.highliglted-parent > .tree-row {
-			background: #f9f9f9;
-		}
-
-		.sortable-item-placeholder {
-			background: #f5f5f5;
-			height: 33px;
+		.highlighted-parent > .tree-row {
+			background: $ui-highlighted-parent-background-color;
 		}
 
 		.placeholder {
-			background-color: #ebeef0;
+			background-color: $ui-placeholder-background-color;
 			-webkit-animation: fadein .5s;
 			-moz-animation: fadein .5s;
 			-ms-animation: fadein .5s;
 			-o-animation: fadein .5s;
 			animation: fadein .5s;
-		}
-
-		.drop-hover > .row {
-			background: #faebd7;
 		}
 	}
 }

@@ -48,7 +48,7 @@ if (!check_fields($fields)) {
 }
 
 $items = getRequest('items', []);
-asort_by_key($items, 'sortorder');
+CArrayHelper::sort($items, ['sortorder']);
 
 /*
  * Permissions

@@ -429,7 +429,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
  ******************************************************************************/
 #ifdef HAVE_IPV6
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -497,7 +497,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 			goto out;
 		}
 
-		if (ZBX_PROTO_ERROR == bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
+		if (ZBX_PROTO_ERROR == zbx_bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
 		{
 			zbx_set_socket_strerror("bind() failed: %s", strerror_from_system(zbx_socket_last_error()));
 			func_socket_close(s);
@@ -505,7 +505,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		}
 	}
 
-	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, ai->ai_addrlen, timeout, &error))
+	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, (socklen_t)ai->ai_addrlen, timeout, &error))
 	{
 		func_socket_close(s);
 		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
@@ -540,7 +540,7 @@ out:
 }
 #else
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
@@ -648,7 +648,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #endif	/* HAVE_IPV6 */
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	if (ZBX_TCP_SEC_UNENCRYPTED != tls_connect && ZBX_TCP_SEC_TLS_CERT != tls_connect &&
 			ZBX_TCP_SEC_TLS_PSK != tls_connect)
@@ -982,7 +982,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 						strerror_from_system(zbx_socket_last_error()));
 			}
 #endif
-			if (ZBX_PROTO_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr,
+			if (ZBX_PROTO_ERROR == zbx_bind(s->sockets[s->num_socks], current_ai->ai_addr,
 					current_ai->ai_addrlen))
 			{
 				zbx_set_socket_strerror("bind() for [[%s]:%s] failed: %s",
@@ -1446,7 +1446,7 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 		}
 		else
 		{
-			if (0 != (left = MIN(ZBX_TCP_LINE_LEN - s->read_bytes, ptr - buffer)))
+			if (0 != (left = MIN(ZBX_TCP_LINE_LEN - s->read_bytes, (size_t)(ptr - buffer))))
 			{
 				/* fill the string to the defined limit */
 				zbx_strncpy_alloc(&s->buffer, &alloc, &offset, buffer, left);
@@ -2021,7 +2021,7 @@ int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
 
-	if (ZBX_PROTO_ERROR == sendto(s->socket, data, data_len, 0, NULL, 0))
+	if (ZBX_PROTO_ERROR == zbx_sendto(s->socket, data, data_len, 0, NULL, 0))
 	{
 		zbx_set_socket_strerror("sendto() failed: %s", strerror_from_system(zbx_socket_last_error()));
 		ret = FAIL;
