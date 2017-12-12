@@ -27,6 +27,8 @@
 
 #ifndef HAVE_SQLITE3
 
+extern unsigned char program_type;
+
 static int	DBpatch_3050000(void)
 {
 	const ZBX_FIELD	field = {"proxy_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -73,24 +75,6 @@ clean:
 	DBfree_result(result);
 
 	return ret;
-}
-
-static int	DBpatch_3050002(void)
-{
-	const ZBX_FIELD field = {"colorpalette", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBadd_field("graph_theme", &field);
-}
-
-static int	DBpatch_3050003(void)
-{
-	const char	*colorpalette = "1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,"
-			"5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4";
-
-	if (ZBX_DB_OK > DBexecute("update graph_theme set colorpalette='%s'", colorpalette))
-		return FAIL;
-
-	return SUCCEED;
 }
 
 static int	DBpatch_3050004(void)
@@ -292,6 +276,115 @@ static int	DBpatch_3050017(void)
 
 	return DBmodify_field_type("dservices", &field, NULL);
 }
+
+static int	DBpatch_3050018(void)
+{
+	return DBdrop_table("graph_theme");
+}
+
+static int	DBpatch_3050019(void)
+{
+	const ZBX_TABLE table =
+		{"graph_theme",	"graphthemeid",	0,
+			{
+				{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"backgroundcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"graphcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"maingridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridbordercolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"textcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"highlightcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"leftpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"rightpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"nonworktimecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"colorpalette", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050020(void)
+{
+	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
+}
+
+#define ZBX_COLORPALETTE_LIGHT	"1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,"	\
+				"5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4"
+#define ZBX_COLORPALETTE_DARK	"199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,"	\
+				"AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4"
+
+static int	DBpatch_3050021(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (1,'blue-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33','E33734',"
+				"'429E47','E33734','EBEBEB','" ZBX_COLORPALETTE_LIGHT "')"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_3050022(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (2,'dark-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2','E45959',"
+				"'59DB8F','E45959','333333','" ZBX_COLORPALETTE_DARK "')"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_3050023(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (3,'hc-light','FFFFFF','FFFFFF','555555','000000','333333','000000','333333',"
+				"'000000','000000','EBEBEB','" ZBX_COLORPALETTE_LIGHT "')"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_3050024(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (4,'hc-dark','000000','000000','666666','888888','4F4F4F','FFFFFF','FFFFFF',"
+				"'FFFFFF','FFFFFF','333333','" ZBX_COLORPALETTE_DARK "')"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+#undef ZBX_COLORPALETTE_LIGHT
+#undef ZBX_COLORPALETTE_DARK
+
 #endif
 
 DBPATCH_START(3050)
@@ -300,8 +393,6 @@ DBPATCH_START(3050)
 
 DBPATCH_ADD(3050000, 0, 1)
 DBPATCH_ADD(3050001, 0, 1)
-DBPATCH_ADD(3050002, 0, 1)
-DBPATCH_ADD(3050003, 0, 1)
 DBPATCH_ADD(3050004, 0, 1)
 DBPATCH_ADD(3050005, 0, 1)
 DBPATCH_ADD(3050006, 0, 1)
@@ -316,5 +407,12 @@ DBPATCH_ADD(3050014, 0, 1)
 DBPATCH_ADD(3050015, 0, 1)
 DBPATCH_ADD(3050016, 0, 1)
 DBPATCH_ADD(3050017, 0, 1)
+DBPATCH_ADD(3050018, 0, 1)
+DBPATCH_ADD(3050019, 0, 1)
+DBPATCH_ADD(3050020, 0, 1)
+DBPATCH_ADD(3050021, 0, 1)
+DBPATCH_ADD(3050022, 0, 1)
+DBPATCH_ADD(3050023, 0, 1)
+DBPATCH_ADD(3050024, 0, 1)
 
 DBPATCH_END()
