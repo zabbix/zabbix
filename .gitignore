@@ -383,7 +383,6 @@ tests/libs/zbxdbhigh/Makefile.in
 tests/libs/zbxsysinfo/.deps
 tests/libs/zbxsysinfo/Makefile
 tests/libs/zbxsysinfo/Makefile.in
-tests/libs/zbxsysinfo/linux/*.o
 tests/libs/zbxsysinfo/linux/.deps
 tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC
 tests/libs/zbxsysinfo/linux/Makefile
