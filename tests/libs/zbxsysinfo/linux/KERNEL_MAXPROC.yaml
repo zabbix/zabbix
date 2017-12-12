@@ -5,7 +5,7 @@ files:
     32768
 out:
   result: '32768'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 ---
 test case: "unsuccessfully read"
 files:
@@ -13,4 +13,4 @@ files:
     
 out:
   result: 'Cannot obtain data from /proc/sys/kernel/pid_max.'
-#return SYSINFO_RET_FAIL;
+  return: 'SYSINFO_RET_FAIL'

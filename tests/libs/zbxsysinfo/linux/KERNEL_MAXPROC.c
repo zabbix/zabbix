@@ -28,27 +28,49 @@ void	zbx_mock_test_entry(void **state)
 	AGENT_REQUEST		request;
 	AGENT_RESULT 		param_result;
 	zbx_mock_error_t	error;
-	zbx_mock_handle_t	expected_param_value_handle;
-	const char		*expected_param_value_string;
+	zbx_mock_handle_t	expected_param_value_handle, expected_return_handle;
+	const char		*expected_param_value_string, *expected_return_string;
 	zbx_uint64_t 		expected_param_value = 0;
 	int			expected_result = FAIL, actual_result = FAIL;
+
 	ZBX_UNUSED(state);
 
-	if (ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("result", &expected_param_value_handle)))
+	if (ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("return", &expected_return_handle)))
 	{
 		fail_msg("Cannot get expected key from test case data: %s", zbx_mock_error_string(error));
 	}
-	else if (ZBX_MOCK_SUCCESS != error || ZBX_MOCK_SUCCESS != (
-		error = zbx_mock_string(expected_param_value_handle, &expected_param_value_string)))
+	else if (ZBX_MOCK_SUCCESS != error || ZBX_MOCK_SUCCESS != (error = zbx_mock_string(expected_return_handle,
+			&expected_return_string)))
 	{
 		fail_msg("Cannot get expected parameters from test case data: %s", zbx_mock_error_string(error));
 	}
 	else
 	{
-		if (FAIL != is_uint64(expected_param_value_string, &expected_param_value))
+		if (0 == strcmp("SYSINFO_RET_OK", expected_return_string))
 			expected_result = SYSINFO_RET_OK;
-		else
+		else if (0 == strcmp("SYSINFO_RET_FAIL", expected_return_string))
 			expected_result = SYSINFO_RET_FAIL;
+		else
+			fail_msg("Get unexpected 'return' parameter from test case data: %s", expected_return_string);
+	}
+
+	if (ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("result", &expected_param_value_handle)))
+	{
+		fail_msg("Cannot get expected key from test case data: %s", zbx_mock_error_string(error));
+	}
+	else if (ZBX_MOCK_SUCCESS != error || ZBX_MOCK_SUCCESS != (error = zbx_mock_string(expected_param_value_handle,
+			&expected_param_value_string)))
+	{
+		fail_msg("Cannot get expected parameters from test case data: %s", zbx_mock_error_string(error));
+	}
+	else
+	{
+		if (FAIL == is_uint64(expected_param_value_string, &expected_param_value) &&
+			SYSINFO_RET_OK == expected_result)
+		{
+			fail_msg("Cannot get expected parameters from test case data: %s",
+					expected_param_value_string);
+		}
 	}
 
 	init_request(&request);
@@ -87,5 +109,4 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	free_request(&request);
-	free_result(&param_result);
 }
