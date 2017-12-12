@@ -78,6 +78,8 @@ int	zbx_vc_init(char **error);
 
 void	zbx_vc_destroy(void);
 
+void	zbx_vc_reset(void);
+
 void	zbx_vc_lock(void);
 
 void	zbx_vc_unlock(void);
