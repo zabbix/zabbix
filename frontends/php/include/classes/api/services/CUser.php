@@ -280,7 +280,7 @@ class CUser extends CApiService {
 			]],
 			'user_medias' =>	['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-				'sendto' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media', 'sendto')],
+				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
@@ -299,7 +299,8 @@ class CUser extends CApiService {
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
 		$this->checkUserGroups($users);
-		$this->checkMediaTypes($users);
+		$db_mediatypes = $this->checkMediaTypes($users);
+		$this->validateMediaRecipients($users, $db_mediatypes);
 	}
 
 	/**
@@ -380,7 +381,7 @@ class CUser extends CApiService {
 			]],
 			'user_medias' =>	['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-				'sendto' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media', 'sendto')],
+				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
@@ -441,7 +442,8 @@ class CUser extends CApiService {
 			$this->checkDuplicates($aliases);
 		}
 		$this->checkUserGroups($users);
-		$this->checkMediaTypes($users);
+		$db_mediatypes = $this->checkMediaTypes($users);
+		$this->validateMediaRecipients($users, $db_mediatypes);
 		$this->checkHimself($users);
 	}
 
@@ -507,10 +509,12 @@ class CUser extends CApiService {
 	/**
 	 * Check for valid media types.
 	 *
-	 * @param array $users
-	 * @param array $users[]['user_medias']  (optional)
+	 * @param array $users                               Array of users.
+	 * @param array $users[]['user_medias']  (optional)  Array of user medias.
 	 *
-	 * @throws APIException  if user media type is not exists.
+	 * @throws APIException if user media type does not exist.
+	 *
+	 * @return array                                     Returns valid media types.
 	 */
 	private function checkMediaTypes(array $users) {
 		$mediatypeids = [];
@@ -524,13 +528,13 @@ class CUser extends CApiService {
 		}
 
 		if (!$mediatypeids) {
-			return;
+			return [];
 		}
 
 		$mediatypeids = array_keys($mediatypeids);
 
 		$db_mediatypes = DB::select('media_type', [
-			'output' => [],
+			'output' => ['mediatypeid', 'type'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
@@ -540,6 +544,66 @@ class CUser extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Media type with ID "%1$s" is not available.', $mediatypeid)
 				);
+			}
+		}
+
+		return $db_mediatypes;
+	}
+
+	/**
+	 * Check if the passed 'sendto' value is a valid input according to the mediatype. Currently validates
+	 * only e-mail media types.
+	 *
+	 * @param array         $users                                    Array of users.
+	 * @param string        $users[]['user_medias'][]['mediatypeid']  Media type ID.
+	 * @param array|string  $users[]['user_medias'][]['sendto']       Address where to send the alert.
+	 * @param array         $db_mediatypes                            List of available media types.
+	 *
+	 * @throws APIException if e-mail is not valid or exeeds maximum DB field length.
+	 */
+	private function validateMediaRecipients(array $users, array $db_mediatypes) {
+		if ($db_mediatypes) {
+			$email_mediatypes = [];
+
+			foreach ($db_mediatypes as $db_mediatype) {
+				if ($db_mediatype['type'] == MEDIA_TYPE_EMAIL) {
+					$email_mediatypes[$db_mediatype['mediatypeid']] = true;
+				}
+			}
+
+			// Validate e-mails for all users.
+			if ($email_mediatypes) {
+				$max_length = DB::getFieldLength('media', 'sendto');
+				$email_validator = new CEmailValidator();
+
+				foreach ($users as $user) {
+					if (array_key_exists('user_medias', $user)) {
+						foreach ($user['user_medias'] as $media) {
+							if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
+								if (!is_array($media['sendto'])) {
+									$media['sendto'] = [$media['sendto']];
+								}
+
+								foreach ($media['sendto'] as $sendto) {
+									if (!$email_validator->validate($sendto)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Invalid email address for media type with ID "%1$s".',
+												$media['mediatypeid']
+											)
+										);
+									}
+									elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
+												$media['mediatypeid']
+											)
+										);
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -702,6 +766,10 @@ class CUser extends CApiService {
 				$medias[$user['userid']] = [];
 
 				foreach ($user['user_medias'] as $media) {
+					if (is_array($media['sendto'])) {
+						$media['sendto'] = implode("\n", $media['sendto']);
+					}
+
 					$medias[$user['userid']][] = $media;
 				}
 			}
@@ -1251,14 +1319,36 @@ class CUser extends CApiService {
 		// adding medias
 		if ($options['selectMedias'] !== null && $options['selectMedias'] != API_OUTPUT_COUNT) {
 			$db_medias = API::getApiService()->select('media', [
-				'output' => $this->outputExtend($options['selectMedias'], ['userid', 'mediaid']),
+				'output' => $this->outputExtend($options['selectMedias'], ['userid', 'mediaid', 'mediatypeid']),
 				'filter' => ['userid' => $userIds],
 				'preservekeys' => true
 			]);
 
+			// 'sendto' parameter in media types with 'type' == MEDIA_TYPE_EMAIL are returned as array.
+			if (($options['selectMedias'] === API_OUTPUT_EXTEND || in_array('sendto', $options['selectMedias']))
+					&& $db_medias) {
+				$db_email_medias = DB::select('media_type', [
+					'output' => [],
+					'filter' => [
+						'mediatypeid' => zbx_objectValues($db_medias, 'mediatypeid'),
+						'type' => MEDIA_TYPE_EMAIL
+					],
+					'preservekeys' => true
+				]);
+
+				foreach ($db_medias as &$db_media) {
+					if (array_key_exists($db_media['mediatypeid'], $db_email_medias)) {
+						$db_media['sendto'] = explode("\n", $db_media['sendto']);
+					}
+				}
+				unset($db_media);
+			}
+
 			$relationMap = $this->createRelationMap($db_medias, 'userid', 'mediaid');
 
-			$db_medias = $this->unsetExtraFields($db_medias, ['userid', 'mediaid'], $options['selectMedias']);
+			$db_medias = $this->unsetExtraFields($db_medias, ['userid', 'mediaid', 'mediatypeid'],
+				$options['selectMedias']
+			);
 			$result = $relationMap->mapMany($result, $db_medias, 'medias');
 		}
 

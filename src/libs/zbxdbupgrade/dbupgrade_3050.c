@@ -361,6 +361,21 @@ static int	DBpatch_3050026(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_3050027(void)
+{
+	const ZBX_FIELD	field = {"sendto", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media", &field, NULL);
+}
+
+static int	DBpatch_3050028(void)
+{
+	const ZBX_FIELD	field = {"sendto", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("alerts", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -390,5 +405,7 @@ DBPATCH_ADD(3050023, 0, 1)
 DBPATCH_ADD(3050024, 0, 1)
 DBPATCH_ADD(3050025, 0, 1)
 DBPATCH_ADD(3050026, 0, 1)
+DBPATCH_ADD(3050027, 0, 1)
+DBPATCH_ADD(3050028, 0, 1)
 
 DBPATCH_END()
