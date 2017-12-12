@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F.I..... [ZBXNEXT-4139] added high contrast light and high contrast dark themes (andzs)
 A......... [ZBXNEXT-4247] removed deprecated API methods: user.updareProfile, user.addMedia, user.updateMedia, user.deleteMedia, usergroup.massAdd, usergroup.massUpdate and usermedia.get (Sasha)
 ........S. [ZBXNEXT-970] added more detailed error information to notification message when DB is unavailable (viktors)
 ..F....... [ZBXNEXT-4137] removed green background from cells (Oleg)
