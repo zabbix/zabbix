@@ -1075,7 +1075,7 @@ int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int
 
 	if (NULL == (socket_path = ipc_make_path(service_name)))
 	{
-		*error = zbx_dsprintf(*error, "Invalid service name \"%s\".", service_name);
+		*error = zbx_dsprintf(*error, "What is actually a problem is that a generated socket file path proved to be too long: \"%s\".", service_name);
 		goto out;
 	}
 
