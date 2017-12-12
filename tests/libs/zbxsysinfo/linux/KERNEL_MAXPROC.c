@@ -86,4 +86,5 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	free_request(&request);
+	free_result(&param_result);
 }
