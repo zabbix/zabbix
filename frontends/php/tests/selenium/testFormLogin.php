@@ -153,4 +153,39 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestTextNotPresent('Password');
 		$this->zbxTestTextNotPresent('Username');
 	}
+
+	public static function login_with_request() {
+		return [
+			[
+				[
+					'url' => 'index.php?request=hosts.php',
+					'login' => 'Admin',
+					'password' => 'zabbix',
+					'header' => 'Hosts'
+				]
+			],
+			[
+				[
+					'url' => 'index.php?request=zabbix.php%3Faction%3Dproxy.list',
+					'login' => 'Admin',
+					'password' => 'zabbix',
+					'header' => 'Proxies'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider login_with_request
+	 */
+	public function testFormLogin_LoginWithRequest($data) {
+		$this->zbxTestOpen($data['url']);
+		$this->zbxTestInputTypeOverwrite('name', $data['login']);
+		$this->zbxTestInputTypeOverwrite('password', $data['password']);
+		$this->zbxTestClickWait('enter');
+
+		// Test page title.
+		$this->zbxTestCheckHeader($data['header']);
+	}
+
 }
