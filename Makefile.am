@@ -78,6 +78,14 @@ css_theme_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
 	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
 
+css_hc_light:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-light.scss frontends/php/styles/hc-light.css
+	cp frontends/php/styles/hc-light.css sass/stylesheets/hc-light.css
+
+css_hc_dark:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-dark.scss frontends/php/styles/hc-dark.css
+	cp frontends/php/styles/hc-dark.css sass/stylesheets/hc-dark.css
+
 css_icons:
 	cp sass/img/icon-sprite.svg frontends/php/img/
 	cp sass/img/browser-sprite.png frontends/php/img/
@@ -89,7 +97,7 @@ css_icons:
 	cp sass/touch-icon-192x192.png frontends/php/img/
 	cp sass/favicon.ico frontends/php/
 
-css: css_theme_blue css_theme_dark css_icons
+css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
 ## CUnit test support
 TESTDIR = src

@@ -835,7 +835,7 @@ class testUsers extends CZabbixTest {
 					'theme' => ''
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
 			],
 			[
 				'user' => [
@@ -847,7 +847,7 @@ class testUsers extends CZabbixTest {
 					'theme' => 'classic'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
 			],
 			[
 				'user' => [
@@ -859,7 +859,7 @@ class testUsers extends CZabbixTest {
 					'theme' => 'originalblue'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
 			],
 			// Check user properties, type.
 			[
