@@ -27,7 +27,11 @@ class testFormLoginWithRequest extends CWebTest {
 		return [
 			[
 				[
-					'request' => 'zabbix.php?action=proxy.list&ddreset=1',
+					'request' => 'index.php?request=hosts.php',
+					'header' => 'Configuration of hosts'
+				],
+				[
+					'request' => 'index.php?request=zabbix.php%3Faction%3Dproxy.list',
 					'header' => 'Proxies'
 				]
 			]
