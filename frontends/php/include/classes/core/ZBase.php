@@ -259,8 +259,8 @@ class ZBase {
 		return [
 			'blue-theme' => _('Blue'),
 			'dark-theme' => _('Dark'),
-			'hc-light' => _('High Contrast Light'),
-			'hc-dark' => _('High Contrast Dark'),
+			'hc-light' => _('High-contrast light'),
+			'hc-dark' => _('High-contrast dark')
 		];
 	}
 
