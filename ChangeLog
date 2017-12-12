@@ -470,6 +470,7 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.11rc2
 
 Bug fixes:
+..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 
 --------------------------------------------------------------------------------
