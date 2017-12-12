@@ -476,7 +476,7 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($hostids === null) {
-			$hostids = $this->getInput('hostid') ? $this->getInput('hostid') : null;
+			$hostids = $this->hasInput('hostid') ? $this->getInput('hostid') : null;
 		}
 
 		$options = [
@@ -632,7 +632,7 @@ class CControllerPopupGeneric extends CController {
 			$page_options['numeric'] = $this->getInput('numeric');
 		}
 		if ($this->getInput('writeonly', 0)) {
-			$page_options['writeonly'] = $this->getInput('writeonly');;
+			$page_options['writeonly'] = $this->getInput('writeonly');
 		}
 		if ($this->getInput('screenid', 0)) {
 			$page_options['screenid'] = $this->getInput('screenid');
@@ -691,8 +691,9 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Template()->get($options);
 
 				// Do not show itself.
-				if (array_key_exists($templateid, $records)) {
-					unset($records[$templateid]);
+				if (array_key_exists('templateid', $page_options)
+						&& array_key_exists($page_options['templateid'], $records)) {
+					unset($records[$page_options['templateid']]);
 				}
 
 				CArrayHelper::sort($records, ['name']);
@@ -840,7 +841,7 @@ class CControllerPopupGeneric extends CController {
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
-					if ($with_webitems) {
+					if (array_key_exists('with_webitems', $page_options)) {
 						$options['webitems'] = true;
 					}
 
@@ -1032,7 +1033,7 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if (($messages = getMessages()) !== null) {
-			$data['messages'] = $messages->toString();
+			$data['messages'] = $messages;
 		}
 		else {
 			$data['messages'] = null;
