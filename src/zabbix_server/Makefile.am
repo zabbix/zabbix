@@ -29,6 +29,7 @@ zabbix_server_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
+	postinit.c postinit.h \
 	server.c
 	
 if ZBXCUNIT
