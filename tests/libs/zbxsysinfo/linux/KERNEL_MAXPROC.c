@@ -16,8 +16,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+
 #include "common.h"
 #include "sysinfo.h"
 
@@ -30,6 +32,7 @@ void	zbx_mock_test_entry(void **state)
 	const char		*expected_param_value_string;
 	zbx_uint64_t 		expected_param_value = 0;
 	int			expected_result = FAIL, actual_result = FAIL;
+
 	ZBX_UNUSED(state);
 
 	if (ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("result", &expected_param_value_handle)))
@@ -37,7 +40,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot get expected key from test case data: %s", zbx_mock_error_string(error));
 	}
 	else if (ZBX_MOCK_SUCCESS != error || ZBX_MOCK_SUCCESS != (
-		error = zbx_mock_string(expected_param_value_handle, &expected_param_value_string)))
+			error = zbx_mock_string(expected_param_value_handle, &expected_param_value_string)))
 	{
 		fail_msg("Cannot get expected parameters from test case data: %s", zbx_mock_error_string(error));
 	}
@@ -55,7 +58,7 @@ void	zbx_mock_test_entry(void **state)
 	if (expected_result != (actual_result = KERNEL_MAXPROC(&request,&param_result)))
 	{
 		fail_msg("Got %s instead of %s as a result.", zbx_sysinfo_ret_string(actual_result),
-			zbx_sysinfo_ret_string(expected_result));
+				zbx_sysinfo_ret_string(expected_result));
 	}
 
 	if (SYSINFO_RET_OK == expected_result)
@@ -63,19 +66,18 @@ void	zbx_mock_test_entry(void **state)
 		if (NULL == GET_UI64_RESULT(&param_result) || expected_param_value != *GET_UI64_RESULT(&param_result))
 		{
 			fail_msg("Got '" ZBX_FS_UI64 "' instead of '%s' as a value.",
-				(NULL != GET_UI64_RESULT(&param_result) ? *GET_UI64_RESULT(&param_result) : 0),
-				expected_param_value_string);
+					(NULL != GET_UI64_RESULT(&param_result) ? *GET_UI64_RESULT(&param_result) : 0),
+					expected_param_value_string);
 		}
 	}
 
 	if (SYSINFO_RET_FAIL == expected_result)
 	{
 		if (NULL == GET_MSG_RESULT(&param_result) ||
-			0 != strcmp(expected_param_value_string, *GET_MSG_RESULT(&param_result)))
+				0 != strcmp(expected_param_value_string, *GET_MSG_RESULT(&param_result)))
 		{
-				fail_msg("Got '%s' instead of '%s' as a value.",
-					(NULL != GET_MSG_RESULT(&param_result) ?
-						*GET_MSG_RESULT(&param_result) : "NULL"),
+			fail_msg("Got '%s' instead of '%s' as a value.",
+					(NULL != GET_MSG_RESULT(&param_result) ? *GET_MSG_RESULT(&param_result) : "NULL"),
 					expected_param_value_string);
 		}
 	}
