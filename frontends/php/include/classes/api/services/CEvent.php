@@ -213,6 +213,10 @@ class CEvent extends CApiService {
 									$tag_filters[$groupid] = $tag_filter;
 									unset($rights[$usrgrpid][$groupid]);
 								}
+								else {
+									$tag_filters[$groupid] = $tag_filter;
+									unset($rights[$usrgrpid]);
+								}
 							}
 						}
 					}
@@ -221,26 +225,28 @@ class CEvent extends CApiService {
 						foreach ($right as $groupid => $value) {
 							if (array_key_exists($groupid, $group_triggers)) {
 								$allowed_triggers = array_merge($allowed_triggers, $group_triggers[$groupid]);
-								unset($group_triggers[$groupid], $tag_filters[$groupid]);
+								unset($group_triggers[$groupid]);
 							}
 						}
 					}
 
 					foreach ($tag_filters as $groupid => $tag_filter) {
-						$triggerids = $group_triggers[$groupid];
-						foreach ($triggerids as $triggerid) {
-							if (!in_array($triggerid, $allowed_triggers)) {
-								foreach ($trigger_tags[$triggerid] as $trigger_tag) {
-									if (in_array($trigger_tag, $tag_filter)) {
-										$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
-										break;
-									}
-
-									foreach ($tag_filter as $tag_array) {
-										if ($tag_array['value'] === ''
-												&& $trigger_tag['tag'] == $tag_array['tag']) {
+						if (array_key_exists($groupid, $group_triggers)) {
+							$triggerids = $group_triggers[$groupid];
+							foreach ($triggerids as $triggerid) {
+								if (!in_array($triggerid, $allowed_triggers)) {
+									foreach ($trigger_tags[$triggerid] as $trigger_tag) {
+										if (in_array($trigger_tag, $tag_filter)) {
 											$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
-											break 2;
+											break;
+										}
+
+										foreach ($tag_filter as $tag_array) {
+											if ($tag_array['value'] === ''
+													&& $trigger_tag['tag'] == $tag_array['tag']) {
+												$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
+												break 2;
+											}
 										}
 									}
 								}
@@ -297,7 +303,6 @@ class CEvent extends CApiService {
 
 					$tag_filters = [];
 					$allowed_triggers = [];
-					$allowed_host_groups = [];
 
 					foreach ($userGroups as $usrgrpid) {
 						if (array_key_exists($usrgrpid, $tag_filters_tmp)) {
@@ -306,11 +311,15 @@ class CEvent extends CApiService {
 									$tag_filters[$groupid] = $tag_filter;
 									unset($rights[$usrgrpid][$groupid]);
 								}
+								else {
+									$tag_filters[$groupid] = $tag_filter;
+								}
 							}
 						}
 						else {
 							if (array_key_exists($usrgrpid, $rights)) {
 								$skip_groups += $rights[$usrgrpid];
+								unset($rights[$usrgrpid]);
 							}
 						}
 					}
@@ -319,8 +328,6 @@ class CEvent extends CApiService {
 						foreach ($right as $groupid => $value) {
 							if (array_key_exists($groupid, $host_groups)) {
 								$allowed_triggers = array_merge($allowed_triggers, $host_groups[$groupid]);
-								$allowed_host_groups[$groupid] = true;
-								unset($host_groups[$groupid], $tag_filters[$groupid]);
 							}
 						}
 					}
