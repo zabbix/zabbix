@@ -118,7 +118,7 @@ define('ZBX_SHOW_SQL_ERRORS',	true);
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
-define('ZBX_SHOW_TECHNICAL_ERRORS', !false);
+define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
