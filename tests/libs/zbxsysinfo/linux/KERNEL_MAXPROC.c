@@ -63,21 +63,24 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SYSINFO_RET_OK == expected_result)
 	{
-		if (NULL == GET_UI64_RESULT(&param_result) || expected_param_value != *GET_UI64_RESULT(&param_result))
+		if (NULL == param_result || NULL == GET_UI64_RESULT(&param_result) ||
+				expected_param_value != *GET_UI64_RESULT(&param_result))
 		{
 			fail_msg("Got '" ZBX_FS_UI64 "' instead of '%s' as a value.",
-					(NULL != GET_UI64_RESULT(&param_result) ? *GET_UI64_RESULT(&param_result) : 0),
+					(NULL != param_result && NULL != GET_UI64_RESULT(&param_result) ?
+									*GET_UI64_RESULT(&param_result) : 0),
 					expected_param_value_string);
 		}
 	}
 
 	if (SYSINFO_RET_FAIL == expected_result)
 	{
-		if (NULL == GET_MSG_RESULT(&param_result) ||
+		if (NULL == param_result || NULL == GET_MSG_RESULT(&param_result) ||
 				0 != strcmp(expected_param_value_string, *GET_MSG_RESULT(&param_result)))
 		{
 			fail_msg("Got '%s' instead of '%s' as a value.",
-					(NULL != GET_MSG_RESULT(&param_result) ? *GET_MSG_RESULT(&param_result) : "NULL"),
+					(NULL != param_result && NULL != GET_MSG_RESULT(&param_result) ?
+									*GET_MSG_RESULT(&param_result) : "NULL"),
 					expected_param_value_string);
 		}
 	}
