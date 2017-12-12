@@ -508,6 +508,9 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
 				continue;
 
+			if (0 != (data.attrib & FILE_ATTRIBUTE_REPARSE_POINT))	/* A file or directory that          */
+				continue;					/* has an associated reparse point,  */
+										/* or a file that is a symbolic link */
 			name = zbx_unicode_to_utf8(data.name);
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 
