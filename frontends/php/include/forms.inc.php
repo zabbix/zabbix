@@ -1545,6 +1545,18 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
+	if ($data['hostid'] && !$data['groupid']) {
+		$db_hostgroups = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'hostids' => $data['hostid'],
+			'templateids' => $data['hostid']
+		]);
+
+		if ($db_hostgroups) {
+			$data['groupid'] = $db_hostgroups[0]['groupid'];
+		}
+	}
+
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
 		$data['expression'] = $trigger['expression'];
 		$data['recovery_expression'] = $trigger['recovery_expression'];
