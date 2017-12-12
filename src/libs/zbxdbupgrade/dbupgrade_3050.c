@@ -20,6 +20,9 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "zbxtasks.h"
+
+extern unsigned char	program_type;
 
 /*
  * 4.0 development database patches
@@ -97,80 +100,6 @@ static int	DBpatch_3050005(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050006(void)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*description, *sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t	triggerid;
-
-	if (NULL == (result = DBselect("select triggerid,description from triggers")))
-		return FAIL;
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		description = DBdyn_escape_string(row[1]);
-		ZBX_STR2UINT64(triggerid, row[0]);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set name='%s' where object=%d"
-				" and objectid=%d and source=%d;\n", description, EVENT_OBJECT_TRIGGER,
-				triggerid, EVENT_SOURCE_TRIGGERS);
-		zbx_free(description);
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			return FAIL;
-	}
-
-	zbx_free(sql);
-
-	return SUCCEED;
-}
-
-static int	DBpatch_3050007(void)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*description, *sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t	triggerid;
-
-	if (NULL == (result = DBselect("select triggerid,description from triggers")))
-		return FAIL;
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		description = DBdyn_escape_string(row[1]);
-		ZBX_STR2UINT64(triggerid, row[0]);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update problem set name='%s' where object=%d"
-				" and objectid=%d and source=%d;\n", description, EVENT_OBJECT_TRIGGER,
-				triggerid, EVENT_SOURCE_TRIGGERS);
-		zbx_free(description);
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			return FAIL;
-	}
-
-	zbx_free(sql);
-
-	return SUCCEED;
-}
-
 #define	ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME	"Cannot calculate trigger expression."
 #define	ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME	"Cannot obtain item value."
 
@@ -178,6 +107,9 @@ static int	DBpatch_3050008(void)
 {
 	int		res;
 	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", trdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, EVENT_STATUS_PROBLEM);
@@ -193,6 +125,9 @@ static int	DBpatch_3050009(void)
 	int		res;
 	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d ", trdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER);
 
@@ -206,6 +141,9 @@ static int	DBpatch_3050010(void)
 {
 	int		res;
 	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, EVENT_STATUS_PROBLEM);
@@ -221,6 +159,9 @@ static int	DBpatch_3050011(void)
 	int		res;
 	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d", itdefault,
 			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM);
 
@@ -233,6 +174,9 @@ static int	DBpatch_3050011(void)
 static int	DBpatch_3050012(void)
 {
 	int		res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	res = DBexecute("update profiles set idx='web.problem.filter.name' where idx='web.problem.filter.problem'");
 
@@ -385,6 +329,38 @@ static int	DBpatch_3050024(void)
 #undef ZBX_COLORPALETTE_LIGHT
 #undef ZBX_COLORPALETTE_DARK
 
+static int	DBpatch_3050025(void)
+{
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_UPDATE_EVENTNAMES, ZBX_TM_STATUS_NEW,
+			time(NULL));
+	zbx_db_insert_autoincrement(&db_insert, "taskid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_3050026(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute("update profiles set value_str='name' where idx='web.problem.sort' and value_str='problem'");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(3050)
@@ -395,8 +371,6 @@ DBPATCH_ADD(3050000, 0, 1)
 DBPATCH_ADD(3050001, 0, 1)
 DBPATCH_ADD(3050004, 0, 1)
 DBPATCH_ADD(3050005, 0, 1)
-DBPATCH_ADD(3050006, 0, 1)
-DBPATCH_ADD(3050007, 0, 1)
 DBPATCH_ADD(3050008, 0, 1)
 DBPATCH_ADD(3050009, 0, 1)
 DBPATCH_ADD(3050010, 0, 1)
@@ -414,5 +388,7 @@ DBPATCH_ADD(3050021, 0, 1)
 DBPATCH_ADD(3050022, 0, 1)
 DBPATCH_ADD(3050023, 0, 1)
 DBPATCH_ADD(3050024, 0, 1)
+DBPATCH_ADD(3050025, 0, 1)
+DBPATCH_ADD(3050026, 0, 1)
 
 DBPATCH_END()

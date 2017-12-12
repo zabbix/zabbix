@@ -1067,7 +1067,7 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 static void	vc_remove_item(zbx_vc_item_t *item)
 {
 	vch_item_free_cache(item);
-	zbx_hashset_remove(&vc_cache->items, item);
+	zbx_hashset_remove_direct(&vc_cache->items, item);
 }
 
 /******************************************************************************
@@ -2622,6 +2622,50 @@ void	zbx_vc_destroy(void)
 
 	if (NULL != vc_cache)
 		zbx_mutex_destroy(&vc_lock);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vc_reset                                                     *
+ *                                                                            *
+ * Purpose: resets value cache                                                *
+ *                                                                            *
+ * Comments: All items and their historical data are removed,                 *
+ *           cache working mode, statistics reseted.                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_reset(void)
+{
+	const char	*__function_name = "zbx_vc_clean";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL != vc_cache)
+	{
+		zbx_vc_item_t		*item;
+		zbx_hashset_iter_t	iter;
+
+		vc_try_lock();
+
+		zbx_hashset_iter_reset(&vc_cache->items, &iter);
+		while (NULL != (item = zbx_hashset_iter_next(&iter)))
+		{
+			vch_item_free_cache(item);
+			zbx_hashset_iter_remove(&iter);
+		}
+
+		vc_cache->db_queries = 0;
+		vc_cache->hits = 0;
+		vc_cache->misses = 0;
+		vc_cache->min_free_request = 0;
+		vc_cache->mode = ZBX_VC_MODE_NORMAL;
+		vc_cache->mode_time = 0;
+		vc_cache->last_warning_time = 0;
+
+		vc_try_unlock();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
