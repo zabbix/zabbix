@@ -10,7 +10,7 @@ in:
   param: 'net.if.in[eno1,bytes]'
 out:
   result: '1395994481'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 
 
 ---
@@ -25,7 +25,7 @@ in:
   param: 'net.if.in[eno1,packets]'
 out:
   result: '5343265'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 
 
 ---
@@ -40,7 +40,7 @@ in:
   param: 'net.if.in[eno1,errors]'
 out:
   result: '2'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 
 
 ---
@@ -55,7 +55,7 @@ in:
   param: 'net.if.in[eno1,dropped]'
 out:
   result: '2'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 
 
 ---
@@ -70,7 +70,7 @@ in:
   param: 'net.if.in[eno1,overruns]'
 out:
   result: '2'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 
 
 ---
@@ -85,7 +85,7 @@ in:
   param: 'net.if.in[eno1,frame]'
 out:
   result: '2'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 
 
 ---
@@ -100,7 +100,7 @@ in:
   param: 'net.if.in[eno1,compressed]'
 out:
   result: '2'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 
 
 ---
@@ -115,7 +115,7 @@ in:
   param: 'net.if.in[eno1,multicast]'
 out:
   result: '83760'
-#return SYSINFO_RET_OK;
+  return: 'SYSINFO_RET_OK'
 
 
 ---
@@ -130,7 +130,7 @@ in:
   param: 'net.if.in[eno1,overruns,XXX]'
 out:
   result: 'Too many parameters.'
-#return SYSINFO_RET_FAIL;
+  return: 'SYSINFO_RET_FAIL'
 
 
 ---
@@ -145,7 +145,7 @@ in:
   param: 'net.if.in[enoX,overruns]'  
 out:
   result: 'Cannot find information for this network interface in /proc/net/dev.'
-#return SYSINFO_RET_FAIL;
+  return: 'SYSINFO_RET_FAIL'
 
 
 ---
@@ -160,4 +160,4 @@ in:
   param: 'net.if.in[eno1,XXX]'  
 out:
   result: 'Invalid second parameter.'
-#return SYSINFO_RET_FAIL;
+  return: 'SYSINFO_RET_FAIL'
