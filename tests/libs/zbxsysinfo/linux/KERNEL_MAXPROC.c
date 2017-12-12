@@ -55,7 +55,7 @@ void	zbx_mock_test_entry(void **state)
 	init_request(&request);
 	init_result(&param_result);
 
-	if (expected_result != (actual_result = KERNEL_MAXPROC(&request,&param_result)))
+	if (expected_result != (actual_result = KERNEL_MAXPROC(&request, &param_result)))
 	{
 		fail_msg("Got %s instead of %s as a result.", zbx_sysinfo_ret_string(actual_result),
 				zbx_sysinfo_ret_string(expected_result));
