@@ -4,9 +4,11 @@
 		jQuery('#user_medias_' + index).remove();
 		// hidden variables
 		jQuery('#user_medias_' + index + '_mediaid').remove();
+		jQuery('#user_medias_' + index + '_mediatype').remove();
 		jQuery('#user_medias_' + index + '_mediatypeid').remove();
 		jQuery('#user_medias_' + index + '_period').remove();
 		jQuery('#user_medias_' + index + '_sendto').remove();
+		removeVarsBySelector(null, 'input[id^="user_medias_' + index + '_sendto_"]');
 		jQuery('#user_medias_' + index + '_severity').remove();
 		jQuery('#user_medias_' + index + '_active').remove();
 		jQuery('#user_medias_' + index + '_description').remove();
