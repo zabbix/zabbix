@@ -41,6 +41,7 @@ Bug fixes:
 Changes for 3.4.5rc2
 
 Bug fixes:
+..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 ........S. [ZBX-13153] fixed possibility that proxy last access updates are lost during cache reload (vso)
 ........S. [ZBX-13149] fixed possible crash in history syncer when processing deleted item (wiper)
 
@@ -469,6 +470,7 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.11rc2
 
 Bug fixes:
+..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.11rc1
