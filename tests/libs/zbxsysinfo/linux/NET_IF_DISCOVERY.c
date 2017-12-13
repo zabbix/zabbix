@@ -29,11 +29,10 @@ static void	get_out_parameter(const char *name, const char **value);
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_mock_error_t	error;
-	AGENT_RESULT		result;
-	const char		*expected_json, *expected_error, *expected_string, *actual_string;
-	char			**p_result;
-	int			expected_ret, actual_ret;
+	AGENT_RESULT	result;
+	const char	*expected_json, *expected_error, *expected_string, *actual_string;
+	char		**p_result;
+	int		expected_ret, actual_ret;
 
 	ZBX_UNUSED(state);
 
