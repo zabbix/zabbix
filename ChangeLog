@@ -41,6 +41,7 @@ Bug fixes:
 Changes for 3.4.5rc2
 
 Bug fixes:
+..F....... [ZBX-13176] fixed last item value retrieval errors in history manager (vjaceslavs)
 ..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 ........S. [ZBX-13153] fixed possibility that proxy last access updates are lost during cache reload (vso)
