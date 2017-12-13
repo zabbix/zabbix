@@ -1436,9 +1436,7 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 	mode = umask(077);
 
 	if (NULL == (socket_path = ipc_make_path(service_name, error)))
-	{
 		goto out;
-	}
 
 	if (0 == access(socket_path, F_OK))
 	{
