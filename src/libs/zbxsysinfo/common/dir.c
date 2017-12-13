@@ -508,19 +508,23 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
 				continue;
 
-			if (0 != (data.attrib & FILE_ATTRIBUTE_REPARSE_POINT))	/* A file or directory that          */
-				continue;					/* has an associated reparse point,  */
-										/* or a file that is a symbolic link */
 			name = zbx_unicode_to_utf8(data.name);
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
+			wpath = zbx_utf8_to_unicode(path);
+
+			if (0 != (GetFileAttributesW(wpath) & FILE_ATTRIBUTE_REPARSE_POINT))
+			{                       			/* A file or directory that          */
+				zbx_free(wpath);			/* has an associated reparse point,  */
+				zbx_free(path);				/* or a file that is a symbolic link */
+				zbx_free(name);
+				continue;
+			}
 
 			if (0 == (data.attrib & _A_SUBDIR))	/* not a directory */
 			{
 				if (0 != filename_matches(name, regex_incl, regex_excl))
 				{
 					DWORD	size_high, size_low;
-
-					wpath = zbx_utf8_to_unicode(path);
 
 					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
 					/* compressed files */
@@ -537,7 +541,6 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 						size += file_size;
 					}
-					zbx_free(wpath);
 				}
 				zbx_free(path);
 			}
@@ -546,6 +549,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 				zbx_free(path);
 			}
 
+			zbx_free(wpath);
 			zbx_free(name);
 
 		} while (0 == _wfindnext(handle, &data));
