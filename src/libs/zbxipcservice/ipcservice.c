@@ -456,9 +456,7 @@ static int	ipc_socket_read_message(zbx_ipc_socket_t *csocket, zbx_uint32_t *head
 		*rx_bytes += read_size;
 
 		if (SUCCEED == ret)
-		{
 			goto out;
-		}
 	}
 
 	/* not enough data in socket buffer, try to read more until message is completed or no data to read */
@@ -1078,9 +1076,7 @@ int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == (socket_path = ipc_make_path(service_name, error)))
-	{
 		goto out;
-	}
 
 	if (-1 == (csocket->fd = socket(AF_UNIX, SOCK_STREAM, 0)))
 	{
