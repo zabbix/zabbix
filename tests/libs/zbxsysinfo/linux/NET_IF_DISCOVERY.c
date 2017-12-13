@@ -58,6 +58,8 @@ void	zbx_mock_test_entry(void **state)
 		expected_string = expected_json;
 	}
 
+	init_result(&result);
+
 	/* NET_IF_DISCOVERY() does not use request */
 	actual_ret = NET_IF_DISCOVERY(&request, &result);
 
