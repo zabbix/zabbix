@@ -84,15 +84,13 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SYSINFO_RET_OK == expected_result)
 	{
-		if (NULL == GET_UI64_RESULT(&param_result) || expected_param_value != *GET_UI64_RESULT(&param_result))
+		if (NULL == GET_UI64_RESULT(&param_result))
+			fail_msg("Got 'NULL' instead of '%s' as a value.", expected_param_value_string);
+
+		if (expected_param_value != *GET_UI64_RESULT(&param_result))
 		{
-			if (NULL != GET_UI64_RESULT(&param_result))
-			{
-				fail_msg("Got '" ZBX_FS_UI64 "' instead of '%s' as a value.",
-						*GET_UI64_RESULT(&param_result), expected_param_value_string);
-			}
-			else
-				fail_msg("Got 'NULL' instead of '%s' as a value.", expected_param_value_string);
+			fail_msg("Got '" ZBX_FS_UI64 "' instead of '%s' as a value.", *GET_UI64_RESULT(&param_result),
+					expected_param_value_string);
 		}
 	}
 
