@@ -96,7 +96,7 @@
 
 	// Add new widget.
 	function dashbrd_add_widget() {
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget', this);
 	};
 
 	var showEditMode = function showEditMode() {

@@ -689,7 +689,7 @@
 		return free;
 	}
 
-	function openConfigDialogue($obj, data, widget) {
+	function openConfigDialogue($obj, data, widget, trigger_elmnt) {
 		var edit_mode = (widget !== null);
 
 		data.dialogue = {};
@@ -714,7 +714,7 @@
 				}
 			],
 			'dialogueid': 'widgetConfg'
-		}, jQuery('.btn-widget-edit', widget['content_header']));
+		}, trigger_elmnt);
 
 		var overlay_dialogue = $('#overlay_dialogue');
 		data.dialogue.div = overlay_dialogue;
@@ -907,7 +907,7 @@
 						showEditMode();
 					}
 
-					methods.addNewWidget.call($obj);
+					methods.addNewWidget.call($obj, this);
 				})
 			);
 		}
@@ -1239,7 +1239,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, widget);
+				openConfigDialogue($this, data, widget, this);
 			});
 		},
 
@@ -1549,12 +1549,12 @@
 			return ref;
 		},
 
-		addNewWidget: function() {
+		addNewWidget: function(trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, null);
+				openConfigDialogue($this, data, null, trigger_elmnt);
 			});
 		},
 
