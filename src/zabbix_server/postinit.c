@@ -321,8 +321,6 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
 
 	DBfree_result(result);
 
-	zbx_vc_reset();
-
 	return ret;
 }
 
