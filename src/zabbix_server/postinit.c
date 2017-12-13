@@ -140,7 +140,11 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 
 			if (ZBX_HIST_MACRO_NONE != (macro_type = is_historical_macro(macro)))
 			{
-				macro_len = token.data.macro.name.r - token.data.macro.name.l + 1;
+				if (0 != isdigit(*(trigger->description + token.token.r - 1)))
+					macro_len = token.data.macro.name.r - token.data.macro.name.l;
+				else
+					macro_len = token.data.macro.name.r - token.data.macro.name.l + 1;
+
 				macro = convert_historical_macro(macro_type);
 
 				token.token.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc, &name_len,
