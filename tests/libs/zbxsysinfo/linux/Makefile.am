@@ -20,8 +20,8 @@ NET_IF_DISCOVERY_SOURCES = \
 
 NET_IF_DISCOVERY_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \

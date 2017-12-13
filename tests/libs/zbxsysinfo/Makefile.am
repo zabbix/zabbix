@@ -1,5 +1,5 @@
 SUBDIRS = \
-	linux
+	@ARCH@
 
 if SERVER
 SERVER_tests = parse_item_key
