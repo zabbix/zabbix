@@ -325,7 +325,6 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
  *           smaller time segments (hours, day, week, month) and the next (larger)  *
  *           time segment is read only if the requested number of values (<count>)  *
  *           is not yet retrieved.                                                  *
- *                                                                                  *
  ************************************************************************************/
 static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values,
 		int count, int end_timestamp, zbx_uint64_t *queries)
@@ -758,7 +757,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 		item = items.values[i].item;
 
 		freed += vch_item_free_cache(item) + sizeof(zbx_vc_item_t);
-		zbx_hashset_remove(&vc_cache->items, item);
+		zbx_hashset_remove_direct(&vc_cache->items, item);
 	}
 	zbx_vector_vc_itemweight_destroy(&items);
 }
@@ -932,7 +931,7 @@ static size_t	vc_item_strfree(char *str)
 		if (0 == --(*(zbx_uint32_t *)ptr))
 		{
 			freed = strlen(str) + REFCOUNT_FIELD_SIZE + 1;
-			zbx_hashset_remove(&vc_cache->strpool, ptr);
+			zbx_hashset_remove_direct(&vc_cache->strpool, ptr);
 		}
 	}
 
@@ -2674,54 +2673,61 @@ void	zbx_vc_reset(void)
  *                                                                            *
  * Function: zbx_vc_add_values                                                *
  *                                                                            *
- * Purpose: adds item values to the value cache                               *
+ * Purpose: adds item values to the history and value cache                   *
  *                                                                            *
  * Parameters: history - [IN] item history values                             *
  *                                                                            *
+ * Return value: SUCCEED - the values were added successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *timestamp,
-		const history_value_t *value)
+int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 {
-	const char	*__function_name = "zbx_vc_add_value";
+	zbx_vc_item_t		*item;
+	int 			i;
+	ZBX_DC_HISTORY		*h;
 
-	zbx_vc_item_t	*item;
-	int 		ret = FAIL;
-
-	if (NULL == vc_cache)
+	if (FAIL == zbx_history_add_values(history))
 		return FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d timestamp:%d.%d",
-			__function_name, itemid, value_type, timestamp->sec, timestamp->ns);
+	if (NULL == vc_cache)
+		return SUCCEED;
 
 	vc_try_lock();
 
-	if (NULL != (item = zbx_hashset_search(&vc_cache->items, &itemid)))
+	for (i = 0; i < history->values_num; i++)
 	{
-		zbx_history_record_t	record = {*timestamp, *value};
+		h = (ZBX_DC_HISTORY *)history->values[i];
 
-		if (0 == (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
+		if (NULL != (item = zbx_hashset_search(&vc_cache->items, &h->itemid)))
 		{
-			vc_item_addref(item);
+			zbx_history_record_t	record = {h->ts, h->value};
 
-			/* If the new value type does not match the item's type in cache we can't  */
-			/* change the cache because other processes might still be accessing it    */
-			/* at the same time. The only thing that can be done - mark it for removal */
-			/* so it could be added later with new type.                               */
-			/* Also mark it for removal if the value adding failed. In this case we    */
-			/* won't have the latest data in cache - so the requests must go directly  */
-			/* to the database.                                                        */
-			if (item->value_type != value_type || FAIL == (ret = vch_item_add_value_at_head(item, &record)))
-				item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
+			if (0 == (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
+			{
+				vc_item_addref(item);
 
-			vc_item_release(item);
+				/* If the new value type does not match the item's type in cache we can't  */
+				/* change the cache because other processes might still be accessing it    */
+				/* at the same time. The only thing that can be done - mark it for removal */
+				/* so it could be added later with new type.                               */
+				/* Also mark it for removal if the value adding failed. In this case we    */
+				/* won't have the latest data in cache - so the requests must go directly  */
+				/* to the database.                                                        */
+				if (item->value_type != h->value_type ||
+						FAIL == vch_item_add_value_at_head(item, &record))
+				{
+					item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
+				}
+
+				vc_item_release(item);
+			}
 		}
 	}
 
 	vc_try_unlock();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
