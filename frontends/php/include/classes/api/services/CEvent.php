@@ -211,12 +211,17 @@ class CEvent extends CApiService {
 							foreach ($tag_filters_tmp[$usrgrpid] as $groupid => $tag_filter) {
 								if (array_key_exists($usrgrpid, $rights)
 										&& array_key_exists($groupid, $rights[$usrgrpid])) {
-									$tag_filters[$groupid] = $tag_filter;
 									unset($rights[$usrgrpid][$groupid]);
 								}
 								else {
-									$tag_filters[$groupid] = $tag_filter;
 									unset($rights[$usrgrpid]);
+								}
+
+								if (array_key_exists($groupid, $tag_filters)) {
+									$tag_filters[$groupid] = array_merge($tag_filters[$groupid], $tag_filter);
+								}
+								else {
+									$tag_filters[$groupid] = $tag_filter;
 								}
 							}
 						}
@@ -309,8 +314,11 @@ class CEvent extends CApiService {
 						if (array_key_exists($usrgrpid, $tag_filters_tmp)) {
 							foreach ($tag_filters_tmp[$usrgrpid] as $groupid => $tag_filter) {
 								if (array_key_exists($groupid, $rights[$usrgrpid])) {
-									$tag_filters[$groupid] = $tag_filter;
 									unset($rights[$usrgrpid][$groupid]);
+								}
+
+								if (array_key_exists($groupid, $tag_filters)) {
+									$tag_filters[$groupid] = array_merge($tag_filters[$groupid], $tag_filter);
 								}
 								else {
 									$tag_filters[$groupid] = $tag_filter;
