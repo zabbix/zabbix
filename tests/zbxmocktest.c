@@ -146,6 +146,8 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 char	*CONFIG_SOCKET_PATH		= NULL;
+char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
+char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
 
 const char	title_message[] = "";
 const char	*usage_message[] = {NULL};
