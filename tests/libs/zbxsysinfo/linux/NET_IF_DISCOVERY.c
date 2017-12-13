@@ -30,7 +30,6 @@ static void	get_out_parameter(const char *name, const char **value);
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	error;
-	AGENT_REQUEST		request;
 	AGENT_RESULT		result;
 	const char		*expected_json, *expected_error, *expected_string, *actual_string;
 	char			**p_result;
@@ -61,7 +60,7 @@ void	zbx_mock_test_entry(void **state)
 	init_result(&result);
 
 	/* NET_IF_DISCOVERY() does not use request */
-	actual_ret = NET_IF_DISCOVERY(&request, &result);
+	actual_ret = NET_IF_DISCOVERY(NULL, &result);
 
 	if (actual_ret != expected_ret)
 	{
