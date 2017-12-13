@@ -350,7 +350,7 @@ static int	update_event_names(void)
 	if (0 == (triggers_num = get_trigger_count()))
 		goto out;
 
-	memset(&trigger, 0, sizeof(DB_TRIGGER);
+	memset(&trigger, 0, sizeof(DB_TRIGGER));
 
 	sql = zbx_malloc(NULL, sql_alloc);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
