@@ -137,8 +137,8 @@ static const char	*ipc_make_path(const char *service_name, char **error)
 			ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + prefix_len)
 	{
 		*error = zbx_dsprintf(*error,
-				"Socket path \"%s%s%s%s\" exceeds maximum length of unix domain socket path.",
-				ZBX_IPC_SOCKET_PREFIX, prefix, service_name, ZBX_IPC_SOCKET_SUFFIX);
+				"Socket path \"%s%s%s%s%s\" exceeds maximum length of unix domain socket path.",
+				ipc_path, ZBX_IPC_SOCKET_PREFIX, prefix, service_name, ZBX_IPC_SOCKET_SUFFIX);
 		return NULL;
 	}
 
