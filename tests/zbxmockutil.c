@@ -26,7 +26,7 @@
 
 void	zbx_mock_get_parameter_string(const char *path, const char **value)
 {
-	int			err;
+	zbx_mock_error_t	err;
 	zbx_mock_handle_t	handle;
 
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
@@ -38,7 +38,7 @@ void	zbx_mock_get_parameter_string(const char *path, const char **value)
 
 void	zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name, const char **value)
 {
-	int			err;
+	zbx_mock_error_t	err;
 	zbx_mock_handle_t	handle;
 
 
@@ -52,7 +52,7 @@ void	zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *nam
 
 void	zbx_mock_get_parameter_handle(const char *path, zbx_mock_handle_t *handle)
 {
-	int	err;
+	zbx_mock_error_t	err;
 
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, handle)))
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
