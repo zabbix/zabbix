@@ -29,6 +29,7 @@ static void	get_out_parameter(const char *name, const char **value);
 
 void	zbx_mock_test_entry(void **state)
 {
+	AGENT_REQUEST	request;
 	AGENT_RESULT	result;
 	const char	*expected_json, *expected_error, *expected_string, *actual_string;
 	char		**p_result;
@@ -56,10 +57,17 @@ void	zbx_mock_test_entry(void **state)
 		expected_string = expected_json;
 	}
 
+	init_request(&request);
 	init_result(&result);
 
-	/* NET_IF_DISCOVERY() does not use request */
-	actual_ret = NET_IF_DISCOVERY(NULL, &result);
+	init_request(&request);
+
+	if (SUCCEED != parse_item_key("net.if.discovery", &request))
+		fail_msg("Unexpected return code from parse_item_key()");
+
+	actual_ret = NET_IF_DISCOVERY(&request, &result);
+
+	free_request(&request);
 
 	if (actual_ret != expected_ret)
 	{
@@ -80,6 +88,8 @@ void	zbx_mock_test_entry(void **state)
 
 	if (0 != strcmp(expected_string, actual_string))
 		fail_msg("Unexpected result string: expected \"%s\", got \"%s\"", expected_string, actual_string);
+
+	free_result(&result);
 }
 
 /* fails on error, sets *value to NULL if parameter not found */
