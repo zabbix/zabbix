@@ -1634,38 +1634,13 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	}
 
 	if (0 != history_values.values_num)
-		ret = zbx_history_add_values(&history_values);
+		ret = zbx_vc_add_values(&history_values);
 
 	zbx_vector_ptr_destroy(&history_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
-}
-
-static void	DCmass_add_history(const ZBX_DC_HISTORY *history, int history_num)
-{
-	int		i;
-	const char	*__function_name = "DCmass_add_history";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* add to value cache */
-	zbx_vc_lock();
-
-	for (i = 0; i < history_num; i++)
-	{
-		const ZBX_DC_HISTORY	*h = &history[i];
-
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
-			continue;
-
-		zbx_vc_add_value(h->itemid, h->value_type, &h->ts, &h->value);
-	}
-
-	zbx_vc_unlock();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2388,7 +2363,6 @@ int	DCsync_history(int sync_type, int *total_num)
 				/* trigger calculation requires up to date information */
 				/* in configuration and value caches                   */
 				DCconfig_items_apply_changes(&item_diff);
-				DCmass_add_history(history, history_num);
 				DCmass_update_trends(history, history_num, &trends, &trends_num);
 
 				do
