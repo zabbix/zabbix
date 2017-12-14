@@ -41,14 +41,12 @@ void	zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *nam
 	zbx_mock_error_t	err;
 	zbx_mock_handle_t	handle;
 
-
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, value)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
 	}
 }
-
 
 void	zbx_mock_get_parameter_handle(const char *path, zbx_mock_handle_t *handle)
 {
