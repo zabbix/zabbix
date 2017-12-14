@@ -52,8 +52,9 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickButtonText('Add');
 		$this->zbxTestWaitForPageToLoad();
-		$xpath = '//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr%s/td';
-		$this->zbxTestAssertElementText(sprintf($xpath, ''), 'One time only');
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr/td',
+			'One time only'
+		);
 		// Add "Daily" maintenance period.
 		$this->zbxTestClickButtonText('New');
 		$this->zbxTestWaitForPageToLoad();
@@ -61,7 +62,9 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickButtonText('Add');
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementText(sprintf($xpath, '[2]'), 'Daily');
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[2]/td',
+			'Daily'
+		);
 		// Add "Weekly" maintenance period with "Monday" and "Sunday".
 		$this->zbxTestClickButtonText('New');
 		$this->zbxTestWaitForPageToLoad();
@@ -72,7 +75,9 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestClick('new_timeperiod_dayofweek_su');
 		$this->zbxTestClickButtonText('Add');
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementText(sprintf($xpath, '[3]'), 'Weekly');
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[3]/td',
+			'Weekly'
+		);
 		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[3]/td[2]');
 		$this->assertRegexp('/Monday/', $text);
 		$this->assertRegexp('/Sunday/', $text);
@@ -87,7 +92,9 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestClickButtonText('Add');
 		$this->zbxTestWaitForPageToLoad();
 
-		$this->zbxTestAssertElementText(sprintf($xpath, '[4]'), 'Monthly');
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[4]/td',
+			'Monthly'
+		);
 		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[4]/td[2]');
 		$this->assertRegexp('/January/', $text);
 		$this->assertRegexp('/November/', $text);
