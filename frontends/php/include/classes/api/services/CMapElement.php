@@ -59,7 +59,7 @@ abstract class CMapElement extends CApiService {
 
 			if (array_key_exists('urls', $selement)) {
 				foreach ($selement['urls'] as $url_data) {
-					if (!CHtmlUrlValidator::validate($url_data['url'])) {
+					if (!CHtmlUrlValidator::validate($url_data['url'], false)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 					}
 				}
