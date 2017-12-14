@@ -583,18 +583,6 @@ elseif (isset($_REQUEST['form'])) {
 		'groupid' => getRequest('groupid', 0)
 	];
 
-	if (!$data['groupid']) {
-		$db_hostgroup = API::HostGroup()->get([
-			'output' => ['groupid'],
-			'hostids' => $data['hostid'],
-			'templateids' => $data['hostid']
-		]);
-
-		if ($db_hostgroup) {
-			$data['groupid'] = $db_hostgroup[0]['groupid'];
-		}
-	}
-
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));
 	$triggersView->render();
 	$triggersView->show();

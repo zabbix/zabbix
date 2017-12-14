@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+........S. [ZBXNEXT-3480] added support of inventory macros in event tags (abs, vso)
 A.F.I...S. [ZBXNEXT-4175] implemented ability to send email to several email addresses specified as user media (Sergejs, miks)
 ..F.I..... [ZBXNEXT-4139] added high contrast light and high contrast dark themes (andzs)
 A......... [ZBXNEXT-4247] removed deprecated API methods: user.updareProfile, user.addMedia, user.updateMedia, user.deleteMedia, usergroup.massAdd, usergroup.massUpdate and usermedia.get (Sasha)
@@ -40,7 +41,12 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 3.4.5rc2
 
+New features:
+A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
+
 Bug fixes:
+.......PS. [ZBX-13188] fixed possibility of endless loop during unrecoverable database error; fixed incomplete handling of database error (vso)
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13176] fixed last item value retrieval errors in history manager (vjaceslavs)
 ..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
@@ -472,7 +478,11 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 --------------------------------------------------------------------------------
 Changes for 3.2.11rc2
 
+New features:
+A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
+
 Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 
@@ -1043,7 +1053,11 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.14rc2
 
+New features:
+A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
+
 Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 ..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 
@@ -2872,7 +2886,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 --------------------------------------------------------------------------------
 Changes for 2.2.21rc2
 
+New features:
+..F....... [ZBX-12825] implemented URL validation as optional; improved URL validation (miks)
+
 Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 
 --------------------------------------------------------------------------------

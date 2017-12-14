@@ -113,8 +113,6 @@ define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
-define('ZBX_SHOW_SQL_ERRORS',	true);
-
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
@@ -161,6 +159,9 @@ define('P_NO_TRIM',				0x0040);
 define('P_ALLOW_USER_MACRO',	0x0080);
 define('P_ALLOW_LLD_MACRO',		0x0100);
 define('ZBX_URI_VALID_SCHEMES', 'http,https,ftp,file,mailto,tel,ssh');
+
+// Validate URI against schemes whitelist defined in ZBX_URI_VALID_SCHEMES.
+define('VALIDATE_URI_SCHEMES', true);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');

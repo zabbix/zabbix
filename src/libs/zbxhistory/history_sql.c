@@ -160,14 +160,14 @@ static void	sql_writer_add_dbinsert(zbx_db_insert_t *db_insert)
  ************************************************************************************/
 static int	sql_writer_flush(void)
 {
-	int	i, ret = SUCCEED;
+	int	i, txn_error;
 
 	/* The writer might be uninitialized only if the history */
 	/* was already flushed. In that case, return SUCCEED */
 	if (0 == writer.initialized)
 		return SUCCEED;
 
-	while (1)
+	do
 	{
 		DBbegin();
 
@@ -176,21 +176,12 @@ static int	sql_writer_flush(void)
 			zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)writer.dbinserts.values[i];
 			zbx_db_insert_execute(db_insert);
 		}
-
-		if (0 == zbx_db_txn_error())
-		{
-			DBcommit();
-			break;
-		}
-
-		DBrollback();
-
-		ret = FAIL;
 	}
+	while (ZBX_DB_DOWN == (txn_error = DBcommit()));
 
 	sql_writer_release();
 
-	return ret;
+	return ZBX_DB_OK == txn_error ? SUCCEED : FAIL;
 }
 
 /******************************************************************************************************************
