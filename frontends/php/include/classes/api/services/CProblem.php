@@ -100,31 +100,274 @@ class CProblem extends CApiService {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				// specific triggers
+				$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+
 				if ($options['objectids'] !== null) {
 					$triggers = API::Trigger()->get([
-						'output' => [],
+						'output' => ['triggerid'],
+						'selectGroups' => ['groupid'],
+						'selectTags' => ['tag', 'value'],
 						'triggerids' => $options['objectids'],
-						'editable' => $options['editable'],
-						'preservekeys' => true
+						'editable' => $options['editable']
 					]);
-					$options['objectids'] = array_keys($triggers);
+
+					$group_triggers = [];
+					$trigger_tags = [];
+
+					foreach ($triggers as $trigger) {
+						$trigger_tags[$trigger['triggerid']] = [];
+
+						foreach ($trigger['tags'] as $tag) {
+							if ($tag['tag'] !== '') {
+								$trigger_tags[$trigger['triggerid']][] = [
+									'tag' => $tag['tag'],
+									'value' => $tag['value']
+								];
+							}
+						}
+
+						foreach ($trigger['groups'] as $group) {
+							$group_triggers[$group['groupid']][$trigger['triggerid']] = $trigger['triggerid'];
+						}
+					}
+
+					// Get rights.
+					$db_rights = DBselect(
+						'SELECT r.groupid,r.id'.
+						' FROM rights r'.
+						' WHERE '.dbConditionInt('r.groupid', $userGroups).
+							' AND '.dbConditionInt('r.id', array_keys($group_triggers))
+					);
+
+					$rights = [];
+
+					while ($db_right = DBfetch($db_rights)) {
+						$rights[$db_right['groupid']][$db_right['id']] = true;
+					}
+
+					// Get tag filter.
+					$db_tag_filters = DBselect(
+						'SELECT tf.groupid,tf.tag,tf.value,tf.usrgrpid'.
+						' FROM tag_filter tf'.
+						' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
+							' AND '.dbConditionInt('tf.groupid', array_keys($group_triggers))
+					);
+
+					$tag_filters_tmp = [];
+					$allowed_triggers = [];
+
+					while ($db_tag_filter = DBfetch($db_tag_filters)) {
+						if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === '') {
+							$allowed_triggers = array_merge($allowed_triggers,
+								$group_triggers[$db_tag_filter['groupid']]
+							);
+						}
+						else {
+							$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
+								'tag' => $db_tag_filter['tag'],
+								'value' => $db_tag_filter['value']
+							];
+						}
+					}
+
+					$tag_filters = [];
+
+					foreach ($userGroups as $usrgrpid) {
+						if (array_key_exists($usrgrpid, $tag_filters_tmp)) {
+							foreach ($tag_filters_tmp[$usrgrpid] as $groupid => $tag_filter) {
+								if (array_key_exists($usrgrpid, $rights)
+										&& array_key_exists($groupid, $rights[$usrgrpid])) {
+									unset($rights[$usrgrpid][$groupid]);
+								}
+								else {
+									unset($rights[$usrgrpid]);
+								}
+
+								if (array_key_exists($groupid, $tag_filters)) {
+									$tag_filters[$groupid] = array_merge($tag_filters[$groupid], $tag_filter);
+								}
+								else {
+									$tag_filters[$groupid] = $tag_filter;
+								}
+							}
+						}
+					}
+
+					foreach ($rights as $usrgrpid => $right) {
+						foreach ($right as $groupid => $value) {
+							if (array_key_exists($groupid, $group_triggers)) {
+								$allowed_triggers = array_merge($allowed_triggers, $group_triggers[$groupid]);
+								unset($group_triggers[$groupid]);
+							}
+						}
+					}
+
+					foreach ($tag_filters as $groupid => $tag_filter) {
+						if (array_key_exists($groupid, $group_triggers)) {
+							$triggerids = $group_triggers[$groupid];
+							foreach ($triggerids as $triggerid) {
+								if (!in_array($triggerid, $allowed_triggers)) {
+									foreach ($trigger_tags[$triggerid] as $trigger_tag) {
+										if (in_array($trigger_tag, $tag_filter)) {
+											$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
+											break;
+										}
+
+										foreach ($tag_filter as $tag_array) {
+											if ($tag_array['value'] === ''
+													&& $trigger_tag['tag'] == $tag_array['tag']) {
+												$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
+												break 2;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+					$options['objectids'] = array_unique($allowed_triggers);
 				}
 				// all triggers
 				else {
-					$sqlParts['where'][] = 'NOT EXISTS ('.
+					// Get all visible groups.
+					$host_groups = API::HostGroup()->get([
+						'output' => ['groupid'],
+						'preservekeys' => true
+					]);
+
+					// Get rights.
+					$db_rights = DBselect(
+						'SELECT r.groupid,r.id'.
+						' FROM rights r'.
+						' WHERE '.dbConditionInt('r.groupid', $userGroups).
+							' AND '.dbConditionInt('r.id', array_keys($host_groups))
+					);
+
+					$rights = [];
+
+					while ($db_right = DBfetch($db_rights)) {
+						$rights[$db_right['groupid']][$db_right['id']] = true;
+					}
+
+					// Get tag filter.
+					$db_tag_filters = DBselect(
+						'SELECT tf.groupid,tf.tag,tf.value,tf.usrgrpid'.
+						' FROM tag_filter tf'.
+						' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
+							' AND '.dbConditionInt('tf.groupid', array_keys($host_groups))
+					);
+
+					$tag_filters_tmp = [];
+
+					$skip_groups = [];
+					while ($db_tag_filter = DBfetch($db_tag_filters)) {
+						if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === '') {
+							$skip_groups[$db_tag_filter['groupid']] = true;
+						}
+						else {
+							$tag_filters_tmp[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']][] = [
+								'tag' => $db_tag_filter['tag'],
+								'value' => $db_tag_filter['value']
+							];
+						}
+					}
+
+					$tag_filters = [];
+					$allowed_triggers = [];
+
+					foreach ($userGroups as $usrgrpid) {
+						if (array_key_exists($usrgrpid, $tag_filters_tmp)) {
+							foreach ($tag_filters_tmp[$usrgrpid] as $groupid => $tag_filter) {
+								if (array_key_exists($groupid, $rights[$usrgrpid])) {
+									unset($rights[$usrgrpid][$groupid]);
+								}
+
+								if (array_key_exists($groupid, $tag_filters)) {
+									$tag_filters[$groupid] = array_merge($tag_filters[$groupid], $tag_filter);
+								}
+								else {
+									$tag_filters[$groupid] = $tag_filter;
+								}
+							}
+						}
+						else {
+							if (array_key_exists($usrgrpid, $rights)) {
+								$skip_groups += $rights[$usrgrpid];
+								unset($rights[$usrgrpid]);
+							}
+						}
+					}
+
+					foreach ($rights as $usrgrpid => $right) {
+						foreach ($right as $groupid => $value) {
+							if (array_key_exists($groupid, $host_groups)) {
+								$allowed_triggers = array_merge($allowed_triggers, $host_groups[$groupid]);
+							}
+						}
+					}
+
+					if ($host_groups) {
+						$triggers = API::Trigger()->get([
+							'output' => ['triggerid'],
+							'selectGroups' => ['groupid'],
+							'selectTags' => ['tag', 'value'],
+							'groupids' => array_keys($host_groups)
+						]);
+
+						$group_triggers = [];
+						$trigger_tags = [];
+
+						foreach ($triggers as $trigger) {
+							$trigger_tags[$trigger['triggerid']] = [];
+
+							foreach ($trigger['tags'] as $tag) {
+								if ($tag['tag'] !== '') {
+									$trigger_tags[$trigger['triggerid']][] = [
+										'tag' => $tag['tag'],
+										'value' => $tag['value']
+									];
+								}
+							}
+
+							foreach ($trigger['groups'] as $group) {
+								$group_triggers[$group['groupid']][$trigger['triggerid']] = $trigger['triggerid'];
+							}
+						}
+
+						foreach ($tag_filters as $groupid => $tag_filter) {
+							$triggerids = $group_triggers[$groupid];
+							foreach ($triggerids as $triggerid) {
+								if (!in_array($triggerid, $allowed_triggers)) {
+									foreach ($trigger_tags[$triggerid] as $trigger_tag) {
+										if (in_array($trigger_tag, $tag_filter)) {
+											$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
+											break;
+										}
+
+										foreach ($tag_filter as $tag_array) {
+											if ($tag_array['value'] === ''
+													&& $trigger_tag['tag'] == $tag_array['tag']) {
+												$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
+												break 2;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+					$sqlParts['where'][] = '(EXISTS ('.
 						'SELECT NULL'.
 						' FROM functions f,items i,hosts_groups hgg'.
-							' LEFT JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
 						' WHERE p.objectid=f.triggerid'.
 							' AND f.itemid=i.itemid'.
 							' AND i.hostid=hgg.hostid'.
-						' GROUP BY i.hostid'.
-						' HAVING MAX(permission)<'.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-							' OR MIN(permission) IS NULL'.
-							' OR MIN(permission)='.PERM_DENY.
-						')';
+							' AND '.dbConditionInt('hgg.groupid', array_keys($skip_groups)).
+						')'.
+						' OR '.dbConditionInt('p.objectid', $allowed_triggers).
+					')';
 				}
 			}
 			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
