@@ -72,6 +72,13 @@ static ZBX_MUTEX	vc_lock = ZBX_MUTEX_NULL;
 /* flag indicating that the cache was explicitly locked by this process */
 static int	vc_locked = 0;
 
+/* value cache enable/disable flags */
+#define ZBX_VC_DISABLED		0
+#define ZBX_VC_ENABLED		1
+
+/* value cache state, after initialization value cache is always disabled */
+static int	vc_state = ZBX_VC_DISABLED;
+
 /* the value cache size */
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 
@@ -256,7 +263,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item);
  ******************************************************************************/
 static void	vc_try_lock(void)
 {
-	if (NULL != vc_cache && 0 == vc_locked)
+	if (ZBX_VC_ENABLED == vc_state && 0 == vc_locked)
 		zbx_mutex_lock(&vc_lock);
 }
 
@@ -270,7 +277,7 @@ static void	vc_try_lock(void)
  ******************************************************************************/
 static void	vc_try_unlock(void)
 {
-	if (NULL != vc_cache && 0 == vc_locked)
+	if (ZBX_VC_ENABLED == vc_state && 0 == vc_locked)
 		zbx_mutex_unlock(&vc_lock);
 }
 
@@ -640,7 +647,7 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 		item->last_accessed = ZBX_VC_TIME();
 	}
 
-	if (NULL != vc_cache)
+	if (ZBX_VC_ENABLED == vc_state)
 	{
 		vc_cache->hits += hits;
 		vc_cache->misses += misses;
@@ -2602,6 +2609,8 @@ int	zbx_vc_init(char **error)
 
 	ret = SUCCEED;
 out:
+	zbx_vc_disable();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
@@ -2687,7 +2696,7 @@ int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	zbx_vc_item_t	*item;
 	int 		ret = FAIL;
 
-	if (NULL == vc_cache)
+	if (ZBX_VC_DISABLED == vc_state)
 		return FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d timestamp:%d.%d",
@@ -2761,7 +2770,7 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 
 	vc_try_lock();
 
-	if (NULL == vc_cache)
+	if (ZBX_VC_DISABLED == vc_state)
 		goto out;
 
 	if (ZBX_VC_MODE_LOWMEM == vc_cache->mode)
@@ -2835,7 +2844,7 @@ out:
 
 		vc_try_lock();
 
-		if (NULL != vc_cache)
+		if (ZBX_VC_ENABLED == vc_state)
 			vc_cache->db_queries += queries;
 
 		if (SUCCEED == ret)
@@ -2884,7 +2893,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 	vc_try_lock();
 
-	if (NULL == vc_cache)
+	if (ZBX_VC_DISABLED == vc_state)
 		goto out;
 
 	if (ZBX_VC_MODE_LOWMEM == vc_cache->mode)
@@ -2925,7 +2934,7 @@ out:
 
 		vc_try_lock();
 
-		if (NULL != vc_cache)
+		if (ZBX_VC_ENABLED == vc_state)
 			vc_cache->db_queries += queries;
 
 		if (SUCCEED == ret)
@@ -2963,7 +2972,7 @@ out:
  ******************************************************************************/
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 {
-	if (NULL == vc_cache)
+	if (ZBX_VC_DISABLED == vc_state)
 		return FAIL;
 
 	vc_try_lock();
@@ -3042,4 +3051,29 @@ void	zbx_vc_unlock(void)
 {
 	vc_locked = 0;
 	zbx_mutex_unlock(&vc_lock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vc_enable                                                    *
+ *                                                                            *
+ * Purpose: enables value caching for current process                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_enable(void)
+{
+	if (NULL != vc_cache)
+		vc_state = ZBX_VC_ENABLED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vc_disable                                                   *
+ *                                                                            *
+ * Purpose: disables value caching for current process                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_disable(void)
+{
+	vc_state = ZBX_VC_DISABLED;
 }
