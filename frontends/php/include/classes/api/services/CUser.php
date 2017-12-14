@@ -596,8 +596,12 @@ class CUser extends CApiService {
 								}
 							}
 						}
-						// For non-email media types only one value allowed.
-						elseif (!is_string($media['sendto'][0]) || count($media['sendto']) > 1) {
+						/*
+						 * For non-email media types only one value allowed. Since value is normalized, need to validate
+						 * if array contains only one item. If there are more than one string, error message is
+						 * displayed, indicating that passed value is not a string.
+						 */
+						elseif (count($media['sendto']) > 1) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('a character string is expected'))
 							);
