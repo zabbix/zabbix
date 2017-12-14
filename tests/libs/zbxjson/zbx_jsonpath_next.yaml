@@ -15,7 +15,7 @@ out:
   result: fail
   components:
 ---
-test case: Invalid path "$." - missing dot notation memeber name 
+test case: Invalid path "$." - missing dot notation member name 
 in:
   path: $.
 out:
@@ -79,7 +79,7 @@ out:
     - class: bracket
       value: a
 ---
-test case: Invalid path "$.a." - missing dot notation memeber name
+test case: Invalid path "$.a." - missing dot notation member name
 in:
   path: $.a.
 out:
@@ -88,7 +88,7 @@ out:
     - class: dot
       value: a
 ---
-test case: Invalid path "$.['a']" - missing dot notation memeber name
+test case: Invalid path "$.['a']" - missing dot notation member name
 in:
   path: $.['a']
 out:
@@ -98,7 +98,7 @@ out:
 # Valid JSON paths
 
 ---
-test case: Valid path "$.a" - get dot notation first level memeber 
+test case: Valid path "$.a" - get dot notation first level member 
 in:
   path: $.a
 out:
@@ -134,7 +134,7 @@ out:
     - class: bracket
       value: a
 ---
-test case: Valid path "$.a.b" - get dot notation second level memeber
+test case: Valid path "$.a.b" - get dot notation second level member
 in:
   path: $.a.b
 out:
@@ -145,7 +145,7 @@ out:
     - class: dot
       value: b
 ---
-test case: Valid path "$['a'].b" - get mixed notation second level memeber
+test case: Valid path "$['a'].b" - get mixed notation second level member
 in:
   path: $['a'].b
 out:
@@ -156,7 +156,7 @@ out:
     - class: dot
       value: b
 ---
-test case: Valid path "$['a']['b']" - get bracket notation second level memeber
+test case: Valid path "$['a']['b']" - get bracket notation second level member
 in:
   path: $['a']['b']
 out:
@@ -167,7 +167,7 @@ out:
     - class: bracket
       value: b
 ---
-test case: Valid path $.a['b'] - get mixed notation second level memeber
+test case: Valid path $.a['b'] - get mixed notation second level member
 in:
   path: $.a['b']
 out:
@@ -226,7 +226,7 @@ out:
     - class: index
       value: 1
 ---
-test case: Valid path $['a'][2] - get third array element of bracket notation first level memeber
+test case: Valid path $['a'][2] - get third array element of bracket notation first level member
 in:
   path: $['a'][2]
 out:
