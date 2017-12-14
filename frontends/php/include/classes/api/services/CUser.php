@@ -577,6 +577,30 @@ class CUser extends CApiService {
 			foreach ($users as $user) {
 				if (array_key_exists('user_medias', $user)) {
 					foreach ($user['user_medias'] as $media) {
+						/*
+						 * For non-email media types only one value allowed. Since value is normalized, need to validate
+						 * if array contains only one item. If there are more than one string, error message is
+						 * displayed, indicating that passed value is not a string.
+						 */
+						if (!array_key_exists($media['mediatypeid'], $email_mediatypes)
+								&& count($media['sendto']) > 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('a character string is expected'))
+							);
+						}
+
+						/*
+						 * If input value is an array with empty string, ApiInputValidator identifies it as valid since
+						 * values are normalized. That's why value must be revalidated.
+						 */
+						foreach ($media['sendto'] as $sendto) {
+							if ($sendto === '') {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('cannot be empty'))
+								);
+							}
+						}
+
 						// API_NORMALIZEed array of strings expected.
 						if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
 							foreach ($media['sendto'] as $sendto) {
@@ -595,25 +619,6 @@ class CUser extends CApiService {
 									);
 								}
 							}
-						}
-						/*
-						 * For non-email media types only one value allowed. Since value is normalized, need to validate
-						 * if array contains only one item. If there are more than one string, error message is
-						 * displayed, indicating that passed value is not a string.
-						 */
-						elseif (count($media['sendto']) > 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('a character string is expected'))
-							);
-						}
-						/*
-						 * If input value is an array with empty string, ApiInputValidator identifies it as valid since
-						 * values are normalized. That's why value must be revalidated.
-						 */
-						elseif ($media['sendto'][0] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('cannot be empty'))
-							);
 						}
 					}
 				}
