@@ -1816,9 +1816,16 @@ error:
 		zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
-		DBfree_result(result);
-		result = (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result) ? (DB_RESULT)ZBX_DB_DOWN :
-				NULL);
+		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
+		{
+			DBfree_result(result);
+			result = (DB_RESULT)ZBX_DB_DOWN;
+		}
+		else
+		{
+			DBfree_result(result);
+			result = NULL;
+		}
 	}
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
