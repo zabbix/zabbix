@@ -84,6 +84,10 @@ void	zbx_vc_lock(void);
 
 void	zbx_vc_unlock(void);
 
+void	zbx_vc_enable(void);
+
+void	zbx_vc_disable(void);
+
 int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
 		int count, int timestamp);
 
