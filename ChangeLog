@@ -29,6 +29,7 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 .......PS. [ZBX-12251] fixed possibility of trigger status getting stuck in PROBLEM or OK state due to transaction error in history synchronization, added deadlock to a list of recoverable errors (vso, wiper)
 ..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
 ....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
@@ -45,6 +46,7 @@ New features:
 A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
 
 Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13176] fixed last item value retrieval errors in history manager (vjaceslavs)
 ..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
@@ -480,6 +482,7 @@ New features:
 A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
 
 Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 
@@ -2886,6 +2889,7 @@ New features:
 ..F....... [ZBX-12825] implemented URL validation as optional; improved URL validation (miks)
 
 Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 
 --------------------------------------------------------------------------------

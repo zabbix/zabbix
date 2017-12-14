@@ -113,8 +113,6 @@ define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
-define('ZBX_SHOW_SQL_ERRORS',	true);
-
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
