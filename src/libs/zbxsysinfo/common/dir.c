@@ -426,7 +426,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "vfs_dir_size";
 	char			*dir = NULL;
-	int			mode, max_depth, ret = SYSINFO_RET_FAIL, attrib_ex;
+	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
+	unsigned long		attrib_ex;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list;
 	zbx_stat_t		status;
@@ -519,7 +520,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 					path, strerror_from_system(GetLastError()));
 			}
 
-			if ((0 != (attrib_ex & FILE_ATTRIBUTE_REPARSE_POINT)) || INVALID_FILE_ATTRIBUTES == attrib_ex)
+			if (0 != (attrib_ex & FILE_ATTRIBUTE_REPARSE_POINT))
 			{						/* A file or directory that          */
 				zbx_free(wpath);			/* has an associated reparse point,  */
 				zbx_free(path);				/* or a file that is a symbolic link */
