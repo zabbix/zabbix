@@ -1,7 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
-........S. [ZBXNEXT-3480] added suppor of inventory macros in event tags (abs, vso)
+........S. [ZBXNEXT-3480] added support of inventory macros in event tags (abs, vso)
 A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
 A.F.I...S. [ZBXNEXT-4175] implemented ability to send email to several email addresses specified as user media (Sergejs, miks)
 ..F.I..... [ZBXNEXT-4139] added high contrast light and high contrast dark themes (andzs)
