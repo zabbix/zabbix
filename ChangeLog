@@ -41,6 +41,7 @@ Bug fixes:
 Changes for 3.4.5rc2
 
 Bug fixes:
+..F....... [ZBX-13176] fixed last item value retrieval errors in history manager (vjaceslavs)
 ..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 ........S. [ZBX-13153] fixed possibility that proxy last access updates are lost during cache reload (vso)
@@ -54,6 +55,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 .........T [ZBXNEXT-4223] performed network templates cleanup (vitaly)
 ........S. [ZBX-12974] fixed TLS connection to passive proxy error handling (gleb, valdis)
 ..F....... [ZBX-12714] fixed overflow property of svg (vjaceslavs)
@@ -1049,6 +1051,7 @@ Bug fixes:
 Changes for 3.0.14rc1
 
 Bug fixes:
+..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 ..F....... [ZBX-13042] fixed unclickable template link on host items list page (gcalenko)
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 ..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
@@ -2876,6 +2879,7 @@ Bug fixes:
 Changes for 2.2.21rc1
 
 Bug fixes:
+..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
 ..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
 ..F....... [ZBX-13133] fixed multiple security issues (miks)
