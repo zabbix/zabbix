@@ -571,36 +571,45 @@ class CUser extends CApiService {
 				}
 			}
 
-			// Validate e-mails for all users.
-			if ($email_mediatypes) {
-				$max_length = DB::getFieldLength('media', 'sendto');
-				$email_validator = new CEmailValidator();
+			$max_length = DB::getFieldLength('media', 'sendto');
+			$email_validator = new CEmailValidator();
 
-				foreach ($users as $user) {
-					if (array_key_exists('user_medias', $user)) {
-						foreach ($user['user_medias'] as $media) {
-							if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
-								if (!is_array($media['sendto'])) {
-									$media['sendto'] = [$media['sendto']];
+			foreach ($users as $user) {
+				if (array_key_exists('user_medias', $user)) {
+					foreach ($user['user_medias'] as $media) {
+						// API_NORMALIZEed array of strings expected.
+						if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
+							foreach ($media['sendto'] as $sendto) {
+								if (!$email_validator->validate($sendto)) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Invalid email address for media type with ID "%1$s".',
+											$media['mediatypeid']
+										)
+									);
 								}
-
-								foreach ($media['sendto'] as $sendto) {
-									if (!$email_validator->validate($sendto)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Invalid email address for media type with ID "%1$s".',
-												$media['mediatypeid']
-											)
-										);
-									}
-									elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
-												$media['mediatypeid']
-											)
-										);
-									}
+								elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
+											$media['mediatypeid']
+										)
+									);
 								}
 							}
+						}
+						// For non-email media types only one value allowed.
+						elseif (!is_string($media['sendto'][0]) || count($media['sendto']) > 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('a character string is expected'))
+							);
+						}
+						/*
+						 * If input value is an array with empty string, ApiInputValidator identifies it as valid since
+						 * values are normalized. That's why value must be revalidated.
+						 */
+						elseif ($media['sendto'][0] === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('cannot be empty'))
+							);
 						}
 					}
 				}
@@ -766,10 +775,7 @@ class CUser extends CApiService {
 				$medias[$user['userid']] = [];
 
 				foreach ($user['user_medias'] as $media) {
-					if (is_array($media['sendto'])) {
-						$media['sendto'] = implode("\n", $media['sendto']);
-					}
-
+					$media['sendto'] = implode("\n", $media['sendto']);
 					$medias[$user['userid']][] = $media;
 				}
 			}
