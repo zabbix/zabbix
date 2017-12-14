@@ -102,14 +102,6 @@ static ZBX_DC_IDS	*ids = NULL;
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	const char	*field_name;
-	char		*value_esc;
-}
-zbx_inventory_value_t;
-
-typedef struct
-{
 	zbx_uint64_t	history_counter;	/* the total number of processed values */
 	zbx_uint64_t	history_float_counter;	/* the number of processed float values */
 	zbx_uint64_t	history_uint_counter;	/* the number of processed uint values */
@@ -1047,31 +1039,37 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 	inventory_value = zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
 
 	inventory_value->hostid = item->host.hostid;
+	inventory_value->idx = item->inventory_link - 1;
 	inventory_value->field_name = inventory_field;
-	inventory_value->value_esc = DBdyn_escape_field("host_inventory", inventory_field, value);
+	inventory_value->value = zbx_strdup(NULL, value);
 
 	zbx_vector_ptr_append(inventory_values, inventory_value);
 }
 
 static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
 {
+	char	*value_esc;
 	int	i;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
 		const zbx_inventory_value_t	*inventory_value = inventory_values->values[i];
 
+		value_esc = DBdyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
-				inventory_value->field_name, inventory_value->value_esc, inventory_value->hostid);
+				inventory_value->field_name, value_esc, inventory_value->hostid);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, sql_offset);
+
+		zbx_free(value_esc);
 	}
 }
 
 static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
 {
-	zbx_free(inventory_value->value_esc);
+	zbx_free(inventory_value->value);
 	zbx_free(inventory_value);
 }
 
@@ -1517,6 +1515,8 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
+
+		DCconfig_update_inventory_values(inventory_values);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
