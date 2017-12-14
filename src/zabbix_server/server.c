@@ -66,6 +66,7 @@
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"
 #include "zbxhistory.h"
+#include "postinit.h"
 
 #ifdef ZBX_CUNIT
 #include "../libs/zbxcunit/zbxcunit.h"
@@ -1007,7 +1008,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	/* make initial configuration sync before worker processes are forked */
 	DCsync_configuration(ZBX_DBSYNC_INIT);
 
+	if (SUCCEED != zbx_check_postinit_tasks(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	DBclose();
+
+	zbx_vc_enable();
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;

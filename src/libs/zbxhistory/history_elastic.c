@@ -320,11 +320,11 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 		return;
 	}
 
-	curl_easy_setopt(data->handle, CURLOPT_URL, data->post_url);
-	curl_easy_setopt(data->handle, CURLOPT_POST, 1);
-	curl_easy_setopt(data->handle, CURLOPT_POSTFIELDS, data->buf);
-	curl_easy_setopt(data->handle, CURLOPT_WRITEFUNCTION, curl_write_send_cb);
-	curl_easy_setopt(data->handle, CURLOPT_FAILONERROR, 1L);
+	(void)curl_easy_setopt(data->handle, CURLOPT_URL, data->post_url);
+	(void)curl_easy_setopt(data->handle, CURLOPT_POST, 1);
+	(void)curl_easy_setopt(data->handle, CURLOPT_POSTFIELDS, data->buf);
+	(void)curl_easy_setopt(data->handle, CURLOPT_WRITEFUNCTION, curl_write_send_cb);
+	(void)curl_easy_setopt(data->handle, CURLOPT_FAILONERROR, 1L);
 
 	curl_multi_add_handle(writer.handle, data->handle);
 
@@ -363,7 +363,7 @@ static int	elastic_writer_flush(void)
 		zbx_history_iface_t		*hist = (zbx_history_iface_t *)writer.ifaces.values[i];
 		zbx_elastic_data_t	*data = hist->data;
 
-		curl_easy_setopt(data->handle, CURLOPT_HTTPHEADER, curl_headers);
+		(void)curl_easy_setopt(data->handle, CURLOPT_HTTPHEADER, curl_headers);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "sending %s", data->buf);
 	}

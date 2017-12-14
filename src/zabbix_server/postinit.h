@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -18,30 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_POSTINIT_H
+#define ZABBIX_POSTINIT_H
 
-class CWidgetFieldUrl extends CWidgetField {
+int	zbx_check_postinit_tasks(char **error);
 
-	/**
-	 * URL widget field.
-	 *
-	 * @param string $name  field name in form
-	 * @param string $label  label for the field in form
-	 */
-	public function __construct($name, $label) {
-		parent::__construct($name, $label);
-
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO]);
-		$this->setDefault('');
-	}
-
-	public function validate($strict = false) {
-		$errors = parent::validate($strict);
-
-		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && $this->getValue() === '') {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
-		}
-
-		return $errors;
-	}
-}
+#endif
