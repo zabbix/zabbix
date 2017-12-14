@@ -601,7 +601,12 @@ class CUser extends CApiService {
 							}
 						}
 
-						// API_NORMALIZEed array of strings expected.
+						/*
+						 * If media type is email, validate each given string against email pattern.
+						 * Additionally, total lenght of emails must be checked, because all media type emails are
+						 * separated by newline and stored as a string in single database field. Newline characters
+						 * consumes extra space, so additional validation must be made.
+						 */
 						if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
 							foreach ($media['sendto'] as $sendto) {
 								if (!$email_validator->validate($sendto)) {
