@@ -89,15 +89,11 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	err = zbx_mock_vector_element(components, &component);
+	if (ZBX_MOCK_SUCCESS == (err = zbx_mock_vector_element(components, &component)))
+		fail_msg("Too many path components parsed");
 
 	if (ZBX_MOCK_END_OF_VECTOR != err && ZBX_MOCK_NOT_A_VECTOR != err)
-	{
-		if (ZBX_MOCK_SUCCESS == err)
-			fail_msg("Too many path components parsed");
-		else
-			fail_msg("Cannot get vector element: %s", zbx_mock_error_string(err));
-	}
+		fail_msg("Cannot get vector element: %s", zbx_mock_error_string(err));
 
 	zbx_free(buffer);
 }
