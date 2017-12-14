@@ -111,6 +111,58 @@ class testFormMaintenance extends CWebTest {
 	}
 
 	/**
+	 * Changes not preserve when close edit form using cancel button.
+	 */
+	public function testFromMaintenance_Cancel() {
+		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
+		$this->zbxTestCheckHeader('Maintenance periods');
+		// Filter by "Dev-718 Test maintenance'.
+		$this->zbxTestInputTypeOverwrite('filter_name', 'DEV-718 Test maintenance');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestWaitForPageToLoad();
+
+		// Open form.
+		$this->zbxTestClickLinkText('DEV-718 Test maintenance');
+		$this->zbxTestWaitForPageToLoad();
+
+		// "Maintenance" tab
+		// Change period name.
+		$this->zbxTestInputTypeOverwrite('mname', 'Some random text');
+
+		// "Periods" tab.
+		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
+		// Remove 4th defined period
+		$this->zbxTestClickXpath('//tr[4]/td[4]/ul/li[2]/button');
+		$this->zbxTestWaitForPageToLoad();
+
+		$this->zbxTestClick('cancel');
+		$this->zbxTestWaitForPageToLoad();
+
+		// Open form to check changes was not saved.
+		$this->zbxTestClickLinkText('DEV-718 Test maintenance');
+		$this->zbxTestWaitForPageToLoad();
+
+		// "Maintenance" tab.
+		$this->zbxTestAssertElementValue('mname', 'DEV-718 Test maintenance');
+
+		// "Periods" tab.
+		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
+		// Assert that there are 4 periods.
+		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[9]', 'Edit');
+		// Assert that 4th period type is "Monthly".
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[4]/td',
+			'Monthly'
+		);
+
+		// Cancel and reset "Maintenance period" list filter.
+		$this->zbxTestClick('cancel');
+		$this->zbxTestWaitForPageToLoad();
+
+		$this->zbxTestClickButtonText('Reset');
+	}
+
+	/**
 	 * Update "DEV-718 Test maintenance" maintenance.
 	 */
 	public function testFormMaintenance_Update() {
