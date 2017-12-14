@@ -1559,6 +1559,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	ub4		prefetch_rows = 200, counter;
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
+	PGresult	*pg_result;
 #elif defined(HAVE_SQLITE3)
 	int		ret = FAIL;
 	char		*error = NULL;
@@ -1802,26 +1803,26 @@ error:
 	}
 #elif defined(HAVE_POSTGRESQL)
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
-	result->pg_result = PQexec(conn, sql);
+	pg_result = result->pg_result = PQexec(conn, sql);
 	result->values = NULL;
 	result->cursor = 0;
 	result->row_num = 0;
 
-	if (NULL == result->pg_result)
+	if (NULL == pg_result)
 		zbx_db_errlog(ERR_Z3005, 0, "result is NULL", sql);
 
-	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
+	if (PGRES_TUPLES_OK != PQresultStatus(pg_result))
 	{
-		zbx_postgresql_error(&error, result->pg_result);
+		zbx_postgresql_error(&error, pg_result);
 		zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
 		DBfree_result(result);
-		result = (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result) ? (DB_RESULT)ZBX_DB_DOWN :
+		result = (SUCCEED == is_recoverable_postgresql_error(conn, pg_result) ? (DB_RESULT)ZBX_DB_DOWN :
 				NULL);
 	}
 	else	/* init rownum */
-		result->row_num = PQntuples(result->pg_result);
+		result->row_num = PQntuples(pg_result);
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level)
 		zbx_mutex_lock(&sqlite_access);
