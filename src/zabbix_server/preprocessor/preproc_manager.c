@@ -1032,7 +1032,6 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
-	time_now = time_stat;
 	time_flush = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
