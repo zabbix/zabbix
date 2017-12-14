@@ -25,31 +25,27 @@
 
 void cm_print_error(const char * const format, ...);
 
-#define _FAIL(file, line, prefix, message, ...)	\
-	do 				\
-	{				\
-		cm_print_error("%s%s" message, (NULL != prefix_msg ? prefix_msg : ""),	\
+#define _FAIL(file, line, prefix, message, ...)							\
+	do 											\
+	{											\
+		cm_print_error("%s%s" message, (NULL != prefix_msg ? prefix_msg : ""),		\
 				(NULL != prefix_msg && '\0' != *prefix_msg ? ": " : ""),	\
-				__VA_ARGS__);	\
-		_fail(file, line);	\
-	} while(0);
+				__VA_ARGS__);							\
+		_fail(file, line);								\
+	} while(0)
 
 void	__zbx_mock_assert_streq(const char *file, int line, const char *prefix_msg, const char *expected_value,
 		const char *return_value)
 {
 	if (0 != strcmp(return_value, expected_value))
-	{
 		_FAIL(file, line, prefix_msg, "Expected \"%s\" while got \"%s\"\n", expected_value, return_value);
-	}
 }
 
 void	__zbx_mock_assert_strne(const char *file, int line, const char *prefix_msg, const char *expected_value,
 		const char *return_value)
 {
 	if (0 == strcmp(return_value, expected_value))
-	{
 		_FAIL(file, line, prefix_msg, "Expected not \"%s\" while got \"%s\"\n", expected_value, return_value);
-	}
 }
 
 void	__zbx_mock_assert_uint64eq(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
@@ -76,16 +72,12 @@ void	__zbx_mock_assert_inteq(const char *file, int line, const char *prefix_msg,
 		int return_value)
 {
 	if (return_value != expected_value)
-	{
 		_FAIL(file, line, prefix_msg, "Expected \"%d\" while got \"%d\"\n", expected_value, return_value);
-	}
 }
 
 void	__zbx_mock_assert_intne(const char *file, int line, const char *prefix_msg, int expected_value,
 		int return_value)
 {
 	if (return_value == expected_value)
-	{
 		_FAIL(file, line, prefix_msg, "Expected not \"%d\" while got \"%d\"\n", expected_value, return_value);
-	}
 }
