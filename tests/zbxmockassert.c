@@ -36,50 +36,58 @@ do 											\
 }											\
 while(0)
 
-void	__zbx_mock_assert_streq(const char *file, int line, const char *prefix_msg, const char *expected_value,
-		const char *return_value)
-{
-	if (0 != strcmp(return_value, expected_value))
-		_FAIL(file, line, prefix_msg, "Expected \"%s\" while got \"%s\"\n", expected_value, return_value);
-}
-
-void	__zbx_mock_assert_strne(const char *file, int line, const char *prefix_msg, const char *expected_value,
+void	__zbx_mock_assert_str_eq(const char *file, int line, const char *prefix_msg, const char *expected_value,
 		const char *return_value)
 {
 	if (0 == strcmp(return_value, expected_value))
-		_FAIL(file, line, prefix_msg, "Expected not \"%s\" while got \"%s\"\n", expected_value, return_value);
+		return;
+
+	_FAIL(file, line, prefix_msg, "Expected \"%s\" while got \"%s\"\n", expected_value, return_value);
 }
 
-void	__zbx_mock_assert_uint64eq(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
-		zbx_uint64_t return_value)
+void	__zbx_mock_assert_str_ne(const char *file, int line, const char *prefix_msg, const char *expected_value,
+		const char *return_value)
 {
-	if (return_value != expected_value)
-	{
-		_FAIL(file, line, prefix_msg, "Expected \"" ZBX_FS_UI64 "\" while got \"" ZBX_FS_UI64 "\"\n",
-				expected_value, return_value);
-	}
+	if (0 != strcmp(return_value, expected_value))
+		return;
+
+	_FAIL(file, line, prefix_msg, "Expected not \"%s\" while got \"%s\"\n", expected_value, return_value);
 }
 
-void	__zbx_mock_assert_uint64ne(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
+void	__zbx_mock_assert_uint64_eq(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
 		zbx_uint64_t return_value)
 {
 	if (return_value == expected_value)
-	{
-		_FAIL(file, line, prefix_msg, "Expected not \"" ZBX_FS_UI64 "\" while got \"" ZBX_FS_UI64 "\"\n",
-				expected_value, return_value);
-	}
+		return;
+
+	_FAIL(file, line, prefix_msg, "Expected \"" ZBX_FS_UI64 "\" while got \"" ZBX_FS_UI64 "\"\n", expected_value,
+			return_value);
 }
 
-void	__zbx_mock_assert_inteq(const char *file, int line, const char *prefix_msg, int expected_value,
-		int return_value)
+void	__zbx_mock_assert_uint64_ne(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
+		zbx_uint64_t return_value)
 {
 	if (return_value != expected_value)
-		_FAIL(file, line, prefix_msg, "Expected \"%d\" while got \"%d\"\n", expected_value, return_value);
+		return;
+
+	_FAIL(file, line, prefix_msg, "Expected not \"" ZBX_FS_UI64 "\" while got \"" ZBX_FS_UI64 "\"\n",
+			expected_value, return_value);
 }
 
-void	__zbx_mock_assert_intne(const char *file, int line, const char *prefix_msg, int expected_value,
+void	__zbx_mock_assert_int_eq(const char *file, int line, const char *prefix_msg, int expected_value,
 		int return_value)
 {
 	if (return_value == expected_value)
-		_FAIL(file, line, prefix_msg, "Expected not \"%d\" while got \"%d\"\n", expected_value, return_value);
+		return;
+
+	_FAIL(file, line, prefix_msg, "Expected \"%d\" while got \"%d\"\n", expected_value, return_value);
+}
+
+void	__zbx_mock_assert_int_ne(const char *file, int line, const char *prefix_msg, int expected_value,
+		int return_value)
+{
+	if (return_value != expected_value)
+		return;
+
+	_FAIL(file, line, prefix_msg, "Expected not \"%d\" while got \"%d\"\n", expected_value, return_value);
 }

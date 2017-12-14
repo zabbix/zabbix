@@ -39,21 +39,21 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_get_parameter_string("out.result", &result);
 
 	ret = zbx_json_open(json, &jp);
-	zbx_mock_assert_inteq("Invalid zbx_json_open() return value", SUCCEED, ret);
+	zbx_mock_assert_int_eq("Invalid zbx_json_open() return value", SUCCEED, ret);
 
 	if (FAIL == (ret = zbx_json_path_open(&jp, path, &jp_out)))
 	{
-		zbx_mock_assert_streq("Invalid zbx_json_path_open() return value", result, "fail");
+		zbx_mock_assert_str_eq("Invalid zbx_json_path_open() return value", result, "fail");
 		return;
 	}
 
-	zbx_mock_assert_streq("Invalid zbx_json_path_open() return value", result, "succeed");
+	zbx_mock_assert_str_eq("Invalid zbx_json_path_open() return value", result, "succeed");
 
 	buffer = zbx_malloc(NULL, strlen(json));
 	zbx_strlcpy(buffer, jp_out.start, jp_out.end - jp_out.start + 2);
 
 	zbx_mock_get_parameter_string("out.value", &value);
-	zbx_mock_assert_streq("Invalid value", value, buffer);
+	zbx_mock_assert_str_eq("Invalid value", value, buffer);
 
 	zbx_free(buffer);
 }

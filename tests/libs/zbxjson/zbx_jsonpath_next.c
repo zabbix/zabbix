@@ -49,7 +49,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		if (SUCCEED != (ret = zbx_jsonpath_next(path, &next, &loc, &type)))
 		{
-			zbx_mock_assert_streq("Return value", result, "fail");
+			zbx_mock_assert_str_eq("Return value", result, "fail");
 			break;
 		}
 
@@ -66,25 +66,25 @@ void	zbx_mock_test_entry(void **state)
 		switch (type)
 		{
 			case 0: /* ZBX_JSONPATH_COMPONENT_DOT */
-				zbx_mock_assert_streq("Component class", component_class, "dot");
+				zbx_mock_assert_str_eq("Component class", component_class, "dot");
 				break;
 			case 1: /* ZBX_JSONPATH_COMPONENT_BRACKET */
-				zbx_mock_assert_streq("Component class", component_class, "bracket");
+				zbx_mock_assert_str_eq("Component class", component_class, "bracket");
 				break;
 
 			case 2: /* ZBX_JSONPATH_ARRAY_INDEX */
-				zbx_mock_assert_streq("Component class", component_class, "index");
+				zbx_mock_assert_str_eq("Component class", component_class, "index");
 				break;
 		}
 
 		zbx_strlcpy(buffer, path + loc.l, loc.r - loc.l + 2);
 
 		zbx_mock_get_object_member_string(component, "value", &component_value);
-		zbx_mock_assert_streq("Component value", component_value, buffer);
+		zbx_mock_assert_str_eq("Component value", component_value, buffer);
 
 		if ('\0' == *next)
 		{
-			zbx_mock_assert_streq("Return value", result, "succeed");
+			zbx_mock_assert_str_eq("Return value", result, "succeed");
 			break;
 		}
 	}
