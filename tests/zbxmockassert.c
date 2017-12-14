@@ -25,14 +25,16 @@
 
 void cm_print_error(const char * const format, ...);
 
-#define _FAIL(file, line, prefix, message, ...)							\
-	do 											\
-	{											\
-		cm_print_error("%s%s" message, (NULL != prefix_msg ? prefix_msg : ""),		\
-				(NULL != prefix_msg && '\0' != *prefix_msg ? ": " : ""),	\
-				__VA_ARGS__);							\
-		_fail(file, line);								\
-	} while(0)
+#define _FAIL(file, line, prefix, message, ...)						\
+											\
+do 											\
+{											\
+	cm_print_error("%s%s" message, (NULL != prefix_msg ? prefix_msg : ""),		\
+			(NULL != prefix_msg && '\0' != *prefix_msg ? ": " : ""),	\
+			__VA_ARGS__);							\
+	_fail(file, line);								\
+}											\
+while(0)
 
 void	__zbx_mock_assert_streq(const char *file, int line, const char *prefix_msg, const char *expected_value,
 		const char *return_value)
