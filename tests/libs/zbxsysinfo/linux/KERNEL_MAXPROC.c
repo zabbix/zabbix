@@ -37,7 +37,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("return", &expected_return_handle)))
 	{
-		fail_msg("Cannot get expected key from test case data: %s", zbx_mock_error_string(error));
+		fail_msg("Cannot get expected 'return' handle from test case data: %s", zbx_mock_error_string(error));
 	}
 	else if (ZBX_MOCK_SUCCESS != error || ZBX_MOCK_SUCCESS != (error = zbx_mock_string(expected_return_handle,
 			&expected_return_string)))
@@ -56,7 +56,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("result", &expected_param_value_handle)))
 	{
-		fail_msg("Cannot get expected key from test case data: %s", zbx_mock_error_string(error));
+		fail_msg("Cannot get expected 'result' handle from test case data: %s", zbx_mock_error_string(error));
 	}
 	else if (ZBX_MOCK_SUCCESS != error || ZBX_MOCK_SUCCESS != (error = zbx_mock_string(expected_param_value_handle,
 			&expected_param_value_string)))
