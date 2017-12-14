@@ -100,7 +100,6 @@ class CEvent extends CApiService {
 			'acknowledged'				=> null,
 			'evaltype'					=> TAG_EVAL_TYPE_AND,
 			'tags'						=> null,
-			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,

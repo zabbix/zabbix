@@ -108,16 +108,21 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  * @param array|null  $config       array of configuration parameters to get trigger severity name; can be omitted
  *                                  if $text is not null
  * @param string|null $text         trigger severity name
- * @param bool        $forceNormal  true to return 'normal' class, false to return corresponding severity class
+ * @param bool        $force_normal  true to return 'normal' class, false to return corresponding severity class
  *
  * @return CCol
  */
-function getSeverityCell($severity, array $config = null, $text = null, $forceNormal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
 
-	return (new CCol($text))->addClass(getSeverityStyle($severity, !$forceNormal));
+	if ($force_normal) {
+		return new CCol($text);
+	}
+	else {
+		return (new CCol($text))->addClass(getSeverityStyle($severity));
+	}
 }
 
 /**
@@ -704,7 +709,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  */
 function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
 	$data = [];
-	$hostNames = [];
+	$host_names = [];
 	$trcounter = [];
 
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers, true);
@@ -718,7 +723,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				continue;
 			}
 
-			$hostNames[$host['hostid']] = $host['name'];
+			$host_names[$host['hostid']] = $host['name'];
 
 			if (!array_key_exists($host['name'], $trcounter)) {
 				$trcounter[$host['name']] = [];
@@ -744,20 +749,22 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 	$triggerTable = new CTableInfo();
 
-	if (empty($hostNames)) {
+	if (!$host_names) {
 		return $triggerTable;
 	}
 
 	$triggerTable->makeVerticalRotation();
 
-	order_result($hostNames);
+	order_result($host_names);
 
 	if ($viewMode == STYLE_TOP) {
 		// header
 		$header = [_('Triggers')];
 
-		foreach ($hostNames as $hostName) {
-			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
+		foreach ($host_names as $host_name) {
+			$header[] = (new CColHeader($host_name))
+				->addClass('vertical_rotation')
+				->setTitle($host_name);
 		}
 		$triggerTable->setHeader($header);
 
@@ -766,9 +773,9 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			foreach ($trigger_data as $trigger_hosts) {
 				$columns = [nbsp($trigger_name)];
 
-				foreach ($hostNames as $hostName) {
+				foreach ($host_names as $host_name) {
 					$columns[] = getTriggerOverviewCells(
-						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
 						$pageFile,
 						$screenId
 					);
@@ -783,7 +790,9 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 		foreach ($data as $trigger_name => $trigger_data) {
 			foreach ($trigger_data as $trigger_hosts) {
-				$header[] = (new CColHeader($trigger_name))->addClass('vertical_rotation');
+				$header[] = (new CColHeader($trigger_name))
+					->addClass('vertical_rotation')
+					->setTitle($trigger_name);
 			}
 		}
 
@@ -792,15 +801,15 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		// data
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
-		foreach ($hostNames as $hostId => $hostName) {
-			$name = (new CSpan($hostName))->addClass(ZBX_STYLE_LINK_ACTION);
+		foreach ($host_names as $hostId => $host_name) {
+			$name = (new CSpan($host_name))->addClass(ZBX_STYLE_LINK_ACTION);
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(
-						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
 						$pageFile,
 						$screenId
 					);
@@ -923,7 +932,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
 			$column->addClass('blink');
 			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
-			$column->setAttribute('data-toggle-class', $css);
+			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));

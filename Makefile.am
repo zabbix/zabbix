@@ -78,6 +78,14 @@ css_theme_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
 	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
 
+css_hc_light:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-light.scss frontends/php/styles/hc-light.css
+	cp frontends/php/styles/hc-light.css sass/stylesheets/hc-light.css
+
+css_hc_dark:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-dark.scss frontends/php/styles/hc-dark.css
+	cp frontends/php/styles/hc-dark.css sass/stylesheets/hc-dark.css
+
 css_icons:
 	cp sass/img/icon-sprite.svg frontends/php/img/
 	cp sass/img/browser-sprite.png frontends/php/img/
@@ -89,7 +97,7 @@ css_icons:
 	cp sass/touch-icon-192x192.png frontends/php/img/
 	cp sass/favicon.ico frontends/php/
 
-css: css_theme_blue css_theme_dark css_icons
+css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
 ## CUnit test support
 TESTDIR = src
@@ -108,10 +116,30 @@ WRAP_DB_FUNCS = \
 	-Wl,--wrap=DBexecute_multiple_query \
 	-Wl,--wrap=DBfree_result
 
+WRAP_IO_FUNCS = \
+	-Wl,--wrap=fopen \
+	-Wl,--wrap=fclose \
+	-Wl,--wrap=fgets
+
+WRAP_FS_FUNCS = \
+	-Wl,--wrap=opendir \
+	-Wl,--wrap=readdir \
+	-Wl,--wrap=stat \
+	-Wl,--wrap=__xstat
+
+WRAP_EXIT = \
+	-Wl,--wrap=exit
+
+COMMON_WRAP_FUNCS = \
+	$(WRAP_DB_FUNCS) \
+	$(WRAP_IO_FUNCS) \
+	$(WRAP_FS_FUNCS) \
+	$(WRAP_EXIT)
+
 tests:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(WRAP_DB_FUNCS)" LIBS="$(LIBS) -lcmocka" && \
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
 	./tests_run.pl
 endif
 

@@ -396,13 +396,6 @@ class API {
 	}
 
 	/**
-	 * @return CUserMedia
-	 */
-	public static function UserMedia() {
-		return self::getApi('usermedia');
-	}
-
-	/**
 	 * @return CValueMap
 	 */
 	public static function ValueMap() {

@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Generic SNMPv2</template>
          <name>Template Module Generic SNMPv2</name>
-         <description>Template Module Generic version: 0.13
+         <description>Template Module Generic version: 0.14
 MIBs used:
 SNMPv2-MIB</description>
          <groups>
@@ -145,7 +145,7 @@ The time (in hundredths of a second) since the network management portion of the
                <privatekey/>
                <port/>
                <description>MIB: SNMPv2-MIB
- The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</description>
+The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</description>
                <inventory_link>24</inventory_link>
                <applications>
                   <application>
@@ -229,7 +229,7 @@ The textual identification of the contact person for this managed node, together
                <privatekey/>
                <port/>
                <description>MIB: SNMPv2-MIB
- The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</description>
+The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -406,7 +406,7 @@ The device uptime is less than 10 minutes</description>
          <manual_close>1</manual_close>
          <dependencies>
             <dependency>
-               <name> No SNMP data collection</name>
+               <name>No SNMP data collection</name>
                <expression>{Template Module Generic SNMPv2:zabbix[host,snmp,available].max({$SNMP_TIMEOUT})}=0</expression>
                <recovery_expression/>
             </dependency>
@@ -417,7 +417,7 @@ The device uptime is less than 10 minutes</description>
          <expression>{Template Module Generic SNMPv2:zabbix[host,snmp,available].max({$SNMP_TIMEOUT})}=0</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
-         <name> No SNMP data collection</name>
+         <name>No SNMP data collection</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
          <url/>

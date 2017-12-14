@@ -55,7 +55,7 @@ $table = (new CTableInfo())
 		_('Info'),
 		($data['sortfield'] === 'host') ? [_('Host'), $sort_div] : _('Host'),
 		[
-			($data['sortfield'] === 'problem') ? [_('Problem'), $sort_div] : _('Problem'),
+			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
 			' &bullet; ',
 			($data['sortfield'] === 'priority') ? [_('Severity'), $sort_div] : _('Severity')
 		],
@@ -151,18 +151,20 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	$description_style = getSeverityStyle($trigger['priority'], $value == TRIGGER_VALUE_TRUE);
 	$description = (new CCol([
-		(new CSpan(CMacrosResolverHelper::resolveEventDescription(
-			$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-		)))
+		(new CSpan($problem['name']))
 			->setHint(
 				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
 				true
 			)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-	]))
-		->addClass($description_style);
+	]));
+
+	$description_style = getSeverityStyle($trigger['priority']);
+
+	if ($value == TRIGGER_VALUE_TRUE) {
+		$description->addClass($description_style);
+	}
 
 	if (!$show_recovery_data) {
 		// blinking
@@ -171,7 +173,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
 			$description->addClass('blink');
 			$description->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration);
-			$description->setAttribute('data-toggle-class', $description_style);
+			$description->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 	}
 

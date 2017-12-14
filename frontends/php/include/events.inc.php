@@ -171,18 +171,18 @@ function get_next_event($currentEvent, array $eventList = []) {
  * @param string $event['eventid']					Event ID.
  * @param string $event['correlationid']			OK Event correlation ID.
  * @param string $event['userid]					User ID who gerenerated the OK event.
- * @param array  $trigger							An array of trigger data.
+ * @param string $event['name']						Event name.
  * @param string $backurl							A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
  */
-function make_event_details($event, $trigger, $backurl) {
+function make_event_details($event, $backurl) {
 	$config = select_config();
 
 	$table = (new CTableInfo())
 		->addRow([
 			_('Event'),
-			CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))
+			$event['name']
 		])
 		->addRow([
 			_('Time'),
@@ -422,9 +422,14 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 	}
 
 	if ($trigger['url'] !== '') {
+		$trigger_url = CHtmlUrlValidator::validate($trigger['url'])
+			? $trigger['url']
+			: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'], false, false)).
+				'\');';
+
 		$div->addItem(
 			(new CDiv())
-				->addItem(new CLink($trigger['url'], $trigger['url']))
+				->addItem(new CLink($trigger['url'], $trigger_url))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addStyle('max-width: 500px')
 		);
@@ -812,10 +817,10 @@ function getLastEvents($options) {
 	}
 
 	$triggerOptions = [
+		'output' => ['triggerid', 'priority'],
 		'filter' => [],
 		'skipDependent' => 1,
 		'selectHosts' => ['hostid', 'name'],
-		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['triggerLimit']
@@ -867,10 +872,7 @@ function getLastEvents($options) {
 		$events[$enum]['host'] = reset($events[$enum]['trigger']['hosts']);
 		$sortClock[$enum] = $event['clock'];
 		$sortEvent[$enum] = $event['eventid'];
-
-		//expanding description for the state where event was
-		$merged_event = array_merge($event, $triggers[$event['objectid']]);
-		$events[$enum]['trigger']['description'] = CMacrosResolverHelper::resolveEventDescription($merged_event);
+		$events[$enum]['trigger']['description'] = $event['name'];
 	}
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
 
