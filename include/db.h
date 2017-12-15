@@ -717,4 +717,16 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
+typedef struct
+{
+	zbx_uint64_t	hostgrouid;
+	char		*tag;
+	char		*value;
+}
+zbx_tag_filter_t;
+
+int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event);
+int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid);
+int	check_perm2system(zbx_uint64_t userid);
+
 #endif
