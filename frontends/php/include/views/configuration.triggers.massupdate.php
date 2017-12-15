@@ -87,9 +87,20 @@ foreach ($data['dependencies'] as $dependency) {
 $dependenciesDiv = (new CDiv([
 	$dependenciesTable,
 	(new CButton('btn1', _('Add')))
-		->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'&with_triggers=1&noempty=1");')
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'triggers',
+				'srcfld1' => 'triggerid',
+				'dstfrm' => 'massupdate',
+				'dstfld1' => 'new_dependency',
+				'dstact' => 'add_dependency',
+				'reference' => 'deptrigger',
+				'objname' => 'triggers',
+				'multiselect' => '1',
+				'with_triggers' => '1',
+				'noempty' => '1'
+			]).');'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

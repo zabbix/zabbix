@@ -316,7 +316,9 @@ static int	ipc_socket_write_message(zbx_ipc_socket_t *csocket, zbx_uint32_t code
 
 	if (ZBX_IPC_SOCKET_BUFFER_SIZE - ZBX_IPC_HEADER_SIZE >= size)
 	{
-		memcpy(buffer + 2, data, size);
+		if (0 != size)
+			memcpy(buffer + 2, data, size);
+
 		return ipc_write_data(csocket->fd, (unsigned char *)buffer, size + ZBX_IPC_HEADER_SIZE, tx_size);
 	}
 
