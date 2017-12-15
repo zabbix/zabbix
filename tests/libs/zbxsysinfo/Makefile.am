@@ -140,3 +140,6 @@ process_LDADD += @AGENT_LIBS@
 
 process_CFLAGS = $(process_WRAP_FUNCS) -DZABBIX_DAEMON -I@top_srcdir@/tests
 endif
+
+SUBDIRS = \
+	@ARCH@
