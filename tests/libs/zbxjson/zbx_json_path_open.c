@@ -25,8 +25,6 @@
 #include "common.h"
 #include "zbxjson.h"
 
-#include "sysinfo.h"
-
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*json, *path, *result, *value;
