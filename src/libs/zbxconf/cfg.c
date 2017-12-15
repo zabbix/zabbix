@@ -520,7 +520,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	return SUCCEED;
 cannot_open:
-	if (0 != optional)
+	if (ZBX_CFG_FILE_REQUIRED != optional)
 		return SUCCEED;
 	zbx_error("cannot open config file \"%s\": %s", cfg_file, zbx_strerror(errno));
 	goto error;

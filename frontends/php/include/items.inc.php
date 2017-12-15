@@ -937,7 +937,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	foreach ($db_items as $db_item) {
 		$item_name = $db_item['name_expanded'];
 		$host_name = $db_item['hosts'][0]['name'];
-		$hostNames[$db_item['hostid']] = $host_name;
+		$host_names[$db_item['hostid']] = $host_name;
 
 		if (!array_key_exists($host_name, $item_counter)) {
 			$item_counter[$host_name] = [];
@@ -991,25 +991,27 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	}
 
 	$table = new CTableInfo();
-	if (empty($hostNames)) {
+	if (!$host_names) {
 		return $table;
 	}
 	$table->makeVerticalRotation();
 
-	order_result($hostNames);
+	order_result($host_names);
 
 	if ($viewMode == STYLE_TOP) {
 		$header = [_('Items')];
-		foreach ($hostNames as $hostName) {
-			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
+		foreach ($host_names as $host_name) {
+			$header[] = (new CColHeader($host_name))
+				->addClass('vertical_rotation')
+				->setTitle($host_name);
 		}
 		$table->setHeader($header);
 
 		foreach ($items as $item_name => $item_data) {
 			foreach ($item_data as $ithosts) {
 				$tableRow = [nbsp($item_name)];
-				foreach ($hostNames as $hostName) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+				foreach ($host_names as $host_name) {
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
 				}
 				$table->addRow($tableRow);
 			}
@@ -1021,12 +1023,14 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 		$header = [_('Hosts')];
 		foreach ($items as $item_name => $item_data) {
 			foreach ($item_data as $ithosts) {
-				$header[] = (new CColHeader($item_name))->addClass('vertical_rotation');
+				$header[] = (new CColHeader($item_name))
+					->addClass('vertical_rotation')
+					->setTitle($item_name);
 			}
 		}
 		$table->setHeader($header);
 
-		foreach ($hostNames as $hostId => $hostName) {
+		foreach ($host_names as $hostId => $host_name) {
 			$host = $hosts[$hostId];
 
 			$name = (new CSpan($host['name']))
@@ -1036,7 +1040,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
 				foreach ($item_data as $ithosts) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
 				}
 			}
 			$table->addRow($tableRow);

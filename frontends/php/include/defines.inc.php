@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha1');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050006);
+define('ZABBIX_DB_VERSION',		3050020);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2017');
@@ -111,7 +111,7 @@ define('ZBX_SHOW_SQL_ERRORS',	true);
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
-define('ZBX_SHOW_TECHNICAL_ERRORS', false);
+define('ZBX_SHOW_TECHNICAL_ERRORS', !false);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);

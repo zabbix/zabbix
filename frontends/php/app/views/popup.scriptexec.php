@@ -19,15 +19,17 @@
 **/
 
 
-class CIcon extends CSpan {
-
-	public function __construct($title = null) {
-		parent::__construct();
-
-		$this->addClass('menu_icon');
-		$this->addClass('shadow');
-		if ($title !== null) {
-			$this->setAttribute('title', $title);
-		}
-	}
-}
+echo (new CJson())->encode([
+	'header' => $data['title'],
+	'body' => (new CForm())
+		->addItem([
+			$data['errors'],
+			(new CTabView())->addTab('scriptTab', null,
+				(new CPre(
+					(new CList([bold($data['command']), SPACE, $data['message']]))
+				))
+			)
+		])
+		->toString(),
+	'buttons' => null
+]);

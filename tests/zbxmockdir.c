@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -18,16 +17,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/* make sure that __wrap_*() prototypes match unwrapped counterparts */
 
-return (new CWidget())
-	->setTitle($data['name'])
-	->addItem(
-		(new CForm())
-			->addItem(
-				(new CTabView())->addTab('scriptTab', null,
-					(new CPre(
-						(new CList([bold($data['command']), SPACE, $data['message']]))
-					))
-				)
-			)
-	);
+#define opendir	__wrap_opendir
+#define readdir	__wrap_readdir
+#include <dirent.h>
+#undef opendir
+#undef readdir
+
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+
+#include "common.h"
+
+DIR	*__wrap_opendir(const char *name)
+{
+	ZBX_UNUSED(name);
+
+	errno = ENOENT;
+	return NULL;
+}
+
+struct dirent	*__wrap_readdir(DIR *dirp)
+{
+	ZBX_UNUSED(dirp);
+
+	errno = EBADF;
+	return NULL;
+}

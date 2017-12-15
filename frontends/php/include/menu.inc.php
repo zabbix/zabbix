@@ -72,7 +72,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'tr_status.php',
 					'active_if' => ['acknowledge.edit'],
 					'label' => _('Triggers'),
-					'sub_pages' => ['tr_comments.php', 'chart4.php', 'scripts_exec.php']
+					'sub_pages' => ['tr_comments.php', 'chart4.php']
 				],
 				[
 					'url' => 'charts.php',
@@ -173,9 +173,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'report4.php',
 					'label' => _('Notifications'),
 					'user_type' => USER_TYPE_ZABBIX_ADMIN
-				],
-				[
-					'url' => 'popup.php'
 				]
 			]
 		],
@@ -207,15 +204,11 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 						'triggers.php',
 						'graphs.php',
 						'applications.php',
-						'tr_logform.php',
-						'tr_testexpr.php',
-						'popup_trexpr.php',
 						'host_discovery.php',
 						'disc_prototypes.php',
 						'trigger_prototypes.php',
 						'host_prototypes.php',
-						'httpconf.php',
-						'popup_httpstep.php'
+						'httpconf.php'
 					]
 				],
 				[
@@ -305,7 +298,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'pages' => [
 				[
 					'url' => 'index.php',
-					'sub_pages' => ['profile.php', 'popup_media.php']
+					'sub_pages' => ['profile.php']
 				]
 			]
 		]
@@ -412,11 +405,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		}
 		$mmenu_entry = (new CListItem(
 			(new CLink($menu['label']))
+				->onClick('javascript: MMenu.mouseOver(\''.$label.'\');')
+				->onKeyup('javascript: MMenu.keyUp(\''.$label.'\', event);')
 				->setAttribute('tabindex', 0)
 		))
 			->addClass($menu_class)
 			->setId($label);
-		$mmenu_entry->onClick('javascript: MMenu.mouseOver(\''.$label.'\');');
+
 		array_push($main_menu, $mmenu_entry);
 	}
 

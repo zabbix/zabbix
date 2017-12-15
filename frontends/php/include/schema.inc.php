@@ -1246,7 +1246,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'port' => [
@@ -4084,42 +4084,6 @@ return [
 			],
 		],
 	],
-	'tag_filter' => [
-		'key' => 'tag_filterid',
-		'fields' => [
-			'tag_filterid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'usrgrpid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'usrgrp',
-				'ref_field' => 'usrgrpid',
-			],
-			'groupid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'groups',
-				'ref_field' => 'groupid',
-			],
-			'tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			],
-			'value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			],
-		],
-	],
 	'maintenances_hosts' => [
 		'key' => 'maintenance_hostid',
 		'fields' => [
@@ -4748,7 +4712,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 		],
@@ -4802,6 +4766,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
 			],
 		],
 	],
@@ -5094,7 +5064,7 @@ return [
 			'listen_dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'host_metadata' => [
@@ -5140,7 +5110,7 @@ return [
 			'listen_dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'host_metadata' => [
@@ -5247,7 +5217,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 		],
@@ -6360,6 +6330,12 @@ return [
 				'ref_table' => 'users',
 				'ref_field' => 'userid',
 			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			],
 		],
 	],
 	'problem_tag' => [
@@ -6376,6 +6352,42 @@ return [
 				'length' => 20,
 				'ref_table' => 'problem',
 				'ref_field' => 'eventid',
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'tag_filter' => [
+		'key' => 'tag_filterid',
+		'fields' => [
+			'tag_filterid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid',
+			],
+			'groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'groups',
+				'ref_field' => 'groupid',
 			],
 			'tag' => [
 				'null' => false,
