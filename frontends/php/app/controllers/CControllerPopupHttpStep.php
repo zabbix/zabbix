@@ -93,7 +93,12 @@ class CControllerPopupHttpStep extends CController {
 			$page_options['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 		}
 
-		if ($this->getInput('validate', false)) {
+		$page_options['step_pair_key_map'] = [
+			'variables' => 'step_variables',
+			'headers' => 'step_headers'
+		];
+
+		if ($this->hasInput('validate')) {
 			$output = [];
 
 			// Validate if step names are unique.
@@ -128,6 +133,15 @@ class CControllerPopupHttpStep extends CController {
 				if ($page_options['stepid'] >= 0) {
 					$params['stepid'] = $page_options['stepid'];
 				}
+
+				foreach ($params['pairs'] as &$pair) {
+					foreach ($page_options['step_pair_key_map'] as $server_step_pair_name => $frontend_step_pair_name) {
+						if (array_key_exists('type', $pair) && $pair['type'] === $frontend_step_pair_name) {
+							$pair['type'] = $server_step_pair_name;
+						}
+					}
+				}
+				unset($pair);
 
 				$output = [
 					'dstfrm' => $page_options['dstfrm'],
