@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -17,29 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_STRPOOL_H
-#define ZABBIX_STRPOOL_H
 
-#include "mutexs.h"
-#include "zbxalgo.h"
-#include "memalloc.h"
+/**
+ * Class to validate e-mails.
+ */
+class CEmailValidator extends CStringValidator {
 
-typedef struct
-{
-	zbx_mem_info_t	*mem_info;
-	zbx_hashset_t	*hashset;
+	/**
+	 * Function validates given string against the defined e-mail pattern.
+	 *
+	 * @param string $value  String to validate against defined e-mail pattern.
+	 *
+	 * @return bool
+	 */
+	public function validate($value) {
+		if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+			preg_match('/.*<(?<email>.*[^>])>$/i', $value, $match);
+
+			if (!array_key_exists('email', $match) || !filter_var($match['email'], FILTER_VALIDATE_EMAIL)) {
+				$this->setError(_s('Invalid email address "%1$s".', $value));
+
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
-zbx_strpool_t;
-
-int		zbx_strpool_create(size_t size, char **error);
-void		zbx_strpool_destroy(void);
-
-const char	*zbx_strpool_intern(const char *str);
-const char	*zbx_strpool_acquire(const char *str);
-void		zbx_strpool_release(const char *str);
-
-void		zbx_strpool_clear(void);
-
-const zbx_strpool_t	*zbx_strpool_info(void);
-
-#endif

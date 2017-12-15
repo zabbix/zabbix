@@ -271,6 +271,21 @@ out:
 
 #endif	/* HAVE_ORACLE */
 
+#ifdef HAVE_POSTGRESQL
+static void	zbx_postgresql_error(char **error, const PGresult *pg_result)
+{
+	char	*result_error_msg;
+	size_t	error_alloc = 0, error_offset = 0;
+
+	zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", PQresStatus(PQresultStatus(pg_result)));
+
+	result_error_msg = PQresultErrorMessage(pg_result);
+
+	if ('\0' != *result_error_msg)
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, ":%s", result_error_msg);
+}
+#endif /*HAVE_POSTGRESQL*/
+
 #ifdef HAVE___VA_ARGS__
 #	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
@@ -1457,9 +1472,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
-		error = zbx_dsprintf(error, "%s:%s",
-				PQresStatus(PQresultStatus(result)),
-				PQresultErrorMessage(result));
+		zbx_postgresql_error(&error, result);
 		zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
@@ -1799,15 +1812,20 @@ error:
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
-		error = zbx_dsprintf(error, "%s:%s",
-				PQresStatus(PQresultStatus(result->pg_result)),
-				PQresultErrorMessage(result->pg_result));
+		zbx_postgresql_error(&error, result->pg_result);
 		zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
-		DBfree_result(result);
-		result = (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result) ? (DB_RESULT)ZBX_DB_DOWN :
-				NULL);
+		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
+		{
+			DBfree_result(result);
+			result = (DB_RESULT)ZBX_DB_DOWN;
+		}
+		else
+		{
+			DBfree_result(result);
+			result = NULL;
+		}
 	}
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
@@ -1846,7 +1864,6 @@ lbl_get_table:
 	if (0 == txn_level)
 		zbx_mutex_unlock(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
-
 	if (0 != CONFIG_LOG_SLOW_QUERIES)
 	{
 		sec = zbx_time() - sec;

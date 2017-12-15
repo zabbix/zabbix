@@ -254,23 +254,66 @@ class CHistoryManager {
 	 * @see CHistoryManager::getValueAt
 	 */
 	private function getValueAtFromSql($item, $clock, $ns) {
-		$value = DBfetch(DBselect(
-			'SELECT h.value'.
-			' FROM '.self::getTableName($item['value_type']).' h'.
-			' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-					' AND clock='.zbx_dbstr($clock).
-					' AND ns<='.zbx_dbstr($ns).
-			' ORDER BY h.ns DESC'
-		), 1);
+		$value = null;
+		$table = self::getTableName($item['value_type']);
 
-		if ($value === null) {
-			$value = DBfetch(DBselect(
-				'SELECT h.value'.
-				' FROM '.self::getTableName($item['value_type']).' h'.
-				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-						' AND clock<'.zbx_dbstr($clock).
-				' ORDER BY h.clock DESC, h.ns DESC'
-			), 1);
+		$sql = 'SELECT value'.
+				' FROM '.$table.
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
+					' AND clock='.zbx_dbstr($clock).
+					' AND ns='.zbx_dbstr($ns);
+
+		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
+			$value = $row['value'];
+		}
+
+		if ($value !== null) {
+			return $value;
+		}
+
+		$max_clock = 0;
+		$sql = 'SELECT DISTINCT clock'.
+				' FROM '.$table.
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
+					' AND clock='.zbx_dbstr($clock).
+					' AND ns<'.zbx_dbstr($ns);
+
+		if (($row = DBfetch(DBselect($sql))) !== false) {
+			$max_clock = $row['clock'];
+		}
+
+		if ($max_clock == 0) {
+			$sql = 'SELECT MAX(clock) AS clock'.
+					' FROM '.$table.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock<'.zbx_dbstr($clock);
+
+			if (($row = DBfetch(DBselect($sql))) !== false) {
+				$max_clock = $row['clock'];
+			}
+		}
+
+		if ($max_clock == 0) {
+			return $value;
+		}
+
+		if ($clock == $max_clock) {
+			$sql = 'SELECT value'.
+					' FROM '.$table.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock='.zbx_dbstr($clock).
+						' AND ns<'.zbx_dbstr($ns);
+		}
+		else {
+			$sql = 'SELECT value'.
+					' FROM '.$table.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock='.zbx_dbstr($max_clock).
+					' ORDER BY itemid,clock desc,ns desc';
+		}
+
+		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
+			$value = $row['value'];
 		}
 
 		return $value;
@@ -623,7 +666,7 @@ class CHistoryManager {
 			' HAVING COUNT(*)>0' // Necessary because DBselect() return 0 if empty data set, for graph templates.
 		);
 
-		if (null != ($row = DBfetch($result))) {
+		if (($row = DBfetch($result)) !== false) {
 			return $row['value'];
 		}
 
