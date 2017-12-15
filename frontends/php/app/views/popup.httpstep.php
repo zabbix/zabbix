@@ -201,7 +201,9 @@ $output['body'] .= (new CTag('script'))
 
 $output['script_inline'] .=
 	'jQuery(document).ready(function() {'."\n".
-		'pairManager.add(' . CJs::encodeJson(array_values($options['pairs'])) . ');'."\n".
+		'stepsPairManager.add(' . CJs::encodeJson(array_values($options['pairs'])) . ','.
+			'jQuery("#'.$http_popup_form->getId('http_step').'"), '.
+			CJs::encodeJson($options['step_pair_key_map']) . ');'."\n".
 		'setPostType(' . CJs::encodeJson($options['post_type']) . ');'."\n".
 		'cookie.init();'."\n".
 		'chkbxRange.init();'."\n".
