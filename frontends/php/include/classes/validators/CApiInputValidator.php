@@ -1155,7 +1155,6 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1163,8 +1162,6 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateUrl($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
 		if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
 			return false;
 		}
@@ -1174,7 +1171,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data !== '' && CHtmlUrlValidator::validate($data, ($flags & API_ALLOW_USER_MACRO)) === false) {
+		if ($data !== '' && CHtmlUrlValidator::validate($data) === false) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptible URL'));
 			return false;
 		}

@@ -6,6 +6,3 @@ SUBDIRS = \
 	oracle \
 	postgresql \
 	sqlite3
-
-EXTRA_DIST = \
-	elasticsearch

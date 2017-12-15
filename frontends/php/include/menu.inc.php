@@ -72,7 +72,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'tr_status.php',
 					'active_if' => ['acknowledge.edit'],
 					'label' => _('Triggers'),
-					'sub_pages' => ['tr_comments.php', 'chart4.php']
+					'sub_pages' => ['tr_comments.php', 'chart4.php', 'scripts_exec.php']
 				],
 				[
 					'url' => 'charts.php',
@@ -173,6 +173,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'report4.php',
 					'label' => _('Notifications'),
 					'user_type' => USER_TYPE_ZABBIX_ADMIN
+				],
+				[
+					'url' => 'popup.php'
 				]
 			]
 		],
@@ -204,11 +207,15 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 						'triggers.php',
 						'graphs.php',
 						'applications.php',
+						'tr_logform.php',
+						'tr_testexpr.php',
+						'popup_trexpr.php',
 						'host_discovery.php',
 						'disc_prototypes.php',
 						'trigger_prototypes.php',
 						'host_prototypes.php',
-						'httpconf.php'
+						'httpconf.php',
+						'popup_httpstep.php'
 					]
 				],
 				[
@@ -298,7 +305,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'pages' => [
 				[
 					'url' => 'index.php',
-					'sub_pages' => ['profile.php']
+					'sub_pages' => ['profile.php', 'popup_media.php']
 				]
 			]
 		]

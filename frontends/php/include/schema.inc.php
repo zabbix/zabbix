@@ -3325,7 +3325,7 @@ return [
 			'sendto' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
+				'length' => 100,
 				'default' => '',
 			],
 			'active' => [
@@ -4343,7 +4343,7 @@ return [
 			'sendto' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
+				'length' => 100,
 				'default' => '',
 			],
 			'subject' => [

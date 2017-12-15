@@ -261,9 +261,11 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestClickButtonMultiselect('add_templates_');
-		$this->zbxTestLaunchOverlayDialog('Templates');
+		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickLinkTextWait('Template OS Linux');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
@@ -322,9 +324,11 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestClickButtonMultiselect('add_templates_');
-		$this->zbxTestLaunchOverlayDialog('Templates');
+		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickLinkTextWait('Template OS Linux');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');

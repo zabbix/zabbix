@@ -95,7 +95,6 @@ class CUrl {
 		}
 		$this->formatQuery();
 	}
-
 	/**
 	 * Return relative url.
 	 *

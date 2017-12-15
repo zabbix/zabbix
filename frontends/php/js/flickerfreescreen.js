@@ -41,8 +41,6 @@
 			// SCREEN_RESOURCE_MAP
 			if (screen.resourcetype == 2) {
 				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
-				$(screen.data.container).attr({'aria-label': screen.data.options.aria_label, 'tabindex': 0})
-					.find('svg').attr('aria-hidden', 'true');
 			}
 
 			// init refresh plan
@@ -334,7 +332,7 @@
 		},
 
 		refreshMap: function(id) {
-			var screen = this.screens[id], self = this;
+			var screen = this.screens[id];
 
 			if (screen.isRefreshing) {
 				this.calculateReRefresh(id);
@@ -360,7 +358,6 @@
 					data.show_timestamp = screen.data.options.show_timestamp;
 					screen.isRefreshing = false;
 					screen.data.update(data);
-					$(screen.data.container).attr('aria-label', data.aria_label);
 					screen.timestamp = screen.timestampActual;
 					window.flickerfreeScreenShadow.end(id);
 				});

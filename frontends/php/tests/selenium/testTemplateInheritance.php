@@ -53,9 +53,11 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestTabSwitch('Templates');
 
-		$this->zbxTestClickButtonMultiselect('add_templates_');
-		$this->zbxTestLaunchOverlayDialog('Templates');
+		$this->zbxTestAssertElementPresentId('add_templates_');
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickLinkTextWait('Template App Zabbix Agent');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template App Zabbix Agent');
@@ -264,9 +266,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClick('add_item');
-		$this->zbxTestLaunchOverlayDialog('Items');
-		$this->zbxTestClickLinkText('testInheritanceItem1');
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_item']");
+		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
+		$this->webDriver->switchTo()->window('');
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Graph added');
 
@@ -492,13 +494,14 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClick('add_protoitem');
-		$this->zbxTestLaunchOverlayDialog('Item prototypes');
-		$this->zbxTestClickLinkText('itemDiscovery');
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_protoitem']");
+		$this->zbxTestClickLinkTextWait('itemDiscovery');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestTextPresent($this->templateName.': itemDiscovery');
 
-		$this->zbxTestClick('add_item');
-		$this->zbxTestClickLinkText('testInheritanceItem1');
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_item']");
+		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 
 		$this->zbxTestClickWait('add');

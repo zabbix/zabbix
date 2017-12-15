@@ -723,11 +723,15 @@ function getMenuPopupTriggerLog(options) {
 	items[items.length] = {
 		label: t('Create trigger'),
 		clickCallback: function() {
-			jQuery(this).closest('.action-menu').fadeOut(100);
+			openWinCentered(
+				'tr_logform.php?sform=1&itemid=' + options.itemid,
+				'TriggerLog',
+				1000,
+				700,
+				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
+			);
 
-			return PopUp('popup.triggerwizard', {
-				itemid: options.itemid
-			});
+			jQuery(this).closest('.action-menu').fadeOut(100);
 		}
 	};
 
@@ -743,12 +747,15 @@ function getMenuPopupTriggerLog(options) {
 			triggers[triggers.length] = {
 				label: trigger.name,
 				clickCallback: function() {
-					jQuery(this).closest('.action-menu').fadeOut(100);
+					openWinCentered(
+						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
+						'TriggerLog',
+						1000,
+						700,
+						'titlebar=no, resizable=yes, scrollbars=yes'
+					);
 
-					return PopUp('popup.triggerwizard', {
-						itemid: options.itemid,
-						triggerid: trigger.id
-					});
+					jQuery(this).closest('.action-menu').fadeOut(100);
 				}
 			};
 		});

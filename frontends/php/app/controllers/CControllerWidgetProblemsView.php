@@ -126,10 +126,10 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				return ['host', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_NAME_ASC:
-				return ['name', ZBX_SORT_UP];
+				return ['problem', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_NAME_DESC:
-				return ['name', ZBX_SORT_DOWN];
+				return ['problem', ZBX_SORT_DOWN];
 		}
 	}
 }

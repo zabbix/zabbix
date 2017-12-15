@@ -138,9 +138,10 @@ class testFormScreen extends CWebTest {
 		$vsize = $this->zbxTestGetValue("//input[@id='vsize']");
 
 		if (isset($data['owner'])) {
-			$this->zbxTestClickButtonMultiselect('userid');
-			$this->zbxTestLaunchOverlayDialog('Users');
+			$this->zbxTestClickXpathWait("//button[text()='Select']");
+			$this->zbxTestSwitchToWindow('zbx_popup');
 			$this->zbxTestClickLinkTextWait($data['owner']);
+			$this->webDriver->switchTo()->window('');
 		}
 
 		if (isset($data['remove_owner'])) {

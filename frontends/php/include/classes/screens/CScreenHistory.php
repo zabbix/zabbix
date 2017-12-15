@@ -474,7 +474,7 @@ class CScreenHistory extends CScreenBase {
 			 * minimum clock value.
 			 */
 			$this->timeline['starttime']
-				= date(TIMESTAMP_FORMAT, Manager::History()->getMinClock([$firstItem]) - 1);
+				= date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid([$firstItem]) - 1);
 
 			$this->dataId = 'historyGraph';
 
