@@ -77,7 +77,7 @@ $alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'us
 	'clock', 'subject', 'message', 'p_eventid', 'acknowledgeid'
 ];
 $options = [
-	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value', 'name'],
+	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value'],
 	'select_alerts' => $alert_options,
 	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
@@ -154,7 +154,7 @@ $eventTab = (new CTable())
 			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
 				->setHeader(_('Event source details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
-				make_event_details($event,
+				make_event_details($event, $trigger,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
 				)
 			))->setHeader(_('Event details'))

@@ -400,7 +400,7 @@ class CScreenHistory extends CScreenBase {
 
 					$table_header[] = (new CColHeader($item['name_expanded']))
 						->addClass('vertical_rotation')
-						->setTitle($item['name_expanded']);
+						->setAttribute('title', $item['name_expanded']);
 					$history_data_index = 0;
 
 					foreach ($item_data as $item_data_row) {
@@ -474,7 +474,7 @@ class CScreenHistory extends CScreenBase {
 			 * minimum clock value.
 			 */
 			$this->timeline['starttime']
-				= date(TIMESTAMP_FORMAT, Manager::History()->getMinClock([$firstItem]) - 1);
+				= date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid([$firstItem]) - 1);
 
 			$this->dataId = 'historyGraph';
 

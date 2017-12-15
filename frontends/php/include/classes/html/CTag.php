@@ -218,11 +218,6 @@ class CTag extends CObject {
 		return $this;
 	}
 
-	public function onKeyup($script) {
-		$this->addAction('onkeyup', $script);
-		return $this;
-	}
-
 	public function addStyle($value) {
 		if (!isset($this->attributes['style'])) {
 			$this->attributes['style'] = '';

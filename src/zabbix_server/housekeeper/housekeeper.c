@@ -26,7 +26,6 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 
-#include "zbxhistory.h"
 #include "housekeeper.h"
 
 extern unsigned char	process_type, program_type;
@@ -142,35 +141,25 @@ typedef struct
 
 	/* the item delete queue */
 	zbx_vector_ptr_t	delete_queue;
-
-	/* type for checking which values are sent to the history storage */
-	unsigned char		type;
 }
 zbx_hk_history_rule_t;
 
 /* the history item rules, used for housekeeping history and trends tables */
 static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{.table = "history",		.history = "history",	.poption_mode = &cfg.hk.history_mode,
-			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
-			.type = ITEM_VALUE_TYPE_FLOAT},
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
 	{.table = "history_str",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
-			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
-			.type = ITEM_VALUE_TYPE_STR},
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
 	{.table = "history_log",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
-			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
-			.type = ITEM_VALUE_TYPE_LOG},
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
 	{.table = "history_uint",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
-			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
-			.type = ITEM_VALUE_TYPE_UINT64},
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
 	{.table = "history_text",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
-			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
-			.type = ITEM_VALUE_TYPE_TEXT},
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
 	{.table = "trends",		.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
-			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends,
-			.type = ITEM_VALUE_TYPE_FLOAT},
+			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends},
 	{.table = "trends_uint",	.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
-			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends,
-			.type = ITEM_VALUE_TYPE_UINT64},
+			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends},
 	{NULL}
 };
 
@@ -545,7 +534,7 @@ static int	housekeeping_history_and_trends(int now)
 
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
-		if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode || FAIL == zbx_history_requires_trends(rule->type))
+		if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode)
 			continue;
 
 		/* process housekeeping rule */
@@ -1018,8 +1007,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
 
-		zbx_setproctitle("%s [removing old history and trends]",
-				get_process_type_string(process_type));
+		zbx_setproctitle("%s [removing old history and trends]", get_process_type_string(process_type));
 		sec = zbx_time();
 		d_history_and_trends = housekeeping_history_and_trends(now);
 
@@ -1045,9 +1033,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
 				" %d sessions, %d alarms, %d audit items in " ZBX_FS_DBL " sec, %s]",
-				get_process_type_string(process_type), d_history_and_trends,
-				d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sec,
-				sleeptext);
+				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				d_problems, d_sessions, d_services, d_audit, sec, sleeptext);
 
 		zbx_config_clean(&cfg);
 

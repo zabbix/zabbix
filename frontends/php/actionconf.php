@@ -485,35 +485,49 @@ elseif (hasRequest('edit_ack_operationid')) {
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.massenable', 'action.massdisable']) && hasRequest('g_actionid')) {
-	$status = (getRequest('action') == 'action.massenable') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
-	$actionids = (array) getRequest('g_actionid', []);
-	$actions_count = count($actionids);
-	$actions = [];
+	$result = true;
+	$enable = (getRequest('action') == 'action.massenable');
+	$status = $enable ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
+	$statusName = $enable ? 'enabled' : 'disabled';
+	$actionIds = [];
+	$updated = 0;
 
-	foreach ($actionids as $actionid) {
-		$actions[] = ['actionid' => $actionid, 'status' => $status];
+	DBstart();
+
+	$dbActions = DBselect(
+		'SELECT a.actionid'.
+		' FROM actions a'.
+		' WHERE '.dbConditionInt('a.actionid', getRequest('g_actionid'))
+	);
+	while ($row = DBfetch($dbActions)) {
+		$result &= DBexecute(
+			'UPDATE actions'.
+			' SET status='.zbx_dbstr($status).
+			' WHERE actionid='.zbx_dbstr($row['actionid'])
+		);
+		if ($result) {
+			$actionIds[] = $row['actionid'];
+		}
+		$updated++;
 	}
 
-	$response = API::Action()->update($actions);
+	if ($result) {
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
+	}
 
-	if ($response && array_key_exists('actionids', $response)) {
-		$message = $status == ACTION_STATUS_ENABLED
-			? _n('Action enabled', 'Actions enabled', $actions_count)
-			: _n('Action disabled', 'Actions disabled', $actions_count);
+	$messageSuccess = $enable
+		? _n('Action enabled', 'Actions enabled', $updated)
+		: _n('Action disabled', 'Actions disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable action', 'Cannot enable actions', $updated)
+		: _n('Cannot disable action', 'Cannot disable actions', $updated);
 
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $response['actionids']).'] '.
-			($status == ACTION_STATUS_ENABLED ? 'enabled' : 'disabled')
-		);
-		show_messages(true, $message);
+	$result = DBend($result);
+
+	if ($result) {
 		uncheckTableRows();
 	}
-	else {
-		$message = $status == ACTION_STATUS_ENABLED
-			? _n('Cannot enable action', 'Cannot enable actions', $actions_count)
-			: _n('Cannot disable action', 'Cannot disable actions', $actions_count);
-
-		show_messages(false, null, $message);
-	}
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && hasRequest('g_actionid')) {
 	$result = API::Action()->delete(getRequest('g_actionid'));

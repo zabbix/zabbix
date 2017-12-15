@@ -748,7 +748,7 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	if ($items) {
 		DBstart();
 
-		$result = Manager::History()->deleteHistory([$itemId]);
+		$result = deleteHistoryByItemIds([$itemId]);
 
 		if ($result) {
 			$item = reset($items);
@@ -1096,7 +1096,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 	if ($items) {
 		DBstart();
 
-		$result = Manager::History()->deleteHistory($itemIds);
+		$result = deleteHistoryByItemIds($itemIds);
 
 		if ($result) {
 			foreach ($items as $item) {

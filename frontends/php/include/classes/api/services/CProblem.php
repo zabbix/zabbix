@@ -70,6 +70,7 @@ class CProblem extends CApiService {
 			'evaltype'					=> TAG_EVAL_TYPE_AND,
 			'tags'						=> null,
 			'recent'					=> null,
+			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,

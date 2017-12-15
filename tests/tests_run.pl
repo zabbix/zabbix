@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-use YAML::XS qw(LoadFile Dump);
-use Path::Tiny qw(path);
-use IPC::Run3 qw(run3);
+use JSON::XS;
+use Path::Tiny;
+use IPC::Run3;
 use Time::HiRes qw(clock);
 use File::Basename qw(dirname);
 
@@ -44,30 +44,56 @@ sub launch($$$)
 	$test_suite->{'tests'}++;
 
 	my $test_case = {
-		'name'		=> $test_data->{'test case'} // "N/A",
+		'name'		=> $test_data->{'test_case'} // "N/A",
 		'assertions'	=> 0
 	};
 
 	if (path($test_exec)->is_file)
 	{
-		my $in = Dump($test_data);
+		my $in = encode_json($test_data);
 		my $out;
 		my $err;
 
-		eval {run3($test_exec, \$in, \$out, \$err)};
+		eval {run3(dirname($0) . "/json_parser.pl", \$in, \$out, \$err)};
 
 		if ($@)	# something went wrong with run3()
 		{
 			$test_case->{'error'} = $!;
 			$test_suite->{'errors'}++;
 		}
-		elsif ($?)	# something went wrong with test executable
+		else	# run3() was successful
 		{
-			$test_case->{'failure'} = "test case failed";
-			$test_suite->{'failures'}++;
+			if ($?)	# something went wrong with json_parser.pl
+			{
+				$test_case->{'error'} = "json_parser.pl failed";
+				$test_suite->{'errors'}++;
 
-			$test_case->{'system-out'} = $out;
-			$test_case->{'system-err'} = $err;
+				$test_case->{'system-out'} = $out;
+				$test_case->{'system-err'} = $err;
+			}
+			else
+			{
+				$in = $out;
+				$out = undef;
+				$err = undef;
+
+				eval {run3($test_exec, \$in, \$out, \$err)};
+
+				if ($@)	# something went wrong with run3()
+				{
+					$test_case->{'error'} = $!;
+					$test_suite->{'errors'}++;
+				}
+				elsif ($?)	# something went wrong with test executable
+				{
+					$test_case->{'failure'} = "test case failed";
+					$test_suite->{'failures'}++;
+
+					$test_case->{'system-out'} = $out;
+					$test_case->{'system-err'} = $err;
+				}
+			}
+
 		}
 	}
 	else
@@ -93,7 +119,7 @@ my @test_suites = ();
 while (my $path = $iter->())
 {
 	next unless ($path->is_file());
-	next unless ($path->basename =~ qr/^(.+)\.yaml$/);
+	next unless ($path->basename =~ qr/^(.+)\.json$/);
 
 	my $test_suite = {
 		'name'		=> $1,
@@ -105,7 +131,9 @@ while (my $path = $iter->())
 		'testcases'	=> []
 	};
 
-	foreach my $test_case (LoadFile($path))
+	my $json = decode_json($path->slurp_utf8());
+
+	foreach my $test_case (ref($json) eq 'ARRAY' ? @{$json} : ($json))
 	{
 		launch($test_suite, $path->parent() . "/$1", $test_case);
 	}

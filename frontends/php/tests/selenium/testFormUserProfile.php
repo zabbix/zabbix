@@ -540,7 +540,8 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestTabSwitch('Media');
 		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestLaunchOverlayDialog('Media');
+		$this->zbxTestSwitchToWindow('zbx_popup');
+		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('type', $data)) {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);
@@ -554,10 +555,11 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestInputTypeOverwrite('period', $data['period']);
 		}
 
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->zbxTestWaitWindowClose();
 				$this->zbxTestClickWait('update');
 				$this->zbxTestCheckHeader('Dashboard');
 				$this->zbxTestCheckFatalErrors();
@@ -565,7 +567,7 @@ class testFormUserProfile extends CWebTest {
 				$this->assertEquals(1, DBcount($sql));
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Page received incorrect data');
 				$this->zbxTestTextPresent($data['error_msg']);
 				$this->zbxTestCheckFatalErrors();
 				break;

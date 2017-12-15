@@ -269,10 +269,6 @@ class CHelpItems {
 					'description' => _('Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				],
 				[
-					'key' => 'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>]',
-					'description' => _('Count of directory entries, recursively. Returns integer')
-				],
-				[
 					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
 					'description' => _('Directory size (in bytes). Returns integer')
 				],
@@ -569,10 +565,6 @@ class CHelpItems {
 				[
 					'key' => 'vfs.dev.write[<device>,<type>,<mode>]',
 					'description' => _('Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
-				],
-				[
-					'key' => 'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>]',
-					'description' => _('Count of directory entries, recursively. Returns integer')
 				],
 				[
 					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',

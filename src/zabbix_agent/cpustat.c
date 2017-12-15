@@ -122,11 +122,10 @@ static int	refresh_kstat(ZBX_CPUS_STAT_DATA *pcpus)
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char			*__function_name = "init_cpu_collector";
-	char				*error = NULL;
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
 	wchar_t				cpu[8];
-	char				counterPath[PDH_MAX_COUNTER_PATH];
+	char				counterPath[PDH_MAX_COUNTER_PATH], *error = NULL;
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -175,10 +174,9 @@ clean:
 	}
 
 #else	/* not _WINDOWS */
-	if (SUCCEED != zbx_mutex_create(&cpustats_lock, ZBX_MUTEX_CPUSTATS, &error))
+	if (SUCCEED != zbx_mutex_create(&cpustats_lock, ZBX_MUTEX_CPUSTATS, NULL))	/* FIXME later */
 	{
-		zbx_error("unable to create mutex for cpu collector: %s", error);
-		zbx_free(error);
+		zbx_error("unable to create mutex for cpu collector");
 		exit(EXIT_FAILURE);
 	}
 

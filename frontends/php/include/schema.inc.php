@@ -1246,7 +1246,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 64,
 				'default' => '',
 			],
 			'port' => [
@@ -3325,7 +3325,7 @@ return [
 			'sendto' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
+				'length' => 100,
 				'default' => '',
 			],
 			'active' => [
@@ -4379,7 +4379,7 @@ return [
 			'sendto' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
+				'length' => 100,
 				'default' => '',
 			],
 			'subject' => [
@@ -4748,7 +4748,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 64,
 				'default' => '',
 			],
 		],
@@ -4802,12 +4802,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			],
-			'name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
 			],
 		],
 	],
@@ -5100,7 +5094,7 @@ return [
 			'listen_dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 64,
 				'default' => '',
 			],
 			'host_metadata' => [
@@ -5146,7 +5140,7 @@ return [
 			'listen_dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 64,
 				'default' => '',
 			],
 			'host_metadata' => [
@@ -5253,7 +5247,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 64,
 				'default' => '',
 			],
 		],
@@ -6365,12 +6359,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid',
-			],
-			'name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
 			],
 		],
 	],

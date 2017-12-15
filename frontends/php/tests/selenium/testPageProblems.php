@@ -146,31 +146,32 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestClickButtonText('Reset');
 
 		// Select host group
-		$this->zbxTestClickButtonMultiselect('filter_groupids_');
-		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->zbxTestCheckboxSelect('item_4');
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
+		$this->zbxTestClickXpath('//div[@id="filter_groupids_"]/..//button');
+		$this->zbxTestSwitchToWindow('zbx_popup');
+		$this->zbxTestCheckboxSelect('hostGroups_4');
+		$this->zbxTestClick('select');
+		$this->zbxTestWaitWindowClose();
 
 		// Select host
-		$this->zbxTestClickButtonMultiselect('filter_hostids_');
-		$this->zbxTestLaunchOverlayDialog('Hosts');
+		$this->zbxTestClickXpath('//div[@id="filter_hostids_"]/..//button');
+		$this->zbxTestSwitchToWindow('zbx_popup');
 		$this->zbxTestClickWait('spanid10084');
+		$this->zbxTestWaitWindowClose();
 
 		// Type application
 		$this->zbxTestInputType('filter_application', 'Processes');
 
 		// Select trigger
-		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
-		$this->zbxTestLaunchOverlayDialog('Triggers');
-
+		$this->zbxTestClickAndSwitchToNewWindow('//div[@id="filter_triggerids_"]/..//button');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestDropdownSelect('hostid', 'ЗАББИКС Сервер');
-		$this->zbxTestCheckboxSelect("item_'99250'");
-		$this->zbxTestCheckboxSelect("item_'99251'");
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
+		$this->zbxTestCheckboxSelect("triggers_'99250'");
+		$this->zbxTestCheckboxSelect("triggers_'99251'");
+		$this->zbxTestClick('select');
+		$this->zbxTestWaitWindowClose();
 
 		// Type problem name
-		$this->zbxTestInputType('filter_name', 'Test trigger');
+		$this->zbxTestInputType('filter_problem', 'Test trigger');
 
 		// Change minimum severity to Average
 		$this->zbxTestDropdownSelect('filter_severity', 'Average');

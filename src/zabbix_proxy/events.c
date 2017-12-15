@@ -35,7 +35,7 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *error)
+		unsigned char trigger_value)
 {
 	ZBX_UNUSED(source);
 	ZBX_UNUSED(object);
@@ -51,7 +51,6 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 	ZBX_UNUSED(trigger_correlation_mode);
 	ZBX_UNUSED(trigger_correlation_tag);
 	ZBX_UNUSED(trigger_value);
-	ZBX_UNUSED(error);
 
 	THIS_SHOULD_NEVER_HAPPEN;
 	return FAIL;

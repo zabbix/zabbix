@@ -23,32 +23,11 @@
 int	zbx_mock_data_init(void **state);
 int	zbx_mock_data_free(void **state);
 
-typedef int	zbx_mock_handle_t;
-
-typedef enum
-{
-	ZBX_MOCK_SUCCESS,
-	ZBX_MOCK_INVALID_HANDLE,
-	ZBX_MOCK_NO_PARAMETER,
-	ZBX_MOCK_NO_EXIT_CODE,
-	ZBX_MOCK_NOT_AN_OBJECT,
-	ZBX_MOCK_NO_SUCH_MEMBER,
-	ZBX_MOCK_NOT_A_VECTOR,
-	ZBX_MOCK_END_OF_VECTOR,
-	ZBX_MOCK_NOT_A_STRING,
-	ZBX_MOCK_INTERNAL_ERROR
-}
-zbx_mock_error_t;
-
-const char	*zbx_mock_error_string(zbx_mock_error_t error);
-
-zbx_mock_error_t	zbx_mock_in_parameter(const char *name, zbx_mock_handle_t *parameter);
-zbx_mock_error_t	zbx_mock_out_parameter(const char *name, zbx_mock_handle_t *parameter);
-zbx_mock_error_t	zbx_mock_db_rows(const char *data_source, zbx_mock_handle_t *rows);
-zbx_mock_error_t	zbx_mock_file(const char *path, zbx_mock_handle_t *file);
-zbx_mock_error_t	zbx_mock_exit_code(int *status);
-zbx_mock_error_t	zbx_mock_object_member(zbx_mock_handle_t object, const char *name, zbx_mock_handle_t *member);
-zbx_mock_error_t	zbx_mock_vector_element(zbx_mock_handle_t vector, zbx_mock_handle_t *element);
-zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value);
+char	*get_out_param_by_index(int idx);
+char	*get_out_param_by_name(char *name);
+char	*get_in_param_by_index(int idx);
+char	*get_in_param_by_name(char *name);
+char	*get_out_func_param_by_index(int idx);
+char	*get_out_func_param_by_name(char *name);
 
 #endif	/* ZABBIX_MOCK_DATA_H */

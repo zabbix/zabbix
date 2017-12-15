@@ -95,11 +95,11 @@ struct	_DC_TRIGGER;
 #define HOST_PROXY_ADDRESS_LEN		255
 #define HOST_PROXY_ADDRESS_LEN_MAX	(HOST_PROXY_ADDRESS_LEN + 1)
 
-#define INTERFACE_DNS_LEN		255
+#define INTERFACE_DNS_LEN		64
 #define INTERFACE_DNS_LEN_MAX		(INTERFACE_DNS_LEN + 1)
 #define INTERFACE_IP_LEN		64
 #define INTERFACE_IP_LEN_MAX		(INTERFACE_IP_LEN + 1)
-#define INTERFACE_ADDR_LEN		255	/* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
+#define INTERFACE_ADDR_LEN		64	/* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
 #define INTERFACE_ADDR_LEN_MAX		(INTERFACE_ADDR_LEN + 1)
 #define INTERFACE_PORT_LEN		64
 #define INTERFACE_PORT_LEN_MAX		(INTERFACE_PORT_LEN + 1)
@@ -176,8 +176,6 @@ struct	_DC_TRIGGER;
 #define PROXY_DHISTORY_VALUE_LEN	255
 
 #define ITEM_PREPROC_PARAMS_LEN		255
-
-#define EVENT_NAME_LEN			2048
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
@@ -282,7 +280,6 @@ typedef struct
 	zbx_uint64_t		eventid;
 	DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
-	char			*name;
 	int			source;
 	int			object;
 	int			clock;
@@ -715,6 +712,5 @@ void	zbx_db_free_event(DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
 
-void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
 #endif

@@ -531,14 +531,12 @@ jQuery(function($) {
 
 			// draw popup link
 			if (options.popup.parameters != null) {
-				var popup_options = options.popup.parameters;
+				var urlParameters = options.popup.parameters;
 
 				if (options.ignored) {
-					var excludeids = [];
 					$.each(options.ignored, function(i, value) {
-						excludeids.push(i);
+						urlParameters = urlParameters + '&excludeids[]=' + i;
 					});
-					popup_options['excludeids'] = excludeids;
 				}
 
 				var popupButton = $('<button>', {
@@ -552,7 +550,7 @@ jQuery(function($) {
 				}
 				else {
 					popupButton.click(function() {
-						return PopUp('popup.generic', popup_options);
+						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
 					});
 				}
 

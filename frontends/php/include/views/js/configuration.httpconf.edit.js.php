@@ -299,55 +299,40 @@
 			$('#add_step').click(function() {
 				var form = $(this).parents('form');
 
-				// Append existing step names.
-				var step_names = [];
-				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, step) {
-					step_names.push($(step).val());
+				// append existing step names
+				var stepNames = '';
+				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, stepName) {
+					stepNames += '&steps_names[]=' + encodeURIComponent($(stepName).val());
 				});
 
-				var popup_options = {dstfrm: 'httpForm'};
-				if (step_names.length > 0) {
-					popup_options['steps_names'] = step_names;
-				}
-
-				return PopUp('popup.httpstep', popup_options);
+				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames);
 			});
 		<?php endif ?>
 
 		// http step edit pop up
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
 			$('#name_<?= $i ?>').click(function() {
-				// Append existing step names.
-				var step_names = [];
+				// append existing step names
+				var stepNames = '';
 				var form = $(this).parents('form');
-				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, step) {
-					step_names.push($(step).val());
+				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, stepName) {
+					stepNames += '&steps_names[]=' + encodeURIComponent($(stepName).val());
 				});
 
-				var popup_options = <?= CJs::encodeJson([
-					'dstfrm' => 'httpForm',
-					'templated' => $this->data['templated'] ? 1 : 0,
-					'list_name' => 'steps',
-					'name' => $step['name'],
-					'url' => $step['url'],
-					'posts' => $step['posts'],
-					'pairs' => (array_key_exists('pairs', $step)) ? $step['pairs'] : [],
-					'post_type' => $step['post_type'],
-					'timeout' => $step['timeout'],
-					'required' => $step['required'],
-					'status_codes' => $step['status_codes'],
-					'old_name' => $step['name'],
-					'retrieve_mode' => $step['retrieve_mode'],
-					'follow_redirects' => $step['follow_redirects']
-				]) ?>
-
-				if (step_names.length > 0) {
-					popup_options['steps_names'] = step_names;
-				}
-
-				return PopUp('popup.httpstep',jQuery.extend(popup_options,{
-					stepid: jQuery(this).attr('name_step')
-				}));
+				return PopUp('popup_httpstep.php?dstfrm=httpForm&templated=<?= $this->data['templated'] ?>'
+					+ '&list_name=steps&stepid=' + jQuery(this).attr('name_step')
+					+ '<?= url_param($step['name'], false, 'name') ?>'
+					+ '<?= url_param($step['url'], false, 'url') ?>'
+					+ '<?= url_param($step['posts'], false, 'posts') ?>'
+					+ '<?= url_param($step['post_type'], false, 'post_type') ?>'
+					+ '<?= url_param(array_key_exists('pairs', $step) ? $step['pairs'] : [], false, 'pairs') ?>'
+					+ '<?= url_param($step['timeout'], false, 'timeout') ?>'
+					+ '<?= url_param($step['required'], false, 'required') ?>'
+					+ '<?= url_param($step['status_codes'], false, 'status_codes') ?>'
+					+ '<?= url_param($step['name'], false, 'old_name') ?>'
+					+ '<?= url_param($step['retrieve_mode'], false, 'retrieve_mode') ?>'
+					+ '<?= url_param($step['follow_redirects'], false, 'follow_redirects') ?>'
+					+ stepNames);
 			});
 		<?php endforeach ?>
 

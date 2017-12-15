@@ -260,7 +260,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				levels_moved = Math.floor(Math.abs(parent_item.offset().left - this.positionAbs.left) / o.indent_size);
 			}
 
-			$('.highlighted-parent').removeClass('highlighted-parent');
+			$('.highliglted-parent').removeClass('highliglted-parent');
 
 			if (direction_moved === 'right' && levels_moved) {
 				var drop_to = prev_item,
@@ -270,7 +270,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 
 				this.changing_parent = setTimeout(function() {
 					$(drop_to)
-						.addClass('highlighted-parent opened')
+						.addClass('highliglted-parent opened')
 						.removeClass('closed');
 
 					if (prev_offset_top && (prev_offset_top <= prev_item.offset().top)) {
@@ -297,7 +297,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 					levels_moved--;
 				}
 
-				$(drop_to).addClass('highlighted-parent');
+				$(drop_to).addClass('highliglted-parent');
 
 				this.changing_parent = setTimeout(function() {
 					if (one_before && one_before.length) {
@@ -316,7 +316,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				this._isAllowed(prev_item, level, level + child_levels);
 			}
 			else {
-				$(this.placeholder.parent().closest('.tree-item')).addClass('highlighted-parent');
+				$(this.placeholder.parent().closest('.tree-item')).addClass('highliglted-parent');
 				this._isAllowed(prev_item, level, level + child_levels);
 			}
 
@@ -341,7 +341,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				return;
 			}
 
-			$('.highlighted-parent').removeClass('highlighted-parent');
+			$('.highliglted-parent').removeClass('highliglted-parent');
 			this.placeholder.removeClass('sortable-error');
 
 			if (this.changing_parent) {
@@ -725,7 +725,7 @@ jQuery(function($) {
 															.removeClass('closed');
 													}
 
-													overlayDialogueDestroy('navtreeitem');
+													overlayDialogueDestroy();
 													setTreeHandlers($obj);
 												}
 											}
@@ -739,8 +739,7 @@ jQuery(function($) {
 									'class': 'btn-alt',
 									'action': function() {}
 								}
-							],
-							'dialogueid': 'navtreeitem'
+							]
 						});
 					}
 				});
@@ -908,7 +907,13 @@ jQuery(function($) {
 					btn2.setAttribute('class', 'import-items-btn');
 					btn2.setAttribute('title', t('Add multiple maps'));
 					btn2.addEventListener('click', function() {
-						var id = $(this).data('id');
+						var url = new Curl('popup.php'),
+							id = $(this).data('id');
+
+						url.setArgument('srctbl', 'sysmaps');
+						url.setArgument('srcfld1', 'sysmapid');
+						url.setArgument('srcfld2', 'name');
+						url.setArgument('multiselect', '1');
 
 						if (typeof addPopupValues === 'function') {
 							old_addPopupValues = addPopupValues;
@@ -942,12 +947,7 @@ jQuery(function($) {
 							}
 						};
 
-						return PopUp('popup.generic', {
-							srctbl: 'sysmaps',
-							srcfld1: 'sysmapid',
-							srcfld2: 'name',
-							multiselect: '1'
-						});
+						return PopUp(url.getUrl());
 					});
 					tools.appendChild(btn2);
 

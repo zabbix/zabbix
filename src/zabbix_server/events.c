@@ -101,7 +101,6 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             trigger_correlation_mode    - [IN] trigger correlation mode    *
  *             trigger_correlation_tag     - [IN] trigger correlation tag     *
  *             trigger_value               - [IN] trigger value               *
- *             error                       - [IN] error for internal events   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
@@ -109,7 +108,7 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *error)
+		unsigned char trigger_value)
 {
 	int	i;
 
@@ -123,7 +122,6 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 	events[events_num].source = source;
 	events[events_num].object = object;
 	events[events_num].objectid = objectid;
-	events[events_num].name = NULL;
 	events[events_num].clock = timespec->sec;
 	events[events_num].ns = timespec->ns;
 	events[events_num].value = value;
@@ -141,13 +139,9 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		events[events_num].trigger.correlation_mode = trigger_correlation_mode;
 		events[events_num].trigger.correlation_tag = zbx_strdup(NULL, trigger_correlation_tag);
 		events[events_num].trigger.value = trigger_value;
-		events[events_num].name = zbx_strdup(NULL, trigger_description);
 
 		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&events[events_num].trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
-
-		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&events[events_num].name, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		zbx_vector_ptr_create(&events[events_num].tags);
 
@@ -183,8 +177,6 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 			}
 		}
 	}
-	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
-		events[events_num].name = zbx_strdup(NULL, error);
 
 	return events_num++;
 }
@@ -219,8 +211,7 @@ static int	close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, cons
 
 	index = zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid, ts, TRIGGER_VALUE_OK,
 			trigger_description, trigger_expression, trigger_recovery_expression, trigger_priority,
-			trigger_type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM,
-			NULL);
+			trigger_type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM);
 
 	recovery_local.eventid = eventid;
 	recovery_local.objectid = objectid;
@@ -255,7 +246,7 @@ static int	save_events(void)
 	}
 
 	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
-			"name", NULL);
+			NULL);
 
 	eventid = DBget_maxid_num("events", num);
 
@@ -270,8 +261,7 @@ static int	save_events(void)
 			events[i].eventid = eventid++;
 
 		zbx_db_insert_add_values(&db_insert, events[i].eventid, events[i].source, events[i].object,
-				events[i].objectid, events[i].clock, events[i].ns, events[i].value,
-				ZBX_NULL2EMPTY_STR(events[i].name));
+				events[i].objectid, events[i].clock, events[i].ns, events[i].value);
 
 		num++;
 
@@ -371,14 +361,14 @@ static void	save_problems(void)
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", "clock", "ns",
-				"name", NULL);
+				NULL);
 
 		for (j = 0; j < problems.values_num; j++)
 		{
 			const DB_EVENT	*event = (const DB_EVENT *)problems.values[j];
 
 			zbx_db_insert_add_values(&db_insert, event->eventid, event->source, event->object,
-					event->objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name));
+					event->objectid, event->clock, event->ns);
 		}
 
 		zbx_db_insert_execute(&db_insert);
@@ -1558,8 +1548,6 @@ static void	clean_events(void)
 
 	for (i = 0; i < events_num; i++)
 	{
-		zbx_free(events[i].name);
-
 		if (EVENT_SOURCE_TRIGGERS != events[i].source)
 			continue;
 

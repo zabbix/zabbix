@@ -125,9 +125,7 @@ class CScreenDiscovery extends CScreenBase {
 		];
 
 		foreach ($services as $name => $foo) {
-			$header[] = (new CColHeader($name))
-				->addClass('vertical_rotation')
-				->setTitle($name);
+			$header[] = (new CColHeader($name))->addClass('vertical_rotation');
 		}
 
 		// create table
@@ -181,7 +179,7 @@ class CScreenDiscovery extends CScreenBase {
 							'type' => $htype,
 							'class' => $hclass,
 							'host' => $hostName,
-							'time' => $htime
+							'time' => $htime,
 						];
 					}
 
@@ -190,7 +188,7 @@ class CScreenDiscovery extends CScreenBase {
 						$time = 'lastdown';
 					}
 					else {
-						$class = null;
+						$class = ZBX_STYLE_ACTIVE_BG;
 						$time = 'lastup';
 					}
 

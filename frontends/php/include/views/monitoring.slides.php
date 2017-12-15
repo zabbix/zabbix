@@ -46,11 +46,13 @@ $controls = (new CList())->addItem(
 	])
 );
 
-$favourite_icon = get_icon('favourite', [
-	'fav' => 'web.favorite.screenids',
-	'elname' => 'slideshowid',
-	'elid' => $this->data['elementId']
-]);
+$favourite_icon = $this->data['screen']
+	? get_icon('favourite', [
+		'fav' => 'web.favorite.screenids',
+		'elname' => 'slideshowid',
+		'elid' => $this->data['elementId']
+	])
+	: (new CIcon(_('Favourites')))->addClass('iconplus');
 
 $refresh_icon = get_icon('screenconf');
 
