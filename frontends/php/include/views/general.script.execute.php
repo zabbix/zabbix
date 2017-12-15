@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -17,9 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_POSTINIT_H
-#define ZABBIX_POSTINIT_H
 
-int	zbx_check_postinit_tasks(char **error);
-
-#endif
+return (new CWidget())
+	->setTitle($data['name'])
+	->addItem(
+		(new CForm())
+			->addItem(
+				(new CTabView())->addTab('scriptTab', null,
+					(new CPre(
+						(new CList([bold($data['command']), SPACE, $data['message']]))
+					))
+				)
+			)
+	);

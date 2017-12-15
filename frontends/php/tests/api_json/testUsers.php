@@ -300,39 +300,6 @@ class testUsers extends CZabbixTest {
 		}
 	}
 
-	/**
-	* Create user with multiple email address
-	*/
-	public function testUsers_CreateUserWithMultipleEmails() {
-		$user = [
-					'alias' => 'API user create with multiple emails',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => 7]
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["api1@zabbix.com","Api test <api2@zabbix.com>","АПИ test ☺æų <api2@zabbix.com>"],
-						]
-					]
-				];
-
-		$result = $this->api_acall('user.create', $user, $debug);
-
-		$this->assertTrue(array_key_exists('result', $result));
-		$this->assertFalse(array_key_exists('error', $result));
-
-		$id = $result['result']['userids'][0];
-		$dbResultUser = 'select * from users where userid='.$id;
-		$this->assertEquals(1, DBcount($dbResultUser));
-
-		$dbResultMedia = DBSelect('select * from media where userid='.$id);
-		$dbRowMedia = DBFetch($dbResultMedia);
-		$diff = array_diff($user['user_medias'][0]['sendto'], explode("\n", $dbRowMedia['sendto']));
-		$this->assertTrue(count($diff) === 0);
-	}
-
 	public static function user_update() {
 		return [
 			// Check user id.
@@ -868,7 +835,7 @@ class testUsers extends CZabbixTest {
 					'theme' => ''
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
 			],
 			[
 				'user' => [
@@ -880,7 +847,7 @@ class testUsers extends CZabbixTest {
 					'theme' => 'classic'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
 			],
 			[
 				'user' => [
@@ -892,7 +859,7 @@ class testUsers extends CZabbixTest {
 					'theme' => 'originalblue'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
 			],
 			// Check user properties, type.
 			[
@@ -1077,7 +1044,7 @@ class testUsers extends CZabbixTest {
 					],
 					'user_medias' => [
 						[
-							'mediatypeid' => '1'
+						'mediatypeid' => '1'
 						]
 					],
 				],
@@ -1093,42 +1060,8 @@ class testUsers extends CZabbixTest {
 					],
 					'user_medias' => [
 						[
-							'mediatypeid' => '1',
-							'sendto' => ''
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
-			],
-			[
-				'user' => [
-					'alias' => 'User with empty sendto',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => [[]]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/sendto/1": a character string is expected.'
-			],
-			[
-				'user' => [
-					'alias' => 'User with empty sendto',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => []
+						'mediatypeid' => '1',
+						'sendto' => ''
 						]
 					],
 				],
@@ -1137,156 +1070,20 @@ class testUsers extends CZabbixTest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with empty sendto',
+					'alias' => 'User with long sendto',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
 					'user_medias' => [
 						[
-							'mediatypeid' => '1',
-							'sendto' => [""]
+						'mediatypeid' => '1',
+						'sendto' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
 						]
 					],
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
-			],
-			[
-				'user' => [
-					'alias' => 'User with empty second email',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["test1@zabbix.com",""]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
-			],
-			[
-				'user' => [
-					'alias' => 'User with invalid email',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["test1zabbix.com"]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid email address for media type with ID "1".'
-			],
-			[
-				'user' => [
-					'alias' => 'User with invalid email',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["test1@zabbixcom"]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid email address for media type with ID "1".'
-			],
-			[
-				'user' => [
-					'alias' => 'User with invalid email',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["test1@@zabbix.com"]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid email address for media type with ID "1".'
-			],
-			[
-				'user' => [
-					'alias' => 'User with invalid email',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["test1 test2@zabbix.com"]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid email address for media type with ID "1".'
-			],
-			[
-				'user' => [
-					'alias' => 'User with invalid email',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["<test1@zabbix.com> test2"]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid email address for media type with ID "1".'
-			],
-			[
-				'user' => [
-					'alias' => 'User with invalid email',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["test1@zabbix.com, a,b"]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid email address for media type with ID "1".'
-			],
-			[
-				'user' => [
-					'alias' => 'User with invalid email',
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					],
-					'user_medias' => [
-						[
-							'mediatypeid' => '1',
-							'sendto' => ["test1@zabbix.com,test2@zabbix.com"]
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/user_medias/1/sendto": value is too long.'
 			],
 			// Check user media, active.
 			[
@@ -1298,9 +1095,9 @@ class testUsers extends CZabbixTest {
 					],
 					'user_medias' => [
 						[
-							'mediatypeid' => '1',
-							'sendto' => 'api@zabbix.com',
-							'active' => ''
+						'mediatypeid' => '1',
+						'sendto' => 'api@zabbix.com',
+						'active' => ''
 						]
 					],
 				],

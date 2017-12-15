@@ -613,15 +613,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 				'objectName' => 'templates',
 				'ignored' => $ignoredTemplates,
 				'popup' => [
-					'parameters' => [
-						'srctbl' => 'templates',
-						'srcfld1' => 'hostid',
-						'srcfld2' => 'host',
-						'dstfrm' => $frmHost->getName(),
-						'dstfld1' => 'add_templates_',
-						'templated_hosts' => '1',
-						'multiselect' => '1'
-					]
+					'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+						'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		])

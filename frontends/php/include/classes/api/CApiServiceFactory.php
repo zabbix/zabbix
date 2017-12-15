@@ -71,6 +71,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'user' => 'CUser',
 			'usergroup' => 'CUserGroup',
 			'usermacro' => 'CUserMacro',
+			'usermedia' => 'CUserMedia',
 			'valuemap' => 'CValueMap'
 		], $objects));
 	}

@@ -75,7 +75,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 		}
 
 		// fetch HTTP item history
-		$item_history = Manager::History()->getLastValues($items);
+		$item_history = Manager::History()->getLast($items);
 
 		$table = (new CTableInfo())
 			->setHeader([

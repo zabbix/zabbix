@@ -593,7 +593,7 @@
 				}
 				else {
 					// No errors, proceed with update.
-					overlayDialogueDestroy('widgetConfg');
+					overlayDialogueDestroy();
 
 					if (widget === null) {
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
@@ -712,8 +712,7 @@
 					'class': 'btn-alt',
 					'action': function() {}
 				}
-			],
-			'dialogueid': 'widgetConfg'
+			]
 		});
 
 		var overlay_dialogue = $('#overlay_dialogue');

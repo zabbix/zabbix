@@ -203,9 +203,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 
 static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *result, int *mode)
 {
-	char	*mode_str;
-
-	mode_str = get_rparam(request, 3);
+	char	*mode_str = get_rparam(request, 3);
 
 	if (NULL == mode_str || '\0' == *mode_str || 0 == strcmp(mode_str, "apparent"))	/* <mode> default value */
 	{
@@ -298,34 +296,13 @@ static int	parse_size_parameter(char *text, zbx_uint64_t *size_out)
 	return str2uint64(text, "KMGT", size_out);
 }
 
-static int	parse_age_parameter(char *text, time_t *time_out, time_t now)
-{
-	zbx_uint64_t	seconds;
-
-	if (NULL == text || '\0' == *text)
-		return SUCCEED;
-
-	if (SUCCEED != str2uint64(text, "smhdw", &seconds))
-		return FAIL;
-
-	*time_out = now - (time_t)seconds;
-
-	return SUCCEED;
-}
-
 static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *result, int *types_out,
-		zbx_uint64_t *min_size, zbx_uint64_t *max_size, time_t *min_time, time_t *max_time)
+		zbx_uint64_t *min_size, zbx_uint64_t *max_size)
 {
-	int	types_incl;
-	int	types_excl;
-	char	*min_size_str;
-	char	*max_size_str;
-	char	*min_age_str;
-	char	*max_age_str;
-	time_t	now;
-
-	types_incl = etypes_to_mask(get_rparam(request, 3), result);
-	types_excl = etypes_to_mask(get_rparam(request, 4), result);
+	int	types_incl = etypes_to_mask(get_rparam(request, 3), result);
+	int	types_excl = etypes_to_mask(get_rparam(request, 4), result);
+	char	*min_size_str = get_rparam(request, 6);
+	char	*max_size_str = get_rparam(request, 7);
 
 	if (DET_OVERFLOW & (types_incl | types_excl))
 		return FAIL;
@@ -335,10 +312,7 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 
 	*types_out = types_incl & (~types_excl) & DET_ALLMASK;
 
-	/* min/max output variables must be already initialized to default values */
-
-	min_size_str = get_rparam(request, 6);
-	max_size_str = get_rparam(request, 7);
+	/* min/max variables must be already initialized to default values */
 
 	if (SUCCEED != parse_size_parameter(min_size_str, min_size))
 	{
@@ -349,22 +323,6 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 	if (SUCCEED != parse_size_parameter(max_size_str, max_size))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid maximum size \"%s\".", max_size_str));
-		return FAIL;
-	}
-
-	now = time(NULL);
-	min_age_str = get_rparam(request, 8);
-	max_age_str = get_rparam(request, 9);
-
-	if (SUCCEED != parse_age_parameter(min_age_str, max_time, now))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid minimum age \"%s\".", min_age_str));
-		return FAIL;
-	}
-
-	if (SUCCEED != parse_age_parameter(max_age_str, min_time, now))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid maximum age \"%s\".", max_age_str));
 		return FAIL;
 	}
 
@@ -730,13 +688,12 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 	regex_t			*regex_incl = NULL, *regex_excl = NULL;
 	zbx_directory_item_t	*item;
 	zbx_uint64_t		min_size = 0, max_size = 0x7fffffffffffffff;
-	time_t			min_time = 0, max_time = 0x7fffffff;
 
-	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
+	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size))
 		return ret;
 
 	if (SUCCEED != prepare_common_parameters(request, result, &regex_incl, &regex_excl, &max_depth, &dir, &status,
-			5, 10))
+			5, 8))
 		goto err1;
 
 	zbx_vector_ptr_create(&list);
@@ -810,12 +767,6 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (max_size < data.size)
 				match = 0;
 
-			if (min_time >= data.time_write)
-				match = 0;
-
-			if (max_time < data.time_write)
-				match = 0;
-
 			switch (data.attrib & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
 			{
 				case FILE_ATTRIBUTE_REPARSE_POINT:
@@ -876,13 +827,12 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR 			*directory;
 	struct dirent 		*entry;
 	zbx_uint64_t		min_size = 0, max_size = 0x7FFFffffFFFFffff;
-	time_t			min_time = 0, max_time = 0x7fffffff;
 
-	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
+	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size))
 		return ret;
 
 	if (SUCCEED != prepare_common_parameters(request, result, &regex_incl, &regex_excl, &max_depth, &dir, &status,
-			5, 10))
+			5, 8))
 		goto err1;
 
 	zbx_vector_ptr_create(&list);
@@ -932,9 +882,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 						(S_ISCHR(status.st_mode)  && 0 != (types & DET_CDEV)) ||
 						(S_ISFIFO(status.st_mode) && 0 != (types & DET_FIFO))) &&
 						(min_size <= (zbx_uint64_t)status.st_size
-								&& (zbx_uint64_t)status.st_size <= max_size) &&
-						(min_time < status.st_mtim.tv_sec &&
-								status.st_mtim.tv_sec <= max_time))
+								&& (zbx_uint64_t)status.st_size <= max_size))
 				{
 					++count;
 				}

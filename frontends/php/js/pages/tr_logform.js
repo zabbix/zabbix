@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -19,7 +18,6 @@
 **/
 
 
-ob_start(); ?>
 // trigger log expression
 var logexpr_count = 0;
 var key_count = 0;
@@ -147,7 +145,7 @@ function add_logexpr() {
 	var url = document.createElement('button');
 	url.setAttribute('onclick', 'javascript: remove_expression("logtr' + logexpr_count + '");');
 	url.setAttribute(classattr, 'btn-link');
-	url.appendChild(document.createTextNode('<?= _('Remove') ?>'));
+	url.appendChild(document.createTextNode(locale['S_REMOVE']));
 
 	td.appendChild(url);
 
@@ -271,6 +269,11 @@ function swapNodesNames(n1, n2) {
 	return false;
 }
 
+function closeForm(page) {
+	window.opener.location.reload(true);
+	window.self.close();
+}
+
 function add_keyword(bt_type) {
 	try {
 		var expr = document.getElementById('logexpr');
@@ -300,9 +303,7 @@ function add_keyword(bt_type) {
 
 	td.appendChild(document.createTextNode(expr.value));
 
-	var input = IE
-		? document.createElement('<input name="keys[' + key_count + '][value]" />')
-		: document.createElement('input');
+	var input = IE ? document.createElement('<input name="keys[' + key_count + '][value]" />') : document.createElement('input');
 	input.setAttribute('type', 'hidden');
 	input.setAttribute('value', expr.value);
 	!IE ? input.setAttribute('name', 'keys[' + key_count + '][value]') : '';
@@ -315,9 +316,7 @@ function add_keyword(bt_type) {
 
 	td.appendChild(document.createTextNode(iregexp.checked ? 'iregexp' : 'regexp'));
 
-	var input = IE
-		? document.createElement('<input name="keys[' + key_count + '][type]" />')
-		: document.createElement('input');
+	var input = IE ? document.createElement('<input name="keys[' + key_count + '][type]" />') : document.createElement('input');
 	input.setAttribute('type', 'hidden');
 	input.setAttribute('value', iregexp.checked ? 'iregexp' : 'regexp');
 	!IE ? input.setAttribute('name', 'keys[' + key_count + '][type]') : '';
@@ -332,7 +331,7 @@ function add_keyword(bt_type) {
 	var url = document.createElement('button');
 	url.setAttribute('onclick', 'javascript: remove_keyword("keytr' + key_count + '");');
 	url.setAttribute(classattr, 'btn-link');
-	url.appendChild(document.createTextNode('<?= _('Remove') ?>'));
+	url.appendChild(document.createTextNode(locale['S_REMOVE']));
 
 	td.appendChild(url);
 
@@ -396,36 +395,3 @@ function remove_keyword(key_id) {
 		}
 	}
 }
-
-/**
- * Submit trigger wizard form to save.
- *
- * @param {string} formname		Form name that is sent to server.
- * @param {string} dialogueid	(optional) id of overlay dialogue.
- */
-function validateTriggerWizard(formname, dialogueid) {
-	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action')),
-		dialogueid = dialogueid || null;
-
-	url.setArgument('save', 1);
-
-	jQuery.ajax({
-		url: url.getUrl(),
-		data: jQuery(form).serialize(),
-		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
-
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
-			}
-			else if (dialogueid) {
-				overlayDialogueDestroy(dialogueid);
-				window.location.reload(true);
-			}
-		},
-		dataType: 'json',
-		type: 'post'
-	});
-}
-<?php return ob_get_clean(); ?>

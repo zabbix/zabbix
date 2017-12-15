@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,29 +19,29 @@
 **/
 
 
-/**
- * Class to validate e-mails.
- */
-class CEmailValidator extends CStringValidator {
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+
+class testFormLoginWithRequest extends CWebTest {
+	// Returns layout data
+	public static function provider() {
+		return [
+			[
+				[
+					'request' => 'zabbix.php?action=proxy.list&ddreset=1',
+					'header' => 'Proxies'
+				]
+			]
+		];
+	}
 
 	/**
-	 * Function validates given string against the defined e-mail pattern.
-	 *
-	 * @param string $value  String to validate against defined e-mail pattern.
-	 *
-	 * @return bool
+	 * @dataProvider provider
 	 */
-	public function validate($value) {
-		if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-			preg_match('/.*<(?<email>.*[^>])>$/i', $value, $match);
+	public function testFormLoginWithRequest_test($data) {
+		// Log in.
+		$this->zbxTestLogin($data['request']);
 
-			if (!array_key_exists('email', $match) || !filter_var($match['email'], FILTER_VALIDATE_EMAIL)) {
-				$this->setError(_s('Invalid email address "%1$s".', $value));
-
-				return false;
-			}
-		}
-
-		return true;
+		// Test page title.
+		$this->zbxTestCheckHeader($data['header']);
 	}
 }

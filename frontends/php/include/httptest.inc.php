@@ -74,30 +74,30 @@ function httptest_status2style($status) {
 /**
  * Delete web scenario item and web scenario step item history and trends by given web scenario IDs.
  *
- * @param array $http_testids
+ * @param array $httpTestIds
  *
  * @return bool
  */
-function deleteHistoryByHttpTestIds(array $http_testids) {
-	$itemids = [];
+function deleteHistoryByHttpTestIds(array $httpTestIds) {
+	$itemIds = [];
 
-	$db_items = DBselect(
+	$dbItems = DBselect(
 		'SELECT hti.itemid'.
 		' FROM httptestitem hti'.
-		' WHERE '.dbConditionInt('httptestid', $http_testids).
+		' WHERE '.dbConditionInt('httptestid', $httpTestIds).
 		' UNION ALL '.
 		'SELECT hsi.itemid'.
 		' FROM httpstep hs,httpstepitem hsi'.
 		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND '.dbConditionInt('httptestid', $http_testids)
+			' AND '.dbConditionInt('httptestid', $httpTestIds)
 	);
 
-	while ($db_item = DBfetch($db_items)) {
-		$itemids[] = $db_item['itemid'];
+	while ($dbItem = DBfetch($dbItems)) {
+		$itemIds[] = $dbItem['itemid'];
 	}
 
-	if ($itemids) {
-		return Manager::History()->deleteHistory($itemids);
+	if ($itemIds) {
+		return deleteHistoryByItemIds($itemIds);
 	}
 
 	return true;

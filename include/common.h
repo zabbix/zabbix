@@ -552,8 +552,6 @@ zbx_maintenance_type_t;
 #define HOST_INVENTORY_MANUAL		0
 #define HOST_INVENTORY_AUTOMATIC	1
 
-#define HOST_INVENTORY_FIELD_COUNT	70
-
 /* host availability */
 #define HOST_AVAILABLE_UNKNOWN		0
 #define HOST_AVAILABLE_TRUE		1
@@ -764,10 +762,10 @@ zbx_script_t;
 
 #define ZBX_STRDUP(var, str)	(var = zbx_strdup(var, str))
 
-void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size);
-void	*zbx_malloc2(const char *filename, int line, void *old, size_t size);
-void	*zbx_realloc2(const char *filename, int line, void *old, size_t size);
-char	*zbx_strdup2(const char *filename, int line, char *old, const char *str);
+void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size);
+void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
+void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
+char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 void	*zbx_guaranteed_memset(void *v, int c, size_t n);
 

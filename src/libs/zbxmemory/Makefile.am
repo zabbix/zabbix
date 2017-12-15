@@ -3,4 +3,4 @@
 noinst_LIBRARIES = libzbxmemory.a
 
 libzbxmemory_a_SOURCES = \
-	memalloc.c
+	memalloc.c strpool.c

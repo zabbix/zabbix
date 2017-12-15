@@ -46,7 +46,18 @@ class CHistory extends CApiService {
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = []) {
-		$def_options = [
+		$result = [];
+
+		$sqlParts = [
+			'select'	=> ['history' => 'h.itemid'],
+			'from'		=> [],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
+			'limit'		=> null
+		];
+
+		$defOptions = [
 			'history'					=> ITEM_VALUE_TYPE_UINT64,
 			'hostids'					=> null,
 			'itemids'					=> null,
@@ -70,7 +81,12 @@ class CHistory extends CApiService {
 			'sortorder'					=> '',
 			'limit'						=> null
 		];
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
+
+		if (!$tableName = CHistoryManager::getTableName($options['history'])) {
+			$tableName = 'history';
+		}
+		$sqlParts['from']['history'] = $tableName.' h';
 
 		// editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == self::$userData['type'] || $options['nopermissions']) {
@@ -86,151 +102,94 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
-		if ($options['itemids'] !== null) {
-			zbx_value2array($options['itemids']);
-		}
-
-		if ($options['hostids'] !== null) {
-			$itemids = [];
-
-			$hosts = API::Host()->get([
-				'hostids' => $options['hostids'],
-				'itemids' => $options['itemids'],
-				'output' => [],
-				'selectItems' => ['output' => 'itemid']
-			]);
-
-			foreach ($hosts as $host) {
-				foreach ($host['items'] as $item) {
-					$itemids[] = $item['itemid'];
-				}
-			}
-
-			$options['itemids'] = $itemids;
-		}
-
-		$items = API::Item()->get([
-			'itemids' => $options['itemids'],
-			'output' => ['itemid', 'value_type'],
-			'editable' => $options['editable'],
-			'preservekeys' => true,
-			'webitems' => true
-		]);
-
-		switch (CHistoryManager::getDataSourceType($options['history'])) {
-			case ZBX_HISTORY_SOURCE_ELASTIC:
-				return $this->getFromElasticSearch($options);
-
-			default:
-				return $this->getFromSql($options);
-		}
-	}
-
-	/**
-	 * SQL specific implementation of get.
-	 *
-	 * @see CHistory::get
-	 */
-	private function getFromSql($options) {
-		$result = [];
-		$sql_parts = [
-			'select'	=> ['history' => 'h.itemid'],
-			'from'		=> [],
-			'where'		=> [],
-			'group'		=> [],
-			'order'		=> [],
-			'limit'		=> null
-		];
-
-		if (!$table_name = CHistoryManager::getTableName($options['history'])) {
-			$table_name = 'history';
-		}
-
-		$sql_parts['from']['history'] = $table_name.' h';
-
 		// itemids
-		if ($options['itemids'] !== null) {
-			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
+		if (!is_null($options['itemids'])) {
+			zbx_value2array($options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
+		}
+
+		// hostids
+		if (!is_null($options['hostids'])) {
+			zbx_value2array($options['hostids']);
+
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+			$sqlParts['where']['hi'] = 'h.itemid=i.itemid';
 		}
 
 		// time_from
-		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
+		if (!is_null($options['time_from'])) {
+			$sqlParts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
-		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
+		if (!is_null($options['time_till'])) {
+			$sqlParts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			$this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
+			$this->dbFilter($sqlParts['from']['history'], $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
+			zbx_db_search($sqlParts['from']['history'], $options, $sqlParts);
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			unset($sql_parts['select']['clock']);
-			$sql_parts['select']['history'] = 'h.*';
+			unset($sqlParts['select']['clock']);
+			$sqlParts['select']['history'] = 'h.*';
 		}
 
 		// countOutput
 		if ($options['countOutput']) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = ['count(DISTINCT h.hostid) as rowscount'];
+			$sqlParts['select'] = ['count(DISTINCT h.hostid) as rowscount'];
 
 			// groupCount
 			if ($options['groupCount']) {
-				foreach ($sql_parts['group'] as $key => $fields) {
-					$sql_parts['select'][$key] = $fields;
+				foreach ($sqlParts['group'] as $key => $fields) {
+					$sqlParts['select'][$key] = $fields;
 				}
 			}
 		}
 
 		// sorting
-		$sql_parts = $this->applyQuerySortOptions($table_name, $this->tableAlias(), $options, $sql_parts);
+		$sqlParts = $this->applyQuerySortOptions($tableName, $this->tableAlias(), $options, $sqlParts);
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_order = '';
-
-		if ($sql_parts['select']) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-
-		if ($sql_parts['from']) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-
-		$sql_where = $sql_parts['where'] ? ' WHERE '.implode(' AND ', $sql_parts['where']) : '';
-
-		if ($sql_parts['order']) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		$sqlWhere = !empty($sqlParts['where']) ? ' WHERE '.implode(' AND ', $sqlParts['where']) : '';
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql_limit = $sql_parts['limit'];
-		$sql = 'SELECT '.$sql_select.
-				' FROM '.$sql_from.
-				$sql_where.
-				$sql_order;
-		$db_res = DBselect($sql, $sql_limit);
-
-		while ($data = DBfetch($db_res)) {
+		$sql = 'SELECT '.$sqlSelect.
+				' FROM '.$sqlFrom.
+				$sqlWhere.
+				$sqlOrder;
+		$dbRes = DBselect($sql, $sqlLimit);
+		while ($data = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $data;
 			}
@@ -242,85 +201,6 @@ class CHistory extends CApiService {
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
-
 		return $result;
-	}
-
-	/**
-	 * ElasticSearch specific implementation of get.
-	 *
-	 * @see CHistory::get
-	 */
-	private function getFromElasticSearch($options) {
-		$query = [];
-
-		if (!$table_name = CHistoryManager::getTableName($options['history'])) {
-			$table_name = 'history';
-		}
-
-		$schema = DB::getSchema($table_name);
-
-		// itemids
-		if ($options['itemids'] !== null) {
-			$query['query']['bool']['must'][] = [
-				'terms' => [
-					'itemid' => array_values($options['itemids'])
-				]
-			];
-		}
-
-		// time_from
-		if ($options['time_from'] !== null) {
-			$query['query']['bool']['must'][] = [
-				'range' => [
-					'clock' => [
-						'gte' => $options['time_from']
-					]
-				]
-			];
-		}
-
-		// time_till
-		if ($options['time_till'] !== null) {
-			$query['query']['bool']['must'][] = [
-				'range' => [
-					'clock' => [
-						'lte' => $options['time_till']
-					]
-				]
-			];
-		}
-
-		// filter
-		if (is_array($options['filter'])) {
-			$query = CElasticSearchHelper::addFilter(DB::getSchema($table_name), $query, $options);
-		}
-
-		// search
-		if (is_array($options['search'])) {
-			$query = CElasticSearchHelper::addSearch($schema, $query, $options);
-		}
-
-		// output
-		if ($options['output'] != API_OUTPUT_EXTEND && $options['output'] != API_OUTPUT_COUNT) {
-			$query['_source'] = $options['output'];
-		}
-
-		// sorting
-		if ($this->sortColumns && $options['sortfield']) {
-			$query = CElasticSearchHelper::addSort($this->sortColumns, $query, $options);
-		}
-
-		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$query['size'] = $options['limit'];
-		}
-
-		$endpoints = CHistoryManager::getElasticSearchEndpoints($options['history']);
-		if ($endpoints) {
-			return CElasticSearchHelper::query('POST', reset($endpoints), $query);
-		}
-
-		return null;
 	}
 }

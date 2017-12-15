@@ -130,16 +130,8 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		}
 
 		$addItemButton = (new CButton('add_log', _('Add')))
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'reference' => 'itemid',
-					'multiselect' => '1',
-					'real_hosts' => '1',
-					'value_types' => [$data['value_type']]
-				]).');'
-			);
+			->onClick("return PopUp('popup.php?multiselect=1&real_hosts=1".
+					'&reference=itemid&srctbl=items&value_types[]='.$this->data['value_type']."&srcfld1=itemid');");
 		$deleteItemButton = null;
 
 		if (count($this->data['items']) > 1) {
