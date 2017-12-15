@@ -29,8 +29,9 @@ void	zbx_mock_test_entry(void **state)
 {
 	const char		*json, *path, *result, *value;
 	struct zbx_json_parse	jp, jp_out;
-	char			*buffer;
+	char			*buffer = NULL;
 	int			ret;
+	size_t			size = 0;
 
 	ZBX_UNUSED(state);
 
@@ -49,8 +50,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_str_eq("Invalid zbx_json_path_open() return value", result, "succeed");
 
-	buffer = zbx_malloc(NULL, strlen(json));
-	zbx_strlcpy(buffer, jp_out.start, jp_out.end - jp_out.start + 2);
+	zbx_json_value_dyn(&jp_out, &buffer, &size);
 
 	zbx_mock_get_parameter_string("out.value", &value);
 	zbx_mock_assert_str_eq("Invalid value", value, buffer);
