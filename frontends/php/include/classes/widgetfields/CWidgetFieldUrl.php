@@ -31,7 +31,7 @@ class CWidgetFieldUrl extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_URL]);
+		$this->setValidationRules(['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO]);
 		$this->setDefault('');
 	}
 

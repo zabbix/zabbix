@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -17,29 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_STRPOOL_H
-#define ZABBIX_STRPOOL_H
 
-#include "mutexs.h"
-#include "zbxalgo.h"
-#include "memalloc.h"
-
-typedef struct
-{
-	zbx_mem_info_t	*mem_info;
-	zbx_hashset_t	*hashset;
-}
-zbx_strpool_t;
-
-int		zbx_strpool_create(size_t size, char **error);
-void		zbx_strpool_destroy(void);
-
-const char	*zbx_strpool_intern(const char *str);
-const char	*zbx_strpool_acquire(const char *str);
-void		zbx_strpool_release(const char *str);
-
-void		zbx_strpool_clear(void);
-
-const zbx_strpool_t	*zbx_strpool_info(void);
-
-#endif
+echo (new CJson())->encode([
+	'header' => $data['title'],
+	'body' => (new CForm())
+		->addItem([
+			$data['errors'],
+			(new CTabView())->addTab('scriptTab', null,
+				(new CPre(
+					(new CList([bold($data['command']), SPACE, $data['message']]))
+				))
+			)
+		])
+		->toString(),
+	'buttons' => null
+]);

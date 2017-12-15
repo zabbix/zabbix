@@ -916,7 +916,7 @@ class CMap extends CMapElement {
 						);
 					}
 
-					if (!CHtmlUrlValidator::validate($url['url'])) {
+					if (!CHtmlUrlValidator::validate($url['url'], false)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 					}
 
@@ -1358,7 +1358,7 @@ class CMap extends CMapElement {
 						);
 					}
 
-					if (!CHtmlUrlValidator::validate($url['url'])) {
+					if (!CHtmlUrlValidator::validate($url['url'], false)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 					}
 
