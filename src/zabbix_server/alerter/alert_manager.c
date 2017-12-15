@@ -919,16 +919,27 @@ static char	*am_create_db_alert_message(void)
 	char		*alert_message = NULL;
 	size_t		alert_message_alloc = 0, alert_message_offset = 0;
 
-	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s database %s on %s",
-			ZBX_DATABASE_TYPE, CONFIG_DBNAME, CONFIG_DBHOST);
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s database \"%s\"",
+			ZBX_DATABASE_TYPE, CONFIG_DBNAME);
 
-	if (0 != CONFIG_DBPORT)
-		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d", CONFIG_DBPORT);
+	if ('\0' != *CONFIG_DBHOST)
+	{
+		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " on \"%s",
+				CONFIG_DBHOST);
 
-	if (NULL == (error = zbx_db_last_strerr()) || '\0' == *error)
-		error = "unknown error";
+		if (0 != CONFIG_DBPORT)
+		{
+			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d\"",
+					CONFIG_DBPORT);
+		}
+		else
+			zbx_chrcpy_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, '\"');
+	}
 
-	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " is not available: %s", error);
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " is not available");
+
+	if (NULL != (error = zbx_db_last_strerr()) && '\0' != *error)
+		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ": %s", error);
 
 	return alert_message;
 }
@@ -1952,6 +1963,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		{
 			if (ZBX_DB_DOWN == (manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE)))
 			{
+				am_queue_watchdog_alerts(&manager);
+
 				zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds",
 						ZBX_DB_WAIT_DOWN);
 			}
@@ -1997,9 +2010,6 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 			time_watchdog = now;
 		}
-
-		if (ZBX_DB_DOWN == manager.dbstatus)
-			am_queue_watchdog_alerts(&manager);
 
 		now = time(NULL);
 

@@ -364,6 +364,20 @@ static int	DBpatch_3050026(void)
 
 static int	DBpatch_3050027(void)
 {
+	const ZBX_FIELD	field = {"sendto", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media", &field, NULL);
+}
+
+static int	DBpatch_3050028(void)
+{
+	const ZBX_FIELD	field = {"sendto", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("alerts", &field, NULL);
+}
+
+static int	DBpatch_3050029(void)
+{
 	const ZBX_TABLE table =
 			{"tag_filter", "tag_filterid", 0,
 				{
@@ -380,14 +394,14 @@ static int	DBpatch_3050027(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050028(void)
+static int	DBpatch_3050030(void)
 {
 	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("tag_filter", 1, &field);
 }
 
-static int	DBpatch_3050029(void)
+static int	DBpatch_3050031(void)
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -426,5 +440,7 @@ DBPATCH_ADD(3050026, 0, 1)
 DBPATCH_ADD(3050027, 0, 1)
 DBPATCH_ADD(3050028, 0, 1)
 DBPATCH_ADD(3050029, 0, 1)
+DBPATCH_ADD(3050030, 0, 1)
+DBPATCH_ADD(3050031, 0, 1)
 
 DBPATCH_END()

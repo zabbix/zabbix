@@ -1017,6 +1017,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	DBclose();
 
+	zbx_vc_enable();
+
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
 
