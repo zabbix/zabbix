@@ -1,18 +1,23 @@
 if AGENT
-noinst_PROGRAMS = KERNEL_MAXPROC
+AGENT_tests = NET_IF_DISCOVERY KERNEL_MAXPROC
+endif
 
-KERNEL_MAXPROC_SOURCES = \
-	KERNEL_MAXPROC.c \
+noinst_PROGRAMS = $(AGENT_tests)
+
+if AGENT
+COMMON_SRC_FILES = \
+	../../../../src/zabbix_agent/active.c ../../../../src/zabbix_agent/active.h \
 	../../../../src/zabbix_agent/stats.c \
 	../../../../src/zabbix_agent/cpustat.c \
 	../../../../src/zabbix_agent/diskdevices.c \
 	../../../../src/zabbix_agent/vmstats.c \
 	../../../../src/zabbix_agent/logfiles.c \
 	../../../../src/zabbix_agent/zbxconf.c \
+	../../../../src/zabbix_agent/listener.c \
 	../../../../src/zabbix_agent/procstat.c \
 	../../../zbxmocktest.h
 
-KERNEL_MAXPROC_LDADD = \
+COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
@@ -35,7 +40,27 @@ KERNEL_MAXPROC_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
+COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
+
+NET_IF_DISCOVERY_SOURCES = \
+	NET_IF_DISCOVERY.c \
+	$(COMMON_SRC_FILES)
+
+NET_IF_DISCOVERY_LDADD = \
+	$(COMMON_LIB_FILES)
+
+NET_IF_DISCOVERY_LDADD += @AGENT_LIBS@
+
+NET_IF_DISCOVERY_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+KERNEL_MAXPROC_SOURCES = \
+	KERNEL_MAXPROC.c \
+	$(COMMON_SRC_FILES)
+
+KERNEL_MAXPROC_LDADD = \
+	$(COMMON_LIB_FILES)
+
 KERNEL_MAXPROC_LDADD += @AGENT_LIBS@
 
-KERNEL_MAXPROC_CFLAGS = -I@top_srcdir@/tests
+KERNEL_MAXPROC_CFLAGS = $(COMMON_COMPILER_FLAGS)
 endif
