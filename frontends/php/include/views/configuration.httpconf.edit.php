@@ -80,8 +80,11 @@ $httpFormList
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(_('Attempts'),
-		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow(
+		(new CLabel(_('Attempts'), 'retries'))->setAsteriskMark(),
+		(new CNumericBox('retries', $this->data['retries'], 2))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
 $agentComboBox = new CComboBox('agent', $this->data['agent']);
