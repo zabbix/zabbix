@@ -148,15 +148,15 @@ class CProblem extends CApiService {
 					$db_tag_filters = DBselect(
 						'SELECT tf.groupid,tf.tag,tf.value,tf.usrgrpid'.
 						' FROM tag_filter tf'.
-						' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups).
-							' AND '.dbConditionInt('tf.groupid', array_keys($group_triggers))
+						' WHERE '.dbConditionInt('tf.usrgrpid', $userGroups)
 					);
 
 					$tag_filters_tmp = [];
 					$allowed_triggers = [];
 
 					while ($db_tag_filter = DBfetch($db_tag_filters)) {
-						if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === '') {
+						if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === ''
+								&& array_key_exists($db_tag_filter['groupid'], $group_triggers)) {
 							$allowed_triggers = array_merge($allowed_triggers,
 								$group_triggers[$db_tag_filter['groupid']]
 							);
