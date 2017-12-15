@@ -143,11 +143,10 @@ $securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmp
 	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
 ]);
 $itemFormList->addRow(_('Security level'), $securityLevelComboBox, 'row_snmpv3_securitylevel');
-$itemFormList->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'))->setAsteriskMark(),
+$itemFormList->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
 	(new CRadioButtonList('snmpv3_authprotocol', (int) $this->data['snmpv3_authprotocol']))
 		->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
 		->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
-		->setAriaRequired()
 		->setModern(true),
 	'row_snmpv3_authprotocol'
 );
@@ -156,11 +155,10 @@ $itemFormList->addRow(_('Authentication passphrase'),
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_snmpv3_authpassphrase'
 );
-$itemFormList->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'))->setAsteriskMark(),
+$itemFormList->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
 	(new CRadioButtonList('snmpv3_privprotocol', (int) $this->data['snmpv3_privprotocol']))
 		->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
 		->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
-		->setAriaRequired()
 		->setModern(true),
 	'row_snmpv3_privprotocol'
 );

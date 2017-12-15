@@ -41,11 +41,10 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
 	)
-	->addRow((new CLabel(_('Maintenance type'), 'maintenance_type'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Maintenance type'), 'maintenance_type')),
 		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
 			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
-			->setAriaRequired()
 			->setModern(true)
 	);
 

@@ -256,8 +256,8 @@ else {
 		->setModern(true);
 }
 
-$itemFormList->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'))->setAsteriskMark(),
-	$snmpv3_authprotocol->setAriaRequired(),
+$itemFormList->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
+	$snmpv3_authprotocol,
 	'row_snmpv3_authprotocol'
 );
 
@@ -283,8 +283,8 @@ else {
 		->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
 		->setModern(true);
 }
-$itemFormList->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'))->setAsteriskMark(),
-	$snmpv3_privprotocol->setAriaRequired(),
+$itemFormList->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
+	$snmpv3_privprotocol,
 	'row_snmpv3_privprotocol'
 );
 

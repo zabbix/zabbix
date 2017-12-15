@@ -38,19 +38,17 @@ $scriptFormList = (new CFormList())
 			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Type'), 'type')),
 		(new CRadioButtonList('type', (int) $data['type']))
 			->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
 			->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
-			->setAriaRequired()
 			->setModern(true)
 	)
-	->addRow((new CLabel(_('Execute on'), 'execute_on'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Execute on'), 'execute_on')),
 		(new CRadioButtonList('execute_on', (int) $data['execute_on']))
 			->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 			->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-			->setAriaRequired()
 			->setModern(true)
 	)
 	->addRow((new CLabel(_('Commands'), 'command'))->setAsteriskMark(),
@@ -95,11 +93,10 @@ $scriptFormList
 			]
 		]]))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
-	->addRow((new CLabel(_('Required host permissions'), 'host_access'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Required host permissions'), 'host_access')),
 		(new CRadioButtonList('host_access', (int) $data['host_access']))
 			->addValue(_('Read'), PERM_READ)
 			->addValue(_('Write'), PERM_READ_WRITE)
-			->setAriaRequired()
 			->setModern(true)
 	)
 	->addRow(_('Enable confirmation'),

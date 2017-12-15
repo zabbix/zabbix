@@ -39,7 +39,6 @@ class CSysmapWidgetForm extends CWidgetForm {
 			WIDGET_SYSMAP_SOURCETYPE_MAP => _('Map'),
 			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree'),
 		]))
-			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			->setDefault(WIDGET_SYSMAP_SOURCETYPE_MAP)
 			->setAction('updateWidgetConfigDialogue()')
 			->setModern(true);

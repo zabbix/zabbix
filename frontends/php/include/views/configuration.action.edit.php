@@ -945,14 +945,13 @@ if (!empty($data['new_operation'])) {
 				)
 				// script
 				->addRow(
-					(new CLabel(_('Execute on'), 'new_operation[opcommand][execute_on]'))->setAsteriskMark(),
+					(new CLabel(_('Execute on'), 'new_operation[opcommand][execute_on]')),
 					(new CRadioButtonList('new_operation[opcommand][execute_on]',
 						(int) $data['new_operation']['opcommand']['execute_on']
 					))
 						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 						->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-						->setAriaRequired()
 						->setModern(true)
 				)
 				// ssh
@@ -1087,13 +1086,12 @@ if (!empty($data['new_operation'])) {
 
 		case OPERATION_TYPE_HOST_INVENTORY:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Inventory mode'), 'new_operation[opinventory][inventory_mode]'))->setAsteriskMark(),
+				(new CLabel(_('Inventory mode'), 'new_operation[opinventory][inventory_mode]')),
 				(new CRadioButtonList('new_operation[opinventory][inventory_mode]',
 					(int) $data['new_operation']['opinventory']['inventory_mode']
 				))
 					->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 					->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-					->setAriaRequired()
 					->setModern(true)
 			);
 			break;
@@ -1730,14 +1728,13 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				// script
 				$new_operation_formlist->addRow(
-					(new CLabel(_('Execute on'), 'new_recovery_operation[opcommand][execute_on]'))->setAsteriskMark(),
+					(new CLabel(_('Execute on'), 'new_recovery_operation[opcommand][execute_on]')),
 					(new CRadioButtonList('new_recovery_operation[opcommand][execute_on]',
 						(int) $data['new_recovery_operation']['opcommand']['execute_on']
 					))
 						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 						->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-						->setAriaRequired()
 						->setModern(true)
 				);
 
@@ -2199,14 +2196,13 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					]))->addClass(ZBX_STYLE_NOWRAP)
 				)
 				->addRow(
-					(new CLabel(_('Execute on'), 'new_ack_operation[opcommand][execute_on]'))->setAsteriskMark(),
+					(new CLabel(_('Execute on'), 'new_ack_operation[opcommand][execute_on]')),
 					(new CRadioButtonList('new_ack_operation[opcommand][execute_on]',
 						(int) $data['new_ack_operation']['opcommand']['execute_on']
 					))
 						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 						->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-						->setAriaRequired()
 						->setModern(true)
 				)
 				->addRow(_('Authentication method'),

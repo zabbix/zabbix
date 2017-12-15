@@ -78,11 +78,10 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Proxy mode'), 'status'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Proxy mode'), 'status')),
 		(new CRadioButtonList('status', (int) $data['status']))
 			->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
 			->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
-			->setAriaRequired()
 			->setModern(true)
 	)
 	->addRow((new CLabel(_('Interface'), 'proxy_interface'))->setAsteriskMark(),

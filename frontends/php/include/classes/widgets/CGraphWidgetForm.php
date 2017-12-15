@@ -29,7 +29,6 @@ class CGraphWidgetForm extends CWidgetForm {
 			ZBX_WIDGET_FIELD_RESOURCE_GRAPH => _('Graph'),
 			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
 		]))
-			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
 			->setAction('updateWidgetConfigDialogue()')
 			->setModern(true);
