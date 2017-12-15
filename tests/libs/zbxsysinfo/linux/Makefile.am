@@ -12,8 +12,6 @@ KERNEL_MAXPROC_SOURCES = \
 	../../../../src/zabbix_agent/procstat.c \
 	../../../zbxmocktest.h
 
-
-
 KERNEL_MAXPROC_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
@@ -36,7 +34,6 @@ KERNEL_MAXPROC_LDADD = \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
-
 
 KERNEL_MAXPROC_LDADD += @AGENT_LIBS@
 
