@@ -37,13 +37,17 @@ $http_popup_form = (new CForm())
 	->addVar('action', 'popup.httpstep');
 
 $http_popup_form_list = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $options['name'], (bool) $options['templated'], 64))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('URL'),
+	->addRow(
+		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 		new CDiv([
 			(new CTextBox('url', $options['url'], false, null))
+				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('parse', _('Parse')))

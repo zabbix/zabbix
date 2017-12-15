@@ -116,8 +116,11 @@ $form->addItem(
 	(new CTabView())
 		->addTab('trigger_tab', null,
 			(new CFormList())
-				->addRow(_('Name'),
-					(new CTextBox('description', $options['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addRow(
+					(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
+					(new CTextBox('description', $options['description']))
+						->setAriaRequired()
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				)
 				->addRow(_('Item'), [
 					(new CTextBox('item', $options['item_name']))
@@ -142,8 +145,10 @@ $form->addItem(
 					'name' => 'priority',
 					'value' => (int) $options['priority']
 				]))
-				->addRow(_('Expression'),
+				->addRow(
+					(new CLabel(_('Expression'), 'logexpr'))->setAsteriskMark(),
 					(new CTextBox('expression'))
+						->setAriaRequired()
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('logexpr')
 				)

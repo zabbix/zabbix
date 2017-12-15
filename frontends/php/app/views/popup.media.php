@@ -35,10 +35,12 @@ $email_send_to_table = (new CTable())->setId('email_send_to');
 
 foreach ($options['sendto_emails'] as $i => $email) {
 	$email_send_to_table->addRow([
-		(new CTextBox('sendto_emails['.$i.']', $email))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			(new CButton('sendto_emails['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+		(new CTextBox('sendto_emails['.$i.']', $email))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CButton('sendto_emails['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
 	], 'form_row');
 }
 
@@ -51,11 +53,17 @@ $email_send_to_table->setFooter(new CCol(
 // Create media form.
 $media_form = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $options['mediatypeid'], null, $data['db_mediatypes']))
-	->addRow(_('Send to'),
-		(new CTextBox('sendto', $options['sendto'], false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	->addRow(
+		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
+		(new CTextBox('sendto', $options['sendto'], false, 100))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'mediatype_send_to'
 	)
-	->addRow(_('Send to'), $email_send_to_table, 'mediatype_email_send_to')
+	->addRow(
+		(new CLabel(_('Send to'), 'mediatype_email_send_to'))->setAsteriskMark(),
+		$email_send_to_table, 'mediatype_email_send_to'
+	)
 	->addRow(_('When active'),
 		(new CTextBox('period', $options['period'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
@@ -78,7 +86,9 @@ $body_html = (new CForm())
 
 $body_html .= (new CTag('script'))
 	->addItem((new CRow([
-		(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))),
+		(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))),
 		(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
