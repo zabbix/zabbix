@@ -427,7 +427,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	const char		*__function_name = "vfs_dir_size";
 	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
-	unsigned long		attrib_ex;
+	DWORD			attrib_ex;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list;
 	zbx_stat_t		status;
