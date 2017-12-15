@@ -10,6 +10,7 @@ bin/win64/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
 bin/win64/zabbix_get.exe -text svneol=unset#application/x-dosexec
 bin/win64/zabbix_sender.exe -text svneol=unset#application/x-dosexec
 /build-backend.xml -text
+database/elasticsearch/elasticsearch.map -text
 frontends/php/audio/alarm_average.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_disaster.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_high.wav -text svneol=unset#audio/x-wav
@@ -38,6 +39,7 @@ frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/locale/ca/LC_MESSAGES/frontend.po -text
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
 frontends/php/tests/images/image.png -text svneol=unset#image/png
+include/zbxhistory.h -text
 include/zbxipcservice.h -text
 include/zbxserialize.h -text
 m4/libevent.m4 -text

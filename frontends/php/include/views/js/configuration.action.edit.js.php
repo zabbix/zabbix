@@ -412,9 +412,6 @@
 
 			opCmdTarget.parent().append(opCmdTargetObject);
 
-			var srctbl = (opCmdTargetVal == 'host') ? 'hosts' : 'host_groups',
-				srcfld1 = (opCmdTargetVal == 'host') ? 'hostid' : 'groupid';
-
 			jQuery(opCmdTargetObject).multiSelectHelper({
 				id: 'opCmdTargetObject',
 				objectName: (opCmdTargetVal == 'host') ? 'hosts' : 'hostGroup',
@@ -423,8 +420,14 @@
 					editable: true
 				},
 				popup: {
-					parameters: 'srctbl=' + srctbl + '&dstfrm=action.edit&dstfld1=opCmdTargetObject&srcfld1=' +
-						srcfld1 + '&writeonly=1&multiselect=1'
+					parameters: {
+						srctbl: (opCmdTargetVal == 'host') ? 'hosts' : 'host_groups',
+						srcfld1: (opCmdTargetVal == 'host') ? 'hostid' : 'groupid',
+						dstfrm: 'action.edit',
+						dstfld1: 'opCmdTargetObject',
+						writeonly: '1',
+						multiselect: '1'
+					}
 				}
 			});
 		}
@@ -677,21 +680,36 @@
 		showOpTypeForm(<?= ACTION_ACKNOWLEDGE_OPERATION ?>);
 
 		jQuery('#select_operation_opcommand_script').click(function() {
-			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
-				+ '&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script'
-			);
+			PopUp('popup.generic', {
+				srctbl: 'scripts',
+				srcfld1: 'scriptid',
+				srcfld2: 'name',
+				dstfrm: 'action.edit',
+				dstfld1: 'new_operation_opcommand_scriptid',
+				dstfld2: 'new_operation_opcommand_script'
+			});
 		});
 
 		jQuery('#select_recovery_operation_opcommand_script').click(function() {
-			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
-				+ '&dstfld1=new_recovery_operation_opcommand_scriptid&dstfld2=new_recovery_operation_opcommand_script'
-			);
+			PopUp('popup.generic', {
+				srctbl: 'scripts',
+				srcfld1: 'scriptid',
+				srcfld2: 'name',
+				dstfrm: 'action.edit',
+				dstfld1: 'new_recovery_operation_opcommand_scriptid',
+				dstfld2: 'new_recovery_operation_opcommand_script'
+			});
 		});
 
 		jQuery('#select_ack_operation_opcommand_script').click(function() {
-			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
-				+ '&dstfld1=new_ack_operation_opcommand_scriptid&dstfld2=new_ack_operation_opcommand_script'
-			);
+			PopUp('popup.generic', {
+				srctbl: 'scripts',
+				srcfld1: 'scriptid',
+				srcfld2: 'name',
+				dstfrm: 'action.edit',
+				dstfld1: 'new_ack_operation_opcommand_scriptid',
+				dstfld2: 'new_ack_operation_opcommand_script'
+			});
 		});
 
 		processTypeOfCalculation();

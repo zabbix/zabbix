@@ -29,6 +29,7 @@ zabbix_server_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
+	postinit.c postinit.h \
 	server.c
 	
 if ZBXCUNIT
@@ -62,6 +63,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \

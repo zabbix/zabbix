@@ -121,6 +121,22 @@ void	zbx_json_init(struct zbx_json *j, size_t allocate)
 	zbx_json_addobject(j, NULL);
 }
 
+void	zbx_json_initarray(struct zbx_json *j, size_t allocate)
+{
+	assert(j);
+
+	j->buffer = NULL;
+	j->buffer_allocated = 0;
+	j->buffer_offset = 0;
+	j->buffer_size = 0;
+	j->status = ZBX_JSON_EMPTY;
+	j->level = 0;
+	__zbx_json_realloc(j, allocate);
+	*j->buffer = '\0';
+
+	zbx_json_addarray(j, NULL);
+}
+
 void	zbx_json_clean(struct zbx_json *j)
 {
 	assert(j);
@@ -482,10 +498,13 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 			zbx_free(error);
 		}
 		else
+		{
 			zbx_set_json_strerror("cannot parse as a valid JSON object \"%.64s\"", buffer);
+		}
 
 		return FAIL;
 	}
+
 	jp->end = jp->start + len - 1;
 
 	return SUCCEED;

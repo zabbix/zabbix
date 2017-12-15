@@ -63,7 +63,13 @@ if (!$data['screen']['templateid']) {
 		'objectName' => 'users',
 		'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 		'popup' => [
-			'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+			'parameters' => [
+				'srctbl' => 'users',
+				'dstfrm' => $form->getName(),
+				'dstfld1' => 'userid',
+				'srcfld1' => 'userid',
+				'srcfld2' => 'fullname'
+			]
 		]
 	];
 
@@ -130,8 +136,14 @@ if (!$data['screen']['templateid']) {
 		->setAttribute('style', 'width: 100%;');
 
 	$add_user_group_btn = ([(new CButton(null, _('Add')))
-		->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
-			'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'usrgrp',
+				'srcfld1' => 'usrgrpid',
+				'srcfld2' => 'name',
+				'dstfrm' => $form->getName(),
+				'multiselect' => '1'
+			]).');'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -160,8 +172,14 @@ if (!$data['screen']['templateid']) {
 		->setAttribute('style', 'width: 100%;');
 
 	$add_user_btn = ([(new CButton(null, _('Add')))
-		->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
-			'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'users',
+				'srcfld1' => 'userid',
+				'srcfld2' => 'fullname',
+				'dstfrm' => $form->getName(),
+				'multiselect' => '1'
+			]).');'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)]);
 
