@@ -683,7 +683,14 @@ class CControllerPopupTriggerExpr extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -933,20 +940,26 @@ class CControllerPopupTriggerExpr extends CController {
 			}
 
 			if (($messages = getMessages()) !== null) {
-				echo (new CJson())->encode(['messages' => $messages->toString()]);
+				$output = [
+					'errors' => $messages->toString()
+				];
 			}
 			else {
-				echo (new CJson())->encode([
+				$output = [
 					'expression' => $data['expression'],
 					'dstfld1' => $data['dstfld1'],
 					'dstfrm' => $data['dstfrm']
-				]);
+				];
 			}
-			exit;
-		}
 
-		$this->setResponse(new CControllerResponseData(
-			$data + ['title' => _('Condition'), 'errors' => hasErrorMesssages() ? getMessages() : null]
-		));
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
+		}
+		else {
+			$this->setResponse(new CControllerResponseData(
+				$data + ['title' => _('Condition'), 'errors' => hasErrorMesssages() ? getMessages() : null]
+			));
+		}
 	}
 }

@@ -26,7 +26,6 @@
 #include "ipc.h"
 #include "mutexs.h"
 #include "memalloc.h"
-#include "strpool.h"
 #include "zbxserver.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
@@ -548,6 +547,59 @@ static ZBX_DC_HOST	*DCfind_proxy(const char *host)
 		return NULL;
 	else
 		return host_p->host_ptr;
+}
+
+/* private strpool functions */
+
+#define	REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
+
+static zbx_hash_t	__config_strpool_hash(const void *data)
+{
+	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
+}
+
+static int	__config_strpool_compare(const void *d1, const void *d2)
+{
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
+}
+
+static const char	*zbx_strpool_intern(const char *str)
+{
+	void		*record;
+	zbx_uint32_t	*refcount;
+
+	record = zbx_hashset_search(&config->strpool, str - REFCOUNT_FIELD_SIZE);
+
+	if (NULL == record)
+	{
+		record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
+				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE);
+		*(zbx_uint32_t *)record = 0;
+	}
+
+	refcount = (zbx_uint32_t *)record;
+	(*refcount)++;
+
+	return (char *)record + REFCOUNT_FIELD_SIZE;
+}
+
+static void	zbx_strpool_release(const char *str)
+{
+	zbx_uint32_t	*refcount;
+
+	refcount = (zbx_uint32_t *)(str - REFCOUNT_FIELD_SIZE);
+	if (0 == --(*refcount))
+		zbx_hashset_remove(&config->strpool, str - REFCOUNT_FIELD_SIZE);
+}
+
+static const char	*zbx_strpool_acquire(const char *str)
+{
+	zbx_uint32_t	*refcount;
+
+	refcount = (zbx_uint32_t *)(str - REFCOUNT_FIELD_SIZE);
+	(*refcount)++;
+
+	return str;
 }
 
 static int	DCstrpool_replace(int found, const char **curr, const char *new)
@@ -1448,14 +1500,11 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 {
 	const char		*__function_name = "DCsync_host_inventory";
 
+	ZBX_DC_HOST_INVENTORY	*host_inventory, *host_inventory_auto;
+	zbx_uint64_t		rowid, hostid;
+	int			found, ret, i;
 	char			**row;
-	zbx_uint64_t		rowid;
 	unsigned char		tag;
-
-	ZBX_DC_HOST_INVENTORY	*host_inventory;
-
-	int			found, ret;
-	zbx_uint64_t		hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1469,9 +1518,33 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 
 		host_inventory = DCfind_id(&config->host_inventories, hostid, sizeof(ZBX_DC_HOST_INVENTORY), &found);
 
-		/* store new information in host_inventory structure */
-
 		ZBX_STR2UCHAR(host_inventory->inventory_mode, row[1]);
+
+		/* store new information in host_inventory structure */
+		for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
+			DCstrpool_replace(found, &(host_inventory->values[i]), row[i + 2]);
+
+		host_inventory_auto = DCfind_id(&config->host_inventories_auto, hostid, sizeof(ZBX_DC_HOST_INVENTORY),
+				&found);
+
+		host_inventory_auto->inventory_mode = host_inventory->inventory_mode;
+
+		if (1 == found)
+		{
+			for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
+			{
+				if (NULL == host_inventory_auto->values[i])
+					continue;
+
+				zbx_strpool_release(host_inventory_auto->values[i]);
+				host_inventory_auto->values[i] = NULL;
+			}
+		}
+		else
+		{
+			for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
+				host_inventory_auto->values[i] = NULL;
+		}
 	}
 
 	/* remove deleted host inventory from cache */
@@ -1480,7 +1553,24 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		if (NULL == (host_inventory = zbx_hashset_search(&config->host_inventories, &rowid)))
 			continue;
 
+		for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
+			zbx_strpool_release(host_inventory->values[i]);
+
 		zbx_hashset_remove_direct(&config->host_inventories, host_inventory);
+
+		if (NULL == (host_inventory_auto = zbx_hashset_search(&config->host_inventories_auto, &rowid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
+		{
+			if (NULL != host_inventory_auto->values[i])
+				zbx_strpool_release(host_inventory_auto->values[i]);
+		}
+
+		zbx_hashset_remove_direct(&config->host_inventories_auto, host_inventory_auto);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -2262,9 +2352,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		ZBX_DBROW2UINT64(item->interfaceid, row[25]);
 
 		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
+		{
+			item->history_sec = config->config->hk.history;
 			item->history = (0 != config->config->hk.history);
+		}
 		else
+		{
+			is_time_suffix(row[31], &(item->history_sec), ZBX_LENGTH_UNLIMITED);
 			item->history = zbx_time2bool(row[31]);
+		}
 
 		ZBX_STR2UCHAR(item->inventory_link, row[33]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[34]);
@@ -4366,7 +4462,6 @@ void	DCsync_configuration(unsigned char mode)
 				correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 				corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, total, total2,
 				update_sec;
-	const zbx_strpool_t	*strpool;
 
 	zbx_dbsync_t		config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync,
 				items_sync, triggers_sync, tdep_sync, func_sync, expr_sync, action_sync, action_op_sync,
@@ -4672,8 +4767,6 @@ void	DCsync_configuration(unsigned char mode)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		strpool = zbx_strpool_info();
-
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
 				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec;
@@ -4859,18 +4952,13 @@ void	DCsync_configuration(unsigned char mode)
 				100 * ((double)config_mem->free_size / config_mem->orig_size));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
-				strpool->hashset->num_data, strpool->hashset->num_slots);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() strpoolfree: " ZBX_FS_DBL "%%", __function_name,
-				100 * ((double)strpool->mem_info->free_size / strpool->mem_info->orig_size));
+				config->strpool.num_data, config->strpool.num_slots);
 
 		zbx_mem_dump_stats(config_mem);
-		zbx_mem_dump_stats(strpool->mem_info);
 	}
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
-	config->proxy_lastaccess_ts = time(NULL);
 
 	FINISH_SYNC;
 out:
@@ -5200,22 +5288,17 @@ int	init_configuration_cache(char **error)
 	const char	*__function_name = "init_configuration_cache";
 
 	int		i, ret;
-	size_t		config_size;
-	size_t		strpool_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_UI64, __function_name, CONFIG_CONF_CACHE_SIZE);
-
-	strpool_size = (size_t)(CONFIG_CONF_CACHE_SIZE * 0.15);
-	config_size = CONFIG_CONF_CACHE_SIZE - strpool_size;
 
 	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_mem_create(&config_mem, config_size, "configuration cache", "CacheSize", 0, error)))
+	if (SUCCEED != (ret = zbx_mem_create(&config_mem, CONFIG_CONF_CACHE_SIZE, "configuration cache",
+			"CacheSize", 0, error)))
+	{
 		goto out;
-
-	if (SUCCEED != (ret = zbx_strpool_create(strpool_size, error)))
-		goto out;
+	}
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
@@ -5251,6 +5334,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->hosts, 10);
 	CREATE_HASHSET(config->proxies, 0);
 	CREATE_HASHSET(config->host_inventories, 0);
+	CREATE_HASHSET(config->host_inventories_auto, 0);
 	CREATE_HASHSET(config->ipmihosts, 0);
 	CREATE_HASHSET(config->htmpls, 0);
 	CREATE_HASHSET(config->gmacros, 0);
@@ -5278,6 +5362,8 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash, __config_interface_addr_compare);
 	CREATE_HASHSET_EXT(config->regexps, 0, __config_regexp_hash, __config_regexp_compare);
+
+	CREATE_HASHSET_EXT(config->strpool, 100, __config_strpool_hash, __config_strpool_compare);
 
 	zbx_vector_uint64_create_ext(&config->locked_lld_ruleids,
 			__config_mem_malloc_func,
@@ -5340,6 +5426,7 @@ int	init_configuration_cache(char **error)
 
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
+	config->proxy_lastaccess_ts = time(NULL);
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
@@ -5729,6 +5816,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
+	dst_item->history_sec = src_item->history_sec;
 
 	dst_item->error = zbx_strdup(NULL, src_item->error);
 
@@ -7981,8 +8069,7 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 	{
 		ha = (zbx_host_availability_t *)availabilities->values[i];
 
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &ha->hostid)) ||
-				HOST_STATUS_MONITORED != dc_host->status)
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &ha->hostid)))
 		{
 			int	j;
 
@@ -8004,10 +8091,31 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 
 /******************************************************************************
  *                                                                            *
- * Comments: helper function for DCconfig_check_trigger_dependencies()        *
+ * Comments: helper function for trigger dependency checking                  *
+ *                                                                            *
+ * Parameters: trigdep        - [IN] the trigger dependency data              *
+ *             level          - [IN] the trigger dependency level             *
+ *             triggerids     - [IN] the currently processing trigger ids     *
+ *                                   for bulk trigger operations              *
+ *                                   (optional, can be NULL)                  *
+ *             master_triggerids - [OUT] unresolved master trigger ids        *
+ *                                   for bulk trigger operations              *
+ *                                   (optional together with triggerids       *
+ *                                   parameter)                               *
+ *                                                                            *
+ * Return value: SUCCEED - trigger dependency check succeed / was unresolved  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: With bulk trigger processing a master trigger can be in the same *
+ *           batch as dependent trigger. In this case it might be impossible  *
+ *           to perform dependency check based on cashed trigger values. The  *
+ *           unresolved master trigger ids will be added to master_triggerids *
+ *           vector, so the dependency check can be performed after a new     *
+ *           master trigger value has been calculated.                        *
  *                                                                            *
  ******************************************************************************/
-static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
+static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level,
+		const zbx_vector_uint64_t *triggerids, zbx_vector_uint64_t *master_triggerids)
 {
 	int				i;
 	const ZBX_DC_TRIGGER		*next_trigger;
@@ -8027,15 +8135,25 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 			next_trigdep = (const ZBX_DC_TRIGGER_DEPLIST *)trigdep->dependencies.values[i];
 
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
-					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
 					TRIGGER_STATUS_ENABLED == next_trigger->status &&
 					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
 			{
-				return FAIL;
+
+				if (NULL == triggerids || FAIL == zbx_vector_uint64_bsearch(triggerids,
+						next_trigger->triggerid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					if (TRIGGER_VALUE_PROBLEM == next_trigger->value)
+						return FAIL;
+				}
+				else
+					zbx_vector_uint64_append(master_triggerids, next_trigger->triggerid);
 			}
 
-			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1))
+			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1, triggerids,
+					master_triggerids))
+			{
 				return FAIL;
+			}
 		}
 	}
 
@@ -8062,7 +8180,7 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
 	LOCK_CACHE;
 
 	if (NULL != (trigdep = zbx_hashset_search(&config->trigdeps, &triggerid)))
-		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0);
+		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0, NULL, NULL);
 
 	UNLOCK_CACHE;
 
@@ -8150,7 +8268,7 @@ static void	DCconfig_sort_triggers_topologically(void)
  * Function: DCconfig_triggers_apply_changes                                  *
  *                                                                            *
  * Purpose: apply trigger value,state,lastchange or error changes to          *
- *          configuration cache                                               *
+ *          configuration cache after committed to database                   *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
@@ -8158,6 +8276,9 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 	int			i;
 	zbx_trigger_diff_t	*diff;
 	ZBX_DC_TRIGGER		*dc_trigger;
+
+	if (0 == trigger_diff->values_num)
+		return;
 
 	LOCK_CACHE;
 
@@ -8243,25 +8364,19 @@ void	*DCconfig_get_stats(int request)
 	static zbx_uint64_t	value_uint;
 	static double		value_double;
 
-	const zbx_mem_info_t	*strpool_mem;
-
-	strpool_mem = zbx_strpool_info()->mem_info;
-
 	switch (request)
 	{
 		case ZBX_CONFSTATS_BUFFER_TOTAL:
-			value_uint = config_mem->orig_size + strpool_mem->orig_size;
+			value_uint = config_mem->orig_size;
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_USED:
-			value_uint = (config_mem->orig_size + strpool_mem->orig_size) -
-					(config_mem->free_size + strpool_mem->free_size);
+			value_uint = config_mem->orig_size - config_mem->free_size;
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_FREE:
-			value_uint = config_mem->free_size + strpool_mem->free_size;
+			value_uint = config_mem->free_size;
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_PFREE:
-			value_double = 100.0 * ((double)(config_mem->free_size + strpool_mem->free_size) /
-							(config_mem->orig_size + strpool_mem->orig_size));
+			value_double = 100.0 * ((double)(config_mem->free_size) / (config_mem->orig_size));
 			return &value_double;
 		default:
 			return NULL;
@@ -10758,6 +10873,9 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 	const zbx_item_diff_t	*diff;
 	ZBX_DC_ITEM		*dc_item;
 
+	if (0 == item_diff->values_num)
+		return;
+
 	LOCK_CACHE;
 
 	for (i = 0; i < item_diff->values_num; i++)
@@ -10784,4 +10902,140 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 	}
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_update_inventory_values                                 *
+ *                                                                            *
+ * Purpose: update automatic inventory in configuration cache                 *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
+{
+	ZBX_DC_HOST_INVENTORY	*host_inventory = NULL;
+	int			i;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < inventory_values->values_num; i++)
+	{
+		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+		const char			**value;
+
+		if (NULL == host_inventory || inventory_value->hostid != host_inventory->hostid)
+		{
+			host_inventory = zbx_hashset_search(&config->host_inventories_auto, &inventory_value->hostid);
+
+			if (NULL == host_inventory)
+				continue;
+		}
+
+		value = &host_inventory->values[inventory_value->idx];
+
+		DCstrpool_replace((NULL != *value ? 1 : 0), value, inventory_value->value);
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_host_inventory_value_by_itemid                             *
+ *                                                                            *
+ * Purpose: find inventory value in automatically populated cache, if not     *
+ *          found then look in main inventory cache                           *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx)
+{
+	ZBX_DC_ITEM		*dc_item;
+	ZBX_DC_HOST_INVENTORY	*dc_inventory;
+	int			ret = FAIL;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)))
+	{
+		if (NULL != (dc_inventory = zbx_hashset_search(&config->host_inventories_auto, &dc_item->hostid)) &&
+				NULL != dc_inventory->values[value_idx])
+		{
+			*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
+			ret = SUCCEED;
+		}
+		else if (NULL != (dc_inventory = zbx_hashset_search(&config->host_inventories, &dc_item->hostid)))
+		{
+			*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
+			ret = SUCCEED;
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_trigger_dependencies                                  *
+ *                                                                            *
+ * Purpose: checks/returns trigger dependencies for a set of triggers         *
+ *                                                                            *
+ * Parameter: triggerids  - [IN] the currently processing trigger ids         *
+ *            deps        - [OUT] list of dependency check results for failed *
+ *                                or unresolved dependencies                  *
+ *                                                                            *
+ * Comments: This function returns list of zbx_trigger_dep_t structures       *
+ *           for failed or unresolved dependency checks.                      *
+ *           Dependency check is failed if any of the master triggers that    *
+ *           are not being processed in this batch (present in triggerids     *
+ *           vector) has a problem value.                                     *
+ *           Dependency check is unresolved if a master trigger is being      *
+ *           processed in this batch (present in triggerids vector) and no    *
+ *           other master triggers have problem value.                        *
+ *           Dependency check is successful if all master triggers (if any)   *
+ *           have OK value and are not being processed in this batch.         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps)
+{
+	int				i, ret;
+	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
+	zbx_vector_uint64_t		masterids;
+	zbx_trigger_dep_t		*dep;
+
+	zbx_vector_uint64_create(&masterids);
+	zbx_vector_uint64_reserve(&masterids, 64);
+
+	LOCK_CACHE;
+
+	for (i = 0; i < triggerids->values_num; i++)
+	{
+		if (NULL == (trigdep = zbx_hashset_search(&config->trigdeps, &triggerids->values[i])))
+			continue;
+
+		if (FAIL == (ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0, triggerids, &masterids)) ||
+				0 != masterids.values_num)
+		{
+			dep = (zbx_trigger_dep_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_t));
+			dep->triggerid = triggerids->values[i];
+			zbx_vector_uint64_create(&dep->masterids);
+
+			if (SUCCEED == ret)
+			{
+				dep->status = ZBX_TRIGGER_DEPENDENCY_UNRESOLVED;
+				zbx_vector_uint64_append_array(&dep->masterids, masterids.values, masterids.values_num);
+			}
+			else
+				dep->status = ZBX_TRIGGER_DEPENDENCY_FAIL;
+
+			zbx_vector_ptr_append(deps, dep);
+		}
+
+		zbx_vector_uint64_clear(&masterids);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&masterids);
 }

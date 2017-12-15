@@ -205,6 +205,38 @@ function Confirm(msg) {
 	return confirm(msg);
 }
 
+/**
+ * Function removes input elements in specified form that matches given selector.
+ *
+ * @param {object}|{string}  form_name  Form element in which input elements will be selected. If given value is 'null',
+ *                                      the DOM document object will be used.
+ * @param {string} selector             String containing one or more commas separated CSS selectors.
+ *
+ * @returns {bool}
+ */
+function removeVarsBySelector(form_name, selector) {
+	if (form_name !== null) {
+		var source = is_string(form_name) ? document.forms[form_name] : form_name;
+	}
+	else {
+		var source = document;
+	}
+
+	if (!source) {
+		return false;
+	}
+
+	var inputs = source.querySelectorAll(selector);
+
+	if (inputs.length) {
+		for (var i in inputs) {
+			if (typeof inputs[i] === 'object') {
+				inputs[i].parentNode.removeChild(inputs[i]);
+			}
+		}
+	}
+}
+
 function create_var(form_name, var_name, var_value, doSubmit) {
 	var objForm = is_string(form_name) ? document.forms[form_name] : form_name;
 	if (!objForm) {
@@ -407,21 +439,26 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			return xhr;
 		},
 		success: function(resp) {
-			var buttons = resp.buttons !== null ? resp.buttons : [];
+			if (typeof resp.errors !== 'undefined') {
+				ovelay_properties['content'] = resp.errors;
+			}
+			else {
+				var buttons = resp.buttons !== null ? resp.buttons : [];
 
-			buttons.push({
-				'title': t('Cancel'),
-				'class': 'btn-alt',
-				'action': function() {}
-			});
+				buttons.push({
+					'title': t('Cancel'),
+					'class': 'btn-alt',
+					'action': function() {}
+				});
 
-			ovelay_properties['title'] = resp.header;
-			ovelay_properties['content'] = resp.body;
-			ovelay_properties['controls'] = resp.controls;
-			ovelay_properties['buttons'] = buttons;
+				ovelay_properties['title'] = resp.header;
+				ovelay_properties['content'] = resp.body;
+				ovelay_properties['controls'] = resp.controls;
+				ovelay_properties['buttons'] = buttons;
 
-			if (typeof resp.script_inline !== 'undefined') {
-				ovelay_properties['script_inline'] = resp.script_inline;
+				if (typeof resp.script_inline !== 'undefined') {
+					ovelay_properties['script_inline'] = resp.script_inline;
+				}
 			}
 
 			overlayDialogue(ovelay_properties);
@@ -674,7 +711,15 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
 	var media_name = (media > -1) ? 'user_medias[' + media + ']' : 'new_media';
 
 	window.create_var(form, media_name + '[mediatypeid]', mediatypeid);
-	window.create_var(form, media_name + '[sendto]', sendto);
+	if (typeof sendto === "object") {
+		window.removeVarsBySelector(form, 'input[name^="'+media_name+'[sendto]"]');
+		jQuery(sendto).each(function(i, st) {
+			window.create_var(form, media_name + '[sendto]['+i+']', st);
+		});
+	}
+	else {
+		window.create_var(form, media_name + '[sendto]', sendto);
+	}
 	window.create_var(form, media_name + '[period]', period);
 	window.create_var(form, media_name + '[active]', active);
 	window.create_var(form, media_name + '[severity]', severity);
@@ -697,8 +742,8 @@ function validate_media(formname) {
 		success: function(ret) {
 			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
+			if (typeof ret.errors !== 'undefined') {
+				jQuery(ret.errors).insertBefore(jQuery(form));
 			}
 			else {
 				add_media(ret.dstfrm, ret.media, ret.mediatypeid, ret.sendto, ret.period, ret.active, ret.severity);
@@ -728,8 +773,8 @@ function validate_trigger_expression(formname, dialogueid) {
 		success: function(ret) {
 			jQuery(window.document.forms[formname]).parent().find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(window.document.forms[formname]));
+			if (typeof ret.errors !== 'undefined') {
+				jQuery(ret.errors).insertBefore(jQuery(window.document.forms[formname]));
 			}
 			else {
 				var form = window.document.forms[ret.dstfrm];
@@ -773,8 +818,8 @@ function validate_httpstep(formname, dialogueid) {
 		success: function(ret) {
 			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
+			if (typeof ret.errors !== 'undefined') {
+				jQuery(ret.errors).insertBefore(jQuery(form));
 			}
 			else {
 				if (typeof ret.params.stepid !== 'undefined') {

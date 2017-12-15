@@ -132,19 +132,29 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 	if (!empty($data['user_medias'])) {
 		$mediaTypeDescriptions = [];
 		$dbMediaTypes = DBselect(
-			'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
+			'SELECT mt.mediatypeid,mt.type,mt.description FROM media_type mt WHERE '.
 				dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 		);
 		while ($dbMediaType = DBfetch($dbMediaTypes)) {
-			$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
+			$mediaTypeDescriptions[$dbMediaType['mediatypeid']]['description'] = $dbMediaType['description'];
+			$mediaTypeDescriptions[$dbMediaType['mediatypeid']]['mediatype'] = $dbMediaType['type'];
 		}
 
 		foreach ($data['user_medias'] as &$media) {
-			$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']];
+			$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']]['description'];
+			$media['mediatype'] = $mediaTypeDescriptions[$media['mediatypeid']]['mediatype'];
+			$media['send_to_sort_field'] = is_array($media['sendto'])
+				? implode(', ', $media['sendto'])
+				: $media['sendto'];
 		}
 		unset($media);
 
-		CArrayHelper::sort($data['user_medias'], ['description', 'sendto']);
+		CArrayHelper::sort($data['user_medias'], ['description', 'send_to_sort_field']);
+
+		foreach ($data['user_medias'] as &$media) {
+			unset($media['send_to_sort_field']);
+		}
+		unset($media);
 	}
 
 	// set user rights
@@ -1535,6 +1545,18 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
+	if ($data['hostid'] && (!array_key_exists('groupid', $data) || !$data['groupid'])) {
+		$db_hostgroups = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'hostids' => $data['hostid'],
+			'templateids' => $data['hostid']
+		]);
+
+		if ($db_hostgroups) {
+			$data['groupid'] = $db_hostgroups[0]['groupid'];
+		}
+	}
+
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
 		$data['expression'] = $trigger['expression'];
 		$data['recovery_expression'] = $trigger['recovery_expression'];
@@ -1939,7 +1961,7 @@ function get_timeperiod_form() {
 
 		$tblPeriod->addRow([_('Date'),
 			(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
-				->addValue(_('Day'), 0, null, 'submit()')
+				->addValue(_('Day of month'), 0, null, 'submit()')
 				->addValue(_('Day of week'), 1, null, 'submit()')
 				->setModern(true)
 		]);

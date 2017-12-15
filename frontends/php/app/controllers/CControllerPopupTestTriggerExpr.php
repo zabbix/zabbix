@@ -112,14 +112,24 @@ class CControllerPopupTestTriggerExpr extends CController {
 	}
 
 	protected function checkInput() {
-		// Validation must be done in old fashion.
-		$this->fields['test_expression'] = [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null];
+		$fields = [
+			'test_expression' => 'string'
+		];
 
-		// Here validation results are just registered and stored in message stack to be displayed later.
-		check_fields($this->fields, false, true);
+		$ret = $this->validateInput($fields);
 
-		// Return true anyway. We will use messages to report errors.
-		return true;
+		if (!$ret) {
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {

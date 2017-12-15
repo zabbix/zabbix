@@ -49,7 +49,14 @@ class CControllerPopupTriggerWizard extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -216,67 +223,68 @@ class CControllerPopupTriggerWizard extends CController {
 				error(_s('Field "%1$s" is mandatory.', 'expressions'));
 			}
 
+			$output = [];
 			if (($messages = getMessages()) !== null) {
-				echo (CJs::encodeJson(['messages' => $messages->toString()]));
+				$output['errors'] = $messages->toString();
 			}
-			else {
-				// Return empty array if successfuly saved.
-				echo '[]';
-			}
-			exit;
-		}
 
-		// Select requested trigger.
-		if (array_key_exists('triggerid', $page_options)) {
-			$result = DBselect(
-				'SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type'.
-				' FROM triggers t'.
-				' WHERE t.triggerid='.zbx_dbstr($page_options['triggerid']).
-					' AND EXISTS ('.
-						'SELECT NULL'.
-						' FROM functions f,items i'.
-						' WHERE t.triggerid=f.triggerid'.
-							' AND f.itemid=i.itemid '.
-							' AND i.value_type IN ('.
-								ITEM_VALUE_TYPE_LOG.','.ITEM_VALUE_TYPE_TEXT.','.ITEM_VALUE_TYPE_STR.
-							')'.
-					')'
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
 			);
+		}
+		else {
+			// Select requested trigger.
+			if (array_key_exists('triggerid', $page_options)) {
+				$result = DBselect(
+					'SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type'.
+					' FROM triggers t'.
+					' WHERE t.triggerid='.zbx_dbstr($page_options['triggerid']).
+						' AND EXISTS ('.
+							'SELECT NULL'.
+							' FROM functions f,items i'.
+							' WHERE t.triggerid=f.triggerid'.
+								' AND f.itemid=i.itemid '.
+								' AND i.value_type IN ('.
+									ITEM_VALUE_TYPE_LOG.','.ITEM_VALUE_TYPE_TEXT.','.ITEM_VALUE_TYPE_STR.
+								')'.
+						')'
+				);
 
-			if ($row = DBfetch($result)) {
-				$expression = CMacrosResolverHelper::resolveTriggerExpression($row['expression']);
-				$page_options['description'] = $row['description'];
-				$page_options['type'] = $row['type'];
-				$page_options['priority'] = $row['priority'];
-				$page_options['comments'] = $row['comments'];
-				$page_options['url'] = $row['url'];
-				$page_options['status'] = $row['status'];
+				if ($row = DBfetch($result)) {
+					$expression = CMacrosResolverHelper::resolveTriggerExpression($row['expression']);
+					$page_options['description'] = $row['description'];
+					$page_options['type'] = $row['type'];
+					$page_options['priority'] = $row['priority'];
+					$page_options['comments'] = $row['comments'];
+					$page_options['url'] = $row['url'];
+					$page_options['status'] = $row['status'];
+				}
+
+				// Break expression into parts.
+				$exprs = $constructor->getPartsFromExpression($expression);
 			}
 
-			// Break expression into parts.
-			$exprs = $constructor->getPartsFromExpression($expression);
-		}
+			// Resolve item name.
+			if ($page_options['itemid']) {
+				$items = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'key_', 'name'],
+					'selectHosts' => ['name'],
+					'itemids' => $page_options['itemid']
+				]);
 
-		// Resolve item name.
-		if ($page_options['itemid']) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'key_', 'name'],
-				'selectHosts' => ['name'],
-				'itemids' => $page_options['itemid']
-			]);
-
-			if ($items) {
-				$items = CMacrosResolverHelper::resolveItemNames($items);
-				$page_options['item_name'] = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded'];
+				if ($items) {
+					$items = CMacrosResolverHelper::resolveItemNames($items);
+					$page_options['item_name'] = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded'];
+				}
 			}
-		}
 
-		// Output popup form.
-		$this->setResponse(new CControllerResponseData([
-			'title' => _('Trigger'),
-			'options' => $page_options,
-			'keys' => $this->getInput('keys', []),
-			'expressions' => $exprs
-		]));
+			// Output popup form.
+			$this->setResponse(new CControllerResponseData([
+				'title' => _('Trigger'),
+				'options' => $page_options,
+				'keys' => $this->getInput('keys', []),
+				'expressions' => $exprs
+			]));
+		}
 	}
 }

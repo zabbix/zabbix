@@ -17,39 +17,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../../zbxtests.h"
+/* make sure that __wrap_*() prototypes match unwrapped counterparts */
+
+#define opendir	__wrap_opendir
+#define readdir	__wrap_readdir
+#include <dirent.h>
+#undef opendir
+#undef readdir
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
-#include "../../../src/zabbix_server/taskmanager/taskmanager.h"
 
-extern char	*curr_wrapped_function;
+#include "common.h"
 
-void	__wrap_DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in,
-		zbx_vector_uint64_t *triggerids_out)
+DIR	*__wrap_opendir(const char *name)
 {
-	zbx_uint64_t	triggerid;
+	ZBX_UNUSED(name);
 
-	ZBX_UNUSED(triggerids_in);
-
-	curr_wrapped_function = "DCconfig_lock_triggers_by_triggerids";
-
-	ZBX_STR2UINT64(triggerid, get_out_func_param_by_name("triggerids"));
-	zbx_vector_uint64_append(triggerids_out, triggerid);
+	errno = ENOENT;
+	return NULL;
 }
 
-void	__wrap_DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
+struct dirent	*__wrap_readdir(DIR *dirp)
 {
-}
+	ZBX_UNUSED(dirp);
 
-void	zbx_mock_test_entry(void **state)
-{
-	int	ret, taskid, res;
-
-	ZBX_UNUSED(state);
-
-	taskid = atoi(get_in_param_by_name("taskid"));
-	ret = tm_try_task_close_problem(taskid);
-	res = atoi(get_out_param_by_name("return"));
-
-	assert_int_equal(ret, res);
+	errno = EBADF;
+	return NULL;
 }

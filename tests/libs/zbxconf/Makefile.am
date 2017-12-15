@@ -1,15 +1,14 @@
-noinst_PROGRAMS = try_task_closes_problem
+if SERVER
+noinst_PROGRAMS = parse_cfg_file
 
-try_task_closes_problem_SOURCES = \
-	try_task_closes_problem.json \
-	try_task_closes_problem.c \
+parse_cfg_file_SOURCES = \
+	parse_cfg_file.c \
 	../../../src/zabbix_server/actions.c \
 	../../../src/zabbix_server/events.c \
 	../../../src/zabbix_server/operations.c \
-	../../zbxmocktest.c \
 	../../zbxmocktest.h
 
-try_task_closes_problem_LDADD = \
+parse_cfg_file_LDADD = \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
@@ -42,6 +41,7 @@ try_task_closes_problem_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
@@ -66,12 +66,10 @@ try_task_closes_problem_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-try_task_closes_problem_LDADD += @SERVER_LIBS@
+parse_cfg_file_LDADD += @SERVER_LIBS@
 
-try_task_closes_problem_LDFLAGS = \
-	-Wl,--wrap=DCconfig_lock_triggers_by_triggerids \
-	-Wl,--wrap=DCconfig_unlock_triggers
-
-try_task_closes_problem_CFLAGS = -I@top_srcdir@/tests
+parse_cfg_file_CFLAGS = -I@top_srcdir@/tests
+endif

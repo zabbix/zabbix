@@ -11,7 +11,7 @@
       <template>
          <template>Template Net D-Link DES_DGS Switch SNMPv2</template>
          <name>Template Net D-Link DES_DGS Switch SNMPv2</name>
-         <description>Template D-Link DES_DGS Switch version: 0.13
+         <description>Template D-Link DES_DGS Switch version: 0.14
 MIBs used:
 DLINK-AGENT-MIB
 EQUIPMENT-MIB
@@ -434,7 +434,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -578,7 +578,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -622,7 +622,7 @@ disconnect : The power unit is not connected.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.psu.status[swPowerStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.psu.status[swPowerStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Power supply is in critical state</name>
@@ -693,7 +693,7 @@ Please check the power supply unit for errors</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -735,7 +735,7 @@ speed-high  : Fan spin using the highest speed.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.fan.status[swFanStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.fan.status[swFanStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Fan is in critical state</name>

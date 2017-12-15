@@ -49,7 +49,7 @@ extern int	CONFIG_TIMEOUT;
 
 struct cfg_line
 {
-	char		*parameter;
+	const char	*parameter;
 	void		*variable;
 	int		type;
 	int		mandatory;

@@ -17,29 +17,41 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_STRPOOL_H
-#define ZABBIX_STRPOOL_H
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
 
-#include "mutexs.h"
-#include "zbxalgo.h"
-#include "memalloc.h"
+#include "common.h"
 
-typedef struct
+int	__wrap_stat(const char *pathname, struct stat *buf)
 {
-	zbx_mem_info_t	*mem_info;
-	zbx_hashset_t	*hashset;
+	zbx_mock_error_t	error;
+	zbx_mock_handle_t	handle;
+
+	if (ZBX_MOCK_SUCCESS == (error = zbx_mock_file(pathname, &handle)))
+	{
+		buf->st_mode = S_IFMT & S_IFREG;
+		return 0;
+	}
+
+	if (ZBX_MOCK_NO_PARAMETER != error)
+	{
+		fail_msg("Error during path \"%s\" lookup among files: %s", pathname,
+				zbx_mock_error_string(error));
+	}
+
+	if (0)	/* directory lookup is not implemented */
+	{
+		buf->st_mode = S_IFMT & S_IFDIR;
+		return 0;
+	}
+
+	errno = ENOENT;	/* No such file or directory */
+	return -1;
 }
-zbx_strpool_t;
 
-int		zbx_strpool_create(size_t size, char **error);
-void		zbx_strpool_destroy(void);
+int	__wrap___xstat(int ver, const char *pathname, struct stat *buf)
+{
+	ZBX_UNUSED(ver);
 
-const char	*zbx_strpool_intern(const char *str);
-const char	*zbx_strpool_acquire(const char *str);
-void		zbx_strpool_release(const char *str);
-
-void		zbx_strpool_clear(void);
-
-const zbx_strpool_t	*zbx_strpool_info(void);
-
-#endif
+	return __wrap_stat(pathname, buf);
+}

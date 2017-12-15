@@ -573,8 +573,8 @@ class CPageFilter {
 				}
 			}
 
-			// select remembered selection
-			if ($hostId === null) {
+			// Select stored hostid, ignore zero value ('All hosts').
+			if ($hostId === null && $this->_profileIds['hostid'] > 0) {
 				$hostId = $this->_profileIds['hostid'];
 			}
 
@@ -764,7 +764,8 @@ class CPageFilter {
 		}
 		$options += ['objectName' => 'hosts', 'classes' => $classes];
 
-		return $this->_getCB('hostid', $this->hostid, $items, $options);
+		return $this->_getCB('hostid', $this->hostid, $items, $options)
+					->addStyle('max-width: '.ZBX_TEXTAREA_FILTER_STANDARD_WIDTH.'px;');
 	}
 
 	/**
@@ -785,7 +786,8 @@ class CPageFilter {
 			'objectName' => 'groups'
 		];
 
-		return $this->_getCB('groupid', $this->groupid, $items, $options);
+		return $this->_getCB('groupid', $this->groupid, $items, $options)
+					->addStyle('max-width: '.ZBX_TEXTAREA_FILTER_STANDARD_WIDTH.'px;');
 	}
 
 	/**

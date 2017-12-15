@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Juniper SNMPv2</template>
          <name>Template Net Juniper SNMPv2</name>
-         <description>Template Net Juniper version: 0.13
+         <description>Template Net Juniper version: 0.14
 MIBs used:
 JUNIPER-MIB
 JUNIPER-ALARM-MIB
@@ -268,7 +268,7 @@ The name, model, or detailed description of the box,indicating which product the
                   </conditions>
                </filter>
                <lifetime>30d</lifetime>
-               <description>Scanning JUNIPER-MIB::jnxOperatingTable for CPU and Memory 
+               <description>Scanning JUNIPER-MIB::jnxOperatingTable for CPU and Memory
 http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
                <item_prototypes>
                   <item_prototype>
@@ -500,7 +500,7 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                   </conditions>
                </filter>
                <lifetime>30d</lifetime>
-               <description>Scanning JUNIPER-MIB::jnxOperatingTable for Temperature 
+               <description>Scanning JUNIPER-MIB::jnxOperatingTable for Temperature
 http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
                <item_prototypes>
                   <item_prototype>
@@ -515,7 +515,7 @@ http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=sear
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -651,7 +651,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -688,7 +688,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Juniper SNMPv2:sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: Fan is in critical state</name>
@@ -751,7 +751,7 @@ Please check the fan unit</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -790,7 +790,7 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Juniper SNMPv2:sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: Power supply is in critical state</name>

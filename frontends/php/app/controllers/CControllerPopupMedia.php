@@ -35,8 +35,10 @@ class CControllerPopupMedia extends CController {
 		$fields = [
 			'dstfrm' =>			'string|fatal',
 			'media' =>			'int32',
+			'type' =>			'string',
 			'mediatypeid' =>	'db media_type.mediatypeid',
 			'sendto' =>			'string',
+			'sendto_emails'	=>	'array',
 			'period' =>			'string',
 			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
 			'severity' =>		'',
@@ -46,7 +48,14 @@ class CControllerPopupMedia extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -68,71 +77,103 @@ class CControllerPopupMedia extends CController {
 			'sendto' => $this->getInput('sendto', ''),
 			'mediatypeid' => $this->getInput('mediatypeid', 0),
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),
-			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL)
+			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL),
+			'sendto_emails' => array_values($this->getInput('sendto_emails', [''])),
+			'type' => $this->getInput('type', '')
 		];
 
 		// Validation before adding Media to user's Media tab.
-		if ($this->getInput('add', false)) {
-			if ($page_options['sendto'] === '') {
-				error(_s('Incorrect value for field "%1$s": cannot be empty.', 'sendto'));
+		if ($this->hasInput('add')) {
+			$output = [];
+
+			if ($page_options['type'] == MEDIA_TYPE_EMAIL) {
+				$email_validator = new CEmailValidator();
+
+				$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
+				if (!$page_options['sendto_emails']) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
+				}
+
+				foreach ($page_options['sendto_emails'] as $email) {
+					if (!$email_validator->validate($email)) {
+						error($email_validator->getError());
+						break;
+					}
+				}
+			}
+			elseif ($page_options['sendto'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
+			}
+
+			if (!parse_period($page_options['period'])) {
+				error(_s('Field "%1$s" is not correct: %2$s', _('When active'), _('a time period is expected')));
 			}
 
 			if (($messages = getMessages()) !== null) {
-				echo (new CJson())->encode(['messages' => $messages->toString()]);
-				exit;
+				$output['errors'] = $messages->toString();
 			}
-
-			$severity = 0;
-			$input_severity = $this->getInput('severity', []);
-			foreach ($input_severity as $id) {
-				$severity |= 1 << $id;
-			}
-
-			echo (new CJson())->encode([
-				'dstfrm' => $page_options['dstfrm'],
-				'media' => $this->getInput('media', -1),
-				'mediatypeid' => $page_options['mediatypeid'],
-				'sendto' => $page_options['sendto'],
-				'period' => $page_options['period'],
-				'active' => $this->getInput('active', MEDIA_STATUS_DISABLED),
-				'severity' => $severity
-			]);
-			exit;
-		}
-
-		// Prepare data for view.
-		if ($page_options['media'] != -1) {
-			$severity_request = $this->getInput('severity', 63);
-
-			$page_options['severities'] = [];
-			foreach ($this->severities as $severity => $foo) {
-				if ($severity_request & (1 << $severity)) {
-					$page_options['severities'][$severity] = $severity;
+			else {
+				$severity = 0;
+				$input_severity = $this->getInput('severity', []);
+				foreach ($input_severity as $id) {
+					$severity |= 1 << $id;
 				}
+
+				$output = [
+					'dstfrm' => $page_options['dstfrm'],
+					'media' => $this->getInput('media', -1),
+					'mediatypeid' => $page_options['mediatypeid'],
+					'sendto' => $page_options['type'] == MEDIA_TYPE_EMAIL
+									? $page_options['sendto_emails']
+									: $page_options['sendto'],
+					'period' => $page_options['period'],
+					'active' => $this->getInput('active', MEDIA_STATUS_DISABLED),
+					'severity' => $severity
+				];
 			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 		else {
-			$page_options['severities'] = $this->getInput('severity', array_keys($this->severities));
+			// Prepare data for view.
+			if ($page_options['media'] != -1) {
+				$severity_request = $this->getInput('severity', 63);
+
+				$page_options['severities'] = [];
+				foreach ($this->severities as $severity => $foo) {
+					if ($severity_request & (1 << $severity)) {
+						$page_options['severities'][$severity] = $severity;
+					}
+				}
+			}
+			else {
+				$page_options['severities'] = $this->getInput('severity', array_keys($this->severities));
+			}
+
+			$db_mediatypes = API::MediaType()->get([
+				'output' => ['description', 'type'],
+				'preservekeys' => true
+			]);
+			CArrayHelper::sort($db_mediatypes, ['description']);
+
+			$mediatypes = [];
+			foreach ($db_mediatypes as $mediatypeid => &$db_mediatype) {
+				$mediatypes[$mediatypeid] = $db_mediatype['type'];
+				$db_mediatype = $db_mediatype['description'];
+			}
+			unset($db_mediatype);
+
+			$data = [
+				'title' => _('Media'),
+				'options' => $page_options,
+				'db_mediatypes' => $db_mediatypes,
+				'mediatypes' => $mediatypes,
+				'severities' => $this->severities
+			];
+
+			$this->setResponse(new CControllerResponseData($data));
 		}
-
-		$mediatypes = API::MediaType()->get([
-			'output' => ['description'],
-			'preservekeys' => true
-		]);
-		CArrayHelper::sort($mediatypes, ['description']);
-
-		foreach ($mediatypes as &$mediatype) {
-			$mediatype = $mediatype['description'];
-		}
-		unset($mediatype);
-
-		$data = [
-			'title' => _('Media'),
-			'options' => $page_options,
-			'mediatypes' => $mediatypes,
-			'severities' => $this->severities
-		];
-
-		$this->setResponse(new CControllerResponseData($data));
 	}
 }

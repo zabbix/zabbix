@@ -1,15 +1,14 @@
-noinst_PROGRAMS = dbselect_uint64
+if SERVER
+noinst_PROGRAMS = DBselect_uint64
 
-dbselect_uint64_SOURCES = \
-	dbselect_uint64.json \
-	dbselect_uint64.c \
+DBselect_uint64_SOURCES = \
+	DBselect_uint64.c \
 	../../../src/zabbix_server/actions.c \
 	../../../src/zabbix_server/events.c \
 	../../../src/zabbix_server/operations.c \
-	../../zbxmocktest.c \
 	../../zbxmocktest.h
 
-dbselect_uint64_LDADD = \
+DBselect_uint64_LDADD = \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
@@ -42,6 +41,7 @@ dbselect_uint64_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
@@ -66,8 +66,10 @@ dbselect_uint64_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-dbselect_uint64_LDADD += @SERVER_LIBS@
+DBselect_uint64_LDADD += @SERVER_LIBS@
 
-dbselect_uint64_CFLAGS = -I@top_srcdir@/tests
+DBselect_uint64_CFLAGS = -I@top_srcdir@/tests
+endif

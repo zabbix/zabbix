@@ -27,15 +27,22 @@ class CControllerPopupServices extends CController {
 	protected function checkInput() {
 		$fields = [
 			'serviceid' =>	'db services.serviceid',
-			'pservices' =>	'db services.serviceid',
-			'cservices' =>	'db services.serviceid',
+			'pservices' =>	'in 1',
+			'cservices' =>	'in 1',
 			'parentid' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 
 		return $ret;

@@ -429,7 +429,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
  ******************************************************************************/
 #ifdef HAVE_IPV6
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -540,7 +540,7 @@ out:
 }
 #else
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
@@ -648,7 +648,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #endif	/* HAVE_IPV6 */
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	if (ZBX_TCP_SEC_UNENCRYPTED != tls_connect && ZBX_TCP_SEC_TLS_CERT != tls_connect &&
 			ZBX_TCP_SEC_TLS_PSK != tls_connect)

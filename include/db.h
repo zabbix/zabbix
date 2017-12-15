@@ -95,11 +95,11 @@ struct	_DC_TRIGGER;
 #define HOST_PROXY_ADDRESS_LEN		255
 #define HOST_PROXY_ADDRESS_LEN_MAX	(HOST_PROXY_ADDRESS_LEN + 1)
 
-#define INTERFACE_DNS_LEN		64
+#define INTERFACE_DNS_LEN		255
 #define INTERFACE_DNS_LEN_MAX		(INTERFACE_DNS_LEN + 1)
 #define INTERFACE_IP_LEN		64
 #define INTERFACE_IP_LEN_MAX		(INTERFACE_IP_LEN + 1)
-#define INTERFACE_ADDR_LEN		64	/* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
+#define INTERFACE_ADDR_LEN		255	/* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
 #define INTERFACE_ADDR_LEN_MAX		(INTERFACE_ADDR_LEN + 1)
 #define INTERFACE_PORT_LEN		64
 #define INTERFACE_PORT_LEN_MAX		(INTERFACE_PORT_LEN + 1)
@@ -176,6 +176,8 @@ struct	_DC_TRIGGER;
 #define PROXY_DHISTORY_VALUE_LEN	255
 
 #define ITEM_PREPROC_PARAMS_LEN		255
+
+#define EVENT_NAME_LEN			2048
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
@@ -280,6 +282,7 @@ typedef struct
 	zbx_uint64_t		eventid;
 	DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
+	char			*name;
 	int			source;
 	int			object;
 	int			clock;
@@ -292,7 +295,6 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
 #define ZBX_FLAGS_DB_EVENT_NO_ACTION		0x0002
-#define ZBX_FLAGS_DB_EVENT_LINKED		0x0004
 	zbx_uint64_t		flags;
 }
 DB_EVENT;
@@ -465,7 +467,7 @@ DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
 void		DBbegin(void);
-void		DBcommit(void);
+int		DBcommit(void);
 void		DBrollback(void);
 void		DBend(int ret);
 
@@ -523,7 +525,7 @@ typedef struct
 zbx_trigger_diff_t;
 
 void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
-void	zbx_save_trigger_changes(const zbx_vector_ptr_t *diffs);
+void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *diffs);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
@@ -537,7 +539,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t length);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
-int	DBhost_exists(char *server);
 int	DBadd_templates_to_host(int hostid, int host_templateid);
 
 int	DBadd_template_linkage(int hostid, int templateid, int items, int triggers, int graphs);
@@ -707,5 +708,13 @@ typedef struct
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE	(ZBX_FLAGS_ITEM_DIFF_UPDATE_DB | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK)
 }
 zbx_item_diff_t;
+
+/* event support */
+void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
+void	zbx_db_free_event(DB_EVENT *event);
+void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
+		zbx_vector_uint64_t *r_eventids);
+
+void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
 #endif

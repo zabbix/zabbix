@@ -181,11 +181,6 @@ function get_icon($type, $params = []) {
 
 			return $icon;
 
-		case 'action':
-			return (new CRedirectButton(SPACE, null))
-				->addClass(ZBX_STYLE_BTN_ACTION)
-				->setTitle(_('Actions'));
-
 		case 'screenconf':
 			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_CONF)
@@ -201,8 +196,6 @@ function get_icon($type, $params = []) {
 				->setTitle(_('Reset'))
 				->onClick('timeControl.objectReset();');
 	}
-
-	return null;
 }
 
 /**
@@ -957,7 +950,7 @@ function getTriggerSeverityCss($config)
 	$css = '';
 
 	foreach ($severities as $class => $color) {
-		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label { background-color: #'.$color.' }'."\n";
+		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before { background-color: #'.$color.' }'."\n";
 	}
 
 	return $css;

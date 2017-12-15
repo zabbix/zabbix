@@ -171,9 +171,15 @@ void	DBbegin(void)
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit(void)
+int	DBcommit(void)
 {
-	DBtxn_operation(zbx_db_commit);
+	if (ZBX_DB_OK > zbx_db_commit())
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
+		DBrollback();
+	}
+
+	return zbx_db_txn_end_error();
 }
 
 /******************************************************************************
@@ -189,7 +195,13 @@ void	DBcommit(void)
  ******************************************************************************/
 void	DBrollback(void)
 {
-	DBtxn_operation(zbx_db_rollback);
+	if (ZBX_DB_OK > zbx_db_rollback())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
+
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+	}
 }
 
 /******************************************************************************
@@ -204,9 +216,9 @@ void	DBrollback(void)
 void	DBend(int ret)
 {
 	if (SUCCEED == ret)
-		DBtxn_operation(zbx_db_commit);
+		DBcommit();
 	else
-		DBtxn_operation(zbx_db_rollback);
+		DBrollback();
 }
 
 #ifdef HAVE_ORACLE
@@ -1458,8 +1470,8 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 		ts.sec = autoreg_host->now;
 
-		add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0);
+		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
+				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 	}
 
 	if (0 != new)
@@ -1475,7 +1487,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		zbx_free(sql);
 	}
 
-	process_events();
+	zbx_process_events(NULL, NULL);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1683,15 +1695,13 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
 	return buf[n];
 }
 
-#define ZBX_MAX_INVENTORY_FIELDS	70
-
 /******************************************************************************
  *                                                                            *
  * Function: DBget_inventory_field                                            *
  *                                                                            *
  * Purpose: get corresponding host_inventory field name                       *
  *                                                                            *
- * Parameters: inventory_link - [IN] field number; 1..ZBX_MAX_INVENTORY_FIELDS*
+ * Parameters: inventory_link - [IN] field link 1..HOST_INVENTORY_FIELD_COUNT *
  *                                                                            *
  * Return value: field name or NULL if value of inventory_link is incorrect   *
  *                                                                            *
@@ -1700,7 +1710,7 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
  ******************************************************************************/
 const char	*DBget_inventory_field(unsigned char inventory_link)
 {
-	static const char	*inventory_fields[ZBX_MAX_INVENTORY_FIELDS] =
+	static const char	*inventory_fields[HOST_INVENTORY_FIELD_COUNT] =
 	{
 		"type", "type_full", "name", "alias", "os", "os_full", "os_short", "serialno_a", "serialno_b", "tag",
 		"asset_tag", "macaddress_a", "macaddress_b", "hardware", "hardware_full", "software", "software_full",
@@ -1715,13 +1725,11 @@ const char	*DBget_inventory_field(unsigned char inventory_link)
 		"poc_2_screen", "poc_2_notes"
 	};
 
-	if (1 > inventory_link || inventory_link > ZBX_MAX_INVENTORY_FIELDS)
+	if (1 > inventory_link || inventory_link > HOST_INVENTORY_FIELD_COUNT)
 		return NULL;
 
 	return inventory_fields[inventory_link - 1];
 }
-
-#undef ZBX_MAX_INVENTORY_FIELDS
 
 int	DBtxn_status(void)
 {

@@ -55,7 +55,7 @@ if (array_key_exists('only_hostid', $options)) {
 			(new CComboBox('hostid', $host['hostid']))
 				->addItem($host['hostid'], $host['name'])
 				->setEnabled(false)
-				->setAttribute('title', _('You can not switch hosts for current selection.'))
+				->setTitle(_('You can not switch hosts for current selection.'))
 		];
 	}
 }

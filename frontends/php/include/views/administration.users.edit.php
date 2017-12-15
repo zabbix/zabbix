@@ -227,11 +227,19 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			'dstfrm' => $userForm->getName(),
 			'media' => $id,
 			'mediatypeid' => $media['mediatypeid'],
-			'sendto' => urlencode($media['sendto']),
 			'period' => $media['period'],
 			'severity' => $media['severity'],
 			'active' => $media['active']
 		];
+
+		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+			foreach ($media['sendto'] as $email) {
+				$popup_options['sendto_emails'][] = $email;
+			}
+		}
+		else {
+			$popup_options['sendto'] = $media['sendto'];
+		}
 
 		$mediaSeverity = [];
 
@@ -243,6 +251,13 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
 				->setHint($severityName.' ('.($mediaActive ? _('on') : _('off')).')', '', false)
 				->addClass($mediaActive ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY);
+		}
+
+		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+			$media['sendto'] = implode(', ', $media['sendto']);
+			if (strlen($media['sendto']) > 50) {
+				$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
+			}
 		}
 
 		$mediaTableInfo->addRow(

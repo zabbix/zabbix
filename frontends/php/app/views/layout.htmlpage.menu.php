@@ -33,27 +33,27 @@ $icons = (new CList())
 		(new CLink('Share', 'https://share.zabbix.com/'))
 			->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
 			->setAttribute('target', '_blank')
-			->setAttribute('title', _('Zabbix Share'))
+			->setTitle(_('Zabbix Share'))
 	)
 	->addItem(
 		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.4/'))
 			->addClass(ZBX_STYLE_TOP_NAV_HELP)
 			->setAttribute('target', '_blank')
-			->setAttribute('title', _('Help'))
+			->setTitle(_('Help'))
 	);
 
 if (!$data['user']['is_guest']) {
 	$icons->addItem(
 		(new CLink(SPACE, 'profile.php'))
 			->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
-			->setAttribute('title', getUserFullname($data['user']))
+			->setTitle(getUserFullname($data['user']))
 	);
 }
 
 $icons->addItem(
 	(new CLink(SPACE, 'index.php?reconnect=1'))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
-		->setAttribute('title', _('Sign out'))
+		->setTitle(_('Sign out'))
 		->addSID()
 );
 
@@ -91,7 +91,7 @@ foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 			->setArgument('ddreset', 1)
 			->removeArgument('sid');
 
-		$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl());
+		$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->setAttribute('tabindex', 0);
 		if ($sub_page['selected']) {
 			$sub_menu_item->addClass(ZBX_STYLE_SELECTED);
 		}

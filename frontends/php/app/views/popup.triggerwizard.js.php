@@ -416,8 +416,8 @@ function validateTriggerWizard(formname, dialogueid) {
 		success: function(ret) {
 			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
+			if (typeof ret.errors !== 'undefined') {
+				jQuery(ret.errors).insertBefore(jQuery(form));
 			}
 			else if (dialogueid) {
 				overlayDialogueDestroy(dialogueid);
