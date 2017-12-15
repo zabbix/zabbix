@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha1
 
 New features:
+..F.I..... [ZBXNEXT-4139] added high contrast light and high contrast dark themes (andzs)
 A......... [ZBXNEXT-4247] removed deprecated API methods: user.updareProfile, user.addMedia, user.updateMedia, user.deleteMedia, usergroup.massAdd, usergroup.massUpdate and usermedia.get (Sasha)
 ........S. [ZBXNEXT-970] added more detailed error information to notification message when DB is unavailable (viktors)
 ..F....... [ZBXNEXT-4137] removed green background from cells (Oleg)
@@ -462,6 +463,11 @@ A.F.....S. [ZBX-11470] fixed unary minus and prefix extraction for trigger expre
 ..F....... [ZBX-11371] prevented executing client side script by changing value of $ZBX_SERVER_NAME from setup.php page (Cemeris)
 A......... [ZBX-5116] prevented escaping forward slashes while encoding API response to JSON text (Cemeris)
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.11rc2
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 3.2.11rc1
@@ -2853,6 +2859,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.21rc2
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 2.2.21rc1

@@ -202,8 +202,6 @@ class testPageActions extends CWebTest {
 	* @dataProvider allActions
 	*/
 	public function testPageActions_SingleEnableDisable($action) {
-		DBexecute("UPDATE usrgrp SET debug_mode = 0 WHERE usrgrpid = 7");
-
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 
@@ -235,8 +233,6 @@ class testPageActions extends CWebTest {
 		));
 
 		$this->assertEquals($this->oldHashAction, DBhash($this->sqlHashAction));
-
-		DBexecute("UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7");
 	}
 
 	/**

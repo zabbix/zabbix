@@ -334,7 +334,7 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 		->setArgument('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM)
 		->setArgument('filter_groupids', null)
 		->setArgument('filter_hostids', array_key_exists('hostids', $filter) ? $filter['hostids'] : null)
-		->setArgument('filter_problem', array_key_exists('problem', $filter) ? $filter['problem'] : null)
+		->setArgument('filter_name', array_key_exists('problem', $filter) ? $filter['problem'] : null)
 		->setArgument('filter_maintenance', (array_key_exists('maintenance', $filter) && $filter['maintenance'])
 			? 1
 			: null
