@@ -25,6 +25,8 @@
 #include "common.h"
 #include "zbxjson.h"
 
+#include "sysinfo.h"
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*json, *path, *result, *value;
@@ -40,7 +42,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_get_parameter_string("out.result", &result);
 
 	ret = zbx_json_open(json, &jp);
-	zbx_mock_assert_int_eq("Invalid zbx_json_open() return value", SUCCEED, ret);
+	zbx_mock_assert_result_eq("Invalid zbx_json_open() return value", SUCCEED, ret);
 
 	if (FAIL == (ret = zbx_json_path_open(&jp, path, &jp_out)))
 	{
@@ -48,6 +50,7 @@ void	zbx_mock_test_entry(void **state)
 		return;
 	}
 
+	zbx_mock_assert_result_eq("Invalid zbx_json_path_open() return value", SUCCEED, ret);
 	zbx_mock_assert_str_eq("Invalid zbx_json_path_open() return value", result, "succeed");
 
 	zbx_json_value_dyn(&jp_out, &buffer, &size);

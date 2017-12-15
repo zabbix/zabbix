@@ -22,40 +22,64 @@
 
 #include "common.h"
 
-void	__zbx_mock_assert_str_eq(const char *file, int li_ne, const char *prefix_msg, const char *expected_value,
+void	__zbx_mock_assert_str_eq(const char *file, int line, const char *prefix_msg, const char *expected_value,
 		const char *return_value);
 
-void	__zbx_mock_assert_str__ne(const char *file, int li_ne, const char *prefix_msg, const char *expected_value,
+void	__zbx_mock_assert_str__ne(const char *file, int line, const char *prefix_msg, const char *expected_value,
 		const char *return_value);
 
-void	__zbx_mock_assert_uint64_eq(const char *file, int li_ne, const char *prefix_msg, zbx_uint64_t expected_value,
+void	__zbx_mock_assert_uint64_eq(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
 		zbx_uint64_t return_value);
 
-void	__zbx_mock_assert_uint64__ne(const char *file, int li_ne, const char *prefix_msg, zbx_uint64_t expected_value,
+void	__zbx_mock_assert_uint64__ne(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
 		zbx_uint64_t return_value);
 
-void	__zbx_mock_assert_int_eq(const char *file, int li_ne, const char *prefix_msg, int expected_value,
+void	__zbx_mock_assert_int_eq(const char *file, int line, const char *prefix_msg, int expected_value,
 		int return_value);
 
-void	__zbx_mock_assert_int__ne(const char *file, int li_ne, const char *prefix_msg, int expected_value,
+void	__zbx_mock_assert_int_ne(const char *file, int line, const char *prefix_msg, int expected_value,
 		int return_value);
 
-#define	zbx_mock_assert_str_eq(prefix_msg, expected_value, return_value) \
+void	__zbx_mock_assert_result_eq(const char *file, int line, const char *prefix_msg, int expected_value,
+		int return_value);
+
+void	__zbx_mock_assert_result_ne(const char *file, int line, const char *prefix_msg, int expected_value,
+		int return_value);
+
+void	__zbx_mock_assert_sysinfo_ret_eq(const char *file, int line, const char *prefix_msg, int expected_value,
+		int return_value);
+
+void	__zbx_mock_assert_sysinfo_ret_ne(const char *file, int line, const char *prefix_msg, int expected_value,
+		int return_value);
+
+#define zbx_mock_assert_str_eq(prefix_msg, expected_value, return_value) \
 	__zbx_mock_assert_str_eq(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
 
-#define	zbx_mock_assert_str_ne(prefix_msg, expected_value, return_value) \
+#define zbx_mock_assert_str_ne(prefix_msg, expected_value, return_value) \
 	__zbx_mock_assert_str_ne(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
 
-#define	zbx_mock_assert_uint64_eq(prefix_msg, expected_value, return_value) \
+#define zbx_mock_assert_uint64_eq(prefix_msg, expected_value, return_value) \
 	__zbx_mock_assert_uint64_eq(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
 
-#define	zbx_mock_assert_uint64_ne(prefix_msg, expected_value, return_value) \
+#define zbx_mock_assert_uint64_ne(prefix_msg, expected_value, return_value) \
 	__zbx_mock_assert_uint64_ne(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
 
-#define	zbx_mock_assert_int_eq(prefix_msg, expected_value, return_value) \
+#define zbx_mock_assert_int_eq(prefix_msg, expected_value, return_value) \
 	__zbx_mock_assert_int_eq(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
 
-#define	zbx_mock_assert_int_ne(prefix_msg, expected_value, return_value) \
+#define zbx_mock_assert_int_ne(prefix_msg, expected_value, return_value) \
 	__zbx_mock_assert_int_ne(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
+
+#define zbx_mock_assert_result_eq(prefix_msg, expected_value, return_value) \
+	__zbx_mock_assert_result_eq(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
+
+#define zbx_mock_assert_result_ne(prefix_msg, expected_value, return_value) \
+	__zbx_mock_assert_result_ne(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
+
+#define zbx_mock_assert_sysinfo_ret_eq(prefix_msg, expected_value, return_value) \
+	__zbx_mock_assert_sysinfo_ret_eq(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
+
+#define zbx_mock_assert_sysinfo_ret_ne(prefix_msg, expected_value, return_value) \
+	__zbx_mock_assert_sysinfo_ret_ne(__FILE__, __LINE__, prefix_msg, expected_value, return_value)
 
 #endif
