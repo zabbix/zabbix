@@ -46,7 +46,7 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_out_parameter("expected_ret", &mock_handle)) ||
 			ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_string(mock_handle, &expected_ret_str)))
 	{
-		fail_msg("Cannot get \"expected_ret\"' parameter from test case data: %s",
+		fail_msg("Cannot get \"expected_ret\" parameter from test case data: %s",
 				zbx_mock_error_string(mock_ret_code));
 	}
 
@@ -55,7 +55,7 @@ void	zbx_mock_test_entry(void **state)
 	else if (0 == strcmp("SYSINFO_RET_FAIL", expected_ret_str))
 		expected_ret = SYSINFO_RET_FAIL;
 	else
-		fail_msg("Invalid \"expected_ret\"' parameter in test case data: %s", expected_ret_str);
+		fail_msg("Invalid \"expected_ret\" parameter in test case data: %s", expected_ret_str);
 
 	if (SYSINFO_RET_OK == expected_ret)
 	{
@@ -63,19 +63,19 @@ void	zbx_mock_test_entry(void **state)
 				ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_string(mock_handle,
 				&expected_context_switches_str)))
 		{
-			fail_msg("Cannot get \"ctxt\"' parameter from test case data: %s",
+			fail_msg("Cannot get \"ctxt\" parameter from test case data: %s",
 					zbx_mock_error_string(mock_ret_code));
 		}
 
 		if (SUCCEED != is_uint64(expected_context_switches_str, &expected_context_switches_count))
-			fail_msg("Invalid \"ctxt\"' parameter in test case data: %s", expected_context_switches_str);
+			fail_msg("Invalid \"ctxt\" parameter in test case data: %s", expected_context_switches_str);
 	}
 	else	/* SYSINFO_RET_FAIL */
 	{
 		if (ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_out_parameter("error_msg", &mock_handle)) ||
 				ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_string(mock_handle, &expected_error_msg)))
 		{
-			fail_msg("Cannot get \"error_msg\"' parameter from test case data: %s",
+			fail_msg("Cannot get \"error_msg\" parameter from test case data: %s",
 					zbx_mock_error_string(mock_ret_code));
 		}
 	}
