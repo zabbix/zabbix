@@ -641,7 +641,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 				for (j = 0; j < add_results.values_num; j++)
 				{
-					AGENT_RESULT	*add_result = add_results.values[j];
+					AGENT_RESULT	*add_result = (AGENT_RESULT *)add_results.values[j];
 
 					if (ISSET_MSG(add_result))
 					{
