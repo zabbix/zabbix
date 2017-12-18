@@ -20,11 +20,13 @@
 
 
 ob_start(); ?>
-var pairManager = (function() {
+var stepsPairManager = (function() {
 	'use strict';
 
 	var rowTemplate = new Template(jQuery('#stepPairRow').html()),
-		allPairs = {};
+		allPairs = {},
+		namesMap,
+		form;
 
 	function renderPairRow(pair) {
 		var	parent,
@@ -37,7 +39,7 @@ var pairManager = (function() {
 
 		target.before(pair_row);
 
-		parent = jQuery('#pairRow_' + pair.id);
+		parent = jQuery(stepsPairManager.form).find('#pairRow_' + pair.id);
 		parent.find("input[data-type]").on('change', function() {
 			var	target = jQuery(this),
 				parent = target.parents('.pairRow'),
@@ -54,6 +56,12 @@ var pairManager = (function() {
 	}
 
 	function addPair(pair) {
+		for (var name in stepsPairManager.namesMap) {
+			if (pair.type === name) {
+				pair.type = stepsPairManager.namesMap[name];
+			}
+		}
+
 		if (pair.isNew === 'true') {
 			pair.isNew = true;
 		}
@@ -101,12 +109,15 @@ var pairManager = (function() {
 	}
 
 	return {
-		add: function(pairs) {
+		add: function(pairs, form, namesMap) {
+			stepsPairManager.form = form || null;
+			stepsPairManager.namesMap = namesMap || null;
+
 			for (var i = 0; i < pairs.length; i++) {
 				renderPairRow(addPair(pairs[i]));
 			}
 
-			jQuery('.pair-container').each(function() {
+			jQuery('.pair-container', stepsPairManager.form).each(function() {
 				var rows = jQuery(this).find('.pairRow').length;
 				if (rows === 0) {
 					renderPairRow(createNewPair(this.id));
@@ -285,7 +296,7 @@ function parseUrl() {
 			return false;
 		}
 
-		pairManager.merge(pairs);
+		stepsPairManager.merge(pairs);
 	}
 
 	target.val(url);
@@ -373,16 +384,16 @@ function switchToPostType(type) {
 			}
 		}
 
-		pairManager.removeAll('post_fields');
+		stepsPairManager.removeAll('post_fields');
 		for (var i = 0; i < pairs.length; i++) {
-			pairManager.addNew('post_fields', pairs[i].name, pairs[i].value);
+			stepsPairManager.addNew('post_fields', pairs[i].name, pairs[i].value);
 		}
-		pairManager.refresh();
+		stepsPairManager.refresh();
 	}
 	else {
 		var fields = [],
 			parts,
-			pairs = pairManager.getPairsByType('post_fields');
+			pairs = stepsPairManager.getPairsByType('post_fields');
 
 		for (var p = 0; p < pairs.length; p++) {
 			parts = [];
@@ -409,7 +420,7 @@ jQuery(document).ready(function() {
 	jQuery('#scenarioStepTab').on('click', 'button.remove', function() {
 		var pairId = jQuery(this).data('pairid');
 		jQuery('#pairRow_' + pairId).remove();
-		pairManager.remove(pairId);
+		stepsPairManager.remove(pairId);
 	});
 
 	jQuery('.pair-container-sortable').sortable({
@@ -429,8 +440,8 @@ jQuery(document).ready(function() {
 		}
 	});
 
-	jQuery('.pairs-control-add').on('click', function() {
-		pairManager.addNew(jQuery(this).data('type'));
+	jQuery('.pairs-control-add', jQuery('#scenarioStepTab')).on('click', function() {
+		stepsPairManager.addNew(jQuery(this).data('type'));
 	});
 
 	jQuery(function() {
@@ -440,7 +451,7 @@ jQuery(document).ready(function() {
 				jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link, #post_type input').attr('disabled', this.checked);
 
 				if (this.checked === false) {
-					pairManager.refresh();
+					stepsPairManager.refresh();
 				}
 			})
 			.trigger('change');
