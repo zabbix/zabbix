@@ -924,6 +924,7 @@ jQuery(function($) {
 
 		var opener = $(this),
 			id = opener.data('menu-popup-id'),
+			target = opener.closest('svg').length ? event : event.target,
 			menuPopup = $('#' + id),
 			mapContainer = null;
 
@@ -941,7 +942,7 @@ jQuery(function($) {
 			}
 
 			menuPopup.position({
-				of: event.target,
+				of: target,
 				my: 'left top',
 				at: 'left bottom'
 			});
@@ -1015,7 +1016,7 @@ jQuery(function($) {
 					clearTimeout(window.menuPopupTimeoutHandler);
 				})
 				.position({
-					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event.target,
+					of: (opener.prop('tagName') === 'AREA') ? mapContainer : target,
 					my: 'left top',
 					at: 'left bottom'
 				});
