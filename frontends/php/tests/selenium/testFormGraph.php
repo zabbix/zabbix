@@ -917,7 +917,7 @@ class testFormGraph extends CWebTest {
 		}
 
 		if (isset($data['ymin_name'])) {
-			$this->zbxTestClick('add_item');
+			$this->zbxTestClick('yaxis_min');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
