@@ -697,7 +697,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 	if (0 <= from_mails->values_num)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() not specify the sender's address", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() sender's address is not specified", __function_name);
 	}
 	else if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_FROM,
 			((zbx_mailaddr_t *)from_mails->values[0])->addr)))
