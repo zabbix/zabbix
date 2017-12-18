@@ -924,9 +924,16 @@ jQuery(function($) {
 
 		var opener = $(this),
 			id = opener.data('menu-popup-id'),
-			target = event.originalEvent.detail !== 0 ? event : event.target,
+			target,
 			menuPopup = $('#' + id),
 			mapContainer = null;
+
+		if (IE) {
+			target = opener.closest('svg').length > 0 ? event : event.target;
+		}
+		else {
+			target = event.originalEvent.detail !== 0 ? event : event.target;
+		}
 
 		if (menuPopup.length > 0) {
 			var display = menuPopup.css('display');
