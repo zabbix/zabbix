@@ -394,6 +394,11 @@ content: "";
 	background-color: $ui-bg-selected-color !important;
 }
 
+.sortable .na-bg {
+	padding-left: 42px !important;
+	color: $font-color;
+}
+
 td.normal-bg {
 	~ td.normal-bg {
 		border-left: none;
@@ -442,6 +447,11 @@ content: "";
 
 .normal-bg.blink-hidden:after{
 	content: none;
+}
+
+.sortable .normal-bg {
+	padding-left: 42px !important;
+	color: $font-color;
 }
 
 td.info-bg {
@@ -500,6 +510,11 @@ content: "";
 	background-color: $ui-bg-selected-color !important;
 }
 
+.sortable .info-bg {
+	padding-left: 42px !important;
+	color: $font-color;
+}
+
 td.average-bg {
 	~ td.average-bg {
 		border-left: none;
@@ -554,6 +569,11 @@ content: "";
 	&::after { content: none }
 	color: $white !important;
 	background-color: $ui-bg-selected-color !important;
+}
+
+.sortable .average-bg {
+	padding-left: 42px !important;
+	color: $font-color;
 }
 
 td.warning-bg {
@@ -612,6 +632,11 @@ content: "";
 	background-color: $ui-bg-selected-color !important;
 }
 
+.sortable .warning-bg {
+	padding-left: 42px !important;
+	color: $font-color;
+}
+
 td.high-bg {
 	~ td.high-bg {
 		border-left: none;
@@ -668,6 +693,11 @@ content: "";
 	background-color: $ui-bg-selected-color !important;
 }
 
+.sortable .high-bg {
+	padding-left: 42px !important;
+	color: $font-color;
+}
+
 td.disaster-bg {
 	~ td.disaster-bg {
 		border-left: none;
@@ -722,6 +752,11 @@ content: "";
 	&::after { content: none }
 	color: $white !important;
 	background-color: $ui-bg-selected-color !important;
+}
+
+.sortable .disaster-bg {
+	padding-left: 42px !important;
+	color: $font-color;
 }
 
 .notif-body li {
