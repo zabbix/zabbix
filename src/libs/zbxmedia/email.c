@@ -59,7 +59,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 	assert(NULL == *p_base64);		/* do not accept already allocated memory */
 
 	p_base64_alloc = ZBX_EMAIL_B64_MAXWORD_RFC2047 + sizeof(ZBX_EMAIL_ENCODED_WORD_SEPARATOR);
-	*p_base64 = zbx_malloc(NULL, p_base64_alloc);
+	*p_base64 = (char *)zbx_malloc(NULL, p_base64_alloc);
 	**p_base64 = '\0';
 
 	for (p0 = src; '\0' != *p0; p0 = p1)
@@ -239,7 +239,7 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 
 			if (pstart < angle_addr_start)	/* display name */
 			{
-				mailaddr->disp_name = zbx_malloc(mailaddr->disp_name,
+				mailaddr->disp_name = (char *)zbx_malloc(mailaddr->disp_name,
 						(size_t)(angle_addr_start - pstart + 1));
 				memcpy(mailaddr->disp_name, pstart, (size_t)(angle_addr_start - pstart));
 				*(mailaddr->disp_name + (angle_addr_start - pstart)) = '\0';
@@ -626,8 +626,9 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 #ifdef HAVE_SMTP_AUTHENTICATION
 	const char		*__function_name = "send_email_curl";
 
-	int			err, ret = FAIL, i;
-	CURL            	*easyhandle;
+	int			ret = FAIL, i;
+	CURL			*easyhandle;
+	CURLcode		err;
 	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE] = "";
 	size_t			url_offset= 0;
 	struct curl_slist	*recipients = NULL;

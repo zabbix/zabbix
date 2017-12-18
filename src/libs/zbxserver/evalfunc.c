@@ -2181,8 +2181,8 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *parameters,
 
 	if (0 < values.values_num)
 	{
-		t = zbx_malloc(t, values.values_num * sizeof(double));
-		x = zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -2326,8 +2326,8 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *parameters,
 
 	if (0 < values.values_num)
 	{
-		t = zbx_malloc(t, values.values_num * sizeof(double));
-		x = zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
