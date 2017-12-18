@@ -39,9 +39,9 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_mock_get_parameter_string("in.path", &path);
-	zbx_mock_get_parameter_string("out.result", &result);
-	zbx_mock_get_parameter_handle("out.components", &components);
+	path = zbx_mock_get_parameter_string("in.path");
+	result = zbx_mock_get_parameter_string("out.result");
+	components = zbx_mock_get_parameter_handle("out.components");
 
 	buffer = zbx_malloc(NULL, strlen(path) + 1);
 
@@ -61,7 +61,7 @@ void	zbx_mock_test_entry(void **state)
 				fail_msg("Cannot get vector element: %s", zbx_mock_error_string(err));
 		}
 
-		zbx_mock_get_object_member_string(component, "class", &component_class);
+		component_class = zbx_mock_get_object_member_string(component, "class");
 
 		switch (type)
 		{
@@ -79,7 +79,7 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_strlcpy(buffer, path + loc.l, loc.r - loc.l + 2);
 
-		zbx_mock_get_object_member_string(component, "value", &component_value);
+		component_value = zbx_mock_get_object_member_string(component, "value");
 		zbx_mock_assert_str_eq("Component value", component_value, buffer);
 
 		if ('\0' == *next)

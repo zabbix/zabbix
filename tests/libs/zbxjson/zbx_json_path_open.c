@@ -35,9 +35,9 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_mock_get_parameter_string("in.json", &json);
-	zbx_mock_get_parameter_string("in.path", &path);
-	zbx_mock_get_parameter_string("out.result", &result);
+	json = zbx_mock_get_parameter_string("in.json");
+	path = zbx_mock_get_parameter_string("in.path");
+	result = zbx_mock_get_parameter_string("out.result");
 
 	ret = zbx_json_open(json, &jp);
 	zbx_mock_assert_result_eq("Invalid zbx_json_open() return value", SUCCEED, ret);
@@ -53,7 +53,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_json_value_dyn(&jp_out, &buffer, &size);
 
-	zbx_mock_get_parameter_string("out.value", &value);
+	value = zbx_mock_get_parameter_string("out.value");
 	zbx_mock_assert_str_eq("Invalid value", value, buffer);
 
 	zbx_free(buffer);

@@ -22,9 +22,11 @@
 
 #include "zbxmockdata.h"
 
-void	zbx_mock_get_parameter_string(const char *path, const char **value);
-void	zbx_mock_get_parameter_handle(const char *path, zbx_mock_handle_t *handle);
+const char	*zbx_mock_get_parameter_string(const char *path);
+const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name);
 
-void	zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name, const char **value);
+zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);
+zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, const char *name);
+
 
 #endif

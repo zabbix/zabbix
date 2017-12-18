@@ -24,34 +24,55 @@
 
 #include "common.h"
 
-void	zbx_mock_get_parameter_string(const char *path, const char **value)
+const char	*zbx_mock_get_parameter_string(const char *path)
 {
 	zbx_mock_error_t	err;
 	zbx_mock_handle_t	handle;
+	const char		*parameter;
 
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
-			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, value)))
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &parameter)))
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
 	}
+
+	return parameter;
 }
 
-void	zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name, const char **value)
+const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name)
 {
 	zbx_mock_error_t	err;
 	zbx_mock_handle_t	handle;
+	const char		*member;
 
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
-			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, value)))
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
 	}
+
+	return member;
 }
 
-void	zbx_mock_get_parameter_handle(const char *path, zbx_mock_handle_t *handle)
+zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path)
 {
 	zbx_mock_error_t	err;
+	zbx_mock_handle_t	parameter;
 
-	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, handle)))
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &parameter)))
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+	return parameter;
 }
+
+zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, const char *name)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	member;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &member)))
+		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+	return member;
+}
+
