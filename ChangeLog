@@ -46,6 +46,7 @@ New features:
 A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
 
 Bug fixes:
+A......... [ZBX-13210] fixed sort param logic for elasticseach (vjaceslavs)
 .......PS. [ZBX-13188] fixed possibility of endless loop during unrecoverable database error; fixed incomplete handling of database error (vso)
 ..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13176] fixed last item value retrieval errors in history manager (vjaceslavs)
