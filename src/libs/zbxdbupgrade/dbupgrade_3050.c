@@ -106,7 +106,7 @@ static int	DBpatch_3050005(void)
 static int	DBpatch_3050008(void)
 {
 	int		res;
-	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
+	char		*trdefault = (char *)ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -123,7 +123,7 @@ static int	DBpatch_3050008(void)
 static int	DBpatch_3050009(void)
 {
 	int		res;
-	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
+	char		*trdefault = (char *)ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -140,7 +140,7 @@ static int	DBpatch_3050009(void)
 static int	DBpatch_3050010(void)
 {
 	int		res;
-	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
+	char		*itdefault = (char *)ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -157,7 +157,7 @@ static int	DBpatch_3050010(void)
 static int	DBpatch_3050011(void)
 {
 	int		res;
-	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
+	char		*itdefault = (char *)ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;

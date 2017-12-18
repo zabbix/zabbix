@@ -70,7 +70,7 @@ static void	row2value_ui64(history_value_t *value, DB_ROW row)
 /* timestamp, logeventid, severity, source, value */
 static void	row2value_log(history_value_t *value, DB_ROW row)
 {
-	value->log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
+	value->log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 
 	value->log->timestamp = atoi(row[0]);
 	value->log->logeventid = atoi(row[1]);
@@ -207,7 +207,7 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_FLOAT != h->value_type)
 			continue;
@@ -233,7 +233,7 @@ static void	add_history_uint(zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_UINT64 != h->value_type)
 			continue;
@@ -259,7 +259,7 @@ static void	add_history_str(zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_STR != h->value_type)
 			continue;
@@ -285,7 +285,7 @@ static void	add_history_text(zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
 			continue;
@@ -312,7 +312,7 @@ static void	add_history_log(zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 		const zbx_log_value_t	*log;
 
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
@@ -666,7 +666,7 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (h->value_type == hist->value_type)
 			h_num++;
