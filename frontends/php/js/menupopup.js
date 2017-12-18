@@ -924,7 +924,7 @@ jQuery(function($) {
 
 		var opener = $(this),
 			id = opener.data('menu-popup-id'),
-			target = opener.closest('svg').length ? event : event.target,
+			target = event.originalEvent.detail !== 0 ? event : event.target,
 			menuPopup = $('#' + id),
 			mapContainer = null;
 
