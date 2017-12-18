@@ -941,7 +941,7 @@ jQuery(function($) {
 			}
 
 			menuPopup.position({
-				of: event,
+				of: event.target,
 				my: 'left top',
 				at: 'left bottom'
 			});
@@ -1015,7 +1015,7 @@ jQuery(function($) {
 					clearTimeout(window.menuPopupTimeoutHandler);
 				})
 				.position({
-					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
+					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event.target,
 					my: 'left top',
 					at: 'left bottom'
 				});
