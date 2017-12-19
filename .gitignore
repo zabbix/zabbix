@@ -387,10 +387,12 @@ tests/libs/zbxsysinfo/.deps
 tests/libs/zbxsysinfo/Makefile
 tests/libs/zbxsysinfo/Makefile.in
 tests/libs/zbxsysinfo/linux/.deps
+tests/libs/zbxsysinfo/linux/KERNEL_MAXFILES
 tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC
 tests/libs/zbxsysinfo/linux/Makefile
 tests/libs/zbxsysinfo/linux/Makefile.in
 tests/libs/zbxsysinfo/linux/NET_IF_DISCOVERY
+tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
 upgrades/Makefile
