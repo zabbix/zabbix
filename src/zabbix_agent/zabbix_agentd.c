@@ -1012,7 +1012,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
+	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #0 started [main process]");
 
