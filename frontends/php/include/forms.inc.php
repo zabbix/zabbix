@@ -1845,8 +1845,7 @@ function get_timeperiod_form() {
 			TIMEPERIOD_TYPE_DAILY	=> _('Daily'),
 			TIMEPERIOD_TYPE_WEEKLY	=> _('Weekly'),
 			TIMEPERIOD_TYPE_MONTHLY	=> _('Monthly')
-		]))
-			->setAriaRequired()
+		]))->setAriaRequired()
 	]);
 
 	if ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
@@ -2066,8 +2065,7 @@ function get_timeperiod_form() {
 
 		$tblPeriod->addRow([
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
-			(new CDiv(createDateSelector('new_timeperiod_start_date', $date)))
-				->setId('new_timeperiod_start_date')
+			(new CDiv(createDateSelector('new_timeperiod_start_date', $date)))->setId('new_timeperiod_start_date')
 		]);
 	}
 
@@ -2095,8 +2093,7 @@ function get_timeperiod_form() {
 			_('Hours').SPACE.SPACE,
 			$perMinutes,
 			_('Minutes')
-		]))
-			->setId('new_timeperiod')
+		]))->setId('new_timeperiod')
 	]);
 
 	return $tblPeriod;
