@@ -41,6 +41,12 @@
 		var rowTemplate = new Template(jQuery('#scenarioPairRow').html()),
 			allPairs = {};
 
+		/**
+		 * Creates HTML for parir, inserts it in page
+		 *
+		 * @param {string}	formid	Id of current form HTML form element.
+		 * @param {object}	pair	Object with pair data.
+		 */
 		function renderPairRow(formid, pair) {
 			var parent,
 				target = jQuery(getDomTargetIdForRowInsert(pair.type), jQuery('#'+formid)),
@@ -52,7 +58,7 @@
 
 			target.before(pair_row);
 			parent = jQuery('#pairRow_' + pair.id);
-			parent.find("input[data-type]").on('change', function() {
+			parent.find('input[data-type]').on('change', function() {
 				var	target = jQuery(this),
 					parent = target.parents('.pairRow'),
 					id = parent.data('pairid'),
@@ -63,10 +69,24 @@
 			});
 		}
 
+		/**
+		 * Prepares ID for block, at the end of which new pair will be added.
+		 *
+		 * @param {string}	type	Type of pair to be added.
+		 *
+		 * @return {string}
+		 */
 		function getDomTargetIdForRowInsert(type) {
 			return '#' + type.toLowerCase().trim() + '_footer';
 		}
 
+		/**
+		 * Add pair in allPairs array.
+		 *
+		 * @param {object}	pair	Object with pair data. Should contain id.
+		 *
+		 * @return {object}
+		 */
 		function addPair(pair) {
 			if (pair.isNew === 'true') {
 				pair.isNew = true;
@@ -75,6 +95,13 @@
 			return pair;
 		}
 
+		/**
+		 * Creates new pair object from provided data.
+		 *
+		 * @param {object}	options		Object with pair options that are different from default. Should contain type.
+		 *
+		 * @return {object}
+		 */
 		function createNewPair(options) {
 			var newPair = jQuery.extend({
 				formid: '',
@@ -92,7 +119,9 @@
 			return addPair(newPair);
 		}
 
-		// Make sortable handler inactive, if nothing to sort.
+		/**
+		 * Makes sortable handler inactive, if nothing to sort.
+		 */
 		function refreshContainers() {
 			jQuery('.pair-container-sortable').each(function() {
 				jQuery(this).sortable({
@@ -102,7 +131,12 @@
 		}
 
 		return {
-			// Add when form is beeing created
+			/**
+			 * Add pair when form is beeing created.
+			 *
+			 * @param {string}	formid	Id of current form HTML form element.
+			 * @param {object}	pairs	Object with pair objects.
+			 */
 			add: function(formid, pairs) {
 				for (var i = 0; i < pairs.length; i++) {
 					pairs[i]['formid'] = formid;
@@ -119,14 +153,24 @@
 				refreshContainers();
 			},
 
-			// Add empty pair, when 'Add new' button is pressed
+			/**
+			 * Add empty pair at the block of pair's type.
+			 *
+			 * @param {string}	formid		Id of current form HTML form element.
+			 * @param {object}	options		Object with new pair options, that are different from default.
+			 *								Should contain type.
+			 */
 			addNew: function(formid, options) {
 				options.formid = formid;
 				renderPairRow(formid, createNewPair(options));
 				refreshContainers();
 			},
 
-			// Delete pair with given ID from allPairs
+			/**
+			 * Delete pair with given ID from allPairs.
+			 *
+			 * @param {number}	pairId		Id of current form HTML form element.
+			 */
 			remove: function(pairId) {
 				delete allPairs[pairId];
 				refreshContainers();
@@ -164,7 +208,8 @@
 				jQuery('#retrieve_mode', $form)
 					.on('change', function() {
 						jQuery('#post_fields', $form).toggleClass('disabled',this.checked);
-						jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link, #post_type input', $form)
+						jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link,' +
+								'#post_type input', $form)
 							.attr('disabled', this.checked);
 
 						if (this.checked === false) {
@@ -195,7 +240,7 @@
 				}
 
 				for (var p = 0; p < existingPairs.length; p++) {
-					if (allPairs[existingPairs[p]] !== undefined
+					if (typeof allPairs[existingPairs[p]] !== 'undefined'
 							&& allPairs[existingPairs[p]].type === type
 							&& allPairs[existingPairs[p]].formid === formid
 							&& allPairs[existingPairs[p]].name.indexOf('[]') === -1) {
@@ -228,7 +273,7 @@
 				refreshContainers();
 			},
 
-			// Removes all new pairs with empty name and value (of given type withing given form)
+			// Removes all new pairs with empty name and value (of given type withing given form).
 			cleanup: function(formid, type) {
 				var pairs = this.getPairsByType(formid, type);
 
@@ -240,7 +285,7 @@
 				}
 			},
 
-			// Finds all pairs of given type within given form
+			// Finds all pairs of given type within given form.
 			getPairsByType: function(formid, type) {
 				var	pairs = [],
 					existingPairs = Object.keys(allPairs);
@@ -291,15 +336,16 @@
 		recalculateSortOrder();
 	}
 
-	// Changes ID's of steps in table (data in row and all hidden fields with step data),
-	// after one of existing steps is deleted.
+	/* Changes ID's of steps in table (data in row and all hidden fields with step data),
+	 * after one of existing steps is deleted.
+	 */
 	function recalculateSortOrder() {
 		var i = 0;
 
 		jQuery('#httpStepTable tr.sortable .rowNum').each(function() {
 			var step = (i == 0) ? '0' : i;
 
-			// rewrite ids to temp
+			// Rewrite ids to temp.
 			jQuery('#remove_' + step).attr('id', 'tmp_remove_' + step);
 			jQuery('#name_' + step).attr('id', 'tmp_name_' + step);
 			jQuery('#steps_' + step).attr('id', 'tmp_steps_' + step);
@@ -312,14 +358,14 @@
 				input.attr('id', id);
 			});
 
-			// set order number
+			// Set order number.
 			jQuery(this)
 				.attr('new_step', i)
 				.text((i + 1) + ':');
 			i++;
 		});
 
-		// rewrite ids in new order
+		// Rewrite ids in new order.
 		for (var n = 0; n < i; n++) {
 			var currStep = jQuery('#tmp_current_step_' + n),
 				newStep = currStep.attr('new_step');
@@ -341,7 +387,7 @@
 
 			jQuery('#steps_' + newStep + '_no').val(parseInt(newStep) + 1);
 
-			// set new step order position
+			// Set new step order position.
 			currStep.attr('id', 'current_step_' + newStep);
 		}
 	}
@@ -366,7 +412,7 @@
 			opacity: 0.6,
 			update: recalculateSortOrder,
 			create: function () {
-				// force not to change table width
+				// Force not to change table width.
 				stepTable.width(stepTableWidth);
 			},
 			helper: function(e, ui) {
@@ -376,9 +422,9 @@
 					td.width(stepTableColumnWidths[i]);
 				});
 
-				// when dragging element on safari, it jumps out of the table
+				// When dragging element on safari, it jumps out of the table.
 				if (SF) {
-					// move back draggable element to proper position
+					// Move back draggable element to proper position.
 					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
 
@@ -389,12 +435,12 @@
 				return ui;
 			},
 			start: function(e, ui) {
-				// fix placeholder not to change height while object is being dragged
+				// Fix placeholder not to change height while object is being dragged.
 				$(ui.placeholder).height($(ui.helper).height());
 			}
 		});
 
-		// http step add pop up
+		// Http step add pop up.
 		<?php if (!$this->data['templated']) : ?>
 			$('#add_step').click(function() {
 				var form = $(this).parents('form');
@@ -414,7 +460,7 @@
 			});
 		<?php endif ?>
 
-		// http step edit pop up
+		// Http step edit pop up.
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
 			$('#name_<?= $i ?>').click(function() {
 				// Append existing step names.
@@ -470,20 +516,19 @@
 		$('#authentication').trigger('change');
 	});
 
-	/**** Steps popup functions ****/
-	// Inital post time selection
+	// Inital post time selection.
 	function setPostType(formid, type) {
 		var $form = jQuery('#'+formid);
 		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
-			jQuery('#post_fields_row', $form).css("display", 'table-row');
-			jQuery('#post_raw_row', $form).css("display", "none");
+			jQuery('#post_fields_row', $form).css('display', 'table-row');
+			jQuery('#post_raw_row', $form).css('display', 'none');
 		}
 		else {
-			jQuery('#post_fields_row', $form).css("display", "none");
-			jQuery('#post_raw_row', $form).css("display", 'table-row');
+			jQuery('#post_fields_row', $form).css('display', 'none');
+			jQuery('#post_raw_row', $form).css('display', 'table-row');
 		}
 
-		jQuery('input[name="post_type"][value="' + type + '"]', $form).prop("checked", true);
+		jQuery('input[name="post_type"][value="' + type + '"]', $form).prop('checked', true);
 	}
 
 	function switchToPostType(formid, type) {
@@ -511,11 +556,12 @@
 							}
 
 							if (/%[01]/.match(parts[0]) || /%[01]/.match(parts[1]) ) {
-								throw null; /* non-printable characters in data */
+								// Non-printable characters in data.
+								throw null;
 							}
 
-							pair.name = decodeURIComponent(parts[0].replace(/\+/g, " "));
-							pair.value = decodeURIComponent(parts[1].replace(/\+/g, " "));
+							pair.name = decodeURIComponent(parts[0].replace(/\+/g, ' '));
+							pair.value = decodeURIComponent(parts[1].replace(/\+/g, ' '));
 						}
 						catch(e) {
 							throw <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>;
@@ -534,7 +580,7 @@
 				}
 				catch(e) {
 					jQuery('input[name="post_type"][value="<?= ZBX_POSTTYPE_RAW ?>"]', jQuery('#'+formid))
-						.prop("checked", true);
+						.prop('checked', true);
 
 					overlayDialogue({
 						'title': <?= CJs::encodeJson(_('Error')); ?>,
@@ -574,10 +620,10 @@
 			for (var p = 0; p < pairs.length; p++) {
 				parts = [];
 				if (pairs[p].name !== '') {
-					parts.push(encodeURIComponent(pairs[p].name.replace(/'/g,"%27").replace(/"/g,"%22")));
+					parts.push(encodeURIComponent(pairs[p].name.replace(/'/g,'%27').replace(/"/g,'%22')));
 				}
 				if (pairs[p].value !== '') {
-					parts.push(encodeURIComponent(pairs[p].value.replace(/'/g,"%27").replace(/"/g,"%22")));
+					parts.push(encodeURIComponent(pairs[p].value.replace(/'/g,'%27').replace(/"/g,'%22')));
 				}
 				if (parts.length > 0) {
 					fields.push(parts.join('='));
@@ -590,7 +636,7 @@
 		setPostType(formid, type);
 	}
 
-	// Parse actin for URL field
+	// Parse actin for URL field.
 	function parseUrl(formid) {
 		var i,
 			query,
@@ -599,14 +645,14 @@
 			pair,
 			hasErrors = false,
 			pairs = [],
-			target = jQuery("#url", jQuery('#'+formid)),
+			target = jQuery('#url', jQuery('#'+formid)),
 			url = target.val();
 
-		index = url.indexOf("#");
+		index = url.indexOf('#');
 		if (index !== -1)
 			url = url.substring(0, index);
 
-		index = url.indexOf("?");
+		index = url.indexOf('?');
 		if (index !== -1) {
 			query = url.substring(index + 1);
 			url = url.substring(0, index);
@@ -617,7 +663,7 @@
 					continue;
 
 				pair = {};
-				index = fields[i].indexOf("=");
+				index = fields[i].indexOf('=');
 				if (index > 0) {
 					pair.name = fields[i].substring(0, index);
 					pair.value = fields[i].substring(index + 1);
@@ -627,18 +673,19 @@
 						fields[i] = fields[i].substring(1);
 					}
 					pair.name = fields[i];
-					pair.value = "";
+					pair.value = '';
 				}
 
 				try {
 					if (/%[01]/.match(pair.name) || /%[01]/.match(pair.value) ) {
-						throw null; /* non-printable characters in URL */
+						// Non-printable characters in URL.
+						throw null;
 					}
-					pair.name = decodeURIComponent(pair.name.replace(/\+/g,  " "));
-					pair.value = decodeURIComponent(pair.value.replace(/\+/g,  " "));
+					pair.name = decodeURIComponent(pair.name.replace(/\+/g, ' '));
+					pair.value = decodeURIComponent(pair.value.replace(/\+/g, ' '));
 				}
 				catch( e ) {
-					/* malformed url */
+					// Malformed url.
 					hasErrors = true;
 					break;
 				}
@@ -646,7 +693,7 @@
 				pairs.push(pair);
 			}
 
-			if (true === hasErrors) {
+			if (hasErrors === true) {
 				overlayDialogue({
 					'title': <?= CJs::encodeJson(_('Error')); ?>,
 					'content': jQuery('<span>').html(<?=
@@ -748,8 +795,9 @@
 			var pair = stepPairs[pairs[i]];
 			prefix = name + '[' + pair.id + ']';
 
-			/* empty values are ignored */
-			if (pair.name === undefined || (pair.isNew !== undefined && pair.name === '' && pair.value === '')) {
+			// Empty values are ignored.
+			if (typeof pair.name === 'undefined'
+					|| (typeof pair.isNew !== 'undefined' && pair.name === '' && pair.value === '')) {
 				continue;
 			}
 
