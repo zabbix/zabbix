@@ -824,8 +824,7 @@ function getFontComboBox($name) {
 					->addStyle('top: 0px;'),
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CCol([new CDiv('#{name}')]))
-				->addClass('#{class_name}'),
+			(new CCol('#{name}'))->addClass('#{class_name}'),
 			(new CCol([
 				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),
 				(new CVar('element_name[#{triggerid}]', '#{name}')),
