@@ -135,8 +135,8 @@ foreach ($pair_tables as $pair_table){
 
 $httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
-zbx_add_post_js('pairManager.add('.CJs::encodeJson($this->data['pairs']).', '.
-					'jQuery("#'.(new CForm())->getId('httpForm').'"), {});');
+zbx_add_post_js('pairManager.add("'.$httpForm->getId().'",'.CJs::encodeJson($this->data['pairs']).');');
+zbx_add_post_js('pairManager.initControls("'.$httpForm->getId().'");');
 
 /*
  * Authentication tab
