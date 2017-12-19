@@ -7,7 +7,6 @@ out:
   result: '1612713'
   return: 'SYSINFO_RET_OK'
 ---
-
 test case: "unsuccessfully read"
 files:
   /proc/sys/fs/file-max: |

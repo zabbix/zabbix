@@ -80,8 +80,8 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SYSINFO_RET_FAIL == expected_result)
 	{
-		if (NULL == GET_MSG_RESULT(&param_result) || 0 != strcmp(expected_param_value_string,
-				*GET_MSG_RESULT(&param_result)))
+		if (NULL == GET_MSG_RESULT(&param_result) ||
+				0 != strcmp(expected_param_value_string, *GET_MSG_RESULT(&param_result)))
 		{
 			fail_msg("Got '%s' instead of '%s' as a value.",
 					(NULL != GET_MSG_RESULT(&param_result) ?
