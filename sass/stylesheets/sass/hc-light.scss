@@ -386,11 +386,7 @@ content: "";
 }
 
 td.normal-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-	~ td.normal-bg {
-		border-left: none;
-	}
+	@extend td.na-bg;
 }
 
 .normal-bg {
@@ -427,11 +423,7 @@ content: "";
 }
 
 td.info-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-	~ td.info-bg {
-		border-left: none;
-	}
+	@extend td.na-bg;
 }
 
 .info-bg {
@@ -474,11 +466,7 @@ content: "";
 }
 
 td.average-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-	~ td.average-bg {
-		border-left: none;
-	}
+	@extend td.na-bg;
 }
 
 .average-bg {
@@ -521,11 +509,7 @@ content: "";
 }
 
 td.warning-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-	~ td.warning-bg {
-		border-left: none;
-	}
+	@extend td.na-bg;
 }
 
 .warning-bg {
@@ -568,11 +552,7 @@ content: "";
 }
 
 td.high-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-	~ td.high-bg {
-		border-left: none;
-	}
+	@extend td.na-bg;
 }
 
 .high-bg {
@@ -615,11 +595,7 @@ content: "";
 }
 
 td.disaster-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-	~ td.disaster-bg {
-		border-left: none;
-	}
+	@extend td.na-bg;
 }
 
 .disaster-bg {
