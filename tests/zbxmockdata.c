@@ -116,6 +116,8 @@ int	zbx_mock_data_init(void **state)
 			{
 				if (NULL == yaml_document_get_root_node(&tmp))
 				{
+					yaml_document_delete(&tmp);
+
 					if (YAML_MAPPING_NODE == root->type)
 					{
 						const yaml_node_pair_t	*pair;
@@ -454,6 +456,7 @@ zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value)
 	tmp = zbx_malloc(tmp, handle->node->data.scalar.length + 1);
 	memcpy(tmp, handle->node->data.scalar.value, handle->node->data.scalar.length);
 	tmp[handle->node->data.scalar.length] = '\0';
+	zbx_vector_str_append(&string_pool, tmp);
 	*value = tmp;
 	return ZBX_MOCK_SUCCESS;
 }
