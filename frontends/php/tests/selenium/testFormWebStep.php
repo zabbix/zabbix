@@ -33,7 +33,6 @@ class testFormWebStep extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Empty step name',
 					'url' => 'http://www.zabbix.com',
-					'error_msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value for field "name": cannot be empty.'
 					]
@@ -54,7 +53,6 @@ class testFormWebStep extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Empty step url',
 					'step_name' => 'Step with empty step url',
-					'error_msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value for field "url": cannot be empty.'
 					]
@@ -666,22 +664,38 @@ class testFormWebStep extends CWebTest {
 					'step_name' => 'Step timeout -1',
 					'url' => 'http://www.zabbix.com',
 					'timeout' => '-1',
-					'error_msg' => 'Page received incorrect data',
+					'error_webform' => true,
+					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value "-1" for "Timeout" field: must be between 0 and 65535.'
+						'Invalid parameter "/1/steps/1/timeout": a time unit is expected.'
 					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Timeout 65536',
-					'step_name' => 'Step timeout 65536',
+					'name' => 'Timeout 3601',
+					'step_name' => 'Step timeout 3601',
 					'url' => 'http://www.zabbix.com',
-					'timeout' => 65536,
-					'error_msg' => 'Page received incorrect data',
+					'timeout' => 3601,
+					'error_webform' => true,
+					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value "65536" for "Timeout" field: must be between 0 and 65535.'
+						'Invalid parameter "/1/steps/1/timeout": value must be one of 0-3600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Timeout string',
+					'step_name' => 'Step timeout string',
+					'url' => 'http://www.zabbix.com',
+					'timeout' => 'abc',
+					'error_webform' => true,
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/steps/1/timeout": a time unit is expected.'
 					]
 				]
 			],
@@ -720,7 +734,7 @@ class testFormWebStep extends CWebTest {
 					'headers' => [
 						['name' => 'header', 'value' => 'test_header'],
 					],
-					'timeout' => 65535,
+					'timeout' => 3600,
 					'string' => 'Zabbix',
 					'code' => 200,
 					'dbCheck' => true
@@ -876,7 +890,7 @@ class testFormWebStep extends CWebTest {
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 			$raw = $this->zbxTestGetText("//textarea[@id='posts']");
 			$this->assertEquals($raw, $data['check_raw']);
-			$this->zbxTestClick('cancel');
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
 
 		if (array_key_exists('parse_query', $data)) {
@@ -918,7 +932,7 @@ class testFormWebStep extends CWebTest {
 				$url = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="url"]');
 				$this->assertEquals($url, $data['check_url']);
 			}
-			$this->zbxTestClick('cancel');
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
 
 		if (array_key_exists('error_webform', $data)) {
@@ -932,11 +946,13 @@ class testFormWebStep extends CWebTest {
 				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-				$this->zbxTestCheckFatalErrors();
+				if (array_key_exists('error_msg', $data)) {
+					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
+				}
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
+				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_ERROR:
 				$get_text = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']/span");
