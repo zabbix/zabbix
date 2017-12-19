@@ -1639,6 +1639,56 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
 
 /******************************************************************************
  *                                                                            *
+ * Function: scheduler_find_dst_change                                        *
+ *                                                                            *
+ * Purpose: finds daylight saving change time inside specified time period    *
+ *                                                                            *
+ * Parameters: time_start - [IN] the time period start                        *
+ *             time_end   - [IN] the the time period end                      *
+ *                                                                            *
+ * Return Value: Time when the daylight saving changes should occur.          *
+ *                                                                            *
+ * Comments: The calculated time is cached and reused if it first the         *
+ *           specified period.                                                *
+ *                                                                            *
+ ******************************************************************************/
+static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
+{
+	static time_t	time_dst = 0;
+	struct tm	*tm;
+	time_t		time_mid;
+	int		start, end, mid, dst, dst_start;
+
+	if (time_dst < time_start || time_dst > time_end)
+	{
+		/* assume that daylight saving will change only on 0 seconds */
+		start = time_start / 60;
+		end = time_end / 60;
+
+		tm = localtime(&time_start);
+		dst_start = tm->tm_isdst;
+
+		while (end > start + 1)
+		{
+			mid = (start + end) / 2;
+			time_mid = mid * 60;
+
+			tm = localtime(&time_mid);
+
+			if (tm->tm_isdst == dst_start)
+				start = mid;
+			else
+				end = mid;
+		}
+
+		time_dst = end * 60;
+	}
+
+	return time_dst;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: scheduler_get_nextcheck                                          *
  *                                                                            *
  * Purpose: applies second filter to the specified time/day calculating the   *
@@ -1652,7 +1702,7 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
  ******************************************************************************/
 static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t now)
 {
-	struct tm	tm_start, tm;
+	struct tm	tm_start, tm, tm_dst;
 	time_t		nextcheck = 0, current_nextcheck;
 
 	tm_start = *(localtime(&now));
@@ -1666,8 +1716,26 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 		scheduler_apply_minute_filter(interval, &tm);
 		scheduler_apply_second_filter(interval, &tm);
 
-		tm.tm_isdst = -1;
+		tm.tm_isdst = tm_start.tm_isdst;
 		current_nextcheck = mktime(&tm);
+
+		tm_dst = *(localtime(&current_nextcheck));
+		if (tm_dst.tm_isdst != tm_start.tm_isdst)
+		{
+			int	dst = tm_dst.tm_isdst;
+			time_t	time_dst;
+
+			time_dst = scheduler_find_dst_change(now, current_nextcheck);
+			tm_dst = *localtime(&time_dst);
+
+			scheduler_apply_day_filter(interval, &tm_dst);
+			scheduler_apply_hour_filter(interval, &tm_dst);
+			scheduler_apply_minute_filter(interval, &tm_dst);
+			scheduler_apply_second_filter(interval, &tm_dst);
+
+			tm_dst.tm_isdst = dst;
+			current_nextcheck = mktime(&tm_dst);
+		}
 
 		if (0 == nextcheck || current_nextcheck < nextcheck)
 			nextcheck = current_nextcheck;
