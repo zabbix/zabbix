@@ -477,7 +477,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
 		])
-		->addRow((new CLabel(_('Show lines')))->setAsteriskMark(),
+		->addRow((new CLabel(_('Show lines'), 'elements'))->setAsteriskMark(),
 			(new CNumericBox('elements', $elements, 3))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
