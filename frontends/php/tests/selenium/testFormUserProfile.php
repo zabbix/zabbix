@@ -570,6 +570,7 @@ class testFormUserProfile extends CWebTest {
 				$this->assertEquals(1, DBcount($sql));
 				break;
 			case TEST_BAD:
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));
 				$this->zbxTestTextPresent($data['error_msg']);
 				$this->zbxTestCheckFatalErrors();
 				break;
