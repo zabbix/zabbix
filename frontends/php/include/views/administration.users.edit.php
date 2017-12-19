@@ -201,9 +201,10 @@ $userFormList
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(_('Rows per page'),
+	->addRow((new CLabel(_('Rows per page'), 'rows_per_page'))->setAsteriskMark(),
 		(new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
 		(new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

@@ -64,8 +64,10 @@ $media_form = (new CFormList(_('Media')))
 		(new CLabel(_('Send to'), 'mediatype_email_send_to'))->setAsteriskMark(),
 		$email_send_to_table, 'mediatype_email_send_to'
 	)
-	->addRow(_('When active'),
-		(new CTextBox('period', $options['period'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->addRow((new CLabel(_('When active'), 'period'))->setAsteriskMark(),
+		(new CTextBox('period', $options['period'], false, 1024))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Use if severity'), $severity_row)
 	->addRow(_('Enabled'),

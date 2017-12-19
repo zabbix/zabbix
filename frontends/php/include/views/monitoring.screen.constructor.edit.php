@@ -477,8 +477,10 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
 		])
-		->addRow(_('Show lines'),
-			(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		->addRow((new CLabel(_('Show lines')))->setAsteriskMark(),
+			(new CNumericBox('elements', $elements, 3))
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		)
 		->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
 }

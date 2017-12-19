@@ -145,10 +145,8 @@ $form->addItem(
 					'name' => 'priority',
 					'value' => (int) $options['priority']
 				]))
-				->addRow(
-					(new CLabel(_('Expression'), 'logexpr'))->setAsteriskMark(),
+				->addRow(_('Expression'),
 					(new CTextBox('expression'))
-						->setAriaRequired()
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('logexpr')
 				)
@@ -177,7 +175,7 @@ $form->addItem(
 						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				)
-				->addRow(null,
+				->addRow((new CLabel(_('Expressions'), $expression_table->getId()))->setAsteriskMark(),
 					(new CDiv($expression_table))
 						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

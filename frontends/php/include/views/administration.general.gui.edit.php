@@ -40,11 +40,15 @@ $guiTab = (new CFormList())
 			->setLabel(_('remember selected'))
 			->setChecked($data['dropdown_first_remember'] == 1)
 	])
-	->addRow(_('Limit for search and filter results'),
-		(new CNumericBox('search_limit', $data['search_limit'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
+		(new CNumericBox('search_limit', $data['search_limit'], 6))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
-	->addRow(_('Max count of elements to show inside table cell'),
-		(new CNumericBox('max_in_table', $data['max_in_table'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Max count of elements to show inside table cell'), 'max_in_table'))->setAsteriskMark(),
+		(new CNumericBox('max_in_table', $data['max_in_table'], 5))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Enable event acknowledgement'),
 		(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)

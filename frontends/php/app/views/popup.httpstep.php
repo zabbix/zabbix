@@ -135,8 +135,9 @@ $http_popup_form_list
 		(new CCheckBox('retrieve_mode'))
 			->setChecked($options['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 	)
-	->addRow(_('Timeout'),
+	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $options['timeout']))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Required string'),
