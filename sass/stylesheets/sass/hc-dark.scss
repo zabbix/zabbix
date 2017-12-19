@@ -371,6 +371,8 @@ a {
 
 // SEVERITY STATUSES
 td.na-bg {
+	padding-left: 42px !important;
+	color: $font-color;
 	~ td.na-bg {
 		border-left: none;
 	}
@@ -382,17 +384,6 @@ td.na-bg {
 
 .na-bg .link-action {
 	color: $link-color;
-}
-
-.list-table .na-bg,
-.dashbrd-widget .list-table .na-bg,
-.dashbrd-grid-widget-content .list-table .na-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .na-bg {
-	padding-left: 42px;
 }
 
 .na-bg:before {
@@ -427,12 +418,9 @@ td.na-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-.sortable .na-bg {
+td.normal-bg {
 	padding-left: 42px !important;
 	color: $font-color;
-}
-
-td.normal-bg {
 	~ td.normal-bg {
 		border-left: none;
 	}
@@ -444,17 +432,6 @@ td.normal-bg {
 
 .normal-bg .link-action {
 	color: $link-color;
-}
-
-.list-table .normal-bg,
-.dashbrd-widget .list-table .normal-bg,
-.dashbrd-grid-widget-content .list-table .normal-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .normal-bg {
-	padding-left: 42px;
 }
 
 .normal-bg:before {
@@ -482,12 +459,9 @@ td.normal-bg {
 	content: none;
 }
 
-.sortable .normal-bg {
+td.info-bg {
 	padding-left: 42px !important;
 	color: $font-color;
-}
-
-td.info-bg {
 	~ td.info-bg {
 		border-left: none;
 	}
@@ -499,17 +473,6 @@ td.info-bg {
 
 .info-bg .link-action {
 	color: $link-color;
-}
-
-.list-table .info-bg,
-.dashbrd-widget .list-table .info-bg,
-.dashbrd-grid-widget-content .list-table .info-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .info-bg {
-	padding-left: 42px;
 }
 
 .info-bg:before {
@@ -543,12 +506,9 @@ td.info-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-.sortable .info-bg {
+td.average-bg {
 	padding-left: 42px !important;
 	color: $font-color;
-}
-
-td.average-bg {
 	~ td.average-bg {
 		border-left: none;
 	}
@@ -560,17 +520,6 @@ td.average-bg {
 
 .average-bg .link-action {
 	color: $link-color;
-}
-
-.list-table .average-bg,
-.dashbrd-widget .list-table .average-bg,
-.dashbrd-grid-widget-content .list-table .average-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .average-bg {
-	padding-left: 42px;
 }
 
 .average-bg:before {
@@ -604,12 +553,9 @@ td.average-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-.sortable .average-bg {
+td.warning-bg {
 	padding-left: 42px !important;
 	color: $font-color;
-}
-
-td.warning-bg {
 	~ td.warning-bg {
 		border-left: none;
 	}
@@ -621,17 +567,6 @@ td.warning-bg {
 
 .warning-bg .link-action {
 	color: $link-color;
-}
-
-.list-table .warning-bg,
-.dashbrd-widget .list-table .warning-bg,
-.dashbrd-grid-widget-content .list-table .warning-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .warning-bg {
-	padding-left: 42px;
 }
 
 .warning-bg:before {
@@ -665,12 +600,9 @@ td.warning-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-.sortable .warning-bg {
+td.high-bg {
 	padding-left: 42px !important;
 	color: $font-color;
-}
-
-td.high-bg {
 	~ td.high-bg {
 		border-left: none;
 	}
@@ -682,17 +614,6 @@ td.high-bg {
 
 .high-bg .link-action {
 	color: $link-color;
-}
-
-.list-table .high-bg,
-.dashbrd-widget .list-table .high-bg,
-.dashbrd-grid-widget-content .list-table .high-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .high-bg {
-	padding-left: 42px;
 }
 
 .high-bg:before {
@@ -726,12 +647,9 @@ td.high-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-.sortable .high-bg {
+td.disaster-bg {
 	padding-left: 42px !important;
 	color: $font-color;
-}
-
-td.disaster-bg {
 	~ td.disaster-bg {
 		border-left: none;
 	}
@@ -743,17 +661,6 @@ td.disaster-bg {
 
 .disaster-bg .link-action {
 	color: $link-color;
-}
-
-.list-table .disaster-bg,
-.dashbrd-widget .list-table .disaster-bg,
-.dashbrd-grid-widget-content .list-table .disaster-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .disaster-bg {
-	padding-left: 42px;
 }
 
 .disaster-bg:before {
@@ -787,11 +694,6 @@ td.disaster-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-.sortable .disaster-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-}
-
 .notif-body li {
 	padding: 0 0 10px 42px;
 }
@@ -805,6 +707,11 @@ td.disaster-bg {
 
 .notif-indic-container {
 	margin: 0 0 0 -42px;
+}
+
+td.inactive-bg {
+	padding-left: 42px !important;
+	color: $font-color;
 }
 
 .inactive-bg {
@@ -831,11 +738,6 @@ td.disaster-bg {
 	top: 5px;
 	left: 6px;
 	position: absolute;
-}
-
-.list-table .inactive-bg {
-	padding-left: 42px;
-	color: $font-color !important;
 }
 
 // ERROR MESSAGES
