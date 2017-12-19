@@ -279,8 +279,16 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', _('short description'))
 		])
-		->addRow([_('From'), createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')])
-		->addRow([_('Till'), createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')]);
+		->addRow([
+			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
+			(new CDiv(createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')))
+				->setId('new_service_time_from')
+		])
+		->addRow([
+			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
+			(new CDiv(createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')))
+				->setId('new_service_time_to')
+		]);
 }
 else {
 	$weekFromComboBox = new CComboBox('new_service_time[from_week]', isset($_REQUEST['new_service_time']['from_week'])
