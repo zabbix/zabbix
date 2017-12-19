@@ -174,26 +174,31 @@
 					.trigger('change');
 			},
 
-			/**** Steps popup functions ****/
 			refresh: function() {
 				refreshContainers();
 			},
 
-			// Merge 'query_fields' values with ones from URL
-			merge: function (formid, pairs) {
+			/**
+			 * Merge 'query_fields' values with ones from URL.
+			 *
+			 * @param {string}	formid	Id of current form HTML element.
+			 * @param {string}	type	Type of pairs that should be merged.
+			 * @param {object}	pairs	Object with pair data.
+			 */
+			merge: function (formid, type, pairs) {
 				var	pair,
 					queryFields = [],
 					existingPairs = Object.keys(allPairs);
 
 				if (pairs.length > 0) {
-					this.cleanup(formid, 'query_fields');
+					this.cleanup(formid, type);
 				}
 
 				for (var p = 0; p < existingPairs.length; p++) {
-					if (allPairs[existingPairs[p]] !== undefined &&
-						allPairs[existingPairs[p]].type === 'query_fields' &&
-						allPairs[existingPairs[p]].formid === formid &&
-						allPairs[existingPairs[p]].name.indexOf('[]') === -1) {
+					if (allPairs[existingPairs[p]] !== undefined
+							&& allPairs[existingPairs[p]].type === type
+							&& allPairs[existingPairs[p]].formid === formid
+							&& allPairs[existingPairs[p]].name.indexOf('[]') === -1) {
 						queryFields.push(allPairs[existingPairs[p]]);
 					}
 				}
@@ -210,13 +215,13 @@
 					if (pair === null) {
 						renderPairRow(formid, createNewPair({
 							formid: formid,
-							type: 'query_fields',
+							type: type,
 							name: pairs[i].name,
 							value: pairs[i].value
 						}));
 					}
 					else {
-						jQuery('#pair_value_' + pair.id).val(pairs[i].value);
+						jQuery('#pairs_' + pair.id + '_value').val(pairs[i].value);
 					}
 				}
 
@@ -249,12 +254,18 @@
 				return pairs;
 			},
 
-			// Removes all pairs and their fields of given type in given form.
+			/**
+			 * Removes all pairs and their fields of given type in given form.
+			 *
+			 * @param {string}	formid	Id of current form HTML element.
+			 * @param {string}	type	String with type of pair, or '', if all pairs for the form should be removed.
+			 */
 			removeAll: function(formid, type) {
 				var pairs = Object.keys(allPairs);
 
 				for (var p = 0; p < pairs.length; p++) {
-					if (allPairs[pairs[p]].type === type && allPairs[pairs[p]].formid === formid) {
+					if (allPairs[pairs[p]].formid === formid
+							&& (type === '' || allPairs[pairs[p]].type === type)) {
 						jQuery('#pairRow_' + pairs[p]).remove();
 						delete allPairs[pairs[p]];
 					}
@@ -654,7 +665,7 @@
 				return false;
 			}
 
-			pairManager.merge(formid, pairs);
+			pairManager.merge(formid, 'query_fields', pairs);
 		}
 
 		target.val(url);

@@ -166,6 +166,7 @@ $output['body'] = (new CDiv($http_popup_form))->toString();
 
 $output['script_inline'] .=
 	'jQuery(document).ready(function() {'."\n".
+		'pairManager.removeAll("'.$http_popup_form->getId().'", "");' .
 		'pairManager.add("'.$http_popup_form->getId().'",' .
 			CJs::encodeJson(array_values($options['pairs'])) . ');'."\n".
 		'pairManager.initControls("'.$http_popup_form->getId().'");'."\n".
