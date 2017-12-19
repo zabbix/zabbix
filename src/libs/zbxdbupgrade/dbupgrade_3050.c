@@ -106,7 +106,7 @@ static int	DBpatch_3050005(void)
 static int	DBpatch_3050008(void)
 {
 	int		res;
-	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
+	char		*trdefault = (char *)ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -123,7 +123,7 @@ static int	DBpatch_3050008(void)
 static int	DBpatch_3050009(void)
 {
 	int		res;
-	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
+	char		*trdefault = (char *)ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -140,7 +140,7 @@ static int	DBpatch_3050009(void)
 static int	DBpatch_3050010(void)
 {
 	int		res;
-	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
+	char		*itdefault = (char *)ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -157,7 +157,7 @@ static int	DBpatch_3050010(void)
 static int	DBpatch_3050011(void)
 {
 	int		res;
-	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
+	char		*itdefault = (char *)ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -361,6 +361,21 @@ static int	DBpatch_3050026(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_3050027(void)
+{
+	const ZBX_FIELD	field = {"sendto", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media", &field, NULL);
+}
+
+static int	DBpatch_3050028(void)
+{
+	const ZBX_FIELD	field = {"sendto", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("alerts", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -390,5 +405,7 @@ DBPATCH_ADD(3050023, 0, 1)
 DBPATCH_ADD(3050024, 0, 1)
 DBPATCH_ADD(3050025, 0, 1)
 DBPATCH_ADD(3050026, 0, 1)
+DBPATCH_ADD(3050027, 0, 1)
+DBPATCH_ADD(3050028, 0, 1)
 
 DBPATCH_END()

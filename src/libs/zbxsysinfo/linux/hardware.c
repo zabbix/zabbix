@@ -110,7 +110,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 		if (-1 == fstat(fd, &file_buf))
 			goto close;
 
-		smbuf = zbx_malloc(NULL, file_buf.st_size);
+		smbuf = (unsigned char *)zbx_malloc(NULL, file_buf.st_size);
 
 		if (-1 == (ssize_t)(smbios_len = read(fd, smbuf, file_buf.st_size)))
 			goto clean;
@@ -153,7 +153,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 			goto close;
 		}
 
-		smbuf = zbx_malloc(smbuf, smbios_len);
+		smbuf = (unsigned char *)zbx_malloc(smbuf, smbios_len);
 
 		len = smbios % pagesize;	/* mmp needs to be a multiple of pagesize for munmap */
 		if (MAP_FAILED == (mmp = mmap(0, len + smbios_len, PROT_READ, MAP_SHARED, fd, smbios - len)))

@@ -238,7 +238,10 @@ class CMenuPopupHelper {
 		}
 
 		if ($trigger['url'] !== '') {
-			$data['url'] = $trigger['url'];
+			$data['url'] = CHtmlUrlValidator::validate($trigger['url'])
+				? $trigger['url']
+				: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'], false,
+						false)).'\');';
 		}
 
 		return $data;
