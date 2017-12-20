@@ -792,7 +792,7 @@ class testFormWebStep extends CWebTest {
 		}
 
 		if (array_key_exists('query', $data)) {
-			$i = 1;
+			$i = 3;
 			foreach($data['query'] as $item) {
 				if (array_key_exists('name', $item)) {
 					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]', $item['name']);
@@ -801,7 +801,7 @@ class testFormWebStep extends CWebTest {
 					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]', $item['value']);
 				}
 				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="query_fields_footer"]//button[text()="Add"]');
-				$i = 5;
+				$i = 7;
 			}
 		}
 
@@ -810,7 +810,7 @@ class testFormWebStep extends CWebTest {
 		}
 
 		if (array_key_exists('post', $data)) {
-			$i = 2;
+			$i = 4;
 			foreach($data['post'] as $item) {
 				if (array_key_exists('name', $item)) {
 					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]', $item['name']);
@@ -819,12 +819,12 @@ class testFormWebStep extends CWebTest {
 					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]', $item['value']);
 				}
 				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="post_fields_footer"]//button[text()="Add"]');
-				$i = 5;
+				$i = 7;
 			}
 		}
 
 		if (array_key_exists('variables', $data)) {
-			$i = 3;
+			$i = 5;
 			foreach($data['variables'] as $item) {
 				if (array_key_exists('name', $item)) {
 					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]', $item['name']);
@@ -832,13 +832,13 @@ class testFormWebStep extends CWebTest {
 				if (array_key_exists('value', $item)) {
 					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]', $item['value']);
 				}
-				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="step_variables_footer"]//button[text()="Add"]');
-				$i = 5;
+				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="variables_footer"]//button[text()="Add"]');
+				$i = 7;
 			}
 		}
 
 		if (array_key_exists('headers', $data)) {
-			$i = 4;
+			$i = 6;
 			foreach($data['headers'] as $item) {
 				if (array_key_exists('name', $item)) {
 					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]', $item['name']);
@@ -846,8 +846,8 @@ class testFormWebStep extends CWebTest {
 				if (array_key_exists('value', $item)) {
 					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]', $item['value']);
 				}
-				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="step_headers_footer"]//button[text()="Add"]');
-				$i = 5;
+				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="headers_footer"]//button[text()="Add"]');
+				$i = 7;
 			}
 		}
 
@@ -862,11 +862,11 @@ class testFormWebStep extends CWebTest {
 
 		if (array_key_exists('retrieve', $data)) {
 			$this->zbxTestCheckboxSelect('retrieve_mode');
-			$this->zbxTestAssertElementPresentXpath("//input[@id='post_type_0'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='post_type_1'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='pairs_2_name'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='pairs_2_value'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='required'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='post_type_0'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='post_type_1'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='pairs_4_name'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='pairs_4_value'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='required'][@disabled]");
 		}
 
 		if (array_key_exists('timeout', $data)) {
@@ -888,7 +888,7 @@ class testFormWebStep extends CWebTest {
 		if (array_key_exists('check_raw', $data)) {
 			$this->zbxTestClickLinkText($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
-			$raw = $this->zbxTestGetText("//textarea[@id='posts']");
+			$raw = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']//textarea[@id='posts']");
 			$this->assertEquals($raw, $data['check_raw']);
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
@@ -896,7 +896,7 @@ class testFormWebStep extends CWebTest {
 		if (array_key_exists('parse_query', $data)) {
 			$this->zbxTestClickLinkText($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
-			$i = 1;
+			$i = 3;
 			foreach($data['parse_query'] as $item) {
 				$name = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]');
 				$this->assertEquals($name, $item['name']);
@@ -904,7 +904,7 @@ class testFormWebStep extends CWebTest {
 					$value = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]');
 					$this->assertEquals($value, $item['value']);
 				}
-				$i = 5;
+				$i = 7;
 			}
 
 			if (array_key_exists('check_url', $data)) {
@@ -917,7 +917,7 @@ class testFormWebStep extends CWebTest {
 		if (array_key_exists('check_post', $data)) {
 			$this->zbxTestClickLinkText($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
-			$i = 2;
+			$i = 4;
 			foreach($data['check_post'] as $item) {
 				$name = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]');
 				$this->assertEquals($name, $item['name']);
@@ -925,7 +925,7 @@ class testFormWebStep extends CWebTest {
 					$value = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]');
 					$this->assertEquals($value, $item['value']);
 				}
-				$i = 5;
+				$i = 7;
 			}
 
 			if (array_key_exists('check_url', $data)) {
