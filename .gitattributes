@@ -351,6 +351,7 @@ src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
+tests/libs/zbxcommon/calculate_item_nextcheck.yaml -text
 tests/libs/zbxconf/parse_cfg_file.yaml -text
 tests/libs/zbxdbhigh/DBselect_uint64.yaml -text
 tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC.yaml -text

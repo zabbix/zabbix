@@ -1,0 +1,171 @@
+---
+test case: Calculate active item nextcheck from simple delay
+in:
+  item type: ZABBIX_ACTIVE
+  delay: 1h
+  start time: 2017-10-29 04:00:00+03:00
+out:
+  checks:
+    - 2017-10-29 05:00:00+03:00
+    - 2017-10-29 06:00:00+03:00
+---
+test case: Calculate active item nextcheck from scheduled interval
+in:
+  item type: ZABBIX_ACTIVE
+  delay: 0;h12
+  start time: 2017-10-29 04:00:00+03:00
+out:
+  checks:
+    - 2038-01-01 03:00:00+03:00
+---
+test case: Sheduled every 15m check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;m/15
+  start time: 2017-10-29 03:00:00+03:00
+out:
+  checks:
+    - 2017-10-29 03:15:00+03:00
+    - 2017-10-29 03:30:00+03:00
+    - 2017-10-29 03:45:00+03:00
+    - 2017-10-29 03:00:00+02:00
+    - 2017-10-29 03:15:00+02:00
+    - 2017-10-29 03:30:00+02:00
+---
+test case: Scheduled every 1h check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;h/1
+  start time: 2017-10-29 03:00:00+03:00
+out:
+  checks:
+    - 2017-10-29 03:00:00+02:00
+    - 2017-10-29 04:00:00+02:00
+    - 2017-10-29 05:00:00+02:00
+---
+test case: Scheduled 9:00 check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;h9
+  start time: 2017-10-29 03:00:00+03:00
+out:
+  checks:
+    - 2017-10-29 09:00:00+02:00
+    - 2017-10-30 09:00:00+02:00
+---
+test case: Scheduled 15m check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;m15
+  start time: 2017-10-29 03:00:00+03:00
+out:
+  checks:
+    - 2017-10-29 03:15:00+03:00
+    - 2017-10-29 03:15:00+02:00
+    - 2017-10-29 04:15:00+02:00
+    - 2017-10-29 05:15:00+02:00
+---
+test case: Scheduled 3:30 check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;h3m30
+  start time: 2017-10-29 03:00:00+03:00
+out:
+  checks:
+    - 2017-10-29 03:30:00+03:00
+    - 2017-10-29 03:30:00+02:00
+    - 2017-10-30 03:30:00+02:00
+---
+test case: Scheduled every 2h check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;h/2
+  start time: 2017-10-29 01:00:00+03:00
+out:
+  checks:
+    - 2017-10-29 02:00:00+03:00
+    - 2017-10-29 04:00:00+02:00
+    - 2017-10-29 06:00:00+02:00
+
+---
+test case: Sheduled every 15m check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;m/15
+  start time: 2017-03-26 02:00:00+02:00
+out:
+  checks:
+    - 2017-03-26 02:15:00+02:00
+    - 2017-03-26 02:30:00+02:00
+    - 2017-03-26 02:45:00+02:00
+    - 2017-03-26 04:00:00+03:00
+    - 2017-03-26 04:15:00+03:00
+    - 2017-03-26 04:30:00+03:00
+---
+test case: Scheduled every 1h check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h/1
+  start time: 2017-03-26 01:00:00+02:00
+out:
+  checks:
+    - 2017-03-26 02:00:00+02:00
+    - 2017-03-26 04:00:00+03:00
+    - 2017-03-26 05:00:00+03:00
+    - 2017-03-26 06:00:00+03:00
+---
+test case: Scheduled 9:00 check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h9
+  start time: 2017-03-26 02:00:00+02:00
+out:
+  checks:
+    - 2017-03-26 09:00:00+03:00
+    - 2017-03-27 09:00:00+03:00
+---
+test case: Scheduled 15m check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;m15
+  start time: 2017-03-26 02:00:00+02:00
+out:
+  checks:
+    - 2017-03-26 02:15:00+02:00
+    - 2017-03-26 04:15:00+03:00
+    - 2017-03-26 05:15:00+03:00
+---
+test case: Scheduled 3:30 check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h3m30
+  start time: 2017-03-25 02:00:00+02:00
+out:
+  checks:
+    - 2017-03-25 03:30:00+02:00
+    - 2017-03-27 03:30:00+03:00
+    - 2017-03-28 03:30:00+03:00
+---
+test case: Scheduled every 2h check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h/2
+  start time: 2017-03-26 01:00:00+03:00
+out:
+  checks:
+    - 2017-03-26 02:00:00+02:00
+    - 2017-03-26 04:00:00+03:00
+    - 2017-03-26 06:00:00+03:00
+---
+test case: Scheduled 3:00 check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h3
+  start time: 2017-03-25 02:00:00+02:00
+out:
+  checks:
+    - 2017-03-25 03:00:00+02:00
+    - 2017-03-27 03:00:00+03:00
+    - 2017-03-28 03:00:00+03:00
+...
+
