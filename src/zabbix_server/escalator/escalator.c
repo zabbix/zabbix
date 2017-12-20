@@ -203,7 +203,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		const DB_EVENT *event)
 {
 	const char		*__function_name = "get_tag_based_permission";
-	char			*sql = NULL, tmp[ZBX_MAX_UINT64_LEN];
+	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -232,6 +232,8 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		tag_filter->value = zbx_strdup(NULL, row[2]);
 		zbx_vector_ptr_append(&tag_filters, tag_filter);
 	}
+	zbx_free(sql);
+	DBfree_result(result);
 
 	zbx_vector_ptr_sort(&tag_filters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -261,8 +263,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		memset(condition, 0, sizeof(DB_CONDITION));
 		condition->conditiontype = CONDITION_TYPE_HOST_GROUP;
 		condition->operator = CONDITION_OPERATOR_EQUAL;
-		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_UI64, tag_filter->hostgrouid);
-		condition->value = zbx_strdup(NULL, tmp);
+		condition->value = zbx_dsprintf(NULL, ZBX_FS_UI64, tag_filter->hostgrouid);
 		zbx_vector_ptr_append(&conditions, condition);
 
 		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
@@ -300,9 +301,6 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		zbx_vector_ptr_destroy(&conditions);
 	}
 out:
-	zbx_free(sql);
-	DBfree_result(result);
-
 	zbx_vector_ptr_clear_ext(&tag_filters, (zbx_clean_func_t)zbx_tag_filter_free);
 	zbx_vector_ptr_destroy(&tag_filters);
 
