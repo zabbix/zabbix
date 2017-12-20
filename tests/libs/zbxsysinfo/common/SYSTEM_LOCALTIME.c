@@ -95,27 +95,14 @@ void	zbx_mock_test_entry(void **state)
 	type = get_rparam(&request, 0);
 
 	if (SYSINFO_RET_OK == expected_result)
-	{
-		if (NULL == type || 0 != strcmp(type, "local"))
-		{
-			if (NULL != GET_UI64_RESULT(&param_result))
-				value = zbx_dsprintf(value, ZBX_FS_UI64, *GET_UI64_RESULT(&param_result));
-		}
-		else
-			value = *GET_STR_RESULT(&param_result);
-	}
+		value = (NULL != GET_TEXT_RESULT(&param_result)) ? *GET_TEXT_RESULT(&param_result) : NULL;
 	else
-		value = *GET_MSG_RESULT(&param_result);
+		value = (NULL != GET_MSG_RESULT(&param_result)) ? *GET_MSG_RESULT(&param_result) : NULL;
 
 	if (NULL == value || 0 != strcmp(expected_value_string, value))
 	{
 		fail_msg("Got '%s' instead of '%s' as a value.", (NULL != value ? value : "NULL"),
 				expected_value_string);
-	}
-	else
-	{
-		if (SYSINFO_RET_OK == expected_result && (NULL == type || 0 != strcmp(type, "local")))
-			zbx_free(value);
 	}
 
 	free_request(&request);
