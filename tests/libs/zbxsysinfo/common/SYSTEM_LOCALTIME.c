@@ -51,7 +51,7 @@ void	zbx_mock_test_entry(void **state)
 	else if (0 == strcmp("SYSINFO_RET_FAIL", expected_return_string))
 		expected_result = SYSINFO_RET_FAIL;
 	else
-		fail_msg("Get unexpected 'return' parameter from test case data: %s", expected_return_string);
+		fail_msg("Got unexpected 'return' parameter from test case data: %s", expected_return_string);
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("result", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expected_value_string)))
@@ -69,22 +69,25 @@ void	zbx_mock_test_entry(void **state)
 					zbx_mock_error_string(error));
 		}
 
-		if (FAIL == is_uint32(expected_timestamp_string, &expected_timestamp_value)
-				&& SYSINFO_RET_OK == expected_result)
-		{
-			fail_msg("Cannot get expected timestamp from test case data: %s", expected_timestamp_value);
-		}
+		if (FAIL == is_uint32(expected_timestamp_string, &expected_timestamp_value))
+			fail_msg("Cannot convert 'timestamp' parameter value to numeric: %s", expected_timestamp_value);
+	}
+
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("key", &param_handle)) ||
+			ZBX_MOCK_SUCCESS != zbx_mock_string(param_handle, &key_string))
+	{
+		fail_msg("Cannot get expected 'key' parameter from test case data: %s",
+				zbx_mock_error_string(error));
 	}
 
 	init_request(&request);
 	init_result(&param_result);
 
-	if (ZBX_MOCK_SUCCESS == (error = zbx_mock_in_parameter("key", &param_handle)) &&
-			ZBX_MOCK_SUCCESS == zbx_mock_string(param_handle, &key_string) &&
-			SUCCEED != parse_item_key(key_string, &request))
-	{
-		fail_msg("Failed to parse item key from string '%s'", key_string);
-	}
+	if (SUCCEED != parse_item_key(key_string, &request))
+		fail_msg("Cannot parse item key from string '%s'", key_string);
+
+	if (0 != strcmp(request.key, "system.localtime"))
+		fail_msg("Got unexpected item key parameter from test case data: %s", key_string);
 
 	if (expected_result != (actual_result = SYSTEM_LOCALTIME(&request, &param_result)))
 	{
