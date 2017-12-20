@@ -337,7 +337,7 @@ a {
 }
 
 // SEVERITY STATUSES
-td.na-bg {
+td.na-bg, .log-na-bg {
 	padding-left: 42px !important;
 	color: $font-color;
 	~ td.na-bg {
@@ -345,7 +345,7 @@ td.na-bg {
 	}
 }
 
-.na-bg {
+.na-bg, .log-na-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
@@ -353,7 +353,12 @@ td.na-bg {
 	color: $link-color;
 }
 
-.na-bg:before {
+.log-na-bg:before {
+	color: darken($alt-blue-grey,45%) !important;
+	background-color: $alt-blue-grey !important;
+}
+
+.na-bg:before, .log-na-bg:before {
 content: "";
 	width: 34px;
 	position: absolute;
@@ -364,7 +369,7 @@ content: "";
 	min-height: 28px;
 }
 
-.na-bg:after {
+.na-bg:after, .log-na-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -106px -411px;
 	width: 22px;
@@ -398,7 +403,7 @@ td.normal-bg {
 }
 
 .normal-bg:before {
-content: "";
+	content: "";
 	width: 34px;
 	position: absolute;
 	top: 0;
@@ -422,11 +427,11 @@ content: "";
 	content: none;
 }
 
-td.info-bg {
+td.info-bg, td.log-info-bg {
 	@extend td.na-bg;
 }
 
-.info-bg {
+.info-bg, .log-info-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
@@ -434,8 +439,13 @@ td.info-bg {
 	color: $link-color;
 }
 
-.info-bg:before {
-content: "";
+.log-info-bg:before {
+	color: darken($alt-dark-blue,45%) !important;
+	background-color: $alt-dark-blue !important;
+}
+
+.info-bg:before, .log-info-bg:before {
+	content: "";
 	width: 34px;
 	position: absolute;
 	top: 0;
@@ -444,7 +454,7 @@ content: "";
 	min-height: 28px;
 }
 
-.info-bg:after {
+.info-bg:after, .log-info-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -136px -411px;
 	width: 22px;
@@ -478,7 +488,7 @@ td.average-bg {
 }
 
 .average-bg:before {
-content: "";
+	content: "";
 	width: 34px;
 	position: absolute;
 	top: 0;
@@ -508,11 +518,11 @@ content: "";
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.warning-bg {
+td.warning-bg, td.log-warning-bg {
 	@extend td.na-bg;
 }
 
-.warning-bg {
+.warning-bg, .log-warning-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
@@ -520,8 +530,13 @@ td.warning-bg {
 	color: $link-color;
 }
 
-.warning-bg:before {
-content: "";
+.log-warning-bg:before {
+	color: darken($alt-yellow,45%) !important;
+	background-color: $alt-yellow !important;
+}
+
+.warning-bg:before, .log-warning-bg:before {
+	content: "";
 	width: 34px;
 	position: absolute;
 	top: 0;
@@ -530,7 +545,7 @@ content: "";
 	min-height: 28px;
 }
 
-.warning-bg:after {
+.warning-bg:after, .log-warning-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -166px -411px;
 	width: 22px;
@@ -551,11 +566,11 @@ content: "";
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.high-bg {
+td.high-bg, td.log-high-bg {
 	@extend td.na-bg;
 }
 
-.high-bg {
+.high-bg, .log-high-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
@@ -563,8 +578,13 @@ td.high-bg {
 	color: $link-color;
 }
 
-.high-bg:before {
-content: "";
+.log-high-bg:before {
+	color: darken($alt-dark-orange,45%) !important;
+	background-color: $alt-dark-orange !important;
+}
+
+.high-bg:before, .log-high-bg:before {
+	content: "";
 	width: 34px;
 	position: absolute;
 	top: 0;
@@ -573,7 +593,7 @@ content: "";
 	min-height: 28px;
 }
 
-.high-bg:after {
+.high-bg:after, .log-high-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -226px -411px;
 	width: 22px;
@@ -594,11 +614,11 @@ content: "";
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.disaster-bg {
+td.disaster-bg, td.log-disaster-bg {
 	@extend td.na-bg;
 }
 
-.disaster-bg {
+.disaster-bg, .log-disaster-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
@@ -606,8 +626,13 @@ td.disaster-bg {
 	color: $link-color;
 }
 
-.disaster-bg:before {
-content: "";
+.log-disaster-bg:before {
+	color: darken($alt-red,45%) !important;
+	background-color: $alt-red !important;
+}
+
+.disaster-bg:before, .log-disaster-bg:before {
+	content: "";
 	width: 34px;
 	position: absolute;
 	top: 0;
@@ -616,7 +641,7 @@ content: "";
 	min-height: 28px;
 }
 
-.disaster-bg:after {
+.disaster-bg:after, .log-disaster-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -256px -411px;
 	width: 22px;
