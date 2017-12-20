@@ -21,7 +21,6 @@
 #include "stats.h"
 #include "log.h"
 #include "zbxconf.h"
-#include "zbxself.h"
 
 #ifndef _WINDOWS
 #	include "diskdevices.h"

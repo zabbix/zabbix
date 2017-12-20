@@ -24,7 +24,6 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
-#include "zbxself.h"
 #include "comms.h"
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;

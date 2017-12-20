@@ -23,7 +23,7 @@
 #include "pid.h"
 #include "cfg.h"
 #include "log.h"
-#include "zbxself.h"
+#include "control.h"
 
 #include "fatal.h"
 #include "sighandler.h"

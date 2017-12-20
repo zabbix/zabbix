@@ -32,6 +32,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags);
 void	daemon_stop(void);
 
 int	zbx_sigusr_send(int flags);
+void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
 #define ZBX_IS_RUNNING()	1
 #define ZBX_DO_EXIT()

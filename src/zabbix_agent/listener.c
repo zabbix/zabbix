@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "listener.h"
-#include "zbxself.h"
 
 #include "comms.h"
 #include "cfg.h"
