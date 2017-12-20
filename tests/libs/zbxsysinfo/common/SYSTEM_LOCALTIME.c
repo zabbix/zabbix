@@ -111,7 +111,8 @@ void	zbx_mock_test_entry(void **state)
 
 time_t	__wrap_time(time_t *seconds)
 {
-	ZBX_UNUSED(seconds);
+	if (NULL != seconds)
+		*seconds = expected_timestamp_value;
 
 	return expected_timestamp_value;
 }
