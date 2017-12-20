@@ -29,6 +29,7 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 ....I..... [ZBX-11909] replaced company.com with example.com in data.sql (vmurzins)
 
 Bug fixes:
+........S. [ZBX-13208] fixed problem when items might be synced without preprocessing steps if they were created during configuration cache synchronization (wiper)
 .......PS. [ZBX-12251] fixed possibility of trigger status getting stuck in PROBLEM or OK state due to transaction error in history synchronization, added deadlock to a list of recoverable errors (vso, wiper)
 .......PS. [ZBX-12251] fixed possibility that new history values are lost and not processed by Zabbix server or Zabbix proxy due to recoverable transaction error (vso, wiper)
 ..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
