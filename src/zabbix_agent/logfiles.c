@@ -468,23 +468,26 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
  *                                                                            *
  * Purpose: compare device numbers and inode numbers of 2 files               *
  *                                                                            *
- * Parameters: old     - [IN] details of the 1st log file                     *
- *             new     - [IN] details of the 2nd log file                     *
- *             use_ino - [IN] 0 - do not use inodes in comparison,            *
- *                            1 - use up to 64-bit inodes in comparison,      *
- *                            2 - use 128-bit inodes in comparison.           *
+ * Parameters: old_file - [IN] details of the 1st log file                    *
+ *             new_file - [IN] details of the 2nd log file                    *
+ *             use_ino  - [IN] 0 - do not use inodes in comparison,           *
+ *                             1 - use up to 64-bit inodes in comparison,     *
+ *                             2 - use 128-bit inodes in comparison.          *
  *                                                                            *
  * Return value: ZBX_FILE_PLACE_SAME - both files have the same place         *
  *               ZBX_FILE_PLACE_OTHER - files reside in different places      *
  *               ZBX_FILE_PLACE_UNKNOWN - cannot compare places (no inodes)   *
  *                                                                            *
  ******************************************************************************/
-static int	compare_file_places(const struct st_logfile *old, const struct st_logfile *new, int use_ino)
+static int	compare_file_places(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino)
 {
 	if (1 == use_ino || 2 == use_ino)
 	{
-		if (old->ino_lo != new->ino_lo || old->dev != new->dev || (2 == use_ino && old->ino_hi != new->ino_hi))
+		if (old_file->ino_lo != new_file->ino_lo || old_file->dev != new_file->dev ||
+				(2 == use_ino && old_file->ino_hi != new_file->ino_hi))
+		{
 			return ZBX_FILE_PLACE_OTHER;
+		}
 		else
 			return ZBX_FILE_PLACE_SAME;
 	}
@@ -1151,7 +1154,7 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 	char		*old2new, *p;
 
 	/* set up a two dimensional array of possible mappings from old files to new files */
-	old2new = zbx_malloc(NULL, (size_t)num_new * (size_t)num_old * sizeof(char));
+	old2new = (char *)zbx_malloc(NULL, (size_t)num_new * (size_t)num_old * sizeof(char));
 	p = old2new;
 
 	for (i = 0; i < num_old; i++)
@@ -2208,17 +2211,17 @@ static void	adjust_mtime_to_clock(int *mtime)
 	}
 }
 
-static int	is_swap_required(const struct st_logfile *old, struct st_logfile *new, int use_ino, int idx)
+static int	is_swap_required(const struct st_logfile *old_files, struct st_logfile *new_files, int use_ino, int idx)
 {
 	int	is_same_place;
 
 	/* if the 1st file is not processed at all while the 2nd file was processed (at least partially) */
 	/* then swap them */
-	if (0 == new[idx].seq && 0 < new[idx + 1].seq)
+	if (0 == new_files[idx].seq && 0 < new_files[idx + 1].seq)
 		return SUCCEED;
 
 	/* if the 2nd file is not a copy of some other file then no need to swap */
-	if (-1 == new[idx + 1].copy_of)
+	if (-1 == new_files[idx + 1].copy_of)
 		return FAIL;
 
 	/* The 2nd file is a copy. But is it a copy of the 1st file ? */
@@ -2226,18 +2229,18 @@ static int	is_swap_required(const struct st_logfile *old, struct st_logfile *new
 	/* On file systems with inodes or file indices if a file is copied and truncated, we assume that */
 	/* there is a high possibility that the truncated file has the same inode (index) as before. */
 
-	if (NULL == old)	/* cannot consult the old file list */
+	if (NULL == old_files)	/* cannot consult the old file list */
 		return FAIL;
 
-	is_same_place = compare_file_places(old + new[idx + 1].copy_of, new + idx, use_ino);
+	is_same_place = compare_file_places(old_files + new_files[idx + 1].copy_of, new_files + idx, use_ino);
 
-	if (ZBX_FILE_PLACE_SAME == is_same_place && new[idx].seq >= new[idx + 1].seq)
+	if (ZBX_FILE_PLACE_SAME == is_same_place && new_files[idx].seq >= new_files[idx + 1].seq)
 		return SUCCEED;
 
 	/* The last attempt - compare file names. It is less reliable as file rotation can change file names. */
 	if (ZBX_FILE_PLACE_OTHER == is_same_place || ZBX_FILE_PLACE_UNKNOWN == is_same_place)
 	{
-		if (0 == strcmp((old + new[idx + 1].copy_of)->filename, (new + idx)->filename))
+		if (0 == strcmp((old_files + new_files[idx + 1].copy_of)->filename, (new_files + idx)->filename))
 			return SUCCEED;
 	}
 
