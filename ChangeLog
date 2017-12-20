@@ -45,6 +45,7 @@ Changes for 3.4.5rc3
 New features:
 
 Bug fixes:
+.......PS. [ZBX-13225] fixed compilation problem with old curl version for elasticsearch support (abs, wiper)
 ........S. [ZBX-13208] fixed problem when items might be synced without preprocessing steps if they were created during configuration cache synchronization (wiper)
 
 --------------------------------------------------------------------------------
