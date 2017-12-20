@@ -96,7 +96,7 @@ static void	init_active_metrics(void)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer: first allocation for %d elements", CONFIG_BUFFER_SIZE);
 		sz = CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
-		buffer.data = zbx_malloc(buffer.data, sz);
+		buffer.data = (ZBX_ACTIVE_BUFFER_ELEMENT *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
 		buffer.pcount = 0;
@@ -231,7 +231,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 		goto out;
 	}
 
-	metric = zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
+	metric = (ZBX_ACTIVE_METRIC *)zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
 
 	/* add new metric */
 	metric->key = zbx_strdup(NULL, key);
@@ -1165,7 +1165,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
 	AGENT_REQUEST		request;
-	const char		*filename, *regexp, *encoding, *skip, *output_templ;
+	const char		*filename, *regexp, *encoding, *skip, *output_template;
 	char			*encoding_uc = NULL;
 	int			max_lines_per_sec, ret = FAIL, s_count, p_count, s_count_orig, is_count_item,
 				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0, rotation_type;
@@ -1245,8 +1245,8 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	}
 
 	/* parameter 'output' (not used for log.count[], logrt.count[]) */
-	if (1 == is_count_item || (NULL == (output_templ = get_rparam(&request, 5))))
-		output_templ = "";
+	if (1 == is_count_item || (NULL == (output_template = get_rparam(&request, 5))))
+		output_template = "";
 
 	/* parameter 'maxdelay' */
 	if (SUCCEED != init_max_delay(is_count_item, &request, &max_delay, error))
@@ -1295,7 +1295,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, regexp,
-			output_templ, &p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME,
+			output_template, &p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type);
 

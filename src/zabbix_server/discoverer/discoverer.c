@@ -336,7 +336,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	value = zbx_malloc(value, value_alloc);
+	value = (char *)zbx_malloc(value, value_alloc);
 
 	for (start = dcheck->ports; '\0' != *start;)
 	{

@@ -36,7 +36,7 @@ $url_group = (new CUrl('zabbix.php'))
 	->setArgument('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM)
 	->setArgument('filter_groupids', null)
 	->setArgument('filter_hostids', $data['filter']['hostids'])
-	->setArgument('filter_problem', $data['filter']['problem'])
+	->setArgument('filter_name', $data['filter']['problem'])
 	->setArgument('filter_maintenance', ($data['filter']['maintenance'] == 1) ? 1 : null)
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 $url_host = (new CUrl('zabbix.php'))
@@ -45,7 +45,7 @@ $url_host = (new CUrl('zabbix.php'))
 	->setArgument('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM)
 	->setArgument('filter_groupids', null)
 	->setArgument('filter_hostids', null)
-	->setArgument('filter_problem', $data['filter']['problem'])
+	->setArgument('filter_name', $data['filter']['problem'])
 	->setArgument('filter_maintenance', ($data['filter']['maintenance'] == 1) ? 1 : null)
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 

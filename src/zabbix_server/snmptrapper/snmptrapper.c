@@ -96,11 +96,11 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
-	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
-	states = zbx_malloc(states, sizeof(unsigned char) * num);
-	lastclocks = zbx_malloc(lastclocks, sizeof(int) * num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * num);
-	results = zbx_malloc(results, sizeof(AGENT_RESULT) * num);
+	itemids = (zbx_uint64_t *)zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
+	states = (unsigned char *)zbx_malloc(states, sizeof(unsigned char) * num);
+	lastclocks = (int *)zbx_malloc(lastclocks, sizeof(int) * num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * num);
+	results = (AGENT_RESULT *)zbx_malloc(results, sizeof(AGENT_RESULT) * num);
 
 	for (i = 0; i < num; i++)
 	{
@@ -627,7 +627,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	DBget_lastsize();
 
-	buffer = zbx_malloc(buffer, MAX_BUFFER_LEN);
+	buffer = (char *)zbx_malloc(buffer, MAX_BUFFER_LEN);
 	*buffer = '\0';
 
 	for (;;)

@@ -80,10 +80,10 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 	part1_length = (size_t)(del - str + 1);
 	part2_length = str_length - part1_length;
 
-	*part1 = zbx_malloc(*part1, part1_length + 1);
+	*part1 = (char *)zbx_malloc(*part1, part1_length + 1);
 	zbx_strlcpy(*part1, str, part1_length + 1);
 
-	*part2 = zbx_malloc(*part2, part2_length + 1);
+	*part2 = (char *)zbx_malloc(*part2, part2_length + 1);
 	zbx_strlcpy(*part2, str + part1_length, part2_length + 1);
 
 	ret = SUCCEED;
@@ -545,12 +545,12 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
  *          could be the same file in case of simple rotation                 *
  *                                                                            *
  * Parameters:                                                                *
- *          old     - [IN] file from the old list                             *
- *          new     - [IN] file from the new list                             *
- *          use_ino - [IN] 0 - do not use inodes in comparison,               *
- *                         1 - use up to 64-bit inodes in comparison,         *
- *                         2 - use 128-bit inodes in comparison.              *
- *          err_msg - [IN/OUT] error message why an item became               *
+ *          old_file - [IN] file from the old list                            *
+ *          new_file - [IN] file from the new list                            *
+ *          use_ino  - [IN] 0 - do not use inodes in comparison,              *
+ *                          1 - use up to 64-bit inodes in comparison,        *
+ *                          2 - use 128-bit inodes in comparison.             *
+ *          err_msg  - [IN/OUT] error message why an item became              *
  *                    NOTSUPPORTED                                            *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
@@ -563,29 +563,29 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
  *           truncated and replaced with a similar one.                       *
  *                                                                            *
  ******************************************************************************/
-static int	is_same_file_logrt(const struct st_logfile *old, const struct st_logfile *new, int use_ino,
+static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
 		char **err_msg)
 {
-	if (ZBX_FILE_PLACE_OTHER == compare_file_places(old, new, use_ino))
+	if (ZBX_FILE_PLACE_OTHER == compare_file_places(old_file, new_file, use_ino))
 	{
 		/* files cannot reside on different devices or occupy different inodes */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old->mtime > new->mtime)
+	if (old_file->mtime > new_file->mtime)
 	{
 		/* file mtime cannot decrease unless manipulated */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old->size > new->size)
+	if (old_file->size > new_file->size)
 	{
 		/* File size cannot decrease. Truncating or replacing a file with a smaller one */
 		/* counts as 2 different files. */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old->size == new->size && old->mtime < new->mtime)
+	if (old_file->size == new_file->size && old_file->mtime < new_file->mtime)
 	{
 		/* Depending on file system it's possible that stat() was called */
 		/* between mtime and file size update. In this situation we will */
@@ -595,51 +595,51 @@ static int	is_same_file_logrt(const struct st_logfile *old, const struct st_logf
 		/* If the size has not changed on the next check, then we assume */
 		/* that some tampering was done and to be safe we will treat it  */
 		/* as a different file.                                          */
-		if (0 == old->retry)
+		if (0 == old_file->retry)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "the modification time of log file \"%s\" has been updated"
-					" without changing its size, try checking again later", old->filename);
+					" without changing its size, try checking again later", old_file->filename);
 			return ZBX_SAME_FILE_RETRY;
 		}
 
 		zabbix_log(LOG_LEVEL_WARNING, "after changing modification time the size of log file \"%s\""
-				" still has not been updated, consider it to be a new file", old->filename);
+				" still has not been updated, consider it to be a new file", old_file->filename);
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (-1 == old->md5size || -1 == new->md5size)
+	if (-1 == old_file->md5size || -1 == new_file->md5size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old->md5size > new->md5size)
+	if (old_file->md5size > new_file->md5size)
 	{
 		/* file initial block size from which MD5 sum is calculated cannot decrease */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old->md5size == new->md5size)
+	if (old_file->md5size == new_file->md5size)
 	{
-		if (0 != memcmp(old->md5buf, new->md5buf, sizeof(new->md5buf)))		/* MD5 sums differ */
+		if (0 != memcmp(old_file->md5buf, new_file->md5buf, sizeof(new_file->md5buf)))	/* MD5 sums differ */
 			return ZBX_SAME_FILE_NO;
 
 		return ZBX_SAME_FILE_YES;
 	}
 
-	if (0 < old->md5size)
+	if (0 < old_file->md5size)
 	{
 		/* MD5 for the old file has been calculated from a smaller block than for the new file */
 
 		int		f, ret;
 		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
 
-		if (-1 == (f = open_file_helper(new->filename, err_msg)))
+		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, old->md5size, md5tmp, new->filename, err_msg))
+		if (SUCCEED == file_start_md5(f, old_file->md5size, md5tmp, new_file->filename, err_msg))
 		{
-			ret = (0 == memcmp(old->md5buf, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
+			ret = (0 == memcmp(old_file->md5buf, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
 					ZBX_SAME_FILE_NO;
 		}
 		else
@@ -649,7 +649,7 @@ static int	is_same_file_logrt(const struct st_logfile *old, const struct st_logf
 		{
 			if (ZBX_SAME_FILE_ERROR != ret)
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new->filename,
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new_file->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 			}
@@ -706,13 +706,13 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
  *          could be the same file or copy in case of copy/truncate rotation  *
  *                                                                            *
  * Parameters:                                                                *
- *          old     - [IN] file from the old list                             *
- *          new     - [IN] file from the new list                             *
- *          use_ino - [IN] 0 - do not use inodes in comparison,               *
- *                         1 - use up to 64-bit inodes in comparison,         *
- *                         2 - use 128-bit inodes in comparison.              *
- *          err_msg - [IN/OUT] error message why an item became               *
- *                    NOTSUPPORTED                                            *
+ *          old_file - [IN] file from the old list                            *
+ *          new_file - [IN] file from the new list                            *
+ *          use_ino  - [IN] 0 - do not use inodes in comparison,              *
+ *                          1 - use up to 64-bit inodes in comparison,        *
+ *                          2 - use 128-bit inodes in comparison.             *
+ *          err_msg  - [IN/OUT] error message why an item became              *
+ *                     NOTSUPPORTED                                           *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - it is not the same file                   *
  *               ZBX_SAME_FILE_YES - it could be the same file                *
@@ -723,43 +723,46 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
  *           In other cases it COULD BE the same file or copy.                *
  *                                                                            *
  ******************************************************************************/
-static int	is_same_file_logcpt(const struct st_logfile *old, const struct st_logfile *new, int use_ino,
+static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
 		char **err_msg)
 {
 	int	is_same_place;
 
-	if (old->mtime > new->mtime)
+	if (old_file->mtime > new_file->mtime)
 		return ZBX_SAME_FILE_NO;
 
-	if (old->size > new->size)
+	if (old_file->size > new_file->size)
 		return ZBX_SAME_FILE_NO;
 
-	if (-1 == old->md5size || -1 == new->md5size)
+	if (-1 == old_file->md5size || -1 == new_file->md5size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old->md5size > new->md5size)
+	if (old_file->md5size > new_file->md5size)
 		return ZBX_SAME_FILE_NO;
 
-	is_same_place = compare_file_places(old, new, use_ino);
+	is_same_place = compare_file_places(old_file, new_file, use_ino);
 
-	if (old->md5size == new->md5size)
-		return examine_md5_and_place(old->md5buf, new->md5buf, sizeof(new->md5buf), is_same_place);
+	if (old_file->md5size == new_file->md5size)
+	{
+		return examine_md5_and_place(old_file->md5buf, new_file->md5buf, sizeof(new_file->md5buf),
+				is_same_place);
+	}
 
-	if (0 < old->md5size)
+	if (0 < old_file->md5size)
 	{
 		/* MD5 for the old file has been calculated from a smaller block than for the new file */
 
 		int		f, ret;
 		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
 
-		if (-1 == (f = open_file_helper(new->filename, err_msg)))
+		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, old->md5size, md5tmp, new->filename, err_msg))
-			ret = examine_md5_and_place(old->md5buf, md5tmp, sizeof(md5tmp), is_same_place);
+		if (SUCCEED == file_start_md5(f, old_file->md5size, md5tmp, new_file->filename, err_msg))
+			ret = examine_md5_and_place(old_file->md5buf, md5tmp, sizeof(md5tmp), is_same_place);
 		else
 			ret = ZBX_SAME_FILE_ERROR;
 
@@ -767,7 +770,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old, const struct st_log
 		{
 			if (ZBX_SAME_FILE_ERROR != ret)
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new->filename,
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new_file->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 			}
@@ -988,8 +991,8 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 
 	/* protect unique mappings from further modifications */
 
-	protected_rows = zbx_calloc(protected_rows, (size_t)num_old, sizeof(char));
-	protected_cols = zbx_calloc(protected_cols, (size_t)num_new, sizeof(char));
+	protected_rows = (char *)zbx_calloc(protected_rows, (size_t)num_old, sizeof(char));
+	protected_cols = (char *)zbx_calloc(protected_cols, (size_t)num_new, sizeof(char));
 
 	for (i = 0; i < num_old; i++)
 	{
@@ -1123,9 +1126,9 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
  *                                                                            *
  * Parameters:                                                                *
  *     rotation_type - [IN] file rotation type                                *
- *     old           - [IN] old file list                                     *
+ *     old_files     - [IN] old file list                                     *
  *     num_old       - [IN] number of elements in the old file list           *
- *     new           - [IN] new file list                                     *
+ *     new_files     - [IN] new file list                                     *
  *     num_new       - [IN] number of elements in the new file list           *
  *     use_ino       - [IN] how to use inodes in is_same_file()               *
  *     err_msg       - [IN/OUT] error message why an item became NOTSUPPORTED *
@@ -1140,8 +1143,8 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
  *                             file                                           *
  *                                                                            *
  ******************************************************************************/
-static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *old, int num_old,
-		struct st_logfile *new, int num_new, int use_ino, char **err_msg)
+static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *old_files, int num_old,
+		struct st_logfile *new_files, int num_new, int use_ino, char **err_msg)
 {
 	const char	*__function_name = "create_old2new_and_copy_of";
 	int		i, j;
@@ -1158,9 +1161,9 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 			int	rc;
 
 			if (ZBX_LOG_ROTATION_LOGRT == rotation_type)
-				rc = is_same_file_logrt(old + i, new + j, use_ino, err_msg);
+				rc = is_same_file_logrt(old_files + i, new_files + j, use_ino, err_msg);
 			else
-				rc = is_same_file_logcpt(old + i, new + j, use_ino, err_msg);
+				rc = is_same_file_logcpt(old_files + i, new_files + j, use_ino, err_msg);
 
 			switch (rc)
 			{
@@ -1168,22 +1171,22 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 					p[j] = '0';
 					break;
 				case ZBX_SAME_FILE_YES:
-					if (1 == old[i].retry)
+					if (1 == old_files[i].retry)
 					{
 						zabbix_log(LOG_LEVEL_DEBUG, "%s(): the size of log file \"%s\" has been"
 								" updated since modification time change, consider"
 								" it to be the same file", __function_name,
-								old->filename);
-						old[i].retry = 0;
+								old_files->filename);
+						old_files[i].retry = 0;
 					}
 					p[j] = '1';
 					break;
 				case ZBX_SAME_FILE_COPY:
 					p[j] = '2';
-					new[j].copy_of = i;
+					new_files[j].copy_of = i;
 					break;
 				case ZBX_SAME_FILE_RETRY:
-					old[i].retry = 1;
+					old_files[i].retry = 1;
 					zbx_free(old2new);
 					return NULL;
 				case ZBX_SAME_FILE_ERROR:
@@ -1194,7 +1197,7 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): is_same_file(%s, %s) = %c", __function_name,
-						old[i].filename, new[j].filename, p[j]);
+						old_files[i].filename, new_files[j].filename, p[j]);
 			}
 		}
 
@@ -1265,7 +1268,8 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	if (*logfiles_alloc == *logfiles_num)
 	{
 		*logfiles_alloc += 64;
-		*logfiles = zbx_realloc(*logfiles, (size_t)*logfiles_alloc * sizeof(struct st_logfile));
+		*logfiles = (struct st_logfile *)zbx_realloc(*logfiles,
+				(size_t)*logfiles_alloc * sizeof(struct st_logfile));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logfiles:%p logfiles_alloc:%d",
 				__function_name, *logfiles, *logfiles_alloc);
@@ -1796,7 +1800,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 						/* required. */
 
 	if (NULL == buf)
-		buf = zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
+		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
