@@ -2,6 +2,7 @@
 test case: "timestamp check without params"
 in:
   timestamp: 1513598769
+  key: 'system.localtime'
 out:
   result: '1513598769'
   return: 'SYSINFO_RET_OK'
