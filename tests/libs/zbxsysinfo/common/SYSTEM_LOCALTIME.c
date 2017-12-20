@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/common/system.h"
 
 static time_t	expected_timestamp_value = 0;
 
