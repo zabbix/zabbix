@@ -87,10 +87,8 @@ $graphFormList
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Graph type'), 'graphtype'))->setAsteriskMark(),
-		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))
-			->setEnabled(!$readonly)
-			->setAriaRequired()
+	->addRow((new CLabel(_('Graph type'), 'graphtype')),
+		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))->setEnabled(!$readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))

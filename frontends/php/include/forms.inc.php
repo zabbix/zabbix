@@ -1839,13 +1839,13 @@ function get_timeperiod_form() {
 	$bit_month = strrev($month);
 
 	$tblPeriod->addRow([
-		(new Clabel(_('Period type'), 'new_timeperiod[timeperiod_type]'))->setAsteriskMark(),
+		(new Clabel(_('Period type'), 'new_timeperiod[timeperiod_type]')),
 		(new CComboBox('new_timeperiod[timeperiod_type]', $new_timeperiod['timeperiod_type'], 'submit()', [
 			TIMEPERIOD_TYPE_ONETIME => _('One time only'),
 			TIMEPERIOD_TYPE_DAILY	=> _('Daily'),
 			TIMEPERIOD_TYPE_WEEKLY	=> _('Weekly'),
 			TIMEPERIOD_TYPE_MONTHLY	=> _('Monthly')
-		]))->setAriaRequired()
+		]))
 	]);
 
 	if ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {

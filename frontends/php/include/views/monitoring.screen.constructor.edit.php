@@ -92,7 +92,9 @@ if ($this->data['screen']['templateid']) {
 }
 
 $screenFormList = (new CFormList())
-	->addRow(_('Resource'), new CComboBox('resourcetype', $resourceType, 'submit()', $screenResources));
+	->addRow((new CLabel(_('Resource'), 'resourcetype')),
+		(new CComboBox('resourcetype', $resourceType, 'submit()', $screenResources))
+	);
 
 /*
  * Screen item: Graph

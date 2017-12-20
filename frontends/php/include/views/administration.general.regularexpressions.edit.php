@@ -59,9 +59,7 @@ foreach ($data['expressions'] as $i => $expression) {
 	$row = [
 		(new CComboBox('expressions['.$i.'][expression_type]', $expression['expression_type'], null,
 			expression_type2str()
-		))
-			->setAriaRequired()
-			->onChange('onChangeExpressionType(this, '.$i.')'),
+		))->onChange('onChangeExpressionType(this, '.$i.')'),
 		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired(),

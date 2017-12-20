@@ -57,15 +57,13 @@ $itemFormList->addRow(
 // append type to form list
 if ($readonly) {
 	$itemForm->addVar('type', $this->data['type']);
-	$itemFormList->addRow((new CLabel(_('Type'), 'typename'))->setAsteriskMark(),
-		(new CTextBox('typename', item_type2str($this->data['type']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
+	$itemFormList->addRow((new CLabel(_('Type'), 'typename')),
+		(new CTextBox('typename', item_type2str($this->data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 }
 else {
-	$itemFormList->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(),
-		(new CComboBox('type', $this->data['type'], null, $this->data['types']))->setAriaRequired()
+	$itemFormList->addRow((new CLabel(_('Type'), 'type')),
+		(new CComboBox('type', $this->data['type'], null, $this->data['types']))
 	);
 }
 
@@ -287,21 +285,20 @@ $itemFormList->addRow(
 // append value type to form list
 if ($readonly) {
 	$itemForm->addVar('value_type', $this->data['value_type']);
-	$itemFormList->addRow((new CLabel(_('Type of information'), 'value_type_name'))->setAsteriskMark(),
+	$itemFormList->addRow((new CLabel(_('Type of information'), 'value_type_name')),
 		(new CTextBox('value_type_name', itemValueTypeString($this->data['value_type']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
 	);
 }
 else {
-	$itemFormList->addRow((new CLabel(_('Type of information'), 'value_type'))->setAsteriskMark(),
+	$itemFormList->addRow((new CLabel(_('Type of information'), 'value_type')),
 		(new CComboBox('value_type', $this->data['value_type'], null, [
 			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 			ITEM_VALUE_TYPE_STR => _('Character'),
 			ITEM_VALUE_TYPE_LOG => _('Log'),
 			ITEM_VALUE_TYPE_TEXT => _('Text')
-		]))->setAriaRequired()
+		]))
 	);
 }
 

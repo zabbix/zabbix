@@ -60,12 +60,12 @@ $userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), [_('Ot
 $isGranted = ($data['usrgrpid'] != 0) ? granted2update_group($data['usrgrpid']) : true;
 if ($isGranted) {
 	$userGroupFormList->addRow(
-		(new CLabel(_('Frontend access'), 'gui_access'))->setAsteriskMark(),
+		(new CLabel(_('Frontend access'), 'gui_access')),
 		(new CComboBox('gui_access', $data['gui_access'], null, [
 			GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
 			GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
 			GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
-		]))->setAriaRequired()
+		]))
 	);
 	$userGroupFormList->addRow(_('Enabled'),
 		(new CCheckBox('users_status'))->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)

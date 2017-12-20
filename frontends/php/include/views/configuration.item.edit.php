@@ -69,15 +69,13 @@ $itemFormList->addRow(
 // Append type to form list.
 if ($readonly) {
 	$itemForm->addVar('type', $data['type']);
-	$itemFormList->addRow((new CLabel(_('Type'), 'type_name'))->setAsteriskMark(),
-		(new CTextBox('type_name', item_type2str($data['type']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
+	$itemFormList->addRow((new CLabel(_('Type'), 'type_name')),
+		(new CTextBox('type_name', item_type2str($data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 }
 else {
-	$itemFormList->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(),
-		(new CComboBox('type', $data['type'], null, $data['types']))->setAriaRequired()
+	$itemFormList->addRow((new CLabel(_('Type'), 'type')),
+		(new CComboBox('type', $data['type'], null, $data['types']))
 	);
 }
 
@@ -382,14 +380,14 @@ if ($readonly) {
 	);
 }
 else {
-	$itemFormList->addRow((new CLabel(_('Type of information'), 'value_type'))->setAsteriskMark(),
+	$itemFormList->addRow((new CLabel(_('Type of information'), 'value_type')),
 		(new CComboBox('value_type', $data['value_type'], null, [
 			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 			ITEM_VALUE_TYPE_STR => _('Character'),
 			ITEM_VALUE_TYPE_LOG => _('Log'),
 			ITEM_VALUE_TYPE_TEXT => _('Text')
-		]))->setAriaRequired()
+		]))
 	);
 }
 

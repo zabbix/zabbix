@@ -52,17 +52,13 @@ $itemFormList->addRow(
 // append type to form list
 if ($this->data['limited']) {
 	$itemForm->addVar('type', $this->data['type']);
-	$itemFormList->addRow((new CLabel(_('Type'), 'typename'))->setAsteriskMark(),
-		(new CTextBox('typename', item_type2str($this->data['type']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
+	$itemFormList->addRow((new CLabel(_('Type'), 'typename')),
+		(new CTextBox('typename', item_type2str($this->data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 }
 else {
-	$itemFormList->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(),
-		(new CComboBox('type', $this->data['type']))
-			->addItems($this->data['types'])
-			->setAriaRequired()
+	$itemFormList->addRow((new CLabel(_('Type'), 'type')),
+		(new CComboBox('type', $this->data['type']))->addItems($this->data['types'])
 	);
 }
 

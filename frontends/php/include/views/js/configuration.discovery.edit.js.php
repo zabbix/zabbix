@@ -34,8 +34,8 @@
 			(new CTable())
 				->addRow(
 					(new CRow([
-						(new CLabel(_('Check type'), 'type'))->setAsteriskMark(),
-						(new CComboBox('type'))->setAriaRequired()
+						(new CLabel(_('Check type'), 'type')),
+						(new CComboBox('type'))
 					]))
 				)
 				->addRow(

@@ -59,14 +59,13 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 			(new CSpan(($i + 1).':'))->addClass('rowNum'),
 			(new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link'],
 				null, $data['inventoryList']
-			))->setAriaRequired(),
+			)),
 			(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 				->setAttribute('maxlength', 64),
 			(new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid'], null, $data['iconList']))
-				->addClass('mappingIcon')
-				->setAriaRequired(),
+				->addClass('mappingIcon'),
 			(new CCol(
 				(new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 					'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
@@ -98,7 +97,6 @@ $iconMapTable
 	->addRow([
 		(new CCol(_('Default')))->setColSpan(4),
 		(new CComboBox('iconmap[default_iconid]', $data['iconmap']['default_iconid'], null, $data['iconList']))
-			->setAriaRequired()
 			->addClass('mappingIcon'),
 		(new CCol(
 			(new CImg('imgstore.php?iconid='.$data['iconmap']['default_iconid'].

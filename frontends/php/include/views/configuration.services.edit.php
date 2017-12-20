@@ -68,8 +68,8 @@ $servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setA
 
 // append algorithm to form list
 $servicesFormList->addRow(
-	(new CLabel(_('Status calculation algorithm'), 'algorithm'))->setAsteriskMark(),
-	(new CComboBox('algorithm', $data['algorithm'], null, serviceAlgorithm()))->setAriaRequired()
+	(new CLabel(_('Status calculation algorithm'), 'algorithm')),
+	(new CComboBox('algorithm', $data['algorithm'], null, serviceAlgorithm()))
 );
 
 // append SLA to form list
@@ -217,12 +217,12 @@ $servicesTimeFormList->addRow(_('Service times'),
 // create service time table
 $serviceTimeTable = (new CTable())
 	->addRow([
-		(new CLabel(_('Period type'), 'new_service_time[type]'))->setAsteriskMark(),
+		(new CLabel(_('Period type'), 'new_service_time[type]')),
 		(new CComboBox('new_service_time[type]', $data['new_service_time']['type'], 'submit()', [
 			SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
 			SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
 			SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
-		]))->setAriaRequired()
+		]))
 	]);
 
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {

@@ -29,9 +29,8 @@ $js_scripts = [];
 $form_list = new CFormList();
 
 // common fields
-$form_list->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(),
+$form_list->addRow((new CLabel(_('Type'), 'type')),
 	(new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $data['known_widget_types']))
-		->setAriaRequired()
 );
 
 $form_list->addRow(_('Name'),

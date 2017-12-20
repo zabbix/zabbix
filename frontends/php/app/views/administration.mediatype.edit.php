@@ -43,15 +43,14 @@ $mediatype_formlist = (new CFormList())
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow((new CLabel(_('Type'), 'type'))->setAsteriskMark(), [
+	->addRow((new CLabel(_('Type'), 'type')), [
 		(new CComboBox('type', $data['type'], null, [
 			MEDIA_TYPE_EMAIL => _('Email'),
 			MEDIA_TYPE_EXEC => _('Script'),
 			MEDIA_TYPE_SMS => _('SMS'),
 			MEDIA_TYPE_JABBER => _('Jabber')
 		]))
-			->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')])
-			->setAriaRequired(),
+			->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]),
 		(new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
 			->setId('eztext_link')
 			->setTarget('_blank')

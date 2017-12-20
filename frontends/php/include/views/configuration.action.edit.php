@@ -637,9 +637,8 @@ if (!empty($data['new_operation'])) {
 		foreach ($data['allowedOperations'][ACTION_OPERATION] as $operation) {
 			$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 		}
-		$new_operation_formlist->addRow(
-			(new CLabel(_('Operation type'), 'new_operation[operationtype]'))->setAsteriskMark(),
-			$operationTypeComboBox->setAriaRequired()
+		$new_operation_formlist->addRow((new CLabel(_('Operation type'), 'new_operation[operationtype]')),
+			$operationTypeComboBox
 		);
 	}
 
@@ -927,7 +926,7 @@ if (!empty($data['new_operation'])) {
 			$new_operation_formlist
 				// type
 				->addRow(
-					(new CLabel(_('Type'), 'new_operation[opcommand][type]'))->setAsteriskMark(),
+					(new CLabel(_('Type'), 'new_operation[opcommand][type]')),
 					(new CComboBox('new_operation[opcommand][type]',
 						$data['new_operation']['opcommand']['type'],
 						'showOpTypeForm('.ACTION_OPERATION.')',	[
@@ -937,7 +936,7 @@ if (!empty($data['new_operation'])) {
 							ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
 						]
-					))->setAriaRequired()
+					))
 				)
 				->addRow(
 					(new CLabel(_('Script name'), 'new_operation_opcommand_script'))->setAsteriskMark(),
@@ -1407,9 +1406,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			foreach ($data['allowedOperations'][ACTION_RECOVERY_OPERATION] as $operation) {
 				$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 			}
-			$new_operation_formlist->addRow(
-				(new CLabel(_('Operation type'), 'new_recovery_operation[operationtype]'))->setAsteriskMark(),
-				$operationTypeComboBox->setAriaRequired()
+			$new_operation_formlist->addRow((new CLabel(_('Operation type'), 'new_recovery_operation[operationtype]')),
+				$operationTypeComboBox
 			);
 		}
 
@@ -1701,7 +1699,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 						ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
 					]
-				))->setAriaRequired();
+				));
 
 				$userScript = [
 					new CVar('new_recovery_operation[opcommand][scriptid]',
@@ -1717,8 +1715,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						->addClass(ZBX_STYLE_BTN_GREY)
 				];
 
-				$new_operation_formlist->addRow(
-					(new CLabel(_('Type'), 'new_recovery_operation[opcommand][type]'))->setAsteriskMark(),
+				$new_operation_formlist->addRow((new CLabel(_('Type'), 'new_recovery_operation[opcommand][type]')),
 					$typeComboBox
 				);
 				$new_operation_formlist->addRow(
@@ -1974,9 +1971,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			$operationtype->addItem($operation, operation_type2str($operation));
 		}
 
-		$new_operation_formlist->addRow(
-			(new CLabel(_('Operation type'), 'new_ack_operation[operationtype]'))->setAsteriskMark(),
-			$operationtype->setAriaRequired()
+		$new_operation_formlist->addRow((new CLabel(_('Operation type'), 'new_ack_operation[operationtype]')),
+			$operationtype
 		);
 
 		$usrgrp_list = null;
@@ -2168,7 +2164,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					->setId('ackOpCmdList')
 				)
 				->addRow(
-					(new CLabel(_('Type'), 'new_ack_operation[opcommand][type]'))->setAsteriskMark(),
+					(new CLabel(_('Type'), 'new_ack_operation[opcommand][type]')),
 					(new CComboBox('new_ack_operation[opcommand][type]',
 						$data['new_ack_operation']['opcommand']['type'],
 						'showOpTypeForm('.ACTION_ACKNOWLEDGE_OPERATION.')', [
@@ -2177,7 +2173,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 							ZBX_SCRIPT_TYPE_SSH => _('SSH'),
 							ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-					]))->setAriaRequired()
+					]))
 				)
 				->addRow(
 					(new CLabel(_('Script name'), 'new_ack_operation[opcommand][script]'))->setAsteriskMark(),

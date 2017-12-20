@@ -7,8 +7,7 @@
 		(new CSpan('#0:'))->addClass('rowNum'),
 		(new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]', null, null, $data['inventoryList']))
 			->setId('iconmap_mappings_#{iconmappingid}_inventory_link')
-			->setAttribute('autocomplete', 'off')
-			->setAriaRequired(),
+			->setAttribute('autocomplete', 'off'),
 		(new CTextBox('iconmap[mappings][#{iconmappingid}][expression]', '', false, 64))
 			->setId('iconmap_mappings_#{iconmappingid}_expression')
 			->setAriaRequired()
@@ -16,8 +15,7 @@
 		(new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', null, null, $data['iconList']))
 			->setId('iconmap_mappings_#{iconmappingid}_iconid')
 			->addClass('mappingIcon')
-			->setAttribute('autocomplete', 'off')
-			->setAriaRequired(),
+			->setAttribute('autocomplete', 'off'),
 		(new CCol(
 			(new CImg('imgstore.php?iconid='.$data['default_imageid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 				'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'))
