@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 #include "proc.h"
 
-ZBX_METRIC	parameters_specific[] =
+ZBX_METRIC parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},

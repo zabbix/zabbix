@@ -90,7 +90,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 
 	ZBX_STR2UCHAR(script.type, row[0]);
 	ZBX_STR2UCHAR(script.execute_on, row[1]);
-	script.port = (0 == atoi(row[2]) ? "" : row[2]);
+	script.port = (0 == atoi(row[2]) ? (char *)"" : row[2]);
 	ZBX_STR2UCHAR(script.authtype, row[3]);
 	script.username = row[4];
 	script.password = row[5];

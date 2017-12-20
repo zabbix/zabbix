@@ -788,7 +788,7 @@ static int	DBpatch_2050092(void)
 	int		len, ret = FAIL, rc;
 	char		*url = NULL, *url_esc;
 	size_t		i, url_alloc = 0, url_offset;
-	char		*url_map[] = {
+	const char	*url_map[] = {
 				"dashboard.php", "dashboard.view",
 				"discovery.php", "discovery.view",
 				"maps.php", "map.view",

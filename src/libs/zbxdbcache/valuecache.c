@@ -583,7 +583,7 @@ static zbx_log_value_t	*vc_history_logdup(const zbx_log_value_t *log)
 {
 	zbx_log_value_t	*plog;
 
-	plog = zbx_malloc(NULL, sizeof(zbx_log_value_t));
+	plog = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 
 	plog->timestamp = log->timestamp;
 	plog->logeventid = log->logeventid;
@@ -719,7 +719,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 	/* first remove items with the last accessed time older than a day */
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 
-	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (0 == item->refcount && source_item != item && item->last_accessed < timestamp)
 		{
@@ -742,7 +742,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 
-	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
 		/* don't remove the item that requested the space and also keep */
 		/* items currently being accessed                               */
@@ -845,13 +845,13 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 {
 	char	*ptr;
 
-	if (NULL == (ptr = __vc_mem_malloc_func(NULL, size)))
+	if (NULL == (ptr = (char *)__vc_mem_malloc_func(NULL, size)))
 	{
 		/* If failed to allocate required memory, try to free space in      */
 		/* cache and allocate again. If there still is not enough space -   */
 		/* return NULL as failure.                                          */
 		vc_release_space(item, size);
-		ptr = __vc_mem_malloc_func(NULL, size);
+		ptr = (char *)__vc_mem_malloc_func(NULL, size);
 	}
 
 	return ptr;
@@ -967,7 +967,7 @@ static zbx_log_value_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_log_value_
 {
 	zbx_log_value_t	*plog = NULL;
 
-	if (NULL == (plog = vc_item_malloc(item, sizeof(zbx_log_value_t))))
+	if (NULL == (plog = (zbx_log_value_t *)vc_item_malloc(item, sizeof(zbx_log_value_t))))
 		return NULL;
 
 	plog->timestamp = log->timestamp;
@@ -1272,7 +1272,7 @@ static int	vch_item_add_chunk(zbx_vc_item_t *item, int nslots, zbx_vc_chunk_t *i
 
 	chunk_size = sizeof(zbx_vc_chunk_t) + sizeof(zbx_history_record_t) * (nslots - 1);
 
-	if (NULL == (chunk = vc_item_malloc(item, chunk_size)))
+	if (NULL == (chunk = (zbx_vc_chunk_t *)vc_item_malloc(item, chunk_size)))
 		return FAIL;
 
 	memset(chunk, 0, sizeof(zbx_vc_chunk_t));
@@ -2572,7 +2572,7 @@ int	zbx_vc_init(char **error)
 
 	CONFIG_VALUE_CACHE_SIZE -= size_reserved;
 
-	vc_cache = __vc_mem_malloc_func(vc_cache, sizeof(zbx_vc_cache_t));
+	vc_cache = (zbx_vc_cache_t *)__vc_mem_malloc_func(vc_cache, sizeof(zbx_vc_cache_t));
 
 	if (NULL == vc_cache)
 	{
@@ -2658,7 +2658,7 @@ void	zbx_vc_reset(void)
 		vc_try_lock();
 
 		zbx_hashset_iter_reset(&vc_cache->items, &iter);
-		while (NULL != (item = zbx_hashset_iter_next(&iter)))
+		while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 		{
 			vch_item_free_cache(item);
 			zbx_hashset_iter_remove(&iter);
@@ -2708,7 +2708,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 	{
 		h = (ZBX_DC_HISTORY *)history->values[i];
 
-		if (NULL != (item = zbx_hashset_search(&vc_cache->items, &h->itemid)))
+		if (NULL != (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid)))
 		{
 			zbx_history_record_t	record = {h->ts, h->value};
 
@@ -2782,13 +2782,13 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 	if (ZBX_VC_MODE_LOWMEM == vc_cache->mode)
 		vc_warn_low_memory();
 
-	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
+	if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
 		if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t   new_item = {.itemid = itemid, .value_type = value_type};
 
-			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
+			if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
 				goto out;
 		}
 		else
@@ -2905,13 +2905,13 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	if (ZBX_VC_MODE_LOWMEM == vc_cache->mode)
 		vc_warn_low_memory();
 
-	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
+	if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
 		if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t   new_item = {.itemid = itemid, .value_type = value_type};
 
-			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
+			if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
 				goto out;
 		}
 		else

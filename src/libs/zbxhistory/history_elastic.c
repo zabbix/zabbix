@@ -74,7 +74,7 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 
 	ZBX_UNUSED(userdata);
 
-	zbx_strncpy_alloc(&page.data, &page.alloc, &page.offset, ptr, r_size);
+	zbx_strncpy_alloc(&page.data, &page.alloc, &page.offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
@@ -100,7 +100,7 @@ static history_value_t	history_str2value(char *str, unsigned char value_type)
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_LOG:
-			value.log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
+			value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 			memset(value.log, 0, sizeof(zbx_log_value_t));
 			value.log->value = zbx_strdup(NULL, str);
 			break;
@@ -230,7 +230,7 @@ static void	elastic_log_error(CURL *handle, CURLcode error)
  ************************************************************************************/
 static void	elastic_close(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = hist->data;
+	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 
 	zbx_free(data->buf);
 	zbx_free(data->post_url);
@@ -289,7 +289,7 @@ static void	elastic_writer_release(void)
 	int	i;
 
 	for (i = 0; i < writer.ifaces.values_num; i++)
-		elastic_close(writer.ifaces.values[i]);
+		elastic_close((zbx_history_iface_t *)writer.ifaces.values[i]);
 
 	curl_multi_cleanup(writer.handle);
 	writer.handle = NULL;
@@ -310,7 +310,7 @@ static void	elastic_writer_release(void)
  ************************************************************************************/
 static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = hist->data;
+	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 
 	elastic_writer_init();
 
@@ -361,7 +361,7 @@ static int	elastic_writer_flush(void)
 	for (i = 0; i < writer.ifaces.values_num; i++)
 	{
 		zbx_history_iface_t		*hist = (zbx_history_iface_t *)writer.ifaces.values[i];
-		zbx_elastic_data_t	*data = hist->data;
+		zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 
 		(void)curl_easy_setopt(data->handle, CURLOPT_HTTPHEADER, curl_headers);
 
@@ -462,7 +462,7 @@ try_again:
  ************************************************************************************/
 static void	elastic_destroy(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = hist->data;
+	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 
 	elastic_close(hist);
 
@@ -495,7 +495,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 {
 	const char		*__function_name = "elastic_get_values";
 
-	zbx_elastic_data_t	*data = hist->data;
+	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 	size_t			url_alloc = 0, url_offset = 0, id_alloc = 0, scroll_alloc = 0, scroll_offset = 0;
 	int			total, empty, ret;
 	CURLcode			err;
@@ -704,7 +704,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 {
 	const char	*__function_name = "elastic_add_values";
 
-	zbx_elastic_data_t	*data = hist->data;
+	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 	int				i, num = 0;
 	ZBX_DC_HISTORY			*h;
 	struct zbx_json			json_idx, json;
@@ -815,7 +815,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 		return FAIL;
 	}
 
-	data = zbx_malloc(NULL, sizeof(zbx_elastic_data_t));
+	data = (zbx_elastic_data_t *)zbx_malloc(NULL, sizeof(zbx_elastic_data_t));
 	memset(data, 0, sizeof(zbx_elastic_data_t));
 	data->base_url = zbx_strdup(NULL, CONFIG_HISTORY_STORAGE_URL);
 	zbx_rtrim(data->base_url, "/");

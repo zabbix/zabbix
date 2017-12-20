@@ -377,7 +377,7 @@ static int	ipc_read_buffer(zbx_uint32_t *header, unsigned char **data, zbx_uint3
 			return SUCCEED;
 		}
 
-		*data = zbx_malloc(NULL, data_size);
+		*data = (unsigned char *)zbx_malloc(NULL, data_size);
 		data_offset = 0;
 	}
 	else
@@ -538,13 +538,13 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 
 	zbx_ipc_socket_close(&client->csocket);
 
-	while (NULL != (message = zbx_queue_ptr_pop(&client->rx_queue)))
+	while (NULL != (message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&client->rx_queue)))
 		zbx_ipc_message_free(message);
 
 	zbx_queue_ptr_destroy(&client->rx_queue);
 	zbx_free(client->rx_data);
 
-	while (NULL != (message = zbx_queue_ptr_pop(&client->tx_queue)))
+	while (NULL != (message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&client->tx_queue)))
 		zbx_ipc_message_free(message);
 
 	zbx_queue_ptr_destroy(&client->tx_queue);
@@ -594,7 +594,7 @@ static void	ipc_client_pop_tx_message(zbx_ipc_client_t *client)
 	zbx_free(client->tx_data);
 	client->tx_bytes = 0;
 
-	if (NULL == (message = zbx_queue_ptr_pop(&client->tx_queue)))
+	if (NULL == (message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&client->tx_queue)))
 		return;
 
 	client->tx_bytes = ZBX_IPC_HEADER_SIZE + message->size;
@@ -924,7 +924,7 @@ static zbx_ipc_message_t	*ipc_message_create(zbx_uint32_t code, const unsigned c
 
 	if (0 != size)
 	{
-		message->data = zbx_malloc(NULL, size);
+		message->data = (unsigned char *)zbx_malloc(NULL, size);
 		memcpy(message->data, data, size);
 	}
 	else
@@ -1293,7 +1293,7 @@ void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
 	if (ZBX_IPC_DATA_DUMP_SIZE < data_num)
 		data_num = ZBX_IPC_DATA_DUMP_SIZE;
 
-	*data = zbx_malloc(*data, data_alloc);
+	*data = (char *)zbx_malloc(*data, data_alloc);
 	zbx_snprintf_alloc(data, &data_alloc, &data_offset, "code:%u size:%u data:", message->code, message->size);
 
 	for (i = 0; i < data_num; i++)
@@ -1321,7 +1321,7 @@ void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src)
 {
 	dst->code = src->code;
 	dst->size = src->size;
-	dst->data = zbx_malloc(NULL, src->size);
+	dst->data = (unsigned char *)zbx_malloc(NULL, src->size);
 	memcpy(dst->data, src->data, src->size);
 }
 
@@ -1520,7 +1520,7 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 	close(service->fd);
 
 	for (i = 0; i < service->clients.values_num; i++)
-		ipc_client_free(service->clients.values[i]);
+		ipc_client_free((zbx_ipc_client_t *)service->clients.values[i]);
 
 	zbx_free(service->path);
 
@@ -1583,7 +1583,7 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client
 
 	if (NULL != (*client = ipc_service_pop_client(service)))
 	{
-		if (NULL != (*message = zbx_queue_ptr_pop(&(*client)->rx_queue)))
+		if (NULL != (*message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&(*client)->rx_queue)))
 		{
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 			{
@@ -1652,7 +1652,7 @@ int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsig
 	{
 		client->tx_header[ZBX_IPC_MESSAGE_CODE] = code;
 		client->tx_header[ZBX_IPC_MESSAGE_SIZE] = size;
-		client->tx_data = zbx_malloc(NULL, size);
+		client->tx_data = (unsigned char *)zbx_malloc(NULL, size);
 		memcpy(client->tx_data, data, size);
 		client->tx_bytes = ZBX_IPC_HEADER_SIZE + size - tx_size;
 		event_add(client->tx_event, NULL);

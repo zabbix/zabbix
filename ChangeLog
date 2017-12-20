@@ -30,6 +30,7 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 
 Bug fixes:
 .......PS. [ZBX-12251] fixed possibility of trigger status getting stuck in PROBLEM or OK state due to transaction error in history synchronization, added deadlock to a list of recoverable errors (vso, wiper)
+.......PS. [ZBX-12251] fixed possibility that new history values are lost and not processed by Zabbix server or Zabbix proxy due to recoverable transaction error (vso, wiper)
 ..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
 ....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
@@ -45,6 +46,7 @@ New features:
 A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
 
 Bug fixes:
+A......... [ZBX-13210] fixed sort param logic for elasticseach (vjaceslavs)
 .......PS. [ZBX-13188] fixed possibility of endless loop during unrecoverable database error; fixed incomplete handling of database error (vso)
 ..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13176] fixed last item value retrieval errors in history manager (vjaceslavs)
