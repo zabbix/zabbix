@@ -3,7 +3,7 @@ Changes for 4.0.0alpha2
 New features:
 
 Bug fixes:
-
+...G...PS. [ZBX-12671] refactoring the code base to support the compiler flag -Wstrict-prototypes (MVekslers)
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha1
 
