@@ -422,9 +422,14 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 	}
 
 	if ($trigger['url'] !== '') {
+		$trigger_url = CHtmlUrlValidator::validate($trigger['url'])
+			? $trigger['url']
+			: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'], false, false)).
+				'\');';
+
 		$div->addItem(
 			(new CDiv())
-				->addItem(new CLink($trigger['url'], $trigger['url']))
+				->addItem(new CLink($trigger['url'], $trigger_url))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addStyle('max-width: 500px')
 		);

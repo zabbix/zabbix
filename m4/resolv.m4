@@ -33,7 +33,7 @@ AC_TRY_LINK(
 	char	*buf;
 
 	res_init();
-	res_query("", C_IN, T_SOA, buf, 0);
+	res_query("", C_IN, T_SOA, (unsigned char *)buf, 0);
 ],
 found_resolv="yes"
 RESOLV_LIBS="$1")

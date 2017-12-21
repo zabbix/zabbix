@@ -51,7 +51,7 @@ static wchar_t	*read_registry_value(HKEY hKey, LPCTSTR name)
  * Purpose: get Windows version information                                   *
  *                                                                            *
  ******************************************************************************/
-const OSVERSIONINFOEX		*zbx_win_getversion()
+const OSVERSIONINFOEX		*zbx_win_getversion(void)
 {
 #	define ZBX_REGKEY_VERSION		"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 #	define ZBX_REGVALUE_CURRENTVERSION	"CurrentVersion"

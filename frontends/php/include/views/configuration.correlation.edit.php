@@ -123,8 +123,14 @@ switch ($data['new_condition']['type']) {
 			],
 			'defaultValue' => 0,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=new_condition_groupids_'.
-					'&srcfld1=groupid&writeonly=1&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'new_condition_groupids_',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;

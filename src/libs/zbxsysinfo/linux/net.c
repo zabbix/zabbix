@@ -156,7 +156,7 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 			for (r_hdr = (struct nlmsghdr *)buffer; NLMSG_OK(r_hdr, (unsigned)status);
 					r_hdr = NLMSG_NEXT(r_hdr, status))
 			{
-				struct inet_diag_msg	*r = NLMSG_DATA(r_hdr);
+				struct inet_diag_msg	*r = (struct inet_diag_msg *)NLMSG_DATA(r_hdr);
 
 				if (sequence != r_hdr->nlmsg_seq)
 					continue;
@@ -312,7 +312,7 @@ static int    proc_read_tcp_listen(const char *filename, char **buffer, int *buf
 		if (offset == *buffer_alloc)
 		{
 			*buffer_alloc *= 2;
-			*buffer = zbx_realloc(*buffer, *buffer_alloc);
+			*buffer = (char *)zbx_realloc(*buffer, *buffer_alloc);
 		}
 
 		(*buffer)[offset] = '\0';
@@ -393,7 +393,7 @@ static int	proc_read_file(const char *filename, char **buffer, int *buffer_alloc
 		if (offset == *buffer_alloc)
 		{
 			*buffer_alloc *= 2;
-			*buffer = zbx_realloc(*buffer, *buffer_alloc);
+			*buffer = (char *)zbx_realloc(*buffer, *buffer_alloc);
 		}
 	}
 
@@ -670,7 +670,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "netlink interface error: %s", error);
 		zabbix_log(LOG_LEVEL_DEBUG, "falling back on reading /proc/net/tcp...");
 #endif
-		buffer = zbx_malloc(NULL, buffer_alloc);
+		buffer = (char *)zbx_malloc(NULL, buffer_alloc);
 
 		if (0 < (n = proc_read_tcp_listen("/proc/net/tcp", &buffer, &buffer_alloc)))
 		{
@@ -726,7 +726,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	buffer = zbx_malloc(NULL, buffer_alloc);
+	buffer = (char *)zbx_malloc(NULL, buffer_alloc);
 
 	if (0 < (n = proc_read_file("/proc/net/udp", &buffer, &buffer_alloc)))
 	{
