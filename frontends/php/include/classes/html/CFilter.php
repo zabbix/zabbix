@@ -154,8 +154,6 @@ class CFilter extends CTag {
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 			);
-
-		return $buttons;
 	}
 
 	/**
