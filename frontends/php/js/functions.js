@@ -540,22 +540,22 @@ function getOverlayDialogueId() {
 /**
  * Display modal window.
  *
- * @param {object} params						Modal window params.
- * @param {string} params.title					Modal window title.
- * @param {object} params.content				Window content.
- * @param {object} params.controls				Window controls.
- * @param {array}  params.buttons				Window buttons.
- * @param {string} params.buttons[]['title']	Text on the button.
- * @param {object}|{string} params.buttons[]['action']	Function object or executable string that will be executed on
- *														click.
- * @param {string} params.buttons[]['class']	(optional) Button class.
- * @param {bool}   params.buttons[]['cancel']	(optional) It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']	(optional) Focus this button.
- * @param {bool}   params.buttons[]['enabled']	(optional) Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen']	(optional) Prevent dialogue closing, if button action returned false.
- * @param string   params.dialogueid            (optional) Unique dialogue identifier to reuse existing overlay dialog
- *												or create a new one if value is not set.
- * @param string   params.script_inline         (optional) Custom javascript code to execute when initializing dialog.
+ * @param {object} params                                   Modal window params.
+ * @param {string} params.title                             Modal window title.
+ * @param {object} params.content                           Window content.
+ * @param {object} params.controls                          Window controls.
+ * @param {array}  params.buttons                           Window buttons.
+ * @param {string} params.buttons[]['title']                Text on the button.
+ * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
+ *                                                          on click.
+ * @param {string} params.buttons[]['class']	(optional)  Button class.
+ * @param {bool}   params.buttons[]['cancel']	(optional)  It means what this button has cancel action.
+ * @param {bool}   params.buttons[]['focused']	(optional)  Focus this button.
+ * @param {bool}   params.buttons[]['enabled']	(optional)  Should the button be enabled? Default: true.
+ * @param {bool}   params.buttons[]['keepOpen']	(optional)  Prevent dialogue closing, if button action returned false.
+ * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
+ *                                                          or create a new one if value is not set.
+ * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
  *
  * @return {bool}
  */
