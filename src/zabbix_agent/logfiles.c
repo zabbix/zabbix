@@ -1628,7 +1628,7 @@ clean:
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	make_logfile_list(unsigned char flags, const char *filename, const int *mtime,
+static int	make_logfile_list(unsigned char flags, const char *filename, int mtime,
 		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, int *use_ino, char **err_msg)
 {
 	int	ret = SUCCEED;
@@ -1673,7 +1673,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 		if (SUCCEED != (ret = compile_filename_regexp(filename_regexp, &re, err_msg)))
 			goto clean1;
 
-		if (SUCCEED != (ret = pick_logfiles(directory, *mtime, &re, use_ino, logfiles, logfiles_alloc,
+		if (SUCCEED != (ret = pick_logfiles(directory, mtime, &re, use_ino, logfiles, logfiles_alloc,
 				logfiles_num, err_msg)))
 		{
 			goto clean2;
@@ -2850,7 +2850,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 
 	adjust_mtime_to_clock(mtime);
 
-	if (SUCCEED != make_logfile_list(flags, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
+	if (SUCCEED != make_logfile_list(flags, filename, *mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
 			err_msg))
 	{
 		/* an error occurred or a file was not accessible for a log[] or log.count[] item */
