@@ -886,7 +886,7 @@ class testFormWebStep extends CWebTest {
 		}
 
 		if (array_key_exists('check_raw', $data)) {
-			$this->zbxTestClickLinkText($data['step_name']);
+			$this->zbxTestClickLinkTextWait($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 			$raw = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']//textarea[@id='posts']");
 			$this->assertEquals($raw, $data['check_raw']);
@@ -894,7 +894,7 @@ class testFormWebStep extends CWebTest {
 		}
 
 		if (array_key_exists('parse_query', $data)) {
-			$this->zbxTestClickLinkText($data['step_name']);
+			$this->zbxTestClickLinkTextWait($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 			$i = 3;
 			foreach($data['parse_query'] as $item) {
@@ -915,7 +915,7 @@ class testFormWebStep extends CWebTest {
 		}
 
 		if (array_key_exists('check_post', $data)) {
-			$this->zbxTestClickLinkText($data['step_name']);
+			$this->zbxTestClickLinkTextWait($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 			$i = 4;
 			foreach($data['check_post'] as $item) {
@@ -948,6 +948,9 @@ class testFormWebStep extends CWebTest {
 			case TEST_BAD:
 				if (array_key_exists('error_msg', $data)) {
 					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
+				}
+				else {
+					$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));
 				}
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
