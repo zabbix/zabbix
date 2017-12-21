@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2017 Zabbix SIA
@@ -10,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -18,30 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_POSTINIT_H
+#define ZABBIX_POSTINIT_H
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+int	zbx_check_postinit_tasks(char **error);
 
-class testFormLoginWithRequest extends CWebTest {
-	// Returns layout data
-	public static function provider() {
-		return [
-			[
-				[
-					'request' => 'zabbix.php?action=proxy.list&ddreset=1',
-					'header' => 'Proxies'
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider provider
-	 */
-	public function testFormLoginWithRequest_test($data) {
-		// Log in.
-		$this->zbxTestLogin($data['request']);
-
-		// Test page title.
-		$this->zbxTestCheckHeader($data['header']);
-	}
-}
+#endif

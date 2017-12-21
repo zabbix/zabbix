@@ -49,19 +49,19 @@ static zbx_config_t	cfg;
 typedef struct
 {
 	/* target table name */
-	char	*table;
+	const char	*table;
 
 	/* Optional filter, must be empty string if not used. Only the records matching */
 	/* filter are subject to housekeeping procedures.                               */
-	char	*filter;
+	const char	*filter;
 
 	/* The oldest record in table (with filter in effect). The min_clock value is   */
 	/* read from the database when accessed for the first time and then during      */
 	/* housekeeping procedures updated to the last 'cutoff' value.                  */
-	int	min_clock;
+	int		min_clock;
 
 	/* a reference to the settings value specifying number of seconds the records must be kept */
-	int	*phistory;
+	int		*phistory;
 }
 zbx_hk_rule_t;
 
@@ -71,10 +71,10 @@ zbx_hk_rule_t;
 typedef struct
 {
 	/* housekeeper table name */
-	char		*name;
+	const char		*name;
 
 	/* a reference to housekeeping configuration enable value for this table */
-	unsigned char	*poption_mode;
+	unsigned char		*poption_mode;
 }
 zbx_hk_cleanup_table_t;
 
@@ -123,10 +123,10 @@ zbx_hk_delete_queue_t;
 typedef struct
 {
 	/* the target table name */
-	char			*table;
+	const char		*table;
 
 	/* history setting field name in items table (history|trends) */
-	char			*history;
+	const char		*history;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
 	unsigned char		*poption_mode;
@@ -137,14 +137,14 @@ typedef struct
 	/* a reference to the housekeeping configuration history value for this table */
 	int			*poption;
 
+	/* type for checking which values are sent to the history storage */
+	unsigned char		type;
+
 	/* the oldest item record timestamp cache for target table */
 	zbx_hashset_t		item_cache;
 
 	/* the item delete queue */
 	zbx_vector_ptr_t	delete_queue;
-
-	/* type for checking which values are sent to the history storage */
-	unsigned char		type;
 }
 zbx_hk_history_rule_t;
 
@@ -252,7 +252,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 		/* update oldest timestamp in item cache */
 		item_record->min_clock = MIN(keep_from, item_record->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
-		update_record = zbx_malloc(NULL, sizeof(zbx_hk_delete_queue_t));
+		update_record = (zbx_hk_delete_queue_t *)zbx_malloc(NULL, sizeof(zbx_hk_delete_queue_t));
 		update_record->itemid = item_record->itemid;
 		update_record->min_clock = item_record->min_clock;
 		zbx_vector_ptr_append(&rule->delete_queue, update_record);
@@ -351,13 +351,13 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rule, int now, zbx_uin
 	if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode)
 		return;
 
-	item_record = zbx_hashset_search(&rule->item_cache, &itemid);
+	item_record = (zbx_hk_item_cache_t *)zbx_hashset_search(&rule->item_cache, &itemid);
 
 	if (NULL == item_record)
 	{
 		zbx_hk_item_cache_t	item_data = {itemid, now};
 
-		item_record = zbx_hashset_insert(&rule->item_cache, &item_data, sizeof(zbx_hk_item_cache_t));
+		item_record = (zbx_hk_item_cache_t *)zbx_hashset_insert(&rule->item_cache, &item_data, sizeof(zbx_hk_item_cache_t));
 		if (NULL == item_record)
 			return;
 	}
@@ -554,7 +554,7 @@ static int	housekeeping_history_and_trends(int now)
 
 		for (i = 0; i < rule->delete_queue.values_num; i++)
 		{
-			zbx_hk_delete_queue_t	*item_record = rule->delete_queue.values[i];
+			zbx_hk_delete_queue_t	*item_record = (zbx_hk_delete_queue_t *)rule->delete_queue.values[i];
 
 			rc = DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 					rule->table, item_record->itemid, item_record->min_clock);

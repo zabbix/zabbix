@@ -932,7 +932,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
 			$column->addClass('blink');
 			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
-			$column->setAttribute('data-toggle-class', $css);
+			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));

@@ -261,7 +261,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		for (i = 0; i < hosts_count; i++)
 		{
-			hosts[i].status = zbx_malloc(NULL, count);
+			hosts[i].status = (char *)zbx_malloc(NULL, count);
 			memset(hosts[i].status, 0, count);
 		}
 
