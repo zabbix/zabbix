@@ -24,7 +24,78 @@
 #include "sysinfo.h"
 #include "../../../../src/libs/zbxsysinfo/common/system.h"
 
-static time_t	expected_timestamp_value = 0;
+#define LONG_DATETIME_LENGTH	30	/* Length of datetime like "2017-12-18,14:06:09.123,+02:30" */
+#define SHORT_DATETIME_LENGTH	19	/* Length of datetime like "2017-12-18,14:06:09" */
+
+static zbx_timespec_t	timespec;
+static int		time_parsed = 0;
+
+static void	zbx_mock_time(void)
+{
+	zbx_mock_error_t	error;
+	zbx_mock_handle_t	param_handle;
+	const char		*timestamp;
+	struct	tm		tm;
+	int			ms, hour, min;
+	char			sign, tmp[16];
+	size_t			length;
+
+	if (0 != time_parsed)
+		return;	/* timestamp param was already parsed */
+
+	memset(&tm, 0, sizeof(tm));
+	memset(&timespec, 0, sizeof(timespec));
+
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("timestamp", &param_handle)) ||
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &timestamp)))
+	{
+		fail_msg("Cannot get expected 'timestamp' parameter from test case data: %s",
+				zbx_mock_error_string(error));
+	}
+
+	length = strlen(timestamp);
+	if (SHORT_DATETIME_LENGTH == length || LONG_DATETIME_LENGTH == length)
+	{
+		if (6 != sscanf(timestamp, "%04d-%02d-%02d,%02d:%02d:%02d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+				&tm.tm_hour, &tm.tm_min, &tm.tm_sec) || 1900 > tm.tm_year || 1 > tm.tm_mon ||
+				12 < tm.tm_mon || 1 > tm.tm_mday || 31 < tm.tm_mday || 0 > tm.tm_hour ||
+				23 < tm.tm_hour || 0 > tm.tm_min || 59 < tm.tm_min || 0 > tm.tm_sec || 59 < tm.tm_sec)
+		{
+			fail_msg("Cannot parse date and time part of 'timestamp' parameter: %s", timestamp);
+		}
+
+		tm.tm_year -= 1900;
+		tm.tm_mon--;
+
+		if (LONG_DATETIME_LENGTH == length)
+		{
+			if (4 != sscanf(timestamp + SHORT_DATETIME_LENGTH, ".%d,%c%d:%d", &ms, &sign, &hour, &min) ||
+					0 > ms || 1000 <= ms || ('-' != sign && '+' != sign) || 0 > hour || 23 < hour ||
+					0 > min || 59 < min)
+			{
+				fail_msg("Cannot parse ms and timezone part of 'timestamp' parameter: %s", timestamp);
+			}
+
+			timespec.ns = ms * 1000;
+
+			zbx_snprintf(tmp, sizeof(tmp), "ZBX%c%02d:%02d", (sign == '+' ? '-' : '+'), hour, min);
+			if (0 != setenv("TZ", tmp, 1))
+				fail_msg("Cannot set timezone value: %s", tmp);
+
+			tzset();
+		}
+
+		timespec.sec = mktime(&tm);
+	}
+	else
+	{
+		/* Fallback to numeric timestamp format */
+		if (FAIL == is_uint32(timestamp, &timespec.sec))
+			fail_msg("Cannot convert 'timestamp' parameter value to numeric: %s", timestamp);
+	}
+
+	time_parsed = 1;
+}
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -32,8 +103,7 @@ void	zbx_mock_test_entry(void **state)
 	AGENT_RESULT 		param_result;
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	param_handle;
-	const char		*expected_value_string, *expected_return_string, *key_string, *type,
-				*expected_timestamp_string;
+	const char		*expected_value_string, *expected_return_string, *key_string;
 	char			*value = NULL;
 	int			expected_result = SYSINFO_RET_FAIL, actual_result;
 
@@ -60,19 +130,6 @@ void	zbx_mock_test_entry(void **state)
 				zbx_mock_error_string(error));
 	}
 
-	if (SYSINFO_RET_OK == expected_result)
-	{
-		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("timestamp", &param_handle)) ||
-				ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expected_timestamp_string)))
-		{
-			fail_msg("Cannot get expected 'timestamp' parameter from test case data: %s",
-					zbx_mock_error_string(error));
-		}
-
-		if (FAIL == is_uint32(expected_timestamp_string, &expected_timestamp_value))
-			fail_msg("Cannot convert 'timestamp' parameter value to numeric: %s", expected_timestamp_value);
-	}
-
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("key", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != zbx_mock_string(param_handle, &key_string))
 	{
@@ -95,8 +152,6 @@ void	zbx_mock_test_entry(void **state)
 				zbx_sysinfo_ret_string(expected_result));
 	}
 
-	type = get_rparam(&request, 0);
-
 	if (SYSINFO_RET_OK == expected_result)
 		value = (NULL != GET_TEXT_RESULT(&param_result)) ? *GET_TEXT_RESULT(&param_result) : NULL;
 	else
@@ -114,22 +169,26 @@ void	zbx_mock_test_entry(void **state)
 
 time_t	__wrap_time(time_t *seconds)
 {
-	if (NULL != seconds)
-		*seconds = expected_timestamp_value;
+	zbx_mock_time();
 
-	return expected_timestamp_value;
+	if (NULL != seconds)
+		*seconds = timespec.sec;
+
+	return timespec.sec;
 }
 
-void	__wrap_zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
+int	__wrap_gettimeofday(struct timeval *__restrict tv, __timezone_ptr_t tz)
 {
-	localtime_r(&expected_timestamp_value, tm);
-
-	if (NULL != tz)
+	if (NULL != tv)
 	{
-		tz->tz_sign = '+';
-		tz->tz_hour = 2;
-		tz->tz_min = 30;
+		zbx_mock_time();
+
+		tv->tv_sec = timespec.sec;
+		tv->tv_usec = timespec.ns;
 	}
 
-	*milliseconds = 123;
+	if (NULL != tz)
+		fail_msg("Timezone param in gettimeofday call is not set to null");
+
+	return 0;
 }

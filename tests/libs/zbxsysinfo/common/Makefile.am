@@ -48,7 +48,7 @@ SYSTEM_LOCALTIME_SOURCES = \
 
 SYSTEM_LOCALTIME_WRAP_FUNCS = \
 	-Wl,--wrap=time \
-	-Wl,--wrap=zbx_get_time
+	-Wl,--wrap=gettimeofday
 
 SYSTEM_LOCALTIME_LDADD = \
 	$(COMMON_LIB_FILES)
