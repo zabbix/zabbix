@@ -567,8 +567,13 @@ class CControllerPopupGeneric extends CController {
 			'dstfrm' => $this->getInput('dstfrm'),
 			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
-			'excludeids' => $excludeids
+			'excludeids' => $excludeids,
+			'multiselect' => $this->getInput('multiselect', 0),
+			'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
+			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
+
+		$page_options['parentid'] = $page_options['dstfld1'] !== '' ? zbx_jsvalue($page_options['dstfld1']) : 'null';
 
 		if ($this->hasInput('only_hostid')) {
 			$hostid = $this->getInput('only_hostid');
@@ -582,74 +587,26 @@ class CControllerPopupGeneric extends CController {
 
 			$page_options['only_hostid'] = $only_hosts[0];
 		}
-		if ($this->hasInput('monitored_hosts')) {
-			$page_options['monitored_hosts'] = true;
-		}
-		if ($this->hasInput('real_hosts')) {
-			$page_options['real_hosts'] = true;
-		}
-		if ($this->hasInput('templated_hosts')) {
-			$page_options['templated_hosts'] = true;
-		}
-		if ($this->hasInput('with_applications')) {
-			$page_options['with_applications'] = true;
-		}
-		if ($this->hasInput('with_graphs')) {
-			$page_options['with_graphs'] = true;
-		}
-		if ($this->hasInput('submit_parent')) {
-			$page_options['submit_parent'] = true;
-		}
-		if ($this->hasInput('with_items')) {
-			$page_options['with_items'] = true;
-		}
-		if ($this->hasInput('host_templates')) {
-			$page_options['host_templates'] = $this->getInput('host_templates');
-		}
-		if ($this->hasInput('with_simple_graph_items')) {
-			$page_options['with_simple_graph_items'] = true;
-		}
-		if ($this->hasInput('with_triggers')) {
-			$page_options['with_triggers'] = true;
-		}
-		if ($this->hasInput('with_webitems')) {
-			$page_options['with_webitems'] = true;
-		}
-		if ($this->hasInput('normal_only')) {
-			$page_options['normal_only'] = true;
-		}
-		if ($this->hasInput('with_monitored_triggers')) {
-			$page_options['with_monitored_triggers'] = true;
-		}
-		if ($this->hasInput('value_types')) {
-			$page_options['value_types'] = $this->getInput('value_types');
-		}
-		if ($this->hasInput('itemtype')) {
-			$page_options['itemtype'] = $this->getInput('itemtype');
-		}
+
 		if ($hostid) {
 			$page_options['hostid'] = $hostid;
 		}
-		if ($this->hasInput('numeric')) {
-			$page_options['numeric'] = true;
-		}
-		if ($this->hasInput('writeonly')) {
-			$page_options['writeonly'] = true;
-		}
-		if ($this->hasInput('screenid')) {
-			$page_options['screenid'] = $this->getInput('screenid');
-		}
-		if ($this->hasInput('templateid')) {
-			$page_options['templateid'] = $this->getInput('templateid');
-		}
-		if ($this->getInput('noempty', 0)) {
-			$page_options['noempty'] = $this->getInput('noempty');
+
+		$option_fields_binary = ['monitored_hosts', 'noempty', 'normal_only', 'numeric', 'real_hosts', 'submit_parent',
+			'templated_hosts', 'with_applications', 'with_graphs', 'with_items', 'with_monitored_triggers',
+			'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
+		foreach ($option_fields_binary as $field) {
+			if ($this->hasInput($field)) {
+				$page_options[$field] = true;
+			}
 		}
 
-		$page_options['multiselect'] = $this->getInput('multiselect', 0);
-		$page_options['parent_discoveryid'] = $this->getInput('parent_discoveryid', 0);
-		$page_options['reference'] = $this->getInput('reference', $this->getInput('srcfld1', 'unknown'));
-		$page_options['parentid'] = $page_options['dstfld1'] ? zbx_jsvalue($page_options['dstfld1']) : 'null';
+		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'templateid', 'value_types'];
+		foreach ($option_fields_value as $field) {
+			if ($this->hasInput($field)) {
+				$page_options[$field] = $this->getInput($field);
+			}
+		}
 
 		// Get data.
 		switch ($this->source_table) {
@@ -767,8 +724,8 @@ class CControllerPopupGeneric extends CController {
 				];
 
 				if ($this->source_table === 'trigger_prototypes') {
-					if ($this->hasInput('parent_discoveryid')) {
-						$options['discoveryids'] = [$this->getInput('parent_discoveryid')];
+					if ($page_options['parent_discoveryid']) {
+						$options['discoveryids'] = [$page_options['parent_discoveryid']];
 					}
 					else {
 						$options['hostids'] = [$hostid];
@@ -800,11 +757,11 @@ class CControllerPopupGeneric extends CController {
 						$options['templated'] = $templated;
 					}
 
-					if ($this->hasInput('with_monitored_triggers')) {
+					if (array_key_exists('with_monitored_triggers', $page_options)) {
 						$options['monitored'] = true;
 					}
 
-					if ($this->hasInput('normal_only')) {
+					if (array_key_exists('normal_only', $page_options)) {
 						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 					}
 
@@ -822,8 +779,8 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->hasInput('parent_discoveryid')) {
-					$options['discoveryids'] = [$this->getInput('parent_discoveryid')];
+				if ($page_options['parent_discoveryid']) {
+					$options['discoveryids'] = [$page_options['parent_discoveryid']];
 				}
 				else {
 					$options['hostids'] = $hostid;
@@ -849,7 +806,7 @@ class CControllerPopupGeneric extends CController {
 						$options['webitems'] = true;
 					}
 
-					if ($this->hasInput('normal_only')) {
+					if (array_key_exists('normal_only', $page_options)) {
 						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 					}
 
