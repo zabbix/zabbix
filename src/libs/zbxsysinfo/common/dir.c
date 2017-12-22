@@ -422,6 +422,71 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
  *                                                                            *
  *****************************************************************************/
 #ifdef _WINDOWS
+BY_HANDLE_FILE_INFORMATION get_file_attributes_by_handle(wchar_t *wpath, char **error)
+{
+	HANDLE file_handle = CreateFile(
+		wpath,
+		GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL,
+		OPEN_EXISTING,
+		FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
+		NULL
+	);
+
+	BY_HANDLE_FILE_INFORMATION link_info;
+
+	if (INVALID_HANDLE_VALUE == file_handle)
+	{
+		*error = zbx_strdup(NULL,strerror_from_system(GetLastError()));
+		link_info.dwFileAttributes = INVALID_FILE_ATTRIBUTES;
+		return link_info;
+	}
+
+	if (0 == GetFileInformationByHandle(file_handle, &link_info))
+	{
+		*error = zbx_strdup(NULL,strerror_from_system(GetLastError()));
+		link_info.dwFileAttributes = INVALID_FILE_ATTRIBUTES;
+	}
+
+	CloseHandle(file_handle);
+
+	return link_info;
+}
+
+DWORD	link_state(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char **error)
+{
+	BY_HANDLE_FILE_INFORMATION link_info;
+	zbx_file_descriptor_t	*file;
+
+	link_info = get_file_attributes_by_handle(wpath, error);
+
+	if (INVALID_FILE_ATTRIBUTES == link_info.dwFileAttributes)
+		return link_info.dwFileAttributes;
+
+	/* A file or directory that          */
+	/* has an associated reparse point,  */
+	/* or a file that is a symbolic link */
+	if (0 != (link_info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT));
+	{
+		/* skip file if inode was already processed (multiple hardlinks) */
+		file = (zbx_file_descriptor_t*)zbx_malloc(NULL, sizeof(zbx_file_descriptor_t));
+
+		file->st_dev = link_info.dwVolumeSerialNumber;
+		file->st_ino = (long long) link_info.nFileIndexHigh << 32 | link_info.nFileIndexLow;
+
+		if (FAIL != zbx_vector_ptr_search(descriptors, file, compare_descriptors) )
+		{
+			zbx_free(file);
+			return link_info.dwFileAttributes;
+		}
+
+		zbx_vector_ptr_append(descriptors, file);
+	}
+
+	return 0;
+}
+
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "vfs_dir_size";
@@ -433,6 +498,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_stat_t		status;
 	regex_t			*regex_incl = NULL, *regex_excl = NULL;
 	zbx_directory_item_t	*item;
+	zbx_vector_ptr_t	descriptors;
 
 	if (SUCCEED != prepare_mode_parameter(request, result, &mode))
 		return ret;
@@ -441,6 +507,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			4, 5))
 		goto err1;
 
+	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
 
 	if (SUCCEED == queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
@@ -505,6 +572,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		do
 		{
 			char	*path;
+			char 	*error;
 
 			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
 				continue;
@@ -512,18 +580,19 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			name = zbx_unicode_to_utf8(data.name);
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 			wpath = zbx_utf8_to_unicode(path);
-			attrib_ex = GetFileAttributesW(wpath);
+			attrib_ex = link_state(wpath, &descriptors, &error);
 
-			if (INVALID_FILE_ATTRIBUTES == attrib_ex)
+			if (0 != attrib_ex)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute '%s': %s", __function_name,
-					path, strerror_from_system(GetLastError()));
-			}
+				if (INVALID_FILE_ATTRIBUTES == attrib_ex)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute '%s': %s",
+							__function_name, path, error);
+					zbx_free(error);
+				}
 
-			if (0 != (attrib_ex & FILE_ATTRIBUTE_REPARSE_POINT))
-			{						/* A file or directory that          */
-				zbx_free(wpath);			/* has an associated reparse point,  */
-				zbx_free(path);				/* or a file that is a symbolic link */
+				zbx_free(wpath);
+				zbx_free(path);
 				zbx_free(name);
 				continue;
 			}
@@ -576,6 +645,7 @@ skip:
 	ret = SYSINFO_RET_OK;
 err2:
 	list_vector_destroy(&list);
+	descriptors_vector_destroy(&descriptors);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl);
 	zbx_free(dir);
