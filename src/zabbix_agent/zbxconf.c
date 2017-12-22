@@ -194,7 +194,7 @@ pc_fail:
 #endif	/* _WINDOWS */
 
 #ifdef _AIX
-void	tl_version()
+void	tl_version(void)
 {
 #ifdef _AIXVERSION_610
 #	define ZBX_AIX_TL	"6100 and above"

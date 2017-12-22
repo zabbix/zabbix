@@ -29,6 +29,7 @@ if (!empty($this->data['hostid'])) {
 // create form
 $httpForm = (new CForm())
 	->setName('httpForm')
+	->setId('httpForm')
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('steps', $this->data['steps'])
@@ -134,7 +135,8 @@ foreach ($pair_tables as $pair_table){
 
 $httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
-zbx_add_post_js('pairManager.add('.CJs::encodeJson($this->data['pairs']).');');
+zbx_add_post_js('pairManager.add("'.$httpForm->getId().'",'.CJs::encodeJson($this->data['pairs']).');');
+zbx_add_post_js('pairManager.initControls("'.$httpForm->getId().'");');
 
 /*
  * Authentication tab
