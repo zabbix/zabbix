@@ -2386,6 +2386,62 @@ static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num
 	}
 }
 
+static void	delay_update_if_copies(struct st_logfile *logfiles, int logfiles_num, int *mtime,
+		zbx_uint64_t *lastlogsize)
+{
+	int	i, idx_to_keep = logfiles_num - 1;
+
+	/* If there are copies in 'logfiles' list then find the element with the smallest index which must be */
+	/* preserved in the list to keep information about copies. */
+
+	for (i = 0; i < logfiles_num - 1; i++)
+	{
+		int	j, largest_for_i = -1;
+
+		if (0 == logfiles[i].size)
+			continue;
+
+		for (j = i + 1; j < logfiles_num; j++)
+		{
+			if (0 == logfiles[j].size)
+				continue;
+
+			if (SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
+			{
+				int	more_processed;
+
+				/* logfiles[i] and logfiles[j] are original and copy (or vice versa) */
+
+				more_processed = (logfiles[i].processed_size > logfiles[j].processed_size) ? i : j;
+
+				if (largest_for_i < more_processed)
+					largest_for_i = more_processed;
+			}
+		}
+
+		if (-1 != largest_for_i && idx_to_keep > largest_for_i)
+			idx_to_keep = largest_for_i;
+	}
+
+	if (logfiles[idx_to_keep].mtime < *mtime)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "delay_update_if_copies(): setting mtime back from %d to %d,"
+				" lastlogsize from " ZBX_FS_UI64 " to " ZBX_FS_UI64, *mtime,
+				logfiles[idx_to_keep].mtime, *lastlogsize, logfiles[idx_to_keep].processed_size);
+
+		/* ensure that next time element 'idx_to_keep' is included in file list with the right 'lastlogsize' */
+		*mtime = logfiles[idx_to_keep].mtime;
+		*lastlogsize = logfiles[idx_to_keep].processed_size;
+
+		if (logfiles_num - 1 > idx_to_keep)
+		{
+			/* ensure that next time processing starts from element'idx_to_keep' */
+			for (i = idx_to_keep + 1; i < logfiles_num; i++)
+				logfiles[i].seq = 0;
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: calculate_delay                                                  *
@@ -3023,6 +3079,18 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		}
 
 		i++;
+	}
+
+	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
+	{
+		/* If logrt[] or logrt.count[] item is checked often but rotation by copying is slow it could happen */
+		/* that the original file is completely processed but the copy with a newer timestamp is still in */
+		/* progress. The original file goes out of the list of files and the copy is analyzed as new file, */
+		/* so the matching lines are reported twice. To prevent this we manipulate our stored 'mtime' */
+		/* and 'lastlogsize' to keep information about copies in the list as long as necessary to prevent */
+		/* reporting twice. */
+
+		delay_update_if_copies(logfiles, logfiles_num, mtime, lastlogsize);
 	}
 
 	/* store the new log file list for using in the next check */
