@@ -734,17 +734,11 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 	if (old_file->mtime > new_file->mtime)
 		return ZBX_SAME_FILE_NO;
 
-	if (old_file->size > new_file->size)
-		return ZBX_SAME_FILE_NO;
-
 	if (-1 == old_file->md5size || -1 == new_file->md5size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
 		return ZBX_SAME_FILE_NO;
 	}
-
-	if (old_file->md5size > new_file->md5size)
-		return ZBX_SAME_FILE_NO;
 
 	is_same_place = compare_file_places(old_file, new_file, use_ino);
 
@@ -754,18 +748,30 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 				is_same_place);
 	}
 
-	if (0 < old_file->md5size)
+	if (0 < old_file->md5size && 0 < new_file->md5size)
 	{
-		/* MD5 for the old file has been calculated from a smaller block than for the new file */
+		/* MD5 sums have been calculated from initial blocks of diferent sizes */
 
-		int		f, ret;
-		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+		const struct st_logfile	*p_smaller, *p_larger;
+		int			f, ret;
+		md5_byte_t		md5tmp[MD5_DIGEST_SIZE];
 
-		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
+		if (old_file->md5size < new_file->md5size)
+		{
+			p_smaller = old_file;
+			p_larger = new_file;
+		}
+		else
+		{
+			p_smaller = new_file;
+			p_larger = old_file;
+		}
+
+		if (-1 == (f = open_file_helper(p_larger->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, old_file->md5size, md5tmp, new_file->filename, err_msg))
-			ret = examine_md5_and_place(old_file->md5buf, md5tmp, sizeof(md5tmp), is_same_place);
+		if (SUCCEED == file_start_md5(f, p_smaller->md5size, md5tmp, p_larger->filename, err_msg))
+			ret = examine_md5_and_place(p_smaller->md5buf, md5tmp, sizeof(md5tmp), is_same_place);
 		else
 			ret = ZBX_SAME_FILE_ERROR;
 
@@ -773,7 +779,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 		{
 			if (ZBX_SAME_FILE_ERROR != ret)
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new_file->filename,
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", p_larger->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 			}
