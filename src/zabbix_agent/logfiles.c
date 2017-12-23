@@ -2296,7 +2296,7 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 	}
 }
 
-static int	files_have_same_md5_sum(const struct st_logfile *log1, const struct st_logfile *log2)
+static int	files_start_with_same_md5(const struct st_logfile *log1, const struct st_logfile *log2)
 {
 	if (-1 == log1->md5size || -1 == log2->md5size)
 		return FAIL;
@@ -2358,7 +2358,7 @@ static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num
 
 	for (j = i + 1; j < logfiles_num; j++)
 	{
-		if (SUCCEED == files_have_same_md5_sum(logfiles + i, logfiles + j))
+		if (SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
 		{
 			/* logfiles[i] and logfiles[j] are original and copy (or vice versa). */
 			/* If logfiles[i] has been at least partially processed then transfer its */
