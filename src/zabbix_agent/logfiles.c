@@ -2079,7 +2079,8 @@ out:
  *                       or logrt.count                                       *
  *     filename        - [IN] logfile name                                    *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
- *     mtime           - [IN] file modification time for reporting to server  *
+ *     mtime           - [IN/OUT] file modification time for reporting to     *
+ *                       server                                               *
  *     lastlogsize_sent - [OUT] lastlogsize value that was last sent          *
  *     mtime_sent      - [OUT] mtime value that was last sent                 *
  *     skip_old_data   - [IN/OUT] start from the beginning of the file or     *
