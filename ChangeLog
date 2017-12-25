@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-4295] added selection of the create images tickbox by default on "Maps import" page (Sasha)
 ..F....... [ZBXNEXT-1456] added filter by item discovery status for item configuration view (Alexei)
 ...G...... [ZBXNEXT-3991] Extend net.if.* key output (MVekslers)
 
