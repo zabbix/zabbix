@@ -81,6 +81,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
 ..F....... [ZBX-13260] fixed permissions check in script execution form (miks)
 ..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 .........T [ZBXNEXT-4223] performed network templates cleanup (vitaly)
@@ -511,6 +512,7 @@ Bug fixes:
 Changes for 3.2.11rc1
 
 Bug fixes:
+..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
 ..F....... [ZBX-13260] fixed permissions check in script execution form (miks)
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
@@ -1087,6 +1089,7 @@ Bug fixes:
 Changes for 3.0.14rc1
 
 Bug fixes:
+..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
 ..F....... [ZBX-13260] fixed permissions check in script execution form (miks)
 ..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 ..F....... [ZBX-13042] fixed unclickable template link on host items list page (gcalenko)
@@ -2920,6 +2923,7 @@ Bug fixes:
 Changes for 2.2.21rc1
 
 Bug fixes:
+..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
 ..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
 ..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
