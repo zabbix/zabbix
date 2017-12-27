@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>3.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Network Devices</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Net TP-LINK SNMPv2</template>
+         <name>Template Net TP-LINK SNMPv2</name>
+         <description>Template Net TP-LINK JetStream version: 0.14
+Overview: Link to MIBs: http://www.tp-linkru.com/download/T2600G-28TS.html#MIBs_Files
+Sample device overview page: http://www.tp-linkru.com/products/details/cat-39_T2600G-28TS.html#overview
+emulation page(web): http://www.tp-linkru.com/resources/simulator/T2600G-28TS(UN)_1.0/Index.htm
+
+MIBs used:
+TPLINK-SYSMONITOR-MIB
+TPLINK-SYSINFO-MIB
+Known Issues:
+description : default sysLocation, sysName and sysContact is not filled with proper data. Real hostname and location can be found only in private branch(TPLINK-SYSINFO-MIB). Please check whether this problem exists in the latest firware: http://www.tp-linkru.com/download/T2600G-28TS.html#Firmware
+version : 2.0.0 Build 20170628 Rel.55184(Beta)
+device : T2600G-28TS 2.0description : The Serial number of the product(tpSysInfoSerialNum) is missing in HW versions prior to V2_170323
+version : prior to version V2_170323
+device : T2600G-28TS 2.0</description>
+         <groups>
+            <group>
+               <name>Templates/Network Devices</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>CPU</name>
+            </application>
+            <application>
+               <name>Memory</name>
+            </application>
+            <application>
+               <name>Inventory</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Hardware model name</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.11863.6.1.1.5.0</snmp_oid>
+               <key>system.hw.model</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: TPLINK-SYSINFO-MIB
+The hardware version of the product.</description>
+               <inventory_link>29</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Hardware serial number</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.11863.6.1.1.8.0</snmp_oid>
+               <key>system.hw.serialnumber</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: TPLINK-SYSINFO-MIB
+The Serial number of the product.</description>
+               <inventory_link>8</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Firmware version</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.11863.6.1.1.6.0</snmp_oid>
+               <key>system.hw.firmware</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: TPLINK-SYSINFO-MIB
+The software version of the product.</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Hardware version(revision)</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.11863.6.1.1.5.0</snmp_oid>
+               <key>system.hw.version</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: TPLINK-SYSINFO-MIB
+The hardware version of the product.</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>CPU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.11863.6.4.1.1.1.1.1]</snmp_oid>
+               <key>cpu.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorCpuTable, displays the CPU utilization of all UNITs.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>#{#SNMPVALUE}: CPU utilization</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.11863.6.4.1.1.1.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>%</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: TPLINK-SYSMONITOR-MIB
+Displays the CPU utilization in 1 minute.
+Reference: http://www.tp-link.com/faq-1330.html</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>CPU</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Net TP-LINK SNMPv2:system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#SNMPVALUE}: High CPU utilization</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>#{#SNMPVALUE}: CPU utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Net TP-LINK SNMPv2</host>
+                              <key>system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Memory Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.11863.6.4.1.2.1.1.1]</snmp_oid>
+               <key>memory.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryTable, displays the memory utilization of all UNITs.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>#{#SNMPVALUE}: Memory utilization</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.11863.6.4.1.2.1.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>vm.memory.pused[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>%</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: TPLINK-SYSMONITOR-MIB
+Displays the memory utilization.
+Reference: http://www.tp-link.com/faq-1330.html</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Memory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Net TP-LINK SNMPv2:vm.memory.pused[tpSysMonitorMemoryUtilization.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#SNMPVALUE}: High memory utilization</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>#{#SNMPVALUE}: Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Net TP-LINK SNMPv2</host>
+                              <key>vm.memory.pused[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$CPU_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+         </macros>
+         <templates>
+            <template>
+               <name>Template Module Interfaces Simple SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+         </templates>
+         <screens/>
+      </template>
+   </templates>
+   <graphs/>
+   <triggers>
+      <trigger>
+         <expression>{Template Net TP-LINK SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net TP-LINK SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <recovery_mode>2</recovery_mode>
+         <recovery_expression/>
+         <name>Device has been replaced (new serial number received)</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>1</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Device serial number has changed. Ack to close</description>
+         <type>0</type>
+         <manual_close>1</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Net TP-LINK SNMPv2:system.hw.firmware.diff()}=1 and {Template Net TP-LINK SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <recovery_mode>2</recovery_mode>
+         <recovery_expression/>
+         <name>Firmware has changed</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>1</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Firmware version has changed. Ack to close</description>
+         <type>0</type>
+         <manual_close>1</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+   </triggers>
+   <value_maps/>
+</zabbix_export>

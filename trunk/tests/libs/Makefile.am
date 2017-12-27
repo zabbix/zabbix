@@ -1,0 +1,5 @@
+SUBDIRS = \
+	zbxconf \
+	zbxdbhigh \
+	zbxsysinfo
+
