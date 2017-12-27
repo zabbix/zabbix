@@ -81,6 +81,7 @@ New features:
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-13262] fixed cookie http-only attribute to prevent XSS attacks (miks)
 ..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
 ..F....... [ZBX-13260] fixed permissions check in script execution form (miks)
 ..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
@@ -1089,6 +1090,7 @@ Bug fixes:
 Changes for 3.0.14rc1
 
 Bug fixes:
+..F....... [ZBX-13262] fixed cookie http-only attribute to prevent XSS attacks (miks)
 ..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
 ..F....... [ZBX-13260] fixed permissions check in script execution form (miks)
 ..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
@@ -2923,6 +2925,7 @@ Bug fixes:
 Changes for 2.2.21rc1
 
 Bug fixes:
+..F....... [ZBX-13262] fixed cookie http-only attribute to prevent XSS attacks (miks)
 ..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
 ..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
