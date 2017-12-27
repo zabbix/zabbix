@@ -365,7 +365,12 @@ class CElasticSearchHelper {
 				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
 			}
 
-			$query['sort'][$sortfield] = $sortorder;
+			if ($sortorder !== '') {
+				$query['sort'][$sortfield] = $sortorder;
+			}
+			else {
+				$query['sort'][] = $sortfield;
+			}
 		}
 
 		return $query;
