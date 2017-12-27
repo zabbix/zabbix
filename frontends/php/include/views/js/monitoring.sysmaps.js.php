@@ -166,7 +166,8 @@ function getFontComboBox($name) {
 										'srcfld1' => 'triggerid',
 										'with_triggers' => '1',
 										'real_hosts' => '1',
-										'multiselect' => '1'
+										'multiselect' => '1',
+										'noempty' => '1'
 									]
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
