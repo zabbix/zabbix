@@ -7,7 +7,6 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-13178] add ipc_path to error message (MVekslers)
-...G...PS. [ZBX-12671] refactoring the code base to support the compiler flag -Wstrict-prototypes (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha1
