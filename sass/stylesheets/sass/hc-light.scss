@@ -337,7 +337,12 @@ a {
 }
 
 // SEVERITY STATUSES
-td.na-bg, .log-na-bg {
+td.log-na-bg {
+	padding-left: 42px !important;
+	color: $font-color;
+}
+
+td.na-bg {
 	padding-left: 42px !important;
 	color: $font-color;
 	~ td.na-bg {
@@ -427,7 +432,11 @@ td.normal-bg {
 	content: none;
 }
 
-td.info-bg, td.log-info-bg {
+td.log-info-bg {
+	@extend td.log-na-bg;
+}
+
+td.info-bg {
 	@extend td.na-bg;
 }
 
@@ -518,7 +527,11 @@ td.average-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.warning-bg, td.log-warning-bg {
+td.log-warning-bg {
+	@extend td.log-na-bg;
+}
+
+td.warning-bg {
 	@extend td.na-bg;
 }
 
@@ -566,7 +579,11 @@ td.warning-bg, td.log-warning-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.high-bg, td.log-high-bg {
+td.log-high-bg {
+	@extend td.log-na-bg;
+}
+
+td.high-bg {
 	@extend td.na-bg;
 }
 
@@ -614,7 +631,11 @@ td.high-bg, td.log-high-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.disaster-bg, td.log-disaster-bg {
+td.log-disaster-bg {
+	@extend td.log-na-bg;
+}
+
+td.disaster-bg {
 	@extend td.na-bg;
 }
 
