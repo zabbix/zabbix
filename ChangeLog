@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-12758] fixed slow housekeeping of events due to missing index on foreign key (vso)
 ..F.....S. [ZBX-13238] fixed spelling of Elasticsearch (abs, vjaceslavs)
 ........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
 ..F....... [ZBXNEXT-4139] fixed displaying of the eventlog severitites and severities in trigger map element (andzs)
@@ -60,6 +61,7 @@ Changes for 3.4.6rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12758] fixed slow housekeeping of events due to missing index on foreign key (vso)
 ..F....... [ZBX-11305] fixed color and label for event status on event details page (gcalenko)
 ..F.....S. [ZBX-13238] fixed spelling of Elasticsearch (abs, vjaceslavs)
 ........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
