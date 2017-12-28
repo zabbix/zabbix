@@ -842,7 +842,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	ZBX_UNUSED(hist);
 	ZBX_UNUSED(value_type);
 
-	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for ElasticSearch history backend");
+	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for Elasticsearch history backend");
 	return FAIL;
 }
 
