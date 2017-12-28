@@ -229,6 +229,7 @@ class CUserGroup extends CApiService {
 		$this->checkUsers($usrgrps);
 		$this->checkHimself($usrgrps, __FUNCTION__);
 		$this->checkHostGroups($usrgrps);
+		$this->checkTagFilters($usrgrps);
 	}
 
 	/**
@@ -343,6 +344,7 @@ class CUserGroup extends CApiService {
 		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
+		$this->checkTagFilters($usrgrps);
 	}
 
 	/**
@@ -441,6 +443,28 @@ class CUserGroup extends CApiService {
 		foreach ($groupids as $groupid) {
 			if (!array_key_exists($groupid, $db_groups)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group with ID "%1$s" is not available.', $groupid));
+			}
+		}
+	}
+
+	/**
+	 * Tag filter validation.
+	 *
+	 * @param array  $usrgrps
+	 *
+	 * @throws APIException
+	 */
+	private function checkTagFilters(array $usrgrps) {
+		foreach ($usrgrps as $usrgrp) {
+			if (array_key_exists('tag_filters', $usrgrp)) {
+				foreach ($usrgrp['tag_filters'] as $tag_filter) {
+					if (array_key_exists('value', $tag_filter) && $tag_filter['value'] !== ''
+							&& (!array_key_exists('tag', $tag_filter) || $tag_filter['tag'] === '')) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Empty tag for value "%1$s".', $tag_filter['value'])
+						);
+					}
+				}
 			}
 		}
 	}
