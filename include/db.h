@@ -328,7 +328,7 @@ typedef struct
 	char		*value2;
 	int		condition_result;
 	unsigned char	conditiontype;
-	unsigned char	operator;
+	unsigned char	op;
 }
 DB_CONDITION;
 
@@ -441,7 +441,6 @@ void	DBclose(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
-int	DBstatement_execute();
 #endif
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

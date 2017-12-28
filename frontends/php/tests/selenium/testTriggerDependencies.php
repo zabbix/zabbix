@@ -36,7 +36,7 @@ class testTriggerDependencies extends CWebTest {
 		$this->zbxTestClickLinkTextWait('{HOST.NAME} has just been restarted');
 		$this->zbxTestClickWait('tab_dependenciesTab');
 
-		$this->zbxTestClick('btn1');
+		$this->zbxTestClick('bnt1');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
 
 		$this->zbxTestDropdownSelectWait('hostid', 'Template OS FreeBSD');

@@ -62,7 +62,7 @@ void	load_perf_counters(const char **lines);
 #endif
 
 #ifdef _AIX
-void	tl_version();
+void	tl_version(void);
 #endif
 
 #endif /* ZABBIX_ZBXCONF_H */

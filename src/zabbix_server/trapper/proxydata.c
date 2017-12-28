@@ -59,7 +59,7 @@ int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const
 			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_INPROGRESS);
 	}
 
-	zbx_json_clean(&json);
+	zbx_json_free(&json);
 
 	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 	zbx_vector_ptr_destroy(&tasks);
