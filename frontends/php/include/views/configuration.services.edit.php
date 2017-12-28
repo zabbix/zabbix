@@ -321,31 +321,31 @@ else {
 		->setAttribute('placeholder', _('mm'));
 
 	$serviceTimeTable->addRow([
-		(new CLabel(_('From')))->setAsteriskMark(),
+		(new CLabel(_('From'), 'new_service_time[from_week]'))->setAsteriskMark(),
 		[
-			$weekFromComboBox,
+			$weekFromComboBox->setAttribute('aria-label', _('Day')),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			_('Time'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeFromHourTextBox,
+			$timeFromHourTextBox->setAttribute('aria-label', _('Hour')),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			':',
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeFromMinuteTextBox
+			$timeFromMinuteTextBox->setAttribute('aria-label', _('Minute'))
 		]
 	]);
 	$serviceTimeTable->addRow([
-		(new CLabel(_('Till')))->setAsteriskMark(),
+		(new CLabel(_('Till'), 'new_service_time[to_week]'))->setAsteriskMark(),
 		[
-			$weekToComboBox,
+			$weekToComboBox->setAttribute('aria-label', _('Day')),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			_('Time'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeToHourTextBox,
+			$timeToHourTextBox->setAttribute('aria-label', _('Hour')),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			':',
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeToMinuteTextBox
+			$timeToMinuteTextBox->setAttribute('aria-label', _('Minute'))
 		]
 	]);
 	$servicesForm->addVar('new_service_time[note]', '');

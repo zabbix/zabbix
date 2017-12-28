@@ -427,9 +427,7 @@ if (!$data['is_profile']) {
 		$userForm->addVar('user_type', $data['user_type']);
 	}
 	else {
-		$permissionsFormList->addRow((new CLabel(_('User type'), 'user_type'))->setAsteriskMark(),
-			$userTypeComboBox->setAriaRequired()
-		);
+		$permissionsFormList->addRow(_('User type'), $userTypeComboBox);
 	}
 
 	$permissions_table = (new CTable())

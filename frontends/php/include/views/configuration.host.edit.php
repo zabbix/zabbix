@@ -89,7 +89,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	}
 
 	$hostList->addRow(
-		(new CLabel(_('Groups'), 'groups'))->setAsteriskMark(), $groups_tweenbox->get(_('In groups'), _('Other groups'))
+		(new CLabel(_('Groups'), 'groups_tweenbox'))->setAsteriskMark(), $groups_tweenbox->get(_('In groups'), _('Other groups'))
 	);
 
 	$new_group = (new CTextBox('newgroup', $data['newgroup']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
