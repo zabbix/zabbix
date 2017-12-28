@@ -376,6 +376,13 @@ static int	DBpatch_3050028(void)
 	return DBmodify_field_type("alerts", &field, NULL);
 }
 
+extern int	DBpatch_3040006(void);
+
+static int	DBpatch_3050029(void)
+{
+	return DBpatch_3040006();
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -407,5 +414,6 @@ DBPATCH_ADD(3050025, 0, 1)
 DBPATCH_ADD(3050026, 0, 1)
 DBPATCH_ADD(3050027, 0, 1)
 DBPATCH_ADD(3050028, 0, 1)
+DBPATCH_ADD(3050029, 0, 0)
 
 DBPATCH_END()
