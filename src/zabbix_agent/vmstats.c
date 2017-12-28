@@ -234,7 +234,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			if (lparstats.type.b.pool_util_authority)
 			{
 				/* Available Pool Processor (app) */
-				vmstat->cpu_app = (lparstats.pool_idle_time - last_pool_idle_time) / (XINTFRAC * (double)dtimebase);
+				vmstat->cpu_app = (lparstats.pool_idle_time - last_pool_idle_time) / (XINTFRAC * dtimebase);
 			}
 		}
 #else	/* not _AIXVERSION_530 */
