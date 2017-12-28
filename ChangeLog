@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
 
 Bug fixes:
+........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
 ..F....... [ZBXNEXT-4139] fixed displaying of the eventlog severitites and severities in trigger map element (andzs)
 .......PS. [ZBX-13178] add ipc_path to error message (MVekslers)
 
@@ -58,6 +59,7 @@ Changes for 3.4.6rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.5
