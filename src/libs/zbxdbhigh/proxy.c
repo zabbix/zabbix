@@ -2625,14 +2625,6 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 			{
 				goto out;
 			}
-
-			av->ts.ns += client_timediff->ns;
-
-			if (av->ts.ns > 999999999)
-			{
-				av->ts.sec++;
-				av->ts.ns -= 1000000000;
-			}
 		}
 		else
 		{
@@ -2808,6 +2800,9 @@ static int	parse_history_data(struct zbx_json_parse *jp_data, const char **pnext
 		}
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): time different between server and arrived timestamp from json"
+		" %i seconds and %i nanosecond",__function_name, client_timediff->sec, client_timediff->ns);
+
 	/* iterate the history data rows */
 	do
 	{
@@ -2887,6 +2882,9 @@ static int	parse_history_data_33(struct zbx_json_parse *jp_data, const char **pn
 			goto out;
 		}
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): time different between server and arrived timestamp from json"
+		" %i seconds and %i nanosecond",__function_name, client_timediff->sec, client_timediff->ns);
 
 	/* iterate the history data rows */
 	do
@@ -3227,17 +3225,14 @@ int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, z
  * Purpose: parse discovery data contents and process it                      *
  *                                                                            *
  * Parameters: jp_data         - [IN] JSON with discovery data                *
- *             client_timediff - [IN] time difference between sending and     *
- *                                    receiving parties                       *
- *             info            - [OUT] address of a pointer to the info       *
+ *             error           - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const zbx_timespec_t *client_timediff,
-		char **error)
+static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char **error)
 {
 	const char		*__function_name = "process_discovery_data_contents";
 	DB_RESULT		result;
@@ -3268,7 +3263,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 			goto json_parse_error;
 
-		itemtime = atoi(tmp) + client_timediff->sec;
+		itemtime = atoi(tmp);
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DRULE, tmp, sizeof(tmp)))
 			goto json_parse_error;
@@ -3416,10 +3411,10 @@ int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_client_timediff(jp, ts, &client_timediff)))
+	if (SUCCEED == (ret = get_client_timediff(jp, ts, &client_timediff)))
 	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): time different between server and arrived timestamp from json"
+			" %i seconds and %i nanosecond",__function_name, client_timediff.sec, client_timediff.ns);
 	}
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
@@ -3428,7 +3423,7 @@ int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char *
 		goto out;
 	}
 
-	ret = process_discovery_data_contents(&jp_data, &client_timediff, error);
+	ret = process_discovery_data_contents(&jp_data, error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -3443,8 +3438,6 @@ out:
  *                                                                            *
  * Parameters: jp_data         - [IN] JSON with auto registration data        *
  *             proxy_hostid    - [IN] proxy identifier from database          *
- *             client_timediff - [IN] time difference between sending and     *
- *                                    receiving parties                       *
  *             error           - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
  *                                                                            *
@@ -3452,8 +3445,7 @@ out:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
-		const zbx_timespec_t *client_timediff, char **error)
+static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **error)
 {
 	const char		*__function_name = "process_auto_registration_contents";
 
@@ -3480,7 +3472,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
 			break;
 
-		itemtime = atoi(tmp) + client_timediff->sec;
+		itemtime = atoi(tmp);
 
 		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host))))
 			break;
@@ -3577,10 +3569,10 @@ int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_host
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_client_timediff(jp, ts, &client_timediff)))
+	if (SUCCEED == (ret = get_client_timediff(jp, ts, &client_timediff)))
 	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): time different between server and arrived timestamp from json"
+			" %i seconds and %i nanosecond",__function_name, client_timediff.sec, client_timediff.ns);
 	}
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
@@ -3589,7 +3581,7 @@ int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_host
 		goto out;
 	}
 
-	ret = process_auto_registration_contents(&jp_data, proxy_hostid, &client_timediff, error);
+	ret = process_auto_registration_contents(&jp_data, proxy_hostid, error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -3868,17 +3860,14 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
-		if (SUCCEED != process_discovery_data_contents(&jp_data, &client_timediff, &error_step))
+		if (SUCCEED != process_discovery_data_contents(&jp_data, &error_step))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTO_REGISTRATION, &jp_data))
 	{
-		if (SUCCEED != process_auto_registration_contents(&jp_data, proxy->hostid, &client_timediff,
-				&error_step))
-		{
+		if (SUCCEED != process_auto_registration_contents(&jp_data, proxy->hostid, &error_step))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
-		}
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_TASKS, &jp_data))

@@ -311,9 +311,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (item->nextcheck = DCget_disable_until(item, host)))
 		return;
 
-	if (0 != host->proxy_hostid && NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
-		now -= proxy->timediff;
-
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
 	/* for new items, supported items and items that are notsupported due to invalid update interval try to parse */
@@ -371,8 +368,8 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 
 	item->schedulable = 1;
 
-	if (NULL != proxy)
-		item->nextcheck += proxy->timediff + 1;
+	if (0 != host->proxy_hostid && NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
+		item->nextcheck += 1;
 }
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
