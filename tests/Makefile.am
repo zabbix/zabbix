@@ -1,15 +1,20 @@
-if SERVER
-SERVER_SUBDIRS = \
-	libs
-endif
-
 SUBDIRS = \
 	. \
-	$(SERVER_SUBDIRS)
+	libs
 
-noinst_LIBRARIES = libzbxmockdata.a
+noinst_LIBRARIES = \
+	libzbxmocktest.a \
+	libzbxmockdata.a
+
+libzbxmocktest_a_SOURCES = \
+	zbxmocktest.c \
+	zbxmocktest.h
 
 libzbxmockdata_a_SOURCES = \
-	db_simulation.c \
+	zbxmockdb.c \
+	zbxmockdir.c \
+	zbxmockexit.c \
+	zbxmockfile.c \
+	zbxmockstat.c \
 	zbxmockdata.c \
 	zbxmockdata.h

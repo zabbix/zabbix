@@ -76,7 +76,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestClickButton('mediatype.disable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type disabled');
 
@@ -101,7 +101,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestClickButton('mediatype.enable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type enabled');
 
@@ -115,7 +115,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 	/**
 	 * @dataProvider allMediaTypes
-	 * @backup media_type
+	 * @backup-once media_type
 	 */
 	public function testPageAdministrationMediaTypes_Delete($mediatype) {
 		$dbRow = DBfetch(DBselect(
@@ -128,7 +128,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestClickButton('mediatype.delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of media types');
 
 		$sql = 'SELECT NULL FROM media_type WHERE mediatypeid='.$mediatype['mediatypeid'];

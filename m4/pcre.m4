@@ -30,7 +30,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 [
 	AC_ARG_WITH([libpcre],[
 If you want to specify libpcre installation directories:
-AC_HELP_STRING([--with-libpcre=@<:@DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
+AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
 		[
 			LIBPCRE_CFLAGS="-I$withval/include"
 			LIBPCRE_LDFLAGS="-L$withval/lib"
@@ -39,11 +39,21 @@ AC_HELP_STRING([--with-libpcre=@<:@DIR@:>@], [use libpcre from given base instal
 	)
 
 	AC_ARG_WITH([libpcre-include],
-		AC_HELP_STRING([--with-libpcre-include=@<:@DIR@:>@],
+		AC_HELP_STRING([--with-libpcre-include@<:@=DIR@:>@],
 			[use libpcre include headers from given path.]
 		),
 		[
 			LIBPCRE_CFLAGS="-I$withval"
+			_libpcre_dir_set="yes"
+		]
+	)
+
+	AC_ARG_WITH([libpcre-lib],
+		AC_HELP_STRING([--with-libpcre-lib@<:@=DIR@:>@],
+			[use libpcre libraries from given path.]
+		),
+		[
+			LIBPCRE_LDFLAGS="-L$withval"
 			_libpcre_dir_set="yes"
 		]
 	)

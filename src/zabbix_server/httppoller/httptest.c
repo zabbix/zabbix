@@ -33,26 +33,25 @@
 
 typedef struct
 {
+	long	rspcode;
+	double	total_time;
+	double	speed_download;
+}
+zbx_httpstat_t;
+
+extern int	CONFIG_HTTPPOLLER_FORKS;
+
+#ifdef HAVE_LIBCURL
+
+typedef struct
+{
 	char	*data;
 	size_t	allocated;
 	size_t	offset;
 }
 zbx_httppage_t;
 
-typedef struct
-{
-	long	rspcode;
-	double	total_time;
-	double	speed_download;
-	double	test_total_time;
-	int	test_last_step;
-}
-zbx_httpstat_t;
-
-extern int	CONFIG_HTTPPOLLER_FORKS;
 extern char	*CONFIG_SOURCE_IP;
-
-#ifdef HAVE_LIBCURL
 
 extern char	*CONFIG_SSL_CA_LOCATION;
 extern char	*CONFIG_SSL_CERT_LOCATION;
@@ -74,10 +73,10 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 	{
 		page.allocated = MAX(8096, r_size);
 		page.offset = 0;
-		page.data = zbx_malloc(page.data, page.allocated);
+		page.data = (char *)zbx_malloc(page.data, page.allocated);
 	}
 
-	zbx_strncpy_alloc(&page.data, &page.allocated, &page.offset, ptr, r_size);
+	zbx_strncpy_alloc(&page.data, &page.allocated, &page.offset, (char *)ptr, r_size);
 
 	return r_size;
 }
@@ -226,8 +225,8 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
  *             pairs           - [IN] vector of pairs                         *
  *                                                                            *
  ******************************************************************************/
-static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, char *value_delimiter,
-		char *pair_delimiter, zbx_vector_ptr_pair_t *pairs)
+static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, const char *value_delimiter,
+		const char *pair_delimiter, zbx_vector_ptr_pair_t *pairs)
 {
 	int	p;
 	char	*key, *value;
@@ -715,10 +714,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 #ifdef HAVE_LIBCURL
 	DB_ROW		row;
 	zbx_httpstat_t	stat;
-	int		err;
 	char		*auth = NULL, errbuf[CURL_ERROR_SIZE];
 	size_t		auth_alloc = 0, auth_offset;
 	CURL		*easyhandle = NULL;
+	CURLcode	err;
 	zbx_httpstep_t	httpstep;
 #endif
 

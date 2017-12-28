@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Huawei VRP SNMPv2</template>
          <name>Template Net Huawei VRP SNMPv2</name>
-         <description>Template Net Huawei VRP version: 0.13
+         <description>Template Net Huawei VRP version: 0.14
 Overview: Reference: https://www.slideshare.net/Huanetwork/huawei-s5700-naming-conventions-and-port-numbering-conventions
 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
 
@@ -182,7 +182,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -646,7 +646,7 @@ Device serial number has changed. Ack to close</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -683,7 +683,7 @@ Device serial number has changed. Ack to close</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Huawei VRP SNMPv2:sensor.fan.status[hwEntityFanState.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:sensor.fan.status[hwEntityFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Fan is in critical state</name>

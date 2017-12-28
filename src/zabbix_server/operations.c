@@ -122,7 +122,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select groupid"
@@ -653,7 +653,7 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	/* make sure host belongs to at least one hostgroup */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

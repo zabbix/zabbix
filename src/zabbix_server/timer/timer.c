@@ -79,13 +79,12 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		zbx_process_triggers(&trigger_order, &trigger_diff);
 
-		if (0 != (events_num = process_trigger_events(&trigger_diff, &triggerids,
-				ZBX_EVENTS_PROCESS_CORRELATION)))
+		if (0 != (events_num = zbx_process_events(&trigger_diff, &triggerids)))
 		{
 			*events_count += events_num;
 
 			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_save_trigger_changes(&trigger_diff);
+			zbx_db_save_trigger_changes(&trigger_diff);
 		}
 
 		DBcommit();
@@ -182,7 +181,7 @@ static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm,
 	if (*hm_alloc == *hm_count)
 	{
 		*hm_alloc += 4;
-		*hm = zbx_realloc(*hm, *hm_alloc * sizeof(zbx_host_maintenance_t));
+		*hm = (zbx_host_maintenance_t *)zbx_realloc(*hm, *hm_alloc * sizeof(zbx_host_maintenance_t));
 	}
 
 	memmove(&(*hm)[hm_index + 1], &(*hm)[hm_index], sizeof(zbx_host_maintenance_t) * (*hm_count - hm_index));
@@ -327,7 +326,7 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	DBbegin();
 
@@ -454,7 +453,7 @@ static int	process_maintenance(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == hm)
-		hm = zbx_malloc(hm, sizeof(zbx_host_maintenance_t) * hm_alloc);
+		hm = (zbx_host_maintenance_t *)zbx_malloc(hm, sizeof(zbx_host_maintenance_t) * hm_alloc);
 
 	now = time(NULL);
 	tm = localtime(&now);
@@ -655,9 +654,13 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
 
-		/* flush correlated event queue and set minimal sleep time if queue is not empty */
-		if (0 != flush_correlated_events() && 1 < sleeptime)
-			sleeptime = 1;
+		/* try flushing correlated event queue */
+		if (0 != zbx_flush_correlated_events())
+		{
+			/* force minimal sleep period if there are still some events left in queue */
+			if (1 < sleeptime)
+				sleeptime = 1;
+		}
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

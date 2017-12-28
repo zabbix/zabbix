@@ -132,19 +132,29 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 	if (!empty($data['user_medias'])) {
 		$mediaTypeDescriptions = [];
 		$dbMediaTypes = DBselect(
-			'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
+			'SELECT mt.mediatypeid,mt.type,mt.description FROM media_type mt WHERE '.
 				dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 		);
 		while ($dbMediaType = DBfetch($dbMediaTypes)) {
-			$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
+			$mediaTypeDescriptions[$dbMediaType['mediatypeid']]['description'] = $dbMediaType['description'];
+			$mediaTypeDescriptions[$dbMediaType['mediatypeid']]['mediatype'] = $dbMediaType['type'];
 		}
 
 		foreach ($data['user_medias'] as &$media) {
-			$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']];
+			$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']]['description'];
+			$media['mediatype'] = $mediaTypeDescriptions[$media['mediatypeid']]['mediatype'];
+			$media['send_to_sort_field'] = is_array($media['sendto'])
+				? implode(', ', $media['sendto'])
+				: $media['sendto'];
 		}
 		unset($media);
 
-		CArrayHelper::sort($data['user_medias'], ['description', 'sendto']);
+		CArrayHelper::sort($data['user_medias'], ['description', 'send_to_sort_field']);
+
+		foreach ($data['user_medias'] as &$media) {
+			unset($media['send_to_sort_field']);
+		}
+		unset($media);
 	}
 
 	// set user rights
@@ -251,6 +261,7 @@ function getItemFilterForm(&$items) {
 	$filter_state				= $_REQUEST['filter_state'];
 	$filter_templated_items		= $_REQUEST['filter_templated_items'];
 	$filter_with_triggers		= $_REQUEST['filter_with_triggers'];
+	$filter_discovery           = $_REQUEST['filter_discovery'];
 	$subfilter_hosts			= $_REQUEST['subfilter_hosts'];
 	$subfilter_apps				= $_REQUEST['subfilter_apps'];
 	$subfilter_types			= $_REQUEST['subfilter_types'];
@@ -259,6 +270,7 @@ function getItemFilterForm(&$items) {
 	$subfilter_state			= $_REQUEST['subfilter_state'];
 	$subfilter_templated_items	= $_REQUEST['subfilter_templated_items'];
 	$subfilter_with_triggers	= $_REQUEST['subfilter_with_triggers'];
+	$subfilter_discovery        = $_REQUEST['subfilter_discovery'];
 	$subfilter_history			= $_REQUEST['subfilter_history'];
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
@@ -272,6 +284,7 @@ function getItemFilterForm(&$items) {
 		->addVar('subfilter_state', $subfilter_state)
 		->addVar('subfilter_templated_items', $subfilter_templated_items)
 		->addVar('subfilter_with_triggers', $subfilter_with_triggers)
+		->addVar('subfilter_discovery', $subfilter_discovery)
 		->addVar('subfilter_history', $subfilter_history)
 		->addVar('subfilter_trends', $subfilter_trends)
 		->addVar('subfilter_interval', $subfilter_interval);
@@ -340,8 +353,13 @@ function getItemFilterForm(&$items) {
 			],
 			'data' => $groupFilter,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
-					'&srcfld1=groupid&writeonly=1'
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'filter_groupid',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
@@ -393,8 +411,13 @@ function getItemFilterForm(&$items) {
 			],
 			'data' => $hostFilterData,
 			'popup' => [
-				'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
-					'&srcfld1=hostid&writeonly=1'
+				'parameters' => [
+					'srctbl' => 'host_templates',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'filter_hostid',
+					'srcfld1' => 'hostid',
+					'writeonly' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
@@ -418,12 +441,19 @@ function getItemFilterForm(&$items) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton(null, _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick(
-					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
-						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-						'&with_applications=1'.
-						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
-						.', 0, 0, "application");')
+				->onClick('return PopUp("popup.generic",jQuery.extend('.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'filter_application',
+						'with_applications' => '1'
+					]).
+					',(jQuery("input[name=\'filter_hostid\']").length > 0)'.
+						' ? {hostid: jQuery("input[name=\'filter_hostid\']").val()}'.
+						' : {}'.
+					'));'
+				)
 		]
 	);
 	$filterColumn2->addRow(_('SNMP community'),
@@ -474,6 +504,13 @@ function getItemFilterForm(&$items) {
 		(new CNumericBox('filter_port', $filter_port, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		'filter_port_row'
 	);
+	$filterColumn4->addRow(_('Discovery'),
+		new CComboBox('filter_discovery', $filter_discovery, null, [
+			-1 => _('all'),
+			ZBX_FLAG_DISCOVERY_CREATED => _('Discovered items'),
+			ZBX_FLAG_DISCOVERY_NORMAL => _('Regular items')
+		])
+	);
 
 	$form->addColumn($filterColumn1);
 	$form->addColumn($filterColumn2);
@@ -498,6 +535,7 @@ function getItemFilterForm(&$items) {
 		'state' => [],
 		'templated_items' => [],
 		'with_triggers' => [],
+		'discovery' => [],
 		'history' => [],
 		'trends' => [],
 		'interval' => []
@@ -687,6 +725,31 @@ function getItemFilterForm(&$items) {
 			}
 		}
 
+		// discovery
+		if ($filter_discovery == -1) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL && !isset($item_params['discovery'][0])) {
+				$item_params['discovery'][0] = ['name' => _('Regular'), 'count' => 0];
+			}
+			elseif ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && !isset($item_params['discovery'][1])) {
+				$item_params['discovery'][1] = ['name' => _('Discovered'), 'count' => 0];
+			}
+			$show_item = true;
+			foreach ($item['subfilters'] as $name => $value) {
+				if ($name == 'subfilter_discovery') {
+					continue;
+				}
+				$show_item &= $value;
+			}
+			if ($show_item) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					$item_params['discovery'][0]['count']++;
+				}
+				else {
+					$item_params['discovery'][1]['count']++;
+				}
+			}
+		}
+
 		// trends
 		if ($filter_trends === ''
 				&& !in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
@@ -834,6 +897,11 @@ function getItemFilterForm(&$items) {
 	if ($filter_with_triggers == -1 && count($item_params['with_triggers']) > 1) {
 		$with_triggers_output = prepareSubfilterOutput(_('With triggers'), $item_params['with_triggers'], $subfilter_with_triggers, 'subfilter_with_triggers');
 		$table_subfilter->addRow([$with_triggers_output]);
+	}
+
+	if ($filter_discovery == -1 && count($item_params['discovery']) > 1) {
+		$discovery_output = prepareSubfilterOutput(_('Discovery'), $item_params['discovery'], $subfilter_discovery, 'subfilter_discovery');
+		$table_subfilter->addRow([$discovery_output]);
 	}
 
 	if (zbx_empty($filter_history) && count($item_params['history']) > 1) {
@@ -1518,6 +1586,18 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
+	if ($data['hostid'] && (!array_key_exists('groupid', $data) || !$data['groupid'])) {
+		$db_hostgroups = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'hostids' => $data['hostid'],
+			'templateids' => $data['hostid']
+		]);
+
+		if ($db_hostgroups) {
+			$data['groupid'] = $db_hostgroups[0]['groupid'];
+		}
+	}
+
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
 		$data['expression'] = $trigger['expression'];
 		$data['recovery_expression'] = $trigger['recovery_expression'];
@@ -1922,7 +2002,7 @@ function get_timeperiod_form() {
 
 		$tblPeriod->addRow([_('Date'),
 			(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
-				->addValue(_('Day'), 0, null, 'submit()')
+				->addValue(_('Day of month'), 0, null, 'submit()')
 				->addValue(_('Day of week'), 1, null, 'submit()')
 				->setModern(true)
 		]);

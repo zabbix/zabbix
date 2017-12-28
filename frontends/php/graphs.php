@@ -603,7 +603,7 @@ elseif (isset($_REQUEST['form'])) {
 
 		$i = $next;
 	}
-	asort_by_key($data['items'], 'sortorder');
+	CArrayHelper::sort($data['items'], ['sortorder']);
 	$data['items'] = array_values($data['items']);
 
 	// is template

@@ -25,6 +25,53 @@
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "zbxself.h"
+#include "comms.h"
+
+char	*CONFIG_HOSTS_ALLOWED		= NULL;
+char	*CONFIG_HOSTNAME		= NULL;
+char	*CONFIG_HOSTNAME_ITEM		= NULL;
+char	*CONFIG_HOST_METADATA		= NULL;
+char	*CONFIG_HOST_METADATA_ITEM	= NULL;
+
+int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
+int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
+int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
+int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
+int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
+char	*CONFIG_LISTEN_IP		= NULL;
+char	*CONFIG_SOURCE_IP		= NULL;
+int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
+
+int	CONFIG_BUFFER_SIZE		= 100;
+int	CONFIG_BUFFER_SEND		= 5;
+
+int	CONFIG_MAX_LINES_PER_SECOND	= 20;
+
+char	*CONFIG_LOAD_MODULE_PATH	= NULL;
+
+char	**CONFIG_ALIASES		= NULL;
+char	**CONFIG_LOAD_MODULE		= NULL;
+char	**CONFIG_USER_PARAMETERS	= NULL;
+#if defined(_WINDOWS)
+char	**CONFIG_PERF_COUNTERS		= NULL;
+#endif
+
+char	*CONFIG_USER			= NULL;
+
+/* TLS parameters */
+unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
+unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
+
+char	*CONFIG_TLS_CONNECT		= NULL;
+char	*CONFIG_TLS_ACCEPT		= NULL;
+char	*CONFIG_TLS_CA_FILE		= NULL;
+char	*CONFIG_TLS_CRL_FILE		= NULL;
+char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
+char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
+char	*CONFIG_TLS_CERT_FILE		= NULL;
+char	*CONFIG_TLS_KEY_FILE		= NULL;
+char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 #ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
@@ -525,7 +572,7 @@ static void	set_defaults(void)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
 
 	if (NULL == CONFIG_PID_FILE)
-		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
+		CONFIG_PID_FILE = (char *)"/tmp/zabbix_agentd.pid";
 #endif
 	if (NULL == CONFIG_LOG_TYPE_STR)
 		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
@@ -622,7 +669,7 @@ static int	add_activechk_host(const char *host, unsigned short port)
 	}
 
 	CONFIG_ACTIVE_FORKS++;
-	CONFIG_ACTIVE_ARGS = zbx_realloc(CONFIG_ACTIVE_ARGS, sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
+	CONFIG_ACTIVE_ARGS = (ZBX_THREAD_ACTIVECHK_ARGS *)zbx_realloc(CONFIG_ACTIVE_ARGS, sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
 	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].host = zbx_strdup(NULL, host);
 	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].port = port;
 
@@ -965,7 +1012,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
+	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #0 started [main process]");
 

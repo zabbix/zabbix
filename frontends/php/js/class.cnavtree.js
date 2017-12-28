@@ -260,7 +260,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				levels_moved = Math.floor(Math.abs(parent_item.offset().left - this.positionAbs.left) / o.indent_size);
 			}
 
-			$('.highliglted-parent').removeClass('highliglted-parent');
+			$('.highlighted-parent').removeClass('highlighted-parent');
 
 			if (direction_moved === 'right' && levels_moved) {
 				var drop_to = prev_item,
@@ -270,7 +270,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 
 				this.changing_parent = setTimeout(function() {
 					$(drop_to)
-						.addClass('highliglted-parent opened')
+						.addClass('highlighted-parent opened')
 						.removeClass('closed');
 
 					if (prev_offset_top && (prev_offset_top <= prev_item.offset().top)) {
@@ -297,7 +297,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 					levels_moved--;
 				}
 
-				$(drop_to).addClass('highliglted-parent');
+				$(drop_to).addClass('highlighted-parent');
 
 				this.changing_parent = setTimeout(function() {
 					if (one_before && one_before.length) {
@@ -316,7 +316,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				this._isAllowed(prev_item, level, level + child_levels);
 			}
 			else {
-				$(this.placeholder.parent().closest('.tree-item')).addClass('highliglted-parent');
+				$(this.placeholder.parent().closest('.tree-item')).addClass('highlighted-parent');
 				this._isAllowed(prev_item, level, level + child_levels);
 			}
 
@@ -341,7 +341,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				return;
 			}
 
-			$('.highliglted-parent').removeClass('highliglted-parent');
+			$('.highlighted-parent').removeClass('highlighted-parent');
 			this.placeholder.removeClass('sortable-error');
 
 			if (this.changing_parent) {
@@ -707,8 +707,8 @@ jQuery(function($) {
 																				parent: +itemid
 																			};
 
-																		root.appendChild(createTreeItem($obj, new_item, 1,
-																			true, true
+																		root.appendChild(createTreeItem($obj, new_item,
+																			1, true, true
 																		));
 																		add_child_levels($obj, +submapid,
 																			submap_itemid
@@ -725,7 +725,7 @@ jQuery(function($) {
 															.removeClass('closed');
 													}
 
-													overlayDialogueDestroy();
+													overlayDialogueDestroy('navtreeitem');
 													setTreeHandlers($obj);
 												}
 											}
@@ -739,7 +739,8 @@ jQuery(function($) {
 									'class': 'btn-alt',
 									'action': function() {}
 								}
-							]
+							],
+							'dialogueid': 'navtreeitem'
 						});
 					}
 				});
@@ -907,13 +908,7 @@ jQuery(function($) {
 					btn2.setAttribute('class', 'import-items-btn');
 					btn2.setAttribute('title', t('Add multiple maps'));
 					btn2.addEventListener('click', function() {
-						var url = new Curl('popup.php'),
-							id = $(this).data('id');
-
-						url.setArgument('srctbl', 'sysmaps');
-						url.setArgument('srcfld1', 'sysmapid');
-						url.setArgument('srcfld2', 'name');
-						url.setArgument('multiselect', '1');
+						var id = $(this).data('id');
 
 						if (typeof addPopupValues === 'function') {
 							old_addPopupValues = addPopupValues;
@@ -947,7 +942,12 @@ jQuery(function($) {
 							}
 						};
 
-						return PopUp(url.getUrl());
+						return PopUp('popup.generic', {
+							srctbl: 'sysmaps',
+							srcfld1: 'sysmapid',
+							srcfld2: 'name',
+							multiselect: '1'
+						});
 					});
 					tools.appendChild(btn2);
 

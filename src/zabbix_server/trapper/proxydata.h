@@ -32,7 +32,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts);
 
 int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info);
 
-void	init_proxy_history_lock(void);
+int	init_proxy_history_lock(char **error);
 void	free_proxy_history_lock(void);
 
 #endif

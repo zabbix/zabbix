@@ -1430,15 +1430,21 @@ INSERT INTO functions (functionid,triggerid,itemid,function,parameter) VALUES ('
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99250','97');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('service','abcdef','99250','98');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Database','','99250','99');
-INSERT INTO events (eventid,source,object,objectid,clock,ns,value) VALUES (92,0,0,99250,1508751328,128786843,1);
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (92,0,0,99250,1508751328,128786843,1,'Test trigger to check tag filter on problem page');
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (90,92,'Service','abc'),(91,92,'service','abcdef'),(92,92,'Database','');
-INSERT INTO problem (eventid,source,object,objectid,clock,ns) VALUES (92,0,0,99250,1508751328,128786843);
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (92,0,0,99250,1508751328,128786843,'Test trigger to check tag filter on problem page');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (90,92,'Service','abc'),(91,92,'service','abcdef'),(92,92,'Database','');
 
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger with tag','{13083}>100','0','0','','2','','1','0','0','','','99251');
 INSERT INTO functions (functionid,triggerid,itemid,function,parameter) VALUES ('99529','99251','23292','avg','5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99251','100');
-INSERT INTO events (eventid,source,object,objectid,clock,ns,value) VALUES (93,0,0,99251,1508761528,128786843,1);
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (93,0,0,99251,1508761528,128786843,1,'Test trigger with tag');
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
-INSERT INTO problem (eventid,source,object,objectid,clock,ns) VALUES (93,0,0,99251,1508761528,128786843);
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (93,0,0,99251,1508761528,128786843,'Test trigger with tag');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
+
+-- event correlation
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event corelation for delete', '', 0, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99000, 'tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99000, 99000, 0);

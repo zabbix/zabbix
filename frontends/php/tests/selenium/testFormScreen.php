@@ -138,10 +138,9 @@ class testFormScreen extends CWebTest {
 		$vsize = $this->zbxTestGetValue("//input[@id='vsize']");
 
 		if (isset($data['owner'])) {
-			$this->zbxTestClickXpathWait("//button[text()='Select']");
-			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+			$this->zbxTestClickButtonMultiselect('userid');
+			$this->zbxTestLaunchOverlayDialog('Users');
 			$this->zbxTestClickLinkTextWait($data['owner']);
-			$this->webDriver->switchTo()->window('');
 		}
 
 		if (isset($data['remove_owner'])) {
@@ -217,7 +216,7 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickXpathWait("//a[text()='$this->testscreen_history']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen deleted');
 		$this->assertEquals(0, DBcount("SELECT screenid FROM screens WHERE name='$this->testscreen_history'"));
 	}

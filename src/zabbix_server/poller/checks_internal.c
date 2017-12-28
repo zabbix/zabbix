@@ -32,7 +32,7 @@ extern unsigned char	program_type;
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
-	const DC_INTERFACE2	*i1 = p1, *i2 = p2;
+	const DC_INTERFACE2	*i1 = (DC_INTERFACE2 *)p1, *i2 = (DC_INTERFACE2 *)p2;
 
 	if (i1->type > i2->type)		/* 1st criterion: 'type' in ascending order */
 		return 1;
@@ -454,7 +454,13 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		zbx_alarm_off();
 
 		if (SUCCEED != res)
+		{
+			tmp1 = get_rparam(&request, 2);
+			/* the default error code "NOTSUPPORTED" renders nodata() trigger function nonfunctional */
+			if (NULL != tmp1 && 0 == strcmp(tmp1, "ping"))
+				ret = GATEWAY_ERROR;
 			goto out;
+		}
 	}
 	else if (0 == strcmp(tmp, "process"))			/* zabbix["process",<type>,<mode>,<state>] */
 	{

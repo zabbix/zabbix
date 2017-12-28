@@ -60,13 +60,13 @@ $data = [
 		'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'screens' => ['updateExisting' => false, 'createMissing' => false],
 		'maps' => ['updateExisting' => false, 'createMissing' => false],
-		'images' => ['updateExisting' => false, 'createMissing' => false],
+		'images' => ['updateExisting' => false, 'createMissing' => true],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 	],
 	'backurl' => getRequest('backurl', '')
 ];
 
-if (!CHtmlUrlValidator::validate($data['backurl'])) {
+if (!CHtmlUrlValidator::validate($data['backurl'], false, true)) {
 	$data['backurl'] = 'zabbix.php?action=dashboard.view';
 }
 

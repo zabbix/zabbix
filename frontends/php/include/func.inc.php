@@ -101,7 +101,7 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS);
+	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS, true);
 	$_COOKIE[$name] = $value;
 }
 
@@ -331,6 +331,17 @@ function zbxAddSecondsToUnixtime($sec, $unixtime) {
 }
 
 /*************** CONVERTING ******************/
+/**
+ * Convert the Windows new line (CR+LF) to Linux style line feed (LF).
+ *
+ * @param string $string  Input string that will be converted.
+ *
+ * @return string
+ */
+function CRLFtoLF($string) {
+	return str_replace("\r\n", "\n", $string);
+}
+
 function rgb2hex($color) {
 	$HEX = [
 		dechex($color[0]),
@@ -614,10 +625,16 @@ function convert_units($options = []) {
 		return convertUnitsS($options['value'], $options['ignoreMillisec']);
 	}
 
-	// any other unit
 	// black list of units that should have no multiplier prefix (K, M, G etc) applied
 	$blackList = ['%', 'ms', 'rpm', 'RPM'];
 
+	// add to the blacklist if unit is prefixed with '!'
+	if ($options['units'] !== null && $options['units'] !== '' && $options['units'][0] === '!') {
+		$options['units'] = substr($options['units'], 1);
+		$blackList[] = $options['units'];
+	}
+
+	// any other unit
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
 			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
 		if (preg_match('/^\-?\d+\.\d+$/', $options['value'])) {
@@ -1052,17 +1069,6 @@ function natksort(&$array) {
 	$array = $new_array;
 
 	return true;
-}
-
-function asort_by_key(&$array, $key) {
-	if (!is_array($array)) {
-		error(_('Incorrect type of asort_by_key.'));
-		return [];
-	}
-	$key = htmlspecialchars($key);
-	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-
-	return $array;
 }
 
 // recursively sort an array by key
@@ -1786,16 +1792,24 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
 {
 	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
-	$msg_box = (new CDiv($title))->addClass($class);
+	$msg_details = null;
+	$link_details = null;
 
 	if ($messages) {
-		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS);
-
 		if ($title !== null) {
-			$link = (new CSpan(_('Details')))
+			$link_details = (new CSpan())
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->onClick('javascript: showHide($(this).next(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));');
-			$msg_details->addItem($link);
+				->addItem(_('Details'))
+				->addItem(' ') // space
+				->addItem((new CSpan())
+					->setId('details-arrow')
+					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
+				)
+				->onClick('javascript: '.
+					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
+						'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));'.
+					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'
+				);
 		}
 
 		$list = new CList();
@@ -1811,19 +1825,52 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 				$list->addItem($message_part);
 			}
 		}
-		$msg_details->addItem($list);
-
-		$msg_box->addItem($msg_details);
+		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
 	}
+
+	$msg_box = (new CDiv())->addClass($class)
+		->addItem($link_details) // Details link should be in front of title
+		->addItem($title)
+		->addItem($msg_details);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
 			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
-			->setAttribute('title', _('Close')));
+			->setTitle(_('Close')));
 	}
 
 	return $msg_box;
+}
+
+/**
+ * Filters messages that can be displayed to user based on defines (see ZBX_SHOW_TECHNICAL_ERRORS) and user settings.
+ *
+ * @param array $messages	List of messages to filter.
+ *
+ * @return array
+ */
+function filter_messages(array $messages = []) {
+	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+		$filtered_messages = [];
+		$generic_exists = false;
+
+		foreach ($messages as $message) {
+			if (array_key_exists('src', $message) && ($message['src'] === 'sql' || $message['src'] === 'php')) {
+				if (!$generic_exists) {
+					$message['message'] = _('System error occurred. Please contact Zabbix administrator.');
+					$filtered_messages[] = $message;
+					$generic_exists = true;
+				}
+			}
+			else {
+				$filtered_messages[] = $message;
+			}
+		}
+		$messages = $filtered_messages;
+	}
+
+	return $messages;
 }
 
 /**
@@ -1837,7 +1884,9 @@ function getMessages()
 {
 	global $ZBX_MESSAGES;
 
-	$message_box = isset($ZBX_MESSAGES) && $ZBX_MESSAGES ? makeMessageBox(false, $ZBX_MESSAGES) : null;
+	$message_box = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES)
+		? makeMessageBox(false, filter_messages($ZBX_MESSAGES))
+		: null;
 
 	$ZBX_MESSAGES = [];
 
@@ -1860,27 +1909,8 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	$imageMessages = [];
 
 	$title = $good ? $okmsg : $errmsg;
-	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
+	$messages = isset($ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
 	$ZBX_MESSAGES = [];
-
-	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
-		$filtered_messages = [];
-		$generic_exists = false;
-
-		foreach ($messages as $message) {
-			if (array_key_exists('src', $message) && ($message['src'] === 'sql' || $message['src'] === 'php')) {
-				if (!$generic_exists) {
-					$message['message'] = _('System error occurred. Please contact Zabbix administrator.');
-					$filtered_messages[] = $message;
-					$generic_exists = true;
-				}
-			}
-			else {
-				$filtered_messages[] = $message;
-			}
-		}
-		$messages = $filtered_messages;
-	}
 
 	switch ($page['type']) {
 		case PAGE_TYPE_IMAGE:
@@ -2030,7 +2060,7 @@ function clear_messages($count = null) {
 		$ZBX_MESSAGES = [];
 	}
 
-	return $result;
+	return $result ? filter_messages($result) : $result;
 }
 
 function fatal_error($msg) {

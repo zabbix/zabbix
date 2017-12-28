@@ -429,7 +429,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
  ******************************************************************************/
 #ifdef HAVE_IPV6
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -540,7 +540,7 @@ out:
 }
 #else
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
@@ -648,7 +648,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #endif	/* HAVE_IPV6 */
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	if (ZBX_TCP_SEC_UNENCRYPTED != tls_connect && ZBX_TCP_SEC_TLS_CERT != tls_connect &&
 			ZBX_TCP_SEC_TLS_PSK != tls_connect)
@@ -1613,7 +1613,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 			else
 			{
 				s->buf_type = ZBX_BUF_TYPE_DYN;
-				s->buffer = zbx_malloc(NULL, allocated);
+				s->buffer = (char *)zbx_malloc(NULL, allocated);
 				buf_dyn_bytes = buf_stat_bytes - ZBX_TCP_HEADER_LEN - sizeof(zbx_uint64_t);
 				buf_stat_bytes = 0;
 				memcpy(s->buffer, s->buf_stat + ZBX_TCP_HEADER_LEN + sizeof(zbx_uint64_t),
@@ -1632,7 +1632,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 		if (sizeof(s->buf_stat) == buf_stat_bytes)
 		{
 			s->buf_type = ZBX_BUF_TYPE_DYN;
-			s->buffer = zbx_malloc(NULL, allocated);
+			s->buffer = (char *)zbx_malloc(NULL, allocated);
 			buf_dyn_bytes = sizeof(s->buf_stat);
 			buf_stat_bytes = 0;
 			memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
@@ -2060,7 +2060,7 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 	else
 	{
 		s->buf_type = ZBX_BUF_TYPE_DYN;
-		s->buffer = zbx_malloc(s->buffer, read_bytes + 1);
+		s->buffer = (char *)zbx_malloc(s->buffer, read_bytes + 1);
 	}
 
 	buffer[read_bytes] = '\0';

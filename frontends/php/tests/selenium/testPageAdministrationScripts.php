@@ -79,7 +79,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('all_scripts');
 		$this->zbxTestClickButton('script.delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestTextPresent('Scripts deleted');
 
@@ -88,13 +88,13 @@ class testPageAdministrationScripts extends CWebTest {
 
 	/**
 	 * @dataProvider allScripts
-	 * @backup scripts
+	 * @backup-once scripts
 	 */
 	public function testPageAdministrationScripts_MassDelete($script) {
 		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('scriptids_'.$script['scriptid']);
 		$this->zbxTestClickButton('script.delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestTextPresent('Script deleted');
 

@@ -251,6 +251,9 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
+char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
+char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -953,7 +956,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-	init_proxy_history_lock();
+
+	if (SUCCEED != init_proxy_history_lock(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize lock for passive proxy history: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (SUCCEED != init_configuration_cache(&error))
 	{
@@ -1013,7 +1022,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_SELFMON_FORKS
 			+ CONFIG_VMWARE_FORKS + CONFIG_IPMIMANAGER_FORKS + CONFIG_TASKMANAGER_FORKS;
 
-	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
+	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
