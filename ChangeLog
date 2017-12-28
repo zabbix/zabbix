@@ -1104,6 +1104,7 @@ Changes for 3.0.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13078] fixed javascript error in user group permission granting popup (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.14
