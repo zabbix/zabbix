@@ -60,6 +60,7 @@ Changes for 3.4.6rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11305] fixed color and label for event status on event details page (gcalenko)
 ..F.....S. [ZBX-13238] fixed spelling of Elasticsearch (abs, vjaceslavs)
 ........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
 .......PS. [ZBX-13178] fixed ipc_path value in error message (MVekslers)
