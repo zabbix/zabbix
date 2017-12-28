@@ -10,7 +10,7 @@ Bug fixes:
 ..F.....S. [ZBX-13238] fixed spelling of Elasticsearch (abs, vjaceslavs)
 ........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
 ..F....... [ZBXNEXT-4139] fixed displaying of the eventlog severitites and severities in trigger map element (andzs)
-.......PS. [ZBX-13178] add ipc_path to error message (MVekslers)
+.......PS. [ZBX-13178] fixed ipc_path value in error message (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha1
