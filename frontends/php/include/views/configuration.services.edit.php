@@ -321,32 +321,32 @@ else {
 		->setAttribute('placeholder', _('mm'));
 
 	$serviceTimeTable->addRow([
-		(new CLabel(_('From'), 'new_service_time[from_week]'))->setAsteriskMark(),
-		[
-			$weekFromComboBox->setAttribute('aria-label', _('Day')),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			_('Time'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeFromHourTextBox->setAttribute('aria-label', _('Hour')),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			':',
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeFromMinuteTextBox->setAttribute('aria-label', _('Minute'))
-		]
+		(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
+		(new CDiv([
+				$weekFromComboBox,
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				_('Time'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$timeFromHourTextBox,
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				':',
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$timeFromMinuteTextBox
+		]))->setId('new_service_time_from')
 	]);
 	$serviceTimeTable->addRow([
-		(new CLabel(_('Till'), 'new_service_time[to_week]'))->setAsteriskMark(),
-		[
-			$weekToComboBox->setAttribute('aria-label', _('Day')),
+		(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
+		(new CDiv([
+			$weekToComboBox,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			_('Time'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeToHourTextBox->setAttribute('aria-label', _('Hour')),
+			$timeToHourTextBox,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			':',
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeToMinuteTextBox->setAttribute('aria-label', _('Minute'))
-		]
+			$timeToMinuteTextBox
+		]))->setId('new_service_time_to')
 	]);
 	$servicesForm->addVar('new_service_time[note]', '');
 }
