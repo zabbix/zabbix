@@ -408,6 +408,8 @@ function validateTriggerWizard(formname, dialogueid) {
 		url = new Curl(jQuery(form).attr('action')),
 		dialogueid = dialogueid || null;
 
+	jQuery(form).trimValues(['#description', '#logexpr']);
+
 	url.setArgument('save', 1);
 
 	jQuery.ajax({
