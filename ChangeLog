@@ -1105,6 +1105,7 @@ Changes for 3.0.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11305] fixed color and label for event status on event details page (gcalenko)
 ..F....... [ZBX-13085] fixed trigger mass update form redirect to trigger list on attempt to attach dependent trigger if there was errors in previous submit attempts (gcalenko)
 ..F....... [ZBX-13078] fixed javascript error in user group permission granting popup (gcalenko)
 
