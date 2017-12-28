@@ -139,26 +139,11 @@ class CEvent extends CApiService {
 					$triggers = API::Trigger()->get([
 						'output' => ['triggerid'],
 						'selectGroups' => ['groupid'],
-						'selectTags' => ['tag', 'value'],
 						'triggerids' => $options['objectids'],
 						'editable' => $options['editable']
 					]);
 
-					$group_triggers = [];
-					$trigger_tags = [];
-
 					foreach ($triggers as $trigger) {
-						$trigger_tags[$trigger['triggerid']] = [];
-
-						foreach ($trigger['tags'] as $tag) {
-							if ($tag['tag'] !== '') {
-								$trigger_tags[$trigger['triggerid']][] = [
-									'tag' => $tag['tag'],
-									'value' => $tag['value']
-								];
-							}
-						}
-
 						foreach ($trigger['groups'] as $group) {
 							$group_triggers[$group['groupid']][$trigger['triggerid']] = $trigger['triggerid'];
 						}
@@ -235,31 +220,35 @@ class CEvent extends CApiService {
 						}
 					}
 
-					foreach ($tag_filters as $groupid => $tag_filter) {
-						if (array_key_exists($groupid, $group_triggers)) {
-							$triggerids = $group_triggers[$groupid];
-							foreach ($triggerids as $triggerid) {
-								if (!in_array($triggerid, $allowed_triggers)) {
-									foreach ($trigger_tags[$triggerid] as $trigger_tag) {
-										if (in_array($trigger_tag, $tag_filter)) {
-											$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
-											break;
-										}
+					$fillter_condition = [];
 
-										foreach ($tag_filter as $tag_array) {
-											if ($tag_array['value'] === ''
-													&& $trigger_tag['tag'] == $tag_array['tag']) {
-												$allowed_triggers = array_merge($allowed_triggers, [$triggerid]);
-												break 2;
-											}
-										}
-									}
+					if ($allowed_triggers) {
+						$fillter_condition[] = dbConditionInt('e.objectid', $allowed_triggers);
+					}
+
+					foreach ($tag_filters as $groupid => $tag_filter) {
+						foreach ($tag_filter as $values) {
+							if (array_key_exists($groupid, $group_triggers)) {
+								$tag_value = '';
+								if ($values['value'] !== '') {
+									$tag_value = ' AND et.value = '.zbx_dbstr($values['value']);
 								}
+
+								$fillter_condition[] = 'EXISTS ('.
+									'SELECT NULL'.
+									' FROM event_tag et'.
+									' WHERE et.eventid = e.eventid'.
+										' AND '.dbConditionInt('e.objectid', $group_triggers[$groupid]).
+										' AND et.tag = '.zbx_dbstr($values['tag']).
+										$tag_value.
+								')';
 							}
 						}
 					}
 
-					$options['objectids'] = array_unique($allowed_triggers);
+					if ($fillter_condition) {
+						$sqlParts['where'][] = '('.implode(' OR ', $fillter_condition).')';
+					}
 				}
 				// all triggers
 				else {
