@@ -132,7 +132,6 @@ $new_permissions_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
-			'styles' => ['margin-top' => '-.3em'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
