@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
 
 Bug fixes:
+...G...... [ZBX-13264] fixed Zabbix agent compilation on OS/X (vso)
 .......PS. [ZBX-13245] fixed IP fragmentation handling in Zabbix server response to Zabbix proxy (vso)
 ..F....... [ZBX-13258] fixed misaligned user group permission controls (Ivo)
 ....I..... [ZBX-13031] fixed Java gateway compilation without libpcre (Sergejs)
