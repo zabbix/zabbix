@@ -934,6 +934,8 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	$items = [];
 	$item_counter = [];
 	$host_items = [];
+	$host_names = [];
+
 	foreach ($db_items as $db_item) {
 		$item_name = $db_item['name_expanded'];
 		$host_name = $db_item['hosts'][0]['name'];

@@ -52,6 +52,10 @@ class CControllerWidgetUrlView extends CControllerWidget {
 			$fields['url'] = $resolved_url ? $resolved_url : $fields['url'];
 		}
 
+		if (!$error && !CHtmlUrlValidator::validate($fields['url'])) {
+			$error = _s('Provided URL "%1$s" is invalid.', $fields['url']);
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'url' => [

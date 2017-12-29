@@ -30,7 +30,7 @@ class CControllerScriptUpdate extends CController {
 			'command' =>				'               db scripts.command     |flags '.P_CRLF,
 			'commandipmi' =>			'               db scripts.command     |flags '.P_CRLF,
 			'description' =>			'               db scripts.description',
-			'host_access' =>			'               db scripts.host_access |in 0,1,2,3',
+			'host_access' =>			'               db scripts.host_access |in '.PERM_READ.','.PERM_READ_WRITE,
 			'groupid' =>				'               db scripts.groupid',
 			'usrgrpid' =>				'               db scripts.usrgrpid',
 			'hgstype' =>				'                                       in 0,1',

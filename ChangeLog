@@ -1,6 +1,28 @@
+Changes for 4.0.0alpha2
+
+New features:
+..F.....S. [ZBXNEXT-768] added item unit blacklisting with character "!" in order to disable metric prefixes (Alexei)
+..F....... [ZBXNEXT-4295] added selection of the create images tickbox by default on "Maps import" page (Sasha)
+..F....... [ZBXNEXT-1456] added filter by item discovery status for item configuration view; thanks to Volker Fröhlich for the original patch (Alexei)
+...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
+
+Bug fixes:
+.......PS. [ZBX-12963] fixed passing argument to external check item that contain literal $ (Sergejs)
+A......... [ZBX-12991] removed default values for "active_since" and "active_till" fields in maintenance.create API method (Ivo)
+..F....... [ZBX-13270] fixed default selection of the required host permissions radio in the global gcripts form (sasha)
+.......PS. [ZBX-12758] fixed slow housekeeping of events due to missing index on foreign key (vso)
+..F....... [ZBX-11305] fixed color and label for event status on event details page (gcalenko)
+..F.....S. [ZBX-13238] fixed spelling of Elasticsearch (abs, vjaceslavs)
+..F....... [ZBX-13056] fixed incorrect positioning of context menu when it is opened using keyboard (gcalenko)
+........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
+..F....... [ZBXNEXT-4139] fixed displaying of the eventlog severitites and severities in trigger map element (andzs)
+.......PS. [ZBX-13178] fixed ipc_path value in error message (MVekslers)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.0alpha1
 
 New features:
+........S. [ZBXNEXT-3480] added support of inventory macros in event tags (abs, vso)
 A.F.I...S. [ZBXNEXT-4175] implemented ability to send email to several email addresses specified as user media (Sergejs, miks)
 ..F.I..... [ZBXNEXT-4139] added high contrast light and high contrast dark themes (andzs)
 A......... [ZBXNEXT-4247] removed deprecated API methods: user.updareProfile, user.addMedia, user.updateMedia, user.deleteMedia, usergroup.massAdd, usergroup.massUpdate and usermedia.get (Sasha)
@@ -29,6 +51,7 @@ A......... [ZBX-3783] added strict validation for proxy.delete() method; proxy c
 
 Bug fixes:
 .......PS. [ZBX-12251] fixed possibility of trigger status getting stuck in PROBLEM or OK state due to transaction error in history synchronization, added deadlock to a list of recoverable errors (vso, wiper)
+.......PS. [ZBX-12251] fixed possibility that new history values are lost and not processed by Zabbix server or Zabbix proxy due to recoverable transaction error (vso, wiper)
 ..F....... [ZBX-12996] fixed radio button and label inconsistency in maintenance period configuration (Sasha)
 ....I..... [ZBX-12895] improved performance of DB patch for updating data in the alerts table (Sergejs)
 ..F....... [ZBX-12082] fixed possibility to select triggers with same name in multiselect (Ivo)
@@ -38,9 +61,43 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
 
 --------------------------------------------------------------------------------
-Changes for 3.4.5rc2
+Changes for 3.4.6rc1
+
+New features:
 
 Bug fixes:
+A......... [ZBX-12991] removed default values for "active_since" and "active_till" fields in maintenance.create API method (Ivo)
+..F....... [ZBX-13270] fixed default selection of the required host permissions radio in the global gcripts form (sasha)
+.......PS. [ZBX-12758] fixed slow housekeeping of events due to missing index on foreign key (vso)
+..F....... [ZBX-11305] fixed color and label for event status on event details page (gcalenko)
+..F.....S. [ZBX-13238] fixed spelling of Elasticsearch (abs, vjaceslavs)
+........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
+.......PS. [ZBX-13178] fixed ipc_path value in error message (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.5
+
+3.4.5rc3 was released as 3.4.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.4.5rc3
+
+Bug fixes:
+.......PS. [ZBX-13225] fixed compilation problem with old curl version for Elasticsearch support (abs, wiper)
+........S. [ZBX-13208] fixed problem when items might be synced without preprocessing steps if they were created during configuration cache synchronization (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.5rc2
+
+New features:
+A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
+
+Bug fixes:
+A......... [ZBX-13210] fixed sort param logic for elasticseach (vjaceslavs)
+.......PS. [ZBX-13188] fixed possibility of endless loop during unrecoverable database error; fixed incomplete handling of database error (vso)
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
+..F....... [ZBX-13176] fixed last item value retrieval errors in history manager (vjaceslavs)
+..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 ........S. [ZBX-13153] fixed possibility that proxy last access updates are lost during cache reload (vso)
 ........S. [ZBX-13149] fixed possible crash in history syncer when processing deleted item (wiper)
@@ -49,10 +106,14 @@ Bug fixes:
 Changes for 3.4.5rc1
 
 New features:
-..F.....S. [ZBXNEXT-4002] implemented support for elasticsearch as history storage (abs, vjaceslavs, wiper)
+..F.....S. [ZBXNEXT-4002] implemented support for Elasticsearch as history storage (abs, vjaceslavs, wiper)
 ..F....... [ZBX-12809] implemented overlay dialog centering using javascript (miks)
 
 Bug fixes:
+..F....... [ZBX-13262] fixed cookie http-only attribute to prevent XSS attacks (miks)
+..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
+..F....... [ZBX-13260] fixed permissions check in script execution form (miks)
+..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 .........T [ZBXNEXT-4223] performed network templates cleanup (vitaly)
 ........S. [ZBX-12974] fixed TLS connection to passive proxy error handling (gleb, valdis)
 ..F....... [ZBX-12714] fixed overflow property of svg (vjaceslavs)
@@ -467,15 +528,27 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
+Changes for 3.2.11
+
+3.2.11rc2 was released as 3.2.11 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.2.11rc2
 
+New features:
+A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
+
 Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
+..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.11rc1
 
 Bug fixes:
+..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
+..F....... [ZBX-13260] fixed permissions check in script execution form (miks)
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 .......PS. [ZBX-12497] improved VMware event log data collection and processing (gleb)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
@@ -1037,9 +1110,29 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.14rc2
+Changes for 3.0.15rc1
+
+New features:
 
 Bug fixes:
+A......... [ZBX-12991] removed default values for "active_since" and "active_till" fields in maintenance.create API method (Ivo)
+..F....... [ZBX-11305] fixed color and label for event status on event details page (gcalenko)
+..F....... [ZBX-13085] fixed trigger mass update form redirect to trigger list on attempt to attach dependent trigger if there was errors in previous submit attempts (gcalenko)
+..F....... [ZBX-13078] fixed javascript error in user group permission granting popup (gcalenko)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.14
+
+3.0.14rc2 was released as 3.0.14 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.14rc2
+
+New features:
+A.F....... [ZBX-12825] implemented delayed URL validation; enabled user macros containing URLs as valid; made URL validation as optional; improved URL validation (miks)
+
+Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 ..F....... [ZBX-12856] fixed empty host filter when adding dependent trigger in trigger edit form (gcalenko)
 
@@ -1047,6 +1140,10 @@ Bug fixes:
 Changes for 3.0.14rc1
 
 Bug fixes:
+..F....... [ZBX-13262] fixed cookie http-only attribute to prevent XSS attacks (miks)
+..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
+..F....... [ZBX-13260] fixed permissions check in script execution form (miks)
+..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 ..F....... [ZBX-13042] fixed unclickable template link on host items list page (gcalenko)
 .......PS. [ZBX-12925] fixed logic of commit/rollback operations (vjaceslavs)
 ..F....... [ZBX-13088] fixed incomplete data in notification reports for yearly report types (gcalenko)
@@ -2865,15 +2962,34 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
-Changes for 2.2.21rc2
+Changes for 2.2.22rc1
+
+New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.21
+
+2.2.21rc2 was released as 2.2.21 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.21rc2
+
+New features:
+..F....... [ZBX-12825] implemented URL validation as optional; improved URL validation (miks)
+
+Bug fixes:
+..F....... [ZBX-13181] fixed database configuration error reporting and message filtering when messages are received from clear_messages function (miks)
 ..F....... [ZBX-13024] fixed parsing "request" parameter for URLs without input parameters (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.21rc1
 
 Bug fixes:
+..F....... [ZBX-13262] fixed cookie http-only attribute to prevent XSS attacks (miks)
+..F....... [ZBX-13261] fixed reflected XSS vulnerability in popup forms (gcalenko)
+..F....... [ZBX-13190] fixed check for permissions to enable/disable actions (gcalenko)
 ..F....... [ZBX-13024] fixed missed url search part in request login parameter (miks)
 ..F....... [ZBX-13044] fixed undefined index when setting strict-transport-security http header (miks)
 ..F....... [ZBX-13133] fixed multiple security issues (miks)
