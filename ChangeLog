@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-13245] fixed IP fragmentation handling in Zabbix server response to Zabbix proxy (vso)
 ..F....... [ZBX-13258] fixed misaligned user group permission controls (Ivo)
 ....I..... [ZBX-13031] fixed Java gateway compilation without libpcre (Sergejs)
 .......PS. [ZBX-12963] fixed passing argument to external check item that contain literal $ (Sergejs)
@@ -68,6 +69,7 @@ Changes for 3.4.6rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-13245] fixed IP fragmentation handling in Zabbix server response to Zabbix proxy (vso)
 ....I..... [ZBX-13031] fixed Java gateway compilation without libpcre (Sergejs)
 A......... [ZBX-12991] removed default values for "active_since" and "active_till" fields in maintenance.create API method (Ivo)
 ..F....... [ZBX-13270] fixed default selection of the required host permissions radio in the global gcripts form (sasha)
