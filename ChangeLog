@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-13258] fixed misaligned user group permission controls (Ivo)
 ....I..... [ZBX-13031] fixed Java gateway compilation without libpcre (Sergejs)
 .......PS. [ZBX-12963] fixed passing argument to external check item that contain literal $ (Sergejs)
 A......... [ZBX-12991] removed default values for "active_since" and "active_till" fields in maintenance.create API method (Ivo)
