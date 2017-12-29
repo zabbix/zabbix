@@ -215,7 +215,7 @@ switch ($data['method']) {
 			]);
 
 			foreach ($triggers as $trigger) {
-				$trigger['color'] = getSeverityColor($trigger['priority']);
+				$trigger['class_name'] = getSeverityStyle($trigger['priority']);
 				$result[] = $trigger;
 			}
 		}

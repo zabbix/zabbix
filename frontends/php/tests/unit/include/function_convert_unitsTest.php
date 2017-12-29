@@ -22,6 +22,16 @@
 require_once dirname(__FILE__).'/../../../include/translateDefines.inc.php';
 
 class function_convert_units extends PHPUnit_Framework_TestCase {
+	protected $defaultTimezone;
+
+	public function setUp() {
+		$this->defaultTimezone = date_default_timezone_get();
+		date_default_timezone_set('UTC');
+	}
+
+	public function tearDown() {
+		date_default_timezone_set($this->defaultTimezone);
+	}
 
 	public static function provider() {
 		return [
