@@ -268,6 +268,18 @@ class CNewValidator {
 					break;
 
 				/*
+				 * 'tunit' => true
+				 */
+				case 'tunit':
+					if (array_key_exists($field, $this->input) && !$this->is_time_unit($this->input[$field], $flags)) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time unit is expected'))
+						);
+						return false;
+					}
+					break;
+
+				/*
 				 * 'flags' => <value1> | <value2> | ... | <valueN>
 				 */
 				case 'flags':
@@ -430,6 +442,15 @@ class CNewValidator {
 
 		return ($Y >= 1990 && $M >= 1 && $M <= 12 && $D >= 1 && $D <= $this->getDaysInMonth($Y, $M)
 			&& $h >= 0 && $h <= 23 && $m >= 0 && $m <= 59 && $s >= 0 && $s <= 59);
+	}
+
+	private function is_time_unit($value, $flags) {
+		$simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => ($flags & P_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & P_ALLOW_LLD_MACRO)
+		]);
+
+		return ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS);
 	}
 
 	/**

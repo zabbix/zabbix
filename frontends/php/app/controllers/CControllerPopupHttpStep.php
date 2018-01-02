@@ -37,7 +37,7 @@ class CControllerPopupHttpStep extends CController {
 			'pairs' =>				'array',
 			'retrieve_mode' =>		'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS]),
 			'follow_redirects' =>	'in '.implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_ON, HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF]),
-			'timeout' =>			'string',
+			'timeout' =>			'string|tunit|flags '.P_ALLOW_USER_MACRO,
 			'required' =>			'string',
 			'status_codes' =>		'string',
 			'templated' =>			'in 0,1',
