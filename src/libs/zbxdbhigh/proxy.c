@@ -34,9 +34,9 @@
 extern char	*CONFIG_SERVER;
 
 /* the space reserved in json buffer to hold at least one record plus service data */
-#define ZBX_DATA_JSON_RESERVED  	(HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
+#define ZBX_DATA_JSON_RESERVED		(HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
 
-#define ZBX_DATA_JSON_RECORD_LIMIT 	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
+#define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
 #define ZBX_DATA_JSON_BATCH_LIMIT	((ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED) / 2)
 
 /* the maximum number of values processed in one batch */
@@ -68,7 +68,7 @@ typedef struct
 zbx_id_offset_t;
 
 
-typedef int (*zbx_client_item_validator_t)(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error);
+typedef int	(*zbx_client_item_validator_t)(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error);
 
 typedef struct
 {
@@ -77,7 +77,7 @@ typedef struct
 }
 zbx_host_rights_t;
 
-static zbx_history_table_t dht = {
+static zbx_history_table_t	dht = {
 	"proxy_dhistory", "dhistory_lastid",
 		{
 		{"clock",		ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
@@ -92,7 +92,7 @@ static zbx_history_table_t dht = {
 		}
 };
 
-static zbx_history_table_t areg = {
+static zbx_history_table_t	areg = {
 	"proxy_autoreg_host", "autoreg_host_lastid",
 		{
 		{"clock",		ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
