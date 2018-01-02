@@ -1,12 +1,14 @@
 Changes for 4.0.0alpha2
 
 New features:
+
 ..F.....S. [ZBXNEXT-768] added item unit blacklisting with character "!" in order to disable metric prefixes (Alexei)
 ..F....... [ZBXNEXT-4295] added selection of the create images tickbox by default on "Maps import" page (Sasha)
 ..F....... [ZBXNEXT-1456] added filter by item discovery status for item configuration view; thanks to Volker Fröhlich for the original patch (Alexei)
 ...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
 
 Bug fixes:
+........S. [ZBX-13275] fixed slow housekeeping of events on MySQL (vso)
 ...G...... [ZBX-13264] fixed Zabbix agent compilation on OS/X (vso)
 .......PS. [ZBX-13245] fixed IP fragmentation handling in Zabbix server response to Zabbix proxy (vso)
 ..F....... [ZBX-13258] fixed misaligned user group permission controls (Ivo)
@@ -70,6 +72,7 @@ Changes for 3.4.6rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13275] fixed slow housekeeping of events on MySQL (vso)
 .......PS. [ZBX-13245] fixed IP fragmentation handling in Zabbix server response to Zabbix proxy (vso)
 ....I..... [ZBX-13031] fixed Java gateway compilation without libpcre (Sergejs)
 A......... [ZBX-12991] removed default values for "active_since" and "active_till" fields in maintenance.create API method (Ivo)
