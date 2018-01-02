@@ -27,6 +27,4 @@ extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 
 ZBX_THREAD_ENTRY(alerter_thread, args);
 
-int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int max_error_len);
-
 #endif

@@ -549,7 +549,7 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* convert MD5 hash to text form */
 
 	sz = MD5_DIGEST_SIZE * 2 + 1;
-	hash_text = zbx_malloc(hash_text, sz);
+	hash_text = (char *)zbx_malloc(hash_text, sz);
 
 	for (i = 0; i < MD5_DIGEST_SIZE; i++)
 	{

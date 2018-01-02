@@ -59,7 +59,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	cmd = zbx_malloc(cmd, cmd_alloc);
+	cmd = (char *)zbx_malloc(cmd, cmd_alloc);
 	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_EXTERNALSCRIPTS, get_rkey(&request));
 
 	if (-1 == access(cmd, X_OK))
@@ -76,7 +76,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		param = get_rparam(&request, i);
 
 		param_esc = zbx_dyn_escape_string(param, "\"\\");
-		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\"", param_esc);
+		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
 		zbx_free(param_esc);
 	}
 

@@ -73,7 +73,7 @@ static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
 		if (need > sizeof(j->buf_stat))
 		{
 			j->buffer_allocated = need;
-			j->buffer = zbx_malloc(j->buffer, j->buffer_allocated);
+			j->buffer = (char *)zbx_malloc(j->buffer, j->buffer_allocated);
 		}
 		else
 		{
@@ -97,11 +97,11 @@ static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
 		if (j->buffer == j->buf_stat)
 		{
 			j->buffer = NULL;
-			j->buffer = zbx_malloc(j->buffer, j->buffer_allocated);
+			j->buffer = (char *)zbx_malloc(j->buffer, j->buffer_allocated);
 			memcpy(j->buffer, j->buf_stat, sizeof(j->buf_stat));
 		}
 		else
-			j->buffer = zbx_realloc(j->buffer, j->buffer_allocated);
+			j->buffer = (char *)zbx_realloc(j->buffer, j->buffer_allocated);
 	}
 }
 
@@ -119,6 +119,22 @@ void	zbx_json_init(struct zbx_json *j, size_t allocate)
 	*j->buffer = '\0';
 
 	zbx_json_addobject(j, NULL);
+}
+
+void	zbx_json_initarray(struct zbx_json *j, size_t allocate)
+{
+	assert(j);
+
+	j->buffer = NULL;
+	j->buffer_allocated = 0;
+	j->buffer_offset = 0;
+	j->buffer_size = 0;
+	j->status = ZBX_JSON_EMPTY;
+	j->level = 0;
+	__zbx_json_realloc(j, allocate);
+	*j->buffer = '\0';
+
+	zbx_json_addarray(j, NULL);
 }
 
 void	zbx_json_clean(struct zbx_json *j)
@@ -482,10 +498,13 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 			zbx_free(error);
 		}
 		else
+		{
 			zbx_set_json_strerror("cannot parse as a valid JSON object \"%.64s\"", buffer);
+		}
 
 		return FAIL;
 	}
+
 	jp->end = jp->start + len - 1;
 
 	return SUCCEED;
@@ -742,7 +761,7 @@ static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t
 			if (*string_alloc <= len)
 			{
 				*string_alloc = len + 1;
-				*string = zbx_realloc(*string, *string_alloc);
+				*string = (char *)zbx_realloc(*string, *string_alloc);
 			}
 
 			return zbx_json_copy_value(p, len, *string, *string_alloc);
@@ -753,7 +772,7 @@ static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t
 			if (*string_alloc < 1)
 			{
 				*string_alloc = 1;
-				*string = zbx_realloc(*string, *string_alloc);
+				*string = (char *)zbx_realloc(*string, *string_alloc);
 			}
 
 			**string = '\0';
@@ -1192,7 +1211,7 @@ void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *
 		size_t	len = jp->end - jp->start + 2;
 
 		if (*string_alloc < len)
-			*string = zbx_realloc(*string, len);
+			*string = (char *)zbx_realloc(*string, len);
 
 		zbx_strlcpy(*string, jp->start, len);
 	}

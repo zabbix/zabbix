@@ -82,8 +82,15 @@ if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.php?srctbl=help_items&srcfld1=key&dstfrm='.$itemForm->getName().
-			'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());');
+		->onClick('return PopUp("popup.generic",jQuery.extend('.
+			CJs::encodeJson([
+				'srctbl' => 'help_items',
+				'srcfld1' => 'key',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'key'
+			]).
+				',{itemtype: jQuery("#type option:selected").val()}));'
+		);
 }
 
 $itemFormList->addRow(_('Key'), $key_controls);
@@ -97,9 +104,18 @@ if (!$readonly) {
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.php?srctbl=items&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
-			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&only_hostid='.$data['hostid'].
-			'&with_webitems=0&excludeids[]='.$data['itemid'].'");'
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'master_itemname',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'dstfld2' => 'master_itemname',
+				'only_hostid' => $data['hostid'],
+				'with_webitems' => '0',
+				'excludeids' => [$data['itemid']]
+			]).');'
 		);
 }
 

@@ -1505,16 +1505,15 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 			foreach($data['add_step'] as $item) {
 				$this->zbxTestClickWait('add_step');
-				$this->zbxTestSwitchToWindow('zbx_popup');
-				$this->zbxTestCheckFatalErrors();
-				$step = $item['step']." step";
-				$this->zbxTestInputTypeWait('name',$step);
-				$url = $step." url";
-				$this->zbxTestInputTypeWait('url', $url);
-				$this->zbxTestClick('add');
-				$this->zbxTestWaitWindowClose();
+				$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+				$step = $item['step'].' step';
+				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $step);
+				$url = $step.' url';
+				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $url);
+				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+				$this->zbxTestWaitForPageToLoad();
 
-				if(isset($item['remove'])) {
+				if (isset($item['remove'])) {
 					$this->zbxTestClickWait('remove_0');
 				}
 			}

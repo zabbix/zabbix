@@ -33,9 +33,8 @@ class testFormWebStep extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Empty step name',
 					'url' => 'http://www.zabbix.com',
-					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "name": cannot be empty.'
 					]
 				]
 			],
@@ -54,9 +53,8 @@ class testFormWebStep extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Empty step url',
 					'step_name' => 'Step with empty step url',
-					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "URL": cannot be empty.'
+						'Incorrect value for field "url": cannot be empty.'
 					]
 				]
 			],
@@ -666,22 +664,38 @@ class testFormWebStep extends CWebTest {
 					'step_name' => 'Step timeout -1',
 					'url' => 'http://www.zabbix.com',
 					'timeout' => '-1',
-					'error_msg' => 'Page received incorrect data',
+					'error_webform' => true,
+					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value "-1" for "Timeout" field: must be between 0 and 65535.'
+						'Invalid parameter "/1/steps/1/timeout": a time unit is expected.'
 					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Timeout 65536',
-					'step_name' => 'Step timeout 65536',
+					'name' => 'Timeout 3601',
+					'step_name' => 'Step timeout 3601',
 					'url' => 'http://www.zabbix.com',
-					'timeout' => 65536,
-					'error_msg' => 'Page received incorrect data',
+					'timeout' => 3601,
+					'error_webform' => true,
+					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value "65536" for "Timeout" field: must be between 0 and 65535.'
+						'Invalid parameter "/1/steps/1/timeout": value must be one of 0-3600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Timeout string',
+					'step_name' => 'Step timeout string',
+					'url' => 'http://www.zabbix.com',
+					'timeout' => 'abc',
+					'error_webform' => true,
+					'error_msg' => 'Cannot add web scenario',
+					'errors' => [
+						'Invalid parameter "/1/steps/1/timeout": a time unit is expected.'
 					]
 				]
 			],
@@ -720,7 +734,7 @@ class testFormWebStep extends CWebTest {
 					'headers' => [
 						['name' => 'header', 'value' => 'test_header'],
 					],
-					'timeout' => 65535,
+					'timeout' => 3600,
 					'string' => 'Zabbix',
 					'code' => 200,
 					'dbCheck' => true
@@ -767,27 +781,27 @@ class testFormWebStep extends CWebTest {
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 		$this->zbxTestClickWait('add_step');
-		$this->zbxTestSwitchToWindow('zbx_popup');
+		$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 
 		if (array_key_exists('step_name', $data)) {
-			$this->zbxTestInputTypeWait('name',$data['step_name']);
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $data['step_name']);
 		}
 
 		if (array_key_exists('url', $data)) {
-			$this->zbxTestInputTypeWait('url',$data['url']);
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $data['url']);
 		}
 
 		if (array_key_exists('query', $data)) {
-			$i = 1;
+			$i = 3;
 			foreach($data['query'] as $item) {
 				if (array_key_exists('name', $item)) {
-					$this->zbxTestInputType('pairs_'.$i.'_name', $item['name']);
+					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]', $item['name']);
 				}
 				if (array_key_exists('value', $item)) {
-					$this->zbxTestInputType('pair_value_'.$i, $item['value']);
+					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]', $item['value']);
 				}
-				$this->zbxTestClickXpath("//tr[@id='query_fields_footer']//button");
-				$i = 5;
+				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="query_fields_footer"]//button[text()="Add"]');
+				$i = 7;
 			}
 		}
 
@@ -796,63 +810,63 @@ class testFormWebStep extends CWebTest {
 		}
 
 		if (array_key_exists('post', $data)) {
-			$i = 2;
+			$i = 4;
 			foreach($data['post'] as $item) {
 				if (array_key_exists('name', $item)) {
-					$this->zbxTestInputType('pairs_'.$i.'_name', $item['name']);
+					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]', $item['name']);
 				}
 				if (array_key_exists('value', $item)) {
-					$this->zbxTestInputType('pair_value_'.$i, $item['value']);
+					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]', $item['value']);
 				}
-				$this->zbxTestClickXpath("//tr[@id='post_fields_footer']//button");
-				$i = 5;
+				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="post_fields_footer"]//button[text()="Add"]');
+				$i = 7;
 			}
 		}
 
 		if (array_key_exists('variables', $data)) {
-			$i = 3;
+			$i = 5;
 			foreach($data['variables'] as $item) {
 				if (array_key_exists('name', $item)) {
-					$this->zbxTestInputType('pairs_'.$i.'_name', $item['name']);
+					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]', $item['name']);
 				}
 				if (array_key_exists('value', $item)) {
-					$this->zbxTestInputType('pair_value_'.$i, $item['value']);
+					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]', $item['value']);
 				}
-				$this->zbxTestClickXpath("//tr[@id='variables_footer']//button");
-				$i = 5;
+				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="variables_footer"]//button[text()="Add"]');
+				$i = 7;
 			}
 		}
 
 		if (array_key_exists('headers', $data)) {
-			$i = 4;
+			$i = 6;
 			foreach($data['headers'] as $item) {
 				if (array_key_exists('name', $item)) {
-					$this->zbxTestInputType('pairs_'.$i.'_name', $item['name']);
+					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]', $item['name']);
 				}
 				if (array_key_exists('value', $item)) {
-					$this->zbxTestInputType('pair_value_'.$i, $item['value']);
+					$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]', $item['value']);
 				}
-				$this->zbxTestClickXpath("//tr[@id='headers_footer']//button");
-				$i = 5;
+				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-body"]//tr[@id="headers_footer"]//button[text()="Add"]');
+				$i = 7;
 			}
 		}
 
 		if (array_key_exists('raw', $data)) {
-			$this->zbxTestClickXpath("//label[@for='post_type_1']");
+			$this->zbxTestClickXpath('//label[@for="post_type_1"]');
 		}
 
 		if (array_key_exists('to_form', $data)) {
 			$this->zbxTestInputType('posts', $data['raw_data']);
-			$this->zbxTestClickXpath("//label[@for='post_type_0']");
+			$this->zbxTestClickXpath('//label[@for="post_type_0"]');
 		}
 
 		if (array_key_exists('retrieve', $data)) {
 			$this->zbxTestCheckboxSelect('retrieve_mode');
-			$this->zbxTestAssertElementPresentXpath("//input[@id='post_type_0'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='post_type_1'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='pairs_2_name'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='pair_value_2'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='required'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='post_type_0'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='post_type_1'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='pairs_4_name'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='pairs_4_value'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='required'][@disabled]");
 		}
 
 		if (array_key_exists('timeout', $data)) {
@@ -868,83 +882,82 @@ class testFormWebStep extends CWebTest {
 		}
 
 		if ($data['expected'] != TEST_ERROR) {
-			$this->zbxTestClick('add');
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 		}
 
 		if (array_key_exists('check_raw', $data)) {
-			$this->zbxTestWaitWindowClose();
-			$this->zbxTestClickLinkText($data['step_name']);
-			$this->zbxTestSwitchToWindow('zbx_popup');
-			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('posts'));
-			$raw = $this->zbxTestGetText("//textarea[@id='posts']");
-			$this->assertEquals($raw, $data['check_raw']);
-			$this->zbxTestClick('cancel');
+			$this->zbxTestClickLinkTextWait($data['step_name']);
+			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+			$raw = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']//textarea[@id='posts']");
+			$this->assertEquals($data['check_raw'], $raw);
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
 
 		if (array_key_exists('parse_query', $data)) {
-			$this->zbxTestWaitWindowClose();
-			$this->zbxTestClickLinkText($data['step_name']);
-			$this->zbxTestSwitchToWindow('zbx_popup');
-			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('posts'));
-			$i = 1;
+			$this->zbxTestClickLinkTextWait($data['step_name']);
+			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+			$i = 3;
 			foreach($data['parse_query'] as $item) {
-				$name = $this->zbxTestGetValue("//input[@id='pairs_".$i."_name']");
-				$this->assertEquals($name, $item['name']);
+				$name = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]');
+				$this->assertEquals($item['name'], $name);
 				if (array_key_exists('value', $item)) {
-					$value = $this->zbxTestGetValue("//input[@id='pair_value_".$i."']");
+					$value = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]');
 					$this->assertEquals($value, $item['value']);
 				}
-				$i = 5;
+				$i = 7;
 			}
 
 			if (array_key_exists('check_url', $data)) {
-				$url = $this->zbxTestGetValue("//input[@id='url']");
-				$this->assertEquals($url, $data['check_url']);
+				$url = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="url"]');
+				$this->assertEquals($data['check_url'], $url);
 			}
-			$this->zbxTestClick('cancel');
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
 
 		if (array_key_exists('check_post', $data)) {
-			$this->zbxTestWaitWindowClose();
-			$this->zbxTestClickLinkText($data['step_name']);
-			$this->zbxTestSwitchToWindow('zbx_popup');
-			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('posts'));
-			$i = 2;
+			$this->zbxTestClickLinkTextWait($data['step_name']);
+			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+			$i = 4;
 			foreach($data['check_post'] as $item) {
-				$name = $this->zbxTestGetValue("//input[@id='pairs_".$i."_name']");
+				$name = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]');
 				$this->assertEquals($name, $item['name']);
 				if (array_key_exists('value', $item)) {
-					$value = $this->zbxTestGetValue("//input[@id='pair_value_".$i."']");
+					$value = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]');
 					$this->assertEquals($value, $item['value']);
 				}
-				$i = 5;
+				$i = 7;
 			}
 
 			if (array_key_exists('check_url', $data)) {
-				$url = $this->zbxTestGetValue("//input[@id='url']");
+				$url = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="url"]');
 				$this->assertEquals($url, $data['check_url']);
 			}
-			$this->zbxTestClick('cancel');
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
 
 		if (array_key_exists('error_webform', $data)) {
-			$this->zbxTestWaitWindowClose();
+			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('add');
 		}
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestWaitWindowClose();
+				$this->zbxTestWaitForPageToLoad();
 				$this->zbxTestClickWait('add');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
 				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-				$this->zbxTestCheckFatalErrors();
+				if (array_key_exists('error_msg', $data)) {
+					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
+				}
+				else {
+					$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));
+				}
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
+				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_ERROR:
 				$get_text = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']/span");
