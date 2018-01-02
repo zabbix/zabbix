@@ -220,7 +220,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$yaxismin_label = new CLabel(_('Y axis MIN value'));
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$yaxismin_label->setAsteriskMark()
+		$yaxismin_label
+			->setAsteriskMark()
 			->setAttribute('for', 'ymin_name');
 	}
 
@@ -299,7 +300,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$yaxismax_label = new CLabel(_('Y axis MAX value'));
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$yaxismax_label->setAsteriskMark()
+		$yaxismax_label
+			->setAsteriskMark()
 			->setAttribute('for', 'ymax_name');
 	}
 
