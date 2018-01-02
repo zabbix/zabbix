@@ -71,7 +71,6 @@ void	zbx_mock_test_entry(void **state)
 			case 1: /* ZBX_JSONPATH_COMPONENT_BRACKET */
 				zbx_mock_assert_str_eq("Component class", component_class, "bracket");
 				break;
-
 			case 2: /* ZBX_JSONPATH_ARRAY_INDEX */
 				zbx_mock_assert_str_eq("Component class", component_class, "index");
 				break;

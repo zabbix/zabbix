@@ -58,4 +58,3 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_free(buffer);
 }
-
