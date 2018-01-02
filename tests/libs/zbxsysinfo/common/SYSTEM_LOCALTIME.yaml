@@ -10,7 +10,7 @@ out:
 test case: "timestamp check with empty params"
 in:
   timestamp: 1513598769
-  key: "system.localtime"
+  key: "system.localtime[]"
 out:
   result: "1513598769"
   return: "SYSINFO_RET_OK"

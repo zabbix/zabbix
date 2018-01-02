@@ -28,14 +28,14 @@
 #define SHORT_DATETIME_LENGTH	19	/* Length of datetime like "2017-12-18,14:06:09" */
 
 static zbx_timespec_t	timespec;
-static int		time_parsed = 0;
 
 static void	zbx_mock_time(void)
 {
+	static int		time_parsed = 0;
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	param_handle;
 	const char		*timestamp;
-	struct	tm		tm;
+	struct tm		tm;
 	int			ms, hour, min;
 	char			sign, tmp[16];
 	size_t			length;
@@ -188,7 +188,7 @@ int	__wrap_gettimeofday(struct timeval *__restrict tv, __timezone_ptr_t tz)
 	}
 
 	if (NULL != tz)
-		fail_msg("Timezone param in gettimeofday call is not set to null");
+		fail_msg("Timezone param in gettimeofday() call is not set to null");
 
 	return 0;
 }
