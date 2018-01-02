@@ -1591,6 +1591,7 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/Makefile
 	tests/libs/zbxconf/Makefile
 	tests/libs/zbxdbhigh/Makefile
+	tests/libs/zbxjson/Makefile
 	tests/libs/zbxsysinfo/Makefile
 	tests/libs/zbxsysinfo/linux/Makefile
 )])
