@@ -1886,8 +1886,12 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 
 	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
 	{
-		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
+		/* The file size has not changed, no new lines. Here we do not deal with a case of changing */
 		/* a logfile's content while keeping the same length. */
+
+		if (1 == *skip_old_data)
+			*skip_old_data = 0;
+
 		ret = SUCCEED;
 		goto out;
 	}
