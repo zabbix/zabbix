@@ -21,7 +21,6 @@
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
-#include "zbxself.h"
 
 #include "housekeeper.h"
 
