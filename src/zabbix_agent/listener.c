@@ -76,7 +76,7 @@ static void	process_listener(zbx_socket_t *s)
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED ": %s]", *value);
 
 				if (NULL == buffer)
-					buffer = zbx_malloc(buffer, buffer_alloc);
+					buffer = (char *)zbx_malloc(buffer, buffer_alloc);
 
 				zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 						ZBX_NOTSUPPORTED, ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED));

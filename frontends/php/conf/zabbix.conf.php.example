@@ -17,10 +17,10 @@ $ZBX_SERVER_NAME		= '';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
-// ElasticSearch url (can be string if same url is used for all types).
+// Elasticsearch url (can be string if same url is used for all types).
 $HISTORY['url']   = [
 		'uint' => 'http://localhost:9200',
 		'text' => 'http://localhost:9200'
 ];
-// Value types stored in ElasticSearch.
+// Value types stored in Elasticsearch.
 $HISTORY['types'] = ['uint', 'text'];

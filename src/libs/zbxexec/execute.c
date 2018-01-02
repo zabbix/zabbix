@@ -314,7 +314,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (NULL != output)
 		zbx_free(*output);
 
-	buffer = zbx_malloc(buffer, buf_size);
+	buffer = (char *)zbx_malloc(buffer, buf_size);
 	*buffer = '\0';
 
 #ifdef _WINDOWS
