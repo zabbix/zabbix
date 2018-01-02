@@ -210,7 +210,7 @@ void	zbx_mock_test_entry(void **state)
 
 	item_type = get_item_type(zbx_mock_get_parameter_string("in['item type']"));
 
-	if (SUCCEED != zbx_strtime_to_time(zbx_mock_get_parameter_string("in.['start time']"), &now))
+	if (SUCCEED != zbx_strtime_to_time(zbx_mock_get_parameter_string("in['start time']"), &now))
 		fail_msg("Invalid 'start time' format");
 
 	checks = zbx_mock_get_parameter_handle("out.checks");
@@ -231,7 +231,7 @@ void	zbx_mock_test_entry(void **state)
 		if (SUCCEED != zbx_time_to_strtime(nextcheck, tz_sec, nextcheck_result, sizeof(nextcheck_result)))
 			fail_msg("Cannot convert nextcheck to string format");
 
-		zbx_snprintf(msg, sizeof(msg), "Invalid nextcheck calcualtion step %d", step++);
+		zbx_snprintf(msg, sizeof(msg), "Invalid nextcheck calculation step %d", step++);
 		zbx_mock_assert_str_eq(msg, nextcheck_expected, nextcheck_result);
 
 		now = nextcheck;
