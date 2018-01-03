@@ -75,7 +75,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 		param = get_rparam(&request, i);
 
-		param_esc = zbx_dyn_escape_string(param, "\"\\");
+		param_esc = zbx_dyn_escape_shell_single_quote(param);
 		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
 		zbx_free(param_esc);
 	}
