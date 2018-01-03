@@ -353,6 +353,9 @@ class CProblem extends CApiService {
 					if ($fillter_condition) {
 						$sqlParts['where'][] = '('.implode(' OR ', $fillter_condition).')';
 					}
+					else {
+						$options['objectids'] = [];
+					}
 				}
 			}
 			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
