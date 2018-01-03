@@ -331,6 +331,8 @@ class CEvent extends CApiService {
 						}
 					}
 
+					$fillter_condition = [];
+
 					if ($host_groups) {
 						$triggers = API::Trigger()->get([
 							'output' => ['triggerid'],
@@ -345,8 +347,6 @@ class CEvent extends CApiService {
 								$group_triggers[$group['groupid']][$trigger['triggerid']] = $trigger['triggerid'];
 							}
 						}
-
-						$fillter_condition = [];
 
 						if ($allowed_triggers) {
 							$fillter_condition[] = dbConditionInt('e.objectid', $allowed_triggers);
