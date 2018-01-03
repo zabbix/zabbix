@@ -215,15 +215,15 @@ $servicesTimeFormList->addRow(_('Service times'),
 );
 
 // create service time table
-$serviceTimeTable = (new CTable())
-	->addRow([
+$serviceTimeTable = (new CFormList())
+	->addRow(
 		(new CLabel(_('Period type'), 'new_service_time[type]')),
 		(new CComboBox('new_service_time[type]', $data['new_service_time']['type'], 'submit()', [
 			SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
 			SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
 			SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
 		]))
-	]);
+	);
 
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 	// downtime since
@@ -273,22 +273,22 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	$servicesForm->addVar('new_service_time[to]', $serviceTimeTo);
 
 	$serviceTimeTable
-		->addRow([
+		->addRow(
 			_('Note'),
 			(new CTextBox('new_service_time[note]'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', _('short description'))
-		])
-		->addRow([
+		)
+		->addRow(
 			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
 			(new CDiv(createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')))
 				->setId('new_service_time_from')
-		])
-		->addRow([
+		)
+		->addRow(
 			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
 			(new CDiv(createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')))
 				->setId('new_service_time_to')
-		]);
+		);
 }
 else {
 	$weekFromComboBox = new CComboBox('new_service_time[from_week]', isset($_REQUEST['new_service_time']['from_week'])
@@ -320,34 +320,35 @@ else {
 		->setAriaRequired()
 		->setAttribute('placeholder', _('mm'));
 
-	$serviceTimeTable->addRow([
-		(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
-		(new CDiv([
-				$weekFromComboBox,
+	$serviceTimeTable
+		->addRow(
+			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
+			(new CDiv([
+					$weekFromComboBox,
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					_('Time'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$timeFromHourTextBox,
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					':',
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$timeFromMinuteTextBox
+			]))->setId('new_service_time_from')
+		)
+		->addRow(
+			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
+			(new CDiv([
+				$weekToComboBox,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				_('Time'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$timeFromHourTextBox,
+				$timeToHourTextBox,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				':',
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$timeFromMinuteTextBox
-		]))->setId('new_service_time_from')
-	]);
-	$serviceTimeTable->addRow([
-		(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
-		(new CDiv([
-			$weekToComboBox,
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			_('Time'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeToHourTextBox,
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			':',
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$timeToMinuteTextBox
-		]))->setId('new_service_time_to')
-	]);
+				$timeToMinuteTextBox
+			]))->setId('new_service_time_to')
+		);
 	$servicesForm->addVar('new_service_time[note]', '');
 }
 
