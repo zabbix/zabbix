@@ -1,4 +1,5 @@
 SUBDIRS = \
+	common \
 	@ARCH@
 
 if SERVER
