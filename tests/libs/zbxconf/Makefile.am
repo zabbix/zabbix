@@ -71,5 +71,7 @@ parse_cfg_file_LDADD = \
 
 parse_cfg_file_LDADD += @SERVER_LIBS@
 
+parse_cfg_file_LDFLAGS = @SERVER_LDFLAGS@
+
 parse_cfg_file_CFLAGS = -I@top_srcdir@/tests
 endif
