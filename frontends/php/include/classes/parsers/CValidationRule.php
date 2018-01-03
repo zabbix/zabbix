@@ -71,8 +71,7 @@ class CValidationRule {
 									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
 									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
 									&& !$this->parseArray($buffer, $pos, $rule)			// array
-									&& !$this->parseFlags($buffer, $pos, $rule)			// flags
-									&& !$this->parseTimeUnit($buffer, $pos, $rule)) {	// time unit
+									&& !$this->parseFlags($buffer, $pos, $rule)) {		// flags
 								// incorrect validation rule
 								break 3;
 							}
@@ -152,22 +151,6 @@ class CValidationRule {
 
 		$pos += 4;
 		$rules['time'] = true;
-
-		return true;
-	}
-
-	/**
-	 * tunit (cannot use time_unit or timeunit or anything that starts with "time").
-	 *
-	 * 'time_unit' => true
-	 */
-	private function parseTimeUnit($buffer, &$pos, &$rules) {
-		if (strncmp(substr($buffer, $pos), 'tunit', 5) != 0) {
-			return false;
-		}
-
-		$pos += 5;
-		$rules['tunit'] = true;
 
 		return true;
 	}
