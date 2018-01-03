@@ -663,7 +663,7 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
  *           cache is working in the low memory mode.                         *
  *                                                                            *
  ******************************************************************************/
-static void	vc_warn_low_memory()
+static void	vc_warn_low_memory(void)
 {
 	int	now;
 

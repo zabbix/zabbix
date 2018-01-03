@@ -799,9 +799,9 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
  ******************************************************************************/
 static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	struct	zbx_json_parse	jp, jp_out;
-	char	*data = NULL;
-	size_t	data_alloc = 0;
+	struct zbx_json_parse	jp, jp_out;
+	char			*data = NULL;
+	size_t			data_alloc = 0;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -848,7 +848,7 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: item_preproc_xpath_op                                             *
+ * Function: item_preproc_xpath_op                                            *
  *                                                                            *
  * Purpose: execute xpath query                                               *
  *                                                                            *
@@ -960,7 +960,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: item_preproc_xpath_op                                             *
+ * Function: item_preproc_xpath                                               *
  *                                                                            *
  * Purpose: execute xpath query                                               *
  *                                                                            *

@@ -2857,7 +2857,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 		}
 
 		*alloc += alloc_step;
-		*values = (uint64_t *)zbx_realloc(*values, *alloc * sizeof(zbx_uint64_t));
+		*values = (zbx_uint64_t *)zbx_realloc(*values, *alloc * sizeof(zbx_uint64_t));
 	}
 
 	memmove(&(*values)[index + 1], &(*values)[index], sizeof(zbx_uint64_t) * (*num - index));
