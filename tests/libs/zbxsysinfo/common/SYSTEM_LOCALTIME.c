@@ -76,7 +76,7 @@ static void	zbx_mock_time(void)
 				fail_msg("Cannot parse ms and timezone part of 'timestamp' parameter: %s", timestamp);
 			}
 
-			timespec.ns = ms * 1000;
+			timespec.ns = ms * 1000000;
 
 			zbx_snprintf(tmp, sizeof(tmp), "ZBX%c%02d:%02d", (sign == '+' ? '-' : '+'), hour, min);
 			if (0 != setenv("TZ", tmp, 1))
@@ -184,7 +184,7 @@ int	__wrap_gettimeofday(struct timeval *__restrict tv, __timezone_ptr_t tz)
 		zbx_mock_time();
 
 		tv->tv_sec = timespec.sec;
-		tv->tv_usec = timespec.ns;
+		tv->tv_usec = timespec.ns / 1000;
 	}
 
 	if (NULL != tz)
