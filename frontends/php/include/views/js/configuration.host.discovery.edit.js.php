@@ -79,6 +79,20 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 			});
 
 			$('#evaltype').trigger('change');
+
+			$('#type').change(function() {
+				var type = parseInt($('#type').val()),
+					asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
+
+				if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
+					$('label[for=username]').addClass(asterisk);
+					$('input[name=username]').attr('aria-required', 'true');
+				}
+				else {
+					$('label[for=username]').removeClass(asterisk);
+					$('input[name=username]').removeAttr('aria-required');
+				}
+			}).trigger('change');
 		});
 	})(jQuery);
 </script>

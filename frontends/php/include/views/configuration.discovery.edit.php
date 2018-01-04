@@ -33,9 +33,11 @@ if (!empty($this->data['druleid'])) {
 
 // create form list
 $discoveryFormList = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $this->data['drule']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -48,15 +50,19 @@ foreach ($this->data['proxies'] as $proxy) {
 
 $discoveryFormList
 	->addRow(_('Discovery by proxy'), $proxyComboBox)
-	->addRow(_('IP range'),
+	->addRow((new CLabel(_('IP range'), 'iprange'))->setAsteriskMark(),
 		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Update interval'),
-		(new CTextBox('delay', $data['drule']['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	->addRow((new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
+		(new CTextBox('delay', $data['drule']['delay']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
 	);
 
-$discoveryFormList->addRow(_('Checks'),
+$discoveryFormList->addRow(
+	(new CLabel(_('Checks'), 'dcheckList'))->setAsteriskMark(),
 	(new CDiv(
 		(new CTable())
 			->setAttribute('style', 'width: 100%;')
