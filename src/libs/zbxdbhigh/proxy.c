@@ -3839,8 +3839,9 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED != (ret = get_client_timediff(jp, ts, &client_timediff)))
 	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
+		zabbix_log(LOG_LEVEL_DEBUG, "Structure client_timediff not initialized and set to zero");
+		client_timediff.sec = 0;
+		client_timediff.ns = 0;
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
@@ -3851,10 +3852,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
-		zbx_timespec_t	client_timediff_copy = client_timediff;
-
-		/* use modifiable copy of client_timediff to allow unique clock,ns value timestamps */
-		process_proxy_history_data_33(proxy, &jp_data, &client_timediff_copy, &error_step);
+		process_proxy_history_data_33(proxy, &jp_data, &client_timediff, &error_step);
 		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
