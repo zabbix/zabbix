@@ -90,9 +90,16 @@ class testFormEventCorelation extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Event correlation for update',
+					'error_header' => 'Cannot add correlation',
+					'error_message' => 'Correlation "Event correlation for update" already exists.'
+				]
+			],
+			[
+				[
 					'name' => 'Without conditions',
 					'error_header' => 'Cannot add correlation',
-					'error_message' => 'No "conditions" given for correlation'
+					'error_message' => 'No "conditions" given for correlation "Without conditions".'
 				]
 			],
 			[
@@ -100,7 +107,7 @@ class testFormEventCorelation extends CWebTest {
 					'name' => 'Without operation',
 					'tag' => 'tag name',
 					'error_header' => 'Cannot add correlation',
-					'error_message' => 'No "operations" given for correlation'
+					'error_message' => 'No "operations" given for correlation "Without operation".'
 				]
 			]
 		];
@@ -131,7 +138,12 @@ class testFormEventCorelation extends CWebTest {
 
 		$this->zbxTestCheckFatalErrors();
 
-		if (array_key_exists('name', $data)) {
+		if 	(array_key_exists('name', $data) and $data['name'] == 'Event correlation for update') {
+			$sql = "SELECT NULL FROM correlation WHERE name='".$data['name']."'";
+			$this->assertEquals(1, DBcount($sql));
+		}
+
+		if (array_key_exists('name', $data) and $data['name'] != 'Event correlation for update') {
 			$sql = "SELECT NULL FROM correlation WHERE name='".$data['name']."'";
 			$this->assertEquals(0, DBcount($sql));
 		}
@@ -236,7 +248,7 @@ class testFormEventCorelation extends CWebTest {
 					'value' => 'TagValue'
 				]
 			],
-						[
+			[
 				[
 					'name' => 'Test create with New event tag value = Empty',
 					'select_tag' => 'New event tag value',
@@ -561,5 +573,172 @@ class testFormEventCorelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$sql = "SELECT NULL FROM correlation WHERE name='".$data['name']."'";
 		$this->assertEquals(1, DBcount($sql));
+	}
+
+	public static function update() {
+		return [
+			[
+				[
+					'select_tag' => 'New event tag',
+					'tag' => 'NEW update tag'
+				]
+			],
+			[
+				[
+					'description' => 'NEW Test description update'
+				]
+			],
+			[
+				[
+					'operation' => 'Close new event'
+				]
+			],
+			[
+				[
+					'name' => 'NEW Event correlation for update'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider update
+	 */
+	public function testFormEventCorelation_Update($data) {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickLinkTextWait('Event correlation for update');
+		$this->zbxTestCheckHeader('Event correlation rules');
+		$this->zbxTestCheckTitle('Event correlation rules');
+
+		if (array_key_exists('select_tag', $data)) {
+			$this->zbxTestClick('remove');
+			$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
+			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
+			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+		}
+
+		if (array_key_exists('description', $data)) {
+			$this->zbxTestInputTypeOverwrite('description', $data['description']);
+		}
+
+		if (array_key_exists('operation', $data)) {
+			$this->zbxTestTabSwitch('Operations');
+			$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');
+			$this->zbxTestDropdownSelect('new_operation_type', $data['operation']);
+			$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
+		}
+
+		if (array_key_exists('name', $data)) {
+			$this->zbxTestInputTypeOverwrite('name', $data['name']);
+		}
+
+		$this->zbxTestClick('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation updated');
+
+		$this->zbxTestCheckFatalErrors();
+
+		if (array_key_exists('select_tag', $data)) {
+			$sql = "SELECT * FROM corr_condition_tag WHERE tag='update tag'";
+			$this->assertEquals(0, DBcount($sql));
+
+			$sql = "SELECT * FROM corr_condition_tag WHERE tag='NEW update tag'";
+			$this->assertEquals(1, DBcount($sql));
+		}
+
+		if (array_key_exists('description', $data)) {
+			$sql = "SELECT NULL FROM correlation WHERE description='Test description update'";
+			$this->assertEquals(0, DBcount($sql));
+
+			$sql = "SELECT NULL FROM correlation WHERE description='".$data['description']."'";
+			$this->assertEquals(1, DBcount($sql));
+		}
+
+		if (array_key_exists('operation', $data)) {
+			$sql = "SELECT * FROM corr_operation WHERE correlationid='99001' and type='0'";
+			$this->assertEquals(0, DBcount($sql));
+
+			$sql = "SELECT * FROM corr_operation WHERE correlationid='99001' and type='1'";
+			$this->assertEquals(1, DBcount($sql));
+		}
+
+		if (array_key_exists('name', $data)) {
+			$sql = "SELECT * FROM correlation WHERE name='Event correlation for update'";
+			$this->assertEquals(0, DBcount($sql));
+
+			$sql = "SELECT * FROM correlation WHERE name='".$data['name']."'";
+			$this->assertEquals(1, DBcount($sql));
+		}
+	}
+
+	public static function updateValidation() {
+		return [
+			[
+				[
+					'name'=> ' ',
+					'error_header' => 'Page received incorrect data',
+					'error_message' => 'Incorrect value for field "Name": cannot be empty.'
+				]
+			],
+			[
+				[
+					'error_header' => 'Cannot update correlation',
+					'error_message' => 'No "conditions" given for correlation "Event correlation for update validation".'
+				]
+			],
+			[
+				[
+					'error_header' => 'Cannot update correlation',
+					'error_message' => 'No "operations" given for correlation "Event correlation for update validation".'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider updateValidation
+	 */
+	public function testFormEventCorelation_UpdateValidation($data) {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickLinkTextWait('Event correlation for update validation');
+		$this->zbxTestCheckHeader('Event correlation rules');
+		$this->zbxTestCheckTitle('Event correlation rules');
+
+		if ($data['error_message'] == 'Incorrect value for field "Name": cannot be empty.') {
+			$this->zbxTestInputTypeOverwrite('name', $data['name']);
+		}
+
+		if ($data['error_message'] == 'No "conditions" given for correlation "Event correlation for update validation".') {
+			$this->zbxTestClick('remove');
+		}
+
+		if ($data['error_message'] == 'No "operations" given for correlation "Event correlation for update validation".') {
+			$this->zbxTestTabSwitch('Operations');
+			$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');
+		}
+
+		$this->zbxTestClick('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_header']);
+		$error = $this->zbxTestGetText('//ul[@class=\'msg-details-border\']');
+		$this->assertContains($data['error_message'], $error);
+
+		$this->zbxTestCheckFatalErrors();
+
+		if ($data['error_message'] == 'Incorrect value for field "Name": cannot be empty.') {
+			$sql = "SELECT * FROM correlation WHERE name=''";
+			$this->assertEquals(0, DBcount($sql));
+
+			$sql = "SELECT * FROM correlation WHERE name='Event correlation for update validation'";
+			$this->assertEquals(1, DBcount($sql));
+		}
+
+		if ($data['error_message'] == 'No "conditions" given for correlation "Event correlation for update".') {
+			$sql = "SELECT * FROM corr_condition WHERE corr_conditionid IS NULL";
+			$this->assertEquals(0, DBcount($sql));
+		}
+
+		if ($data['error_message'] == 'No "operations" given for correlation "Event correlation for update".') {
+			$sql = "SELECT * FROM corr_operation WHERE corr_operationid IS NULL";
+			$this->assertEquals(0, DBcount($sql));
+		}
 	}
 }

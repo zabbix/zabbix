@@ -889,7 +889,7 @@ class testFormWebStep extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 			$raw = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']//textarea[@id='posts']");
-			$this->assertEquals($raw, $data['check_raw']);
+			$this->assertEquals($data['check_raw'], $raw);
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
 
@@ -899,7 +899,7 @@ class testFormWebStep extends CWebTest {
 			$i = 3;
 			foreach($data['parse_query'] as $item) {
 				$name = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_name"]');
-				$this->assertEquals($name, $item['name']);
+				$this->assertEquals($item['name'], $name);
 				if (array_key_exists('value', $item)) {
 					$value = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="pairs_'.$i.'_value"]');
 					$this->assertEquals($value, $item['value']);
@@ -909,7 +909,7 @@ class testFormWebStep extends CWebTest {
 
 			if (array_key_exists('check_url', $data)) {
 				$url = $this->zbxTestGetValue('//div[@class="overlay-dialogue-body"]//input[@id="url"]');
-				$this->assertEquals($url, $data['check_url']);
+				$this->assertEquals($data['check_url'], $url);
 			}
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
@@ -936,11 +936,13 @@ class testFormWebStep extends CWebTest {
 		}
 
 		if (array_key_exists('error_webform', $data)) {
+			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('add');
 		}
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->zbxTestWaitForPageToLoad();
 				$this->zbxTestClickWait('add');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
 				$this->zbxTestCheckFatalErrors();

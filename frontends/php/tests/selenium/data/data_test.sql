@@ -1444,7 +1444,17 @@ INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (93,0,
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
 
 -- event correlation
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event corelation for delete', '', 0, 0, '');
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99000, 'tag');
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99000, 'delete tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99000, 99000, 0);
+
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99001, 'Event correlation for update', 'Test description update', 0, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99001, 99001, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99001, 'update tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99001, 99001, 0);
+
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'Event correlation for update validation', 'Test description update validation', 0, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99002, 99002, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99002, 'update validation tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99002, 99002, 0);

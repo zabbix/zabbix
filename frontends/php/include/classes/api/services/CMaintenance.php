@@ -313,8 +313,8 @@ class CMaintenance extends CApiService {
 		foreach ($maintenances as $maintenance) {
 			$dbFields = [
 				'name' => null,
-				'active_since' => $now,
-				'active_till' => $now + SEC_PER_DAY
+				'active_since' => null,
+				'active_till' => null
 			];
 
 			if (!check_db_fields($dbFields, $maintenance)) {
