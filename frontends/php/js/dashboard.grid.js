@@ -737,7 +737,7 @@
 			.attr('title', t('Edit'))
 			.click(function() {
 				doAction('beforeConfigLoad', $obj, data, widget);
-				methods.editWidget.call($obj, widget);
+				methods.editWidget.call($obj, widget, this);
 			});
 
 		var	btn_delete = $('<button>')
@@ -1234,12 +1234,12 @@
 		},
 
 		// After pressing "Edit" button on widget
-		editWidget: function(widget) {
+		editWidget: function(widget, trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, widget, this);
+				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},
 
