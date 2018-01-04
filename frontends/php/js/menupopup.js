@@ -974,6 +974,7 @@ jQuery(function($) {
 				});
 
 				// create sections
+				var tabindex = 1;
 				if (sections.length > 0) {
 					$.each(sections, function(i, section) {
 						if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
@@ -988,6 +989,11 @@ jQuery(function($) {
 						menuPopup.append(sectionItem);
 
 						$.each(section.items, function(i, item) {
+							if (typeof item['disabled'] === 'undefined' || !item['disabled']) {
+								item['tabindex'] = tabindex;
+								tabindex++;
+							}
+
 							menuPopup.append(createMenuItem(item));
 						});
 					});
@@ -1040,6 +1046,7 @@ jQuery(function($) {
 					});
 			}
 
+			overlayDialogueOnLoad(true, menuPopup);
 			addToOverlaysStack('contextmenu', event.target, 'contextmenu');
 
 			$(document).click(function(e) {
@@ -1060,6 +1067,7 @@ jQuery(function($) {
 	 * @param array  options['data']			item data as key => value
 	 * @param array  options['items']			item sub menu
 	 * @param object options['clickCallback']	item click callback
+	 * @param integer options['tabindex']		item tabindex
 	 *
 	 * @return object
 	 */
@@ -1094,6 +1102,10 @@ jQuery(function($) {
 
 			if (typeof options.clickCallback !== 'undefined') {
 				link.click(options.clickCallback);
+			}
+
+			if (typeof options.tabindex !== 'undefined') {
+				link.attr('tabindex', options.tabindex);
 			}
 		}
 
