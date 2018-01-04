@@ -528,8 +528,11 @@ function overlayDialogueDestroy(dialogueid, xhr) {
 		}
 
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
-		jQuery('body').css({'overflow': ''});
-		jQuery('body[style=""]').removeAttr('style');
+
+		if (!jQuery('[data-dialogueid]').length) {
+			jQuery('body').css({'overflow': ''});
+			jQuery('body[style=""]').removeAttr('style');
+		}
 
 		removeFromOverlaysStack(dialogueid);
 	}
