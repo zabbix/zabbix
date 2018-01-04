@@ -3843,8 +3843,6 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		goto out;
 	}
 
-	DCconfig_set_proxy_timediff(proxy->hostid, &client_timediff);
-
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
 		if (SUCCEED != process_host_availability_contents(&jp_data, &error_step))

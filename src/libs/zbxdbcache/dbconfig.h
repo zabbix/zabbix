@@ -332,7 +332,6 @@ typedef struct
 	int		proxy_data_nextcheck;
 	int		proxy_tasks_nextcheck;
 	int		nextcheck;
-	int		timediff;
 	int		lastaccess;
 	int		version;
 	unsigned char	location;

@@ -165,13 +165,6 @@ static void	DCdump_proxies(ZBX_DC_CONFIG *config)
 
 	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	for (i = 0; i < index.values_num; i++)
-	{
-		proxy = (ZBX_DC_PROXY *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " timediff:%d location:%u", proxy->hostid,
-				proxy->timediff, proxy->location);
-	}
-
 	zbx_vector_ptr_destroy(&index);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
