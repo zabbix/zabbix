@@ -261,6 +261,7 @@ function getItemFilterForm(&$items) {
 	$filter_state				= $_REQUEST['filter_state'];
 	$filter_templated_items		= $_REQUEST['filter_templated_items'];
 	$filter_with_triggers		= $_REQUEST['filter_with_triggers'];
+	$filter_discovery           = $_REQUEST['filter_discovery'];
 	$subfilter_hosts			= $_REQUEST['subfilter_hosts'];
 	$subfilter_apps				= $_REQUEST['subfilter_apps'];
 	$subfilter_types			= $_REQUEST['subfilter_types'];
@@ -269,6 +270,7 @@ function getItemFilterForm(&$items) {
 	$subfilter_state			= $_REQUEST['subfilter_state'];
 	$subfilter_templated_items	= $_REQUEST['subfilter_templated_items'];
 	$subfilter_with_triggers	= $_REQUEST['subfilter_with_triggers'];
+	$subfilter_discovery        = $_REQUEST['subfilter_discovery'];
 	$subfilter_history			= $_REQUEST['subfilter_history'];
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
@@ -282,6 +284,7 @@ function getItemFilterForm(&$items) {
 		->addVar('subfilter_state', $subfilter_state)
 		->addVar('subfilter_templated_items', $subfilter_templated_items)
 		->addVar('subfilter_with_triggers', $subfilter_with_triggers)
+		->addVar('subfilter_discovery', $subfilter_discovery)
 		->addVar('subfilter_history', $subfilter_history)
 		->addVar('subfilter_trends', $subfilter_trends)
 		->addVar('subfilter_interval', $subfilter_interval);
@@ -501,6 +504,13 @@ function getItemFilterForm(&$items) {
 		(new CNumericBox('filter_port', $filter_port, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		'filter_port_row'
 	);
+	$filterColumn4->addRow(_('Discovery'),
+		new CComboBox('filter_discovery', $filter_discovery, null, [
+			-1 => _('all'),
+			ZBX_FLAG_DISCOVERY_CREATED => _('Discovered items'),
+			ZBX_FLAG_DISCOVERY_NORMAL => _('Regular items')
+		])
+	);
 
 	$form->addColumn($filterColumn1);
 	$form->addColumn($filterColumn2);
@@ -525,6 +535,7 @@ function getItemFilterForm(&$items) {
 		'state' => [],
 		'templated_items' => [],
 		'with_triggers' => [],
+		'discovery' => [],
 		'history' => [],
 		'trends' => [],
 		'interval' => []
@@ -714,6 +725,31 @@ function getItemFilterForm(&$items) {
 			}
 		}
 
+		// discovery
+		if ($filter_discovery == -1) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL && !isset($item_params['discovery'][0])) {
+				$item_params['discovery'][0] = ['name' => _('Regular'), 'count' => 0];
+			}
+			elseif ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && !isset($item_params['discovery'][1])) {
+				$item_params['discovery'][1] = ['name' => _('Discovered'), 'count' => 0];
+			}
+			$show_item = true;
+			foreach ($item['subfilters'] as $name => $value) {
+				if ($name == 'subfilter_discovery') {
+					continue;
+				}
+				$show_item &= $value;
+			}
+			if ($show_item) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					$item_params['discovery'][0]['count']++;
+				}
+				else {
+					$item_params['discovery'][1]['count']++;
+				}
+			}
+		}
+
 		// trends
 		if ($filter_trends === ''
 				&& !in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
@@ -861,6 +897,11 @@ function getItemFilterForm(&$items) {
 	if ($filter_with_triggers == -1 && count($item_params['with_triggers']) > 1) {
 		$with_triggers_output = prepareSubfilterOutput(_('With triggers'), $item_params['with_triggers'], $subfilter_with_triggers, 'subfilter_with_triggers');
 		$table_subfilter->addRow([$with_triggers_output]);
+	}
+
+	if ($filter_discovery == -1 && count($item_params['discovery']) > 1) {
+		$discovery_output = prepareSubfilterOutput(_('Discovery'), $item_params['discovery'], $subfilter_discovery, 'subfilter_discovery');
+		$table_subfilter->addRow([$discovery_output]);
 	}
 
 	if (zbx_empty($filter_history) && count($item_params['history']) > 1) {
@@ -1545,7 +1586,7 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
-	if ($data['hostid'] && !$data['groupid']) {
+	if ($data['hostid'] && (!array_key_exists('groupid', $data) || !$data['groupid'])) {
 		$db_hostgroups = API::HostGroup()->get([
 			'output' => ['groupid'],
 			'hostids' => $data['hostid'],

@@ -17,29 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_STRPOOL_H
-#define ZABBIX_STRPOOL_H
+#ifndef ZABBIX_MOCK_UTIL_H
+#define ZABBIX_MOCK_UTIL_H
 
-#include "mutexs.h"
-#include "zbxalgo.h"
-#include "memalloc.h"
+#include "zbxmockdata.h"
 
-typedef struct
-{
-	zbx_mem_info_t	*mem_info;
-	zbx_hashset_t	*hashset;
-}
-zbx_strpool_t;
+const char	*zbx_mock_get_parameter_string(const char *path);
+const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name);
 
-int		zbx_strpool_create(size_t size, char **error);
-void		zbx_strpool_destroy(void);
+zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);
+zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, const char *name);
 
-const char	*zbx_strpool_intern(const char *str);
-const char	*zbx_strpool_acquire(const char *str);
-void		zbx_strpool_release(const char *str);
-
-void		zbx_strpool_clear(void);
-
-const zbx_strpool_t	*zbx_strpool_info(void);
 
 #endif

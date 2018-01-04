@@ -552,6 +552,8 @@ zbx_maintenance_type_t;
 #define HOST_INVENTORY_MANUAL		0
 #define HOST_INVENTORY_AUTOMATIC	1
 
+#define HOST_INVENTORY_FIELD_COUNT	70
+
 /* host availability */
 #define HOST_AVAILABLE_UNKNOWN		0
 #define HOST_AVAILABLE_TRUE		1
@@ -1128,7 +1130,7 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
-const OSVERSIONINFOEX	*zbx_win_getversion();
+const OSVERSIONINFOEX	*zbx_win_getversion(void);
 void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, char **utf8_value);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);

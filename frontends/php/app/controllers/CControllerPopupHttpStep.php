@@ -93,7 +93,7 @@ class CControllerPopupHttpStep extends CController {
 			$page_options['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 		}
 
-		if ($this->getInput('validate', false)) {
+		if ($this->hasInput('validate')) {
 			$output = [];
 
 			// Validate if step names are unique.

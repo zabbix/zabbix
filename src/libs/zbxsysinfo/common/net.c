@@ -194,8 +194,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #endif
 	typedef struct
 	{
-		char	*name;
-		int	type;
+		const char	*name;
+		int		type;
 	}
 	resolv_querytype_t;
 

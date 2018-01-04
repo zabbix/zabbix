@@ -38,7 +38,7 @@ static FARPROC	GetProcAddressAndLog(HMODULE hModule, const char *procName)
 	return ptr;
 }
 
-void	import_symbols()
+void	import_symbols(void)
 {
 	HMODULE	hModule;
 

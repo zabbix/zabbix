@@ -498,6 +498,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestTextPresent($this->templateName.': itemDiscovery');
 
 		$this->zbxTestClick('add_item');
+		$this->zbxTestLaunchOverlayDialog('Items');
 		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 

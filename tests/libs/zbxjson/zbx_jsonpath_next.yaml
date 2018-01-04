@@ -1,0 +1,265 @@
+# Invalid JSON paths
+
+---
+test case: Invalid path "" - empty path
+in:
+  path: ""
+out:
+  result: fail
+  components:
+---
+test case: Invalid path "$" - only root node specified
+in:
+  path: $
+out:
+  result: fail
+  components:
+---
+test case: Invalid path "$." - missing dot notation member name 
+in:
+  path: $.
+out:
+  result: fail
+  components:
+---
+test case: Invalid path "$['a'" - unclosed bracket notation bracket
+in:
+  path: $['a'
+out:
+  result: fail
+  components:
+---
+test case: Invalid path "$[a']" - unquoted bracket notation member name
+in:
+  path: $[a']
+out:
+  result: fail
+  components:
+---
+test case: Invalid path "$['']" - empty bracked notation member name
+in:
+  path: $['']
+out:
+  result: fail
+  components:
+---
+test case: Invalid path "$.a[]" - empty bracked notation member name 
+in:
+  path: $.a[]
+out:
+  result: fail
+  components:
+    - class: dot
+      value: a
+---
+test case: Invalid path "$.a[1" - missing array index closing bracket
+in:
+  path: $.a[1
+out:
+  result: fail
+  components:
+    - class: dot
+      value: a
+---
+test case: Invalid path "$['a'][]" - empty bracked notation member name
+in:
+  path: $['a'][]
+out:
+  result: fail
+  components:
+    - class: bracket
+      value: a
+---
+test case: Invalid path "$['a'][1" - missing array index closing bracket
+in:
+  path: $['a'][1
+out:
+  result: fail
+  components:
+    - class: bracket
+      value: a
+---
+test case: Invalid path "$.a." - missing dot notation member name
+in:
+  path: $.a.
+out:
+  result: fail
+  components:
+    - class: dot
+      value: a
+---
+test case: Invalid path "$.['a']" - missing dot notation member name
+in:
+  path: $.['a']
+out:
+  result: fail
+  components:
+
+# Valid JSON paths
+
+---
+test case: Valid path "$.a" - get dot notation first level member 
+in:
+  path: $.a
+out:
+  result: succeed
+  components:
+    - class: dot
+      value: a
+---
+test case: Valid path "$['a']" - get bracket notation (single quotes) first level member
+in:
+  path: $['a']
+out:
+  result: succeed
+  components:
+    - class: bracket
+      value: a
+---
+test case: Valid path "$[ 'a' ]" - get bracket notation first level member with spacing around member name
+in:
+  path: $[ 'a' ]
+out:
+  result: succeed
+  components:
+    - class: bracket
+      value: a
+---
+test case: Valid path '$["a"]' - get bracket notation (double quotes) first level member
+in:
+  path: $["a"]
+out:
+  result: succeed
+  components:
+    - class: bracket
+      value: a
+---
+test case: Valid path "$.a.b" - get dot notation second level member
+in:
+  path: $.a.b
+out:
+  result: succeed
+  components:
+    - class: dot
+      value: a
+    - class: dot
+      value: b
+---
+test case: Valid path "$['a'].b" - get mixed notation second level member
+in:
+  path: $['a'].b
+out:
+  result: succeed
+  components:
+    - class: bracket
+      value: a
+    - class: dot
+      value: b
+---
+test case: Valid path "$['a']['b']" - get bracket notation second level member
+in:
+  path: $['a']['b']
+out:
+  result: succeed
+  components:
+    - class: bracket
+      value: a
+    - class: bracket
+      value: b
+---
+test case: Valid path $.a['b'] - get mixed notation second level member
+in:
+  path: $.a['b']
+out:
+  result: succeed
+  components:
+    - class: dot
+      value: a
+    - class: bracket
+      value: b
+---
+test case: Valid path $.a[0] - get first array element
+in:
+  path: $.a[0]
+out:
+  result: succeed
+  components:
+    - class: dot
+      value: a
+    - class: index
+      value: 0
+---
+test case: Valid path $.a[0].b[1] - get array elements from mixed dot notation members and arrays 
+in:
+  path: $.a[0].b[1]
+out:
+  result: succeed
+  components:
+    - class: dot
+      value: a
+    - class: index
+      value: 0
+    - class: dot
+      value: b
+    - class: index
+      value: 1
+---
+test case: Valid path $.a[1000] - get 1001th array element
+in:
+  path: $.a[1000]
+out:
+  result: succeed
+  components:
+    - class: dot
+      value: a
+    - class: index
+      value: 1000
+---
+test case: Valid path $.a[ 1 ] - get second array element with whitespace enclosing index
+in:
+  path: $.a[ 1 ]
+out:
+  result: succeed
+  components:
+    - class: dot
+      value: a
+    - class: index
+      value: 1
+---
+test case: Valid path $['a'][2] - get third array element of bracket notation first level member
+in:
+  path: $['a'][2]
+out:
+  result: succeed
+  components:
+    - class: bracket
+      value: a
+    - class: index
+      value: 2
+---
+test case: Valid path $['a'][2]['b'][3] - get array elements from mixed bracket notation members and arrays
+in:
+  path: $['a'][2]['b'][3]
+out:
+  result: succeed
+  components:
+    - class: bracket
+      value: a
+    - class: index
+      value: 2
+    - class: bracket
+      value: b
+    - class: index
+      value: 3
+---
+test case: Valid path $[1][2] - get nested array element
+in:
+  path: $[1][2]
+out:
+  result: succeed
+  components:
+    - class: index
+      value: 1
+    - class: index
+      value: 2
+...
