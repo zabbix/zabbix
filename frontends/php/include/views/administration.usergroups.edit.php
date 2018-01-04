@@ -180,6 +180,7 @@ $tag_filter_table = (new CTable())
 	->setHeader([_('Host group'), _('Tags'), _('Action')]);
 
 $pre_name = '';
+
 foreach ($data['tag_filters'] as $key => $tag_filter) {
 	$action = (new CSimpleButton(_('Remove')))
 		->onClick('javascript: submitFormWithParam('.
@@ -192,12 +193,17 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 	else {
 		$pre_name = $tag_filter['name'];
 	}
-	if ($tag_filter['tag'] || $tag_filter['value']) {
+
+	if ($tag_filter['tag'] !== '' && $tag_filter['value'] !== '') {
 		$tag_value = $tag_filter['tag'].NAME_DELIMITER.$tag_filter['value'];
 	}
-	else {
-		$tag_value = _('All tags');
+	elseif ($tag_filter['tag'] !== '') {
+		$tag_value = $tag_filter['tag'];
 	}
+	else {
+		$tag_value = italic(_('All tags'));
+	}
+
 	$tag_filter_table->addRow([$tag_filter['name'], $tag_value, $action]);
 	$userGroupForm->addVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']);
 	$userGroupForm->addVar('tag_filters['.$key.'][tag]', $tag_filter['tag']);
@@ -215,6 +221,7 @@ $new_permissions_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'tag_filter_groupids[]',
 			'objectName' => 'hostGroup',
+			'data' => $data['host_groups'],
 			'styles' => ['margin-top' => '-.3em'],
 			'popup' => [
 				'parameters' => [
@@ -238,7 +245,7 @@ $new_permissions_table = (new CTable())
 		)
 	])
 	->addRow([[
-		(new CCheckBox('tag_filter_subgroups')),
+		(new CCheckBox('tag_filter_subgroups'))->setChecked($data['tag_filter_subgroups'] == 1),
 		SPACE,
 		_('Include subgroups')
 	]])
