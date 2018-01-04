@@ -139,6 +139,7 @@ calendar.prototype = {
 			this.clndr_calendar.show();
 			this.visible = 1;
 
+			overlayDialogueOnLoad(true, this.clndr_calendar);
 			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
 		}
 	},
@@ -659,6 +660,7 @@ calendar.prototype = {
 		// done
 		this.clndr_done = document.createElement('button');
 		this.clndr_done.setAttribute('type', 'button');
+		this.clndr_done.setAttribute('autofocus', 'autofocus');
 		this.clndr_done.appendChild(document.createTextNode(locale['S_DONE']));
 		line_div.appendChild(this.clndr_done);
 		this.clndr_calendar.appendChild(line_div);

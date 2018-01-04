@@ -773,23 +773,27 @@ function overlayDialogueOnLoad(focus, overlay) {
 		var first_focusable = focusable.filter(':first'),
 			last_focusable = focusable.filter(':last');
 
-		first_focusable.on('keydown', function(e) {
-			// TAB and SHIFT
-			if (e.which == 9 && e.shiftKey) {
-				last_focusable.focus();
+		first_focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				// TAB and SHIFT
+				if (e.which == 9 && e.shiftKey) {
+					last_focusable.focus();
 
-				return false;
-			}
-		});
+					return false;
+				}
+			});
 
-		last_focusable.on('keydown', function(e) {
-			// TAB and not SHIFT
-			if (e.which == 9 && !e.shiftKey) {
-				first_focusable.focus();
+		last_focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				// TAB and not SHIFT
+				if (e.which == 9 && !e.shiftKey) {
+					first_focusable.focus();
 
-				return false;
-			}
-		});
+					return false;
+				}
+			});
 	}
 }
 
