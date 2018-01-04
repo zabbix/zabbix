@@ -217,6 +217,9 @@ class CProblem extends CApiService {
 					if ($fillter_condition) {
 						$sqlParts['where'][] = '('.implode(' OR ', $fillter_condition).')';
 					}
+					else {
+						$options['objectids'] = [];
+					}
 				}
 				// all triggers
 				else {
@@ -352,9 +355,6 @@ class CProblem extends CApiService {
 
 					if ($fillter_condition) {
 						$sqlParts['where'][] = '('.implode(' OR ', $fillter_condition).')';
-					}
-					else {
-						$options['objectids'] = [];
 					}
 				}
 			}
