@@ -123,21 +123,23 @@ function getFontComboBox($name) {
 							MAP_LABEL_LOC_TOP => _('Top')
 						])
 					)
-					->addRow(_('Host group'),
+					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHostGroup',
 							'objectName' => 'hostGroup'
-						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAriaRequired(),
 						'hostGroupSelectRow'
 					)
-					->addRow(_('Host'),
+					->addRow((new CLabel(_('Host'), 'elementNameHost'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHost',
 							'objectName' => 'hosts'
-						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAriaRequired(),
 						'hostSelectRow'
 					)
-					->addRow(_('Triggers'), [
+					->addRow((new CLabel(_('Triggers'), 'triggerContainer'))->setAsteriskMark(), [
 						(new CDiv([
 							(new CTable())
 								->setHeader(['', _('Name'), (new CColHeader(_('Action')))->addStyle('padding: 0 5px;')])
@@ -179,11 +181,12 @@ function getFontComboBox($name) {
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 						'triggerSelectRow'
 					)
-					->addRow(_('Map'), [
+					->addRow((new CLabel(_('Map'), 'elementName'))->setAsteriskMark(), [
 						(new CTextBox('elementName'))
 							->setReadonly(true)
 							->setId('elementNameMap')
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAriaRequired(),
 						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))

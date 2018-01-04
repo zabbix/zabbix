@@ -29,9 +29,10 @@ $widget = (new CWidget())
 $workingTimeView = (new CTabView())
 	->addTab('workingTime', _('Working time'),
 		(new CFormList())
-			->addRow(_('Working time'),
+			->addRow((new CLabel(_('Working time'), 'work_period'))->setAsteriskMark(),
 				(new CTextBox('work_period', $data['work_period']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
 			)
 	)

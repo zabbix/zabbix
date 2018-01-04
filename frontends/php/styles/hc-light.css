@@ -1173,6 +1173,12 @@ footer, .footer {
       -moz-transition: none;
       transition: none; }
 
+label.form-label-asterisk:before {
+  color: #990000;
+  display: inline-block;
+  content: '*';
+  margin-right: 0.3em; }
+
 label input[type="checkbox"] {
   margin-right: 3px; }
 label input[type="radio"] {
@@ -2293,8 +2299,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue .table-paging {
     border: none;
     border-top: 1px solid #888; }
-  .overlay-dialogue .table-forms-td-left {
-    text-align: left; }
   .overlay-dialogue .table-forms-td-right td {
     vertical-align: middle; }
     .overlay-dialogue .table-forms-td-right td label {

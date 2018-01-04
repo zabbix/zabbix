@@ -35,9 +35,10 @@ if (!empty($this->data['applicationid'])) {
 $applicationTab = (new CTabView())
 	->addTab('applicationTab', _('Application'),
 		(new CFormList())
-			->addRow(_('Name'),
+			->addRow((new CLabel(_('Name'), 'appname'))->setAsteriskMark(),
 				(new CTextBox('appname', $this->data['appname']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
 			)
 	);

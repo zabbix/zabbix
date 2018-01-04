@@ -51,7 +51,9 @@ class CSysmapWidgetForm extends CWidgetForm {
 		if ($field_source_type->getValue() === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			$field_filter_widget = (new CWidgetFieldWidgetListComboBox('filter_widget_reference', _('Filter'),
 				'type', 'navigationtree'
-			))->setDefault('');
+			))
+				->setDefault('')
+				->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);
 
 			if (array_key_exists('filter_widget_reference', $this->data)) {
 				$field_filter_widget->setValue($this->data['filter_widget_reference']);
@@ -62,7 +64,7 @@ class CSysmapWidgetForm extends CWidgetForm {
 		else {
 			// select sysmap field
 			$field_map = (new CWidgetFieldSelectResource('sysmapid', _('Map'), WIDGET_FIELD_SELECT_RES_SYSMAP))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
 			if (array_key_exists('sysmapid', $this->data)) {
 				$field_map->setValue($this->data['sysmapid']);

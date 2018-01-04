@@ -103,7 +103,11 @@ foreach ($titles as $key => $title) {
 
 // form list
 $form_list = (new CFormList())
-	->addRow(_('Import file'), (new CFile('import_file'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow((new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
+		(new CFile('import_file'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
 	->addRow(_('Rules'), new CDiv($rulesTable));
 
 // tab

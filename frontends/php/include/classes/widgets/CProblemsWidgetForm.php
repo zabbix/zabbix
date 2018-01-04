@@ -142,7 +142,9 @@ class CProblemsWidgetForm extends CWidgetForm {
 		// show lines
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
-		))->setDefault(ZBX_DEFAULT_WIDGET_LINES);
+		))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			->setDefault(ZBX_DEFAULT_WIDGET_LINES);
 
 		if (array_key_exists('show_lines', $this->data)) {
 			$field_lines->setValue($this->data['show_lines']);

@@ -1482,6 +1482,7 @@ define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
+define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

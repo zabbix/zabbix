@@ -106,6 +106,10 @@ class CRadioButtonList extends CList {
 			}
 		}
 
+		if ($this->getAttribute('aria-required') === 'true') {
+			$this->setAttribute('role', 'radiogroup');
+		}
+
 		return parent::toString($destroy);
 	}
 }
