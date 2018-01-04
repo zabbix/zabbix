@@ -3687,10 +3687,14 @@ static size_t	zbx_no_function(const char *expr)
  * Purpose: validate parameters and give position of terminator if found and  *
  *          not quoted                                                        *
  *                                                                            *
- * Parameters: expr       - [IN] string to parse that contains parameters     *
- *             terminator - [IN] use ')' if parameters end with parenthesis   *
- *                               or '\0' if ends with NULL terminator         *
- *             par_r      - [OUT] position of the terminator if found         *
+ * Parameters: expr                - [IN] string to parse that contains       *
+ *                                        parameters                          *
+ *             terminator          - [IN] use ')' if parameters end with      *
+ *                                        parenthesis or '\0' if ends         *
+ *                                        with NULL terminator                *
+ *             par_r               - [OUT] position of the terminator if found*
+ *             last_parse_param    - [OUT] position of the last parsed param. *
+ *             last_parse_param_len- [OUT] length of the last parsed parameter*
  *                                                                            *
  * Return value: SUCCEED -  closing parenthesis was found or other custom     *
  *                          terminator and not quoted                         *
@@ -3698,7 +3702,8 @@ static size_t	zbx_no_function(const char *expr)
  *                          function parameter list                           *
  *                                                                            *
  ******************************************************************************/
-static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r)
+static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r,
+			const char **last_parse_param, size_t * last_parse_param_len)
 {
 #define ZBX_FUNC_PARAM_NEXT		0
 #define ZBX_FUNC_PARAM_QUOTED		1
@@ -3719,6 +3724,7 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 		switch (state)
 		{
 			case ZBX_FUNC_PARAM_NEXT:
+				*last_parse_param = ptr;
 				if ('"' == *ptr)
 					state = ZBX_FUNC_PARAM_QUOTED;
 				else if (' ' != *ptr && ',' != *ptr)
@@ -3736,12 +3742,17 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 				if (',' == *ptr)
 					state = ZBX_FUNC_PARAM_NEXT;
 				else if (' ' != *ptr)
+				{
+					*last_parse_param_len = ptr - *last_parse_param;
 					return FAIL;
+				}
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
+
+	*last_parse_param_len = ptr - *last_parse_param;
 
 	if (terminator == *ptr && ZBX_FUNC_PARAM_QUOTED != state)
 	{
@@ -3764,18 +3775,22 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
  * Purpose: given the position of opening function parenthesis find the       *
  *          position of a closing one                                         *
  *                                                                            *
- * Parameters: expr     - [IN] string to parse                                *
- *             par_l    - [IN] position of the opening parenthesis            *
- *             par_r    - [OUT] position of the closing parenthesis           *
+ * Parameters: expr                - [IN] string to parse                     *
+ *             par_l               - [IN] position of the opening parenthesis *
+ *             par_r               - [OUT] position of the closing parenthesis*
+ *             last_parse_param    - [OUT] position of the last parsed param. *
+ *             last_parse_param_len- [OUT] length of the last parsed parameter*
  *                                                                            *
  * Return value: SUCCEED - closing parenthesis was found                      *
  *               FAIL    - string after par_l does not look like a valid      *
  *                         function parameter list                            *
  *                                                                            *
  ******************************************************************************/
-static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r)
+static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r,
+			const char **last_parse_param, size_t *last_parse_param_len)
 {
-	if (SUCCEED == function_validate_parameters(expr + par_l + 1, ')', par_r))
+	if (SUCCEED == function_validate_parameters(expr + par_l + 1, ')', par_r,
+		last_parse_param, last_parse_param_len))
 	{
 		*par_r += par_l + 1;
 		return SUCCEED;
@@ -3801,7 +3816,9 @@ static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *pa
  ******************************************************************************/
 int	zbx_function_validate_parameters(const char *expr, size_t *length)
 {
-	return function_validate_parameters(expr, '\0', length);
+	const char *ptr;
+	size_t len;
+	return function_validate_parameters(expr, '\0', length, &ptr, &len);
 }
 
 /******************************************************************************
@@ -3810,24 +3827,27 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  *                                                                            *
  * Purpose: check whether expression starts with a valid function             *
  *                                                                            *
- * Parameters: expr     - [IN] string to parse                                *
- *             par_l    - [OUT] position of the opening parenthesis or the    *
- *                              amount of characters to skip                  *
- *             par_r    - [OUT] position of the closing parenthesis           *
+ * Parameters: expr                - [IN] string to parse                     *
+ *             par_l               - [OUT] position of the opening parenthesis*
+ *                                         or the amount of characters to skip*
+ *             par_r               - [OUT] position of the closing parenthesis*
+ *             last_parse_param    - [OUT] position of the last parsed param. *
+ *             last_parse_param_len- [OUT] length of the last parsed parameter*
  *                                                                            *
  * Return value: SUCCEED - string starts with a valid function                *
  *               FAIL    - string does not start with a function and par_l    *
  *                         characters can be safely skipped                   *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r)
+static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
+			const char **last_parse_param, size_t *last_parse_param_len)
 {
 	/* try to validate function name */
 	if (SUCCEED != function_parse_name(expr, par_l))
 		return FAIL;
 
 	/* now we know the position of '(', try to find ')' */
-	return function_match_parenthesis(expr, *par_l, par_r);
+	return function_match_parenthesis(expr, *par_l, par_r, last_parse_param, last_parse_param_len);
 }
 
 /******************************************************************************
@@ -3837,27 +3857,43 @@ static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r)
  * Purpose: find the location of the next function and its parameters in      *
  *          calculated item (prototype) formula                               *
  *                                                                            *
- * Parameters: expr     - [IN] string to parse                                *
- *             func_pos - [OUT] function position in the string               *
- *             par_l    - [OUT] position of the opening parenthesis           *
- *             par_r    - [OUT] position of the closing parenthesis           *
+ * Parameters: expr          - [IN] string to parse                           *
+ *             func_pos      - [OUT] function position in the string          *
+ *             par_l         - [OUT] position of the opening parenthesis      *
+ *             par_r         - [OUT] position of the closing parenthesis      *
+ *             error         - [OUT] error message                            *
+ *             max_error_len - [IN] error size                                *
+ *                                                                            *
  *                                                                            *
  * Return value: SUCCEED - function was found at func_pos                     *
  *               FAIL    - there are no functions in the expression           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r)
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
+		char *error, int max_error_len)
 {
-	const char	*ptr;
+	const char	*ptr, *last_parse_param;
+	size_t		last_parse_param_len;
 
 	for (ptr = expr; '\0' != *ptr; ptr += *par_l)
 	{
 		/* skip the part of expression that is definitely not a function */
 		ptr += zbx_no_function(ptr);
+		*par_r = 0;
 
 		/* try to validate function candidate */
-		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r))
+		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r, &last_parse_param, &last_parse_param_len))
+		{
+			if (*par_l > *par_r)
+			{
+				zbx_snprintf(error,max_error_len, "Incorrect function '%.*s' expression. "
+					"Check expression part starting from %.*s",
+					*par_l, ptr, last_parse_param_len, last_parse_param);
+				return FAIL;
+			}
+
 			continue;
+		}
 
 		*func_pos = ptr - expr;
 		*par_l += *func_pos;
@@ -4153,9 +4189,10 @@ static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_
 static int	zbx_token_parse_function(const char *expression, const char *func,
 		zbx_strloc_t *func_loc, zbx_strloc_t *func_param)
 {
-	size_t	par_l, par_r;
+	size_t		par_l, par_r, last_parse_param_len;
+	const char 	*last_parse_param;
 
-	if (SUCCEED != zbx_function_validate(func, &par_l, &par_r))
+	if (SUCCEED != zbx_function_validate(func, &par_l, &par_r, &last_parse_param, &last_parse_param_len))
 		return FAIL;
 
 	func_loc->l = func - expression;
