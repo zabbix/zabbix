@@ -2562,15 +2562,19 @@ static void	zbx_agent_values_clean(zbx_agent_value_t *values, size_t values_num)
 static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv,
 		zbx_timespec_t *client_timediff)
 {
-	char	tmp[32];
+	const char	*__function_name = "get_client_timediff";
+	char		tmp[32];
+	int		sec, ns = 0;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 	{
-		client_timediff->sec = ts_recv->sec - atoi(tmp);
+		sec = atoi(tmp);
+		client_timediff->sec = ts_recv->sec - sec;
 
 		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
 		{
-			client_timediff->ns = ts_recv->ns - atoi(tmp);
+			ns = atoi(tmp);
+			client_timediff->ns = ts_recv->ns - ns;
 
 			if (client_timediff->ns < 0)
 			{
@@ -2580,6 +2584,9 @@ static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *
 		}
 		else
 			client_timediff->ns = 0;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %i seconds and %i nanosecond",
+				__function_name, sec, ns);
 
 		return SUCCEED;
 	}
@@ -3413,11 +3420,7 @@ int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED == (ret = get_client_timediff(jp, ts, &client_timediff)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): time different between server and arrived timestamp from json"
-			" %i seconds and %i nanosecond",__function_name, client_timediff.sec, client_timediff.ns);
-	}
+	get_client_timediff(jp, ts, &client_timediff);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
@@ -3571,11 +3574,7 @@ int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_host
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED == (ret = get_client_timediff(jp, ts, &client_timediff)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): time different between server and arrived timestamp from json"
-			" %i seconds and %i nanosecond",__function_name, client_timediff.sec, client_timediff.ns);
-	}
+	get_client_timediff(jp, ts, &client_timediff);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
@@ -3837,12 +3836,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_client_timediff(jp, ts, &client_timediff)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Structure client_timediff not initialized and set to zero");
-		client_timediff.sec = 0;
-		client_timediff.ns = 0;
-	}
+	get_client_timediff(jp, ts, &client_timediff);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
