@@ -2604,7 +2604,7 @@ static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx_timespec_t *client_timediff,
+static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx_timespec_t *unique_shift,
 		zbx_agent_value_t *av)
 {
 	char	*tmp = NULL;
@@ -2618,7 +2618,7 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		if (FAIL == is_uint31(tmp, &av->ts.sec))
 			goto out;
 
-		av->ts.sec += client_timediff->sec;
+		av->ts.sec += unique_shift->sec;
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 		{
@@ -2632,12 +2632,12 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
 
-			av->ts.ns = client_timediff->ns++;
+			av->ts.ns = unique_shift->ns++;
 
-			if (client_timediff->ns > 999999999)
+			if (unique_shift->ns > 999999999)
 			{
-				client_timediff->sec++;
-				client_timediff->ns = 0;
+				unique_shift->sec++;
+				unique_shift->ns = 0;
 			}
 		}
 	}
