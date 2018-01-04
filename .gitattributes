@@ -358,6 +358,7 @@ tests/libs/zbxjson/zbx_json_path_open.yaml -text
 tests/libs/zbxjson/zbx_jsonpath_next.yaml -text
 tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC.yaml -text
 tests/libs/zbxsysinfo/linux/NET_IF_DISCOVERY.yaml -text
+tests/libs/zbxsysinfo/linux/SYSTEM_BOOTTIME.yaml -text
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES.yaml -text
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY.yaml -text
 tests/libs/zbxsysinfo/parse_item_key.yaml -text
