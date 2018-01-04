@@ -215,7 +215,8 @@ class CEvent extends CApiService {
 
 					foreach ($rights as $usrgrpid => $right) {
 						foreach ($right as $groupid => $value) {
-							if (array_key_exists($groupid, $tag_filters_tmp[$usrgrpid])) {
+							if (!array_key_exists($usrgrpid, $tag_filters_tmp)
+									|| array_key_exists($groupid, $tag_filters_tmp[$usrgrpid])) {
 								if (array_key_exists($groupid, $group_triggers)) {
 									$allowed_triggers = array_merge($allowed_triggers, $group_triggers[$groupid]);
 									unset($group_triggers[$groupid]);
