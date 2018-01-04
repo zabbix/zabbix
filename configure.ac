@@ -1377,7 +1377,7 @@ if test "x$have_ipcservice" = "xyes"; then
 	if test "x$found_libevent" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
 	fi
-	
+
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
 
@@ -1594,6 +1594,7 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxjson/Makefile
 	tests/libs/zbxsysinfo/Makefile
 	tests/libs/zbxsysinfo/linux/Makefile
+	tests/libs/zbxsysinfo/common/Makefile
 )])
 
 AC_OUTPUT([
