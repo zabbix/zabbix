@@ -563,6 +563,8 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->zbxTestWaitForPageToLoad();
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 				$this->zbxTestClickWait('update');
 				$this->zbxTestCheckHeader('Dashboard');
 				$this->zbxTestCheckFatalErrors();
