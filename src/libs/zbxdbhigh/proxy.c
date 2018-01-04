@@ -2578,6 +2578,8 @@ static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *
 				client_timediff->ns += 1000000000;
 			}
 		}
+		else
+			client_timediff->ns = 0;
 
 		return SUCCEED;
 	}
