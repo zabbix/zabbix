@@ -332,13 +332,13 @@ if (hasRequest('form')) {
 					'output' => ['groupid', 'name'],
 					'groupids' => $new_groupids
 				]);
-			}
 
-			foreach ($host_groups as $host_group) {
-				$data['host_groups'][] = [
-					'id' => $host_group['groupid'],
-					'name' => $host_group['name']
-				];
+				foreach ($host_groups as $host_group) {
+					$data['host_groups'][] = [
+						'id' => $host_group['groupid'],
+						'name' => $host_group['name']
+					];
+				}
 			}
 		}
 		else {
