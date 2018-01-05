@@ -180,8 +180,6 @@ const char	*zbx_cu_assert_args_int(const char *description, const char *operatio
 const char	*zbx_cu_assert_args_char(const char *description, const char *operation, const char *expression1,
 		char actual, const char *expression2, char expected);
 
-extern struct mallinfo	zbx_cu_minfo;
-
 void	zbx_cu_run(int args, char *argv[]);
 
 void	*zbx_cu_galloc(void *old, size_t size);
