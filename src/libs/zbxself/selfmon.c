@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -333,7 +333,7 @@ int	init_selfmon_collector(char **error)
 		goto out;
 	}
 
-	if ((void *)(-1) == (p = shmat(shm_id, NULL, 0)))
+	if ((void *)(-1) == (p = (char *)shmat(shm_id, NULL, 0)))
 	{
 		*error = zbx_dsprintf(*error, "cannot attach shared memory for a self-monitoring collector: %s",
 				zbx_strerror(errno));

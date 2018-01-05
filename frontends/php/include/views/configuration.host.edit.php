@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,9 +60,11 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 }
 
-$hostList->addRow(_('Host name'),
+$hostList->addRow(
+	(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
 	(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 );
 
@@ -72,21 +74,23 @@ $hostList->addRow(_('Visible name'),
 );
 
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	// groups for normal hosts
-	$groupsTB = new CTweenBox($frmHost, 'groups', $data['groups'], 10);
+	// Groups for normal hosts.
+	$groups_tweenbox = new CTweenBox($frmHost, 'groups', $data['groups'], 10);
 
 	foreach ($data['groupsAll'] as $group) {
 		if (in_array($group['groupid'], $data['groups'])) {
-			$groupsTB->addItem($group['groupid'], $group['name'], null,
+			$groups_tweenbox->addItem($group['groupid'], $group['name'], null,
 				array_key_exists($group['groupid'], $data['groupsAllowed'])
 			);
 		}
 		elseif (array_key_exists($group['groupid'], $data['groupsAllowed'])) {
-			$groupsTB->addItem($group['groupid'], $group['name']);
+			$groups_tweenbox->addItem($group['groupid'], $group['name']);
 		}
 	}
 
-	$hostList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
+	$hostList->addRow((new CLabel(_('Groups'), 'groups_tweenbox'))->setAsteriskMark(),
+		$groups_tweenbox->get(_('In groups'), _('Other groups'))
+	);
 
 	$new_group = (new CTextBox('newgroup', $data['newgroup']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	$new_group_label = _('New group');
@@ -99,17 +103,19 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 }
 else {
-	// groups for discovered hosts
-	$groupBox = new CListBox(null, null, 10);
-	$groupBox->setEnabled(false);
+	// Groups for discovered hosts.
+	$group_box = (new CListBox(null, null, 10))
+		->setEnabled(false)
+		->setId('host_groups');
+
 	foreach ($data['groupsAll'] as $group) {
 		if (in_array($group['groupid'], $data['groups'])) {
-			$groupBox->addItem($group['groupid'], $group['name'], null,
+			$group_box->addItem($group['groupid'], $group['name'], null,
 				array_key_exists($group['groupid'], $data['groupsAllowed'])
 			);
 		}
 	}
-	$hostList->addRow(_('Groups'), $groupBox);
+	$hostList->addRow((new CLabel(_('Groups'), $group_box->getId()))->setAsteriskMark(), $group_box);
 	$hostList->addVar('groups', $data['groups']);
 }
 
@@ -119,6 +125,9 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
 		: 'hostInterfacesManager.addNew("agent");');
 
+	$hostList->addRow('',
+		(new CLabel(_('At least one interface must exist.')))->setAsteriskMark()
+	);
 	// Zabbix agent interfaces
 	$ifTab = (new CTable())
 		->setId('agentInterfaces')
@@ -799,13 +808,17 @@ $encryption_form_list = (new CFormList('encryption'))
 				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			)
 	)
-	->addRow(_('PSK identity'),
+	->addRow(
+		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('PSK'),
+	->addRow(
+		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))

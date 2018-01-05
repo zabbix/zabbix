@@ -2,7 +2,9 @@
 	<?= (new CRow([
 			(new CComboBox('expressions[#{rowNum}][expression_type]', null, null, expression_type2str()))
 				->onChange('onChangeExpressionType(this, #{rowNum})'),
-			(new CTextBox('expressions[#{rowNum}][expression]', '', false, 255))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			(new CTextBox('expressions[#{rowNum}][expression]', '', false, 255))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAriaRequired(),
 			(new CComboBox('expressions[#{rowNum}][exp_delimiter]', null, null, expressionDelimiters()))
 				->addStyle('display: none;'),
 			new CCheckBox('expressions[#{rowNum}][case_sensitive]'),

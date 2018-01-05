@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ static int	calcitem_add_function(expression_t *exp, char *host, char *key, char 
 	if (exp->functions_alloc == exp->functions_num)
 	{
 		exp->functions_alloc += 8;
-		exp->functions = zbx_realloc(exp->functions, exp->functions_alloc * sizeof(function_t));
+		exp->functions = (function_t *)zbx_realloc(exp->functions, exp->functions_alloc * sizeof(function_t));
 	}
 
 	f = &exp->functions[exp->functions_num++];
@@ -94,7 +94,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
 
-	exp->exp = zbx_malloc(exp->exp, exp_alloc);
+	exp->exp = (char *)zbx_malloc(exp->exp, exp_alloc);
 
 	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
@@ -180,9 +180,9 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 	if (0 == exp->functions_num)
 		return ret;
 
-	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * (size_t)exp->functions_num);
-	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)exp->functions_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)exp->functions_num);
+	keys = (zbx_host_key_t *)zbx_malloc(keys, sizeof(zbx_host_key_t) * (size_t)exp->functions_num);
+	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)exp->functions_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)exp->functions_num);
 
 	for (i = 0; i < exp->functions_num; i++)
 	{
@@ -250,7 +250,7 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 			ret_unknown = 1;
 		}
 
-		f->value = zbx_malloc(f->value, MAX_BUFFER_LEN);
+		f->value = (char *)zbx_malloc(f->value, MAX_BUFFER_LEN);
 
 		if (0 == ret_unknown &&
 				SUCCEED != evaluate_function(f->value, &items[i], f->func, f->params, now, &errstr))
@@ -291,7 +291,7 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 			f->value = wrapped;
 		}
 		else
-			f->value = zbx_realloc(f->value, strlen(f->value) + 1);
+			f->value = (char *)zbx_realloc(f->value, strlen(f->value) + 1);
 
 		zbx_snprintf(replace, sizeof(replace), "{%d}", f->functionid);
 		buf = string_replace(exp->exp, replace, f->value);
@@ -353,7 +353,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [" ZBX_FS_DBL "]"
 				" is not suitable for value type [%s].",
-				value, zbx_item_value_type_string(dc_item->value_type)));
+				value, zbx_item_value_type_string((zbx_item_value_type_t)dc_item->value_type)));
 		ret = NOTSUPPORTED;
 		goto clean;
 	}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 		/* recursive call to calculate required buffer size */
 		data_size = message_pack_data(NULL, fields, count);
 		message->size += data_size;
-		message->data = zbx_realloc(message->data, message->size);
+		message->data = (unsigned char *)zbx_realloc(message->data, message->size);
 		offset = message->data + (message->size - data_size);
 	}
 
@@ -98,7 +98,7 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 			/* size calculation */
 			if (PACKED_FIELD_STRING == fields[i].type)
 			{
-				field_size = (NULL != fields[i].value) ? strlen(fields[i].value) + 1 : 0;
+				field_size = (NULL != fields[i].value) ? strlen((const char *)fields[i].value) + 1 : 0;
 				fields[i].size = field_size;
 				field_size += sizeof(zbx_uint32_t);
 			}
@@ -512,7 +512,7 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 	offset += zbx_deserialize_int(offset, steps_num);
 	if (0 < *steps_num)
 	{
-		*steps = zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * (*steps_num));
+		*steps = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * (*steps_num));
 		for (i = 0; i < *steps_num; i++)
 		{
 			offset += zbx_deserialize_char(offset, &(*steps)[i].type);

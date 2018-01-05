@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -934,6 +934,8 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	$items = [];
 	$item_counter = [];
 	$host_items = [];
+	$host_names = [];
+
 	foreach ($db_items as $db_item) {
 		$item_name = $db_item['name_expanded'];
 		$host_name = $db_item['hosts'][0]['name'];

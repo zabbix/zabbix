@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -201,6 +201,38 @@ function close_window() {
 
 function Confirm(msg) {
 	return confirm(msg);
+}
+
+/**
+ * Function removes input elements in specified form that matches given selector.
+ *
+ * @param {object}|{string}  form_name  Form element in which input elements will be selected. If given value is 'null',
+ *                                      the DOM document object will be used.
+ * @param {string} selector             String containing one or more commas separated CSS selectors.
+ *
+ * @returns {bool}
+ */
+function removeVarsBySelector(form_name, selector) {
+	if (form_name !== null) {
+		var source = is_string(form_name) ? document.forms[form_name] : form_name;
+	}
+	else {
+		var source = document;
+	}
+
+	if (!source) {
+		return false;
+	}
+
+	var inputs = source.querySelectorAll(selector);
+
+	if (inputs.length) {
+		for (var i in inputs) {
+			if (typeof inputs[i] === 'object') {
+				inputs[i].parentNode.removeChild(inputs[i]);
+			}
+		}
+	}
 }
 
 function create_var(form_name, var_name, var_value, doSubmit) {
@@ -563,7 +595,15 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
 	var media_name = (media > -1) ? 'user_medias[' + media + ']' : 'new_media';
 
 	window.create_var(form, media_name + '[mediatypeid]', mediatypeid);
-	window.create_var(form, media_name + '[sendto]', sendto);
+	if (typeof sendto === "object") {
+		window.removeVarsBySelector(form, 'input[name^="'+media_name+'[sendto]"]');
+		jQuery(sendto).each(function(i, st) {
+			window.create_var(form, media_name + '[sendto]['+i+']', st);
+		});
+	}
+	else {
+		window.create_var(form, media_name + '[sendto]', sendto);
+	}
 	window.create_var(form, media_name + '[period]', period);
 	window.create_var(form, media_name + '[active]', active);
 	window.create_var(form, media_name + '[severity]', severity);

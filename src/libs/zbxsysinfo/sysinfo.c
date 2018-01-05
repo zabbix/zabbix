@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 	commands[i].function = metric->function;
 	commands[i].test_param = (NULL == metric->test_param ? NULL : zbx_strdup(NULL, metric->test_param));
 
-	commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
+	commands = (ZBX_METRIC *)zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
 	memset(&commands[i + 1], 0, sizeof(ZBX_METRIC));
 
 	return SUCCEED;
@@ -163,12 +163,12 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 	return ret;
 }
 
-void	init_metrics()
+void	init_metrics(void)
 {
 	int	i;
 	char	error[MAX_STRING_LEN];
 
-	commands = zbx_malloc(commands, sizeof(ZBX_METRIC));
+	commands = (ZBX_METRIC *)zbx_malloc(commands, sizeof(ZBX_METRIC));
 	commands[0].key = NULL;
 
 #ifdef WITH_AGENT_METRICS
@@ -224,7 +224,7 @@ void	init_metrics()
 #endif
 }
 
-void	free_metrics()
+void	free_metrics(void)
 {
 	if (NULL != commands)
 	{
@@ -341,7 +341,7 @@ void	free_request(AGENT_REQUEST *request)
 static void	add_request_param(AGENT_REQUEST *request, char *pvalue)
 {
 	request->nparam++;
-	request->params = zbx_realloc(request->params, request->nparam * sizeof(char *));
+	request->params = (char **)zbx_realloc(request->params, request->nparam * sizeof(char *));
 	request->params[request->nparam - 1] = pvalue;
 }
 
@@ -366,7 +366,7 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 		case ZBX_COMMAND_WITH_PARAMS:
 			if (0 == (request->nparam = num_param(params)))
 				goto out;	/* key is badly formatted */
-			request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
+			request->params = (char **)zbx_malloc(request->params, request->nparam * sizeof(char *));
 			for (i = 0; i < request->nparam; i++)
 				request->params[i] = get_param_dyn(params, i + 1);
 			break;
@@ -474,7 +474,7 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 		if (NULL == strchr(param, *c))
 			continue;
 
-		buf = zbx_malloc(buf, buf_alloc);
+		buf = (char *)zbx_malloc(buf, buf_alloc);
 
 		for (c = suppressed_chars; '\0' != *c; c++)
 		{
@@ -653,7 +653,7 @@ notsupported:
 
 static void	add_log_result(AGENT_RESULT *result, const char *value)
 {
-	result->log = zbx_malloc(result->log, sizeof(zbx_log_t));
+	result->log = (zbx_log_t *)zbx_malloc(result->log, sizeof(zbx_log_t));
 
 	zbx_log_init(result->log);
 
@@ -876,7 +876,7 @@ static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
 
 	if (0 != ISSET_VALUE(result))
 	{
-		result->log = zbx_malloc(result->log, sizeof(zbx_log_t));
+		result->log = (zbx_log_t *)zbx_malloc(result->log, sizeof(zbx_log_t));
 
 		zbx_log_init(result->log);
 
@@ -1013,7 +1013,7 @@ int	quote_key_param(char **param, int forced)
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 
-	*param = zbx_realloc(*param, sz_dst);
+	*param = (char *)zbx_realloc(*param, sz_dst);
 
 	(*param)[--sz_dst] = '\0';
 	(*param)[--sz_dst] = '"';
@@ -1122,7 +1122,7 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		while (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
 			*data_alloc *= 1.5;
 
-		*data = zbx_realloc(*data, *data_alloc);
+		*data = (char *)zbx_realloc(*data, *data_alloc);
 	}
 
 	memcpy(*data + *data_offset, &agent_ret, sizeof(int));
@@ -1262,7 +1262,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		goto out;
 	}
 
-	data = zbx_malloc(NULL, data_alloc);
+	data = (char *)zbx_malloc(NULL, data_alloc);
 
 	if (0 == pid)
 	{
@@ -1312,7 +1312,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 			while ((int)(data_alloc - data_offset) < n + 1)
 				data_alloc *= 1.5;
 
-			data = zbx_realloc(data, data_alloc);
+			data = (char *)zbx_realloc(data, data_alloc);
 		}
 
 		memcpy(data + data_offset, buffer, n);

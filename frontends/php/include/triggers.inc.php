@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,16 +108,21 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  * @param array|null  $config       array of configuration parameters to get trigger severity name; can be omitted
  *                                  if $text is not null
  * @param string|null $text         trigger severity name
- * @param bool        $forceNormal  true to return 'normal' class, false to return corresponding severity class
+ * @param bool        $force_normal  true to return 'normal' class, false to return corresponding severity class
  *
  * @return CCol
  */
-function getSeverityCell($severity, array $config = null, $text = null, $forceNormal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
 
-	return (new CCol($text))->addClass(getSeverityStyle($severity, !$forceNormal));
+	if ($force_normal) {
+		return new CCol($text);
+	}
+	else {
+		return (new CCol($text))->addClass(getSeverityStyle($severity));
+	}
 }
 
 /**
@@ -927,7 +932,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
 			$column->addClass('blink');
 			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
-			$column->setAttribute('data-toggle-class', $css);
+			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
@@ -1179,9 +1184,9 @@ function make_trigger_details($trigger) {
 		]);
 	}
 
-	$table->addRow([_('Disabled'), (TRIGGER_STATUS_ENABLED == $trigger['status'])
-		? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN)
-		: (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED)
+	$table->addRow([_('Enabled'), ($trigger['status'] == TRIGGER_STATUS_ENABLED)
+		? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
+		: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
 	]);
 
 	return $table;

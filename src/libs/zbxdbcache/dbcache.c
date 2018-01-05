@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,14 +99,6 @@ static ZBX_DC_IDS	*ids = NULL;
 #define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
 #define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
 #define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
-
-typedef struct
-{
-	zbx_uint64_t	hostid;
-	const char	*field_name;
-	char		*value_esc;
-}
-zbx_inventory_value_t;
 
 typedef struct
 {
@@ -335,7 +327,7 @@ static void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff)
 	{
 		ZBX_DC_TREND	*trend;
 
-		if (NULL != (trend = zbx_hashset_search(&cache->trends, &trends_diff->values[i].first)))
+		if (NULL != (trend = (ZBX_DC_TREND *)zbx_hashset_search(&cache->trends, &trends_diff->values[i].first)))
 			trend->disable_from = trends_diff->values[i].second;
 	}
 
@@ -638,7 +630,7 @@ static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uin
 	}
 
 	itemids_alloc = MIN(ZBX_HC_SYNC_MAX, *trends_num);
-	itemids = zbx_malloc(itemids, itemids_alloc * sizeof(zbx_uint64_t));
+	itemids = (zbx_uint64_t *)zbx_malloc(itemids, itemids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < *trends_num; i++)
 	{
@@ -741,7 +733,7 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trend
 	if (*trends_num == *trends_alloc)
 	{
 		*trends_alloc += 256;
-		*trends = zbx_realloc(*trends, *trends_alloc * sizeof(ZBX_DC_TREND));
+		*trends = (ZBX_DC_TREND *)zbx_realloc(*trends, *trends_alloc * sizeof(ZBX_DC_TREND));
 	}
 
 	memcpy(&(*trends)[*trends_num], trend, sizeof(ZBX_DC_TREND));
@@ -881,13 +873,16 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 {
 	ZBX_DC_TREND	*trends_tmp;
 
-	trends_tmp = zbx_malloc(NULL, trends_num * sizeof(ZBX_DC_TREND));
-	memcpy(trends_tmp, trends, trends_num * sizeof(ZBX_DC_TREND));
+	if (0 != trends_num)
+	{
+		trends_tmp = (ZBX_DC_TREND *)zbx_malloc(NULL, trends_num * sizeof(ZBX_DC_TREND));
+		memcpy(trends_tmp, trends, trends_num * sizeof(ZBX_DC_TREND));
 
-	while (0 < trends_num)
-		DBflush_trends(trends_tmp, &trends_num, trends_diff);
+		while (0 < trends_num)
+			DBflush_trends(trends_tmp, &trends_num, trends_diff);
 
-	zbx_free(trends_tmp);
+		zbx_free(trends_tmp);
+	}
 }
 
 /******************************************************************************
@@ -959,8 +954,8 @@ static void	DBmass_update_triggers(const ZBX_DC_HISTORY *history, int history_nu
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * (size_t)history_num);
-	timespecs = zbx_malloc(timespecs, sizeof(zbx_timespec_t) * (size_t)history_num);
+	itemids = (zbx_uint64_t *)zbx_malloc(itemids, sizeof(zbx_uint64_t) * (size_t)history_num);
+	timespecs = (zbx_timespec_t *)zbx_malloc(timespecs, sizeof(zbx_timespec_t) * (size_t)history_num);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1041,34 +1036,40 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 
 	zbx_format_value(value, sizeof(value), item->valuemapid, item->units, h->value_type);
 
-	inventory_value = zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
+	inventory_value = (zbx_inventory_value_t *)zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
 
 	inventory_value->hostid = item->host.hostid;
+	inventory_value->idx = item->inventory_link - 1;
 	inventory_value->field_name = inventory_field;
-	inventory_value->value_esc = DBdyn_escape_field("host_inventory", inventory_field, value);
+	inventory_value->value = zbx_strdup(NULL, value);
 
 	zbx_vector_ptr_append(inventory_values, inventory_value);
 }
 
 static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
 {
+	char	*value_esc;
 	int	i;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
-		const zbx_inventory_value_t	*inventory_value = inventory_values->values[i];
+		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+
+		value_esc = DBdyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
-				inventory_value->field_name, inventory_value->value_esc, inventory_value->hostid);
+				inventory_value->field_name, value_esc, inventory_value->hostid);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, sql_offset);
+
+		zbx_free(value_esc);
 	}
 }
 
 static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
 {
-	zbx_free(inventory_value->value_esc);
+	zbx_free(inventory_value->value);
 	zbx_free(inventory_value);
 }
 
@@ -1227,7 +1228,7 @@ static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type,
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
 			{
 				dc_history_clean_value(hdata);
-				hdata->value.log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
+				hdata->value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 				memset(hdata->value.log, 0, sizeof(zbx_log_value_t));
 			}
 			hdata->value.log->value = value->data.str;
@@ -1321,15 +1322,6 @@ static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 	zbx_variant_clear(&value_var);
 out:
 	return ret;
-}
-
-static int	dc_item_compare(const void *d1, const void *d2)
-{
-	const DC_ITEM	*i1 = (const DC_ITEM *)d1;
-	const DC_ITEM	*i2 = (const DC_ITEM *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(i1->itemid, i2->itemid);
-	return 0;
 }
 
 /******************************************************************************
@@ -1504,7 +1496,7 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 	{
 		zbx_item_diff_t	*diff;
 
-		diff = item_diff->values[i];
+		diff = (zbx_item_diff_t *)item_diff->values[i];
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags))
 			break;
 	}
@@ -1523,6 +1515,8 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
+
+		DCconfig_update_inventory_values(inventory_values);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1640,38 +1634,13 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	}
 
 	if (0 != history_values.values_num)
-		ret = zbx_history_add_values(&history_values);
+		ret = zbx_vc_add_values(&history_values);
 
 	zbx_vector_ptr_destroy(&history_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
-}
-
-static void	DCmass_add_history(const ZBX_DC_HISTORY *history, int history_num)
-{
-	int		i;
-	const char	*__function_name = "DCmass_add_history";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* add to value cache */
-	zbx_vc_lock();
-
-	for (i = 0; i < history_num; i++)
-	{
-		const ZBX_DC_HISTORY	*h = &history[i];
-
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
-			continue;
-
-		zbx_vc_add_value(h->itemid, h->value_type, &h->ts, &h->value);
-	}
-
-	zbx_vc_unlock();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1786,7 +1755,7 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 		else
 		{
 			flags |= PROXY_HISTORY_FLAG_NOVALUE;
-			pvalue = "";
+			pvalue = (char *)"";
 		}
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue, h->lastlogsize, h->mtime,
@@ -1967,6 +1936,8 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  *          be added                                                          *
  *                                                                            *
  * Parameters: history          - [IN/OUT] array of history data              *
+ *             itemids          - [IN] the item identifiers                   *
+ *                                     (used for item lookup)                 *
  *             items            - [IN] the items                              *
  *             errcodes         - [IN] item error codes                       *
  *             history_num      - [IN] number of history structures           *
@@ -1974,8 +1945,9 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  *             inventory_values - [OUT] the inventory values to add           *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const DC_ITEM *items, const int *errcodes,
-		int history_num, zbx_vector_ptr_t *item_diff, zbx_vector_ptr_t *inventory_values)
+static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
+		const DC_ITEM *items, const int *errcodes, int history_num, zbx_vector_ptr_t *item_diff,
+		zbx_vector_ptr_t *inventory_values)
 {
 	const char	*__function_name = "DCmass_prepare_history";
 	int		i;
@@ -1986,22 +1958,23 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const DC_ITEM *items
 	{
 		ZBX_DC_HISTORY	*h = &history[i];
 		const DC_ITEM	*item;
-		DC_ITEM		item_local;
 		zbx_item_diff_t	*diff;
+		int		index;
 
-		item_local.itemid = h->itemid;
+		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			h->flags |= ZBX_DC_FLAG_UNDEF;
+			continue;
+		}
 
-		if (NULL == (item = bsearch(&item_local, items, history_num, sizeof(DC_ITEM), dc_item_compare)))
+		if (SUCCEED != errcodes[index])
 		{
 			h->flags |= ZBX_DC_FLAG_UNDEF;
 			continue;
 		}
 
-		if (SUCCEED != errcodes[item - items])
-		{
-			h->flags |= ZBX_DC_FLAG_UNDEF;
-			continue;
-		}
+		item = &items[index];
 
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
@@ -2009,7 +1982,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const DC_ITEM *items
 			continue;
 		}
 
-		if (0 == items->history)
+		if (0 == item->history)
 			h->flags |= ZBX_DC_FLAG_NOHISTORY;
 
 		if ((ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type) ||
@@ -2302,22 +2275,22 @@ int	DCsync_history(int sync_type, int *total_num)
 	sync_start = time(NULL);
 
 	if (NULL == history)
-		history = zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
+		history = (ZBX_DC_HISTORY *)zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
 	if (NULL == history_float && NULL != history_float_cbs)
-		history_float = zbx_malloc(history_float, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_FLOAT));
+		history_float = (ZBX_HISTORY_FLOAT *)zbx_malloc(history_float, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_FLOAT));
 
 	if (NULL == history_integer && NULL != history_integer_cbs)
-		history_integer = zbx_malloc(history_integer, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_INTEGER));
+		history_integer = (ZBX_HISTORY_INTEGER *)zbx_malloc(history_integer, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_INTEGER));
 
 	if (NULL == history_string && NULL != history_string_cbs)
-		history_string = zbx_malloc(history_string, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_STRING));
+		history_string = (ZBX_HISTORY_STRING *)zbx_malloc(history_string, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_STRING));
 
 	if (NULL == history_text && NULL != history_text_cbs)
-		history_text = zbx_malloc(history_text, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
+		history_text = (ZBX_HISTORY_TEXT *)zbx_malloc(history_text, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
 
 	if (NULL == history_log && NULL != history_log_cbs)
-		history_log = zbx_malloc(history_log, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
+		history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
@@ -2367,8 +2340,8 @@ int	DCsync_history(int sync_type, int *total_num)
 			DC_ITEM			*items;
 			zbx_vector_uint64_t	itemids;
 
-			items = zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
-			errcodes = zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
+			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
+			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
 
 			zbx_vector_uint64_create(&itemids);
 			zbx_vector_uint64_reserve(&itemids, history_num);
@@ -2380,9 +2353,9 @@ int	DCsync_history(int sync_type, int *total_num)
 
 			DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
 
+			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
+					&inventory_values);
 			zbx_vector_uint64_destroy(&itemids);
-
-			DCmass_prepare_history(history, items, errcodes, history_num, &item_diff, &inventory_values);
 
 			/* process values only if they were successfully stored by the history backend */
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
@@ -2390,7 +2363,6 @@ int	DCsync_history(int sync_type, int *total_num)
 				/* trigger calculation requires up to date information */
 				/* in configuration and value caches                   */
 				DCconfig_items_apply_changes(&item_diff);
-				DCmass_add_history(history, history_num);
 				DCmass_update_trends(history, history_num, &trends, &trends_num);
 
 				do
@@ -2544,7 +2516,7 @@ static void	dc_string_buffer_realloc(size_t len)
 	}
 	while (string_values_alloc < string_values_offset + len);
 
-	string_values = zbx_realloc(string_values, string_values_alloc);
+	string_values = (char *)zbx_realloc(string_values, string_values_alloc);
 }
 
 static dc_item_value_t	*dc_local_get_history_slot(void)
@@ -2555,7 +2527,7 @@ static dc_item_value_t	*dc_local_get_history_slot(void)
 	if (item_values_alloc == item_values_num)
 	{
 		item_values_alloc += ZBX_STRUCT_REALLOC_STEP;
-		item_values = zbx_realloc(item_values, item_values_alloc * sizeof(dc_item_value_t));
+		item_values = (dc_item_value_t *)zbx_realloc(item_values, item_values_alloc * sizeof(dc_item_value_t));
 	}
 
 	return &item_values[item_values_num++];
@@ -3296,7 +3268,7 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				history->value.str = zbx_strdup(NULL, data->value.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				history->value.log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
+				history->value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 				history->value.log->value = zbx_strdup(NULL, data->value.log->value);
 
 				if (NULL != data->value.log->source)
@@ -3562,7 +3534,7 @@ int	init_database_cache(char **error)
 	}
 
 	if (NULL == sql)
-		sql = zbx_malloc(sql, sql_alloc);
+		sql = (char *)zbx_malloc(sql, sql_alloc);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -3730,7 +3702,7 @@ void	DCupdate_hosts_availability(void)
 	for (i = 0; i < hosts.values_num; i++)
 	{
 		if (SUCCEED == zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
-				hosts.values[i]))
+				(zbx_host_availability_t *)hosts.values[i]))
 		{
 			zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
 		}

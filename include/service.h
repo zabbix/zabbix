@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,11 +31,11 @@ extern ZBX_THREAD_HANDLE	*threads;
 void	service_start(int flags);
 
 int	ZabbixCreateService(const char *path, int multiple_agents);
-int	ZabbixRemoveService();
-int	ZabbixStartService();
-int	ZabbixStopService();
+int	ZabbixRemoveService(void);
+int	ZabbixStartService(void);
+int	ZabbixStopService(void);
 
-void	set_parent_signal_handler();
+void	set_parent_signal_handler(void);
 
 int	application_status;	/* required for closing application from service */
 

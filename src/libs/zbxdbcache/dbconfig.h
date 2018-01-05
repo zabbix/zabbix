@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -311,6 +311,7 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	unsigned char	inventory_mode;
+	const char	*values[HOST_INVENTORY_FIELD_COUNT];
 }
 ZBX_DC_HOST_INVENTORY;
 
@@ -628,6 +629,7 @@ typedef struct
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		host_inventories;
+	zbx_hashset_t		host_inventories_auto;	/* for caching of automatically populated host inventories */
 	zbx_hashset_t		ipmihosts;
 	zbx_hashset_t		htmpls;
 	zbx_hashset_t		gmacros;
@@ -658,6 +660,7 @@ typedef struct
 	zbx_vector_uint64_t	locked_lld_ruleids;	/* for keeping track of lld rules being processed */
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
+	zbx_hashset_t		strpool;
 }
 ZBX_DC_CONFIG;
 

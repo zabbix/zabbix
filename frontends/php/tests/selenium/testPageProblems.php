@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,29 +146,28 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestClickButtonText('Reset');
 
 		// Select host group
-		$this->zbxTestClickXpath('//div[@id="filter_groupids_"]/..//button');
-		$this->zbxTestSwitchToWindow('zbx_popup');
-		$this->zbxTestCheckboxSelect('hostGroups_4');
-		$this->zbxTestClick('select');
-		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClickButtonMultiselect('filter_groupids_');
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+		$this->zbxTestCheckboxSelect('item_4');
+		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
 		// Select host
-		$this->zbxTestClickXpath('//div[@id="filter_hostids_"]/..//button');
-		$this->zbxTestSwitchToWindow('zbx_popup');
+		$this->zbxTestClickButtonMultiselect('filter_hostids_');
+		$this->zbxTestLaunchOverlayDialog('Hosts');
 		$this->zbxTestClickWait('spanid10084');
-		$this->zbxTestWaitWindowClose();
 
 		// Type application
 		$this->zbxTestInputType('filter_application', 'Processes');
 
 		// Select trigger
-		$this->zbxTestClickAndSwitchToNewWindow('//div[@id="filter_triggerids_"]/..//button');
+		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
+		$this->zbxTestLaunchOverlayDialog('Triggers');
+
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestDropdownSelect('hostid', 'ЗАББИКС Сервер');
-		$this->zbxTestCheckboxSelect("triggers_'99250'");
-		$this->zbxTestCheckboxSelect("triggers_'99251'");
-		$this->zbxTestClick('select');
-		$this->zbxTestWaitWindowClose();
+		$this->zbxTestCheckboxSelect("item_'99250'");
+		$this->zbxTestCheckboxSelect("item_'99251'");
+		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
 		// Type problem name
 		$this->zbxTestInputType('filter_name', 'Test trigger');

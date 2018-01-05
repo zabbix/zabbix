@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,20 +40,28 @@ $guiTab = (new CFormList())
 			->setLabel(_('remember selected'))
 			->setChecked($data['dropdown_first_remember'] == 1)
 	])
-	->addRow(_('Limit for search and filter results'),
-		(new CNumericBox('search_limit', $data['search_limit'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
+		(new CNumericBox('search_limit', $data['search_limit'], 6))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
-	->addRow(_('Max count of elements to show inside table cell'),
-		(new CNumericBox('max_in_table', $data['max_in_table'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Max count of elements to show inside table cell'), 'max_in_table'))->setAsteriskMark(),
+		(new CNumericBox('max_in_table', $data['max_in_table'], 5))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Enable event acknowledgement'),
 		(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)
 	)
-	->addRow(_('Show events not older than'),
-		(new CTextBox('event_expire', $data['event_expire']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	->addRow((new CLabel(_('Show events not older than'), 'event_expire'))->setAsteriskMark(),
+		(new CTextBox('event_expire', $data['event_expire']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Max count of events per trigger to show'),
-		(new CTextBox('event_show_max', $data['event_show_max']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	->addRow((new CLabel(_('Max count of events per trigger to show'), 'event_show_max'))->setAsteriskMark(),
+		(new CTextBox('event_show_max', $data['event_show_max']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('Show warning if Zabbix server is down'),
 		(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))

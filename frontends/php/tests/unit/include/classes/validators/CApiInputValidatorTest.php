@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1833,9 +1833,9 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_URL],
-				'ftp://user@host:port',
+				'ftp://user@host:8080',
 				'/1/url',
-				'ftp://user@host:port'
+				'ftp://user@host:8080'
 			],
 			[
 				['type' => API_URL],
@@ -1897,6 +1897,24 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/chart_bar.php?a=1&b=2',
 				'/1/url',
 				'Invalid parameter "/1/url": unacceptible URL.'
+			],
+			[
+				['type' => API_URL],
+				'{$URL}',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptible URL.'
+			],
+			[
+				['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO],
+				'{$URL}',
+				'/1/url',
+				'{$URL}'
+			],
+			[
+				['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO],
+				'javascript:{$URL}',
+				'/1/url',
+				'javascript:{$URL}'
 			]
 		];
 	}

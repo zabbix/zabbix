@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"
 #include "zbxhistory.h"
+#include "postinit.h"
 
 #ifdef ZBX_CUNIT
 #include "../libs/zbxcunit/zbxcunit.h"
@@ -1007,7 +1008,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	/* make initial configuration sync before worker processes are forked */
 	DCsync_configuration(ZBX_DBSYNC_INIT);
 
+	if (SUCCEED != zbx_check_postinit_tasks(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	DBclose();
+
+	zbx_vc_enable();
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
@@ -1020,7 +1030,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
 			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS;
-	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
+	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
