@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -275,6 +275,42 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: mode_parameter_is_skip                                           *
+ *                                                                            *
+ * Purpose: test log[] or log.count[] item key if <mode> parameter is set to  *
+ *          'skip'                                                            *
+ *                                                                            *
+ * Return value: SUCCEED - <mode> parameter is set to 'skip'                  *
+ *               FAIL - <mode> is not 'skip' or error                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
+{
+	AGENT_REQUEST	request;
+	const char	*skip;
+	int		ret = FAIL, max_num_parameters;
+
+	if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log[] */
+		max_num_parameters = 7;
+	else						/* log.count[] */
+		max_num_parameters = 6;
+
+	init_request(&request);
+
+	if (SUCCEED == parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
+			max_num_parameters >= get_rparams_num(&request) && NULL != (skip = get_rparam(&request, 4)) &&
+			0 == strcmp(skip, "skip"))
+	{
+		ret = SUCCEED;
+	}
+
+	free_request(&request);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: parse_list_of_checks                                             *
  *                                                                            *
  * Purpose: Parse list of active checks received from server                  *
@@ -397,6 +433,17 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		int	found = 0;
 
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+
+		/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set to 'skip'. */
+		/* We need to keep their state, namely 'skip_old_data', in case the items become NOTSUPPORTED as */
+		/* server might not send them in a new active check list. */
+
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & metric->flags) && ITEM_STATE_NOTSUPPORTED == metric->state &&
+				0 == metric->skip_old_data && SUCCEED == mode_parameter_is_skip(metric->flags,
+				metric->key))
+		{
+			continue;
+		}
 
 		for (j = 0; j < received_metrics.values_num; j++)
 		{
