@@ -422,61 +422,72 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
  *                                                                            *
  *****************************************************************************/
 #ifdef _WINDOWS
-BY_HANDLE_FILE_INFORMATION get_file_attributes_by_handle(wchar_t *wpath, char **error)
+int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_info, char **error)
 {
-	HANDLE				file_handle;
-	BY_HANDLE_FILE_INFORMATION	link_info;
+	HANDLE	file_handle;
 
-	file_handle = CreateFile(wpath,GENERIC_READ,FILE_SHARE_READ | FILE_SHARE_WRITE,NULL,
-		OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,NULL);
+	file_handle = CreateFile(wpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, NULL);
 
 	if (INVALID_HANDLE_VALUE == file_handle)
 	{
 		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
-		link_info.dwFileAttributes = INVALID_FILE_ATTRIBUTES;
-		return link_info;
+		link_info->dwFileAttributes = INVALID_FILE_ATTRIBUTES;
+		return FAIL;
 	}
 
-	if (0 == GetFileInformationByHandle(file_handle, &link_info))
+	if (0 == GetFileInformationByHandle(file_handle, link_info))
 	{
+		CloseHandle(file_handle);
 		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
-		link_info.dwFileAttributes = INVALID_FILE_ATTRIBUTES;
+		link_info->dwFileAttributes = INVALID_FILE_ATTRIBUTES;
+		return FAIL;
 	}
 
 	CloseHandle(file_handle);
 
-	return link_info;
+	return SUCCEED;
 }
 
-DWORD	get_link_state(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char **error)
+int	link_processed(wchar_t *wpath, DWORD *attrib, zbx_vector_ptr_t *descriptors, char **error)
 {
 	BY_HANDLE_FILE_INFORMATION	link_info;
 	zbx_file_descriptor_t		*file;
 
-	link_info = get_file_attributes_by_handle(wpath, error);
+	if (INVALID_FILE_ATTRIBUTES == (*attrib = GetFileAttributesW(wpath)))
+	{
+		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
+		return SUCCEED;
+	}
 
-	if (INVALID_FILE_ATTRIBUTES == link_info.dwFileAttributes)
-		return link_info.dwFileAttributes;
+	if (0 != (*attrib & FILE_ATTRIBUTE_REPARSE_POINT))
+		return SUCCEED;
 
-	/* A file or directory that has an associated reparse point, or a file that is a symbolic link */
-	if (0 != (link_info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT));
+	if (FAIL == get_file_info_by_handle(wpath, &link_info, error))
+	{
+		*attrib = link_info.dwFileAttributes;
+		return SUCCEED;
+	}
+
+	/* A file is a hard link only*/
+	if (1 < link_info.nNumberOfLinks)
 	{
 		/* skip file if inode was already processed (multiple hardlinks) */
 		file = (zbx_file_descriptor_t*)zbx_malloc(NULL, sizeof(zbx_file_descriptor_t));
 
 		file->st_dev = link_info.dwVolumeSerialNumber;
-		file->st_ino = (zbx_uint64_t) link_info.nFileIndexHigh << 32 | link_info.nFileIndexLow;
+		file->st_ino = (zbx_uint64_t)link_info.nFileIndexHigh << 32 | link_info.nFileIndexLow;
 
 		if (FAIL != zbx_vector_ptr_search(descriptors, file, compare_descriptors))
 		{
 			zbx_free(file);
-			return link_info.dwFileAttributes;
+			return SUCCEED;
 		}
 
 		zbx_vector_ptr_append(descriptors, file);
 	}
 
-	return 0;
+	return FAIL;
 }
 
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -572,7 +583,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 			wpath = zbx_utf8_to_unicode(path);
 
-			if (0 != (attrib_ex = get_link_state(wpath, &descriptors, &error)))
+			if (SUCCEED == link_processed(wpath, &attrib_ex, &descriptors, &error))
 			{
 				if (INVALID_FILE_ATTRIBUTES == attrib_ex)
 				{
