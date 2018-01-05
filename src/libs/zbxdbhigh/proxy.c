@@ -1063,7 +1063,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	if (0 == fields_count)
 	{
-		*error = zbx_dsprintf(*error, "lost list of table's columns");
+		*error = zbx_dsprintf(*error, "empty list of field names");
 		goto out;
 	}
 
