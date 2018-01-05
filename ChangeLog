@@ -74,6 +74,7 @@ Changes for 3.4.6rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12661] fixed Low-level discovery of dependent items not working after being edited and resulting in undefined offset error or foreign key constraint violation (vso)
 ...G...... [ZBX-13254] fixed 'skip' parameter behaviour for log[], log.count[], logrt[], logrt.count[] items in case log files initially do not exist (Andris)
 ...G...... [ZBX-13253] fixed losing the 1st record by log[] and logrt[] items if 'skip' parameter is used and log file initially is empty (Andris)
 ........S. [ZBX-13275] fixed slow housekeeping of events on MySQL (vso)
