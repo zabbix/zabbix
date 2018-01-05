@@ -89,6 +89,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	setenv("TZ", zbx_mock_get_parameter_string("in.timezone"), 1);
+
 	delay = zbx_mock_get_parameter_string("in.delay");
 	err = zbx_interval_preproc(delay, &simple_interval, &custom_intervals, &error);
 	zbx_mock_assert_result_eq("zbx_interval_preproc() return value", SUCCEED, err);

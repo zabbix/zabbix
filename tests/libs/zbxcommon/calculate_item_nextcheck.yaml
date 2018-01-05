@@ -4,6 +4,7 @@ in:
   item type: ZABBIX_ACTIVE
   delay: 1h
   start time: 2017-10-29 04:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-10-29 05:00:00 +03:00
@@ -14,6 +15,7 @@ in:
   item type: ZABBIX_ACTIVE
   delay: 0;h12
   start time: 2017-10-29 04:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2038-01-01 03:00:00 +03:00
@@ -23,6 +25,7 @@ in:
   item type: ZABBIX
   delay: 0;m/15
   start time: 2017-10-29 03:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-10-29 03:15:00 +03:00
@@ -37,6 +40,7 @@ in:
   item type: ZABBIX
   delay: 0;h/1
   start time: 2017-10-29 03:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-10-29 03:00:00 +02:00
@@ -48,6 +52,7 @@ in:
   item type: ZABBIX
   delay: 0;h9
   start time: 2017-10-29 03:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-10-29 09:00:00 +02:00
@@ -58,6 +63,7 @@ in:
   item type: ZABBIX
   delay: 0;m15
   start time: 2017-10-29 03:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-10-29 03:15:00 +03:00
@@ -70,6 +76,7 @@ in:
   item type: ZABBIX
   delay: 0;h3m30
   start time: 2017-10-29 03:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-10-29 03:30:00 +03:00
@@ -81,6 +88,7 @@ in:
   item type: ZABBIX
   delay: 0;h/2
   start time: 2017-10-29 01:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-10-29 02:00:00 +03:00
@@ -93,6 +101,7 @@ in:
   item type: ZABBIX
   delay: 0;m/15
   start time: 2017-03-26 02:00:00 +02:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-03-26 02:15:00 +02:00
@@ -107,6 +116,7 @@ in:
   item type: ZABBIX
   delay: 0;h/1
   start time: 2017-03-26 01:00:00 +02:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-03-26 02:00:00 +02:00
@@ -119,6 +129,7 @@ in:
   item type: ZABBIX
   delay: 0;h9
   start time: 2017-03-26 02:00:00 +02:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-03-26 09:00:00 +03:00
@@ -129,6 +140,7 @@ in:
   item type: ZABBIX
   delay: 0;m15
   start time: 2017-03-26 02:00:00 +02:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-03-26 02:15:00 +02:00
@@ -140,6 +152,7 @@ in:
   item type: ZABBIX
   delay: 0;h3m30
   start time: 2017-03-25 02:00:00 +02:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-03-25 03:30:00 +02:00
@@ -151,6 +164,7 @@ in:
   item type: ZABBIX
   delay: 0;h/2
   start time: 2017-03-26 01:00:00 +03:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-03-26 02:00:00 +02:00
@@ -162,6 +176,7 @@ in:
   item type: ZABBIX
   delay: 0;h3
   start time: 2017-03-25 02:00:00 +02:00
+  timezone: :Europe/Riga
 out:
   checks:
     - 2017-03-25 03:00:00 +02:00
