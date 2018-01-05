@@ -873,7 +873,7 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlErrorPtr	pErr;
-	xmlBufferPtr	xmlBuf;
+	xmlBufferPtr	xmlBufferLocal;
 	int		ret = FAIL, i;
 	char		buffer[32], *ptr;
 
@@ -901,19 +901,19 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 	switch (xpathObj->type)
 	{
 		case XPATH_NODESET:
-			xmlBuf = xmlBufferCreate();
+			xmlBufferLocal = xmlBufferCreate();
 
 			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 			{
 				nodeset = xpathObj->nodesetval;
 				for (i = 0; i < nodeset->nodeNr; i++)
-					xmlNodeDump(xmlBuf, doc, nodeset->nodeTab[i], 0, 0);
+					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
 			}
 
 			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBuf->content));
+			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
 
-			xmlBufferFree(xmlBuf);
+			xmlBufferFree(xmlBufferLocal);
 			ret = SUCCEED;
 			break;
 		case XPATH_STRING:
