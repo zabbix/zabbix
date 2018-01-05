@@ -817,6 +817,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_directory_item_t	*item;
 	zbx_uint64_t		min_size = 0, max_size = 0x7fffffffffffffff;
 	time_t			min_time = 0, max_time = 0x7fffffff;
+	zbx_vector_ptr_t	descriptors;
 
 	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
 		return ret;
@@ -825,6 +826,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 			5, 10))
 		goto err1;
 
+	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
 
 	if (SUCCEED == queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
@@ -882,6 +884,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			char	*path;
 			int	match;
+			DWORD 	attrib_ex;
 
 			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
 				continue;
@@ -904,12 +907,14 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			switch (data.attrib & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
 			{
-				case FILE_ATTRIBUTE_REPARSE_POINT:
 				case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
-					if (0 != (types & DET_SYM) && 0 != match)
-						++count;
-
 					goto free_path;
+				case FILE_ATTRIBUTE_REPARSE_POINT:
+								/* not a symlink directory => symlink regular file*/
+								/* counting symlink files as MS explorer */
+					if (0 != (types & DET_FILE) && 0 != match)
+						++count;
+					break;
 				case FILE_ATTRIBUTE_DIRECTORY:
 					if (SUCCEED != queue_directory(&list, path, item->depth, max_depth))
 						zbx_free(path);
@@ -919,7 +924,21 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 					break;
 				default:	/* not a directory => regular file */
 					if (0 != (types & DET_FILE) && 0 != match)
-						++count;
+					{
+						wpath = zbx_utf8_to_unicode(path);
+						if (FAIL == link_processed(wpath, &attrib_ex, &descriptors, &error))
+						{
+							++count;
+						}
+						else if (INVALID_FILE_ATTRIBUTES == attrib_ex)
+						{
+							zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute "
+									"'%s': %s", __function_name, path, error);
+							zbx_free(error);
+						}
+
+						zbx_free(wpath);
+					}
 free_path:
 					zbx_free(path);
 			}
@@ -942,6 +961,7 @@ skip:
 	ret = SYSINFO_RET_OK;
 err2:
 	list_vector_destroy(&list);
+	descriptors_vector_destroy(&descriptors);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl);
 	zbx_free(dir);
