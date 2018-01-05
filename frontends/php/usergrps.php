@@ -399,11 +399,11 @@ if (hasRequest('form')) {
 		}
 	}
 
+	$data['tag_filters'] = collapseTagFilters($data['tag_filters']);
+
 	$data['tag_filters'] = array_map('unserialize',
 		array_values(array_unique(array_map('serialize', $data['tag_filters'])))
 	);
-
-	$data['tag_filters'] = collapseTagFilters($data['tag_filters']);
 
 	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
 
