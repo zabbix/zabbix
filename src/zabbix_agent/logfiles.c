@@ -2497,9 +2497,9 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	/* enter the loop with index of the first file to be processed, later continue the loop from the start */
 	i = last_processed;
 
-	while (i < logfiles_num)
+	while (NULL != logfiles && i < logfiles_num)
 	{
-		if (NULL != logfiles && 0 == logfiles[i].incomplete &&
+		if (0 == logfiles[i].incomplete &&
 				(logfiles[i].size != logfiles[i].processed_size || 0 == logfiles[i].seq))
 		{
 			if (start_idx != i)
