@@ -97,8 +97,8 @@ void	zbx_mock_test_entry(void **state)
 
 	item_type = get_item_type(zbx_mock_get_parameter_string("in['item type']"));
 
-	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in['start time']"), &ts))
-		fail_msg("Invalid 'start time' format");
+	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.at"), &ts))
+		fail_msg("Invalid 'at' format");
 
 	now = ts.sec;
 	checks = zbx_mock_get_parameter_handle("out.checks");
