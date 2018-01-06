@@ -2108,6 +2108,7 @@ out:
  *     hostname        - [IN] hostname the data comes from                    *
  *     key             - [IN] item key the data belongs to                    *
  *     processed_bytes - [OUT] number of processed bytes in logfile           *
+ *     seek_offset     - [IN] position to seek in file                        *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -2123,66 +2124,33 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		const char *server, unsigned short port, const char *hostname, const char *key,
-		zbx_uint64_t *processed_bytes)
+		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset)
 {
 	const char	*__function_name = "process_log";
-
 	int		f, ret = FAIL;
-	zbx_stat_t	buf;
-	zbx_uint64_t	l_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
 
-	if (0 != zbx_stat(filename, &buf))
-	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s", filename,
-				zbx_strerror(errno));
-		goto out;
-	}
-
-	if (NULL != mtime)
-		*mtime = (int)buf.st_mtime;
-
-	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
-	{
-		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
-		/* a logfile's content while keeping the same length. */
-		ret = SUCCEED;
-		goto out;
-	}
-
 	if (-1 == (f = open_file_helper(filename, err_msg)))
 		goto out;
 
-	l_size = *lastlogsize;
-
-	if (1 == *skip_old_data)
+	if ((zbx_offset_t)-1 != zbx_lseek(f, seek_offset, SEEK_SET))
 	{
-		l_size = (zbx_uint64_t)buf.st_size;
-		zabbix_log(LOG_LEVEL_DEBUG, "skipping old data in filename:'%s' to lastlogsize:" ZBX_FS_UI64,
-				filename, l_size);
-	}
-
-	if ((zbx_uint64_t)buf.st_size < l_size)	/* handle file truncation */
-		l_size = 0;
-
-	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
-	{
-		*lastlogsize = l_size;
+		*lastlogsize = seek_offset;
 		*skip_old_data = 0;
 
 		if (SUCCEED == (ret = zbx_read2(f, flags, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding,
 				regexps, pattern, output_template, p_count, s_count, process_value, server, port,
 				hostname, key, lastlogsize_sent, mtime_sent)))
 		{
-			*processed_bytes = *lastlogsize - l_size;
+			*processed_bytes = *lastlogsize - seek_offset;
 		}
 	}
 	else
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " in file \"%s\": %s",
-				l_size, filename, zbx_strerror(errno));
+				seek_offset, filename, zbx_strerror(errno));
 	}
 
 	if (SUCCEED != close_file_helper(f, filename, err_msg))
@@ -2440,6 +2408,37 @@ static void	delay_update_if_copies(struct st_logfile *logfiles, int logfiles_num
 				logfiles[i].seq = 0;
 		}
 	}
+}
+
+static int	coordinate_with_copies(const struct st_logfile *logfiles, int logfiles_num, int i,
+		zbx_uint64_t seek_offset, zbx_uint64_t latest_size, zbx_uint64_t *lastlogsize)
+{
+	zbx_uint64_t	max_processed = 0;
+	int		j;
+
+	/* Are there copies? How far are they processed? */
+	for (j = 0; j < logfiles_num - 1; j++)
+	{
+		if (i != j && SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
+		{
+			/* logfiles[i] and logfiles[j] are original and copy (or vice versa). */
+			if (max_processed < logfiles[j].processed_size)
+				max_processed = logfiles[j].processed_size;
+		}
+	}
+
+	if (seek_offset < max_processed)	/* there is a copy processed further than the current file */
+	{
+		*lastlogsize = MIN(latest_size, max_processed);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "coordinate_with_copies(): setting lastlogsize to " ZBX_FS_UI64,
+				*lastlogsize);
+
+		if (*lastlogsize == latest_size)
+			return SUCCEED;
+	}
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -3023,16 +3022,58 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				0 == logfiles[i].seq))
 		{
 			zbx_uint64_t	processed_bytes_tmp = 0;
+			zbx_stat_t	buf;
 
 			if (start_idx != i)
 				*lastlogsize = logfiles[i].processed_size;
 
-			ret = process_log(flags, logfiles[i].filename, lastlogsize,
-					(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime : NULL), lastlogsize_sent,
-					(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime_sent : NULL), skip_old_data,
-					big_rec, &logfiles[i].incomplete, err_msg, encoding, regexps, pattern,
-					output_template, p_count, s_count, process_value, server, port, hostname, key,
-					&processed_bytes_tmp);
+			if (0 != zbx_stat(logfiles[i].filename, &buf))
+			{
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s",
+						logfiles[i].filename, zbx_strerror(errno));
+				ret = FAIL;
+				break;
+			}
+
+			if (NULL != mtime)			/* for logrt[], logrt.count[] items */
+				*mtime = (int)buf.st_mtime;
+
+			if ((zbx_uint64_t)buf.st_size != *lastlogsize)
+			{
+				zbx_uint64_t	seek_offset;
+
+				/* There are data to analyze - either from 'lastlogsize' to the end of file or from */
+				/* the start (if file has been truncated). Here we do not deal with the case of */
+				/* changing a log file's content while keeping the same length. */
+
+				if (0 == *skip_old_data)
+				{
+					seek_offset = *lastlogsize;
+				}
+				else
+				{
+					seek_offset = (zbx_uint64_t)buf.st_size;
+					zabbix_log(LOG_LEVEL_DEBUG, "skipping old data in filename:'%s' to seek_offset:"
+							ZBX_FS_UI64, logfiles[i].filename, seek_offset);
+				}
+
+				if ((zbx_uint64_t)buf.st_size < seek_offset)	/* handle file truncation */
+					seek_offset = 0;
+
+				if (ZBX_LOG_ROTATION_LOGCPT != rotation_type ||
+						SUCCEED != coordinate_with_copies(logfiles, logfiles_num, i,
+						seek_offset, (zbx_uint64_t)buf.st_size, lastlogsize))
+				{
+					ret = process_log(flags, logfiles[i].filename, lastlogsize,
+							(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime : NULL),
+							lastlogsize_sent,
+							(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime_sent : NULL),
+							skip_old_data, big_rec, &logfiles[i].incomplete, err_msg,
+							encoding, regexps, pattern, output_template, p_count, s_count,
+							process_value, server, port, hostname, key,
+							&processed_bytes_tmp, seek_offset);
+				}
+			}
 
 			/* process_log() advances 'lastlogsize' only on success therefore */
 			/* we do not check for errors here */
