@@ -78,8 +78,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 3.4.6rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-13276] fixed compatibility issue with Elasticsearch versions starting from 6.0 (vjaceslavs)
 ..F....... [ZBX-12389] fixed latest data host group filter (Oleg)
