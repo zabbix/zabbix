@@ -207,7 +207,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			ret = FAIL, i, n;
+	int			ret = FAIL, i, n, exist_tag_filter = 0;
 	zbx_vector_ptr_t	tag_filters, conditions;
 	zbx_tag_filter_t	*tag_filter;
 	DB_CONDITION		*condition;
@@ -243,13 +243,17 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		for (n = 0; n < tag_filters.values_num; n++)
 		{
 			if (hostgroupids->values[i] == ((zbx_tag_filter_t *)tag_filters.values[n])->hostgrouid)
-				break;
+			{
+				exist_tag_filter = 1;
+				goto out;
+			}
 		}
-		if (tag_filters.values_num == n)
-		{
-			ret = SUCCEED;
-			goto out;
-		}
+	}
+out:
+	if (0 == exist_tag_filter)
+	{
+		ret = SUCCEED;
+		goto res;
 	}
 
 	/* if all conditions at least one of tag filter is matched then user has access to event */
@@ -300,7 +304,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		}
 		zbx_vector_ptr_destroy(&conditions);
 	}
-out:
+res:
 	zbx_vector_ptr_clear_ext(&tag_filters, (zbx_clean_func_t)zbx_tag_filter_free);
 	zbx_vector_ptr_destroy(&tag_filters);
 
