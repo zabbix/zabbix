@@ -20,7 +20,6 @@
 #include "common.h"
 #include "active.h"
 #include "zbxconf.h"
-#include "zbxself.h"
 
 #include "cfg.h"
 #include "log.h"
