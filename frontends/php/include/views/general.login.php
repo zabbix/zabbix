@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ global $ZBX_SERVER_NAME;
 			)
 	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
 	(new CDiv([
-		(new CLink(_('Help'), 'http://www.zabbix.com/documentation/3.4/'))
+		(new CLink(_('Help'), 'http://www.zabbix.com/documentation/4.0/'))
 			->setTarget('_blank')
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT),

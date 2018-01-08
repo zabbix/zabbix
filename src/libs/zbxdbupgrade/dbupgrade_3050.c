@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ static int	DBpatch_3050005(void)
 static int	DBpatch_3050008(void)
 {
 	int		res;
-	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
+	char		*trdefault = (char *)ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -123,7 +123,7 @@ static int	DBpatch_3050008(void)
 static int	DBpatch_3050009(void)
 {
 	int		res;
-	char		*trdefault = ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
+	char		*trdefault = (char *)ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -140,7 +140,7 @@ static int	DBpatch_3050009(void)
 static int	DBpatch_3050010(void)
 {
 	int		res;
-	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
+	char		*itdefault = (char *)ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -157,7 +157,7 @@ static int	DBpatch_3050010(void)
 static int	DBpatch_3050011(void)
 {
 	int		res;
-	char		*itdefault = ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
+	char		*itdefault = (char *)ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -376,7 +376,14 @@ static int	DBpatch_3050028(void)
 	return DBmodify_field_type("alerts", &field, NULL);
 }
 
+extern int	DBpatch_3040006(void);
+
 static int	DBpatch_3050029(void)
+{
+	return DBpatch_3040006();
+}
+
+static int	DBpatch_3050030(void)
 {
 	const ZBX_TABLE table =
 			{"tag_filter", "tag_filterid", 0,
@@ -394,14 +401,14 @@ static int	DBpatch_3050029(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050030(void)
+static int	DBpatch_3050031(void)
 {
 	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("tag_filter", 1, &field);
 }
 
-static int	DBpatch_3050031(void)
+static int	DBpatch_3050032(void)
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -439,8 +446,9 @@ DBPATCH_ADD(3050025, 0, 1)
 DBPATCH_ADD(3050026, 0, 1)
 DBPATCH_ADD(3050027, 0, 1)
 DBPATCH_ADD(3050028, 0, 1)
-DBPATCH_ADD(3050029, 0, 1)
+DBPATCH_ADD(3050029, 0, 0)
 DBPATCH_ADD(3050030, 0, 1)
 DBPATCH_ADD(3050031, 0, 1)
+DBPATCH_ADD(3050032, 0, 1)
 
 DBPATCH_END()

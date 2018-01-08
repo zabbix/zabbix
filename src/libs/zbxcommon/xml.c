@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ static char	data_static[ZBX_MAX_B64_LEN];
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data)
 {
 	size_t	len, sz;
-	char	*start, *end;
+	const char	*start, *end;
 
 	sz = sizeof(data_static);
 
@@ -48,7 +48,7 @@ int	xml_get_data_dyn(const char *xml, const char *tag, char **data)
 	len = end - start;
 
 	if (len > sz - 1)
-		*data = zbx_malloc(*data, len + 1);
+		*data = (char *)zbx_malloc(*data, len + 1);
 	else
 		*data = data_static;
 
@@ -109,7 +109,7 @@ char	*xml_escape_dyn(const char *data)
 	}
 	size++;
 
-	out = zbx_malloc(NULL, size);
+	out = (char *)zbx_malloc(NULL, size);
 
 	for (ptr_out = out, ptr_in = data; '\0' != *ptr_in; ptr_in++)
 	{

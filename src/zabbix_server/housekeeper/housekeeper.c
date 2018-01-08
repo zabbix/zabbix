@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,19 +49,19 @@ static zbx_config_t	cfg;
 typedef struct
 {
 	/* target table name */
-	char	*table;
+	const char	*table;
 
 	/* Optional filter, must be empty string if not used. Only the records matching */
 	/* filter are subject to housekeeping procedures.                               */
-	char	*filter;
+	const char	*filter;
 
 	/* The oldest record in table (with filter in effect). The min_clock value is   */
 	/* read from the database when accessed for the first time and then during      */
 	/* housekeeping procedures updated to the last 'cutoff' value.                  */
-	int	min_clock;
+	int		min_clock;
 
 	/* a reference to the settings value specifying number of seconds the records must be kept */
-	int	*phistory;
+	int		*phistory;
 }
 zbx_hk_rule_t;
 
@@ -71,10 +71,10 @@ zbx_hk_rule_t;
 typedef struct
 {
 	/* housekeeper table name */
-	char		*name;
+	const char		*name;
 
 	/* a reference to housekeeping configuration enable value for this table */
-	unsigned char	*poption_mode;
+	unsigned char		*poption_mode;
 }
 zbx_hk_cleanup_table_t;
 
@@ -123,10 +123,10 @@ zbx_hk_delete_queue_t;
 typedef struct
 {
 	/* the target table name */
-	char			*table;
+	const char		*table;
 
 	/* history setting field name in items table (history|trends) */
-	char			*history;
+	const char		*history;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
 	unsigned char		*poption_mode;
@@ -137,14 +137,14 @@ typedef struct
 	/* a reference to the housekeeping configuration history value for this table */
 	int			*poption;
 
+	/* type for checking which values are sent to the history storage */
+	unsigned char		type;
+
 	/* the oldest item record timestamp cache for target table */
 	zbx_hashset_t		item_cache;
 
 	/* the item delete queue */
 	zbx_vector_ptr_t	delete_queue;
-
-	/* type for checking which values are sent to the history storage */
-	unsigned char		type;
 }
 zbx_hk_history_rule_t;
 
@@ -252,7 +252,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 		/* update oldest timestamp in item cache */
 		item_record->min_clock = MIN(keep_from, item_record->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
-		update_record = zbx_malloc(NULL, sizeof(zbx_hk_delete_queue_t));
+		update_record = (zbx_hk_delete_queue_t *)zbx_malloc(NULL, sizeof(zbx_hk_delete_queue_t));
 		update_record->itemid = item_record->itemid;
 		update_record->min_clock = item_record->min_clock;
 		zbx_vector_ptr_append(&rule->delete_queue, update_record);
@@ -351,13 +351,13 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rule, int now, zbx_uin
 	if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode)
 		return;
 
-	item_record = zbx_hashset_search(&rule->item_cache, &itemid);
+	item_record = (zbx_hk_item_cache_t *)zbx_hashset_search(&rule->item_cache, &itemid);
 
 	if (NULL == item_record)
 	{
 		zbx_hk_item_cache_t	item_data = {itemid, now};
 
-		item_record = zbx_hashset_insert(&rule->item_cache, &item_data, sizeof(zbx_hk_item_cache_t));
+		item_record = (zbx_hk_item_cache_t *)zbx_hashset_insert(&rule->item_cache, &item_data, sizeof(zbx_hk_item_cache_t));
 		if (NULL == item_record)
 			return;
 	}
@@ -554,7 +554,7 @@ static int	housekeeping_history_and_trends(int now)
 
 		for (i = 0; i < rule->delete_queue.values_num; i++)
 		{
-			zbx_hk_delete_queue_t	*item_record = rule->delete_queue.values[i];
+			zbx_hk_delete_queue_t	*item_record = (zbx_hk_delete_queue_t *)rule->delete_queue.values[i];
 
 			rc = DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 					rule->table, item_record->itemid, item_record->min_clock);
@@ -762,7 +762,7 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t i
  * Comments: sqlite3 does not use CONFIG_MAX_HOUSEKEEPER_DELETE, deletes all  *
  *                                                                            *
  ******************************************************************************/
-static int	housekeeping_cleanup()
+static int	housekeeping_cleanup(void)
 {
 	const char		*__function_name = "housekeeping_cleanup";
 
@@ -900,23 +900,22 @@ static int	housekeeping_audit(int now)
 
 static int	housekeeping_events(int now)
 {
+#define ZBX_HK_EVENT_RULE	" and not exists (select null from problem where events.eventid=problem.eventid)" \
+				" and not exists (select null from problem where events.eventid=problem.r_eventid)"
+
 	static zbx_hk_rule_t 	rules[] = {
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_trigger},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_trigger},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
@@ -936,6 +935,7 @@ static int	housekeeping_events(int now)
 		deleted += housekeeping_process_rule(now, rule);
 
 	return deleted;
+#undef ZBX_HK_EVENT_RULE
 }
 
 static int	housekeeping_problems(int now)

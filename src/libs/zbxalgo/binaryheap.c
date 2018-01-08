@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ static void	__binary_heap_ensure_free_space(zbx_binary_heap_t *heap)
 
 	if (heap->elems_num != tmp_elems_alloc)
 	{
-		heap->elems = heap->mem_realloc_func(heap->elems, tmp_elems_alloc * sizeof(zbx_binary_heap_elem_t));
+		heap->elems = (zbx_binary_heap_elem_t *)heap->mem_realloc_func(heap->elems, tmp_elems_alloc * sizeof(zbx_binary_heap_elem_t));
 
 		if (NULL == heap->elems)
 		{
@@ -165,7 +165,7 @@ void	zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t comp
 
 	if (HAS_DIRECT_OPTION(heap))
 	{
-		heap->key_index = mem_malloc_func(NULL, sizeof(zbx_hashmap_t));
+		heap->key_index = (zbx_hashmap_t *)mem_malloc_func(NULL, sizeof(zbx_hashmap_t));
 		zbx_hashmap_create_ext(heap->key_index, 512,
 					ZBX_DEFAULT_UINT64_HASH_FUNC,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC,

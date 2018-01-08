@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,10 +74,10 @@ void	zbx_tm_task_clear(zbx_tm_task_t *task)
 		switch (task->type)
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
-				tm_remote_command_clear(task->data);
+				tm_remote_command_clear((zbx_tm_remote_command_t *)task->data);
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
-				tm_remote_command_result_clear(task->data);
+				tm_remote_command_result_clear((zbx_tm_remote_command_result_t *)task->data);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -195,7 +195,7 @@ zbx_tm_task_t	*zbx_tm_task_create(zbx_uint64_t taskid, unsigned char type, unsig
 {
 	zbx_tm_task_t	*task;
 
-	task = zbx_malloc(NULL, sizeof(zbx_tm_task_t));
+	task = (zbx_tm_task_t *)zbx_malloc(NULL, sizeof(zbx_tm_task_t));
 
 	task->taskid = taskid;
 	task->type = type;
@@ -540,10 +540,10 @@ void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *
 		switch (task->type)
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
-				tm_json_serialize_remote_command(json, task->data);
+				tm_json_serialize_remote_command(json, (zbx_tm_remote_command_t *)task->data);
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
-				tm_json_serialize_remote_command_result(json, task->data);
+				tm_json_serialize_remote_command_result(json, (zbx_tm_remote_command_result_t *)task->data);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

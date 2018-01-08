@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -586,25 +586,25 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 
 	/* allocate zbx_mem_info_t structure, its buckets, and description inside shared memory */
 
-	*info = ALIGN8(base);
+	*info = (zbx_mem_info_t *)ALIGN8(base);
 	(*info)->shm_id = shm_id;
 	(*info)->orig_size = size;
 	size -= (char *)(*info + 1) - (char *)base;
 
 	base = (void *)(*info + 1);
 
-	(*info)->buckets = ALIGNPTR(base);
+	(*info)->buckets = (void **)ALIGNPTR(base);
 	memset((*info)->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
 	size -= (char *)((*info)->buckets + MEM_BUCKET_COUNT) - (char *)base;
 	base = (void *)((*info)->buckets + MEM_BUCKET_COUNT);
 
-	zbx_strlcpy(base, descr, size);
-	(*info)->mem_descr = base;
+	zbx_strlcpy((char *)base, descr, size);
+	(*info)->mem_descr = (char *)base;
 	size -= strlen(descr) + 1;
 	base = (void *)((char *)base + strlen(descr) + 1);
 
-	zbx_strlcpy(base, param, size);
-	(*info)->mem_param = base;
+	zbx_strlcpy((char *)base, param, size);
+	(*info)->mem_param = (char *)base;
 	size -= strlen(param) + 1;
 	base = (void *)((char *)base + strlen(param) + 1);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,7 +207,7 @@ static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int aut
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __function_name, ip, port);
 
-	h = zbx_malloc(NULL, sizeof(zbx_ipmi_host_t));
+	h = (zbx_ipmi_host_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_host_t));
 
 	memset(h, 0, sizeof(zbx_ipmi_host_t));
 
@@ -298,9 +298,9 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	sz = (size_t)h->sensor_count * sizeof(zbx_ipmi_sensor_t);
 
 	if (NULL == h->sensors)
-		h->sensors = zbx_malloc(h->sensors, sz);
+		h->sensors = (zbx_ipmi_sensor_t *)zbx_malloc(h->sensors, sz);
 	else
-		h->sensors = zbx_realloc(h->sensors, sz);
+		h->sensors = (zbx_ipmi_sensor_t *)zbx_realloc(h->sensors, sz);
 
 	s = &h->sensors[h->sensor_count - 1];
 	s->sensor = sensor;
@@ -352,7 +352,7 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 		h->sensor_count--;
 		if (h->sensor_count != i)
 			memmove(&h->sensors[i], &h->sensors[i + 1], sz * (size_t)(h->sensor_count - i));
-		h->sensors = zbx_realloc(h->sensors, sz * (size_t)h->sensor_count);
+		h->sensors = (zbx_ipmi_sensor_t *)zbx_realloc(h->sensors, sz * (size_t)h->sensor_count);
 
 		break;
 	}
@@ -412,7 +412,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	char			*c_name = NULL;
 
 	sz = (size_t)ipmi_control_get_id_length(control);
-	c_name = zbx_malloc(c_name, sz + 1);
+	c_name = (char *)zbx_malloc(c_name, sz + 1);
 	ipmi_control_get_id(control, c_name, sz);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d'", __function_name, c_name, h->ip, h->port);
@@ -421,9 +421,9 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	sz = (size_t)h->control_count * sizeof(zbx_ipmi_control_t);
 
 	if (NULL == h->controls)
-		h->controls = zbx_malloc(h->controls, sz);
+		h->controls = (zbx_ipmi_control_t *)zbx_malloc(h->controls, sz);
 	else
-		h->controls = zbx_realloc(h->controls, sz);
+		h->controls = (zbx_ipmi_control_t *)zbx_realloc(h->controls, sz);
 
 	c = &h->controls[h->control_count - 1];
 
@@ -433,7 +433,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	c->c_name = c_name;
 	c->num_values = ipmi_control_get_num_vals(control);
 	sz = sizeof(int) * (size_t)c->num_values;
-	c->val = zbx_malloc(c->val, sz);
+	c->val = (int *)zbx_malloc(c->val, sz);
 	memset(c->val, 0, sz);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, c);
@@ -464,7 +464,7 @@ static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 		h->control_count--;
 		if (h->control_count != i)
 			memmove(&h->controls[i], &h->controls[i + 1], sz * (size_t)(h->control_count - i));
-		h->controls = zbx_realloc(h->controls, sz * (size_t)h->control_count);
+		h->controls = (zbx_ipmi_control_t *)zbx_realloc(h->controls, sz * (size_t)h->control_count);
 
 		break;
 	}
@@ -478,7 +478,7 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 {
 	const char		*__function_name = "zbx_got_thresh_reading_cb";
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
-	zbx_ipmi_host_t		*h = cb_data;
+	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
 	zbx_ipmi_sensor_t	*s;
 
 	ZBX_UNUSED(raw_value);
@@ -574,7 +574,7 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 	const char		*__function_name = "zbx_got_discrete_states_cb";
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int			id, i, val, ret, is_state_set;
-	zbx_ipmi_host_t		*h = cb_data;
+	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
 	zbx_ipmi_sensor_t	*s;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
@@ -769,7 +769,7 @@ out:
 static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *val, void *cb_data)
 {
 	const char		*__function_name = "zbx_got_control_reading_cb";
-	zbx_ipmi_host_t		*h = cb_data;
+	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
 	int			n;
 	zbx_ipmi_control_t	*c;
 	const char		*e_string;
@@ -826,7 +826,7 @@ out:
 static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *cb_data)
 {
 	const char		*__function_name = "zbx_got_control_setting_cb";
-	zbx_ipmi_host_t		*h = cb_data;
+	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
 	zbx_ipmi_control_t	*c;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
@@ -948,7 +948,7 @@ out:
 static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor_t *sensor, void *cb_data)
 {
 	const char	*__function_name = "zbx_sensor_change_cb";
-	zbx_ipmi_host_t	*h = cb_data;
+	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
@@ -981,7 +981,7 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_control_t *control, void *cb_data)
 {
 	const char	*__function_name = "zbx_control_change_cb";
-	zbx_ipmi_host_t	*h = cb_data;
+	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
@@ -1011,7 +1011,7 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 {
 	const char	*__function_name = "zbx_entity_change_cb";
 	int		ret;
-	zbx_ipmi_host_t	*h = cb_data;
+	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
@@ -1041,7 +1041,7 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 static void	zbx_domain_closed_cb(void *cb_data)
 {
 	const char	*__function_name = "zbx_domain_closed_cb";
-	zbx_ipmi_host_t	*h = cb_data;
+	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
@@ -1061,7 +1061,7 @@ static void	zbx_connection_change_cb(ipmi_domain_t *domain, int err, unsigned in
 
 	const char	*__function_name = "zbx_connection_change_cb";
 	int		ret;
-	zbx_ipmi_host_t	*h = cb_data;
+	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
@@ -1092,7 +1092,7 @@ out:
 static void	zbx_domain_up_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	const char	*__function_name = "zbx_domain_up_cb";
-	zbx_ipmi_host_t	*h = cb_data;
+	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
@@ -1306,7 +1306,7 @@ static int		domain_close_ok;
 /* callback function invoked from OpenIPMI */
 static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 {
-	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = cb_data;
+	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = (char *)cb_data;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_get_domain_id_by_name_cb");
 
@@ -1324,7 +1324,7 @@ static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 /* callback function invoked from OpenIPMI */
 static void	zbx_domain_close_cb(ipmi_domain_t *domain, void *cb_data)
 {
-	zbx_ipmi_host_t	*h = cb_data;
+	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
 	int		ret;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_domain_close_cb");

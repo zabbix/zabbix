@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 
 	*historical = FAIL;
 
-	replace = zbx_malloc(NULL, replace_alloc);
+	replace = (char *)zbx_malloc(NULL, replace_alloc);
 
 	name_alloc = name_len = strlen(trigger->description) + 1;
 
@@ -354,7 +354,7 @@ static int	update_event_names(void)
 
 	memset(&trigger, 0, sizeof(DB_TRIGGER));
 
-	sql = zbx_malloc(NULL, sql_alloc);
+	sql = (char *)zbx_malloc(NULL, sql_alloc);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(

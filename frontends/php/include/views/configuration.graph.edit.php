@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,20 +70,24 @@ if ($discovered_graph) {
 }
 
 $graphFormList
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $this->data['name'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Width'),
+	->addRow((new CLabel(_('Width'), 'width'))->setAsteriskMark(),
 		(new CNumericBox('width', $this->data['width'], 5, $readonly))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Height'),
+	->addRow((new CLabel(_('Height'), 'height'))->setAsteriskMark(),
 		(new CNumericBox('height', $this->data['height'], 5, $readonly))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Graph type'),
+	->addRow((new CLabel(_('Graph type'), 'graphtype')),
 		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))->setEnabled(!$readonly)
 	)
 	->addRow(_('Show legend'),
@@ -168,7 +172,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired();
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 		// Select item button.
@@ -212,7 +218,14 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
 	}
 
-	$graphFormList->addRow(_('Y axis MIN value'), $yaxisMinData);
+	$yaxismin_label = new CLabel(_('Y axis MIN value'));
+	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+		$yaxismin_label
+			->setAsteriskMark()
+			->setAttribute('for', 'ymin_name');
+	}
+
+	$graphFormList->addRow($yaxismin_label, $yaxisMinData);
 
 	$yaxisMaxData = [(new CComboBox('ymax_type', $this->data['ymax_type'], null, [
 		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
@@ -239,7 +252,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired();
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 		// Select item button.
@@ -283,7 +298,14 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
 	}
 
-	$graphFormList->addRow(_('Y axis MAX value'), $yaxisMaxData);
+	$yaxismax_label = new CLabel(_('Y axis MAX value'));
+	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+		$yaxismax_label
+			->setAsteriskMark()
+			->setAttribute('for', 'ymax_name');
+	}
+
+	$graphFormList->addRow($yaxismax_label, $yaxisMaxData);
 }
 else {
 	$graphFormList->addRow(_('3D view'),
@@ -294,7 +316,7 @@ else {
 }
 
 // Append items to form list.
-$itemsTable = (new CTable())
+$items_table = (new CTable())
 	->setId('itemsTable')
 	->setHeader([
 		(new CColHeader())->setWidth(15),
@@ -352,7 +374,7 @@ if ($data['parent_discoveryid']) {
 	$popup_options_add_prototype['parent_discoveryid'] = $data['parent_discoveryid'];
 }
 
-$itemsTable->addRow(
+$items_table->addRow(
 	(new CRow(
 		$readonly
 			? null
@@ -393,7 +415,10 @@ foreach ($this->data['items'] as $n => $item) {
 	);
 }
 
-$graphFormList->addRow(_('Items'), (new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$graphFormList->addRow(
+	(new CLabel(_('Items'), $items_table->getId()))->setAsteriskMark(),
+	(new CDiv($items_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+);
 
 // Append tabs to form.
 $graphTab = new CTabView();

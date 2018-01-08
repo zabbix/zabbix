@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ static zbx_module_t	*zbx_register_module(void *lib, char *name)
 {
 	zbx_module_t	*module;
 
-	module = zbx_malloc(NULL, sizeof(zbx_module_t));
+	module = (zbx_module_t *)zbx_malloc(NULL, sizeof(zbx_module_t));
 	module->lib = lib;
 	module->name = zbx_strdup(NULL, name);
 	zbx_vector_ptr_append(&modules, module);
@@ -110,14 +110,14 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_float_cbs)
 		{
-			history_float_cbs = zbx_malloc(history_float_cbs, sizeof(zbx_history_float_cb_t));
+			history_float_cbs = (zbx_history_float_cb_t *)zbx_malloc(history_float_cbs, sizeof(zbx_history_float_cb_t));
 			history_float_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_float_cbs[j].module)
 			j++;
 
-		history_float_cbs = zbx_realloc(history_float_cbs, (j + 2) * sizeof(zbx_history_float_cb_t));
+		history_float_cbs = (zbx_history_float_cb_t *)zbx_realloc(history_float_cbs, (j + 2) * sizeof(zbx_history_float_cb_t));
 		history_float_cbs[j].module = module;
 		history_float_cbs[j].history_float_cb = history_write_cbs.history_float_cb;
 		history_float_cbs[j + 1].module = NULL;
@@ -129,14 +129,14 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_integer_cbs)
 		{
-			history_integer_cbs = zbx_malloc(history_integer_cbs, sizeof(zbx_history_integer_cb_t));
+			history_integer_cbs = (zbx_history_integer_cb_t *)zbx_malloc(history_integer_cbs, sizeof(zbx_history_integer_cb_t));
 			history_integer_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_integer_cbs[j].module)
 			j++;
 
-		history_integer_cbs = zbx_realloc(history_integer_cbs, (j + 2) * sizeof(zbx_history_integer_cb_t));
+		history_integer_cbs = (zbx_history_integer_cb_t *)zbx_realloc(history_integer_cbs, (j + 2) * sizeof(zbx_history_integer_cb_t));
 		history_integer_cbs[j].module = module;
 		history_integer_cbs[j].history_integer_cb = history_write_cbs.history_integer_cb;
 		history_integer_cbs[j + 1].module = NULL;
@@ -148,14 +148,14 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_string_cbs)
 		{
-			history_string_cbs = zbx_malloc(history_string_cbs, sizeof(zbx_history_string_cb_t));
+			history_string_cbs = (zbx_history_string_cb_t *)zbx_malloc(history_string_cbs, sizeof(zbx_history_string_cb_t));
 			history_string_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_string_cbs[j].module)
 			j++;
 
-		history_string_cbs = zbx_realloc(history_string_cbs, (j + 2) * sizeof(zbx_history_string_cb_t));
+		history_string_cbs = (zbx_history_string_cb_t *)zbx_realloc(history_string_cbs, (j + 2) * sizeof(zbx_history_string_cb_t));
 		history_string_cbs[j].module = module;
 		history_string_cbs[j].history_string_cb = history_write_cbs.history_string_cb;
 		history_string_cbs[j + 1].module = NULL;
@@ -167,14 +167,14 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_text_cbs)
 		{
-			history_text_cbs = zbx_malloc(history_text_cbs, sizeof(zbx_history_text_cb_t));
+			history_text_cbs = (zbx_history_text_cb_t *)zbx_malloc(history_text_cbs, sizeof(zbx_history_text_cb_t));
 			history_text_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_text_cbs[j].module)
 			j++;
 
-		history_text_cbs = zbx_realloc(history_text_cbs, (j + 2) * sizeof(zbx_history_text_cb_t));
+		history_text_cbs = (zbx_history_text_cb_t *)zbx_realloc(history_text_cbs, (j + 2) * sizeof(zbx_history_text_cb_t));
 		history_text_cbs[j].module = module;
 		history_text_cbs[j].history_text_cb = history_write_cbs.history_text_cb;
 		history_text_cbs[j + 1].module = NULL;
@@ -186,14 +186,14 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_log_cbs)
 		{
-			history_log_cbs = zbx_malloc(history_log_cbs, sizeof(zbx_history_log_cb_t));
+			history_log_cbs = (zbx_history_log_cb_t *)zbx_malloc(history_log_cbs, sizeof(zbx_history_log_cb_t));
 			history_log_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_log_cbs[j].module)
 			j++;
 
-		history_log_cbs = zbx_realloc(history_log_cbs, (j + 2) * sizeof(zbx_history_log_cb_t));
+		history_log_cbs = (zbx_history_log_cb_t *)zbx_realloc(history_log_cbs, (j + 2) * sizeof(zbx_history_log_cb_t));
 		history_log_cbs[j].module = module;
 		history_log_cbs[j].history_log_cb = history_write_cbs.history_log_cb;
 		history_log_cbs[j + 1].module = NULL;

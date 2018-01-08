@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #define ZBX_SAME_FILE_NO	0
 #define ZBX_SAME_FILE_YES	1
 #define ZBX_SAME_FILE_RETRY	2
+#define ZBX_NO_FILE_ERROR	3
 
 /******************************************************************************
  *                                                                            *
@@ -79,10 +80,10 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 	part1_length = (size_t)(del - str + 1);
 	part2_length = str_length - part1_length;
 
-	*part1 = zbx_malloc(*part1, part1_length + 1);
+	*part1 = (char *)zbx_malloc(*part1, part1_length + 1);
 	zbx_strlcpy(*part1, str, part1_length + 1);
 
-	*part2 = zbx_malloc(*part2, part2_length + 1);
+	*part2 = (char *)zbx_malloc(*part2, part2_length + 1);
 	zbx_strlcpy(*part2, str + part1_length, part2_length + 1);
 
 	ret = SUCCEED;
@@ -466,12 +467,12 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
  *          list could be the same file                                       *
  *                                                                            *
  * Parameters:                                                                *
- *          old     - [IN] file from the old list                             *
- *          new     - [IN] file from the new list                             *
- *          use_ino - [IN] 0 - do not use inodes in comparison,               *
- *                         1 - use up to 64-bit inodes in comparison,         *
- *                         2 - use 128-bit inodes in comparison.              *
- *          err_msg - [IN/OUT] error message why an item became               *
+ *          old_file - [IN] file from the old list                            *
+ *          new_file - [IN] file from the new list                            *
+ *          use_ino  - [IN] 0 - do not use inodes in comparison,              *
+ *                          1 - use up to 64-bit inodes in comparison,        *
+ *                          2 - use 128-bit inodes in comparison.             *
+ *          err_msg  - [IN/OUT] error message why an item became              *
  *                    NOTSUPPORTED                                            *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
@@ -484,39 +485,39 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
  *           truncated and replaced with a similar one.                       *
  *                                                                            *
  ******************************************************************************/
-static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino, char **err_msg)
+static int	is_same_file(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino, char **err_msg)
 {
 	int	ret = ZBX_SAME_FILE_NO;
 
 	if (1 == use_ino || 2 == use_ino)
 	{
-		if (old->ino_lo != new->ino_lo || old->dev != new->dev)
+		if (old_file->ino_lo != new_file->ino_lo || old_file->dev != new_file->dev)
 		{
 			/* file inode and device id cannot differ */
 			goto out;
 		}
 	}
 
-	if (2 == use_ino && old->ino_hi != new->ino_hi)
+	if (2 == use_ino && old_file->ino_hi != new_file->ino_hi)
 	{
 		/* file inode (older 64-bits) cannot differ */
 		goto out;
 	}
 
-	if (old->mtime > new->mtime)
+	if (old_file->mtime > new_file->mtime)
 	{
 		/* file mtime cannot decrease unless manipulated */
 		goto out;
 	}
 
-	if (old->size > new->size)
+	if (old_file->size > new_file->size)
 	{
 		/* File size cannot decrease. Truncating or replacing a file with a smaller one */
 		/* counts as 2 different files. */
 		goto out;
 	}
 
-	if (old->size == new->size && old->mtime < new->mtime)
+	if (old_file->size == new_file->size && old_file->mtime < new_file->mtime)
 	{
 		/* Depending on file system it's possible that stat() was called */
 		/* between mtime and file size update. In this situation we will */
@@ -526,36 +527,36 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 		/* If the size has not changed on the next check, then we assume */
 		/* that some tampering was done and to be safe we will treat it  */
 		/* as a different file.                                          */
-		if (0 == old->retry)
+		if (0 == old_file->retry)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "the modification time of log file \"%s\" has been updated"
-					" without changing its size, try checking again later", old->filename);
+					" without changing its size, try checking again later", old_file->filename);
 			ret = ZBX_SAME_FILE_RETRY;
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "after changing modification time the size of log file \"%s\""
-					" still has not been updated, consider it to be a new file", old->filename);
+					" still has not been updated, consider it to be a new file", old_file->filename);
 		}
 
 		goto out;
 	}
 
-	if (-1 == old->md5size || -1 == new->md5size)
+	if (-1 == old_file->md5size || -1 == new_file->md5size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
 		goto out;
 	}
 
-	if (old->md5size > new->md5size)
+	if (old_file->md5size > new_file->md5size)
 	{
 		/* file initial block size from which MD5 sum is calculated cannot decrease */
 		goto out;
 	}
 
-	if (old->md5size == new->md5size)
+	if (old_file->md5size == new_file->md5size)
 	{
-		if (0 != memcmp(old->md5buf, new->md5buf, sizeof(new->md5buf)))
+		if (0 != memcmp(old_file->md5buf, new_file->md5buf, sizeof(new_file->md5buf)))
 		{
 			/* MD5 sums differ */
 			goto out;
@@ -563,24 +564,24 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 	}
 	else
 	{
-		if (0 < old->md5size)
+		if (0 < old_file->md5size)
 		{
 			/* MD5 for the old file has been calculated from a smaller block than for the new file */
 
 			int		f;
 			md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
 
-			if (-1 == (f = zbx_open(new->filename, O_RDONLY)))
+			if (-1 == (f = zbx_open(new_file->filename, O_RDONLY)))
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", new->filename,
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", new_file->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 				goto out;
 			}
 
-			if (SUCCEED == file_start_md5(f, old->md5size, md5tmp, new->filename, err_msg))
+			if (SUCCEED == file_start_md5(f, old_file->md5size, md5tmp, new_file->filename, err_msg))
 			{
-				ret = (0 == memcmp(old->md5buf, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
+				ret = (0 == memcmp(old_file->md5buf, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
 						ZBX_SAME_FILE_NO;
 			}
 			else
@@ -590,7 +591,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 			{
 				if (ZBX_SAME_FILE_ERROR != ret)
 				{
-					*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new->filename,
+					*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new_file->filename,
 							zbx_strerror(errno));
 					ret = ZBX_SAME_FILE_ERROR;
 				}
@@ -613,13 +614,13 @@ out:
  *          new log files.                                                    *
  *                                                                            *
  * Parameters:                                                                *
- *          old2new - [IN] two dimensional array of possible mappings         *
- *          old     - [IN] old file list                                      *
- *          num_old - [IN] number of elements in the old file list            *
- *          new     - [IN] new file list                                      *
- *          num_new - [IN] number of elements in the new file list            *
- *          use_ino - [IN] how to use inodes in is_same_file()                *
- *          err_msg - [IN/OUT] error message why an item became NOTSUPPORTED  *
+ *          old2new   - [IN] two dimensional array of possible mappings       *
+ *          old_files - [IN] old file list                                    *
+ *          num_old   - [IN] number of elements in the old file list          *
+ *          new_files - [IN] new file list                                    *
+ *          num_new   - [IN] number of elements in the new file list          *
+ *          use_ino   - [IN] how to use inodes in is_same_file()              *
+ *          err_msg   - [IN/OUT] error message why an item became NOTSUPPORTED*
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -629,8 +630,8 @@ out:
  *       old2new[i][j] = '1' - the i-th old file COULD BE the j-th new file   *
  *                                                                            *
  ******************************************************************************/
-static int	setup_old2new(char *old2new, struct st_logfile *old, int num_old,
-		const struct st_logfile *new, int num_new, int use_ino, char **err_msg)
+static int	setup_old2new(char *old2new, struct st_logfile *old_files, int num_old,
+		const struct st_logfile *new_files, int num_new, int use_ino, char **err_msg)
 {
 	int	i, j, rc;
 	char	*p = old2new;
@@ -639,7 +640,7 @@ static int	setup_old2new(char *old2new, struct st_logfile *old, int num_old,
 	{
 		for (j = 0; j < num_new; j++)
 		{
-			rc = is_same_file(old + i, new + j, use_ino, err_msg);
+			rc = is_same_file(old_files + i, new_files + j, use_ino, err_msg);
 
 			switch (rc)
 			{
@@ -647,17 +648,17 @@ static int	setup_old2new(char *old2new, struct st_logfile *old, int num_old,
 					p[j] = '0';
 					break;
 				case ZBX_SAME_FILE_YES:
-					if (1 == old[i].retry)
+					if (1 == old_files[i].retry)
 					{
 						zabbix_log(LOG_LEVEL_DEBUG, "the size of log file \"%s\" has been"
 								" updated since modification time change, consider"
-								" it to be the same file", old->filename);
-						old[i].retry = 0;
+								" it to be the same file", old_files->filename);
+						old_files[i].retry = 0;
 					}
 					p[j] = '1';
 					break;
 				case ZBX_SAME_FILE_RETRY:
-					old[i].retry = 1;
+					old_files[i].retry = 1;
 					/* break; is not missing here */
 				case ZBX_SAME_FILE_ERROR:
 					return FAIL;
@@ -666,7 +667,7 @@ static int	setup_old2new(char *old2new, struct st_logfile *old, int num_old,
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "setup_old2new: is_same_file(%s, %s) = %c",
-						old[i].filename, new[j].filename, p[j]);
+						old_files[i].filename, new_files[j].filename, p[j]);
 			}
 		}
 
@@ -874,8 +875,8 @@ non_unique:
 
 	/* protect unique mappings from further modifications */
 
-	protected_rows = zbx_calloc(protected_rows, (size_t)num_old, sizeof(char));
-	protected_cols = zbx_calloc(protected_cols, (size_t)num_new, sizeof(char));
+	protected_rows = (char *)zbx_calloc(protected_rows, (size_t)num_old, sizeof(char));
+	protected_cols = (char *)zbx_calloc(protected_cols, (size_t)num_new, sizeof(char));
 
 	for (i = 0; i < num_old; i++)
 	{
@@ -1055,7 +1056,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	if (*logfiles_alloc == *logfiles_num)
 	{
 		*logfiles_alloc += 64;
-		*logfiles = zbx_realloc(*logfiles, (size_t)*logfiles_alloc * sizeof(struct st_logfile));
+		*logfiles = (struct st_logfile *)zbx_realloc(*logfiles, (size_t)*logfiles_alloc * sizeof(struct st_logfile));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logfiles:%p logfiles_alloc:%d",
 				__function_name, *logfiles, *logfiles_alloc);
@@ -1317,10 +1318,12 @@ clean:
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
  *     use_ino        - [IN/OUT] how to use inode numbers                     *
- *     err_msg        - [IN/OUT] error message why an item became             *
- *                      NOTSUPPORTED                                          *
+ *     err_msg        - [IN/OUT] error message (if FAIL or ZBX_NO_FILE_ERROR  *
+ *                      is returned)                                          *
  *                                                                            *
- * Return value: SUCCEED or FAIL                                              *
+ * Return value: SUCCEED - file list successfully built,                      *
+ *               ZBX_NO_FILE_ERROR - file(s) do not exist,                    *
+ *               FAIL - other errors                                          *
  *                                                                            *
  ******************************************************************************/
 static int	make_logfile_list(unsigned char flags, const char *filename, const int *mtime,
@@ -1335,7 +1338,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s", filename,
 					zbx_strerror(errno));
-			ret = FAIL;
+			ret = ZBX_NO_FILE_ERROR;
 			goto clean;
 		}
 
@@ -1401,6 +1404,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 #ifdef _WINDOWS
 			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\" or insufficient "
 					"access rights", format, directory);
+			ret = ZBX_NO_FILE_ERROR;
 #else
 			if (0 != access(directory, X_OK))
 			{
@@ -1411,6 +1415,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\"", format,
 						directory);
+				ret = ZBX_NO_FILE_ERROR;
 			}
 #endif
 		}
@@ -1420,7 +1425,7 @@ clean1:
 		zbx_free(directory);
 		zbx_free(format);
 
-		if (FAIL == ret)
+		if (FAIL == ret || ZBX_NO_FILE_ERROR == ret)
 			goto clean;
 	}
 	else
@@ -1464,7 +1469,7 @@ clean3:
 		}
 	}
 clean:
-	if (FAIL == ret && NULL != *logfiles)
+	if ((FAIL == ret || ZBX_NO_FILE_ERROR == ret) && NULL != *logfiles)
 		destroy_logfile_list(logfiles, logfiles_alloc, logfiles_num);
 
 	return	ret;
@@ -1550,7 +1555,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 						/* required. */
 
 	if (NULL == buf)
-		buf = zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
+		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
@@ -1886,8 +1891,12 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 
 	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
 	{
-		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
+		/* The file size has not changed, no new lines. Here we do not deal with a case of changing */
 		/* a logfile's content while keeping the same length. */
+
+		if (1 == *skip_old_data)
+			*skip_old_data = 0;
+
 		ret = SUCCEED;
 		goto out;
 	}
@@ -2328,7 +2337,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
-				max_old_seq = 0, old_last, from_first_file = 1, last_processed, limit_reached = 0;
+				max_old_seq = 0, old_last, from_first_file = 1, last_processed, limit_reached = 0, res;
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
@@ -2352,11 +2361,18 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				"seconds back.", (int)(old_mtime - now));
 	}
 
-	if (SUCCEED != make_logfile_list(flags, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
-			err_msg))
+	if (SUCCEED != (res = make_logfile_list(flags, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num,
+			use_ino, err_msg)))
 	{
-		/* an error occurred or a file was not accessible for a log[] or log.count[] item */
-		goto out;
+		if (ZBX_NO_FILE_ERROR == res && 1 == *skip_old_data)
+		{
+			*skip_old_data = 0;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0", __function_name);
+		}
+
+		/* file was not accessible for a log[] or log.count[] item or an error occurred */
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & flags) || (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && FAIL == res))
+			goto out;
 	}
 
 	if (0 == logfiles_num)
@@ -2378,7 +2394,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	if (0 < *logfiles_num_old && 0 < logfiles_num)
 	{
 		/* set up a mapping array from old files to new files */
-		old2new = zbx_malloc(old2new, (size_t)logfiles_num * (size_t)(*logfiles_num_old) * sizeof(char));
+		old2new = (char *)zbx_malloc(old2new, (size_t)logfiles_num * (size_t)(*logfiles_num_old) * sizeof(char));
 
 		if (SUCCEED != setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num,
 				*use_ino, err_msg))

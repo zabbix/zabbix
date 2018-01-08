@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -267,7 +267,7 @@ static void	DCexpand_trigger_expression(char **expression)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
-	tmp = zbx_malloc(tmp, tmp_alloc);
+	tmp = (char *)zbx_malloc(tmp, tmp_alloc);
 
 	for (l = 0; '\0' != (*expression)[l]; l++)
 	{
@@ -568,10 +568,10 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_
 		goto out;
 	}
 
-	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	*replace_to = (char *)zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct h.name"
@@ -654,10 +654,10 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64
 		}
 	}
 
-	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	*replace_to = (char *)zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.name"
@@ -1429,7 +1429,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 	time_t		now;
 	zbx_uint64_t	userid;
 
-	buf = zbx_malloc(buf, buf_alloc);
+	buf = (char *)zbx_malloc(buf, buf_alloc);
 
 	zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
 			zbx_date2str(event->clock), zbx_time2str(event->clock),
@@ -1569,7 +1569,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 		return;
 	}
 
-	buf = zbx_malloc(buf, buf_alloc);
+	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
 	result = DBselect("select clock,userid,message,action"
@@ -2510,7 +2510,7 @@ static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_al
 		if (NULL != replace_to_alloc)
 			*replace_to_alloc = replace_to_len + 3;
 
-		buffer = zbx_malloc(NULL, replace_to_len + 3);
+		buffer = (char *)zbx_malloc(NULL, replace_to_len + 3);
 
 		memcpy(buffer + 1, *replace_to, replace_to_len);
 
@@ -4210,7 +4210,7 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 
 		if (SUCCEED == extract_expression_functionids(&funcids, tr->expression))
 		{
-			tr_func_pos = zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
+			tr_func_pos = (zbx_trigger_func_position_t *)zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
 			tr_func_pos->trigger = tr;
 			tr_func_pos->start_index = functionids->values_num;
 			tr_func_pos->count = funcids.values_num;
@@ -4259,8 +4259,8 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 
 	zbx_link_triggers_with_functions(&triggers_func_pos, &functionids, trigger_order);
 
-	functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
+	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 
 	DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes, functionids.values_num);
 
@@ -4375,8 +4375,8 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 	func_local.value = NULL;
 	func_local.error = NULL;
 
-	functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
+	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
 
 	DCconfig_get_functions_by_functionids(functions, functionids->values, errcodes, functionids->values_num);
 
@@ -4402,9 +4402,9 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 		func_local.function = functions[i].function;
 		func_local.parameter = functions[i].parameter;
 
-		if (NULL == (func = zbx_hashset_search(funcs, &func_local)))
+		if (NULL == (func = (zbx_func_t *)zbx_hashset_search(funcs, &func_local)))
 		{
-			func = zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
+			func = (zbx_func_t *)zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
 			func->function = zbx_strdup(NULL, func_local.function);
 			func->parameter = zbx_strdup(NULL, func_local.parameter);
 		}
@@ -4440,19 +4440,19 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 	zbx_vector_uint64_reserve(&itemids, funcs->num_data);
 
 	zbx_hashset_iter_reset(funcs, &iter);
-	while (NULL != (func = zbx_hashset_iter_next(&iter)))
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 		zbx_vector_uint64_append(&itemids, func->itemid);
 
 	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
+	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
 
 	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	zbx_hashset_iter_reset(funcs, &iter);
-	while (NULL != (func = zbx_hashset_iter_next(&iter)))
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
 		int	ret_unknown = 0;	/* flag raised if current function evaluates to ZBX_UNKNOWN */
 		char	*unknown_msg;
@@ -4580,7 +4580,7 @@ static int	substitute_expression_functions_results(zbx_hashset_t *ifuncs, char *
 		*br++ = '}';
 		bl = br;
 
-		if (NULL == (ifunc = zbx_hashset_search(ifuncs, &functionid)))
+		if (NULL == (ifunc = (zbx_ifunc_t *)zbx_hashset_search(ifuncs, &functionid)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot obtain function"
 					" and item for functionid: " ZBX_FS_UI64, functionid);
@@ -4628,7 +4628,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d tr_num:%d",
 			__function_name, ifuncs->num_data, triggers->values_num);
 
-	out = zbx_malloc(out, out_alloc);
+	out = (char *)zbx_malloc(out, out_alloc);
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -4867,7 +4867,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, const str
 		goto out;
 	}
 
-	replace_to = zbx_malloc(NULL, replace_to_alloc);
+	replace_to = (char *)zbx_malloc(NULL, replace_to_alloc);
 
 	lld_start = token->data.simple_macro.key.l;
 	lld_end = token->data.simple_macro.func_param.r - 1;

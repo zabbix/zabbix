@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_fork()
+int	zbx_fork(void)
 {
 	fflush(stdout);
 	fflush(stderr);
@@ -53,7 +53,7 @@ int	zbx_fork()
  * Comments: use this function only for forks from the main process           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_child_fork()
+int	zbx_child_fork(void)
 {
 	pid_t		pid;
 	sigset_t	mask, orig_mask;
@@ -193,7 +193,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 	return status;
 }
 
-long int	zbx_get_thread_id()
+long int	zbx_get_thread_id(void)
 {
 #ifdef _WINDOWS
 	return (long int)GetCurrentThreadId();

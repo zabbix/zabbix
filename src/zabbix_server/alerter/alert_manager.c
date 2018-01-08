@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1187,7 +1187,7 @@ static int	am_db_get_alerts(zbx_am_t *manager, zbx_vector_ptr_t *alerts, int now
 		if (SUCCEED == DBis_null(row[7]))
 		{
 			am_db_update_alert(manager, alertid, ALERT_STATUS_FAILED, 0,
-					"Related event was removed.");
+					(char *)"Related event was removed.");
 			continue;
 		}
 
@@ -1570,7 +1570,7 @@ static int	am_db_sync_watchdog(zbx_am_t *manager)
 		if (NULL == (media = (zbx_am_media_t *)zbx_hashset_search(&manager->watchdog, &mediaid)))
 		{
 			media_local.mediaid = mediaid;
-			media = zbx_hashset_insert(&manager->watchdog, &media_local, sizeof(media_local));
+			media = (zbx_am_media_t *)zbx_hashset_insert(&manager->watchdog, &media_local, sizeof(media_local));
 			media->sendto = NULL;
 
 			zbx_vector_ptr_append(&media_new, media);
@@ -1659,7 +1659,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
 
-	*cmd = zbx_malloc(NULL, cmd_alloc);
+	*cmd = (char *)zbx_malloc(NULL, cmd_alloc);
 
 	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
 
@@ -1774,7 +1774,7 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			zbx_free(cmd);
 			break;
 		default:
-			am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, "unsupported media type");
+			am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, (char *)"unsupported media type");
 			zabbix_log(LOG_LEVEL_ERR, "cannot process alertid:" ZBX_FS_UI64 ": unsupported media type: %d",
 					alert->alertid, mediatype->type);
 			am_remove_alert(manager, alert);
@@ -2015,7 +2015,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 		while (SUCCEED == am_check_queue(&manager, now))
 		{
-			if (NULL == (alerter = zbx_queue_ptr_pop(&manager.free_alerters)))
+			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
 			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager)))

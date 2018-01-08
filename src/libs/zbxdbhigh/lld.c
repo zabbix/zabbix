@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -164,7 +164,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		condition = zbx_malloc(NULL, sizeof(lld_condition_t));
+		condition = (lld_condition_t *)zbx_malloc(NULL, sizeof(lld_condition_t));
 		ZBX_STR2UINT64(condition->id, row[0]);
 		condition->macro = zbx_strdup(NULL, row[1]);
 		condition->regexp = zbx_strdup(NULL, row[2]);
@@ -521,7 +521,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 		if (SUCCEED != filter_evaluate(filter, &jp_row))
 			continue;
 
-		lld_row = zbx_malloc(NULL, sizeof(zbx_lld_row_t));
+		lld_row = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
 		lld_row->jp_row = jp_row;
 		zbx_vector_ptr_create(&lld_row->item_links);
 
@@ -587,7 +587,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	lld_filter_init(&filter);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
 			"select hostid,key_,state,evaltype,formula,error,lifetime"

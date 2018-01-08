@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -969,8 +969,10 @@ int	zbx_db_commit(void)
 	rc = zbx_db_execute("%s", "commit;");
 #endif
 
-	if (ZBX_DB_OK > rc)
-		return rc; /* commit failed */
+	if (ZBX_DB_OK > rc) { /* commit failed */
+		txn_error = rc;
+		return rc;
+	}
 
 #ifdef HAVE_SQLITE3
 	zbx_mutex_unlock(&sqlite_access);
@@ -1634,7 +1636,7 @@ error:
 		result = (SQL_CD_TRUE == IBM_DB2server_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL)
-	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
+	result = (DB_RESULT)zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->result = NULL;
 
 	if (NULL == conn)
@@ -2413,7 +2415,7 @@ char	*zbx_db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_cha
 
 	len = zbx_db_get_escape_string_len(src, max_bytes, max_chars, flag);
 
-	dst = zbx_malloc(dst, len);
+	dst = (char *)zbx_malloc(dst, len);
 
 	zbx_db_escape_string(src, dst, len, flag);
 
@@ -2480,7 +2482,7 @@ static void	zbx_db_escape_like_pattern(const char *src, char *dst, int len)
 
 	assert(dst);
 
-	tmp = zbx_malloc(tmp, len);
+	tmp = (char *)zbx_malloc(tmp, len);
 
 	zbx_db_escape_string(src, tmp, len, ESCAPE_SEQUENCE_ON);
 
@@ -2518,7 +2520,7 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 
 	len = zbx_db_get_escape_like_pattern_len(src);
 
-	dst = zbx_malloc(dst, len);
+	dst = (char *)zbx_malloc(dst, len);
 
 	zbx_db_escape_like_pattern(src, dst, len);
 
