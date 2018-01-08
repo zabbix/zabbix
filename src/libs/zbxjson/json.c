@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1032,7 +1032,7 @@ static int	zbx_jsonpath_error(const char *path)
  *               FAIL    - json path parsing error                            *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
+int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
 {
 	const char	*next = *pnext;
 	size_t		pos;
@@ -1216,5 +1216,4 @@ void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *
 		zbx_strlcpy(*string, jp->start, len);
 	}
 }
-
 

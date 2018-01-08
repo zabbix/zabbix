@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,8 +116,11 @@ $form->addItem(
 	(new CTabView())
 		->addTab('trigger_tab', null,
 			(new CFormList())
-				->addRow(_('Name'),
-					(new CTextBox('description', $options['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addRow(
+					(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
+					(new CTextBox('description', $options['description']))
+						->setAriaRequired()
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				)
 				->addRow(_('Item'), [
 					(new CTextBox('item', $options['item_name']))
@@ -142,7 +145,7 @@ $form->addItem(
 					'name' => 'priority',
 					'value' => (int) $options['priority']
 				]))
-				->addRow(_('Expression'),
+				->addRow((new CLabel(_('Expression'), $expression_table->getId()))->setAsteriskMark(),
 					(new CTextBox('expression'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('logexpr')

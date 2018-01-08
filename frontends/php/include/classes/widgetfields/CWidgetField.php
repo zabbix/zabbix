@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ class CWidgetField {
 
 	const FLAG_ACKNOWLEDGES = 0x01;
 	const FLAG_NOT_EMPTY = 0x02;
+	const FLAG_LABEL_ASTERISK = 0x04;
 
 	protected	$name;
 	protected	$label;

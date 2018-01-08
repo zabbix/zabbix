@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -842,7 +842,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	ZBX_UNUSED(hist);
 	ZBX_UNUSED(value_type);
 
-	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for ElasticSearch history backend");
+	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for Elasticsearch history backend");
 	return FAIL;
 }
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -600,6 +600,9 @@ int	DBtxn_ongoing(void);
 
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
+#ifndef HAVE_SQLITE3
+int	DBindex_exists(const char *table_name, const char *index_name);
+#endif
 
 int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);

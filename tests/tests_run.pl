@@ -12,6 +12,12 @@ use File::Basename qw(dirname);
 use constant TEST_SUITE_ATTRIBUTES	=> ('name', 'tests', 'skipped', 'errors', 'failures', 'time');
 use constant TEST_CASE_ATTRIBUTES	=> ('name', 'assertions', 'time');
 
+use constant TEST_CASE_HEADER_FORMAT	=> " %*s │ %-7s │ %s\n";
+use constant TEST_CASE_FORMAT		=> " %*d │ %-7s │ %s\n";
+use constant TEST_SUITE_HEADER_FORMAT	=> " %-*s │ %9s │ %7s │ %6s │ %8s │ %5s\n";
+use constant TEST_SUITE_FORMAT		=> " %-*s │ %9d │ %7d │ %6d │ %8d │ %5.2f\n";
+use constant TEST_SUITE_PATTERN		=> qr/^( [a-zA-Z0-9_:]+\b\D*)(\d+)(\D*)(\d+)(\D*)(\d+)(\D*)(\d+)(.*)$/;
+
 sub escape_xml_entity($)
 {
 	my $entity = shift;
@@ -111,6 +117,177 @@ while (my $path = $iter->())
 	}
 
 	push(@test_suites, $test_suite);
+}
+
+if (-t STDOUT)
+{
+	use Term::ANSIColor qw(:constants);
+
+	# find out requirements for column width
+
+	my $longest_suite_name = 0;
+	my $largest_case_index = 1;
+	my $longest_case_name = 0;
+
+	foreach my $test_suite (@test_suites)
+	{
+		if ($longest_suite_name < length($test_suite->{'name'}))
+		{
+			$longest_suite_name = length($test_suite->{'name'});
+		}
+
+		$largest_case_index = $test_suite->{'tests'} if ($largest_case_index < $test_suite->{'tests'});
+
+		foreach my $test_case (@{$test_suite->{'testcases'}})
+		{
+			if ($longest_case_name < length($test_case->{'name'}))
+			{
+				$longest_case_name = length($test_case->{'name'});
+			}
+		}
+	}
+
+	$largest_case_index--;	# indices start from 0
+
+	my $longest_case_index = 1;
+
+	until (($largest_case_index /= 10) < 1)
+	{
+		$longest_case_index++;
+	}
+
+	if ($longest_case_name < length("Test case description"))
+	{
+		$longest_case_name = length("Test case description");
+	}
+
+	# do the printing
+
+	my $split_cases = sub ($) {
+		my $split_character = shift;
+
+		print("─") for 1 .. $longest_case_index + 2;
+		print($split_character);
+		print("─") for 1 .. 7 + 2;
+		print($split_character);
+		print("─") for 1 .. $longest_case_name + 2;
+		print("\n");
+	};
+
+	$split_cases->("┬");
+	printf(TEST_CASE_HEADER_FORMAT, $longest_case_index, "#", "Status", "Test case description");
+	$split_cases->("┴");
+
+	foreach my $test_suite (@test_suites)
+	{
+		print(" " . BOLD . $test_suite->{'name'} . RESET . "\n");
+		$split_cases->("┬");
+
+		my $case_index = 0;
+
+		foreach my $test_case (@{$test_suite->{'testcases'}})
+		{
+			my $case_status;
+			my $color_status;
+
+			if (exists($test_case->{'skipped'}))
+			{
+				$color_status = BRIGHT_YELLOW . ($case_status = "SKIPPED") . RESET;
+			}
+			elsif (exists($test_case->{'error'}))
+			{
+				$color_status = BRIGHT_MAGENTA . ($case_status = "ERROR") . RESET;
+			}
+			elsif (exists($test_case->{'failure'}))
+			{
+				$color_status = BRIGHT_RED . ($case_status = "FAILURE") . RESET;
+			}
+			else
+			{
+				$color_status = BRIGHT_GREEN . ($case_status = "OK") . RESET;
+			}
+
+			my $line = sprintf(TEST_CASE_FORMAT, $longest_case_index, $case_index, $case_status,
+					$test_case->{'name'});
+
+			$line =~ s/$case_status/$color_status/;
+			print($line);
+
+			if (exists($test_case->{'system-out'}))
+			{
+				print(BRIGHT_CYAN . BOLD . "STDOUT:" . RESET . "\n" . $test_case->{'system-out'});
+			}
+
+			if (exists($test_case->{'system-err'}))
+			{
+				print(BRIGHT_RED . BOLD . "STDERR:" . RESET . "\n" . $test_case->{'system-err'});
+			}
+
+			$case_index++;
+		}
+
+		$split_cases->("┴");
+	}
+
+	my $split_suites = sub ($) {
+		my $split_character = shift;
+
+		print("─") for 1 .. $longest_suite_name + 2;
+		print($split_character);
+		print("─") for 1 .. 9 + 2;
+		print($split_character);
+		print("─") for 1 .. 7 + 2;
+		print($split_character);
+		print("─") for 1 .. 6 + 2;
+		print($split_character);
+		print("─") for 1 .. 8 + 2;
+		print($split_character);
+		print("─") for 1 .. 5 + 2;
+		print("\n");
+	};
+
+	$split_suites->("┬");
+	printf(TEST_SUITE_HEADER_FORMAT, $longest_suite_name, "Test suite", "Succeeded", "Skipped", "Errors",
+			"Failures", "Time");
+	$split_suites->("┼");
+
+	my $succeeded = 0;
+	my $skipped = 0;
+	my $errors = 0;
+	my $failures = 0;
+	my $time = 0.0;
+
+	foreach my $test_suite (@test_suites)
+	{
+		sprintf(TEST_SUITE_FORMAT, $longest_suite_name, $test_suite->{'name'}, $test_suite->{'tests'} -
+				$test_suite->{'skipped'} - $test_suite->{'errors'} - $test_suite->{'failures'},
+				$test_suite->{'skipped'}, $test_suite->{'errors'}, $test_suite->{'failures'},
+				$test_suite->{'time'}) =~ TEST_SUITE_PATTERN;
+
+		print($1 . $2 . $3. ($4 eq "0" ? "0" : BRIGHT_YELLOW . BOLD . $4 . RESET) . $5 .
+				($6 eq "0" ? "0" : BRIGHT_MAGENTA . BOLD . $6 . RESET) . $7 .
+				($8 eq "0" ? "0" : BRIGHT_RED . BOLD . $8 . RESET) . $9 . "\n");
+
+		$succeeded += $test_suite->{'tests'} - $test_suite->{'skipped'} - $test_suite->{'errors'} -
+				$test_suite->{'failures'};
+		$skipped += $test_suite->{'skipped'};
+		$errors += $test_suite->{'errors'};
+		$failures += $test_suite->{'failures'};
+		$time += $test_suite->{'time'};
+	}
+
+	$split_suites->("┼");
+	printf(TEST_SUITE_HEADER_FORMAT, $longest_suite_name, "Test suite", "Succeeded", "Skipped", "Errors",
+			"Failures", "Time");
+	$split_suites->("┼");
+	sprintf(TEST_SUITE_FORMAT, $longest_suite_name, "Total:", $succeeded, $skipped, $errors, $failures, $time) =~
+			TEST_SUITE_PATTERN;
+	print($1 . $2 . $3. ($4 eq "0" ? "0" : BRIGHT_YELLOW . BOLD . $4 . RESET) . $5 .
+			($6 eq "0" ? "0" : BRIGHT_MAGENTA . BOLD . $6 . RESET) . $7 .
+			($8 eq "0" ? "0" : BRIGHT_RED . BOLD . $8 . RESET) . $9 . "\n");
+	$split_suites->("┴");
+
+	exit();	# stop here, do not print XML
 }
 
 print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");

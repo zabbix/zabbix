@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,9 +32,11 @@ if ($data['correlationid']) {
 }
 
 $correlation_tab = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['correlation']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -98,10 +100,12 @@ $correlation_tab
 			->setId('formula')
 			->setAttribute('placeholder', 'A or (B and C) &hellip;')
 	])
-	->addRow(_('Conditions'),
+	->addRow(
+		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
 		(new CDiv($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setAriaRequired()
 	);
 
 $condition2 = null;
@@ -202,7 +206,10 @@ $correlation_tab
 // Operations tab.
 $operation_tab = new CFormList('operationlist');
 
-$operations_table = (new CTable())->setAttribute('style', 'width: 100%;')->setHeader([_('Details'), _('Action')]);
+$operations_table = (new CTable())
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Details'), _('Action')])
+	->setId('operations_table');
 
 if ($data['correlation']['operations']) {
 	foreach ($data['correlation']['operations'] as $operationid => $operation) {
@@ -223,7 +230,8 @@ if ($data['correlation']['operations']) {
 }
 
 $operation_tab
-	->addRow(_('Operations'),
+	->addRow(
+		(new CLabel(_('Operations'), $operations_table->getId()))->setAsteriskMark(),
 		(new CDiv([$operations_table]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

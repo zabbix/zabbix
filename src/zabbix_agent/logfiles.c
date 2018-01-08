@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #define ZBX_SAME_FILE_NO	0
 #define ZBX_SAME_FILE_YES	1
 #define ZBX_SAME_FILE_RETRY	2
+#define ZBX_NO_FILE_ERROR	3
 
 /******************************************************************************
  *                                                                            *
@@ -1317,10 +1318,12 @@ clean:
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
  *     use_ino        - [IN/OUT] how to use inode numbers                     *
- *     err_msg        - [IN/OUT] error message why an item became             *
- *                      NOTSUPPORTED                                          *
+ *     err_msg        - [IN/OUT] error message (if FAIL or ZBX_NO_FILE_ERROR  *
+ *                      is returned)                                          *
  *                                                                            *
- * Return value: SUCCEED or FAIL                                              *
+ * Return value: SUCCEED - file list successfully built,                      *
+ *               ZBX_NO_FILE_ERROR - file(s) do not exist,                    *
+ *               FAIL - other errors                                          *
  *                                                                            *
  ******************************************************************************/
 static int	make_logfile_list(unsigned char flags, const char *filename, const int *mtime,
@@ -1335,7 +1338,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s", filename,
 					zbx_strerror(errno));
-			ret = FAIL;
+			ret = ZBX_NO_FILE_ERROR;
 			goto clean;
 		}
 
@@ -1401,6 +1404,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 #ifdef _WINDOWS
 			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\" or insufficient "
 					"access rights", format, directory);
+			ret = ZBX_NO_FILE_ERROR;
 #else
 			if (0 != access(directory, X_OK))
 			{
@@ -1411,6 +1415,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\"", format,
 						directory);
+				ret = ZBX_NO_FILE_ERROR;
 			}
 #endif
 		}
@@ -1420,7 +1425,7 @@ clean1:
 		zbx_free(directory);
 		zbx_free(format);
 
-		if (FAIL == ret)
+		if (FAIL == ret || ZBX_NO_FILE_ERROR == ret)
 			goto clean;
 	}
 	else
@@ -1464,7 +1469,7 @@ clean3:
 		}
 	}
 clean:
-	if (FAIL == ret && NULL != *logfiles)
+	if ((FAIL == ret || ZBX_NO_FILE_ERROR == ret) && NULL != *logfiles)
 		destroy_logfile_list(logfiles, logfiles_alloc, logfiles_num);
 
 	return	ret;
@@ -1886,8 +1891,12 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 
 	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
 	{
-		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
+		/* The file size has not changed, no new lines. Here we do not deal with a case of changing */
 		/* a logfile's content while keeping the same length. */
+
+		if (1 == *skip_old_data)
+			*skip_old_data = 0;
+
 		ret = SUCCEED;
 		goto out;
 	}
@@ -2328,7 +2337,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
-				max_old_seq = 0, old_last, from_first_file = 1, last_processed, limit_reached = 0;
+				max_old_seq = 0, old_last, from_first_file = 1, last_processed, limit_reached = 0, res;
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
@@ -2352,11 +2361,18 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				"seconds back.", (int)(old_mtime - now));
 	}
 
-	if (SUCCEED != make_logfile_list(flags, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
-			err_msg))
+	if (SUCCEED != (res = make_logfile_list(flags, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num,
+			use_ino, err_msg)))
 	{
-		/* an error occurred or a file was not accessible for a log[] or log.count[] item */
-		goto out;
+		if (ZBX_NO_FILE_ERROR == res && 1 == *skip_old_data)
+		{
+			*skip_old_data = 0;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0", __function_name);
+		}
+
+		/* file was not accessible for a log[] or log.count[] item or an error occurred */
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & flags) || (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && FAIL == res))
+			goto out;
 	}
 
 	if (0 == logfiles_num)
