@@ -83,7 +83,6 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwin32\service.o \
-	..\..\..\src\libs\zbxself\selfmon.o \
 	..\..\..\src\zabbix_agent\active.o \
 	..\..\..\src\zabbix_agent\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \
