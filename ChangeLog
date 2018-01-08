@@ -37,7 +37,7 @@ Changes for 4.0.0alpha1
 
 New features:
 ........S. [ZBXNEXT-3480] added support of inventory macros in event tags (abs, vso)
-A.F.I...S. [ZBXNEXT-4175] implemented ability to send email to several email addresses specified as user media (Sergejs, miks)
+A.F.I...S. [ZBXNEXT-4175] implemented ability to send email to several email addresses specified as user media (miks, Sergejs)
 ..F.I..... [ZBXNEXT-4139] added high contrast light and high contrast dark themes (andzs)
 A......... [ZBXNEXT-4247] removed deprecated API methods: user.updareProfile, user.addMedia, user.updateMedia, user.deleteMedia, usergroup.massAdd, usergroup.massUpdate and usermedia.get (Sasha)
 ........S. [ZBXNEXT-970] added more detailed error information to notification message when DB is unavailable (viktors)
