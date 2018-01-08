@@ -36,7 +36,6 @@ $fields = [
 	// group
 	'groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
-	'twb_groupid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'subgroups' =>		[T_ZBX_INT, O_OPT, null,	IN([1]),	null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -312,85 +311,33 @@ if (hasRequest('form')) {
 		'form' => getRequest('form'),
 		'groupid' => getRequest('groupid', 0),
 		'name' => getRequest('name', ''),
-		'hosts' => getRequest('hosts', []),
-		'twb_groupid' => getRequest('twb_groupid', -1),
-		'r_hosts' => [],
 		'subgroups' => getRequest('subgroups', 0)
 	];
 
 	if ($data['groupid'] != 0) {
-		/*
-		 * Permissions
-		 */
 		$groups = API::HostGroup()->get([
 			'output' => ['name', 'flags'],
 			'groupids' => $data['groupid'],
 			'editable' => true
 		]);
+
 		if (!$groups) {
 			access_deny();
 		}
 
 		$data['group'] = reset($groups);
 
-		// if first time select all hosts for group from db
 		if (!hasRequest('form_refresh')) {
 			$data['name'] = $data['group']['name'];
-
-			$data['hosts'] = API::Host()->get([
-				'groupids' => $data['groupid'],
-				'templated_hosts' => true,
-				'output' => ['hostid']
-			]);
-
-			$data['hosts'] = zbx_toHash(zbx_objectValues($data['hosts'], 'hostid'), 'hostid');
 		}
-	}
 
-	// get all possible groups
-	$data['db_groups'] = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'with_hosts_and_templates' => true,
-		'editable' => true
-	]);
-	order_result($data['db_groups'], 'name');
-
-	if ($data['twb_groupid'] == -1) {
-		$dbGroup = reset($data['db_groups']);
-
-		$data['twb_groupid'] = $dbGroup['groupid'];
-	}
-
-	// get all possible hosts
-	$data['db_hosts'] = API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'groupids' => $data['twb_groupid'] ? $data['twb_groupid'] : null,
-		'templated_hosts' => true,
-		'editable' => true,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-	]);
-	order_result($data['db_hosts'], 'name');
-
-	// get selected hosts
-	if ($data['hosts']) {
-		$data['r_hosts'] = API::Host()->get([
-			'output' => ['hostid', 'name', 'flags'],
-			'hostids' => $data['hosts'],
-			'templated_hosts' => true,
-			'preservekeys' => true
-		]);
-		order_result($data['r_hosts'], 'name');
-	}
-
-	// deletable groups
-	if ($data['groupid'] != 0) {
-		$data['deletableHostGroups'] = getDeletableHostGroupIds([$data['groupid']]);
+		$data['deletable_host_groups'] = getDeletableHostGroupIds([$data['groupid']]);
 	}
 
 	// render view
-	$hostgroupView = new CView('configuration.hostgroups.edit', $data);
-	$hostgroupView->render();
-	$hostgroupView->show();
+	$view = new CView('configuration.hostgroups.edit', $data);
+	$view->render();
+	$view->show();
 }
 /*
  * Display list
@@ -465,9 +412,9 @@ else {
 	unset($group);
 
 	// render view
-	$hostgroupView = new CView('configuration.hostgroups.list', $data);
-	$hostgroupView->render();
-	$hostgroupView->show();
+	$view = new CView('configuration.hostgroups.list', $data);
+	$view->render();
+	$view->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

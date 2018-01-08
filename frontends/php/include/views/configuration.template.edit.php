@@ -88,7 +88,6 @@ $groups_tweenbox = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
 
 if ($data['form'] === 'update') {
 	// Add existing template groups to list and, depending on permissions show name as enabled or disabled.
-
 	$groupsInList = [];
 
 	foreach ($data['groupsAll'] as $group) {
@@ -129,43 +128,11 @@ if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 	$new_group_label .= ' '._('(Only super admins can create groups)');
 	$new_group->setReadonly(true);
 }
-$templateList->addRow(new CLabel($new_group_label, 'newgroup'),
-	(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-);
-
-// FORM ITEM : linked Hosts tween box [  ] [  ]
-$cmbGroups = new CComboBox('twb_groupid', $data['twb_groupid'], 'submit()');
-foreach ($data['groupsAllowed'] as $group) {
-	$cmbGroups->addItem($group['groupid'], $group['name']);
-}
-
-$hostsTB = new CTweenBox($frmHost, 'hosts', $data['hostIdsLinkedTo'], 20);
-
-foreach ($data['hostsAllowedToAdd'] as $host) {
-	if (bccomp($host['hostid'], $data['templateid']) == 0) {
-		continue;
-	}
-	if (isset($data['hostIdsLinkedTo'][$host['hostid']])) {
-		continue;
-	}
-	if (array_key_exists($host['hostid'], $data['linkedTemplates'])) {
-		continue;
-	}
-	$hostsTB->addItem($host['hostid'], $host['name']);
-}
-
-foreach ($data['hostsAll'] as $host) {
-	$hostsTB->addItem($host['hostid'], $host['name'], true, isset($data['hostsAllowed'][$host['hostid']]));
-}
-
-$templateList->addRow(_('Hosts / templates'), $hostsTB->Get(_('In'), [
-	_('Other | group').SPACE,
-	$cmbGroups
-]));
-
-$templateList->addRow(_('Description'),
-	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
+$templateList
+	->addRow(new CLabel($new_group_label, 'newgroup'), (new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP))
+	->addRow(_('Description'),
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // FULL CLONE {
 if ($data['form'] === 'full_clone') {
@@ -440,10 +407,6 @@ foreach ($data['linkedTemplates'] as $template) {
 	], null, 'conditions_'.$template['templateid']);
 
 	$ignoredTemplates[$template['templateid']] = $template['name'];
-}
-
-foreach ($data['hostIdsLinkedTo'] as $templateid) {
-	$ignoredTemplates[$templateid] = '';
 }
 
 $tmplList->addRow(_('Linked templates'),
