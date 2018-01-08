@@ -8,6 +8,7 @@ New features:
 ...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-13196] fixed setting of transaction error flag in commit operation (vjaceslavs)
 ..F....... [ZBX-13221] fixed trimming of values in overlay dialogues (Ivo)
 ..F....... [ZBX-13221] added "Timeout" validation in web scenario step overlay dialogue (Ivo)
 ..F....... [ZBX-12389] fixed latest data host group filter (Oleg)
