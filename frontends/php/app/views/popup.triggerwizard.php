@@ -191,15 +191,15 @@ $form->addItem(
 );
 
 $output['body'] = $form->toString();
-$output['buttons'] = [
-	[
-		'title' => array_key_exists('triggerid', $options) ? _('Update') : _('Add'),
-		'class' => '',
-		'keepOpen' => true,
-		'action' => 'return validateTriggerWizard("'.$form->getName().'", '.
-						'jQuery(window.document.forms["'.$form->getName().'"]).closest("[data-dialogueid]")'.
-							'.attr("data-dialogueid"));'
-	]
-];
+$output['buttons'] = [[
+	'title' => array_key_exists('triggerid', $options) ? _('Update') : _('Add'),
+	'class' => '',
+	'keepOpen' => true,
+	'action' => 'return validateTriggerWizard("'.$form->getName().'", '.
+					'jQuery(window.document.forms["'.$form->getName().'"])'.
+						'.closest("[data-dialogueid]")'.
+						'.attr("data-dialogueid")'.
+				');'
+]];
 
 echo (new CJson())->encode($output);

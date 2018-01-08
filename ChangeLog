@@ -8,6 +8,8 @@ New features:
 ...G...... [ZBXNEXT-3991] added additional params to net.if.* key output for linux base agent (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-13221] fixed trimming of values in overlay dialogues (Ivo)
+..F....... [ZBX-13221] added "Timeout" validation in web scenario step overlay dialogue (Ivo)
 ..F....... [ZBX-12389] fixed latest data host group filter (Oleg)
 ..F....... [ZBX-13119] removed 'empty' button in trigger selection window for map constructor item modal form (gcalenko, Ivo)
 ........S. [ZBX-12661] fixed Low-level discovery of dependent items not working after being edited and resulting in undefined offset error or foreign key constraint violation (vso)
