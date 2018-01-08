@@ -87,10 +87,7 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
 		if (0 == strcmp(condition->value2, tag->tag))
-		{
 			ret = zbx_strmatch_condition(tag->value, condition->value, condition->operator);
-			zabbix_log(LOG_LEVEL_ERR, "_test %d", ret);
-		}
 	}
 
 	return ret;
