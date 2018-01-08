@@ -28,6 +28,8 @@
 #define ZBX_MOCK_FORMAT_NS		".%09d"
 #define ZBX_MOCK_FORMAT_TZ		" %+03d:%02d"
 
+#define ZBX_MOCK_TIMESTAMP_MAX_LEN	36
+
 typedef enum
 {
 	ZBX_MOCK_TIME_DATE	= 1 << 0,
@@ -466,11 +468,8 @@ zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, int tz_sec, c
 	int		tz_hour, tz_min;
 	time_t		timestamp = ts->sec;
 
-	if (size < ZBX_CONST_STRLEN(ZBX_MOCK_FORMAT_DATETIME) + ZBX_CONST_STRLEN(ZBX_MOCK_FORMAT_TZ) +
-			ZBX_CONST_STRLEN(ZBX_MOCK_FORMAT_NS) + 1)
-	{
+	if (size < ZBX_MOCK_TIMESTAMP_MAX_LEN + 1)
 		return ZBX_MOCK_NOT_ENOUGH_MEMORY;
-	}
 
 	timestamp += tz_sec;
 	tz_hour = tz_sec / 60;
