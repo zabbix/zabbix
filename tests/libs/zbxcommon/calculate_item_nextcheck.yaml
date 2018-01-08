@@ -20,7 +20,7 @@ out:
   checks:
     - 2038-01-01 03:00:00 +03:00
 ---
-test case: Sheduled every 15m check when changing from summer time to winter
+test case: Scheduled every 15m check when changing from summer time to winter
 in:
   item type: ZABBIX
   delay: 0;m/15
@@ -226,4 +226,24 @@ in:
 out:
   checks:
     - 2018-01-01 00:01:00 -00:45
+---
+test case: Scheduling interval with month day and week day filters
+in:
+  item type: ZABBIX
+  delay: 0;md1wd6
+  timezone: UTC
+  at: 1970-01-01 00:00:00 +00:00
+out:
+  checks:
+    - 1970-08-01 00:00:00 +00:00
+test case: Scheduling interval month day is outside of current month day range
+in:
+  item type: ZABBIX
+  delay: 0;md1,31
+  timezone: UTC
+  at: 1970-02-01 00:00:00 +00:00
+out:
+  checks:
+    - 1970-03-01 00:00:00 +00:00
+    - 1970-03-31 00:00:00 +00:00
 ...
