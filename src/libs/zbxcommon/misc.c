@@ -1657,7 +1657,7 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
 	static time_t	time_dst = 0;
 	struct tm	*tm;
 	time_t		time_mid;
-	int		start, end, mid, dst, dst_start;
+	int		start, end, mid, dst_start;
 
 	if (time_dst < time_start || time_dst > time_end)
 	{
