@@ -30,14 +30,10 @@
 
 #define ZBX_MOCK_TIMESTAMP_MAX_LEN	36
 
-typedef enum
-{
-	ZBX_MOCK_TIME_DATE	= 1 << 0,
-	ZBX_MOCK_TIME_TIME	= 1 << 1,
-	ZBX_MOCK_TIME_NS	= 1 << 2,
-	ZBX_MOCK_TIME_TZ	= 1 << 3
-}
-zbx_mock_time_component_t;
+#define ZBX_MOCK_TIME_DATE	0x0001
+#define ZBX_MOCK_TIME_TIME	0x0002
+#define ZBX_MOCK_TIME_NS	0x0003
+#define ZBX_MOCK_TIME_TZ	0x0004
 
 /******************************************************************************
  *                                                                            *
