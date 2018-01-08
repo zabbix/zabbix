@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ void	load_perf_counters(const char **lines);
 #endif
 
 #ifdef _AIX
-void	tl_version();
+void	tl_version(void);
 #endif
 
 #endif /* ZABBIX_ZBXCONF_H */

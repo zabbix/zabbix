@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -762,7 +762,7 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t i
  * Comments: sqlite3 does not use CONFIG_MAX_HOUSEKEEPER_DELETE, deletes all  *
  *                                                                            *
  ******************************************************************************/
-static int	housekeeping_cleanup()
+static int	housekeeping_cleanup(void)
 {
 	const char		*__function_name = "housekeeping_cleanup";
 
@@ -900,23 +900,22 @@ static int	housekeeping_audit(int now)
 
 static int	housekeeping_events(int now)
 {
+#define ZBX_HK_EVENT_RULE	" and not exists (select null from problem where events.eventid=problem.eventid)" \
+				" and not exists (select null from problem where events.eventid=problem.r_eventid)"
+
 	static zbx_hk_rule_t 	rules[] = {
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_trigger},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_trigger},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
 		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
@@ -936,6 +935,7 @@ static int	housekeeping_events(int now)
 		deleted += housekeeping_process_rule(now, rule);
 
 	return deleted;
+#undef ZBX_HK_EVENT_RULE
 }
 
 static int	housekeeping_problems(int now)

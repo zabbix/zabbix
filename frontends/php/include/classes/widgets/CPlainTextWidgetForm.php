@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class CPlainTextWidgetForm extends CWidgetForm {
 
 		// item field
 		$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
-			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
 		if (array_key_exists('itemid', $this->data)) {
 			$field_item->setValue($this->data['itemid']);
@@ -37,7 +37,9 @@ class CPlainTextWidgetForm extends CWidgetForm {
 		// Number of records to display.
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
-		))->setDefault(25);
+		))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			->setDefault(25);
 
 		if (array_key_exists('show_lines', $this->data)) {
 			$field_lines->setValue($this->data['show_lines']);

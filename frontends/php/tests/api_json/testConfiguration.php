@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -442,94 +442,97 @@ class testConfiguration extends CZabbixTest {
 
 	public static function import_source() {
 		return [
-			[
+			[[
 				'format' => 'xml',
 				'source' => '' ,
 				'error' => 'Cannot read XML: XML is empty.'
-			],
-			[
+			]],
+			[[
 				'format' => 'xml',
 				'source' => 'test' ,
 				'error' => 'Cannot read XML: (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
-			],
-			[
+			]],
+			[[
 				'format' => 'xml',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 							<zabbix_export><date>2016-12-09T07:12:45Z</date></zabbix_export>',
 				'error' => 'Invalid tag "/zabbix_export": the tag "version" is missing.'
-			],
-			[
+			]],
+			[[
 				'format' => 'xml',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 							<zabbix_export><version></version><date>2016-12-09T07:12:45Z</date></zabbix_export>' ,
 				'error' => 'Invalid tag "/zabbix_export/version": unsupported version number.'
-			],
-			[
+			]],
+			[[
 				'format' => 'xml',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 							<zabbix_export><version>3.2</version><date>2016-12-09T07:12:45Z</date>' ,
-				// TODO: different error message on jenkins
-				// 'error' => 'Cannot read XML: (77) Premature end of data in tag zabbix_export line 2 [Line: 2 | Column: 78].'
-				'error' => 'Cannot read XML: (77) Premature end of data in tag zabbix_export line 2 [Line: 2 | Column: 58].'
-			],
-			[
+				// can be different error message text
+				'error_contains' => 'Cannot read XML:'
+			]],
+			[[
 				'format' => 'json',
 				'source' => '' ,
-				// TODO: different error message on jenkins
-				// 'error' => 'Cannot read JSON: Syntax error.'
-				'error' => 'Cannot read JSON: No error.'
-			],
-			[
+				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: No error.'
+				'error_contains' => 'Cannot read JSON: '
+			]],
+			[[
 				'format' => 'json',
 				'source' => 'test' ,
-				// TODO: different error message on jenkins
-				// 'error' => 'Cannot read JSON: Syntax error.'
-				'error' => 'Cannot read JSON: boolean expected.'
-			],
-			[
+				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: boolean expected.'
+				'error_contains' => 'Cannot read JSON: '
+			]],
+			[[
 				'format' => 'json',
 				'source' => '{"zabbix_export":{"date":"2016-12-09T07:29:55Z"}}' ,
 				'error' => 'Invalid tag "/zabbix_export": the tag "version" is missing.'
-			],
-			[
+			]],
+			[[
 				'format' => 'json',
 				'source' => '{"zabbix_export":{"version":"","date":"2016-12-09T07:29:55Z"}}' ,
 				'error' => 'Invalid tag "/zabbix_export/version": unsupported version number.'
-			],
-			[
+			]],
+			[[
 				'format' => 'json',
 				'source' => '{"export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}' ,
 				'error' => 'Invalid tag "/": unexpected tag "export".'
-			],
-			[
+			]],
+			[[
 				'format' => 'json',
 				'source' => '{"export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}' ,
-				// TODO: different error message on jenkins
-				// 'error' => 'Cannot read JSON: Syntax error.'
-				'error' => 'Cannot read JSON: unexpected end of data.'
-			],
+				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: unexpected end of data.'
+				'error_contains' => 'Cannot read JSON: '
+			]]
 		];
 	}
 
 	/**
 	* @dataProvider import_source
 	*/
-	public function testConfiguration_ImportInvalidSource($format, $source, $error) {
+	public function testConfiguration_ImportInvalidSource($data) {
 		$result = $this->api_acall('configuration.import',
 				[
-					'format' => $format,
+					'format' => $data['format'],
 					'rules' => [
 						'groups' => [
 							'createMissing' => true
 						]
 					],
-					'source' => $source
+					'source' => $data['source']
 				],
 				$debug);
 
 		$this->assertFalse(array_key_exists('result', $result));
 		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertSame($error, $result['error']['data']);
+
+		// condition for different error message text
+		if (array_key_exists('error_contains', $data)) {
+			$this->assertContains($data['error_contains'], $result['error']['data']);
+		}
+		else {
+			$this->assertSame($data['error'], $result['error']['data']);
+		}
 	}
 
 	public static function import_create() {

@@ -1,4 +1,5 @@
 SUBDIRS = \
+	common \
 	@ARCH@
 
 if SERVER
@@ -81,6 +82,8 @@ parse_item_key_LDADD = \
 
 parse_item_key_LDADD += @SERVER_LIBS@
 
+parse_item_key_LDFLAGS = @SERVER_LDFLAGS@
+
 parse_item_key_CFLAGS = -I@top_srcdir@/tests
 endif
 
@@ -117,7 +120,6 @@ process_LDADD = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
@@ -140,6 +142,8 @@ process_WRAP_FUNCS = \
 	-Wl,--wrap=SYSTEM_USERS_NUM
 
 process_LDADD += @AGENT_LIBS@
+
+process_LDFLAGS = @AGENT_LDFLAGS@
 
 process_CFLAGS = $(process_WRAP_FUNCS) -DZABBIX_DAEMON -I@top_srcdir@/tests
 endif

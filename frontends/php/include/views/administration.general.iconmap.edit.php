@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,9 @@ $iconMapTab = new CFormList();
 $name = (new CTextBox('iconmap[name]', $this->data['iconmap']['name']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 64)
+	->setAriaRequired()
 	->setAttribute('autofocus', 'autofocus');
-$iconMapTab->addRow(_('Name'), $name);
+$iconMapTab->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
 
 $iconMapForm = (new CForm())
 	->addVar('form', 1);
@@ -50,43 +51,33 @@ $iconMapTable = (new CTable())
 order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 0;
 foreach ($this->data['iconmap']['mappings'] as $mapping) {
-	$numSpan = (new CSpan(($i + 1).':'))->addClass('rowNum');
-
-	$profileLinksComboBox = new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link'], null,
-		$this->data['inventoryList']
-	);
-
-	$expressionTextBox = [
-		(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('maxlength', 64)
-	];
-
-	$iconsComboBox = new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid'], null,
-		$this->data['iconList']
-	);
-	$iconsComboBox->addClass('mappingIcon');
-
-	$iconPreviewImage = (new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
-		'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
-		->addClass('preview')
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid']);
-
 	$iconMapTable->addRow(
 		(new CRow([
 			(new CCol(
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			$numSpan,
-			$profileLinksComboBox,
-			$expressionTextBox,
-			$iconsComboBox,
-			(new CCol($iconPreviewImage))->setAttribute('style', 'vertical-align: middle;'),
+			(new CSpan(($i + 1).':'))->addClass('rowNum'),
+			(new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link'],
+				null, $data['inventoryList']
+			)),
+			(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+				->setAttribute('maxlength', 64),
+			(new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid'], null, $data['iconList']))
+				->addClass('mappingIcon'),
+			(new CCol(
+				(new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
+					'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
+				))
+					->addClass('preview')
+					->addClass(ZBX_STYLE_CURSOR_POINTER)
+					->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid'])
+			))->setAttribute('style', 'vertical-align: middle;'),
 			(new CCol(
 				(new CButton('remove', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('removeMapping')
+					->addClass('remove_mapping')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
@@ -97,35 +88,33 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 }
 
 // add row button
-$iconMapTable->addRow((new CRow([
-	(new CCol(
-		(new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-	))->setColSpan(7)
-]))->setId('iconMapListFooter'));
-
-// <default icon row>
-$iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']['default_iconid'], null,
-	$this->data['iconList']
-);
-$iconsComboBox->addClass('mappingIcon');
-
-$iconPreviewImage = (new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'].
-	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
-	->addClass(ZBX_STYLE_CURSOR_POINTER)
-	->addClass('preview')
-	->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
-
-$iconMapTable->addRow([
-	(new CCol(_('Default')))->setColSpan(4),
-	$iconsComboBox,
-	(new CCol($iconPreviewImage))->setAttribute('style', 'vertical-align: middle;')
-]);
+$iconMapTable
+	->addRow((new CRow([
+		(new CCol(
+			(new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+		))->setColSpan(7)
+	]))->setId('iconMapListFooter'))
+	->addRow([
+		(new CCol(_('Default')))->setColSpan(4),
+		(new CComboBox('iconmap[default_iconid]', $data['iconmap']['default_iconid'], null, $data['iconList']))
+			->addClass('mappingIcon'),
+		(new CCol(
+			(new CImg('imgstore.php?iconid='.$data['iconmap']['default_iconid'].
+				'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
+			))
+				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->addClass('preview')
+				->setAttribute('data-image-full', 'imgstore.php?iconid='.$data['iconmap']['default_iconid'])
+		))->setAttribute('style', 'vertical-align: middle;')
+	]);
 // </default icon row>
 
-$iconMapTab->addRow(_('Mappings'),
+$iconMapTab->addRow(
+	(new CLabel(_('Mappings'), 'iconmap_list'))->setAsteriskMark(),
 	(new CDiv($iconMapTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->setId('iconmap_list')
 );
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);

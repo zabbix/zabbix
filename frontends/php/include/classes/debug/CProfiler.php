@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class CProfiler {
 	protected $slowSqlQueryTime = 0.01;
 
 	/**
-	 * Determines time for single ElasticSearch query to be considered slow.
+	 * Determines time for single Elasticsearch query to be considered slow.
 	 *
 	 * @var float
 	 */
@@ -50,7 +50,7 @@ class CProfiler {
 	protected $sqlQueryLog = [];
 
 	/**
-	 * Contains ElasticSearch queries info.
+	 * Contains Elasticsearch queries info.
 	 *
 	 * @var array
 	 */
@@ -64,7 +64,7 @@ class CProfiler {
 	protected $sqlTotalTime = 0.0;
 
 	/**
-	 * Total time of all performed ElasticSearch queries.
+	 * Total time of all performed Elasticsearch queries.
 	 *
 	 * @var float
 	 */
@@ -150,7 +150,7 @@ class CProfiler {
 		$debug[] = BR();
 
 		if ($this->elasticQueryLog) {
-			$debug[] = _s('Total ElasticSearch time: %1$s', $this->elasticTotalTime);
+			$debug[] = _s('Total Elasticsearch time: %1$s', $this->elasticTotalTime);
 			$debug[] = BR();
 		}
 
@@ -214,7 +214,7 @@ class CProfiler {
 			$time = $query[0];
 
 			$record = [
-				'ElasticSearch ('.$time.'): ',
+				'Elasticsearch ('.$time.'): ',
 				$query[1].' ',
 				(new CSpan($query[2]))->addClass(ZBX_STYLE_BLUE),
 				BR(),
@@ -308,22 +308,24 @@ class CProfiler {
 	}
 
 	/**
-	 * Store ElasticSearch query data.
+	 * Store Elasticsearch query data.
 	 *
 	 * @param float  $time
 	 * @param string $method
 	 * @param string $endpoint
 	 * @param string $query
 	 */
-	public function profileElasticSearch($time, $method, $endpoint, $query) {
+	public function profileElasticsearch($time, $method, $endpoint, $query) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
 		}
 
+		$time = round($time, 6);
+
 		$this->elasticTotalTime += $time;
 		$this->elasticQueryLog[] = [
-			round($time, 6),
+			$time,
 			$method,
 			$endpoint,
 			$query,

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ void	DBdeinit(void)
  * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  ******************************************************************************/
-static void	DBtxn_operation(int (*txn_operation)())
+static void	DBtxn_operation(int (*txn_operation)(void))
 {
 	int	rc;
 
@@ -1908,6 +1908,65 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+#ifndef HAVE_SQLITE3
+int	DBindex_exists(const char *table_name, const char *index_name)
+{
+	char		*table_name_esc, *index_name_esc;
+#if defined(HAVE_POSTGRESQL)
+	char		*table_schema_esc;
+#endif
+	DB_RESULT	result;
+	int		ret;
+
+	table_name_esc = DBdyn_escape_string(table_name);
+	index_name_esc = DBdyn_escape_string(index_name);
+
+#if defined(HAVE_IBM_DB2)
+	result = DBselect(
+			"select 1"
+			" from syscat.indexes"
+			" where tabschema=user"
+				" and lower(tabname)='%s'"
+				" and lower(indname)='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_MYSQL)
+	result = DBselect(
+			"show index from %s"
+			" where key_name='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_ORACLE)
+	result = DBselect(
+			"select 1"
+			" from user_indexes"
+			" where lower(table_name)='%s'"
+				" and lower(index_name)='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+				"public" : CONFIG_DBSCHEMA);
+
+	result = DBselect(
+			"select 1"
+			" from pg_indexes"
+			" where tablename='%s'"
+				" and indexname='%s'"
+				" and schemaname='%s'",
+			table_name_esc, index_name_esc, table_schema_esc);
+
+	zbx_free(table_schema_esc);
+#endif
+
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	zbx_free(table_name_esc);
+	zbx_free(index_name_esc);
+
+	return ret;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
