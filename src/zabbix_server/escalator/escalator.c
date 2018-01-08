@@ -249,13 +249,13 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 			}
 		}
 	}
-out:
+
 	if (0 == exist_tag_filter)
 	{
 		ret = SUCCEED;
 		goto res;
 	}
-
+out:
 	/* if all conditions at least one of tag filter is matched then user has access to event */
 	for (i = 0; i < tag_filters.values_num && SUCCEED != ret; i++)
 	{
