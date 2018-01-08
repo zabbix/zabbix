@@ -206,4 +206,24 @@ out:
     # 2017-03-26 04:00:00 +03:00 local daylight time instead
     - 2017-03-27 03:00:00 +03:00
     - 2017-03-28 03:00:00 +03:00
+---
+test case: Time zone 1:30 west of UTC
+in:
+  item type: ZABBIX
+  delay: 1m
+  timezone: ZBX1:30
+  at: 2018-01-01 00:00:00 -01:30
+out:
+  checks:
+    - 2018-01-01 00:01:00 -01:30
+---
+test case: Time zone 0:45 west of UTC
+in:
+  item type: ZABBIX
+  delay: 1m
+  timezone: ZBX0:45
+  at: 2018-01-01 00:00:00 -00:45
+out:
+  checks:
+    - 2018-01-01 00:01:00 -00:45
 ...
