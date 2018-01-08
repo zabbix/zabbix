@@ -24,6 +24,7 @@
 #include "zbxmocktime.h"
 
 #include "common.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -89,7 +90,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	setenv("TZ", zbx_mock_get_parameter_string("in.timezone"), 1);
+	if (0 != setenv("TZ", zbx_mock_get_parameter_string("in.timezone"), 1))
+		fail_msg("Cannot set 'TZ' environment variable: %s", zbx_strerror(errno));
 
 	delay = zbx_mock_get_parameter_string("in.delay");
 	err = zbx_interval_preproc(delay, &simple_interval, &custom_intervals, &error);
