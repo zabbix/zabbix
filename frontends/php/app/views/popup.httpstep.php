@@ -21,7 +21,7 @@
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => ''
+	'script_inline' => require 'app/views/popup.httpstep.js.php'
 ];
 
 $options = $data['options'];
@@ -158,7 +158,7 @@ $output['buttons'] = [
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
 		'class' => '',
 		'keepOpen' => true,
-		'action' => 'return validate_httpstep("'.$http_popup_form->getId().'", '.
+		'action' => 'return validateHttpStep("'.$http_popup_form->getId().'", '.
 						'jQuery(window.document.forms["'.$http_popup_form->getId().'"])' .
 							'.closest("[data-dialogueid]").attr("data-dialogueid"));'
 	]
