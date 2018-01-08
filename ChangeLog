@@ -44,7 +44,7 @@ A......... [ZBXNEXT-4247] removed deprecated API methods: user.updareProfile, us
 ..F....... [ZBXNEXT-4137] removed green background from cells (Oleg)
 ..F....... [ZBXNEXT-4157] added map status summary to be readable by screen reader software (gcalenko)
 ..F....... [ZBXNEXT-4127] implemented popup displaying in overlay dialogues (miks)
-...GI..PS. [ZBXNEXT-1520] increased the maximum Hosts/DNS name character length from 63 to 255 (greg, Sergejs)
+...GI..PS. [ZBXNEXT-1520] increased the maximum Hosts/DNS name character length from 63 to 255 (gcalenko, Sergejs)
 ..F.....S. [ZBXNEXT-4108] implemented search of problems by trigger name (abs, miks)
 ..F....... [ZBXNEXT-4143] implemented keybord interaction in top navigation (miks)
 ...G...... [ZBXNEXT-1567] added item "vfs.dir.count" for counting directory entries (valdis)
