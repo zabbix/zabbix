@@ -26,7 +26,7 @@
 #define ZBX_MOCK_FORMAT_TIME		"%02d:%02d:%02d"
 #define ZBX_MOCK_FORMAT_DATETIME	ZBX_MOCK_FORMAT_DATE " " ZBX_MOCK_FORMAT_TIME
 #define ZBX_MOCK_FORMAT_NS		".%09d"
-#define ZBX_MOCK_FORMAT_TZ		" %+03d:%02d"
+#define ZBX_MOCK_FORMAT_TZ		" %c%02d:%02d"
 
 #define ZBX_MOCK_TIMESTAMP_MAX_LEN	36
 
@@ -427,20 +427,29 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, int tz_sec, char *buffer,
 {
 	struct tm	*tm;
 	int		tz_hour, tz_min;
+	char		tz_sign;
 
 	if (size < ZBX_CONST_STRLEN(ZBX_MOCK_FORMAT_DATETIME) + ZBX_CONST_STRLEN(ZBX_MOCK_FORMAT_TZ) + 1)
 		return ZBX_MOCK_NOT_ENOUGH_MEMORY;
 
 	timestamp += tz_sec;
+	tm = gmtime(&timestamp);
+
+	if (0 > tz_sec)
+	{
+		tz_sec = -tz_sec;
+		tz_sign = '-';
+	}
+	else
+		tz_sign = '+';
+
 	tz_hour = tz_sec / 60;
 	tz_min = tz_hour % 60;
 	tz_hour /= 60;
 
-	tm = gmtime(&timestamp);
-
 	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_TZ,
 			tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-			tm->tm_hour, tm->tm_min, tm->tm_sec, tz_hour, tz_min);
+			tm->tm_hour, tm->tm_min, tm->tm_sec, tz_sign, tz_hour, tz_min);
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -467,20 +476,29 @@ zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, int tz_sec, c
 	struct tm	*tm;
 	int		tz_hour, tz_min;
 	time_t		timestamp = ts->sec;
+	char		tz_sign;
 
 	if (size < ZBX_MOCK_TIMESTAMP_MAX_LEN + 1)
 		return ZBX_MOCK_NOT_ENOUGH_MEMORY;
 
 	timestamp += tz_sec;
+	tm = gmtime(&timestamp);
+
+	if (0 > tz_sec)
+	{
+		tz_sec = -tz_sec;
+		tz_sign = '-';
+	}
+	else
+		tz_sign = '+';
+
 	tz_hour = tz_sec / 60;
 	tz_min = tz_hour % 60;
 	tz_hour /= 60;
 
-	tm = gmtime(&timestamp);
-
 	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_NS ZBX_MOCK_FORMAT_TZ,
 			tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-			tm->tm_hour, tm->tm_min, tm->tm_sec, ts->ns, tz_hour, tz_min);
+			tm->tm_hour, tm->tm_min, tm->tm_sec, ts->ns, tz_sign, tz_hour, tz_min);
 
 	return ZBX_MOCK_SUCCESS;
 }
