@@ -78,7 +78,7 @@ static unsigned char	get_item_type(const char *item_type)
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			err, simple_interval, nextcheck, tz_sec, step = 1;
+	int			simple_interval, nextcheck, tz_sec, step = 1;
 	zbx_custom_interval_t	*custom_intervals = NULL;
 	char			*error = NULL, nextcheck_result[64], msg[4096];
 	const char		*delay, *nextcheck_expected;
@@ -94,8 +94,9 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot set 'TZ' environment variable: %s", zbx_strerror(errno));
 
 	delay = zbx_mock_get_parameter_string("in.delay");
-	err = zbx_interval_preproc(delay, &simple_interval, &custom_intervals, &error);
-	zbx_mock_assert_result_eq("zbx_interval_preproc() return value", SUCCEED, err);
+
+	if (SUCCEED != zbx_interval_preproc(delay, &simple_interval, &custom_intervals, &error))
+		fail_msg("Value of 'delay' is not a valid update interval: %s.", error);
 
 	item_type = get_item_type(zbx_mock_get_parameter_string("in['item type']"));
 
@@ -108,10 +109,10 @@ void	zbx_mock_test_entry(void **state)
 	while (ZBX_MOCK_END_OF_VECTOR != (mock_err = (zbx_mock_vector_element(checks, &handle))))
 	{
 		if (ZBX_MOCK_SUCCESS != mock_err)
-			fail_msg("Cannot read checks element: %s", zbx_mock_error_string(mock_err));
+			fail_msg("Cannot read 'checks' element #%d: %s", step, zbx_mock_error_string(mock_err));
 
-		if (ZBX_MOCK_SUCCESS != zbx_mock_string(handle, &nextcheck_expected))
-			fail_msg("Cannot read checks value: %s", zbx_mock_error_string(mock_err));
+		if (ZBX_MOCK_SUCCESS != (mock_err = zbx_mock_string(handle, &nextcheck_expected)))
+			fail_msg("Cannot read 'checks' element #%d value: %s", step, zbx_mock_error_string(mock_err));
 
 		if (ZBX_MOCK_SUCCESS != zbx_strtime_tz_sec(nextcheck_expected, &tz_sec))
 			fail_msg("Invalid nextcheck time format");
