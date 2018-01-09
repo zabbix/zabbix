@@ -301,7 +301,7 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 		case ZBX_MOCK_NOT_A_TIMESTAMP:
 			return "Invalid timestamp format.";
 		case ZBX_MOCK_NOT_ENOUGH_MEMORY:
-			return "Not enough space in out buffer.";
+			return "Not enough space in output buffer.";
 		default:
 			return "Unknown error.";
 	}

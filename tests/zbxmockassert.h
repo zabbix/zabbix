@@ -52,6 +52,18 @@ void	__zbx_mock_assert_sysinfo_ret_eq(const char *file, int line, const char *pr
 void	__zbx_mock_assert_sysinfo_ret_ne(const char *file, int line, const char *prefix_msg, int expected_value,
 		int returned_value);
 
+void	__zbx_mock_assert_timespec_eq(const char *file, int line, const char *prefix_msg,
+		const zbx_timespec_t *expected_value, const zbx_timespec_t *returned_value);
+
+void	__zbx_mock_assert_timespec_ne(const char *file, int line, const char *prefix_msg,
+		const zbx_timespec_t *expected_value, const zbx_timespec_t *returned_value);
+
+void	__zbx_mock_assert_time_eq(const char *file, int line, const char *prefix_msg, time_t expected_value,
+		time_t returned_value);
+
+void	__zbx_mock_assert_time_ne(const char *file, int line, const char *prefix_msg, time_t expected_value,
+		time_t returned_value);
+
 #define zbx_mock_assert_str_eq(prefix_msg, expected_value, returned_value) \
 	__zbx_mock_assert_str_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
 
@@ -81,5 +93,17 @@ void	__zbx_mock_assert_sysinfo_ret_ne(const char *file, int line, const char *pr
 
 #define zbx_mock_assert_sysinfo_ret_ne(prefix_msg, expected_value, returned_value) \
 	__zbx_mock_assert_sysinfo_ret_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_timespec_eq(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_timespec_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_timespec_ne(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_timespec_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_time_eq(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_time_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_time_ne(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_time_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
 
 #endif

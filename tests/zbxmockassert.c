@@ -129,3 +129,69 @@ void	__zbx_mock_assert_sysinfo_ret_ne(const char *file, int line, const char *pr
 	_FAIL(file, line, prefix_msg, "Did not expect sysinfo result \"%s\"", zbx_sysinfo_ret_string(returned_value));
 }
 
+void	__zbx_mock_assert_timespec_eq(const char *file, int line, const char *prefix_msg,
+		const zbx_timespec_t *expected_value, const zbx_timespec_t *returned_value)
+{
+	char	expected_str[ZBX_MOCK_TIMESTAMP_MAX_LEN], returned_str[ZBX_MOCK_TIMESTAMP_MAX_LEN];
+	int	err;
+
+	if (expected_value->sec == returned_value->sec && expected_value->ns == returned_value->ns)
+		return;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_timespec_to_strtime(expected_value, expected_str, sizeof(expected_str))))
+		_FAIL(file, line, NULL, "Cannot convert timestamp to string format: %s", zbx_mock_error_string(err));
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_timespec_to_strtime(returned_value, returned_str, sizeof(returned_str))))
+		_FAIL(file, line, NULL, "Cannot convert timestamp to string format: %s", zbx_mock_error_string(err));
+
+	_FAIL(file, line, prefix_msg, "Expected timestamp \"%s\" while got \"%s\"", expected_str, returned_str);
+}
+
+void	__zbx_mock_assert_timespec_ne(const char *file, int line, const char *prefix_msg,
+		const zbx_timespec_t *expected_value, const zbx_timespec_t *returned_value)
+{
+	char	returned_str[ZBX_MOCK_TIMESTAMP_MAX_LEN];
+	int	err;
+
+	if (expected_value->sec != returned_value->sec || expected_value->ns != returned_value->ns)
+		return;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_timespec_to_strtime(returned_value, returned_str, sizeof(returned_str))))
+		_FAIL(file, line, NULL, "Cannot convert timestamp to string format: %s", zbx_mock_error_string(err));
+
+	_FAIL(file, line, prefix_msg, "Did not expect timestamp \"%s\"", returned_str);
+}
+
+void	__zbx_mock_assert_time_eq(const char *file, int line, const char *prefix_msg, time_t expected_value,
+		time_t returned_value)
+{
+	char	expected_str[ZBX_MOCK_TIMESTAMP_MAX_LEN], returned_str[ZBX_MOCK_TIMESTAMP_MAX_LEN];
+	int	err;
+
+	if (expected_value == returned_value)
+		return;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_strtime(expected_value, expected_str, sizeof(expected_str))))
+		_FAIL(file, line, NULL, "Cannot convert timestamp to string format: %s", zbx_mock_error_string(err));
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_strtime(returned_value, returned_str, sizeof(returned_str))))
+		_FAIL(file, line, NULL, "Cannot convert timestamp to string format: %s", zbx_mock_error_string(err));
+
+	_FAIL(file, line, prefix_msg, "Expected timestamp \"%s\" while got \"%s\"", expected_str, returned_str);
+}
+
+void	__zbx_mock_assert_time_ne(const char *file, int line, const char *prefix_msg, time_t expected_value,
+		time_t returned_value)
+{
+	char	returned_str[ZBX_MOCK_TIMESTAMP_MAX_LEN];
+	int	err;
+
+	if (expected_value != returned_value)
+		return;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_strtime(returned_value, returned_str, sizeof(returned_str))))
+		_FAIL(file, line, NULL, "Cannot convert timestamp to string format: %s", zbx_mock_error_string(err));
+
+	_FAIL(file, line, prefix_msg, "Did not expect timestamp \"%s\"", returned_str);
+}
+

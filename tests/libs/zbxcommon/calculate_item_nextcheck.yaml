@@ -7,8 +7,8 @@ in:
   at: 2017-10-29 04:00:00 +03:00
 out:
   checks:
-    - 2017-10-29 05:00:00 +03:00
-    - 2017-10-29 06:00:00 +03:00
+    - 2017-10-29 04:00:00 +02:00
+    - 2017-10-29 05:00:00 +02:00
 ---
 test case: Calculate active item nextcheck from scheduled interval
 in:
@@ -18,7 +18,7 @@ in:
   at: 2017-10-29 04:00:00 +03:00
 out:
   checks:
-    - 2038-01-01 03:00:00 +03:00
+    - 2038-01-01 02:00:00 +02:00
 ---
 test case: Scheduled every 15m check when changing from summer time to winter
 in:

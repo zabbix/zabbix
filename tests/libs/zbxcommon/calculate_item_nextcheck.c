@@ -21,7 +21,6 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
-#include "zbxmocktime.h"
 
 #include "common.h"
 #include "log.h"
@@ -78,9 +77,9 @@ static unsigned char	get_item_type(const char *item_type)
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			simple_interval, nextcheck, tz_sec, step = 1;
+	int			simple_interval, nextcheck, step = 1;
 	zbx_custom_interval_t	*custom_intervals = NULL;
-	char			*error = NULL, nextcheck_result[64], msg[4096];
+	char			*error = NULL, msg[4096];
 	const char		*delay, *nextcheck_expected;
 	zbx_mock_handle_t	checks, handle;
 	unsigned char		item_type;
@@ -92,6 +91,8 @@ void	zbx_mock_test_entry(void **state)
 
 	if (0 != setenv("TZ", zbx_mock_get_parameter_string("in.timezone"), 1))
 		fail_msg("Cannot set 'TZ' environment variable: %s", zbx_strerror(errno));
+
+	tzset();
 
 	delay = zbx_mock_get_parameter_string("in.delay");
 
@@ -114,19 +115,16 @@ void	zbx_mock_test_entry(void **state)
 		if (ZBX_MOCK_SUCCESS != (mock_err = zbx_mock_string(handle, &nextcheck_expected)))
 			fail_msg("Cannot read 'checks' element #%d value: %s", step, zbx_mock_error_string(mock_err));
 
-		if (ZBX_MOCK_SUCCESS != zbx_strtime_tz_sec(nextcheck_expected, &tz_sec))
-			fail_msg("Invalid nextcheck time format");
+		if (ZBX_MOCK_SUCCESS != (mock_err = zbx_strtime_to_timespec(nextcheck_expected, &ts)))
+		{
+			fail_msg("Cannot convert 'checks' element #%d valuel to time: %s", step,
+					zbx_mock_error_string(mock_err));
+		}
 
 		nextcheck = calculate_item_nextcheck(0, item_type, simple_interval, custom_intervals, now);
 
-		if (ZBX_MOCK_SUCCESS != zbx_time_to_strtime(nextcheck, tz_sec, nextcheck_result,
-				sizeof(nextcheck_result)))
-		{
-			fail_msg("Cannot convert nextcheck to string format");
-		}
-
 		zbx_snprintf(msg, sizeof(msg), "Invalid nextcheck calculation step %d", step++);
-		zbx_mock_assert_str_eq(msg, nextcheck_expected, nextcheck_result);
+		zbx_mock_assert_time_eq(msg, ts.sec, nextcheck);
 
 		now = nextcheck;
 	}

@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-#include "zbxmocktime.h"
+#include "zbxmockdata.h"
 
 /* output formats */
 #define ZBX_MOCK_FORMAT_DATE		"%04d-%02d-%02d"
@@ -28,12 +28,10 @@
 #define ZBX_MOCK_FORMAT_NS		".%09d"
 #define ZBX_MOCK_FORMAT_TZ		" %c%02d:%02d"
 
-#define ZBX_MOCK_TIMESTAMP_MAX_LEN	36
-
 #define ZBX_MOCK_TIME_DATE	0x0001
 #define ZBX_MOCK_TIME_TIME	0x0002
-#define ZBX_MOCK_TIME_NS	0x0003
-#define ZBX_MOCK_TIME_TZ	0x0004
+#define ZBX_MOCK_TIME_NS	0x0004
+#define ZBX_MOCK_TIME_TZ	0x0008
 
 /******************************************************************************
  *                                                                            *
@@ -76,21 +74,21 @@ static const char	*ts_get_component_end(const char *text)
  * Comments: The year, month, day limits are not validated.                   *
  *                                                                            *
  ******************************************************************************/
-zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int *day, const char **pnext)
+static zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int *day, const char **pnext)
 {
 	const char	*year_end, *month_end, *day_end;
 
 	year_end = ts_get_component_end(text);
-	if (year_end == text || '-' != *year_end)
+	if (year_end - text != 4 || '-' != *year_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	month_end = ts_get_component_end(year_end + 1);
-	if (month_end == year_end + 1 || '-' != *month_end)
+	if (month_end == year_end || '-' != *month_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	day_end = ts_get_component_end(month_end + 1);
 
-	if (day_end == month_end + 1)
+	if (day_end == month_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	*pnext = day_end;
@@ -121,7 +119,7 @@ zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int *day, 
  * Comments: The hours, minutes and seconds limits are not validated.         *
  *                                                                            *
  ******************************************************************************/
-zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, int *seconds, const char **pnext)
+static zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, int *seconds, const char **pnext)
 {
 	const char	*hours_end, *minutes_end, *seconds_send;
 
@@ -130,12 +128,12 @@ zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, int *se
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	minutes_end = ts_get_component_end(hours_end + 1);
-	if (minutes_end == hours_end + 1 || ':' != *minutes_end)
+	if (minutes_end - hours_end != 3 || ':' != *minutes_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	seconds_send = ts_get_component_end(minutes_end + 1);
 
-	if (seconds_send == minutes_end + 1)
+	if (seconds_send - minutes_end != 3)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	*pnext = seconds_send;
@@ -163,7 +161,7 @@ zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, int *se
  * Comments: The nanoseconds limits are not validated.                        *
  *                                                                            *
  ******************************************************************************/
-zbx_mock_error_t	ts_get_ns(const char *text, int *ns, const char **pnext)
+static zbx_mock_error_t	ts_get_ns(const char *text, int *ns, const char **pnext)
 {
 	const char	*ns_end;
 	int		pad;
@@ -200,7 +198,7 @@ zbx_mock_error_t	ts_get_ns(const char *text, int *ns, const char **pnext)
  * Comments: The timezone offset limits are not validated.                    *
  *                                                                            *
  ******************************************************************************/
-zbx_mock_error_t	ts_get_tz(const char *text, int *sec, const char **pnext)
+static zbx_mock_error_t	ts_get_tz(const char *text, int *sec, const char **pnext)
 {
 	const char	*tz_end;
 	int		hours = 0, minutes = 0;
@@ -230,6 +228,68 @@ zbx_mock_error_t	ts_get_tz(const char *text, int *sec, const char **pnext)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_leap_year                                                     *
+ *                                                                            *
+ * Return value:  SUCCEED - year is a leap year                               *
+ *                FAIL    - year is not a leap year                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_leap_year(int year)
+{
+	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_time_to_localtime                                            *
+ *                                                                            *
+ * Purpose: converts timestamp to a broken-down time representation and       *
+ *          timezone offset (in seconds).                                     *
+ *                                                                            *
+ * Parameters: timestamp - [IN] the number of seconds since Epoch             *
+ *             local     - [OUT] broken-down time representation              *
+ *             tz_offset - [OUT] timezone offset in seconds                   *
+ *             tz_sec - [IN] timezone offset in seconds                       *
+ *                                                                            *
+ * Return value: ZBX_MOCK_SUCCESS - the time was converted successfully       *
+ *               ZBX_MOCK_INTERNAL_ERROR - invalid timestamp was specified    *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_mock_error_t	zbx_time_to_localtime(time_t timestamp, struct tm *local, int *tz_offset)
+{
+	struct tm	tm_utc, tm_local;
+
+	if (NULL == gmtime_r(&timestamp, &tm_utc))
+		return ZBX_MOCK_INTERNAL_ERROR;
+
+	if (NULL == localtime_r(&timestamp, &tm_local))
+		return ZBX_MOCK_INTERNAL_ERROR;
+
+	*tz_offset = (tm_local.tm_yday - tm_utc.tm_yday) * SEC_PER_DAY +
+			(tm_local.tm_hour - tm_utc.tm_hour) * SEC_PER_HOUR +
+			(tm_local.tm_min - tm_utc.tm_min) * SEC_PER_MIN;
+
+	while (tm_local.tm_year > tm_utc.tm_year)
+		*tz_offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+
+	while (tm_local.tm_year < tm_utc.tm_year)
+		*tz_offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+
+	*local = tm_local;
+
+	return ZBX_MOCK_SUCCESS;
+}
+
+typedef enum
+{
+	ZBX_TOKEN_START,
+	ZBX_TOKEN_DELIM,
+	ZBX_TOKEN_COMPONENT
+}
+zbx_mock_time_parser_state_t;
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_strtime_to_timespec                                          *
  *                                                                            *
  * Purpose: converts YAML space separated timestamp having                    *
@@ -251,14 +311,18 @@ zbx_mock_error_t	ts_get_tz(const char *text, int *sec, const char **pnext)
  ******************************************************************************/
 zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts)
 {
-	int		err, sec, ns, tz, components = 0;
-	const char	*ptr, *pnext;
-	struct tm	tm;
+	int				err, sec, ns, tz, components = 0;
+	const char			*ptr, *pnext;
+	struct tm			tm;
+	zbx_mock_time_parser_state_t	state;
 
 	for (ptr = strtime; '\0' != *ptr;)
 	{
 		if ('.' == *ptr)
 		{
+			if (ZBX_TOKEN_DELIM == state)
+				return ZBX_MOCK_NOT_A_TIMESTAMP;
+
 			if (ZBX_MOCK_TIME_NS < components)
 				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
@@ -266,12 +330,36 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 			components |= ZBX_MOCK_TIME_NS;
-
-			if (' ' == *ptr)
-				ptr++;
-
+			state = ZBX_TOKEN_COMPONENT;
 			continue;
 		}
+
+		if ('Z' == *ptr)
+		{
+			if (ZBX_TOKEN_DELIM == state)
+				return ZBX_MOCK_NOT_A_TIMESTAMP;
+
+			if (0 != (components & ZBX_MOCK_TIME_TZ) || 0 == (components & ZBX_MOCK_TIME_DATE))
+				return ZBX_MOCK_NOT_A_TIMESTAMP;
+
+			tz = 0;
+			ptr++;
+			components |= ZBX_MOCK_TIME_TZ;
+			state = ZBX_TOKEN_COMPONENT;
+			continue;
+		}
+
+		if (' ' == *ptr || '\t' == *ptr)
+		{
+			state = ZBX_TOKEN_DELIM;
+			ptr++;
+			continue;
+		}
+
+		if (ZBX_TOKEN_COMPONENT == state)
+			return ZBX_MOCK_NOT_A_TIMESTAMP;
+
+		state = ZBX_TOKEN_COMPONENT;
 
 		if ('-' == *ptr || '+' == *ptr)
 		{
@@ -282,7 +370,6 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 			components |= ZBX_MOCK_TIME_TZ;
-
 			continue;
 		}
 
@@ -303,10 +390,6 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 
 			tm.tm_year -= 1900;
 			tm.tm_mon--;
-
-			if (' ' == *ptr)
-				ptr++;
-
 			continue;
 		}
 
@@ -319,10 +402,6 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 				return err;
 
 			components |= ZBX_MOCK_TIME_TIME;
-
-			if (' ' == *ptr)
-				ptr++;
-
 			continue;
 		}
 
@@ -365,71 +444,36 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strtime_tz_sec                                               *
- *                                                                            *
- * Purpose: obtains timezone offset in seconds from YAML space separated      *
- *          timestamp having YYYY-MM-DD hh:mm:ss.nnnnnnnnn TZ format          *
- *                                                                            *
- * Parameters: strtime - [IN] the YAML space separated timestamp              *
- *             tz      - [OUT]  timezone offset in seconds                    *
- *                                                                            *
- * Return value: ZBX_MOCK_SUCCESS - the timestamp was parsed successfully     *
- *               ZBX_MOCK_NOT_A_TIMESTAMP - invalid timestamp format          *
- *                                                                            *
- * Comments: If timezone component is not present then zero offset is         *
- *           returned.                                                        *
- *                                                                            *
- ******************************************************************************/
-zbx_mock_error_t	zbx_strtime_tz_sec(const char *strtime, int *tz_sec)
-{
-	int		err;
-	const char	*ptr;
-
-	for (ptr = strtime; '\0' != *ptr; ptr = ts_get_component_end(ptr + 1))
-	{
-		if (' ' == *ptr)
-		{
-			ptr++;
-			if ('-' == *ptr || '+' == *ptr)
-			{
-				if (ZBX_MOCK_SUCCESS != (err = ts_get_tz(ptr, tz_sec, &ptr)))
-					return ZBX_MOCK_NOT_A_TIMESTAMP;
-				break;
-			}
-		}
-	}
-
-	return ZBX_MOCK_SUCCESS;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_time_to_strtime                                              *
  *                                                                            *
  * Purpose: converts time to YAML space separated timestamp in                *
  *          YYYY-MM-DD hh:mm:ss TZ format                                     *
  *                                                                            *
  * Parameters: timestamp - [IN] the time (seconds since Epoch)                *
- *             tz_sec    - [IN] timezone offset in seconds                    *
  *             buffer    - [OUT] the output buffer                            *
  *             size      - [OUT] the size of output buffer                    *
  *                                                                            *
  * Return value: ZBX_MOCK_SUCCESS - the time was converted successfully       *
  *               ZBX_MOCK_NOT_ENOUGH_MEMORY - the output buffer size is too   *
  *                                            small                           *
+ *               ZBX_MOCK_INTERNAL_ERROR - invalid timestamp specified        *
+ *                                                                            *
+ * Comments: The time is converted by using current timezone settings.        *
  *                                                                            *
  ******************************************************************************/
-zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, int tz_sec, char *buffer, size_t size)
+zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size)
 {
-	struct tm	*tm;
-	int		tz_hour, tz_min;
-	char		tz_sign;
+	struct tm		tm;
+	int			tz_hour, tz_min, tz_sec;
+	char			tz_sign;
+	zbx_mock_error_t	err;
 
-	if (size < ZBX_CONST_STRLEN(ZBX_MOCK_FORMAT_DATETIME) + ZBX_CONST_STRLEN(ZBX_MOCK_FORMAT_TZ) + 1)
+	/* max timestamp length minus nanosecond component */
+	if (size < ZBX_MOCK_TIMESTAMP_MAX_LEN - 10)
 		return ZBX_MOCK_NOT_ENOUGH_MEMORY;
 
-	timestamp += tz_sec;
-	tm = gmtime(&timestamp);
+	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_localtime(timestamp, &tm, &tz_sec)))
+		return err;
 
 	if (0 > tz_sec)
 	{
@@ -444,8 +488,8 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, int tz_sec, char *buffer,
 	tz_hour /= 60;
 
 	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_TZ,
-			tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-			tm->tm_hour, tm->tm_min, tm->tm_sec, tz_sign, tz_hour, tz_min);
+			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+			tm.tm_hour, tm.tm_min, tm.tm_sec, tz_sign, tz_hour, tz_min);
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -458,27 +502,29 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, int tz_sec, char *buffer,
  *          timestamp in YYYY-MM-DD hh:mm:ss.nnnnnnnnn TZ format              *
  *                                                                            *
  * Parameters: ts     - [IN] the zabbix timespec (seconds + nanoseconds)      *
- *             tz_sec - [IN] timezone offset in seconds                       *
  *             buffer - [OUT] the output buffer                               *
  *             size   - [OUT] the size of output buffer                       *
  *                                                                            *
  * Return value: ZBX_MOCK_SUCCESS - the time was converted successfully       *
  *               ZBX_MOCK_NOT_ENOUGH_MEMORY - the output buffer size is too   *
  *                                            small                           *
+ *               ZBX_MOCK_INTERNAL_ERROR - invalid timestamp specified        *
+ *                                                                            *
+ * Comments: The time is converted by using current timezone settings.        *
  *                                                                            *
  ******************************************************************************/
-zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, int tz_sec, char *buffer, size_t size)
+zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer, size_t size)
 {
-	struct tm	*tm;
-	int		tz_hour, tz_min;
-	time_t		timestamp = ts->sec;
-	char		tz_sign;
+	struct tm		tm;
+	int			tz_hour, tz_min, tz_sec;
+	char			tz_sign;
+	zbx_mock_error_t	err;
 
-	if (size < ZBX_MOCK_TIMESTAMP_MAX_LEN + 1)
+	if (size < ZBX_MOCK_TIMESTAMP_MAX_LEN)
 		return ZBX_MOCK_NOT_ENOUGH_MEMORY;
 
-	timestamp += tz_sec;
-	tm = gmtime(&timestamp);
+	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_localtime(ts->sec, &tm, &tz_sec)))
+		return err;
 
 	if (0 > tz_sec)
 	{
@@ -493,8 +539,8 @@ zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, int tz_sec, c
 	tz_hour /= 60;
 
 	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_NS ZBX_MOCK_FORMAT_TZ,
-			tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-			tm->tm_hour, tm->tm_min, tm->tm_sec, ts->ns, tz_sign, tz_hour, tz_min);
+			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+			tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns, tz_sign, tz_hour, tz_min);
 
 	return ZBX_MOCK_SUCCESS;
 }
