@@ -45,6 +45,7 @@ $fields = [
 	'hosts' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'groups' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'new_groups' =>		[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'remove_groups' =>	[T_ZBX_STR, O_OPT, P_SYS,			DB_ID,		null],
 	'hostids' =>		[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'groupids' =>		[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'applications' =>	[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
@@ -311,7 +312,10 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			$templateids = $_REQUEST['templates'];
 		}
 
-		// add new or existing host groups
+		/*
+		 * Step 2. Add new host groups. This is actually done later, but before we can do that we need to check what
+		 * groups will be added and first of all actually create them and get the new IDs.
+		 */
 		$newHostGroupIds = [];
 		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
@@ -339,13 +343,20 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			}
 		}
 
+		// Step 1. Replace existing groups.
 		if (isset($visible['groups'])) {
 			if (isset($_REQUEST['groups'])) {
+				// First (step 1.) we try to replace existing groups and add new groups in the process (step 2.).
 				$replaceHostGroupsIds = $newHostGroupIds
 					? array_unique(array_merge(getRequest('groups'), $newHostGroupIds))
 					: $_REQUEST['groups'];
 			}
 			elseif ($newHostGroupIds) {
+				/*
+				 * If no groups need to be replaced, use same variable as if new groups are added. This is used in
+				 * step 3. The only difference is that we try to remove all existing groups by replacing with nothing
+				 * since we left it empty.
+				 */
 				$replaceHostGroupsIds = $newHostGroupIds;
 			}
 
@@ -359,13 +370,6 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			else {
 				$newValues['groups'] = [];
 			}
-		}
-		elseif ($newHostGroupIds) {
-			$newHostGroups = API::HostGroup()->get([
-				'groupids' => $newHostGroupIds,
-				'editable' => true,
-				'output' => ['groupid']
-			]);
 		}
 
 		if (isset($_REQUEST['mass_replace_tpls'])) {
@@ -406,7 +410,53 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				$host['inventory'] = [];
 			}
 
-			if ($newHostGroupIds && !array_key_exists('groups', $visible)) {
+			/*
+			 * Step 3. Case when groups need to be removed. This is done inside the loop, since each host may have
+			 * different existing groups. So we need to know what can we remove.
+			 */
+			if (isset($visible['remove_groups'])) {
+				$remove_groups = getRequest('remove_groups', []);
+
+				if ($remove_groups) {
+					if (isset($replaceHostGroupsIds)) {
+						/*
+						 * Previously we determined what groups fro ALL hosts will be replaced.
+						 * The $replaceHostGroupsIds holds both - groups to replace and new groups to add.
+						 * But $replace_host_groupids is the difference between the replaceable groups and removable
+						 * groups.
+						 */
+						$replace_host_groupids = array_diff($replaceHostGroupsIds, $remove_groups);
+					}
+					else {
+						/*
+						 * The $newHostGroupIds holds only groups that need to be added. So $replace_host_groupsids is
+						 * the difference between the groups that already exist + groups that need to be added and
+						 * removable groups.
+						 */
+						$current_groupids = zbx_objectValues($host['groups'], 'groupid');
+
+						$replace_host_groupids = $newHostGroupIds
+							? array_diff(array_unique(array_merge($current_groupids, $newHostGroupIds)), $remove_groups)
+							: array_diff($current_groupids, $remove_groups);
+					}
+				}
+
+				// In case groups need to be replaced, we need to check permissions and re-select them once again.
+				if (isset($replace_host_groupids)) {
+					$newValues['groups'] = API::HostGroup()->get([
+						'groupids' => $replace_host_groupids,
+						'editable' => true,
+						'output' => ['groupid']
+					]);
+				}
+				else {
+					$newValues['groups'] = [];
+				}
+			}
+
+			// Case when we only need to add new groups to host.
+			if ($newHostGroupIds && !array_key_exists('groups', $visible)
+					&& !array_key_exists('remove_groups', $visible)) {
 				$add_groups = [];
 
 				foreach ($newHostGroupIds as $groupid) {
@@ -416,6 +466,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				$host['groups'] = array_merge($host['groups'], $add_groups);
 			}
 			else {
+				// In all other cases we first clear out the old values. And simply replace with $newValues later.
 				unset($host['groups']);
 			}
 
