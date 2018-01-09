@@ -99,12 +99,13 @@ static const char	*ipc_get_path(void)
  * Purpose: makes socket path from the service name                           *
  *                                                                            *
  * Parameters: service_name - [IN] the service name                           *
+ *             error        - [OUT] the error message                         *
  *                                                                            *
  * Return value: The created path or NULL if the path exceeds unix domain     *
  *               socket path maximum length                                   *
  *                                                                            *
  ******************************************************************************/
-static const char	*ipc_make_path(const char *service_name)
+static const char	*ipc_make_path(const char *service_name, char **error)
 {
 	const char	*prefix;
 	size_t		path_len, offset, prefix_len;
@@ -135,6 +136,9 @@ static const char	*ipc_make_path(const char *service_name)
 	if (ZBX_IPC_PATH_MAX < ipc_path_root_len + path_len + 1 + ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX) +
 			ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + prefix_len)
 	{
+		*error = zbx_dsprintf(*error,
+				"Socket path \"%s%s%s%s%s\" exceeds maximum length of unix domain socket path.",
+				ipc_path, ZBX_IPC_SOCKET_PREFIX, prefix, service_name, ZBX_IPC_SOCKET_SUFFIX);
 		return NULL;
 	}
 
@@ -452,9 +456,7 @@ static int	ipc_socket_read_message(zbx_ipc_socket_t *csocket, zbx_uint32_t *head
 		*rx_bytes += read_size;
 
 		if (SUCCEED == ret)
-		{
 			goto out;
-		}
 	}
 
 	/* not enough data in socket buffer, try to read more until message is completed or no data to read */
@@ -1073,11 +1075,8 @@ int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (socket_path = ipc_make_path(service_name)))
-	{
-		*error = zbx_dsprintf(*error, "Invalid service name \"%s\".", service_name);
+	if (NULL == (socket_path = ipc_make_path(service_name, error)))
 		goto out;
-	}
 
 	if (-1 == (csocket->fd = socket(AF_UNIX, SOCK_STREAM, 0)))
 	{
@@ -1436,11 +1435,8 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 
 	mode = umask(077);
 
-	if (NULL == (socket_path = ipc_make_path(service_name)))
-	{
-		*error = zbx_dsprintf(*error, "Invalid service name \"%s\".", service_name);
+	if (NULL == (socket_path = ipc_make_path(service_name, error)))
 		goto out;
-	}
 
 	if (0 == access(socket_path, F_OK))
 	{

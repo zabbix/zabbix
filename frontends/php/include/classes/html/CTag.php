@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -293,5 +293,23 @@ class CTag extends CObject {
 	 */
 	public function getEncStrategy() {
 		return $this->encStrategy;
+	}
+
+	/**
+	 * Set or reset element 'aria-required' attribute.
+	 *
+	 * @param bool $is_required  Define aria-required attribute for element.
+	 *
+	 * @return CObject
+	 */
+	public function setAriaRequired($is_required = true) {
+		if ($is_required) {
+			$this->setAttribute('aria-required', 'true');
+		}
+		else {
+			$this->removeAttribute('aria-required');
+		}
+
+		return $this;
 	}
 }

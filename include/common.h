@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -496,6 +496,40 @@ zbx_group_status_type_t;
 #define ZBX_PROGRAM_TYPE_SENDER		0x10
 #define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
+
+/* process type */
+#define ZBX_PROCESS_TYPE_POLLER		0
+#define ZBX_PROCESS_TYPE_UNREACHABLE	1
+#define ZBX_PROCESS_TYPE_IPMIPOLLER	2
+#define ZBX_PROCESS_TYPE_PINGER		3
+#define ZBX_PROCESS_TYPE_JAVAPOLLER	4
+#define ZBX_PROCESS_TYPE_HTTPPOLLER	5
+#define ZBX_PROCESS_TYPE_TRAPPER	6
+#define ZBX_PROCESS_TYPE_SNMPTRAPPER	7
+#define ZBX_PROCESS_TYPE_PROXYPOLLER	8
+#define ZBX_PROCESS_TYPE_ESCALATOR	9
+#define ZBX_PROCESS_TYPE_HISTSYNCER	10
+#define ZBX_PROCESS_TYPE_DISCOVERER	11
+#define ZBX_PROCESS_TYPE_ALERTER	12
+#define ZBX_PROCESS_TYPE_TIMER		13
+#define ZBX_PROCESS_TYPE_HOUSEKEEPER	14
+#define ZBX_PROCESS_TYPE_DATASENDER	15
+#define ZBX_PROCESS_TYPE_CONFSYNCER	16
+#define ZBX_PROCESS_TYPE_HEARTBEAT	17
+#define ZBX_PROCESS_TYPE_SELFMON	18
+#define ZBX_PROCESS_TYPE_VMWARE		19
+#define ZBX_PROCESS_TYPE_COLLECTOR	20
+#define ZBX_PROCESS_TYPE_LISTENER	21
+#define ZBX_PROCESS_TYPE_ACTIVE_CHECKS	22
+#define ZBX_PROCESS_TYPE_TASKMANAGER	23
+#define ZBX_PROCESS_TYPE_IPMIMANAGER	24
+#define ZBX_PROCESS_TYPE_ALERTMANAGER	25
+#define ZBX_PROCESS_TYPE_PREPROCMAN	26
+#define ZBX_PROCESS_TYPE_PREPROCESSOR	27
+#define ZBX_PROCESS_TYPE_COUNT		28	/* number of process types */
+#define ZBX_PROCESS_TYPE_UNKNOWN	255
+const char	*get_process_type_string(unsigned char process_type);
+int		get_process_type_by_name(const char *proc_type_str);
 
 /* maintenance */
 typedef enum
@@ -1130,7 +1164,7 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
-const OSVERSIONINFOEX	*zbx_win_getversion();
+const OSVERSIONINFOEX	*zbx_win_getversion(void);
 void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, char **utf8_value);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);

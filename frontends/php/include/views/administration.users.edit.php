@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,9 +45,12 @@ if ($data['userid'] != 0) {
 $userFormList = new CFormList('userFormList');
 
 if (!$data['is_profile']) {
-	$userFormList->addRow(_('Alias'), (new CTextBox('alias', $this->data['alias']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+	$userFormList->addRow(
+		(new CLabel(_('Alias'), 'alias'))->setAsteriskMark(),
+		(new CTextBox('alias', $this->data['alias']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 		->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
 	);
 	$userFormList->addRow(_x('Name', 'user first name'),
@@ -71,7 +74,7 @@ if (!$this->data['is_profile']) {
 	}
 
 	$userFormList->addRow(
-		_('Groups'),
+		(new CLabel(_('Groups'), 'user_groups[]'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'user_groups[]',
 			'objectName' => 'usersGroups',
@@ -85,7 +88,9 @@ if (!$this->data['is_profile']) {
 					'multiselect' => '1'
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	);
 }
 
@@ -93,12 +98,16 @@ if (!$this->data['is_profile']) {
 if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
 		$userFormList->addRow(
-			_('Password'),
-			(new CPassBox('password1', $this->data['password1']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			(new CLabel(_('Password'), 'password1'))->setAsteriskMark(),
+			(new CPassBox('password1', $this->data['password1']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
 		);
 		$userFormList->addRow(
-			_('Password (once again)'),
-			(new CPassBox('password2', $this->data['password2']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			(new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
+			(new CPassBox('password2', $this->data['password2']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
 		);
 
 		if (isset($this->data['change_password'])) {
@@ -187,12 +196,15 @@ if ($this->data['alias'] != ZBX_GUEST_USER) {
 }
 
 $userFormList
-	->addRow(_('Refresh'),
-		(new CTextBox('refresh', $data['refresh']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
+		(new CTextBox('refresh', $data['refresh']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Rows per page'),
+	->addRow((new CLabel(_('Rows per page'), 'rows_per_page'))->setAsteriskMark(),
 		(new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
 		(new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

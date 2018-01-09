@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -969,8 +969,10 @@ int	zbx_db_commit(void)
 	rc = zbx_db_execute("%s", "commit;");
 #endif
 
-	if (ZBX_DB_OK > rc)
-		return rc; /* commit failed */
+	if (ZBX_DB_OK > rc) { /* commit failed */
+		txn_error = rc;
+		return rc;
+	}
 
 #ifdef HAVE_SQLITE3
 	zbx_mutex_unlock(&sqlite_access);

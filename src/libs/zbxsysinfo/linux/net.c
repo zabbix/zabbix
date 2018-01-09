@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,18 @@ typedef struct
 	zbx_uint64_t ipackets;
 	zbx_uint64_t ierr;
 	zbx_uint64_t idrop;
+	zbx_uint64_t ififo;
+	zbx_uint64_t iframe;
+	zbx_uint64_t icompressed;
+	zbx_uint64_t imulticast;
 	zbx_uint64_t obytes;
 	zbx_uint64_t opackets;
 	zbx_uint64_t oerr;
 	zbx_uint64_t odrop;
-	zbx_uint64_t colls;
+	zbx_uint64_t ocolls;
+	zbx_uint64_t ofifo;
+	zbx_uint64_t ocarrier;
+	zbx_uint64_t ocompressed;
 }
 net_stat_t;
 
@@ -224,20 +231,31 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 		*p = '\t';
 
-		if (10 == sscanf(line, "%s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%*s\t%*s\t%*s\t%*s\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t%*s\t" ZBX_FS_UI64 "\t%*s\t%*s\n",
+		if (17 == sscanf(line, "%s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n",
 				name,
 				&result->ibytes,	/* bytes */
 				&result->ipackets,	/* packets */
 				&result->ierr,		/* errs */
 				&result->idrop,		/* drop */
+				&result->ififo,		/* fifo (overruns) */
+				&result->iframe,	/* frame */
+				&result->icompressed,	/* compressed */
+				&result->imulticast,	/* multicast */
 				&result->obytes,	/* bytes */
 				&result->opackets,	/* packets */
 				&result->oerr,		/* errs */
 				&result->odrop,		/* drop */
-				&result->colls))	/* icolls */
+				&result->ofifo,		/* fifo (overruns)*/
+				&result->ocolls,	/* colls (collisions) */
+				&result->ocarrier,	/* carrier */
+				&result->ocompressed))	/* compressed */
 		{
 			if (0 == strcmp(name, if_name))
 			{
@@ -414,6 +432,14 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, ns.ierr);
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, ns.idrop);
+	else if (0 == strcmp(mode, "overruns"))
+		SET_UI64_RESULT(result, ns.ififo);
+	else if (0 == strcmp(mode, "frame"))
+		SET_UI64_RESULT(result, ns.iframe);
+	else if (0 == strcmp(mode, "compressed"))
+		SET_UI64_RESULT(result, ns.icompressed);
+	else if (0 == strcmp(mode, "multicast"))
+		SET_UI64_RESULT(result, ns.imulticast);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -451,6 +477,14 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, ns.oerr);
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, ns.odrop);
+	else if (0 == strcmp(mode, "overruns"))
+		SET_UI64_RESULT(result, ns.ofifo);
+	else if (0 == strcmp(mode, "collisions"))
+		SET_UI64_RESULT(result, ns.ocolls);
+	else if (0 == strcmp(mode, "carrier"))
+		SET_UI64_RESULT(result, ns.ocarrier);
+	else if (0 == strcmp(mode, "compressed"))
+		SET_UI64_RESULT(result, ns.ocompressed);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -488,6 +522,10 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, ns.ierr + ns.oerr);
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, ns.idrop + ns.odrop);
+	else if (0 == strcmp(mode, "overruns"))
+		SET_UI64_RESULT(result, ns.ififo + ns.ofifo);
+	else if (0 == strcmp(mode, "compressed"))
+		SET_UI64_RESULT(result, ns.icompressed + ns.ocompressed);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -516,7 +554,7 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_UI64_RESULT(result, ns.colls);
+	SET_UI64_RESULT(result, ns.ocolls);
 
 	return SYSINFO_RET_OK;
 }
