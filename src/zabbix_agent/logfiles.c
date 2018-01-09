@@ -862,7 +862,7 @@ static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const
  *               row                                                          *
  *                                                                            *
  ******************************************************************************/
-static int	is_uniq_row(const char *arr, int n_cols, int row)
+static int	is_uniq_row(const char * const arr, int n_cols, int row)
 {
 	int		i, mappings = 0, ret = -1;
 	const char	*p;
@@ -905,7 +905,7 @@ static int	is_uniq_row(const char *arr, int n_cols, int row)
  *               column                                                       *
  *                                                                            *
  ******************************************************************************/
-static int	is_uniq_col(const char *arr, int n_rows, int n_cols, int col)
+static int	is_uniq_col(const char * const arr, int n_rows, int n_cols, int col)
 {
 	int		i, mappings = 0, ret = -1;
 	const char	*p;
@@ -946,7 +946,7 @@ static int	is_uniq_col(const char *arr, int n_rows, int n_cols, int col)
  *               FAIL - there are non-unique mappings                         *
  *                                                                            *
  ******************************************************************************/
-static int	is_old2new_unique_mapping(const char *old2new, int num_old, int num_new)
+static int	is_old2new_unique_mapping(const char * const old2new, int num_old, int num_new)
 {
 	int	i;
 
@@ -1234,10 +1234,10 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
  *               -1 if no mapping was found                                   *
  *                                                                            *
  ******************************************************************************/
-static int	find_old2new(char *old2new, int num_new, int i_old)
+static int	find_old2new(const char * const old2new, int num_new, int i_old)
 {
-	int	i;
-	char	*p = old2new + i_old * num_new;
+	int		i;
+	const char	*p = old2new + i_old * num_new;
 
 	for (i = 0; i < num_new; i++)		/* loop over columns (new files) on i_old-th row */
 	{
