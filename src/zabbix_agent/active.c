@@ -1140,7 +1140,7 @@ static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request,
 		else						/* logrt.count */
 			options_par_nr = 6;
 
-		if (NULL != (options = get_rparam(request, options_par_nr)))
+		if (NULL != (options = get_rparam(request, options_par_nr)) && '\0' != *options)
 		{
 			if (0 == strcmp(options, "copytruncate"))
 			{
