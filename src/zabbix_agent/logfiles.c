@@ -3032,46 +3032,49 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s",
 						logfiles[i].filename, zbx_strerror(errno));
 				ret = FAIL;
-				break;
 			}
-
-			if (NULL != mtime)			/* for logrt[], logrt.count[] items */
-				*mtime = (int)buf.st_mtime;
-
-			if ((zbx_uint64_t)buf.st_size != *lastlogsize)
+			else
 			{
-				zbx_uint64_t	seek_offset;
+				if (NULL != mtime)			/* for logrt[], logrt.count[] items */
+					*mtime = (int)buf.st_mtime;
 
-				/* There are data to analyze - either from 'lastlogsize' to the end of file or from */
-				/* the start (if file has been truncated). Here we do not deal with the case of */
-				/* changing a log file's content while keeping the same length. */
-
-				if (0 == *skip_old_data)
+				if ((zbx_uint64_t)buf.st_size != *lastlogsize)
 				{
-					seek_offset = *lastlogsize;
-				}
-				else
-				{
-					seek_offset = (zbx_uint64_t)buf.st_size;
-					zabbix_log(LOG_LEVEL_DEBUG, "skipping old data in filename:'%s' to seek_offset:"
-							ZBX_FS_UI64, logfiles[i].filename, seek_offset);
-				}
+					zbx_uint64_t	seek_offset;
 
-				if ((zbx_uint64_t)buf.st_size < seek_offset)	/* handle file truncation */
-					seek_offset = 0;
+					/* There are data to analyze - either from 'lastlogsize' to the end of file */
+					/* or from the start (if file has been truncated). Here we do not deal with */
+					/* the case of changing a log file's content while keeping the same length. */
 
-				if (ZBX_LOG_ROTATION_LOGCPT != rotation_type ||
-						SUCCEED != coordinate_with_copies(logfiles, logfiles_num, i,
-						seek_offset, (zbx_uint64_t)buf.st_size, lastlogsize))
-				{
-					ret = process_log(flags, logfiles[i].filename, lastlogsize,
-							(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime : NULL),
-							lastlogsize_sent,
-							(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime_sent : NULL),
-							skip_old_data, big_rec, &logfiles[i].incomplete, err_msg,
-							encoding, regexps, pattern, output_template, p_count, s_count,
-							process_value, server, port, hostname, key,
-							&processed_bytes_tmp, seek_offset);
+					if (0 == *skip_old_data)
+					{
+						seek_offset = *lastlogsize;
+					}
+					else
+					{
+						seek_offset = (zbx_uint64_t)buf.st_size;
+						zabbix_log(LOG_LEVEL_DEBUG, "skipping old data in filename:'%s' to"
+								" seek_offset:" ZBX_FS_UI64, logfiles[i].filename,
+								seek_offset);
+					}
+
+					if ((zbx_uint64_t)buf.st_size < seek_offset)	/* handle file truncation */
+						seek_offset = 0;
+
+					if (ZBX_LOG_ROTATION_LOGCPT != rotation_type ||
+							SUCCEED != coordinate_with_copies(logfiles, logfiles_num, i,
+							seek_offset, (zbx_uint64_t)buf.st_size, lastlogsize))
+					{
+						ret = process_log(flags, logfiles[i].filename, lastlogsize,
+								(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ?
+								mtime : NULL), lastlogsize_sent,
+								(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ?
+								mtime_sent : NULL), skip_old_data, big_rec,
+								&logfiles[i].incomplete, err_msg, encoding, regexps,
+								pattern, output_template, p_count, s_count,
+								process_value, server, port, hostname, key,
+								&processed_bytes_tmp, seek_offset);
+					}
 				}
 			}
 
