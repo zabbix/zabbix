@@ -2767,6 +2767,102 @@ static zbx_uint64_t	calculate_remaining_bytes(struct st_logfile *logfiles, int l
 	return remaining_bytes;
 }
 
+static void	transfer_for_rotate(const struct st_logfile *logfiles_old, int idx, struct st_logfile *logfiles,
+		int logfiles_num, const char *old2new, int *seq)
+{
+	int	j;
+
+	if (0 < logfiles_old[idx].processed_size && 0 == logfiles_old[idx].incomplete &&
+			-1 != (j = find_old2new(old2new, logfiles_num, idx)))
+	{
+		if (logfiles_old[idx].size == logfiles_old[idx].processed_size &&
+				logfiles_old[idx].size == logfiles[j].size)
+		{
+			/* the file was fully processed during the previous check and must be ignored during this */
+			/* check */
+			logfiles[j].processed_size = logfiles[j].size;
+			logfiles[j].seq = (*seq)++;
+		}
+		else
+		{
+			/* the file was not fully processed during the previous check or has grown */
+			if (logfiles[j].processed_size < logfiles_old[idx].processed_size)
+				logfiles[j].processed_size = MIN(logfiles[j].size, logfiles_old[idx].processed_size);
+		}
+	}
+	else if (1 == logfiles_old[idx].incomplete && -1 != (j = find_old2new(old2new, logfiles_num, idx)))
+	{
+		if (logfiles_old[idx].size < logfiles[j].size)
+		{
+			/* The file was not fully processed because of incomplete last record but it has grown. */
+			/* Try to process it further. */
+			logfiles[j].incomplete = 0;
+		}
+		else
+			logfiles[j].incomplete = 1;
+
+		if (logfiles[j].processed_size < logfiles_old[idx].processed_size)
+			logfiles[j].processed_size = MIN(logfiles[j].size, logfiles_old[idx].processed_size);
+	}
+}
+
+static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int idx, struct st_logfile *logfiles,
+		int logfiles_num, const char *old2new, int *seq)
+{
+	const char	*p = old2new + idx * logfiles_num;	/* start of idx-th row in 'old2new' array */
+	int		j;
+
+	if (0 < logfiles_old[idx].processed_size && 0 == logfiles_old[idx].incomplete)
+	{
+		for (j = 0; j < logfiles_num; j++, p++)		/* loop over columns (new files) on idx-th row */
+		{
+			if ('1' == *p || '2' == *p)
+			{
+				if (logfiles_old[idx].size == logfiles_old[idx].processed_size &&
+						logfiles_old[idx].size == logfiles[j].size)
+				{
+					/* the file was fully processed during the previous check and must be ignored */
+					/* during this check */
+					logfiles[j].processed_size = logfiles[j].size;
+					logfiles[j].seq = (*seq)++;
+				}
+				else
+				{
+					/* the file was not fully processed during the previous check or has grown */
+					if (logfiles[j].processed_size < logfiles_old[idx].processed_size)
+					{
+						logfiles[j].processed_size = MIN(logfiles[j].size,
+								logfiles_old[idx].processed_size);
+					}
+				}
+			}
+		}
+	}
+	else if (1 == logfiles_old[idx].incomplete)
+	{
+		for (j = 0; j < logfiles_num; j++, p++)		/* loop over columns (new files) on idx-th row */
+		{
+			if ('1' == *p || '2' == *p)
+			{
+				if (logfiles_old[idx].size < logfiles[j].size)
+				{
+					/* The file was not fully processed because of incomplete last record but it */
+					/* has grown. Try to process it further. */
+					logfiles[j].incomplete = 0;
+				}
+				else
+					logfiles[j].incomplete = 1;
+
+				if (logfiles[j].processed_size < logfiles_old[idx].processed_size)
+				{
+					logfiles[j].processed_size = MIN(logfiles[j].size,
+							logfiles_old[idx].processed_size);
+				}
+			}
+		}
+	}
+}
+
 static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfiles_old, int logfiles_num_old,
 		struct st_logfile *logfiles, int logfiles_num, int use_ino, int *seq, int *start_idx,
 		zbx_uint64_t *lastlogsize, char **err_msg)
@@ -2783,40 +2879,10 @@ static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfil
 	/* transfer data about fully and partially processed files from the old file list to the new list */
 	for (i = 0; i < logfiles_num_old; i++)
 	{
-		int	j;
-
-		if (0 < logfiles_old[i].processed_size && 0 == logfiles_old[i].incomplete &&
-				-1 != (j = find_old2new(old2new, logfiles_num, i)))
-		{
-			if (logfiles_old[i].size == logfiles_old[i].processed_size
-					&& logfiles_old[i].size == logfiles[j].size)
-			{
-				/* the file was fully processed during the previous check and must be ignored */
-				/* during this check */
-				logfiles[j].processed_size = logfiles[j].size;
-				logfiles[j].seq = (*seq)++;
-			}
-			else
-			{
-				/* the file was not fully processed during the previous check or has grown */
-				if (logfiles[j].processed_size < logfiles_old[i].processed_size)
-					logfiles[j].processed_size = MIN(logfiles[j].size, logfiles_old[i].processed_size);
-			}
-		}
-		else if (1 == logfiles_old[i].incomplete && -1 != (j = find_old2new(old2new, logfiles_num, i)))
-		{
-			if (logfiles_old[i].size < logfiles[j].size)
-			{
-				/* The file was not fully processed because of incomplete last record */
-				/* but it has grown. Try to process it further. */
-				logfiles[j].incomplete = 0;
-			}
-			else
-				logfiles[j].incomplete = 1;
-
-			if (logfiles[j].processed_size < logfiles_old[i].processed_size)
-				logfiles[j].processed_size = MIN(logfiles[j].size, logfiles_old[i].processed_size);
-		}
+		if (ZBX_LOG_ROTATION_LOGCPT == rotation_type)
+			transfer_for_copytruncate(logfiles_old, i, logfiles, logfiles_num, old2new, seq);
+		else
+			transfer_for_rotate(logfiles_old, i, logfiles, logfiles_num, old2new, seq);
 
 		/* find the last file processed (fully or partially) in the previous check */
 		if (max_old_seq < logfiles_old[i].seq)
@@ -2949,14 +3015,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	}
 
 	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
-	{
-		int	k;
-
 		ensure_order_if_mtimes_equal(*logfiles_old, logfiles, logfiles_num, *use_ino, &start_idx);
-
-		for (k = 0; k < logfiles_num - 1; k++)
-			handle_multiple_copies(logfiles, logfiles_num, k);
-	}
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
