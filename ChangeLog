@@ -37,7 +37,7 @@ A......... [ZBX-12991] removed default values for "active_since" and "active_til
 ..F.....S. [ZBX-13238] fixed spelling of Elasticsearch (abs, vjaceslavs)
 ..F....... [ZBX-13056] fixed incorrect positioning of context menu when it is opened using keyboard (gcalenko)
 ........S. [ZBX-13241] fixed memory leak on Zabbix server when executing remote commands through proxy (vso)
-..F....... [ZBXNEXT-4139] fixed displaying of the eventlog severitites and severities in trigger map element (andzs)
+..F....... [ZBXNEXT-4139] fixed displaying of the eventlog severitites and severities in trigger map element (Andzs)
 .......PS. [ZBX-13178] fixed ipc_path value in error message (MVekslers)
 
 --------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ Changes for 4.0.0alpha1
 New features:
 ........S. [ZBXNEXT-3480] added support of inventory macros in event tags (abs, vso)
 A.F.I...S. [ZBXNEXT-4175] implemented ability to send email to several email addresses specified as user media (miks, Sergejs)
-..F.I..... [ZBXNEXT-4139] added high contrast light and high contrast dark themes (andzs)
+..F.I..... [ZBXNEXT-4139] added high contrast light and high contrast dark themes (Andzs)
 A......... [ZBXNEXT-4247] removed deprecated API methods: user.updareProfile, user.addMedia, user.updateMedia, user.deleteMedia, usergroup.massAdd, usergroup.massUpdate and usermedia.get (Sasha)
 ........S. [ZBXNEXT-970] added more detailed error information to notification message when DB is unavailable (viktors)
 ..F....... [ZBXNEXT-4137] removed green background from cells (Oleg)
@@ -375,7 +375,7 @@ Bug fixes:
 ........S. [ZBX-12581] fixed crash when syncing actions without operations (wiper)
 ..F....... [ZBX-12531] removed usage of SVG viewBox attribute in IE and disabled map scaling in screens (miks)
 ..F....... [ZBXNEXT-3987] fixed wrong response and error message when invalid or unavailable dashboardid has been requested (miks)
-..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andžs, Ivo)
+..F....... [ZBX-12593] fixed overlay window displaying on different browsers and removed horizontal scrollbar from widget configuration dialogue (Andzs, Ivo)
 A.F....... [ZBX-12430] fixed error when linking one template to another in template edit form (gcalenko)
 .........T [ZBXNEXT-3920] fixed extra new lines in Templates (vso, vitaly)
 ..F....... [ZBX-12588] fixed clock and map widget scaling on Safari (Ivo)
