@@ -207,7 +207,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			ret = FAIL, i, n, exist_tag_filter = 0;
+	int			ret = FAIL, i, n;
 	zbx_vector_ptr_t	tag_filters, conditions;
 	zbx_tag_filter_t	*tag_filter;
 	DB_CONDITION		*condition;
