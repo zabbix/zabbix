@@ -2033,7 +2033,7 @@ Changes for 3.0.0alpha3
 
 New features:
 A.FGI..PS. [ZBXNEXT-1263] added encryption support for communications between Zabbix components (Alexei, Andris, asaveljevs, dimir, gleb, Ivo, Oleg, wiper)
-..F....... [ZBXNEXT-2662] implemented on-click navigation for sub menus (Alex)
+..F....... [ZBXNEXT-2662] implemented on-click navigation for sub menus (Alexei)
 ........S. [ZBXNEXT-2844] added multiple escalator support (wiper)
 .......PS. [ZBXNEXT-2988] reduced the number of poller configuration cache locks by 1/3 (wiper)
 A.F.I...S. [ZBXNEXT-2163] implemented argument support for script media type (Ivo, wiper)
@@ -6159,7 +6159,7 @@ Bug fixes:
  - [ZBX-3493] fixed warnings when removing and clearing a template (Alexei)
  - [ZBX-4143] fixed cases with upgrade patch sometimes attempting to reference tables that were not created yet (Richlv, Sasha)
  - [ZBX-3618] extended allowed syntax for host interface DNS names (Vedmak)
- - [ZBX-3999] fixed map border (Alex, Sasha, Eduard)
+ - [ZBX-3999] fixed map border (Alexei, Sasha, Eduard)
  - [ZBX-3946] fixed errors when create trigger with dependencies (Vedmak)
  - [ZBX-3921] fixed change link shown for maps in slide show (Vedmak)
  - [ZBX-4082] fixed error in Monitoring->Triggers when acknowledges are disabled (Vedmak)
