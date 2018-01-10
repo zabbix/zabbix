@@ -243,18 +243,10 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		for (n = 0; n < tag_filters.values_num; n++)
 		{
 			if (hostgroupids->values[i] == ((zbx_tag_filter_t *)tag_filters.values[n])->hostgrouid)
-			{
-				exist_tag_filter = 1;
 				goto out;
-			}
 		}
 	}
-
-	if (0 == exist_tag_filter)
-	{
-		ret = SUCCEED;
-		goto res;
-	}
+	ret = SUCCEED;
 out:
 	/* if all conditions at least one of tag filter is matched then user has access to event */
 	for (i = 0; i < tag_filters.values_num && SUCCEED != ret; i++)
@@ -304,7 +296,6 @@ out:
 		}
 		zbx_vector_ptr_destroy(&conditions);
 	}
-res:
 	zbx_vector_ptr_clear_ext(&tag_filters, (zbx_clean_func_t)zbx_tag_filter_free);
 	zbx_vector_ptr_destroy(&tag_filters);
 
