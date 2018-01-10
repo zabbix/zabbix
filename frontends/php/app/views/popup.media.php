@@ -38,9 +38,9 @@ foreach ($options['sendto_emails'] as $i => $email) {
 		(new CTextBox('sendto_emails['.$i.']', $email))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CButton('sendto_emails['.$i.'][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
+			(new CButton('sendto_emails['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
 	], 'form_row');
 }
 
@@ -62,7 +62,8 @@ $media_form = (new CFormList(_('Media')))
 	)
 	->addRow(
 		(new CLabel(_('Send to'), 'mediatype_email_send_to'))->setAsteriskMark(),
-		$email_send_to_table, 'mediatype_email_send_to'
+		$email_send_to_table,
+		'mediatype_email_send_to'
 	)
 	->addRow((new CLabel(_('When active'), 'period'))->setAsteriskMark(),
 		(new CTextBox('period', $options['period'], false, 1024))
@@ -74,71 +75,44 @@ $media_form = (new CFormList(_('Media')))
 		(new CCheckBox('active', MEDIA_STATUS_ACTIVE))->setChecked($options['active'] == MEDIA_STATUS_ACTIVE)
 	);
 
-$body_html = (new CForm())
-		->addVar('action', 'popup.media')
-		->addVar('add', '1')
-		->addVar('media', $options['media'])
-		->addVar('type', $options['type'])
-		->addVar('dstfrm', $options['dstfrm'])
-		->addItem(
-			(new CTabView())->addTab('mediaTab', _('Media'), $media_form)
-		)
-		->setId('media_form')
-		->toString();
-
-$body_html .= (new CTag('script'))
-	->addItem((new CRow([
-		(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))),
-		(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-		)),
-	]))
-		->addClass('form_row'))
-	->setAttribute('type', 'text/x-jquery-tmpl')
-	->setAttribute('id', 'email_send_to_table_row')
-	->toString();
+$form = (new CForm())
+	->setName('media_form')
+	->addVar('action', 'popup.media')
+	->addVar('add', '1')
+	->addVar('media', $options['media'])
+	->addVar('type', $options['type'])
+	->addVar('dstfrm', $options['dstfrm'])
+	->setId('media_form')
+	->addItem((new CTabView())->addTab('mediaTab', _('Media'), $media_form))
+	->addItem(
+		(new CTag('script'))
+			->addItem((new CRow([
+				(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
+					->setAriaRequired()
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				)),
+				(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+				)),
+			]))
+				->addClass('form_row'))
+				->setAttribute('type', 'text/x-jquery-tmpl')
+				->setAttribute('id', 'email_send_to_table_row')
+);
 
 $output = [
 	'header' => $data['title'],
-	'body' => $body_html,
+	'script_inline' => require 'app/views/popup.media.js.php',
+	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => ($options['media'] !== -1) ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
-			'action' => 'return validate_media("media_form");'
+			'action' => 'return validateMedia("'.$form->getName().'");'
 		]
-	],
-	'script_inline' =>
-		'jQuery(document).ready(function($) {'.
-			'\'use strict\';'.
-			''.
-			'$("#email_send_to").dynamicRows({'.
-				'template: "#email_send_to_table_row"'.
-			'});'.
-
-			// Show/hide multiple "Send to" inputs and single "Send to" input and populate hidden "type" field.
-			'$("#mediatypeid")'.
-				'.on("change", function() {'.
-					'var mediatypes_by_type = '.(new CJson())->encode($data['mediatypes']).','.
-						'mediatypeid = $(this).val();'.
-
-					'$("#type").val(mediatypes_by_type[mediatypeid]);'.
-
-					'if (mediatypes_by_type[mediatypeid] == '.MEDIA_TYPE_EMAIL.') {'.
-						'$("#mediatype_send_to").hide();'.
-						'$("#mediatype_email_send_to").show();'.
-					'}'.
-					'else {'.
-						'$("#mediatype_send_to").show();'.
-						'$("#mediatype_email_send_to").hide();'.
-					'}'.
-				'})'.
-				'.trigger("change");'.
-		'});'
+	]
 ];
 
 echo (new CJson())->encode($output);

@@ -63,10 +63,12 @@
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
+<!-- section of script temporary commented out for testing-->
 <!--		<for list="${conf.list}" param="name" delimiter=",">
 			<sequential>-->
 				<exec executable="scan-build" failonerror="on">
 					<arg line="./configure"/>
+<!-- section of script temporary commented out for testing-->
 <!--					<arg line="${@{name}}"/>-->
 					<arg line="--enable-agent"/>
 				</exec>
@@ -88,6 +90,7 @@
 						</exec>
 					</finally>
 				</trycatch>
+<!-- section of script temporary commented out for testing-->
 <!--			</sequential>
 		</for>-->
 	</target>

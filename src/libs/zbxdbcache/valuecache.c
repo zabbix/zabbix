@@ -2629,7 +2629,15 @@ void	zbx_vc_destroy(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL != vc_cache)
+	{
 		zbx_mutex_destroy(&vc_lock);
+
+		zbx_hashset_destroy(&vc_cache->items);
+		zbx_hashset_destroy(&vc_cache->strpool);
+
+		__vc_mem_free_func(vc_cache);
+		vc_cache = NULL;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2993,37 +3001,6 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 	vc_try_unlock();
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vc_history_value2str                                         *
- *                                                                            *
- * Purpose: converts history value to string format                           *
- *                                                                            *
- * Parameters: buffer     - [OUT] the output buffer                           *
- *             size       - [IN] the output buffer size                       *
- *             value      - [IN] the value to convert                         *
- *             value_type - [IN] the history value type                       *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value, int value_type)
-{
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(buffer, size, ZBX_FS_DBL, value->dbl);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			zbx_snprintf(buffer, size, ZBX_FS_UI64, value->ui64);
-			break;
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			zbx_strlcpy_utf8(buffer, value->str, size);
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			zbx_strlcpy_utf8(buffer, value->log->value, size);
-	}
 }
 
 /******************************************************************************

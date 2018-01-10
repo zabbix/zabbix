@@ -120,13 +120,18 @@ if ($filter['groupids'] !== null) {
 		'preservekeys' => true
 	]);
 
-	foreach ($filterGroups as $group) {
-		$multiSelectHostGroupData[] = [
-			'id' => $group['groupid'],
-			'name' => $group['name']
-		];
+	if ($filterGroups) {
+		foreach ($filterGroups as $group) {
+			$multiSelectHostGroupData[] = [
+				'id' => $group['groupid'],
+				'name' => $group['name']
+			];
 
-		$child_groups[] = $group['name'].'/';
+			$child_groups[] = $group['name'].'/';
+		}
+	}
+	else {
+		$filter['groupids'] = [];
 	}
 }
 
