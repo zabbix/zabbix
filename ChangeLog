@@ -2364,7 +2364,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (Taiwan), Czech, Dut
 Bug fixes:
 ..F....... [ZBX-9375] fixed "Group" and "Host" dropdowns not setting values in "Events" page when navigating from trigger menu pop-up link and fixed availability reports filter dropdowns mistakenly using "Dropdown first entry" config (Ivo)
 ........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
-...G...... [ZBX-9605] fixed an issue with start lines and end lines in vfs.file.regexp[] and vfs.file.regmatch[] (Gleb)
+...G...... [ZBX-9605] fixed an issue with start lines and end lines in vfs.file.regexp[] and vfs.file.regmatch[] (gleb)
 ..F....... [ZBX-9332] fixed correct display of green circle in maps and showing more unacknowledged problems than total number of problems (Ivo)
 ..F....... [ZBX-9381] removed 'groupid' parameter from global search URLs sometimes causing inaccessible forms due to insufficient permissions (Ivo)
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
@@ -3361,7 +3361,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, French, Japanese, Pol
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
-...G...... [ZBX-9605] fixed an issue with start lines and end lines in vfs.file.regexp[] and vfs.file.regmatch[] (Gleb)
+...G...... [ZBX-9605] fixed an issue with start lines and end lines in vfs.file.regexp[] and vfs.file.regmatch[] (gleb)
 ..F....... [ZBX-9332] fixed correct display of green circle in maps and showing more unacknowledged problems than total number of problems (Ivo)
 ..F....... [ZBX-8895] improved trigger count calculation and removed unnecessary query, thanks to Alexey Pustovalov (Krists)
 ..F....... [ZBX-9381] removed 'groupid' parameter from global search URLs sometimes causing inaccessible forms due to insufficient permissions (Ivo)
