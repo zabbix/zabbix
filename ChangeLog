@@ -80,7 +80,7 @@ Bug fixes:
 ...G...PS. [ZBX-12983] fixed compilation warnings under Windows (valdis)
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
-...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, andris)
+...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.6rc1
@@ -195,7 +195,7 @@ Changes for 3.4.4rc1
 
 New features:
 ..F....... [ZBXNEXT-1421] added service sorting by name if multiple services has same 'sortorder' value (miks)
-...G...... [ZBXNEXT-3493] added Windows service configuration check to determine if service can be trigger started (andris, viktors)
+...G...... [ZBXNEXT-3493] added Windows service configuration check to determine if service can be trigger started (Andris, viktors)
 ..F....... [ZBXNEXT-4019] implemented default widget refresh interval (Ivo)
 ..F....... [ZBXNEXT-4081] improved error message for case when none of supported database modules exists (gcalenko)
 
@@ -2778,7 +2778,7 @@ A.F.I..... [ZBX-8406] fixed typos "overriden" to "overridden", "occurence" to "o
 A.F....... [ZBX-8397] removed outdated queue related code from frontend and API (Krists)
 ........S. [ZBX-8359] changed servers timer processes title line to display amount of hosts that have changed maintenance status; active maintenance period count is no longer displayed (Juris)
 ..F....... [ZBX-8375] fixed multiple issues in various forms: removed duplicate hidden fields, added missing field translations, added JS confirmation message encoding and fixed displaying submitted values on failure (Ivo)
-..F....... [ZBX-8240] fixed multiselect input placeholder behaviour on IE8, input cursor issue and removed "clear field" button for multiselect in IE10+ (Oleg, Krists)
+..F....... [ZBX-8240] fixed multiselect input placeholder behaviour on IE8, input cursor issue and removed "clear field" button for multiselect in IE10+ (Krists, Oleg)
 ..F....... [ZBXNEXT-1782] fixed testing of trigger expressions that contain nested parentheses (Pavels)
 ...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
 .......PS. [ZBX-8422] removed PHP mutex locking from server code because of not being used and incompatible licensing issues (wiper)
@@ -4279,7 +4279,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platform (igors)
 
 Bug fixes:
-..F....... [ZBX-6888] fixed javascript error in popups with "select all" checkbox
+..F....... [ZBX-6888] fixed javascript error in popups with "select all" checkbox (Vitalij)
 .......P.. [ZBX-6897] fixed synchronization of the "httptest" configuration table (Sasha)
 ........S. [ZBX-6898] fixed processing of queue request; items that are not checked will be included in the queue (Sasha)
 ........S. [ZBX-6889] fixed processing of availability data by the server (Sasha)
