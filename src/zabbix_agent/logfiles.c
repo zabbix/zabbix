@@ -2422,7 +2422,7 @@ static int	coordinate_with_copies(const struct st_logfile *logfiles, int logfile
 	int		j;
 
 	/* Are there copies? How far are they processed? */
-	for (j = 0; j < logfiles_num - 1; j++)
+	for (j = 0; j < logfiles_num; j++)
 	{
 		if (i != j && SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
 		{
