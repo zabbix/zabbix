@@ -128,7 +128,6 @@ if ($data['server_name'] !== '') {
 }
 
 (new CTag('header', true))
-	->setAttribute('role', 'banner')
 	->addItem(
 		(new CDiv())
 			->addItem($top_menu)

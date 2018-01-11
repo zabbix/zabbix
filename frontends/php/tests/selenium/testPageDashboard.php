@@ -186,13 +186,13 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
 		$this->zbxTestClickXpathWait("//button[@class='btn-max']");
 		$this->zbxTestCheckHeader('Dashboard');
-		$this->zbxTestAssertElementNotPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestCheckFatalErrors();
 
 		$this->zbxTestAssertAttribute("//button[@class='btn-min']", 'title', 'Normal view');
 		$this->zbxTestClickXpathWait("//button[@class='btn-min']");
 		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
-		$this->zbxTestAssertElementPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestCheckFatalErrors();
 	}
 }
