@@ -575,10 +575,6 @@ article {
 	padding: 10px 10px 0 10px;
 }
 
-.article {
-	@extend article;
-}
-
 // Object Group Navigation
 .object-group {
 	margin: 0 0 10px 0;
@@ -636,6 +632,10 @@ footer {
 	height: 30px;
 	text-align: center;
 	color: $font-alt-color;
+}
+
+main {
+	@extend article;
 }
 
 .logo {

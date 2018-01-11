@@ -29,11 +29,9 @@ $buttons = [
 
 echo '<body lang="'.CWebUser::getLang().'">';
 
-(new CDiv(
-	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons), ZBX_STYLE_ARTICLE
-))
-->setAttribute('role', 'main')
-->show();
+(new CTag('main', true,
+	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons)
+))->show();
 
 echo '</body>';
 echo '</html>';

@@ -259,7 +259,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	echo '<div class="'.ZBX_STYLE_ARTICLE.'" role="main">';
+	echo '<main>';
 }
 
 // unset multiple variables
