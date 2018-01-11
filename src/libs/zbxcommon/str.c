@@ -3820,6 +3820,7 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
 {
 	const char *ptr;
 	size_t len;
+
 	return function_validate_parameters(expr, '\0', length, &ptr, &len);
 }
 
