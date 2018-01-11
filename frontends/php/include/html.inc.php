@@ -810,7 +810,7 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
  */
 function makePageFooter($with_version = true)
 {
-	return (new CDiv([
+	return (new CTag('footer', true, [
 		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
 		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
 		(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
@@ -818,8 +818,7 @@ function makePageFooter($with_version = true)
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->setAttribute('target', '_blank')
 	]))
-	->setAttribute('role', 'contentinfo')
-	->addClass(ZBX_STYLE_FOOTER);
+	->setAttribute('role', 'contentinfo');
 }
 
 /**

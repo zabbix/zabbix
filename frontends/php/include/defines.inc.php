@@ -1356,7 +1356,6 @@ define('ZBX_STYLE_FILTER_ACTIVE', 'filter-active');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
-define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');

@@ -70,8 +70,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="<?= ZBX_STYLE_FOOTER ?>" role="contentinfo">
+		<footer role="contentinfo">
 			&copy; <?= ZABBIX_COPYRIGHT_FROM ?>&ndash;<?= ZABBIX_COPYRIGHT_TO ?>, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
-		</div>
+		</footer>
 	</body>
 </html>
