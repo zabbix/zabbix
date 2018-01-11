@@ -52,7 +52,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_agent";
 	zbx_socket_t	s;
-	char		*buffer = NULL, *tls_arg1, *tls_arg2;
+	char		*tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -97,11 +97,9 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
 			item->host.tls_connect, tls_arg1, tls_arg2)))
 	{
-		buffer = zbx_dsprintf(buffer, "%s\n", item->key);
-		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
 
-		/* send requests using old protocol */
-		if (SUCCEED != zbx_tcp_send_raw(&s, buffer))
+		if (SUCCEED != zbx_tcp_send(&s, item->key))
 			ret = NETWORK_ERROR;
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			ret = SUCCEED;
@@ -109,8 +107,6 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			ret = TIMEOUT_ERROR;
 		else
 			ret = NETWORK_ERROR;
-
-		zbx_free(buffer);
 	}
 	else
 		ret = NETWORK_ERROR;
