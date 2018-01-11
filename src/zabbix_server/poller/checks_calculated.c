@@ -96,7 +96,8 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	exp->exp = (char *)zbx_malloc(exp->exp, exp_alloc);
 
-	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, error, max_error_len); e += par_r + 1)
+	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, error, max_error_len);
+			e += par_r + 1)
 	{
 		char	*func, *params, *host = NULL, *key = NULL;
 		size_t	param_pos, param_len, sep_pos;
