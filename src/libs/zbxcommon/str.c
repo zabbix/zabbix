@@ -3693,7 +3693,7 @@ static size_t	zbx_no_function(const char *expr)
  *                                        parenthesis or '\0' if ends         *
  *                                        with NULL terminator                *
  *             par_r               - [OUT] position of the terminator if found*
- *             last_parse_param    - [OUT] position of the last parsed param. *
+ *             last_parse_offset   - [OUT] offset of the last parsed parameter*
  *             last_parse_param_len- [OUT] length of the last parsed parameter*
  *                                                                            *
  * Return value: SUCCEED -  closing parenthesis was found or other custom     *
@@ -3703,7 +3703,7 @@ static size_t	zbx_no_function(const char *expr)
  *                                                                            *
  ******************************************************************************/
 static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r,
-			const char **last_parse_param, size_t * last_parse_param_len)
+		size_t * last_parse_offset, size_t * last_parse_param_len)
 {
 #define ZBX_FUNC_PARAM_NEXT		0
 #define ZBX_FUNC_PARAM_QUOTED		1
@@ -3724,7 +3724,7 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 		switch (state)
 		{
 			case ZBX_FUNC_PARAM_NEXT:
-				*last_parse_param = ptr;
+				*last_parse_offset = ptr - expr;
 				if ('"' == *ptr)
 					state = ZBX_FUNC_PARAM_QUOTED;
 				else if (' ' != *ptr && ',' != *ptr)
@@ -3745,7 +3745,7 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 				}
 				else if (' ' != *ptr)
 				{
-					*last_parse_param_len = ptr - *last_parse_param;
+					*last_parse_param_len = ptr - (expr + *last_parse_offset);
 					return FAIL;
 				}
 				break;
@@ -3754,7 +3754,7 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 		}
 	}
 
-	*last_parse_param_len = ptr - *last_parse_param;
+	*last_parse_param_len = ptr - (expr + *last_parse_offset);
 
 	if (terminator == *ptr && ZBX_FUNC_PARAM_QUOTED != state)
 	{
@@ -3780,7 +3780,7 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
  * Parameters: expr                - [IN] string to parse                     *
  *             par_l               - [IN] position of the opening parenthesis *
  *             par_r               - [OUT] position of the closing parenthesis*
- *             last_parse_param    - [OUT] position of the last parsed param. *
+ *             last_parse_offset   - [OUT] offset of the last parsed parameter*
  *             last_parse_param_len- [OUT] length of the last parsed parameter*
  *                                                                            *
  * Return value: SUCCEED - closing parenthesis was found                      *
@@ -3789,10 +3789,10 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
  *                                                                            *
  ******************************************************************************/
 static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r,
-			const char **last_parse_param, size_t *last_parse_param_len)
+		size_t *last_parse_offset, size_t *last_parse_param_len)
 {
 	if (SUCCEED == function_validate_parameters(expr + par_l + 1, ')', par_r,
-		last_parse_param, last_parse_param_len))
+		last_parse_offset, last_parse_param_len))
 	{
 		*par_r += par_l + 1;
 		return SUCCEED;
@@ -3818,10 +3818,9 @@ static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *pa
  ******************************************************************************/
 int	zbx_function_validate_parameters(const char *expr, size_t *length)
 {
-	const char *ptr;
-	size_t len;
+	size_t offset, len;
 
-	return function_validate_parameters(expr, '\0', length, &ptr, &len);
+	return function_validate_parameters(expr, '\0', length, &offset, &len);
 }
 
 /******************************************************************************
@@ -3834,8 +3833,8 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  *             par_l               - [OUT] position of the opening parenthesis*
  *                                         or the amount of characters to skip*
  *             par_r               - [OUT] position of the closing parenthesis*
- *             last_parse_param    - [OUT] position of the last parsed param. *
- *             last_parse_param_len- [OUT] length of the last parsed parameter*
+ *             error               - [OUT] error message                      *
+ *             max_error_len       - [IN] error size                          *
  *                                                                            *
  * Return value: SUCCEED - string starts with a valid function                *
  *               FAIL    - string does not start with a function and par_l    *
@@ -3845,21 +3844,21 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
 static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 			char *error, int max_error_len)
 {
-	const char	*last_parse_param;
-	size_t		last_parse_param_len;
+	size_t	last_parse_param_offset, last_parse_param_len;
 
 	/* try to validate function name */
 	if (SUCCEED != function_parse_name(expr, par_l))
 		return FAIL;
 
 	/* now we know the position of '(', try to find ')' */
-	if (SUCCEED != function_match_parenthesis(expr, *par_l, par_r, &last_parse_param, &last_parse_param_len))
+	if (SUCCEED != function_match_parenthesis(expr, *par_l, par_r, &last_parse_param_offset,
+			&last_parse_param_len))
 	{
 		if (*par_l > *par_r && NULL != error)
 		{
 			zbx_snprintf(error, max_error_len, "Incorrect function '%.*s' expression. "
 				"Check expression part starting from %.*s",
-				*par_l, expr, last_parse_param_len, last_parse_param);
+				*par_l, expr, last_parse_param_len, expr + last_parse_param_offset);
 		}
 
 		return FAIL;
