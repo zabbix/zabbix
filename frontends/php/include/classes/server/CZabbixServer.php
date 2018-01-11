@@ -295,7 +295,8 @@ class CZabbixServer {
 		stream_set_timeout($this->socket, $this->timeout);
 
 		// send the command
-		if (fwrite($this->socket, CJs::encodeJson($params)) === false) {
+		$jsonEncodedParams = CJs::encodeJson($params);
+		if (fwrite($this->socket, "ZBXD\1" . pack("P", strlen($jsonEncodedParams)) . $jsonEncodedParams) === false) {
 			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
 
 			return false;
