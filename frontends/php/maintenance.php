@@ -27,14 +27,12 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of maintenance periods');
 $page['file'] = 'maintenance.php';
-$page['scripts'] = ['class.calendar.js'];
+$page['scripts'] = ['class.calendar.js', 'multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hosts' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'groups' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostids' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'groupids' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
@@ -456,39 +454,47 @@ if (!empty($data['form'])) {
 		$data['groupids'] = getRequest('groupids', []);
 	}
 
-	// get groups
-	$data['all_groups'] = API::HostGroup()->get([
+	// Groups with RW permissions.
+	$groups_allowed = API::HostGroup()->get([
+		'output' => ['name'],
 		'editable' => true,
-		'output' => ['groupid', 'name'],
-		'real_hosts' => true,
 		'preservekeys' => true
 	]);
-	order_result($data['all_groups'], 'name');
 
-	$data['twb_groupid'] = getRequest('twb_groupid', 0);
-	if (!isset($data['all_groups'][$data['twb_groupid']])) {
-		$twb_groupid = reset($data['all_groups']);
-		$data['twb_groupid'] = $twb_groupid['groupid'];
+	$data['groups_ms'] = [];
+
+	// Prepare data for multiselect. Skip silently removed groups.
+	foreach ($data['groupids'] as $groupid) {
+		if (!array_key_exists($groupid, $groups_allowed)) {
+			continue;
+		}
+
+		$data['groups_ms'][] = [
+			'id' => $groupid,
+			'name' => $groups_allowed[$groupid]['name']
+		];
 	}
 
-	// get hosts from selected twb group
-	$data['hosts'] = API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'real_hosts' => true,
+	// Hosts with RW permissions.
+	$hosts_allowed = API::Host()->get([
+		'output' => ['name'],
 		'editable' => true,
-		'groupids' => $data['twb_groupid']
+		'preservekeys' => true
 	]);
 
-	// selected hosts
-	$hostsSelected = API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'real_hosts' => true,
-		'editable' => true,
-		'hostids' => $data['hostids']
-	]);
-	$data['hosts'] = array_merge($data['hosts'], $hostsSelected);
-	$data['hosts'] = zbx_toHash($data['hosts'], 'hostid');
-	order_result($data['hosts'], 'name');
+	$data['hosts_ms'] = [];
+
+	// Prepare data for multiselect. Skip silently removed hosts.
+	foreach ($data['hostids'] as $hostid) {
+		if (!array_key_exists($hostid, $hosts_allowed)) {
+			continue;
+		}
+
+		$data['hosts_ms'][] = [
+			'id' => $hostid,
+			'name' => $hosts_allowed[$hostid]['name']
+		];
+	}
 
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.edit', $data);
