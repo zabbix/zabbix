@@ -638,6 +638,10 @@ main {
 	@extend article;
 }
 
+output {
+	display: block;
+}
+
 .logo {
 	float: left;
 	display: block;
