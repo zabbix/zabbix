@@ -3740,7 +3740,9 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 				break;
 			case ZBX_FUNC_PARAM_POSTQUOTED:
 				if (',' == *ptr)
+				{
 					state = ZBX_FUNC_PARAM_NEXT;
+				}
 				else if (' ' != *ptr)
 				{
 					*last_parse_param_len = ptr - *last_parse_param;
