@@ -46,8 +46,8 @@ struct	st_logfile
 };
 
 typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
-		unsigned char, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
-		unsigned char);
+		unsigned char, zbx_uint64_t *, const int *, unsigned long *, const char *, unsigned short *,
+		unsigned long *, unsigned char);
 
 void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num);
 
