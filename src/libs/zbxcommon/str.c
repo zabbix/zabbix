@@ -3843,14 +3843,29 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  *                                                                            *
  ******************************************************************************/
 static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
-			const char **last_parse_param, size_t *last_parse_param_len)
+			char *error, int max_error_len)
 {
+	const char	*last_parse_param;
+	size_t		last_parse_param_len;
+
 	/* try to validate function name */
 	if (SUCCEED != function_parse_name(expr, par_l))
 		return FAIL;
 
 	/* now we know the position of '(', try to find ')' */
-	return function_match_parenthesis(expr, *par_l, par_r, last_parse_param, last_parse_param_len);
+	if (SUCCEED != function_match_parenthesis(expr, *par_l, par_r, &last_parse_param, &last_parse_param_len))
+	{
+		if (*par_l > *par_r && NULL != error)
+		{
+			zbx_snprintf(error, max_error_len, "Incorrect function '%.*s' expression. "
+				"Check expression part starting from %.*s",
+				*par_l, expr, last_parse_param_len, last_parse_param);
+		}
+
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -3875,8 +3890,7 @@ static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
 		char *error, int max_error_len)
 {
-	const char	*ptr, *last_parse_param;
-	size_t		last_parse_param_len;
+	const char	*ptr;
 
 	for (ptr = expr; '\0' != *ptr; ptr += *par_l)
 	{
@@ -3885,18 +3899,8 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 		*par_r = 0;
 
 		/* try to validate function candidate */
-		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r, &last_parse_param, &last_parse_param_len))
-		{
-			if (*par_l > *par_r)
-			{
-				zbx_snprintf(error,max_error_len, "Incorrect function '%.*s' expression. "
-					"Check expression part starting from %.*s",
-					*par_l, ptr, last_parse_param_len, last_parse_param);
-				return FAIL;
-			}
-
+		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r, error, max_error_len))
 			continue;
-		}
 
 		*func_pos = ptr - expr;
 		*par_l += *func_pos;
@@ -4192,10 +4196,9 @@ static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_
 static int	zbx_token_parse_function(const char *expression, const char *func,
 		zbx_strloc_t *func_loc, zbx_strloc_t *func_param)
 {
-	size_t		par_l, par_r, last_parse_param_len;
-	const char 	*last_parse_param;
+	size_t		par_l, par_r;
 
-	if (SUCCEED != zbx_function_validate(func, &par_l, &par_r, &last_parse_param, &last_parse_param_len))
+	if (SUCCEED != zbx_function_validate(func, &par_l, &par_r, NULL, 0))
 		return FAIL;
 
 	func_loc->l = func - expression;
