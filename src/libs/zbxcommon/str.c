@@ -3703,7 +3703,7 @@ static size_t	zbx_no_function(const char *expr)
  *                                                                            *
  ******************************************************************************/
 static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r,
-		size_t * last_parse_offset, size_t * last_parse_param_len)
+			size_t *last_parse_offset, size_t *last_parse_param_len)
 {
 #define ZBX_FUNC_PARAM_NEXT		0
 #define ZBX_FUNC_PARAM_QUOTED		1

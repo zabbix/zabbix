@@ -1014,6 +1014,9 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, ")");
 	}
 
+	if (par_l > par_r)
+		goto out;
+
 	/* substitute LLD macros in the remaining part */
 
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
