@@ -98,8 +98,7 @@ void	zbx_mock_test_entry(void **state)
 				fail_msg("Got 'NULL' instead of '%s' as a value.", expected_param_value_string);
 		}
 	}
-
-	if (SYSINFO_RET_FAIL == expected_result)
+	else if (SYSINFO_RET_FAIL == expected_result)
 	{
 		if (NULL == GET_MSG_RESULT(&param_result) ||
 			0 != strcmp(expected_param_value_string, *GET_MSG_RESULT(&param_result)))
@@ -110,6 +109,8 @@ void	zbx_mock_test_entry(void **state)
 					expected_param_value_string);
 		}
 	}
+	else
+		fail_msg("Test not support %s as a result.", zbx_sysinfo_ret_string(expected_result));
 
 	free_request(&request);
 	free_result(&param_result);
