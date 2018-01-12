@@ -1534,10 +1534,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 {
 #define ZBX_TCP_EXPECT_HEADER	1
 #define ZBX_TCP_EXPECT_LENGTH	2
-#define ZBX_TCP_EXPECT_TEXT_XML	3
-#define ZBX_TCP_EXPECT_SIZE	4
-#define ZBX_TCP_EXPECT_CLOSE	5
-#define ZBX_TCP_EXPECT_XML_END	6
+#define ZBX_TCP_EXPECT_SIZE	3
+#define ZBX_TCP_EXPECT_CLOSE	4
 
 	ssize_t		nbytes;
 	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0, header_bytes = 0;
@@ -1575,15 +1573,29 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 			{
 				if (0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, buf_stat_bytes))
 					continue;
-
-				expect = ZBX_TCP_EXPECT_TEXT_XML;
+				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+					expect = ZBX_TCP_EXPECT_CLOSE;
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header and"
+							" data length. Message ignored.", s->peer);
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
 			}
 			else
 			{
 				if (0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 					expect = ZBX_TCP_EXPECT_LENGTH;
+				else if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+					expect = ZBX_TCP_EXPECT_CLOSE;
 				else
-					expect = ZBX_TCP_EXPECT_TEXT_XML;
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header and"
+							" data length. Message ignored.", s->peer);
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
 			}
 		}
 
@@ -1641,41 +1653,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 
 		if (sizeof(s->buf_stat) == nbytes)
 			continue;
-
-		if (ZBX_TCP_EXPECT_TEXT_XML == expect)
-		{
-			if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
-			{
-				expect = ZBX_TCP_EXPECT_CLOSE;
-				continue;
-			}
-
-			if (ZBX_CONST_STRLEN("<req>") > buf_stat_bytes + buf_dyn_bytes)
-			{
-				if (0 != strncmp(s->buffer, "<req>", buf_stat_bytes + buf_dyn_bytes))
-					break;
-
-				continue;
-			}
-			else
-			{
-				if (0 != strncmp(s->buffer, "<req>", ZBX_CONST_STRLEN("<req>")))
-					break;
-
-				expect = ZBX_TCP_EXPECT_XML_END;
-			}
-		}
-
-		if (ZBX_TCP_EXPECT_XML_END == expect)
-		{
-			/* closing tag received in the last 10 bytes? */
-			s->buffer[buf_stat_bytes + buf_dyn_bytes] = '\0';
-			if (NULL != strstr(s->buffer + buf_stat_bytes + buf_dyn_bytes - (10 > buf_stat_bytes +
-					buf_dyn_bytes ? buf_stat_bytes + buf_dyn_bytes : 10), "</req>"))
-			{
-				break;
-			}
-		}
 	}
 
 	if (ZBX_TCP_EXPECT_SIZE == expect)
@@ -1715,10 +1692,8 @@ out:
 
 #undef ZBX_TCP_EXPECT_HEADER
 #undef ZBX_TCP_EXPECT_LENGTH
-#undef ZBX_TCP_EXPECT_TEXT_XML
 #undef ZBX_TCP_EXPECT_SIZE
 #undef ZBX_TCP_EXPECT_CLOSE
-#undef ZBX_TCP_EXPECT_XML_END
 }
 
 static int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)
