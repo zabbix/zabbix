@@ -1707,6 +1707,17 @@ footer {
 }
 
 label {
+	&.form-label-asterisk {
+		&:before {
+			color: $form-label-asterisk-color;
+			display: inline-block;
+			content: '*';
+			margin-right: 0.3em;
+		}
+	}
+}
+
+label {
 	input[type="checkbox"] {
 		margin-right: 3px;
 	}
@@ -3280,10 +3291,6 @@ $form-icon-btn: (
 	.table-paging {
 		border: none;
 		border-top: 1px solid $table-border-color;
-	}
-
-	.table-forms-td-left {
-		text-align: left;
 	}
 
 	.table-forms-td-right {

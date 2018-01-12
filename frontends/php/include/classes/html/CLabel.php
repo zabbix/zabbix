@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,5 +27,16 @@ class CLabel extends CTag {
 		if ($for !== null) {
 			$this->setAttribute('for', zbx_formatDomId($for));
 		}
+	}
+
+	/**
+	 * Allow to add visual 'asterisk' mark to label.
+	 *
+	 * @param bool $add_asterisk  Define is label marked with asterisk or not.
+	 *
+	 * @return CLabel
+	 */
+	public function setAsteriskMark($add_asterisk = true) {
+		return $this->addClass($add_asterisk ? ZBX_STYLE_FIELD_LABEL_ASTERISK : null);
 	}
 }

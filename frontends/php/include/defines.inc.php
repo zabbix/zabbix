@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha2');
+define('ZABBIX_VERSION',		'4.0.0alpha3');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
 define('ZABBIX_DB_VERSION',		3050028);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2017');
+define('ZABBIX_COPYRIGHT_TO',	'2018');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -1482,6 +1482,7 @@ define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
+define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

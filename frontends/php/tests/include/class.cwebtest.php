@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -379,9 +379,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
 	}
 
-	public function zbxTestInputTypeByXpath($xpath, $str) {
+	public function zbxTestInputTypeByXpath($xpath, $str, $validate = true) {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->sendKeys($str);
+
+		if ($validate) {
+			$this->zbxTestWaitUntilElementValuePresent(WebDriverBy::xpath($xpath), $str);
+		}
 	}
 
 	public function zbxTestInputTypeWait($id, $str) {
@@ -509,6 +513,18 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestWaitUntilElementVisible($by) {
 		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
+	}
+
+	public function zbxTestWaitUntilElementValuePresent($by, $value) {
+		$this->webDriver->wait(20, self::WAIT_ITERATION)->until(
+			function ($driver) use ($by, $value) {
+				try {
+					return $driver->findElement($by)->getAttribute('value') === $value;
+				} catch (StaleElementReferenceException $e) {
+					return null;
+				}
+			}
+		);
 	}
 
 	public function zbxTestWaitUntilElementNotVisible($by) {

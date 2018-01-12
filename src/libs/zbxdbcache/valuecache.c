@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2993,37 +2993,6 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 	vc_try_unlock();
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vc_history_value2str                                         *
- *                                                                            *
- * Purpose: converts history value to string format                           *
- *                                                                            *
- * Parameters: buffer     - [OUT] the output buffer                           *
- *             size       - [IN] the output buffer size                       *
- *             value      - [IN] the value to convert                         *
- *             value_type - [IN] the history value type                       *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value, int value_type)
-{
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(buffer, size, ZBX_FS_DBL, value->dbl);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			zbx_snprintf(buffer, size, ZBX_FS_UI64, value->ui64);
-			break;
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			zbx_strlcpy_utf8(buffer, value->str, size);
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			zbx_strlcpy_utf8(buffer, value->log->value, size);
-	}
 }
 
 /******************************************************************************

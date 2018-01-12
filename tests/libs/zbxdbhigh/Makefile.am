@@ -71,5 +71,7 @@ DBselect_uint64_LDADD = \
 
 DBselect_uint64_LDADD += @SERVER_LIBS@
 
+DBselect_uint64_LDFLAGS = @SERVER_LDFLAGS@
+
 DBselect_uint64_CFLAGS = -I@top_srcdir@/tests
 endif

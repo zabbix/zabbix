@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class CControllerPopupHttpStep extends CController {
 			'pairs' =>				'array',
 			'retrieve_mode' =>		'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS]),
 			'follow_redirects' =>	'in '.implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_ON, HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF]),
-			'timeout' =>			'string',
+			'timeout' =>			'string|not_empty',
 			'required' =>			'string',
 			'status_codes' =>		'string',
 			'templated' =>			'in 0,1',
@@ -95,6 +95,21 @@ class CControllerPopupHttpStep extends CController {
 
 		if ($this->hasInput('validate')) {
 			$output = [];
+
+			// Validate "Timeout" field manually, since it cannot be properly added into MVC validation rules.
+			$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
+			$timeout = $this->getInput('timeout');
+
+			if ($simple_interval_parser->parse($timeout) != CParser::PARSE_SUCCESS) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a time unit is expected')));
+			}
+			elseif ($timeout[0] !== '{') {
+				$seconds = timeUnitToSeconds($timeout);
+
+				if (bccomp($seconds, SEC_PER_HOUR) > 0) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a number is too large')));
+				}
+			}
 
 			// Validate if step names are unique.
 			if (($page_options['stepid'] >= 0 && $page_options['name'] !== $page_options['old_name'])

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -933,8 +933,8 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 						(S_ISFIFO(status.st_mode) && 0 != (types & DET_FIFO))) &&
 						(min_size <= (zbx_uint64_t)status.st_size
 								&& (zbx_uint64_t)status.st_size <= max_size) &&
-						(min_time < status.st_mtim.tv_sec &&
-								status.st_mtim.tv_sec <= max_time))
+						(min_time < status.st_mtime &&
+								status.st_mtime <= max_time))
 				{
 					++count;
 				}

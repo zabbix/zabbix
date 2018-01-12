@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
-#include "zbxself.h"
 #include "comms.h"
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -613,32 +613,6 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
 }
 
 /**
- * Send media form data to server for validation before adding them to user media tab.
- *
- * @param {string} formname		form name that is sent to server for validation
- */
-function validate_media(formname) {
-	var form = window.document.forms[formname];
-
-	jQuery.ajax({
-		url: jQuery(form).attr('action'),
-		data: jQuery(form).serialize(),
-		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
-
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
-			}
-			else {
-				add_media(ret.dstfrm, ret.media, ret.mediatypeid, ret.sendto, ret.period, ret.active, ret.severity);
-			}
-		},
-		dataType: 'json',
-		type: 'post'
-	});
-}
-
-/**
  * Send trigger expression form data to server for validation before adding it to trigger expression field.
  *
  * @param {string} formname		form name that is sent to server for validation
@@ -671,46 +645,6 @@ function validate_trigger_expression(formname, dialogueid) {
 				}
 				else {
 					jQuery(obj).val(ret.expression);
-				}
-
-				if (dialogueid) {
-					overlayDialogueDestroy(dialogueid);
-				}
-			}
-		},
-		dataType: 'json',
-		type: 'post'
-	});
-}
-
-/**
- * Send http test step form data to server for validation before adding it to web scenarion tab.
- *
- * @param {string} formname		form name that is sent to server for validation
- * @param {string} dialogueid	(optional) id of overlay dialogue.
- */
-function validate_httpstep(formname, dialogueid) {
-	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action')),
-		dialogueid = dialogueid || null;
-
-	url.setArgument('validate', 1);
-
-	jQuery.ajax({
-		url: url.getUrl(),
-		data: jQuery(form).serialize(),
-		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
-
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
-			}
-			else {
-				if (typeof ret.params.stepid !== 'undefined') {
-					update_httpstep(ret.dstfrm, ret.list_name, ret.params);
-				}
-				else {
-					add_httpstep(ret.dstfrm, ret.params);
 				}
 
 				if (dialogueid) {
@@ -879,7 +813,10 @@ jQuery.fn.trimValues = function(selectors) {
 
 	jQuery.each(selectors, function(i, value) {
 		obj = jQuery(value, form);
-		obj.val(jQuery.trim(obj.val()));
+
+		jQuery(obj).each(function() {
+			jQuery(this).val(jQuery.trim(jQuery(this).val()));
+		});
 	});
 };
 
