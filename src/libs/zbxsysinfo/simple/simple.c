@@ -109,11 +109,10 @@ lbl_ret:
 
 static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
-	int		ret;
+	int		ret, major, minor;
 	zbx_socket_t	s;
 	char		send_buf[MAX_STRING_LEN];
 	const char	*buf;
-	int		remote_major, remote_minor;
 
 	*value_int = 0;
 
@@ -123,10 +122,9 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 		while (NULL != (buf = zbx_tcp_recv_line(&s)))
 		{
 			/* parse buf for SSH identification string as per RFC 4253, section 4.2 */
-			if (2 == sscanf(buf, "SSH-%d.%d-%*s", &remote_major, &remote_minor))
+			if (2 == sscanf(buf, "SSH-%d.%d-%*s", &major, &minor))
 			{
-				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%d.%d-zabbix_agent\r\n",
-						remote_major, remote_minor);
+				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%d.%d-zabbix_agent\r\n", major, minor);
 				*value_int = 1;
 				break;
 			}
