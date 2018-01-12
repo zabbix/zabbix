@@ -422,6 +422,10 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
  *                                                                            *
  *****************************************************************************/
 #ifdef _WINDOWS
+
+#define		DW2UI64(h,l) 	((zbx_uint64_t)h << 32 | l)
+#define		FT2UT(ft) 	(time_t)(DW2UI64(ft.dwHighDateTime,ft.dwLowDateTime) / 10000000ULL - 11644473600ULL)
+
 int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_info, char **error)
 {
 	HANDLE	file_handle;
@@ -449,23 +453,28 @@ int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_inf
 	return SUCCEED;
 }
 
-int	link_processed(wchar_t *wpath, DWORD *attrib, zbx_vector_ptr_t *descriptors, char **error)
+int	link_processed(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char *path, const char *parent_function_name)
 {
 	BY_HANDLE_FILE_INFORMATION	link_info;
 	zbx_file_descriptor_t		*file;
+	char 				*error;
+	DWORD				attrib;
 
-	if (INVALID_FILE_ATTRIBUTES == (*attrib = GetFileAttributesW(wpath)))
+	if (INVALID_FILE_ATTRIBUTES == (attrib = GetFileAttributesW(wpath)))
 	{
-		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute '%s': %s",
+				parent_function_name, path, strerror_from_system(GetLastError()));
 		return SUCCEED;
 	}
 
-	if (0 != (*attrib & FILE_ATTRIBUTE_REPARSE_POINT))
+	if (0 != (attrib & FILE_ATTRIBUTE_REPARSE_POINT))
 		return SUCCEED;
 
-	if (FAIL == get_file_info_by_handle(wpath, &link_info, error))
+	if (FAIL == get_file_info_by_handle(wpath, &link_info, &error))
 	{
-		*attrib = link_info.dwFileAttributes;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute '%s': %s",
+				parent_function_name, path, error);
+		zbx_free(error);
 		return SUCCEED;
 	}
 
@@ -476,7 +485,7 @@ int	link_processed(wchar_t *wpath, DWORD *attrib, zbx_vector_ptr_t *descriptors,
 		file = (zbx_file_descriptor_t*)zbx_malloc(NULL, sizeof(zbx_file_descriptor_t));
 
 		file->st_dev = link_info.dwVolumeSerialNumber;
-		file->st_ino = (zbx_uint64_t)link_info.nFileIndexHigh << 32 | link_info.nFileIndexLow;
+		file->st_ino = DW2UI64(link_info.nFileIndexHigh, link_info.nFileIndexLow);
 
 		if (FAIL != zbx_vector_ptr_search(descriptors, file, compare_descriptors))
 		{
@@ -495,7 +504,6 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	const char		*__function_name = "vfs_dir_size";
 	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
-	DWORD			attrib_ex;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list;
 	zbx_stat_t		status;
@@ -583,15 +591,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 			wpath = zbx_utf8_to_unicode(path);
 
-			if (SUCCEED == link_processed(wpath, &attrib_ex, &descriptors, &error))
+			if (SUCCEED == link_processed(wpath, &descriptors, path, __function_name))
 			{
-				if (INVALID_FILE_ATTRIBUTES == attrib_ex)
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute '%s': %s",
-							__function_name, path, error);
-					zbx_free(error);
-				}
-
 				zbx_free(wpath);
 				zbx_free(path);
 				zbx_free(name);
@@ -838,8 +839,8 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		char			*name, *error = NULL;
 		wchar_t			*wpath;
-		intptr_t		handle;
-		struct _wfinddata_t	data;
+		HANDLE			handle;
+		WIN32_FIND_DATA		data;
 
 		item = list.values[--list.values_num];
 
@@ -863,10 +864,10 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_free(name);
 
-		handle = _wfindfirst(wpath, &data);
+		handle = FindFirstFileW(wpath, &data);
 		zbx_free(wpath);
 
-		if (-1 == handle)
+		if (INVALID_HANDLE_VALUE == handle)
 		{
 			if (0 < item->depth)
 			{
@@ -884,28 +885,27 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			char	*path;
 			int	match;
-			DWORD 	attrib_ex;
 
-			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
+			if (0 == wcscmp(data.cFileName, L".") || 0 == wcscmp(data.cFileName, L".."))
 				continue;
 
-			name = zbx_unicode_to_utf8(data.name);
+			name = zbx_unicode_to_utf8(data.cFileName);
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 			match = filename_matches(name, regex_incl, regex_excl);
 
-			if (min_size > data.size)
+			if (min_size > DW2UI64(data.nFileSizeHigh, data.nFileSizeLow))
 				match = 0;
 
-			if (max_size < data.size)
+			if (max_size < DW2UI64(data.nFileSizeHigh, data.nFileSizeLow))
 				match = 0;
 
-			if (min_time >= data.time_write)
+			if (min_time >= FT2UT(data.ftLastWriteTime))
 				match = 0;
 
-			if (max_time < data.time_write)
+			if (max_time < FT2UT(data.ftLastWriteTime))
 				match = 0;
 
-			switch (data.attrib & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
+			switch (data.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
 			{
 				case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
 					goto free_path;
@@ -926,16 +926,8 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 					if (0 != (types & DET_FILE) && 0 != match)
 					{
 						wpath = zbx_utf8_to_unicode(path);
-						if (FAIL == link_processed(wpath, &attrib_ex, &descriptors, &error))
-						{
+						if (FAIL == link_processed(wpath, &descriptors, path, __function_name))
 							++count;
-						}
-						else if (INVALID_FILE_ATTRIBUTES == attrib_ex)
-						{
-							zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute "
-									"'%s': %s", __function_name, path, error);
-							zbx_free(error);
-						}
 
 						zbx_free(wpath);
 					}
@@ -945,9 +937,9 @@ free_path:
 
 			zbx_free(name);
 
-		} while (0 == _wfindnext(handle, &data));
+		} while (0 != FindNextFile(handle, &data));
 
-		if (-1 == _findclose(handle))
+		if (0 == FindClose(handle))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot close directory listing '%s': %s", __function_name,
 					item->path, zbx_strerror(errno));
