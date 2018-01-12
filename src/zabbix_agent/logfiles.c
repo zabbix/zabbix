@@ -555,7 +555,7 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
  *                          1 - use up to 64-bit inodes in comparison,        *
  *                          2 - use 128-bit inodes in comparison.             *
  *          err_msg  - [IN/OUT] error message why an item became              *
- *                    NOTSUPPORTED                                            *
+ *                     NOTSUPPORTED                                           *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
  *               ZBX_SAME_FILE_YES - it could be the same file,               *
