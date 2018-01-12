@@ -1,5 +1,5 @@
 ---
-test case: "#1.1 successfully read"
+test case: "#1.1 successfully read 'bytes'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -14,7 +14,7 @@ out:
 
 
 ---
-test case: "#1.2 successfully read"
+test case: "#1.2 successfully read 'packets'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -29,7 +29,7 @@ out:
 
 
 ---
-test case: "#1.3 successfully read"
+test case: "#1.3 successfully read 'errors'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -44,7 +44,7 @@ out:
 
 
 ---
-test case: "#1.4 successfully read"
+test case: "#1.4 successfully read 'dropped'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -59,7 +59,7 @@ out:
 
 
 ---
-test case: "#1.5 successfully read"
+test case: "#1.5 successfully read 'overruns'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -74,7 +74,7 @@ out:
 
 
 ---
-test case: "#1.6 successfully read"
+test case: "#1.6 successfully read 'frame'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -89,7 +89,7 @@ out:
 
 
 ---
-test case: "#1.7 successfully read"
+test case: "#1.7 successfully read 'compressed'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -104,7 +104,7 @@ out:
 
 
 ---
-test case: "#1.8 successfully read"
+test case: "#1.8 successfully read 'multicast'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -119,7 +119,7 @@ out:
 
 
 ---
-test case: "#2.1 unsuccessfully read"
+test case: "#2.1 unsuccessfully read 'Too many parameters.'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -134,7 +134,7 @@ out:
 
 
 ---
-test case: "#2.2 unsuccessfully read"
+test case: "#2.2 unsuccessfully read 'Cannot find information'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -149,7 +149,7 @@ out:
 
 
 ---
-test case: "#2.3 unsuccessfully read"
+test case: "#2.3 unsuccessfully read 'Invalid second parameter.'"
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
