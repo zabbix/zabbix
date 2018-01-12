@@ -315,6 +315,30 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'proxies':
+				$proxies = API::Proxy()->get([
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
+					'output' => ['proxyid', 'host'],
+					'search' => isset($data['search']) ? ['host' => $data['search']] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($proxies) {
+					CArrayHelper::sort($proxies, ['host']);
+
+					if (isset($data['limit'])) {
+						$proxies = array_slice($proxies, 0, $data['limit']);
+					}
+
+					foreach ($proxies as $proxy) {
+						$result[] = [
+							'id' => $proxy['proxyid'],
+							'name' => $proxy['host']
+						];
+					}
+				}
+				break;
+
 			case 'applications':
 				$applications = API::Application()->get([
 					'hostids' => zbx_toArray($data['hostid']),

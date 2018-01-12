@@ -42,81 +42,100 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hosts' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groups' =>			[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'new_groups' =>		[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'remove_groups' =>	[T_ZBX_STR, O_OPT, P_SYS,			DB_ID,		null],
-	'hostids' =>		[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groupids' =>		[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'applications' =>	[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
-	'clone_hostid' =>	[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "full_clone"'],
-	'host' =>			[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
-	'visiblename' =>	[T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'],
-	'description' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
-	'proxy_hostid' =>	[T_ZBX_INT, O_OPT, P_SYS,		    DB_ID,		null],
-	'status' =>			[T_ZBX_INT, O_OPT, null,			IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null],
-	'newgroup' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
-	'interfaces' =>		[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')],
-	'mainInterfaces' =>	[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'add_template' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
-	'add_templates' => [T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'templates_rem' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'clear_templates' => [T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'ipmi_authtype' =>	[T_ZBX_INT, O_OPT, null,			BETWEEN(-1, 6), null],
-	'ipmi_privilege' =>	[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null],
-	'ipmi_username' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
-	'ipmi_password' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
-	'tls_connect' =>	[T_ZBX_INT, O_OPT, null,
-		IN([HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]), null],
-	'tls_accept' =>		[T_ZBX_INT, O_OPT, null,
-		BETWEEN(0, (HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)), null],
-	'tls_subject' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
-	'tls_issuer' =>		[T_ZBX_STR, O_OPT, null,		null,		null],
-	'tls_psk_identity' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
-	'tls_psk' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
-	'flags' =>			[T_ZBX_INT, O_OPT, null,
-		IN([ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null],
-	'mass_replace_tpls' => [T_ZBX_STR, O_OPT, null,		null,		null],
-	'mass_clear_tpls' => [T_ZBX_STR, O_OPT, null,			null,		null],
-	'inventory_mode' => [T_ZBX_INT, O_OPT, null,
-		IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC), null],
-	'host_inventory' =>	[T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null],
-	'macros' =>			[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'visible' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
-	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'hosts' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'groups' =>					[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'new_groups' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'remove_groups' =>			[T_ZBX_STR, O_OPT, P_SYS,			DB_ID,		null],
+	'hostids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'groupid' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
+	'clone_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,
+									'isset({form}) && {form} == "full_clone"'
+								],
+	'host' =>					[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})',
+									_('Host name')
+								],
+	'visiblename' =>			[T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'],
+	'description' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'proxy_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,		    DB_ID,		null],
+	'status' =>					[T_ZBX_INT, O_OPT, null,
+									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
+								],
+	'newgroup' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
+									'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')
+								],
+	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'add_template' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'templates_rem' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'clear_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'ipmi_authtype' =>			[T_ZBX_INT, O_OPT, null,			BETWEEN(-1, 6), null],
+	'ipmi_privilege' =>			[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null],
+	'ipmi_username' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'ipmi_password' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'tls_connect' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
+									null
+								],
+	'tls_accept' =>				[T_ZBX_INT, O_OPT, null,
+									BETWEEN(0,
+										(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)
+									),
+									null
+								],
+	'tls_subject' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'tls_issuer' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'tls_psk_identity' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
+	'tls_psk' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'flags' =>					[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null
+								],
+	'mass_replace_tpls' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
+	'mass_clear_tpls' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
+	'inventory_mode' =>			[T_ZBX_INT, O_OPT, null,
+									IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC),
+									null
+								],
+	'host_inventory' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null],
+	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'visible' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	// actions
-	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-							IN('"host.export","host.massdelete","host.massdisable","host.massenable","host.massupdate"'.
-								',"host.massupdateform"'
-							),
-							null
-						],
-	'add_to_group' =>	[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null],
-	'delete_from_group' => [T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null],
-	'unlink' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'unlink_and_clear' => [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'masssave' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'clone' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'full_clone' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
-	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
-	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,		null,			null],
+	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+									IN('"host.export","host.massdelete","host.massdisable",'.
+										'"host.massenable","host.massupdate","host.massupdateform"'
+									),
+									null
+								],
+	'add_to_group' =>			[T_ZBX_INT, O_OPT, P_SYS|P_ACT,		DB_ID,		null],
+	'delete_from_group' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,		DB_ID,		null],
+	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'unlink_and_clear' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'masssave' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'full_clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,			null,		null],
 	// filter
-	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
-	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
-	'filter_host' =>	[T_ZBX_STR, O_OPT, null,		null,			null],
-	'filter_ip' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
-	'filter_dns' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
-	'filter_port' =>	[T_ZBX_STR, O_OPT, null,		null,			null],
+	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'filter_host' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_ip' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_monitored_by' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_proxyids' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
 	// sort and sortorder
-	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
-	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
+	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -167,6 +186,10 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.hosts.filter_dns', getRequest('filter_dns', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_host', getRequest('filter_host', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_port', getRequest('filter_port', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter.monitored_by', getRequest('filter_monitored_by', ZBX_MONITORED_BY_ALL),
+		PROFILE_TYPE_STR
+	);
+	CProfile::updateArray('web.hosts.filter.proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -174,6 +197,8 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.hosts.filter_dns');
 	CProfile::delete('web.hosts.filter_host');
 	CProfile::delete('web.hosts.filter_port');
+	CProfile::delete('web.hosts.filter.monitored_by');
+	CProfile::deleteIdx('web.hosts.filter.proxyids');
 	DBend();
 }
 
@@ -181,6 +206,8 @@ $filter['ip'] = CProfile::get('web.hosts.filter_ip', '');
 $filter['dns'] = CProfile::get('web.hosts.filter_dns', '');
 $filter['host'] = CProfile::get('web.hosts.filter_host', '');
 $filter['port'] = CProfile::get('web.hosts.filter_port', '');
+$filter['monitored_by'] = CProfile::get('web.hosts.filter.monitored_by', ZBX_MONITORED_BY_ALL);
+$filter['proxyids'] = CProfile::getArray('web.hosts.filter.proxyids', []);
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
 $macros = cleanInheritedMacros(getRequest('macros', []));
@@ -1239,8 +1266,13 @@ else {
 				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
 			],
 			'filter' => [
-				'port' => ($filter['port'] === '') ? null : $filter['port']
-			]
+				'port' => ($filter['port'] === '') ? null : $filter['port'],
+			],
+			'proxyids' => ($filter['monitored_by'] == ZBX_MONITORED_BY_PROXY)
+								? $filter['proxyids']
+									? $filter['proxyids']
+									: null
+								: null
 		]);
 	}
 	order_result($hosts, $sortField, $sortOrder);
@@ -1320,6 +1352,23 @@ else {
 		]);
 	}
 
+	// Prepare data for multiselect and remove unexisting proxies.
+	$proxies_ms = [];
+	if ($filter['proxyids']) {
+		$filter_proxies = API::Proxy()->get([
+			'output' => ['proxyid', 'host'],
+			'proxyids' => $filter['proxyids'],
+			'preservekeys' => true
+		]);
+
+		foreach ($filter_proxies as $proxy) {
+			$proxies_ms[] = [
+				'id' => $proxy['proxyid'],
+				'name' => $proxy['host']
+			];
+		}
+	}
+
 	$data = [
 		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
@@ -1331,7 +1380,8 @@ else {
 		'config' => $config,
 		'templates' => $templates,
 		'writable_templates' => $writable_templates,
-		'proxies' => $proxies
+		'proxies' => $proxies,
+		'proxies_ms' => $proxies_ms
 	];
 
 	$hostView = new CView('configuration.host.list', $data);
