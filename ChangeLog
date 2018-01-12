@@ -3,6 +3,7 @@ Changes for 4.0.0alpha3
 New features:
 
 Bug fixes:
+...G...... [ZBX-11422] fixed compilation warnings under OS X 64bit (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha2

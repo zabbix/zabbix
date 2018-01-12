@@ -97,9 +97,15 @@ typedef __int64	zbx_offset_t;
 
 #	define zbx_uint64_t	uint64_t
 #	if __WORDSIZE == 64
-#		define ZBX_FS_UI64	"%lu"
-#		define ZBX_FS_UO64	"%lo"
-#		define ZBX_FS_UX64	"%lx"
+#		if defined(__APPLE__) && defined(__MACH__)	/* OS X */
+#			define ZBX_FS_UI64	"%llu"
+#			define ZBX_FS_UO64	"%llo"
+#			define ZBX_FS_UX64	"%llx"
+#		else
+#			define ZBX_FS_UI64	"%lu"
+#			define ZBX_FS_UO64	"%lo"
+#			define ZBX_FS_UX64	"%lx"
+#		endif
 #	else
 #		ifdef HAVE_LONG_LONG_QU
 #			define ZBX_FS_UI64	"%qu"
@@ -114,9 +120,15 @@ typedef __int64	zbx_offset_t;
 
 #	define zbx_int64_t	int64_t
 #	if __WORDSIZE == 64
-#		define ZBX_FS_I64	"%ld"
-#		define ZBX_FS_O64	"%lo"
-#		define ZBX_FS_X64	"%lx"
+#		if defined(__APPLE__) && defined(__MACH__)	/* OS X */
+#			define ZBX_FS_I64	"%lld"
+#			define ZBX_FS_O64	"%llo"
+#			define ZBX_FS_X64	"%llx"
+#		else
+#			define ZBX_FS_I64	"%ld"
+#			define ZBX_FS_O64	"%lo"
+#			define ZBX_FS_X64	"%lx"
+#		endif
 #	else
 #		ifdef HAVE_LONG_LONG_QU
 #			define ZBX_FS_I64	"%qd"
