@@ -30,17 +30,17 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	init_param_handle;
 	const char		*init_param;
-	zbx_mock_handle_t	expected_param_value_handle, expected_return_handle;
+	zbx_mock_handle_t	param_handle;
 	const char		*expected_param_value_string, *expected_return_string;
 	zbx_uint64_t 		expected_param_value = 0;
 	int			expected_result = FAIL, actual_result = FAIL;
 
 	ZBX_UNUSED(state);
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("return", &expected_return_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(expected_return_handle,&expected_return_string)))
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("return", &param_handle)) ||
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&expected_return_string)))
 	{
-		fail_msg("Cannot get expected 'return' parametr from test case data: %s", zbx_mock_error_string(error));
+		fail_msg("Can't get expected 'return' parameter from test case data:%s", zbx_mock_error_string(error));
 	}
 	else
 	{
@@ -52,15 +52,14 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Get unexpected 'return' parameter from test case data: %s", expected_return_string);
 	}
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("param", &init_param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(init_param_handle, &init_param)))
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("param", &param_handle)) ||
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &init_param)))
 	{
 		fail_msg("Cannot get input 'param' from test case data: %s", zbx_mock_error_string(error));
 	}
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("result", &expected_param_value_handle)) ||
-		ZBX_MOCK_SUCCESS != (error = zbx_mock_string(
-			expected_param_value_handle, &expected_param_value_string)))
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("result", &param_handle)) ||
+		ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expected_param_value_string)))
 	{
 		fail_msg("Cannot get expected 'result' parameters from test case data: %s",
 				zbx_mock_error_string(error));
@@ -77,7 +76,8 @@ void	zbx_mock_test_entry(void **state)
 
 	init_request(&request);
 	init_result(&param_result);
-	parse_item_key(init_param, &request);
+	if (SUCCEED != parse_item_key(init_param, &request))
+		fail_msg("Invalid parse_item_key() for key: %s", init_param);
 
 	if (expected_result != (actual_result = NET_IF_IN(&request,&param_result)))
 	{
