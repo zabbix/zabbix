@@ -1575,7 +1575,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 					continue;
 				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
 					expect = ZBX_TCP_EXPECT_CLOSE;
-				else
+				else	/* not possible to determine end of message */
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header and"
 							" data length. Message ignored.", s->peer);
@@ -1589,7 +1589,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 					expect = ZBX_TCP_EXPECT_LENGTH;
 				else if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
 					expect = ZBX_TCP_EXPECT_CLOSE;
-				else
+				else	/* not possible to determine end of message */
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header and"
 							" data length. Message ignored.", s->peer);
@@ -1637,22 +1637,15 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 
 			if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 				break;
-
-			continue;
 		}
-
-		if (sizeof(s->buf_stat) == buf_stat_bytes)
+		else if (sizeof(s->buf_stat) == buf_stat_bytes)	/* ZBX_TCP_EXPECT_CLOSE */
 		{
 			s->buf_type = ZBX_BUF_TYPE_DYN;
 			s->buffer = (char *)zbx_malloc(NULL, allocated);
 			buf_dyn_bytes = sizeof(s->buf_stat);
 			buf_stat_bytes = 0;
 			memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
-			continue;
 		}
-
-		if (sizeof(s->buf_stat) == nbytes)
-			continue;
 	}
 
 	if (ZBX_TCP_EXPECT_SIZE == expect)
