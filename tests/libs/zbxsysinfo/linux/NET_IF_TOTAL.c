@@ -40,7 +40,8 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("return", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&expected_return_string)))
 	{
-		fail_msg("Can't get expected 'return' parameter from test case data:%s", zbx_mock_error_string(error));
+		fail_msg("Cannot get expected 'return' parameter from test case data: %s",
+				zbx_mock_error_string(error));
 	}
 	else
 	{
@@ -77,7 +78,7 @@ void	zbx_mock_test_entry(void **state)
 	init_request(&request);
 	init_result(&param_result);
 	if (SUCCEED != parse_item_key(init_param, &request))
-		fail_msg("Invalid parse_item_key() for key: %s", init_param);
+		fail_msg("Cannot parse item key: %s", init_param);
 
 	if (expected_result != (actual_result = NET_IF_TOTAL(&request,&param_result)))
 	{
