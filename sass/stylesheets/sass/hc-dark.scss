@@ -12,7 +12,7 @@ $green: #23d545;
 $light-green: #23d545;
 $lighter-green: #44e763;
 
-$blue: #429ae3;
+$blue: white;
 
 $white: #000 !important;
 
@@ -260,9 +260,18 @@ ul.top-nav-icons {
 
 // COLORS AND GENERAL
 
+button {
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, 1));
+	}
+}
+
 .radio-segmented {
 	input[type="radio"] {
-
+			&:focus + label {
+				border-color: $form-border-focus-color !important;
+				background-color: $link-hover-color !important;
+			}
 		&:checked[disabled] + label {
 			background-color: #595959 !important;
 		}
@@ -279,6 +288,9 @@ a {
 	&:hover {
 		border-bottom: 1px solid $link-hover-color;
 	}
+	&:focus {
+		border-bottom: 3px solid $link-hover-color;
+	}
 }
 
 .link-action {
@@ -290,6 +302,10 @@ a {
 	&:active {
 		color: $link-hover-color;
 		border-bottom: 1px dotted $link-hover-color;
+	}
+	&:focus {
+		color: $link-hover-color;
+		border-bottom: 3px solid $link-hover-color;
 	}
 }
 
@@ -309,7 +325,7 @@ a {
 
 	&:focus {
 		color: $link-hover-color;
-		border-bottom: 1px solid $link-hover-color;
+		border-bottom: 3px solid $link-hover-color;
 	}
 
 	&:active {
@@ -318,10 +334,32 @@ a {
 	}
 }
 
+.top-nav {
+	a {
+		&:focus {
+			color: $link-main-nav-active-color;
+			background-color: lighten($ui-hover-color, 10%) !important;
+		}
+	}
+}
+
 .top-subnav a {
 	&.selected {
 		font-weight: bold;
 		border-bottom: 4px solid #000 !important;
+	}
+	&:focus {
+		border-bottom: 4px solid rgba($ui-hover-color, .7) !important;
+		outline: none;
+	}
+}
+
+ul.top-nav-icons {
+	a {
+		&:focus {
+			background-color: lighten($ui-hover-color, 10%) !important;
+			@include opacity(1);
+		}
 	}
 }
 
@@ -337,6 +375,10 @@ a {
 .btn-link {
 	font-weight: bold !important;
 	color: #fff !important;
+
+	&:focus {
+		border-bottom: 3px solid $link-hover-color !important;
+	}
 }
 
 .paging-selected {
@@ -368,6 +410,30 @@ a {
 .disabled {
 	@include opacity(0.6);
 }
+
+.multiselect {
+	.multiselect-list {
+		padding-left: 2px;
+		padding-bottom: 2px;
+
+		li {
+
+			&.selected {
+
+				.subfilter-enabled {
+					background-color: $ui-hover-color !important;
+					@include box-shadow(0 0 0 1px rgba($blue, 1));
+				}
+
+				.subfilter-disable-btn {
+					background-color: $ui-hover-color !important;
+					@include box-shadow(0 0 0 1px rgba($blue, 1));
+				}
+			}
+		}
+	}
+}
+
 
 // SEVERITY STATUSES
 td.log-na-bg {

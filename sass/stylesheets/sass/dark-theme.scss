@@ -141,3 +141,10 @@ $clock-lines-color: #4f4f4f;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+.top-subnav a {
+	&:focus {
+		border-bottom: 4px solid lighten($main-nav-bg-color, 30%) !important;
+		outline: none;
+	}
+}

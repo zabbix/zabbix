@@ -42,7 +42,8 @@ a {
 	&:focus {
 		position: relative;
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.35);
 	}
 
 	&:active {
@@ -95,6 +96,12 @@ svg a {
 	&:active {
 		@extend %link-action-style;
 	}
+
+	&:focus {
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.35);
+
+	}
 }
 
 %link-action-style {
@@ -121,7 +128,8 @@ svg a {
 
 	&:focus {
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.35);
 	}
 
 	&:active {
@@ -312,7 +320,7 @@ nav {
 
 		&:focus {
 			color: $link-main-nav-active-color;
-			background-color: $ui-hover-color;
+			background-color: $ui-hover-color !important;
 		}
 
 		&:active {
@@ -453,6 +461,9 @@ ul.top-nav-icons {
 
 	&:focus {
 		color: $link-main-subnav-active-color;
+		padding: 8px 0 4px 0;
+		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
+		outline: none;
 	}
 
 	&:active {
@@ -1673,12 +1684,12 @@ footer {
 			}
 		}
 
-		&:focus + label {
-			border-color: $form-border-focus-color;
-			background-color: $btn-form-hover-color;
-			position: relative;
-			z-index: 2;
-		}
+			&:focus + label {
+				border-color: $form-border-focus-color;
+				background-color: $btn-form-hover-color;
+				position: relative;
+				z-index: 2;
+			}
 
 		&:checked + label {
 			color: $white;
@@ -1689,7 +1700,7 @@ footer {
 		}
 
 		&:checked:focus + label {
-			border-color: $form-border-focus-color;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 			position: relative;
 			z-index: 2;
 		}
@@ -2010,6 +2021,7 @@ button {
 	&:focus {
 		@include box-shadow(0 0 0 2px rgba($blue, .35));
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
 	}
 
 	&:active {
@@ -2093,6 +2105,7 @@ button {
 }
 
 .btn-link {
+	position: relative;
 	background-color: $transparent;
 	border: none;
 	color: $link-color;
@@ -2108,6 +2121,11 @@ button {
 
 	&:focus {
 		@extend .btn-link;
+		outline: none;
+		border-bottom: 3px solid rgba($link-hover-color, 0.5);
+		-webkit-box-shadow: 0 0 0 0px !important;
+		-moz-box-shadow: 0 0 0 0px !important;
+		box-shadow: 0 0 0 0px !important;
 	}
 
 	&:active {
@@ -4868,6 +4886,13 @@ svg {
 					.import-items-btn:hover,
 					.add-child-btn:hover {
 						opacity: 1;
+					}
+					.edit-item-btn:focus,
+					.remove-item-btn:focus,
+					.import-items-btn:focus,
+					.add-child-btn:focus {
+						opacity: 1;
+						outline: none;
 					}
 					.add-child-btn {
 						background: url(../img/icon-sprite.svg) no-repeat -47px -551px;
