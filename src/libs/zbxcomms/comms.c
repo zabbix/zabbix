@@ -1499,7 +1499,7 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 #endif
 	do
 	{
-		res = ZBX_TCP_READ(s->socket, buf, 1);
+		res = ZBX_TCP_READ(s->socket, buf, len);
 #ifdef _WINDOWS
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
