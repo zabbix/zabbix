@@ -1631,7 +1631,12 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 
 	if (ZBX_TCP_EXPECT_SIZE == expect)
 	{
-		if (buf_stat_bytes + buf_dyn_bytes != expected_len)
+		if (buf_stat_bytes + buf_dyn_bytes == expected_len)
+		{
+			s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
+			s->buffer[s->read_bytes] = '\0';
+		}
+		else
 		{
 			if (buf_stat_bytes + buf_dyn_bytes < expected_len)
 			{
@@ -1645,24 +1650,18 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			}
 
 			nbytes = ZBX_PROTO_ERROR;
-			goto out;
 		}
 	}
 	else if (ZBX_TCP_EXPECT_LENGTH == expect)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing data length. Message ignored.", s->peer);
 		nbytes = ZBX_PROTO_ERROR;
-		goto out;
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header. Message ignored.", s->peer);
 		nbytes = ZBX_PROTO_ERROR;
-		goto out;
 	}
-
-	s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
-	s->buffer[s->read_bytes] = '\0';
 out:
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
