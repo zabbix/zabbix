@@ -462,6 +462,9 @@ int	link_processed(DWORD attrib, wchar_t *wpath, zbx_vector_ptr_t *descriptors, 
 	if (0 != (attrib & FILE_ATTRIBUTE_REPARSE_POINT))
 		return SUCCEED;
 
+	if (0 != (attrib & FILE_ATTRIBUTE_DIRECTORY))
+		return FAIL;
+
 	if (FAIL == get_file_info_by_handle(wpath, &link_info, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get handle file information '%s': %s",
@@ -583,20 +586,19 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 			wpath = zbx_utf8_to_unicode(path);
 
+			if (SUCCEED == link_processed(data.dwFileAttributes, wpath, &descriptors, path))
+			{
+				zbx_free(wpath);
+				zbx_free(path);
+				zbx_free(name);
+				continue;
+			}
+
 			if (0 == (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))	/* not a directory */
 			{
 				if (0 != filename_matches(name, regex_incl, regex_excl))
 				{
 					DWORD	size_high, size_low;
-
-					if (SUCCEED == link_processed(data.dwFileAttributes, wpath, &descriptors,
-							path))
-					{
-						zbx_free(wpath);
-						zbx_free(path);
-						zbx_free(name);
-						continue;
-					}
 
 					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
 					/* compressed files */
