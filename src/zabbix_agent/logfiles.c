@@ -978,10 +978,9 @@ static int	is_old2new_unique_mapping(const char * const old2new, int num_old, in
  * Purpose: resolve non-unique mappings                                       *
  *                                                                            *
  * Parameters:                                                                *
- *     rotation_type - [IN] file rotation type                                *
- *           old2new - [IN] two dimensional array of possible mappings        *
- *           num_old - [IN] number of elements in the old file list           *
- *           num_new - [IN] number of elements in the new file list           *
+ *     old2new - [IN] two dimensional array of possible mappings              *
+ *     num_old - [IN] number of elements in the old file list                 *
+ *     num_new - [IN] number of elements in the new file list                 *
  *                                                                            *
  ******************************************************************************/
 static void	resolve_old2new(char *old2new, int num_old, int num_new)
