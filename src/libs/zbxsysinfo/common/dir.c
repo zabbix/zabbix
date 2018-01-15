@@ -436,7 +436,6 @@ int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_inf
 	if (INVALID_HANDLE_VALUE == file_handle)
 	{
 		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
-		link_info->dwFileAttributes = INVALID_FILE_ATTRIBUTES;
 		return FAIL;
 	}
 
@@ -444,7 +443,6 @@ int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_inf
 	{
 		CloseHandle(file_handle);
 		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
-		link_info->dwFileAttributes = INVALID_FILE_ATTRIBUTES;
 		return FAIL;
 	}
 
