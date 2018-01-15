@@ -1499,7 +1499,7 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 #endif
 	do
 	{
-		res = ZBX_TCP_READ(s->socket, buf, len);
+		res = ZBX_TCP_READ(s->socket, buf, 1);
 #ifdef _WINDOWS
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
@@ -1655,13 +1655,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			nbytes = ZBX_PROTO_ERROR;
 			goto out;
 		}
-	}
-	else if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is longer than " ZBX_FS_UI64 " bytes allowed for"
-				" plain text. Message ignored.", s->peer, expected_len);
-		nbytes = ZBX_PROTO_ERROR;
-		goto out;
 	}
 
 	s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
