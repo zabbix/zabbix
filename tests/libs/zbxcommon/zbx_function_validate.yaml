@@ -1,0 +1,13 @@
+---
+test case: "successfully read"
+in:
+  param: 'last(123,"grpsum[\"{$MYGROUP}\",\"ckey3\",last]")'
+out:
+  return: 'SUCCEED'
+---
+test case: "unsuccessfully read"
+in:
+  param: 'last(123,"grpsum[\"{$MYGROUP}\",\"ckey3\",last"])'
+out:
+  error: 'Incorrect function ''last'' expression. Check expression part starting from "grpsum[\"{$MYGROUP}\",\"ckey3\",last"'
+  return: 'FAIL'
