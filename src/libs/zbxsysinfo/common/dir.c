@@ -589,19 +589,19 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 			wpath = zbx_utf8_to_unicode(path);
 
-			if (SUCCEED == link_processed(wpath, &descriptors, path, __function_name))
-			{
-				zbx_free(wpath);
-				zbx_free(path);
-				zbx_free(name);
-				continue;
-			}
-
 			if (0 == (data.attrib & _A_SUBDIR))	/* not a directory */
 			{
 				if (0 != filename_matches(name, regex_incl, regex_excl))
 				{
 					DWORD	size_high, size_low;
+
+					if (SUCCEED == link_processed(wpath, &descriptors, path, __function_name))
+					{
+						zbx_free(wpath);
+						zbx_free(path);
+						zbx_free(name);
+						continue;
+					}
 
 					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
 					/* compressed files */
