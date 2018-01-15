@@ -3798,6 +3798,7 @@ static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *pa
 		return SUCCEED;
 	}
 
+	*last_parse_offset += par_l + 1;
 	return FAIL;
 }
 
@@ -3841,7 +3842,10 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  *                         characters can be safely skipped                   *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
+#ifndef ZBXCMOCKA
+	static
+#endif
+int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 			char *error, int max_error_len)
 {
 	size_t	last_parse_param_offset, last_parse_param_len;
@@ -3899,7 +3903,12 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 
 		/* try to validate function candidate */
 		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r, error, max_error_len))
+		{
+			if (*par_l > *par_r)
+				return FAIL;
+
 			continue;
+		}
 
 		*func_pos = ptr - expr;
 		*par_l += *func_pos;
