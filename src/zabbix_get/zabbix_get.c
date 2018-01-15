@@ -240,7 +240,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&s, key)))
 		{
-			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, 0, 0)))
+			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, 0)))
 			{
 				if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED) && sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
 				{
