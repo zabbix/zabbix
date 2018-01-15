@@ -1557,7 +1557,17 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 		if (ZBX_BUF_TYPE_STAT == s->buf_type)
 			buf_stat_bytes += nbytes;
 		else
-			zbx_strncpy_alloc(&s->buffer, &allocated, &buf_dyn_bytes, s->buf_stat, nbytes);
+		{
+			if (buf_dyn_bytes + nbytes >= allocated)
+			{
+				while (buf_dyn_bytes + nbytes >= allocated)
+					allocated *= 2;
+				s->buffer = (char *)zbx_realloc(s->buffer, allocated);
+			}
+
+			memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, nbytes);
+			buf_dyn_bytes += nbytes;
+		}
 
 		if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 			break;
