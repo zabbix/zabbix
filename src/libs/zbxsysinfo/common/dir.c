@@ -451,8 +451,9 @@ int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_inf
 	return SUCCEED;
 }
 
-int	link_processed(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char *path, const char *parent_function_name)
+int	link_processed(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char *path)
 {
+	const char			*__function_name = "link_processed";
 	BY_HANDLE_FILE_INFORMATION	link_info;
 	zbx_file_descriptor_t		*file;
 	char 				*error;
@@ -461,7 +462,7 @@ int	link_processed(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char *path, co
 	if (INVALID_FILE_ATTRIBUTES == (attrib = GetFileAttributesW(wpath)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute '%s': %s",
-				parent_function_name, path, strerror_from_system(GetLastError()));
+				__function_name, path, strerror_from_system(GetLastError()));
 		return SUCCEED;
 	}
 
@@ -471,7 +472,7 @@ int	link_processed(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char *path, co
 	if (FAIL == get_file_info_by_handle(wpath, &link_info, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get handle file information '%s': %s",
-				parent_function_name, path, error);
+				__function_name, path, error);
 		zbx_free(error);
 		return SUCCEED;
 	}
@@ -595,7 +596,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 				{
 					DWORD	size_high, size_low;
 
-					if (SUCCEED == link_processed(wpath, &descriptors, path, __function_name))
+					if (SUCCEED == link_processed(wpath, &descriptors, path))
 					{
 						zbx_free(wpath);
 						zbx_free(path);
@@ -924,7 +925,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 					if (0 != (types & DET_FILE) && 0 != match)
 					{
 						wpath = zbx_utf8_to_unicode(path);
-						if (FAIL == link_processed(wpath, &descriptors, path, __function_name))
+						if (FAIL == link_processed(wpath, &descriptors, path))
 							++count;
 
 						zbx_free(wpath);
