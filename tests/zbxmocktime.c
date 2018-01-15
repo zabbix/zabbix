@@ -314,7 +314,7 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 	int				err, sec, ns, tz, components = 0;
 	const char			*ptr, *pnext;
 	struct tm			tm;
-	zbx_mock_time_parser_state_t	state;
+	zbx_mock_time_parser_state_t	state = ZBX_TOKEN_START;
 
 	for (ptr = strtime; '\0' != *ptr;)
 	{
