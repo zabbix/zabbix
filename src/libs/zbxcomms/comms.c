@@ -1537,7 +1537,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 #define ZBX_TCP_EXPECT_SIZE	3
 
 	ssize_t		nbytes;
-	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0, header_bytes = 0;
+	size_t		allocated, buf_dyn_bytes = 0, buf_stat_bytes = 0, header_bytes = 0;
 	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
 
@@ -1558,14 +1558,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			buf_stat_bytes += nbytes;
 		else
 		{
-			if (buf_dyn_bytes + nbytes >= allocated)
-			{
-				while (buf_dyn_bytes + nbytes >= allocated)
-					allocated *= 2;
-				s->buffer = (char *)zbx_realloc(s->buffer, allocated);
-			}
-
-			memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, nbytes);
+			if (buf_dyn_bytes + nbytes <= expected_len)
+				memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, nbytes);
 			buf_dyn_bytes += nbytes;
 		}
 
@@ -1627,6 +1621,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			else
 			{
 				s->buf_type = ZBX_BUF_TYPE_DYN;
+				allocated = expected_len + 1;
 				s->buffer = (char *)zbx_malloc(NULL, allocated);
 				buf_dyn_bytes = buf_stat_bytes - ZBX_TCP_HEADER_LEN - sizeof(zbx_uint64_t);
 				buf_stat_bytes = 0;
