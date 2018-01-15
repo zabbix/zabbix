@@ -1576,22 +1576,14 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 				if (0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, buf_stat_bytes))
 					continue;
 
-				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header and"
-						" data length. Message ignored.", s->peer);
-				nbytes = ZBX_PROTO_ERROR;
-				goto out;
+				break;
 			}
 			else
 			{
 				if (0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 					expect = ZBX_TCP_EXPECT_LENGTH;
 				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header and"
-							" data length. Message ignored.", s->peer);
-					nbytes = ZBX_PROTO_ERROR;
-					goto out;
-				}
+					break;
 			}
 		}
 
@@ -1655,6 +1647,18 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			nbytes = ZBX_PROTO_ERROR;
 			goto out;
 		}
+	}
+	else if (ZBX_TCP_EXPECT_LENGTH == expect)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing data length. Message ignored.", s->peer);
+		nbytes = ZBX_PROTO_ERROR;
+		goto out;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header. Message ignored.", s->peer);
+		nbytes = ZBX_PROTO_ERROR;
+		goto out;
 	}
 
 	s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
