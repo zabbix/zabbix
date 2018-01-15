@@ -451,21 +451,14 @@ int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_inf
 	return SUCCEED;
 }
 
-int	link_processed(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char *path)
+int	link_processed(DWORD attrib, wchar_t *wpath, zbx_vector_ptr_t *descriptors, char *path)
 {
 	const char			*__function_name = "link_processed";
 	BY_HANDLE_FILE_INFORMATION	link_info;
 	zbx_file_descriptor_t		*file;
 	char 				*error;
-	DWORD				attrib;
 
-	if (INVALID_FILE_ATTRIBUTES == (attrib = GetFileAttributesW(wpath)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute '%s': %s",
-				__function_name, path, strerror_from_system(GetLastError()));
-		return SUCCEED;
-	}
-
+	/* Behavior like MS file explorer */
 	if (0 != (attrib & FILE_ATTRIBUTE_REPARSE_POINT))
 		return SUCCEED;
 
@@ -530,8 +523,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		char			*name, *error = NULL;
 		wchar_t			*wpath;
 		zbx_uint64_t		cluster_size = 0;
-		intptr_t		handle;
-		struct _wfinddata_t	data;
+		HANDLE			handle;
+		WIN32_FIND_DATA		data;
 
 		item = list.values[--list.values_num];
 
@@ -555,10 +548,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_free(name);
 
-		handle = _wfindfirst(wpath, &data);
+		handle = FindFirstFile(wpath, &data);
 		zbx_free(wpath);
 
-		if (-1 == handle)
+		if (INVALID_HANDLE_VALUE == handle)
 		{
 			if (0 < item->depth)
 			{
@@ -583,20 +576,21 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			char	*path;
 
-			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
+			if (0 == wcscmp(data.cFileName, L".") || 0 == wcscmp(data.cFileName, L".."))
 				continue;
 
-			name = zbx_unicode_to_utf8(data.name);
+			name = zbx_unicode_to_utf8(data.cFileName);
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 			wpath = zbx_utf8_to_unicode(path);
 
-			if (0 == (data.attrib & _A_SUBDIR))	/* not a directory */
+			if (0 == (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))	/* not a directory */
 			{
 				if (0 != filename_matches(name, regex_incl, regex_excl))
 				{
 					DWORD	size_high, size_low;
 
-					if (SUCCEED == link_processed(wpath, &descriptors, path))
+					if (SUCCEED == link_processed(data.dwFileAttributes, wpath, &descriptors,
+							path))
 					{
 						zbx_free(wpath);
 						zbx_free(path);
@@ -630,9 +624,9 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_free(wpath);
 			zbx_free(name);
 
-		} while (0 == _wfindnext(handle, &data));
+		} while (0 != FindNextFile(handle, &data));
 
-		if (-1 == _findclose(handle))
+		if (0 == FindClose(handle))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot close directory listing '%s': %s", __function_name,
 					item->path, zbx_strerror(errno));
@@ -922,11 +916,15 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 						++count;
 					break;
 				default:	/* not a directory => regular file */
-					if (0 != (types & DET_FILE) && 0 != match)
+					if (0 != (types & DET_FILE) && 0 != match &&
+							INVALID_FILE_ATTRIBUTES != data.dwFileAttributes)
 					{
 						wpath = zbx_utf8_to_unicode(path);
-						if (FAIL == link_processed(wpath, &descriptors, path))
+						if (FAIL == link_processed(data.dwFileAttributes, wpath, &descriptors,
+								path))
+						{
 							++count;
+						}
 
 						zbx_free(wpath);
 					}
