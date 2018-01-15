@@ -470,7 +470,7 @@ int	link_processed(wchar_t *wpath, zbx_vector_ptr_t *descriptors, char *path, co
 
 	if (FAIL == get_file_info_by_handle(wpath, &link_info, &error))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file attribute '%s': %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get handle file information '%s': %s",
 				parent_function_name, path, error);
 		zbx_free(error);
 		return SUCCEED;
