@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,7 +254,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 			if (p->userid == userid && p->ackid == ackid && 0 == strcmp(p->subject, subject) &&
 					0 == strcmp(p->message, message) && 0 != p->mediatypeid)
 			{
-				*pnext = p->next;
+				*pnext = (ZBX_USER_MSG *)p->next;
 
 				zbx_free(p->subject);
 				zbx_free(p->message);
@@ -265,7 +265,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 		}
 	}
 
-	for (p = *user_msg; NULL != p; p = p->next)
+	for (p = *user_msg; NULL != p; p = (ZBX_USER_MSG *)p->next)
 	{
 		if (p->userid == userid && p->ackid == ackid && 0 == strcmp(p->subject, subject) &&
 				0 == strcmp(p->message, message) &&
@@ -277,7 +277,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 	if (NULL == p)
 	{
-		p = zbx_malloc(p, sizeof(ZBX_USER_MSG));
+		p = (ZBX_USER_MSG *)zbx_malloc(p, sizeof(ZBX_USER_MSG));
 
 		p->userid = userid;
 		p->mediatypeid = mediatypeid;
@@ -535,7 +535,7 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const DB_EVENT
 	while (NULL != *user_msg)
 	{
 		p = *user_msg;
-		*user_msg = (*user_msg)->next;
+		*user_msg = (ZBX_USER_MSG *)(*user_msg)->next;
 
 		add_message_alert(event, r_event, actionid, esc_step, p->userid, p->mediatypeid, p->subject,
 				p->message, p->ackid);
@@ -760,7 +760,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	buffer = zbx_malloc(buffer, buffer_alloc);
+	buffer = (char *)zbx_malloc(buffer, buffer_alloc);
 
 	/* get hosts operation's hosts */
 
@@ -974,7 +974,8 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		now, severity, medias_num = 0, status, res;
-	char		error[MAX_STRING_LEN], *perror, *period = NULL;
+	char		error[MAX_STRING_LEN], *period = NULL;
+	const char	*perror;
 	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1143,7 +1144,7 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 	{
 		memset(&condition, 0, sizeof(condition));
 		condition.conditiontype	= (unsigned char)atoi(row[0]);
-		condition.operator = (unsigned char)atoi(row[1]);
+		condition.op = (unsigned char)atoi(row[1]);
 		condition.value = row[2];
 
 		switch (evaltype)
@@ -1624,8 +1625,8 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 
 	get_functionids(&functionids, trigger.expression_orig);
 
-	functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
+	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 
 	DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes, functionids.values_num);
 
@@ -1641,8 +1642,8 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
-	errcodes = zbx_realloc(errcodes, sizeof(int) * itemids.values_num);
+	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
+	errcodes = (int *)zbx_realloc(errcodes, sizeof(int) * itemids.values_num);
 
 	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
@@ -2242,7 +2243,7 @@ cancel_warning:
 		char	*sql = NULL;
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 
-		sql = zbx_malloc(sql, sql_alloc);
+		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		zbx_vector_ptr_sort(&diffs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 

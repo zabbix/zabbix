@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1942,17 +1942,15 @@ class testFormAction extends CWebTest {
 			}
 				switch ($operation['type']) {
 					case 'Send message':
-						$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
-						$this->zbxTestSwitchToWindow('zbx_popup');
-						$this->zbxTestCheckboxSelect('all_usrgrps');
-						$this->zbxTestClick('select');
-						$this->zbxTestWaitWindowClose();
+						$this->zbxTestClickXpath('//tr[@id="opmsgUsrgrpListFooter"]//button');
+						$this->zbxTestLaunchOverlayDialog('User groups');
+						$this->zbxTestCheckboxSelect('all_records');
+						$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
-						$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
-						$this->zbxTestSwitchToNewWindow();
-						$this->zbxTestCheckboxSelect('all_users');
-						$this->zbxTestClick('select');
-						$this->zbxTestWaitWindowClose();
+						$this->zbxTestClickXpath('//tr[@id="opmsgUserListFooter"]//button');
+						$this->zbxTestLaunchOverlayDialog('Users');
+						$this->zbxTestCheckboxSelect('all_records');
+						$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
 						$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', $operation['media']);
 						break;
@@ -2024,18 +2022,17 @@ class testFormAction extends CWebTest {
 		$this->zbxTestInputTypeWait('def_shortdata', 'subject');
 		$this->zbxTestInputType('def_longdata', 'message');
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
-		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
-		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestCheckboxSelect('usrgrps_7');
-		$this->zbxTestCheckboxSelect('usrgrps_11');
-		$this->zbxTestClick('select');
-		$this->zbxTestWaitWindowClose();
 
-		$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
-		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestCheckboxSelect('users_1');
-		$this->zbxTestClick('select');
-		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClickXpath('//tr[@id="opmsgUsrgrpListFooter"]//button');
+		$this->zbxTestLaunchOverlayDialog('User groups');
+		$this->zbxTestCheckboxSelect('item_7');
+		$this->zbxTestCheckboxSelect('item_11');
+		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
+
+		$this->zbxTestClickXpath('//tr[@id="opmsgUserListFooter"]//button');
+		$this->zbxTestLaunchOverlayDialog('Users');
+		$this->zbxTestCheckboxSelect('item_1');
+		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
 		$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', 'Jabber');
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'add_operation')]");
@@ -2055,23 +2052,23 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClickXpath('//tr[@id="opCmdListFooter"]//button[@id="add"]');
 		$this->zbxTestDropdownSelect('opCmdTarget', 'Host');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
-		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
 
-		$this->zbxTestClickAndSwitchToNewWindow("//button[text()='Select']");
+		$this->zbxTestClickButtonMultiselect('opCmdTargetObject');
+		$this->zbxTestLaunchOverlayDialog('Hosts');
+
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickLinkTextWait('Simple form test host');
-		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 // add target group Zabbix servers
 		$this->zbxTestClickXpath('//tr[@id="opCmdListFooter"]//button[@id="add"]');
 		$this->zbxTestDropdownSelect('opCmdTarget', 'Host group');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
-		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
 
-		$this->zbxTestClickAndSwitchToNewWindow("//button[text()='Select']");
+		$this->zbxTestClickButtonMultiselect('opCmdTargetObject');
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
-		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 		$this->zbxTestInputType('new_operation_opcommand_command', 'command');

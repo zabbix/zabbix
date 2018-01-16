@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,11 +33,10 @@ class testFormAdministrationUserCreate extends CWebTest {
 		$this->zbxTestInputType('alias', 'User alias');
 		$this->zbxTestInputType('name', 'User name');
 		$this->zbxTestInputType('surname', 'User surname');
-		$this->zbxTestClickButtonText('Select');
-		$this->zbxTestSwitchToWindow('zbx_popup');
-		$this->zbxTestCheckboxSelect('usrgrps_7');
-		$this->zbxTestClick('select');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestClickButtonMultiselect('user_groups_');
+		$this->zbxTestLaunchOverlayDialog('User groups');
+		$this->zbxTestCheckboxSelect('item_7');
+		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 		$this->zbxTestInputTypeWait('password1', '123');
 		$this->zbxTestInputType('password2', '123');
 		$this->zbxTestClick('add');

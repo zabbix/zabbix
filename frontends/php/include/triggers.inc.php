@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -932,7 +932,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
 			$column->addClass('blink');
 			$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
-			$column->setAttribute('data-toggle-class', $css);
+			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
@@ -1184,9 +1184,9 @@ function make_trigger_details($trigger) {
 		]);
 	}
 
-	$table->addRow([_('Disabled'), (TRIGGER_STATUS_ENABLED == $trigger['status'])
-		? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN)
-		: (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED)
+	$table->addRow([_('Enabled'), ($trigger['status'] == TRIGGER_STATUS_ENABLED)
+		? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
+		: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
 	]);
 
 	return $table;

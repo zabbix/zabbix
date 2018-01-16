@@ -1,3 +1,7 @@
+SUBDIRS = \
+	common \
+	@ARCH@
+
 if SERVER
 SERVER_tests = parse_item_key
 endif
@@ -48,6 +52,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
@@ -77,6 +82,8 @@ parse_item_key_LDADD = \
 
 parse_item_key_LDADD += @SERVER_LIBS@
 
+parse_item_key_LDFLAGS = @SERVER_LDFLAGS@
+
 parse_item_key_CFLAGS = -I@top_srcdir@/tests
 endif
 
@@ -93,7 +100,7 @@ process_SOURCES = \
 	../../../src/zabbix_agent/listener.c \
 	../../../src/zabbix_agent/procstat.c \
 	../../zbxmocktest.h
-	
+
 process_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
@@ -113,10 +120,9 @@ process_LDADD = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
-	
+
 process_WRAP_FUNCS = \
 	-Wl,--wrap=SYSTEM_LOCALTIME \
 	-Wl,--wrap=WEB_PAGE_GET \
@@ -136,6 +142,8 @@ process_WRAP_FUNCS = \
 	-Wl,--wrap=SYSTEM_USERS_NUM
 
 process_LDADD += @AGENT_LIBS@
+
+process_LDFLAGS = @AGENT_LDFLAGS@
 
 process_CFLAGS = $(process_WRAP_FUNCS) -DZABBIX_DAEMON -I@top_srcdir@/tests
 endif

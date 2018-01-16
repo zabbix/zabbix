@@ -461,8 +461,8 @@ ul.top-nav-icons {
 
 	&.selected {
 		color: $link-main-subnav-active-color;
-		padding: 8px 0 5px 0;
-		border-bottom: 3px solid lighten($main-subnav-bg-color, 20%);
+		padding: 8px 0 4px 0;
+		border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
 	}
 }
 
@@ -1702,6 +1702,17 @@ footer {
 		&[disabled] + label {
 			@include transition(none);
 			@extend %form-disabled;
+		}
+	}
+}
+
+label {
+	&.form-label-asterisk {
+		&:before {
+			color: $form-label-asterisk-color;
+			display: inline-block;
+			content: '*';
+			margin-right: 0.3em;
 		}
 	}
 }
@@ -3282,10 +3293,6 @@ $form-icon-btn: (
 		border-top: 1px solid $table-border-color;
 	}
 
-	.table-forms-td-left {
-		text-align: left;
-	}
-
 	.table-forms-td-right {
 
 		td {
@@ -3928,9 +3935,12 @@ a.teal {
 		}
 	}
 }
-td.na-bg {
-	border-left: none;
 
+.na-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
+td.na-bg {
 	~ td.na-bg {
 		border-left: 1px dotted $table-border-color;
 	}
@@ -3940,14 +3950,16 @@ td.na-bg {
 	color: darken($alt-blue-grey,45%);
 	background-color: $alt-blue-grey;
 }
-td.log-na-bg {
-	@extend td.na-bg;
-}
 
 .normal-bg {
 	color: darken($alt-green,45%);
 	@extend .green-bg;
 }
+
+.normal-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.normal-bg {
 	@extend td.na-bg;
 }
@@ -3961,6 +3973,11 @@ td.normal-bg {
 		}
 	}
 }
+
+.info-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.info-bg {
 	@extend td.na-bg;
 }
@@ -3968,9 +3985,6 @@ td.info-bg {
 .log-info-bg {
 	color: darken($alt-dark-blue,45%);
 	background-color: $alt-dark-blue;
-}
-td.log-info-bg {
-	@extend td.na-bg;
 }
 
 .average-bg {
@@ -3982,6 +3996,11 @@ td.log-info-bg {
 		}
 	}
 }
+
+.average-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -3995,6 +4014,11 @@ td.average-bg {
 		}
 	}
 }
+
+.warning-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.warning-bg {
 	@extend td.na-bg;
 }
@@ -4003,10 +4027,6 @@ td.warning-bg {
 	color: darken($alt-yellow,45%);
 	background-color: $alt-yellow;
 }
-td.log-warning-bg {
-	@extend td.na-bg;
-}
-
 
 .high-bg {
 	color: darken($alt-dark-orange,45%);
@@ -4017,6 +4037,11 @@ td.log-warning-bg {
 		}
 	}
 }
+
+.high-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.high-bg {
 	@extend td.na-bg;
 }
@@ -4024,9 +4049,6 @@ td.high-bg {
 .log-high-bg {
 	color: darken($alt-dark-orange,45%);
 	background-color: $alt-dark-orange;
-}
-td.log-high-bg {
-	@extend td.na-bg;
 }
 
 .disaster-bg {
@@ -4038,6 +4060,11 @@ td.log-high-bg {
 		}
 	}
 }
+
+.disaster-bg.blink-hidden {
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
 td.disaster-bg {
 	@extend td.na-bg;
 }
@@ -4045,9 +4072,6 @@ td.disaster-bg {
 .log-disaster-bg {
 	color: darken($alt-red,45%);
 	background-color: $alt-red;
-}
-td.log-disaster-bg {
-	@extend td.na-bg;
 }
 
 .inactive-bg {
@@ -4180,7 +4204,6 @@ td.inactive-bg {
 	margin-left: 16px;
 	margin-top: 2px;
 }
-
 
 .msg-details {
 	font-size: $font-form-size;
@@ -4547,7 +4570,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar-thumb {
 		background-color: $scrollbar-thumb-color;
-		border: 1px solid darken($scrollbar-thumb-color,5%);
+		border: 1px solid darken($scrollbar-thumb-color, $scrollbar-thumb-color-darken);
 	}
 }
 
@@ -4935,19 +4958,14 @@ svg {
 			}
 
 			&.ui-sortable-helper {
-				background: #f7f7f7;
-				border-color: #d7dadc;
+				background: $ui-sortable-helper-background-color;
+				border-color: $ui-sortable-helper-border-color;
 				border-width: 1px;
 				border-style: solid;
 
 				.tools {
 					display: none;
 				}
-			}
-
-			&.sortable-error {
-				border-color: transparent;
-				background: #fbe3e4;
 			}
 
 			&.opened > ul {
@@ -4957,28 +4975,24 @@ svg {
 			&.closed > ul {
 				display: none;
 			}
+
+			.sortable-error {
+				border-color: transparent;
+				background: rgba($red, 0.2);
+			}
 		}
 
-		.highliglted-parent > .tree-row {
-			background: #f9f9f9;
-		}
-
-		.sortable-item-placeholder {
-			background: #f5f5f5;
-			height: 33px;
+		.highlighted-parent > .tree-row {
+			background: $ui-highlighted-parent-background-color;
 		}
 
 		.placeholder {
-			background-color: #ebeef0;
+			background-color: $ui-placeholder-background-color;
 			-webkit-animation: fadein .5s;
 			-moz-animation: fadein .5s;
 			-ms-animation: fadein .5s;
 			-o-animation: fadein .5s;
 			animation: fadein .5s;
-		}
-
-		.drop-hover > .row {
-			background: #faebd7;
 		}
 	}
 }

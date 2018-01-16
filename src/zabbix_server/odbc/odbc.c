@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -229,7 +229,7 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dsn:'%s' user:'%s'", __function_name, dsn, user);
 
-	data_source = zbx_malloc(data_source, sizeof(zbx_odbc_data_source_t));
+	data_source = (zbx_odbc_data_source_t *)zbx_malloc(data_source, sizeof(zbx_odbc_data_source_t));
 
 	if (0 != SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &data_source->henv)))
 	{
@@ -327,7 +327,7 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, query);
 
-	query_result = zbx_malloc(query_result, sizeof(zbx_odbc_query_result_t));
+	query_result = (zbx_odbc_query_result_t *)zbx_malloc(query_result, sizeof(zbx_odbc_query_result_t));
 
 	rc = SQLAllocHandle(SQL_HANDLE_STMT, data_source->hdbc, &query_result->hstmt);
 
@@ -344,9 +344,9 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 				SQLSMALLINT	i;
 				SQLLEN		col_type;
 
-				query_result->c_types = zbx_malloc(NULL,
+				query_result->c_types = (SQLSMALLINT *)zbx_malloc(NULL,
 						sizeof(SQLSMALLINT) * (size_t)query_result->col_num);
-				query_result->row = zbx_malloc(NULL, sizeof(char *) * (size_t)query_result->col_num);
+				query_result->row = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)query_result->col_num);
 
 				for (i = 0; ; i++)
 				{

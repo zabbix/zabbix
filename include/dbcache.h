@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -333,6 +333,15 @@ zbx_config_t;
 
 typedef struct
 {
+	zbx_uint64_t	hostid;
+	unsigned char	idx;
+	const char	*field_name;
+	char		*value;
+}
+zbx_inventory_value_t;
+
+typedef struct
+{
 	char	*tag;
 }
 zbx_corr_condition_tag_t;
@@ -605,6 +614,9 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff);
 
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
+
+void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
+int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ class CHistory extends CApiService {
 
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
-				return $this->getFromElasticSearch($options);
+				return $this->getFromElasticsearch($options);
 
 			default:
 				return $this->getFromSql($options);
@@ -247,11 +247,11 @@ class CHistory extends CApiService {
 	}
 
 	/**
-	 * ElasticSearch specific implementation of get.
+	 * Elasticsearch specific implementation of get.
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromElasticSearch($options) {
+	private function getFromElasticsearch($options) {
 		$query = [];
 
 		if (!$table_name = CHistoryManager::getTableName($options['history'])) {
@@ -293,12 +293,12 @@ class CHistory extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
-			$query = CElasticSearchHelper::addFilter(DB::getSchema($table_name), $query, $options);
+			$query = CElasticsearchHelper::addFilter(DB::getSchema($table_name), $query, $options);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			$query = CElasticSearchHelper::addSearch($schema, $query, $options);
+			$query = CElasticsearchHelper::addSearch($schema, $query, $options);
 		}
 
 		// output
@@ -308,7 +308,7 @@ class CHistory extends CApiService {
 
 		// sorting
 		if ($this->sortColumns && $options['sortfield']) {
-			$query = CElasticSearchHelper::addSort($this->sortColumns, $query, $options);
+			$query = CElasticsearchHelper::addSort($this->sortColumns, $query, $options);
 		}
 
 		// limit
@@ -316,9 +316,9 @@ class CHistory extends CApiService {
 			$query['size'] = $options['limit'];
 		}
 
-		$endpoints = CHistoryManager::getElasticSearchEndpoints($options['history']);
+		$endpoints = CHistoryManager::getElasticsearchEndpoints($options['history']);
 		if ($endpoints) {
-			return CElasticSearchHelper::query('POST', reset($endpoints), $query);
+			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
 		}
 
 		return null;

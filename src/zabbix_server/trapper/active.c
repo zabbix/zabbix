@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -260,7 +260,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 	get_list_of_active_checks(hostid, &itemids);
 
-	buffer = zbx_malloc(buffer, buffer_alloc);
+	buffer = (char *)zbx_malloc(buffer, buffer_alloc);
 
 	if (0 != itemids.values_num)
 	{
@@ -268,8 +268,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 		int		*errcodes, now;
 		zbx_config_t	cfg;
 
-		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
-		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
+		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
+		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
@@ -449,7 +449,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
+	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
 	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_HOST_METADATA,
 			&host_metadata, &host_metadata_alloc))
@@ -493,8 +493,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		int		*errcodes, now, delay;
 		zbx_config_t	cfg;
 
-		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
-		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
+		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
+		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
@@ -572,7 +572,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		for (i = 0; i < regexps.values_num; i++)
 		{
-			zbx_expression_t	*regexp = regexps.values[i];
+			zbx_expression_t	*regexp = (zbx_expression_t *)regexps.values[i];
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, "name", regexp->name, ZBX_JSON_TYPE_STRING);

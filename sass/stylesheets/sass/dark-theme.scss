@@ -31,6 +31,10 @@ $ui-bg-color: #2b2b2b;
 $ui-bg-selected-color: #4f4f4f;
 $ui-hover-color: #383838;
 $ui-border-color: #303030;
+$ui-placeholder-background-color: darken($ui-hover-color, 15%);
+$ui-highlighted-parent-background-color: darken($ui-hover-color, 10%);
+$ui-sortable-helper-background-color: $ui-bg-color;
+$ui-sortable-helper-border-color: $ui-border-color;
 
 $action-hover-color: #454545;
 $action-border-color: #383838;
@@ -111,7 +115,7 @@ $clock-lines-color: #4f4f4f;
 .top-nav-zbbshare {
 	background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important;
 }
-.btn-search{
+.btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
 .btn-back-map {

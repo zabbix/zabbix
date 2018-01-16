@@ -34,7 +34,10 @@
 		))->toString()
 	?>
 	<td class="interface-port">
-		<input name="interfaces[#{iface.interfaceid}][port]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_PORT_WIDTH ?>px" maxlength="64" value="#{iface.port}">
+		<?= (new CTextBox('interfaces[#{iface.interfaceid}][port]', '#{iface.port}', false, 64))
+				->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+				->setAriaRequired()
+		?>
 	</td>
 	<td class="interface-default">
 		<input class="mainInterface <?= ZBX_STYLE_CHECKBOX_RADIO ?>" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
@@ -72,7 +75,8 @@
 				jQuery('.interface-bulk', domRow).remove();
 			}
 
-			jQuery('#interfaces_' + hostInterface.interfaceid + '_useip_' + hostInterface.useip).prop('checked', true);
+			jQuery('#interfaces_' + hostInterface.interfaceid + '_useip_' + hostInterface.useip).prop('checked', true)
+				.trigger('click');
 
 			if (hostInterface.locked > 0) {
 				addNotDraggableIcon(domRow);
@@ -338,6 +342,12 @@
 		jQuery('#hostlist').on('click', 'input[type=radio][id*="_useip_"]', function() {
 			var interfaceId = jQuery(this).attr('id').match(/\d+/);
 			hostInterfacesManager.setUseipForInterface(interfaceId[0], jQuery(this).val());
+
+			jQuery('[name^="interfaces['+interfaceId[0]+']["]')
+				.filter('[name$="[ip]"],[name$="[dns]"]')
+				.removeAttr('aria-required')
+				.filter((jQuery(this).val() == <?= INTERFACE_USE_IP ?>) ? '[name$="[ip]"]' : '[name$="[dns]"]')
+				.attr('aria-required', true);
 		});
 
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -202,8 +202,6 @@ class testPageActions extends CWebTest {
 	* @dataProvider allActions
 	*/
 	public function testPageActions_SingleEnableDisable($action) {
-		DBexecute("UPDATE usrgrp SET debug_mode = 0 WHERE usrgrpid = 7");
-
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 
@@ -235,8 +233,6 @@ class testPageActions extends CWebTest {
 		));
 
 		$this->assertEquals($this->oldHashAction, DBhash($this->sqlHashAction));
-
-		DBexecute("UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7");
 	}
 
 	/**

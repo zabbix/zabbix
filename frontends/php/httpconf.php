@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -595,6 +595,7 @@ if (isset($_REQUEST['form'])) {
 			}
 		}
 
+		// Used for both, Scenario and Steps pairs.
 		$id = 1;
 		$data['pairs'] = [];
 
@@ -638,7 +639,6 @@ if (isset($_REQUEST['form'])) {
 		];
 
 		foreach ($data['steps'] as &$step) {
-			$id = 0;
 			$step['pairs'] = [];
 
 			CArrayHelper::sort($step['variables'], ['name']);

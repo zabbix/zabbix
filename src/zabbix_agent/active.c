@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include "common.h"
 #include "active.h"
 #include "zbxconf.h"
-#include "zbxself.h"
 
 #include "cfg.h"
 #include "log.h"
@@ -96,7 +95,7 @@ static void	init_active_metrics(void)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer: first allocation for %d elements", CONFIG_BUFFER_SIZE);
 		sz = CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
-		buffer.data = zbx_malloc(buffer.data, sz);
+		buffer.data = (ZBX_ACTIVE_BUFFER_ELEMENT *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
 		buffer.pcount = 0;
@@ -231,7 +230,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 		goto out;
 	}
 
-	metric = zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
+	metric = (ZBX_ACTIVE_METRIC *)zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
 
 	/* add new metric */
 	metric->key = zbx_strdup(NULL, key);
@@ -271,6 +270,42 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: mode_parameter_is_skip                                           *
+ *                                                                            *
+ * Purpose: test log[] or log.count[] item key if <mode> parameter is set to  *
+ *          'skip'                                                            *
+ *                                                                            *
+ * Return value: SUCCEED - <mode> parameter is set to 'skip'                  *
+ *               FAIL - <mode> is not 'skip' or error                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
+{
+	AGENT_REQUEST	request;
+	const char	*skip;
+	int		ret = FAIL, max_num_parameters;
+
+	if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log[] */
+		max_num_parameters = 7;
+	else						/* log.count[] */
+		max_num_parameters = 6;
+
+	init_request(&request);
+
+	if (SUCCEED == parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
+			max_num_parameters >= get_rparams_num(&request) && NULL != (skip = get_rparam(&request, 4)) &&
+			0 == strcmp(skip, "skip"))
+	{
+		ret = SUCCEED;
+	}
+
+	free_request(&request);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -397,6 +432,17 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		int	found = 0;
 
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+
+		/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set to 'skip'. */
+		/* We need to keep their state, namely 'skip_old_data', in case the items become NOTSUPPORTED as */
+		/* server might not send them in a new active check list. */
+
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & metric->flags) && ITEM_STATE_NOTSUPPORTED == metric->state &&
+				0 == metric->skip_old_data && SUCCEED == mode_parameter_is_skip(metric->flags,
+				metric->key))
+		{
+			continue;
+		}
 
 		for (j = 0; j < received_metrics.values_num; j++)
 		{
@@ -1049,7 +1095,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
 	AGENT_REQUEST		request;
-	const char		*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
+	const char		*filename, *pattern, *encoding, *maxlines_persec, *skip, *output_template;
 	char			*encoding_uc = NULL, *max_delay_str;
 	int			rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr,
 				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0;
@@ -1138,8 +1184,8 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 	/* parameter 5 is <output> for log[], logrt[], but <maxdelay> for log.count[], logrt.count[] */
 
-	if (1 == is_count_item || (NULL == (template = get_rparam(&request, 5))))
-		template = "";
+	if (1 == is_count_item || (NULL == (output_template = get_rparam(&request, 5))))
+		output_template = "";
 
 	/* <maxdelay> is parameter 6 for log[], logrt[], but parameter 5 for log.count[], logrt.count[] */
 
@@ -1189,7 +1235,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
-			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, pattern, template,
+			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, pattern, output_template,
 			&p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME, metric->key_orig, &jumped,
 			max_delay, &metric->start_time, &metric->processed_bytes);
 

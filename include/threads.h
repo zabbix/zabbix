@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,8 +47,8 @@
 
 #else	/* not _WINDOWS */
 
-	int	zbx_fork();
-	int	zbx_child_fork();
+	int	zbx_fork(void);
+	int	zbx_child_fork(void);
 
 	#define ZBX_THREAD_ERROR	-1
 
@@ -87,6 +87,6 @@ zbx_thread_args_t;
 ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args);
 int			zbx_thread_wait(ZBX_THREAD_HANDLE thread);
 /* zbx_thread_exit(status) -- declared as define !!! */
-long int		zbx_get_thread_id();
+long int		zbx_get_thread_id(void);
 
 #endif	/* ZABBIX_THREADS_H */

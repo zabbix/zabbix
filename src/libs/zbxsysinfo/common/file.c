@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -549,7 +549,7 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* convert MD5 hash to text form */
 
 	sz = MD5_DIGEST_SIZE * 2 + 1;
-	hash_text = zbx_malloc(hash_text, sz);
+	hash_text = (char *)zbx_malloc(hash_text, sz);
 
 	for (i = 0; i < MD5_DIGEST_SIZE; i++)
 	{

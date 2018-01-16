@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,8 +179,6 @@ const char	*zbx_cu_assert_args_int(const char *description, const char *operatio
 
 const char	*zbx_cu_assert_args_char(const char *description, const char *operation, const char *expression1,
 		char actual, const char *expression2, char expected);
-
-extern struct mallinfo	zbx_cu_minfo;
 
 void	zbx_cu_run(int args, char *argv[]);
 

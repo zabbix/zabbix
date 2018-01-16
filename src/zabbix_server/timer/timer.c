@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm,
 	if (*hm_alloc == *hm_count)
 	{
 		*hm_alloc += 4;
-		*hm = zbx_realloc(*hm, *hm_alloc * sizeof(zbx_host_maintenance_t));
+		*hm = (zbx_host_maintenance_t *)zbx_realloc(*hm, *hm_alloc * sizeof(zbx_host_maintenance_t));
 	}
 
 	memmove(&(*hm)[hm_index + 1], &(*hm)[hm_index], sizeof(zbx_host_maintenance_t) * (*hm_count - hm_index));
@@ -326,7 +326,7 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	DBbegin();
 
@@ -453,7 +453,7 @@ static int	process_maintenance(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == hm)
-		hm = zbx_malloc(hm, sizeof(zbx_host_maintenance_t) * hm_alloc);
+		hm = (zbx_host_maintenance_t *)zbx_malloc(hm, sizeof(zbx_host_maintenance_t) * hm_alloc);
 
 	now = time(NULL);
 	tm = localtime(&now);

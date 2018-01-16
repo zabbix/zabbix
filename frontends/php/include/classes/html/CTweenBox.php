@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ class CTweenBox {
 				$selected = 1;
 			}
 		}
+
 		if ((is_bool($selected) && $selected)
 				|| (is_int($selected) && $selected != 0)
 				|| (is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected == 'on'))) {
@@ -64,6 +65,7 @@ class CTweenBox {
 		else {
 			$this->rbox->addItem($value, $caption, null, $enabled);
 		}
+
 		return $this;
 	}
 
@@ -78,7 +80,7 @@ class CTweenBox {
 		$grp_tab = (new CTable())
 			->addClass('tweenBoxTable')
 			->setAttribute('name', $this->name)
-			->setId('id', zbx_formatDomId($this->name))
+			->setId(zbx_formatDomId($this->name))
 			->setCellSpacing(0)
 			->setCellPadding(0);
 
@@ -93,7 +95,10 @@ class CTweenBox {
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('moveListBoxSelectedItem("'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
 
-		$grp_tab->addRow([$this->lbox, (new CCol([$add_btn, BR(), $rmv_btn]))->addClass(ZBX_STYLE_CENTER), $this->rbox]);
+		$grp_tab->addRow([$this->lbox, (new CCol([$add_btn, BR(), $rmv_btn]))->addClass(ZBX_STYLE_CENTER),
+			$this->rbox
+		]);
+
 		return $grp_tab;
 	}
 
@@ -101,16 +106,20 @@ class CTweenBox {
 		if (empty($caption_l)) {
 			$caption_l = _('In');
 		}
+
 		if (empty($caption_r)) {
 			$caption_r = _('Other');
 		}
+
 		$tab = $this->get($caption_l, $caption_r);
 		$tab->show();
+
 		return $this;
 	}
 
 	public function toString() {
 		$tab = $this->get();
+
 		return $tab->toString();
 	}
 }
