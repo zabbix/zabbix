@@ -77,7 +77,7 @@ files:
       eno1: 1395994481 5343265    0    0    0     2          0     83760 111280259  741237    0    0    0     1       0          0
         lo: 6410206   43792    0    0    0     0          0         0  6410206   43792    0    0    0     0       0          0
 in:
-  param: 'net.if.out[eno1,colls]'
+  param: 'net.if.out[eno1,collisions]'
 out:
   result: '1'
   return: 'SYSINFO_RET_OK'

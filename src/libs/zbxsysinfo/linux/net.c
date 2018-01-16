@@ -40,9 +40,6 @@ typedef struct
 	zbx_uint64_t ofifo;
 	zbx_uint64_t ocarrier;
 	zbx_uint64_t ocompressed;
-	zbx_uint64_t ofifo;
-	zbx_uint64_t ocarrier;
-	zbx_uint64_t ocompressed;
 }
 net_stat_t;
 
