@@ -192,8 +192,8 @@ static int	proxy_data_sender(int *more, int now)
 
 	zbx_json_free(&j);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:%x", __function_name, zbx_result_string(upload_state),
-			*more, flags);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __function_name,
+			zbx_result_string(upload_state), *more, flags);
 
 	return history_records + discovery_records + areg_records;
 }
