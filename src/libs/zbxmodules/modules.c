@@ -41,6 +41,8 @@ zbx_history_string_cb_t		*history_string_cbs = NULL;
 zbx_history_text_cb_t		*history_text_cbs = NULL;
 zbx_history_log_cb_t		*history_log_cbs = NULL;
 
+extern unsigned char		program_type;
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_register_module_items                                        *
@@ -301,14 +303,17 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	/* module passed validation and can now be registered */
 	module = zbx_register_module(lib, name);
 
-	if (NULL == (func_history_write_cbs = (ZBX_HISTORY_WRITE_CBS (*)(void))dlsym(lib,
-			ZBX_MODULE_FUNC_HISTORY_WRITE_CBS)))
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_HISTORY_WRITE_CBS "()\""
-				" function in module \"%s\": %s", name, dlerror());
+		if (NULL == (func_history_write_cbs = (ZBX_HISTORY_WRITE_CBS (*)(void))dlsym(lib,
+				ZBX_MODULE_FUNC_HISTORY_WRITE_CBS)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_HISTORY_WRITE_CBS "()\""
+					" function in module \"%s\": %s", name, dlerror());
+		}
+		else
+			zbx_register_history_write_cbs(module, func_history_write_cbs());
 	}
-	else
-		zbx_register_history_write_cbs(module, func_history_write_cbs());
 
 	return SUCCEED;
 fail:
