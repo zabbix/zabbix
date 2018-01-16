@@ -4,6 +4,7 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-13208] eliminated race condition that caused history collection for newly created items to start before preprocecessing steps finished syncing (vso)
+.......P.. [ZBX-13130] fixed Zabbix proxy not to generate high network traffic when server does not accept data (vso)
 ..F....... [ZBX-13288] fixed image ghosting for mass update of map elements (vjaceslavs)
 ...G...... [ZBX-11422] fixed compilation warnings under OS X 64bit (MVekslers)
 
