@@ -439,7 +439,7 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 	ts->sec = sec;
 	ts->ns = ns;
 
-	return SUCCEED;
+	return ZBX_MOCK_SUCCESS;
 }
 
 /******************************************************************************
