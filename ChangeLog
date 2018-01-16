@@ -3,6 +3,8 @@ Changes for 4.0.0alpha3
 New features:
 
 Bug fixes:
+........S. [ZBX-13208] eliminated race condition that caused history collection for newly created items to start before preprocecessing steps finished syncing (vso)
+.......P.. [ZBX-13130] fixed Zabbix proxy not to generate high network traffic when server does not accept data (vso)
 ..F....... [ZBX-13288] fixed image ghosting for mass update of map elements (vjaceslavs)
 ...G...... [ZBX-11422] fixed compilation warnings under OS X 64bit (MVekslers)
 
@@ -90,6 +92,7 @@ Changes for 3.4.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13208] eliminated race condition that caused history collection for newly created items to start before preprocecessing steps finished syncing (vso)
 .......P.. [ZBX-13130] fixed Zabbix proxy not to generate high network traffic when server does not accept data (vso)
 ..F....... [ZBX-13288] fixed image ghosting for mass update of map elements (vjaceslavs)
 ...G...... [ZBX-13246] fixed processing of command line arguments which are longer than 2KB for proc.num and proc.mem items on AIX (viktors)
