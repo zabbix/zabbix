@@ -33,7 +33,8 @@ if ($data['form_refresh'] == 0) {
 $mediaTypeForm = (new CForm())
 	->setId('media_type_form')
 	->addVar('form', 1)
-	->addVar('mediatypeid', $data['mediatypeid']);
+	->addVar('mediatypeid', $data['mediatypeid'])
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // create form list
 $nameTextBox = (new CTextBox('description', $data['description'], false, 100))

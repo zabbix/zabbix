@@ -139,6 +139,9 @@ $houseKeeperView = (new CTabView())
 		[new CButton('resetDefaults', _('Reset defaults'))]
 	));
 
-$widget->addItem((new CForm())->addItem($houseKeeperView));
+$widget->addItem((new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addItem($houseKeeperView)
+);
 
 return $widget;

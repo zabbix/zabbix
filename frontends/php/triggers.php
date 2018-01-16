@@ -600,7 +600,7 @@ elseif (isset($_REQUEST['form'])) {
 	$triggersView->show();
 }
 elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && hasRequest('g_triggerid')) {
-	$data = getCopyElementsFormData('g_triggerid', _('CONFIGURATION OF TRIGGERS'));
+	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
 	$data['action'] = 'trigger.masscopyto';
 	$triggersView = new CView('configuration.copy.elements', $data);
 	$triggersView->render();

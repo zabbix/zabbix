@@ -80,6 +80,7 @@ $severityTab = (new CFormList())
 	->addInfo(_('Custom severity names affect all locales and require manual translation!'));
 
 $severityForm = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(
 		(new CTabView())
 			->addTab('severities', _('Trigger severities'), $severityTab)

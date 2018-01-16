@@ -24,6 +24,7 @@ $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 // create form
 $maintenanceForm = (new CForm())
 	->setName('maintenanceForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
 if (isset($this->data['maintenanceid'])) {
 	$maintenanceForm->addVar('maintenanceid', $this->data['maintenanceid']);

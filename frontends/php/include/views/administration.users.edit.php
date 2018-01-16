@@ -33,6 +33,7 @@ else {
 // create form
 $userForm = (new CForm())
 	->setName('userForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
 
 if ($data['userid'] != 0) {

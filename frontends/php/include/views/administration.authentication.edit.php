@@ -22,7 +22,9 @@
 $widget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
-$authenticationForm = (new CForm())->setName('authenticationForm');
+$authenticationForm = (new CForm())
+	->setName('authenticationForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // create form list
 $authenticationFormList = new CFormList('authenticationList');

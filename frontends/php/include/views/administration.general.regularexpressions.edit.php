@@ -35,6 +35,7 @@ $widget = (new CWidget())
 
 $form = (new CForm())
 	->setId('zabbixRegExpForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('regexpid', $data['regexpid']);
 

@@ -25,6 +25,7 @@ $commentWidget = (new CWidget())->setTitle(_('Comments'));
 
 // create form
 $commentForm = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('triggerid', $this->data['triggerid']);
 
 // create form list

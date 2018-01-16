@@ -44,6 +44,7 @@ global $ZBX_SERVER_NAME;
 		(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),
 		(new CForm())
 			->cleanItems()
+			->setAttribute('aria-label', _('Sign in'))
 			->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
 			->addItem(
 				(new CList())

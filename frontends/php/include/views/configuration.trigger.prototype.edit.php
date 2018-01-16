@@ -28,6 +28,7 @@ $triggersWidget = (new CWidget())
 // create form
 $triggersForm = (new CForm())
 	->setName('triggersForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid'])
 	->addVar('expression_constructor', $data['expression_constructor'])

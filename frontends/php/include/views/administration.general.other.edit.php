@@ -64,6 +64,7 @@ $otherTab
 
 $otherForm = (new CForm())
 	->setName('otherForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(
 		(new CTabView())
 			->addTab('other', _('Other parameters'), $otherTab)

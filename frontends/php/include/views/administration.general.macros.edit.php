@@ -81,6 +81,7 @@ $tab_view->setFooter(makeFormFooter($saveButton));
 
 $form = (new CForm())
 	->setName('macrosForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($tab_view);
 
 $widget->addItem($form);
