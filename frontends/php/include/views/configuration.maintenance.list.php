@@ -20,23 +20,24 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Maintenance periods'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-		)
-		->addItem((new Clist())
-			->setAttribute('role', 'navigation')
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
+				])
+			),
+		(new CTag('nav', true, new CRedirectButton(_('Create maintenance period'), (new CUrl())
+			->setArgument('groupids[]', $data['pageFilter']->groupid)
+			->setArgument('form', 'create')
+			->getUrl()
+		)))
 			->setAttribute('aria-label', _('Content controls'))
-			->addItem(new CSubmit('form', _('Create maintenance period')))
-		)
-	)
+	]))
 	->addItem((new CFilter('web.maintenance.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),
 			(new CTextBox('filter_name', $data['filter']['name']))

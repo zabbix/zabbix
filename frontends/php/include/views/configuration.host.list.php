@@ -21,24 +21,26 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$data['pageFilter']->getGroupsCB()
-			])
-		)
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _('Content controls'))
-			->addItem(new CSubmit('form', _('Create host')))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getGroupsCB()
+				])
+			),
+		(new CTag('nav', true, (new CList())
+			->addItem(new CRedirectButton(_('Create host'), (new CUrl())
+				->setArgument('form', 'create')
+				->getUrl()
+			))
 			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
-		)
-	);
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	]));
 
 // filter
 $filter = (new CFilter('web.hosts.filter.state'))

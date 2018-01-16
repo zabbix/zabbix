@@ -23,13 +23,14 @@ include('include/views/js/administration.general.triggerSeverity.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger severities'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem(makeAdministrationGeneralMenu('adm.triggerseverities.php'))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.triggerseverities.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $severityTab = (new CFormList())

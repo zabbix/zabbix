@@ -20,13 +20,11 @@
 
 $widget = (new CWidget())
 	->setTitle(_('User groups'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create user group'), '?form=create'))
+		))
 			->setAttribute('aria-label', _('Content controls'))
-			->addItem(new CSubmit('form', _('Create user group')))
-		)
 	)
 	->addItem((new CFilter('web.usergroup.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),

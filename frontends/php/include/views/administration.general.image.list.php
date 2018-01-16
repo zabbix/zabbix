@@ -21,12 +21,10 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Images'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem(
-			(new CList())
-				->setAttribute('role', 'form')
-				->setAttribute('aria-label', _('Main filter'))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
 				->addItem(makeAdministrationGeneralMenu('adm.images.php'))
 				->addItem([
 					new CLabel(_('Type'), 'imagetype'),
@@ -36,16 +34,14 @@ $widget = (new CWidget())
 						IMAGE_TYPE_BACKGROUND => _('Background')
 					])
 				])
-		)
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _('Content controls'))
-			->addItem(
-				new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON)
-					? _('Create icon')
-					: _('Create background'))
+				->addItem(
+					new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON)
+						? _('Create icon')
+						: _('Create background'))
+				)
 			)
-		)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 if (!$data['images']) {

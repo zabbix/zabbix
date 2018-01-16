@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$userGroupComboBox = (new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()'))
+$userGroupComboBox = (new CComboBox('filter_usrgrpid', getRequest('filter_usrgrpid', 0), 'submit()'))
 	->addItem(0, _('All'));
 
 foreach ($this->data['userGroups'] as $userGroup) {
@@ -27,23 +27,25 @@ foreach ($this->data['userGroups'] as $userGroup) {
 
 $widget = (new CWidget())
 	->setTitle(_('Users'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
-			->addItem([
-				new CLabel(_('User group'), 'filter_usrgrpid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$userGroupComboBox
-			])
-		)
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('User group'), 'filter_usrgrpid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$userGroupComboBox
+				])
+			),
+		(new CTag('nav', true,
+			new CRedirectButton(_('Create user'), (new CUrl())
+				->setArgument('form', 'create')
+				->getUrl()
+			)
+		))
 			->setAttribute('aria-label', _('Content controls'))
-			->addItem(new CSubmit('form', _('Create user')))
-		)
-	)
+	]))
 	->addItem((new CFilter('web.user.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Alias'),
 			(new CTextBox('filter_alias', $data['filter']['alias']))

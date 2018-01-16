@@ -24,30 +24,27 @@ $this->addJsFile('flickerfreescreen.js');
 
 (new CWidget())
 	->setTitle(_('Web monitoring'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addVar('action', 'web.view')
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-		->addItem((new CList())
-			->setAttribute('role', 'form')
+	->setControls((new CList([
+		(new CForm('get'))
+			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$data['pageFilter']->getGroupsCB()
-			])
-			->addItem([
-				new CLabel(_('Host'), 'hostid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$data['pageFilter']->getHostsCB()
-			])
-		)
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
+			->addVar('action', 'web.view')
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getGroupsCB()
+				])
+				->addItem([
+					new CLabel(_('Host'), 'hostid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getHostsCB()
+				])
+			),
+		(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
 			->setAttribute('aria-label', _('Content controls'))
-			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-		)
-	)
+	])))
 	->addItem(
 		CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,

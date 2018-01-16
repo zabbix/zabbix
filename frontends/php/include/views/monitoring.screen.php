@@ -39,19 +39,12 @@ $widget = (new CWidget())
 	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
 $controls = (new CList())
-	->setAttribute('role', 'form')
-	->setAttribute('aria-label', _('Main filter'))
 	->addItem(
 		new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
 			'screens.php' => _('Screens'),
 			'slides.php' => _('Slide shows')
 		])
 );
-
-// Append screens combobox to page header.
-$form = (new CForm())
-	->setName('headerForm')
-	->addVar('fullscreen', $data['fullscreen']);
 
 if (check_dynamic_items($data['screen']['screenid'], 0)) {
 	$pageFilter = new CPageFilter([
@@ -83,26 +76,28 @@ if (check_dynamic_items($data['screen']['screenid'], 0)) {
 		]);
 }
 
-$form->addItem($controls)
-	->addItem((new CList())
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Content controls'))
-		->addItem($data['screen']['editable']
-			? (new CButton('edit', _('Edit screen')))
-				->onClick('redirect("screenedit.php?screenid='.$data['screen']['screenid'].'")')
-			: null
-		)
-		->addItem(get_icon('favourite',
-			[
-				'fav' => 'web.favorite.screenids',
-				'elname' => 'screenid',
-				'elid' => $data['screen']['screenid']
-			]
-		))
-		->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-	);
+$controls
+	->addItem($data['screen']['editable']
+		? (new CButton('edit', _('Edit screen')))
+			->onClick('redirect("screenedit.php?screenid='.$data['screen']['screenid'].'")')
+		: null
+	)
+	->addItem(get_icon('favourite', [
+			'fav' => 'web.favorite.screenids',
+			'elname' => 'screenid',
+			'elid' => $data['screen']['screenid']
+		]
+	))
+	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
-$widget->setControls($form);
+$widget->setControls((new CTag('nav', true, (new CList())
+	->addItem((new CForm('get'))
+		->setName('headerForm')
+		->addVar('fullscreen', $data['fullscreen'])
+		->addItem($controls)
+	)))
+		->setAttribute('aria-label', _('Content controls'))
+);
 
 // Append screens to widget.
 $screenBuilder = new CScreenBuilder([

@@ -24,26 +24,22 @@ $this->addJsFile('flickerfreescreen.js');
 
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
-	->setControls(
+	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->addVar('action', 'discovery.view')
 			->addVar('fullscreen', $data['fullscreen'])
+			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
-				->setAttribute('role', 'form')
-				->setAttribute('aria-label', _('Main filter'))
 				->addItem([
 					new CLabel(_('Discovery rule'), 'druleid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$data['pageFilter']->getDiscoveryCB()
 				])
-			)
-			->addItem((new CList())
-				->setAttribute('role', 'navigation')
-				->setAttribute('aria-label', _('Content controls'))
-				->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-			)
-	);
+			),
+		(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
+			->setAttribute('aria-label', _('Content controls'))
+	]));
 
 $discovery_table = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_DISCOVERY,

@@ -23,13 +23,14 @@ require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.p
 
 $widget = (new CWidget())
 	->setTitle(_('Housekeeping'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem(makeAdministrationGeneralMenu('adm.housekeeper.php'))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.housekeeper.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $houseKeeperTab = (new CFormList())

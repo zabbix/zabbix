@@ -71,16 +71,15 @@ $top_menu = (new CDiv())
 			->addClass(ZBX_STYLE_HEADER_LOGO)
 	)
 	->addItem(
-		(new CList($data['menu']['main_menu']))
-			->addClass(ZBX_STYLE_TOP_NAV)
-			->setAttribute('role', 'navigation')
+		(new CTag('nav', true, (new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)))
 			->setAttribute('aria-label', _('Main navigation'))
 	)
 	->addItem($user_navigation)
 	->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
 	->setId('mmenu');
 
-$sub_menu_div = (new CDiv())
+$sub_menu_div = (new CTag('nav', true))
+	->setAttribute('aria-label', _('Sub navigation'))
 	->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER)
 	->onMouseover('javascript: MMenu.submenu_mouseOver();')
 	->onMouseout('javascript: MMenu.mouseOut();');
@@ -89,8 +88,6 @@ $sub_menu_div = (new CDiv())
 foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 	$sub_menu_row = (new CList())
 		->addClass(ZBX_STYLE_TOP_SUBNAV)
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Sub navigation'))
 		->setId('sub_'.$label);
 
 	foreach ($sub_menu as $id => $sub_page) {

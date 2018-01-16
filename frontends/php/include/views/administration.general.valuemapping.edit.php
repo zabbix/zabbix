@@ -23,13 +23,14 @@ include('include/views/js/administration.general.valuemapping.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Value mapping'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $form = (new CForm())->addVar('form', $data['form']);

@@ -21,13 +21,14 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Event correlation'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
+	->setControls((new CTag('nav', true,
+		(new CForm('get'))
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(new CSubmit('form', _('Create correlation')))
+			)
+		))
 			->setAttribute('aria-label', _('Content controls'))
-			->addItem(new CSubmit('form', _('Create correlation')))
-		)
 	)
 	->addItem((new CFilter('web.correlation.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),

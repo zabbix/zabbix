@@ -73,37 +73,30 @@ elseif (count($this->data['items']) > 1) {
 }
 
 $action_list = (new CList())
-	->setAttribute('role', 'form')
-	->setAttribute('aria-label', _('Main filter'))
 	->addItem([
 		new CLabel(_('View as')),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CComboBox('action', $this->data['action'], 'submit()', $actions),
 	]);
 
-$content_control = (new CList())
-	->setAttribute('role', 'navigation')
-	->setAttribute('aria-label', _('Content controls'));
-
 if ($data['action'] !== HISTORY_GRAPH && $data['action'] !== HISTORY_BATCH_GRAPH) {
-	$content_control->addItem(new CSubmit('plaintext', _('As plain text')));
+	$action_list->addItem(new CSubmit('plaintext', _('As plain text')));
 }
 
 if ($this->data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
-	$content_control->addItem(get_icon('favourite', [
+	$action_list->addItem(get_icon('favourite', [
 		'fav' => 'web.favorite.graphids',
 		'elid' => $item['itemid'],
 		'elname' => 'itemid'
 	]));
 }
 
-$content_control->addItem([
+$action_list->addItem([
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']])
 ]);
 
-$header['right']->addItem($action_list)
-	->addItem($content_control);
+$header['right']->addItem($action_list);
 
 // create filter
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
@@ -227,8 +220,11 @@ if ($this->data['plaintext']) {
 	$historyWidget->addItem($pre);
 }
 else {
-	$historyWidget->setTitle($header['left'])
-		->setControls($header['right']);
+	$historyWidget
+		->setTitle($header['left'])
+		->setControls((new CTag('nav', true, $header['right']))
+			->setAttribute('aria-label', _('Content controls'))
+	);
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm->addNavigator();

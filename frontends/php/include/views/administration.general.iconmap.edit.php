@@ -23,13 +23,14 @@ include('include/views/js/administration.general.iconmap.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php'))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $iconMapTab = new CFormList();

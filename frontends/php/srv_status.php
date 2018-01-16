@@ -157,24 +157,21 @@ else {
 
 		$srv_wdgt = (new CWidget())
 			->setTitle(_('Services'))
-			->setControls((new CForm('get'))
-				->cleanItems()
-				->addVar('fullscreen', $_REQUEST['fullscreen'])
-				->addItem((new CList())
-					->setAttribute('role', 'form')
+			->setControls(new CList([
+				(new CForm('get'))
+					->cleanItems()
+					->addVar('fullscreen', getRequest('fullscreen'))
 					->setAttribute('aria-label', _('Main filter'))
-					->addItem([
-						new CLabel(_('Period'), 'period'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$period_combo
-					])
-				)
-				->addItem((new CList())
-					->setAttribute('role', 'navigation')
+					->addItem((new CList())
+						->addItem([
+							new CLabel(_('Period'), 'period'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							$period_combo
+						])
+					),
+				(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])))
 					->setAttribute('aria-label', _('Content controls'))
-					->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
-				)
-			)
+			]))
 			->addItem(BR())
 			->addItem($tree->getHTML())
 			->show();

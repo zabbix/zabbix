@@ -39,40 +39,39 @@ $help->setHint($help_hint);
 
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
+	->setControls((new CList([
+		(new CForm('get'))
+			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-			->addItem([
-				new CLabel(_('Type'), 'type'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('type', $this->data['type'], 'submit()', [
-					SHOW_TRIGGERS => _('Triggers'),
-					SHOW_DATA => _('Data')
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
 				])
-			])
-			->addItem([
-				new CLabel(_('Hosts location'), 'view_style'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('view_style', $this->data['view_style'], 'submit()', [
-					STYLE_TOP => _('Top'),
-					STYLE_LEFT => _('Left')
+				->addItem([
+					new CLabel(_('Type'), 'type'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('type', $this->data['type'], 'submit()', [
+						SHOW_TRIGGERS => _('Triggers'),
+						SHOW_DATA => _('Data')
+					])
 				])
-			])
-		)
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _('Content controls'))
+				->addItem([
+					new CLabel(_('Hosts location'), 'view_style'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+						STYLE_TOP => _('Top'),
+						STYLE_LEFT => _('Left')
+					])
+				])
+		),
+		(new CTag('nav', true, (new CList())
 			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
 			->addItem($help)
-		)
-	);
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	])));
 
 // filter
 $filter = (new CFilter('web.overview.filter.state'))

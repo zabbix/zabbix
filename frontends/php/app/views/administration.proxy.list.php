@@ -25,13 +25,11 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Proxies'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _('Content controls'))
+	->setControls((new CTag('nav', true,
+		(new CList())
 			->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit'))
-		)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter('web.proxies.filter.state'))
 		->addVar('action', 'proxy.list')

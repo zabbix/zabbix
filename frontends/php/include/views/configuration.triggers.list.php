@@ -54,28 +54,33 @@ $filter = (new CFilter('web.triggers.filter.state'))
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->setAttribute('role', 'form')
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-			->addItem([
-				new CLabel(_('Host'), 'hostid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getHostsCB()
-			])
-		)
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
+				])
+				->addItem([
+					new CLabel(_('Host'), 'hostid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getHostsCB()
+				])
+			),
+		(new CTag('nav', true, ($data['hostid'] != 0)
+			? new CRedirectButton(_('Create trigger'), (new CUrl())
+					->setArgument('groupid', $data['pageFilter']->groupid)
+					->setArgument('hostid', $data['pageFilter']->hostid)
+					->setArgument('form', 'create')
+					->getUrl()
+				)
+			: (new CButton('form', _('Create trigger (select host first)')))->setEnabled(false)
+		))
 			->setAttribute('aria-label', _('Content controls'))
-			->addItem($create_button)
-		)
-	);
+	]));
 
 if ($this->data['hostid']) {
 	$widget->addItem(get_header_host_table('triggers', $this->data['hostid']));

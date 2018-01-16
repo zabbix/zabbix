@@ -21,14 +21,13 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create host prototype'), (new CUrl())->setArgument('form', 'create')
+				->getUrl()
+			))
+		))
 			->setAttribute('aria-label', _('Content controls'))
-			->addItem(new CSubmit('form', _('Create host prototype')))
-		)
 	)
 	->addItem(
 		get_header_host_table('hosts', $this->data['discovery_rule']['hostid'], $this->data['parent_discoveryid'])

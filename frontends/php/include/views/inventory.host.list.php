@@ -21,9 +21,8 @@
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CForm('get'))
+		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
-			->setAttribute('role', 'form')
-			->setAttribute('aria-label', _('Main filter'))
 			->addItem([
 				new CLabel(_('Group'), 'groupid'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

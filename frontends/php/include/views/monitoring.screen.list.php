@@ -18,12 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())->setTitle(_('Screens'));
 $form = (new CForm('get'))->cleanItems();
 
 $content_control = (new CList())
-	->setAttribute('role', 'navigation')
-	->setAttribute('aria-label', _('Content controls'))
 	->addItem(new CSubmit('form', _('Create screen')));
 
 if ($data['templateid']) {
@@ -32,8 +31,6 @@ if ($data['templateid']) {
 }
 else {
 	$form->addItem((new CList())
-		->setAttribute('role', 'form')
-		->setAttribute('aria-label', _('Main filter'))
 		->addItem(
 			new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
 				'screens.php' => _('Screens'),
@@ -45,7 +42,9 @@ else {
 }
 
 $form->addItem($content_control);
-$widget->setControls($form);
+$widget->setControls((new CTag('nav', true, $form))
+	->setAttribute('aria-label', _('Content controls'))
+);
 
 // filter
 if (!$data['templateid']) {

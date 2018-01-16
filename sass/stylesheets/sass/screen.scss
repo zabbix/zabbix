@@ -215,8 +215,6 @@ pre {
 
 // Main Navigation
 nav {
-	background-color: $main-subnav-bg-color;
-
 	a {
 
 		&:link {
@@ -243,6 +241,8 @@ nav {
 
 .nav {
 	@extend nav;
+
+	background-color: $main-subnav-bg-color;
 }
 
 %no-border {
@@ -533,6 +533,10 @@ ul.top-nav-icons {
 			vertical-align: top;
 			position: relative;
 			padding: 0 0 0 10px;
+		}
+
+		ul li:first-child {
+			padding-left: 0;
 		}
 	}
 

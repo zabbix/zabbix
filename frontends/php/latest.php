@@ -315,10 +315,10 @@ if ($filter['hostids']) {
  */
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
-	->setControls((new CList())
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Content controls'))
+	->setControls((new CTag('nav', true, (new CList())
 		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+	))
+		->setAttribute('aria-label', _('Content controls'))
 	);
 
 // Filter
