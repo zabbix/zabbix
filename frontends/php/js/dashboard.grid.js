@@ -1263,6 +1263,7 @@
 					data = $this.data('dashboardGrid'),
 					body = data.dialogue['body'],
 					footer = $('.overlay-dialogue-footer', data.dialogue['div']),
+					header = $('.dashbrd-widget-head', data.dialogue['div']),
 					form = $('form', body),
 					widget = data.dialogue['widget'], // widget currently beeing edited
 					url = new Curl('zabbix.php'),
@@ -1324,6 +1325,8 @@
 						if (typeof(resp.messages) !== 'undefined') {
 							body.append(resp.messages);
 						}
+
+						body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
 
 						// Change submit function for returned form.
 						$('#widget_dialogue_form', body).on('submit', function(e) {

@@ -185,7 +185,6 @@ class CFilter extends CTag {
 					->addClass($this->attributes['class'])
 					->setId($this->attributes['id'])
 			]))
-			->setAttribute('role', 'form')
 			->setAttribute('aria-label', _('Filter'));
 
 		return $wrapper->toString($destroy);

@@ -563,6 +563,7 @@ function overlayDialogue(params) {
 	var button_focused = null,
 		cancel_action = null,
 		overlay_dialogue = null,
+		headerid = '',
 		overlay_dialogue_footer = jQuery('<div>', {
 			class: 'overlay-dialogue-footer'
 		});
@@ -574,6 +575,8 @@ function overlayDialogue(params) {
 	if (typeof params.script_inline !== 'undefined') {
 		jQuery(overlay_dialogue_footer).append(jQuery('<script>').text(params.script_inline));
 	}
+
+	headerid = 'dashbrd-widget-head-title-'+params.dialogueid;
 
 	if (jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]').length) {
 		overlay_dialogue = jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]');
@@ -587,7 +590,10 @@ function overlayDialogue(params) {
 		overlay_dialogue = jQuery('<div>', {
 			'id': 'overlay_dialogue',
 			'class': 'overlay-dialogue modal',
-			'data-dialogueid': params.dialogueid
+			'data-dialogueid': params.dialogueid,
+			'role': 'dialog',
+			'aria-modal': 'true',
+			'aria-labeledby': headerid
 		});
 
 		jQuery('<div>', {
@@ -668,7 +674,7 @@ function overlayDialogue(params) {
 		.append(
 			jQuery('<div>', {
 				class: 'dashbrd-widget-head'
-			}).append(jQuery('<h4 id="dashbrd-widget-head-title">').text(params.title))
+			}).append(jQuery('<h4 id="'+headerid+'">').text(params.title))
 		)
 		.append(params.controls ? jQuery('<div>').addClass('overlay-dialogue-controls').html(params.controls) : null)
 		.append(
@@ -679,6 +685,9 @@ function overlayDialogue(params) {
 				.each(function() {
 					body_mutation_observer.observe(this, {childList: true, subtree: true});
 				})
+				.find('form')
+					.attr('aria-labeledby', headerid)
+				.end()
 		)
 		.append(overlay_dialogue_footer)
 		.on('keydown', function(e) {
