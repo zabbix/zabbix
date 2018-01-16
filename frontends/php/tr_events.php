@@ -129,6 +129,10 @@ if ($event['r_eventid'] != 0) {
 				}
 			}
 		}
+		$event['r_accessible'] = true;
+	}
+	else {
+		$event['r_accessible'] = false;
 	}
 }
 

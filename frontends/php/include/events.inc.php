@@ -195,7 +195,7 @@ function make_event_details($event, $backurl) {
 		$table->addRow([_('Acknowledged'), getEventAckState($event, $backurl)]);
 	}
 
-	if ($event['r_eventid'] != 0) {
+	if ($event['r_eventid'] != 0 && $event['r_accessible']) {
 		if ($event['correlationid'] != 0) {
 			$correlations = API::Correlation()->get([
 				'output' => ['correlationid', 'name'],
@@ -308,6 +308,13 @@ function make_small_eventlist($startEvent, $backurl) {
 		: [];
 
 	foreach ($events as &$event) {
+		if ($event['r_eventid'] != 0 && !array_key_exists($event['r_eventid'], $r_events)) {
+			$event['r_accessible'] = false;
+		}
+		else {
+			$event['r_accessible'] = true;
+		}
+
 		if (array_key_exists($event['r_eventid'], $r_events)) {
 			$event['r_clock'] = $r_events[$event['r_eventid']]['clock'];
 			$event['correlationid'] = $r_events[$event['r_eventid']]['correlationid'];
@@ -328,11 +335,17 @@ function make_small_eventlist($startEvent, $backurl) {
 			? zbx_date2age($event['clock'])
 			: zbx_date2age($event['clock'], $event['r_clock']);
 
-		if (bccomp($startEvent['eventid'], $event['eventid']) == 0 && $nextevent = get_next_event($event, $events)) {
-			$duration = zbx_date2age($nextevent['clock'], $clock);
+		if ($event['r_accessible']) {
+			if (bccomp($startEvent['eventid'], $event['eventid']) == 0
+					&& $nextevent = get_next_event($event, $events)) {
+				$duration = zbx_date2age($nextevent['clock'], $clock);
+			}
+			elseif (bccomp($startEvent['eventid'], $event['eventid']) == 0) {
+				$duration = zbx_date2age($clock);
+			}
 		}
-		elseif (bccomp($startEvent['eventid'], $event['eventid']) == 0) {
-			$duration = zbx_date2age($clock);
+		else {
+			$duration = _('Inaccessible value');
 		}
 
 		if ($event['r_eventid'] == 0) {
@@ -371,13 +384,17 @@ function make_small_eventlist($startEvent, $backurl) {
 			$acknowledges = makeEventsAcknowledges($events, $backurl);
 		}
 
+		$r_clock = $event['r_accessible']
+			? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['r_clock'])
+			: _('Inaccessible value');
+
 		$table->addRow([
 			(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 			))->addClass('action'),
 			($event['r_eventid'] == 0)
 				? ''
-				: (new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['r_clock']),
+				: (new CLink($r_clock,
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 				))->addClass('action'),
 			$cell_status,
