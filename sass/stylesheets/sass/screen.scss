@@ -2122,7 +2122,8 @@ button {
 	&:focus {
 		@extend .btn-link;
 		outline: none;
-		border-bottom: 3px solid rgba($link-hover-color, 0.5);
+		margin-bottom: -2px !important;
+		border-bottom: 2px solid rgba($link-hover-color, 0.5);
 		-webkit-box-shadow: 0 0 0 0px !important;
 		-moz-box-shadow: 0 0 0 0px !important;
 		box-shadow: 0 0 0 0px !important;
@@ -4407,6 +4408,10 @@ td.inactive-bg {
 	background-color: $transparent !important;
 	@extend %close-icon;
 	@include border-radius(2px);
+
+	&:focus {
+	box-shadow: none;
+	}
 }
 
 .overlay-close-btn {

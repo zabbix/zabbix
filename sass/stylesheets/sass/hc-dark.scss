@@ -377,6 +377,7 @@ ul.top-nav-icons {
 	color: #fff !important;
 
 	&:focus {
+		margin-bottom: -3px !important;
 		border-bottom: 3px solid $link-hover-color !important;
 	}
 }

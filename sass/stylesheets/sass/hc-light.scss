@@ -358,6 +358,11 @@ ul.top-nav-icons {
 .btn-link {
 	font-weight: bold !important;
 	color: #000 !important;
+
+	&:focus {
+		margin-bottom: -3px !important;
+		border-bottom: 3px solid $link-hover-color !important;
+	}
 }
 
 .filter-trigger {
