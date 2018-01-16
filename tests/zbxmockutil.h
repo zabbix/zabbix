@@ -1,7 +1,6 @@
-<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -18,30 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_MOCK_UTIL_H
+#define ZABBIX_MOCK_UTIL_H
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+#include "zbxmockdata.h"
 
-class testFormLoginWithRequest extends CWebTest {
-	// Returns layout data
-	public static function provider() {
-		return [
-			[
-				[
-					'request' => 'zabbix.php?action=proxy.list&ddreset=1',
-					'header' => 'Proxies'
-				]
-			]
-		];
-	}
+const char	*zbx_mock_get_parameter_string(const char *path);
+const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name);
 
-	/**
-	 * @dataProvider provider
-	 */
-	public function testFormLoginWithRequest_test($data) {
-		// Log in.
-		$this->zbxTestLogin($data['request']);
+zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);
+zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, const char *name);
 
-		// Test page title.
-		$this->zbxTestCheckHeader($data['header']);
-	}
-}
+
+#endif

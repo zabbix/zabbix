@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	{
 		DB_EVENT	*event = NULL;
 
-		event = zbx_malloc(event, sizeof(DB_EVENT));
+		event = (DB_EVENT *)zbx_malloc(event, sizeof(DB_EVENT));
 		ZBX_STR2UINT64(event->eventid, row[0]);
 		event->source = atoi(row[1]);
 		event->object = atoi(row[2]);
@@ -114,10 +114,10 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 					continue;
 				}
 
-				event = events->values[index];
+				event = (DB_EVENT *)events->values[index];
 			}
 
-			tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[1]);
 			tag->value = zbx_strdup(NULL, row[2]);
 			zbx_vector_ptr_append(&event->tags, tag);
@@ -149,7 +149,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 			for (i = 0; i < events->values_num; i++)
 			{
-				DB_EVENT	*event = events->values[i];
+				DB_EVENT	*event = (DB_EVENT *)events->values[i];
 
 				if (EVENT_OBJECT_TRIGGER != event->object)
 					continue;
@@ -179,6 +179,24 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_db_trigger_clean                                             *
+ *                                                                            *
+ * Purpose: frees resources allocated to store trigger data                   *
+ *                                                                            *
+ * Parameters: trigger -                                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
+{
+	zbx_free(trigger->description);
+	zbx_free(trigger->expression);
+	zbx_free(trigger->recovery_expression);
+	zbx_free(trigger->comments);
+	zbx_free(trigger->url);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_free_event                                                   *
  *                                                                            *
  * Purpose: deallocate memory allocated in function 'get_db_events_info'      *
@@ -195,13 +213,7 @@ void	zbx_db_free_event(DB_EVENT *event)
 	}
 
 	if (0 != event->trigger.triggerid)
-	{
-		zbx_free(event->trigger.description);
-		zbx_free(event->trigger.expression);
-		zbx_free(event->trigger.recovery_expression);
-		zbx_free(event->trigger.comments);
-		zbx_free(event->trigger.url);
-	}
+		zbx_db_trigger_clean(&event->trigger);
 
 	zbx_free(event->name);
 	zbx_free(event);

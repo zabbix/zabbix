@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -238,7 +238,10 @@ class CMenuPopupHelper {
 		}
 
 		if ($trigger['url'] !== '') {
-			$data['url'] = $trigger['url'];
+			$data['url'] = CHtmlUrlValidator::validate($trigger['url'])
+				? $trigger['url']
+				: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'], false,
+						false)).'\');';
 		}
 
 		return $data;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class CTrend extends CApiService {
 
 				switch ($source) {
 					case ZBX_HISTORY_SOURCE_ELASTIC:
-						$data = $this->getFromElasticSearch($options);
+						$data = $this->getFromElasticsearch($options);
 						break;
 
 					default:
@@ -189,11 +189,11 @@ class CTrend extends CApiService {
 	}
 
 	/**
-	 * ElasticSearch specific implementation of get.
+	 * Elasticsearch specific implementation of get.
 	 *
 	 * @see CTrend::get
 	 */
-	private function getFromElasticSearch($options) {
+	private function getFromElasticsearch($options) {
 		$query_must = [];
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
 
@@ -261,7 +261,7 @@ class CTrend extends CApiService {
 			$result = 0;
 		}
 
-		foreach (CHistoryManager::getElasticSearchEndpoints($value_types) as $type => $endpoint) {
+		foreach (CHistoryManager::getElasticsearchEndpoints($value_types) as $type => $endpoint) {
 			$itemids = array_keys($options['itemids'][$type]);
 
 			if (!$itemids) {
@@ -276,7 +276,7 @@ class CTrend extends CApiService {
 
 			$query['aggs']['group_by_itemid']['terms']['size'] = count($itemids);
 
-			$data = CElasticSearchHelper::query('POST', $endpoint, $query);
+			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!$options['countOutput']) {

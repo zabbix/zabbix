@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,16 @@
 #define ZABBIX_ZBXMEDIA_H
 
 #include "sysinc.h" /* using "config.h" would be better, but it causes warnings when compiled with Net-SNMP */
+#include "zbxalgo.h"
 
 extern char	*CONFIG_SOURCE_IP;
+
+typedef struct
+{
+	char		*addr;
+	char		*disp_name;
+}
+zbx_mailaddr_t;
 
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		const char *smtp_email, const char *mailto, const char *mailsubject, const char *mailbody,

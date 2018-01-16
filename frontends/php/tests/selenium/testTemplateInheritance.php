@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,11 +53,9 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestTabSwitch('Templates');
 
-		$this->zbxTestAssertElementPresentId('add_templates_');
-		$this->zbxTestClickButtonText('Select');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickButtonMultiselect('add_templates_');
+		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestClickLinkTextWait('Template App Zabbix Agent');
-		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template App Zabbix Agent');
@@ -266,9 +264,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_item']");
-		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestClick('add_item');
+		$this->zbxTestLaunchOverlayDialog('Items');
+		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Graph added');
 
@@ -494,14 +492,14 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_protoitem']");
-		$this->zbxTestClickLinkTextWait('itemDiscovery');
-		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClick('add_protoitem');
+		$this->zbxTestLaunchOverlayDialog('Item prototypes');
+		$this->zbxTestClickLinkText('itemDiscovery');
 		$this->zbxTestTextPresent($this->templateName.': itemDiscovery');
 
-		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_item']");
-		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
-		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClick('add_item');
+		$this->zbxTestLaunchOverlayDialog('Items');
+		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 
 		$this->zbxTestClickWait('add');

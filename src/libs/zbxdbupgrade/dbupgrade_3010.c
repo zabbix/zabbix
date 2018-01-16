@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -265,7 +265,7 @@ static int	DBpatch_3010021_update_event_recovery(zbx_hashset_t *events, zbx_uint
 	zbx_object_events_t	*object_events, object_events_local;
 	zbx_db_insert_t		db_insert;
 
-	sql = zbx_malloc(NULL, sql_alloc);
+	sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 	/* source: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

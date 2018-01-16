@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 
 		for (j = 0; j < host->interfaces_v.values_num; j++)
 		{
-			ZBX_DC_INTERFACE	*interface = host->interfaces_v.values[j];
+			ZBX_DC_INTERFACE	*interface = (ZBX_DC_INTERFACE *)host->interfaces_v.values[j];
 
 			zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, interface->interfaceid);
 		}
@@ -216,7 +216,7 @@ static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
 	ZBX_DC_HOST_INVENTORY		*host_inventory;
 	zbx_hashset_iter_t		iter;
 	zbx_vector_ptr_t		index;
-	int				i;
+	int				i, j;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
 
@@ -233,6 +233,12 @@ static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
 		host_inventory = (ZBX_DC_HOST_INVENTORY *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " inventory_mode:%u", host_inventory->hostid,
 				host_inventory->inventory_mode);
+
+		for (j = 0; j < HOST_INVENTORY_FIELD_COUNT; j++)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", DBget_inventory_field(j + 1),
+					host_inventory->values[j]);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -713,7 +719,7 @@ static void	DCdump_trigdeps(ZBX_DC_CONFIG *config)
 
 		for (j = 0; j < trigdep->dependencies.values_num; j++)
 		{
-			const ZBX_DC_TRIGGER_DEPLIST	*trigdep_up = trigdep->dependencies.values[j];
+			const ZBX_DC_TRIGGER_DEPLIST	*trigdep_up = (ZBX_DC_TRIGGER_DEPLIST *)trigdep->dependencies.values[j];
 
 			zabbix_log(LOG_LEVEL_TRACE, "  triggerid:" ZBX_FS_UI64, trigdep_up->triggerid);
 		}
@@ -785,7 +791,7 @@ static void	DCdump_actions(ZBX_DC_CONFIG *config)
 
 		for (j = 0; j < action->conditions.values_num; j++)
 		{
-			zbx_dc_action_condition_t	*condition = action->conditions.values[j];
+			zbx_dc_action_condition_t	*condition = (zbx_dc_action_condition_t *)action->conditions.values[j];
 
 			zabbix_log(LOG_LEVEL_TRACE, "  conditionid:" ZBX_FS_UI64 " conditiontype:%u operator:%u"
 					" value:'%s' value2:'%s'", condition->conditionid, condition->conditiontype,

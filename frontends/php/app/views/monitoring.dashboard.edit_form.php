@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,13 +43,15 @@ $multiselect = (new CMultiSelect([
 	'callPostEvent' => true
 ]))
 	->setAttribute('data-default-owner', CJs::encodeJson($data['dashboard']['owner']))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAriaRequired();
 
 $form->addItem((new CFormList())
-	->addRow(_('Owner'), $multiselect)
-	->addRow(_('Name'),
+	->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect)
+	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
 );

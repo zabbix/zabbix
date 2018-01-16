@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,6 +104,10 @@ class CRadioButtonList extends CList {
 				$radio->addClass(ZBX_STYLE_CHECKBOX_RADIO);
 				parent::addItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]);
 			}
+		}
+
+		if ($this->getAttribute('aria-required') === 'true') {
+			$this->setAttribute('role', 'radiogroup');
 		}
 
 		return parent::toString($destroy);

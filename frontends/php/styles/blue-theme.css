@@ -312,8 +312,8 @@ ul.top-nav-icons {
     color: white; }
   .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
     color: white;
-    padding: 8px 0 5px 0;
-    border-bottom: 3px solid #1384c7; }
+    padding: 8px 0 4px 0;
+    border-bottom: 4px solid #80c8f3; }
 
 .arrow-up {
   border-left: 4px solid transparent;
@@ -1172,6 +1172,12 @@ footer, .footer {
       -webkit-transition: none;
       -moz-transition: none;
       transition: none; }
+
+label.form-label-asterisk:before {
+  color: #e33734;
+  display: inline-block;
+  content: '*';
+  margin-right: 0.3em; }
 
 label input[type="checkbox"] {
   margin-right: 3px; }
@@ -2293,8 +2299,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue .table-paging {
     border: none;
     border-top: 1px solid #ebeef0; }
-  .overlay-dialogue .table-forms-td-left {
-    text-align: left; }
   .overlay-dialogue .table-forms-td-right td {
     vertical-align: middle; }
     .overlay-dialogue .table-forms-td-right td label {
@@ -2701,10 +2705,11 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .na-bg, .na-bg input[type="radio"]:checked + label {
   color: #2a353a; }
 
-td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg, td.warning-bg, td.log-warning-bg, td.high-bg, td.log-high-bg, td.disaster-bg, td.log-disaster-bg {
-  border-left: none; }
-  td.na-bg ~ td.na-bg, td.log-na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.log-info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.log-warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.log-high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.log-disaster-bg ~ td.na-bg, td.na-bg ~ td.log-na-bg, td.log-na-bg ~ td.log-na-bg, td.normal-bg ~ td.log-na-bg, td.info-bg ~ td.log-na-bg, td.log-info-bg ~ td.log-na-bg, td.average-bg ~ td.log-na-bg, td.warning-bg ~ td.log-na-bg, td.log-warning-bg ~ td.log-na-bg, td.high-bg ~ td.log-na-bg, td.log-high-bg ~ td.log-na-bg, td.disaster-bg ~ td.log-na-bg, td.log-disaster-bg ~ td.log-na-bg, td.na-bg ~ td.normal-bg, td.log-na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.log-info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.log-warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.log-high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.log-disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.log-na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.log-info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.log-warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.log-high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.log-disaster-bg ~ td.info-bg, td.na-bg ~ td.log-info-bg, td.log-na-bg ~ td.log-info-bg, td.normal-bg ~ td.log-info-bg, td.info-bg ~ td.log-info-bg, td.log-info-bg ~ td.log-info-bg, td.average-bg ~ td.log-info-bg, td.warning-bg ~ td.log-info-bg, td.log-warning-bg ~ td.log-info-bg, td.high-bg ~ td.log-info-bg, td.log-high-bg ~ td.log-info-bg, td.disaster-bg ~ td.log-info-bg, td.log-disaster-bg ~ td.log-info-bg, td.na-bg ~ td.average-bg, td.log-na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.log-info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.log-warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.log-high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.log-disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.log-na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.log-info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.log-warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.log-high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.log-disaster-bg ~ td.warning-bg, td.na-bg ~ td.log-warning-bg, td.log-na-bg ~ td.log-warning-bg, td.normal-bg ~ td.log-warning-bg, td.info-bg ~ td.log-warning-bg, td.log-info-bg ~ td.log-warning-bg, td.average-bg ~ td.log-warning-bg, td.warning-bg ~ td.log-warning-bg, td.log-warning-bg ~ td.log-warning-bg, td.high-bg ~ td.log-warning-bg, td.log-high-bg ~ td.log-warning-bg, td.disaster-bg ~ td.log-warning-bg, td.log-disaster-bg ~ td.log-warning-bg, td.na-bg ~ td.high-bg, td.log-na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.log-info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.log-warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.log-high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.log-disaster-bg ~ td.high-bg, td.na-bg ~ td.log-high-bg, td.log-na-bg ~ td.log-high-bg, td.normal-bg ~ td.log-high-bg, td.info-bg ~ td.log-high-bg, td.log-info-bg ~ td.log-high-bg, td.average-bg ~ td.log-high-bg, td.warning-bg ~ td.log-high-bg, td.log-warning-bg ~ td.log-high-bg, td.high-bg ~ td.log-high-bg, td.log-high-bg ~ td.log-high-bg, td.disaster-bg ~ td.log-high-bg, td.log-disaster-bg ~ td.log-high-bg, td.na-bg ~ td.disaster-bg, td.log-na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.log-info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.log-warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.log-high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg, td.log-disaster-bg ~ td.disaster-bg, td.na-bg ~ td.log-disaster-bg, td.log-na-bg ~ td.log-disaster-bg, td.normal-bg ~ td.log-disaster-bg, td.info-bg ~ td.log-disaster-bg, td.log-info-bg ~ td.log-disaster-bg, td.average-bg ~ td.log-disaster-bg, td.warning-bg ~ td.log-disaster-bg, td.log-warning-bg ~ td.log-disaster-bg, td.high-bg ~ td.log-disaster-bg, td.log-high-bg ~ td.log-disaster-bg, td.disaster-bg ~ td.log-disaster-bg, td.log-disaster-bg ~ td.log-disaster-bg {
-    border-left: 1px dotted #ebeef0; }
+.na-bg.blink-hidden, .na-bg input[type="radio"]:checked + label.blink-hidden {
+  background-color: transparent; }
+
+td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg {
+  border-left: 1px dotted #ebeef0; }
 
 .log-na-bg {
   color: #2a353a;
@@ -2713,8 +2718,14 @@ td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg,
 .normal-bg {
   color: #0e4123; }
 
+.normal-bg.blink-hidden {
+  background-color: transparent; }
+
 .info-bg, .info-bg input[type="radio"]:checked + label {
   color: #00268e; }
+
+.info-bg.blink-hidden, .info-bg input[type="radio"]:checked + label.blink-hidden {
+  background-color: transparent; }
 
 .log-info-bg {
   color: #00268e;
@@ -2723,8 +2734,14 @@ td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg,
 .average-bg, .average-bg input[type="radio"]:checked + label {
   color: #733100; }
 
+.average-bg.blink-hidden, .average-bg input[type="radio"]:checked + label.blink-hidden {
+  background-color: transparent; }
+
 .warning-bg, .warning-bg input[type="radio"]:checked + label {
   color: #734d00; }
+
+.warning-bg.blink-hidden, .warning-bg input[type="radio"]:checked + label.blink-hidden {
+  background-color: transparent; }
 
 .log-warning-bg {
   color: #734d00;
@@ -2733,12 +2750,18 @@ td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg,
 .high-bg, .high-bg input[type="radio"]:checked + label {
   color: #52190b; }
 
+.high-bg.blink-hidden, .high-bg input[type="radio"]:checked + label.blink-hidden {
+  background-color: transparent; }
+
 .log-high-bg {
   color: #52190b;
   background-color: #e97659; }
 
 .disaster-bg, .disaster-bg input[type="radio"]:checked + label {
   color: #4b0c0c; }
+
+.disaster-bg.blink-hidden, .disaster-bg input[type="radio"]:checked + label.blink-hidden {
+  background-color: transparent; }
 
 .log-disaster-bg {
   color: #4b0c0c;
@@ -3463,24 +3486,21 @@ svg {
   .navtree .tree .tree-item.no-map > .tree-row > .content > .item-name, .navtree .tree .tree-item.inaccessible > .tree-row > .content > .item-name {
     color: #acbbc2; }
   .navtree .tree .tree-item.ui-sortable-helper {
-    background: #f7f7f7;
-    border-color: #d7dadc;
+    background: #fff;
+    border-color: #dfe4e7;
     border-width: 1px;
     border-style: solid; }
     .navtree .tree .tree-item.ui-sortable-helper .tools {
       display: none; }
-  .navtree .tree .tree-item.sortable-error {
-    border-color: transparent;
-    background: #fbe3e4; }
   .navtree .tree .tree-item.opened > ul {
     display: block; }
   .navtree .tree .tree-item.closed > ul {
     display: none; }
-  .navtree .tree .highliglted-parent > .tree-row {
-    background: #f9f9f9; }
-  .navtree .tree .sortable-item-placeholder {
-    background: #f5f5f5;
-    height: 33px; }
+  .navtree .tree .tree-item .sortable-error {
+    border-color: transparent;
+    background: rgba(227, 55, 52, 0.2); }
+  .navtree .tree .highlighted-parent > .tree-row {
+    background: #f7f8f9; }
   .navtree .tree .placeholder {
     background-color: #ebeef0;
     -webkit-animation: fadein .5s;
@@ -3488,8 +3508,6 @@ svg {
     -ms-animation: fadein .5s;
     -o-animation: fadein .5s;
     animation: fadein .5s; }
-  .navtree .tree .drop-hover > .row {
-    background: #faebd7; }
 
 /*doc
 ---

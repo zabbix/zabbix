@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ if ($blink_period > 0) {
 				->addClass(ZBX_STYLE_NOTIF_INDIC)
 				->addClass(getSeverityStyle(null, false))
 				->addClass('blink')
+				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN)
 		);
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 		$indic_container->addItem(
@@ -58,6 +59,7 @@ if ($blink_period > 0) {
 				->addClass(ZBX_STYLE_NOTIF_INDIC)
 				->addClass(getSeverityStyle($severity))
 				->addClass('blink')
+				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN)
 			);
 	}
 	$indic_container->addItem(

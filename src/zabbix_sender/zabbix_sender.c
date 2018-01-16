@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -982,7 +982,7 @@ static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
 		if (*buffer_alloc - buffer_offset < len + 1)
 		{
 			*buffer_alloc = (buffer_offset + len + 1) * 3 / 2;
-			*buffer = zbx_realloc(*buffer, *buffer_alloc);
+			*buffer = (char *)zbx_realloc(*buffer, *buffer_alloc);
 		}
 
 		memcpy(*buffer + buffer_offset, tmp, len);
@@ -1104,7 +1104,7 @@ int	main(int argc, char **argv)
 		}
 
 		sendval_args.sync_timestamp = WITH_TIMESTAMPS;
-		in_line = zbx_malloc(NULL, in_line_alloc);
+		in_line = (char *)zbx_malloc(NULL, in_line_alloc);
 
 		ret = SUCCEED;
 
@@ -1167,7 +1167,7 @@ int	main(int argc, char **argv)
 			if (key_value_alloc != in_line_alloc)
 			{
 				key_value_alloc = in_line_alloc;
-				key_value = zbx_realloc(key_value, key_value_alloc);
+				key_value = (char *)zbx_realloc(key_value, key_value_alloc);
 			}
 
 			if ('\0' != *p && '"' != *p)

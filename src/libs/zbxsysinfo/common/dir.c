@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,11 +241,11 @@ static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *re
 
 static int	etype_to_mask(char *etype)
 {
-	static char	*template = DET_TEMPLATE;
-	char		*tmp;
-	int		ret = 1;
+	static const char	*template_list = DET_TEMPLATE;
+	const char		*tmp;
+	int			ret = 1;
 
-	for (tmp = template; '\0' != *tmp; tmp += strlen(tmp) + 1)
+	for (tmp = template_list; '\0' != *tmp; tmp += strlen(tmp) + 1)
 	{
 		if (0 == strcmp(etype, tmp))
 			break;
@@ -392,7 +392,7 @@ static void	list_vector_destroy(zbx_vector_ptr_t *list)
 
 	while (0 < list->values_num)
 	{
-		item = list->values[--list->values_num];
+		item = (zbx_directory_item_t *)list->values[--list->values_num];
 		zbx_free(item->path);
 		zbx_free(item);
 	}
@@ -405,7 +405,7 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
 
 	while (0 < descriptors->values_num)
 	{
-		file = descriptors->values[--descriptors->values_num];
+		file = (zbx_file_descriptor_t *)descriptors->values[--descriptors->values_num];
 		zbx_free(file);
 	}
 	zbx_vector_ptr_destroy(descriptors);
@@ -609,7 +609,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < list.values_num)
 	{
-		item = list.values[--list.values_num];
+		item = (zbx_directory_item_t *)list.values[--list.values_num];
 
 		if (NULL == (directory = opendir(item->path)))
 		{
@@ -894,7 +894,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < list.values_num)
 	{
-		item = list.values[--list.values_num];
+		item = (zbx_directory_item_t *)list.values[--list.values_num];
 
 		if (NULL == (directory = opendir(item->path)))
 		{
@@ -933,8 +933,8 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 						(S_ISFIFO(status.st_mode) && 0 != (types & DET_FIFO))) &&
 						(min_size <= (zbx_uint64_t)status.st_size
 								&& (zbx_uint64_t)status.st_size <= max_size) &&
-						(min_time < status.st_mtim.tv_sec &&
-								status.st_mtim.tv_sec <= max_time))
+						(min_time < status.st_mtime &&
+								status.st_mtime <= max_time))
 				{
 					++count;
 				}

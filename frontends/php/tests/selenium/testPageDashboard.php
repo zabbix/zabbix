@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,20 +42,21 @@ class testPageDashboard extends CWebTest {
 					$this->zbxTestCheckNoRealHostnames();
 					break;
 				case 'admin' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , 4);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
 					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//a[@href='zabbix.php?action=discovery.view&druleid=3']", 'External network');
 					break;
 				case 'user';
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , 5);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
 					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 				case 'guest';
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,14 +127,14 @@ static void	its_itservices_clean(zbx_itservices_t *itservices)
 
 	zbx_hashset_iter_reset(&itservices->index, &iter);
 
-	while (NULL != (index = zbx_hashset_iter_next(&iter)))
+	while (NULL != (index = (zbx_itservice_index_t *)zbx_hashset_iter_next(&iter)))
 		zbx_vector_ptr_destroy(&index->itservices);
 
 	zbx_hashset_destroy(&itservices->index);
 
 	zbx_hashset_iter_reset(&itservices->itservices, &iter);
 
-	while (NULL != (itservice = zbx_hashset_iter_next(&iter)))
+	while (NULL != (itservice = (zbx_itservice_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vector_ptr_destroy(&itservice->children);
 		zbx_vector_ptr_destroy(&itservice->parents);
@@ -168,17 +168,17 @@ static zbx_itservice_t	*its_itservice_create(zbx_itservices_t *itservices, zbx_u
 	zbx_vector_ptr_create(&itservice.children);
 	zbx_vector_ptr_create(&itservice.parents);
 
-	pitservice = zbx_hashset_insert(&itservices->itservices, &itservice, sizeof(itservice));
+	pitservice = (zbx_itservice_t *)zbx_hashset_insert(&itservices->itservices, &itservice, sizeof(itservice));
 
 	if (0 != triggerid)
 	{
-		if (NULL == (pindex = zbx_hashset_search(&itservices->index, &triggerid)))
+		if (NULL == (pindex = (zbx_itservice_index_t *)zbx_hashset_search(&itservices->index, &triggerid)))
 		{
 			zbx_itservice_index_t	index = {.triggerid = triggerid};
 
 			zbx_vector_ptr_create(&index.itservices);
 
-			pindex = zbx_hashset_insert(&itservices->index, &index, sizeof(index));
+			pindex = (zbx_itservice_index_t *)zbx_hashset_insert(&itservices->index, &index, sizeof(index));
 		}
 
 		zbx_vector_ptr_append(&pindex->itservices, pitservice);
@@ -203,7 +203,7 @@ static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid,
 {
 	zbx_status_update_t	*update;
 
-	update = zbx_malloc(NULL, sizeof(zbx_status_update_t));
+	update = (zbx_status_update_t *)zbx_malloc(NULL, sizeof(zbx_status_update_t));
 
 	update->sourceid = sourceid;
 	update->status = status;
@@ -245,7 +245,7 @@ static void	its_itservices_load_children(zbx_itservices_t *itservices)
 
 	zbx_hashset_iter_reset(&itservices->itservices, &iter);
 
-	while (NULL != (itservice = zbx_hashset_iter_next(&iter)))
+	while (NULL != (itservice = (zbx_itservice_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (0 == itservice->triggerid)
 			zbx_vector_uint64_append(&serviceids, itservice->serviceid);
@@ -272,13 +272,13 @@ static void	its_itservices_load_children(zbx_itservices_t *itservices)
 		ZBX_STR2UINT64(serviceid, row[0]);
 		ZBX_STR2UINT64(parentid, row[3]);
 
-		if (NULL == (parent = zbx_hashset_search(&itservices->itservices, &parentid)))
+		if (NULL == (parent = (zbx_itservice_t *)zbx_hashset_search(&itservices->itservices, &parentid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		if (NULL == (itservice = zbx_hashset_search(&itservices->itservices, &serviceid)))
+		if (NULL == (itservice = (zbx_itservice_t *)zbx_hashset_search(&itservices->itservices, &serviceid)))
 			itservice = its_itservice_create(itservices, serviceid, 0, atoi(row[1]), atoi(row[2]));
 
 		if (FAIL == zbx_vector_ptr_search(&parent->children, itservice, ZBX_DEFAULT_PTR_COMPARE_FUNC))
@@ -339,14 +339,14 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 		ZBX_STR2UINT64(serviceid, row[3]);
 
 		/* find the service */
-		if (NULL == (itservice = zbx_hashset_search(&itservices->itservices, &serviceid)))
+		if (NULL == (itservice = (zbx_itservice_t *)zbx_hashset_search(&itservices->itservices, &serviceid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
 		/* find/load the parent service */
-		if (NULL == (parent = zbx_hashset_search(&itservices->itservices, &parentid)))
+		if (NULL == (parent = (zbx_itservice_t *)zbx_hashset_search(&itservices->itservices, &parentid)))
 		{
 			parent = its_itservice_create(itservices, parentid, 0, atoi(row[1]), atoi(row[2]));
 			zbx_vector_uint64_append(serviceids, parent->serviceid);
@@ -483,7 +483,7 @@ static void	its_itservice_update_status(zbx_itservice_t *itservice, int clock, z
 
 		/* update parent services */
 		for (i = 0; i < itservice->parents.values_num; i++)
-			its_itservice_update_status(itservice->parents.values[i], clock, alarms);
+			its_itservice_update_status((zbx_itservice_t *)itservice->parents.values[i], clock, alarms);
 	}
 out:
 	;
@@ -531,7 +531,7 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 	zbx_vector_ptr_create(&updates);
 	zbx_hashset_iter_reset(&itservices->itservices, &iter);
 
-	while (NULL != (itservice = zbx_hashset_iter_next(&iter)))
+	while (NULL != (itservice = (zbx_itservice_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (itservice->old_status != itservice->status)
 			its_updates_append(&updates, itservice->serviceid, itservice->status, 0);
@@ -547,7 +547,7 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 
 		for (i = 0; i < updates.values_num; i++)
 		{
-			zbx_status_update_t	*update = updates.values[i];
+			zbx_status_update_t	*update = (zbx_status_update_t *)updates.values[i];
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update services"
@@ -582,7 +582,7 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 
 		for (i = 0; i < alarms->values_num; i++)
 		{
-			zbx_status_update_t	*update = alarms->values[i];
+			zbx_status_update_t	*update = (zbx_status_update_t *)alarms->values[i];
 
 			zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status,
 					update->clock);
@@ -664,9 +664,9 @@ static int	its_flush_updates(const zbx_vector_ptr_t *updates)
 	/* apply status updates */
 	for (i = 0; i < updates->values_num; i++)
 	{
-		update = updates->values[i];
+		update = (const zbx_status_update_t *)updates->values[i];
 
-		if (NULL == (index = zbx_hashset_search(&itservices.index, update)))
+		if (NULL == (index = (zbx_itservice_index_t *)zbx_hashset_search(&itservices.index, update)))
 			continue;
 
 		/* change the status of services based on the update */
@@ -688,7 +688,7 @@ static int	its_flush_updates(const zbx_vector_ptr_t *updates)
 
 			/* update parent services */
 			for (k = 0; k < itservice->parents.values_num; k++)
-				its_itservice_update_status(itservice->parents.values[k], update->clock, &alarms);
+				its_itservice_update_status((zbx_itservice_t *)itservice->parents.values[k], update->clock, &alarms);
 		}
 	}
 

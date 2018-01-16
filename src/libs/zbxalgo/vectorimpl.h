@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,12 +30,12 @@ static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *v
 	{													\
 		vector->values_num = 0;										\
 		vector->values_alloc = 32;									\
-		vector->values = vector->mem_malloc_func(NULL, vector->values_alloc * sizeof(__type));		\
+		vector->values = (__type *)vector->mem_malloc_func(NULL, vector->values_alloc * sizeof(__type));		\
 	}													\
 	else if (vector->values_num == vector->values_alloc)							\
 	{													\
 		vector->values_alloc = MAX(vector->values_alloc + 1, vector->values_alloc * ZBX_VECTOR_ARRAY_GROWTH_FACTOR); \
-		vector->values = vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
+		vector->values = (__type *)vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
 	}													\
 }														\
 														\
@@ -259,7 +259,7 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 	if ((int)size > vector->values_alloc)									\
 	{													\
 		vector->values_alloc = (int)size;								\
-		vector->values = vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
+		vector->values = (__type *)vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
 	}													\
 }														\
 														\

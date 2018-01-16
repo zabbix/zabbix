@@ -10,6 +10,13 @@
 			toggleEncryptionFields();
 		});
 
+		$(':radio[name=useip]').change(function() {
+			$(':text[name=ip],:text[name=dns]')
+				.removeAttr('aria-required')
+				.filter(($(this).val() == <?= INTERFACE_USE_IP ?>) ? '[name=ip]' : '[name=dns]')
+				.attr('aria-required', 'true');
+		});
+
 		// clone button, special processing because of list of hosts
 		$('#clone').click(function() {
 			var url = new Curl('zabbix.php?action=proxy.edit');
@@ -54,7 +61,7 @@
 		});
 
 		// Refresh field visibility on document load.
-		$('#status').trigger('change');
+		$('#status,[name=useip]:checked').trigger('change');
 
 		$('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
 			displayAdditionalEncryptionFields();

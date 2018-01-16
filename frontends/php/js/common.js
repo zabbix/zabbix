@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -201,6 +201,38 @@ function close_window() {
 
 function Confirm(msg) {
 	return confirm(msg);
+}
+
+/**
+ * Function removes input elements in specified form that matches given selector.
+ *
+ * @param {object}|{string}  form_name  Form element in which input elements will be selected. If given value is 'null',
+ *                                      the DOM document object will be used.
+ * @param {string} selector             String containing one or more commas separated CSS selectors.
+ *
+ * @returns {bool}
+ */
+function removeVarsBySelector(form_name, selector) {
+	if (form_name !== null) {
+		var source = is_string(form_name) ? document.forms[form_name] : form_name;
+	}
+	else {
+		var source = document;
+	}
+
+	if (!source) {
+		return false;
+	}
+
+	var inputs = source.querySelectorAll(selector);
+
+	if (inputs.length) {
+		for (var i in inputs) {
+			if (typeof inputs[i] === 'object') {
+				inputs[i].parentNode.removeChild(inputs[i]);
+			}
+		}
+	}
 }
 
 function create_var(form_name, var_name, var_value, doSubmit) {
@@ -563,39 +595,21 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
 	var media_name = (media > -1) ? 'user_medias[' + media + ']' : 'new_media';
 
 	window.create_var(form, media_name + '[mediatypeid]', mediatypeid);
-	window.create_var(form, media_name + '[sendto]', sendto);
+	if (typeof sendto === "object") {
+		window.removeVarsBySelector(form, 'input[name^="'+media_name+'[sendto]"]');
+		jQuery(sendto).each(function(i, st) {
+			window.create_var(form, media_name + '[sendto]['+i+']', st);
+		});
+	}
+	else {
+		window.create_var(form, media_name + '[sendto]', sendto);
+	}
 	window.create_var(form, media_name + '[period]', period);
 	window.create_var(form, media_name + '[active]', active);
 	window.create_var(form, media_name + '[severity]', severity);
 
 	form.submit();
 	return true;
-}
-
-/**
- * Send media form data to server for validation before adding them to user media tab.
- *
- * @param {string} formname		form name that is sent to server for validation
- */
-function validate_media(formname) {
-	var form = window.document.forms[formname];
-
-	jQuery.ajax({
-		url: jQuery(form).attr('action'),
-		data: jQuery(form).serialize(),
-		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
-
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
-			}
-			else {
-				add_media(ret.dstfrm, ret.media, ret.mediatypeid, ret.sendto, ret.period, ret.active, ret.severity);
-			}
-		},
-		dataType: 'json',
-		type: 'post'
-	});
 }
 
 /**
@@ -631,46 +645,6 @@ function validate_trigger_expression(formname, dialogueid) {
 				}
 				else {
 					jQuery(obj).val(ret.expression);
-				}
-
-				if (dialogueid) {
-					overlayDialogueDestroy(dialogueid);
-				}
-			}
-		},
-		dataType: 'json',
-		type: 'post'
-	});
-}
-
-/**
- * Send http test step form data to server for validation before adding it to web scenarion tab.
- *
- * @param {string} formname		form name that is sent to server for validation
- * @param {string} dialogueid	(optional) id of overlay dialogue.
- */
-function validate_httpstep(formname, dialogueid) {
-	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action')),
-		dialogueid = dialogueid || null;
-
-	url.setArgument('validate', 1);
-
-	jQuery.ajax({
-		url: url.getUrl(),
-		data: jQuery(form).serialize(),
-		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
-
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
-			}
-			else {
-				if (typeof ret.params.stepid !== 'undefined') {
-					update_httpstep(ret.dstfrm, ret.list_name, ret.params);
-				}
-				else {
-					add_httpstep(ret.dstfrm, ret.params);
 				}
 
 				if (dialogueid) {
@@ -839,7 +813,10 @@ jQuery.fn.trimValues = function(selectors) {
 
 	jQuery.each(selectors, function(i, value) {
 		obj = jQuery(value, form);
-		obj.val(jQuery.trim(obj.val()));
+
+		jQuery(obj).each(function() {
+			jQuery(this).val(jQuery.trim(jQuery(this).val()));
+		});
 	});
 };
 

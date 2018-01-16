@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #define ZBX_TM_TASK_REMOTE_COMMAND			2
 #define ZBX_TM_TASK_REMOTE_COMMAND_RESULT		3
 #define ZBX_TM_TASK_ACKNOWLEDGE				4
+#define ZBX_TM_TASK_UPDATE_EVENTNAMES			5
 
 /* task manager task states */
 #define ZBX_TM_STATUS_NEW			1

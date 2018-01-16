@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num)
 		return;
 
 	alloc_num = MAX(queue->alloc_num + num + 1, queue->alloc_num * 1.5);
-	queue->values = zbx_realloc(queue->values, alloc_num * sizeof(*queue->values));
+	queue->values = (void **)zbx_realloc(queue->values, alloc_num * sizeof(*queue->values));
 
 	if (queue->tail_pos > queue->head_pos)
 	{
@@ -110,7 +110,7 @@ void	zbx_queue_ptr_compact(zbx_queue_ptr_t *queue)
 		}
 	}
 
-	queue->values = zbx_realloc(queue->values, alloc_num * sizeof(*queue->values));
+	queue->values = (void **)zbx_realloc(queue->values, alloc_num * sizeof(*queue->values));
 	queue->alloc_num = alloc_num;
 }
 

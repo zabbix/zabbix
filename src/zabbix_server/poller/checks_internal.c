@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ extern unsigned char	program_type;
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
-	const DC_INTERFACE2	*i1 = p1, *i2 = p2;
+	const DC_INTERFACE2	*i1 = (DC_INTERFACE2 *)p1, *i2 = (DC_INTERFACE2 *)p2;
 
 	if (i1->type > i2->type)		/* 1st criterion: 'type' in ascending order */
 		return 1;

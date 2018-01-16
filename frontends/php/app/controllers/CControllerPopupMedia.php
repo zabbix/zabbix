@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,8 +35,10 @@ class CControllerPopupMedia extends CController {
 		$fields = [
 			'dstfrm' =>			'string|fatal',
 			'media' =>			'int32',
+			'type' =>			'string',
 			'mediatypeid' =>	'db media_type.mediatypeid',
 			'sendto' =>			'string',
+			'sendto_emails'	=>	'array',
 			'period' =>			'string',
 			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
 			'severity' =>		'',
@@ -75,18 +77,36 @@ class CControllerPopupMedia extends CController {
 			'sendto' => $this->getInput('sendto', ''),
 			'mediatypeid' => $this->getInput('mediatypeid', 0),
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),
-			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL)
+			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL),
+			'sendto_emails' => array_values($this->getInput('sendto_emails', [''])),
+			'type' => $this->getInput('type', '')
 		];
 
 		// Validation before adding Media to user's Media tab.
-		if ($this->getInput('add', false)) {
+		if ($this->hasInput('add')) {
 			$output = [];
 
-			if ($page_options['sendto'] === '') {
-				error(_s('Incorrect value for field "%1$s": cannot be empty.', 'sendto'));
+			if ($page_options['type'] == MEDIA_TYPE_EMAIL) {
+				$email_validator = new CEmailValidator();
+
+				$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
+				if (!$page_options['sendto_emails']) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
+				}
+
+				foreach ($page_options['sendto_emails'] as $email) {
+					if (!$email_validator->validate($email)) {
+						error($email_validator->getError());
+						break;
+					}
+				}
+			}
+			elseif ($page_options['sendto'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
 			}
 
-			if (!parse_period($page_options['period'])) {
+			$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
+			if ($time_period_parser->parse($page_options['period']) != CParser::PARSE_SUCCESS) {
 				error(_s('Field "%1$s" is not correct: %2$s', _('When active'), _('a time period is expected')));
 			}
 
@@ -104,7 +124,9 @@ class CControllerPopupMedia extends CController {
 					'dstfrm' => $page_options['dstfrm'],
 					'media' => $this->getInput('media', -1),
 					'mediatypeid' => $page_options['mediatypeid'],
-					'sendto' => $page_options['sendto'],
+					'sendto' => $page_options['type'] == MEDIA_TYPE_EMAIL
+									? $page_options['sendto_emails']
+									: $page_options['sendto'],
 					'period' => $page_options['period'],
 					'active' => $this->getInput('active', MEDIA_STATUS_DISABLED),
 					'severity' => $severity
@@ -131,20 +153,23 @@ class CControllerPopupMedia extends CController {
 				$page_options['severities'] = $this->getInput('severity', array_keys($this->severities));
 			}
 
-			$mediatypes = API::MediaType()->get([
-				'output' => ['description'],
+			$db_mediatypes = API::MediaType()->get([
+				'output' => ['description', 'type'],
 				'preservekeys' => true
 			]);
-			CArrayHelper::sort($mediatypes, ['description']);
+			CArrayHelper::sort($db_mediatypes, ['description']);
 
-			foreach ($mediatypes as &$mediatype) {
-				$mediatype = $mediatype['description'];
+			$mediatypes = [];
+			foreach ($db_mediatypes as $mediatypeid => &$db_mediatype) {
+				$mediatypes[$mediatypeid] = $db_mediatype['type'];
+				$db_mediatype = $db_mediatype['description'];
 			}
-			unset($mediatype);
+			unset($db_mediatype);
 
 			$data = [
 				'title' => _('Media'),
 				'options' => $page_options,
+				'db_mediatypes' => $db_mediatypes,
 				'mediatypes' => $mediatypes,
 				'severities' => $this->severities
 			];
