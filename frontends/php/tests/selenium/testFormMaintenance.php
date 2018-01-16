@@ -31,180 +31,149 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
  * @backup maintenances
  */
 class testFormMaintenance extends CWebTest {
+	public $name = 'Test maintenance';
 
 	/**
-	 * Create maintenace period "DEV-718 Test maintenance".
+	 * Create maintenace with periods and host group.
 	 */
 	public function testFormMaintenance_Create() {
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
-		$this->zbxTestClick('form');
-		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestClickWait('form');
 
-		// Fill "name" field value.
-		$this->zbxTestInputTypeOverwrite('mname', 'DEV-718 Test maintenance');
+		// Type maintenance name.
+		$this->zbxTestInputTypeWait('mname', $this->name);
 
 		// "Periods" tab.
 		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
+
 		// Add "One time only" maintenance period.
 		$this->zbxTestClickButtonText('New');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr/td',
-			'One time only'
-		);
+		$this->zbxTestClickXpathWait('//button[@class=\'btn-link\' and text()=\'Add\']');
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr/td','One time only');
+
 		// Add "Daily" maintenance period.
 		$this->zbxTestClickButtonText('New');
-		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestDropdownSelectWait('new_timeperiod_timeperiod_type', 'Daily');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[2]/td',
-			'Daily'
-		);
+		$this->zbxTestClickXpathWait('//button[@class=\'btn-link\' and text()=\'Add\']');
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[2]/td','Daily');
+
 		// Add "Weekly" maintenance period with "Monday" and "Sunday".
 		$this->zbxTestClickButtonText('New');
-		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestDropdownSelectWait('new_timeperiod_timeperiod_type', 'Weekly');
-		$this->zbxTestWaitForPageToLoad();
-
-		$this->zbxTestClick('new_timeperiod_dayofweek_mo');
-		$this->zbxTestClick('new_timeperiod_dayofweek_su');
-		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[3]/td',
-			'Weekly'
-		);
-		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[3]/td[2]');
+		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_mo');
+		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_su');
+		$this->zbxTestClickXpathWait('//button[@class=\'btn-link\' and text()=\'Add\']');
+		// Check weekly period in frontend.
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[3]/td','Weekly');
+		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[3]/td[2]');
 		$this->assertRegexp('/Monday/', $text);
 		$this->assertRegexp('/Sunday/', $text);
+
 		// Add "Monthly" maintenace period with "January" and "November".
 		$this->zbxTestClickButtonText('New');
-		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestDropdownSelectWait('new_timeperiod_timeperiod_type', 'Monthly');
-		$this->zbxTestWaitForPageToLoad();
-
-		$this->zbxTestClick('new_timeperiod_month_jan');
-		$this->zbxTestClick('new_timeperiod_month_nov');
-		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestWaitForPageToLoad();
-
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[4]/td',
-			'Monthly'
-		);
-		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[4]/td[2]');
+		$this->zbxTestCheckboxSelect('new_timeperiod_month_jan');
+		$this->zbxTestCheckboxSelect('new_timeperiod_month_nov');
+		$this->zbxTestClickXpathWait('//button[@class=\'btn-link\' and text()=\'Add\']');
+		// Check monthly period in frontend.
+		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[4]/td','Monthly');
+		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[4]/td[2]');
 		$this->assertRegexp('/January/', $text);
 		$this->assertRegexp('/November/', $text);
 
-		// "Hosts & Groups" tab.
+		// Open "Hosts & Groups" tab and add group.
 		$this->zbxTestTabSwitchById('tab_hostTab', 'Hosts & Groups');
 		$this->zbxTestDropdownSelect('groupids_right', 'Zabbix servers');
-		$this->zbxTestClickXpath('(//button[@id=\'add\'])[2]');
+		$this->zbxTestClickXpath('//table[@name=\'groupids_tweenbox\']//button[@id=\'add\']');
 
-		// Create maintenance.
-		$this->zbxTestClickXpath('(//button[@id=\'add\'])[3]');
-		$this->zbxTestWaitForPageToLoad();
+		// Create maintenance and check the results in frontend.
+		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance added');
+		$this->zbxTestTextPresent($this->name);
+		$this->zbxTestCheckFatalErrors();
+
+		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 	}
 
 	/**
 	 * Changes not preserve when close edit form using cancel button.
+	 *
+	 * @depends testFormMaintenance_Create
 	 */
 	public function testFromMaintenance_Cancel() {
+		$sql_hash = 'SELECT * FROM maintenances ORDER BY maintenanceid';
+		$old_hash = DBhash($sql_hash);
+
+		// Open form and change maintenance name.
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
-		$this->zbxTestCheckTitle('Configuration of maintenance periods');
-		$this->zbxTestCheckHeader('Maintenance periods');
-		// Filter by "Dev-718 Test maintenance'.
-		$this->zbxTestInputTypeOverwrite('filter_name', 'DEV-718 Test maintenance');
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestWaitForPageToLoad();
-
-		// Open form.
-		$this->zbxTestClickLinkText('DEV-718 Test maintenance');
-		$this->zbxTestWaitForPageToLoad();
-
-		// "Maintenance" tab
-		// Change period name.
+		$this->zbxTestClickLinkTextWait($this->name);
 		$this->zbxTestInputTypeOverwrite('mname', 'Some random text');
 
-		// "Periods" tab.
+		// Open "Periods" tab and remove 4th defined period.
 		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
-		// Remove 4th defined period
-		$this->zbxTestClickXpath('//tr[4]/td[4]/ul/li[2]/button');
+		$this->zbxTestClickXpathWait('//td[contains(text(), \'Monthly\')]/..//button[text()=\'Remove\']');
 		$this->zbxTestWaitForPageToLoad();
 
-		$this->zbxTestClick('cancel');
+		// Close the form.
+		$this->zbxTestClickWait('cancel');
 		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestCheckFatalErrors();
+
+		// Check the result in DB.
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 
 		// Open form to check changes was not saved.
-		$this->zbxTestClickLinkText('DEV-718 Test maintenance');
-		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestClickLinkTextWait($this->name);
 
-		// "Maintenance" tab.
-		$this->zbxTestAssertElementValue('mname', 'DEV-718 Test maintenance');
+		// "Maintenance" tab, check name.
+		$this->zbxTestAssertElementValue('mname', $this->name);
 
-		// "Periods" tab.
+		// "Periods" tab, check that 4th period exist.
 		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
-		// Assert that there are 4 periods.
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[9]', 'Edit');
-		// Assert that 4th period type is "Monthly".
-		$this->zbxTestAssertElementText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[4]/td',
-			'Monthly'
-		);
-
-		// Cancel and reset "Maintenance period" list filter.
-		$this->zbxTestClick('cancel');
-		$this->zbxTestWaitForPageToLoad();
-
-		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestAssertElementPresentXpath('//td[contains(text(), \'Monthly\')]/..//button[text()=\'Edit\']');
 	}
 
 	/**
-	 * Update "DEV-718 Test maintenance" maintenance.
+	 * Test update by changing maintenance period and type.
+	 *
+	 * @depends testFormMaintenance_Create
 	 */
 	public function testFormMaintenance_Update() {
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
-		// Filter by "Dev-718 Test maintenance'.
-		$this->zbxTestInputTypeOverwrite('filter_name', 'DEV-718 Test maintenance');
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestClickLinkText('DEV-718 Test maintenance');
-		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestClickLinkTextWait($this->name);
 
-		// "Maintenance" tab.
-		$this->zbxTestClickXpath('//label[contains(text(), \'No data collection\')]');
-		// "Periods" tab.
+		// Change maintenance type.
+		$this->zbxTestClickXpathWait('//label[contains(text(), \'No data collection\')]');
+
+		// Open "Periods" tab.
 		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
 		// Remove "One time only".
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[4]');
+		$this->zbxTestClickXpath('//td[contains(text(), \'One time only\')]/..//button[text()=\'Remove\']');
 		$this->zbxTestWaitForPageToLoad();
 		// Edit "Weekly".
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[5]');
+		$this->zbxTestClickXpathWait('//td[contains(text(), \'Weekly\')]/..//button[text()=\'Edit\']');
+		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_we');
+		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_fr');
+		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_timeperiod\')]');
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestClick('new_timeperiod_dayofweek_we');
-		$this->zbxTestClick('new_timeperiod_dayofweek_fr');
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[9]');
-		$this->zbxTestWaitForPageToLoad();
-		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[2]/td[2]');
+		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[2]/td[2]');
 		$this->assertRegexp('/Monday/', $text);
 		$this->assertRegexp('/Wednesday/', $text);
 		$this->assertRegexp('/Friday/', $text);
 		$this->assertRegexp('/Sunday/', $text);
 		// Edit "Monthly".
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[7]');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestClick('new_timeperiod_month_sep');
-		$this->zbxTestClick('new_timeperiod_month_jun');
+		$this->zbxTestClickXpath('//td[contains(text(), \'Monthly\')]/..//button[text()=\'Edit\']');
+		$this->zbxTestCheckboxSelect('new_timeperiod_month_sep');
+		$this->zbxTestCheckboxSelect('new_timeperiod_month_jun');
 		$this->zbxTestClickXpath('//label[contains(text(), \'Day of week\')]');
-		$this->zbxTestClickXpath('//label[contains(text(), \'Wednesday\')]');
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[9]');
+		$this->zbxTestClickXpathWait('//label[contains(text(), \'Wednesday\')]');
+		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_timeperiod\')]');
 		$this->zbxTestWaitForPageToLoad();
-		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']/li/div[2]/div/table/tbody/tr[3]/td[2]');
+		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[3]/td[2]');
 		$this->assertRegexp('/Wednesday/', $text);
 		$this->assertRegexp('/January/', $text);
 		$this->assertRegexp('/June/', $text);
@@ -212,54 +181,63 @@ class testFormMaintenance extends CWebTest {
 		$this->assertRegexp('/November/', $text);
 
 		$this->zbxTestClick('update');
-		$this->zbxTestWaitForPageToLoad();
 
-		// Wait until message "Maintenance updated" is shown.
+		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance updated');
-		$this->zbxTestAssertElementText('//td[3]', 'No data collection');
-		// Reset filter.
-		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestAssertElementText('//a[text()=\''.$this->name.'\']/../../td[3]', 'No data collection');
+		$this->zbxTestTextPresent($this->name);
+		$this->zbxTestCheckFatalErrors();
+
+		// Check the results in DB.
+		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 	}
 
 	/**
-	 * Clone maintenance period "DEV-718 Test maintenance" to "DEV-718 Test maintenance (clone)".
+	 * Test cloning of maintenance.
+	 *
+	 * @depends testFormMaintenance_Create
 	 */
 	public function testFormMaintenance_Clone() {
+		$suffix = ' (clone)';
+
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
 
-		// Find item to clone.
-		$this->zbxTestClickLinkText('DEV-718 Test maintenance');
-		$this->zbxTestWaitForPageToLoad();
+		// Open existing maintenance form.
+		$this->zbxTestClickLinkText($this->name);
 
-		// Click on element with id "clone".
-		$this->zbxTestClick('clone');
-		$this->zbxTestWaitForPageToLoad();
+		// Clone maintenance, rename the clone and save it.
+		$this->zbxTestClickWait('clone');
+		$this->zbxTestInputTypeOverwrite('mname', $this->name.$suffix);
+		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');
 
-		$this->zbxTestInputTypeOverwrite('mname', 'DEV-718 Test maintenance (clone)');
-
-		// Create maintenance.
-		$this->zbxTestClickXpath('(//button[@id=\'add\'])[3]');
-		$this->zbxTestWaitForPageToLoad();
-
-		// Wait until message "Maintenance added" is shown.
+		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance added');
+		$this->zbxTestTextPresent([$this->name.$suffix, $this->name]);
+		$this->zbxTestCheckFatalErrors();
+
+		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name.$suffix)));
 	}
 
 	/**
-	 * Delete cloned maintenance "DEV-718 Test maintenance (clone)".
+	 * Test deleting of maintenance.
+	 *
+	 * @depends testFormMaintenance_Create
 	 */
 	public function testFormMaintenance_Delete() {
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
 
-		$this->zbxTestClickLinkText('DEV-718 Test maintenance (clone)');
-		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestClickLinkText($this->name);
 
-		// Click on element with id "delete" and accept alert.
+		// Delete a maintenance and check the result in frontend.
 		$this->zbxTestClickAndAcceptAlert('delete');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance deleted');
+		$this->zbxTestCheckFatalErrors();
+
+		$this->assertEquals(0, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 	}
 }
