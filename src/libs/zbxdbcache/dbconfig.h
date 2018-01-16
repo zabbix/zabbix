@@ -603,6 +603,7 @@ typedef struct
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
+	int			item_sync_ts;
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
