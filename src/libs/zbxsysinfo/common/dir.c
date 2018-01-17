@@ -426,7 +426,7 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
 #define		DW2UI64(h,l) 	((zbx_uint64_t)h << 32 | l)
 #define		FT2UT(ft) 	(time_t)(DW2UI64(ft.dwHighDateTime,ft.dwLowDateTime) / 10000000ULL - 11644473600ULL)
 
-static int	get_file_info(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_info, char **error)
+static int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_info, char **error)
 {
 	HANDLE	file_handle;
 
@@ -465,9 +465,9 @@ static int	link_processed(DWORD attrib, wchar_t *wpath, zbx_vector_ptr_t *descri
 	if (0 != (attrib & FILE_ATTRIBUTE_DIRECTORY))
 		return FAIL;
 
-	if (FAIL == get_file_info(wpath, &link_info, &error))
+	if (FAIL == get_file_info_by_handle(wpath, &link_info, &error))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get handle file information '%s': %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get file information '%s': %s",
 				__function_name, path, error);
 		zbx_free(error);
 		return SUCCEED;
