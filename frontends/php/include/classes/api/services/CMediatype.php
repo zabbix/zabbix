@@ -259,14 +259,6 @@ class CMediatype extends CApiService {
 								$mediatype['description']
 							));
 						}
-
-						if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
-								&& (!array_key_exists('passwd', $mediatype) || $mediatype['passwd'] === ''
-									|| $mediatype['passwd'] === null)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Password required for media type "%1$s".', $mediatype['description'])
-							);
-						}
 					}
 
 					// Validate optional 'smtp_port' field.
