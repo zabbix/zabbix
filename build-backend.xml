@@ -293,10 +293,7 @@
 			<arg line="-j5"/>
 			<arg line="tests_build"/>
 		</exec>
-		<exec executable="tests/tests_run.pl" failonerror="on">
-			<arg line=">"/>
-			<arg line="output.xml"/>
-		</exec>
+		<exec executable="tests/tests_run.pl" failonerror="on" output="output.xml"></exec>
 	</target>
 
 	<target name="run-unit-test">
