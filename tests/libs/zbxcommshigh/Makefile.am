@@ -46,6 +46,9 @@ zbx_tcp_recv_ext_SOURCES = \
 	zbx_tcp_recv_ext.c \
 	$(COMMON_SRC_FILES)
 
+zbx_tcp_recv_ext_WRAP_FUNCS = \
+	-Wl,--wrap=read
+
 zbx_tcp_recv_ext_LDADD = \
 	$(COMMON_LIB_FILES)
 
@@ -53,5 +56,5 @@ zbx_tcp_recv_ext_LDADD += @AGENT_LIBS@
 
 zbx_tcp_recv_ext_LDFLAGS = @AGENT_LDFLAGS@
 
-zbx_tcp_recv_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_tcp_recv_ext_CFLAGS = $(zbx_tcp_recv_ext_WRAP_FUNCS) $(COMMON_COMPILER_FLAGS)
 endif

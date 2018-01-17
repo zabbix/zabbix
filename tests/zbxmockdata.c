@@ -461,6 +461,28 @@ zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value)
 	return ZBX_MOCK_SUCCESS;
 }
 
+zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, size_t *length)
+{
+	const zbx_mock_pool_handle_t	*handle;
+	char				*tmp = NULL;
+
+	if (0 > binary || binary >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[binary];
+
+	if (YAML_SCALAR_NODE != handle->node->type)
+		return ZBX_MOCK_NOT_A_STRING;
+
+	tmp = zbx_malloc(tmp, handle->node->data.scalar.length);
+	memcpy(tmp, handle->node->data.scalar.value, handle->node->data.scalar.length);
+	zbx_vector_str_append(&string_pool, tmp);
+	*value = tmp;
+	*length = handle->node->data.scalar.length;
+
+	return ZBX_MOCK_SUCCESS;
+}
+
 static zbx_mock_error_t	zbx_yaml_path_next(const char **pnext, const char **key, int *key_len, int *index)
 {
 	const char	*next = *pnext;
