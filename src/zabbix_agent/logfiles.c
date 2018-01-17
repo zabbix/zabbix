@@ -1185,7 +1185,7 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 						zabbix_log(LOG_LEVEL_DEBUG, "%s(): the size of log file \"%s\" has been"
 								" updated since modification time change, consider"
 								" it to be the same file", __function_name,
-								old_files->filename);
+								old_files[i].filename);
 						old_files[i].retry = 0;
 					}
 					p[j] = '1';
