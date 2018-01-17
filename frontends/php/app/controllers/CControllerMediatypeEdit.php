@@ -48,7 +48,6 @@ class CControllerMediatypeEdit extends CController {
 			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'smtp_passwd' =>			'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
@@ -125,8 +124,6 @@ class CControllerMediatypeEdit extends CController {
 			'eztext_limit' => EZ_TEXTING_LIMIT_USA,
 			'smtp_username' => '',
 			'passwd' => '',
-			'smtp_passwd' => '',
-			'email_passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
@@ -166,7 +163,6 @@ class CControllerMediatypeEdit extends CController {
 			switch ($data['type']) {
 				case MEDIA_TYPE_EMAIL:
 					$data['smtp_username'] = $this->mediatype['username'];
-					$data['smtp_passwd'] = $this->mediatype['passwd'];
 					break;
 
 				case MEDIA_TYPE_JABBER:

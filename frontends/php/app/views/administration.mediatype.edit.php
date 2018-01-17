@@ -130,7 +130,7 @@ $mediatype_formlist->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteri
 );
 
 // Create password field.
-if ($data['type'] != MEDIA_TYPE_EMAIL && $data['passwd'] !== '') {
+if ($data['passwd'] !== '') {
 	$passwd_field = [
 		(new CButton('chPass_btn', _('Change password')))
 			->onClick('this.style.display="none"; $("passwd").show().focus();'),
@@ -142,22 +142,6 @@ if ($data['type'] != MEDIA_TYPE_EMAIL && $data['passwd'] !== '') {
 }
 else {
 	$passwd_field = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-}
-
-if ($data['type'] == MEDIA_TYPE_EMAIL && $data['smtp_passwd'] != '') {
-	$smtp_passwd = [
-		(new CButton('chPass_btn', _('Change password')))
-			->onClick('this.style.display="none"; $("smtp_passwd").show().focus();'),
-		(new CPassBox('smtp_passwd', $data['smtp_passwd']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-			->addStyle('display: none;')
-	];
-}
-else {
-	$smtp_passwd = (new CPassBox('smtp_passwd'))
-		->setAriaRequired()
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // append password field to form list
@@ -172,11 +156,8 @@ $mediatype_formlist
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Password'), 'passwd')),
+	->addRow((new CLabel(_('Password'), 'passwd'))->setAsteriskMark($data['passwd'] !== ''),
 		$passwd_field
-	)
-	->addRow((new CLabel(_('Password'), 'smtp_passwd'))->setAsteriskMark(),
-		$smtp_passwd
 	)
 	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [
 		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
