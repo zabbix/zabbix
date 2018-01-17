@@ -3,6 +3,7 @@ Changes for 4.0.0alpha3
 New features:
 
 Bug fixes:
+...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
 ..F....... [ZBX-13214] added support of \0 matching group for regsub and iregsub methods (gcalenko, Sasha)
 ........S. [ZBX-13208] eliminated race condition that caused history collection for newly created items to start before preprocecessing steps finished syncing (vso)
 .......P.. [ZBX-13130] fixed Zabbix proxy not to generate high network traffic when server does not accept data (vso)
@@ -93,6 +94,8 @@ Changes for 3.4.7rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
+..F....... [ZBX-13345] removed SID from URL in screen edit mode (miks)
 ..F....... [ZBX-13214] added support of \0 matching group for regsub and iregsub methods (gcalenko, Sasha)
 ........S. [ZBX-13208] eliminated race condition that caused history collection for newly created items to start before preprocecessing steps finished syncing (vso)
 .......P.. [ZBX-13130] fixed Zabbix proxy not to generate high network traffic when server does not accept data (vso)
@@ -1166,6 +1169,8 @@ Changes for 3.0.15rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
+..F....... [ZBX-13345] removed SID from URL in screen edit mode (miks)
 ...G...... [ZBX-13246] fixed processing of command line arguments which are longer than 2KB for proc.num and proc.mem items on AIX (viktors)
 ...G...... [ZBX-13254] fixed 'skip' parameter behaviour for log[], log.count[], logrt[], logrt.count[] items in case log files initially do not exist (Andris)
 ...G...... [ZBX-13253] fixed losing the 1st record by log[] and logrt[] items if 'skip' parameter is used and log file initially is empty (Andris)
