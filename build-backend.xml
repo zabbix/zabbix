@@ -282,6 +282,7 @@
 		<!-- Build Zabbix server and proxy with C mock tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<exec executable="./configure" failonerror="on">
+			<arg line="-q"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
