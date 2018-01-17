@@ -1595,6 +1595,7 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxsysinfo/Makefile
 	tests/libs/zbxsysinfo/linux/Makefile
 	tests/libs/zbxsysinfo/common/Makefile
+	tests/libs/zbxcommshigh/Makefile
 )])
 
 AC_OUTPUT([

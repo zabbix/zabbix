@@ -1,0 +1,6 @@
+---
+test case: Test all bytes received
+out:
+      received: '308874139'
+      ret: 'succeed'
+...
