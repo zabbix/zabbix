@@ -385,7 +385,9 @@ function make_small_eventlist($startEvent, $backurl) {
 		}
 
 		$r_clock = $event['r_accessible']
-			? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['r_clock'])
+			? (new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['r_clock']),
+					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
+				))->addClass('action')
 			: _('Inaccessible value');
 
 		$table->addRow([
@@ -394,9 +396,7 @@ function make_small_eventlist($startEvent, $backurl) {
 			))->addClass('action'),
 			($event['r_eventid'] == 0)
 				? ''
-				: (new CLink($r_clock,
-						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
-				))->addClass('action'),
+				: $r_clock,
 			$cell_status,
 			zbx_date2age($event['clock']),
 			$duration,

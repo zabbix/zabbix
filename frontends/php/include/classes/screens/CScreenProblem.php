@@ -781,20 +781,29 @@ class CScreenProblem extends CScreenBase {
 						->setArgument('triggerid', $problem['objectid'])
 						->setArgument('eventid', $problem['eventid'])
 				));
+
 				if ($problem['r_eventid'] != 0) {
-					$cell_r_clock = ($problem['r_clock'] >= $today)
-						? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
-						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
-					$cell_r_clock = (new CCol(new CLink($cell_r_clock,
-						(new CUrl('tr_events.php'))
-							->setArgument('triggerid', $problem['objectid'])
-							->setArgument('eventid', $problem['eventid'])
-					)))
-						->addClass(ZBX_STYLE_NOWRAP)
-						->addClass(ZBX_STYLE_RIGHT);
+					if ($problem['r_clock'] == 0) {
+						$cell_r_clock = _('Inaccessible value');
+						$duration = _('Inaccessible value');
+					}
+					else {
+						$cell_r_clock = ($problem['r_clock'] >= $today)
+							? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
+							: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
+						$cell_r_clock = (new CCol(new CLink($cell_r_clock,
+							(new CUrl('tr_events.php'))
+								->setArgument('triggerid', $problem['objectid'])
+								->setArgument('eventid', $problem['eventid'])
+						)))
+							->addClass(ZBX_STYLE_NOWRAP)
+							->addClass(ZBX_STYLE_RIGHT);
+						$duration = zbx_date2age($problem['clock'], $problem['r_clock']);
+					}
 				}
 				else {
 					$cell_r_clock = '';
+					$duration = zbx_date2age($problem['clock']);
 				}
 
 				if ($problem['r_eventid'] != 0) {
@@ -897,9 +906,7 @@ class CScreenProblem extends CScreenBase {
 					makeInformationList($info_icons),
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
-					($problem['r_eventid'] != 0)
-						? zbx_date2age($problem['clock'], $problem['r_clock'])
-						: zbx_date2age($problem['clock']),
+					$duration,
 					$this->config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
 					array_key_exists($eventid, $actions)
 						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
