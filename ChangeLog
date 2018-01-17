@@ -92,6 +92,7 @@ Changes for 3.4.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13214] added support of \0 matching group for regsub and iregsub methods (gcalenko, Sasha)
 ........S. [ZBX-13208] eliminated race condition that caused history collection for newly created items to start before preprocecessing steps finished syncing (vso)
 .......P.. [ZBX-13130] fixed Zabbix proxy not to generate high network traffic when server does not accept data (vso)
 ..F....... [ZBX-13288] fixed image ghosting for mass update of map elements (vjaceslavs)
