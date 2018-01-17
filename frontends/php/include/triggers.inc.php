@@ -137,26 +137,38 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
 	$config = select_config();
 
+	$color_class = null;
+	$color = null;
+	$blinks = null;
+
 	// color of text and blinking depends on trigger value and whether event is acknowledged
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
+		$color_class = ZBX_STYLE_PROBLEM_UNACK_FG;
 		$color = $config['problem_unack_color'];
 		$blinks = $config['problem_unack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_TRUE && $isAcknowledged) {
+		$color_class = ZBX_STYLE_PROBLEM_ACK_FG;
 		$color = $config['problem_ack_color'];
 		$blinks = $config['problem_ack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && !$isAcknowledged) {
+		$color_class = ZBX_STYLE_OK_UNACK_FG;
 		$color = $config['ok_unack_color'];
 		$blinks = $config['ok_unack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && $isAcknowledged) {
+		$color_class = ZBX_STYLE_OK_ACK_FG;
 		$color = $config['ok_ack_color'];
 		$blinks = $config['ok_ack_style'];
 	}
-	if (isset($color) && isset($blinks)) {
+
+	if ($color_class != null && $color != null && $blinks != null) {
 		// color
-		$object->addStyle('color: #'.$color);
+		$object->addClass($color_class);
+		if ($config['custom_color']) {
+			$object->addStyle('color: #'.$color);
+		}
 
 		// blinking
 		$timeSinceLastChange = time() - $triggerLastChange;

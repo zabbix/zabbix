@@ -21,7 +21,7 @@
 
 class CColor extends CDiv {
 
-	public function __construct($name, $value, $insert_color_picker = true) {
+	public function __construct($name, $value, $insert_color_picker = true, $disabled = false) {
 		parent::__construct([
 			(new CColorCell('lbl_'.$name, $value))
 				->setTitle('#'.$value)
@@ -29,6 +29,7 @@ class CColor extends CDiv {
 			(new CTextBox($name, $value))
 				->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
 				->setAttribute('maxlength', 6)
+				->setAttribute('disabled', $disabled ? 'disabled' : null)
 				->onChange('set_color_by_name("'.zbx_formatDomId($name).'", this.value)')
 		]);
 

@@ -27,14 +27,19 @@ $page['file'] = 'adm.triggerdisplayoptions.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = [
-	'problem_unack_color' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update})',
+	'custom_color' =>			[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Use custom event status colors')],
+	'problem_unack_color' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update}) && isset({custom_color})',
 		_('Unacknowledged PROBLEM events')
 	],
-	'problem_ack_color' =>		[T_ZBX_CLR, O_OPT, null, null, 'isset({update})',
+	'problem_ack_color' =>		[T_ZBX_CLR, O_OPT, null, null, 'isset({update}) && isset({custom_color})',
 		_('Acknowledged PROBLEM events')
 	],
-	'ok_unack_color' =>			[T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Unacknowledged OK events')],
-	'ok_ack_color' =>			[T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Acknowledged OK events')],
+	'ok_unack_color' =>			[T_ZBX_CLR, O_OPT, null, null, 'isset({update}) && isset({custom_color})',
+		_('Unacknowledged OK events')
+	],
+	'ok_ack_color' =>			[T_ZBX_CLR, O_OPT, null, null, 'isset({update}) && isset({custom_color})',
+		_('Acknowledged OK events')
+	],
 	'problem_unack_style' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')],
 	'problem_ack_style' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')],
 	'ok_unack_style' =>			[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')],
@@ -53,19 +58,25 @@ check_fields($fields);
  * Actions
  */
 if (hasRequest('update')) {
-	DBstart();
-	$result = update_config([
-		'problem_unack_color' => getRequest('problem_unack_color'),
-		'problem_ack_color' => getRequest('problem_ack_color'),
-		'ok_unack_color' => getRequest('ok_unack_color'),
-		'ok_ack_color' => getRequest('ok_ack_color'),
+	$update_values = [
+		'custom_color' => getRequest('custom_color', 0),
 		'problem_unack_style' => getRequest('problem_unack_style', 0),
 		'problem_ack_style' => getRequest('problem_ack_style', 0),
 		'ok_unack_style' => getRequest('ok_unack_style', 0),
 		'ok_ack_style' => getRequest('ok_ack_style', 0),
 		'ok_period' => getRequest('ok_period'),
 		'blink_period' => getRequest('blink_period')
-	]);
+	];
+
+	if ($update_values['custom_color'] == 1) {
+		$update_values['problem_unack_color'] = getRequest('problem_unack_color');
+		$update_values['problem_ack_color'] = getRequest('problem_ack_color');
+		$update_values['ok_unack_color'] = getRequest('ok_unack_color');
+		$update_values['ok_ack_color'] = getRequest('ok_ack_color');
+	}
+
+	DBstart();
+	$result = update_config($update_values);
 	$result = DBend($result);
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
@@ -79,6 +90,7 @@ $config = select_config();
 // form has been submitted
 if (hasRequest('form_refresh')) {
 	$data = [
+		'custom_color' => getRequest('custom_color', 0),
 		'problem_unack_color' => getRequest('problem_unack_color', $config['problem_unack_color']),
 		'problem_ack_color' => getRequest('problem_ack_color', $config['problem_ack_color']),
 		'ok_unack_color' => getRequest('ok_unack_color', $config['ok_unack_color']),
@@ -93,6 +105,7 @@ if (hasRequest('form_refresh')) {
 }
 else {
 	$data = [
+		'custom_color' => $config['custom_color'],
 		'problem_unack_color' => $config['problem_unack_color'],
 		'problem_ack_color' => $config['problem_ack_color'],
 		'ok_unack_color' => $config['ok_unack_color'],
