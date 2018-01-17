@@ -41,6 +41,7 @@ class CControllerMediatypeCreate extends CController {
 			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
+			'smtp_passwd' =>			'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
@@ -91,11 +92,16 @@ class CControllerMediatypeCreate extends CController {
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'passwd'
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication'
 				]);
 
 				if ($this->hasInput('smtp_username')) {
 					$mediatype['username'] = $this->getInput('smtp_username');
+				}
+
+				if ($mediatype['type'] == MEDIA_TYPE_EMAIL
+						&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+					$mediatype['passwd'] = $this->getInput('smtp_passwd');
 				}
 				break;
 
