@@ -1,22 +1,53 @@
 ---
 test case: Correct number of bytes received
 in:
-      recv data: "ZBXD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      recv data:
+      - "ZBXD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
 out:
       ret: 'succeed'
       number of bytes: '23'
 ---
 test case: Don't accept if bigger length is supplied in header than sent
 in:
-      recv data: "ZBXD\x01\x0B\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      recv data:
+      - "ZBXD\x01\x0B\x00\x00\x00\x00\x00\x00\x00agent.ping"
 out:
       ret: 'fail'
       number of bytes: '23'
 ---
 test case: Don't accept if smaller length supplied than sent
 in:
-      recv data: "ZBXD\x01\x09\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      recv data:
+      - "ZBXD\x01\x09\x00\x00\x00\x00\x00\x00\x00agent.ping"
 out:
       ret: 'fail'
+      number of bytes: '23'
+---
+test case: Fragmented header
+in:
+      recv data:
+      - "ZB"
+      - "XD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+out:
+      ret: 'succeed'
+      number of bytes: '23'
+---
+test case: Fragmented data length
+in:
+      recv data:
+      - "ZBXD\x01\x0A\x00\x00"
+      - "\x00\x00\x00\x00\x00agent.ping"
+out:
+      ret: 'succeed'
+      number of bytes: '23'
+---
+test case: Fragmented key
+in:
+      recv data:
+      - "ZBXD\x01\x0A\x00\x00"
+      - "\x00\x00\x00\x00\x00agent.pi"
+      - "ng"
+out:
+      ret: 'succeed'
       number of bytes: '23'
 ...
