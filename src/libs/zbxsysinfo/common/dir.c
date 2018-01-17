@@ -918,8 +918,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 						++count;
 					break;
 				default:	/* not a directory => regular file */
-					if (0 != (types & DET_FILE) && 0 != match &&
-							INVALID_FILE_ATTRIBUTES != data.dwFileAttributes)
+					if (0 != (types & DET_FILE) && 0 != match)
 					{
 						wpath = zbx_utf8_to_unicode(path);
 						if (FAIL == link_processed(data.dwFileAttributes, wpath, &descriptors,
