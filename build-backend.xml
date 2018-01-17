@@ -278,8 +278,9 @@
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
 
-	<target name="mock-tests" depends="init">
+	<target name="mock-tests">
 		<!-- Build Zabbix server and proxy with C mock tests -->
+		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<make args="--enable-server --enable-proxy --with-mysql --with-libxml2" target="tests_build"/>
 		<exec executable="tests/tests_run.pl" failonerror="on">
 			<arg line=">"/>
