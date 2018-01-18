@@ -126,8 +126,8 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 }
 
 /**
- * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
- * Settings and colors are kept in 'config' database table
+ * Add color style and blinking to an object like CSpan or CDiv depending on trigger status.
+ * Settings and colors are kept in 'config' database table.
  *
  * @param mixed $object             object like CSpan, CDiv, etc.
  * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
@@ -140,7 +140,7 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 	$color_class = null;
 	$blinks = null;
 
-	// color class for text and blinking depends on trigger value and whether event is acknowledged
+	// Color class for text and blinking depends on trigger value and whether event is acknowledged.
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
 		$color_class = ZBX_STYLE_PROBLEM_UNACK_FG;
 		$blinks = $config['problem_unack_style'];
