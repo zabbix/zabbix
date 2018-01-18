@@ -153,6 +153,7 @@ void	zbx_mock_test_entry(void **state)
 	if (0 != memcmp(buffer + ZBX_TCP_HEADER_DATALEN_LEN, s.buffer, received - ZBX_TCP_HEADER_DATALEN_LEN))
 		fail_msg("Received message mismatch expected");
 
+	zbx_tcp_close(&s);
 	zbx_free(buffer);
 #undef ZBX_TCP_HEADER_DATALEN_LEN
 }
