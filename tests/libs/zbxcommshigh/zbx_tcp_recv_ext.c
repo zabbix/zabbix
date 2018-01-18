@@ -46,17 +46,7 @@ static zbx_uint64_t	read_yaml_uint64(const char *out)
 	return value;
 }
 
-static int	zbx_tcp_connect_mock(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
-{
-	memset(s, 0, sizeof(zbx_socket_t));
-
-	s->buf_type = ZBX_BUF_TYPE_STAT;
-
-	return SUCCEED;
-}
-
-static char	*yaml_assemble_binary_data_array(ssize_t expected)
+static char	*yaml_assemble_binary_data_array(size_t expected)
 {
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	fragment;
