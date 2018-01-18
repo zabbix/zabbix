@@ -70,6 +70,22 @@ out:
       ret: 'succeed'
       number of bytes: '23'
 ---
+test case: Only header with 0 data
+in:
+      recv data:
+      - "ZBXD\x01\x00\x00\x00\x00\x00\x00\x00\x00"
+out:
+      ret: 'succeed'
+      number of bytes: '13'
+---
+test case: Header is too small
+in:
+      recv data:
+      - "ZBX"
+out:
+      ret: 'fail'
+      number of bytes: '3'
+---
 # End of header parsing tests
 # Start of data length parsing tests
 test case: Header and data length fragmented
@@ -121,6 +137,14 @@ in:
 out:
       ret: 'fail'
       number of bytes: '23'
+---
+test case: Data length is too small
+in:
+      recv data:
+      - "ZBXD\x01\x01\x00\x00\x00\x00\x00\x00"
+out:
+      ret: 'fail'
+      number of bytes: '12'
 ---
 # End of data length parsing tests
 # Start of data tests

@@ -56,6 +56,37 @@ static int	zbx_tcp_connect_mock(zbx_socket_t *s, const char *source_ip, const ch
 	return SUCCEED;
 }
 
+static char	*yaml_assemble_binary_data_array(ssize_t expected)
+{
+	zbx_mock_error_t	error;
+	zbx_mock_handle_t	fragment;
+	const char		*value;
+	size_t			length, offset = 0;
+	char			*buffer;
+
+	buffer = zbx_malloc(NULL, expected);
+
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("recv data", &fragments)))
+		fail_msg("Cannot get recv data handle: %s", zbx_mock_error_string(error));
+
+	while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(fragments, &fragment))
+	{
+		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &value, &length)))
+			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
+
+		if (offset + length > expected)
+			fail_msg("Incorrect message size");
+
+		memcpy(buffer + offset, value, length);
+		offset += length;
+	}
+
+	if (offset != expected)
+		fail_msg("Assembled message is smaller:" ZBX_FS_UI64 " than expected:" ZBX_FS_UI64, offset, expected);
+
+	return buffer;
+}
+
 ssize_t	__wrap_read(int fd, void *buf, size_t nbytes)
 {
 	zbx_mock_error_t	error;
@@ -78,27 +109,39 @@ ssize_t	__wrap_read(int fd, void *buf, size_t nbytes)
 
 void	zbx_mock_test_entry(void **state)
 {
+#define ZBX_TCP_HEADER_DATALEN_LEN	13
+	char			*buffer;
 	zbx_socket_t		s;
-	ssize_t			bytes_received, bytes_expected;
+	ssize_t			received, expected;
 	zbx_mock_error_t	error;
-	int			i, ret;
 
 	ZBX_UNUSED(state);
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("recv data", &fragments)))
-		fail_msg("Cannot get recv data handle: %s", zbx_mock_error_string(error));
-
 	zbx_tcp_connect_mock(&s, "127.0.0.2", "127.0.0.1", 10050, 0, 0, NULL, NULL);
 
-	if (read_yaml_ret() != SUCCEED_OR_FAIL((bytes_received = zbx_tcp_recv_ext(&s, 0))))
-		fail_msg("Unexpected return code '%s'", zbx_result_string(SUCCEED_OR_FAIL(bytes_received)));
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("recv data", &fragments)))
+			fail_msg("Cannot get recv data handle: %s", zbx_mock_error_string(error));
 
-	if (FAIL == SUCCEED_OR_FAIL(bytes_received))
+	if (read_yaml_ret() != SUCCEED_OR_FAIL((received = zbx_tcp_recv_ext(&s, 0))))
+		fail_msg("Unexpected return code '%s'", zbx_result_string(SUCCEED_OR_FAIL(received)));
+
+	if (FAIL == SUCCEED_OR_FAIL(received))
 		return;
 
-	if ((bytes_expected = read_yaml_uint64("number of bytes")) != bytes_received)
+	if (received != (expected = read_yaml_uint64("number of bytes")))
 	{
 		fail_msg("Expected number of bytes to receive:" ZBX_FS_UI64 " received:" ZBX_FS_UI64,
-				bytes_received, bytes_expected);
+				expected, received);
 	}
+
+	if (ZBX_TCP_HEADER_DATALEN_LEN > received)
+		fail_msg("Received less than header size");
+
+	buffer = yaml_assemble_binary_data_array(received);
+
+	if (0 != memcmp(buffer + ZBX_TCP_HEADER_DATALEN_LEN, s.buffer, received - ZBX_TCP_HEADER_DATALEN_LEN))
+		fail_msg("Received message mismatch expected");
+
+	zbx_free(buffer);
+#undef ZBX_TCP_HEADER_DATALEN_LEN
 }
