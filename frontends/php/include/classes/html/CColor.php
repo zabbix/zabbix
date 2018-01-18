@@ -25,22 +25,25 @@ class CColor extends CDiv {
 
 	private $name;
 	private $value;
-	private $is_enabled;
-	private $is_required;
-	private $insert_color_picker;
+	private $is_enabled = true;
+	private $is_required = false;
+	private $append_color_picker_js = true;
 
-	public function __construct($name, $value, $insert_color_picker = true) {
+	/**
+	 * Creates a color picker form element.
+	 *
+	 * @param string $name	Color picker field name.
+	 * @param string $value Color value in HEX RGB format.
+	 */
+	public function __construct($name, $value) {
 		parent::__construct();
 
 		$this->name = $name;
 		$this->value = $value;
-		$this->is_enabled = true;
-		$this->is_required = false;
-		$this->insert_color_picker = $insert_color_picker;
 	}
 
 	/**
-	 * Enable or disable the element
+	 * Enable or disable the element.
 	 *
 	 * @param bool $is_enabled
 	 *
@@ -55,7 +58,7 @@ class CColor extends CDiv {
 	/**
 	 * Set or reset element 'aria-required' attribute.
 	 *
-	 * @param bool $is_required  Define aria-required attribute for element.
+	 * @param bool $is_required
 	 *
 	 * @return CColor
 	 */
@@ -65,10 +68,31 @@ class CColor extends CDiv {
 		return $this;
 	}
 
+	/**
+	 * Append color picker javascript.
+	 *
+	 * @param bool $append
+	 *
+	 * @return CColor
+	 */
+	public function appendColorPickerJs($append = true)
+	{
+		$this->append_color_picker_js = $append;
+
+		return $this;
+	}
+
+	/**
+	 * Gets string representation of widget HTML content.
+	 *
+	 * @param bool $destroy
+	 *
+	 * @return string
+	 */
 	public function toString($destroy = true) {
 		$this->cleanItems();
 
-		parent::addItem([
+		$this->addItem([
 			(new CColorCell('lbl_'.$this->name, $this->value))
 				->setTitle('#'.$this->value)
 				->onClick('javascript: show_color_picker("'.zbx_formatDomId($this->name).'")'),
@@ -82,7 +106,7 @@ class CColor extends CDiv {
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
-		if ($this->insert_color_picker) {
+		if ($this->append_color_picker_js) {
 			insert_show_color_picker_javascript();
 		}
 
