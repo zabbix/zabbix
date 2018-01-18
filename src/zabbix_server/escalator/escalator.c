@@ -505,7 +505,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event))
+				if (PERM_READ > get_trigger_permission(userid, (NULL != r_event ? r_event : event)))
 					continue;
 				break;
 			case EVENT_OBJECT_ITEM:
