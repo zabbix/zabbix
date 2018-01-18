@@ -63,36 +63,32 @@
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
-<!-- section of script temporary commented out for testing-->
-<!--		<for list="${conf.list}" param="name" delimiter=",">
-			<sequential>-->
-				<exec executable="scan-build" failonerror="on">
-					<arg line="./configure"/>
-<!-- section of script temporary commented out for testing-->
-<!--					<arg line="${@{name}}"/>-->
-					<arg line="--enable-agent"/>
-				</exec>
-				<trycatch>
-					<try>
-						<exec executable="scan-build" failonerror="on">
-							<arg line="-o"/>
-							<arg line="./clang-scan-build-reports"/>
-							<arg line="make"/>
-							<arg line="-s"/>
-							<arg line="-j5"/>
-						</exec>
-					</try>
-					<finally>
-						<exec executable="make" failonerror="on">
-							<arg line="-s"/>
-							<arg line="-j5"/>
-							<arg line="clean"/>
-						</exec>
-					</finally>
-				</trycatch>
-<!-- section of script temporary commented out for testing-->
-<!--			</sequential>
-		</for>-->
+		<for list="${conf.list}" param="name" delimiter=",">
+<!--			<sequential>-->
+			<exec executable="scan-build" failonerror="on">
+				<arg line="./configure"/>
+				<arg line="${@{name}}"/>
+			</exec>
+			<trycatch>
+				<try>
+					<exec executable="scan-build" failonerror="on">
+						<arg line="-o"/>
+						<arg line="./clang-scan-build-reports"/>
+						<arg line="make"/>
+						<arg line="-s"/>
+						<arg line="-j5"/>
+					</exec>
+				</try>
+				<finally>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="clean"/>
+					</exec>
+				</finally>
+			</trycatch>
+<!--			</sequential>-->
+		</for>
 	</target>
 
 	<!-- Static analysis container target -->
