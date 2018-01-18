@@ -1174,6 +1174,7 @@ Changes for 3.0.15rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
 ..F....... [ZBX-13345] removed SID from URL in screen edit mode (miks)
 ...G...... [ZBX-13246] fixed processing of command line arguments which are longer than 2KB for proc.num and proc.mem items on AIX (viktors)
