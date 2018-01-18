@@ -1,4 +1,11 @@
 ---
+test case: Zero bytes received
+in:
+      recv data:
+      - ""
+out:
+      ret: 'fail'
+---
 test case: Correct number of bytes received
 in:
       recv data:
@@ -6,6 +13,98 @@ in:
 out:
       ret: 'succeed'
       number of bytes: '23'
+# Start of header parsing tests
+---
+test case: Fragmented header
+in:
+      recv data:
+      - "ZB"
+      - "XD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+out:
+      ret: 'succeed'
+      number of bytes: '23'
+---
+test case: Fragmented incorrect header in part 1
+in:
+      recv data:
+      - "ZZ"
+      - "XD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+out:
+      ret: 'fail'
+---
+test case: Fragmented incorrect header in part 2
+in:
+      recv data:
+      - "ZB"
+      - "XX\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+out:
+      ret: 'fail'
+---
+test case: Header in separate fragment
+in:
+      recv data:
+      - "ZBXD\x01"
+      - "\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+out:
+      ret: 'succeed'
+      number of bytes: '23'
+---
+test case: Header in separate fragment incorrect
+in:
+      recv data:
+      - "ZBBD\x01"
+      - "\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+out:
+      ret: 'fail'
+---
+test case: Whole header fragmented
+in:
+      recv data:
+      - "Z"
+      - "B"
+      - "X"
+      - "D"
+      - "\x01"
+      - "\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+out:
+      ret: 'succeed'
+      number of bytes: '23'
+---
+# End of header parsing tests
+# Start of data length parsing tests
+test case: Header and data length fragmented
+in:
+      recv data:
+      - "Z"
+      - "B"
+      - "X"
+      - "D"
+      - "\x01"
+      - "\x0A" # data length starts
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "agent.ping"
+out:
+      ret: 'succeed'
+      number of bytes: '23'
+---
+test case: Data length indicator exceed max size
+in:
+      recv data:
+      - "Z"
+      - "B"
+      - "X"
+      - "D"
+      - "\x01"
+      - "\x01\x00\x00\x08\x00\x00\x00\x00"
+      - "agent.ping"
+out:
+      ret: 'fail'
 ---
 test case: Don't accept if bigger length is supplied in header than sent
 in:
@@ -23,30 +122,63 @@ out:
       ret: 'fail'
       number of bytes: '23'
 ---
-test case: Fragmented header
-in:
-      recv data:
-      - "ZB"
-      - "XD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
-out:
-      ret: 'succeed'
-      number of bytes: '23'
----
-test case: Fragmented data length
-in:
-      recv data:
-      - "ZBXD\x01\x0A\x00\x00"
-      - "\x00\x00\x00\x00\x00agent.ping"
-out:
-      ret: 'succeed'
-      number of bytes: '23'
----
+# End of data length parsing tests
+# Start of data tests
 test case: Fragmented key
 in:
       recv data:
       - "ZBXD\x01\x0A\x00\x00"
       - "\x00\x00\x00\x00\x00agent.pi"
       - "ng"
+out:
+      ret: 'succeed'
+      number of bytes: '23'
+---
+test case: Fragmented key by bytes
+in:
+      recv data:
+      - "ZBXD\x01\x0A\x00\x00"
+      - "\x00\x00\x00\x00\x00"
+      - "a"
+      - "g"
+      - "e"
+      - "n"
+      - "t"
+      - "."
+      - "p"
+      - "i"
+      - "n"
+      - "g"
+out:
+      ret: 'succeed'
+      number of bytes: '23'
+---
+test case: Whole message streamed by 1 byte
+in:
+      recv data:
+      - "Z"
+      - "B"
+      - "X"
+      - "D"
+      - "\x01"
+      - "\x0A" # data length starts
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "\x00"
+      - "a"
+      - "g"
+      - "e"
+      - "n"
+      - "t"
+      - "."
+      - "p"
+      - "i"
+      - "n"
+      - "g"
 out:
       ret: 'succeed'
       number of bytes: '23'

@@ -4,7 +4,7 @@
 #include "common.h"
 #include "comms.h"
 
-static zbx_mock_handle_t	recv_vector, recv_elem;
+static zbx_mock_handle_t	fragments;
 
 static int	read_yaml_ret(void)
 {
@@ -61,13 +61,14 @@ ssize_t	__wrap_read(int fd, void *buf, size_t nbytes)
 	zbx_mock_error_t	error;
 	const char		*value;
 	size_t			length;
+	zbx_mock_handle_t	fragment;
 
 	ZBX_UNUSED(fd);
 
-	if (ZBX_MOCK_SUCCESS != zbx_mock_vector_element(recv_vector, &recv_elem))
+	if (ZBX_MOCK_SUCCESS != zbx_mock_vector_element(fragments, &fragment))
 		return 0;	/* no more data */
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(recv_elem, &value, &length)))
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &value, &length)))
 		fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
 
 	memcpy(buf, value, length);
@@ -84,7 +85,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("recv data", &recv_vector)))
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("recv data", &fragments)))
 		fail_msg("Cannot get recv data handle: %s", zbx_mock_error_string(error));
 
 	zbx_tcp_connect_mock(&s, "127.0.0.2", "127.0.0.1", 10050, 0, 0, NULL, NULL);
