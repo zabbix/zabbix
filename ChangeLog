@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha3
 
 New features:
+...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
 ..F....... [ZBX-13223] fixed graphs duplication in graph preview (ashubin)
