@@ -3,6 +3,7 @@ Changes for 4.0.0alpha3
 New features:
 
 Bug fixes:
+..F....... [ZBX-13223] fixed graphs duplication in graph preview (ashubin)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
 ..F....... [ZBX-13214] added support of \0 matching group for regsub and iregsub methods (gcalenko, Sasha)
 ........S. [ZBX-13208] eliminated race condition that caused history collection for newly created items to start before preprocecessing steps finished syncing (vso)
@@ -94,6 +95,7 @@ Changes for 3.4.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13223] fixed graphs duplication in graph preview (ashubin)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
 ..F....... [ZBX-13345] removed SID from URL in screen edit mode (miks)
 ..F....... [ZBX-13214] added support of \0 matching group for regsub and iregsub methods (gcalenko, Sasha)
