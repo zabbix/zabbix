@@ -777,22 +777,6 @@ footer {
 		white-space: nowrap;
 		@include rotate(270);
 	}
-
-	.problem-unack-fg {
-		color: $problem-unack-fg-color;
-	}
-
-	.problem-ack-fg {
-		color: $problem-ack-fg-color;
-	}
-
-	.ok-unack-fg {
-		color: $ok-unack-fg-color;
-	}
-
-	.ok-ack-fg {
-		color: $ok-ack-fg-color;
-	}
 }
 
 .table-paging {
@@ -5011,6 +4995,23 @@ svg {
 			animation: fadein .5s;
 		}
 	}
+}
+
+// EVENT STATUS COLORS
+.problem-unack-fg {
+	color: $problem-unack-fg-color;
+}
+
+.problem-ack-fg {
+	color: $problem-ack-fg-color;
+}
+
+.ok-unack-fg {
+	color: $ok-unack-fg-color;
+}
+
+.ok-ack-fg {
+	color: $ok-ack-fg-color;
 }
 
 /*doc
