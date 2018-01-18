@@ -63,7 +63,6 @@ $fields = [
 	'timeperiods' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'edit_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
-	'twb_groupid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	// actions
 	'action' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null],
 	'add_timeperiod' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],

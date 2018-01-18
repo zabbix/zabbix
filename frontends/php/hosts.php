@@ -63,7 +63,6 @@ $fields = [
 	'status' =>					[T_ZBX_INT, O_OPT, null,
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
-	'newgroup' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
 									'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')
 								],
@@ -457,44 +456,36 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			 * Step 3. Case when groups need to be removed. This is done inside the loop, since each host may have
 			 * different existing groups. So we need to know what can we remove.
 			 */
-			if (isset($visible['remove_groups'])) {
-				$remove_groups = getRequest('remove_groups', []);
+			$remove_groups = getRequest('remove_groups', []);
 
-				if ($remove_groups) {
-					if (isset($replaceHostGroupsIds)) {
-						/*
-						 * Previously we determined what groups fro ALL hosts will be replaced.
-						 * The $replaceHostGroupsIds holds both - groups to replace and new groups to add.
-						 * But $replace_host_groupids is the difference between the replaceable groups and removable
-						 * groups.
-						 */
-						$replace_host_groupids = array_diff($replaceHostGroupsIds, $remove_groups);
-					}
-					else {
-						/*
-						 * The $newHostGroupIds holds only groups that need to be added. So $replace_host_groupsids is
-						 * the difference between the groups that already exist + groups that need to be added and
-						 * removable groups.
-						 */
-						$current_groupids = zbx_objectValues($host['groups'], 'groupid');
-
-						$replace_host_groupids = $newHostGroupIds
-							? array_diff(array_unique(array_merge($current_groupids, $newHostGroupIds)), $remove_groups)
-							: array_diff($current_groupids, $remove_groups);
-					}
-				}
-
-				// In case groups need to be replaced, we need to check permissions and re-select them once again.
-				if (isset($replace_host_groupids)) {
-					$newValues['groups'] = API::HostGroup()->get([
-						'groupids' => $replace_host_groupids,
-						'editable' => true,
-						'output' => ['groupid']
-					]);
+			if (array_key_exists('remove_groups', $visible) && $remove_groups) {
+				if (isset($replaceHostGroupsIds)) {
+					/*
+						* Previously we determined what groups fro ALL hosts will be replaced.
+						* The $replaceHostGroupsIds holds both - groups to replace and new groups to add.
+						* But $replace_host_groupids is the difference between the replaceable groups and removable
+						* groups.
+						*/
+					$replace_host_groupids = array_diff($replaceHostGroupsIds, $remove_groups);
 				}
 				else {
-					$newValues['groups'] = [];
+					/*
+						* The $newHostGroupIds holds only groups that need to be added. So $replace_host_groupsids is
+						* the difference between the groups that already exist + groups that need to be added and
+						* removable groups.
+						*/
+					$current_groupids = zbx_objectValues($host['groups'], 'groupid');
+
+					$replace_host_groupids = $newHostGroupIds
+						? array_diff(array_unique(array_merge($current_groupids, $newHostGroupIds)), $remove_groups)
+						: array_diff($current_groupids, $remove_groups);
 				}
+
+				$newValues['groups'] = API::HostGroup()->get([
+					'groupids' => $replace_host_groupids,
+					'editable' => true,
+					'output' => ['groupid']
+				]);
 			}
 
 			// Case when we only need to add new groups to host.
@@ -910,7 +901,6 @@ if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) &
 		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
-		'newgroup' => getRequest('newgroup', ''),
 		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),
 		'proxy_hostid' => getRequest('proxy_hostid', ''),
@@ -1268,10 +1258,8 @@ else {
 			'filter' => [
 				'port' => ($filter['port'] === '') ? null : $filter['port'],
 			],
-			'proxyids' => ($filter['monitored_by'] == ZBX_MONITORED_BY_PROXY)
+			'proxyids' => ($filter['monitored_by'] == ZBX_MONITORED_BY_PROXY && $filter['proxyids'])
 								? $filter['proxyids']
-									? $filter['proxyids']
-									: null
 								: null
 		]);
 	}

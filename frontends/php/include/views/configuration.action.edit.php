@@ -296,23 +296,21 @@ switch ($data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_PROXY:
-		$condition = [
-			(new CMultiSelect([
-				'name' => 'new_condition[value]',
-				'objectName' => 'proxies',
-				'selectedLimit' => 1,
-				'defaultValue' => 0,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'proxies',
-						'srcfld1' => 'proxyid',
-						'srcfld2' => 'host',
-						'dstfrm' => $actionForm->getName(),
-						'dstfld1' => 'new_condition_value'
-					]
+		$condition = (new CMultiSelect([
+			'name' => 'new_condition[value]',
+			'objectName' => 'proxies',
+			'selectedLimit' => 1,
+			'defaultValue' => 0,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'proxies',
+					'srcfld1' => 'proxyid',
+					'srcfld2' => 'host',
+					'dstfrm' => $actionForm->getName(),
+					'dstfld1' => 'new_condition_value'
 				]
-			]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		];
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DHOST_IP:

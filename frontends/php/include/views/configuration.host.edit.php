@@ -87,7 +87,9 @@ $hostList
 					'multiselect' => '1'
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 // interfaces for normal hosts

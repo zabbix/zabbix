@@ -180,7 +180,7 @@ if (getRequest('remove_groups')) {
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[remove_groups]', 'remove_groups', _('Original')))
 		->setLabel(_('Remove host groups'))
-		->setChecked(isset($data['visible']['remove_groups'])),
+		->setChecked(array_key_exists('remove_groups', $data['visible'])),
 	(new CDiv(
 		(new CMultiSelect([
 			'name' => 'remove_groups[]',

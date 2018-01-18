@@ -99,7 +99,9 @@ $templateList = (new CFormList('hostlist'))
 					'multiselect' => '1'
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

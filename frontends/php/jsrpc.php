@@ -317,9 +317,9 @@ switch ($data['method']) {
 
 			case 'proxies':
 				$proxies = API::Proxy()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : false,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['proxyid', 'host'],
-					'search' => isset($data['search']) ? ['host' => $data['search']] : null,
+					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);
 
