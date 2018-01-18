@@ -21,22 +21,71 @@
 
 class CColor extends CDiv {
 
-	public function __construct($name, $value, $insert_color_picker = true, $disabled = false) {
-		parent::__construct([
-			(new CColorCell('lbl_'.$name, $value))
-				->setTitle('#'.$value)
-				->onClick('javascript: show_color_picker("'.zbx_formatDomId($name).'")'),
-			(new CTextBox($name, $value))
+	const MAX_LENGTH = 6;
+
+	private $name;
+	private $value;
+	private $is_enabled;
+	private $is_required;
+	private $insert_color_picker;
+
+	public function __construct($name, $value, $insert_color_picker = true) {
+		parent::__construct();
+
+		$this->name = $name;
+		$this->value = $value;
+		$this->is_enabled = true;
+		$this->is_required = false;
+		$this->insert_color_picker = $insert_color_picker;
+	}
+
+	/**
+	 * Enable or disable the element
+	 *
+	 * @param bool $is_enabled
+	 *
+	 * @return CColor
+	 */
+	public function setEnabled($is_enabled = true) {
+		$this->is_enabled = $is_enabled;
+
+		return $this;
+	}
+
+	/**
+	 * Set or reset element 'aria-required' attribute.
+	 *
+	 * @param bool $is_required  Define aria-required attribute for element.
+	 *
+	 * @return CColor
+	 */
+	public function setAriaRequired($is_required = true) {
+		$this->is_required = $is_required;
+
+		return $this;
+	}
+
+	public function toString($destroy = true) {
+		$this->cleanItems();
+
+		parent::addItem([
+			(new CColorCell('lbl_'.$this->name, $this->value))
+				->setTitle('#'.$this->value)
+				->onClick('javascript: show_color_picker("'.zbx_formatDomId($this->name).'")'),
+			(new CTextBox($this->name, $this->value))
 				->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
-				->setAttribute('maxlength', 6)
-				->setAttribute('disabled', $disabled ? 'disabled' : null)
-				->onChange('set_color_by_name("'.zbx_formatDomId($name).'", this.value)')
+				->setAttribute('maxlength', self::MAX_LENGTH)
+				->setEnabled($this->is_enabled)
+				->setAriaRequired($this->is_required)
+				->onChange('set_color_by_name("'.zbx_formatDomId($this->name).'", this.value)')
 		]);
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
-		if ($insert_color_picker) {
+		if ($this->insert_color_picker) {
 			insert_show_color_picker_javascript();
 		}
+
+		return parent::toString($destroy);
 	}
 }

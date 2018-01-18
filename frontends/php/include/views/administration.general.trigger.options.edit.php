@@ -32,7 +32,8 @@ $triggerDOFormList = (new CFormList())
 	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
 		->setChecked($data['custom_color'] == 1))
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
-		(new CColor('problem_unack_color', $data['problem_unack_color'], true, $data['custom_color'] != 1))
+		(new CColor('problem_unack_color', $data['problem_unack_color']))
+			->setEnabled($data['custom_color'] == 1)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_unack_style'))
@@ -40,7 +41,8 @@ $triggerDOFormList = (new CFormList())
 			->setChecked($data['problem_unack_style'] == 1)
 	])
 	->addRow((new CLabel(_('Acknowledged PROBLEM events'), 'problem_ack_color'))->setAsteriskMark(), [
-		(new CColor('problem_ack_color', $data['problem_ack_color'], true, $data['custom_color'] != 1))
+		(new CColor('problem_ack_color', $data['problem_ack_color']))
+			->setEnabled($data['custom_color'] == 1)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_ack_style'))
@@ -48,7 +50,8 @@ $triggerDOFormList = (new CFormList())
 			->setChecked($data['problem_ack_style'] == 1)
 	])
 	->addRow((new CLabel(_('Unacknowledged OK events'), 'ok_unack_color'))->setAsteriskMark(), [
-		(new CColor('ok_unack_color', $data['ok_unack_color'], true, $data['custom_color'] != 1))
+		(new CColor('ok_unack_color', $data['ok_unack_color']))
+			->setEnabled($data['custom_color'] == 1)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_unack_style'))
@@ -56,7 +59,8 @@ $triggerDOFormList = (new CFormList())
 			->setChecked($data['ok_unack_style'] == 1)
 	])
 	->addRow((new CLabel(_('Acknowledged OK events'), 'ok_ack_color'))->setAsteriskMark(), [
-		(new CColor('ok_ack_color', $data['ok_ack_color'], true, $data['custom_color'] != 1))
+		(new CColor('ok_ack_color', $data['ok_ack_color']))
+			->setEnabled($data['custom_color'] == 1)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_ack_style'))
