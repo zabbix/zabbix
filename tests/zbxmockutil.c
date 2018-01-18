@@ -24,6 +24,8 @@
 
 #include "common.h"
 
+#include <malloc.h>
+
 const char	*zbx_mock_get_parameter_string(const char *path)
 {
 	zbx_mock_error_t	err;
@@ -75,4 +77,3 @@ zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, co
 
 	return member;
 }
-

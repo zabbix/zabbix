@@ -40,6 +40,12 @@ void	__zbx_mock_assert_int_eq(const char *file, int line, const char *prefix_msg
 void	__zbx_mock_assert_int_ne(const char *file, int line, const char *prefix_msg, int expected_value,
 		int returned_value);
 
+void	__zbx_mock_assert_double_eq(const char *file, double line, const char *prefix_msg, double expected_value,
+		double returned_value);
+
+void	__zbx_mock_assert_double_ne(const char *file, double line, const char *prefix_msg, double expected_value,
+		double returned_value);
+
 void	__zbx_mock_assert_result_eq(const char *file, int line, const char *prefix_msg, int expected_value,
 		int returned_value);
 
@@ -57,6 +63,18 @@ void	__zbx_mock_assert_ptr_eq(const char *file, int line, const char *prefix_msg
 
 void	__zbx_mock_assert_ptr_ne(const char *file, int line, const char *prefix_msg, const void *expected_value,
 		const void *returned_value);
+
+void	__zbx_mock_assert_timespec_eq(const char *file, int line, const char *prefix_msg,
+		const zbx_timespec_t *expected_value, const zbx_timespec_t *returned_value);
+
+void	__zbx_mock_assert_timespec_ne(const char *file, int line, const char *prefix_msg,
+		const zbx_timespec_t *expected_value, const zbx_timespec_t *returned_value);
+
+void	__zbx_mock_assert_time_eq(const char *file, int line, const char *prefix_msg, time_t expected_value,
+		time_t returned_value);
+
+void	__zbx_mock_assert_time_ne(const char *file, int line, const char *prefix_msg, time_t expected_value,
+		time_t returned_value);
 
 #define zbx_mock_assert_str_eq(prefix_msg, expected_value, returned_value) \
 	__zbx_mock_assert_str_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
@@ -76,6 +94,12 @@ void	__zbx_mock_assert_ptr_ne(const char *file, int line, const char *prefix_msg
 #define zbx_mock_assert_int_ne(prefix_msg, expected_value, returned_value) \
 	__zbx_mock_assert_int_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
 
+#define zbx_mock_assert_double_eq(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_double_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_double_ne(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_double_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
 #define zbx_mock_assert_result_eq(prefix_msg, expected_value, returned_value) \
 	__zbx_mock_assert_result_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
 
@@ -93,5 +117,17 @@ void	__zbx_mock_assert_ptr_ne(const char *file, int line, const char *prefix_msg
 
 #define zbx_mock_assert_ptr_ne(prefix_msg, expected_value, returned_value) \
 	__zbx_mock_assert_ptr_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_timespec_eq(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_timespec_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_timespec_ne(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_timespec_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_time_eq(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_time_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_time_ne(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_time_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
 
 #endif

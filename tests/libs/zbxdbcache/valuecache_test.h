@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MOCK_UTIL_H
-#define ZABBIX_MOCK_UTIL_H
+#ifndef ZABBIX_VALUECACHE_TEST_H
+#define ZABBIX_VALUECACHE_TEST_H
 
-#include "zbxmockdata.h"
-
-const char	*zbx_mock_get_parameter_string(const char *path);
-const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name);
-
-zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);
-zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, const char *name);
+void	zbx_vc_set_mode(int mode);
+int	zbx_vc_get_cached_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_history_record_t *values);
+int	zbx_vc_precache_values(zbx_uint64_t itemid, int value_type, int seconds, int count, int end);
+int	zbx_vc_get_item_state(zbx_uint64_t itemid, int *status, int *active_range, int *values_total,
+		int *db_cached_from);
+int	zbx_vc_get_cache_state(int *mode, zbx_uint64_t *hits, zbx_uint64_t *misses);
 
 #endif

@@ -273,7 +273,7 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
  *             value_type - [IN] the history value type                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_history_value2str(char *buffer, size_t size, history_value_t *value, int value_type)
+void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *value, int value_type)
 {
 	switch (value_type)
 	{

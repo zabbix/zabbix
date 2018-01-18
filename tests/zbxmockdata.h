@@ -58,7 +58,7 @@ zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value);
 zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter);
 
 /* date/time support */
-#define ZBX_MOCK_TIMESTAMP_MAX_LEN	37
+#define ZBX_MOCK_TIMESTAMP_MAX_LEN	64
 
 zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts);
 zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size);

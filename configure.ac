@@ -1596,7 +1596,9 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxsysinfo/Makefile
 	tests/libs/zbxsysinfo/linux/Makefile
 	tests/libs/zbxsysinfo/common/Makefile
-)])
+	),
+	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
+])
 
 AC_OUTPUT([
 	Makefile

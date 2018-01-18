@@ -60,9 +60,17 @@
 #define ZBX_VC_MODE_NORMAL	0
 #define ZBX_VC_MODE_LOWMEM	1
 
+/* indicates that all values from database are cached */
+#define ZBX_ITEM_STATUS_CACHED_ALL	1
+
 /* the cache statistics */
 typedef struct
 {
+	/* Value cache misses are new values cached during request and hits are calculated by  */
+	/* subtracting misses from the total number of values returned (0 if the number of     */
+	/* returned values is less than misses.                                                */
+	/* When performing count based requests the number of cached values might be greater   */
+	/* than number of returned values. This can skew the hits/misses ratio towards misses. */
 	zbx_uint64_t	hits;
 	zbx_uint64_t	misses;
 

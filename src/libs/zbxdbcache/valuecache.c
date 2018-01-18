@@ -60,11 +60,6 @@
 /* time period after which value cache will switch back to normal mode */
 #define ZBX_VC_LOW_MEMORY_RESET_PERIOD		SEC_PER_DAY
 
-/* Redefine the time function so unit tests can simulate time changes. */
-/* It should not be changed during normal processing.                  */
-static time_t (*vc_time)(time_t *) = time;
-#define ZBX_VC_TIME()	vc_time(NULL)
-
 static zbx_mem_info_t	*vc_mem = NULL;
 
 static ZBX_MUTEX	vc_lock = ZBX_MUTEX_NULL;
@@ -128,9 +123,6 @@ zbx_vc_chunk_t;
 /* the item operational state flags */
 #define ZBX_ITEM_STATE_CLEAN_PENDING	1
 #define ZBX_ITEM_STATE_REMOVE_PENDING	2
-
-/* indicates that all values from database are cached */
-#define ZBX_ITEM_STATUS_CACHED_ALL	1
 
 /* the value cache item data */
 typedef struct
@@ -643,7 +635,7 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 	if (NULL != item)
 	{
 		item->hits += hits;
-		item->last_accessed = ZBX_VC_TIME();
+		item->last_accessed = time(NULL);
 	}
 
 	if (ZBX_VC_ENABLED == vc_state)
@@ -667,7 +659,7 @@ static void	vc_warn_low_memory(void)
 {
 	int	now;
 
-	now = ZBX_VC_TIME();
+	now = time(NULL);
 
 	if (now - vc_cache->mode_time > ZBX_VC_LOW_MEMORY_RESET_PERIOD)
 	{
@@ -710,7 +702,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 	size_t				freed = 0;
 	zbx_vector_vc_itemweight_t	items;
 
-	timestamp = ZBX_VC_TIME() - SEC_PER_DAY;
+	timestamp = time(NULL) - SEC_PER_DAY;
 
 	/* reserve at least min_free_request bytes to avoid spamming with free space requests */
 	if (space < vc_cache->min_free_request)
@@ -733,7 +725,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 
 	/* failed to free enough space by removing old items, entering low memory mode */
 	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
-	vc_cache->mode_time = ZBX_VC_TIME();
+	vc_cache->mode_time = time(NULL);
 
 	vc_warn_low_memory();
 
@@ -1388,7 +1380,7 @@ static int	vch_item_get_last_value(const zbx_vc_item_t *item, int end_timestamp,
 	index = chunk->last_value;
 
 	if (0 == end_timestamp)
-		end_timestamp = ZBX_VC_TIME();
+		end_timestamp = time(NULL);
 
 	if (chunk->slots[index].timestamp.sec > end_timestamp)
 	{
@@ -1535,12 +1527,16 @@ out:
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
 {
 	size_t	freed;
+	int	first_value, last_value;
 
 	freed = vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->last_value);
 
+	first_value = chunk->first_value;
+	last_value = chunk->last_value;
+
 	__vc_mem_free_func(chunk);
 
-	return freed + sizeof(zbx_vc_chunk_t) + (chunk->last_value - chunk->first_value) * sizeof(zbx_history_record_t);
+	return freed + sizeof(zbx_vc_chunk_t) + (last_value - first_value) * sizeof(zbx_history_record_t);
 }
 
 /******************************************************************************
@@ -1590,7 +1586,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 		zbx_vc_chunk_t	*chunk = tail;
 		int		timestamp;
 
-		timestamp = ZBX_VC_TIME() - item->active_range;
+		timestamp = time(NULL) - item->active_range;
 
 		/* try to remove chunks with all history values older than maximum request range */
 		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp &&
@@ -1899,7 +1895,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 	}
 	else
-		update_end = ZBX_VC_TIME();
+		update_end = time(NULL);
 
 	update_seconds = update_end - start;
 
@@ -1995,7 +1991,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 		if (NULL != item->head)
 			update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 		else
-			update_end = ZBX_VC_TIME();
+			update_end = time(NULL);
 
 		zbx_vector_history_record_create(&records);
 
@@ -2095,7 +2091,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 		if (NULL != item->head)
 			update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 		else
-			update_end = ZBX_VC_TIME();
+			update_end = time(NULL);
 
 		zbx_vector_history_record_create(&records);
 
@@ -2179,7 +2175,7 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 	/* find if the cache should be updated to cover the required range */
 	if (NULL == item->tail)
 	{
-		update_end = ZBX_VC_TIME();
+		update_end = time(NULL);
 	}
 	else
 	{
@@ -2254,7 +2250,7 @@ static void	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_
 	/* range which might be greater than the current request range.        */
 	if (0 != item->active_range || ZBX_ITEM_STATUS_CACHED_ALL != item->status)
 	{
-		now = ZBX_VC_TIME();
+		now = time(NULL);
 		vch_item_update_range(item, seconds + now - timestamp, now);
 	}
 
@@ -2345,7 +2341,7 @@ out:
 		range_timestamp = values->values[values->values_num - 1].timestamp.sec - 1;
 	}
 
-	now = ZBX_VC_TIME();
+	now = time(NULL);
 	vch_item_update_range(item, now - range_timestamp, now);
 }
 
@@ -2491,7 +2487,7 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 
 	vc_history_record_copy(value, &chunk->slots[index], item->value_type);
 
-	now = ZBX_VC_TIME();
+	now = time(NULL);
 	vch_item_update_range(item, now - value->timestamp.sec + 1, now);
 
 	*found = 1;
@@ -2537,6 +2533,9 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
 
 	return freed;
 }
+
+#include <setjmp.h>
+#include "cmocka.h"
 
 /******************************************************************************************************************
  *                                                                                                                *
@@ -2669,7 +2668,7 @@ void	zbx_vc_reset(void)
 		while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 		{
 			vch_item_free_cache(item);
-			zbx_hashset_iter_remove(&iter);
+			zbx_hashset_remove_direct(&vc_cache->items, &iter);
 		}
 
 		vc_cache->db_queries = 0;
@@ -3060,3 +3059,7 @@ void	zbx_vc_disable(void)
 {
 	vc_state = ZBX_VC_DISABLED;
 }
+
+#ifdef HAVE_TESTS
+#	include "valuecache_test.c"
+#endif
