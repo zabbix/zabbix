@@ -47,7 +47,8 @@ zbx_tcp_recv_ext_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tcp_recv_ext_WRAP_FUNCS = \
-	-Wl,--wrap=read
+	-Wl,--wrap=read \
+	-Wl,--wrap=connect
 
 zbx_tcp_recv_ext_LDADD = \
 	$(COMMON_LIB_FILES)

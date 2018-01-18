@@ -87,6 +87,15 @@ static char	*yaml_assemble_binary_data_array(ssize_t expected)
 	return buffer;
 }
 
+int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len)
+{
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(addr);
+	ZBX_UNUSED(len);
+
+	return 0;
+}
+
 ssize_t	__wrap_read(int fd, void *buf, size_t nbytes)
 {
 	zbx_mock_error_t	error;
@@ -110,6 +119,7 @@ ssize_t	__wrap_read(int fd, void *buf, size_t nbytes)
 void	zbx_mock_test_entry(void **state)
 {
 #define ZBX_TCP_HEADER_DATALEN_LEN	13
+
 	char			*buffer;
 	zbx_socket_t		s;
 	ssize_t			received, expected;
@@ -117,7 +127,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_tcp_connect_mock(&s, "127.0.0.2", "127.0.0.1", 10050, 0, 0, NULL, NULL);
+	if (SUCCEED != zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
+		fail_msg("Failed to connect");
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("recv data", &fragments)))
 			fail_msg("Cannot get recv data handle: %s", zbx_mock_error_string(error));
