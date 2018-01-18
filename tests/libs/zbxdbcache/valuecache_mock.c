@@ -25,6 +25,7 @@
 #include "zbxhistory.h"
 #include "history.h"
 #include "valuecache.h"
+#include "dbcache.h"
 
 #include <setjmp.h>
 #include <cmocka.h>
@@ -51,44 +52,19 @@ static int	history_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mock_get_value_type                                          *
+ * Function: zbx_vcmock_read_history_value                                    *
  *                                                                            *
- * Purpose: converts item value type from text format                         *
- *                                                                            *
- ******************************************************************************/
-unsigned char	zbx_mock_get_value_type(const char *value_type)
-{
-	if (0 == strcmp(value_type, "ITEM_VALUE_TYPE_FLOAT"))
-		return ITEM_VALUE_TYPE_FLOAT;
-
-	if (0 == strcmp(value_type, "ITEM_VALUE_TYPE_STR"))
-		return ITEM_VALUE_TYPE_STR;
-
-	if (0 == strcmp(value_type, "ITEM_VALUE_TYPE_LOG"))
-		return ITEM_VALUE_TYPE_LOG;
-
-	if (0 == strcmp(value_type, "ITEM_VALUE_TYPE_UINT64"))
-		return ITEM_VALUE_TYPE_UINT64;
-
-	if (0 == strcmp(value_type, "ITEM_VALUE_TYPE_TEXT"))
-		return ITEM_VALUE_TYPE_TEXT;
-
-	fail_msg("Unknown value type \"%s\"", value_type);
-	return ITEM_VALUE_TYPE_MAX;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vcmock_ds_read_record                                        *
- *                                                                            *
- * Purpose: reads history record from input data                              *
+ * Purpose: reads history value and timestamp from input data                 *
  *                                                                            *
  * Parameters: hvalue     - [IN] handle to the history record mapping         *
  *             value_type - [IN] the value type of the history data           *
- *             rec        - [OUT] the history record                          *
+ *             value      - [OUT] the history value                           *
+ *             ts         - [OUT] the history value timestamp                 *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_vcmock_ds_read_record(zbx_mock_handle_t hvalue, unsigned char value_type, zbx_history_record_t *rec)
+
+static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned char value_type,
+		history_value_t *value, zbx_timespec_t *ts)
 {
 	const char		*data;
 	zbx_mock_error_t	err;
@@ -101,14 +77,14 @@ static void	zbx_vcmock_ds_read_record(zbx_mock_handle_t hvalue, unsigned char va
 		{
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
-				rec->value.str = zbx_strdup(NULL, data);
+				value->str = zbx_strdup(NULL, data);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				if (FAIL == is_uint64(data, &rec->value.ui64))
+				if (FAIL == is_uint64(data, &value->ui64))
 					fail_msg("Invalid uint64 value \"%s\"", data);
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				rec->value.dbl = atof(data);
+				value->dbl = atof(data);
 		}
 	}
 	else
@@ -132,11 +108,11 @@ static void	zbx_vcmock_ds_read_record(zbx_mock_handle_t hvalue, unsigned char va
 		if (FAIL == is_uint32(data, &log->timestamp))
 			fail_msg("Invalid log timestamp value \"%s\"", data);
 
-		rec->value.log = log;
+		value->log = log;
 	}
 
 	data = zbx_mock_get_object_member_string(hvalue, "ts");
-	if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(data, &rec->timestamp)))
+	if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(data, ts)))
 		fail_msg("Invalid value timestamp \"%s\": %s", data, zbx_mock_error_string(err));
 }
 
@@ -158,7 +134,7 @@ static void	zbx_vcmock_ds_read_item(zbx_mock_handle_t hitem, zbx_vcmock_ds_item_
 	if (SUCCEED != is_uint64(itemid, &item->itemid))
 		fail_msg("Invalid itemid \"%s\"", itemid);
 
-	item->value_type = zbx_mock_get_value_type(zbx_mock_get_object_member_string(hitem, "value type"));
+	item->value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(hitem, "value type"));
 
 	zbx_vector_history_record_create(&item->data);
 	zbx_vcmock_read_values(zbx_mock_get_object_member_handle(hitem, "data"), item->value_type, &item->data);
@@ -220,12 +196,12 @@ void	zbx_vcmock_read_values(zbx_mock_handle_t hdata, unsigned char value_type, z
 {
 	zbx_mock_error_t	err;
 	zbx_mock_handle_t	hvalue;
-	zbx_history_record_t	value;
+	zbx_history_record_t	rec;
 
 	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hdata, &hvalue))))
 	{
-		zbx_vcmock_ds_read_record(hvalue, value_type, &value);
-		zbx_vector_history_record_append_ptr(values, &value);
+		zbx_vcmock_read_history_value(hvalue, value_type, &rec.value, &rec.timestamp);
+		zbx_vector_history_record_append_ptr(values, &rec);
 	}
 }
 
@@ -335,7 +311,7 @@ void	zbx_vcmock_ds_dump()
  * Purpose: converts value cache mode from text format                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vcmock_get_cache_mode(const char *mode)
+int	zbx_vcmock_str_to_cache_mode(const char *mode)
 {
 	if (0 == strcmp(mode, "ZBX_VC_MODE_NORMAL"))
 		return ZBX_VC_MODE_NORMAL;
@@ -349,14 +325,14 @@ int	zbx_vcmock_get_cache_mode(const char *mode)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vcmock_get_item_status                                       *
+ * Function: zbx_vcmock_str_to_item_status                                    *
  *                                                                            *
  * Purpose: converts value cache item status from text format                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vcmock_get_item_status(const char *status)
+int	zbx_vcmock_str_to_item_status(const char *str)
 {
-	if (0 == strcmp(status, "ZBX_ITEM_STATUS_CACHED_ALL"))
+	if (0 == strcmp(str, "ZBX_ITEM_STATUS_CACHED_ALL"))
 		return ZBX_ITEM_STATUS_CACHED_ALL;
 
 	return 0;
@@ -418,6 +394,73 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 				break;
 		}
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_get_dc_history                                        *
+ *                                                                            *
+ * Purpose: reads ZBX_DC_HISTORY vector from input data                       *
+ *                                                                            *
+ * Parameters: handle  - [IN] the history data handle in input data           *
+ *             history - [OUT] the history records                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *history)
+{
+	zbx_mock_handle_t	hitem, hdata;
+	zbx_mock_error_t	err;
+	ZBX_DC_HISTORY		*data;
+	const char		*itemid;
+
+	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(handle, &hitem))))
+	{
+		if (ZBX_MOCK_SUCCESS != err)
+		{
+			fail_msg("Cannot read 'values' element #%d: %s", history->values_num,
+					zbx_mock_error_string(err));
+		}
+
+		data = (ZBX_DC_HISTORY *)zbx_malloc(NULL, sizeof(ZBX_DC_HISTORY));
+		memset(data, 0, sizeof(ZBX_DC_HISTORY));
+
+		itemid = zbx_mock_get_object_member_string(hitem, "itemid");
+		if (SUCCEED != is_uint64(itemid, &data->itemid))
+			fail_msg("Invalid itemid \"%s\"", itemid);
+
+		data->value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(hitem, "value type"));
+		hdata = zbx_mock_get_object_member_handle(hitem, "data");
+		zbx_vcmock_read_history_value(hdata, data->value_type, &data->value, &data->ts);
+
+		zbx_vector_ptr_append(history, data);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_free_dc_history                                       *
+ *                                                                            *
+ * Purpose: frees ZBX_DC_HISTORY structure                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vcmock_free_dc_history(void *ptr)
+{
+	ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)ptr;
+
+	switch (h->value_type)
+	{
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			zbx_free(h->value.str);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_free(h->value.log->source);
+			zbx_free(h->value.log->value);
+			zbx_free(h->value.log);
+			break;
+	}
+
+	zbx_free(h);
 }
 
 /*
@@ -547,7 +590,31 @@ int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start
 
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 {
+	int			i;
+	zbx_vcmock_ds_item_t	*item, item_local;
+	zbx_history_record_t	src, dst;
+
 	ZBX_UNUSED(history);
+
+	for (i = 0; i < history->values_num; i++)
+	{
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+
+		if (NULL == (item = zbx_hashset_search(&vc_ds.items, &h->itemid)))
+		{
+			item_local.itemid = h->itemid;
+			item_local.value_type = h->value_type;
+			zbx_history_record_vector_create(&item_local.data);
+
+			item = zbx_hashset_insert(&vc_ds.items, &item_local, sizeof(item_local));
+		}
+
+		src.value = h->value;
+		src.timestamp = h->ts;
+		zbx_vcmock_ds_clone_record(&src, h->value_type, &dst);
+		zbx_vector_history_record_append_ptr(&item->data, &dst);
+		zbx_vector_history_record_sort(&item->data, history_compare);
+	}
 
 	return SUCCEED;
 }
@@ -570,24 +637,8 @@ int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char val
 	return SUCCEED;
 }
 
-/* time() emulation */
-static time_t	vcmock_time;
-
-time_t	__wrap_time(time_t *ptr)
-{
-	if (NULL != ptr)
-		*ptr = vcmock_time;
-
-	return vcmock_time;
-}
-
-void	zbx_vcmock_set_time(time_t new_time)
-{
-	vcmock_time = new_time;
-}
-
 /*
- *
+ * cache allocator size limit handling
  */
 
 /******************************************************************************
@@ -609,7 +660,136 @@ void	zbx_vcmock_set_available_mem(size_t size)
  * Purpose:  retrieves the memory available in the wrapped memory allocator   *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_vcmock_get_available_set()
+size_t	zbx_vcmock_get_available_mem()
 {
 	return vcmock_mem;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_set_cache_size                                        *
+ *                                                                            *
+ * Purpose: sets the available size in value cache if the specified key is    *
+ *          present in input data                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vcmock_set_cache_size(zbx_mock_handle_t hitem, const char *key)
+{
+	const char		*data;
+	zbx_mock_handle_t	hmem;
+	zbx_uint64_t		cache_size;
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hitem, key, &hmem))
+	{
+		if (ZBX_MOCK_SUCCESS != zbx_mock_string(hmem, &data) || SUCCEED != is_uint64(data, &cache_size))
+			fail_msg("Cannot read \"%s\" parameter", key);
+
+		zbx_vcmock_set_available_mem(cache_size);
+	}
+}
+
+/*
+ * input data parsing utility functions
+ */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_get_request_params                                    *
+ *                                                                            *
+ * Purpose: gets value cache precache or requests parameters from input data  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vcmock_get_request_params(zbx_mock_handle_t handle, zbx_uint64_t *itemid, unsigned char *value_type,
+		int *seconds, int *count, int *end)
+{
+	zbx_timespec_t		ts;
+
+	if (FAIL == is_uint64(zbx_mock_get_object_member_string(handle, "itemid"), itemid))
+		fail_msg("Invalid itemid value");
+
+	*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(handle, "value type"));
+	*seconds = atoi(zbx_mock_get_object_member_string(handle, "seconds"));
+	*count = atoi(zbx_mock_get_object_member_string(handle, "count"));
+	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "end"), &ts);
+	*end = ts.sec;
+}
+
+/*
+ * cache working mode handling
+ */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_set_mode                                              *
+ *                                                                            *
+ * Purpose: sets value cache mode if the specified key is present in input    *
+ *          data                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vcmock_set_mode(zbx_mock_handle_t hitem, const char *key)
+{
+	const char		*data;
+	zbx_mock_handle_t	hmode;
+	zbx_mock_error_t	err;
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hitem, key, &hmode))
+	{
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hmode, &data)))
+			fail_msg("Cannot read \"%s\" parameter: %s", key, zbx_mock_error_string(err));
+
+		zbx_vc_set_mode(zbx_vcmock_str_to_cache_mode(data));
+	}
+}
+
+/*
+ * time() emulation
+ */
+
+static time_t	vcmock_time;
+
+time_t	__wrap_time(time_t *ptr)
+{
+	if (NULL != ptr)
+		*ptr = vcmock_time;
+
+	return vcmock_time;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_set_time                                              *
+ *                                                                            *
+ * Purpose: sets the current time. The key must be present in input data or   *
+ *          the test case will fail                                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vcmock_set_time(zbx_mock_handle_t hitem, const char *key)
+{
+	zbx_mock_error_t	err;
+	const char		*data;
+	zbx_timespec_t		ts;
+
+	data = zbx_mock_get_object_member_string(hitem, key);
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(data, &ts)))
+		fail_msg("Cannot read \"%s\" parameter", key);
+
+	vcmock_time = ts.sec;
+}
+
+/*
+ * mock yaml open function to replace stdin with custom file for testing purposes
+ */
+#include <yaml.h>
+static FILE	*input_file;
+
+FILE	*__real_fopen (const char *__restrict __filename, const char *__restrict __modes);
+void	__real_yaml_parser_set_input_file(yaml_parser_t *parser, FILE *file);
+
+void	__wrap_yaml_parser_set_input_file(yaml_parser_t *parser, FILE *file)
+{
+	ZBX_UNUSED(file);
+	input_file = file;
+	/* input_file = __real_fopen("/tmp/test.yaml", "r"); */
+	__real_yaml_parser_set_input_file(parser, input_file);
 }

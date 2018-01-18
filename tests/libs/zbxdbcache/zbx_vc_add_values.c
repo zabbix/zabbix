@@ -36,16 +36,17 @@ extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
  ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
-	char				*error = NULL;
-	const char			*data;
-	int				err,  seconds, count, end, item_status, item_active_range, item_db_cached_from,
+	int				err, seconds, count, end, item_status, item_active_range, item_db_cached_from,
 					item_values_total, cache_mode;
 	zbx_vector_history_record_t	expected, returned;
-	zbx_timespec_t			ts;
-	zbx_uint64_t			itemid, cache_hits, cache_misses, expected_hits, expected_misses;
-	unsigned char			value_type;
-	zbx_mock_handle_t		handle, hitems, hitem, hstatus;
+	const char			*data;
+	char				*error;
+	zbx_mock_handle_t		handle, hitem, hitems, hstatus;
 	zbx_mock_error_t		mock_err;
+	zbx_uint64_t			itemid, cache_hits, cache_misses;
+	unsigned char			value_type;
+	zbx_vector_ptr_t		history;
+	zbx_timespec_t			ts;
 
 	ZBX_UNUSED(state);
 
@@ -75,23 +76,22 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	/* perform request */
+	/* execute request */
 
 	handle = zbx_mock_get_parameter_handle("in.test");
 	zbx_vcmock_set_time(handle, "time");
 	zbx_vcmock_set_mode(handle, "cache mode");
+	zbx_vcmock_set_cache_size(handle, "cache size");
 
-	zbx_vcmock_get_request_params(handle, &itemid, &value_type, &seconds, &count, &end);
-	err = zbx_vc_get_value_range(itemid, value_type, &returned, seconds, count, end);
-	zbx_mock_assert_result_eq("zbx_vc_get_value_range() return value", SUCCEED, err);
+	zbx_vector_ptr_create(&history);
+	zbx_vcmock_get_dc_history(zbx_mock_get_object_member_handle(handle, "values"), &history);
 
-	/* validate results */
+	err = zbx_vc_add_values(&history);
+	data = zbx_mock_get_parameter_string("out.return");
+	zbx_mock_assert_int_eq("zbx_vc_add_values()", zbx_mock_str_to_return_code(data), err);
 
-	zbx_vcmock_read_values(zbx_mock_get_parameter_handle("out.values"), value_type, &expected);
-	zbx_vcmock_check_records("Returned values", value_type,  &expected, &returned);
-
-	zbx_history_record_vector_clean(&returned, value_type);
-	zbx_history_record_vector_clean(&expected, value_type);
+	zbx_vector_ptr_clear_ext(&history, zbx_vcmock_free_dc_history);
+	zbx_vector_ptr_destroy(&history);
 
 	/* validate cache contents */
 
@@ -155,14 +155,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_int_eq("cache.mode", zbx_vcmock_str_to_cache_mode(zbx_mock_get_parameter_string("out.cache.mode")),
 			cache_mode);
 
-	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.hits"), &expected_hits))
-		fail_msg("Invalid out.cache.hits value");
-	zbx_mock_assert_uint64_eq("cache.hits", expected_hits, cache_hits);
-
-	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.misses"), &expected_misses))
-		fail_msg("Invalid out.cache.misses value");
-	zbx_mock_assert_uint64_eq("cache.misses", expected_misses, cache_misses);
-
 	/* cleanup */
 
 	zbx_vector_history_record_destroy(&returned);
@@ -172,5 +164,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vc_reset();
 	zbx_vc_destroy();
-}
 
+}

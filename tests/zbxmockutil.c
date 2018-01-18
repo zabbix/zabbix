@@ -77,3 +77,69 @@ zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, co
 
 	return member;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_str_to_value_type                                       *
+ *                                                                            *
+ * Purpose: converts item value type from text format                         *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	zbx_mock_str_to_value_type(const char *str)
+{
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_FLOAT"))
+		return ITEM_VALUE_TYPE_FLOAT;
+
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_STR"))
+		return ITEM_VALUE_TYPE_STR;
+
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_LOG"))
+		return ITEM_VALUE_TYPE_LOG;
+
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_UINT64"))
+		return ITEM_VALUE_TYPE_UINT64;
+
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_TEXT"))
+		return ITEM_VALUE_TYPE_TEXT;
+
+	fail_msg("Unknown value type \"%s\"", str);
+	return ITEM_VALUE_TYPE_MAX;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_str_to_return_code                                      *
+ *                                                                            *
+ * Purpose: converts common function return code from text format             *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	zbx_mock_str_to_return_code(const char *str)
+{
+	if (0 == strcmp(str, "SUCCEED"))
+		return SUCCEED;
+
+	if (0 == strcmp(str, "FAIL"))
+		return FAIL;
+
+	if (0 == strcmp(str, "NOTSUPPORTED"))
+		return NOTSUPPORTED;
+
+	if (0 == strcmp(str, "NETWORK_ERROR"))
+		return NETWORK_ERROR;
+
+	if (0 == strcmp(str, "TIMEOUT_ERROR"))
+		return TIMEOUT_ERROR;
+
+	if (0 == strcmp(str, "AGENT_ERROR"))
+		return AGENT_ERROR;
+
+	if (0 == strcmp(str, "GATEWAY_ERROR"))
+		return GATEWAY_ERROR;
+
+	if (0 == strcmp(str, "CONFIG_ERROR"))
+		return CONFIG_ERROR;
+
+
+	fail_msg("Unknown return code  \"%s\"", str);
+	return 0;
+}
