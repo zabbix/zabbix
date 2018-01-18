@@ -112,6 +112,8 @@ void	zbx_mock_test_entry(void **state)
 					fail_msg("Minimum allowed value \"%s\" of parameter #%d is not numeric.", tmp,
 							parameter_count + 1);
 				}
+
+				cfg[parameter_count].min = min;
 			}
 			else
 				break;
@@ -129,6 +131,8 @@ void	zbx_mock_test_entry(void **state)
 					fail_msg("Maximum allowed value \"%s\" of parameter #%d is not numeric.", tmp,
 							parameter_count + 1);
 				}
+
+				cfg[parameter_count].max = max;
 			}
 			else
 				break;
