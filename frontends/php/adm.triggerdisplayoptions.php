@@ -59,7 +59,7 @@ check_fields($fields);
  */
 if (hasRequest('update')) {
 	$update_values = [
-		'custom_color' => getRequest('custom_color', 0),
+		'custom_color' => getRequest('custom_color', EVENT_CUSTOM_COLOR_DISABLED),
 		'problem_unack_style' => getRequest('problem_unack_style', 0),
 		'problem_ack_style' => getRequest('problem_ack_style', 0),
 		'ok_unack_style' => getRequest('ok_unack_style', 0),
@@ -90,7 +90,7 @@ $config = select_config();
 // form has been submitted
 if (hasRequest('form_refresh')) {
 	$data = [
-		'custom_color' => getRequest('custom_color', 0),
+		'custom_color' => getRequest('custom_color', EVENT_CUSTOM_COLOR_DISABLED),
 		'problem_unack_color' => getRequest('problem_unack_color', $config['problem_unack_color']),
 		'problem_ack_color' => getRequest('problem_ack_color', $config['problem_ack_color']),
 		'ok_unack_color' => getRequest('ok_unack_color', $config['ok_unack_color']),

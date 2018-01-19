@@ -32,7 +32,7 @@ $schema = DB::getSchema('config');
 							jQuery('#problem_unack_color')
 								.val("<?= $schema['fields']['problem_unack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] ==  EVENT_CUSTOM_COLOR_DISABLED
+									'<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED
 											? 'disabled'
 											: null
 									?>'
@@ -46,7 +46,7 @@ $schema = DB::getSchema('config');
 							jQuery('#problem_ack_color')
 								.val("<?= $schema['fields']['problem_ack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] ==  EVENT_CUSTOM_COLOR_DISABLED
+									'<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED
 										? 'disabled'
 										: null
 									?>'
@@ -60,7 +60,7 @@ $schema = DB::getSchema('config');
 							jQuery('#ok_unack_color')
 								.val("<?= $schema['fields']['ok_unack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] ==  EVENT_CUSTOM_COLOR_DISABLED
+									'<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED
 										? 'disabled'
 										: null
 									?>'
@@ -74,7 +74,7 @@ $schema = DB::getSchema('config');
 							jQuery('#ok_ack_color')
 								.val("<?= $schema['fields']['ok_ack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] ==  EVENT_CUSTOM_COLOR_DISABLED
+									'<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED
 										? 'disabled'
 										: null
 									?>'
