@@ -88,20 +88,38 @@ int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len)
 
 ssize_t	__wrap_read(int fd, void *buf, size_t nbytes)
 {
+	static int		remaining_length;
+	static const char	*data;
 	zbx_mock_error_t	error;
-	const char		*value;
-	size_t			length;
 	zbx_mock_handle_t	fragment;
+	size_t			length;
 
 	ZBX_UNUSED(fd);
 
-	if (ZBX_MOCK_SUCCESS != zbx_mock_vector_element(fragments, &fragment))
-		return 0;	/* no more data */
+	if (0 == remaining_length)
+	{
+		if (ZBX_MOCK_SUCCESS != zbx_mock_vector_element(fragments, &fragment))
+			return 0;	/* no more data */
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &value, &length)))
-		fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
+		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &data, &length)))
+			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
+	}
+	else
+		length = remaining_length;
 
-	memcpy(buf, value, length);
+	if (nbytes < length)
+	{
+		remaining_length = length - nbytes;
+		length = nbytes;
+	}
+	else
+		remaining_length = 0;
+
+
+	memcpy(buf, data, length);
+
+	if (0 != remaining_length)
+		data += length;
 
 	return length;
 }
