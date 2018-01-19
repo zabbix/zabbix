@@ -23,13 +23,19 @@ $schema = DB::getSchema('config');
 						'focused': true,
 						'action': function() {
 							jQuery('#custom_color').prop('checked',
-								<?= $schema['fields']['custom_color']['default'] == 0 ? 'false' : 'true' ?>
+								<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_ENABLED
+										? 'true'
+										: 'false'
+								?>
 							);
 							// Unacknowledged problem events
 							jQuery('#problem_unack_color')
 								.val("<?= $schema['fields']['problem_unack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] == 0 ? 'disabled' : null ?>'
+									'<?= $schema['fields']['custom_color']['default'] ==  EVENT_CUSTOM_COLOR_DISABLED
+											? 'disabled'
+											: null
+									?>'
 								)
 								.change();
 							jQuery('#problem_unack_style').prop('checked',
@@ -40,7 +46,10 @@ $schema = DB::getSchema('config');
 							jQuery('#problem_ack_color')
 								.val("<?= $schema['fields']['problem_ack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] == 0 ? 'disabled' : null ?>'
+									'<?= $schema['fields']['custom_color']['default'] ==  EVENT_CUSTOM_COLOR_DISABLED
+										? 'disabled'
+										: null
+									?>'
 								)
 								.change();
 							jQuery('#problem_ack_style').prop('checked',
@@ -51,7 +60,10 @@ $schema = DB::getSchema('config');
 							jQuery('#ok_unack_color')
 								.val("<?= $schema['fields']['ok_unack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] == 0 ? 'disabled' : null ?>'
+									'<?= $schema['fields']['custom_color']['default'] ==  EVENT_CUSTOM_COLOR_DISABLED
+										? 'disabled'
+										: null
+									?>'
 								)
 								.change();
 							jQuery('#ok_unack_style').prop('checked',
@@ -62,7 +74,10 @@ $schema = DB::getSchema('config');
 							jQuery('#ok_ack_color')
 								.val("<?= $schema['fields']['ok_ack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] == 0 ? 'disabled' : null ?>'
+									'<?= $schema['fields']['custom_color']['default'] ==  EVENT_CUSTOM_COLOR_DISABLED
+										? 'disabled'
+										: null
+									?>'
 								)
 								.change();
 							jQuery('#ok_ack_style').prop('checked',

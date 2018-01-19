@@ -68,7 +68,7 @@ if (hasRequest('update')) {
 		'blink_period' => getRequest('blink_period')
 	];
 
-	if ($update_values['custom_color'] == 1) {
+	if ($update_values['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED) {
 		$update_values['problem_unack_color'] = getRequest('problem_unack_color');
 		$update_values['problem_ack_color'] = getRequest('problem_ack_color');
 		$update_values['ok_unack_color'] = getRequest('ok_unack_color');
