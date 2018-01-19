@@ -2889,7 +2889,7 @@ static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfil
 		/* Cannot find the successor of the last processed file from the previous check. */
 		/* Adjust 'lastlogsize' for this case. */
 		*start_idx = 0;
-		*lastlogsize = MAX(0, logfiles[*start_idx].processed_size);
+		*lastlogsize = logfiles[*start_idx].processed_size;
 	}
 
 	zbx_free(old2new);
