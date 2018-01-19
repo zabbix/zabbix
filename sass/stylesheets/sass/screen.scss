@@ -3160,7 +3160,8 @@ $form-icon-btn: (
 			background-color: $action-hover-color;
 		}
 
-		&:active {
+		&:active,
+		&.highlighted {
 			background-color: $action-hover-color;
 		}
 

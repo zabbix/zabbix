@@ -2229,7 +2229,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       background-color: #454545; }
     .action-menu .action-menu-item:focus {
       background-color: #454545; }
-    .action-menu .action-menu-item:active {
+    .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
       background-color: #454545; }
     .action-menu .action-menu-item.selected::before {
       display: block;

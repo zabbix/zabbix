@@ -958,8 +958,10 @@ jQuery(function($) {
 			id = new Date().getTime();
 
 			menuPopup = $('<ul>', {
-				id: id,
-				'class': 'action-menu action-menu-top'
+				'id': id,
+				'role': 'menu',
+				'class': 'action-menu action-menu-top',
+				'tabindex': 0
 			});
 
 			// create sections
@@ -1029,13 +1031,182 @@ jQuery(function($) {
 				});
 		}
 
-		$(document).click(function(e) {
-			if (!menuPopup.is(e.target) && menuPopup.has(e.target).length === 0) {
-				menuPopup.data('is-active', false);
-				menuPopup.fadeOut(0);
-			}
-		});
+		$(document)
+			.on('keydown', {menu: menuPopup}, menuPopupKeyDownHandler)
+			.click(function(e) {
+				if (!menuPopup.is(e.target) && menuPopup.has(e.target).length == 0) {
+					$(menuPopup).actionMenuClose();
+				}
+			});
+
+		menuPopup.focus();
 	};
+
+	/**
+	 * Expends hovered/selected context menu item.
+	 */
+	$.fn.actionMenuItemExpand = function() {
+		var li = $(this),
+			pos = li.position(),
+			menu = li.closest('.action-menu');
+
+		for (var item = $('li:first-child', menu); item.length > 0; item = item.next()) {
+			if (item[0] == li[0]) {
+				var display = $('ul', item[0]).css('display');
+
+				if (display !== 'block') {
+					$('ul:first', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
+
+					$('ul:first', item[0])
+						.css({
+							'top': pos.top - 6,
+							'left': pos.left + li.outerWidth() + 14,
+							'display': 'block'
+						});
+				}
+			}
+			else {
+				var display = $('ul', item[0]).css('display');
+
+				if (display === 'block') {
+					$('ul', item[0]).prev('[role="menuitem"]').removeClass('highlighted');
+					$('ul', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
+					$('ul', item[0]).css({'display': 'none'});
+				}
+			}
+		}
+
+		return this;
+	};
+
+	/**
+	 * Collapses context menu item that has lost focus or is not selected anymore.
+	 */
+	$.fn.actionMenuItemCollapse = function() {
+		// Remove style and close sub-menus in deeper levels.
+		$('.highlighted', $(this).closest('.action-menu')).removeClass('highlighted');
+		$('[aria-expanded]', $(this).closest('.action-menu')).attr({'aria-expanded': 'false'});
+		$('.action-menu', $(this).closest('.action-menu')).css({'display': 'none'});
+
+		// Close actual menu level.
+		$(this).closest('.action-menu').not('.action-menu-top').css({'display': 'none'});
+		$(this).closest('.action-menu').prev('[role="menuitem"]').not('.action-menu-top')
+			.attr({'aria-expanded': 'false'});
+
+		return this;
+	};
+
+	/**
+	 * Close whole context menu.
+	 */
+	$.fn.actionMenuClose = function() {
+		var menuPopup = $(this);
+		menuPopup.data('is-active', false);
+		menuPopup.fadeOut(0);
+
+		$('.highlighted', menuPopup).removeClass('highlighted');
+		$('[aria-expanded="true"]', menuPopup).attr({'aria-expanded': 'false'});
+		$(document).off('keydown', menuPopupKeyDownHandler);
+
+		return this;
+	};
+
+	function menuPopupKeyDownHandler(event) {
+		var link_selector = '.action-menu-item',
+			menu_popup = $(event.data.menu[0]),
+			level = menu_popup,
+			selected,
+			items;
+
+		// Find active menu level.
+		while ($('[aria-expanded="true"]', level).length) {
+			level = $('[aria-expanded="true"]', level).next('[role="menu"]');
+		}
+
+		// Find active menu items.
+		items = $('>li', level).filter(function() {
+			return $(this).has('.action-menu-item').length;
+		});
+
+		// Find an element that was selected when key was pressed.
+		if ($('.action-menu-item.highlighted', level).length) {
+			selected = $(link_selector + '.highlighted', level).closest('li');
+		}
+		else if ($('.action-menu-item', level).filter(function() {
+			return this == document.activeElement;
+		}).length) {
+			selected = $(document.activeElement).closest('li');
+		}
+
+		// Perform action based on keydown event.
+		switch (event.which) {
+			case 37: // arrow left
+				if (typeof selected !== 'undefined' && selected.has('.action-menu')) {
+					if (level != menu_popup) {
+						selected.actionMenuItemCollapse();
+
+						// Must focus previous element, otherwise screen reader will exit menu.
+						selected.closest('.action-menu').prev('[role="menuitem"]').addClass('highlighted').focus();
+					}
+				}
+				break;
+
+			case 38: // arrow up
+				if (typeof selected === 'undefined') {
+					$(link_selector + ':last', level).addClass('highlighted').focus();
+				}
+				else {
+					var prev = items[items.index(selected) - 1];
+					if (typeof prev === 'undefined') {
+						prev = items[items.length - 1];
+					}
+
+					$(link_selector, selected).removeClass('highlighted');
+					$(link_selector + ':first', prev).addClass('highlighted').focus();
+				}
+
+				// Prevent page scrolling.
+				event.preventDefault();
+				break;
+
+			case 39: // arrow right
+				if (typeof selected !== 'undefined' && selected.has('.action-menu')) {
+					selected.actionMenuItemExpand();
+					$('ul > li ' + link_selector + ':first', selected).addClass('highlighted').focus();
+				}
+				break;
+
+			case 40: // arrow down
+				if (typeof selected === 'undefined') {
+					$(link_selector + ':first', items[0]).addClass('highlighted').focus();
+				}
+				else {
+					var next = items[items.index(selected) + 1];
+					if (typeof next === 'undefined') {
+						next = items[0];
+					}
+
+					$(link_selector, selected).removeClass('highlighted');
+					$(link_selector + ':first', next).addClass('highlighted').focus();
+				}
+
+				// Prevent page scrolling.
+				event.preventDefault();
+				break;
+
+			case 27: // ESC
+				$(menu_popup).actionMenuClose();
+				break;
+
+			case 13: // Enter
+				$('>' + link_selector, selected)[0].click();
+				break;
+
+			case 9: // Tab
+				event.preventDefault();
+				break;
+		}
+	}
 
 	/**
 	 * Create menu item.
@@ -1051,7 +1222,11 @@ jQuery(function($) {
 	 */
 	function createMenuItem(options) {
 		var item = $('<li>'),
-			link = $('<a>');
+			link = $('<a>', {
+				role: 'menuitem',
+				tabindex: '-1',
+				'aria-label': options.label
+			});
 
 		if (typeof options.label !== 'undefined') {
 			link.text(options.label);
@@ -1087,10 +1262,21 @@ jQuery(function($) {
 			link.addClass('selected');
 		}
 
+		if (typeof options.items !== 'undefined' && options.items.length > 0) {
+			link.attr({
+				'aria-haspopup': 'true',
+				'aria-expanded': 'false',
+				'area-hidden': 'true'
+			});
+		}
+
 		item.append(link);
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
-			var menu = $('<ul>', {'class' : 'action-menu'});
+			var menu = $('<ul>', {
+				class : 'action-menu',
+				role: 'menu'
+			});
 
 			$.each(options.items, function(i, item) {
 				menu.append(createMenuItem(item));
@@ -1099,36 +1285,12 @@ jQuery(function($) {
 			item.append(menu);
 
 			item.hover(function() {
-				var li = $(this),
-					pos = li.position(),
-					menu = li.closest('.action-menu');
-
-				for (var item = $('li:first-child', menu); item.length > 0; item = item.next()) {
-					if (item[0] == li[0]) {
-						var display = $('ul', item[0]).css('display');
-
-						if (display !== 'block') {
-							$('ul:first', item[0])
-								.css({
-									'top': pos.top - 6,
-									'left': pos.left + li.outerWidth() + 14,
-									'display': 'block'
-								});
-						}
-					}
-					else {
-						var display = $('ul', item[0]).css('display');
-
-						if (display === 'block') {
-							$('ul', item[0]).css({'display': 'none'});
-						}
-					}
-				}
+				$(this).actionMenuItemExpand();
 			});
 		}
 		else {
 			item.hover(function() {
-				$('li ul', $(this).closest('.action-menu')).css({'display': 'none'});
+				$(this).actionMenuItemCollapse();
 			});
 		}
 
