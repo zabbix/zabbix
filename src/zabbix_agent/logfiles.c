@@ -3081,8 +3081,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			zbx_uint64_t	processed_bytes_tmp = 0, seek_offset;
 			int		process_this_file = 1;
 
-			if (NULL != mtime)			/* for logrt[], logrt.count[] items */
-				*mtime = logfiles[i].mtime;
+			*mtime = logfiles[i].mtime;
 
 			if (start_idx != i)
 				*lastlogsize = logfiles[i].processed_size;
