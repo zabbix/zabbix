@@ -599,15 +599,6 @@ class CProblem extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		if ($options['output'] !== API_OUTPUT_EXTEND && in_array('r_clock', $options['output'])
-				&& !in_array('r_eventid', $options['output'])) {
-			$options['output'][] = 'r_eventid';
-			$unset_extra_field = true;
-		}
-		else {
-			$unset_extra_field = false;
-		}
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -625,7 +616,6 @@ class CProblem extends CApiService {
 		}
 
 		if ($result) {
-			$result = $this->hideInaccessibleData($result, $options['output'], $unset_extra_field);
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['object', 'objectid'], $options['output']);
 		}
@@ -737,41 +727,6 @@ class CProblem extends CApiService {
 				$event['tags'][] = $tag;
 			}
 			unset($event);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * If user don't have permission to see recovery event, r_clock should be hidden.
-	 *
-	 * @param array $result
-	 * @param mixed $output
-	 * @param bool  $unset_extra_field
-	 *
-	 * @return array
-	 */
-	protected function hideInaccessibleData(array $result, $output, $unset_extra_field) {
-		if ($output === API_OUTPUT_EXTEND || in_array('r_clock', $output)) {
-			$r_eventids = (array_flip((zbx_objectValues($result, 'r_eventid'))));
-			unset($r_eventids[0]);
-
-			$events = API::Event()->get([
-				'output' => ['eventid'],
-				'eventids' => array_keys($r_eventids),
-				'preservekeys' => true
-			]);
-
-			foreach ($result as &$problem) {
-				if ($problem['r_eventid'] && !array_key_exists($problem['r_eventid'], $events)) {
-					$problem['r_clock'] = 0;
-				}
-
-				if ($unset_extra_field) {
-					unset($problem['r_eventid']);
-				}
-			}
-			unset($problem);
 		}
 
 		return $result;
