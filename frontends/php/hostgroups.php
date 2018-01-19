@@ -30,7 +30,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hosts' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'groups' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'groupids' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	// group
@@ -67,7 +66,6 @@ if (hasRequest('form')) {
 		unset($_REQUEST['groupid']);
 	}
 	elseif (hasRequest('add') || hasRequest('update')) {
-		$hostIds = getRequest('hosts', []);
 		$groupId = getRequest('groupid');
 		$name = getRequest('name');
 
@@ -104,77 +102,6 @@ if (hasRequest('form')) {
 			}
 
 			if ($result) {
-				$hosts = API::Host()->get([
-					'output' => ['hostid'],
-					'hostids' => $hostIds,
-					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-					'preservekeys' => true
-				]);
-
-				$templates = API::Template()->get([
-					'output' => ['templateid'],
-					'templateids' => $hostIds,
-					'preservekeys' => true
-				]);
-
-				$hostIdsToAdd = [];
-				$hostIdsToRemove = [];
-				$templateIdsToAdd = [];
-				$templateIdsToRemove = [];
-
-				$oldHostIds = zbx_objectValues($oldGroup['hosts'], 'hostid');
-				$newHostIds = array_keys($hosts);
-				$oldTemplateIds = zbx_objectValues($oldGroup['templates'], 'templateid');
-				$newTemplateIds = array_keys($templates);
-
-				foreach (array_diff($newHostIds, $oldHostIds) as $hostId) {
-					$hostIdsToAdd[$hostId] = $hostId;
-				}
-
-				foreach (array_diff($oldHostIds, $newHostIds) as $hostId) {
-					$hostIdsToRemove[$hostId] = $hostId;
-				}
-
-				foreach (array_diff($newTemplateIds, $oldTemplateIds) as $templateId) {
-					$templateIdsToAdd[$templateId] = $templateId;
-				}
-
-				foreach (array_diff($oldTemplateIds, $newTemplateIds) as $templateId) {
-					$templateIdsToRemove[$templateId] = $templateId;
-				}
-
-				if ($hostIdsToAdd || $templateIdsToAdd) {
-					$massAdd = [
-						'groups' => ['groupid' => $groupId]
-					];
-
-					if ($hostIdsToAdd) {
-						$massAdd['hosts'] = zbx_toObject($hostIdsToAdd, 'hostid');
-					}
-
-					if ($templateIdsToAdd) {
-						$massAdd['templates'] = zbx_toObject($templateIdsToAdd, 'templateid');
-					}
-
-					$result &= (bool) API::HostGroup()->massAdd($massAdd);
-				}
-
-				if ($hostIdsToRemove || $templateIdsToRemove) {
-					$massRemove = [
-						'groupids' => [$groupId]
-					];
-
-					if ($hostIdsToRemove) {
-						$massRemove['hostids'] = $hostIdsToRemove;
-					}
-
-					if ($templateIdsToRemove) {
-						$massRemove['templateids'] = $templateIdsToRemove;
-					}
-
-					$result &= (bool) API::HostGroup()->massRemove($massRemove);
-				}
-
 				// Apply permissions to all subgroups.
 				if (getRequest('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 					inheritPermissions($groupId, $name);
@@ -186,27 +113,6 @@ if (hasRequest('form')) {
 			$messageFailed = _('Cannot add group');
 
 			$result = API::HostGroup()->create(['name' => $name]);
-
-			if ($result) {
-				$groupId = $result['groupids'][0];
-
-				$hosts = API::Host()->get([
-					'output' => ['hostid'],
-					'hostids' => $hostIds,
-					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-				]);
-
-				$templates = API::Template()->get([
-					'output' => ['templateid'],
-					'templateids' => $hostIds
-				]);
-
-				$result = API::HostGroup()->massAdd([
-					'groups' => [['groupid' => $groupId]],
-					'hosts' => $hosts,
-					'templates' => $templates
-				]);
-			}
 		}
 
 		$result = DBend($result);
