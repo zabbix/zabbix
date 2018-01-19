@@ -924,7 +924,7 @@ function makeDebugButton()
 }
 
 /**
- * Returns css for trigger severity backgrounds
+ * Returns css for trigger severity backgrounds.
  *
  * @param array $config
  * @param array $config[severity_color_0]
@@ -952,18 +952,32 @@ function getTriggerSeverityCss($config)
 	foreach ($severities as $class => $color) {
 		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before { background-color: #'.$color.' }'."\n";
 	}
+}
 
-	if ($config['custom_color']) {
-		$event_statuses = [
-			ZBX_STYLE_PROBLEM_UNACK_FG => $config['problem_unack_color'],
-			ZBX_STYLE_PROBLEM_ACK_FG => $config['problem_ack_color'],
-			ZBX_STYLE_OK_UNACK_FG => $config['ok_unack_color'],
-			ZBX_STYLE_OK_ACK_FG => $config['ok_ack_color']
-		];
+/**
+ * Returns css for trigger status colors.
+ *
+ * @param array $config
+ * @param array $config[problem_unack_color]
+ * @param array $config[problem_ack_color]
+ * @param array $config[ok_unack_color]
+ * @param array $config[ok_ack_color]
+ *
+ * @return string
+ */
+function getTriggerStatusCss($config)
+{
+	$css = '';
 
-		foreach ($event_statuses as $class => $color) {
-			$css .= '.' . $class . ' {color: #' . $color . ';}' . "\n";
-		}
+	$event_statuses = [
+		ZBX_STYLE_PROBLEM_UNACK_FG => $config['problem_unack_color'],
+		ZBX_STYLE_PROBLEM_ACK_FG => $config['problem_ack_color'],
+		ZBX_STYLE_OK_UNACK_FG => $config['ok_unack_color'],
+		ZBX_STYLE_OK_ACK_FG => $config['ok_ack_color']
+	];
+
+	foreach ($event_statuses as $class => $color) {
+		$css .= '.' . $class . ' {color: #' . $color . ';}' . "\n";
 	}
 
 	return $css;

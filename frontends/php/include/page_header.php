@@ -175,6 +175,11 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 			$pageHeader->addStyle(getTriggerSeverityCss($config));
 
+			// override trigger status colors, if those are customized
+			if ($config['custom_color']) {
+				$pageHeader->addStyle(getTriggerStatusCss($config));
+			}
+
 			// perform Zabbix server check only for standard pages
 			if ((!defined('ZBX_PAGE_NO_MENU') || defined('ZBX_PAGE_FULLSCREEN')) && $config['server_check_interval']
 					&& !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {

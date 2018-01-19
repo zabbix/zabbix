@@ -37,6 +37,11 @@ if (!empty($DB['DB'])) {
 
 	$pageHeader->addStyle(getTriggerSeverityCss($config));
 
+	// override trigger status colors, if those are customized
+	if ($config['custom_color']) {
+		$pageHeader->addStyle(getTriggerStatusCss($config));
+	}
+
 	// perform Zabbix server check only for standard pages
 	if ($config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
 		$scripts[] = 'servercheck.js';
