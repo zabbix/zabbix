@@ -41,7 +41,7 @@ $fields = [
 	'gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
 	'users_status' =>		[T_ZBX_INT, O_OPT, null,	IN([GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),	null],
 	'debug_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
-	'userids' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'userids' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'groups_rights' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'set_gui_access' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
 	// actions
