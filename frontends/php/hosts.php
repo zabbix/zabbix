@@ -1352,12 +1352,7 @@ else {
 			'preservekeys' => true
 		]);
 
-		foreach ($filter_proxies as $proxy) {
-			$proxies_ms[] = [
-				'id' => $proxy['proxyid'],
-				'name' => $proxy['host']
-			];
-		}
+		$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id', 'host' => 'name']);
 	}
 
 	$data = [
