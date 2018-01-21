@@ -189,7 +189,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.hosts.filter_host', getRequest('filter_host', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_port', getRequest('filter_port', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter.monitored_by', getRequest('filter_monitored_by', ZBX_MONITORED_BY_ALL),
-		PROFILE_TYPE_STR
+		PROFILE_TYPE_INT
 	);
 	CProfile::updateArray('web.hosts.filter.proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
 }
