@@ -1348,8 +1348,7 @@ else {
 	if ($filter['proxyids']) {
 		$filter_proxies = API::Proxy()->get([
 			'output' => ['proxyid', 'host'],
-			'proxyids' => $filter['proxyids'],
-			'preservekeys' => true
+			'proxyids' => $filter['proxyids']
 		]);
 
 		$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id', 'host' => 'name']);
