@@ -130,8 +130,11 @@ $fields = [
 	'filter_ip' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
-	'filter_monitored_by' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
-	'filter_proxyids' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_monitored_by' =>	[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_MONITORED_BY_ALL, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_SERVER]),
+									null
+								],
+	'filter_proxyids' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
