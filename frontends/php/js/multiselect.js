@@ -150,6 +150,8 @@ jQuery(function($) {
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]		(optional)
+	 * @param bool   options['data'][inaccessible]	(optional)
+	 * @param bool   options['data'][disabled]		(optional)
 	 * @param array  options['ignored']				preload ignored {id: name} (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
@@ -716,7 +718,8 @@ jQuery(function($) {
 			removeDefaultValue(obj, options);
 			values.selected[item.id] = item;
 
-			var prefix = (typeof item.prefix === 'undefined') ? '' : item.prefix;
+			var prefix = (typeof item.prefix === 'undefined') ? '' : item.prefix,
+				item_disabled = (typeof(item.disabled) !== 'undefined' && item.disabled);
 
 			// add hidden input
 			obj.append($('<input>', {
@@ -731,7 +734,7 @@ jQuery(function($) {
 				'class': 'subfilter-disable-btn'
 			});
 
-			if (!options.disabled) {
+			if (!options.disabled && !item_disabled) {
 				close_btn.click(function() {
 					removeSelected(item.id, obj, values, options);
 				});
@@ -751,6 +754,10 @@ jQuery(function($) {
 
 			if (typeof(item.inaccessible) !== 'undefined' && item.inaccessible) {
 				li.addClass('inaccessible');
+			}
+
+			if (item_disabled) {
+				li.addClass('disabled');
 			}
 
 			$('.selected ul', obj).append(li);

@@ -534,17 +534,38 @@ if (hasRequest('form')) {
 		$groups = getRequest('groups', []);
 	}
 
+	$groupids = [];
+
+	foreach ($groups as $group) {
+		if (is_array($group) && array_key_exists('new', $group)) {
+			continue;
+		}
+
+		$groupids[] = $group;
+	}
+
+	// Groups with R and RW permissions.
+	$groups_all = $groupids
+		? API::HostGroup()->get([
+			'output' => ['name'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		])
+		: [];
+
 	// Groups with RW permissions.
-	$groups_allowed = API::HostGroup()->get([
-		'output' => ['name'],
-		'editable' => true,
-		'preservekeys' => true
-	]);
+	$groups_rw = $groupids && (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+		? API::HostGroup()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
 
 	$data['groups_ms'] = [];
-	$n = 0;
 
-	// Prepare data for multiselect. Remove inaccessible groups.
+	// Prepare data for multiselect.
 	foreach ($groups as $group) {
 		if (is_array($group) && array_key_exists('new', $group)) {
 			$data['groups_ms'][] = [
@@ -553,21 +574,15 @@ if (hasRequest('form')) {
 				'isNew' => true
 			];
 		}
-		elseif (array_key_exists($group, $groups_allowed)) {
+		elseif (array_key_exists($group, $groups_all)) {
 			$data['groups_ms'][] = [
 				'id' => $group,
-				'name' => $groups_allowed[$group]['name']
-			];
-		}
-		else {
-			$postfix = (++$n > 1) ? ' ('.$n.')' : '';
-			$data['groups_ms'][] = [
-				'id' => $group,
-				'name' => _('Inaccessible group').$postfix,
-				'inaccessible' => true
+				'name' => $groups_all[$group]['name'],
+				'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw)
 			];
 		}
 	}
+	CArrayHelper::sort($data['groups_ms'], ['name']);
 
 	$view = new CView('configuration.template.edit', $data);
 }

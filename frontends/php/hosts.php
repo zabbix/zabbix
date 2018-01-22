@@ -532,17 +532,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$msgOk = _('Host updated');
 			$msgFail = _('Cannot update host');
 
-			$options = [
+			$dbHost = API::Host()->get([
 				'output' => ['flags'],
 				'hostids' => $hostId,
 				'editable' => true
-			];
-
-			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-				$options['selectGroups'] = ['groupid'];
-			}
-
-			$dbHost = API::Host()->get($options);
+			]);
 			$dbHost = reset($dbHost);
 		}
 		else {
@@ -636,7 +630,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'ipmi_password' => getRequest('ipmi_password'),
 				'tls_connect' => getRequest('tls_connect', HOST_ENCRYPTION_NONE),
 				'tls_accept' => getRequest('tls_accept', HOST_ENCRYPTION_NONE),
-				'groups' => $groups,
+				'groups' => zbx_toObject($groups, 'groupid'),
 				'templates' => $templates,
 				'interfaces' => $interfaces,
 				'macros' => $macros,
@@ -663,8 +657,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($create) {
-			$host['groups'] = zbx_toObject($groups, 'groupid');
-
 			$hostIds = API::Host()->create($host);
 
 			if ($hostIds) {
@@ -678,26 +670,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		else {
 			$host['hostid'] = $hostId;
-
-			/*
-			 * For non-super admins who may not have permissions to some groups, merge inaccessible groups together with
-			 * submitted ones, so that there are no API errors on submit, in case the inaccessible group has been removed.
-			 */
-			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-				$groups_allowed = API::HostGroup()->get([
-					'output' => [],
-					'editable' => true,
-					'preservekeys' => true
-				]);
-
-				foreach ($dbHost['groups'] as $group) {
-					if (!array_key_exists($group['groupid'], $groups_allowed)) {
-						$groups[] = $group['groupid'];
-					}
-				}
-			}
-
-			$host['groups'] = zbx_toObject($groups, 'groupid');
 
 			if (!API::Host()->update($host)) {
 				throw new Exception();
@@ -1168,17 +1140,38 @@ elseif (hasRequest('form')) {
 		$data['macros'][] = $macro;
 	}
 
+	$groupids = [];
+
+	foreach ($groups as $group) {
+		if (is_array($group) && array_key_exists('new', $group)) {
+			continue;
+		}
+
+		$groupids[] = $group;
+	}
+
+	// Groups with R and RW permissions.
+	$groups_all = $groupids
+		? API::HostGroup()->get([
+			'output' => ['name'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		])
+		: [];
+
 	// Groups with RW permissions.
-	$groups_allowed = API::HostGroup()->get([
-		'output' => ['name'],
-		'editable' => true,
-		'preservekeys' => true
-	]);
+	$groups_rw = $groupids && (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+		? API::HostGroup()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
 
 	$data['groups_ms'] = [];
-	$n = 0;
 
-	// Prepare data for multiselect. Remove inaccessible groups.
+	// Prepare data for multiselect.
 	foreach ($groups as $group) {
 		if (is_array($group) && array_key_exists('new', $group)) {
 			$data['groups_ms'][] = [
@@ -1187,21 +1180,15 @@ elseif (hasRequest('form')) {
 				'isNew' => true
 			];
 		}
-		elseif (array_key_exists($group, $groups_allowed)) {
+		elseif (array_key_exists($group, $groups_all)) {
 			$data['groups_ms'][] = [
 				'id' => $group,
-				'name' => $groups_allowed[$group]['name']
-			];
-		}
-		else {
-			$postfix = (++$n > 1) ? ' ('.$n.')' : '';
-			$data['groups_ms'][] = [
-				'id' => $group,
-				'name' => _('Inaccessible group').$postfix,
-				'inaccessible' => true
+				'name' => $groups_all[$group]['name'],
+				'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw)
 			];
 		}
 	}
+	CArrayHelper::sort($data['groups_ms'], ['name']);
 
 	if ($data['templates']) {
 		$data['linked_templates'] = API::Template()->get([
