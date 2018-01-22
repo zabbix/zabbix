@@ -243,14 +243,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$template = [
 			'host' => $templateName,
 			'name' => getRequest('visiblename', ''),
+			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
 			'macros' => getRequest('macros', []),
 			'description' => getRequest('description', '')
 		];
 
 		if ($templateId == 0) {
-			$template['groups'] = zbx_toObject($groups, 'groupid');
-
 			$result = API::Template()->create($template);
 
 			if ($result) {
@@ -263,34 +262,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		else {
 			$template['templateid'] = $templateId;
 			$template['templates_clear'] = $templatesClear;
-
-			/*
-			 * For non-super admins who may not have permissions to some groups, merge inaccessible groups together with
-			 * submitted ones, so that there are no API errors on submit, in case the inaccessible group has been removed.
-			 */
-			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-				$dbTemplate = API::Template()->get([
-					'output' => [],
-					'selectGroups' => ['groupid'],
-					'templateids' => $templateId,
-					'editable' => true
-				]);
-				$dbTemplate = reset($dbTemplate);
-
-				$groups_allowed = API::HostGroup()->get([
-					'output' => [],
-					'editable' => true,
-					'preservekeys' => true
-				]);
-
-				foreach ($dbTemplate['groups'] as $group) {
-					if (!array_key_exists($group['groupid'], $groups_allowed)) {
-						$groups[] = $group['groupid'];
-					}
-				}
-			}
-
-			$template['groups'] = zbx_toObject($groups, 'groupid');
 
 			$result = API::Template()->update($template);
 
