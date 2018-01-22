@@ -236,6 +236,7 @@ in:
 out:
   checks:
     - 1970-08-01 00:00:00 +00:00
+---
 test case: Scheduling interval month day is outside of current month day range
 in:
   item type: ZABBIX

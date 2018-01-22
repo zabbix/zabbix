@@ -311,9 +311,10 @@ zbx_mock_time_parser_state_t;
  ******************************************************************************/
 zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts)
 {
-	int				err, sec, ns, tz, components = 0;
+	int				sec, ns, tz, components = 0;
 	const char			*ptr, *pnext;
 	struct tm			tm;
+	zbx_mock_error_t		err;
 	zbx_mock_time_parser_state_t	state = ZBX_TOKEN_START;
 
 	for (ptr = strtime; '\0' != *ptr;)
@@ -327,7 +328,7 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 			if (ZBX_MOCK_SUCCESS != (err = ts_get_ns(ptr, &ns, &ptr)))
-				return ZBX_MOCK_NOT_A_TIMESTAMP;
+				return err;
 
 			components |= ZBX_MOCK_TIME_NS;
 			state = ZBX_TOKEN_COMPONENT;
@@ -367,7 +368,7 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 			if (ZBX_MOCK_SUCCESS != (err = ts_get_tz(ptr, &tz, &ptr)))
-				return ZBX_MOCK_NOT_A_TIMESTAMP;
+				return err;
 
 			components |= ZBX_MOCK_TIME_TZ;
 			continue;
