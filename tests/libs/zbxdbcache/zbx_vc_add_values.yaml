@@ -1,5 +1,6 @@
 ---
 # TC0
+# Test that floating type values are cached normally.
 test case: Add numeric (float) type values
 in:
   history: []
@@ -57,6 +58,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC1
+# Test that character type values are cached normally.
 test case: Add character type values
 in:
   history: []
@@ -114,6 +116,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC2
+# Test that log type values are cached normally.
 test case: Add log type values
 in:
   history: []
@@ -191,6 +194,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC3
+# Test that unsigned 64 bit integer type values are cached normally.
 test case: Add numeric (unsigned) type values
 in:
   history: []
@@ -248,6 +252,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC4
+# Test that text type values are cached normally.
 test case: Add text type values
 in:
   history: []
@@ -305,6 +310,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC5
+# Test that values are not added to cache if they weren't used (requested) before.
 test case: Try to add value without having cached it first
 in:
   history: []
@@ -325,6 +331,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC6
+# Test that value is correctly added after the cached data.
 test case: Add value at the end of the cached data
 in:
   history:
@@ -385,6 +392,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC7
+# Test that value is not cached (to avoid having gaps in cache).
 test case: Add value at the beginning of the cached data
 in:
   history:
@@ -444,6 +452,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC8
+# Test that first second of cached values is dropped from cache.
 test case: Add value at the beginning of the cached data matching the seconds value of first item
 in:
   history:
@@ -500,6 +509,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC9
+# Test that he value is correctly inserted in the middle of cached values.
 test case: Add value in the middle of cached data
 in:
   history:
@@ -560,7 +570,8 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC10
-test case: Add value at the beginning of cached data matching timestamp of the latest value
+# Test that he value is correctly appended after cached values.
+test case: Add value at the end of cached data matching timestamp of the latest value
 in:
   history:
   - itemid: 1
@@ -620,6 +631,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC11
+# Test that he value is correctly appended after cached values and 'cached all' flag is not changed.
 test case: Add value at the end of fully cached data
 in:
   history:
@@ -680,6 +692,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC12
+# Test that the value is not added and 'cached all' flag is removed.
 test case: Add value at the beginning of the fully cached data
 in:
   history:
@@ -739,6 +752,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC13
+# Test that the value is correctly added after the cached values.
 test case: Add value at the end of the cached data in low memory mode
 in:
   history:
@@ -800,6 +814,7 @@ out:
     mode: ZBX_VC_MODE_LOWMEM
 ---
 # TC14
+# Test that value cache is switched to low memory mode if value adding failed.
 test case: Try adding value wihout enough space in cache
 in:
   history: []
@@ -867,6 +882,7 @@ out:
     mode: ZBX_VC_MODE_LOWMEM
 ---
 # TC15
+# Test that adding value with different value type causes item to be dropped from cache
 test case: Add value with different value type
 in:
   history:
@@ -914,6 +930,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC16
+# Test that adding values causes old data (outside active request range) to be dropped.
 test case: Add values after time causing old data to be dropped
 in:
   history:

@@ -1,5 +1,6 @@
 ---
 # TC0
+# Test if numeric (float) data is properly returned.
 test case: Get numeric (float) type values
 in:
   history:
@@ -50,6 +51,7 @@ out:
     misses: 2
 ---
 # TC1
+# Test if character data is properly returned.
 test case: Get character type values
 in:
   history:
@@ -107,6 +109,7 @@ out:
     misses: 0
 ---
 # TC2
+# Test if log data is properly returned.
 test case: Get log type values
 in:
   history:
@@ -174,6 +177,7 @@ out:
     misses: 1
 ---
 # TC3
+# Test if numeric (unsigned) data is properly returned.
 test case: Get numeric (unsigned) type values
 in:
   history:
@@ -222,6 +226,7 @@ out:
     misses: 2
 ---
 # TC4
+# Test if text data is properly returned.
 test case: Get text type values
 in:
   history:
@@ -281,6 +286,7 @@ out:
     misses: 2
 ---
 # TC5
+# Test that the data from current time to the requested interval is properly cached.
 test case: Get values in interval before data values leaving unread values in the middle
 in:
   history:
@@ -377,6 +383,7 @@ out:
     misses: 3
 ---
 # TC6
+# Test that cached data is returned from cache without database access.
 test case: Get interval of already already data values
 in:
   history:
@@ -473,6 +480,7 @@ out:
     misses: 0
 ---
 # TC7
+# Test that missing data in cache is properly added if requested interval is larger than cached data.
 test case: Get interval of already data values ending with the last data value
 in:
   history:
@@ -572,6 +580,7 @@ out:
     misses: 0
 ---
 # TC8
+# Test that db_cached_from is set according to the requested time interval.
 test case: Get interval of values larger than database history and caching last values
 in:
   history:
@@ -671,7 +680,8 @@ out:
     misses: 3
 ---
 # TC9
-test case: Get interval of already data values larger than database history
+# Test that database is not accessed if the request data is within db_cached_from limits 
+test case: Get interval of already cached data values larger than database history
 in:
   history:
   - itemid: 1
@@ -770,6 +780,7 @@ out:
     misses: 0
 ---
 # TC10
+# Test that data is cached and value returned
 test case: Get one value in the middle of uncached data
 in:
   history:
@@ -851,7 +862,8 @@ out:
     misses: 1
 ---
 # TC11
-test case: Get one value in the middle of data data
+# Test that value returned by using already cached data
+test case: Get one value in the middle of cached data
 in:
   history:
   - itemid: 1
@@ -939,6 +951,7 @@ out:
     misses: 0
 ---
 # TC12
+# Test that value returned by using already cached data
 test case: Get two values in the middle of data data
 in:
   history:
@@ -1028,6 +1041,7 @@ out:
     misses: 0
 ---
 # TC13
+# Test that all values are cached and the 'cached all' flag set
 test case: Get 4 values when only 3 values exists in database history and are not data
 in:
   history:
@@ -1127,6 +1141,7 @@ out:
     misses: 3
 ---
 # TC14
+# Test that values are returned from cache
 test case: Get 4 values when only 3 values exists in database history and are data
 in:
   history:
@@ -1226,6 +1241,8 @@ out:
     misses: 0
 ---
 # TC15
+# Test that no values are returned, 'cached all' flag is not set 
+# and db_cached_from is set to cover the request range 
 test case: Get one value from empty history interval
 in:
   history:
@@ -1300,6 +1317,7 @@ out:
     misses: 0
 ---
 # TC16
+# Test that the requested interval is cached and returned, 'cached all' flag is not set
 test case: Get 100 values from 1 second interval with 3 history values
 in:
   history:
@@ -1380,7 +1398,8 @@ out:
     misses: 3
 ---
 # TC17
-test case: Get 2 values from already data 1 second interval with 3 history values
+# Test that values are returned from cached data and item properties are not changed
+test case: Get 2 values from already cached 1 second interval with 3 history values
 in:
   history:
   - itemid: 1
@@ -1466,7 +1485,8 @@ out:
     misses: 0
 ---
 # TC18
-test case: Get 3 values from already data 1 second interval with 3 history values
+# Test that values are returned from cached data and item properties are not changed
+test case: Get 3 values from already cached 1 second interval with 3 history values
 in:
   history:
   - itemid: 1
@@ -1553,93 +1573,7 @@ out:
     misses: 0
 ---
 # TC19
-test case: Get 3 values from already data 1 second interval with 3 history values
-in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
-  precache:
-  - time: 2017-01-10 10:10:00.000000000 +00:00
-    itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    seconds: 1
-    count: 0
-    end: 2017-01-10 10:00:05.000000000 +00:00
-  test:
-    time: 2017-01-10 10:10:00.000000000 +00:00
-    itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    seconds: 1
-    count: 3
-    end: 2017-01-10 10:00:05.000000000 +00:00
-out:
-  values: 
-  - *row57
-  - *row55
-  - *row52
-  cache:
-    items:
-    - itemid: 1
-      value type: ITEM_VALUE_TYPE_STR
-      data: 
-      - *row52
-      - *row55
-      - *row57
-      status: 
-      active_range: 596
-      values_total: 3
-      db_cached_from: 2017-01-10 10:00:05.000000000 +00:00
-    mode: ZBX_VC_MODE_NORMAL
-    hits: 3
-    misses: 0
----
-# TC20
+# Test that values are returned from cached data and item properties are not changed
 test case: Get 4 values from already data 1 second interval with 3 history values
 in:
   history:
@@ -1726,8 +1660,9 @@ out:
     hits: 3
     misses: 0
 ---
-# TC21
-test case: Get 1 value from 1 second interval with 3 history values past data data
+# TC20
+# Test that all required data is cached without leaving any gaps in history to current time.
+test case: Get 1 value from 1 second interval with 3 history values past cached data
 in:
   history:
   - itemid: 1
@@ -1817,8 +1752,9 @@ out:
     hits: 0
     misses: 1
 ---
-# TC22
-test case: Get 4 values from partially data 2 second interval with 6 history values
+# TC21
+# Test that the missing data is cached
+test case: Get 4 values from partially cached 2 second interval with 6 history values
 in:
   history:
   - itemid: 1
@@ -1919,7 +1855,8 @@ out:
     hits: 1
     misses: 3
 ---
-# TC23
+# TC22
+# Test that 'cached all' flag is set.
 test case: Get all history values by count when they were already cached by time based request
 in:
   history:
@@ -2030,7 +1967,8 @@ out:
     hits: 15
     misses: 0
 ---
-# TC24
+# TC23
+# Test that data is returned and 'cached all' flag is not changed.
 test case: Get all data values from interval when they were already cached by count
 in:
   history:
@@ -2141,7 +2079,8 @@ out:
     hits: 15
     misses: 0
 ---
-# TC25
+# TC24
+# Test that no data are retrieved, item range and cached from set accordingly.
 test case: Get interval of values from empty history
 in:
   history:
@@ -2170,7 +2109,8 @@ out:
     hits: 0
     misses: 0
 ---
-# TC26
+# TC25
+# Test that no data are retrieved, 'cached all' flag set accordingly
 test case: Get number of values from empty history
 in:
   history:
@@ -2199,7 +2139,8 @@ out:
     hits: 0
     misses: 0
 ---
-# TC27
+# TC26
+# Test that no data are retrieved, item range and cached from set accordingly.
 test case: Get number of values in from interval of history
 in:
   history:
@@ -2228,10 +2169,10 @@ out:
     hits: 0
     misses: 0
 ---
-# TC28
-test case: Get interval of values when item value type has been changed
+# TC27
 # when requesting other value type than data the item is marked for removal
 # and values are retrieved directly from database
+test case: Get interval of values when item value type has been changed
 in:
   history:
   - itemid: 1
@@ -2307,10 +2248,10 @@ out:
     hits: 0
     misses: 3
 ---
-# TC29
-test case: Get number of values when item value type has been changed
+# TC28
 # when requesting other value type than data the item is marked for removal
 # and values are retrieved directly from database
+test case: Get number of values when item value type has been changed
 in:
   history:
   - itemid: 1
@@ -2385,7 +2326,8 @@ out:
     hits: 0
     misses: 2
 ---
-# TC30
+# TC29
+# Test that values are returned, but item is not cached.
 test case: Get number of uncached item values when cache working in low memory mode
 in:
   history:
@@ -2450,12 +2392,14 @@ out:
   - *row57
   - *row55
   cache:
-    items: []
+    items:
+    - itemid: 1
     mode: ZBX_VC_MODE_LOWMEM
     hits: 0
     misses: 2
 ---
-# TC31
+# TC30
+# Test that values are returned, but item is not cached.
 test case: Get interval of uncached item values when cache working in low memory mode
 in:
   history:
@@ -2521,12 +2465,14 @@ out:
   - *row55
   - *row52
   cache:
-    items: []
+    items:
+    - itemid: 1
     mode: ZBX_VC_MODE_LOWMEM
     hits: 0
     misses: 3
 ---
-# TC32
+# TC31
+# Test that values are returned, but item is not cached.
 test case: Get number of uncached item values from interval when cache working in low memory mode
 in:
   history:
@@ -2592,12 +2538,14 @@ out:
   - *row55
   - *row52
   cache:
-    items: []
+    items:
+    - itemid: 1
     mode: ZBX_VC_MODE_LOWMEM
     hits: 0
     misses: 3
 ---
-# TC33
+# TC32
+# Test that items in cache are continued to be cached in low memory mode.
 test case: Get number of data item values when cache working in low memory mode
 in:
   history:
@@ -2690,7 +2638,8 @@ out:
     hits: 0
     misses: 2
 ---
-# TC34
+# TC33
+# Test that items in cache are continued to be cached in low memory mode.
 test case: Get interval of data item values when cache working in low memory mode
 in:
   history:
@@ -2784,7 +2733,8 @@ out:
     hits: 0
     misses: 3
 ---
-# TC35
+# TC34
+# Test that items in cache are continued to be cached in low memory mode.
 test case: Get number of data item values from interval when cache working in low memory mode
 in:
   history:
@@ -2882,7 +2832,8 @@ out:
     hits: 0
     misses: 4
 ---
-# TC36
+# TC35
+# Test that old item is dropped to free space and cache put in low memory mode.
 test case: Get values with not enough space in cache
 in:
   history:
@@ -3021,7 +2972,8 @@ out:
     hits: 0
     misses: 3
 ---
-# TC37
+# TC36
+# Test that space was freed by dropping old (stale) data and cache is still working in normal mode.
 test case: Get values with not enough space in cache and a day+ passed since last request
 in:
   history:
@@ -3160,7 +3112,8 @@ out:
     hits: 0
     misses: 3
 ---
-# TC38
+# TC37
+# Test that item's active range is not decreased during a day.
 test case: Active range tracking during day 
 in:
   history:
@@ -3256,7 +3209,7 @@ out:
     hits: 0
     misses: 0
 ---
-# TC39
+# TC38
 # Test if the active range ir properly reduced to the daily range each day
 test case: Active range change in next few days
 in:
@@ -3359,7 +3312,8 @@ out:
     hits: 0
     misses: 0
 ---
-# TC40
+# TC39
+# Test that value cache attempts to switch back to normal mode after running a day in low memory mode.
 test case: Switch back to normal mode after working a day in low memory mode
 in:
   history:
