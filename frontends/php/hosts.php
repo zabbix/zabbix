@@ -361,60 +361,52 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		 * Step 2. Add new host groups. This is actually done later, but before we can do that we need to check what
 		 * groups will be added and first of all actually create them and get the new IDs.
 		 */
-		$newHostGroupIds = [];
-		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
+		$new_groupids = [];
+
+		if (array_key_exists('new_groups', $visible)) {
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-				foreach ($_REQUEST['new_groups'] as $newGroup) {
-					if (is_array($newGroup) && isset($newGroup['new'])) {
-						$newGroups[] = ['name' => $newGroup['new']];
+				$ins_groups = [];
+
+				foreach (getRequest('new_groups', []) as $new_group) {
+					if (is_array($new_group) && array_key_exists('new', $new_group)) {
+						$ins_groups[] = ['name' => $new_group['new']];
 					}
 					else {
-						$newHostGroupIds[] = $newGroup;
+						$new_groupids[] = $new_group;
 					}
 				}
 
-				if (isset($newGroups)) {
-					if (!$createdGroups = API::HostGroup()->create($newGroups)) {
+				if ($ins_groups) {
+					if (!$result = API::HostGroup()->create($ins_groups)) {
 						throw new Exception();
 					}
 
-					$newHostGroupIds = $newHostGroupIds
-						? array_merge($newHostGroupIds, $createdGroups['groupids'])
-						: $createdGroups['groupids'];
+					$new_groupids = array_merge($new_groupids, $result['groupids']);
 				}
 			}
 			else {
-				$newHostGroupIds = getRequest('new_groups');
+				$new_groupids = getRequest('new_groups');
 			}
 		}
 
 		// Step 1. Replace existing groups.
-		if (isset($visible['groups'])) {
-			if (isset($_REQUEST['groups'])) {
+		if (array_key_exists('groups', $visible)) {
+			$replace_groupids = [];
+
+			if (hasRequest('groups')) {
 				// First (step 1.) we try to replace existing groups and add new groups in the process (step 2.).
-				$replaceHostGroupsIds = $newHostGroupIds
-					? array_unique(array_merge(getRequest('groups'), $newHostGroupIds))
-					: $_REQUEST['groups'];
+				$replace_groupids = array_unique(array_merge(getRequest('groups'), $new_groupids));
 			}
-			elseif ($newHostGroupIds) {
+			elseif ($new_groupids) {
 				/*
 				 * If no groups need to be replaced, use same variable as if new groups are added. This is used in
 				 * step 3. The only difference is that we try to remove all existing groups by replacing with nothing
 				 * since we left it empty.
 				 */
-				$replaceHostGroupsIds = $newHostGroupIds;
+				$replace_groupids = $new_groupids;
 			}
 
-			if (isset($replaceHostGroupsIds)) {
-				$newValues['groups'] = API::HostGroup()->get([
-					'groupids' => $replaceHostGroupsIds,
-					'editable' => true,
-					'output' => ['groupid']
-				]);
-			}
-			else {
-				$newValues['groups'] = [];
-			}
+			$newValues['groups'] = zbx_toObject($replace_groupids, 'groupid');
 		}
 
 		if (isset($_REQUEST['mass_replace_tpls'])) {
@@ -459,48 +451,39 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			 * Step 3. Case when groups need to be removed. This is done inside the loop, since each host may have
 			 * different existing groups. So we need to know what can we remove.
 			 */
-			$remove_groups = getRequest('remove_groups', []);
+			if (array_key_exists('remove_groups', $visible)) {
+				$remove_groups = getRequest('remove_groups', []);
 
-			if (array_key_exists('remove_groups', $visible) && $remove_groups) {
-				if (isset($replaceHostGroupsIds)) {
+				if (array_key_exists('groups', $visible)) {
 					/*
-						* Previously we determined what groups fro ALL hosts will be replaced.
-						* The $replaceHostGroupsIds holds both - groups to replace and new groups to add.
-						* But $replace_host_groupids is the difference between the replaceable groups and removable
-						* groups.
-						*/
-					$replace_host_groupids = array_diff($replaceHostGroupsIds, $remove_groups);
+					 * Previously we determined what groups for ALL hosts will be replaced.
+					 * The $replace_groupids holds both - groups to replace and new groups to add.
+					 * New $replace_groupids is the difference between the replaceable groups and removable groups.
+					 */
+					$replace_groupids = array_diff($replace_groupids, $remove_groups);
 				}
 				else {
 					/*
-						* The $newHostGroupIds holds only groups that need to be added. So $replace_host_groupsids is
-						* the difference between the groups that already exist + groups that need to be added and
-						* removable groups.
-						*/
+					 * The $new_groupids holds only groups that need to be added. So $replace_groupids is
+					 * the difference between the groups that already exist + groups that need to be added and
+					 * removable groups.
+					 */
 					$current_groupids = zbx_objectValues($host['groups'], 'groupid');
 
-					$replace_host_groupids = $newHostGroupIds
-						? array_diff(array_unique(array_merge($current_groupids, $newHostGroupIds)), $remove_groups)
-						: array_diff($current_groupids, $remove_groups);
+					$replace_groupids = array_diff(array_unique(array_merge($current_groupids, $new_groupids)),
+						$remove_groups
+					);
 				}
 
-				$newValues['groups'] = API::HostGroup()->get([
-					'groupids' => $replace_host_groupids,
-					'editable' => true,
-					'output' => ['groupid']
-				]);
+				$newValues['groups'] = zbx_toObject($replace_groupids, 'groupid');
 			}
 
 			// Case when we only need to add new groups to host.
-			if ($newHostGroupIds && !array_key_exists('groups', $visible)
+			if ($new_groupids && !array_key_exists('groups', $visible)
 					&& !array_key_exists('remove_groups', $visible)) {
-				$add_groups = [];
+				$current_groupids = zbx_objectValues($host['groups'], 'groupid');
 
-				foreach ($newHostGroupIds as $groupid) {
-					$add_groups[] = ['groupid' => $groupid];
-				}
-
-				$host['groups'] = array_merge($host['groups'], $add_groups);
+				$host['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)), 'groupid');
 			}
 			else {
 				// In all other cases we first clear out the old values. And simply replace with $newValues later.
