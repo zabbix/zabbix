@@ -182,7 +182,9 @@ elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('templat
 		$_REQUEST['groups'] = $groups;
 	}
 
-	unset($_REQUEST['templateid']);
+	if (hasRequest('clone')) {
+		unset($_REQUEST['templateid']);
+	}
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	try {
