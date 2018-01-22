@@ -28,5 +28,4 @@ const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const ch
 zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);
 zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, const char *name);
 
-
 #endif

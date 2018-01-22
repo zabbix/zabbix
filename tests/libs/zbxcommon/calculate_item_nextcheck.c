@@ -117,7 +117,7 @@ void	zbx_mock_test_entry(void **state)
 
 		if (ZBX_MOCK_SUCCESS != (mock_err = zbx_strtime_to_timespec(nextcheck_expected, &ts)))
 		{
-			fail_msg("Cannot convert 'checks' element #%d valuel to time: %s", step,
+			fail_msg("Cannot convert 'checks' element #%d value to time: %s", step,
 					zbx_mock_error_string(mock_err));
 		}
 
