@@ -298,6 +298,8 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Internal error, please report to maintainers.";
 		case ZBX_MOCK_INVALID_YAML_PATH:
 			return "Invalid YAML path syntax.";
+		case ZBX_MOCK_INVALID_BINARY:
+			return "Invalid binary string supplied";
 		default:
 			return "Unknown error.";
 	}
@@ -465,6 +467,7 @@ zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, s
 {
 	const zbx_mock_pool_handle_t	*handle;
 	char				*tmp, *dst;
+	const char			*src;
 	size_t				i, state = 0;
 
 	if (0 > binary || binary >= handle_pool.values_num)
@@ -473,8 +476,9 @@ zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, s
 	handle = handle_pool.values[binary];
 
 	if (YAML_SCALAR_NODE != handle->node->type)
-		return ZBX_MOCK_NOT_A_STRING;
+		return ZBX_MOCK_INVALID_BINARY;
 
+	src = (char*)handle->node->data.scalar.value;
 	dst = tmp = zbx_malloc(NULL, handle->node->data.scalar.length);
 
 	for (i = 0; i < handle->node->data.scalar.length; i++)
@@ -482,17 +486,15 @@ zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, s
 		switch (state)
 		{
 			case 0:
-				if ('\\' == handle->node->data.scalar.value[i])
+				if ('\\' == src[i])
 					state = 1;
 				else
-					*dst++ = handle->node->data.scalar.value[i];
+					*dst++ = src[i];
 
 				break;
 			case 1:
-				if ('x' == handle->node->data.scalar.value[i] &&
-						i + 2 < handle->node->data.scalar.length &&
-						SUCCEED == is_hex_n_range((char*)&handle->node->data.scalar.value[i + 1],
-								2, dst, sizeof(char), 0, 0xff))
+				if ('x' == src[i] && i + 2 < handle->node->data.scalar.length &&
+						SUCCEED == is_hex_n_range(&src[i + 1], 2, dst, sizeof(char), 0, 0xff))
 				{
 					dst++;
 					state = 0;
@@ -501,8 +503,9 @@ zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, s
 				else
 				{
 					zbx_free(tmp);
-					return ZBX_MOCK_INTERNAL_ERROR;
+					return ZBX_MOCK_INVALID_BINARY;
 				}
+
 				break;
 		}
 	}
@@ -511,7 +514,7 @@ zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, s
 	*value = tmp;
 	*length = dst - tmp;
 
-	return ZBX_MOCK_SUCCESS;
+	return state == 0 ? ZBX_MOCK_SUCCESS : ZBX_MOCK_INVALID_BINARY;
 }
 
 static zbx_mock_error_t	zbx_yaml_path_next(const char **pnext, const char **key, int *key_len, int *index)
