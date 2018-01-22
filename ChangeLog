@@ -99,6 +99,7 @@ Changes for 3.4.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13343] fixed last trends update clock caching (wiper)
 A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
 ..F....... [ZBX-13223] fixed graphs duplication in graph preview (ashubin)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
