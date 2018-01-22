@@ -2,14 +2,14 @@
 test case: Zero bytes received
 in:
       recv data:
-      - ""
+      - ''
 out:
       ret: 'fail'
 ---
 test case: Correct number of bytes received
 in:
       recv data:
-      - "ZBXD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'ZBXD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'succeed'
       number of bytes: '23'
@@ -18,8 +18,8 @@ out:
 test case: Fragmented header
 in:
       recv data:
-      - "ZB"
-      - "XD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'ZB'
+      - 'XD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'succeed'
       number of bytes: '23'
@@ -27,24 +27,24 @@ out:
 test case: Fragmented incorrect header in part 1
 in:
       recv data:
-      - "ZZ"
-      - "XD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'ZZ'
+      - 'XD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'fail'
 ---
 test case: Fragmented incorrect header in part 2
 in:
       recv data:
-      - "ZB"
-      - "XX\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'ZB'
+      - 'XX\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'fail'
 ---
 test case: Header in separate fragment
 in:
       recv data:
-      - "ZBXD\x01"
-      - "\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'ZBXD\x01'
+      - '\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'succeed'
       number of bytes: '23'
@@ -52,20 +52,20 @@ out:
 test case: Header in separate fragment incorrect
 in:
       recv data:
-      - "ZBBD\x01"
-      - "\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'ZBBD\x01'
+      - '\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'fail'
 ---
 test case: Whole header fragmented
 in:
       recv data:
-      - "Z"
-      - "B"
-      - "X"
-      - "D"
-      - "\x01"
-      - "\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'Z'
+      - 'B'
+      - 'X'
+      - 'D'
+      - '\x01'
+      - '\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'succeed'
       number of bytes: '23'
@@ -73,7 +73,7 @@ out:
 test case: Only header with 0 data
 in:
       recv data:
-      - "ZBXD\x01\x00\x00\x00\x00\x00\x00\x00\x00"
+      - 'ZBXD\x01\x00\x00\x00\x00\x00\x00\x00\x00'
 out:
       ret: 'succeed'
       number of bytes: '13'
@@ -81,7 +81,7 @@ out:
 test case: Header is too small
 in:
       recv data:
-      - "ZBX"
+      - 'ZBX'
 out:
       ret: 'fail'
       number of bytes: '3'
@@ -91,20 +91,20 @@ out:
 test case: Header and data length fragmented
 in:
       recv data:
-      - "Z"
-      - "B"
-      - "X"
-      - "D"
-      - "\x01"
-      - "\x0A" # data length starts
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "agent.ping"
+      - 'Z'
+      - 'B'
+      - 'X'
+      - 'D'
+      - '\x01'
+      - '\x0A' # data length starts
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - 'agent.ping'
 out:
       ret: 'succeed'
       number of bytes: '23'
@@ -112,20 +112,20 @@ out:
 test case: Data length indicator exceed max size
 in:
       recv data:
-      - "Z"
-      - "B"
-      - "X"
-      - "D"
-      - "\x01"
-      - "\x01\x00\x00\x08\x00\x00\x00\x00"
-      - "agent.ping"
+      - 'Z'
+      - 'B'
+      - 'X'
+      - 'D'
+      - '\x01'
+      - '\x01\x00\x00\x08\x00\x00\x00\x00'
+      - 'agent.ping'
 out:
       ret: 'fail'
 ---
 test case: Don't accept if bigger length is supplied in header than sent
 in:
       recv data:
-      - "ZBXD\x01\x0B\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'ZBXD\x01\x0B\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'fail'
       number of bytes: '23'
@@ -133,7 +133,7 @@ out:
 test case: Don't accept if smaller length supplied than sent
 in:
       recv data:
-      - "ZBXD\x01\x09\x00\x00\x00\x00\x00\x00\x00agent.ping"
+      - 'ZBXD\x01\x09\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
       ret: 'fail'
       number of bytes: '23'
@@ -141,7 +141,7 @@ out:
 test case: Data length is too small
 in:
       recv data:
-      - "ZBXD\x01\x01\x00\x00\x00\x00\x00\x00"
+      - 'ZBXD\x01\x01\x00\x00\x00\x00\x00\x00'
 out:
       ret: 'fail'
       number of bytes: '12'
@@ -151,9 +151,9 @@ out:
 test case: Fragmented key
 in:
       recv data:
-      - "ZBXD\x01\x0A\x00\x00"
-      - "\x00\x00\x00\x00\x00agent.pi"
-      - "ng"
+      - 'ZBXD\x01\x0A\x00\x00'
+      - '\x00\x00\x00\x00\x00agent.pi'
+      - 'ng'
 out:
       ret: 'succeed'
       number of bytes: '23'
@@ -161,18 +161,18 @@ out:
 test case: Fragmented key by bytes
 in:
       recv data:
-      - "ZBXD\x01\x0A\x00\x00"
-      - "\x00\x00\x00\x00\x00"
-      - "a"
-      - "g"
-      - "e"
-      - "n"
-      - "t"
-      - "."
-      - "p"
-      - "i"
-      - "n"
-      - "g"
+      - 'ZBXD\x01\x0A\x00\x00'
+      - '\x00\x00\x00\x00\x00'
+      - 'a'
+      - 'g'
+      - 'e'
+      - 'n'
+      - 't'
+      - '.'
+      - 'p'
+      - 'i'
+      - 'n'
+      - 'g'
 out:
       ret: 'succeed'
       number of bytes: '23'
@@ -180,38 +180,61 @@ out:
 test case: Whole message streamed by 1 byte
 in:
       recv data:
-      - "Z"
-      - "B"
-      - "X"
-      - "D"
-      - "\x01"
-      - "\x0A" # data length starts
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "\x00"
-      - "a"
-      - "g"
-      - "e"
-      - "n"
-      - "t"
-      - "."
-      - "p"
-      - "i"
-      - "n"
-      - "g"
+      - 'Z'
+      - 'B'
+      - 'X'
+      - 'D'
+      - '\x01'
+      - '\x0A' # data length starts
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - '\x00'
+      - 'a'
+      - 'g'
+      - 'e'
+      - 'n'
+      - 't'
+      - '.'
+      - 'p'
+      - 'i'
+      - 'n'
+      - 'g'
 out:
       ret: 'succeed'
       number of bytes: '23'
 ---
-test case: Message bigger than 2048
+test case: Stat buffer completely filled
 in:
   recv data:
-    - "ZBXD\x01\x44\x11\x00\x00\x00\x00\x00\x00eyJnbG9iYWxtYWNybyI6eyJmaWVsZHMiOlsiZ2xvYmFsbWFjcm9pZCIsIm1hY3JvIiwidmFsdWUiXSwiZGF0YSI6W1syLCJ7JFNOTVBfQ09NTVVOSVRZfSIsInB1YmxpYyJdXX0sImhvc3RzIjp7ImZpZWxkcyI6WyJob3N0aWQiLCJob3N0Iiwic3RhdHVzIiwiaXBtaV9hdXRodHlwZSIsImlwbWlfcHJpdmlsZWdlIiwiaXBtaV91c2VybmFtZSIsImlwbWlfcGFzc3dvcmQiLCJuYW1lIiwidGxzX2Nvbm5lY3QiLCJ0bHNfYWNjZXB0IiwidGxzX2lzc3VlciIsInRsc19zdWJqZWN0IiwidGxzX3Bza19pZGVudGl0eSIsInRsc19wc2siXSwiZGF0YSI6W1sxMDA4NCwiWmFiYml4IHNlcnZlciIsMCwtMSwyLCIiLCIiLCJaYWJiaXggc2VydmVyIiwxLDEsIiIsIiIsIiIsIiJdXX0sImludGVyZmFjZSI6eyJmaWVsZHMiOlsiaW50ZXJmYWNlaWQiLCJob3N0aWQiLCJtYWluIiwidHlwZSIsInVzZWlwIiwiaXAiLCJkbnMiLCJwb3J0IiwiYnVsayJdLCJkYXRhIjpbWzEsMTAwODQsMSwxLDEsIjEyNy4wLjAuMSIsIiIsIjEwMDUwIiwxXV19LCJob3N0c190ZW1wbGF0ZXMiOnsiZmllbGRzIjpbImhvc3R0ZW1wbGF0ZWlkIiwiaG9zdGlkIiwidGVtcGxhdGVpZCJdLCJkYXRhIjpbXX0sImhvc3RtYWNybyI6eyJmaWVsZHMiOlsiaG9zdG1hY3JvaWQiLCJob3N0aWQiLCJtYWNybyIsInZhbHVlIl0sImRhdGEiOltdfSwiaXRlbXMiOnsiZmllbGRzIjpbIml0ZW1pZCIsInR5cGUiLCJzbm1wX2NvbW11bml0eSIsInNubXBfb2lkIiwiaG9zdGlkIiwia2V5XyIsImRlbGF5Iiwic3RhdHVzIiwidmFsdWVfdHlwZSIsInRyYXBwZXJfaG9zdHMiLCJzbm1wdjNfc2VjdXJpdHluYW1lIiwic25tcHYzX3NlY3VyaXR5bGV2ZWwiLCJzbm1wdjNfYXV0aHBhc3NwaHJhc2UiLCJzbm1wdjNfcHJpdnBhc3NwaHJhc2UiLCJsYXN0bG9nc2l6ZSIsImxvZ3RpbWVmbXQiLCJwYXJhbXMiLCJpcG1pX3NlbnNvciIsImF1dGh0eXBlIiwidXNlcm5hbWUiLCJwYXNzd29yZCIsInB1YmxpY2tleSIsInByaXZhdGVrZXkiLCJtdGltZSIsImZsYWdzIiwiaW50ZXJmYWNlaWQiLCJwb3J0Iiwic25tcHYzX2F1dGhwcm90b2NvbCIsInNubXB2M19wcml2cHJvdG9jb2wiLCJzbm1wdjNfY29udGV4dG5hbWUiLCJqbXhfZW5kcG9pbnQiXSwiZGF0YSI6W119LCJkcnVsZXMiOnsiZmllbGRzIjpbImRydWxlaWQiLCJuYW1lIiwiaXByYW5nZSIsImRlbGF5Il0sImRhdGEiOltdfSwiZGNoZWNrcyI6eyJmaWVsZHMiOlsiZGNoZWNraWQiLCJkcnVsZWlkIiwidHlwZSIsImtleV8iLCJzbm1wX2NvbW11bml0eSIsInBvcnRzIiwic25tcHYzX3NlY3VyaXR5bmFtZSIsInNubXB2M19zZWN1cml0eWxldmVsIiwic25tcHYzX2F1dGhwYXNzcGhyYXNlIiwic25tcHYzX3ByaXZwYXNzcGhyYXNlIiwidW5pcSIsInNubXB2M19hdXRocHJvdG9jb2wiLCJzbm1wdjNfcHJpdnByb3RvY29sIiwic25tcHYzX2NvbnRleHRuYW1lIl0sImRhdGEiOltdfSwicmVnZXhwcyI6eyJmaWVsZHMiOlsicmVnZXhwaWQiLCJuYW1lIl0sImRhdGEiOltbMSwiRmlsZSBzeXN0ZW1zIGZvciBkaXNjb3ZlcnkiXSxbMiwiTmV0d29yayBpbnRlcmZhY2VzIGZvciBkaXNjb3ZlcnkiXSxbMywiU3RvcmFnZSBkZXZpY2VzIGZvciBTTk1QIGRpc2NvdmVyeSJdLFs0LCJXaW5kb3dzIHNlcnZpY2UgbmFtZXMgZm9yIGRpc2NvdmVyeSJdLFs1LCJXaW5kb3dzIHNlcnZpY2Ugc3RhcnR1cCBzdGF0ZXMgZm9yIGRpc2NvdmVyeSJdXX0sImV4cHJlc3Npb25zIjp7ImZpZWxkcyI6WyJleHByZXNzaW9uaWQiLCJyZWdleHBpZCIsImV4cHJlc3Npb24iLCJleHByZXNzaW9uX3R5cGUiLCJleHBfZGVsaW1pdGVyIiwiY2FzZV9zZW5zaXRpdmUiXSwiZGF0YSI6W1sxLDEsIl4oYnRyZnN8ZXh0MnxleHQzfGV4dDR8amZzfHJlaXNlcnx4ZnN8ZmZzfHVmc3xqZnN8amZzMnx2eGZzfGhmc3xyZWZzfG50ZnN8ZmF0MzJ8emZzKSQiLDMsIiwiLDBdLFszLDMsIl4oUGh5c2ljYWwgbWVtb3J5fFZpcnR1YWwgbWVtb3J5fE1lbW9yeSBidWZmZXJzfENhY2hlZCBtZW1vcnl8U3dhcCBzcGFjZSkkIiw0LCIsIiwxXSxbNSw0LCJeKE1NQ1NTfGd1cGRhdGV8U3lzbW9uTG9nfGNscl9vcHRpbWl6YXRpb25fdjIuMC41MDcyN18zMnxjbHJfb3B0aW1pemF0aW9uX3Y0LjAuMzAzMTlfMzIpJCIsNCwiLCIsMV0sWzYsNSwiXihhdXRvbWF0aWN8YXV0b21hdGljIGRlbGF5ZWQpJCIsMywiLCIsMV0sWzcsMiwiXlNvZnR3YXJlIExvb3BiYWNrIEludGVyZmFjZSIsNCwiLCIsMV0sWzgsMiwiXihJbik/W0xsXW9vcFtCYl1hY2tbMC05Ll9dKiQiLDQsIiwiLDFdLFs5LDIsIl5OVUxMWzAtOS5dKiQiLDQsIiwiLDFdLFsxMCwyLCJeW0xsXW9bMC05Ll0qJCIsNCwiLCIsMV0sWzExLDIsIl5bU3NdeXN0ZW0kIiw0LCIsIiwxXSxbMTIsMiwiXk51WzAtOS5dKiQiLDQsIiwiLDFdXX0sImdyb3VwcyI6eyJmaWVsZHMiOlsiZ3JvdXBpZCJdLCJkYXRhIjpbWzVdXX0sImNvbmZpZyI6eyJmaWVsZHMiOlsiY29uZmlnaWQiLCJyZWZyZXNoX3Vuc3VwcG9ydGVkIiwiZGlzY292ZXJ5X2dyb3VwaWQiLCJzbm1wdHJhcF9sb2dnaW5nIl0sImRhdGEiOltbMSwiMTBtIiw1LDFdXX0sImh0dHB0ZXN0Ijp7ImZpZWxkcyI6WyJodHRwdGVzdGlkIiwibmFtZSIsImRlbGF5IiwiYWdlbnQiLCJhdXRoZW50aWNhdGlvbiIsImh0dHBfdXNlciIsImh0dHBfcGFzc3dvcmQiLCJob3N0aWQiLCJodHRwX3Byb3h5IiwicmV0cmllcyIsInNzbF9jZXJ0X2ZpbGUiLCJzc2xfa2V5X2ZpbGUiLCJzc2xfa2V5X3Bhc3N3b3JkIiwidmVyaWZ5X3BlZXIiLCJ2ZXJpZnlfaG9zdCJdLCJkYXRhIjpbXX0sImh0dHB0ZXN0aXRlbSI6eyJmaWVsZHMiOlsiaHR0cHRlc3RpdGVtaWQiLCJodHRwdGVzdGlkIiwiaXRlbWlkIiwidHlwZSJdLCJkYXRhIjpbXX0sImh0dHB0ZXN0X2ZpZWxkIjp7ImZpZWxkcyI6WyJodHRwdGVzdF9maWVsZGlkIiwiaHR0cHRlc3RpZCIsInR5cGUiLCJuYW1lIiwidmFsdWUiXSwiZGF0YSI6W119LCJodHRwc3RlcCI6eyJmaWVsZHMiOlsiaHR0cHN0ZXBpZCIsImh0dHB0ZXN0aWQiLCJuYW1lIiwibm8iLCJ1cmwiLCJ0aW1lb3V0IiwicG9zdHMiLCJyZXF1aXJlZCIsInN0YXR1c19jb2RlcyIsImZvbGxvd19yZWRpcmVjdHMiLCJyZXRyaWV2ZV9tb2RlIiwicG9zdF90eXBlIl0sImRhdGEiOltdfSwiaHR0cHN0ZXBpdGVtIjp7ImZpZWxkcyI6WyJodHRwc3RlcGl0ZW1pZCIsImh0dHBzdGVwaWQiLCJpdGVtaWQiLCJ0eXBlIl0sImRhdGEiOltdfSwiaHR0cHN0ZXBfZmllbGQiOnsiZmllbGRzIjpbImh0dHBzdGVwX2ZpZWxkaWQiLCJodHRwc3RlcGlkIiwidHlwZSIsIm5hbWUiLCJ2YWx1ZSJdLCJkYXRhIjpbXX19Jw0K"
+    - 'ZBXD\x01\xF2\x07\x00\x00\x00\x00\x00\x000123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn'
 out:
       ret: 'succeed'
-      number of bytes: '4433'
+      number of bytes: '2047'
+---
+test case: Stat buffer filled and switched to dinamic
+in:
+  recv data:
+    - 'ZBXD\x01\xF3\x07\x00\x00\x00\x00\x00\x000123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno'
+out:
+      ret: 'succeed'
+      number of bytes: '2048'
+---
+test case: Second receive is required to get whole message
+in:
+  recv data:
+    - 'ZBXD\x01\xf5\x07\x00\x00\x00\x00\x00\x000123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq'
+out:
+      ret: 'succeed'
+      number of bytes: '2050'
+---
+test case: Second receive, received more than expected
+in:
+  recv data:
+    - 'ZBXD\x01\xf5\x07\x00\x00\x00\x00\x00\x000123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0'
+out:
+      ret: 'fail'
 ...
