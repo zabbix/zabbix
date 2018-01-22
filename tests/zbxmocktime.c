@@ -121,7 +121,7 @@ static zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int
  ******************************************************************************/
 static zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, int *seconds, const char **pnext)
 {
-	const char	*hours_end, *minutes_end, *seconds_send;
+	const char	*hours_end, *minutes_end, *seconds_end;
 
 	hours_end = ts_get_component_end(text);
 	if (hours_end == text || ':' != *hours_end)
@@ -131,12 +131,12 @@ static zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, 
 	if (minutes_end - hours_end != 3 || ':' != *minutes_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
-	seconds_send = ts_get_component_end(minutes_end + 1);
+	seconds_end = ts_get_component_end(minutes_end + 1);
 
-	if (seconds_send - minutes_end != 3)
+	if (seconds_end - minutes_end != 3)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
-	*pnext = seconds_send;
+	*pnext = seconds_end;
 
 	*hours = atoi(text);
 	*minutes = atoi(hours_end + 1);
