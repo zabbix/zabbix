@@ -533,7 +533,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$msgFail = _('Cannot update host');
 
 			$dbHost = API::Host()->get([
-				'output' => ['flags'],
+				'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
+					'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_psk_identity',
+					'tls_psk', 'tls_issuer', 'tls_subject', 'flags'
+				],
 				'hostids' => $hostId,
 				'editable' => true
 			]);
