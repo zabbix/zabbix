@@ -259,13 +259,13 @@ elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('hostid'
 	$groupids = [];
 
 	// Remove inaccessible groups from request, but leave "new".
-	if ($groups) {
-		foreach ($groups as $group) {
-			if (!is_array($group)) {
-				$groupids[] = $group;
-			}
+	foreach ($groups as $group) {
+		if (!is_array($group)) {
+			$groupids[] = $group;
 		}
+	}
 
+	if ($groupids) {
 		$groups_allowed = API::HostGroup()->get([
 			'output' => [],
 			'groupids' => $groupids,
