@@ -35,10 +35,10 @@ static zbx_uint64_t	read_yaml_uint64(const char *out)
 	zbx_uint64_t		value;
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter(out, &handle)))
-		fail_msg("Cannot get interruptions since boot: %s", zbx_mock_error_string(error));
+		fail_msg("Cannot get number of bytes: %s", zbx_mock_error_string(error));
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(handle, &str)))
-		fail_msg("Cannot read interruptions since boot: %s", zbx_mock_error_string(error));
+		fail_msg("Cannot read number of bytes %s", zbx_mock_error_string(error));
 
 	if (FAIL == is_uint64(str, &value))
 		fail_msg("\"%s\" is not a valid numeric unsigned value", str);
@@ -56,7 +56,7 @@ static char	*yaml_assemble_binary_data_array(size_t expected)
 
 	buffer = zbx_malloc(NULL, expected);
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("recv data", &fragments)))
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("fragments", &fragments)))
 		fail_msg("Cannot get recv data handle: %s", zbx_mock_error_string(error));
 
 	while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(fragments, &fragment))
@@ -138,8 +138,8 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 		fail_msg("Failed to connect");
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("recv data", &fragments)))
-			fail_msg("Cannot get recv data handle: %s", zbx_mock_error_string(error));
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("fragments", &fragments)))
+			fail_msg("Cannot get fragments handle: %s", zbx_mock_error_string(error));
 
 	if (read_yaml_ret() != SUCCEED_OR_FAIL((received = zbx_tcp_recv_ext(&s, 0))))
 		fail_msg("Unexpected return code '%s'", zbx_result_string(SUCCEED_OR_FAIL(received)));
@@ -151,10 +151,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (received != (expected = read_yaml_uint64("number of bytes")))
-	{
-		fail_msg("Expected number of bytes to receive:" ZBX_FS_UI64 " received:" ZBX_FS_UI64,
-				expected, received);
-	}
+		fail_msg("Expected bytes to receive:" ZBX_FS_UI64 " received:" ZBX_FS_UI64, expected, received);
 
 	if (ZBX_TCP_HEADER_DATALEN_LEN > received)
 		fail_msg("Received less than header size");
