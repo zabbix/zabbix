@@ -275,7 +275,8 @@ class CProblem extends CApiService {
 					foreach ($userGroups as $usrgrpid) {
 						if (array_key_exists($usrgrpid, $tag_filters_tmp)) {
 							foreach ($tag_filters_tmp[$usrgrpid] as $groupid => $tag_filter) {
-								if (array_key_exists($groupid, $rights[$usrgrpid])) {
+								if (array_key_exists($usrgrpid, $rights)
+										&& array_key_exists($groupid, $rights[$usrgrpid])) {
 									unset($rights[$usrgrpid][$groupid]);
 								}
 
