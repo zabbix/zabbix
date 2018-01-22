@@ -246,4 +246,18 @@ out:
   checks:
     - 1970-03-01 00:00:00 +00:00
     - 1970-03-31 00:00:00 +00:00
+---
+test case: Scheduling check every day at 2 a.m. when government decides drastically change the timezone
+in:
+  item type: ZABBIX
+  delay: 0;h2
+  timezone: :Pacific/Apia
+  at: 2011-12-29 00:00:00 -10:00
+out:
+  checks:
+    - 2011-12-29 02:00:00 -10:00
+    # 2011-12-30 00:00:00 -10:00 clocks were turned forward 1 day to
+    # 2011-12-31 00:00:00 +14:00 instead, there was no 2011-12-30 in Samoa
+    - 2011-12-31 02:00:00 +14:00
+    - 2012-01-01 02:00:00 +14:00
 ...
