@@ -1084,14 +1084,14 @@ jQuery(function($) {
 	 */
 	$.fn.actionMenuItemCollapse = function() {
 		// Remove style and close sub-menus in deeper levels.
-		$('.highlighted', $(this).closest('.action-menu')).removeClass('highlighted');
-		$('[aria-expanded]', $(this).closest('.action-menu')).attr({'aria-expanded': 'false'});
-		$('.action-menu', $(this).closest('.action-menu')).css({'display': 'none'});
+		var parent_menu = $(this).closest('.action-menu');
+		$('.highlighted', parent_menu).removeClass('highlighted');
+		$('[aria-expanded]', parent_menu).attr({'aria-expanded': 'false'});
+		$('.action-menu', parent_menu).css({'display': 'none'});
 
 		// Close actual menu level.
-		$(this).closest('.action-menu').not('.action-menu-top').css({'display': 'none'});
-		$(this).closest('.action-menu').prev('[role="menuitem"]').not('.action-menu-top')
-			.attr({'aria-expanded': 'false'});
+		parent_menu.not('.action-menu-top').css({'display': 'none'});
+		parent_menu.prev('[role="menuitem"]').not('.action-menu-top').attr({'aria-expanded': 'false'});
 
 		return this;
 	};
