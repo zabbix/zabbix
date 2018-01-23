@@ -77,25 +77,37 @@ static const char	*ts_get_component_end(const char *text)
 static zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int *day, const char **pnext)
 {
 	const char	*year_end, *month_end, *day_end;
+	int		value_year, value_month, value_day;
 
 	year_end = ts_get_component_end(text);
 	if (year_end - text != 4 || '-' != *year_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	month_end = ts_get_component_end(year_end + 1);
-	if (month_end == year_end || '-' != *month_end)
+	if (2 > month_end - year_end || 3 < month_end - year_end || '-' != *month_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	day_end = ts_get_component_end(month_end + 1);
 
-	if (day_end == month_end)
+	if (2 > day_end - month_end || 3 < day_end - month_end)
+		return ZBX_MOCK_NOT_A_TIMESTAMP;
+
+	value_year = atoi(text);
+	if (1970 > value_year || 2038 < value_year)
+		return ZBX_MOCK_NOT_A_TIMESTAMP;
+
+	value_month = atoi(year_end + 1);
+	if (12 < value_month)
+		return ZBX_MOCK_NOT_A_TIMESTAMP;
+
+	value_day = atoi(month_end + 1);
+	if (value_day > zbx_day_in_month(value_year, value_month))
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	*pnext = day_end;
-
-	*year = atoi(text);
-	*month = atoi(year_end + 1);
-	*day = atoi(month_end + 1);
+	*year = value_year;
+	*month = value_month;
+	*day = value_day;
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -122,6 +134,7 @@ static zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int
 static zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, int *seconds, const char **pnext)
 {
 	const char	*hours_end, *minutes_end, *seconds_end;
+	int		value_hours, value_minutes, value_seconds;
 
 	hours_end = ts_get_component_end(text);
 	if (hours_end == text || ':' != *hours_end)
@@ -136,11 +149,22 @@ static zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, 
 	if (seconds_end - minutes_end != 3)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
-	*pnext = seconds_end;
+	value_hours = atoi(text);
+	if (24 <= value_hours)
+		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
-	*hours = atoi(text);
-	*minutes = atoi(hours_end + 1);
-	*seconds = atoi(minutes_end + 1);
+	value_minutes = atoi(hours_end + 1);
+	if (60 <= value_minutes)
+		return ZBX_MOCK_NOT_A_TIMESTAMP;
+
+	value_seconds = atoi(minutes_end + 1);
+	if (60 <= value_seconds)
+		return ZBX_MOCK_NOT_A_TIMESTAMP;
+
+	*pnext = seconds_end;
+	*hours = value_hours;
+	*minutes = value_minutes;
+	*seconds = value_seconds;
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -167,7 +191,7 @@ static zbx_mock_error_t	ts_get_ns(const char *text, int *ns, const char **pnext)
 	int		pad;
 
 	ns_end = ts_get_component_end(text + 1);
-	if (ns_end == text + 1)
+	if (ns_end == text + 1 || 10 < ns_end - text)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	*pnext = ns_end;
@@ -177,6 +201,8 @@ static zbx_mock_error_t	ts_get_ns(const char *text, int *ns, const char **pnext)
 
 	while (0 <= pad--)
 		*ns *= 10;
+
+
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -425,7 +451,7 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 			tm.tm_sec = 0;
 		}
 
-		if (-1 == (sec = timegm(&tm)))
+		if (0 >  (sec = timegm(&tm)))
 			return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 		if (0 != (components & ZBX_MOCK_TIME_TZ))

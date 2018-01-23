@@ -13,5 +13,5 @@ calculate_item_nextcheck_LDADD = \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
-	
+
 calculate_item_nextcheck_CFLAGS = -I@top_srcdir@/tests
