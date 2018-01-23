@@ -996,12 +996,15 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "remove element [%d] Key:'%s:%s'", i, el->host, el->key);
+		if (NULL != el)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "remove element [%d] Key:'%s:%s'", i, el->host, el->key);
 
-		zbx_free(el->host);
-		zbx_free(el->key);
-		zbx_free(el->value);
-		zbx_free(el->source);
+			zbx_free(el->host);
+			zbx_free(el->key);
+			zbx_free(el->value);
+			zbx_free(el->source);
+		}
 
 		sz = (CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		memmove(&buffer.data[i], &buffer.data[i + 1], sz);
