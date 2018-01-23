@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ typedef struct
 	const char		*field;
 	const char		*tag;
 	zbx_json_type_t		jt;
-	char			*default_value;
+	const char		*default_value;
 }
 zbx_history_field_t;
 
@@ -404,7 +404,7 @@ static void	db_update_proxies_lastaccess(const zbx_vector_uint64_pair_t *proxy_d
 	size_t	sql_alloc = 256, sql_offset = 0;
 	int	i;
 
-	sql = zbx_malloc(NULL, sql_alloc);
+	sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 	DBbegin();
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -478,7 +478,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 	zbx_json_addobject(j, table->table);
 	zbx_json_addarray(j, "fields");
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select t.%s", table->recid);
 
@@ -649,7 +649,7 @@ static void	get_proxy_monitored_hosts(zbx_uint64_t proxy_hostid, zbx_vector_uint
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset;
 
-	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+	sql = (char *)zbx_malloc(sql, sql_alloc * sizeof(char));
 
 	result = DBselect(
 			"select hostid"
@@ -841,14 +841,14 @@ static void	remember_record(const ZBX_FIELD **fields, int fields_count, char **r
 
 static zbx_hash_t	id_offset_hash_func(const void *data)
 {
-	const zbx_id_offset_t *p = data;
+	const zbx_id_offset_t *p = (zbx_id_offset_t *)data;
 
 	return ZBX_DEFAULT_UINT64_HASH_ALGO(&p->id, sizeof(zbx_uint64_t), ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	id_offset_compare_func(const void *d1, const void *d2)
 {
-	const zbx_id_offset_t *p1 = d1, *p2 = d2;
+	const zbx_id_offset_t *p1 = (zbx_id_offset_t *)d1, *p2 = (zbx_id_offset_t *)d2;
 
 	return ZBX_DEFAULT_UINT64_COMPARE_FUNC(&p1->id, &p2->id);
 }
@@ -1075,7 +1075,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	}
 
 	/* all records will be stored in one large string */
-	recs = zbx_malloc(recs, recs_alloc);
+	recs = (char *)zbx_malloc(recs, recs_alloc);
 
 	/* hash set as index for fast access to records via IDs */
 	zbx_hashset_create(&h_id_offsets, 10000, id_offset_hash_func, id_offset_compare_func);
@@ -1083,7 +1083,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* a hash set as a list for finding records to be deleted */
 	zbx_hashset_create(&h_del, 10000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select ");
@@ -1187,7 +1187,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 				/* locate a copy of this record as found in database */
 				id_offset.id = recid;
-				if (NULL == (p_id_offset = zbx_hashset_search(&h_id_offsets, &id_offset)))
+				if (NULL == (p_id_offset = (zbx_id_offset_t *)zbx_hashset_search(&h_id_offsets, &id_offset)))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					goto clean2;
@@ -1224,7 +1224,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	/* copy IDs of records to be deleted from hash set to vector */
 	zbx_hashset_iter_reset(&h_del, &iter);
-	while (NULL != (p_recid = zbx_hashset_iter_next(&iter)))
+	while (NULL != (p_recid = (uint64_t *)zbx_hashset_iter_next(&iter)))
 		zbx_vector_uint64_append(del, *p_recid);
 	zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -1320,7 +1320,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_db_value_t	*value;
 
 			/* add the id field */
-			value = zbx_malloc(NULL, sizeof(zbx_db_value_t));
+			value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
 			value->ui64 = recid;
 			zbx_vector_ptr_append(&values, value);
 
@@ -1342,7 +1342,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					goto clean;
 				}
 
-				value = zbx_malloc(NULL, sizeof(zbx_db_value_t));
+				value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
 
 				switch (fields[f]->type)
 				{
@@ -1389,7 +1389,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					case ZBX_TYPE_TEXT:
 					case ZBX_TYPE_SHORTTEXT:
 					case ZBX_TYPE_LONGTEXT:
-						value = values.values[f];
+						value = (zbx_db_value_t *)values.values[f];
 						zbx_free(value->str);
 				}
 			}
@@ -1411,7 +1411,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			/* locate a copy of this record as found in database */
 			id_offset.id = recid;
-			if (NULL == (p_id_offset = zbx_hashset_search(&h_id_offsets, &id_offset)))
+			if (NULL == (p_id_offset = (zbx_id_offset_t *)zbx_hashset_search(&h_id_offsets, &id_offset)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				goto clean;
@@ -1583,7 +1583,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 			break;
 		}
 
-		table_ids = zbx_malloc(NULL, sizeof(table_ids_t));
+		table_ids = (table_ids_t *)zbx_malloc(NULL, sizeof(table_ids_t));
 		table_ids->table = table;
 		zbx_vector_uint64_create(&table_ids->ids);
 		zbx_vector_ptr_append(&tables, table_ids);
@@ -1596,13 +1596,13 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		char	*sql = NULL;
 		size_t	sql_alloc = 512, sql_offset = 0;
 
-		sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+		sql = (char *)zbx_malloc(sql, sql_alloc * sizeof(char));
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = tables.values_num - 1; 0 <= i; i--)
 		{
-			table_ids = tables.values[i];
+			table_ids = (table_ids_t *)tables.values[i];
 
 			if (0 == table_ids->ids.values_num)
 				continue;
@@ -1627,7 +1627,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 	for (i = 0; i < tables.values_num; i++)
 	{
-		table_ids = tables.values[i];
+		table_ids = (table_ids_t *)tables.values[i];
 
 		zbx_vector_uint64_destroy(&table_ids->ids);
 		zbx_free(table_ids);
@@ -1789,14 +1789,14 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 		char	*sql = NULL;
 		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 
-		sql = zbx_malloc(sql, sql_alloc);
+		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		DBbegin();
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < hosts.values_num; i++)
 		{
-			if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]))
+			if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, (zbx_host_availability_t *)hosts.values[i]))
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
@@ -2070,7 +2070,7 @@ static void	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == string_buffer)
-		string_buffer = zbx_malloc(string_buffer, string_buffer_alloc);
+		string_buffer = (char *)zbx_malloc(string_buffer, string_buffer_alloc);
 
 	*more = ZBX_PROXY_DATA_DONE;
 
@@ -2115,8 +2115,8 @@ try_again:
 		if (data_alloc == data_num)
 		{
 			data_alloc += 8;
-			data = zbx_realloc(data, sizeof(zbx_history_data_t) * data_alloc);
-			itemids = zbx_realloc(itemids, sizeof(zbx_uint64_t) * data_alloc);
+			data = (zbx_history_data_t *)zbx_realloc(data, sizeof(zbx_history_data_t) * data_alloc);
+			itemids = (zbx_uint64_t *)zbx_realloc(itemids, sizeof(zbx_uint64_t) * data_alloc);
 		}
 
 		ZBX_STR2UINT64(itemids[data_num], row[1]);
@@ -2142,7 +2142,7 @@ try_again:
 			while (string_buffer_alloc < string_buffer_offset + len1 + len2)
 				string_buffer_alloc += ZBX_KIBIBYTE;
 
-			string_buffer = zbx_realloc(string_buffer, string_buffer_alloc);
+			string_buffer = (char *)zbx_realloc(string_buffer, string_buffer_alloc);
 		}
 
 		hd->psource = string_buffer_offset;
@@ -2156,7 +2156,7 @@ try_again:
 	}
 	DBfree_result(result);
 
-	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
+	dc_items = (DC_ITEM *)zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
 	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
@@ -3264,7 +3264,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 	memset(&drule, 0, sizeof(drule));
 	*last_ip = '\0';
 
-	value = zbx_malloc(value, value_alloc);
+	value = (char *)zbx_malloc(value, value_alloc);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
@@ -3476,7 +3476,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&autoreg_hosts);
-	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
+	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
@@ -3719,8 +3719,8 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	items = zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
-	errcodes = zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
+	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
+	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
 
 	sec = zbx_time();
 

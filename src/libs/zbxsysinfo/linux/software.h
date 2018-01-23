@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ typedef struct
 	const char	*name;
 	const char	*test_cmd;	/* if this shell command has stdout output, package manager is present */
 	const char	*list_cmd;	/* this command lists the installed packages */
-	int		(*parser)();	/* for non-standard list (package per line), add a parser function */
+	int		(*parser)(const char *line, char *package, size_t max_package_len);	/* for non-standard list (package per line), add a parser function */
 }
 ZBX_PACKAGE_MANAGER;
 

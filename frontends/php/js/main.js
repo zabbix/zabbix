@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -393,24 +393,26 @@ var jqBlink = {
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function() {
-		var objects = jQuery('.blink');
+		// Right after page refresh, all blinking elements should be visible.
+		if (this.secondsSinceInit > 0) {
+			var objects = jQuery('.blink');
 
-		// maybe some of the objects should not blink any more?
-		objects = this.filterOutNonBlinking(objects);
+			// maybe some of the objects should not blink any more?
+			objects = this.filterOutNonBlinking(objects);
 
-		// changing visibility state
-		fun = this.shown ? 'removeClass' : 'addClass';
-		jQuery.each(objects, function() {
-			if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
-				jQuery(this)[fun](jQuery(this).data('toggleClass'));
-			}
-			else {
-				jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
-			}
-		})
+			// changing visibility state
+			jQuery.each(objects, function() {
+				if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
+					jQuery(this).toggleClass(jQuery(this).data('toggleClass'));
+				}
+				else {
+					jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
+				}
+			})
 
-		// reversing the value of indicator attribute
-		this.shown = !this.shown;
+			// reversing the value of indicator attribute
+			this.shown = !this.shown;
+		}
 
 		// I close my eyes only for a moment, and a moment's gone
 		this.secondsSinceInit += this.blinkInterval / 1000;
@@ -430,7 +432,13 @@ var jqBlink = {
 			if (typeof obj.data('timeToBlink') !== 'undefined') {
 				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
 
-				return shouldBlink || !that.shown;
+				if (shouldBlink || !that.shown) {
+					return true;
+				}
+				else {
+					obj.removeClass('blink');
+					return false;
+				}
 			}
 			else {
 				// no time-to-blink attribute, should blink forever

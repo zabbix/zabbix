@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -593,7 +593,7 @@
 				}
 				else {
 					// No errors, proceed with update.
-					overlayDialogueDestroy();
+					overlayDialogueDestroy('widgetConfg');
 
 					if (widget === null) {
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
@@ -712,7 +712,8 @@
 					'class': 'btn-alt',
 					'action': function() {}
 				}
-			]
+			],
+			'dialogueid': 'widgetConfg'
 		});
 
 		var overlay_dialogue = $('#overlay_dialogue');

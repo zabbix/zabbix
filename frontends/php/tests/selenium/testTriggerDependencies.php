@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,12 +35,12 @@ class testTriggerDependencies extends CWebTest {
 
 		$this->zbxTestClickLinkTextWait('{HOST.NAME} has just been restarted');
 		$this->zbxTestClickWait('tab_dependenciesTab');
-		$this->zbxTestClickWait('bnt1');
-		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('hostid'));
+
+		$this->zbxTestClick('bnt1');
+		$this->zbxTestLaunchOverlayDialog('Triggers');
+
 		$this->zbxTestDropdownSelectWait('hostid', 'Template OS FreeBSD');
 		$this->zbxTestClickLinkTextWait('/etc/passwd has been changed on Template OS FreeBSD');
-		$this->zbxTestWaitWindowClose();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
 		$this->zbxTestTextPresent('Template OS FreeBSD: /etc/passwd has been changed on {HOST.NAME}');
 		$this->zbxTestClickWait('update');

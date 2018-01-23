@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,9 +45,12 @@ if ($data['userid'] != 0) {
 $userFormList = new CFormList('userFormList');
 
 if (!$data['is_profile']) {
-	$userFormList->addRow(_('Alias'), (new CTextBox('alias', $this->data['alias']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+	$userFormList->addRow(
+		(new CLabel(_('Alias'), 'alias'))->setAsteriskMark(),
+		(new CTextBox('alias', $this->data['alias']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 		->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
 	);
 	$userFormList->addRow(_x('Name', 'user first name'),
@@ -71,16 +74,23 @@ if (!$this->data['is_profile']) {
 	}
 
 	$userFormList->addRow(
-		_('Groups'),
+		(new CLabel(_('Groups'), 'user_groups[]'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'user_groups[]',
 			'objectName' => 'usersGroups',
 			'data' => $user_groups,
 			'popup' => [
-				'parameters' => 'srctbl=usrgrp&dstfrm='.$userForm->getName().'&dstfld1=user_groups_&srcfld1=usrgrpid'.
-					'&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'usrgrp',
+					'dstfrm' => $userForm->getName(),
+					'dstfld1' => 'user_groups_',
+					'srcfld1' => 'usrgrpid',
+					'multiselect' => '1'
+				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	);
 }
 
@@ -88,12 +98,16 @@ if (!$this->data['is_profile']) {
 if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
 		$userFormList->addRow(
-			_('Password'),
-			(new CPassBox('password1', $this->data['password1']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			(new CLabel(_('Password'), 'password1'))->setAsteriskMark(),
+			(new CPassBox('password1', $this->data['password1']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
 		);
 		$userFormList->addRow(
-			_('Password (once again)'),
-			(new CPassBox('password2', $this->data['password2']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			(new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
+			(new CPassBox('password2', $this->data['password2']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
 		);
 
 		if (isset($this->data['change_password'])) {
@@ -182,12 +196,15 @@ if ($this->data['alias'] != ZBX_GUEST_USER) {
 }
 
 $userFormList
-	->addRow(_('Refresh'),
-		(new CTextBox('refresh', $data['refresh']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
+		(new CTextBox('refresh', $data['refresh']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Rows per page'),
+	->addRow((new CLabel(_('Rows per page'), 'rows_per_page'))->setAsteriskMark(),
 		(new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
 		(new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -218,14 +235,23 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
 		}
 
-		$mediaUrl = 'popup_media.php'.
-			'?dstfrm='.$userForm->getName().
-			'&media='.$id.
-			'&mediatypeid='.$media['mediatypeid'].
-			'&sendto='.urlencode($media['sendto']).
-			'&period='.$media['period'].
-			'&severity='.$media['severity'].
-			'&active='.$media['active'];
+		$popup_options = [
+			'dstfrm' => $userForm->getName(),
+			'media' => $id,
+			'mediatypeid' => $media['mediatypeid'],
+			'period' => $media['period'],
+			'severity' => $media['severity'],
+			'active' => $media['active']
+		];
+
+		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+			foreach ($media['sendto'] as $email) {
+				$popup_options['sendto_emails'][] = $email;
+			}
+		}
+		else {
+			$popup_options['sendto'] = $media['sendto'];
+		}
 
 		$mediaSeverity = [];
 
@@ -237,6 +263,13 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
 				->setHint($severityName.' ('.($mediaActive ? _('on') : _('off')).')', '', false)
 				->addClass($mediaActive ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY);
+		}
+
+		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+			$media['sendto'] = implode(', ', $media['sendto']);
+			if (strlen($media['sendto']) > 50) {
+				$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
+			}
 		}
 
 		$mediaTableInfo->addRow(
@@ -252,7 +285,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("'.$mediaUrl.'");'),
+							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).');'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$id.');')
@@ -266,7 +299,11 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 		(new CDiv([
 			$mediaTableInfo,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");')
+				->onClick('return PopUp("popup.media",'.
+					CJs::encodeJson([
+						'dstfrm' => $userForm->getName()
+					]).');'
+				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

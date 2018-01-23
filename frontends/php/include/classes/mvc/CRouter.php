@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,6 +117,14 @@ class CRouter {
 		'widget.trigover.view'	=> ['CControllerWidgetTrigOverView',	'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'		=> ['CControllerWidgetUrlView',			'layout.widget',		'monitoring.widget.url.view'],
 		'widget.plaintext.view'	=> ['CControllerWidgetPlainTextView',	'layout.widget',		'monitoring.widget.plaintext.view'],
+		'popup.generic'			=> ['CControllerPopupGeneric',			'layout.json',			'popup.generic'],
+		'popup.httpstep'		=> ['CControllerPopupHttpStep',			'layout.json',			'popup.httpstep'],
+		'popup.media'			=> ['CControllerPopupMedia',			'layout.json',			'popup.media'],
+		'popup.scriptexec'		=> ['CControllerPopupScriptExec',		'layout.json',			'popup.scriptexec'],
+		'popup.triggerexpr'		=> ['CControllerPopupTriggerExpr',		'layout.json',			'popup.triggerexpr'],
+		'popup.services'		=> ['CControllerPopupServices',			'layout.json',			'popup.services'],
+		'popup.testtriggerexpr'	=> ['CControllerPopupTestTriggerExpr',	'layout.json',			'popup.testtriggerexpr'],
+		'popup.triggerwizard'	=> ['CControllerPopupTriggerWizard',	'layout.json',			'popup.triggerwizard']
 	];
 
 	public function __construct($action) {

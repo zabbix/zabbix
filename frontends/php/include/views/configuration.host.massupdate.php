@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,8 +59,14 @@ $replaceGroups = (new CDiv(
 		'objectOptions' => ['editable' => true],
 		'data' => $hostGroupsToReplace,
 		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1'
+			'parameters' => [
+				'srctbl' => 'host_groups',
+				'dstfrm' => $hostView->getName(),
+				'dstfld1' => 'groups_',
+				'srcfld1' => 'groupid',
+				'writeonly' => '1',
+				'multiselect' => '1'
+			]
 		]
 	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 ))->setId('replaceGroups');
@@ -114,8 +120,14 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				'data' => $hostGroupsToAdd,
 				'addNew' => true,
 				'popup' => [
-					'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_'.
-						'&srcfld1=groupid&writeonly=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'host_groups',
+						'dstfrm' => $hostView->getName(),
+						'dstfld1' => 'new_groups_',
+						'srcfld1' => 'groupid',
+						'writeonly' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('newGroups')
@@ -133,8 +145,14 @@ else {
 				'objectOptions' => ['editable' => true],
 				'data' => $hostGroupsToAdd,
 				'popup' => [
-					'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_'.
-						'&srcfld1=groupid&writeonly=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'host_groups',
+						'dstfrm' => $hostView->getName(),
+						'dstfld1' => 'new_groups_',
+						'srcfld1' => 'groupid',
+						'writeonly' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('newGroups')
@@ -183,8 +201,15 @@ $newTemplateTable = (new CTable())
 			'objectName' => 'templates',
 			'data' => $data['linkedTemplates'],
 			'popup' => [
-				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostView->getName().
-					'&dstfld1=templates_&templated_hosts=1&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'templates',
+					'srcfld1' => 'hostid',
+					'srcfld2' => 'host',
+					'dstfrm' => $hostView->getName(),
+					'dstfld1' => 'templates_',
+					'templated_hosts' => '1',
+					'multiselect' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])

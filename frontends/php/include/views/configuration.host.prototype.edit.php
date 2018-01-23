@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,8 +68,9 @@ if (isset($hostPrototype['hostid'])) {
 $hostTB = (new CTextBox('host', $hostPrototype['host'], (bool) $hostPrototype['templateid']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 128)
+	->setAriaRequired()
 	->setAttribute('autofocus', 'autofocus');
-$hostList->addRow(_('Host name'), $hostTB);
+$hostList->addRow((new CLabel(_('Host name'), 'host'))->setAsteriskMark(), $hostTB);
 
 $name = ($hostPrototype['name'] != $hostPrototype['host']) ? $hostPrototype['name'] : '';
 $visiblenameTB = (new CTextBox('name', $name, (bool) $hostPrototype['templateid']))
@@ -191,7 +192,8 @@ foreach ($data['groups'] as $group) {
 		'name' => $group['name']
 	];
 }
-$groupList->addRow(_('Groups'),
+$groupList->addRow(
+	(new CLabel(_('Groups'), 'group_links[]'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'objectName' => 'hostGroup',
@@ -202,10 +204,19 @@ $groupList->addRow(_('Groups'),
 		'data' => $groups,
 		'disabled' => (bool) $hostPrototype['templateid'],
 		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
-				'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
+			'parameters' => [
+				'srctbl' => 'host_groups',
+				'dstfrm' => $frmHost->getName(),
+				'dstfld1' => 'group_links_',
+				'srcfld1' => 'groupid',
+				'writeonly' => '1',
+				'multiselect' => '1',
+				'normal_only' => '1'
+			]
 		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired()
 );
 
 // new group prototypes
@@ -301,8 +312,15 @@ else {
 				'objectName' => 'templates',
 				'ignored' => $ignoreTemplates,
 				'popup' => [
-					'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-						'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'templates',
+						'srcfld1' => 'hostid',
+						'srcfld2' => 'host',
+						'dstfrm' => $frmHost->getName(),
+						'dstfld1' => 'add_templates_',
+						'templated_hosts' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		])

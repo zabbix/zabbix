@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 					$name = $item['hosts'][0]['name'];
 					unset($items, $item['hosts']);
 
-					$last_value = Manager::History()->getLast([$item]);
+					$last_value = Manager::History()->getLastValues([$item]);
 
 					if ($last_value) {
 						$last_value = $last_value[$item['itemid']][0];

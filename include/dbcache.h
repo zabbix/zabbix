@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,6 +159,7 @@ typedef struct
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char			*units;
 	char			*delay;
+	int			history_sec;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
@@ -332,6 +333,15 @@ zbx_config_t;
 
 typedef struct
 {
+	zbx_uint64_t	hostid;
+	unsigned char	idx;
+	const char	*field_name;
+	char		*value;
+}
+zbx_inventory_value_t;
+
+typedef struct
+{
 	char	*tag;
 }
 zbx_corr_condition_tag_t;
@@ -405,6 +415,34 @@ typedef struct
 }
 zbx_correlation_rules_t;
 
+/* value_avg_t structure is used for item average value trend calculations. */
+/*                                                                          */
+/* For double values the average value is calculated on the fly with the    */
+/* following formula: avg = (dbl * count + value) / (count + 1) and stored  */
+/* into dbl member.                                                         */
+/* For uint64 values the item values are summed into ui64 member and the    */
+/* average value is calculated before flushing trends to database:          */
+/* avg = ui64 / count                                                       */
+typedef union
+{
+	double		dbl;
+	zbx_uint128_t	ui64;
+}
+value_avg_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	history_value_t	value_min;
+	value_avg_t	value_avg;
+	history_value_t	value_max;
+	int		clock;
+	int		num;
+	int		disable_from;
+	unsigned char	value_type;
+}
+ZBX_DC_TREND;
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -413,6 +451,20 @@ typedef struct
 	unsigned char		value_type;
 }
 zbx_item_history_value_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	history_value_t	value;
+	zbx_uint64_t	lastlogsize;
+	zbx_timespec_t	ts;
+	int		mtime;
+	unsigned char	value_type;
+	unsigned char	flags;		/* see ZBX_DC_FLAG_* */
+	unsigned char	state;
+	int		ttl;		/* time-to-live of the history value */
+}
+ZBX_DC_HISTORY;
 
 /* item queue data */
 typedef struct
@@ -562,6 +614,9 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff);
 
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
+
+void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
+int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2

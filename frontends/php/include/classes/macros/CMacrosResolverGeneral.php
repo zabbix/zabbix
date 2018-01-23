@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -699,13 +699,13 @@ class CMacrosResolverGeneral {
 					case 'ITEM.VALUE':
 						if ($events) {
 							$trigger = $triggers[$function['triggerid']];
-							$value = item_get_history($function, $trigger['clock'], $trigger['ns']);
+							$value = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
 							break;
 						}
 						// break; is not missing here
 
 					case 'ITEM.LASTVALUE':
-						$history = Manager::History()->getLast([$function], 1, ZBX_HISTORY_PERIOD);
+						$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
 
 						$value = array_key_exists($function['itemid'], $history)
 							? $history[$function['itemid']][0]['value']

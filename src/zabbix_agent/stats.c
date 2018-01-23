@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include "stats.h"
 #include "log.h"
 #include "zbxconf.h"
-#include "zbxself.h"
 
 #ifndef _WINDOWS
 #	include "diskdevices.h"
@@ -196,7 +195,7 @@ int	init_collector_data(char **error)
 		goto out;
 	}
 
-	if ((void *)(-1) == (collector = shmat(shm_id, NULL, 0)))
+	if ((void *)(-1) == (collector = (ZBX_COLLECTOR_DATA *)shmat(shm_id, NULL, 0)))
 	{
 		*error = zbx_dsprintf(*error, "cannot attach shared memory for collector: %s", zbx_strerror(errno));
 		goto out;
@@ -294,7 +293,7 @@ void	diskstat_shm_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if ((void *)(-1) == (diskdevices = shmat(collector->diskstat_shmid, NULL, 0)))
+	if ((void *)(-1) == (diskdevices = (ZBX_DISKDEVICES_DATA *)shmat(collector->diskstat_shmid, NULL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
 				zbx_strerror(errno));
@@ -338,7 +337,7 @@ void	diskstat_shm_reattach(void)
 			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 		}
 
-		if ((void *)(-1) == (diskdevices = shmat(collector->diskstat_shmid, NULL, 0)))
+		if ((void *)(-1) == (diskdevices = (ZBX_DISKDEVICES_DATA *)shmat(collector->diskstat_shmid, NULL, 0)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
 					zbx_strerror(errno));
@@ -389,7 +388,7 @@ void	diskstat_shm_extend(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if ((void *)(-1) == (new_diskdevices = shmat(new_shmid, NULL, 0)))
+	if ((void *)(-1) == (new_diskdevices = (ZBX_DISKDEVICES_DATA *)shmat(new_shmid, NULL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for extending disk statistics collector: %s",
 				zbx_strerror(errno));

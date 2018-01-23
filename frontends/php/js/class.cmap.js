@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -866,12 +866,21 @@ ZABBIX.apps.map = (function($) {
 
 				// application selection pop up
 				$('#application-select').click(function() {
-					var data = $('#elementNameHost').multiSelect('getData');
+					var data = $('#elementNameHost').multiSelect('getData'),
+						popup_options = {
+							srctbl: 'applications',
+							srcfld1: 'name',
+							dstfrm: 'selementForm',
+							dstfld1: 'application',
+							real_hosts: '1',
+							with_applications: '1'
+						};
 
-					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
-						+ '&with_applications=1&dstfrm=selementForm'
-						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : '')
-					);
+					if (data.length > 0 && $('#elementType').val() == '4') {
+						popup_options['hostid'] = data[0].id;
+					}
+
+					PopUp('popup.generic', popup_options);
 				});
 
 				// mass update form
@@ -2721,8 +2730,12 @@ ZABBIX.apps.map = (function($) {
 					editable: true
 				},
 				popup: {
-					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
-						'&srcfld1=hostid'
+					parameters: {
+						srctbl: 'hosts',
+						srcfld1: 'hostid',
+						dstfrm: 'selementForm',
+						dstfld1: 'elementNameHost'
+					}
 				}
 			});
 
@@ -2736,8 +2749,16 @@ ZABBIX.apps.map = (function($) {
 					real_hosts: true
 				},
 				popup: {
-					parameters: 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers' +
-						'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
+					parameters: {
+						srctbl: 'triggers',
+						srcfld1: 'triggerid',
+						dstfrm: 'selementForm',
+						dstfld1: 'elementNameTriggers',
+						with_triggers: '1',
+						real_hosts: '1',
+						multiselect: '1',
+						noempty: '1'
+					}
 				}
 			});
 
@@ -2751,8 +2772,12 @@ ZABBIX.apps.map = (function($) {
 					editable: true
 				},
 				popup: {
-					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
-						'&srcfld1=groupid'
+					parameters: {
+						srctbl: 'host_groups',
+						srcfld1: 'groupid',
+						dstfrm: 'selementForm',
+						dstfld1: 'elementNameHostGroup'
+					}
 				}
 			});
 
@@ -3892,7 +3917,9 @@ ZABBIX.apps.map = (function($) {
 				}
 			}
 
-			sysmap.updateImage();
+			if (sysmap.buffered_expand === false) {
+				sysmap.updateImage();
+			}
 		});
 
 		return sysmap;

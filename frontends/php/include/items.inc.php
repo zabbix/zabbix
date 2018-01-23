@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -917,7 +917,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	]);
 
 	// fetch latest values
-	$history = Manager::History()->getLast(zbx_toHash($db_items, 'itemid'), 1, ZBX_HISTORY_PERIOD);
+	$history = Manager::History()->getLastValues(zbx_toHash($db_items, 'itemid'), 1, ZBX_HISTORY_PERIOD);
 
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get([
@@ -934,6 +934,8 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	$items = [];
 	$item_counter = [];
 	$host_items = [];
+	$host_names = [];
+
 	foreach ($db_items as $db_item) {
 		$item_name = $db_item['name_expanded'];
 		$host_name = $db_item['hosts'][0]['name'];
@@ -1149,25 +1151,6 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 }
 
 /**
- * Clear item history and trends by provided item IDs.
- *
- * @param array $itemIds
- *
- * @return bool
- */
-function deleteHistoryByItemIds(array $itemIds) {
-	$result = DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemIds));
-	$result = ($result && DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds)));
-
-	return $result;
-}
-
-/**
  * Format history value.
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
@@ -1246,103 +1229,22 @@ function getItemFunctionalValue($item, $function, $parameter) {
 	}
 
 	// allowed item types for min, max and avg function
-	$historyTables = [ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint'];
+	$history_tables = [ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint'];
 
-	if (!isset($historyTables[$item['value_type']])) {
+	if (!array_key_exists($item['value_type'], $history_tables)) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 	else {
-		// search for item function data in DB corresponding history table
-		$result = DBselect(
-			'SELECT '.$function.'(value) AS value'.
-			' FROM '.$historyTables[$item['value_type']].
-			' WHERE clock>'.(time() - $parameter).
-			' AND itemid='.zbx_dbstr($item['itemid']).
-			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
-		);
-		if ($row = DBfetch($result)) {
-			return convert_units(['value' => $row['value'], 'units' => $item['units']]);
+		$result = Manager::History()->getAggregatedValue($item, $function, (time() - $parameter));
+
+		if ($result !== null) {
+			return convert_units(['value' => $result, 'units' => $item['units']]);
 		}
 		// no data in history
 		else {
 			return UNRESOLVED_MACRO_STRING;
 		}
 	}
-}
-
-/**
- * Returns the history value of the item at the given time. If no value exists at the given time, the function
- * will return the previous value.
- *
- * The $db_item parameter must have the value_type and itemid properties set.
- *
- * @param array $db_item
- * @param int $clock
- * @param int $ns
- *
- * @return string
- */
-function item_get_history($db_item, $clock, $ns) {
-	$value = null;
-
-	$table = CHistoryManager::getTableName($db_item['value_type']);
-
-	$sql = 'SELECT value'.
-			' FROM '.$table.
-			' WHERE itemid='.zbx_dbstr($db_item['itemid']).
-				' AND clock='.zbx_dbstr($clock).
-				' AND ns='.zbx_dbstr($ns);
-
-	if ($row = DBfetch(DBselect($sql, 1))) {
-		$value = $row['value'];
-	}
-	if ($value !== null) {
-		return $value;
-	}
-
-	$max_clock = 0;
-
-	$sql = 'SELECT DISTINCT clock'.
-			' FROM '.$table.
-			' WHERE itemid='.zbx_dbstr($db_item['itemid']).
-				' AND clock='.zbx_dbstr($clock).
-				' AND ns<'.zbx_dbstr($ns);
-	if (null != ($row = DBfetch(DBselect($sql)))) {
-		$max_clock = $row['clock'];
-	}
-	if ($max_clock == 0) {
-		$sql = 'SELECT MAX(clock) AS clock'.
-				' FROM '.$table.
-				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
-					' AND clock<'.zbx_dbstr($clock);
-		if (null != ($row = DBfetch(DBselect($sql)))) {
-			$max_clock = $row['clock'];
-		}
-	}
-	if ($max_clock == 0) {
-		return $value;
-	}
-
-	if ($clock == $max_clock) {
-		$sql = 'SELECT value'.
-				' FROM '.$table.
-				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
-					' AND clock='.zbx_dbstr($clock).
-					' AND ns<'.zbx_dbstr($ns);
-	}
-	else {
-		$sql = 'SELECT value'.
-				' FROM '.$table.
-				' WHERE itemid='.zbx_dbstr($db_item['itemid']).
-					' AND clock='.zbx_dbstr($max_clock).
-				' ORDER BY itemid,clock desc,ns desc';
-	}
-
-	if (null != ($row = DBfetch(DBselect($sql, 1)))) {
-		$value = $row['value'];
-	}
-
-	return $value;
 }
 
 /**

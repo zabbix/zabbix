@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -703,7 +703,18 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dbsync_compare_host_inventory(const ZBX_DC_HOST_INVENTORY *hi, const DB_ROW dbrow)
 {
-	return dbsync_compare_uchar(dbrow[1], hi->inventory_mode);
+	int	i;
+
+	if (SUCCEED != dbsync_compare_uchar(dbrow[1], hi->inventory_mode))
+		return FAIL;
+
+	for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
+	{
+		if (FAIL == dbsync_compare_str(dbrow[i + 2], hi->values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -727,15 +738,25 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
 	ZBX_DC_HOST_INVENTORY	*hi;
+	const char		*sql;
 
-	if (NULL == (result = DBselect(
-			"select hostid,inventory_mode"
-			" from host_inventory")))
-	{
+	sql = "select hostid,inventory_mode,type,type_full,name,alias,os,os_full,os_short,serialno_a,"
+			"serialno_b,tag,asset_tag,macaddress_a,macaddress_b,hardware,hardware_full,software,"
+			"software_full,software_app_a,software_app_b,software_app_c,software_app_d,"
+			"software_app_e,contact,location,location_lat,location_lon,notes,chassis,model,"
+			"hw_arch,vendor,contract_number,installer_name,deployment_status,url_a,url_b,"
+			"url_c,host_networks,host_netmask,host_router,oob_ip,oob_netmask,oob_router,"
+			"date_hw_purchase,date_hw_install,date_hw_expiry,date_hw_decomm,site_address_a,"
+			"site_address_b,site_address_c,site_city,site_state,site_country,site_zip,site_rack,"
+			"site_notes,poc_1_name,poc_1_email,poc_1_phone_a,poc_1_phone_b,poc_1_cell,"
+			"poc_1_screen,poc_1_notes,poc_2_name,poc_2_email,poc_2_phone_a,poc_2_phone_b,"
+			"poc_2_cell,poc_2_screen,poc_2_notes"
+			" from host_inventory";
+
+	if (NULL == (result = DBselect("%s", sql)))
 		return FAIL;
-	}
 
-	dbsync_prepare(sync, 2, NULL);
+	dbsync_prepare(sync, 72, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -1249,6 +1270,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
 	unsigned char		value_type, type, history, trends;
+	int			history_sec = 0;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
@@ -1276,11 +1298,22 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		return FAIL;
 
 	if (ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
+	{
 		history = (0 != dbsync_env.cache->config->hk.history);
+		history_sec = dbsync_env.cache->config->hk.history;
+	}
 	else
+	{
+		if (SUCCEED != is_time_suffix(dbrow[31], &history_sec, ZBX_LENGTH_UNLIMITED))
+			return FAIL;
+
 		history = zbx_time2bool(dbrow[31]);
+	}
 
 	if (item->history != history)
+		return FAIL;
+
+	if (history_sec != item->history_sec)
 		return FAIL;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[33], item->inventory_link))

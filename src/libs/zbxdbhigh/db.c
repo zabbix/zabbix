@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ void	DBdeinit(void)
  * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  ******************************************************************************/
-static void	DBtxn_operation(int (*txn_operation)())
+static void	DBtxn_operation(int (*txn_operation)(void))
 {
 	int	rc;
 
@@ -766,7 +766,7 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
 	/* An isolated value is represented as a sequence with length 1. */
-	seq_len = zbx_malloc(seq_len, num * sizeof(int));
+	seq_len = (int *)zbx_malloc(seq_len, num * sizeof(int));
 
 	for (i = 1, seq_num = 0, value = values[0], len = 1; i < num; i++)
 	{
@@ -1314,7 +1314,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 	zbx_autoreg_host_t	*autoreg_host;
 	int			i;
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_str_create(&hosts);
 
 	if (0 != proxy_hostid)
@@ -1400,7 +1400,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 	zbx_autoreg_host_t	*autoreg_host;
 	zbx_uint64_t		autoreg_hostid;
 	zbx_db_insert_t		db_insert;
-	int			i, new = 0, upd = 0;
+	int			i, create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_timespec_t		ts = {0, 0};
@@ -1417,20 +1417,20 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
 		if (0 == autoreg_host->autoreg_hostid)
-			new++;
+			create++;
 	}
 
-	if (0 != new)
+	if (0 != create)
 	{
-		autoreg_hostid = DBget_maxid_num("autoreg_host", new);
+		autoreg_hostid = DBget_maxid_num("autoreg_host", create);
 
 		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxy_hostid", "host", "listen_ip",
 				"listen_dns", "listen_port", "host_metadata", NULL);
 	}
 
-	if (0 != (upd = autoreg_hosts->values_num - new))
+	if (0 != (update = autoreg_hosts->values_num - create))
 	{
-		sql = zbx_malloc(sql, sql_alloc);
+		sql = (char *)zbx_malloc(sql, sql_alloc);
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -1474,13 +1474,13 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 	}
 
-	if (0 != new)
+	if (0 != create)
 	{
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	if (0 != upd)
+	if (0 != update)
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
@@ -1695,15 +1695,13 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
 	return buf[n];
 }
 
-#define ZBX_MAX_INVENTORY_FIELDS	70
-
 /******************************************************************************
  *                                                                            *
  * Function: DBget_inventory_field                                            *
  *                                                                            *
  * Purpose: get corresponding host_inventory field name                       *
  *                                                                            *
- * Parameters: inventory_link - [IN] field number; 1..ZBX_MAX_INVENTORY_FIELDS*
+ * Parameters: inventory_link - [IN] field link 1..HOST_INVENTORY_FIELD_COUNT *
  *                                                                            *
  * Return value: field name or NULL if value of inventory_link is incorrect   *
  *                                                                            *
@@ -1712,7 +1710,7 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
  ******************************************************************************/
 const char	*DBget_inventory_field(unsigned char inventory_link)
 {
-	static const char	*inventory_fields[ZBX_MAX_INVENTORY_FIELDS] =
+	static const char	*inventory_fields[HOST_INVENTORY_FIELD_COUNT] =
 	{
 		"type", "type_full", "name", "alias", "os", "os_full", "os_short", "serialno_a", "serialno_b", "tag",
 		"asset_tag", "macaddress_a", "macaddress_b", "hardware", "hardware_full", "software", "software_full",
@@ -1727,13 +1725,11 @@ const char	*DBget_inventory_field(unsigned char inventory_link)
 		"poc_2_screen", "poc_2_notes"
 	};
 
-	if (1 > inventory_link || inventory_link > ZBX_MAX_INVENTORY_FIELDS)
+	if (1 > inventory_link || inventory_link > HOST_INVENTORY_FIELD_COUNT)
 		return NULL;
 
 	return inventory_fields[inventory_link - 1];
 }
-
-#undef ZBX_MAX_INVENTORY_FIELDS
 
 int	DBtxn_status(void)
 {
@@ -1913,6 +1909,65 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	return ret;
 }
 
+#ifndef HAVE_SQLITE3
+int	DBindex_exists(const char *table_name, const char *index_name)
+{
+	char		*table_name_esc, *index_name_esc;
+#if defined(HAVE_POSTGRESQL)
+	char		*table_schema_esc;
+#endif
+	DB_RESULT	result;
+	int		ret;
+
+	table_name_esc = DBdyn_escape_string(table_name);
+	index_name_esc = DBdyn_escape_string(index_name);
+
+#if defined(HAVE_IBM_DB2)
+	result = DBselect(
+			"select 1"
+			" from syscat.indexes"
+			" where tabschema=user"
+				" and lower(tabname)='%s'"
+				" and lower(indname)='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_MYSQL)
+	result = DBselect(
+			"show index from %s"
+			" where key_name='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_ORACLE)
+	result = DBselect(
+			"select 1"
+			" from user_indexes"
+			" where lower(table_name)='%s'"
+				" and lower(index_name)='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+				"public" : CONFIG_DBSCHEMA);
+
+	result = DBselect(
+			"select 1"
+			" from pg_indexes"
+			" where tablename='%s'"
+				" and indexname='%s'"
+				" and schemaname='%s'",
+			table_name_esc, index_name_esc, table_schema_esc);
+
+	zbx_free(table_schema_esc);
+#endif
+
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	zbx_free(table_name_esc);
+	zbx_free(index_name_esc);
+
+	return ret;
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: DBselect_uint64                                                  *
@@ -1947,7 +2002,7 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 	int	i, ret = SUCCEED;
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -2197,11 +2252,11 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 		exit(EXIT_FAILURE);
 	}
 
-	row = zbx_malloc(NULL, self->fields.values_num * sizeof(zbx_db_value_t));
+	row = (zbx_db_value_t *)zbx_malloc(NULL, self->fields.values_num * sizeof(zbx_db_value_t));
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		ZBX_FIELD		*field = self->fields.values[i];
+		ZBX_FIELD		*field = (ZBX_FIELD *)self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
 
 		switch (field->type)
@@ -2254,9 +2309,9 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		field = self->fields.values[i];
+		field = (ZBX_FIELD *)self->fields.values[i];
 
-		value = zbx_malloc(NULL, sizeof(zbx_db_value_t));
+		value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
 
 		switch (field->type)
 		{
@@ -2343,9 +2398,9 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	}
 
 #ifndef HAVE_ORACLE
-	sql = zbx_malloc(NULL, sql_alloc);
+	sql = (char *)zbx_malloc(NULL, sql_alloc);
 #endif
-	sql_command = zbx_malloc(NULL, sql_command_alloc);
+	sql_command = (char *)zbx_malloc(NULL, sql_command_alloc);
 
 	/* create sql insert statement command */
 
@@ -2467,7 +2522,7 @@ retry_oracle:
 		{
 			const zbx_db_value_t	*value = &values[j];
 
-			field = self->fields.values[j];
+			field = (const ZBX_FIELD *)self->fields.values[j];
 
 			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, delim[0 == j]);
 
@@ -2558,7 +2613,7 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		ZBX_FIELD	*field = self->fields.values[i];
+		ZBX_FIELD	*field = (ZBX_FIELD *)self->fields.values[i];
 
 		if (ZBX_TYPE_ID == field->type && 0 == strcmp(field_name, field->name))
 		{

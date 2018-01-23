@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -513,8 +513,15 @@ if ($this->data['displayApplications']) {
 			'objectOptions' => ['hostid' => $this->data['hostid']],
 			'data' => $appToReplace,
 			'popup' => [
-				'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
-					'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
+				'parameters' => [
+					'srctbl' => 'applications',
+					'dstfrm' => $itemForm->getName(),
+					'dstfld1' => 'applications_',
+					'srcfld1' => 'applicationid',
+					'multiselect' => '1',
+					'noempty' => '1',
+					'hostid' => $this->data['hostid']
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	))->setId('replaceApp');
@@ -564,8 +571,15 @@ if ($this->data['displayApplications']) {
 			'data' => $appToAdd,
 			'addNew' => true,
 			'popup' => [
-				'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
-					'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
+				'parameters' => [
+					'srctbl' => 'applications',
+					'dstfrm' => $itemForm->getName(),
+					'dstfld1' => 'new_applications_',
+					'srcfld1' => 'applicationid',
+					'multiselect' => '1',
+					'noempty' => '1',
+					'hostid' => $this->data['hostid']
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	))->setId('newApp');
@@ -585,9 +599,18 @@ $master_item = (new CDiv([
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.php?srctbl=items&srcfld1=itemid&dstfld1=master_itemid&dstfrm='.
-			$itemForm->getName().'&srcfld2=master_itemname&dstfld2=master_itemname&only_hostid='.$data['hostid'].
-			'&with_webitems=0&'.http_build_query(['excludeids' => $data['itemids']]).'");'
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'master_itemname',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'dstfld2' => 'master_itemname',
+				'only_hostid' => $data['hostid'],
+				'with_webitems' => '0',
+				'excludeids' => $data['itemids']
+			]).');'
 		)
 ]))->setId('master_item');
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,12 +104,12 @@ class testInheritanceWeb extends CWebTest {
 
 		$this->zbxTestClick('tab_stepTab');
 		foreach ($data['addStep'] as $step) {
-			$this->zbxTestLaunchPopup('add_step');
-			$this->zbxTestInputTypeWait('name', $step['name']);
-			$this->zbxTestInputType('url', $step['url']);
-			$this->zbxTestClick('add');
+			$this->zbxTestClick('add_step');
+			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $step['name']);
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $step['url']);
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 			$this->zbxTestTextNotPresent('Page received incorrect data');
-			$this->zbxTestWaitWindowClose();
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name_0'));
 			$this->zbxTestTextPresent($step['name']);
 		}

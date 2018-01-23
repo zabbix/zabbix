@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,14 +87,36 @@ $dependenciesDiv = (new CDiv([
 	$dependenciesTable,
 	new CHorList([
 		(new CButton('add_dep_trigger', _('Add')))
-			->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'&with_triggers=1&normal_only=1&noempty=1");')
+			->onClick('return PopUp("popup.generic",'.
+				CJs::encodeJson([
+					'srctbl' => 'triggers',
+					'srcfld1' => 'triggerid',
+					'dstfrm' => 'massupdate',
+					'dstfld1' => 'new_dependency',
+					'dstact' => 'add_dependency',
+					'reference' => 'deptrigger',
+					'multiselect' => '1',
+					'objname' => 'triggers',
+					'with_triggers' => '1',
+					'normal_only' => '1',
+					'noempty' => '1'
+				]).');'
+			)
 			->addClass(ZBX_STYLE_BTN_LINK),
 		(new CButton('add_dep_trigger_prototype', _('Add prototype')))
-			->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-				'&dstfld1=new_dependency&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.
-				url_param('parent_discoveryid').'&multiselect=1");')
+			->onClick('return PopUp("popup.generic",'.
+				CJs::encodeJson([
+					'srctbl' => 'trigger_prototypes',
+					'srcfld1' => 'triggerid',
+					'dstfrm' => 'massupdate',
+					'dstfld1' => 'new_dependency',
+					'dstact' => 'add_dependency',
+					'reference' => 'deptrigger',
+					'multiselect' => '1',
+					'objname' => 'triggers',
+					'parent_discoveryid' => $data['parent_discoveryid']
+				]).');'
+			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	])
 ]))

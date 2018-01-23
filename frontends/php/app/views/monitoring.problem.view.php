@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,8 +94,13 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hostGroup',
 				'data' => $data['filter']['groups'],
 				'popup' => [
-					'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=filter_groupids_'.
-						'&srcfld1=groupid&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'host_groups',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_groupids_',
+						'srcfld1' => 'groupid',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -105,8 +110,14 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
-					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=filter_hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'hosts',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_hostids_',
+						'srcfld1' => 'hostid',
+						'real_hosts' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -115,16 +126,15 @@ if ($data['action'] == 'problem.view') {
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
-				->onClick('return PopUp("'.
-					(new CUrl('popup.php'))
-						->setArgument('srctbl', 'applications')
-						->setArgument('srcfld1', 'name')
-						->setArgument('dstfrm', 'zbx_filter')
-						->setArgument('dstfld1', 'filter_application')
-						->setArgument('with_applications', '1')
-						->setArgument('real_hosts', '1')
-						->getUrl().
-					'");'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_application',
+						'with_applications' => '1',
+						'real_hosts' => '1'
+					]).');'
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])
@@ -137,8 +147,16 @@ if ($data['action'] == 'problem.view') {
 				],
 				'data' => $data['filter']['triggers'],
 				'popup' => [
-					'parameters' => 'srctbl=triggers&srcfld1=triggerid&dstfrm=zbx_filter&dstfld1=filter_triggerids_'.
-						'&monitored_hosts=1&with_monitored_triggers=1&multiselect=1&noempty=1'
+					'parameters' => [
+						'srctbl' => 'triggers',
+						'srcfld1' => 'triggerid',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_triggerids_',
+						'monitored_hosts' => '1',
+						'with_monitored_triggers' => '1',
+						'multiselect' => '1',
+						'noempty' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)

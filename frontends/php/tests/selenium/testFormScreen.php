@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,10 +138,9 @@ class testFormScreen extends CWebTest {
 		$vsize = $this->zbxTestGetValue("//input[@id='vsize']");
 
 		if (isset($data['owner'])) {
-			$this->zbxTestClickXpathWait("//button[text()='Select']");
-			$this->zbxTestSwitchToWindow('zbx_popup');
+			$this->zbxTestClickButtonMultiselect('userid');
+			$this->zbxTestLaunchOverlayDialog('Users');
 			$this->zbxTestClickLinkTextWait($data['owner']);
-			$this->webDriver->switchTo()->window('');
 		}
 
 		if (isset($data['remove_owner'])) {

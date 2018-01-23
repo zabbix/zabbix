@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,13 @@ $multiselect_data = [
 	'objectName' => 'users',
 	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 	'popup' => [
-		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+		'parameters' => [
+			'srctbl' => 'users',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid',
+			'srcfld1' => 'userid',
+			'srcfld2' => 'fullname'
+		]
 	]
 ];
 
@@ -75,8 +81,11 @@ if ($slideshow_ownerid === '' || $slideshow_ownerid && array_key_exists($slidesh
 	$multiselect_data['data'] = $owner_data;
 
 	// Append multiselect to slide show tab.
-	$slideshow_tab->addRow(_('Owner'),
-		(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	$slideshow_tab->addRow(
+		(new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
+		(new CMultiSelect($multiselect_data))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 }
 else {
@@ -100,13 +109,18 @@ else {
 }
 
 $slideshow_tab
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['slideshow']['name']))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Default delay'),
-		(new CTextBox('delay', $data['slideshow']['delay']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	->addRow(
+		(new CLabel(_('Default delay'), 'delay'))->setAsteriskMark(),
+		(new CTextBox('delay', $data['slideshow']['delay']))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	);
 
 // append slide table
@@ -150,15 +164,22 @@ foreach ($data['slideshow']['slides'] as $key => $slides) {
 
 $addButtonColumn = (new CCol(
 		(new CButton('add', _('Add')))
-			->onClick('return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$form->getName().
-					'&multiselect=1")')
+			->onClick('return PopUp("popup.generic",'.
+				CJs::encodeJson([
+					'srctbl' => 'screens',
+					'srcfld1' => 'screenid',
+					'dstfrm' => $form->getName(),
+					'multiselect' => '1'
+				]).');'
+			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	))->setColSpan(5);
 
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
-$slideshow_tab->addRow(_('Slides'),
+$slideshow_tab->addRow(
+	(new CLabel(_('Slides'), $slideTable->getId()))->setAsteriskMark(),
 	(new CDiv($slideTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -173,8 +194,14 @@ $user_group_shares_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 $add_user_group_btn = ([(new CButton(null, _('Add')))
-	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
-		'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'
+	->onClick('return PopUp("popup.generic",'.
+		CJs::encodeJson([
+			'srctbl' => 'usrgrp',
+			'srcfld1' => 'usrgrpid',
+			'srcfld2' => 'name',
+			'dstfrm' => $form->getName(),
+			'multiselect' => '1'
+		]).');'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -205,8 +232,14 @@ $user_shares_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 $add_user_btn = ([(new CButton(null, _('Add')))
-	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
-		'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'
+	->onClick('return PopUp("popup.generic",'.
+		CJs::encodeJson([
+			'srctbl' => 'users',
+			'srcfld1' => 'userid',
+			'srcfld2' => 'fullname',
+			'dstfrm' => $form->getName(),
+			'multiselect' => '1'
+		]).');'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 

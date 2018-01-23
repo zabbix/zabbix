@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,15 +73,18 @@ $frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
 $templateList = (new CFormList('hostlist'))
-	->addRow(_('Template name'), (new CTextBox('template_name', $host, false, 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+	->addRow(
+		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
+		(new CTextBox('template_name', $host, false, 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-$groupsTB = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
+$groups_tweenbox = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
 
 if ($data['form'] === 'update') {
 	// Add existing template groups to list and, depending on permissions show name as enabled or disabled.
@@ -90,7 +93,7 @@ if ($data['form'] === 'update') {
 
 	foreach ($data['groupsAll'] as $group) {
 		if (isset($data['groupIds'][$group['groupid']])) {
-			$groupsTB->addItem($group['groupid'], $group['name'], true,
+			$groups_tweenbox->addItem($group['groupid'], $group['name'], true,
 				isset($data['groupsAllowed'][$group['groupid']])
 			);
 			$groupsInList[] = $group['groupid'];
@@ -100,7 +103,7 @@ if ($data['form'] === 'update') {
 	// Add other host groups that user has permissions to, if not yet added to list.
 	foreach ($data['groupsAllowed'] as $group) {
 		if (!in_array($group['groupid'], $groupsInList)) {
-			$groupsTB->addItem($group['groupid'], $group['name']);
+			$groups_tweenbox->addItem($group['groupid'], $group['name']);
 		}
 	}
 }
@@ -111,11 +114,13 @@ else {
 	 */
 
 	foreach ($data['groupsAllowed'] as $group) {
-		$groupsTB->addItem($group['groupid'], $group['name']);
+		$groups_tweenbox->addItem($group['groupid'], $group['name']);
 	}
 }
 
-$templateList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
+$templateList->addRow((new CLabel(_('Groups'), 'groups_tweenbox'))->setAsteriskMark(),
+	$groups_tweenbox->get(_('In groups'), _('Other groups'))
+);
 
 // FORM ITEM : new group text box [  ]
 $new_group = (new CTextBox('newgroup', $newgroup))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
@@ -455,8 +460,16 @@ $newTemplateTable = (new CTable())
 			'objectName' => 'templates',
 			'ignored' => $ignoredTemplates,
 			'popup' => [
-				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1&templateid='.$data['templateid']
+				'parameters' => [
+					'srctbl' => 'templates',
+					'srcfld1' => 'hostid',
+					'srcfld2' => 'host',
+					'dstfrm' => $frmHost->getName(),
+					'dstfld1' => 'add_templates_',
+					'templated_hosts' => '1',
+					'multiselect' => '1',
+					'templateid' => $data['templateid']
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])

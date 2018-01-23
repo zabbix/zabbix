@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,10 +158,11 @@ class CPieGraphDraw extends CGraphDraw {
 			}
 		}
 		if ($lastValueItems) {
-			$history = Manager::History()->getLast($lastValueItems);
+			$history = Manager::History()->getLastValues($lastValueItems);
 		}
 
 		$config = select_config();
+		$items = [];
 
 		for ($i = 0; $i < $this->num; $i++) {
 			$item = get_item_by_itemid($this->items[$i]['itemid']);
@@ -213,40 +214,37 @@ class CPieGraphDraw extends CGraphDraw {
 				}
 			}
 
-			if ($item['trends'] == 0 || ($item['history'] * SEC_PER_DAY > time() - ($from_time + $this->period / 2))) {
-				$this->dataFrom = 'history';
-
-				$sql_select = 'AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';
-				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
-			}
-			else {
-				$this->dataFrom = 'trends';
-
-				$sql_select = 'AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
-				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
-			}
-
 			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
 				? $history[$item['itemid']][0]['value'] : null;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 
-			$result = DBselect(
-				'SELECT itemid,'.$sql_select.',MAX(clock) AS clock'.
-				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
-					' AND clock>='.zbx_dbstr($from_time).
-					' AND clock<='.zbx_dbstr($to_time).
-				' GROUP BY itemid'
-			);
-			while ($row = DBfetch($result)) {
-				$this->data[$this->items[$i]['itemid']][$type]['min'] = $row['min'];
-				$this->data[$this->items[$i]['itemid']][$type]['max'] = $row['max'];
-				$this->data[$this->items[$i]['itemid']][$type]['avg'] = $row['avg'];
-				$this->data[$this->items[$i]['itemid']][$type]['clock'] = $row['clock'];
+			$item['source'] = ($item['trends'] == 0
+					|| ($item['history'] * SEC_PER_DAY > time() - ($from_time + $this->period / 2)))
+					? 'history' : 'trends';
+			$items[] = $item;
+		}
+
+		$results = Manager::History()->getGraphAggregation($items, $from_time, $to_time);
+		$i = 0;
+
+		foreach ($items as $item) {
+			if (array_key_exists($item['itemid'], $results)) {
+				$result = $results[$item['itemid']];
+				$this->dataFrom = $result['source'];
+
+				foreach ($result['data'] as $row) {
+					$this->data[$item['itemid']][$type]['min'] = $row['min'];
+					$this->data[$item['itemid']][$type]['max'] = $row['max'];
+					$this->data[$item['itemid']][$type]['avg'] = $row['avg'];
+					$this->data[$item['itemid']][$type]['clock'] = $row['clock'];
+				}
+				unset($result);
 			}
-			unset($row);
+			else {
+				$this->dataFrom = $item['source'];
+			}
 
 			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
@@ -263,9 +261,9 @@ class CPieGraphDraw extends CGraphDraw {
 					$fncName = 'avg';
 			}
 
-			$item_value = empty($this->data[$this->items[$i]['itemid']][$type][$fncName])
+			$item_value = empty($this->data[$item['itemid']][$type][$fncName])
 				? 0
-				: abs($this->data[$this->items[$i]['itemid']][$type][$fncName]);
+				: abs($this->data[$item['itemid']][$type][$fncName]);
 
 			if ($type == GRAPH_ITEM_SUM) {
 				$this->background = $i;
@@ -276,9 +274,10 @@ class CPieGraphDraw extends CGraphDraw {
 
 			$convertedUnit = strlen(convert_units([
 				'value' => $item_value,
-				'units' => $this->items[$i]['units']
+				'units' => $item['units']
 			]));
 			$strvaluelength = max($strvaluelength, $convertedUnit);
+			$i++;
 		}
 
 		if (isset($graph_sum)) {

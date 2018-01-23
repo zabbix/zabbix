@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -588,21 +588,19 @@ class testFormGraphPrototype extends CWebTest {
 		}
 
 		if (!isset($data['form'])) {
-			$this->zbxTestLaunchPopup('add_item');
+			$this->zbxTestClick('add_item');
+			$this->zbxTestLaunchOverlayDialog('Items');
+
 			if (isset($data['host'])) {
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
-				$this->zbxTestAssertElementPresentXpath("//a[text()='".$this->itemSimple."']");
-				$this->zbxTestClickLinkTextWait($this->itemSimple);
+				$this->zbxTestClickLinkText($this->itemSimple);
 			}
 
 			if (isset($data['template'])) {
-				$this->zbxTestClickLinkTextWait($this->itemInheritance);
+				$this->zbxTestClickLinkText($this->itemInheritance);
 			}
-
-			$this->zbxTestWaitWindowClose();
 		}
 
 		if (isset($data['templatedHost'])) {
@@ -613,16 +611,16 @@ class testFormGraphPrototype extends CWebTest {
 		}
 
 		if (!isset($data['form'])) {
-			$this->zbxTestLaunchPopup('add_protoitem');
+			$this->zbxTestClick('add_protoitem');
+			$this->zbxTestLaunchOverlayDialog('Item prototypes');
+
 			if (isset($data['host'])) {
-				$this->zbxTestClickLinkTextWait($this->item);
+				$this->zbxTestClickLinkText($this->item);
 			}
 
 			if (isset($data['template'])) {
-				$this->zbxTestClickLinkTextWait($this->itemDiscovery);
+				$this->zbxTestClickLinkText($this->itemDiscovery);
 			}
-
-			$this->zbxTestWaitWindowClose();
 		}
 
 		switch($ymin_type) {
@@ -1078,17 +1076,17 @@ class testFormGraphPrototype extends CWebTest {
 		}
 
 		if (!isset($data['noItem'])) {
-			$this->zbxTestLaunchPopup('add_protoitem');
+			$this->zbxTestClick('add_protoitem');
+			$this->zbxTestLaunchOverlayDialog('Item prototypes');
 
-			$this->zbxTestClickLinkTextWait($this->item);
-			$this->zbxTestWaitWindowClose();
+			$this->zbxTestClickLinkText($this->item);
 
-			$this->zbxTestLaunchPopup('add_item');
+			$this->zbxTestClick('add_item');
+			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('groupid'));
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-			$this->zbxTestClickLinkAndWaitWindowClose($this->itemSimple);
+			$this->zbxTestClickLinkText($this->itemSimple);
 
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');
@@ -1097,18 +1095,15 @@ class testFormGraphPrototype extends CWebTest {
 				$this->zbxTestClickWait('items_0_remove');
 				$this->zbxTestTextNotPresent($this->itemSimple);
 
-				$this->zbxTestClickWait('add_item');
-				$this->zbxTestSwitchToNewWindow();
-
-				$this->zbxTestWaitUntilElementPresent(webDriverBy::id('groupid'));
+				$this->zbxTestClick('add_item');
+				$this->zbxTestLaunchOverlayDialog('Items');
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-				$this->zbxTestClickLinkAndWaitWindowClose($this->itemSimple);
+				$this->zbxTestClickLinkText($this->itemSimple);
 
-				$this->zbxTestClickWait('add_protoitem');
-				$this->zbxTestSwitchToNewWindow();
-				$this->zbxTestClickLinkTextWait($this->item);
-				$this->zbxTestWaitWindowClose();
+				$this->zbxTestClick('add_protoitem');
+				$this->zbxTestLaunchOverlayDialog('Item prototypes');
+				$this->zbxTestClickLinkText($this->item);
 			}
 		}
 		if (isset($data['width'])) {
@@ -1138,9 +1133,9 @@ class testFormGraphPrototype extends CWebTest {
 					break;
 				case 'Item':
 					if (!isset($data['noAxisItem'])) {
-						$this->zbxTestLaunchPopup('yaxis_min_prototype', 'zbx_popup_item');
-						$this->zbxTestClickLinkTextWait($this->item);
-						$this->zbxTestWaitWindowClose();
+						$this->zbxTestClick('yaxis_min_prototype');
+						$this->zbxTestLaunchOverlayDialog('Item prototypes');
+						$this->zbxTestClickLinkText($this->item);
 					}
 					break;
 				case 'Calculated':
@@ -1153,9 +1148,9 @@ class testFormGraphPrototype extends CWebTest {
 					break;
 				case 'Item':
 					if (!isset($data['noAxisItem'])) {
-						$this->zbxTestLaunchPopup('yaxis_max_prototype', 'zbx_popup_item');
-						$this->zbxTestClickLinkTextWait($this->item);
-						$this->zbxTestWaitWindowClose();
+						$this->zbxTestClick('yaxis_max_prototype');
+						$this->zbxTestLaunchOverlayDialog('Item prototypes');
+						$this->zbxTestClickLinkText($this->item);
 					}
 					break;
 				case 'Calculated':

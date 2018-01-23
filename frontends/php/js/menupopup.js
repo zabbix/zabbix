@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -723,15 +723,11 @@ function getMenuPopupTriggerLog(options) {
 	items[items.length] = {
 		label: t('Create trigger'),
 		clickCallback: function() {
-			openWinCentered(
-				'tr_logform.php?sform=1&itemid=' + options.itemid,
-				'TriggerLog',
-				1000,
-				700,
-				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
-			);
-
 			jQuery(this).closest('.action-menu').fadeOut(100);
+
+			return PopUp('popup.triggerwizard', {
+				itemid: options.itemid
+			});
 		}
 	};
 
@@ -747,15 +743,12 @@ function getMenuPopupTriggerLog(options) {
 			triggers[triggers.length] = {
 				label: trigger.name,
 				clickCallback: function() {
-					openWinCentered(
-						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
-						'TriggerLog',
-						1000,
-						700,
-						'titlebar=no, resizable=yes, scrollbars=yes'
-					);
-
 					jQuery(this).closest('.action-menu').fadeOut(100);
+
+					return PopUp('popup.triggerwizard', {
+						itemid: options.itemid,
+						triggerid: trigger.id
+					});
 				}
 			};
 		});
@@ -931,8 +924,16 @@ jQuery(function($) {
 
 		var opener = $(this),
 			id = opener.data('menu-popup-id'),
+			target,
 			menuPopup = $('#' + id),
 			mapContainer = null;
+
+		if (IE) {
+			target = opener.closest('svg').length > 0 ? event : event.target;
+		}
+		else {
+			target = event.originalEvent.detail !== 0 ? event : event.target;
+		}
 
 		if (menuPopup.length > 0) {
 			var display = menuPopup.css('display');
@@ -948,7 +949,7 @@ jQuery(function($) {
 			}
 
 			menuPopup.position({
-				of: event,
+				of: target,
 				my: 'left top',
 				at: 'left bottom'
 			});
@@ -1022,7 +1023,7 @@ jQuery(function($) {
 					clearTimeout(window.menuPopupTimeoutHandler);
 				})
 				.position({
-					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
+					of: (opener.prop('tagName') === 'AREA') ? mapContainer : target,
 					my: 'left top',
 					at: 'left bottom'
 				});

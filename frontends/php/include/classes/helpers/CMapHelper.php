@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,7 +82,8 @@ class CMapHelper {
 					'font_size' => 11,
 					'font_color' => 'FF0000',
 					'text' => _('No permissions to referred object or it does not exist!')
-				]]
+				]],
+				'aria_label' => ''
 			];
 		}
 		else {
@@ -110,6 +111,7 @@ class CMapHelper {
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
+			'aria_label' => $map['aria_label'],
 			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
 		];
 	}
@@ -193,6 +195,10 @@ class CMapHelper {
 		$actions = getActionsBySysmap($sysmap, $options);
 		$linktrigger_info = getMapLinktriggerInfo($sysmap, $options);
 
+		$problems_total = 0;
+		$status_problems = [];
+		$status_other = [];
+
 		foreach ($sysmap['selements'] as $id => &$element) {
 			$icon = null;
 
@@ -204,6 +210,32 @@ class CMapHelper {
 
 			$element['icon'] = $icon;
 			if ($element['permission'] >= PERM_READ) {
+				$label = str_replace(['.', ','], ' ', CMacrosResolverHelper::resolveMapLabelMacrosAll($element));
+
+				if ($map_info[$id]['problems_total'] > 0) {
+					$problems_total += $map_info[$id]['problems_total'];
+					$problem_desc = str_replace(['.', ','], ' ', $map_info[$id]['aria_label']);
+					$status_problems[] = sprintf('%1$s, %2$s, %3$s, %4$s. ',
+						sysmap_element_types($element['elementtype']), _('Status problem'), $label, $problem_desc
+					);
+				}
+				else {
+					$element_status = _('Status ok');
+
+					if (array_key_exists('info', $map_info[$id])
+							&& array_key_exists('maintenance', $map_info[$id]['info'])) {
+						$element_status = _('Status maintenance');
+					}
+					elseif (array_key_exists('info', $map_info[$id])
+							&& array_key_exists('status', $map_info[$id]['info'])) {
+						$element_status = _('Status disabled');
+					}
+
+					$status_other[] = sprintf('%1$s, %2$s, %3$s. ', sysmap_element_types($element['elementtype']),
+						$element_status, $label
+					);
+				}
+
 				$element['highlight'] = $highlights[$id];
 				$element['actions'] = $actions[$id];
 				$element['label'] = $labels[$id];
@@ -219,6 +251,14 @@ class CMapHelper {
 			}
 		}
 		unset($element);
+
+		$sysmap['aria_label'] = str_replace(['.', ','], ' ', $sysmap['name']).', '.
+			_n('%1$s of %2$s element in problem state', '%1$s of %2$s elements in problem state',
+				count($status_problems), count($sysmap['selements'])).
+			', '.
+			_n('%1$s problem in total', '%1$s problems in total', $problems_total).
+			'. '.
+			implode('', array_merge($status_problems, $status_other));
 
 		foreach ($sysmap['shapes'] as &$shape) {
 			if (array_key_exists('text', $shape)) {

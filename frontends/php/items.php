@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,6 +166,7 @@ $fields = [
 	'filter_state' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]), null],
 	'filter_templated_items' => [T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
 	'filter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
+	'filter_discovery' =>		[T_ZBX_INT, O_OPT, null,	IN([-1, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null],
 	'filter_ipmi_sensor' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// subfilters
 	'subfilter_set' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -176,6 +177,7 @@ $fields = [
 	'subfilter_state' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_templated_items' => [T_ZBX_INT, O_OPT, null, null,		null],
 	'subfilter_with_triggers' => [T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_discovery' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_hosts' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_interval' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_history' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -195,7 +197,7 @@ unset($_REQUEST[$paramsFieldName]);
 
 $subfiltersList = ['subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
 	'subfilter_state', 'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-	'subfilter_history', 'subfilter_trends'
+	'subfilter_history', 'subfilter_trends', 'subfilter_discovery'
 ];
 
 /*
@@ -306,6 +308,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.items.filter_state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_templated_items', getRequest('filter_templated_items', -1), PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_with_triggers', getRequest('filter_with_triggers', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_discovery', getRequest('filter_discovery', -1), PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_ipmi_sensor', getRequest('filter_ipmi_sensor', ''), PROFILE_TYPE_STR);
 
 	// subfilters
@@ -354,6 +357,7 @@ $_REQUEST['filter_trends'] = CProfile::get('web.items.filter_trends', '');
 $_REQUEST['filter_status'] = CProfile::get('web.items.filter_status', -1);
 $_REQUEST['filter_state'] = CProfile::get('web.items.filter_state', -1);
 $_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
+$_REQUEST['filter_discovery'] = CProfile::get('web.items.filter_discovery', -1);
 $_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
 $_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor', '');
 
@@ -748,7 +752,7 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	if ($items) {
 		DBstart();
 
-		$result = deleteHistoryByItemIds([$itemId]);
+		$result = Manager::History()->deleteHistory([$itemId]);
 
 		if ($result) {
 			$item = reset($items);
@@ -1096,7 +1100,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 	if ($items) {
 		DBstart();
 
-		$result = deleteHistoryByItemIds($itemIds);
+		$result = Manager::History()->deleteHistory($itemIds);
 
 		if ($result) {
 			foreach ($items as $item) {
@@ -1542,6 +1546,10 @@ else {
 			&& $_REQUEST['filter_templated_items'] != -1) {
 		$options['inherited'] = $_REQUEST['filter_templated_items'];
 	}
+	if (isset($_REQUEST['filter_discovery']) && !zbx_empty($_REQUEST['filter_discovery'])
+			&& $_REQUEST['filter_discovery'] != -1) {
+		$options['filter']['flags'] = $_REQUEST['filter_discovery'];
+	}
 	if (isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers'])
 			&& $_REQUEST['filter_with_triggers'] != -1) {
 		$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
@@ -1631,6 +1639,9 @@ else {
 				'subfilter_templated_items' => empty($_REQUEST['subfilter_templated_items'])
 					|| ($item['templateid'] == 0 && uint_in_array(0, $_REQUEST['subfilter_templated_items'])
 					|| ($item['templateid'] > 0 && uint_in_array(1, $_REQUEST['subfilter_templated_items']))),
+				'subfilter_discovery' => empty($_REQUEST['subfilter_discovery'])
+					|| ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL && uint_in_array(0, $_REQUEST['subfilter_discovery'])
+					|| ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && uint_in_array(1, $_REQUEST['subfilter_discovery']))),
 				'subfilter_with_triggers' => empty($_REQUEST['subfilter_with_triggers'])
 					|| (count($item['triggers']) == 0 && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
 					|| (count($item['triggers']) > 0 && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])),

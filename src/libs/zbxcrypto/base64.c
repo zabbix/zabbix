@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -196,7 +196,7 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 	assert(p_b64str);
 	assert(!*p_b64str);	/* expect a pointer will NULL value, do not know whether allowed to free that memory */
 
-	*p_b64str = zbx_malloc(*p_b64str, (in_size + 2) / 3 * 4 + 1);
+	*p_b64str = (char *)zbx_malloc(*p_b64str, (in_size + 2) / 3 * 4 + 1);
 	c_per_block = (ZBX_MAX_B64_LEN - 1) / 4 * 3;
 	b_per_block = c_per_block / 3 * 4;
 	full_block_num = in_size / c_per_block;

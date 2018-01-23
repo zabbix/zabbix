@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,10 +27,6 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Configuration of services');
 $page['file'] = 'services.php';
 $page['scripts'] = ['class.calendar.js'];
-
-if (isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
-	define('ZBX_PAGE_NO_MENU', 1);
-}
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -66,9 +62,7 @@ $fields = [
 	'delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
 	// others
 	'form' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>					[T_ZBX_INT, O_OPT, null,	null,		null],
-	'pservices' =>						[T_ZBX_INT, O_OPT, null,	null,		null],
-	'cservices' =>						[T_ZBX_INT, O_OPT, null,	null,		null]
+	'form_refresh' =>					[T_ZBX_INT, O_OPT, null,	null,		null]
 ];
 check_fields($fields);
 
@@ -81,7 +75,7 @@ if (!empty($_REQUEST['serviceid'])) {
 		'serviceids' => $_REQUEST['serviceid']
 	];
 
-	if (isset($_REQUEST['delete']) || isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
+	if (isset($_REQUEST['delete'])) {
 		$options['output'] = ['serviceid', 'name'];
 	}
 	else {
@@ -265,83 +259,9 @@ if (isset($_REQUEST['form'])) {
 }
 
 /*
- * Display parent services list
- */
-if (isset($_REQUEST['pservices'])) {
-	$parent_services = API::Service()->get([
-		'output' => ['serviceid', 'name', 'algorithm'],
-		'selectTrigger' => ['description'],
-		'preservekeys' => true,
-		'sortfield' => ['name']
-	]);
-
-	if (isset($service)) {
-		// unset unavailable parents
-		$childServicesIds = get_service_children($service['serviceid']);
-		$childServicesIds[] = $service['serviceid'];
-		foreach ($childServicesIds as $childServiceId) {
-			unset($parent_services[$childServiceId]);
-		}
-
-		$data = ['service' => $service];
-	}
-	else {
-		$data = [];
-	}
-
-	foreach ($parent_services as &$parent_service) {
-		$parent_service['trigger'] = $parent_service['trigger'] ? $parent_service['trigger']['description'] : '';
-	}
-	unset($parent_service);
-
-	$data['db_pservices'] = $parent_services;
-
-	// render view
-	$servicesView = new CView('configuration.services.parent.list', $data);
-	$servicesView->render();
-	$servicesView->show();
-}
-/*
- * Display child services list
- */
-elseif (isset($_REQUEST['cservices'])) {
-	$child_services = API::Service()->get([
-		'output' => ['serviceid', 'name', 'algorithm'],
-		'selectTrigger' => ['description'],
-		'preservekeys' => true,
-		'sortfield' => ['name']
-	]);
-
-	if (isset($service)) {
-		// unset unavailable parents
-		$childServicesIds = get_service_children($service['serviceid']);
-		$childServicesIds[] = $service['serviceid'];
-		foreach ($childServicesIds as $childServiceId) {
-			unset($child_services[$childServiceId]);
-		}
-
-		$data = ['service' => $service];
-	}
-	else {
-		$data = [];
-	}
-
-	foreach ($child_services as &$child_service) {
-		$child_service['trigger'] = $child_service['trigger'] ? $child_service['trigger']['description'] : '';
-	}
-	unset($child_service);
-
-	$data['db_cservices'] = $child_services;
-
-	// render view
-	$servicesView = new CView('configuration.services.child.list', $data);
-	$servicesView->render();
-	$servicesView->show();
-}
-/*
  * Display
  */
-elseif (isset($_REQUEST['form'])) {
+if (isset($_REQUEST['form'])) {
 	$data = [];
 	$data['form'] = getRequest('form');
 	$data['form_refresh'] = getRequest('form_refresh', 0);

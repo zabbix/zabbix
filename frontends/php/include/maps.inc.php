@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1051,6 +1051,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'latelyChanged' => false,
 			'ack' => true
 		];
+		$info[$selementId]['aria_label'] = '';
 
 		/*
 		 * If user has no rights to see the details of particular selement, add only info that is needed to render map
@@ -1203,6 +1204,14 @@ function getSelementsInfo($sysmap, array $options = []) {
 				$info[$selementId] = getImagesInfo($selement);
 				break;
 		}
+
+		if ($i['problem'] > 0) {
+			$info[$selementId]['aria_label'] = $i['problem'] > 1
+				? _n('%1$s problem', '%1$s problems', $i['problem'])
+				: CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
+		}
+
+		$info[$selementId]['problems_total'] = $i['problem'];
 	}
 
 	if ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {

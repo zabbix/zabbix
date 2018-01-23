@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ static char	**environ_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
 static char	**argv_int = NULL, **environ_int = NULL;
-static char	*empty_str = "";
+static const char	*empty_str = "";
 
 /* ps display buffer */
 static char	*ps_buf = NULL;
@@ -74,7 +74,7 @@ char	**setproctitle_save_env(int argc, char **argv)
 
 	/* measure a size of continuous argv[] area and make a copy */
 
-	argv_int = zbx_malloc(argv_int, ((unsigned int)argc + 1) * sizeof(char *));
+	argv_int = (char **)zbx_malloc(argv_int, ((unsigned int)argc + 1) * sizeof(char *));
 
 #if defined(PS_APPEND_ARGV)
 	argc_ext_copied_first = argc - 1;
@@ -92,7 +92,7 @@ char	**setproctitle_save_env(int argc, char **argv)
 		/* argv[argc_ext_copied_first] will be used to display status messages. The rest of arguments can be */
 		/* overwritten and their argv[] pointers will point to wrong strings. */
 		if (argc_ext_copied_first < i)
-			argv[i] = empty_str;
+			argv[i] = (char *)empty_str;
 	}
 
 	argc_ext_copied_last = i - 1;
@@ -111,7 +111,7 @@ char	**setproctitle_save_env(int argc, char **argv)
 
 		/* measure a size of continuous environment area and make a copy */
 
-		environ_int = zbx_malloc(environ_int, ((unsigned int)envc + 1) * sizeof(char *));
+		environ_int = (char **)zbx_malloc(environ_int, ((unsigned int)envc + 1) * sizeof(char *));
 
 		for (i = 0; arg_next == environ[i]; i++)
 		{
@@ -120,7 +120,7 @@ char	**setproctitle_save_env(int argc, char **argv)
 
 			/* environment variables can be overwritten by status messages in argv[0] */
 			/* and environ[] pointers will point to wrong strings */
-			environ[i] = empty_str;
+			environ[i] = (char *)empty_str;
 		}
 
 		environ_ext_copied = i;

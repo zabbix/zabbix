@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ $items = DBfetchArray(DBselect(
 		' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
 ));
 
-$graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($items));
+$graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, Manager::History()->getMinClock($items));
 
 $url = (new CUrl('chart3.php'))
 	->setArgument('height', 150)

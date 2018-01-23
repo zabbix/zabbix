@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -170,109 +170,7 @@ function get_min_itemclock_by_graphid($graphid) {
 			' AND gi.graphid='.zbx_dbstr($graphid)
 	));
 
-	return get_min_itemclock_by_itemid($items);
-}
-
-/**
- * Return the time of the 1st appearance of items in history or trends.
- *
- * @param array $items
- * @param array $items[]['itemid']
- * @param array $items[]['hostid']
- * @param array $items[]['value_type']
- * @param array $items[]['history']
- * @param array $items[]['trends']
- *
- * @return int (unixtime)
- */
-function get_min_itemclock_by_itemid($items) {
-	$item_types = [
-		ITEM_VALUE_TYPE_FLOAT => [],
-		ITEM_VALUE_TYPE_STR => [],
-		ITEM_VALUE_TYPE_LOG => [],
-		ITEM_VALUE_TYPE_UINT64 => [],
-		ITEM_VALUE_TYPE_TEXT => []
-	];
-
-	$max = ['history' => 0, 'trends' => 0];
-
-	$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['history', 'trends']);
-
-	$simple_interval_parser = new CSimpleIntervalParser();
-
-	foreach ($items as $item) {
-		$item_types[$item['value_type']][] = $item['itemid'];
-
-		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			if ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-				$item['history'] = (int) timeUnitToSeconds($item['history']);
-				$max['history'] = max($max['history'], $item['history']);
-			}
-
-			if ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-				$item['trends'] = (int) timeUnitToSeconds($item['trends']);
-				$max['trends'] = max($max['trends'], $item['trends']);
-			}
-		}
-	}
-
-	$sql_unions = [];
-	foreach ($item_types as $type => $itemids) {
-		if ($itemids) {
-			switch ($type) {
-				case ITEM_VALUE_TYPE_FLOAT:
-					$sql_from = ($max['history'] > $max['trends']) ? 'history' : 'trends';
-					break;
-				case ITEM_VALUE_TYPE_STR:
-					$sql_from = 'history_str';
-					break;
-				case ITEM_VALUE_TYPE_LOG:
-					$sql_from = 'history_log';
-					break;
-				case ITEM_VALUE_TYPE_UINT64:
-					$sql_from = ($max['history'] > $max['trends']) ? 'history_uint' : 'trends_uint';
-					break;
-				case ITEM_VALUE_TYPE_TEXT:
-					$sql_from = 'history_text';
-					break;
-				default:
-					$sql_from = 'history';
-			}
-
-			foreach ($itemids as $itemid) {
-				$sql_unions[] =
-					'SELECT MIN(h.clock) AS clock'.
-					' FROM '.$sql_from.' h'.
-					' WHERE h.itemid='.zbx_dbstr($itemid);
-			}
-		}
-	}
-
-	$row = DBfetch(DBselect(
-		'SELECT MIN(h.clock) AS min_clock'.
-		' FROM ('.implode(' UNION ALL ', $sql_unions).') h'
-	));
-	$min_clock = $row['min_clock'];
-
-	// in case DB clock column is corrupted having negative numbers, return min clock from max possible history storage
-	if ($min_clock == 0) {
-		if ($item_types[ITEM_VALUE_TYPE_FLOAT] || $item_types[ITEM_VALUE_TYPE_UINT64]) {
-			$min_clock = time() - max($max['history'], $max['trends']);
-
-			/*
-			 * In case history storage exceeds the maximum time difference between current year and minimum 1970
-			 * (for example year 2014 - 200 years < year 1970), correct year to 1970 (unix time timestamp 0).
-			 */
-			if ($min_clock < 0) {
-				$min_clock = 0;
-			}
-		}
-		else {
-			$min_clock = time() - SEC_PER_YEAR;
-		}
-	}
-
-	return $min_clock;
+	return Manager::History()->getMinClock($items);
 }
 
 function getGraphByGraphId($graphId) {

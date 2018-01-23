@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,15 +44,6 @@
 #define CF_HAVEPARAMS		0x01	/* item accepts either optional or mandatory parameters */
 #define CF_MODULE		0x02	/* item is defined in a loadable module */
 #define CF_USERPARAMETER	0x04	/* item is defined as user parameter */
-
-typedef struct
-{
-	char		*key;
-	unsigned	flags;
-	int		(*function)();
-	char		*test_param;	/* item test parameters; user parameter items keep command here */
-}
-ZBX_METRIC;
 
 /* agent request structure */
 typedef struct
@@ -98,6 +89,15 @@ typedef struct
 	int		mtime;		/* meta information */
 }
 AGENT_RESULT;
+
+typedef struct
+{
+	char		*key;
+	unsigned	flags;
+	int		(*function)(AGENT_REQUEST *request, AGENT_RESULT *result);
+	char		*test_param;	/* item test parameters; user parameter items keep command here */
+}
+ZBX_METRIC;
 
 /* SET RESULT */
 

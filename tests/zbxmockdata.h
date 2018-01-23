@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ typedef enum
 	ZBX_MOCK_NOT_A_VECTOR,
 	ZBX_MOCK_END_OF_VECTOR,
 	ZBX_MOCK_NOT_A_STRING,
-	ZBX_MOCK_INTERNAL_ERROR
+	ZBX_MOCK_INTERNAL_ERROR,
+	ZBX_MOCK_INVALID_YAML_PATH
 }
 zbx_mock_error_t;
 
@@ -50,5 +51,6 @@ zbx_mock_error_t	zbx_mock_exit_code(int *status);
 zbx_mock_error_t	zbx_mock_object_member(zbx_mock_handle_t object, const char *name, zbx_mock_handle_t *member);
 zbx_mock_error_t	zbx_mock_vector_element(zbx_mock_handle_t vector, zbx_mock_handle_t *element);
 zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value);
+zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter);
 
 #endif	/* ZABBIX_MOCK_DATA_H */

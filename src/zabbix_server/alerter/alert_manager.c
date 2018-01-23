@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -894,6 +894,58 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 	return *alerter;
 }
 
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_DATABASE_TYPE "IBM DB2"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_DATABASE_TYPE "MySQL"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_DATABASE_TYPE "Oracle"
+#elif defined(HAVE_POSTGRESQL)
+#	define ZBX_DATABASE_TYPE "PostgreSQL"
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: am_create_db_alert_message                                       *
+ *                                                                            *
+ * Purpose: get and format error message from database when it is unavailable *
+ *                                                                            *
+ * Return value: full database error message is allocated                     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*am_create_db_alert_message(void)
+{
+	const char	*error;
+	char		*alert_message = NULL;
+	size_t		alert_message_alloc = 0, alert_message_offset = 0;
+
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s database \"%s\"",
+			ZBX_DATABASE_TYPE, CONFIG_DBNAME);
+
+	if ('\0' != *CONFIG_DBHOST)
+	{
+		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " on \"%s",
+				CONFIG_DBHOST);
+
+		if (0 != CONFIG_DBPORT)
+		{
+			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d\"",
+					CONFIG_DBPORT);
+		}
+		else
+			zbx_chrcpy_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, '\"');
+	}
+
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " is not available");
+
+	if (NULL != (error = zbx_db_last_strerr()) && '\0' != *error)
+		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ": %s", error);
+
+	return alert_message;
+}
+
+#undef ZBX_DATABASE_TYPE
+
 /******************************************************************************
  *                                                                            *
  * Function: am_queue_watchdog_alerts                                         *
@@ -914,7 +966,8 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 	zbx_am_alertpool_t	*alertpool;
 	zbx_am_alert_t		*alert;
 	zbx_hashset_iter_t	iter;
-	const char		*message = "Zabbix database is down.";
+	const char		*alert_subject = "Zabbix database is not available.";
+	char			*alert_message;
 
 	if ((now = time(NULL)) < lastsent + ZBX_WATCHDOG_ALERT_FREQUENCY)
 		return;
@@ -928,7 +981,11 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 			continue;
 
 		mediatype->refcount++;
-		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, message, message, 0, 0, 0);
+
+		alert_message = am_create_db_alert_message();
+
+		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject, alert_message, 0,
+				0, 0);
 
 		alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
 		alertpool->refcount++;
@@ -936,6 +993,8 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 		am_push_alert(alertpool, alert);
 		am_push_alertpool(mediatype, alertpool);
 		am_push_mediatype(manager, mediatype);
+
+		zbx_free(alert_message);
 	}
 
 	lastsent = now;
@@ -1128,7 +1187,7 @@ static int	am_db_get_alerts(zbx_am_t *manager, zbx_vector_ptr_t *alerts, int now
 		if (SUCCEED == DBis_null(row[7]))
 		{
 			am_db_update_alert(manager, alertid, ALERT_STATUS_FAILED, 0,
-					"Related event was removed.");
+					(char *)"Related event was removed.");
 			continue;
 		}
 
@@ -1511,7 +1570,7 @@ static int	am_db_sync_watchdog(zbx_am_t *manager)
 		if (NULL == (media = (zbx_am_media_t *)zbx_hashset_search(&manager->watchdog, &mediaid)))
 		{
 			media_local.mediaid = mediaid;
-			media = zbx_hashset_insert(&manager->watchdog, &media_local, sizeof(media_local));
+			media = (zbx_am_media_t *)zbx_hashset_insert(&manager->watchdog, &media_local, sizeof(media_local));
 			media->sendto = NULL;
 
 			zbx_vector_ptr_append(&media_new, media);
@@ -1600,7 +1659,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
 
-	*cmd = zbx_malloc(NULL, cmd_alloc);
+	*cmd = (char *)zbx_malloc(NULL, cmd_alloc);
 
 	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
 
@@ -1715,7 +1774,7 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			zbx_free(cmd);
 			break;
 		default:
-			am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, "unsupported media type");
+			am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, (char *)"unsupported media type");
 			zabbix_log(LOG_LEVEL_ERR, "cannot process alertid:" ZBX_FS_UI64 ": unsupported media type: %d",
 					alert->alertid, mediatype->type);
 			am_remove_alert(manager, alert);
@@ -1903,6 +1962,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		{
 			if (ZBX_DB_DOWN == (manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE)))
 			{
+				am_queue_watchdog_alerts(&manager);
+
 				zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds",
 						ZBX_DB_WAIT_DOWN);
 			}
@@ -1949,14 +2010,11 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			time_watchdog = now;
 		}
 
-		if (ZBX_DB_DOWN == manager.dbstatus)
-			am_queue_watchdog_alerts(&manager);
-
 		now = time(NULL);
 
 		while (SUCCEED == am_check_queue(&manager, now))
 		{
-			if (NULL == (alerter = zbx_queue_ptr_pop(&manager.free_alerters)))
+			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
 			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager)))

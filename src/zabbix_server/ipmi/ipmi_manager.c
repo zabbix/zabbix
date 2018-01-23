@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -576,7 +576,7 @@ static void	ipmi_manager_process_poller_queue(zbx_ipmi_manager_t *manager, zbx_i
 			case ZBX_IPC_IPMI_CLEANUP_REQUEST:
 				break;
 			case ZBX_IPC_IPMI_VALUE_REQUEST:
-				if (NULL == (host = zbx_hashset_search(&manager->hosts, &request->hostid)))
+				if (NULL == (host = (zbx_ipmi_manager_host_t *)zbx_hashset_search(&manager->hosts, &request->hostid)))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					ipmi_request_free(request);
@@ -618,7 +618,7 @@ static zbx_ipmi_manager_host_t	*ipmi_manager_cache_host(zbx_ipmi_manager_t *mana
 		zbx_ipmi_manager_host_t	host_local;
 
 		host_local.hostid = hostid;
-		host = zbx_hashset_insert(&manager->hosts, &host_local, sizeof(host_local));
+		host = (zbx_ipmi_manager_host_t *)zbx_hashset_insert(&manager->hosts, &host_local, sizeof(host_local));
 
 		host->disable_until = 0;
 		host->poller = ipmi_manager_get_host_poller(manager);

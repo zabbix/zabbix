@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include "common.h"
 #include "active.h"
 #include "zbxconf.h"
-#include "zbxself.h"
 
 #include "cfg.h"
 #include "log.h"
@@ -96,7 +95,7 @@ static void	init_active_metrics(void)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer: first allocation for %d elements", CONFIG_BUFFER_SIZE);
 		sz = CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
-		buffer.data = zbx_malloc(buffer.data, sz);
+		buffer.data = (ZBX_ACTIVE_BUFFER_ELEMENT *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
 		buffer.pcount = 0;
@@ -231,7 +230,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 		goto out;
 	}
 
-	metric = zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
+	metric = (ZBX_ACTIVE_METRIC *)zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
 
 	/* add new metric */
 	metric->key = zbx_strdup(NULL, key);
@@ -271,6 +270,42 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: mode_parameter_is_skip                                           *
+ *                                                                            *
+ * Purpose: test log[] or log.count[] item key if <mode> parameter is set to  *
+ *          'skip'                                                            *
+ *                                                                            *
+ * Return value: SUCCEED - <mode> parameter is set to 'skip'                  *
+ *               FAIL - <mode> is not 'skip' or error                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
+{
+	AGENT_REQUEST	request;
+	const char	*skip;
+	int		ret = FAIL, max_num_parameters;
+
+	if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log[] */
+		max_num_parameters = 7;
+	else						/* log.count[] */
+		max_num_parameters = 6;
+
+	init_request(&request);
+
+	if (SUCCEED == parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
+			max_num_parameters >= get_rparams_num(&request) && NULL != (skip = get_rparam(&request, 4)) &&
+			0 == strcmp(skip, "skip"))
+	{
+		ret = SUCCEED;
+	}
+
+	free_request(&request);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -397,6 +432,17 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		int	found = 0;
 
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+
+		/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set to 'skip'. */
+		/* We need to keep their state, namely 'skip_old_data', in case the items become NOTSUPPORTED as */
+		/* server might not send them in a new active check list. */
+
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & metric->flags) && ITEM_STATE_NOTSUPPORTED == metric->state &&
+				0 == metric->skip_old_data && SUCCEED == mode_parameter_is_skip(metric->flags,
+				metric->key))
+		{
+			continue;
+		}
 
 		for (j = 0; j < received_metrics.values_num; j++)
 		{
@@ -903,8 +949,9 @@ ret:
  *                                                                            *
  ******************************************************************************/
 static int	process_value(const char *server, unsigned short port, const char *host, const char *key,
-		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime, unsigned long *timestamp,
-		const char *source, unsigned short *severity, unsigned long *logeventid, unsigned char flags)
+		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
+		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
+		unsigned char flags)
 {
 	const char			*__function_name = "process_value";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
@@ -1048,14 +1095,130 @@ static int	global_regexp_exists(const char *name)
 	return (i == regexps.values_num ? FAIL : SUCCEED);
 }
 
+static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *request, char **error)
+{
+	int	parameter_num, max_parameter_num;
+
+	if (0 == (parameter_num = get_rparams_num(request)))
+	{
+		*error = zbx_strdup(*error, "Invalid number of parameters.");
+		return FAIL;
+	}
+
+	if (0 != (ZBX_METRIC_FLAG_LOG_LOG & flags) && 0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log.count */
+		max_parameter_num = 6;
+	else if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* logrt */
+		max_parameter_num = 8;
+	else
+		max_parameter_num = 7;	/* log or logrt.count */
+
+	if (max_parameter_num < parameter_num)
+	{
+		*error = zbx_strdup(*error, "Too many parameters.");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	init_max_lines_per_sec(int is_count_item, const AGENT_REQUEST *request, int *max_lines_per_sec,
+		char **error)
+{
+	const char	*p;
+	int		rate;
+
+	if (NULL == (p = get_rparam(request, 3)) || '\0' == *p)
+	{
+		if (0 == is_count_item)				/* log[], logrt[] */
+			*max_lines_per_sec = CONFIG_MAX_LINES_PER_SECOND;
+		else						/* log.count[], logrt.count[] */
+			*max_lines_per_sec = MAX_VALUE_LINES_MULTIPLIER * CONFIG_MAX_LINES_PER_SECOND;
+
+		return SUCCEED;
+	}
+
+	if (MIN_VALUE_LINES > (rate = atoi(p)) ||
+			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
+			(1 == is_count_item && MAX_VALUE_LINES_MULTIPLIER * MAX_VALUE_LINES < rate))
+	{
+		*error = zbx_strdup(*error, "Invalid fourth parameter.");
+		return FAIL;
+	}
+
+	*max_lines_per_sec = rate;
+	return SUCCEED;
+}
+
+static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float *max_delay, char **error)
+{
+	const char	*max_delay_str;
+	float		max_delay_tmp;
+	int		max_delay_par_nr;
+
+	/* <maxdelay> is parameter 6 for log[], logrt[], but parameter 5 for log.count[], logrt.count[] */
+
+	if (0 == is_count_item)
+		max_delay_par_nr = 6;
+	else
+		max_delay_par_nr = 5;
+
+	if (NULL == (max_delay_str = get_rparam(request, max_delay_par_nr)) || '\0' == *max_delay_str)
+	{
+		*max_delay = 0.0f;
+		return SUCCEED;
+	}
+
+	if (SUCCEED != is_double(max_delay_str) || 0.0f > (max_delay_tmp = (float)atof(max_delay_str)))
+	{
+		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
+		return FAIL;
+	}
+
+	*max_delay = max_delay_tmp;
+	return SUCCEED;
+}
+
+static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request, int *rotation_type, char **error)
+{
+	if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))
+	{
+		char	*options;
+		int	options_par_nr;
+
+		if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* logrt */
+			options_par_nr = 7;
+		else						/* logrt.count */
+			options_par_nr = 6;
+
+		if (NULL != (options = get_rparam(request, options_par_nr)) && '\0' != *options)
+		{
+			if (0 == strcmp(options, "copytruncate"))
+			{
+				*rotation_type = ZBX_LOG_ROTATION_LOGCPT;
+				return SUCCEED;
+			}
+
+			if (0 != strcmp(options, "rotate"))
+			{
+				*error = zbx_dsprintf(*error, "Invalid %s parameter.", (6 == options_par_nr) ?
+						"seventh" : "eighth");
+				return FAIL;
+			}
+		}
+	}
+
+	*rotation_type = ZBX_LOG_ROTATION_LOGRT;	/* default */
+	return SUCCEED;
+}
+
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
 	AGENT_REQUEST		request;
-	const char		*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
-	char			*encoding_uc = NULL, *max_delay_str;
-	int			rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr,
-				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0;
+	const char		*filename, *regexp, *encoding, *skip, *output_template;
+	char			*encoding_uc = NULL;
+	int			max_lines_per_sec, ret = FAIL, s_count, p_count, s_count_orig, is_count_item,
+				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0, rotation_type;
 	zbx_uint64_t		lastlogsize_orig;
 	float			max_delay;
 	struct st_logfile	*logfiles_new = NULL;
@@ -1067,23 +1230,22 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 	init_request(&request);
 
+	/* Expected parameters by item: */
+	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>]            7 params */
+	/* log.count  [file,       <regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>]            6 params */
+	/* logrt      [file_regexp,<regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>] 8 params */
+	/* logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>] 7 params */
+
 	if (SUCCEED != parse_item_key(metric->key, &request))
 	{
 		*error = zbx_strdup(*error, "Invalid item key format.");
 		goto out;
 	}
 
-	if (0 == get_rparams_num(&request))
-	{
-		*error = zbx_strdup(*error, "Invalid number of parameters.");
+	if (SUCCEED != check_number_of_parameters(metric->flags, &request, error))
 		goto out;
-	}
 
-	if (7 < get_rparams_num(&request) || (1 == is_count_item && 6 < get_rparams_num(&request)))
-	{
-		*error = zbx_strdup(*error, "Too many parameters.");
-		goto out;
-	}
+	/* parameter 'file' or 'file_regexp' */
 
 	if (NULL == (filename = get_rparam(&request, 0)) || '\0' == *filename)
 	{
@@ -1091,15 +1253,19 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		goto out;
 	}
 
-	if (NULL == (pattern = get_rparam(&request, 1)))
+	/* parameter 'regexp' */
+
+	if (NULL == (regexp = get_rparam(&request, 1)))
 	{
-		pattern = "";
+		regexp = "";
 	}
-	else if ('@' == *pattern && SUCCEED != global_regexp_exists(pattern + 1))
+	else if ('@' == *regexp && SUCCEED != global_regexp_exists(regexp + 1))
 	{
-		*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.", pattern + 1);
+		*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.", regexp + 1);
 		goto out;
 	}
+
+	/* parameter 'encoding' */
 
 	if (NULL == (encoding = get_rparam(&request, 2)))
 	{
@@ -1112,22 +1278,11 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		encoding = encoding_uc;
 	}
 
-	/* parameter 3 is <maxlines> for log[], logrt[], but <maxproclines> for log.count[], logrt.count[] */
-
-	if (NULL == (maxlines_persec = get_rparam(&request, 3)) || '\0' == *maxlines_persec)
-	{
-		if (0 == is_count_item)				/* log[], logrt[] */
-			rate = CONFIG_MAX_LINES_PER_SECOND;
-		else						/* log.count[], logrt.count[] */
-			rate = MAX_VALUE_LINES_MULTIPLIER * CONFIG_MAX_LINES_PER_SECOND;
-	}
-	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) ||
-			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
-			(1 == is_count_item && MAX_VALUE_LINES_MULTIPLIER * MAX_VALUE_LINES < rate))
-	{
-		*error = zbx_strdup(*error, "Invalid fourth parameter.");
+	/* parameter 'maxlines' or 'maxproclines' */
+	if (SUCCEED !=  init_max_lines_per_sec(is_count_item, &request, &max_lines_per_sec, error))
 		goto out;
-	}
+
+	/* parameter 'mode' */
 
 	if (NULL == (skip = get_rparam(&request, 4)) || '\0' == *skip || 0 == strcmp(skip, "all"))
 	{
@@ -1139,30 +1294,27 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		goto out;
 	}
 
-	/* parameter 5 is <output> for log[], logrt[], but <maxdelay> for log.count[], logrt.count[] */
+	/* parameter 'output' (not used for log.count[], logrt.count[]) */
+	if (1 == is_count_item || (NULL == (output_template = get_rparam(&request, 5))))
+		output_template = "";
 
-	if (1 == is_count_item || (NULL == (template = get_rparam(&request, 5))))
-		template = "";
+	/* parameter 'maxdelay' */
+	if (SUCCEED != init_max_delay(is_count_item, &request, &max_delay, error))
+		goto out;
 
-	/* <maxdelay> is parameter 6 for log[], logrt[], but parameter 5 for log.count[], logrt.count[] */
+	/* parameter 'options' */
+	if (SUCCEED != init_rotation_type(metric->flags, &request, &rotation_type, error))
+		goto out;
 
-	if (0 == is_count_item)
-		max_delay_par_nr = 6;				/* log[], logrt[] */
-	else
-		max_delay_par_nr = 5;				/* log.count[], logrt.count[] */
-
-	if (NULL == (max_delay_str = get_rparam(&request, max_delay_par_nr)) || '\0' == *max_delay_str)
+	/* jumping over fast growing log files is not supported with 'copytruncate' */
+	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 0.0f != max_delay)
 	{
-		max_delay = 0.0f;
-	}
-	else if (SUCCEED != is_double(max_delay_str) || 0.0f > (max_delay = (float)atof(max_delay_str)))
-	{
-		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
+		*error = zbx_strdup(*error, "maxdelay > 0 is not supported with copytruncate option.");
 		goto out;
 	}
 
 	/* do not flood Zabbix server if file grows too fast */
-	s_count = rate * metric->refresh;
+	s_count = max_lines_per_sec * metric->refresh;
 
 	/* do not flood local system if file grows too fast */
 	if (0 == is_count_item)
@@ -1192,9 +1344,10 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
-			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, pattern, template,
-			&p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME, metric->key_orig, &jumped,
-			max_delay, &metric->start_time, &metric->processed_bytes);
+			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, regexp,
+			output_template, &p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME,
+			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
+			rotation_type);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
@@ -1278,7 +1431,6 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	}
 out:
 	zbx_free(encoding_uc);
-
 	free_request(&request);
 
 	return ret;

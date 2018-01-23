@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -357,6 +357,15 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::xpath("//button[@value='".$value."']"))->click();
 	}
 
+	/**
+	 * Clicks on the "Select" button to the right of the multiselect
+	 *
+	 * @param string $id  ID of the multiselect.
+	 */
+	public function zbxTestClickButtonMultiselect($id) {
+		$this->zbxTestClickXpath("//div[@id='$id']/..//button");
+	}
+
 	public function zbxTestInputType($id, $str) {
 		$this->webDriver->findElement(WebDriverBy::id($id))->clear()->sendKeys($str);
 	}
@@ -370,9 +379,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
 	}
 
-	public function zbxTestInputTypeByXpath($xpath, $str) {
+	public function zbxTestInputTypeByXpath($xpath, $str, $validate = true) {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->sendKeys($str);
+
+		if ($validate) {
+			$this->zbxTestWaitUntilElementValuePresent(WebDriverBy::xpath($xpath), $str);
+		}
 	}
 
 	public function zbxTestInputTypeWait($id, $str) {
@@ -502,6 +515,18 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
 	}
 
+	public function zbxTestWaitUntilElementValuePresent($by, $value) {
+		$this->webDriver->wait(20, self::WAIT_ITERATION)->until(
+			function ($driver) use ($by, $value) {
+				try {
+					return $driver->findElement($by)->getAttribute('value') === $value;
+				} catch (StaleElementReferenceException $e) {
+					return null;
+				}
+			}
+		);
+	}
+
 	public function zbxTestWaitUntilElementNotVisible($by) {
 		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::invisibilityOfElementLocated($by), 'after 60 sec element still visible');
 	}
@@ -534,10 +559,9 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->zbxTestCheckFatalErrors();
 	}
 
-	// zbx_popup is the default opened window id if none is passed
-	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
-		$this->zbxTestClickWait($buttonId);
-		$this->zbxTestSwitchToWindow($windowId);
+	public function zbxTestLaunchOverlayDialog($header) {
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
+		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestSwitchToWindow($id) {
@@ -551,30 +575,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		else {
 			$this->webDriver->switchTo()->window($id);
 		}
-	}
-
-	public function zbxTestSwitchToNewWindow() {
-		$handles = $this->webDriver->getWindowHandles();
-		if (count($handles) <= 1) {
-			$this->webDriver->wait(60, self::WAIT_ITERATION)->until(function () {
-				return count($this->webDriver->getWindowHandles()) > 1;
-			});
-
-			$handles = $this->webDriver->getWindowHandles();
-		}
-
-		$this->webDriver->switchTo()->window(end($handles));
-	}
-
-	public function zbxTestClickAndSwitchToNewWindow($xpath) {
-		$handles = count($this->webDriver->getWindowHandles());
-		$this->zbxTestClickXpathWait($xpath);
-
-		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(function () use ($handles) {
-			return count($this->webDriver->getWindowHandles()) > $handles;
-		});
-
-		$this->zbxTestSwitchToNewWindow();
 	}
 
 	public function zbxTestWaitWindowClose() {
@@ -861,6 +861,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			$this->webDriver = RemoteWebDriver::create('http://localhost:4444/wd/hub',
 					DesiredCapabilities::firefox()->setCapability('loggingPrefs', ["browser" => "SEVERE"])
 			);
+			$this->webDriver->manage()->window()->setSize(new WebDriverDimension(1280, 1024));
 			self::$shared_browser = $this->webDriver;
 		}
 	}
@@ -945,7 +946,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			}
 		}
 
-		$this->fail('Dropdown element "' . $id . '" was not found!');
+		$this->fail('Dropdown element "'.$id.'" was not found!');
 	}
 
 	/**

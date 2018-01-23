@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -498,6 +498,10 @@ jQuery(function($) {
 					$(obj).removeClass('active');
 					cleanSearchInput(obj);
 				});
+				if (obj.attr('aria-required')) {
+					input.attr('aria-required', obj.attr('aria-required'));
+					obj.removeAttr('aria-required');
+				}
 				obj.append(input);
 			}
 
@@ -531,12 +535,14 @@ jQuery(function($) {
 
 			// draw popup link
 			if (options.popup.parameters != null) {
-				var urlParameters = options.popup.parameters;
+				var popup_options = options.popup.parameters;
 
 				if (options.ignored) {
+					var excludeids = [];
 					$.each(options.ignored, function(i, value) {
-						urlParameters = urlParameters + '&excludeids[]=' + i;
+						excludeids.push(i);
 					});
+					popup_options['excludeids'] = excludeids;
 				}
 
 				var popupButton = $('<button>', {
@@ -550,7 +556,7 @@ jQuery(function($) {
 				}
 				else {
 					popupButton.click(function() {
-						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
+						return PopUp('popup.generic', popup_options);
 					});
 				}
 

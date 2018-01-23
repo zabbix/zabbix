@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -318,7 +318,7 @@ class testIconMap extends CZabbixTest {
 	public static function iconmap_mappings() {
 		return [
 			// Check mappings.
-			[
+			[[
 				'iconmap' => [
 					'name' => 'API icon map without mapping parametrs',
 					'default_iconid' => '2',
@@ -326,8 +326,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings": cannot be empty.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'unexpected parameter',
 					'default_iconid' => '2',
@@ -341,9 +341,9 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1": unexpected parameter "iconmapid".'
-			],
+			]],
 			// Check mappings, inventory_link
-			[
+			[[
 				'iconmap' => [
 					'name' => 'without mapping inventory_link',
 					'default_iconid' => '2',
@@ -355,8 +355,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "inventory_link" is missing.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'with empty mapping inventory_link',
 					'default_iconid' => '2',
@@ -369,8 +369,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/inventory_link": a number is expected.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'with invalid inventory_link',
 					'default_iconid' => '2',
@@ -383,8 +383,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/inventory_link": a number is expected.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'nonexistent inventory_link',
 					'default_iconid' => '2',
@@ -397,8 +397,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/inventory_link": value must be one of 1-70.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'nonexistent inventory_link',
 					'default_iconid' => '2',
@@ -411,9 +411,9 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/inventory_link": value must be one of 1-70.'
-			],
+			]],
 			// Check mappings, expression
-			[
+			[[
 				'iconmap' => [
 					'name' => 'without mapping expression',
 					'default_iconid' => '2',
@@ -425,8 +425,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "expression" is missing.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'with empty mapping expression',
 					'default_iconid' => '2',
@@ -439,8 +439,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/expression": cannot be empty.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'long expression',
 					'default_iconid' => '2',
@@ -453,8 +453,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/expression": value is too long.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'global expression',
 					'default_iconid' => '2',
@@ -467,10 +467,10 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Global regular expression "regexpnotexist" does not exist.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
-					'name' => 'empty global expression',
+					'name' => 'Global regular expression does not exist',
 					'default_iconid' => '2',
 					'mappings' =>[
 						[
@@ -480,11 +480,10 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				// TODO: different error message on jenkins
-				// 'expected_error' => 'Global regular expression "" does not exist.'
-				'expected_error' => 'Global regular expression "0" does not exist.'
-			],
-			[
+				// can be different error message text
+				'expected_error_pattern' => '/Global regular expression ".*" does not exist\./'
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'invalid regular expression',
 					'default_iconid' => '2',
@@ -497,8 +496,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'invalid regular expression',
 					'default_iconid' => '2',
@@ -511,8 +510,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'invalid regular expression',
 					'default_iconid' => '2',
@@ -525,8 +524,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'invalid regular expression',
 					'default_iconid' => '2',
@@ -539,8 +538,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'The same mapping values',
 					'default_iconid' => '2',
@@ -558,9 +557,9 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/2": value (inventory_link, expression)=(2, the same mapping) already exists.'
-			],
+			]],
 			// Check mappings, iconid
-			[
+			[[
 				'iconmap' => [
 					'name' => 'without mapping iconid',
 					'default_iconid' => '2',
@@ -572,8 +571,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "iconid" is missing.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'with empty mapping iconid',
 					'default_iconid' => '2',
@@ -586,8 +585,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/iconid": a number is expected.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'with invalid iconid',
 					'default_iconid' => '2',
@@ -600,8 +599,8 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/1/iconid": a number is expected.'
-			],
-			[
+			]],
+			[[
 				'iconmap' => [
 					'name' => 'nonexistent iconid',
 					'default_iconid' => '2',
@@ -614,27 +613,35 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'expected_error' => 'Icon with ID "132456" is not available.'
-			]
+			]]
 		];
 	}
 
 	/**
 	* @dataProvider iconmap_mappings
 	*/
-	public function testIconMap_MappingsCreateUpdate($iconmap, $expected_error) {
+	public function testIconMap_MappingsCreateUpdate($data) {
 		$methods = ['iconmap.create', 'iconmap.update'];
 
 		foreach ($methods as $method) {
 			if ($method == 'iconmap.update') {
-				$iconmap['iconmapid'] = '2';
-				$iconmap['name'] = 'Update '.$iconmap['name'];
+				$data['iconmap']['iconmapid'] = '2';
+				$data['iconmap']['name'] = 'Update '.$data['iconmap']['name'];
 			}
-			$result = $this->api_acall($method, $iconmap, $debug);
+			$result = $this->api_acall($method, $data['iconmap'], $debug);
 
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
-			$this->assertSame($expected_error, $result['error']['data']);
-			$dbResult = "select * from icon_map where name='".$iconmap['name']."'";
+
+			// condition for one test case, because of the different error message text
+			if (array_key_exists('expected_error_pattern', $data)) {
+				$this->assertRegExp($data['expected_error_pattern'], $result['error']['data']);
+			}
+			else {
+				$this->assertSame($data['expected_error'], $result['error']['data']);
+			}
+
+			$dbResult = "select * from icon_map where name='".$data['iconmap']['name']."'";
 			$this->assertEquals(0, DBcount($dbResult));
 		}
 	}

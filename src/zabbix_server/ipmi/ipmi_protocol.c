@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objec
 	data_len = sizeof(zbx_uint64_t) + sizeof(short) + sizeof(char) * 2 + addr_len + username_len + password_len +
 			sensor_len + sizeof(zbx_uint32_t) * 4 + sizeof(int);
 
-	*data = zbx_malloc(NULL, data_len);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr = *data;
 	ptr += zbx_serialize_uint64(ptr, objectid);
 	ptr += zbx_serialize_str(ptr, addr, addr_len);
@@ -87,7 +87,7 @@ zbx_uint32_t	zbx_ipmi_serialize_result(unsigned char **data, const zbx_timespec_
 	value_len = (NULL != value ? strlen(value)  + 1 : 0);
 
 	data_len = value_len + sizeof(zbx_uint32_t) + sizeof(int) * 3;
-	*data = zbx_malloc(NULL, data_len);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
 	ptr += zbx_serialize_int(ptr, ts->sec);

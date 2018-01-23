@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ static wchar_t	*read_registry_value(HKEY hKey, LPCTSTR name)
  * Purpose: get Windows version information                                   *
  *                                                                            *
  ******************************************************************************/
-const OSVERSIONINFOEX		*zbx_win_getversion()
+const OSVERSIONINFOEX		*zbx_win_getversion(void)
 {
 #	define ZBX_REGKEY_VERSION		"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 #	define ZBX_REGVALUE_CURRENTVERSION	"CurrentVersion"

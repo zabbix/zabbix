@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -950,7 +950,7 @@ function getTriggerSeverityCss($config)
 	$css = '';
 
 	foreach ($severities as $class => $color) {
-		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label { background-color: #'.$color.' }'."\n";
+		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before { background-color: #'.$color.' }'."\n";
 	}
 
 	return $css;

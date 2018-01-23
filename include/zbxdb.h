@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ int	zbx_db_init(const char *dbname, const char *const db_schema, char **error);
 void	zbx_db_deinit(void);
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
-void    zbx_db_close(void);
+void	zbx_db_close(void);
 
 int	zbx_db_begin(void);
 int	zbx_db_commit(void);
@@ -74,6 +74,7 @@ int	zbx_db_rollback(void);
 int	zbx_db_txn_level(void);
 int	zbx_db_txn_error(void);
 int	zbx_db_txn_end_error(void);
+const char	*zbx_db_last_strerr(void);
 
 #ifdef HAVE_ORACLE
 
