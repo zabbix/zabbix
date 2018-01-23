@@ -107,7 +107,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 		fail_msg("Failed to connect");
 
-	if (read_yaml_ret() != SUCCEED_OR_FAIL((received = zbx_tcp_recv_ext(&s, 0))))
+	if (read_yaml_ret() != SUCCEED_OR_FAIL((received = zbx_tcp_recv_raw_ext(&s, 0))))
 		fail_msg("Unexpected return code '%s'", zbx_result_string(SUCCEED_OR_FAIL(received)));
 
 	if (FAIL == SUCCEED_OR_FAIL(received))
@@ -124,7 +124,7 @@ void	zbx_mock_test_entry(void **state)
 
 	buffer = yaml_assemble_binary_data_array(received);
 
-	if (0 != memcmp(buffer + ZBX_TCP_HEADER_DATALEN_LEN, s.buffer, received - ZBX_TCP_HEADER_DATALEN_LEN))
+	if (0 != memcmp(buffer, s.buffer, received))
 		fail_msg("Received message mismatch expected");
 
 	zbx_tcp_close(&s);

@@ -1,5 +1,7 @@
 if AGENT
-AGENT_tests = zbx_tcp_recv_ext
+AGENT_tests = \
+	zbx_tcp_recv_ext \
+	zbx_tcp_recv_raw_ext
 endif
 
 noinst_PROGRAMS = $(AGENT_tests)
@@ -42,13 +44,13 @@ COMMON_LIB_FILES = \
 
 COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
 
+COMMON_WRAP_FUNCS = \
+	-Wl,--wrap=read \
+	-Wl,--wrap=connect
+
 zbx_tcp_recv_ext_SOURCES = \
 	zbx_tcp_recv_ext.c \
 	$(COMMON_SRC_FILES)
-
-zbx_tcp_recv_ext_WRAP_FUNCS = \
-	-Wl,--wrap=read \
-	-Wl,--wrap=connect
 
 zbx_tcp_recv_ext_LDADD = \
 	$(COMMON_LIB_FILES)
@@ -57,5 +59,19 @@ zbx_tcp_recv_ext_LDADD += @AGENT_LIBS@
 
 zbx_tcp_recv_ext_LDFLAGS = @AGENT_LDFLAGS@
 
-zbx_tcp_recv_ext_CFLAGS = $(zbx_tcp_recv_ext_WRAP_FUNCS) $(COMMON_COMPILER_FLAGS)
+zbx_tcp_recv_ext_CFLAGS = $(COMMON_WRAP_FUNCS) $(COMMON_COMPILER_FLAGS)
+
+zbx_tcp_recv_raw_ext_SOURCES = \
+	zbx_tcp_recv_raw_ext.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_recv_raw_ext_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tcp_recv_raw_ext_LDADD += @AGENT_LIBS@
+
+zbx_tcp_recv_raw_ext_LDFLAGS = @AGENT_LDFLAGS@
+
+zbx_tcp_recv_raw_ext_CFLAGS = $(COMMON_WRAP_FUNCS) $(COMMON_COMPILER_FLAGS)
+
 endif
