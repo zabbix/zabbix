@@ -4459,6 +4459,11 @@ a.overlay-close-btn {
 	}
 }
 
+a.subfilter-disable-btn {
+	@extend .subfilter-disable-btn;
+	border: 0 none;
+}
+
 // Color picker
 .color-picker {
 	height: 20px;
