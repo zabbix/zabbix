@@ -1061,6 +1061,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 	}
 
+	if (0 == fields_count)
+	{
+		*error = zbx_dsprintf(*error, "empty list of field names");
+		goto out;
+	}
+
 	/* get the entries (line 8 in T1) */
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
