@@ -4,8 +4,6 @@
 #include "common.h"
 #include "comms.h"
 
-static zbx_mock_handle_t	fragments;
-
 static int	read_yaml_ret(void)
 {
 	zbx_mock_handle_t	handle;
@@ -49,7 +47,7 @@ static zbx_uint64_t	read_yaml_uint64(const char *out)
 static char	*yaml_assemble_binary_data_array(size_t expected)
 {
 	zbx_mock_error_t	error;
-	zbx_mock_handle_t	fragment;
+	zbx_mock_handle_t	fragment, fragments;
 	const char		*value;
 	size_t			length, offset = 0;
 	char			*buffer;
@@ -77,69 +75,20 @@ static char	*yaml_assemble_binary_data_array(size_t expected)
 	return buffer;
 }
 
-int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len)
-{
-	ZBX_UNUSED(fd);
-	ZBX_UNUSED(addr);
-	ZBX_UNUSED(len);
 
-	return 0;
-}
-
-ssize_t	__wrap_read(int fd, void *buf, size_t nbytes)
-{
-	static int		remaining_length;
-	static const char	*data;
-	zbx_mock_error_t	error;
-	zbx_mock_handle_t	fragment;
-	size_t			length;
-
-	ZBX_UNUSED(fd);
-
-	if (0 == remaining_length)
-	{
-		if (ZBX_MOCK_SUCCESS != zbx_mock_vector_element(fragments, &fragment))
-			return 0;	/* no more data */
-
-		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &data, &length)))
-			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
-	}
-	else
-		length = remaining_length;
-
-	if (nbytes < length)
-	{
-		remaining_length = length - nbytes;
-		length = nbytes;
-	}
-	else
-		remaining_length = 0;
-
-
-	memcpy(buf, data, length);
-
-	if (0 != remaining_length)
-		data += length;
-
-	return length;
-}
 
 void	zbx_mock_test_entry(void **state)
 {
 #define ZBX_TCP_HEADER_DATALEN_LEN	13
 
-	char			*buffer;
-	zbx_socket_t		s;
-	ssize_t			received, expected;
-	zbx_mock_error_t	error;
+	char		*buffer;
+	zbx_socket_t	s;
+	ssize_t		received, expected;
 
 	ZBX_UNUSED(state);
 
 	if (SUCCEED != zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 		fail_msg("Failed to connect");
-
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("fragments", &fragments)))
-			fail_msg("Cannot get fragments handle: %s", zbx_mock_error_string(error));
 
 	if (read_yaml_ret() != SUCCEED_OR_FAIL((received = zbx_tcp_recv_ext(&s, 0))))
 		fail_msg("Unexpected return code '%s'", zbx_result_string(SUCCEED_OR_FAIL(received)));
