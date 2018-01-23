@@ -82,11 +82,14 @@ svg a {
 	cursor: pointer;
 
 	&:link {
-		@extend %link-action-style;
+		text-decoration: none;
+		color: $font-color;
 	}
 
 	&:visited {
 		@extend %link-action-style;
+
+		color: $font-color;
 	}
 
 	&:hover {
@@ -99,8 +102,7 @@ svg a {
 
 	&:focus {
 		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, 0.35);
-
+		border-bottom: 2px solid rgba($font-color, 0.35);
 	}
 }
 
