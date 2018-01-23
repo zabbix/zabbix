@@ -405,22 +405,20 @@ if (!empty($data['form'])) {
 		CArrayHelper::sort($data['timeperiods'], ['timeperiod_type', 'start_date']);
 
 		// get hosts
-		$data['hostids'] = API::Host()->get([
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
 			'maintenanceids' => $data['maintenanceid'],
-			'real_hosts' => true,
-			'output' => ['hostid'],
 			'editable' => true
 		]);
-		$data['hostids'] = zbx_objectValues($data['hostids'], 'hostid');
+		$data['hosts_ms'] = CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']);
 
-		// get groupids
-		$data['groupids'] = API::HostGroup()->get([
+		// get groups
+		$db_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
 			'maintenanceids' => $data['maintenanceid'],
-			'real_hosts' => true,
-			'output' => ['groupid'],
 			'editable' => true
 		]);
-		$data['groupids'] = zbx_objectValues($data['groupids'], 'groupid');
+		$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 	}
 	else {
 		$data['mname'] = getRequest('mname', '');
@@ -449,50 +447,31 @@ if (!empty($data['form'])) {
 		}
 		$data['description'] = getRequest('description', '');
 		$data['timeperiods'] = getRequest('timeperiods', []);
-		$data['hostids'] = getRequest('hostids', []);
-		$data['groupids'] = getRequest('groupids', []);
-	}
 
-	// Groups with RW permissions.
-	$groups_allowed = API::HostGroup()->get([
-		'output' => ['name'],
-		'editable' => true,
-		'preservekeys' => true
-	]);
+		$hostids = getRequest('hostids', []);
+		$groupids = getRequest('groupids', []);
 
-	$data['groups_ms'] = [];
+		$db_hosts = $hostids
+			? API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $hostids,
+				'editable' => true
+			])
+			: [];
 
-	// Prepare data for multiselect. Skip silently removed groups.
-	foreach ($data['groupids'] as $groupid) {
-		if (!array_key_exists($groupid, $groups_allowed)) {
-			continue;
-		}
+		// Prepare data for multiselect. Skip silently removed hosts.
+		$data['hosts_ms'] = CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']);
 
-		$data['groups_ms'][] = [
-			'id' => $groupid,
-			'name' => $groups_allowed[$groupid]['name']
-		];
-	}
+		$db_groups = $groupids
+			? API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $groupids,
+				'editable' => true
+			])
+			: [];
 
-	// Hosts with RW permissions.
-	$hosts_allowed = API::Host()->get([
-		'output' => ['name'],
-		'editable' => true,
-		'preservekeys' => true
-	]);
-
-	$data['hosts_ms'] = [];
-
-	// Prepare data for multiselect. Skip silently removed hosts.
-	foreach ($data['hostids'] as $hostid) {
-		if (!array_key_exists($hostid, $hosts_allowed)) {
-			continue;
-		}
-
-		$data['hosts_ms'][] = [
-			'id' => $hostid,
-			'name' => $hosts_allowed[$hostid]['name']
-		];
+		// Prepare data for multiselect. Skip silently removed groups.
+		$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 	}
 
 	// render view
