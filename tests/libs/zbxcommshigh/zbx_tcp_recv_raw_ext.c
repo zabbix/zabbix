@@ -38,7 +38,7 @@ void	zbx_mock_test_entry(void **state)
 	if (zbx_read_yaml_expected_ret() != SUCCEED_OR_FAIL((received = zbx_tcp_recv_raw_ext(&s, 0))))
 		fail_msg("Unexpected return code '%s'", zbx_result_string(SUCCEED_OR_FAIL(received)));
 
-	if (FAIL == SUCCEED_OR_FAIL(received))
+	if (FAIL == SUCCEED_OR_FAIL(received) || 0 == received)
 	{
 		zbx_tcp_close(&s);
 		return;

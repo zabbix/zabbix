@@ -1,4 +1,11 @@
 ---
+test case: Zero bytes received
+in:
+  fragments:
+    - ''
+out:
+  ret: 'succeed'
+---
 test case: Correct number of bytes received
 in:
   fragments:
