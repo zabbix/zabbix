@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2017 Zabbix SIA\n"
+	"Copyright (C) 2018 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -227,7 +227,7 @@ retry:
 		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 2;	/* '\0' + one byte to prevent the operation retry */
 		va_end(args);
 		*offset = 0;
-		*str = zbx_malloc(*str, *alloc_len);
+		*str = (char *)zbx_malloc(*str, *alloc_len);
 	}
 
 	avail_len = *alloc_len - *offset;
@@ -238,7 +238,7 @@ retry:
 	if (written_len == avail_len - 1)
 	{
 		*alloc_len *= 2;
-		*str = zbx_realloc(*str, *alloc_len);
+		*str = (char *)zbx_realloc(*str, *alloc_len);
 
 		goto retry;
 	}
@@ -304,13 +304,13 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 	{
 		*alloc_len = n + 1;
 		*offset = 0;
-		*str = zbx_malloc(*str, *alloc_len);
+		*str = (char *)zbx_malloc(*str, *alloc_len);
 	}
 	else if (*offset + n >= *alloc_len)
 	{
 		while (*offset + n >= *alloc_len)
 			*alloc_len *= 2;
-		*str = zbx_realloc(*str, *alloc_len);
+		*str = (char *)zbx_realloc(*str, *alloc_len);
 	}
 
 	while (0 != n && '\0' != *src)
@@ -359,7 +359,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 	diff = (long)strlen(sub_str2) - len;
 
         /* allocate new memory */
-        new_str = zbx_malloc(new_str, (size_t)(strlen(str) + count*diff + 1)*sizeof(char));
+	new_str = (char *)zbx_malloc(new_str, (size_t)(strlen(str) + count*diff + 1)*sizeof(char));
 
         for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
         {
@@ -621,7 +621,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 
 	while (1)
 	{
-		string = zbx_malloc(string, size);
+		string = (char *)zbx_malloc(string, size);
 
 		va_copy(curr, args);
 		n = vsnprintf(string, size, f, curr);
@@ -698,7 +698,7 @@ char	*zbx_strdcat(char *dest, const char *src)
 	len_dest = strlen(dest);
 	len_src = strlen(src);
 
-	dest = zbx_realloc(dest, len_dest + len_src + 1);
+	dest = (char *)zbx_realloc(dest, len_dest + len_src + 1);
 
 	zbx_strlcpy(dest + len_dest, src, len_src + 1);
 
@@ -1360,7 +1360,7 @@ char	*get_param_dyn(const char *p, int num)
 	if (0 != get_param_len(p, num, &sz))
 		return buf;
 
-	buf = zbx_malloc(buf, sz + 1);
+	buf = (char *)zbx_malloc(buf, sz + 1);
 
 	if (0 != get_param(p, num, buf, sz + 1))
 		zbx_free(buf);
@@ -1811,7 +1811,7 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 
 	sz = zbx_get_escape_string_len(src, charlist) + 1;
 
-	dst = zbx_malloc(dst, sz);
+	dst = (char *)zbx_malloc(dst, sz);
 
 	for (d = dst; '\0' != *src; src++)
 	{
@@ -1928,6 +1928,99 @@ int	cmp_key_id(const char *key_1, const char *key_2)
 		;
 
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_process_type_string                                          *
+ *                                                                            *
+ * Purpose: Returns process name                                              *
+ *                                                                            *
+ * Parameters: process_type - [IN] process type; ZBX_PROCESS_TYPE_*           *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: used in internals checks zabbix["process",...], process titles   *
+ *           and log files                                                    *
+ *                                                                            *
+ ******************************************************************************/
+const char	*get_process_type_string(unsigned char proc_type)
+{
+	switch (proc_type)
+	{
+		case ZBX_PROCESS_TYPE_POLLER:
+			return "poller";
+		case ZBX_PROCESS_TYPE_UNREACHABLE:
+			return "unreachable poller";
+		case ZBX_PROCESS_TYPE_IPMIPOLLER:
+			return "ipmi poller";
+		case ZBX_PROCESS_TYPE_PINGER:
+			return "icmp pinger";
+		case ZBX_PROCESS_TYPE_JAVAPOLLER:
+			return "java poller";
+		case ZBX_PROCESS_TYPE_HTTPPOLLER:
+			return "http poller";
+		case ZBX_PROCESS_TYPE_TRAPPER:
+			return "trapper";
+		case ZBX_PROCESS_TYPE_SNMPTRAPPER:
+			return "snmp trapper";
+		case ZBX_PROCESS_TYPE_PROXYPOLLER:
+			return "proxy poller";
+		case ZBX_PROCESS_TYPE_ESCALATOR:
+			return "escalator";
+		case ZBX_PROCESS_TYPE_HISTSYNCER:
+			return "history syncer";
+		case ZBX_PROCESS_TYPE_DISCOVERER:
+			return "discoverer";
+		case ZBX_PROCESS_TYPE_ALERTER:
+			return "alerter";
+		case ZBX_PROCESS_TYPE_TIMER:
+			return "timer";
+		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+			return "housekeeper";
+		case ZBX_PROCESS_TYPE_DATASENDER:
+			return "data sender";
+		case ZBX_PROCESS_TYPE_CONFSYNCER:
+			return "configuration syncer";
+		case ZBX_PROCESS_TYPE_HEARTBEAT:
+			return "heartbeat sender";
+		case ZBX_PROCESS_TYPE_SELFMON:
+			return "self-monitoring";
+		case ZBX_PROCESS_TYPE_VMWARE:
+			return "vmware collector";
+		case ZBX_PROCESS_TYPE_COLLECTOR:
+			return "collector";
+		case ZBX_PROCESS_TYPE_LISTENER:
+			return "listener";
+		case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+			return "active checks";
+		case ZBX_PROCESS_TYPE_TASKMANAGER:
+			return "task manager";
+		case ZBX_PROCESS_TYPE_IPMIMANAGER:
+			return "ipmi manager";
+		case ZBX_PROCESS_TYPE_ALERTMANAGER:
+			return "alert manager";
+		case ZBX_PROCESS_TYPE_PREPROCMAN:
+			return "preprocessing manager";
+		case ZBX_PROCESS_TYPE_PREPROCESSOR:
+			return "preprocessing worker";
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
+int	get_process_type_by_name(const char *proc_type_str)
+{
+	int	i;
+
+	for (i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+	{
+		if (0 == strcmp(proc_type_str, get_process_type_string(i)))
+			return i;
+	}
+
+	return ZBX_PROCESS_TYPE_UNKNOWN;
 }
 
 const char	*get_program_type_string(unsigned char program_type)
@@ -2510,7 +2603,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	char		*out = NULL, *p;
 
 	out_alloc = in_size + 1;
-	p = out = zbx_malloc(out, out_alloc);
+	p = out = (char *)zbx_malloc(out, out_alloc);
 
 	if ('\0' == *encoding || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
 	{
@@ -2530,7 +2623,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		sz = (size_t)(p - out);
 		out_alloc += in_size;
 		out_size_left += in_size;
-		p = out = zbx_realloc(out, out_alloc);
+		p = out = (char *)zbx_realloc(out, out_alloc);
 		p += sz;
 	}
 
@@ -2647,7 +2740,7 @@ char	*zbx_replace_utf8(const char *text)
 	int	n;
 	char	*out, *p;
 
-	out = p = zbx_malloc(NULL, strlen(text) + 1);
+	out = p = (char *)zbx_malloc(NULL, strlen(text) + 1);
 
 	while ('\0' != *text)
 	{
@@ -2956,7 +3049,7 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	dst_size = src_size + feeds * delim_size + 1;
 
 	/* allocate memory for output */
-	dst = zbx_malloc(dst, dst_size);
+	dst = (char *)zbx_malloc(dst, dst_size);
 
 	p_src = src;
 	p_dst = dst;
@@ -3001,7 +3094,7 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
  ******************************************************************************/
 void	zbx_strarr_init(char ***arr)
 {
-	*arr = zbx_malloc(*arr, sizeof(char *));
+	*arr = (char **)zbx_malloc(*arr, sizeof(char *));
 	**arr = NULL;
 }
 
@@ -3030,7 +3123,7 @@ void	zbx_strarr_add(char ***arr, const char *entry)
 	for (i = 0; NULL != (*arr)[i]; i++)
 		;
 
-	*arr = zbx_realloc(*arr, sizeof(char *) * (i + 2));
+	*arr = (char **)zbx_realloc(*arr, sizeof(char *) * (i + 2));
 
 	(*arr)[i] = zbx_strdup((*arr)[i], entry);
 	(*arr)[++i] = NULL;
@@ -3086,7 +3179,7 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
 		sz_data += sz_value - sz_block;
 
 		if (sz_value > sz_block)
-			*data = zbx_realloc(*data, sz_data + 1);
+			*data = (char *)zbx_realloc(*data, sz_data + 1);
 
 		src = *data + l + sz_block;
 		dst = *data + l + sz_value;
@@ -3304,7 +3397,7 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 
 		/* extract the macro name and close with '}' character */
 		len = ptr - macro + 1;
-		*name = zbx_realloc(*name, len + 1);
+		*name = (char *)zbx_realloc(*name, len + 1);
 		memcpy(*name, macro, len - 1);
 		(*name)[len - 1] = '}';
 		(*name)[len] = '\0';
@@ -3313,7 +3406,7 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 	}
 	else
 	{
-		*name = zbx_realloc(*name, macro_r + 2);
+		*name = (char *)zbx_realloc(*name, macro_r + 2);
 		zbx_strlcpy(*name, macro, macro_r + 2);
 	}
 
@@ -3345,7 +3438,7 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
 	int	quoted = 0;
 	char	*buffer, *ptr;
 
-	ptr = buffer = zbx_malloc(NULL, len + 1);
+	ptr = buffer = (char *)zbx_malloc(NULL, len + 1);
 
 	if ('"' == *context)
 	{
@@ -3412,7 +3505,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 		return zbx_strdup(NULL, context);
 
 	len = (int)strlen(context) + 2 + quotes;
-	ptr_buffer = buffer = zbx_malloc(NULL, len + 1);
+	ptr_buffer = buffer = (char *)zbx_malloc(NULL, len + 1);
 
 	*ptr_buffer++ = '"';
 
@@ -3454,7 +3547,7 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
 		len++;
 	}
 
-	pout = arg_esc = zbx_malloc(NULL, len);
+	pout = arg_esc = (char *)zbx_malloc(NULL, len);
 
 	for (pin = arg; '\0' != *pin; pin++)
 	{
@@ -3627,7 +3720,7 @@ int	zbx_function_param_quote(char **param, int forced)
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 
-	*param = zbx_realloc(*param, sz_dst);
+	*param = (char *)zbx_realloc(*param, sz_dst);
 
 	(*param)[--sz_dst] = '\0';
 	(*param)[--sz_dst] = '"';
@@ -4721,7 +4814,7 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 			while (*data_len > *data_alloc)
 				*data_alloc *= 2;
 
-			*data = zbx_realloc(*data, *data_alloc);
+			*data = (char *)zbx_realloc(*data, *data_alloc);
 		}
 
 		to = *data + offset;

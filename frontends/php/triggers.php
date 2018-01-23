@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -582,18 +582,6 @@ elseif (isset($_REQUEST['form'])) {
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'groupid' => getRequest('groupid', 0)
 	];
-
-	if (!$data['groupid']) {
-		$db_hostgroup = API::HostGroup()->get([
-			'output' => ['groupid'],
-			'hostids' => $data['hostid'],
-			'templateids' => $data['hostid']
-		]);
-
-		if ($db_hostgroup) {
-			$data['groupid'] = $db_hostgroup[0]['groupid'];
-		}
-	}
 
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));
 	$triggersView->render();

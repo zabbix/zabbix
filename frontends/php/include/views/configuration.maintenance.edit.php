@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,13 +33,15 @@ if (isset($this->data['maintenanceid'])) {
  * Maintenance tab
  */
 $maintenanceFormList = (new CFormList('maintenanceFormList'))
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
 		(new CTextBox('mname', $this->data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
 	)
-	->addRow(_('Maintenance type'),
+	->addRow((new CLabel(_('Maintenance type'), 'maintenance_type')),
 		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
 			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
@@ -101,12 +103,14 @@ $maintenanceFormList->addRow(_('Description'),
  * Maintenance period tab
  */
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
-$maintenancePeriodTable = (new CTable())
+$maintenance_period_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]);
+	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')])
+	->setId('maintenance_periods')
+	->setAriaRequired();
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
-	$maintenancePeriodTable->addRow([
+	$maintenance_period_table->addRow([
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
 		shedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
@@ -139,9 +143,10 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
-$periodsDiv = (new CDiv($maintenancePeriodTable))
+$periodsDiv = (new CDiv($maintenance_period_table))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
+
 if (!isset($_REQUEST['new_timeperiod'])) {
 	$periodsDiv->addItem(
 		(new CSimpleButton(_('New')))
@@ -149,7 +154,9 @@ if (!isset($_REQUEST['new_timeperiod'])) {
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 }
-$maintenancePeriodFormList->addRow(_('Periods'), $periodsDiv);
+$maintenancePeriodFormList->addRow(
+	(new CLabel(_('Periods'), $maintenance_period_table->getId()))->setAsteriskMark(), $periodsDiv
+);
 
 if (isset($_REQUEST['new_timeperiod'])) {
 	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {
@@ -179,7 +186,9 @@ if (isset($_REQUEST['new_timeperiod'])) {
 /*
  * Hosts & groups tab
  */
-$hostsAndGroupsFormList = new CFormList('hostsAndGroupsFormList');
+$hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))->addRow('',
+	(new CLabel(_('At least one host or host group must be selected.')))->setAsteriskMark()
+);
 $hostTweenBox = new CTweenBox($maintenanceForm, 'hostids', $this->data['hostids'], 10);
 foreach ($this->data['hosts'] as $host) {
 	$hostTweenBox->addItem($host['hostid'], $host['name']);

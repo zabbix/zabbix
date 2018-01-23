@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,10 +146,10 @@ static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager
 	if (ts != manager->cache_ts)
 	{
 		zbx_hashset_iter_reset(&manager->history_cache, &iter);
-		while (NULL != (history_value = zbx_hashset_iter_next(&iter)))
+		while (NULL != (history_value = (zbx_item_history_value_t *)zbx_hashset_iter_next(&iter)))
 		{
 			item_local.itemid = history_value->itemid;
-			if (NULL == (item = zbx_hashset_search(&manager->item_config, &item_local)) ||
+			if (NULL == (item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local)) ||
 					history_value->value_type != item->value_type)
 			{
 				/* history value is removed if item was removed/disabled or item value type changed */
@@ -292,7 +292,7 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 		THIS_SHOULD_NEVER_HAPPEN;
 
 	size = zbx_preprocessor_pack_task(task, request->value.itemid, request->value_type, request->value.ts, &value,
-			zbx_hashset_search(&manager->history_cache, &request->value.itemid), request->steps,
+			(zbx_item_history_value_t *)zbx_hashset_search(&manager->history_cache, &request->value.itemid), request->steps,
 			request->steps_num);
 
 	return size;
@@ -458,7 +458,7 @@ static void	preprocessor_link_delta_items(zbx_preprocessing_manager_t *manager, 
 	if (i != item->preproc_ops_num)
 	{
 		/* existing delta item*/
-		if (NULL != (index = zbx_hashset_search(&manager->delta_items, &item->itemid)))
+		if (NULL != (index = (zbx_delta_item_index_t *)zbx_hashset_search(&manager->delta_items, &item->itemid)))
 		{
 			dep_request = (zbx_preprocessing_request_t *)(enqueued_at->data);
 			request = (zbx_preprocessing_request_t *)(index->queue_item->data);
@@ -558,7 +558,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: %" PRIu64, __function_name, value->itemid);
 
 	item_local.itemid = value->itemid;
-	item = zbx_hashset_search(&manager->item_config, &item_local);
+	item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local);
 
 	/* override priority based on item type */
 	if (NULL != item && ITEM_TYPE_INTERNAL == item->type)
@@ -589,7 +589,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	if (REQUEST_STATE_QUEUED == state)
 	{
 		request->value_type = item->value_type;
-		request->steps = zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * item->preproc_ops_num);
+		request->steps = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * item->preproc_ops_num);
 		request->steps_num = item->preproc_ops_num;
 
 		for (i = 0; i < item->preproc_ops_num; i++)
@@ -666,7 +666,7 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 	if (NULL != source_value->result && ISSET_VALUE(source_value->result))
 	{
 		item_local.itemid = source_value->itemid;
-		if (NULL != (item = zbx_hashset_search(&manager->item_config, &item_local)) &&
+		if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local)) &&
 				0 != item->dep_itemids_num)
 		{
 			for (i = item->dep_itemids_num - 1; i >= 0; i--)
@@ -790,7 +790,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 				}
 				else
 				{
-					log = zbx_malloc(NULL, sizeof(zbx_log_t));
+					log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
 					memset(log, 0, sizeof(zbx_log_t));
 					SET_LOG_RESULT(request->value.result, log);
 				}
@@ -814,7 +814,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		zbx_free(request->value.error);
 		request->value.error = zbx_dsprintf(NULL, "Value \"%s\" of type \"%s\" is not suitable for"
 			" value type \"%s\"", zbx_variant_value_desc(value), zbx_variant_type_desc(value),
-			zbx_item_value_type_string(request->value_type));
+			zbx_item_value_type_string((zbx_item_value_type_t)request->value_type));
 
 		request->value.state = ITEM_STATE_NOTSUPPORTED;
 		ret = FAIL;
@@ -858,7 +858,7 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 		history_value->itemid = request->value.itemid;
 		history_value->value_type = request->value_type;
 
-		if (NULL != (cached_value = zbx_hashset_search(&manager->history_cache, history_value)))
+		if (NULL != (cached_value = (zbx_item_history_value_t *)zbx_hashset_search(&manager->history_cache, history_value)))
 		{
 			if (0 < zbx_timespec_compare(&history_value->timestamp, &cached_value->timestamp))
 			{
@@ -878,7 +878,7 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	if (NULL != request->pending)
 		request->pending->state = REQUEST_STATE_QUEUED;
 
-	if (NULL != (index = zbx_hashset_search(&manager->delta_items, &request->value.itemid)) &&
+	if (NULL != (index = (zbx_delta_item_index_t *)zbx_hashset_search(&manager->delta_items, &request->value.itemid)) &&
 			worker->queue_item == index->queue_item)
 	{
 		/* item is removed from delta index if it was present in delta item index*/
@@ -917,7 +917,7 @@ static void	preprocessor_init_manager(zbx_preprocessing_manager_t *manager)
 
 	memset(manager, 0, sizeof(zbx_preprocessing_manager_t));
 
-	manager->workers = zbx_calloc(NULL, CONFIG_PREPROCESSOR_FORKS, sizeof(zbx_preprocessing_worker_t));
+	manager->workers = (zbx_preprocessing_worker_t *)zbx_calloc(NULL, CONFIG_PREPROCESSOR_FORKS, sizeof(zbx_preprocessing_worker_t));
 	zbx_list_create(&manager->queue);
 	zbx_hashset_create_ext(&manager->item_config, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			(zbx_clean_func_t)preproc_item_clear,

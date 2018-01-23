@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -846,22 +846,6 @@ class testScripts extends CZabbixTest {
 					],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			// Check successfully scripts execution.
-			[
-				'script' => [
-					'scriptid' => '1',
-					'hostid' => '10084'
-					],
-				// TODO: different success result on jenkins
-				// 'success_expected' => true,
-				'success_expected' => false,
-				'expected_error' => 'Connection to Zabbix server "localhost" refused. Possible reasons:
-1. Incorrect server IP/DNS in the "zabbix.conf.php";
-2. Security environment (for example, SELinux) is blocking the connection;
-3. Zabbix server daemon not running;
-4. Firewall is blocking TCP connection.
-Connection refused'
 			]
 		];
 	}
@@ -906,23 +890,6 @@ Connection refused'
 							'hostid' => '10084'
 						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			// User have only read permissions to host, but script required write permissions for the host.
-			[
-				'method' => 'script.execute',
-				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
-				'script' => [
-							'scriptid' => '14',
-							'hostid' => '50012'
-						],
-				// TODO: different error message on jenkins
-				// 'expected_error' => 'Unknown Script ID [14]'
-				'expected_error' => 'Connection to Zabbix server "localhost" refused. Possible reasons:
-1. Incorrect server IP/DNS in the "zabbix.conf.php";
-2. Security environment (for example, SELinux) is blocking the connection;
-3. Zabbix server daemon not running;
-4. Firewall is blocking TCP connection.
-Connection refused'
 			],
 			// User have deny permissions to host, but script required read permissions for the host.
 			[

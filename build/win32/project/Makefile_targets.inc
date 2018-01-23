@@ -67,8 +67,5 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxwin32}.c{..\..\..\src\libs\zbxwin32}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
-{..\..\..\src\libs\zbxself}.c{..\..\..\src\libs\zbxself}.o:
-	$(CC) $? /Fo"$@" $(CFLAGS)
-
 {$(PROJECTDIR)}.c{$(PROJECTDIR)}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)

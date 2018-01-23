@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,7 +247,7 @@ static void	quote_string(char **str, size_t sz_src)
 
 	sz_dst = zbx_get_escape_string_len(*str, "\"") + 3;
 
-	*str = zbx_realloc(*str, sz_dst);
+	*str = (char *)zbx_realloc(*str, sz_dst);
 
 	(*str)[--sz_dst] = '\0';
 	(*str)[--sz_dst] = '"';
@@ -282,7 +282,7 @@ static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_of
 			continue;
 
 		zbx_strcpy_alloc(str, str_alloc, str_offset, separator);
-		separator = ", ";
+		separator = (char *)", ";
 
 		quote_string(&group, strlen(group));
 		zbx_strcpy_alloc(str, str_alloc, str_offset, group);
@@ -346,7 +346,7 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 		goto out;
 	}
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 	esc = DBdyn_escape_string(itemkey);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -436,8 +436,8 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	memset(&value, 0, sizeof(value));
 	zbx_history_record_vector_create(&group_values);
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * itemids.values_num);
+	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * itemids.values_num);
 
 	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 

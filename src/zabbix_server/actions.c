@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *
 {
 	int	i, ret, ret_continue;
 
-	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator || CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+	if (CONDITION_OPERATOR_NOT_EQUAL == condition->op || CONDITION_OPERATOR_NOT_LIKE == condition->op)
 		ret_continue = SUCCEED;
 	else
 		ret_continue = FAIL;
@@ -53,7 +53,7 @@ static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
-		ret = zbx_strmatch_condition(tag->tag, condition->value, condition->operator);
+		ret = zbx_strmatch_condition(tag->tag, condition->value, condition->op);
 	}
 
 	return ret;
@@ -75,7 +75,7 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
 {
 	int	i, ret, ret_continue;
 
-	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator || CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+	if (CONDITION_OPERATOR_NOT_EQUAL == condition->op || CONDITION_OPERATOR_NOT_LIKE == condition->op)
 		ret_continue = SUCCEED;
 	else
 		ret_continue = FAIL;
@@ -87,7 +87,7 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
 		if (0 == strcmp(condition->value2, tag->tag))
-			ret = zbx_strmatch_condition(tag->value, condition->value, condition->operator);
+			ret = zbx_strmatch_condition(tag->value, condition->value, condition->op);
 	}
 
 	return ret;
@@ -148,7 +148,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		zbx_free(sql);
 		zbx_vector_uint64_destroy(&groupids);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (NULL != DBfetch(result))
@@ -169,7 +169,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 		ZBX_STR2UINT64(condition_value, condition->value);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 			case CONDITION_OPERATOR_NOT_EQUAL:
@@ -219,7 +219,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 				}
 				while (SUCCEED != ret && 0 != triggerid);
 
-				if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+				if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 					ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 				break;
 			default:
@@ -230,7 +230,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 			case CONDITION_OPERATOR_NOT_EQUAL:
@@ -248,7 +248,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 					ret = SUCCEED;
 				DBfree_result(result);
 
-				if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+				if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 					ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 				break;
 			default:
@@ -261,7 +261,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 		ZBX_STR2UINT64(condition_value, condition->value);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 			case CONDITION_OPERATOR_NOT_EQUAL:
@@ -293,7 +293,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 					}
 				}
 
-				if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+				if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 					ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 				break;
 			default:
@@ -307,7 +307,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_LIKE:
 				if (NULL != strstr(tmp_str, condition->value))
@@ -326,7 +326,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	{
 		condition_value = atoi(condition->value);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (event->trigger.priority == condition_value)
@@ -359,7 +359,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 		if (SUCCEED == zbx_check_time_period(period, (time_t)event->clock, &res))
 		{
-			switch (condition->operator)
+			switch (condition->op)
 			{
 				case CONDITION_OPERATOR_IN:
 					if (SUCCEED == res)
@@ -383,7 +383,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	}
 	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
 	{
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_IN:
 				result = DBselect(
@@ -431,7 +431,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 				atoi(condition->value),
 				event->eventid);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (NULL != (row = DBfetch(result)))
@@ -453,7 +453,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 					" and t.triggerid=" ZBX_FS_UI64,
 				event->objectid);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				while (NULL != (row = DBfetch(result)))
@@ -508,7 +508,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	if (NOTSUPPORTED == ret)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				(int)condition->operator, condition->conditionid);
+				(int)condition->op, condition->conditionid);
 		ret = FAIL;
 	}
 
@@ -568,7 +568,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 					event->objectid);
 		}
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (NULL != DBfetch(result))
@@ -597,7 +597,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 					condition_value,
 					event->objectid);
 
-			switch (condition->operator)
+			switch (condition->op)
 			{
 				case CONDITION_OPERATOR_EQUAL:
 					if (NULL != DBfetch(result))
@@ -617,7 +617,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 	{
 		int	condition_value_i = atoi(condition->value);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (event->object == condition_value_i)
@@ -655,7 +655,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 					event->objectid);
 		}
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (NULL != DBfetch(result))
@@ -682,7 +682,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 
 			if (NULL != (row = DBfetch(result)))
 			{
-				switch (condition->operator)
+				switch (condition->op)
 				{
 					case CONDITION_OPERATOR_EQUAL:
 						if (0 == strcmp(condition->value, row[0]))
@@ -736,7 +736,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 
 		while (NULL != (row = DBfetch(result)) && FAIL == ret)
 		{
-			switch (condition->operator)
+			switch (condition->op)
 			{
 				case CONDITION_OPERATOR_EQUAL:
 					if (SUCCEED == ip_in_list(condition->value, row[0]))
@@ -769,7 +769,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 			{
 				tmp_int = atoi(row[0]);
 
-				switch (condition->operator)
+				switch (condition->op)
 				{
 					case CONDITION_OPERATOR_EQUAL:
 						if (condition_value_i == tmp_int)
@@ -790,7 +790,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 	{
 		int	condition_value_i = atoi(condition->value);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (condition_value_i == event->value)
@@ -832,7 +832,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 			now = time(NULL);
 			tmp_int = DOBJECT_STATUS_UP == atoi(row[0]) ? atoi(row[1]) : atoi(row[2]);
 
-			switch (condition->operator)
+			switch (condition->op)
 			{
 				case CONDITION_OPERATOR_LESS_EQUAL:
 					if (0 != tmp_int && (now - tmp_int) <= condition_value_i)
@@ -860,7 +860,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 
 			if (NULL != (row = DBfetch(result)))
 			{
-				switch (condition->operator)
+				switch (condition->op)
 				{
 					case CONDITION_OPERATOR_EQUAL:
 						if (SUCCEED == int_in_list(condition->value, atoi(row[0])))
@@ -886,7 +886,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 	if (NOTSUPPORTED == ret)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				(int)condition->operator, condition->conditionid);
+				(int)condition->op, condition->conditionid);
 		ret = FAIL;
 	}
 
@@ -938,7 +938,7 @@ static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION
 
 			if (NULL != (row = DBfetch(result)))
 			{
-				switch (condition->operator)
+				switch (condition->op)
 				{
 					case CONDITION_OPERATOR_LIKE:
 						if (NULL != strstr(row[0], condition->value))
@@ -968,7 +968,7 @@ static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION
 			{
 				ZBX_DBROW2UINT64(id, row[0]);
 
-				switch (condition->operator)
+				switch (condition->op)
 				{
 					case CONDITION_OPERATOR_EQUAL:
 						if (id == condition_value)
@@ -993,7 +993,7 @@ static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION
 	if (NOTSUPPORTED == ret)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				(int)condition->operator, condition->conditionid);
+				(int)condition->op, condition->conditionid);
 		ret = FAIL;
 	}
 
@@ -1099,7 +1099,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 		zbx_free(sqlcond);
 		zbx_vector_uint64_destroy(&groupids);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (NULL != DBfetch(result))
@@ -1120,7 +1120,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 
 		ZBX_STR2UINT64(condition_value, condition->value);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 			case CONDITION_OPERATOR_NOT_EQUAL:
@@ -1195,7 +1195,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 				}
 				while (SUCCEED != ret && 0 != objectid);
 
-				if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+				if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 					ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 				break;
 			default:
@@ -1229,7 +1229,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 
 		result = DBselectN(sql, 1);
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				if (NULL != DBfetch(result))
@@ -1267,7 +1267,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 						event->objectid);
 		}
 
-		switch (condition->operator)
+		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_EQUAL:
 				while (NULL != (row = DBfetch(result)))
@@ -1314,7 +1314,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 	if (NOTSUPPORTED == ret)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				(int)condition->operator, condition->conditionid);
+				(int)condition->op, condition->conditionid);
 		ret = FAIL;
 	}
 out:
@@ -1675,11 +1675,11 @@ static int	is_recovery_event(const DB_EVENT *event)
  ******************************************************************************/
 static int	uniq_conditions_compare_func(const void *d1, const void *d2)
 {
-	const DB_CONDITION	*condition1 = d1, *condition2 = d2;
+	const DB_CONDITION	*condition1 = (const DB_CONDITION *)d1, *condition2 = (const DB_CONDITION *)d2;
 	int			ret;
 
 	ZBX_RETURN_IF_NOT_EQUAL(condition1->conditiontype, condition2->conditiontype);
-	ZBX_RETURN_IF_NOT_EQUAL(condition1->operator, condition2->operator);
+	ZBX_RETURN_IF_NOT_EQUAL(condition1->op, condition2->op);
 
 	if (0 != (ret = strcmp(condition1->value, condition2->value)))
 		return ret;
@@ -1704,13 +1704,13 @@ static int	uniq_conditions_compare_func(const void *d1, const void *d2)
  ******************************************************************************/
 static zbx_hash_t	uniq_conditions_hash_func(const void *data)
 {
-	const DB_CONDITION	*condition = data;
+	const DB_CONDITION	*condition = (const DB_CONDITION *)data;
 	zbx_hash_t		hash;
 
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(condition->value, strlen(condition->value), ZBX_DEFAULT_HASH_SEED);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(condition->value2, strlen(condition->value2), hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->conditiontype, 1, hash);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->operator, 1, hash);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->op, 1, hash);
 
 	return hash;
 }
@@ -1812,7 +1812,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 					/* command and message operations handled by escalators even for    */
 					/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTO_REGISTRATION events */
-					new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
+					new_escalation = (zbx_escalation_new_t *)zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
 					new_escalation->actionid = action->actionid;
 					new_escalation->event = event;
 					zbx_vector_ptr_append(&new_escalations, new_escalation);
@@ -1882,12 +1882,12 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 			r_eventid = closed_events->values[index].second;
 
-			if (NULL == (rec_escalation = zbx_hashset_search(&rec_escalations, &r_eventid)))
+			if (NULL == (rec_escalation = (zbx_escalation_rec_t *)zbx_hashset_search(&rec_escalations, &r_eventid)))
 			{
 				zbx_escalation_rec_t	esc_rec_local;
 
 				esc_rec_local.r_eventid = r_eventid;
-				rec_escalation = zbx_hashset_insert(&rec_escalations, &esc_rec_local,
+				rec_escalation = (zbx_escalation_rec_t *)zbx_hashset_insert(&rec_escalations, &esc_rec_local,
 						sizeof(esc_rec_local));
 
 				zbx_vector_uint64_create(&rec_escalation->escalationids);

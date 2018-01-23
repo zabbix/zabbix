@@ -63,12 +63,12 @@
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
-<!--		<for list="${conf.list}" param="name" delimiter=",">
-			<sequential>-->
+		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>
 				<exec executable="scan-build" failonerror="on">
 					<arg line="./configure"/>
-<!--					<arg line="${@{name}}"/>-->
-					<arg line="--enable-agent"/>
+					<arg line="-q"/>
+					<arg line="${@{name}}"/>
 				</exec>
 				<trycatch>
 					<try>
@@ -88,8 +88,8 @@
 						</exec>
 					</finally>
 				</trycatch>
-<!--			</sequential>
-		</for>-->
+			</sequential>
+		</for>
 	</target>
 
 	<!-- Static analysis container target -->
@@ -233,7 +233,7 @@
 			</sequential>
 		</for>
 	</target>
-	
+
 	<!-- Target "make-gcc" cannot have "init" dependency because it brakes "build-dist" -->
 	<target name="init-make-gcc" depends="init,make-gcc"/>
 
@@ -243,7 +243,7 @@
 			<make cc="clang" args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
 	</target>
-	
+
 	<target name="make-db-mysql" unless="${with.mysql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
@@ -274,14 +274,26 @@
 
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
-	
-	<target name="mock-tests" depends="init">
+
+	<target name="mock-tests">
 		<!-- Build Zabbix server and proxy with C mock tests -->
-		<sequential>
-			<make args="--enable-server --enable-proxy --with-mysql --with-libxml2" target="tests"/>
-		</sequential>
+		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./configure" failonerror="on">
+			<arg line="-q"/>
+			<arg line="--enable-server"/>
+			<arg line="--enable-proxy"/>
+			<arg line="--enable-agent"/>
+			<arg line="--with-mysql"/>
+			<arg line="--with-libxml2"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
+			<arg line="tests_build"/>
+		</exec>
+		<exec executable="tests/tests_run.pl" failonerror="on" output="output.xml"></exec>
 	</target>
-	
+
 	<target name="run-unit-test">
 		<!-- Run C unit tests -->
 		<sequential>
@@ -291,12 +303,12 @@
 			</exec>
 		</sequential>
 	</target>
-	
+
 	<target name="unit-test" depends="init">
 		<!-- Build Zabbix with C unit tests -->
 		<make args="--enable-server --with-mysql --with-libxml2" target="test" post-action="run-unit-test"/>
 	</target>
-	
+
 	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
 	<target name="make-dist" depends="init">

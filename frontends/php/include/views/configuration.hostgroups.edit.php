@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,9 +34,10 @@ $hostGroupFormList = new CFormList('hostgroupFormList');
 $nameTextBox = (new CTextBox('name', $this->data['name'],
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAriaRequired();
 $nameTextBox->setAttribute('autofocus', 'autofocus');
-$hostGroupFormList->addRow(_('Group name'), $nameTextBox);
+$hostGroupFormList->addRow((new CLabel(_('Group name'), 'name'))->setAsteriskMark(), $nameTextBox);
 
 // append groups and hosts to form list
 $groupsComboBox = new CComboBox('twb_groupid', $this->data['twb_groupid'], 'submit()');

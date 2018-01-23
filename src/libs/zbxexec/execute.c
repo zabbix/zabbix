@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -314,7 +314,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (NULL != output)
 		zbx_free(*output);
 
-	buffer = zbx_malloc(buffer, buf_size);
+	buffer = (char *)zbx_malloc(buffer, buf_size);
 	*buffer = '\0';
 
 #ifdef _WINDOWS

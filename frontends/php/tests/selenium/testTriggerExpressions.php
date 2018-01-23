@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,25 +24,30 @@ class testTriggerExpressions extends CWebTest {
 
 	public static function provider() {
 		return [
-			['10M', '20M', 'FALSE'],
-			['10T', '2G', 'TRUE'],
-			['10T', '2T', 'TRUE']
+			['20M', 'FALSE', 'red'],
+			['19.9M', 'TRUE', 'green'],
+			['20479K', 'TRUE', 'green']
 		];
 	}
 
 	/**
 	* @dataProvider provider
 	*/
-	public function testTriggerExpression_SimpleTest($where, $what, $expected) {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$this->zbxTestCheckHeader('Dashboard');
-		$this->zbxTestOpen('tr_testexpr.php?expression={Test%20host%3Avm.memory.size[total].last%280%29}%3C'.$where);
-		$this->zbxTestCheckTitle('Test');
-		$this->zbxTestCheckHeader('Test');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//input[@type='text']"));
-		$this->zbxTestInputTypeByXpath("//input[@type='text']", $what);
+	public function testTriggerExpression_SimpleTest($value, $expected, $css_class) {
+		// Open advanced editor for testing trigger expression results
+		$this->zbxTestLogin('triggers.php?form=update&hostid=10084&triggerid=13504');
+		$this->zbxTestCheckHeader('Triggers');
+		$this->zbxTestClickButtonText('Expression constructor');
+		$this->zbxTestClickWait('test_expression');
+		$this->zbxTestLaunchOverlayDialog('Test');
 
-		$this->zbxTestClick("test_expression");
-		$this->zbxTestTextPresent($expected);
+		// Type values in expression testing form
+		$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@type="text"]', $value);
+
+		// Verify result of expression status
+		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Test"]');
+		$this->zbxTestAssertElementText('(//div[@class="overlay-dialogue-body"]//td[@class="'.$css_class.'"])[1]', $expected);
+		$this->zbxTestAssertElementText('(//div[@class="overlay-dialogue-body"]//td[@class="'.$css_class.'"])[2]', $expected);
+		$this->zbxTestCheckFatalErrors();
 	}
 }

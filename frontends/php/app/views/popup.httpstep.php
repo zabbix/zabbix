@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,17 +37,21 @@ $http_popup_form = (new CForm())
 	->addVar('action', 'popup.httpstep');
 
 $http_popup_form_list = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $options['name'], (bool) $options['templated'], 64))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('URL'),
+	->addRow(
+		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 		new CDiv([
 			(new CTextBox('url', $options['url'], false, null))
+				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('parse', _('Parse')))
-				->onClick('javascript: parseUrl();')
+				->onClick('javascript: parseUrl("'.$http_popup_form->getId().'");')
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])
 	);
@@ -64,8 +68,10 @@ $pair_tables = [
 		'header' => [
 			'label' => _('Post type'),
 			'items' => (new CRadioButtonList('post_type', $options['post_type']))
-				->addValue(_('Form data'), ZBX_POSTTYPE_FORM, null, 'return switchToPostType(this.value);')
-				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW, null, 'return switchToPostType(this.value);')
+				->addValue(_('Form data'), ZBX_POSTTYPE_FORM, null,
+					'return switchToPostType("'.$http_popup_form->getId().'", this.value);')
+				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW, null,
+					'return switchToPostType("'.$http_popup_form->getId().'", this.value);')
 				->setModern(true)
 		],
 		'footer' => [
@@ -77,12 +83,12 @@ $pair_tables = [
 		'class' => 'pair-container pair-container-sortable'
 	],
 	[
-		'id' => 'step_variables',
+		'id' => 'variables',
 		'label' => _('Variables'),
 		'class' => 'pair-container'
 	],
 	[
-		'id' => 'step_headers',
+		'id' => 'headers',
 		'label' => _('Headers'),
 		'class' => 'pair-container pair-container-sortable'
 	]
@@ -131,8 +137,9 @@ $http_popup_form_list
 		(new CCheckBox('retrieve_mode'))
 			->setChecked($options['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 	)
-	->addRow(_('Timeout'),
+	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $options['timeout']))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Required string'),
@@ -151,8 +158,9 @@ $output['buttons'] = [
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
 		'class' => '',
 		'keepOpen' => true,
-		'action' => 'return validate_httpstep("http_step", '.
-					'jQuery(window.document.forms["http_step"]).closest("[data-dialogueid]").attr("data-dialogueid"));'
+		'action' => 'return validateHttpStep("'.$http_popup_form->getId().'", '.
+						'jQuery(window.document.forms["'.$http_popup_form->getId().'"])' .
+							'.closest("[data-dialogueid]").attr("data-dialogueid"));'
 	]
 ];
 
@@ -161,48 +169,14 @@ $http_popup_form->addItem($http_popup_tab);
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();
 
-// Create row's html template.
-$output['body'] .= (new CTag('script'))
-	->addItem((new CRow([
-		(new CCol([
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-			new CInput('hidden', 'pairs[#{pair.id}][isNew]', '#{pair.isNew}'),
-			new CInput('hidden', 'pairs[#{pair.id}][id]', '#{pair.id}'),
-			(new CInput('hidden', 'pairs[#{pair.id}][type]', '#{pair.type}'))->setId('pair_type_#{pair.id}'),
-		]))
-			->addClass('pair-drag-control')
-			->addClass(ZBX_STYLE_TD_DRAG_ICON),
-		(new CTextBox('pairs[#{pair.id}][name]', '#{pair.name}'))
-			->setAttribute('data-type', 'name')
-			->setAttribute('placeholder', _('name'))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
-		'&rArr;',
-		(new CTextBox('pairs[#{pair.id}][value]', '#{pair.value}'))
-			->setId('pair_value_#{pair.id}')
-			->setAttribute('data-type', 'value')
-			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
-		(new CCol(
-			(new CButton('removePair_#{pair.id}', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('remove')
-				->setAttribute('data-pairid', '#{pair.id}')
-		))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->addClass('pair-control')
-	]))
-		->setId('pairRow_#{pair.id}')
-		->addClass('pairRow')
-		->addClass('sortable')
-		->setAttribute('data-pairid', '#{pair.id}'))
-	->setAttribute('type', 'text/x-jquery-tmpl')
-	->setAttribute('id', 'stepPairRow')
-	->toString();
-
 $output['script_inline'] .=
 	'jQuery(document).ready(function() {'."\n".
-		'pairManager.add(' . CJs::encodeJson(array_values($options['pairs'])) . ');'."\n".
-		'setPostType(' . CJs::encodeJson($options['post_type']) . ');'."\n".
+		'pairManager.removeAll("'.$http_popup_form->getId().'", "");' .
+		'pairManager.add("'.$http_popup_form->getId().'",' .
+			CJs::encodeJson(array_values($options['pairs'])) . ');'."\n".
+		'pairManager.initControls("'.$http_popup_form->getId().'");'."\n".
+		'setPostType("'.$http_popup_form->getId().'",' .
+			CJs::encodeJson($options['post_type']) . ');'."\n".
 		'cookie.init();'."\n".
 		'chkbxRange.init();'."\n".
 	'});';

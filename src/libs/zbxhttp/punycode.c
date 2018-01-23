@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -248,7 +248,7 @@ int	zbx_http_punycode_encode(const char *text, char **output)
 	zbx_uint32_t	n, tmp, count = 0, *codepoints;
 
 	zbx_free(*output);
-	codepoints = zbx_malloc(NULL, strlen(text) * sizeof(zbx_uint32_t));
+	codepoints = (zbx_uint32_t *)zbx_malloc(NULL, strlen(text) * sizeof(zbx_uint32_t));
 
 	while ('\0' != *text)
 	{

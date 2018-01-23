@@ -123,21 +123,23 @@ function getFontComboBox($name) {
 							MAP_LABEL_LOC_TOP => _('Top')
 						])
 					)
-					->addRow(_('Host group'),
+					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHostGroup',
 							'objectName' => 'hostGroup'
-						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAriaRequired(),
 						'hostGroupSelectRow'
 					)
-					->addRow(_('Host'),
+					->addRow((new CLabel(_('Host'), 'elementNameHost'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHost',
 							'objectName' => 'hosts'
-						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAriaRequired(),
 						'hostSelectRow'
 					)
-					->addRow(_('Triggers'), [
+					->addRow((new CLabel(_('Triggers'), 'triggerContainer'))->setAsteriskMark(), [
 						(new CDiv([
 							(new CTable())
 								->setHeader(['', _('Name'), (new CColHeader(_('Action')))->addStyle('padding: 0 5px;')])
@@ -166,7 +168,8 @@ function getFontComboBox($name) {
 										'srcfld1' => 'triggerid',
 										'with_triggers' => '1',
 										'real_hosts' => '1',
-										'multiselect' => '1'
+										'multiselect' => '1',
+										'noempty' => '1'
 									]
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
@@ -179,11 +182,12 @@ function getFontComboBox($name) {
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 						'triggerSelectRow'
 					)
-					->addRow(_('Map'), [
+					->addRow((new CLabel(_('Map'), 'elementName'))->setAsteriskMark(), [
 						(new CTextBox('elementName'))
 							->setReadonly(true)
 							->setId('elementNameMap')
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAriaRequired(),
 						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
@@ -825,7 +829,8 @@ function getFontComboBox($name) {
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol([(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)]))
-				->addStyle('background: ##{color}; padding: 0 5px;'),
+				->addStyle('padding: 0 5px;')
+				->addClass('#{class_name}'),
 			(new CCol([
 				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),
 				(new CVar('element_name[#{triggerid}]', '#{name}')),

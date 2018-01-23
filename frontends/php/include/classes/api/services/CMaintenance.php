@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -313,8 +313,8 @@ class CMaintenance extends CApiService {
 		foreach ($maintenances as $maintenance) {
 			$dbFields = [
 				'name' => null,
-				'active_since' => $now,
-				'active_till' => $now + SEC_PER_DAY
+				'active_since' => null,
+				'active_till' => null
 			];
 
 			if (!check_db_fields($dbFields, $maintenance)) {

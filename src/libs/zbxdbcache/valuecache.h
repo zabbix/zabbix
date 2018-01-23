@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,17 +78,22 @@ int	zbx_vc_init(char **error);
 
 void	zbx_vc_destroy(void);
 
+void	zbx_vc_reset(void);
+
 void	zbx_vc_lock(void);
 
 void	zbx_vc_unlock(void);
+
+void	zbx_vc_enable(void);
+
+void	zbx_vc_disable(void);
 
 int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
 		int count, int timestamp);
 
 int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value);
 
-int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *timestamp,
-		const history_value_t *value);
+int	zbx_vc_add_values(zbx_vector_ptr_t *history);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
 

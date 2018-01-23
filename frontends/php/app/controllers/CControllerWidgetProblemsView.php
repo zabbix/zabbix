@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,10 +126,10 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				return ['host', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_NAME_ASC:
-				return ['problem', ZBX_SORT_UP];
+				return ['name', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_NAME_DESC:
-				return ['problem', ZBX_SORT_DOWN];
+				return ['name', ZBX_SORT_DOWN];
 		}
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -267,7 +267,7 @@ static void	DCexpand_trigger_expression(char **expression)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
-	tmp = zbx_malloc(tmp, tmp_alloc);
+	tmp = (char *)zbx_malloc(tmp, tmp_alloc);
 
 	for (l = 0; '\0' != (*expression)[l]; l++)
 	{
@@ -568,10 +568,10 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_
 		goto out;
 	}
 
-	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	*replace_to = (char *)zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct h.name"
@@ -654,10 +654,10 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64
 		}
 	}
 
-	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	*replace_to = (char *)zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.name"
@@ -1429,7 +1429,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 	time_t		now;
 	zbx_uint64_t	userid;
 
-	buf = zbx_malloc(buf, buf_alloc);
+	buf = (char *)zbx_malloc(buf, buf_alloc);
 
 	zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
 			zbx_date2str(event->clock), zbx_time2str(event->clock),
@@ -1569,7 +1569,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 		return;
 	}
 
-	buf = zbx_malloc(buf, buf_alloc);
+	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
 	result = DBselect("select clock,userid,message,action"
@@ -1902,92 +1902,92 @@ static const char	*mod_macros[] = {MVAR_ITEM_VALUE, MVAR_ITEM_LASTVALUE, NULL};
 typedef struct
 {
 	const char	*macro;
-	const char	*field_name;
+	int		idx;
 } inventory_field_t;
 
 static inventory_field_t	inventory_fields[] =
 {
-	{MVAR_INVENTORY_TYPE, "type"},
-	{MVAR_PROFILE_DEVICETYPE, "type"},	/* deprecated */
-	{MVAR_INVENTORY_TYPE_FULL, "type_full"},
-	{MVAR_INVENTORY_NAME, "name"},
-	{MVAR_PROFILE_NAME, "name"},	/* deprecated */
-	{MVAR_INVENTORY_ALIAS, "alias"},
-	{MVAR_INVENTORY_OS, "os"},
-	{MVAR_PROFILE_OS, "os"},	/* deprecated */
-	{MVAR_INVENTORY_OS_FULL, "os_full"},
-	{MVAR_INVENTORY_OS_SHORT, "os_short"},
-	{MVAR_INVENTORY_SERIALNO_A, "serialno_a"},
-	{MVAR_PROFILE_SERIALNO, "serialno_a"},	/* deprecated */
-	{MVAR_INVENTORY_SERIALNO_B, "serialno_b"},
-	{MVAR_INVENTORY_TAG, "tag"},
-	{MVAR_PROFILE_TAG, "tag"},	/* deprecated */
-	{MVAR_INVENTORY_ASSET_TAG, "asset_tag"},
-	{MVAR_INVENTORY_MACADDRESS_A, "macaddress_a"},
-	{MVAR_PROFILE_MACADDRESS, "macaddress_a"},	/* deprecated */
-	{MVAR_INVENTORY_MACADDRESS_B, "macaddress_b"},
-	{MVAR_INVENTORY_HARDWARE, "hardware"},
-	{MVAR_PROFILE_HARDWARE, "hardware"},	/* deprecated */
-	{MVAR_INVENTORY_HARDWARE_FULL, "hardware_full"},
-	{MVAR_INVENTORY_SOFTWARE, "software"},
-	{MVAR_PROFILE_SOFTWARE, "software"},	/* deprecated */
-	{MVAR_INVENTORY_SOFTWARE_FULL, "software_full"},
-	{MVAR_INVENTORY_SOFTWARE_APP_A, "software_app_a"},
-	{MVAR_INVENTORY_SOFTWARE_APP_B, "software_app_b"},
-	{MVAR_INVENTORY_SOFTWARE_APP_C, "software_app_c"},
-	{MVAR_INVENTORY_SOFTWARE_APP_D, "software_app_d"},
-	{MVAR_INVENTORY_SOFTWARE_APP_E, "software_app_e"},
-	{MVAR_INVENTORY_CONTACT, "contact"},
-	{MVAR_PROFILE_CONTACT, "contact"},	/* deprecated */
-	{MVAR_INVENTORY_LOCATION, "location"},
-	{MVAR_PROFILE_LOCATION, "location"},	/* deprecated */
-	{MVAR_INVENTORY_LOCATION_LAT, "location_lat"},
-	{MVAR_INVENTORY_LOCATION_LON, "location_lon"},
-	{MVAR_INVENTORY_NOTES, "notes"},
-	{MVAR_PROFILE_NOTES, "notes"},	/* deprecated */
-	{MVAR_INVENTORY_CHASSIS, "chassis"},
-	{MVAR_INVENTORY_MODEL, "model"},
-	{MVAR_INVENTORY_HW_ARCH, "hw_arch"},
-	{MVAR_INVENTORY_VENDOR, "vendor"},
-	{MVAR_INVENTORY_CONTRACT_NUMBER, "contract_number"},
-	{MVAR_INVENTORY_INSTALLER_NAME, "installer_name"},
-	{MVAR_INVENTORY_DEPLOYMENT_STATUS, "deployment_status"},
-	{MVAR_INVENTORY_URL_A, "url_a"},
-	{MVAR_INVENTORY_URL_B, "url_b"},
-	{MVAR_INVENTORY_URL_C, "url_c"},
-	{MVAR_INVENTORY_HOST_NETWORKS, "host_networks"},
-	{MVAR_INVENTORY_HOST_NETMASK, "host_netmask"},
-	{MVAR_INVENTORY_HOST_ROUTER, "host_router"},
-	{MVAR_INVENTORY_OOB_IP, "oob_ip"},
-	{MVAR_INVENTORY_OOB_NETMASK, "oob_netmask"},
-	{MVAR_INVENTORY_OOB_ROUTER, "oob_router"},
-	{MVAR_INVENTORY_HW_DATE_PURCHASE, "date_hw_purchase"},
-	{MVAR_INVENTORY_HW_DATE_INSTALL, "date_hw_install"},
-	{MVAR_INVENTORY_HW_DATE_EXPIRY, "date_hw_expiry"},
-	{MVAR_INVENTORY_HW_DATE_DECOMM, "date_hw_decomm"},
-	{MVAR_INVENTORY_SITE_ADDRESS_A, "site_address_a"},
-	{MVAR_INVENTORY_SITE_ADDRESS_B, "site_address_b"},
-	{MVAR_INVENTORY_SITE_ADDRESS_C, "site_address_c"},
-	{MVAR_INVENTORY_SITE_CITY, "site_city"},
-	{MVAR_INVENTORY_SITE_STATE, "site_state"},
-	{MVAR_INVENTORY_SITE_COUNTRY, "site_country"},
-	{MVAR_INVENTORY_SITE_ZIP, "site_zip"},
-	{MVAR_INVENTORY_SITE_RACK, "site_rack"},
-	{MVAR_INVENTORY_SITE_NOTES, "site_notes"},
-	{MVAR_INVENTORY_POC_PRIMARY_NAME, "poc_1_name"},
-	{MVAR_INVENTORY_POC_PRIMARY_EMAIL, "poc_1_email"},
-	{MVAR_INVENTORY_POC_PRIMARY_PHONE_A, "poc_1_phone_a"},
-	{MVAR_INVENTORY_POC_PRIMARY_PHONE_B, "poc_1_phone_b"},
-	{MVAR_INVENTORY_POC_PRIMARY_CELL, "poc_1_cell"},
-	{MVAR_INVENTORY_POC_PRIMARY_SCREEN, "poc_1_screen"},
-	{MVAR_INVENTORY_POC_PRIMARY_NOTES, "poc_1_notes"},
-	{MVAR_INVENTORY_POC_SECONDARY_NAME, "poc_2_name"},
-	{MVAR_INVENTORY_POC_SECONDARY_EMAIL, "poc_2_email"},
-	{MVAR_INVENTORY_POC_SECONDARY_PHONE_A, "poc_2_phone_a"},
-	{MVAR_INVENTORY_POC_SECONDARY_PHONE_B, "poc_2_phone_b"},
-	{MVAR_INVENTORY_POC_SECONDARY_CELL, "poc_2_cell"},
-	{MVAR_INVENTORY_POC_SECONDARY_SCREEN, "poc_2_screen"},
-	{MVAR_INVENTORY_POC_SECONDARY_NOTES, "poc_2_notes"},
+	{MVAR_INVENTORY_TYPE, 0},
+	{MVAR_PROFILE_DEVICETYPE, 0},	/* deprecated */
+	{MVAR_INVENTORY_TYPE_FULL, 1},
+	{MVAR_INVENTORY_NAME, 2},
+	{MVAR_PROFILE_NAME, 2},	/* deprecated */
+	{MVAR_INVENTORY_ALIAS, 3},
+	{MVAR_INVENTORY_OS, 4},
+	{MVAR_PROFILE_OS, 4},	/* deprecated */
+	{MVAR_INVENTORY_OS_FULL, 5},
+	{MVAR_INVENTORY_OS_SHORT, 6},
+	{MVAR_INVENTORY_SERIALNO_A, 7},
+	{MVAR_PROFILE_SERIALNO, 7},	/* deprecated */
+	{MVAR_INVENTORY_SERIALNO_B, 8},
+	{MVAR_INVENTORY_TAG, 9},
+	{MVAR_PROFILE_TAG, 9},	/* deprecated */
+	{MVAR_INVENTORY_ASSET_TAG, 10},
+	{MVAR_INVENTORY_MACADDRESS_A, 11},
+	{MVAR_PROFILE_MACADDRESS, 11},	/* deprecated */
+	{MVAR_INVENTORY_MACADDRESS_B, 12},
+	{MVAR_INVENTORY_HARDWARE, 13},
+	{MVAR_PROFILE_HARDWARE, 13},	/* deprecated */
+	{MVAR_INVENTORY_HARDWARE_FULL, 14},
+	{MVAR_INVENTORY_SOFTWARE, 15},
+	{MVAR_PROFILE_SOFTWARE, 15},	/* deprecated */
+	{MVAR_INVENTORY_SOFTWARE_FULL, 16},
+	{MVAR_INVENTORY_SOFTWARE_APP_A, 17},
+	{MVAR_INVENTORY_SOFTWARE_APP_B, 18},
+	{MVAR_INVENTORY_SOFTWARE_APP_C, 19},
+	{MVAR_INVENTORY_SOFTWARE_APP_D, 20},
+	{MVAR_INVENTORY_SOFTWARE_APP_E, 21},
+	{MVAR_INVENTORY_CONTACT, 22},
+	{MVAR_PROFILE_CONTACT, 22},	/* deprecated */
+	{MVAR_INVENTORY_LOCATION, 23},
+	{MVAR_PROFILE_LOCATION, 23},	/* deprecated */
+	{MVAR_INVENTORY_LOCATION_LAT, 24},
+	{MVAR_INVENTORY_LOCATION_LON, 25},
+	{MVAR_INVENTORY_NOTES, 26},
+	{MVAR_PROFILE_NOTES, 26},	/* deprecated */
+	{MVAR_INVENTORY_CHASSIS, 27},
+	{MVAR_INVENTORY_MODEL, 28},
+	{MVAR_INVENTORY_HW_ARCH, 29},
+	{MVAR_INVENTORY_VENDOR, 30},
+	{MVAR_INVENTORY_CONTRACT_NUMBER, 31},
+	{MVAR_INVENTORY_INSTALLER_NAME, 32},
+	{MVAR_INVENTORY_DEPLOYMENT_STATUS, 33},
+	{MVAR_INVENTORY_URL_A, 34},
+	{MVAR_INVENTORY_URL_B, 35},
+	{MVAR_INVENTORY_URL_C, 36},
+	{MVAR_INVENTORY_HOST_NETWORKS, 37},
+	{MVAR_INVENTORY_HOST_NETMASK, 38},
+	{MVAR_INVENTORY_HOST_ROUTER, 39},
+	{MVAR_INVENTORY_OOB_IP, 40},
+	{MVAR_INVENTORY_OOB_NETMASK, 41},
+	{MVAR_INVENTORY_OOB_ROUTER, 42},
+	{MVAR_INVENTORY_HW_DATE_PURCHASE, 43},
+	{MVAR_INVENTORY_HW_DATE_INSTALL, 44},
+	{MVAR_INVENTORY_HW_DATE_EXPIRY, 45},
+	{MVAR_INVENTORY_HW_DATE_DECOMM, 46},
+	{MVAR_INVENTORY_SITE_ADDRESS_A, 47},
+	{MVAR_INVENTORY_SITE_ADDRESS_B, 48},
+	{MVAR_INVENTORY_SITE_ADDRESS_C, 49},
+	{MVAR_INVENTORY_SITE_CITY, 50},
+	{MVAR_INVENTORY_SITE_STATE, 51},
+	{MVAR_INVENTORY_SITE_COUNTRY, 52},
+	{MVAR_INVENTORY_SITE_ZIP, 53},
+	{MVAR_INVENTORY_SITE_RACK, 54},
+	{MVAR_INVENTORY_SITE_NOTES, 55},
+	{MVAR_INVENTORY_POC_PRIMARY_NAME, 56},
+	{MVAR_INVENTORY_POC_PRIMARY_EMAIL, 57},
+	{MVAR_INVENTORY_POC_PRIMARY_PHONE_A, 58},
+	{MVAR_INVENTORY_POC_PRIMARY_PHONE_B, 59},
+	{MVAR_INVENTORY_POC_PRIMARY_CELL, 60},
+	{MVAR_INVENTORY_POC_PRIMARY_SCREEN, 61},
+	{MVAR_INVENTORY_POC_PRIMARY_NOTES, 62},
+	{MVAR_INVENTORY_POC_SECONDARY_NAME, 63},
+	{MVAR_INVENTORY_POC_SECONDARY_EMAIL, 64},
+	{MVAR_INVENTORY_POC_SECONDARY_PHONE_A, 65},
+	{MVAR_INVENTORY_POC_SECONDARY_PHONE_B, 66},
+	{MVAR_INVENTORY_POC_SECONDARY_CELL, 67},
+	{MVAR_INVENTORY_POC_SECONDARY_SCREEN, 68},
+	{MVAR_INVENTORY_POC_SECONDARY_NOTES, 69},
 	{NULL}
 };
 
@@ -2029,44 +2029,6 @@ static int	get_action_value(const char *macro, zbx_uint64_t actionid, char **rep
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_host_inventory_value                                       *
- *                                                                            *
- * Purpose: request host inventory value by itemid and field name             *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_host_inventory_value(zbx_uint64_t itemid, char **replace_to, const char *field_name)
-{
-	const char	*__function_name = "DBget_host_inventory_value";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result = DBselect(
-			"select hi.%s"
-			" from host_inventory hi,items i"
-			" where hi.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64, field_name, itemid);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		ret = SUCCEED;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_host_inventory                                               *
  *                                                                            *
  * Purpose: request host inventory value by macro and trigger                 *
@@ -2085,16 +2047,15 @@ static int	get_host_inventory(const char *macro, const char *expression, char **
 		if (0 == strcmp(macro, inventory_fields[i].macro))
 		{
 			zbx_uint64_t	itemid;
-			int		ret = FAIL;
 
-			if (SUCCEED == get_N_itemid(expression, N_functionid, &itemid))
-				ret = DBget_host_inventory_value(itemid, replace_to, inventory_fields[i].field_name);
+			if (SUCCEED != get_N_itemid(expression, N_functionid, &itemid))
+				return FAIL;
 
-			return ret;
+			return DCget_host_inventory_value_by_itemid(itemid, replace_to, inventory_fields[i].idx);
 		}
 	}
 
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************
@@ -2114,10 +2075,10 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 	for (i = 0; NULL != inventory_fields[i].macro; i++)
 	{
 		if (0 == strcmp(macro, inventory_fields[i].macro))
-			return DBget_host_inventory_value(itemid, replace_to, inventory_fields[i].field_name);
+			return DCget_host_inventory_value_by_itemid(itemid, replace_to, inventory_fields[i].idx);
 	}
 
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************
@@ -2549,7 +2510,7 @@ static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_al
 		if (NULL != replace_to_alloc)
 			*replace_to_alloc = replace_to_len + 3;
 
-		buffer = zbx_malloc(NULL, replace_to_len + 3);
+		buffer = (char *)zbx_malloc(NULL, replace_to_len + 3);
 
 		memcpy(buffer + 1, *replace_to, replace_to_len);
 
@@ -3661,10 +3622,15 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUE) || 0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				{
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
 				}
 			}
 		}
@@ -4028,6 +3994,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
 				}
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+				{
+					ret = get_host_inventory(m, event->trigger.expression, &replace_to,
+							N_functionid);
+				}
 			}
 		}
 
@@ -4239,7 +4210,7 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 
 		if (SUCCEED == extract_expression_functionids(&funcids, tr->expression))
 		{
-			tr_func_pos = zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
+			tr_func_pos = (zbx_trigger_func_position_t *)zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
 			tr_func_pos->trigger = tr;
 			tr_func_pos->start_index = functionids->values_num;
 			tr_func_pos->count = funcids.values_num;
@@ -4288,8 +4259,8 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 
 	zbx_link_triggers_with_functions(&triggers_func_pos, &functionids, trigger_order);
 
-	functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
+	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 
 	DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes, functionids.values_num);
 
@@ -4404,8 +4375,8 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 	func_local.value = NULL;
 	func_local.error = NULL;
 
-	functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
+	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
 
 	DCconfig_get_functions_by_functionids(functions, functionids->values, errcodes, functionids->values_num);
 
@@ -4431,9 +4402,9 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 		func_local.function = functions[i].function;
 		func_local.parameter = functions[i].parameter;
 
-		if (NULL == (func = zbx_hashset_search(funcs, &func_local)))
+		if (NULL == (func = (zbx_func_t *)zbx_hashset_search(funcs, &func_local)))
 		{
-			func = zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
+			func = (zbx_func_t *)zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
 			func->function = zbx_strdup(NULL, func_local.function);
 			func->parameter = zbx_strdup(NULL, func_local.parameter);
 		}
@@ -4469,19 +4440,19 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 	zbx_vector_uint64_reserve(&itemids, funcs->num_data);
 
 	zbx_hashset_iter_reset(funcs, &iter);
-	while (NULL != (func = zbx_hashset_iter_next(&iter)))
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 		zbx_vector_uint64_append(&itemids, func->itemid);
 
 	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
+	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
 
 	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	zbx_hashset_iter_reset(funcs, &iter);
-	while (NULL != (func = zbx_hashset_iter_next(&iter)))
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
 		int	ret_unknown = 0;	/* flag raised if current function evaluates to ZBX_UNKNOWN */
 		char	*unknown_msg;
@@ -4609,7 +4580,7 @@ static int	substitute_expression_functions_results(zbx_hashset_t *ifuncs, char *
 		*br++ = '}';
 		bl = br;
 
-		if (NULL == (ifunc = zbx_hashset_search(ifuncs, &functionid)))
+		if (NULL == (ifunc = (zbx_ifunc_t *)zbx_hashset_search(ifuncs, &functionid)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot obtain function"
 					" and item for functionid: " ZBX_FS_UI64, functionid);
@@ -4657,7 +4628,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d tr_num:%d",
 			__function_name, ifuncs->num_data, triggers->values_num);
 
-	out = zbx_malloc(out, out_alloc);
+	out = (char *)zbx_malloc(out, out_alloc);
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -4896,7 +4867,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, const str
 		goto out;
 	}
 
-	replace_to = zbx_malloc(NULL, replace_to_alloc);
+	replace_to = (char *)zbx_malloc(NULL, replace_to_alloc);
 
 	lld_start = token->data.simple_macro.key.l;
 	lld_end = token->data.simple_macro.func_param.r - 1;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,10 +236,10 @@ static int	cache_get_snmp_index(const DC_ITEM *item, const char *oid, const char
 	main_key_local.community_context = get_item_community_context(item);
 	main_key_local.security_name = get_item_security_name(item);
 
-	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
+	if (NULL == (main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_search(&snmpidx, &main_key_local)))
 		goto end;
 
-	if (NULL == (mapping = zbx_hashset_search(main_key->mappings, &value)))
+	if (NULL == (mapping = (zbx_snmpidx_mapping_t *)zbx_hashset_search(main_key->mappings, &value)))
 		goto end;
 
 	zbx_strcpy_alloc(idx, idx_alloc, &idx_offset, mapping->index);
@@ -288,7 +288,7 @@ static void	cache_put_snmp_index(const DC_ITEM *item, const char *oid, const cha
 	main_key_local.community_context = get_item_community_context(item);
 	main_key_local.security_name = get_item_security_name(item);
 
-	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
+	if (NULL == (main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_search(&snmpidx, &main_key_local)))
 	{
 		main_key_local.addr = zbx_strdup(NULL, item->interface.addr);
 		main_key_local.oid = zbx_strdup(NULL, oid);
@@ -296,15 +296,15 @@ static void	cache_put_snmp_index(const DC_ITEM *item, const char *oid, const cha
 		main_key_local.community_context = zbx_strdup(NULL, get_item_community_context(item));
 		main_key_local.security_name = zbx_strdup(NULL, get_item_security_name(item));
 
-		main_key_local.mappings = zbx_malloc(NULL, sizeof(zbx_hashset_t));
+		main_key_local.mappings = (zbx_hashset_t *)zbx_malloc(NULL, sizeof(zbx_hashset_t));
 		zbx_hashset_create_ext(main_key_local.mappings, 100,
 				__snmpidx_mapping_hash, __snmpidx_mapping_compare, __snmpidx_mapping_clean,
 				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-		main_key = zbx_hashset_insert(&snmpidx, &main_key_local, sizeof(main_key_local));
+		main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_insert(&snmpidx, &main_key_local, sizeof(main_key_local));
 	}
 
-	if (NULL == (mapping = zbx_hashset_search(main_key->mappings, &value)))
+	if (NULL == (mapping = (zbx_snmpidx_mapping_t *)zbx_hashset_search(main_key->mappings, &value)))
 	{
 		mapping_local.value = zbx_strdup(NULL, value);
 		mapping_local.index = zbx_strdup(NULL, index);
@@ -353,7 +353,7 @@ static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 	main_key_local.community_context = get_item_community_context(item);
 	main_key_local.security_name = get_item_security_name(item);
 
-	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
+	if (NULL == (main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_search(&snmpidx, &main_key_local)))
 		goto end;
 
 	zbx_hashset_clear(main_key->mappings);
@@ -485,7 +485,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	if (SNMP_VERSION_1 == session.version || SNMP_VERSION_2c == session.version)
 	{
 		session.community = (u_char *)item->snmp_community;
-		session.community_len = strlen((void *)session.community);
+		session.community_len = strlen((char *)session.community);
 		zabbix_log(LOG_LEVEL_DEBUG, "SNMP [%s@%s]", session.community, session.peername);
 	}
 	else if (SNMP_VERSION_3 == session.version)
@@ -689,7 +689,7 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 		/* snprint_value() escapes hintless ASCII strings, so */
 		/* we are copying the raw unescaped value in this case */
 
-		strval_dyn = zbx_malloc(strval_dyn, var->val_len + 1);
+		strval_dyn = (char *)zbx_malloc(strval_dyn, var->val_len + 1);
 		memcpy(strval_dyn, var->val.string, var->val_len);
 		strval_dyn[var->val_len] = '\0';
 	}
@@ -1722,7 +1722,7 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 	zbx_vector_ptr_destroy(&data->index);
 
 	zbx_hashset_iter_reset(&data->objects, &iter);
-	while (NULL != (obj = zbx_hashset_iter_next(&iter)))
+	while (NULL != (obj = (zbx_snmp_dobject_t *)zbx_hashset_iter_next(&iter)))
 	{
 		for (i = 0; i < data->request.nparam / 2; i++)
 			zbx_free(obj->values[i]);
@@ -1743,7 +1743,7 @@ static void	zbx_snmp_walk_discovery_cb(void *arg, const char *oid, const char *i
 
 	ZBX_UNUSED(oid);
 
-	if (NULL == (obj = zbx_hashset_search(&data->objects, &index)))
+	if (NULL == (obj = (zbx_snmp_dobject_t *)zbx_hashset_search(&data->objects, &index)))
 	{
 		zbx_snmp_dobject_t	new_obj;
 
@@ -1751,7 +1751,7 @@ static void	zbx_snmp_walk_discovery_cb(void *arg, const char *oid, const char *i
 		new_obj.values = (char **)zbx_malloc(NULL, sizeof(char *) * data->request.nparam / 2);
 		memset(new_obj.values, 0, sizeof(char *) * data->request.nparam / 2);
 
-		obj = zbx_hashset_insert(&data->objects, &new_obj, sizeof(new_obj));
+		obj = (zbx_snmp_dobject_t *)zbx_hashset_insert(&data->objects, &new_obj, sizeof(new_obj));
 		zbx_vector_ptr_append(&data->index, obj);
 	}
 
@@ -1845,7 +1845,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	idx = zbx_malloc(idx, idx_alloc);
+	idx = (char *)zbx_malloc(idx, idx_alloc);
 
 	/* perform initial item validation */
 

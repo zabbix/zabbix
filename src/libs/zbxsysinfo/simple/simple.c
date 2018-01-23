@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 	LDAPMessage	*msg	= NULL;
 	BerElement	*ber	= NULL;
 
-	char	*attrs[2] = { "namingContexts", NULL };
+	char	*attrs[2] = {"namingContexts", NULL };
 	char	*attr	 = NULL;
 	char	**valRes = NULL;
 	int	ldapErr = 0;
@@ -178,9 +178,10 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 static int	check_https(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	const char	*__function_name = "check_https";
-	int		err, opt;
-	char		https_host[MAX_STRING_LEN];
 	CURL            *easyhandle;
+	CURLoption	opt;
+	CURLcode	err;
+	char		https_host[MAX_STRING_LEN];
 
 	*value_int = 0;
 

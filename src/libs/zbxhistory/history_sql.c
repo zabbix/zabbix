@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ static void	row2value_ui64(history_value_t *value, DB_ROW row)
 /* timestamp, logeventid, severity, source, value */
 static void	row2value_log(history_value_t *value, DB_ROW row)
 {
-	value->log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
+	value->log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 
 	value->log->timestamp = atoi(row[0]);
 	value->log->logeventid = atoi(row[1]);
@@ -160,14 +160,14 @@ static void	sql_writer_add_dbinsert(zbx_db_insert_t *db_insert)
  ************************************************************************************/
 static int	sql_writer_flush(void)
 {
-	int	i, ret = SUCCEED;
+	int	i, txn_error;
 
 	/* The writer might be uninitialized only if the history */
 	/* was already flushed. In that case, return SUCCEED */
 	if (0 == writer.initialized)
 		return SUCCEED;
 
-	while (1)
+	do
 	{
 		DBbegin();
 
@@ -176,21 +176,12 @@ static int	sql_writer_flush(void)
 			zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)writer.dbinserts.values[i];
 			zbx_db_insert_execute(db_insert);
 		}
-
-		if (0 == zbx_db_txn_error())
-		{
-			DBcommit();
-			break;
-		}
-
-		DBrollback();
-
-		ret = FAIL;
 	}
+	while (ZBX_DB_DOWN == (txn_error = DBcommit()));
 
 	sql_writer_release();
 
-	return ret;
+	return ZBX_DB_OK == txn_error ? SUCCEED : FAIL;
 }
 
 /******************************************************************************************************************
@@ -216,7 +207,7 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_FLOAT != h->value_type)
 			continue;
@@ -242,7 +233,7 @@ static void	add_history_uint(zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_UINT64 != h->value_type)
 			continue;
@@ -268,7 +259,7 @@ static void	add_history_str(zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_STR != h->value_type)
 			continue;
@@ -294,7 +285,7 @@ static void	add_history_text(zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
 			continue;
@@ -321,7 +312,7 @@ static void	add_history_log(zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 		const zbx_log_value_t	*log;
 
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
@@ -675,7 +666,7 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = history->values[i];
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
 		if (h->value_type == hist->value_type)
 			h_num++;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 {
 	int	i;
-	char	procargs[MAX_STRING_LEN];
+	char	procargs[MAX_BUFFER_LEN];
 
 	if (0 != getargs(procentry, (int)sizeof(*procentry), procargs, (int)sizeof(procargs)))
 		return FAIL;
@@ -250,7 +250,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 				pct_size = pct_value;
 		}
-        }
+	}
 out:
 	if (ZBX_PMEM != mem_type_code)
 	{
@@ -343,7 +343,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 
 		proccount++;
-        }
+	}
 out:
 	SET_UI64_RESULT(result, proccount);
 

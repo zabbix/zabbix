@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -647,67 +647,6 @@ static int	DBpatch_2050071(void)
 	return DBmodify_field_type("hostmacro", &field, NULL);
 }
 
-static int	DBpatch_2050072(void)
-{
-	return DBdrop_table("graph_theme");
-}
-
-static int	DBpatch_2050073(void)
-{
-	const ZBX_TABLE table =
-		{"graph_theme",	"graphthemeid",	0,
-			{
-				{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"backgroundcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"graphcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"gridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"maingridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"gridbordercolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"textcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"highlightcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"leftpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"rightpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"nonworktimecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_2050074(void)
-{
-	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
-}
-
-static int	DBpatch_2050075(void)
-{
-	if (ZBX_DB_OK <= DBexecute(
-			"insert into graph_theme"
-			" values (1,'blue-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33','E33734',"
-				"'429E47','E33734','EBEBEB')"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2050076(void)
-{
-	if (ZBX_DB_OK <= DBexecute(
-			"insert into graph_theme"
-			" values (2,'dark-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2','E45959',"
-				"'59DB8F','E45959','333333')"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
 static int	DBpatch_2050077(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
@@ -849,7 +788,7 @@ static int	DBpatch_2050092(void)
 	int		len, ret = FAIL, rc;
 	char		*url = NULL, *url_esc;
 	size_t		i, url_alloc = 0, url_offset;
-	char		*url_map[] = {
+	const char	*url_map[] = {
 				"dashboard.php", "dashboard.view",
 				"discovery.php", "discovery.view",
 				"maps.php", "map.view",
@@ -1242,11 +1181,6 @@ DBPATCH_ADD(2050068, 0, 1)
 DBPATCH_ADD(2050069, 0, 1)
 DBPATCH_ADD(2050070, 0, 1)
 DBPATCH_ADD(2050071, 0, 1)
-DBPATCH_ADD(2050072, 0, 1)
-DBPATCH_ADD(2050073, 0, 1)
-DBPATCH_ADD(2050074, 0, 1)
-DBPATCH_ADD(2050075, 0, 1)
-DBPATCH_ADD(2050076, 0, 1)
 DBPATCH_ADD(2050077, 0, 1)
 DBPATCH_ADD(2050078, 0, 1)
 DBPATCH_ADD(2050079, 0, 1)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@
 	(										\
 			memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
 			0 < value_len ? (						\
-			*value = zbx_malloc(NULL, value_len + 1),			\
+			*value = (char *)zbx_malloc(NULL, value_len + 1),			\
 			memcpy(*(value), buffer + sizeof(zbx_uint32_t), value_len),	\
 			(*value)[value_len] = '\0'					\
 			) : (*value = NULL, 0),						\
