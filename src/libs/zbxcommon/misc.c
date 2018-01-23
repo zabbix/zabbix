@@ -1689,10 +1689,44 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
 
 /******************************************************************************
  *                                                                            *
+ * Function: scheduler_tm_inc                                                 *
+ *                                                                            *
+ * Purpose: increment struct tm value by one second                           *
+ *                                                                            *
+ * Parameters: tm - [IN/OUT] the tm structure to increment                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_tm_inc(struct tm *tm)
+{
+	if (60 > ++tm->tm_sec)
+		return;
+
+	tm->tm_sec = 0;
+	if (60 > ++tm->tm_min)
+		return;
+
+	tm->tm_min = 0;
+	if (24 > ++tm->tm_hour)
+		return;
+
+	tm->tm_hour = 0;
+	if (zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1) >= ++tm->tm_mday)
+		return;
+
+	tm->tm_mday = 1;
+	if (12 > ++tm->tm_mon)
+		return;
+
+	tm->tm_mon = 0;
+	tm->tm_year++;
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: scheduler_get_nextcheck                                          *
  *                                                                            *
- * Purpose: applies second filter to the specified time/day calculating the   *
- *          next scheduled check                                              *
+ * Purpose: finds the next timestamp satisfying one of intervals.             *
  *                                                                            *
  * Parameters: interval - [IN] the scheduler interval                         *
  *             now      - [IN] the current timestamp                          *
@@ -1711,13 +1745,17 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 	{
 		tm = tm_start;
 
-		scheduler_apply_day_filter(interval, &tm);
-		scheduler_apply_hour_filter(interval, &tm);
-		scheduler_apply_minute_filter(interval, &tm);
-		scheduler_apply_second_filter(interval, &tm);
+		do
+		{
+			scheduler_tm_inc(&tm);
+			scheduler_apply_day_filter(interval, &tm);
+			scheduler_apply_hour_filter(interval, &tm);
+			scheduler_apply_minute_filter(interval, &tm);
+			scheduler_apply_second_filter(interval, &tm);
 
-		tm.tm_isdst = tm_start.tm_isdst;
-		current_nextcheck = mktime(&tm);
+			tm.tm_isdst = tm_start.tm_isdst;
+		}
+		while (-1 == (current_nextcheck = mktime(&tm)));
 
 		tm_dst = *(localtime(&current_nextcheck));
 		if (tm_dst.tm_isdst != tm_start.tm_isdst)
@@ -1906,7 +1944,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 		/* first try to parse out and calculate scheduled intervals */
 		if (NULL != custom_intervals)
-			scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, now + 1);
+			scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, now);
 
 		/* Try to find the nearest 'nextcheck' value with condition */
 		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
