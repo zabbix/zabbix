@@ -765,6 +765,7 @@
 		var index = widget['div'].data('widget-index');
 
 		// remove div from the grid
+		widget['div'].find('[data-hintbox=1]').trigger('remove');
 		widget['div'].remove();
 		data['widgets'].splice(index, 1);
 

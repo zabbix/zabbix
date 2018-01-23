@@ -455,7 +455,7 @@ var hintBox = {
 
 	/**
 	 * Initialize hint box event handlers.
-	 * Event 'remove' is triggered on widget content update by updateWidgetContent().
+	 * Event 'remove' is triggered on widget update by updateWidgetContent() and widget remove by deleteWidget().
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
