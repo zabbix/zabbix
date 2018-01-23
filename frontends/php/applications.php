@@ -246,7 +246,6 @@ else {
 			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
 			'selectHost' => ['hostid', 'name'],
 			'selectItems' => ['itemid'],
-			'selectHost' => ['hostid', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectApplicationDiscovery' => ['ts_delete'],
 			'applicationids' => $applicationids

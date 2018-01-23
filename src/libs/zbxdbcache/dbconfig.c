@@ -8258,7 +8258,7 @@ static void	DCconfig_sort_triggers_topologically(void)
 	{
 		trigger = trigdep->trigger;
 
-		if ((NULL != trigger && 1 < trigger->topoindex) || 0 == trigdep->dependencies.values_num)
+		if (NULL == trigger || 1 < trigger->topoindex || 0 == trigdep->dependencies.values_num)
 			continue;
 
 		DCconfig_sort_triggers_topologically_rec(trigdep, 0);
