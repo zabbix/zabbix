@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+...G...... [ZBX-13117] fixed vfs.dir.size with symbol links on Windows (MVekslers)
 ....I..... [ZBX-12045] fixed inconsistencies in configure -h output (MVekslers)
 A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
 ..F....... [ZBX-13223] fixed graphs duplication in graph preview (ashubin)
