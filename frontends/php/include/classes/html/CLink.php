@@ -59,6 +59,8 @@ class CLink extends CTag {
 	public function toString($destroy = true) {
 		$url = $this->url;
 
+		$this->setAttribute('role', ($url == null) ? 'button' : 'link');
+
 		if ($this->use_sid) {
 			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
 				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
@@ -71,7 +73,7 @@ class CLink extends CTag {
 			$this->setAttribute('href', 'javascript:void(0)');
 		}
 		else {
-			$this->setAttribute('href', $url);
+			$this->setAttribute('href', ($url == null) ? 'javascript:void(0)' : $url);
 
 			if ($this->confirm_message !== '') {
 				$this->onClick('javascript: return Confirm('.CJs::encodeJson($this->confirm_message).');');
