@@ -1797,8 +1797,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 
 	if ($messages) {
 		if ($title !== null) {
-			$link_details = (new CSpan())
-				->addClass(ZBX_STYLE_LINK_ACTION)
+			$link_details = (new CActionLink())
 				->addItem(_('Details'))
 				->addItem(' ') // space
 				->addItem((new CSpan())
