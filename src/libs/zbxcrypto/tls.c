@@ -2153,7 +2153,8 @@ static int	zbx_x509_dn_gets(X509_NAME *dn, char *buf, size_t size, char **error)
 out:
 	if (NULL != bio)
 	{
-		BIO_set_close(bio, BIO_CLOSE);	/* ensure that associated memory buffer will be freed by BIO_vfree() */
+		/* ensure that associated memory buffer will be freed by BIO_vfree() */
+		(void)BIO_set_close(bio, BIO_CLOSE);
 		BIO_vfree(bio);
 	}
 
