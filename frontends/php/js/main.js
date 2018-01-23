@@ -453,6 +453,46 @@ var jqBlink = {
  */
 var hintBox = {
 
+	/**
+	 * Initialize hint box event handlers.
+	 * Event 'remove' is triggered on widget content update by updateWidgetContent().
+	 */
+	bindEvents: function () {
+		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
+			switch (e.type) {
+				case 'mouseenter' :
+					hintBox.showHint(e, this, jQuery('.hint-box', this).html(),
+						jQuery(this).data('hintbox-class'), false, jQuery(this).data('hintbox-style')
+					);
+					break;
+
+				case 'mouseleave' :
+					hintBox.hideHint(e, this);
+					break;
+
+				case 'remove' :
+					hintBox.deleteHint(this);
+					break;
+
+				case 'keydown' :
+					if (e.which == 13) {
+						var offset = jQuery(this).offset();
+						this.clientX = offset.left;
+						this.clientY = offset.top;
+					}
+					break;
+
+				case 'click' :
+					if (jQuery(this).data('hintbox-static') == '1') {
+						hintBox.showStaticHint(e, this, jQuery(this).data('hintbox-class'), false,
+							jQuery(this).data('hintbox-style')
+						);
+					}
+					break;
+			}
+		});
+	},
+
 	createBox: function(e, target, hintText, className, isStatic, styles) {
 		var box = jQuery('<div></div>').addClass('overlay-dialogue');
 
@@ -494,28 +534,6 @@ var hintBox = {
 		jQuery('body').append(box);
 
 		return box;
-	},
-
-	HintWrapper: function(e, target, className, styles) {
-		target.isStatic = false;
-
-		var	hintText = jQuery('.hint-box', target).html();
-
-		jQuery(target).on('mouseenter', function(e, d) {
-			if (d) {
-				e = d;
-			}
-			hintBox.showHint(e, target, hintText, className, false, styles);
-
-		}).on('mouseleave', function(e) {
-			hintBox.hideHint(e, target);
-
-		}).on('remove', function(e) {
-			hintBox.deleteHint(target);
-		});
-
-		jQuery(target).removeAttr('onmouseover');
-		jQuery(target).trigger('mouseenter', e);
 	},
 
 	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {

@@ -175,14 +175,16 @@ class CTag extends CObject {
 			))->setAttribute('style', 'display: none;')
 		);
 
-		$this->onMouseover(
-			'hintBox.HintWrapper(event, this, "'.$span_class.'", "'.$styles.'");'
-		);
+		$this->setAttribute('data-hintbox', '1');
 
+		if ($span_class !== '') {
+			$this->setAttribute('data-hintbox-class', $span_class);
+		}
+		if ($styles !== '') {
+			$this->setAttribute('data-hintbox-style', $styles);
+		}
 		if ($freeze_on_click) {
-			$this->onClick(
-				'hintBox.showStaticHint(event, this, "'.$span_class.'", false, "'.$styles.'");'
-			);
+			$this->setAttribute('data-hintbox-static', '1');
 		}
 
 		return $this;

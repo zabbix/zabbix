@@ -485,6 +485,7 @@
 
 				$('h4', widget['content_header']).text(resp.header);
 
+				widget['content_body'].find('[data-hintbox=1]').trigger('remove');
 				widget['content_body'].empty();
 				if (typeof(resp.messages) !== 'undefined') {
 					widget['content_body'].append(resp.messages);

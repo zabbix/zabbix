@@ -145,5 +145,8 @@ jQuery(function($) {
 		if (typeof confirmation === 'undefined' || (typeof confirmation !== 'undefined' && confirm(confirmation))) {
 			window.location = button.data('url');
 		}
-	})
+	});
+
+	// Initialize hintBox event handlers.
+	hintBox.bindEvents();
 });
