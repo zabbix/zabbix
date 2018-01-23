@@ -131,7 +131,7 @@ $fields = [
 	'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_monitored_by' =>	[T_ZBX_INT, O_OPT, null,
-									IN([ZBX_MONITORED_BY_ALL, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_SERVER]),
+									IN([ZBX_MONITORED_BY_ANY, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_SERVER]),
 									null
 								],
 	'filter_proxyids' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
@@ -188,7 +188,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.hosts.filter_dns', getRequest('filter_dns', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_host', getRequest('filter_host', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_port', getRequest('filter_port', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter.monitored_by', getRequest('filter_monitored_by', ZBX_MONITORED_BY_ALL),
+	CProfile::update('web.hosts.filter.monitored_by', getRequest('filter_monitored_by', ZBX_MONITORED_BY_ANY),
 		PROFILE_TYPE_INT
 	);
 	CProfile::updateArray('web.hosts.filter.proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
@@ -208,7 +208,7 @@ $filter['ip'] = CProfile::get('web.hosts.filter_ip', '');
 $filter['dns'] = CProfile::get('web.hosts.filter_dns', '');
 $filter['host'] = CProfile::get('web.hosts.filter_host', '');
 $filter['port'] = CProfile::get('web.hosts.filter_port', '');
-$filter['monitored_by'] = CProfile::get('web.hosts.filter.monitored_by', ZBX_MONITORED_BY_ALL);
+$filter['monitored_by'] = CProfile::get('web.hosts.filter.monitored_by', ZBX_MONITORED_BY_ANY);
 $filter['proxyids'] = CProfile::getArray('web.hosts.filter.proxyids', []);
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')

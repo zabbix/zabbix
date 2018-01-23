@@ -49,7 +49,7 @@ $filter = (new CFilter('web.hosts.filter.state'))
 			->addRow(
 				_('Monitored by'),
 				(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))
-					->addValue(_('all'), ZBX_MONITORED_BY_ALL)
+					->addValue(_('Any'), ZBX_MONITORED_BY_ANY)
 					->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
 					->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
 					->setModern(true)
