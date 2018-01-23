@@ -118,13 +118,13 @@ $table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), 
 foreach ($this->data['triggers'] as $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
 
-	$hostName = (new CActionLink($trigger['hosts'][0]['name']))
+	$hostName = (new CLinkAction($trigger['hosts'][0]['name']))
 		->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 	if ($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
 	}
 
-	$triggerDescription = (new CActionLink($trigger['description']))
+	$triggerDescription = (new CLinkAction($trigger['description']))
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	$table->addRow([

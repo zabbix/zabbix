@@ -120,7 +120,7 @@ foreach ($data['groups'] as $group) {
 					break;
 				}
 			}
-			$lastUnack_count = (new CActionLink($data['hosts_data'][$group['groupid']]['lastUnack']))
+			$lastUnack_count = (new CLinkAction($data['hosts_data'][$group['groupid']]['lastUnack']))
 				->setHint($table_inf);
 		}
 		else {
@@ -178,7 +178,7 @@ foreach ($data['groups'] as $group) {
 				break;
 			}
 		}
-		$problematic_count = (new CActionLink($data['hosts_data'][$group['groupid']]['problematic']))
+		$problematic_count = (new CLinkAction($data['hosts_data'][$group['groupid']]['problematic']))
 			->setHint($table_inf);
 	}
 	else {

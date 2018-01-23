@@ -19,7 +19,7 @@
 **/
 
 
-class CActionLink extends CLink {
+class CLinkAction extends CLink {
 
 	public function __construct($items = null) {
 		parent::__construct($items);

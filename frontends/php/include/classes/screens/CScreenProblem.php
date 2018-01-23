@@ -848,7 +848,7 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$description = [
-					(new CActionLink($problem['name']))
+					(new CLinkAction($problem['name']))
 						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
 				];
 

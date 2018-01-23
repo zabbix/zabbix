@@ -1723,17 +1723,17 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:
-					$status_str = $html ? (new CActionLink(_('Done')))->addClass(ZBX_STYLE_GREEN) : _('Done');
+					$status_str = $html ? (new CLinkAction(_('Done')))->addClass(ZBX_STYLE_GREEN) : _('Done');
 					break;
 
 				case ALERT_STATUS_NOT_SENT:
 					$status_str = $html
-						? (new CActionLink(_('In progress')))->addClass(ZBX_STYLE_YELLOW)
+						? (new CLinkAction(_('In progress')))->addClass(ZBX_STYLE_YELLOW)
 						: _('In progress');
 					break;
 
 				default:
-					$status_str = $html ? (new CActionLink(_('Failures')))->addClass(ZBX_STYLE_RED) : _('Failures');
+					$status_str = $html ? (new CLinkAction(_('Failures')))->addClass(ZBX_STYLE_RED) : _('Failures');
 			}
 
 			if ($html) {

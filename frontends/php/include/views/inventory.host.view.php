@@ -26,7 +26,7 @@ $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
  */
 $overviewFormList = new CFormList();
 
-$host_name = (new CActionLink($data['host']['host']))
+$host_name = (new CLinkAction($data['host']['host']))
 	->setMenuPopup(CMenuPopupHelper::getHost(
 		$data['host'],
 		$data['hostScripts'][$data['host']['hostid']],

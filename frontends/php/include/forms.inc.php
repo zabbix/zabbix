@@ -193,7 +193,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 		// is activated
 		if (str_in_array($id, $subfilter)) {
 			$output[] = (new CSpan([
-				(new CActionLink($element['name']))
+				(new CLinkAction($element['name']))
 					->onClick(CHtml::encode(
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
@@ -216,7 +216,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					? new CSup('+'.$element['count'])
 					: new CSup($element['count']);
 
-				$link = (new CActionLink($element['name']))
+				$link = (new CLinkAction($element['name']))
 					->onClick(CHtml::encode(
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.

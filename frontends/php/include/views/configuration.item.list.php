@@ -219,7 +219,7 @@ foreach ($this->data['items'] as $item) {
 	unset($trigger);
 
 	if (!empty($item['triggers'])) {
-		$triggerInfo = (new CActionLink(_('Triggers')))
+		$triggerInfo = (new CLinkAction(_('Triggers')))
 			->setHint($triggerHintTable);
 		$triggerInfo = [$triggerInfo];
 		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));

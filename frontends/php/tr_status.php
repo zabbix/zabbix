@@ -552,7 +552,7 @@ foreach ($triggers as $trigger) {
 		];
 	}
 
-	$description[] = (new CActionLink(CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event))))
+	$description[] = (new CLinkAction(CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event))))
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {

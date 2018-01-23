@@ -802,7 +802,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($host_names as $hostId => $host_name) {
-			$name = (new CActionLink($host_name))
+			$name = (new CLinkAction($host_name))
 				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
@@ -1133,7 +1133,7 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	foreach ($hosts as $host) {
-		$hostNames[] = (new CActionLink($host['name']))
+		$hostNames[] = (new CLinkAction($host['name']))
 			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 		$hostNames[] = ', ';
 	}
@@ -1290,7 +1290,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 						$expressionId = 'recovery_expr_'.$element['id'];
 					}
 
-					$url = (new CActionLink($element['expression']))
+					$url = (new CLinkAction($element['expression']))
 						->setId($expressionId)
 						->onClick('javascript: copy_expression("'.$expressionId.'", '.$type.');');
 				}
@@ -2248,7 +2248,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
 
-			$host_name = (new CActionLink($host['name']))
+			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host));
 
 			// add maintenance icon with hint if host is in maintenance

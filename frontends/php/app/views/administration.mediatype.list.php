@@ -115,10 +115,10 @@ foreach ($data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? (new CActionLink(_('Enabled'), $statusLink))
+		? (new CLinkAction(_('Enabled'), $statusLink))
 			->addClass(ZBX_STYLE_GREEN)
 			->addSID()
-		: (new CActionLink(_('Disabled'), $statusLink))
+		: (new CLinkAction(_('Disabled'), $statusLink))
 			->addClass(ZBX_STYLE_RED)
 			->addSID();
 
