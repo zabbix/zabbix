@@ -3840,10 +3840,7 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  *                         characters can be safely skipped                   *
  *                                                                            *
  ******************************************************************************/
-#ifndef ZBXCMOCKA
-	static
-#endif
-int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len)
+static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len)
 {
 	size_t	lpp_offset, lpp_len;
 
