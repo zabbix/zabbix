@@ -4,6 +4,9 @@ in:
   param: 'last(123,"grpsum[\"{$MYGROUP}\",\"ckey3\",last]")'
 out:
   return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 48
 ---
 test case: "unsuccessfully read"
 in:

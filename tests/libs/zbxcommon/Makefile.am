@@ -1,5 +1,5 @@
 if SERVER
-SERVER_tests = zbx_function_validate
+SERVER_tests = zbx_function_find 
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -72,18 +72,18 @@ COMMON_LIB_FILES = \
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 
-zbx_function_validate_SOURCES = \
-	zbx_function_validate.c \
+zbx_function_find_SOURCES = \
+	zbx_function_find.c \
 	$(COMMON_SRC_FILES)
 
-zbx_function_validate_LDADD = \
+zbx_function_find_LDADD = \
 	$(COMMON_LIB_FILES) \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a 
 
-zbx_function_validate_LDADD += @SERVER_LIBS@ 
+zbx_function_find_LDADD += @SERVER_LIBS@ 
 
-zbx_function_validate_LDFLAGS = @SERVER_LDFLAGS@
+zbx_function_find_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_function_validate_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_function_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

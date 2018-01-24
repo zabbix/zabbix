@@ -379,7 +379,7 @@ tests/libs/zbxcommon/*.o
 tests/libs/zbxcommon/.deps
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
-tests/libs/zbxcommon/zbx_function_validate
+tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxconf/.deps
 tests/libs/zbxconf/Makefile
 tests/libs/zbxconf/Makefile.in
