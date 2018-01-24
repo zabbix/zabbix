@@ -78,9 +78,8 @@ svg a {
 }
 
 .link-action {
-	@extend %link-action-style;
-
-	color: $font-color;
+	border-bottom: 1px dotted;
+	cursor: pointer;
 
 	&:link {
 		@extend %link-action-style;
@@ -100,15 +99,14 @@ svg a {
 
 	&:focus {
 		outline: none;
-		border-bottom: 2px solid rgba($font-color, 0.35);
+		border-bottom: 2px solid rgba($link-hover-color, 0.35);
+
 	}
 }
 
 %link-action-style {
-	border-bottom-width: 1px;
-	border-bottom-style: dotted;
+	border-bottom: 1px dotted;
 	text-decoration: none;
-	cursor: pointer;
 }
 
 .link-alt {
