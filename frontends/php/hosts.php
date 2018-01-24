@@ -1251,7 +1251,7 @@ else {
 				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
 			],
 			'filter' => [
-				'port' => ($filter['port'] === '') ? null : $filter['port'],
+				'port' => ($filter['port'] === '') ? null : $filter['port']
 			],
 			'proxyids' => $proxyids
 		]);

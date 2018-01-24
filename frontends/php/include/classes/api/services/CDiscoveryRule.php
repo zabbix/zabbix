@@ -142,7 +142,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
+			$sqlParts['where']['interfaceid'] = dbConditionId('i.interfaceid', $options['interfaceids']);
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.interfaceid';
