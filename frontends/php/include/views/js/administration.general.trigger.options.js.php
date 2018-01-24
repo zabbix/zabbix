@@ -5,7 +5,17 @@ $schema = DB::getSchema('config');
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		jQuery("input[name=custom_color]").on('change', function() {
-			jQuery(".input-color-picker > input").attr('disabled', jQuery(this).is(':checked') ? null : 'disabled');
+			var checked = jQuery(this).is(':checked');
+			jQuery(".input-color-picker").each(function() {
+				var field = jQuery(this);
+				if (checked) {
+					field.removeClass('<?= ZBX_STYLE_DISABLED ?>');
+				}
+				else {
+					field.addClass('<?= ZBX_STYLE_DISABLED ?>');
+				}
+				jQuery("input", field).attr('disabled', checked ? null : 'disabled');
+			});
 		});
 		jQuery("#resetDefaults").click(function() {
 			overlayDialogue({
@@ -27,7 +37,7 @@ $schema = DB::getSchema('config');
 										? 'true'
 										: 'false'
 								?>
-							);
+							).trigger('change');
 							// Unacknowledged problem events
 							jQuery('#problem_unack_color')
 								.val("<?= $schema['fields']['problem_unack_color']['default'] ?>")

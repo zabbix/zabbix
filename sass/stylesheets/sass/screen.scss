@@ -4490,6 +4490,14 @@ a.overlay-close-btn {
 	input[type="text"] {
 		padding-left: 25px;
 	}
+
+	&.disabled {
+		opacity: 1;
+
+		div {
+			background: $form-disabled-font-color !important;
+		}
+	}
 }
 
 .preloader-container {
