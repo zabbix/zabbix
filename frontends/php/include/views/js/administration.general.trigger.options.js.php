@@ -33,7 +33,7 @@ $schema = DB::getSchema('config');
 						'focused': true,
 						'action': function() {
 							jQuery('#custom_color').prop('checked',
-								<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_ENABLED
+								<?= ($schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_ENABLED)
 										? 'true'
 										: 'false'
 								?>
@@ -42,56 +42,56 @@ $schema = DB::getSchema('config');
 							jQuery('#problem_unack_color')
 								.val("<?= $schema['fields']['problem_unack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED
+									'<?= ($schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED)
 											? 'disabled'
 											: null
 									?>'
 								)
 								.change();
 							jQuery('#problem_unack_style').prop('checked',
-								<?= $schema['fields']['problem_unack_style']['default'] == 0 ? 'false' : 'true' ?>
+								<?= ($schema['fields']['problem_unack_style']['default'] == 0) ? 'false' : 'true' ?>
 							);
 
 							// Acknowledged problem events
 							jQuery('#problem_ack_color')
 								.val("<?= $schema['fields']['problem_ack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED
-										? 'disabled'
-										: null
+									'<?= ($schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED)
+											? 'disabled'
+											: null
 									?>'
 								)
 								.change();
 							jQuery('#problem_ack_style').prop('checked',
-								<?= $schema['fields']['problem_ack_style']['default'] == 0 ? 'false' : 'true' ?>
+								<?= ($schema['fields']['problem_ack_style']['default'] == 0) ? 'false' : 'true' ?>
 							);
 
 							// Unacknowledged resolved events
 							jQuery('#ok_unack_color')
 								.val("<?= $schema['fields']['ok_unack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED
-										? 'disabled'
-										: null
+									'<?= ($schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED)
+											? 'disabled'
+											: null
 									?>'
 								)
 								.change();
 							jQuery('#ok_unack_style').prop('checked',
-								<?= $schema['fields']['ok_unack_style']['default'] == 0 ? 'false' : 'true' ?>
+								<?= ($schema['fields']['ok_unack_style']['default'] == 0) ? 'false' : 'true' ?>
 							);
 
 							// Acknowledged resolved events
 							jQuery('#ok_ack_color')
 								.val("<?= $schema['fields']['ok_ack_color']['default'] ?>")
 								.attr('disabled',
-									'<?= $schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED
-										? 'disabled'
-										: null
+									'<?= ($schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_DISABLED)
+											? 'disabled'
+											: null
 									?>'
 								)
 								.change();
 							jQuery('#ok_ack_style').prop('checked',
-								<?= $schema['fields']['ok_ack_style']['default'] == 0 ? 'false' : 'true' ?>
+								<?= ($schema['fields']['ok_ack_style']['default'] == 0) ? 'false' : 'true' ?>
 							);
 
 							jQuery('#ok_period').val("<?= $schema['fields']['ok_period']['default'] ?>");

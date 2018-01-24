@@ -34,7 +34,7 @@ $triggerDOFormList = (new CFormList())
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
 		(new CColor('problem_unack_color', $data['problem_unack_color']))
 			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
-			->addClass($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED ? ZBX_STYLE_DISABLED : null)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_unack_style'))
@@ -44,7 +44,7 @@ $triggerDOFormList = (new CFormList())
 	->addRow((new CLabel(_('Acknowledged PROBLEM events'), 'problem_ack_color'))->setAsteriskMark(), [
 		(new CColor('problem_ack_color', $data['problem_ack_color']))
 			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
-			->addClass($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED ? ZBX_STYLE_DISABLED : null)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_ack_style'))
@@ -54,7 +54,7 @@ $triggerDOFormList = (new CFormList())
 	->addRow((new CLabel(_('Unacknowledged RESOLVED events'), 'ok_unack_color'))->setAsteriskMark(), [
 		(new CColor('ok_unack_color', $data['ok_unack_color']))
 			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
-			->addClass($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED ? ZBX_STYLE_DISABLED : null)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_unack_style'))
@@ -64,7 +64,7 @@ $triggerDOFormList = (new CFormList())
 	->addRow((new CLabel(_('Acknowledged RESOLVED events'), 'ok_ack_color'))->setAsteriskMark(), [
 		(new CColor('ok_ack_color', $data['ok_ack_color']))
 			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
-			->addClass($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED ? ZBX_STYLE_DISABLED : null)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_ack_style'))
