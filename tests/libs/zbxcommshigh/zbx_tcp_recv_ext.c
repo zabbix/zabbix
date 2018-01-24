@@ -19,6 +19,8 @@
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
 #include "zbxmockhelper.h"
 
 #include "common.h"
@@ -30,27 +32,25 @@ void	zbx_mock_test_entry(void **state)
 
 	char		*buffer;
 	zbx_socket_t	s;
-	ssize_t		received, expected;
+	ssize_t		received;
+	int		expected_ret;
 
 	ZBX_UNUSED(state);
 
-	if (SUCCEED != zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
-		fail_msg("Failed to connect");
+	zbx_mock_assert_result_eq("zbx_tcp_connect() return code", SUCCEED,
+			zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL));
 
-	if (zbx_read_yaml_expected_ret() != SUCCEED_OR_FAIL((received = zbx_tcp_recv_ext(&s, 0))))
-		fail_msg("Unexpected return code '%s'", zbx_result_string(SUCCEED_OR_FAIL(received)));
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+	received = zbx_tcp_recv_ext(&s, 0);
 
-	if (FAIL == SUCCEED_OR_FAIL(received))
+	if (FAIL == expected_ret)
 	{
+		zbx_mock_assert_result_eq("zbx_tcp_recv_ext() return code", FAIL, received);
 		zbx_tcp_close(&s);
 		return;
 	}
 
-	if (received != (expected = zbx_read_yaml_expected_uint64("number of bytes")))
-		fail_msg("Expected bytes to receive:" ZBX_FS_UI64 " received:" ZBX_FS_UI64, expected, received);
-
-	if (ZBX_TCP_HEADER_DATALEN_LEN > received)
-		fail_msg("Received less than header size");
+	zbx_mock_assert_uint64_eq("Received bytes", zbx_mock_get_parameter_uint64("out.bytes"), received);
 
 	buffer = zbx_yaml_assemble_binary_sequence("fragments", received);
 

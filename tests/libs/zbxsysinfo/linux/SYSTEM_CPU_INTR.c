@@ -1,6 +1,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockhelper.h"
+#include "zbxmockutil.h"
 
 #include "common.h"
 #include "module.h"
@@ -52,7 +53,7 @@ void	zbx_mock_test_entry(void **state)
 		if (NULL == GET_UI64_RESULT(&result))
 			fail_msg("result does not contain numeric unsigned value");
 
-		if ((interr = zbx_read_yaml_expected_uint64("interrupts_since_boot")) != result.ui64)
+		if ((interr = zbx_mock_get_parameter_uint64("out.interrupts_since_boot")) != result.ui64)
 			fail_msg("expected:" ZBX_FS_UI64 " actual:" ZBX_FS_UI64, interr, result.ui64);
 	}
 	else if (NULL == GET_MSG_RESULT(&result))

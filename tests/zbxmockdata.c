@@ -298,8 +298,10 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Internal error, please report to maintainers.";
 		case ZBX_MOCK_INVALID_YAML_PATH:
 			return "Invalid YAML path syntax.";
-		case ZBX_MOCK_INVALID_BINARY:
-			return "Invalid binary string supplied";
+		case ZBX_MOCK_NOT_A_BINARY:
+			return "Provided handle is not a binary string.";
+		case ZBX_MOCK_NOT_AN_UINT64:
+			return "Provided handle is not an unsigned 64 bit integer handle.";
 		default:
 			return "Unknown error.";
 	}
@@ -468,7 +470,7 @@ zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, s
 	const zbx_mock_pool_handle_t	*handle;
 	char				*tmp, *dst;
 	const char			*src;
-	size_t				i, state = 0;
+	size_t				i;
 
 	if (0 > binary || binary >= handle_pool.values_num)
 		return ZBX_MOCK_INVALID_HANDLE;
@@ -476,45 +478,34 @@ zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, s
 	handle = handle_pool.values[binary];
 
 	if (YAML_SCALAR_NODE != handle->node->type)
-		return ZBX_MOCK_INVALID_BINARY;
+		return ZBX_MOCK_NOT_A_BINARY;
 
 	src = (char*)handle->node->data.scalar.value;
 	dst = tmp = zbx_malloc(NULL, handle->node->data.scalar.length);
 
 	for (i = 0; i < handle->node->data.scalar.length; i++)
 	{
-		switch (state)
+		if ('\\' == src[i])
 		{
-			case 0:
-				if ('\\' == src[i])
-					state = 1;
-				else
-					*dst++ = src[i];
+			if (i + 3 >= handle->node->data.scalar.length || 'x' != src[i + 1] ||
+					SUCCEED != is_hex_n_range(&src[i + 2], 2, dst, sizeof(char), 0, 0xff))
+			{
+				zbx_free(tmp);
+				return ZBX_MOCK_NOT_A_BINARY;
+			}
 
-				break;
-			case 1:
-				if ('x' == src[i] && i + 2 < handle->node->data.scalar.length &&
-						SUCCEED == is_hex_n_range(&src[i + 1], 2, dst, sizeof(char), 0, 0xff))
-				{
-					dst++;
-					state = 0;
-					i += 2;
-				}
-				else
-				{
-					zbx_free(tmp);
-					return ZBX_MOCK_INVALID_BINARY;
-				}
-
-				break;
+			dst++;
+			i += 3;
 		}
+		else
+			*dst++ = src[i];
 	}
 
 	zbx_vector_str_append(&string_pool, tmp);
 	*value = tmp;
 	*length = dst - tmp;
 
-	return state == 0 ? ZBX_MOCK_SUCCESS : ZBX_MOCK_INVALID_BINARY;
+	return ZBX_MOCK_SUCCESS;
 }
 
 static zbx_mock_error_t	zbx_yaml_path_next(const char **pnext, const char **key, int *key_len, int *index)
@@ -664,4 +655,25 @@ static zbx_mock_error_t	zbx_mock_parameter_rec(const yaml_node_t *node, const ch
 zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter)
 {
 	return zbx_mock_parameter_rec(root, path, parameter);
+}
+
+zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value)
+{
+	const zbx_mock_pool_handle_t	*handle;
+
+	if (0 > object || object >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[object];
+
+	if (YAML_SCALAR_NODE != handle->node->type || ZBX_MAX_UINT64_LEN < handle->node->data.scalar.length)
+		return ZBX_MOCK_NOT_AN_UINT64;
+
+	if (SUCCEED != is_uint64_n((const char *)handle->node->data.scalar.value, handle->node->data.scalar.length,
+			value))
+	{
+		return ZBX_MOCK_NOT_AN_UINT64;
+	}
+
+	return ZBX_MOCK_SUCCESS;
 }

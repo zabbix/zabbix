@@ -22,9 +22,6 @@
 
 #include "common.h"
 
-int		zbx_read_yaml_expected_ret(void);
-zbx_uint64_t	zbx_read_yaml_expected_uint64(const char *out);
-
 char		*zbx_yaml_assemble_binary_sequence(const char *in, size_t expected);
 
 #endif

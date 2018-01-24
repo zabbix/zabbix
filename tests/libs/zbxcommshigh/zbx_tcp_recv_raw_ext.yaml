@@ -4,7 +4,8 @@ in:
   fragments:
     - ''
 out:
-  ret: 'succeed'
+  return: SUCCEED
+  bytes: 0
 ---
 test case: Correct number of bytes received
 in:
@@ -27,8 +28,8 @@ in:
       <address>Apache/2.4.10 (Debian) Server at www.zabbix.com Port 80</address>
       </body></html>'
 out:
-  ret: 'succeed'
-  number of bytes: '506'
+  return: SUCCEED
+  bytes: 506
 ---
 test case: Correct number of bytes received fragmented
 in:
@@ -66,16 +67,16 @@ in:
     '
     - '</body></html>'
 out:
-  ret: 'succeed'
-  number of bytes: '506'
+  return: SUCCEED
+  bytes: 506
 ---
 test case: Stat buffer filled
 in:
   fragments:
     - '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01'
 out:
-  ret: 'succeed'
-  number of bytes: '2048'
+  return: SUCCEED
+  bytes: 2048
 ---
 test case: Stat buffer filled and switched to dynamic fragmented
 in:
@@ -86,16 +87,16 @@ in:
     - 'q'
     - 'r'
 out:
-  ret: 'succeed'
-  number of bytes: '2100'
+  return: SUCCEED
+  bytes: 2100
 ---
 test case: Correct number of bytes received binary stat buffer
 in:
   fragments:
     - 'ZBXD\x01\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
 out:
-  ret: 'succeed'
-  number of bytes: '23'
+  return: SUCCEED
+  bytes: 23
 ---
 test case: Correct number of bytes received binary dynamic buffer
 in:
@@ -106,8 +107,8 @@ in:
     - 'q'
     - 'r'
 out:
-  ret: 'succeed'
-  number of bytes: '2100'
+  return: SUCCEED
+  bytes: 2100
 ---
 test case: Lots of binary data
 in:
@@ -177,6 +178,6 @@ in:
     - *1
     - *1
 out:
-  ret: 'succeed'
-  number of bytes: '131072'
+  return: SUCCEED
+  bytes: 131072
 ...

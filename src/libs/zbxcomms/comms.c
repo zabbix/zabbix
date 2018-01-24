@@ -1566,9 +1566,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 		if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 			break;
 
-		if (ZBX_TCP_EXPECT_SIZE == expect)	/* performance short-circuit, can be omitted */
-			continue;
-
 		if (ZBX_TCP_EXPECT_HEADER == expect)
 		{
 			if (ZBX_TCP_HEADER_LEN > buf_stat_bytes)

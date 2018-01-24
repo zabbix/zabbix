@@ -21,46 +21,6 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-int	zbx_read_yaml_expected_ret(void)
-{
-	zbx_mock_handle_t	handle;
-	zbx_mock_error_t	error;
-	const char		*str;
-
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("ret", &handle)))
-		fail_msg("Cannot get return code: %s", zbx_mock_error_string(error));
-
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(handle, &str)))
-		fail_msg("Cannot read return code: %s", zbx_mock_error_string(error));
-
-	if (0 == strcasecmp(str, "succeed"))
-		return SUCCEED;
-
-	if (0 != strcasecmp(str, "fail"))
-		fail_msg("Incorrect return code '%s'", str);
-
-	return FAIL;
-}
-
-zbx_uint64_t	zbx_read_yaml_expected_uint64(const char *out)
-{
-	zbx_mock_handle_t	handle;
-	zbx_mock_error_t	error;
-	const char		*str;
-	zbx_uint64_t		value;
-
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter(out, &handle)))
-		fail_msg("Cannot get expected uint64: %s", zbx_mock_error_string(error));
-
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(handle, &str)))
-		fail_msg("Cannot read expected uint64 %s", zbx_mock_error_string(error));
-
-	if (FAIL == is_uint64(str, &value))
-		fail_msg("\"%s\" is not a valid numeric unsigned value", str);
-
-	return value;
-}
-
 char	*zbx_yaml_assemble_binary_sequence(const char *in, size_t expected)
 {
 	zbx_mock_error_t	error;
