@@ -130,11 +130,16 @@ WRAP_FS_FUNCS = \
 WRAP_EXIT = \
 	-Wl,--wrap=exit
 
+WRAP_COMM_FUNCS = \
+	-Wl,--wrap=read \
+	-Wl,--wrap=connect
+
 COMMON_WRAP_FUNCS = \
 	$(WRAP_DB_FUNCS) \
 	$(WRAP_IO_FUNCS) \
 	$(WRAP_FS_FUNCS) \
-	$(WRAP_EXIT)
+	$(WRAP_EXIT) \
+	$(WRAP_COMM_FUNCS)
 
 tests:
 	$(MAKE) $(AM_MAKEFLAGS) && \

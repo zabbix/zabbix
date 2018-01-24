@@ -6,6 +6,27 @@
 #include "module.h"
 #include "sysinfo.h"
 
+static int	read_yaml_ret(void)
+{
+	zbx_mock_handle_t	handle;
+	zbx_mock_error_t	error;
+	const char		*str;
+
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("ret", &handle)))
+		fail_msg("Cannot get return code: %s", zbx_mock_error_string(error));
+
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(handle, &str)))
+		fail_msg("Cannot read return code: %s", zbx_mock_error_string(error));
+
+	if (0 == strcasecmp(str, "succeed"))
+		return SYSINFO_RET_OK;
+
+	if (0 != strcasecmp(str, "fail"))
+		fail_msg("Incorrect return code '%s'", str);
+
+	return SYSINFO_RET_FAIL;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*itemkey = "system.cpu.intr";
@@ -21,7 +42,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != parse_item_key(itemkey, &request))
 		fail_msg("Invalid item key format '%s'", itemkey);
 
-	if (zbx_read_yaml_expected_ret() != (ret = SYSTEM_CPU_INTR(&request, &result)))
+	if (read_yaml_ret() != (ret = SYSTEM_CPU_INTR(&request, &result)))
 		fail_msg("unexpected return code '%s'", zbx_sysinfo_ret_string(ret));
 
 	if (SYSINFO_RET_OK == ret)
