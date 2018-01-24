@@ -54,4 +54,4 @@ MODULES_DIR = $(DESTDIR)@libdir@
 install-data-hook:
 	$(MKDIR_P) "$(INCLUDE_DIR)"
 	$(MKDIR_P) "$(MODULES_DIR)"
-	test -f "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)" || cp "../../conf/$(AGENTD_CONFIG)" "$(DESTDIR)@sysconfdir@"
+	test -f "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)" || cat "../../conf/$(AGENTD_CONFIG)"|sed -e 's,$${libdir},'"$(MODULES_DIR)"',g' > "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)"

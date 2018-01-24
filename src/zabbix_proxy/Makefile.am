@@ -87,4 +87,4 @@ install-data-hook:
 	$(MKDIR_P) "$(INCLUDE_DIR)"
 	$(MKDIR_P) "$(EXSCRIPTS_DIR)"
 	$(MKDIR_P) "$(MODULES_DIR)"
-	test -f "$(DESTDIR)@sysconfdir@/$(PROXY_CONFIG)" || cp "../../conf/$(PROXY_CONFIG)" "$(DESTDIR)@sysconfdir@"
+	test -f "$(DESTDIR)@sysconfdir@/$(PROXY_CONFIG)" || cat "../../conf/$(PROXY_CONFIG)"|sed -e 's,$${libdir},'"$(MODULES_DIR)"',g' > "$(DESTDIR)@sysconfdir@/$(PROXY_CONFIG)"

@@ -1579,6 +1579,40 @@ case "x$ARCH" in
 		;;
 esac
 
+dnl Check svn revision
+REV_CLASS=src/zabbix_java/src/com/zabbix/gateway/Revision.java
+ZBX_REV="Unversioned directory"
+AC_CHECK_PROG(svn_ver,svnversion,yes)
+
+AC_CHECK_FILE($REV_CLASS,
+[if test "xyes" = "x$svn_ver"; then
+	if test "Unversioned file" != "$(svnversion -n $REV_CLASS)"; then
+		ZBX_REV=$(sed -n -e '/ZABBIX_VERSION_REVISION/ s/.*\"\([[0-9A-Z:]]*\)\".*/\1/p' $REV_CLASS)
+	else
+		if test "Unversioned directory" = "$(svnversion -n .)"; then
+			ZBX_REV=$(sed -n -e '/ZABBIX_VERSION_REVISION/ s/.*\"\([[0-9A-Z:]]*\)\".*/\1/p' $REV_CLASS)
+		else
+			ZBX_REV='$(shell svnversion -n $(top_srcdir))'
+		fi
+		grep -e "/\*\|\*\*\|\*/\|package" $(ls src/zabbix_java/src/com/zabbix/gateway/*.java|head -1) > $REV_CLASS
+		printf "\npublic interface Revision {\n\tstatic final String ZABBIX_VERSION_REVISION = \"$(svnversion -n .)\";\n}" >> $REV_CLASS
+	fi
+else
+	ZBX_REV=$(sed -n -e '/ZABBIX_VERSION_REVISION/ s/.*\"\([[0-9A-Z:]]*\)\".*/\1/p' $REV_CLASS)
+fi]
+,
+[grep -e "/\*\|\*\*\|\*/\|package" $(ls src/zabbix_java/src/com/zabbix/gateway/*.java|head -1) > $REV_CLASS
+if test "xyes" = "x$svn_ver"; then
+	ZBX_REV='$(shell svnversion -n $(top_srcdir))'
+	printf "\npublic interface Revision {\n\tstatic final String ZABBIX_VERSION_REVISION = \"$(svnversion -n .)\";\n}" >> $REV_CLASS
+else
+	printf "\npublic interface Revision {\n\tstatic final String ZABBIX_VERSION_REVISION = \"$ZBX_REV\";\n}" >> $REV_CLASS
+fi
+])
+
+AC_SUBST(ZBX_REV)
+AM_CPPFLAGS="${AM_CPPFLAGS} -D'ZABBIX_VERSION_REVISION=${ZBX_REV}'"
+AC_SUBST(AM_CPPFLAGS)
 
 dnl *****************************************************************
 dnl *                                                               *
