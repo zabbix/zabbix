@@ -1268,8 +1268,8 @@ define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
 // monitoring modes
 define('ZBX_MONITORED_BY_ANY', 0);
-define('ZBX_MONITORED_BY_PROXY', 1);
-define('ZBX_MONITORED_BY_SERVER', 2);
+define('ZBX_MONITORED_BY_SERVER', 1);
+define('ZBX_MONITORED_BY_PROXY', 2);
 
 // queue modes
 define('QUEUE_OVERVIEW', 0);

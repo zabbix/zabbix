@@ -131,7 +131,7 @@ $fields = [
 	'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_monitored_by' =>	[T_ZBX_INT, O_OPT, null,
-									IN([ZBX_MONITORED_BY_ANY, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_SERVER]),
+									IN([ZBX_MONITORED_BY_ANY, ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY]),
 									null
 								],
 	'filter_proxyids' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
