@@ -35,10 +35,10 @@ $fields = [
 		_('Acknowledged PROBLEM events')
 	],
 	'ok_unack_color' =>			[T_ZBX_CLR, O_OPT, null, null, 'isset({update}) && isset({custom_color})',
-		_('Unacknowledged OK events')
+		_('Unacknowledged RESOLVED events')
 	],
 	'ok_ack_color' =>			[T_ZBX_CLR, O_OPT, null, null, 'isset({update}) && isset({custom_color})',
-		_('Acknowledged OK events')
+		_('Acknowledged RESOLVED events')
 	],
 	'problem_unack_style' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')],
 	'problem_ack_style' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')],

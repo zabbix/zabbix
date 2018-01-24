@@ -51,7 +51,7 @@ $triggerDOFormList = (new CFormList())
 			->setLabel(_('blinking'))
 			->setChecked($data['problem_ack_style'] == 1)
 	])
-	->addRow((new CLabel(_('Unacknowledged OK events'), 'ok_unack_color'))->setAsteriskMark(), [
+	->addRow((new CLabel(_('Unacknowledged RESOLVED events'), 'ok_unack_color'))->setAsteriskMark(), [
 		(new CColor('ok_unack_color', $data['ok_unack_color']))
 			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
 			->addClass($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED ? ZBX_STYLE_DISABLED : null)
@@ -61,7 +61,7 @@ $triggerDOFormList = (new CFormList())
 			->setLabel(_('blinking'))
 			->setChecked($data['ok_unack_style'] == 1)
 	])
-	->addRow((new CLabel(_('Acknowledged OK events'), 'ok_ack_color'))->setAsteriskMark(), [
+	->addRow((new CLabel(_('Acknowledged RESOLVED events'), 'ok_ack_color'))->setAsteriskMark(), [
 		(new CColor('ok_ack_color', $data['ok_ack_color']))
 			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
 			->addClass($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED ? ZBX_STYLE_DISABLED : null)

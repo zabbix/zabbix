@@ -66,7 +66,7 @@ $schema = DB::getSchema('config');
 								<?= $schema['fields']['problem_ack_style']['default'] == 0 ? 'false' : 'true' ?>
 							);
 
-							// Unacknowledged ok events
+							// Unacknowledged resolved events
 							jQuery('#ok_unack_color')
 								.val("<?= $schema['fields']['ok_unack_color']['default'] ?>")
 								.attr('disabled',
@@ -80,7 +80,7 @@ $schema = DB::getSchema('config');
 								<?= $schema['fields']['ok_unack_style']['default'] == 0 ? 'false' : 'true' ?>
 							);
 
-							// Acknowledged ok events
+							// Acknowledged resolved events
 							jQuery('#ok_ack_color')
 								.val("<?= $schema['fields']['ok_ack_color']['default'] ?>")
 								.attr('disabled',
