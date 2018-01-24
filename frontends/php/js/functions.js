@@ -715,6 +715,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 
 	if (submit_btn) {
 		jQuery('.overlay-dialogue-body form', overlay_dialogue).on('keydown', function(event) {
+			// ENTER
 			if (event.which === 13) {
 				event.preventDefault();
 				submit_btn.trigger('click');

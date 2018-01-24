@@ -588,7 +588,7 @@ class CControllerPopupGeneric extends CController {
 			$page_options['only_hostid'] = $only_hosts[0];
 		}
 
-		if ($hostid) {
+		if ($hostid != 0) {
 			$page_options['hostid'] = $hostid;
 		}
 
