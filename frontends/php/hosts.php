@@ -1220,6 +1220,25 @@ else {
 	// get Hosts
 	$hosts = [];
 	if ($pageFilter->groupsSelected) {
+		switch ($filter['monitored_by']) {
+			case ZBX_MONITORED_BY_ANY:
+				$proxyids = null;
+				break;
+
+			case ZBX_MONITORED_BY_PROXY:
+				$proxyids = $filter['proxyids']
+					? $filter['proxyids']
+					: array_keys(API::Proxy()->get([
+						'output' => [],
+						'preservekeys' => true
+					]));
+				break;
+
+			case ZBX_MONITORED_BY_SERVER:
+				$proxyids = 0;
+				break;
+		}
+
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sortField],
 			'groupids' => $pageFilter->groupids,
@@ -1234,9 +1253,7 @@ else {
 			'filter' => [
 				'port' => ($filter['port'] === '') ? null : $filter['port'],
 			],
-			'proxyids' => ($filter['monitored_by'] == ZBX_MONITORED_BY_PROXY && $filter['proxyids'])
-								? $filter['proxyids']
-								: null
+			'proxyids' => $proxyids
 		]);
 	}
 	order_result($hosts, $sortField, $sortOrder);
