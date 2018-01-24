@@ -78,18 +78,16 @@ svg a {
 }
 
 .link-action {
-	border-bottom: 1px dotted;
-	cursor: pointer;
+	@extend %link-action-style;
+
+	color: $font-color;
 
 	&:link {
-		text-decoration: none;
-		color: $font-color;
+		@extend %link-action-style;
 	}
 
 	&:visited {
 		@extend %link-action-style;
-
-		color: $font-color;
 	}
 
 	&:hover {
@@ -107,8 +105,10 @@ svg a {
 }
 
 %link-action-style {
-	border-bottom: 1px dotted;
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
 	text-decoration: none;
+	cursor: pointer;
 }
 
 .link-alt {
