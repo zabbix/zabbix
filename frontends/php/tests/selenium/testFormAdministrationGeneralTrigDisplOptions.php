@@ -40,8 +40,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 				'blinking',
 				'Unacknowledged PROBLEM events',
 				'Acknowledged PROBLEM events',
-				'Unacknowledged OK events',
-				'Acknowledged OK events',
+				'Unacknowledged RESOLVED events',
+				'Acknowledged RESOLVED events',
 				'Display OK triggers for',
 				'On status change triggers blink for'
 			]
