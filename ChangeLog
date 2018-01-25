@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
 ...G...... [ZBX-11720] fixed memory leak which breaks vfs.fs.size, vfs.fs.inode and vfs.dir.size items if compiled with LeakSanitizer (Andris)
 ........S. [ZBX-13131] fixed truncated multiline text values from network discovery SNMP checks (viktors)
 ...G...... [ZBX-13117] fixed vfs.dir.size with symbol links on Windows (MVekslers)
@@ -103,6 +104,7 @@ Changes for 3.4.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
 ...G...... [ZBX-11720] fixed memory leak which breaks vfs.fs.size, vfs.fs.inode and vfs.dir.size items if compiled with LeakSanitizer (Andris)
 ........S. [ZBX-13131] fixed truncated multiline text values from network discovery SNMP checks (viktors)
 ........S. [ZBX-13343] fixed last trends update clock caching (wiper)
@@ -1183,6 +1185,7 @@ Changes for 3.0.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
 A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
 ..F....... [ZBX-13345] removed SID from URL in screen edit mode (miks)
