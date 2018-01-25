@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+.......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
 ...G...... [ZBX-13233] added new memory metrics for Linux platform - "active", "anon", "inactive" and "slabs"; thanks to Tomasz Kłoczko for the original patch (viktors)
 ........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
 ...G...... [ZBX-11720] fixed memory leak which breaks vfs.fs.size, vfs.fs.inode and vfs.dir.size items if compiled with LeakSanitizer (Andris)
@@ -105,6 +106,7 @@ Changes for 3.4.7rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
 ...G...... [ZBX-13117] fixed vfs.dir.size with symbol links on Windows (MVekslers)
 ........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
 ...G...... [ZBX-11720] fixed memory leak which breaks vfs.fs.size, vfs.fs.inode and vfs.dir.size items if compiled with LeakSanitizer (Andris)
