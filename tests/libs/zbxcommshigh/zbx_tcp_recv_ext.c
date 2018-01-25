@@ -51,7 +51,6 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	zbx_mock_assert_result_eq("zbx_tcp_recv_ext() return code", SUCCEED, SUCCEED_OR_FAIL(received));
-
 	zbx_mock_assert_uint64_eq("Received bytes", zbx_mock_get_parameter_uint64("out.bytes"), received);
 
 	buffer = zbx_yaml_assemble_binary_sequence("fragments", received);
