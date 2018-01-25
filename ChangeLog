@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+...G...... [ZBX-13233] added new memory metrics for Linux platform - "active", "anon", "inactive" and "slabs"; thanks to Tomasz Kłoczko for the original patch (viktors)
 ........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
 ...G...... [ZBX-11720] fixed memory leak which breaks vfs.fs.size, vfs.fs.inode and vfs.dir.size items if compiled with LeakSanitizer (Andris)
 ........S. [ZBX-13131] fixed truncated multiline text values from network discovery SNMP checks (viktors)
