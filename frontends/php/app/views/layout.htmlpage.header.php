@@ -36,6 +36,7 @@ if (!empty($DB['DB'])) {
 	$theme = getUserTheme($data['user']);
 
 	$pageHeader->addStyle(getTriggerSeverityCss($config));
+	$pageHeader->addStyle(getTriggerStatusCss($config));
 
 	// perform Zabbix server check only for standard pages
 	if ($config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
