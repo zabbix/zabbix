@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha3
 
 New features:
+..F.I..... [ZBXNEXT-4273] added default event status colors in themes with option to customize them (ashubin)
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
