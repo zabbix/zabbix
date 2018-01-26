@@ -137,7 +137,7 @@ COMMON_WRAP_FUNCS = \
 	$(WRAP_EXIT)
 
 tests:
-	$(MAKE) $(AM_MAKEFLAGS) CFLAGS="$(CFLAGS) -DZBXCMOCKA" && \
+	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
 	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
 	./tests_run.pl

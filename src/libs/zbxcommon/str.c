@@ -3842,7 +3842,7 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  ******************************************************************************/
 static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len)
 {
-	size_t	lpp_offset, lpp_len;
+	size_t	lpp_offset = 0, lpp_len;
 
 	/* try to validate function name */
 	if (SUCCEED != function_parse_name(expr, par_l))
@@ -4197,7 +4197,7 @@ static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_
 static int	zbx_token_parse_function(const char *expression, const char *func,
 		zbx_strloc_t *func_loc, zbx_strloc_t *func_param)
 {
-	size_t		par_l, par_r;
+	size_t	par_l, par_r;
 
 	if (SUCCEED != zbx_function_validate(func, &par_l, &par_r, NULL, 0))
 		return FAIL;
