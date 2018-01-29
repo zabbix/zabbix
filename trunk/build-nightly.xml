@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Zabbix docker" default="build" basedir=".">
+	<target name="docker">
+	<!-- Get, run and delete script for generating new Zabbix image on Docker Hub -->
+		<exec executable="svn" failonerror="on">
+			<arg line="co"/>
+			<arg line="svn://192.168.3.4/docker/"/>
+			<arg line="--depth=empty"/>
+		</exec>
+		<exec dir="./docker" executable="svn" failonerror="on">
+			<arg line="up"/>
+			<arg line="build_images.py"/>
+		</exec>
+		<exec dir="./docker" executable="python" failonerror="on">
+			<arg line="build_images.py"/>
+			<arg line="-t"/>
+			<arg line="trunk"/>
+		</exec>
+		<delete dir="docker"/>
+	</target>
+</project>

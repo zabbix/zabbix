@@ -1,0 +1,129 @@
+// NOTIFICATION & ALERT
+$red: #e33734 !default;
+$light-red: #ed9898 !default;
+$lighter-red: #fccacf !default;
+
+$orange: #f24f1d;
+$alt-dark-orange: #e97659;
+
+$dark-yellow: #e99003 !default;
+$yellow: #fad634 !default;
+$light-yellow: #fcf39d !default;
+$lighter-yellow: #fcf7c2 !default;
+
+$green: #429e47 !default;
+$light-green: #a5d6a7 !default;
+$lighter-green: #c5e3c6 !default;
+
+$blue: #1e87e3 !default;
+
+$alt-red: #e45959;
+$alt-orange: #ffa059;
+$alt-yellow: #ffc859;
+$alt-green: #59db8f;
+$alt-dark-blue: #7499ff;
+$alt-blue-grey: #97aab3;
+
+$white: #fff !default;
+$transparent: transparent;
+
+$teal: #0f998b;
+
+// MAIN
+$main-nav-bg-color: #fff !default;
+$main-subnav-bg-color: #0a466a !default;
+$main-subnav-bg-selected-color: #026dab !default;
+$main-color: #0275b8 !default;
+$font-color: #1f2c33 !default;
+$font-selected-color: #fff !default;
+$font-alt-color: #768d99 !default;
+$body-bg-color: #ebeef0 !default;
+$overlay-bg-color: #fff !default;
+
+
+// UI
+$ui-bg-color: #fff !default;
+$ui-bg-selected-color: #768d99 !default;
+$ui-hover-color: #e8f5ff !default;
+$ui-border-color: #dfe4e7 !default;
+$ui-placeholder-background-color: $body-bg-color !default;
+$ui-highlighted-parent-background-color: lighten($body-bg-color, 4%) !default;
+$ui-sortable-helper-background-color: $ui-bg-color !default;
+$ui-sortable-helper-border-color: $ui-border-color !default;
+
+$action-hover-color: #e8f5ff !default;
+$action-border-color: #ccd5d9 !default;
+$action-shadow-color: rgba(#768d99, 0.5) !default;
+
+$table-border-color: #ebeef0 !default;
+
+$ui-tab-bg-selected-color: #0275b8 !default;
+
+
+// FORMS
+$form-font-color: #1f2c33 !default;
+$form-bg-color: #fff !default;
+$form-border-color: #acbbc2 !default;
+$form-border-focus-color: #02659f !default;
+$form-label-asterisk-color: $red;
+
+$form-disabled-font-color: #acbbc2 !default;
+$form-disabled-bg-color: #ebebeb !default;
+$form-disabled-border-color: #ccd5d9 !default;
+
+$scrollbar-track-color: #ebebeb !default;
+$scrollbar-thumb-color: #ccd5d9 !default;
+$scrollbar-thumb-color-darken: 5% !default;
+
+
+// BUTTONS
+$btn-font-color: #fff !default;
+$btn-bg-color: #0275b8 !default;
+$btn-border-color: #0275b8 !default;
+
+$btn-alt-font-color: #0275b8 !default;
+$btn-alt-bg-color: transparent !default;
+$btn-alt-border-color: $btn-bg-color !default;
+
+$btn-form-font-color: #1f2c33 !default;
+$btn-form-bg-color: $form-bg-color !default;
+$btn-form-hover-color: #e8f5ff !default;
+$btn-form-border-color: $form-border-color !default;
+
+$btn-disabled-font-color: #acbbc2 !default;
+$btn-disabled-bg-color: #ebebeb !default;
+$btn-disabled-border-color: #ccd5d9 !default;
+
+$btn-back-map-background-color: rgba(255, 255, 255, 0.8) !default;
+$btn-back-text-color: #0275b8 !default;
+$btn-back-background-hover: $form-bg-color !default;
+
+// LINKS
+$link-color: #0275b8 !default;
+$link-hover-color: #0275b8 !default;
+$link-active-color: #0275b8 !default;
+$link-visited-color: #0275b8 !default;
+
+$link-alt-underline-color: #768d99 !default;
+
+$link-main-nav-color: rgba(#1f2c33, 0.8) !default;
+$link-main-nav-hover-color: rgba(#1f2c33, 1) !default;
+$link-main-nav-active-color: rgba(#1f2c33, 1) !default;
+$link-main-nav-visited-color: rgba(#1f2c33, 0.8) !default;
+
+$link-main-subnav-color: rgba(#fff, 0.8) !default;
+$link-main-subnav-hover-color: rgba(#fff, 1) !default;
+$link-main-subnav-active-color: rgba(#fff, 1) !default;
+$link-main-subnav-visited-color: rgba(#fff, 0.8) !default;
+
+// ANALOG CLOCK
+$clock-face-color: #ebebeb!default;
+$clock-hand-color: #1f2c33 !default;
+$clock-hand-sec-color: #0275b8 !default;
+$clock-lines-color: #acbbc2 !default;
+
+// STATUSES
+$problem-unack-fg-color: #cc0000 !default;
+$problem-ack-fg-color: #cc0000 !default;
+$ok-unack-fg-color: #009900 !default;
+$ok-ack-fg-color: #009900 !default;
