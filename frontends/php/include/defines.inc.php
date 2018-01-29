@@ -730,7 +730,7 @@ define('VALIGN_BOTTOM',		2);
 define('STYLE_HORIZONTAL',	0);
 define('STYLE_VERTICAL',	1);
 
-// view style [Overview]
+// view style [Overview, Plaintext]
 define('STYLE_LEFT',	0);
 define('STYLE_TOP',		1);
 

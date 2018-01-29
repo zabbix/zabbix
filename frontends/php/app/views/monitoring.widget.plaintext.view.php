@@ -19,20 +19,81 @@
 **/
 
 
-if ($data['error'] === null) {
-	$table = (new CTableInfo())->setHeader([_('Timestamp'), _('Value')]);
+$history_table = new CTableInfo();
 
-	foreach ($data['table_rows'] as $table_row) {
-		$table->addRow($table_row);
-	}
+if ($data['error'] != null) {
+	$history_table->setNoDataMessage($data['error']);
 }
 else {
-	$table = (new CTableInfo())->setNoDataMessage($data['error']);
+	$table_header = [(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH)];
+	$names_at_top = ($data['name_location'] == STYLE_TOP && count($data['items']) > 1);
+
+	if ($names_at_top) {
+		$history_table->makeVerticalRotation();
+
+		foreach ($data['items'] as $item) {
+			$column_name = ($data['same_host'] === false)
+				? $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
+				: $item['name_expanded'];
+			$table_header[] = (new CColHeader($column_name))
+				->addClass('vertical_rotation')
+				->setTitle($item['name_expanded']);
+		}
+	}
+	else {
+		if ($data['name_location'] == STYLE_LEFT) {
+			$table_header[] = _('Name');
+		}
+		$table_header[] = _('Value');
+	}
+	$history_table->setHeader($table_header);
+
+	$clock = null;
+	$row_values = [];
+	foreach ($data['history_data'] as $history_item) {
+		if ($history_table->getNumRows() >= $data['show_lines']) {
+			break;
+		}
+		if ($names_at_top) {
+			if ($history_item['clock'] != $clock || array_key_exists($history_item['item_id'], $row_values)) {
+				if (count($row_values)) {
+					if ($history_table->getNumRows() >= $data['show_lines']) {
+						break;
+					}
+
+					$table_row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))
+						->addClass(ZBX_STYLE_NOWRAP)];
+
+					foreach ($data['items'] as $item) {
+						$table_row[] = array_key_exists($item['itemid'], $row_values)
+							? $row_values[$item['itemid']]
+							: '';
+					}
+
+					$history_table->addRow($table_row);
+				}
+				$clock = $history_item['clock'];
+				$row_values = [];
+			}
+			$row_values[$history_item['itemid']] = $history_item['value'];
+		}
+		else {
+			$table_row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])))
+				->addClass(ZBX_STYLE_NOWRAP)];
+			if ($data['name_location'] == STYLE_LEFT) {
+				$table_row[] = ($data['same_host'] === false)
+					? $history_item['host_name'].NAME_DELIMITER.$history_item['item_name']
+					: $history_item['item_name'];
+			}
+			$table_row[] = $history_item['value'];
+			$history_table->addRow($table_row);
+		}
+	}
 }
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
+	'body' => $history_table->toString(),
 	'footer' => (new CList())
 		->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
 		->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT)

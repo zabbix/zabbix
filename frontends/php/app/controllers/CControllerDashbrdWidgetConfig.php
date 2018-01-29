@@ -176,6 +176,7 @@ class CControllerDashbrdWidgetConfig extends CController {
 		// Prepare data for CMultiSelect controls.
 		$groupids = [];
 		$hostids = [];
+		$itemids = [];
 
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldGroup) {
@@ -194,6 +195,15 @@ class CControllerDashbrdWidgetConfig extends CController {
 				foreach ($field->getValue() as $hostid) {
 					$captions['ms']['hosts'][$field_name][$hostid] = ['id' => $hostid];
 					$hostids[$hostid][] = $field_name;
+				}
+			}
+			elseif ($field instanceof CWidgetFieldItem) {
+				$field_name = $field->getName();
+				$captions['ms']['items'][$field_name] = [];
+
+				foreach ($field->getValue() as $itemid) {
+					$captions['ms']['items'][$field_name][$itemid] = ['id' => $itemid];
+					$itemids[$itemid][] = $field_name;
 				}
 			}
 		}
@@ -227,9 +237,24 @@ class CControllerDashbrdWidgetConfig extends CController {
 			}
 		}
 
+		if ($itemids) {
+			$items = API::Item()->get([
+				'output' => ['name'],
+				'itemids' => array_keys($itemids),
+				'preservekeys' => true
+			]);
+
+			foreach ($items as $itemid => $item) {
+				foreach ($itemids[$itemid] as $field_name) {
+					$captions['ms']['items'][$field_name][$itemid]['name'] = $item['name'];
+				}
+			}
+		}
+
 		$inaccessible_resources = [
 			'groups' => _('Inaccessible group'),
-			'hosts' => _('Inaccessible host')
+			'hosts' => _('Inaccessible host'),
+			'items' => _('Inaccessible item')
 		];
 
 		foreach ($captions['ms'] as $resource_type => &$fields_captions) {

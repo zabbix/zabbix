@@ -24,22 +24,35 @@ class CPlainTextWidgetForm extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_PLAIN_TEXT);
 
-		// item field
-		$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
-			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
+		// Items selector.
+		$field_items = (new CWidgetFieldItem('itemids', _('Items')))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);
 
-		if (array_key_exists('itemid', $this->data)) {
-			$field_item->setValue($this->data['itemid']);
+		if (array_key_exists('itemids', $this->data)) {
+			$field_items->setValue($this->data['itemids']);
 		}
 
-		$this->fields[] = $field_item;
+		$this->fields[] = $field_items;
+
+		// Location of the item names.
+		$field_style = (new CWidgetFieldRadioButtonList('name_location', _('Items location'), [
+			STYLE_LEFT => _('Left'),
+			STYLE_TOP => _('Top')
+		]))
+			->setDefault(STYLE_LEFT)
+			->setModern(true);
+
+		if (array_key_exists('name_location', $this->data)) {
+			$field_style->setValue($this->data['name_location']);
+		}
+		$this->fields[] = $field_style;
 
 		// Number of records to display.
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
 		))
 			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-			->setDefault(25);
+			->setDefault(ZBX_DEFAULT_WIDGET_LINES);
 
 		if (array_key_exists('show_lines', $this->data)) {
 			$field_lines->setValue($this->data['show_lines']);
@@ -56,8 +69,8 @@ class CPlainTextWidgetForm extends CWidgetForm {
 
 		$this->fields[] = $field_text_as_html;
 
-		// dynamic item
-		$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(0);
+		// Use dynamic items.
+		$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic items')))->setDefault(WIDGET_SIMPLE_ITEM);
 
 		if (array_key_exists('dynamic', $this->data)) {
 			$dynamic_item->setValue($this->data['dynamic']);

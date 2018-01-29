@@ -289,6 +289,34 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'items':
+				$items = API::Item()->get([
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
+					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'selectHosts' => ['name'],
+					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($items) {
+					$items = CMacrosResolverHelper::resolveItemNames($items);
+					CArrayHelper::sort($items, [
+						['field' => 'name_expanded', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (isset($data['limit'])) {
+						$items = array_slice($items, 0, $data['limit']);
+					}
+
+					foreach ($items as $item) {
+						$result[] = [
+							'id' => $item['itemid'],
+							'name' => $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
+						];
+					}
+				}
+				break;
+
 			case 'templates':
 				$templates = API::Template()->get([
 					'editable' => isset($data['editable']) ? $data['editable'] : false,

@@ -120,6 +120,40 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 		$js_scripts[] = $field_hostids->getPostJS();
 	}
+	elseif ($field instanceof CWidgetFieldItem) {
+		// multiselect.js must be preloaded in parent view.
+
+		$popup_parameters = [
+			'srctbl' => 'items',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => $field->getName().'_',
+			'srcfld1' => 'itemid',
+			'reference' => 'id',
+		];
+
+		if ($field->getValuesLimit() > 1) {
+			$popup_parameters['multiselect'] = '1';
+		}
+
+		$field_itemsids = (new CMultiSelect([
+			'name' => $field->getName().'[]',
+			'objectName' => 'items',
+			'data' => $data['captions']['ms']['items'][$field->getName()],
+			'selectedLimit' => $field->getValuesLimit(),
+			'popup' => [
+				'parameters' => $popup_parameters
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired($aria_required);
+
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName().'[]'))->setAsteriskMark($aria_required),
+			$field_itemsids
+		);
+
+		$js_scripts[] = $field_itemsids->getPostJS();
+	}
 	elseif ($field instanceof CWidgetFieldReference) {
 		$form->addVar($field->getName(), $field->getValue() ? $field->getValue() : '');
 
