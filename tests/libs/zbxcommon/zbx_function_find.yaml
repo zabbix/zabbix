@@ -21,21 +21,43 @@ test case: "function name not found #1"
 in:
   param: 'test'
 out:
-  error: '' #not sure there should be an empty error message
+  error: ''
   return: 'FAIL'
 ---
 test case: "function name not found #2"
 in:
   param: 'test)('
 out:
-  error: '' #not sure there should be an empty error message
+  error: ''
   return: 'FAIL'
 ---
 test case: "function name not found #3"
 in:
   param: '()test'
 out:
-  error: '' #not sure there should be an empty error message
+  error: ''
+  return: 'FAIL'
+---
+test case: "function name not found #4"
+in:
+  param: '!!!'
+out:
+  error: ''
+  return: 'FAIL'
+---
+test case: "function name not found #5"
+in:
+  param: '
+'
+out:
+  error: ''
+  return: 'FAIL'
+---
+test case: "function name not found #6"
+in:
+  param: ''
+out:
+  error: ''
   return: 'FAIL'
 ---
 test case: "function parameters not found #1"
@@ -143,7 +165,7 @@ out:
   return: 'SUCCEED'
   func_pos: 0
   par_l: 4
-  par_r: 30
+  par_r: 29
 ---
 test case: "function with a complex set of parameters was successfully found #2"
 in:
@@ -152,5 +174,5 @@ out:
   return: 'SUCCEED'
   func_pos: 0
   par_l: 4
-  par_r: 49
+  par_r: 48
 ...
