@@ -82,7 +82,8 @@ static int	zbx_yaml_scalar_cmp(const char *str, const yaml_node_t *node)
 	if (YAML_SCALAR_NODE != node->type)
 		fail_msg("Internal error: scalar comparison of nonscalar node.");
 
-	return strncmp(str, (const char *)node->data.scalar.value, node->data.scalar.length);
+	return strncmp(str, (const char *)node->data.scalar.value, node->data.scalar.length) ||
+			strlen(str) > node->data.scalar.length;
 }
 
 static int	zbx_yaml_scalar_ncmp(const char *str, size_t len, const yaml_node_t *node)

@@ -1044,6 +1044,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				threads[i] = zbx_thread_start(active_checks_thread, thread_args);
 				break;
 		}
+#ifndef _WINDOWS
+		zbx_free(thread_args);
+#endif
 	}
 
 #ifdef _WINDOWS

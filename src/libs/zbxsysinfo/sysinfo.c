@@ -430,7 +430,7 @@ void	test_parameter(const char *key)
 	fflush(stdout);
 }
 
-void	test_parameters()
+void	test_parameters(void)
 {
 	int	i;
 	char	*key = NULL;
@@ -1329,13 +1329,15 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	{
 		if (0 == WIFEXITED(status))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated unexpectedly."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Data gathering process terminated unexpectedly with"
+					" error %d.", status));
 			kill(pid, SIGKILL);
 			ret = SYSINFO_RET_FAIL;
 		}
 		else if (EXIT_SUCCESS != WEXITSTATUS(status))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated with error."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Data gathering process terminated with error %d.",
+					status));
 			ret = SYSINFO_RET_FAIL;
 		}
 		else

@@ -141,11 +141,13 @@ COMMON_WRAP_FUNCS = \
 	$(WRAP_EXIT) \
 	$(WRAP_COMM_FUNCS)
 
-tests:
+tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
-	./tests_run.pl
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml"
+
+tests: tests_build
+	tests/tests_run.pl
 endif
 
 .PHONY: test tests

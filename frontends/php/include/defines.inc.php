@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha3');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050028);
+define('ZABBIX_DB_VERSION',		3050036);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -556,6 +556,9 @@ define('TRIGGER_SEVERITY_AVERAGE',			3);
 define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
+
+define('EVENT_CUSTOM_COLOR_DISABLED',	0);
+define('EVENT_CUSTOM_COLOR_ENABLED',	1);
 
 define('ALERT_STATUS_NOT_SENT', 0);
 define('ALERT_STATUS_SENT',		1);
@@ -1346,6 +1349,10 @@ define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
+define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
+define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
+define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
+define('ZBX_STYLE_OK_ACK_FG', 'ok-ack-fg');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');

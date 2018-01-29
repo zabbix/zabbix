@@ -406,6 +406,9 @@ tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC
 tests/libs/zbxsysinfo/linux/Makefile
 tests/libs/zbxsysinfo/linux/Makefile.in
 tests/libs/zbxsysinfo/linux/NET_IF_DISCOVERY
+tests/libs/zbxsysinfo/linux/NET_IF_IN
+tests/libs/zbxsysinfo/linux/NET_IF_OUT
+tests/libs/zbxsysinfo/linux/NET_IF_TOTAL
 tests/libs/zbxsysinfo/linux/SYSTEM_BOOTTIME
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_INTR
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES

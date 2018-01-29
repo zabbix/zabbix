@@ -126,7 +126,7 @@ while (0)
 #define GET_LOG_RESULT(res)	((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
 #define GET_MSG_RESULT(res)	((char **)get_result_value_by_type(res, AR_MESSAGE))
 
-void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
+void	*get_result_value_by_type(AGENT_RESULT *result, int require_type);
 
 #define ZBX_FLOAT_PRECISION	0.0001
 

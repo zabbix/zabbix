@@ -40,8 +40,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 				'blinking',
 				'Unacknowledged PROBLEM events',
 				'Acknowledged PROBLEM events',
-				'Unacknowledged OK events',
-				'Acknowledged OK events',
+				'Unacknowledged RESOLVED events',
+				'Acknowledged RESOLVED events',
 				'Display OK triggers for',
 				'On status change triggers blink for'
 			]
@@ -94,7 +94,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestCheckHeader('Trigger displaying options');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
-		$this->zbxTestTextPresent(['Trigger displaying options', 'blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged OK events', 'Acknowledged OK events', 'Display OK triggers for', 'On status change triggers blink for']);
+		$this->zbxTestTextPresent(['Trigger displaying options', 'blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged RESOLVED events', 'Acknowledged RESOLVED events', 'Display OK triggers for', 'On status change triggers blink for']);
 
 		// hash calculation for not-changed DB fields
 		$sqlHash = 'SELECT configid, refresh_unsupported, work_period, alert_usrgrpid, event_ack_enable, event_expire,'.
