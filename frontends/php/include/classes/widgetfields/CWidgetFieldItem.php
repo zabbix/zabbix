@@ -42,7 +42,7 @@ class CWidgetFieldItem extends CWidgetField {
 		return $this;
 	}
 
-	public function getValuesLimёit() {
+	public function getValuesLimit() {
 		return $this->values_limit;
 	}
 

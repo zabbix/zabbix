@@ -239,14 +239,21 @@ class CControllerDashbrdWidgetConfig extends CController {
 
 		if ($itemids) {
 			$items = API::Item()->get([
-				'output' => ['name'],
+				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'selectHosts' => ['name'],
 				'itemids' => array_keys($itemids),
 				'preservekeys' => true
 			]);
 
+			$items = CMacrosResolverHelper::resolveItemNames($items);
+
 			foreach ($items as $itemid => $item) {
 				foreach ($itemids[$itemid] as $field_name) {
-					$captions['ms']['items'][$field_name][$itemid]['name'] = $item['name'];
+					$captions['ms']['items'][$field_name][$itemid] = [
+						'id' => $itemid,
+						'name' => $item['name_expanded'],
+						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+					];
 				}
 			}
 		}

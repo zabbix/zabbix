@@ -311,7 +311,8 @@ switch ($data['method']) {
 					foreach ($items as $item) {
 						$result[] = [
 							'id' => $item['itemid'],
-							'name' => $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
+							'name' => $item['name_expanded'],
+							'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 						];
 					}
 				}

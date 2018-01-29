@@ -131,7 +131,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'reference' => 'id',
 		];
 
-		if ($field->getValuesLimit() > 1) {
+		if ($field->getValuesLimit() != 1) {
 			$popup_parameters['multiselect'] = '1';
 		}
 
@@ -140,9 +140,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'items',
 			'data' => $data['captions']['ms']['items'][$field->getName()],
 			'selectedLimit' => $field->getValuesLimit(),
-			'popup' => [
-				'parameters' => $popup_parameters
-			],
+			'popup' => [ 'parameters' => $popup_parameters ],
 			'add_post_js' => false
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
