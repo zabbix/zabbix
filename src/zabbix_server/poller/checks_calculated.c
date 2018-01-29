@@ -96,8 +96,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	exp->exp = (char *)zbx_malloc(exp->exp, exp_alloc);
 
-	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, error, max_error_len);
-			e += par_r + 1)
+	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
 		char	*func, *params, *host = NULL, *key = NULL;
 		size_t	param_pos, param_len, sep_pos;
@@ -145,9 +144,6 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		/* substitute function with id in curly brackets */
 		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, "{%d}", functionid);
 	}
-
-	if (par_l > par_r)
-		goto out;
 
 	/* copy the remaining part */
 	zbx_strcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e);
