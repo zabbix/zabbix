@@ -3690,7 +3690,8 @@ static size_t	zbx_no_function(const char *expr)
  * Parameters: expr       - [IN] string to parse that contains parameters     *
  *                                                                            *
  *             terminator - [IN] use ')' if parameters end with               *
- *                          parenthesis or '\0' if ends with NULL terminator  *
+ *                               parenthesis or '\0' if ends with NULL        *
+ *                               terminator                                   *
  *             par_r      - [OUT] position of the terminator if found         *
  *             lpp_offset - [OUT] offset of the last parsed parameter         *
  *             lpp_len    - [OUT] length of the last parsed parameter         *
@@ -3830,7 +3831,7 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  *                                                                            *
  * Parameters: expr          - [IN] string to parse                           *
  *             par_l         - [OUT] position of the opening parenthesis      *
- *                             or the amount of characters to skip            *
+ *                                   or the amount of characters to skip      *
  *             par_r         - [OUT] position of the closing parenthesis      *
  *             error         - [OUT] error message                            *
  *             max_error_len - [IN] error size                                *
