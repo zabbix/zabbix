@@ -388,7 +388,8 @@ static void	preprocessor_free_request(zbx_preprocessing_request_t *request)
  ******************************************************************************/
 static void	preprocessor_flush_value(zbx_preproc_item_value_t *value)
 {
-	dc_add_history(value->itemid, value->item_flags, value->result, value->ts, value->state, value->error);
+	dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result, value->ts, value->state,
+			value->error);
 }
 
 /******************************************************************************
@@ -575,6 +576,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 			manager->processed_num++;
 			preprocessor_enqueue_dependent(manager, value, NULL);
 			preproc_item_value_clear(value);
+
 			goto out;
 		}
 	}

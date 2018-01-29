@@ -333,7 +333,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 			/* regular procedure with item update in database and config cache, logging etc. There is */
 			/* no need to set ITEM_STATE_NOTSUPPORTED here. */
 
-			dc_add_history(item->itemid, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
+			dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
 			zbx_free(error);
 
 			/* Polling items with invalid update intervals repeatedly does not make sense because they */
