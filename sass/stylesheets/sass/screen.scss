@@ -3808,6 +3808,22 @@ a.link-action {
 	color: $red;
 	}
 
+	&.green {
+	color: $green;
+	}
+
+	&.green:focus {
+	color: $green;
+	}
+
+	&.orange {
+	color: $orange;
+	}
+
+	&.orange:focus {
+	color: $orange;
+	}
+
 	&:focus {
 	color: $link-color;
 	}
