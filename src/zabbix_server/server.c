@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -995,8 +995,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 	else if (ZBX_DB_SERVER != db_type)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix server cannot work with a"
-				" Zabbix proxy database", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": its \"users\" table is empty (is this the"
+				" Zabbix proxy database?)", CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
 

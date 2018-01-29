@@ -1707,6 +1707,17 @@ footer {
 }
 
 label {
+	&.form-label-asterisk {
+		&:before {
+			color: $form-label-asterisk-color;
+			display: inline-block;
+			content: '*';
+			margin-right: 0.3em;
+		}
+	}
+}
+
+label {
 	input[type="checkbox"] {
 		margin-right: 3px;
 	}
@@ -3282,10 +3293,6 @@ $form-icon-btn: (
 		border-top: 1px solid $table-border-color;
 	}
 
-	.table-forms-td-left {
-		text-align: left;
-	}
-
 	.table-forms-td-right {
 
 		td {
@@ -4076,6 +4083,23 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
+// Event status colors
+.problem-unack-fg {
+	color: $problem-unack-fg-color;
+}
+
+.problem-ack-fg {
+	color: $problem-ack-fg-color;
+}
+
+.ok-unack-fg {
+	color: $ok-unack-fg-color;
+}
+
+.ok-ack-fg {
+	color: $ok-ack-fg-color;
+}
+
 %found-bg {
 	background-color: $lighter-yellow;
 }
@@ -4465,6 +4489,14 @@ a.overlay-close-btn {
 
 	input[type="text"] {
 		padding-left: 25px;
+	}
+
+	&.disabled {
+		opacity: 1;
+
+		div {
+			background: $form-disabled-font-color !important;
+		}
 	}
 }
 

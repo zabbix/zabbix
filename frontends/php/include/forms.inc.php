@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1765,7 +1765,7 @@ function getTriggerFormData(array $data) {
 }
 
 function get_timeperiod_form() {
-	$tblPeriod = new CTable();
+	$form = new CFormList();
 
 	// init new_timeperiod variable
 	$new_timeperiod = getRequest('new_timeperiod', []);
@@ -1773,10 +1773,10 @@ function get_timeperiod_form() {
 
 	if (is_array($new_timeperiod)) {
 		if (isset($new_timeperiod['id'])) {
-			$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+			$form->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
 		}
 		if (isset($new_timeperiod['timeperiodid'])) {
-			$tblPeriod->addItem(new CVar('new_timeperiod[timeperiodid]', $new_timeperiod['timeperiodid']));
+			$form->addItem(new CVar('new_timeperiod[timeperiodid]', $new_timeperiod['timeperiodid']));
 		}
 	}
 	if (!is_array($new_timeperiod)) {
@@ -1879,202 +1879,219 @@ function get_timeperiod_form() {
 	$bit_dayofweek = strrev($dayofweek);
 	$bit_month = strrev($month);
 
-	$cmbType = new CComboBox('new_timeperiod[timeperiod_type]', $new_timeperiod['timeperiod_type'], 'submit()');
-	$cmbType->addItem(TIMEPERIOD_TYPE_ONETIME, _('One time only'));
-	$cmbType->addItem(TIMEPERIOD_TYPE_DAILY, _('Daily'));
-	$cmbType->addItem(TIMEPERIOD_TYPE_WEEKLY, _('Weekly'));
-	$cmbType->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
-
-	$tblPeriod->addRow([_('Period type'), $cmbType]);
+	$form->addRow(
+		(new Clabel(_('Period type'), 'new_timeperiod[timeperiod_type]')),
+		(new CComboBox('new_timeperiod[timeperiod_type]', $new_timeperiod['timeperiod_type'], 'submit()', [
+			TIMEPERIOD_TYPE_ONETIME => _('One time only'),
+			TIMEPERIOD_TYPE_DAILY	=> _('Daily'),
+			TIMEPERIOD_TYPE_WEEKLY	=> _('Weekly'),
+			TIMEPERIOD_TYPE_MONTHLY	=> _('Monthly')
+		]))
+	);
 
 	if ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
-		$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
-		$tblPeriod->addItem(new CVar('new_timeperiod[month]', bindec($bit_month)));
-		$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
-		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
-		$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
-		$tblPeriod->addRow([_('Every day(s)'),
-			(new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-		]);
+		$form
+			->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)))
+			->addItem(new CVar('new_timeperiod[month]', bindec($bit_month)))
+			->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']))
+			->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']))
+			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
+			->addRow(
+				(new CLabel(_('Every day(s)'), 'new_timeperiod[every]'))->setAsteriskMark(),
+				(new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+					->setAriaRequired()
+			);
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
-		$tblPeriod->addItem(new CVar('new_timeperiod[month]', bindec($bit_month)));
-		$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
-		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
-		$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
-		$tblPeriod->addRow([_('Every week(s)'),
-			(new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-		]);
-
-		$tabDays = (new CTable())
+		$form
+			->addItem(new CVar('new_timeperiod[month]', bindec($bit_month)))
+			->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']))
+			->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']))
+			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
 			->addRow(
-				(new CCheckBox('new_timeperiod[dayofweek_mo]'))
-					->setLabel(_('Monday'))
-					->setChecked($dayofweek[0] == 1)
+				(new CLabel(_('Every week(s)'), 'new_timeperiod[every]'))->setAsteriskMark(),
+				(new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+					->setAriaRequired()
 			)
 			->addRow(
-				(new CCheckBox('new_timeperiod[dayofweek_tu]'))
-					->setLabel(_('Tuesday'))
-					->setChecked($dayofweek[1] == 1)
-			)
-			->addRow(
-				(new CCheckBox('new_timeperiod[dayofweek_we]'))
-					->setLabel(_('Wednesday'))
-					->setChecked($dayofweek[2] == 1)
-			)
-			->addRow(
-				(new CCheckBox('new_timeperiod[dayofweek_th]'))
-					->setLabel(_('Thursday'))
-					->setChecked($dayofweek[3] == 1)
-			)
-			->addRow(
-				(new CCheckBox('new_timeperiod[dayofweek_fr]'))
-					->setLabel(_('Friday'))
-					->setChecked($dayofweek[4] == 1)
-			)
-			->addRow(
-				(new CCheckBox('new_timeperiod[dayofweek_sa]'))
-					->setLabel(_('Saturday'))
-					->setChecked($dayofweek[5] == 1)
-			)
-			->addRow(
-				(new CCheckBox('new_timeperiod[dayofweek_su]'))
-					->setLabel(_('Sunday'))
-					->setChecked($dayofweek[6] == 1)
+				(new CLabel(_('Day of week'), 'new_timeperiod_dayofweek'))->setAsteriskMark(),
+				(new CTable())
+					->addRow(
+						(new CCheckBox('new_timeperiod[dayofweek_mo]'))
+							->setLabel(_('Monday'))
+							->setChecked($dayofweek[0] == 1)
+					)
+					->addRow(
+						(new CCheckBox('new_timeperiod[dayofweek_tu]'))
+							->setLabel(_('Tuesday'))
+							->setChecked($dayofweek[1] == 1)
+					)
+					->addRow(
+						(new CCheckBox('new_timeperiod[dayofweek_we]'))
+							->setLabel(_('Wednesday'))
+							->setChecked($dayofweek[2] == 1)
+					)
+					->addRow(
+						(new CCheckBox('new_timeperiod[dayofweek_th]'))
+							->setLabel(_('Thursday'))
+							->setChecked($dayofweek[3] == 1)
+					)
+					->addRow(
+						(new CCheckBox('new_timeperiod[dayofweek_fr]'))
+							->setLabel(_('Friday'))
+							->setChecked($dayofweek[4] == 1)
+					)
+					->addRow(
+						(new CCheckBox('new_timeperiod[dayofweek_sa]'))
+							->setLabel(_('Saturday'))
+							->setChecked($dayofweek[5] == 1)
+					)
+					->addRow(
+						(new CCheckBox('new_timeperiod[dayofweek_su]'))
+							->setLabel(_('Sunday'))
+							->setChecked($dayofweek[6] == 1)
+					)
+					->setId('new_timeperiod_dayofweek')
 			);
-		$tblPeriod->addRow([_('Day of week'), $tabDays]);
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
-		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
-
-		$tabMonths = (new CTable())
-			->addRow([
-				(new CCheckBox('new_timeperiod[month_jan]'))
-					->setLabel(_('January'))
-					->setChecked($month[0] == 1),
-				(new CCheckBox('new_timeperiod[month_jul]'))
-					->setLabel(_('July'))
-					->setChecked($month[6] == 1)
-			])
-			->addRow([
-				(new CCheckBox('new_timeperiod[month_feb]'))
-					->setLabel(_('February'))
-					->setChecked($month[1] == 1),
-				(new CCheckBox('new_timeperiod[month_aug]'))
-					->setLabel(_('August'))
-					->setChecked($month[7] == 1)
-			])
-			->addRow([
-				(new CCheckBox('new_timeperiod[month_mar]'))
-					->setLabel(_('March'))
-					->setChecked($month[2] == 1),
-				(new CCheckBox('new_timeperiod[month_sep]'))
-					->setLabel(_('September'))
-					->setChecked($month[8] == 1)
-			])
-			->addRow([
-				(new CCheckBox('new_timeperiod[month_apr]'))
-					->setLabel(_('April'))
-					->setChecked($month[3] == 1),
-				(new CCheckBox('new_timeperiod[month_oct]'))
-					->setLabel(_('October'))
-					->setChecked($month[9] == 1)
-			])
-			->addRow([
-				(new CCheckBox('new_timeperiod[month_may]'))
-					->setLabel(_('May'))
-					->setChecked($month[4] == 1),
-				(new CCheckBox('new_timeperiod[month_nov]'))
-					->setLabel(_('November'))
-					->setChecked($month[10] == 1)
-			])
-			->addRow([
-				(new CCheckBox('new_timeperiod[month_jun]'))
-					->setLabel(_('June'))
-					->setChecked($month[5] == 1),
-				(new CCheckBox('new_timeperiod[month_dec]'))
-					->setLabel(_('December'))
-					->setChecked($month[11] == 1)
-			]);
-		$tblPeriod->addRow([_('Month'), $tabMonths]);
-
-		$tblPeriod->addRow([_('Date'),
-			(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
-				->addValue(_('Day of month'), 0, null, 'submit()')
-				->addValue(_('Day of week'), 1, null, 'submit()')
-				->setModern(true)
-		]);
+		$form
+			->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']))
+			->addRow(
+				(new CLabel(_('Month'), 'new_timeperiod_month'))->setAsteriskMark(),
+				(new CTable())
+					->addRow([
+						(new CCheckBox('new_timeperiod[month_jan]'))
+							->setLabel(_('January'))
+							->setChecked($month[0] == 1),
+						(new CCheckBox('new_timeperiod[month_jul]'))
+							->setLabel(_('July'))
+							->setChecked($month[6] == 1)
+					])
+					->addRow([
+						(new CCheckBox('new_timeperiod[month_feb]'))
+							->setLabel(_('February'))
+							->setChecked($month[1] == 1),
+						(new CCheckBox('new_timeperiod[month_aug]'))
+							->setLabel(_('August'))
+							->setChecked($month[7] == 1)
+					])
+					->addRow([
+						(new CCheckBox('new_timeperiod[month_mar]'))
+							->setLabel(_('March'))
+							->setChecked($month[2] == 1),
+						(new CCheckBox('new_timeperiod[month_sep]'))
+							->setLabel(_('September'))
+							->setChecked($month[8] == 1)
+					])
+					->addRow([
+						(new CCheckBox('new_timeperiod[month_apr]'))
+							->setLabel(_('April'))
+							->setChecked($month[3] == 1),
+						(new CCheckBox('new_timeperiod[month_oct]'))
+							->setLabel(_('October'))
+							->setChecked($month[9] == 1)
+					])
+					->addRow([
+						(new CCheckBox('new_timeperiod[month_may]'))
+							->setLabel(_('May'))
+							->setChecked($month[4] == 1),
+						(new CCheckBox('new_timeperiod[month_nov]'))
+							->setLabel(_('November'))
+							->setChecked($month[10] == 1)
+					])
+					->addRow([
+						(new CCheckBox('new_timeperiod[month_jun]'))
+							->setLabel(_('June'))
+							->setChecked($month[5] == 1),
+						(new CCheckBox('new_timeperiod[month_dec]'))
+							->setLabel(_('December'))
+							->setChecked($month[11] == 1)
+					])
+					->setId('new_timeperiod_month')
+			)
+			->addRow(_('Date'),
+				(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
+					->addValue(_('Day of month'), 0, null, 'submit()')
+					->addValue(_('Day of week'), 1, null, 'submit()')
+					->setModern(true)
+			);
 
 		if ($new_timeperiod['month_date_type'] > 0) {
-			$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
-
-			$cmbCount = new CComboBox('new_timeperiod[every]', $new_timeperiod['every']);
-			$cmbCount->addItem(1, _('First'));
-			$cmbCount->addItem(2, _x('Second', 'adjective'));
-			$cmbCount->addItem(3, _('Third'));
-			$cmbCount->addItem(4, _('Fourth'));
-			$cmbCount->addItem(5, _('Last'));
-
-			$td = (new CCol($cmbCount))->setColSpan(2);
-
-			$tabDays = (new CTable())
-				->addRow($td)
+			$form
+				->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']))
 				->addRow(
-					(new CCheckBox('new_timeperiod[dayofweek_mo]'))
-						->setLabel(_('Monday'))
-						->setChecked($dayofweek[0] == 1)
-				)
-				->addRow(
-					(new CCheckBox('new_timeperiod[dayofweek_tu]'))
-						->setLabel(_('Tuesday'))
-						->setChecked($dayofweek[1] == 1)
-				)
-				->addRow(
-					(new CCheckBox('new_timeperiod[dayofweek_we]'))
-						->setLabel(_('Wednesday'))
-						->setChecked($dayofweek[2] == 1)
-				)
-				->addRow(
-					(new CCheckBox('new_timeperiod[dayofweek_th]'))
-						->setLabel(_('Thursday'))
-						->setChecked($dayofweek[3] == 1)
-				)
-				->addRow(
-					(new CCheckBox('new_timeperiod[dayofweek_fr]'))
-						->setLabel(_('Friday'))
-						->setChecked($dayofweek[4] == 1)
-				)
-				->addRow(
-					(new CCheckBox('new_timeperiod[dayofweek_sa]'))
-						->setLabel(_('Saturday'))
-						->setChecked($dayofweek[5] == 1)
-				)
-				->addRow(
-					(new CCheckBox('new_timeperiod[dayofweek_su]'))
-						->setLabel(_('Sunday'))
-						->setChecked($dayofweek[6] == 1)
+					(new CLabel(_('Day of week'), 'new_timeperiod_dayofweek'))->setAsteriskMark(),
+					(new CTable())
+						->addRow((new CCol(new CComboBox('new_timeperiod[every]', $new_timeperiod['every'], null, [
+								1 => _('First'),
+								2 => _x('Second', 'adjective'),
+								3 => _('Third'),
+								4 => _('Fourth'),
+								5 => _('Last')
+							])))
+						)
+						->addRow(
+							(new CCheckBox('new_timeperiod[dayofweek_mo]'))
+								->setLabel(_('Monday'))
+								->setChecked($dayofweek[0] == 1)
+						)
+						->addRow(
+							(new CCheckBox('new_timeperiod[dayofweek_tu]'))
+								->setLabel(_('Tuesday'))
+								->setChecked($dayofweek[1] == 1)
+						)
+						->addRow(
+							(new CCheckBox('new_timeperiod[dayofweek_we]'))
+								->setLabel(_('Wednesday'))
+								->setChecked($dayofweek[2] == 1)
+						)
+						->addRow(
+							(new CCheckBox('new_timeperiod[dayofweek_th]'))
+								->setLabel(_('Thursday'))
+								->setChecked($dayofweek[3] == 1)
+						)
+						->addRow(
+							(new CCheckBox('new_timeperiod[dayofweek_fr]'))
+								->setLabel(_('Friday'))
+								->setChecked($dayofweek[4] == 1)
+						)
+						->addRow(
+							(new CCheckBox('new_timeperiod[dayofweek_sa]'))
+								->setLabel(_('Saturday'))
+								->setChecked($dayofweek[5] == 1)
+						)
+						->addRow(
+							(new CCheckBox('new_timeperiod[dayofweek_su]'))
+								->setLabel(_('Sunday'))
+								->setChecked($dayofweek[6] == 1)
+						)
+						->setId('new_timeperiod_dayofweek')
 				);
-			$tblPeriod->addRow([_('Day of week'), $tabDays]);
 		}
 		else {
-			$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
-			$tblPeriod->addRow([_('Day of month'),
-				(new CNumericBox('new_timeperiod[day]', $new_timeperiod['day'], 2))
-					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			]);
+			$form
+				->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)))
+				->addRow(
+					(new CLabel(_('Day of month'), 'new_timeperiod[day]'))->setAsteriskMark(),
+					(new CNumericBox('new_timeperiod[day]', $new_timeperiod['day'], 2))
+						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+						->setAriaRequired()
+				);
 		}
 	}
 	else {
-		$tblPeriod->addItem(new CVar('new_timeperiod[every]', $new_timeperiod['every'], 'new_timeperiod_every_tmp'));
-		$tblPeriod->addItem(new CVar('new_timeperiod[month]', bindec($bit_month), 'new_timeperiod_month_tmp'));
-		$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day'], 'new_timeperiod_day_tmp'));
-		$tblPeriod->addItem(new CVar('new_timeperiod[hour]', $new_timeperiod['hour'], 'new_timeperiod_hour_tmp'));
-		$tblPeriod->addItem(new CVar('new_timeperiod[minute]', $new_timeperiod['minute'], 'new_timeperiod_minute_tmp'));
-		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
-		$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
-		$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
+		$form
+			->addItem(new CVar('new_timeperiod[every]', $new_timeperiod['every'], 'new_timeperiod_every_tmp'))
+			->addItem(new CVar('new_timeperiod[month]', bindec($bit_month), 'new_timeperiod_month_tmp'))
+			->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day'], 'new_timeperiod_day_tmp'))
+			->addItem(new CVar('new_timeperiod[hour]', $new_timeperiod['hour'], 'new_timeperiod_hour_tmp'))
+			->addItem(new CVar('new_timeperiod[minute]', $new_timeperiod['minute'], 'new_timeperiod_minute_tmp'))
+			->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']))
+			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
+			->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
 		if (isset($_REQUEST['add_timeperiod'])) {
 			$date = [
@@ -2090,11 +2107,14 @@ function get_timeperiod_form() {
 				? $new_timeperiod['start_date'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time()));
 		}
 
-		$tblPeriod->addRow([_('Date'), createDateSelector('new_timeperiod_start_date', $date)]);
+		$form->addRow(
+			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
+			(new CDiv(createDateSelector('new_timeperiod_start_date', $date)))->setId('new_timeperiod_start_date')
+		);
 	}
 
 	if ($new_timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
-		$tblPeriod->addRow([_('At (hour:minute)'), [
+		$form->addRow(_('At (hour:minute)'), [
 			(new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -2102,14 +2122,14 @@ function get_timeperiod_form() {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-		]]);
+		]);
 	}
 
 	$perHours = new CComboBox('new_timeperiod[period_hours]', $new_timeperiod['period_hours'], null, range(0, 23));
 	$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes'], null, range(0, 59));
-	$tblPeriod->addRow([
-		_('Maintenance period length'),
-		[
+	$form->addRow(
+		(new CLabel(_('Maintenance period length'), 'new_timeperiod'))->setAsteriskMark(),
+		(new CDiv([
 			(new CNumericBox('new_timeperiod[period_days]', $new_timeperiod['period_days'], 3))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			_('Days').SPACE.SPACE,
@@ -2117,7 +2137,8 @@ function get_timeperiod_form() {
 			_('Hours').SPACE.SPACE,
 			$perMinutes,
 			_('Minutes')
-	]]);
+		]))->setId('new_timeperiod')
+	);
 
-	return $tblPeriod;
+	return $form;
 }

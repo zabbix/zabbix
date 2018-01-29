@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -924,7 +924,7 @@ function makeDebugButton()
 }
 
 /**
- * Returns css for trigger severity backgrounds
+ * Returns css for trigger severity backgrounds.
  *
  * @param array $config
  * @param array $config[severity_color_0]
@@ -938,6 +938,8 @@ function makeDebugButton()
  */
 function getTriggerSeverityCss($config)
 {
+	$css = '';
+
 	$severities = [
 		ZBX_STYLE_NA_BG => $config['severity_color_0'],
 		ZBX_STYLE_INFO_BG => $config['severity_color_1'],
@@ -947,10 +949,40 @@ function getTriggerSeverityCss($config)
 		ZBX_STYLE_DISASTER_BG => $config['severity_color_5']
 	];
 
-	$css = '';
-
 	foreach ($severities as $class => $color) {
 		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before { background-color: #'.$color.' }'."\n";
+	}
+
+	return $css;
+}
+
+/**
+ * Returns css for trigger status colors, if those are customized.
+ *
+ * @param array $config
+ * @param array $config[custom_color]
+ * @param array $config[problem_unack_color]
+ * @param array $config[problem_ack_color]
+ * @param array $config[ok_unack_color]
+ * @param array $config[ok_ack_color]
+ *
+ * @return string
+ */
+function getTriggerStatusCss($config)
+{
+	$css = '';
+
+	if ($config['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED) {
+		$event_statuses = [
+			ZBX_STYLE_PROBLEM_UNACK_FG => $config['problem_unack_color'],
+			ZBX_STYLE_PROBLEM_ACK_FG => $config['problem_ack_color'],
+			ZBX_STYLE_OK_UNACK_FG => $config['ok_unack_color'],
+			ZBX_STYLE_OK_ACK_FG => $config['ok_ack_color']
+		];
+
+		foreach ($event_statuses as $class => $color) {
+			$css .= '.' . $class . ' {color: #' . $color . ';}' . "\n";
+		}
 	}
 
 	return $css;

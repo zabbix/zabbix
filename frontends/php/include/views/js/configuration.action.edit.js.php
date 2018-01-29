@@ -407,7 +407,8 @@
 				'class': 'multiselect',
 				css: {
 					width: '<?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px'
-				}
+				},
+				'aria-required': 'true'
 			});
 
 			opCmdTarget.parent().append(opCmdTargetObject);

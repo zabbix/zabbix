@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,9 +33,11 @@ if ($data['usrgrpid'] != 0) {
  * User group tab
 */
 $userGroupFormList = (new CFormList())
-	->addRow(_('Group name'),
+	->addRow(
+		(new CLabel(_('Group name'), 'gname'))->setAsteriskMark(),
 		(new CTextBox('gname', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('maxlength', DB::getFieldLength('usrgrp', 'name'))
 	);
@@ -57,11 +59,14 @@ $userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), [_('Ot
 // append frontend and user status to from list
 $isGranted = ($data['usrgrpid'] != 0) ? granted2update_group($data['usrgrpid']) : true;
 if ($isGranted) {
-	$userGroupFormList->addRow(_('Frontend access'), new CComboBox('gui_access', $data['gui_access'], null, [
-		GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
-		GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
-		GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
-	]));
+	$userGroupFormList->addRow(
+		(new CLabel(_('Frontend access'), 'gui_access')),
+		(new CComboBox('gui_access', $data['gui_access'], null, [
+			GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
+			GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
+			GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
+		]))
+	);
 	$userGroupFormList->addRow(_('Enabled'),
 		(new CCheckBox('users_status'))->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)
 	);

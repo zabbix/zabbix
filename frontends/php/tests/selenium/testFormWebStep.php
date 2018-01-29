@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -664,10 +664,8 @@ class testFormWebStep extends CWebTest {
 					'step_name' => 'Step timeout -1',
 					'url' => 'http://www.zabbix.com',
 					'timeout' => '-1',
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/timeout": a time unit is expected.'
+						'Incorrect value for field "timeout": a time unit is expected.'
 					]
 				]
 			],
@@ -678,10 +676,8 @@ class testFormWebStep extends CWebTest {
 					'step_name' => 'Step timeout 3601',
 					'url' => 'http://www.zabbix.com',
 					'timeout' => 3601,
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/timeout": value must be one of 0-3600.'
+						'Incorrect value for field "timeout": a number is too large.'
 					]
 				]
 			],
@@ -692,10 +688,8 @@ class testFormWebStep extends CWebTest {
 					'step_name' => 'Step timeout string',
 					'url' => 'http://www.zabbix.com',
 					'timeout' => 'abc',
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/timeout": a time unit is expected.'
+						'Incorrect value for field "timeout": a time unit is expected.'
 					]
 				]
 			],

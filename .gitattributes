@@ -351,17 +351,6 @@ src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
-tests/libs/zbxconf/parse_cfg_file.yaml -text
-tests/libs/zbxdbhigh/DBselect_uint64.yaml -text
-tests/libs/zbxjson/zbx_json_path_open.yaml -text
-tests/libs/zbxjson/zbx_jsonpath_next.yaml -text
-tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC.yaml -text
-tests/libs/zbxsysinfo/linux/NET_IF_DISCOVERY.yaml -text
-tests/libs/zbxsysinfo/linux/SYSTEM_BOOTTIME.yaml -text
-tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES.yaml -text
-tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY.yaml -text
-tests/libs/zbxsysinfo/parse_item_key.yaml -text
-tests/libs/zbxsysinfo/process.yaml -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
