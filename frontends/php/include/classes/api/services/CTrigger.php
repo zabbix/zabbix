@@ -1206,6 +1206,10 @@ class CTrigger extends CTriggerGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		if (!$result) {
+			return $result;
+		}
+
 		$triggerids = array_keys($result);
 
 		// adding trigger dependencies
@@ -1331,6 +1335,34 @@ class CTrigger extends CTriggerGeneral {
 				// find max 'ns' for each trigger and that will be the 'lastEvent'
 				$maxNs = max(array_keys($events));
 				$result[$triggerId]['lastEvent'] = $events[$maxNs];
+			}
+		}
+
+		// adding trigger discovery
+		if ($options['selectTriggerDiscovery'] !== null && $options['selectTriggerDiscovery'] !== API_OUTPUT_COUNT) {
+			foreach ($result as &$trigger) {
+				$trigger['triggerDiscovery'] = [];
+			}
+			unset($trigger);
+
+			$sql_select = ['triggerid'];
+			foreach (['parent_triggerid'] as $field) {
+				if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
+					$sql_select[] = $field;
+				}
+			}
+
+			$trigger_discoveries = DBselect(
+				'SELECT '.implode(',', $sql_select).
+				' FROM trigger_discovery'.
+				' WHERE '.dbConditionInt('triggerid', $triggerids)
+			);
+
+			while ($trigger_discovery = DBfetch($trigger_discoveries)) {
+				$triggerid = $trigger_discovery['triggerid'];
+				unset($trigger_discovery['triggerid']);
+
+				$result[$triggerid]['triggerDiscovery'] = $trigger_discovery;
 			}
 		}
 
