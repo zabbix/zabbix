@@ -5,7 +5,6 @@ New features:
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
-........S. [ZBX-13236] fixed error message of function parameters parse (MVekslers)
 ........S. [ZBX-13194] fixed incorrect processing of zabbix[wcache,value,*] internal check (Sergejs)
 .......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
 ...G...... [ZBX-13233] added new memory metrics for Linux platform - "active", "anon", "inactive" and "slabs"; thanks to Tomasz Kłoczko for the original patch (viktors)
