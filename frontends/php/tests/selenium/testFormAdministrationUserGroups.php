@@ -287,7 +287,7 @@ class testFormAdministrationUserGroups extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Selenium user group in configuration',
-					'error' => 'User group "Selenium user group in configuration" is used in configuration for database down messages. '
+					'error' => 'User group "Selenium user group in configuration" is used in configuration for database down messages.'
 				]
 			],
 			[
