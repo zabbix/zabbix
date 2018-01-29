@@ -126,8 +126,8 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 }
 
 /**
- * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
- * Settings and colors are kept in 'config' database table
+ * Add color style and blinking to an object like CSpan or CDiv depending on trigger status.
+ * Settings and colors are kept in 'config' database table.
  *
  * @param mixed $object             object like CSpan, CDiv, etc.
  * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
@@ -137,26 +137,29 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
 	$config = select_config();
 
-	// color of text and blinking depends on trigger value and whether event is acknowledged
+	$color_class = null;
+	$blinks = null;
+
+	// Color class for text and blinking depends on trigger value and whether event is acknowledged.
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
-		$color = $config['problem_unack_color'];
+		$color_class = ZBX_STYLE_PROBLEM_UNACK_FG;
 		$blinks = $config['problem_unack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_TRUE && $isAcknowledged) {
-		$color = $config['problem_ack_color'];
+		$color_class = ZBX_STYLE_PROBLEM_ACK_FG;
 		$blinks = $config['problem_ack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && !$isAcknowledged) {
-		$color = $config['ok_unack_color'];
+		$color_class = ZBX_STYLE_OK_UNACK_FG;
 		$blinks = $config['ok_unack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && $isAcknowledged) {
-		$color = $config['ok_ack_color'];
+		$color_class = ZBX_STYLE_OK_ACK_FG;
 		$blinks = $config['ok_ack_style'];
 	}
-	if (isset($color) && isset($blinks)) {
-		// color
-		$object->addStyle('color: #'.$color);
+
+	if ($color_class != null && $blinks != null) {
+		$object->addClass($color_class);
 
 		// blinking
 		$timeSinceLastChange = time() - $triggerLastChange;
