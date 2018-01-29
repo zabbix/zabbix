@@ -263,6 +263,13 @@ ul.top-nav-icons {
 button {
 	&:focus {
 		@include box-shadow(0 0 0 2px rgba($blue, 1));
+		background-color: darken($btn-bg-color, 10%)
+	}
+}
+
+.btn-alt {
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, 1));
 	}
 }
 
@@ -291,6 +298,10 @@ a {
 	&:focus {
 		border-bottom: 3px solid $link-hover-color;
 	}
+}
+
+a.link-action {
+	border-bottom: 1px dotted;
 }
 
 .link-action {
@@ -396,13 +407,15 @@ ul.top-nav-icons {
 	background-color: #000 !important;
 }
 
+
 .subfilter-disable-btn {
-	background-color: #000 !important;
+	background-color: $ui-bg-color !important;
 
 	&:active {
-	background-color: $red !important;
+		background-color: $ui-bg-color !important;
 	}
 }
+
 
 .tag {
 	color: $ui-bg-color;
@@ -454,7 +467,7 @@ td.na-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.na-bg .link-action {
+.na-bg a.link-action {
 	color: $link-color;
 }
 
@@ -503,7 +516,7 @@ td.normal-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.normal-bg .link-action {
+.normal-bg a.link-action {
 	color: $link-color;
 }
 
@@ -544,7 +557,7 @@ td.info-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.info-bg .link-action {
+.info-bg a.link-action {
 	color: $link-color;
 }
 
@@ -592,7 +605,7 @@ td.average-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.average-bg .link-action {
+.average-bg a.link-action {
 	color: $link-color;
 }
 
@@ -639,7 +652,7 @@ td.warning-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.warning-bg .link-action {
+.warning-bg a.link-action {
 	color: $link-color;
 }
 
@@ -691,7 +704,7 @@ td.high-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.high-bg .link-action {
+.high-bg a.link-action {
 	color: $link-color;
 }
 
@@ -743,7 +756,7 @@ td.disaster-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.disaster-bg .link-action {
+.disaster-bg a.link-action {
 	color: $link-color;
 }
 
