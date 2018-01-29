@@ -385,7 +385,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				}
 			}
 			else {
-				$new_groupids = getRequest('new_groups');
+				$new_groupids = getRequest('new_groups', []);
 			}
 		}
 
