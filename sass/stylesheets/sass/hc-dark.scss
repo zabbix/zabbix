@@ -113,6 +113,11 @@ $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border: 1px solid rgba($ui-bg-color, .2) !important;
+	background-color: $ui-bg-selected-color !important;
+	color: $ui-bg-color !important;
+}
 
 // Important! @import string should come after variables
 @import 'screen.scss';
