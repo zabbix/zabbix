@@ -188,10 +188,10 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.hosts.filter_dns', getRequest('filter_dns', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_host', getRequest('filter_host', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_port', getRequest('filter_port', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter.monitored_by', getRequest('filter_monitored_by', ZBX_MONITORED_BY_ANY),
+	CProfile::update('web.hosts.filter_monitored_by', getRequest('filter_monitored_by', ZBX_MONITORED_BY_ANY),
 		PROFILE_TYPE_INT
 	);
-	CProfile::updateArray('web.hosts.filter.proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray('web.hosts.filter_proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -199,8 +199,8 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.hosts.filter_dns');
 	CProfile::delete('web.hosts.filter_host');
 	CProfile::delete('web.hosts.filter_port');
-	CProfile::delete('web.hosts.filter.monitored_by');
-	CProfile::deleteIdx('web.hosts.filter.proxyids');
+	CProfile::delete('web.hosts.filter_monitored_by');
+	CProfile::deleteIdx('web.hosts.filter_proxyids');
 	DBend();
 }
 
@@ -208,8 +208,8 @@ $filter['ip'] = CProfile::get('web.hosts.filter_ip', '');
 $filter['dns'] = CProfile::get('web.hosts.filter_dns', '');
 $filter['host'] = CProfile::get('web.hosts.filter_host', '');
 $filter['port'] = CProfile::get('web.hosts.filter_port', '');
-$filter['monitored_by'] = CProfile::get('web.hosts.filter.monitored_by', ZBX_MONITORED_BY_ANY);
-$filter['proxyids'] = CProfile::getArray('web.hosts.filter.proxyids', []);
+$filter['monitored_by'] = CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY);
+$filter['proxyids'] = CProfile::getArray('web.hosts.filter_proxyids', []);
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
 $macros = cleanInheritedMacros(getRequest('macros', []));
