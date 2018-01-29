@@ -177,6 +177,12 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
 
+define('ZBX_TCP_HEADER_DATA',		"ZBXD");
+define('ZBX_TCP_HEADER_VERSION',	"\1");
+define('ZBX_TCP_HEADER',			ZBX_TCP_HEADER_DATA.ZBX_TCP_HEADER_VERSION);
+define('ZBX_TCP_HEADER_LEN',		5);
+define('ZBX_TCP_DATALEN_LEN',		8);
+
 define('AUDIT_ACTION_ADD',		0);
 define('AUDIT_ACTION_UPDATE',	1);
 define('AUDIT_ACTION_DELETE',	2);

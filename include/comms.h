@@ -190,9 +190,6 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, int 
 #define zbx_send_proxy_response(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPONENT_VERSION , timeout)
 
-#define zbx_send_response_raw(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, 0, timeout)
-
 int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
 
 #ifdef HAVE_IPV6
