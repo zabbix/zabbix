@@ -2585,8 +2585,9 @@ static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *
 		else
 			client_timediff->ns = 0;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %i seconds and %i nanosecond",
-				__function_name, sec, ns);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %d seconds and %d nanosecond, "
+				"delta time from json %d seconds and %d nanosecond",
+				__function_name, sec, ns, client_timediff->sec, client_timediff->ns);
 
 		return SUCCEED;
 	}
