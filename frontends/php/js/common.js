@@ -420,23 +420,19 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 		'buttons': [],
 		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
 	};
-	var url = new Curl('zabbix.php'),
-		xhr = new window.XMLHttpRequest();
 
+	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
 	jQuery.each(options, function(key, value) {
 		url.setArgument(key, value);
 	});
 
-	xhr = jQuery.ajax({
+	jQuery.ajax({
 		url: url.getUrl(),
 		type: 'get',
 		dataType: 'json',
-		beforeSend: function() {
-			overlayDialogue(ovelay_properties, trigger_elmnt, xhr);
-		},
-		xhr: function() {
-			return xhr;
+		beforeSend: function(jqXHR) {
+			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
 		},
 		success: function(resp) {
 			if (typeof resp.errors !== 'undefined') {
