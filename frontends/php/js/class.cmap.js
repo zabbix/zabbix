@@ -207,8 +207,6 @@ ZABBIX.apps.map = (function($) {
 					containment: [0, 0, 3200, 3200]
 				});
 
-			addToOverlaysStack('map-window', jQuery('sysmap_update'), 'map-window')
-
 			this.updateImage();
 			this.form = new SelementForm(this.formContainer, this);
 			this.massForm = new MassForm(this.formContainer, this);
