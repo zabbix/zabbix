@@ -207,7 +207,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			ret = FAIL, i, n;
+	int			ret = SUCCEED, i, n;
 	zbx_vector_ptr_t	tag_filters, conditions;
 	zbx_tag_filter_t	*tag_filter;
 	DB_CONDITION		*condition;
@@ -237,16 +237,25 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 	zbx_vector_ptr_sort(&tag_filters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	/* check if the hostgroup does not have any tag filters, then the user has access to event */
+
 	for (i = 0; i < hostgroupids->values_num; i++)
 	{
 		for (n = 0; n < tag_filters.values_num; n++)
 		{
-			if (hostgroupids->values[i] == ((zbx_tag_filter_t *)tag_filters.values[n])->hostgrouid)
+			tag_filter = (zbx_tag_filter_t *)tag_filters.values[n];
+
+			/* if tag name is empty then user has full access to the hostgroup */
+			if (NULL == tag_filter->tag || 0 == strlen(tag_filter->tag))
+			{
+				ret = SUCCEED;
 				goto out;
+			}
+
+			/* if at least one tag filter is present, then need to check matching with current event */
+			if (hostgroupids->values[i] == ((zbx_tag_filter_t *)tag_filters.values[n])->hostgrouid)
+				ret = FAIL;
 		}
 	}
-	ret = SUCCEED;
 out:
 	/* if all conditions at least one of tag filter is matched then user has access to event */
 	for (i = 0; i < tag_filters.values_num && SUCCEED != ret; i++)
