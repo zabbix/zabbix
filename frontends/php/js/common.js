@@ -503,8 +503,8 @@ function addToOverlaysStack(id, element, type, xhr) {
 
 	// Only one instance of handler should be present at any time.
 	jQuery(document)
-		.unbind('keydown', closeDialogHandler)
-		.bind('keydown', closeDialogHandler);
+		.off('keydown', closeDialogHandler)
+		.on('keydown', closeDialogHandler);
 }
 
 // Keydown handler. Closes last opened overlay UI element.
@@ -545,11 +545,6 @@ function closeDialogHandler(event) {
 					hide_color_picker();
 					break;
 			}
-
-			// Remove event listener.
-			if (overlays_stack.length == 0) {
-				jQuery(document).unbind('keydown', closeDialogHandler);
-			}
 		}
 	}
 }
@@ -577,6 +572,11 @@ function removeFromOverlaysStack(dialogueid) {
 
 		// Remove dialogue from the stack.
 		overlays_stack.splice(index, 1);
+	}
+
+	// Remove event listener.
+	if (overlays_stack.length == 0) {
+		jQuery(document).off('keydown', closeDialogHandler);
 	}
 }
 
