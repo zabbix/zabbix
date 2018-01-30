@@ -410,7 +410,6 @@ if (!empty($data['form'])) {
 			'maintenanceids' => $data['maintenanceid'],
 			'editable' => true
 		]);
-		$data['hosts_ms'] = CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']);
 
 		// get groups
 		$db_groups = API::HostGroup()->get([
@@ -459,9 +458,6 @@ if (!empty($data['form'])) {
 			])
 			: [];
 
-		// Prepare data for multiselect. Skip silently removed hosts.
-		$data['hosts_ms'] = CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']);
-
 		$db_groups = $groupids
 			? API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
@@ -469,10 +465,13 @@ if (!empty($data['form'])) {
 				'editable' => true
 			])
 			: [];
-
-		// Prepare data for multiselect. Skip silently removed groups.
-		$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 	}
+
+	$data['hosts_ms'] = CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']);
+	CArrayHelper::sort($data['hosts_ms'], ['name']);
+
+	$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
+	CArrayHelper::sort($data['groups_ms'], ['name']);
 
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.edit', $data);

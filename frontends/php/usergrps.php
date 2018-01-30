@@ -303,6 +303,7 @@ if (hasRequest('form')) {
 			'name' => getUserFullname($users[$userid])
 		];
 	}
+	CArrayHelper::sort($data['users_ms'], ['name']);
 
 	$data['groups_rights'] = hasRequest('form_refresh')
 		? getRequest('groups_rights', [])
