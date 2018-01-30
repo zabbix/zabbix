@@ -338,6 +338,7 @@ class CControllerPopupGeneric extends CController {
 			'templates' =>					'string|not_empty',
 			'host_templates' =>				'string|not_empty',
 			'multiselect' =>				'in 1',
+			'selectLimit' =>				'int32',
 			'submit' =>						'string',
 			'excludeids' =>					'array',
 			'only_hostid' =>				'db hosts.hostid',
@@ -570,7 +571,8 @@ class CControllerPopupGeneric extends CController {
 			'dstfrm' => $this->getInput('dstfrm'),
 			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
-			'excludeids' => $excludeids
+			'excludeids' => $excludeids,
+			'selectLimit' => $this->getInput('selectLimit', 0)
 		];
 
 		if ($this->getInput('only_hostid', 0)) {

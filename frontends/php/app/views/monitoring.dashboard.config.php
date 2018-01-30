@@ -129,11 +129,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'dstfld1' => $field->getName().'_',
 			'srcfld1' => 'itemid',
 			'reference' => 'id',
+			'selectLimit' => $field->getValuesLimit(),
+			'multiselect' => '1'
 		];
-
-		if ($field->getValuesLimit() != 1) {
-			$popup_parameters['multiselect'] = '1';
-		}
 
 		$field_itemsids = (new CMultiSelect([
 			'name' => $field->getName().'[]',

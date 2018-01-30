@@ -135,7 +135,7 @@ if ($page_filter->hostsAll) {
 	$table_columns[] = _('Host');
 }
 
-if ($data['multiselect'] && $form !== null) {
+if ($data['multiselect'] && $options['selectLimit'] != 1 && $form !== null) {
 	$ch_box = (new CColHeader(
 		(new CCheckBox('all_records'))
 			->onClick("javascript: checkAll('".$form->getName()."', 'all_records', 'item');")
@@ -464,7 +464,7 @@ switch ($data['popup_type']) {
 
 			$table->addRow([
 				($options['hostid'] > 0) ? null : $item['hostname'],
-				$data['multiselect']
+				($data['multiselect'] && $options['selectLimit'] != 1)
 					? new CCheckBox('item['.$checkbox_key.']', $item['itemid'])
 					: null,
 				$description,
