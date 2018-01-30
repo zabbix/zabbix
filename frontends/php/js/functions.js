@@ -760,11 +760,6 @@ function overlayDialogueOnLoad(focus, overlay) {
 		else if (jQuery('.overlay-dialogue-body form :focusable', overlay).length) {
 			jQuery('.overlay-dialogue-body form :focusable', overlay).first().focus();
 		}
-		else if (jQuery('[tabindex]', overlay).length) {
-			jQuery('[tabindex]', overlay).filter(function() {
-				return +jQuery(this).attr('tabindex') >= 0;
-			}).first().focus();
-		}
 		else {
 			jQuery(overlay).focus();
 		}
