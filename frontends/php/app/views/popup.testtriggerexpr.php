@@ -94,9 +94,10 @@ $output = [
 			->setId('expression_testing_from')
 			->addVar('expression', $data['expression'])
 			->addVar('test_expression', 1)
-			->addItem(
-				(new CTabView())->addTab('test_tab', null, $form_list)
-			)
+			->addItem([
+				(new CTabView())->addTab('test_tab', null, $form_list),
+				(new CInput('submit', 'submit'))->addStyle('display: none;')
+			])
 		]))->toString(),
 	'buttons' => [
 		[

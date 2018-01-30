@@ -34,7 +34,10 @@ $http_popup_form = (new CForm())
 	->addVar('templated', $options['templated'])
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
-	->addVar('action', 'popup.httpstep');
+	->addVar('action', 'popup.httpstep')
+	->addItem(
+		(new CInput('submit', 'submit'))->addStyle('display: none;')
+	);
 
 $http_popup_form_list = (new CFormList())
 	->addRow(_('Name'),

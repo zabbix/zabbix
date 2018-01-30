@@ -70,9 +70,10 @@ $body_html = (new CForm())
 		->addVar('media', $options['media'])
 		->addVar('type', $options['type'])
 		->addVar('dstfrm', $options['dstfrm'])
-		->addItem(
-			(new CTabView())->addTab('mediaTab', _('Media'), $media_form)
-		)
+		->addItem([
+			(new CTabView())->addTab('mediaTab', _('Media'), $media_form),
+			(new CInput('submit', 'submit'))->addStyle('display: none;')
+		])
 		->setId('media_form')
 		->toString();
 
