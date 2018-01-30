@@ -237,7 +237,6 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 	zbx_vector_ptr_sort(&tag_filters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-
 	for (i = 0; i < hostgroupids->values_num; i++)
 	{
 		for (n = 0; n < tag_filters.values_num; n++)
