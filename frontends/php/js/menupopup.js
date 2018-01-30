@@ -888,7 +888,7 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 				var item = {label: name};
 
 				if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
-					item.items = getMenuPopupScriptItems(data.items);
+					item.items = getMenuPopupScriptItems(data.items, trigger_elm);
 				}
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
