@@ -3835,6 +3835,7 @@ a.link-action {
 
 	&:hover {
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:focus {

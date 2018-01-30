@@ -285,12 +285,15 @@ a {
 
 a.link-action {
 	border-bottom: 1px dotted;
+		&:hover {
+			border-bottom: 1px solid $link-hover-color;
+	}
 }
 
 .link-action {
 	&:hover {
 		color: $link-hover-color;
-		border-bottom: 1px dotted $link-hover-color;
+		border-bottom: 1px solid $link-hover-color;
 	}
 
 	&:active {
