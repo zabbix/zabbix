@@ -63,14 +63,12 @@
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
-<!-- section of script temporary commented out for testing-->
-<!--		<for list="${conf.list}" param="name" delimiter=",">
-			<sequential>-->
+		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>
 				<exec executable="scan-build" failonerror="on">
 					<arg line="./configure"/>
-<!-- section of script temporary commented out for testing-->
-<!--					<arg line="${@{name}}"/>-->
-					<arg line="--enable-agent"/>
+					<arg line="-q"/>
+					<arg line="${@{name}}"/>
 				</exec>
 				<trycatch>
 					<try>
@@ -90,9 +88,8 @@
 						</exec>
 					</finally>
 				</trycatch>
-<!-- section of script temporary commented out for testing-->
-<!--			</sequential>
-		</for>-->
+			</sequential>
+		</for>
 	</target>
 
 	<!-- Static analysis container target -->
@@ -281,11 +278,20 @@
 	<target name="mock-tests">
 		<!-- Build Zabbix server and proxy with C mock tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<make args="--enable-server --enable-proxy --with-mysql --with-libxml2" target="tests_build"/>
-		<exec executable="tests/tests_run.pl" failonerror="on">
-			<arg line=">"/>
-			<arg line="output.xml"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="-q"/>
+			<arg line="--enable-server"/>
+			<arg line="--enable-proxy"/>
+			<arg line="--enable-agent"/>
+			<arg line="--with-mysql"/>
+			<arg line="--with-libxml2"/>
 		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
+			<arg line="tests_build"/>
+		</exec>
+		<exec executable="tests/tests_run.pl" failonerror="on" output="output.xml"></exec>
 	</target>
 
 	<target name="run-unit-test">

@@ -1061,6 +1061,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 	}
 
+	if (0 == fields_count)
+	{
+		*error = zbx_dsprintf(*error, "empty list of field names");
+		goto out;
+	}
+
 	/* get the entries (line 8 in T1) */
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
@@ -2417,7 +2423,8 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
-		zbx_preprocess_item_value(item->itemid, item->flags, NULL, &value->ts, item->state, value->value);
+		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, NULL, &value->ts, item->state,
+				value->value);
 	}
 	else
 	{
@@ -2463,7 +2470,8 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 			set_result_meta(&result, value->lastlogsize, value->mtime);
 
 		item->state = ITEM_STATE_NORMAL;
-		zbx_preprocess_item_value(item->itemid, item->flags, &result, &value->ts, item->state, NULL);
+		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, &result, &value->ts, item->state,
+				NULL);
 
 		free_result(&result);
 	}

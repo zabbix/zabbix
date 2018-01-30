@@ -1,11 +1,25 @@
 Changes for 4.0.0alpha3
 
 New features:
+..F.I..... [ZBXNEXT-4273] added default event status colors in themes with option to customize them (ashubin)
+...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+........S. [ZBX-13194] fixed incorrect processing of zabbix[wcache,value,*] internal check (Sergejs)
+.......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
+...G...... [ZBX-13233] added new memory metrics for Linux platform - "active", "anon", "inactive" and "slabs"; thanks to Tomasz Kłoczko for the original patch (viktors)
+........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
+...G...... [ZBX-11720] fixed memory leak which breaks vfs.fs.size, vfs.fs.inode and vfs.dir.size items if compiled with LeakSanitizer (Andris)
+........S. [ZBX-13131] fixed truncated multiline text values from network discovery SNMP checks (viktors)
+...G...... [ZBX-13117] fixed vfs.dir.size with symbol links on Windows (MVekslers)
+....I..... [ZBX-12045] fixed inconsistencies in configure -h output (MVekslers)
+A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
+..F....... [ZBX-13223] fixed graphs duplication in graph preview (ashubin)
+..F....... [ZBX-13345] removed SID from URL in screen edit mode (miks)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
 ..F....... [ZBX-13214] added support of \0 matching group for regsub and iregsub methods (gcalenko, Sasha)
 ........S. [ZBX-13208] eliminated race condition that caused history collection for newly created items to start before preprocecessing steps finished syncing (vso)
+...G...... [ZBX-13246] fixed processing of command line arguments which are longer than 2KB for proc.num and proc.mem items on AIX (viktors)
 .......P.. [ZBX-13130] fixed Zabbix proxy not to generate high network traffic when server does not accept data (vso)
 ..F....... [ZBX-13288] fixed image ghosting for mass update of map elements (vjaceslavs)
 ...G...... [ZBX-11422] fixed compilation warnings under OS X 64bit (MVekslers)
@@ -91,9 +105,16 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 3.4.7rc1
 
-New features:
-
 Bug fixes:
+........S. [ZBX-13194] fixed incorrect processing of zabbix[wcache,value,*] internal check (Sergejs)
+.......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
+...G...... [ZBX-13117] fixed vfs.dir.size with symbol links on Windows (MVekslers)
+........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
+...G...... [ZBX-11720] fixed memory leak which breaks vfs.fs.size, vfs.fs.inode and vfs.dir.size items if compiled with LeakSanitizer (Andris)
+........S. [ZBX-13131] fixed truncated multiline text values from network discovery SNMP checks (viktors)
+........S. [ZBX-13343] fixed last trends update clock caching (wiper)
+A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
+..F....... [ZBX-13223] fixed graphs duplication in graph preview (ashubin)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
 ..F....... [ZBX-13345] removed SID from URL in screen edit mode (miks)
 ..F....... [ZBX-13214] added support of \0 matching group for regsub and iregsub methods (gcalenko, Sasha)
@@ -1169,6 +1190,8 @@ Changes for 3.0.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
+A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
 ..F....... [ZBX-13345] removed SID from URL in screen edit mode (miks)
 ...G...... [ZBX-13246] fixed processing of command line arguments which are longer than 2KB for proc.num and proc.mem items on AIX (viktors)
