@@ -743,7 +743,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	// Don't focus element in overlay, if the button is already focused.
-	overlayDialogueOnLoad(!button_focused, jQuery('[data-dialogueid="'+params.dialogueid+'"]'));
+	overlayDialogueOnLoad(!button_focused, jQuery('[data-dialogueid="'+params.dialogueid+'"]').not('.overlay-bg'));
 }
 
 /**
@@ -761,7 +761,7 @@ function overlayDialogueOnLoad(focus, overlay) {
 			jQuery('.overlay-dialogue-body form :focusable', overlay).first().focus();
 		}
 		else {
-			jQuery(overlay).focus();
+			jQuery(':focusable:first', overlay).focus();
 		}
 	}
 
