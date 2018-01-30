@@ -105,8 +105,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 3.4.7rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-13194] fixed incorrect processing of zabbix[wcache,value,*] internal check (Sergejs)
 .......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
