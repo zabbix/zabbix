@@ -89,7 +89,7 @@ svg a {
 	&:hover {
 		@extend %link-action-style;
 		color: $link-hover-color;
-		border-bottom: 2px solid rgba($link-hover-color, 0.35);
+		border-bottom: 1px solid rgba($link-hover-color, 0.35);
 	}
 
 	&:active {
@@ -3736,6 +3736,9 @@ $form-icon-btn: (
 
 a.green {
 	@extend .green;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .red {
@@ -3744,6 +3747,9 @@ a.green {
 
 a.red {
 	@extend .red;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 select.red {
@@ -3763,6 +3769,9 @@ select {
 
 a.orange {
 	@extend .orange;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .yellow {
@@ -3771,6 +3780,9 @@ a.orange {
 
 a.yellow {
 	@extend .yellow;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .grey {
@@ -3779,6 +3791,9 @@ a.yellow {
 
 a.grey {
 	@extend .grey;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .blue {
@@ -3787,6 +3802,9 @@ a.grey {
 
 a.blue {
 	@extend .blue;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .teal {
@@ -3795,37 +3813,32 @@ a.blue {
 
 a.teal {
 	@extend .teal;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 a.link-action {
 	color: $font-color;
 
 	&.red {
-	color: $red;
-	}
-
-	&.red:focus {
-	color: $red;
+		color: $red;
 	}
 
 	&.green {
-	color: $green;
-	}
-
-	&.green:focus {
-	color: $green;
+		color: $green;
 	}
 
 	&.orange {
-	color: $orange;
+		color: $orange;
 	}
 
-	&.orange:focus {
-	color: $orange;
+	&:hover {
+		color: $link-hover-color;
 	}
 
 	&:focus {
-	color: $link-color;
+		color: $link-hover-color;
 	}
 }
 
