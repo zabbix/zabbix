@@ -608,7 +608,6 @@ $master_item = (new CDiv([
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',
 				'only_hostid' => $data['hostid'],
-				'with_webitems' => '0',
 				'excludeids' => $data['itemids']
 			]).', null, this);'
 		)
