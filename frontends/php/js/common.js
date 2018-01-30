@@ -533,6 +533,13 @@ function closeDialogHandler(event) {
 					CLNDR[dialog.dialogueid].clndr.clndrhide();
 					break;
 
+				// Close overlay message.
+				case 'message':
+					jQuery(ZBX_MESSAGES).each(function(i, msg) {
+						msg.closeAllMessages();
+					});
+					break;
+
 				// Close overlay color picker.
 				case 'color_picker':
 					hide_color_picker();

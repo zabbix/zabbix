@@ -148,7 +148,11 @@ var CMessageList = Class.create({
 			'messageid': this.messageList[this.msgcounter].messageid
 		};
 
-		jQuery(this.dom.container).fadeTo('fast', 0.9);
+		var trigger_element = document.activeElement;
+		jQuery(this.dom.container).fadeTo('fast', 0.9, function() {
+			addToOverlaysStack('zbx_messages', trigger_element, 'message');
+			overlayDialogueOnLoad(true, this);
+		});
 
 		return this.messageList[this.msgcounter];
 	},
@@ -320,6 +324,7 @@ var CMessageList = Class.create({
 		}
 
 		this.stopSound();
+		removeFromOverlaysStack('zbx_messages');
 	},
 
 	timeoutMessages: function() {
