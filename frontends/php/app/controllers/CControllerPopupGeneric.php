@@ -357,7 +357,6 @@ class CControllerPopupGeneric extends CController {
 			'reference' =>					'string',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
-			'select' =>						'in 1',
 			'submit_parent' =>				'in 1',
 			'templateid' =>					'db hosts.hostid',
 			'with_webitems' =>				'in 1'
