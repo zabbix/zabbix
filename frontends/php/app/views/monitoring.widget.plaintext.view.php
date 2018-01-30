@@ -51,29 +51,20 @@ else {
 	$clock = null;
 	$row_values = [];
 	foreach ($data['history_data'] as $history_item) {
-		if ($history_table->getNumRows() >= $data['show_lines']) {
-			break;
-		}
 		if ($names_at_top) {
-			if ($history_item['clock'] != $clock || array_key_exists($history_item['item_id'], $row_values)) {
-				if (count($row_values)) {
-					if ($history_table->getNumRows() >= $data['show_lines']) {
-						break;
-					}
-
+			if ($history_item['clock'] != $clock || array_key_exists($history_item['itemid'], $row_values)) {
+				if ($clock != null && count($row_values)) {
 					$table_row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))
 						->addClass(ZBX_STYLE_NOWRAP)];
-
 					foreach ($data['items'] as $item) {
 						$table_row[] = array_key_exists($item['itemid'], $row_values)
 							? $row_values[$item['itemid']]
 							: '';
 					}
-
 					$history_table->addRow($table_row);
+					$row_values = [];
 				}
 				$clock = $history_item['clock'];
-				$row_values = [];
 			}
 			$row_values[$history_item['itemid']] = $history_item['value'];
 		}
@@ -87,6 +78,10 @@ else {
 			}
 			$table_row[] = $history_item['value'];
 			$history_table->addRow($table_row);
+		}
+
+		if ($history_table->getNumRows() >= $data['show_lines']) {
+			break;
 		}
 	}
 }
