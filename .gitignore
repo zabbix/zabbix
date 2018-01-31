@@ -375,6 +375,11 @@ tests/Makefile.in
 tests/libs/.deps
 tests/libs/Makefile
 tests/libs/Makefile.in
+tests/libs/zbxcommshigh/.deps
+tests/libs/zbxcommshigh/Makefile
+tests/libs/zbxcommshigh/Makefile.in
+tests/libs/zbxcommshigh/zbx_tcp_recv_ext
+tests/libs/zbxcommshigh/zbx_tcp_recv_raw_ext
 tests/libs/zbxconf/.deps
 tests/libs/zbxconf/Makefile
 tests/libs/zbxconf/Makefile.in
