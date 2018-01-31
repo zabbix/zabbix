@@ -113,7 +113,7 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
  * Purpose: converts common function return code from text format             *
  *                                                                            *
  ******************************************************************************/
-unsigned char	zbx_mock_str_to_return_code(const char *str)
+int	zbx_mock_str_to_return_code(const char *str)
 {
 	if (0 == strcmp(str, "SUCCEED"))
 		return SUCCEED;

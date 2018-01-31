@@ -1592,6 +1592,7 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxconf/Makefile
 	tests/libs/zbxdbcache/Makefile
 	tests/libs/zbxdbhigh/Makefile
+	tests/libs/zbxhistory/Makefile
 	tests/libs/zbxjson/Makefile
 	tests/libs/zbxsysinfo/Makefile
 	tests/libs/zbxsysinfo/linux/Makefile

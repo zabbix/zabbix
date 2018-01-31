@@ -17,18 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MOCK_UTIL_H
-#define ZABBIX_MOCK_UTIL_H
+#ifndef ZABBIX_MOCK_DB_H
+#define ZABBIX_MOCK_DB_H
 
-#include "zbxmockdata.h"
 
-const char	*zbx_mock_get_parameter_string(const char *path);
-const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name);
+void	zbx_mockdb_init();
+void	zbx_mockdb_destroy();
 
-zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);
-zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, const char *name);
-
-unsigned char	zbx_mock_str_to_value_type(const char *str);
-int	zbx_mock_str_to_return_code(const char *str);
-
-#endif
+#endif /* BUILD_TESTS_ZBXMOCKDB_H_ */
