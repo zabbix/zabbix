@@ -300,7 +300,7 @@ class CZabbixServer {
 
 		// Send the command.
 		$json = CJs::encodeJson($params);
-		if (fwrite($this->socket, ZBX_TCP_HEADER.pack('P', strlen($json)).$json) === false) {
+		if (fwrite($this->socket, ZBX_TCP_HEADER.pack('V', strlen($json))."\x00\x00\x00\x00".$json) === false) {
 			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
 			return false;
 		}
