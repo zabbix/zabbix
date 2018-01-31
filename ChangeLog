@@ -5,7 +5,7 @@ New features:
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
-..FG...PS. [ZBXNEXT-3581] dropped plain text protocol support and made header mandatory; added header in Zabbix get request, Zabbix server/proxy passive check request and frontend request to Zabbix server (Sasha, vso)
+..FG...PS. [ZBXNEXT-3581] dropped plain text protocol support and made header mandatory; fixed IP fragmentation handling by including header in Zabbix get request, Zabbix server/proxy passive check request and frontend request to Zabbix server (Sasha, vso)
 ........S. [ZBX-13194] fixed incorrect processing of zabbix[wcache,value,*] internal check (Sergejs)
 .......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
 ...G...... [ZBX-13233] added new memory metrics for Linux platform - "active", "anon", "inactive" and "slabs"; thanks to Tomasz Kłoczko for the original patch (viktors)
