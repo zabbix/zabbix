@@ -923,7 +923,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 
 	zbx_rtrim(s, " \r\n");
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "trapper got '%s'", s);
+	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 
 	if ('{' == *s)	/* JSON protocol */
 	{
