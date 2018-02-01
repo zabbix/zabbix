@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
  * @backup correlation
  */
 
-class testFormEventCorelation extends CWebTest {
+class testFormEventCorrelation extends CWebTest {
 
 	public static function create() {
 		return [
@@ -33,7 +33,7 @@ class testFormEventCorelation extends CWebTest {
 					'name' => 'Test create with all fields',
 					'select_tag' => 'New event tag',
 					'tag' => 'Test tag',
-					'description' => 'Event corelation with description',
+					'description' => 'Event correlation with description',
 					'operation' => 'Close new event'
 				]
 			],
@@ -50,7 +50,7 @@ class testFormEventCorelation extends CWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormEventCorelation_Create($data) {
+	public function testFormEventCorrelation_Create($data) {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -117,7 +117,7 @@ class testFormEventCorelation extends CWebTest {
 	/**
 	 * @dataProvider validation
 	 */
-	public function testFormEventCorelation_CreateValidation($data) {
+	public function testFormEventCorrelation_CreateValidation($data) {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -150,7 +150,7 @@ class testFormEventCorelation extends CWebTest {
 		}
 	}
 
-	public function testFormEventCorelation_LongNameValidation() {
+	public function testFormEventCorrelation_LongNameValidation() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -291,7 +291,7 @@ class testFormEventCorelation extends CWebTest {
 	/**
 	 * @dataProvider tags
 	 */
-	public function testFormEventCorelation_TestTags($data) {
+	public function testFormEventCorrelation_TestTags($data) {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -391,7 +391,7 @@ class testFormEventCorelation extends CWebTest {
 	/**
 	 * @dataProvider tagsValidation
 	 */
-	public function testFormEventCorelation_CheckEmptyTagsValue($data) {
+	public function testFormEventCorrelation_CheckEmptyTagsValue($data) {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -467,7 +467,7 @@ class testFormEventCorelation extends CWebTest {
 	/**
 	 * @dataProvider calculation
 	 */
-	public function testFormEventCorelation_CreateCalculation($data) {
+	public function testFormEventCorrelation_CreateCalculation($data) {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -556,7 +556,7 @@ class testFormEventCorelation extends CWebTest {
 	/**
 	 * @dataProvider formulaValidation
 	 */
-	public function testFormEventCorelation_FormulaValidation($data) {
+	public function testFormEventCorrelation_FormulaValidation($data) {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -616,7 +616,7 @@ class testFormEventCorelation extends CWebTest {
 		];
 	}
 
-	public function testFormEventCorelation_Clone() {
+	public function testFormEventCorrelation_Clone() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for clone');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -643,7 +643,7 @@ class testFormEventCorelation extends CWebTest {
 		$this->assertEquals(2, DBcount($sql));
 	}
 
-	public function testFormEventCorelation_UpdateNone() {
+	public function testFormEventCorrelation_UpdateNone() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for update');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -665,7 +665,7 @@ class testFormEventCorelation extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testFormEventCorelation_UpdateAllFields() {
+	public function testFormEventCorrelation_UpdateAllFields() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for update');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -709,7 +709,7 @@ class testFormEventCorelation extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 	}
 
-	public function testFormEventCorelation_Delete() {
+	public function testFormEventCorrelation_Delete() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for delete');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -725,7 +725,7 @@ class testFormEventCorelation extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 	}
 
-	public function testFormEventCorelation_Cancel() {
+	public function testFormEventCorrelation_Cancel() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for cancel');
 		$this->zbxTestCheckHeader('Event correlation rules');
