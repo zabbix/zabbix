@@ -1173,6 +1173,12 @@ footer, .footer {
       -moz-transition: none;
       transition: none; }
 
+label.form-label-asterisk:before {
+  color: #ff5050;
+  display: inline-block;
+  content: '*';
+  margin-right: 0.3em; }
+
 label input[type="checkbox"] {
   margin-right: 3px; }
 label input[type="radio"] {
@@ -2293,8 +2299,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue .table-paging {
     border: none;
     border-top: 1px solid #333; }
-  .overlay-dialogue .table-forms-td-left {
-    text-align: left; }
   .overlay-dialogue .table-forms-td-right td {
     vertical-align: middle; }
     .overlay-dialogue .table-forms-td-right td label {
@@ -2704,10 +2708,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .na-bg.blink-hidden, .na-bg input[type="radio"]:checked + label.blink-hidden {
   background-color: transparent; }
 
-td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg, td.warning-bg, td.log-warning-bg, td.high-bg, td.log-high-bg, td.disaster-bg, td.log-disaster-bg {
-  border-left: none; }
-  td.na-bg ~ td.na-bg, td.log-na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.log-info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.log-warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.log-high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.log-disaster-bg ~ td.na-bg, td.na-bg ~ td.log-na-bg, td.log-na-bg ~ td.log-na-bg, td.normal-bg ~ td.log-na-bg, td.info-bg ~ td.log-na-bg, td.log-info-bg ~ td.log-na-bg, td.average-bg ~ td.log-na-bg, td.warning-bg ~ td.log-na-bg, td.log-warning-bg ~ td.log-na-bg, td.high-bg ~ td.log-na-bg, td.log-high-bg ~ td.log-na-bg, td.disaster-bg ~ td.log-na-bg, td.log-disaster-bg ~ td.log-na-bg, td.na-bg ~ td.normal-bg, td.log-na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.log-info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.log-warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.log-high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.log-disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.log-na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.log-info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.log-warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.log-high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.log-disaster-bg ~ td.info-bg, td.na-bg ~ td.log-info-bg, td.log-na-bg ~ td.log-info-bg, td.normal-bg ~ td.log-info-bg, td.info-bg ~ td.log-info-bg, td.log-info-bg ~ td.log-info-bg, td.average-bg ~ td.log-info-bg, td.warning-bg ~ td.log-info-bg, td.log-warning-bg ~ td.log-info-bg, td.high-bg ~ td.log-info-bg, td.log-high-bg ~ td.log-info-bg, td.disaster-bg ~ td.log-info-bg, td.log-disaster-bg ~ td.log-info-bg, td.na-bg ~ td.average-bg, td.log-na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.log-info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.log-warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.log-high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.log-disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.log-na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.log-info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.log-warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.log-high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.log-disaster-bg ~ td.warning-bg, td.na-bg ~ td.log-warning-bg, td.log-na-bg ~ td.log-warning-bg, td.normal-bg ~ td.log-warning-bg, td.info-bg ~ td.log-warning-bg, td.log-info-bg ~ td.log-warning-bg, td.average-bg ~ td.log-warning-bg, td.warning-bg ~ td.log-warning-bg, td.log-warning-bg ~ td.log-warning-bg, td.high-bg ~ td.log-warning-bg, td.log-high-bg ~ td.log-warning-bg, td.disaster-bg ~ td.log-warning-bg, td.log-disaster-bg ~ td.log-warning-bg, td.na-bg ~ td.high-bg, td.log-na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.log-info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.log-warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.log-high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.log-disaster-bg ~ td.high-bg, td.na-bg ~ td.log-high-bg, td.log-na-bg ~ td.log-high-bg, td.normal-bg ~ td.log-high-bg, td.info-bg ~ td.log-high-bg, td.log-info-bg ~ td.log-high-bg, td.average-bg ~ td.log-high-bg, td.warning-bg ~ td.log-high-bg, td.log-warning-bg ~ td.log-high-bg, td.high-bg ~ td.log-high-bg, td.log-high-bg ~ td.log-high-bg, td.disaster-bg ~ td.log-high-bg, td.log-disaster-bg ~ td.log-high-bg, td.na-bg ~ td.disaster-bg, td.log-na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.log-info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.log-warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.log-high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg, td.log-disaster-bg ~ td.disaster-bg, td.na-bg ~ td.log-disaster-bg, td.log-na-bg ~ td.log-disaster-bg, td.normal-bg ~ td.log-disaster-bg, td.info-bg ~ td.log-disaster-bg, td.log-info-bg ~ td.log-disaster-bg, td.average-bg ~ td.log-disaster-bg, td.warning-bg ~ td.log-disaster-bg, td.log-warning-bg ~ td.log-disaster-bg, td.high-bg ~ td.log-disaster-bg, td.log-high-bg ~ td.log-disaster-bg, td.disaster-bg ~ td.log-disaster-bg, td.log-disaster-bg ~ td.log-disaster-bg {
-    border-left: 1px dotted #333; }
+td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg {
+  border-left: 1px dotted #333; }
 
 .log-na-bg {
   color: #2a353a;
@@ -2768,6 +2770,18 @@ td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg,
 .inactive-bg, td.inactive-bg {
   color: #4b0c0c;
   background-color: #e45959; }
+
+.problem-unack-fg {
+  color: #ff3333; }
+
+.problem-ack-fg {
+  color: #ff3333; }
+
+.ok-unack-fg {
+  color: #00ff00; }
+
+.ok-ack-fg {
+  color: #00ff00; }
 
 .list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .calendar .tree-item.selected:hover > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
   background-color: #222; }
@@ -3075,6 +3089,10 @@ td.na-bg, td.log-na-bg, td.normal-bg, td.info-bg, td.log-info-bg, td.average-bg,
     height: 20px; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
+  .input-color-picker.disabled {
+    opacity: 1; }
+    .input-color-picker.disabled div {
+      background: #7d7d7d !important; }
 
 .preloader-container {
   z-index: 10;
@@ -4587,29 +4605,27 @@ a:hover {
   opacity: 0.6;
   filter: alpha(opacity=60); }
 
-td.na-bg ~ td.na-bg, td.log-na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.log-info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.log-warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.log-high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.log-disaster-bg ~ td.na-bg, td.na-bg ~ td.log-na-bg, td.log-na-bg ~ td.log-na-bg, td.normal-bg ~ td.log-na-bg, td.info-bg ~ td.log-na-bg, td.log-info-bg ~ td.log-na-bg, td.average-bg ~ td.log-na-bg, td.warning-bg ~ td.log-na-bg, td.log-warning-bg ~ td.log-na-bg, td.high-bg ~ td.log-na-bg, td.log-high-bg ~ td.log-na-bg, td.disaster-bg ~ td.log-na-bg, td.log-disaster-bg ~ td.log-na-bg, td.na-bg ~ td.normal-bg, td.log-na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.log-info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.log-warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.log-high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.log-disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.log-na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.log-info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.log-warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.log-high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.log-disaster-bg ~ td.info-bg, td.na-bg ~ td.log-info-bg, td.log-na-bg ~ td.log-info-bg, td.normal-bg ~ td.log-info-bg, td.info-bg ~ td.log-info-bg, td.log-info-bg ~ td.log-info-bg, td.average-bg ~ td.log-info-bg, td.warning-bg ~ td.log-info-bg, td.log-warning-bg ~ td.log-info-bg, td.high-bg ~ td.log-info-bg, td.log-high-bg ~ td.log-info-bg, td.disaster-bg ~ td.log-info-bg, td.log-disaster-bg ~ td.log-info-bg, td.na-bg ~ td.average-bg, td.log-na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.log-info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.log-warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.log-high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.log-disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.log-na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.log-info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.log-warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.log-high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.log-disaster-bg ~ td.warning-bg, td.na-bg ~ td.log-warning-bg, td.log-na-bg ~ td.log-warning-bg, td.normal-bg ~ td.log-warning-bg, td.info-bg ~ td.log-warning-bg, td.log-info-bg ~ td.log-warning-bg, td.average-bg ~ td.log-warning-bg, td.warning-bg ~ td.log-warning-bg, td.log-warning-bg ~ td.log-warning-bg, td.high-bg ~ td.log-warning-bg, td.log-high-bg ~ td.log-warning-bg, td.disaster-bg ~ td.log-warning-bg, td.log-disaster-bg ~ td.log-warning-bg, td.na-bg ~ td.high-bg, td.log-na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.log-info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.log-warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.log-high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.log-disaster-bg ~ td.high-bg, td.na-bg ~ td.log-high-bg, td.log-na-bg ~ td.log-high-bg, td.normal-bg ~ td.log-high-bg, td.info-bg ~ td.log-high-bg, td.log-info-bg ~ td.log-high-bg, td.average-bg ~ td.log-high-bg, td.warning-bg ~ td.log-high-bg, td.log-warning-bg ~ td.log-high-bg, td.high-bg ~ td.log-high-bg, td.log-high-bg ~ td.log-high-bg, td.disaster-bg ~ td.log-high-bg, td.log-disaster-bg ~ td.log-high-bg, td.na-bg ~ td.disaster-bg, td.log-na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.log-info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.log-warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.log-high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg, td.log-disaster-bg ~ td.disaster-bg, td.na-bg ~ td.log-disaster-bg, td.log-na-bg ~ td.log-disaster-bg, td.normal-bg ~ td.log-disaster-bg, td.info-bg ~ td.log-disaster-bg, td.log-info-bg ~ td.log-disaster-bg, td.average-bg ~ td.log-disaster-bg, td.warning-bg ~ td.log-disaster-bg, td.log-warning-bg ~ td.log-disaster-bg, td.high-bg ~ td.log-disaster-bg, td.log-high-bg ~ td.log-disaster-bg, td.disaster-bg ~ td.log-disaster-bg, td.log-disaster-bg ~ td.log-disaster-bg {
-  border-left: none; }
+td.log-na-bg, td.log-info-bg, td.log-warning-bg, td.log-high-bg, td.log-disaster-bg {
+  padding-left: 42px !important;
+  color: #fff; }
 
-.na-bg, .na-bg input[type="radio"]:checked + label {
+td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td.disaster-bg {
+  padding-left: 42px !important;
+  color: #fff; }
+  td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg {
+    border-left: none; }
+
+.na-bg, .na-bg input[type="radio"]:checked + label, .log-na-bg {
   background-color: transparent !important; }
 
 .na-bg .link-action, .na-bg input[type="radio"]:checked + label .link-action {
   color: #f8f8f8; }
 
-.list-table .na-bg, .list-table .na-bg input[type="radio"]:checked + label, .na-bg .list-table input[type="radio"]:checked + label,
-.dashbrd-widget .list-table .na-bg,
-.dashbrd-widget .list-table .na-bg input[type="radio"]:checked + label,
-.na-bg .dashbrd-widget .list-table input[type="radio"]:checked + label,
-.dashbrd-grid-widget-content .list-table .na-bg,
-.dashbrd-grid-widget-content .list-table .na-bg input[type="radio"]:checked + label,
-.na-bg .dashbrd-grid-widget-content .list-table input[type="radio"]:checked + label {
-  padding-left: 42px;
-  color: #fff; }
+.log-na-bg:before {
+  color: #2a353a !important;
+  background-color: #97aab3 !important; }
 
-.overlay-dialogue .list-table .na-bg, .overlay-dialogue .list-table .na-bg input[type="radio"]:checked + label, .na-bg .overlay-dialogue .list-table input[type="radio"]:checked + label {
-  padding-left: 42px; }
-
-.na-bg:before, .na-bg input[type="radio"]:checked + label:before {
+.na-bg:before, .na-bg input[type="radio"]:checked + label:before, .log-na-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4619,7 +4635,7 @@ td.na-bg ~ td.na-bg, td.log-na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-b
   background-color: #59db8f;
   min-height: 28px; }
 
-.na-bg:after, .na-bg input[type="radio"]:checked + label:after {
+.na-bg:after, .na-bg input[type="radio"]:checked + label:after, .log-na-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -106px -443px;
   width: 22px;
@@ -4639,23 +4655,11 @@ td.na-bg ~ td.na-bg, td.log-na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-b
   .radio-segmented .na-bg::after, .radio-segmented .na-bg input[type="radio"]:checked + label::after, .na-bg .radio-segmented input[type="radio"]:checked + label::after {
     content: none; }
 
-td.normal-bg ~ td.normal-bg {
-  border-left: none; }
-
 .normal-bg {
   background-color: transparent !important; }
 
 .normal-bg .link-action {
   color: #f8f8f8; }
-
-.list-table .normal-bg,
-.dashbrd-widget .list-table .normal-bg,
-.dashbrd-grid-widget-content .list-table .normal-bg {
-  padding-left: 42px;
-  color: #fff; }
-
-.overlay-dialogue .list-table .normal-bg {
-  padding-left: 42px; }
 
 .normal-bg:before {
   content: "";
@@ -4679,29 +4683,17 @@ td.normal-bg ~ td.normal-bg {
 .normal-bg.blink-hidden:after {
   content: none; }
 
-td.info-bg ~ td.info-bg {
-  border-left: none; }
-
-.info-bg, .info-bg input[type="radio"]:checked + label {
+.info-bg, .info-bg input[type="radio"]:checked + label, .log-info-bg {
   background-color: transparent !important; }
 
 .info-bg .link-action, .info-bg input[type="radio"]:checked + label .link-action {
   color: #f8f8f8; }
 
-.list-table .info-bg, .list-table .info-bg input[type="radio"]:checked + label, .info-bg .list-table input[type="radio"]:checked + label,
-.dashbrd-widget .list-table .info-bg,
-.dashbrd-widget .list-table .info-bg input[type="radio"]:checked + label,
-.info-bg .dashbrd-widget .list-table input[type="radio"]:checked + label,
-.dashbrd-grid-widget-content .list-table .info-bg,
-.dashbrd-grid-widget-content .list-table .info-bg input[type="radio"]:checked + label,
-.info-bg .dashbrd-grid-widget-content .list-table input[type="radio"]:checked + label {
-  padding-left: 42px;
-  color: #fff; }
+.log-info-bg:before {
+  color: #00268e !important;
+  background-color: #7499ff !important; }
 
-.overlay-dialogue .list-table .info-bg, .overlay-dialogue .list-table .info-bg input[type="radio"]:checked + label, .info-bg .overlay-dialogue .list-table input[type="radio"]:checked + label {
-  padding-left: 42px; }
-
-.info-bg:before, .info-bg input[type="radio"]:checked + label:before {
+.info-bg:before, .info-bg input[type="radio"]:checked + label:before, .log-info-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4710,7 +4702,7 @@ td.info-bg ~ td.info-bg {
   bottom: 0;
   min-height: 28px; }
 
-.info-bg:after, .info-bg input[type="radio"]:checked + label:after {
+.info-bg:after, .info-bg input[type="radio"]:checked + label:after, .log-info-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -136px -443px;
   width: 22px;
@@ -4730,27 +4722,11 @@ td.info-bg ~ td.info-bg {
   .radio-segmented .info-bg::after, .radio-segmented .info-bg input[type="radio"]:checked + label::after, .info-bg .radio-segmented input[type="radio"]:checked + label::after {
     content: none; }
 
-td.average-bg ~ td.average-bg {
-  border-left: none; }
-
 .average-bg, .average-bg input[type="radio"]:checked + label {
   background-color: transparent !important; }
 
 .average-bg .link-action, .average-bg input[type="radio"]:checked + label .link-action {
   color: #f8f8f8; }
-
-.list-table .average-bg, .list-table .average-bg input[type="radio"]:checked + label, .average-bg .list-table input[type="radio"]:checked + label,
-.dashbrd-widget .list-table .average-bg,
-.dashbrd-widget .list-table .average-bg input[type="radio"]:checked + label,
-.average-bg .dashbrd-widget .list-table input[type="radio"]:checked + label,
-.dashbrd-grid-widget-content .list-table .average-bg,
-.dashbrd-grid-widget-content .list-table .average-bg input[type="radio"]:checked + label,
-.average-bg .dashbrd-grid-widget-content .list-table input[type="radio"]:checked + label {
-  padding-left: 42px;
-  color: #fff; }
-
-.overlay-dialogue .list-table .average-bg, .overlay-dialogue .list-table .average-bg input[type="radio"]:checked + label, .average-bg .overlay-dialogue .list-table input[type="radio"]:checked + label {
-  padding-left: 42px; }
 
 .average-bg:before, .average-bg input[type="radio"]:checked + label:before {
   content: "";
@@ -4781,29 +4757,17 @@ td.average-bg ~ td.average-bg {
   .radio-segmented .average-bg::after, .radio-segmented .average-bg input[type="radio"]:checked + label::after, .average-bg .radio-segmented input[type="radio"]:checked + label::after {
     content: none; }
 
-td.warning-bg ~ td.warning-bg {
-  border-left: none; }
-
-.warning-bg, .warning-bg input[type="radio"]:checked + label {
+.warning-bg, .warning-bg input[type="radio"]:checked + label, .log-warning-bg {
   background-color: transparent !important; }
 
 .warning-bg .link-action, .warning-bg input[type="radio"]:checked + label .link-action {
   color: #f8f8f8; }
 
-.list-table .warning-bg, .list-table .warning-bg input[type="radio"]:checked + label, .warning-bg .list-table input[type="radio"]:checked + label,
-.dashbrd-widget .list-table .warning-bg,
-.dashbrd-widget .list-table .warning-bg input[type="radio"]:checked + label,
-.warning-bg .dashbrd-widget .list-table input[type="radio"]:checked + label,
-.dashbrd-grid-widget-content .list-table .warning-bg,
-.dashbrd-grid-widget-content .list-table .warning-bg input[type="radio"]:checked + label,
-.warning-bg .dashbrd-grid-widget-content .list-table input[type="radio"]:checked + label {
-  padding-left: 42px;
-  color: #fff; }
+.log-warning-bg:before {
+  color: #734d00 !important;
+  background-color: #ffc859 !important; }
 
-.overlay-dialogue .list-table .warning-bg, .overlay-dialogue .list-table .warning-bg input[type="radio"]:checked + label, .warning-bg .overlay-dialogue .list-table input[type="radio"]:checked + label {
-  padding-left: 42px; }
-
-.warning-bg:before, .warning-bg input[type="radio"]:checked + label:before {
+.warning-bg:before, .warning-bg input[type="radio"]:checked + label:before, .log-warning-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4812,7 +4776,7 @@ td.warning-bg ~ td.warning-bg {
   bottom: 0;
   min-height: 28px; }
 
-.warning-bg:after, .warning-bg input[type="radio"]:checked + label:after {
+.warning-bg:after, .warning-bg input[type="radio"]:checked + label:after, .log-warning-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -166px -443px;
   width: 22px;
@@ -4832,29 +4796,17 @@ td.warning-bg ~ td.warning-bg {
   .radio-segmented .warning-bg::after, .radio-segmented .warning-bg input[type="radio"]:checked + label::after, .warning-bg .radio-segmented input[type="radio"]:checked + label::after {
     content: none; }
 
-td.high-bg ~ td.high-bg {
-  border-left: none; }
-
-.high-bg, .high-bg input[type="radio"]:checked + label {
+.high-bg, .high-bg input[type="radio"]:checked + label, .log-high-bg {
   background-color: transparent !important; }
 
 .high-bg .link-action, .high-bg input[type="radio"]:checked + label .link-action {
   color: #f8f8f8; }
 
-.list-table .high-bg, .list-table .high-bg input[type="radio"]:checked + label, .high-bg .list-table input[type="radio"]:checked + label,
-.dashbrd-widget .list-table .high-bg,
-.dashbrd-widget .list-table .high-bg input[type="radio"]:checked + label,
-.high-bg .dashbrd-widget .list-table input[type="radio"]:checked + label,
-.dashbrd-grid-widget-content .list-table .high-bg,
-.dashbrd-grid-widget-content .list-table .high-bg input[type="radio"]:checked + label,
-.high-bg .dashbrd-grid-widget-content .list-table input[type="radio"]:checked + label {
-  padding-left: 42px;
-  color: #fff; }
+.log-high-bg:before {
+  color: #52190b !important;
+  background-color: #e97659 !important; }
 
-.overlay-dialogue .list-table .high-bg, .overlay-dialogue .list-table .high-bg input[type="radio"]:checked + label, .high-bg .overlay-dialogue .list-table input[type="radio"]:checked + label {
-  padding-left: 42px; }
-
-.high-bg:before, .high-bg input[type="radio"]:checked + label:before {
+.high-bg:before, .high-bg input[type="radio"]:checked + label:before, .log-high-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4863,7 +4815,7 @@ td.high-bg ~ td.high-bg {
   bottom: 0;
   min-height: 28px; }
 
-.high-bg:after, .high-bg input[type="radio"]:checked + label:after {
+.high-bg:after, .high-bg input[type="radio"]:checked + label:after, .log-high-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -226px -443px;
   width: 22px;
@@ -4883,29 +4835,17 @@ td.high-bg ~ td.high-bg {
   .radio-segmented .high-bg::after, .radio-segmented .high-bg input[type="radio"]:checked + label::after, .high-bg .radio-segmented input[type="radio"]:checked + label::after {
     content: none; }
 
-td.disaster-bg ~ td.disaster-bg {
-  border-left: none; }
-
-.disaster-bg, .disaster-bg input[type="radio"]:checked + label {
+.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .log-disaster-bg {
   background-color: transparent !important; }
 
 .disaster-bg .link-action, .disaster-bg input[type="radio"]:checked + label .link-action {
   color: #f8f8f8; }
 
-.list-table .disaster-bg, .list-table .disaster-bg input[type="radio"]:checked + label, .disaster-bg .list-table input[type="radio"]:checked + label,
-.dashbrd-widget .list-table .disaster-bg,
-.dashbrd-widget .list-table .disaster-bg input[type="radio"]:checked + label,
-.disaster-bg .dashbrd-widget .list-table input[type="radio"]:checked + label,
-.dashbrd-grid-widget-content .list-table .disaster-bg,
-.dashbrd-grid-widget-content .list-table .disaster-bg input[type="radio"]:checked + label,
-.disaster-bg .dashbrd-grid-widget-content .list-table input[type="radio"]:checked + label {
-  padding-left: 42px;
-  color: #fff; }
+.log-disaster-bg:before {
+  color: #4b0c0c !important;
+  background-color: #e45959 !important; }
 
-.overlay-dialogue .list-table .disaster-bg, .overlay-dialogue .list-table .disaster-bg input[type="radio"]:checked + label, .disaster-bg .overlay-dialogue .list-table input[type="radio"]:checked + label {
-  padding-left: 42px; }
-
-.disaster-bg:before, .disaster-bg input[type="radio"]:checked + label:before {
+.disaster-bg:before, .disaster-bg input[type="radio"]:checked + label:before, .log-disaster-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4914,7 +4854,7 @@ td.disaster-bg ~ td.disaster-bg {
   bottom: 0;
   min-height: 28px; }
 
-.disaster-bg:after, .disaster-bg input[type="radio"]:checked + label:after {
+.disaster-bg:after, .disaster-bg input[type="radio"]:checked + label:after, .log-disaster-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -256px -443px;
   width: 22px;
@@ -4946,6 +4886,10 @@ td.disaster-bg ~ td.disaster-bg {
 .notif-indic-container {
   margin: 0 0 0 -42px; }
 
+td.inactive-bg {
+  padding-left: 42px !important;
+  color: #fff; }
+
 .inactive-bg, td.inactive-bg {
   background-color: transparent !important;
   padding-left: 42px; }
@@ -4968,10 +4912,6 @@ td.disaster-bg ~ td.disaster-bg {
   top: 5px;
   left: 6px;
   position: absolute; }
-
-.list-table .inactive-bg {
-  padding-left: 42px;
-  color: #fff !important; }
 
 .msg-bad .link-action {
   color: #ff3a3a; }

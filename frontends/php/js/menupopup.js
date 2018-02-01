@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -605,7 +605,7 @@ function showDialogForm(form, options, formData, trigger_elmnt) {
 	}, trigger_elmnt);
 
 	form.css('visibility', 'visible');
-	overlayDialogueOnLoad(true, jQuery('[data-dialogueid="dashbrdShare"]'));
+	overlayDialogueOnLoad(true);
 }
 
 /**

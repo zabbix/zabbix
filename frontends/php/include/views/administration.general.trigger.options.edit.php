@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,43 +29,59 @@ $widget = (new CWidget())
 	);
 
 $triggerDOFormList = (new CFormList())
-	->addRow(_('Unacknowledged PROBLEM events'), [
-		new CColor('problem_unack_color', $data['problem_unack_color']),
+	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
+		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED))
+	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
+		(new CColor('problem_unack_color', $data['problem_unack_color']))
+			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
+			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_unack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['problem_unack_style'] == 1)
 	])
-	->addRow(_('Acknowledged PROBLEM events'), [
-		new CColor('problem_ack_color', $data['problem_ack_color']),
+	->addRow((new CLabel(_('Acknowledged PROBLEM events'), 'problem_ack_color'))->setAsteriskMark(), [
+		(new CColor('problem_ack_color', $data['problem_ack_color']))
+			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
+			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_ack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['problem_ack_style'] == 1)
 	])
-	->addRow(_('Unacknowledged OK events'), [
-		new CColor('ok_unack_color', $data['ok_unack_color']),
+	->addRow((new CLabel(_('Unacknowledged RESOLVED events'), 'ok_unack_color'))->setAsteriskMark(), [
+		(new CColor('ok_unack_color', $data['ok_unack_color']))
+			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
+			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_unack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['ok_unack_style'] == 1)
 	])
-	->addRow(_('Acknowledged OK events'), [
-		new CColor('ok_ack_color', $data['ok_ack_color']),
+	->addRow((new CLabel(_('Acknowledged RESOLVED events'), 'ok_ack_color'))->setAsteriskMark(), [
+		(new CColor('ok_ack_color', $data['ok_ack_color']))
+			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
+			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_ack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['ok_ack_style'] == 1)
 	])
 	->addRow(null)
-	->addRow(_('Display OK triggers for'), [
+	->addRow((new CLabel(_('Display OK triggers for'), 'ok_period'))->setAsteriskMark(), [
 		(new CTextBox('ok_period', $data['ok_period']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 			->setAttribute('maxlength', '6')
 	])
-	->addRow(_('On status change triggers blink for'), [
+	->addRow((new CLabel(_('On status change triggers blink for'), 'blink_period'))->setAsteriskMark(), [
 		(new CTextBox('blink_period', $data['blink_period']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 			->setAttribute('maxlength', '6')
 	]);
 

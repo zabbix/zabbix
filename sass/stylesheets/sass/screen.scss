@@ -1707,6 +1707,17 @@ footer {
 }
 
 label {
+	&.form-label-asterisk {
+		&:before {
+			color: $form-label-asterisk-color;
+			display: inline-block;
+			content: '*';
+			margin-right: 0.3em;
+		}
+	}
+}
+
+label {
 	input[type="checkbox"] {
 		margin-right: 3px;
 	}
@@ -3282,10 +3293,6 @@ $form-icon-btn: (
 		border-top: 1px solid $table-border-color;
 	}
 
-	.table-forms-td-left {
-		text-align: left;
-	}
-
 	.table-forms-td-right {
 
 		td {
@@ -3934,8 +3941,6 @@ a.teal {
 }
 
 td.na-bg {
-	border-left: none;
-
 	~ td.na-bg {
 		border-left: 1px dotted $table-border-color;
 	}
@@ -3944,10 +3949,6 @@ td.na-bg {
 .log-na-bg {
 	color: darken($alt-blue-grey,45%);
 	background-color: $alt-blue-grey;
-}
-
-td.log-na-bg {
-	@extend td.na-bg;
 }
 
 .normal-bg {
@@ -3984,9 +3985,6 @@ td.info-bg {
 .log-info-bg {
 	color: darken($alt-dark-blue,45%);
 	background-color: $alt-dark-blue;
-}
-td.log-info-bg {
-	@extend td.na-bg;
 }
 
 .average-bg {
@@ -4029,10 +4027,6 @@ td.warning-bg {
 	color: darken($alt-yellow,45%);
 	background-color: $alt-yellow;
 }
-td.log-warning-bg {
-	@extend td.na-bg;
-}
-
 
 .high-bg {
 	color: darken($alt-dark-orange,45%);
@@ -4055,9 +4049,6 @@ td.high-bg {
 .log-high-bg {
 	color: darken($alt-dark-orange,45%);
 	background-color: $alt-dark-orange;
-}
-td.log-high-bg {
-	@extend td.na-bg;
 }
 
 .disaster-bg {
@@ -4082,9 +4073,6 @@ td.disaster-bg {
 	color: darken($alt-red,45%);
 	background-color: $alt-red;
 }
-td.log-disaster-bg {
-	@extend td.na-bg;
-}
 
 .inactive-bg {
 	color: darken($alt-red,45%);
@@ -4093,6 +4081,23 @@ td.log-disaster-bg {
 
 td.inactive-bg {
 	@extend .inactive-bg;
+}
+
+// Event status colors
+.problem-unack-fg {
+	color: $problem-unack-fg-color;
+}
+
+.problem-ack-fg {
+	color: $problem-ack-fg-color;
+}
+
+.ok-unack-fg {
+	color: $ok-unack-fg-color;
+}
+
+.ok-ack-fg {
+	color: $ok-ack-fg-color;
 }
 
 %found-bg {
@@ -4484,6 +4489,14 @@ a.overlay-close-btn {
 
 	input[type="text"] {
 		padding-left: 25px;
+	}
+
+	&.disabled {
+		opacity: 1;
+
+		div {
+			background: $form-disabled-font-color !important;
+		}
 	}
 }
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -388,7 +388,8 @@ static void	preprocessor_free_request(zbx_preprocessing_request_t *request)
  ******************************************************************************/
 static void	preprocessor_flush_value(zbx_preproc_item_value_t *value)
 {
-	dc_add_history(value->itemid, value->item_flags, value->result, value->ts, value->state, value->error);
+	dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result, value->ts, value->state,
+			value->error);
 }
 
 /******************************************************************************
@@ -575,6 +576,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 			manager->processed_num++;
 			preprocessor_enqueue_dependent(manager, value, NULL);
 			preproc_item_value_clear(value);
+
 			goto out;
 		}
 	}
@@ -1032,7 +1034,6 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
-	time_now = time_stat;
 	time_flush = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);

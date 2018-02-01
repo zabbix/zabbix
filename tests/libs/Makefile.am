@@ -1,5 +1,8 @@
 SUBDIRS = \
 	zbxconf \
 	zbxdbhigh \
-	zbxsysinfo
+	zbxjson \
+	zbxsysinfo \
+	zbxcommshigh
+	
 

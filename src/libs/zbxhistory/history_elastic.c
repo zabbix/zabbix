@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@
 #include "zbxself.h"
 #include "history.h"
 
-#ifdef HAVE_LIBCURL
+/* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
+#if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
 
 #define		ZBX_HISTORY_STORAGE_DOWN	10000 /* Timeout in milliseconds */
 
@@ -835,14 +836,14 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 }
 
 #else
+
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
 {
 	ZBX_UNUSED(hist);
 	ZBX_UNUSED(value_type);
 
-	*error = zbx_strdup(*error, "cURL library support is required for ElasticSearch history");
-
+	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for Elasticsearch history backend");
 	return FAIL;
 }
-#endif
 
+#endif

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1064,6 +1064,8 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 	{
 		if (procstat_queries_num(procstat_ref.addr) == PROCSTAT_MAX_QUERIES)
 			*errmsg = zbx_strdup(*errmsg, "Maximum number of queries reached.");
+		else if (0 == ((zbx_procstat_header_t *)procstat_ref.addr)->size_allocated)
+			*errmsg = zbx_strdup(*errmsg, "Shared memory not ready for use.");
 		else
 			procstat_add(procname, username, cmdline, flags);
 

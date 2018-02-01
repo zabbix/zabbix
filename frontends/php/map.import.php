@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ $data = [
 		'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'screens' => ['updateExisting' => false, 'createMissing' => false],
 		'maps' => ['updateExisting' => false, 'createMissing' => false],
-		'images' => ['updateExisting' => false, 'createMissing' => false],
+		'images' => ['updateExisting' => false, 'createMissing' => true],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 	],
 	'backurl' => getRequest('backurl', '')

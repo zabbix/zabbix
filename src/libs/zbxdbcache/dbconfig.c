@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -333,7 +333,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 			/* regular procedure with item update in database and config cache, logging etc. There is */
 			/* no need to set ITEM_STATE_NOTSUPPORTED here. */
 
-			dc_add_history(item->itemid, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
+			dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
 			zbx_free(error);
 
 			/* Polling items with invalid update intervals repeatedly does not make sense because they */
@@ -1370,6 +1370,7 @@ done:
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
 				proxy->lastaccess = atoi(row[24]);
+				proxy->last_cfg_error_time = 0;
 			}
 
 			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
@@ -4291,7 +4292,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
  * Purpose: updates trigger topology after trigger dependency changes         *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trigger_update_topology()
+static void	dc_trigger_update_topology(void)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_TRIGGER		*trigger;
@@ -4325,7 +4326,7 @@ static int	zbx_default_ptr_pair_ptr_compare_func(const void *d1, const void *d2)
  *              3) list of triggers each item is used by                      *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trigger_update_cache()
+static void	dc_trigger_update_cache(void)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_TRIGGER		*trigger;
@@ -4423,7 +4424,7 @@ static void	dc_trigger_update_cache()
  * Purpose: updates hostgroup name index and resets nested group lists        *
  *                                                                            *
  ******************************************************************************/
-static void	dc_hostgroups_update_cache()
+static void	dc_hostgroups_update_cache(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_dc_hostgroup_t	*group;
@@ -4579,6 +4580,11 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	isec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_item_preprocs(&itempp_sync))
+		goto out;
+	itempp_sec = zbx_time() - sec;
+
 	START_SYNC;
 	sec = zbx_time();
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
@@ -4589,6 +4595,12 @@ void	DCsync_configuration(unsigned char mode)
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 	DCsync_items(&items_sync, flags);
 	isec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	/* relies on items, must be after DCsync_items() */
+	DCsync_item_preproc(&itempp_sync);
+	itempp_sec2 = zbx_time() - sec;
+	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
 
 	/* sync function data to support function lookups when resolving macros during configuration sync */
@@ -4661,11 +4673,6 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	hgroups_sec = zbx_time() - sec;
 
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_item_preprocs(&itempp_sync))
-		goto out;
-	itempp_sec = zbx_time() - sec;
-
 	START_SYNC;
 
 	sec = zbx_time();
@@ -4714,11 +4721,6 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	DCsync_hostgroups(&hgroups_sync);
 	hgroups_sec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	/* relies on items, must be after DCsync_items() */
-	DCsync_item_preproc(&itempp_sync);
-	itempp_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 
@@ -5426,6 +5428,7 @@ int	init_configuration_cache(char **error)
 
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
+	config->item_sync_ts = 0;
 	config->proxy_lastaccess_ts = time(NULL);
 
 #undef CREATE_HASHSET
@@ -6257,11 +6260,11 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* no changes */
-	if (0 != *timestamp && *timestamp == config->sync_ts)
+	if (0 != *timestamp && *timestamp == config->item_sync_ts)
 		goto out;
 
 	zbx_hashset_clear(items);
-	*timestamp = config->sync_ts;
+	*timestamp = config->item_sync_ts;
 
 	LOCK_CACHE;
 
@@ -8256,7 +8259,7 @@ static void	DCconfig_sort_triggers_topologically(void)
 	{
 		trigger = trigdep->trigger;
 
-		if ((NULL != trigger && 1 < trigger->topoindex) || 0 == trigdep->dependencies.values_num)
+		if (NULL == trigger || 1 < trigger->topoindex || 0 == trigdep->dependencies.values_num)
 			continue;
 
 		DCconfig_sort_triggers_topologically_rec(trigdep, 0);
@@ -8392,6 +8395,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_config_nextcheck = src_proxy->proxy_config_nextcheck;
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
+	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
 	dst_proxy->version = src_proxy->version;
 
 	if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
@@ -8449,6 +8453,11 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 
 	dst_proxy->addr = NULL;
 	dst_proxy->port = 0;
+}
+
+int	DCconfig_get_last_sync_time(void)
+{
+	return config->sync_ts;
 }
 
 /******************************************************************************
@@ -8551,7 +8560,7 @@ int	DCconfig_get_proxypoller_nextcheck(void)
 	return nextcheck;
 }
 
-void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
+void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err)
 {
 	const char	*__function_name = "DCrequeue_proxy";
 
@@ -8571,6 +8580,12 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 		if (ZBX_LOC_POLLER == dc_proxy->location)
 			dc_proxy->location = ZBX_LOC_NOWHERE;
 
+		/* set or clear passive proxy misconfiguration error timestamp */
+		if (SUCCEED == proxy_conn_err)
+			dc_proxy->last_cfg_error_time = 0;
+		else if (CONFIG_ERROR == proxy_conn_err)
+			dc_proxy->last_cfg_error_time = (int)now;
+
 		if (HOST_STATUS_PROXY_PASSIVE == dc_host->status)
 		{
 			if (0 != (update_nextcheck & ZBX_PROXY_CONFIG_NEXTCHECK))
@@ -8578,6 +8593,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 				dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
 			}
+
 			if (0 != (update_nextcheck & ZBX_PROXY_DATA_NEXTCHECK))
 			{
 				dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
@@ -10338,7 +10354,8 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 #define ZBX_OPERATION_TYPE_OR		1
 #define ZBX_OPERATION_TYPE_AND		2
 
-	char				*formula = NULL, *op = NULL;
+	char				*formula = NULL;
+	const char			*op = NULL;
 	size_t				formula_alloc = 0, formula_offset = 0;
 	int				i, last_type = -1, last_op = ZBX_OPERATION_TYPE_UNKNOWN;
 	const zbx_dc_corr_condition_t	*dc_condition;
@@ -10352,10 +10369,10 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 	switch (dc_correlation->evaltype)
 	{
 		case CONDITION_EVAL_TYPE_OR:
-			op = (char *)" or";
+			op = " or";
 			break;
 		case CONDITION_EVAL_TYPE_AND:
-			op = (char *)" and";
+			op = " and";
 			break;
 	}
 

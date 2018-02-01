@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,9 @@ if ($data['parent_discoveryid'] !== '') {
 }
 
 $item = [
-	(new CTextBox('description', $data['description'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('description', $data['description'], true))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
@@ -80,7 +82,7 @@ if ($data['parent_discoveryid'] !== '') {
 		);
 }
 
-$expression_form_list->addRow(_('Item'), $item);
+$expression_form_list->addRow((new CLabel(_('Item'), 'description'))->setAsteriskMark(), $item);
 
 $function_combo_box = new CComboBox('expr_type', $data['expr_type'], 'reloadPopup(this.form, "popup.triggerexpr")');
 foreach ($data['functions'] as $id => $f) {
@@ -141,7 +143,12 @@ else {
 	$expression_form->addVar('paramtype', PARAM_TYPE_TIME);
 }
 
-$expression_form_list->addRow('N', (new CTextBox('value', $data['value']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH));
+$expression_form_list->addRow(
+	(new CLabel(_('N'), 'value'))->setAsteriskMark(),
+	(new CTextBox('value', $data['value']))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+);
 
 $expression_form->addItem(
 	(new CTabView())->addTab('expressionTab', _('Trigger expression condition'), $expression_form_list)

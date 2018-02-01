@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 **/
 
 /**
- * A helper class for working with ElasticSearch.
+ * A helper class for working with Elasticsearch.
  */
-class CElasticSearchHelper {
+class CElasticsearchHelper {
 
 	const MAX_RESULT_WINDOW = 10000;
 	const KEEP_CONTEXT_PERIOD = '10s';
@@ -30,7 +30,7 @@ class CElasticSearchHelper {
 	private static $scrolls;
 
 	/**
-	 * Perform request to ElasticSearch.
+	 * Perform request to Elasticsearch.
 	 *
 	 * @param string $method      HTTP method to be used to perform request
 	 * @param string $endpoint    requested url
@@ -44,7 +44,7 @@ class CElasticSearchHelper {
 			'http' => [
 				'header'  => "Content-Type: application/json; charset=UTF-8",
 				'method'  => $method,
-				'ignore_errors' => true // To get error messages from ElasticSearch.
+				'ignore_errors' => true // To get error messages from Elasticsearch.
 			]
 		];
 
@@ -60,14 +60,14 @@ class CElasticSearchHelper {
 			error($e->getMessage());
 		}
 
-		CProfiler::getInstance()->profileElasticSearch(microtime(true) - $time_start, $method, $endpoint, $request);
+		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start, $method, $endpoint, $request);
 
 		return $result;
 	}
 
 	/**
-	 * Get ElasticSearch endpoint for scroll API requests.
-	 * Endpoint should be in following format: <ElasticSearch url>/<indices>/<values>/<action><query string>.
+	 * Get Elasticsearch endpoint for scroll API requests.
+	 * Endpoint should be in following format: <Elasticsearch url>/<indices>/<values>/<action><query string>.
 	 *
 	 * @param string $endpoint    endpoint of the initial request
 	 *
@@ -82,7 +82,7 @@ class CElasticSearchHelper {
 			}
 			else {
 				// Endpoint is in different format, no way to get scroll API url.
-				error(_s('ElasticSearch error: %1$s.',
+				error(_s('Elasticsearch error: %1$s.',
 						_('cannot perform Scroll API request, data could be truncated'))
 				);
 
@@ -94,7 +94,7 @@ class CElasticSearchHelper {
 	}
 
 	/**
-	 * Perform request(s) to ElasticSearch and parse the results.
+	 * Perform request(s) to Elasticsearch and parse the results.
 	 *
 	 * @param string $method      HTTP method to be used to perform request
 	 * @param string $endpoint    requested url
@@ -181,7 +181,7 @@ class CElasticSearchHelper {
 	private static function parseResult($data, $parse_as) {
 		$result = json_decode($data, TRUE);
 		if (!is_array($result)) {
-			error(_s('ElasticSearch error: %1$s.', _('failed to parse JSON')));
+			error(_s('Elasticsearch error: %1$s.', _('failed to parse JSON')));
 
 			return [];
 		}
@@ -191,7 +191,7 @@ class CElasticSearchHelper {
 					? $result['error']['reason']
 					: _('Unknown error');
 
-			error(_s('ElasticSearch error: %1$s.', $error));
+			error(_s('Elasticsearch error: %1$s.', $error));
 
 			return [];
 		}
@@ -235,13 +235,13 @@ class CElasticSearchHelper {
 	}
 
 	/**
-	 * Add filters to ElasticSearch query.
+	 * Add filters to Elasticsearch query.
 	 *
 	 * @param array $schema     DB schema
-	 * @param array $query      ElasticSearch query
+	 * @param array $query      Elasticsearch query
 	 * @param array $options    filtering options
 	 *
-	 * @return array    ElasticSearch query with added filtering
+	 * @return array    Elasticsearch query with added filtering
 	 */
 	public static function addFilter($schema, $query, $options) {
 		foreach ($options['filter'] as $field => $value) {
@@ -272,13 +272,13 @@ class CElasticSearchHelper {
 	}
 
 	/**
-	 * Add search criteria to ElasticSearch query.
+	 * Add search criteria to Elasticsearch query.
 	 *
 	 * @param array $schema     DB schema
-	 * @param array $query      ElasticSearch query
+	 * @param array $query      Elasticsearch query
 	 * @param array $options    search options
 	 *
-	 * @return array    ElasticSearch query with added search criteria
+	 * @return array    Elasticsearch query with added search criteria
 	 */
 	public static function addSearch($schema, $query, $options) {
 		$start = $options['startSearch'] ? '' : '*';
@@ -338,13 +338,13 @@ class CElasticSearchHelper {
 	}
 
 	/**
-	 * Add sorting criteria to ElasticSearch query.
+	 * Add sorting criteria to Elasticsearch query.
 	 *
 	 * @param array $columns    columns that can (are allowed) be used for sorting
-	 * @param array $query      ElasticSearch query
+	 * @param array $query      Elasticsearch query
 	 * @param array $options    sorting options
 	 *
-	 * @return array    ElasticSearch query with added sorting options
+	 * @return array    Elasticsearch query with added sorting options
 	 */
 	public static function addSort($columns, $query, $options) {
 		$options['sortfield'] = is_array($options['sortfield'])

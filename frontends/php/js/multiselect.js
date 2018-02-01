@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -498,6 +498,10 @@ jQuery(function($) {
 					$(obj).removeClass('active');
 					cleanSearchInput(obj);
 				});
+				if (obj.attr('aria-required')) {
+					input.attr('aria-required', obj.attr('aria-required'));
+					obj.removeAttr('aria-required');
+				}
 				obj.append(input);
 			}
 

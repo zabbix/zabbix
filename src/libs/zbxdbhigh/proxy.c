@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1059,6 +1059,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			*error = zbx_dsprintf(*error, "unexpected field \"%s.%s\"", table->table, buf);
 			goto out;
 		}
+	}
+
+	if (0 == fields_count)
+	{
+		*error = zbx_dsprintf(*error, "empty list of field names");
+		goto out;
 	}
 
 	/* get the entries (line 8 in T1) */
@@ -2417,7 +2423,8 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
-		zbx_preprocess_item_value(item->itemid, item->flags, NULL, &value->ts, item->state, value->value);
+		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, NULL, &value->ts, item->state,
+				value->value);
 	}
 	else
 	{
@@ -2463,7 +2470,8 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 			set_result_meta(&result, value->lastlogsize, value->mtime);
 
 		item->state = ITEM_STATE_NORMAL;
-		zbx_preprocess_item_value(item->itemid, item->flags, &result, &value->ts, item->state, NULL);
+		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, &result, &value->ts, item->state,
+				NULL);
 
 		free_result(&result);
 	}

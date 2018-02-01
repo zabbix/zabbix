@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -563,6 +563,8 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->zbxTestWaitForPageToLoad();
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 				$this->zbxTestClickWait('update');
 				$this->zbxTestCheckHeader('Dashboard');
 				$this->zbxTestCheckFatalErrors();
