@@ -37,9 +37,13 @@ Curl.prototype = {
 	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
 	 *
 	 * @param url
+	 * @param add_sid	boolean	Add SID to given URL. Default: true.
 	 */
-	initialize: function(url) {
+	initialize: function(url, add_sid) {
 		url = url || location.href;
+		if (typeof add_sid === 'undefined') {
+			add_sid = true;
+		}
 
 		this.url = url;
 		this.args = {};
@@ -122,7 +126,9 @@ Curl.prototype = {
 			this.formatArguments();
 		}
 
-		this.addSID();
+		if (add_sid) {
+			this.addSID();
+		}
 	},
 
 	addSID: function() {

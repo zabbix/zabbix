@@ -164,6 +164,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 	if (SUCCEED == ret)
 	{
+		char	**pvalue;
+
 		zbx_alarm_on(CONFIG_TIMEOUT);
 
 		switch (dcheck->type)
@@ -224,8 +226,11 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, &result) && NULL != GET_STR_RESULT(&result))
-						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
+					if (SUCCEED == get_value_agent(&item, &result) &&
+							NULL != (pvalue = GET_TEXT_RESULT(&result)))
+					{
+						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
+					}
 					else
 						ret = FAIL;
 				}
@@ -267,8 +272,11 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 								NULL, 0);
 					}
 
-					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))
-						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
+					if (SUCCEED == get_value_snmp(&item, &result) &&
+							NULL != (pvalue = GET_TEXT_RESULT(&result)))
+					{
+						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
+					}
 					else
 						ret = FAIL;
 

@@ -4083,6 +4083,23 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
+// Event status colors
+.problem-unack-fg {
+	color: $problem-unack-fg-color;
+}
+
+.problem-ack-fg {
+	color: $problem-ack-fg-color;
+}
+
+.ok-unack-fg {
+	color: $ok-unack-fg-color;
+}
+
+.ok-ack-fg {
+	color: $ok-ack-fg-color;
+}
+
 %found-bg {
 	background-color: $lighter-yellow;
 }
@@ -4472,6 +4489,14 @@ a.overlay-close-btn {
 
 	input[type="text"] {
 		padding-left: 25px;
+	}
+
+	&.disabled {
+		opacity: 1;
+
+		div {
+			background: $form-disabled-font-color !important;
+		}
 	}
 }
 
