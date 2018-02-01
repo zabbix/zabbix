@@ -398,8 +398,25 @@ ul.top-nav-icons {
 	}
 }
 
+.table-paging {
+	a {
+		&:focus {
+			background-color: $link-hover-color;
+				.arrow-right {
+					border-left-color: #000;
+				}
+				.arrow-left {
+					border-right-color: #000;
+				}
+		}
+	}
+}
+
 .paging-selected {
 	color: #000 !important;
+	&:focus {
+		background-color: $link-hover-color !important;
+	}
 }
 
 .filter-trigger {

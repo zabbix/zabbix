@@ -801,6 +801,14 @@ footer {
 
 	a {
 		@extend %paging-btn;
+		&:focus {
+			.arrow-right {
+				border-left-color: $font-selected-color;
+			}
+			.arrow-left {
+				border-right-color: $font-selected-color;
+			}
+		}
 	}
 }
 
@@ -828,7 +836,7 @@ footer {
 	margin-left: -1px;
 	padding: 3px 11px;
 	background-color: $btn-form-bg-color;
-	border: 1px solid $form-border-color;
+	border: 1px solid $form-border-color !important;
 	text-decoration: none;
 	color: $font-color;
 	outline: 0;
@@ -840,9 +848,7 @@ footer {
 	}
 
 	&:focus {
-		color: $font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $form-border-focus-color;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 		z-index: 10;
 		position: relative;
 	}
@@ -864,7 +870,6 @@ footer {
 
 	&.paging-selected {
 		color: $font-selected-color;
-		border-color: $ui-bg-selected-color;
 		background-color: $ui-bg-selected-color;
 		position: relative;
 		z-index: 1;
@@ -874,14 +879,12 @@ footer {
 		}
 
 		&:focus {
-			background-color: darken($ui-bg-selected-color, 4%);
-			border-color: $form-border-focus-color;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 			position: relative;
 		}
 
 		&:active {
 			background-color: darken($ui-bg-selected-color, 4%);
-			border-color: $form-border-focus-color;
 			position: relative;
 		}
 	}

@@ -381,6 +381,21 @@ ul.top-nav-icons {
 	}
 }
 
+.table-paging {
+	a {
+		&:focus {
+			background-color: #777 !important;
+		}
+	}
+}
+
+.paging-selected {
+	&:focus {
+		background-color: #777 !important;
+	}
+}
+
+
 .filter-trigger {
 	.arrow-down {
 		border-top-color: #FFF !important;
