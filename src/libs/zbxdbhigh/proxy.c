@@ -2550,49 +2550,40 @@ static void	zbx_agent_values_clean(zbx_agent_value_t *values, size_t values_num)
  * Purpose: calculates difference between server and client (proxy, active    *
  *          agent or sender) time                                             *
  *                                                                            *
- * Parameters: jp              - [IN] JSON with clock, [ns] fields            *
- *             ts_recv         - [IN] the connection timestamp                *
- *             client_timediff - [OUT] time difference between sending and    *
- *                                     receiving parties                      *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - the JSON does not have timestamp data                *
+ * Parameters: jp      - [IN] JSON with clock, [ns] fields                    *
+ *             ts_recv - [IN] the connection timestamp                        *
  *                                                                            *
  ******************************************************************************/
-static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv,
-		zbx_timespec_t *client_timediff)
+static void	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv)
 {
 	const char	*__function_name = "get_client_timediff";
 	char		tmp[32];
+	zbx_timespec_t	client_timediff;
 	int		sec, ns = 0;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 	{
 		sec = atoi(tmp);
-		client_timediff->sec = ts_recv->sec - sec;
+		client_timediff.sec = ts_recv->sec - sec;
 
 		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
 		{
 			ns = atoi(tmp);
-			client_timediff->ns = ts_recv->ns - ns;
+			client_timediff.ns = ts_recv->ns - ns;
 
-			if (client_timediff->ns < 0)
+			if (client_timediff.ns < 0)
 			{
-				client_timediff->sec--;
-				client_timediff->ns += 1000000000;
+				client_timediff.sec--;
+				client_timediff.ns += 1000000000;
 			}
 		}
 		else
-			client_timediff->ns = 0;
+			client_timediff.ns = 0;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %d seconds and %d nanosecond, "
 				"delta time from json %d seconds and %d nanosecond",
-				__function_name, sec, ns, client_timediff->sec, client_timediff->ns);
-
-		return SUCCEED;
+				__function_name, sec, ns, client_timediff.sec, client_timediff.ns);
 	}
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -3067,7 +3058,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	int			ret = FAIL, values_num, read_num, processed_num = 0, total_num = 0, i,
 				errcodes[ZBX_HISTORY_VALUES_MAX];
 	struct zbx_json_parse	jp_data;
-	zbx_timespec_t		unique_shift;
+	zbx_timespec_t		unique_shift = {0, 0};
 	const char		*pnext = NULL;
 	char			*error = NULL;
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
@@ -3078,9 +3069,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/*just for logging time from json*/
-	get_client_timediff(jp, ts, &unique_shift);
-	unique_shift.sec = 0;
-	unique_shift.ns = 0;
+	get_client_timediff(jp, ts);
 
 	sec = zbx_time();
 
@@ -3409,11 +3398,10 @@ int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char *
 	const char		*__function_name = "process_discovery_data";
 	int			ret;
 	struct zbx_json_parse	jp_data;
-	zbx_timespec_t		client_timediff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	get_client_timediff(jp, ts, &client_timediff);
+	get_client_timediff(jp, ts);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
@@ -3563,11 +3551,10 @@ int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_host
 
 	struct zbx_json_parse	jp_data;
 	int			ret;
-	zbx_timespec_t		client_timediff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	get_client_timediff(jp, ts, &client_timediff);
+	get_client_timediff(jp, ts);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
@@ -3823,18 +3810,14 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED;
-	zbx_timespec_t		unique_shift;
-
-;
+	zbx_timespec_t		unique_shift = {0, 0};
 	char			*error_step = NULL;
 	size_t			error_alloc = 0, error_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/*just for logging time from json*/
-	get_client_timediff(jp, ts, &unique_shift);
-	unique_shift.sec = 0;
-	unique_shift.ns = 0;
+	get_client_timediff(jp, ts);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
