@@ -2593,10 +2593,8 @@ static void	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t 
  * Purpose: parses agent value from history data json row                     *
  *                                                                            *
  * Parameters: jp_row       - [IN] JSON with history data row                 *
- *             unique_shift - [IN/OUT] time difference between sending and    *
- *                                     receiving parties (nanoseconds may     *
- *                                     be autoincremented to ensure unique    *
- *                                     value timestamps)                      *
+ *             unique_shift - [IN/OUT] auto increment nanoseconds to ensure   *
+ *                                     unique value of timestamps             *
  *             av           - [OUT] the agent value                           *
  *                                                                            *
  * Return value:  SUCCEED - the value was parsed successfully                 *
@@ -2766,10 +2764,8 @@ static int	parse_history_data_row_hostkey(const struct zbx_json_parse *jp_row, z
  *             values_num   - [OUT] number of elements in values and hostkeys *
  *                                  arrays                                    *
  *             parsed_num   - [OUT] the number of values parsed               *
- *             unique_shift - [IN/OUT] time difference between sending and    *
- *                                     receiving parties (nanoseconds may     *
- *                                     be autoincremented to ensure unique    *
- *                                     value timestamps)                      *
+ *             unique_shift - [IN/OUT] auto increment nanoseconds to ensure   *
+ *                                     unique value of timestamps             *
  *             info         - [OUT] address of a pointer to the info          *
  *                                  string (should be freed by the caller)    *
  *                                                                            *
@@ -2844,10 +2840,8 @@ out:
  *             values_num   - [OUT] number of elements in values and itemids  *
  *                                  arrays                                    *
  *             parsed_num   - [OUT] the number of values parsed               *
- *             unique_shift - [IN/OUT] time difference between sending and    *
- *                                     receiving parties (nanoseconds may     *
- *                                     be autoincremented to ensure unique    *
- *                                     value timestamps)                      *
+ *             unique_shift - [IN/OUT] auto increment nanoseconds to ensure   *
+ *                                     unique value of timestamps             *
  *             info         - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *
  *                                                                            *
@@ -3657,10 +3651,8 @@ int	zbx_proxy_update_version(DC_PROXY *proxy, struct zbx_json_parse *jp)
  * Purpose: parses history data array and process the data                    *
  *                                                                            *
  * Parameters: jp_data      - [IN] JSON with history data array               *
- *             unique_shift - [IN/OUT] time difference between sending and    *
- *                                     receiving parties (nanoseconds may be  *
- *                                     autoincremented to ensure unique value *
- *                                     timestamps)                            *
+ *             unique_shift - [IN/OUT] auto increment nanoseconds to ensure   *
+ *                                     unique value of timestamps             *
  *             info         - [OUT] address of a pointer to the info          *
  *                                     string (should be freed by the caller) *
  *                                                                            *
