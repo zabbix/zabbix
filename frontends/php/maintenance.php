@@ -417,7 +417,6 @@ if (!empty($data['form'])) {
 			'maintenanceids' => $data['maintenanceid'],
 			'editable' => true
 		]);
-		$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 	}
 	else {
 		$data['mname'] = getRequest('mname', '');
