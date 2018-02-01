@@ -2278,23 +2278,38 @@ int	DCsync_history(int sync_type, int *total_num)
 	if (NULL == history)
 		history = (ZBX_DC_HISTORY *)zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
-	if (NULL == history_float && NULL != history_float_cbs)
-		history_float = (ZBX_HISTORY_FLOAT *)zbx_malloc(history_float, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_FLOAT));
-
-	if (NULL == history_integer && NULL != history_integer_cbs)
-		history_integer = (ZBX_HISTORY_INTEGER *)zbx_malloc(history_integer, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_INTEGER));
-
-	if (NULL == history_string && NULL != history_string_cbs)
-		history_string = (ZBX_HISTORY_STRING *)zbx_malloc(history_string, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_STRING));
-
-	if (NULL == history_text && NULL != history_text_cbs)
-		history_text = (ZBX_HISTORY_TEXT *)zbx_malloc(history_text, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
-
-	if (NULL == history_log && NULL != history_log_cbs)
-		history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
-
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
+		if (NULL == history_float && NULL != history_float_cbs)
+		{
+			history_float = (ZBX_HISTORY_FLOAT *)zbx_malloc(history_float,
+					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_FLOAT));
+		}
+
+		if (NULL == history_integer && NULL != history_integer_cbs)
+		{
+			history_integer = (ZBX_HISTORY_INTEGER *)zbx_malloc(history_integer,
+					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_INTEGER));
+		}
+
+		if (NULL == history_string && NULL != history_string_cbs)
+		{
+			history_string = (ZBX_HISTORY_STRING *)zbx_malloc(history_string,
+					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_STRING));
+		}
+
+		if (NULL == history_text && NULL != history_text_cbs)
+		{
+			history_text = (ZBX_HISTORY_TEXT *)zbx_malloc(history_text,
+					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
+		}
+
+		if (NULL == history_log && NULL != history_log_cbs)
+		{
+			history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log,
+					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
+		}
+
 		zbx_vector_ptr_create(&inventory_values);
 		zbx_vector_ptr_create(&item_diff);
 		zbx_vector_ptr_create(&trigger_diff);
@@ -2428,7 +2443,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		*total_num += history_num;
 		candidate_num = history_items.values_num;
 
-		if (SUCCEED == ret)
+		if (SUCCEED == ret && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 					history_integer, &history_integer_num, history_string, &history_string_num,
