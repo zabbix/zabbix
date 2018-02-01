@@ -300,7 +300,7 @@ class CZabbixServer {
 
 		// Send the command.
 		$json = CJs::encodeJson($params);
-		if (fwrite($this->socket, ZBX_TCP_HEADER.pack('P', strlen($json)).$json) === false) {
+		if (fwrite($this->socket, ZBX_TCP_HEADER.pack('V', strlen($json))."\x00\x00\x00\x00".$json) === false) {
 			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
 			return false;
 		}
@@ -342,7 +342,7 @@ class CZabbixServer {
 				}
 
 				if ($expected_len === null) {
-					$expected_len = unpack('Plen', substr($response, ZBX_TCP_HEADER_LEN, ZBX_TCP_DATALEN_LEN))['len'];
+					$expected_len = unpack('Vlen', substr($response, ZBX_TCP_HEADER_LEN, 4))['len'];
 					$expected_len += ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN;
 
 					if ($this->totalBytesLimit != 0 && $expected_len >= $this->totalBytesLimit) {
