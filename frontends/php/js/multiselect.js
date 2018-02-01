@@ -354,9 +354,13 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									var prev = selected.prev();
+									var prev = selected.prev(),
+										id = selected.data('id'),
+										item = values.selected[id];
 
-									removeSelected(selected.data('id'), obj, values, options);
+									if (typeof(item.disabled) === 'undefined' || !item.disabled) {
+										removeSelected(id, obj, values, options);
+									}
 
 									if (prev.length > 0) {
 										prev.addClass('selected');
@@ -380,15 +384,19 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									var next = selected.next();
+									var next = selected.next(),
+										id = selected.data('id'),
+										item = values.selected[id];
 
-									removeSelected(selected.data('id'), obj, values, options);
+									if (typeof(item.disabled) === 'undefined' || !item.disabled) {
+										removeSelected(id, obj, values, options);
 
-									if (next.length > 0) {
-										next.addClass('selected');
-									}
-									else {
-										$('.selected li:last-child', obj).addClass('selected');
+										if (next.length > 0) {
+											next.addClass('selected');
+										}
+										else {
+											$('.selected li:last-child', obj).addClass('selected');
+										}
 									}
 								}
 
