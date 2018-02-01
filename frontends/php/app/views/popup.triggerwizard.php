@@ -30,9 +30,7 @@ $form = (new CForm('post', 'zabbix.php'))
 	->addVar('sform', '1')
 	->addVar('action', 'popup.triggerwizard')
 	->addVar('itemid', $options['itemid'])
-	->addItem(
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
-	);
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 if (array_key_exists('triggerid', $options)) {
 	$form->addVar('triggerid', $options['triggerid']);

@@ -35,9 +35,7 @@ $http_popup_form = (new CForm())
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
 	->addVar('action', 'popup.httpstep')
-	->addItem(
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
-	);
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $http_popup_form_list = (new CFormList())
 	->addRow(_('Name'),
@@ -46,8 +44,7 @@ $http_popup_form_list = (new CFormList())
 	)
 	->addRow(_('URL'),
 		new CDiv([
-			(new CTextBox('url', $options['url'], false, null))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('url', $options['url'], false, null))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('parse', _('Parse')))
 				->onClick('javascript: parseUrl("'.$http_popup_form->getId().'");')
@@ -137,8 +134,7 @@ $http_popup_form_list
 			->setChecked($options['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 	)
 	->addRow(_('Timeout'),
-		(new CTextBox('timeout', $options['timeout']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('timeout', $options['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Required string'),
 		(new CTextBox('required', $options['required']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

@@ -28,9 +28,7 @@ $expression_form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('groupid', $data['groupid'])
 	->addVar('itemid', $data['itemid'])
-	->addItem(
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
-	);
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 if ($data['parent_discoveryid'] !== '') {
 	$expression_form->addVar('parent_discoveryid', $data['parent_discoveryid']);
