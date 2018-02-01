@@ -2109,8 +2109,10 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
  *                                                                            *
  ******************************************************************************/
 static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field, zbx_uint64_t flag,
-		size_t field_len, char **error)
+		size_t field_len_max, char **error)
 {
+	size_t field_len;
+
 	if (0 == (tag->flags & ZBX_FLAG_LLD_TAG_DISCOVERED))
 		return;
 
@@ -2128,9 +2130,13 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
 				field_utf8);
 		zbx_free(field_utf8);
 	}
-	else if (zbx_strlen_utf8(field) > field_len)
+	else if ((field_len = zbx_strlen_utf8(field)) > field_len_max)
 	{
 		*error = zbx_strdcatf(*error, "Cannot create trigger tag: value \"%s\" is too long.\n", field);
+	}
+	else if (0 != (flag & ZBX_FLAG_LLD_TAG_UPDATE_TAG) && 0 == field_len)
+	{
+		*error = zbx_strdcatf(*error, "Cannot create trigger tag: empty tag name.\n");
 	}
 	else
 		return;
