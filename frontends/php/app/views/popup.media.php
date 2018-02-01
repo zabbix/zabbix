@@ -85,7 +85,7 @@ $form = (new CForm())
 	->setId('media_form')
 	->addItem()
 	->addItem([
-		(new CTabView())->addTab('mediaTab', _('Media'), $media_form),
+		$media_form,
 		(new CInput('submit', 'submit'))->addStyle('display: none;'),
 		(new CTag('script'))
 			->addItem((new CRow([

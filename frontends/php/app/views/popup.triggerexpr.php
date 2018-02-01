@@ -150,9 +150,7 @@ $expression_form_list->addRow(
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
-$expression_form->addItem(
-	(new CTabView())->addTab('expressionTab', _('Trigger expression condition'), $expression_form_list)
-);
+$expression_form->addItem($expression_form_list);
 
 $output = [
 	'header' => $data['title'],

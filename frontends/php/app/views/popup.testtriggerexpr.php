@@ -95,7 +95,7 @@ $output = [
 			->addVar('expression', $data['expression'])
 			->addVar('test_expression', 1)
 			->addItem([
-				(new CTabView())->addTab('test_tab', null, $form_list),
+				$form_list,
 				(new CInput('submit', 'submit'))->addStyle('display: none;')
 			])
 		]))->toString(),
