@@ -1454,7 +1454,12 @@ INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99001
 INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99001, 'update tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99001, 99001, 0);
 
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'Event correlation for update validation', 'Test description update validation', 0, 0, '');
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'Event correlation for cancel', 'Test description cancel', 0, 0, '');
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99002, 99002, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99002, 'update validation tag');
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99002, 'cancel tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99002, 99002, 0);
+
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99003, 'Event correlation for clone', 'Test description clone', 0, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);

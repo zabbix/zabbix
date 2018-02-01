@@ -58,11 +58,11 @@ class testFormEventCorelation extends CWebTest {
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
-		$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
+		$this->zbxTestInputType('new_condition_tag', $data['tag']);
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 
 		if (array_key_exists('description', $data)) {
-		$this->zbxTestInputTypeOverwrite('description', $data['description']);
+		$this->zbxTestInputType('description', $data['description']);
 		}
 
 		$this->zbxTestTabSwitch('Operations');
@@ -74,9 +74,10 @@ class testFormEventCorelation extends CWebTest {
 		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
+		$this->zbxTestTextPresent($data['name']);
 
 		$this->zbxTestCheckFatalErrors();
-		$sql = "SELECT NULL FROM correlation WHERE name='".$data['name']."'";
+		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -127,7 +128,7 @@ class testFormEventCorelation extends CWebTest {
 		}
 
 		if (array_key_exists('tag', $data)) {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
+			$this->zbxTestInputType('new_condition_tag', $data['tag']);
 			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 		}
 
@@ -139,12 +140,12 @@ class testFormEventCorelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		if 	(array_key_exists('name', $data) and $data['name'] == 'Event correlation for update') {
-			$sql = "SELECT NULL FROM correlation WHERE name='".$data['name']."'";
+			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 			$this->assertEquals(1, DBcount($sql));
 		}
 
 		if (array_key_exists('name', $data) and $data['name'] != 'Event correlation for update') {
-			$sql = "SELECT NULL FROM correlation WHERE name='".$data['name']."'";
+			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 			$this->assertEquals(0, DBcount($sql));
 		}
 	}
@@ -156,7 +157,7 @@ class testFormEventCorelation extends CWebTest {
 		$this->zbxTestCheckTitle('Event correlation rules');
 
 		$this->zbxTestInputType('name', 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name');
-		$this->zbxTestInputTypeOverwrite('new_condition_tag', 'Test tag');
+		$this->zbxTestInputType('new_condition_tag', 'Test tag');
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 
 		$this->zbxTestTabSwitch('Operations');
@@ -180,7 +181,7 @@ class testFormEventCorelation extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Test create with New event host group <>',
+					'name' => 'Test create with New event host group !=',
 					'select_tag' => 'New event host group',
 					'operator' => '<>'
 				]
@@ -214,7 +215,7 @@ class testFormEventCorelation extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value <> tag',
+					'name' => 'Test create with Old event tag value != tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
 					'operator' => '<>',
@@ -259,7 +260,7 @@ class testFormEventCorelation extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value <> tag',
+					'name' => 'Test create with New event tag value != tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
 					'operator' => '<>',
@@ -298,74 +299,30 @@ class testFormEventCorelation extends CWebTest {
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
-		$select_tag = $this->zbxTestGetSelectedLabel('new_condition_type');
 		$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-		$operator = $this->zbxTestGetSelectedLabel('new_condition_operator');
 
-		if ($select_tag == 'New event host group' and $operator == '=') {
-			$this->zbxTestClickXpath('.//*[@class=\'btn-grey\']');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('overlay_dialogue'));
+		if ($data['select_tag'] == 'New event host group') {
+			$this->zbxTestClickButtonMultiselect('new_condition_groupids_');
+			$this->zbxTestLaunchOverlayDialog('Host groups');
 			$this->zbxTestClickWait('spanid4');
 		}
 
-		if ($select_tag == 'New event host group' and $operator == '<>') {
-			$this->zbxTestClickXpath('.//*[@class=\'btn-grey\']');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('overlay_dialogue'));
-			$this->zbxTestClickWait('spanid4');
-		}
-
-		if ($select_tag == 'Event tag pair') {
+		if ($data['select_tag'] == 'Event tag pair') {
 			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestInputTypeOverwrite('new_condition_oldtag', $data['oldtag']);
-			$this->zbxTestInputTypeOverwrite('new_condition_newtag', $data['newtag']);
+			$this->zbxTestInputType('new_condition_oldtag', $data['oldtag']);
+			$this->zbxTestInputType('new_condition_newtag', $data['newtag']);
 		}
 
-		if ($select_tag == 'Old event tag value' and $operator == '=') {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
+		if ($data['select_tag'] == 'Old event tag value') {
+			$this->zbxTestInputType('new_condition_tag', $data['tag']);
 			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
+			$this->zbxTestInputType('new_condition_value', $data['value']);
 		}
 
-		if ($select_tag == 'Old event tag value' and $operator == '<>') {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
+		if ($data['select_tag'] == 'New event tag value') {
+			$this->zbxTestInputType('new_condition_tag', $data['tag']);
 			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
-		}
-
-		if ($select_tag == 'Old event tag value' and $operator == 'like') {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
-		}
-
-		if ($select_tag == 'Old event tag value' and $operator == 'not like') {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
-		}
-
-		if ($select_tag == 'New event tag value' and $operator == '=') {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
-		}
-
-		if ($select_tag == 'New event tag value' and $operator == '<>') {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
-		}
-
-		if ($select_tag == 'New event tag value' and $operator == 'like') {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
-		}
-
-		if ($select_tag == 'New event tag value' and $operator == 'not like') {
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
+			$this->zbxTestInputType('new_condition_value', $data['value']);
 		}
 
 		$this->zbxTestWaitForPageToLoad();
@@ -377,7 +334,8 @@ class testFormEventCorelation extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
 		$this->zbxTestCheckFatalErrors();
-		$sql = "SELECT NULL FROM correlation WHERE name='".$data['name']."'";
+		$this->zbxTestTextPresent($data['name']);
+		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -387,7 +345,6 @@ class testFormEventCorelation extends CWebTest {
 				[
 					'name' => 'Test empty New event tag',
 					'select_tag' => 'New event tag',
-					'error_header'=> 'Cannot add correlation condition',
 					'error_message' => 'Incorrect value for field "tag": cannot be empty.'
 				]
 			],
@@ -395,7 +352,6 @@ class testFormEventCorelation extends CWebTest {
 				[
 					'name' => 'Test empty New event host group',
 					'select_tag' => 'New event host group',
-					'error_header'=> 'Cannot add correlation condition',
 					'error_message' => 'Incorrect value for field "groupid": cannot be empty.'
 				]
 			],
@@ -404,7 +360,6 @@ class testFormEventCorelation extends CWebTest {
 					'name' => 'Test empty Old tag in Event tag pair',
 					'select_tag' => 'Event tag pair',
 					'newtag' => 'New tag',
-					'error_header'=> 'Cannot add correlation condition',
 					'error_message' => 'Incorrect value for field "oldtag": cannot be empty.'
 				]
 			],
@@ -413,7 +368,6 @@ class testFormEventCorelation extends CWebTest {
 					'name' => 'Test empty New tag in Event tag pair',
 					'select_tag' => 'Event tag pair',
 					'oldtag' => 'Old tag',
-					'error_header'=> 'Cannot add correlation condition',
 					'error_message' => 'Incorrect value for field "newtag": cannot be empty.'
 				]
 			],
@@ -421,7 +375,6 @@ class testFormEventCorelation extends CWebTest {
 				[
 					'name' => 'Test empty tag in Old event tag value',
 					'select_tag' => 'Old event tag value',
-					'error_header'=> 'Cannot add correlation condition',
 					'error_message' => 'Incorrect value for field "tag": cannot be empty.'
 				]
 			],
@@ -429,7 +382,6 @@ class testFormEventCorelation extends CWebTest {
 				[
 					'name' => 'Test empty tag in New event tag value',
 					'select_tag' => 'New event tag value',
-					'error_header'=> 'Cannot add correlation condition',
 					'error_message' => 'Incorrect value for field "tag": cannot be empty.'
 				]
 			]
@@ -439,7 +391,7 @@ class testFormEventCorelation extends CWebTest {
 	/**
 	 * @dataProvider tagsValidation
 	 */
-	public function testFormEventCorelation_TagsValidation($data) {
+	public function testFormEventCorelation_CheckEmptyTagsValue($data) {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -449,21 +401,22 @@ class testFormEventCorelation extends CWebTest {
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
 		$this->zbxTestWaitForPageToLoad();
 
-		$select_tag = $this->zbxTestGetSelectedLabel('new_condition_type');
-
-		if ($select_tag == 'Event tag pair' and array_key_exists('newtag', $data)) {
-			$this->zbxTestInputTypeOverwrite('new_condition_newtag', $data['newtag']);
+		if ($data['select_tag'] == 'Event tag pair' and array_key_exists('newtag', $data)) {
+			$this->zbxTestInputType('new_condition_newtag', $data['newtag']);
 		}
 
-		if ($select_tag == 'Event tag pair' and array_key_exists('oldtag', $data)) {
-			$this->zbxTestInputTypeOverwrite('new_condition_oldtag', $data['oldtag']);
+		if ($data['select_tag'] == 'Event tag pair' and array_key_exists('oldtag', $data)) {
+			$this->zbxTestInputType('new_condition_oldtag', $data['oldtag']);
 		}
 
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_header']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation condition');
 		$this->zbxTestAssertElementText('//ul[@class=\'msg-details-border\']', $data['error_message']);
 		$this->zbxTestCheckFatalErrors();
+
+		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	public static function calculation() {
@@ -471,63 +424,43 @@ class testFormEventCorelation extends CWebTest {
 			[
 				[
 					'name' => 'Test create with calculation And/Or',
-					'select_tag1' => 'Old event tag',
-					'tag1' => 'Test tag1',
-					'select_tag2' => 'New event tag',
-					'tag2' => 'Test tag2',
-					'select_tag3' => 'Old event tag value',
-					'tag' => 'Tag3',
-					'operator' => 'like',
-					'value' => 'Value3',
-					'operation' => 'Close new event',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value' ]
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Test create with calculation And',
-					'select_tag1' => 'Old event tag',
-					'tag1' => 'Test tag1',
-					'select_tag2' => 'New event tag',
-					'tag2' => 'Test tag2',
-					'select_tag3' => 'Old event tag value',
-					'tag' => 'Tag3',
-					'operator' => 'like',
-					'value' => 'Value3',
-					'calculation' => 'And',
-					'operation' => 'Close new event',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'And']
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Test create with calculation Or',
-					'select_tag1' => 'Old event tag',
-					'tag1' => 'Test tag1',
-					'select_tag2' => 'New event tag',
-					'tag2' => 'Test tag2',
-					'select_tag3' => 'Old event tag value',
-					'tag' => 'Tag3',
-					'operator' => 'like',
-					'value' => 'Value3',
-					'calculation' => 'Or',
-					'operation' => 'Close new event',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Or']
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Test create with calculation Custom',
-					'select_tag1' => 'Old event tag',
-					'tag1' => 'Test tag1',
-					'select_tag2' => 'New event tag',
-					'tag2' => 'Test tag2',
-					'select_tag3' => 'Old event tag value',
-					'tag' => 'Tag3',
-					'operator' => 'like',
-					'value' => 'Value3',
-					'calculation' => 'Custom expression',
-					'formula'=> 'A or (B and C)',
-					'operation' => 'Close new event',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> 'A or (B and C)']
+					]
 				]
-			]
+			],
 		];
 	}
 
@@ -541,28 +474,23 @@ class testFormEventCorelation extends CWebTest {
 		$this->zbxTestCheckTitle('Event correlation rules');
 
 		$this->zbxTestInputType('name', $data['name']);
-		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag1']);
-		$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag1']);
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 
-		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag2']);
-		$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag2']);
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+		foreach ($data['tags'] as $tag) {
+			$this->zbxTestDropdownSelectWait('new_condition_type', $tag['select_tag']);
+			$this->zbxTestInputType('new_condition_tag', $tag['tag_name']);
 
-		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag3']);
-		$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
-		$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-		$this->zbxTestInputTypeOverwrite('new_condition_value', $data['value']);
-		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+			if (isset($tag['operator'])) {
+				$this->zbxTestDropdownSelectWait('new_condition_operator', $tag['operator']);
+				$this->zbxTestInputType('new_condition_value', $tag['value']);
+				}
 
-		if (array_key_exists('calculation', $data)) {
-			$this->zbxTestDropdownSelect('evaltype', $data['calculation']);
-		}
-
-		$calculation = $this->zbxTestGetSelectedLabel('evaltype');
-
-		if ($calculation == 'Custom expression') {
-			$this->zbxTestInputTypeOverwrite('formula', $data['formula']);
+			if (isset($tag['calculation'])) {
+				$this->zbxTestDropdownSelect('evaltype', $tag['calculation']);
+				if ($tag['calculation'] === 'Custom expression') {
+					$this->zbxTestInputType('formula', $tag['formula']);
+					}
+				}
+			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 		}
 
 		$this->zbxTestTabSwitch('Operations');
@@ -571,174 +499,250 @@ class testFormEventCorelation extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
 		$this->zbxTestCheckFatalErrors();
-		$sql = "SELECT NULL FROM correlation WHERE name='".$data['name']."'";
+		$this->zbxTestTextPresent($data['name']);
+		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public static function update() {
+	public static function formulaValidation() {
 		return [
 			[
 				[
-					'select_tag' => 'New event tag',
-					'tag' => 'NEW update tag'
+					'name' => 'Test create with empty expression',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> '' ]
+					],
+					'error_message' => 'Incorrect custom expression "Test create with empty expression" for correlation "": expression is empty.'
+				]
+			],
+						[
+				[
+					'name' => 'Test create with missing argument',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> 'A or B' ]
+					],
+					'error_message' => 'Condition "C" is not used in formula "A or B" for correlation "Test create with missing argument".'
 				]
 			],
 			[
 				[
-					'description' => 'NEW Test description update'
+					'name' => 'Test create with extra argument',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> '(A or B) and (C or D)' ]
+					],
+					'error_message' => 'Condition "D" used in formula "(A or B) and (C or D)" for correlation "Test create with extra argument" is not defined.'
+				]
+			],
+			[
+				[
+					'name' => 'Test create with wrong formula',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> 'Wrong formula']
+					],
+					'error_message' => 'Incorrect custom expression "Test create with wrong formula" for correlation "Wrong formula": check expression starting from "Wrong formula".'
+				]
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider formulaValidation
+	 */
+	public function testFormEventCorelation_FormulaValidation($data) {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickWait('form');
+		$this->zbxTestCheckHeader('Event correlation rules');
+		$this->zbxTestCheckTitle('Event correlation rules');
+
+		$this->zbxTestInputType('name', $data['name']);
+
+		foreach ($data['tags'] as $tag) {
+			$this->zbxTestDropdownSelectWait('new_condition_type', $tag['select_tag']);
+			$this->zbxTestInputType('new_condition_tag', $tag['tag_name']);
+
+			if (isset($tag['operator'])) {
+				$this->zbxTestDropdownSelectWait('new_condition_operator', $tag['operator']);
+				$this->zbxTestInputType('new_condition_value', $tag['value']);
+				}
+			if (isset($tag['calculation'])) {
+				$this->zbxTestDropdownSelect('evaltype', $tag['calculation']);
+				$this->zbxTestInputType('formula', $tag['formula']);
+				}
+
+			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+		}
+
+		$this->zbxTestClick('add');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation');
+		$error = $this->zbxTestGetText('//ul[@class=\'msg-details-border\']');
+		$this->assertContains($data['error_message'], $error);
+		$this->zbxTestCheckFatalErrors();
+
+		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
+		$this->assertEquals(0, DBcount($sql));
+	}
+
+	public static function correlationClone() {
+		return [
+			[
+				[
+					'name' => 'NEW Event correlation for clone'
+				]
+			],
+			[
+				[
+					'select_tag' => 'New event tag',
+					'tag' => 'NEW clone tag'
+				]
+			],
+			[
+				[
+					'description' => 'NEW Test description clone'
 				]
 			],
 			[
 				[
 					'operation' => 'Close new event'
 				]
-			],
-			[
-				[
-					'name' => 'NEW Event correlation for update'
-				]
 			]
 		];
 	}
 
-	/**
-	 * @dataProvider update
-	 */
-	public function testFormEventCorelation_Update($data) {
+	public function testFormEventCorelation_Clone() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickLinkTextWait('Event correlation for clone');
+		$this->zbxTestCheckHeader('Event correlation rules');
+		$this->zbxTestCheckTitle('Event correlation rules');
+
+		$this->zbxTestClick('clone');
+		$this->zbxTestInputType('name', 'Cloned correlation');
+		$this->zbxTestClick('add');
+
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
+		$this->zbxTestTextPresent('Cloned correlation');
+		$this->zbxTestCheckFatalErrors();
+
+		$sql = "SELECT NULL FROM correlation WHERE name='Cloned correlation'";
+		$this->assertEquals(1, DBcount($sql));
+
+		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for clone'";
+		$this->assertEquals(1, DBcount($sql));
+
+		$sql = "SELECT NULL FROM correlation WHERE description='Test description clone'";
+		$this->assertEquals(2, DBcount($sql));
+
+		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='clone tag'";
+		$this->assertEquals(2, DBcount($sql));
+	}
+
+	public function testFormEventCorelation_UpdateNone() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for update');
 		$this->zbxTestCheckHeader('Event correlation rules');
 		$this->zbxTestCheckTitle('Event correlation rules');
 
-		if (array_key_exists('select_tag', $data)) {
-			$this->zbxTestClick('remove');
-			$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
-			$this->zbxTestInputTypeOverwrite('new_condition_tag', $data['tag']);
-			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
-		}
-
-		if (array_key_exists('description', $data)) {
-			$this->zbxTestInputTypeOverwrite('description', $data['description']);
-		}
-
-		if (array_key_exists('operation', $data)) {
-			$this->zbxTestTabSwitch('Operations');
-			$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');
-			$this->zbxTestDropdownSelect('new_operation_type', $data['operation']);
-			$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
-		}
-
-		if (array_key_exists('name', $data)) {
-			$this->zbxTestInputTypeOverwrite('name', $data['name']);
-		}
-
 		$this->zbxTestClick('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation updated');
 
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation updated');
+		$this->zbxTestTextPresent('Event correlation for update');
 		$this->zbxTestCheckFatalErrors();
 
-		if (array_key_exists('select_tag', $data)) {
-			$sql = "SELECT * FROM corr_condition_tag WHERE tag='update tag'";
-			$this->assertEquals(0, DBcount($sql));
+		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for update'";
+		$this->assertEquals(1, DBcount($sql));
 
-			$sql = "SELECT * FROM corr_condition_tag WHERE tag='NEW update tag'";
-			$this->assertEquals(1, DBcount($sql));
-		}
+		$sql = "SELECT NULL FROM correlation WHERE description='Test description update'";
+		$this->assertEquals(1, DBcount($sql));
 
-		if (array_key_exists('description', $data)) {
-			$sql = "SELECT NULL FROM correlation WHERE description='Test description update'";
-			$this->assertEquals(0, DBcount($sql));
-
-			$sql = "SELECT NULL FROM correlation WHERE description='".$data['description']."'";
-			$this->assertEquals(1, DBcount($sql));
-		}
-
-		if (array_key_exists('operation', $data)) {
-			$sql = "SELECT * FROM corr_operation WHERE correlationid='99001' and type='0'";
-			$this->assertEquals(0, DBcount($sql));
-
-			$sql = "SELECT * FROM corr_operation WHERE correlationid='99001' and type='1'";
-			$this->assertEquals(1, DBcount($sql));
-		}
-
-		if (array_key_exists('name', $data)) {
-			$sql = "SELECT * FROM correlation WHERE name='Event correlation for update'";
-			$this->assertEquals(0, DBcount($sql));
-
-			$sql = "SELECT * FROM correlation WHERE name='".$data['name']."'";
-			$this->assertEquals(1, DBcount($sql));
-		}
+		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='update tag'";
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public static function updateValidation() {
-		return [
-			[
-				[
-					'name'=> ' ',
-					'error_header' => 'Page received incorrect data',
-					'error_message' => 'Incorrect value for field "Name": cannot be empty.'
-				]
-			],
-			[
-				[
-					'error_header' => 'Cannot update correlation',
-					'error_message' => 'No "conditions" given for correlation "Event correlation for update validation".'
-				]
-			],
-			[
-				[
-					'error_header' => 'Cannot update correlation',
-					'error_message' => 'No "operations" given for correlation "Event correlation for update validation".'
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider updateValidation
-	 */
-	public function testFormEventCorelation_UpdateValidation($data) {
+	public function testFormEventCorelation_UpdateAllFields() {
 		$this->zbxTestLogin('correlation.php');
-		$this->zbxTestClickLinkTextWait('Event correlation for update validation');
+		$this->zbxTestClickLinkTextWait('Event correlation for update');
 		$this->zbxTestCheckHeader('Event correlation rules');
 		$this->zbxTestCheckTitle('Event correlation rules');
 
-		if ($data['error_message'] == 'Incorrect value for field "Name": cannot be empty.') {
-			$this->zbxTestInputTypeOverwrite('name', $data['name']);
-		}
+		$this->zbxTestInputTypeOverwrite('name', 'New event correlation for update');
 
-		if ($data['error_message'] == 'No "conditions" given for correlation "Event correlation for update validation".') {
-			$this->zbxTestClick('remove');
-		}
+		$this->zbxTestClick('remove');
+		$this->zbxTestDropdownSelectWait('new_condition_type', 'New event tag');
+		$this->zbxTestInputTypeOverwrite('new_condition_tag', 'New update tag');
+		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 
-		if ($data['error_message'] == 'No "operations" given for correlation "Event correlation for update validation".') {
-			$this->zbxTestTabSwitch('Operations');
-			$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');
-		}
+		$this->zbxTestInputTypeOverwrite('description', 'New test description update');
 
+		$this->zbxTestTabSwitch('Operations');
+		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');;
+		$this->zbxTestDropdownSelect('new_operation_type', 'Close new event');
+		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_operation\')]');
 		$this->zbxTestClick('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_header']);
-		$error = $this->zbxTestGetText('//ul[@class=\'msg-details-border\']');
-		$this->assertContains($data['error_message'], $error);
 
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation updated');
+		$this->zbxTestTextPresent('New event correlation for update');
 		$this->zbxTestCheckFatalErrors();
 
-		if ($data['error_message'] == 'Incorrect value for field "Name": cannot be empty.') {
-			$sql = "SELECT * FROM correlation WHERE name=''";
-			$this->assertEquals(0, DBcount($sql));
+		$sql = "SELECT NULL FROM correlation WHERE name='New event correlation for update'";
+		$this->assertEquals(1, DBcount($sql));
 
-			$sql = "SELECT * FROM correlation WHERE name='Event correlation for update validation'";
-			$this->assertEquals(1, DBcount($sql));
-		}
+		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for update'";
+		$this->assertEquals(0, DBcount($sql));
 
-		if ($data['error_message'] == 'No "conditions" given for correlation "Event correlation for update".') {
-			$sql = "SELECT * FROM corr_condition WHERE corr_conditionid IS NULL";
-			$this->assertEquals(0, DBcount($sql));
-		}
+		$sql = "SELECT NULL FROM correlation WHERE description='New test description update'";
+		$this->assertEquals(1, DBcount($sql));
 
-		if ($data['error_message'] == 'No "operations" given for correlation "Event correlation for update".') {
-			$sql = "SELECT * FROM corr_operation WHERE corr_operationid IS NULL";
-			$this->assertEquals(0, DBcount($sql));
-		}
+		$sql = "SELECT NULL FROM correlation WHERE description='Test description update'";
+		$this->assertEquals(0, DBcount($sql));
+
+		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='New update tag'";
+		$this->assertEquals(1, DBcount($sql));
+
+		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='update tag'";
+		$this->assertEquals(0, DBcount($sql));
+	}
+
+	public function testFormEventCorelation_Delete() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickLinkTextWait('Event correlation for delete');
+		$this->zbxTestCheckHeader('Event correlation rules');
+		$this->zbxTestCheckTitle('Event correlation rules');
+
+		$this->zbxTestClickAndAcceptAlert('delete');
+
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation deleted');
+		$this->zbxTestTextNotPresent('Event correlation for delete');
+		$this->zbxTestCheckFatalErrors();
+
+		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for delete'";
+		$this->assertEquals(0, DBcount($sql));
+	}
+
+	public function testFormEventCorelation_Cancel() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickLinkTextWait('Event correlation for cancel');
+		$this->zbxTestCheckHeader('Event correlation rules');
+		$this->zbxTestCheckTitle('Event correlation rules');
+
+		$this->zbxTestClick('cancel');
+
+		$this->zbxTestTextPresent('Event correlation for cancel');
+		$this->zbxTestCheckFatalErrors();
+
+		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for cancel'";
+		$this->assertEquals(1, DBcount($sql));
+
+		$sql = "SELECT NULL FROM correlation WHERE description='Test description cancel'";
+		$this->assertEquals(1, DBcount($sql));
+
+		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='cancel tag'";
+		$this->assertEquals(1, DBcount($sql));
 	}
 }
