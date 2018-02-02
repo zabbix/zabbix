@@ -2576,13 +2576,17 @@ static void	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t 
 				client_timediff.sec--;
 				client_timediff.ns += 1000000000;
 			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %d seconds and %d nanosecond, "
+					"delta time from json %d seconds and %d nanosecond",
+					__function_name, sec, ns, client_timediff.sec, client_timediff.ns);
 		}
 		else
+		{
 			client_timediff.ns = 0;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %d seconds and %d nanosecond, "
-				"delta time from json %d seconds and %d nanosecond",
-				__function_name, sec, ns, client_timediff.sec, client_timediff.ns);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %d seconds, "
+				"delta time from json %d seconds", __function_name, sec, client_timediff.sec);
+		}
 	}
 }
 
