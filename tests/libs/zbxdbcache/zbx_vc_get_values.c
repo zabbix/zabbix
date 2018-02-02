@@ -38,7 +38,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	char				*error = NULL;
 	const char			*data;
-	int				err,  seconds, count, end, item_status, item_active_range, item_db_cached_from,
+	int				err,  seconds, count, item_status, item_active_range, item_db_cached_from,
 					item_values_total, cache_mode;
 	zbx_vector_history_record_t	expected, returned;
 	zbx_timespec_t			ts;
@@ -70,8 +70,8 @@ void	zbx_mock_test_entry(void **state)
 			zbx_vcmock_set_mode(hitem, "cache mode");
 			zbx_vcmock_set_cache_size(hitem, "cache size");
 
-			zbx_vcmock_get_request_params(hitem, &itemid, &value_type, &seconds, &count, &end);
-			zbx_vc_precache_values(itemid, value_type, seconds, count, end);
+			zbx_vcmock_get_request_params(hitem, &itemid, &value_type, &seconds, &count, &ts);
+			zbx_vc_precache_values(itemid, value_type, seconds, count, &ts);
 		}
 	}
 
@@ -81,8 +81,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vcmock_set_time(handle, "time");
 	zbx_vcmock_set_mode(handle, "cache mode");
 
-	zbx_vcmock_get_request_params(handle, &itemid, &value_type, &seconds, &count, &end);
-	err = zbx_vc_get_value_range(itemid, value_type, &returned, seconds, count, end);
+	zbx_vcmock_get_request_params(handle, &itemid, &value_type, &seconds, &count, &ts);
+	err = zbx_vc_get_values(itemid, value_type, &returned, seconds, count, &ts);
 	zbx_mock_assert_result_eq("zbx_vc_get_value_range() return value", SUCCEED, err);
 
 	/* validate results */

@@ -54,7 +54,7 @@ out:
       status:
       active_range: 900
       values_total: 5
-      db_cached_from: 2017-01-10 09:55:01.000000000 +00:00
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC1
@@ -112,7 +112,7 @@ out:
       status:
       active_range: 900
       values_total: 5
-      db_cached_from: 2017-01-10 09:55:01.000000000 +00:00
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC2
@@ -190,7 +190,7 @@ out:
       status:
       active_range: 900
       values_total: 5
-      db_cached_from: 2017-01-10 09:55:01.000000000 +00:00
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC3
@@ -248,7 +248,7 @@ out:
       status:
       active_range: 900
       values_total: 5
-      db_cached_from: 2017-01-10 09:55:01.000000000 +00:00
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC4
@@ -306,7 +306,7 @@ out:
       status:
       active_range: 900
       values_total: 5
-      db_cached_from: 2017-01-10 09:55:01.000000000 +00:00
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC5
@@ -388,7 +388,7 @@ out:
       status:
       active_range: 600
       values_total: 7
-      db_cached_from: 2017-01-10 10:00:01.000000000 +00:00
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC7
@@ -566,7 +566,7 @@ out:
       status:
       active_range: 600
       values_total: 7
-      db_cached_from: 2017-01-10 10:00:01.000000000 +00:00
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC10
@@ -627,7 +627,7 @@ out:
       status:
       active_range: 600
       values_total: 7
-      db_cached_from: 2017-01-10 10:00:01.000000000 +00:00
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC11
@@ -810,7 +810,7 @@ out:
       status:
       active_range: 600
       values_total: 7
-      db_cached_from: 2017-01-10 10:00:01.000000000 +00:00
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     mode: ZBX_VC_MODE_LOWMEM
 ---
 # TC14

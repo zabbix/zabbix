@@ -1,4 +1,4 @@
-noinst_PROGRAMS = zbx_vc_get_value_range zbx_vc_add_values
+noinst_PROGRAMS = zbx_vc_get_values zbx_vc_add_values
 
 VALUECACHE_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
@@ -11,14 +11,14 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-zbx_vc_get_value_range_SOURCES = \
-	zbx_vc_get_value_range.c \
+zbx_vc_get_values_SOURCES = \
+	zbx_vc_get_values.c \
 	valuecache_mock.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
-zbx_vc_get_value_range_WRAP_FUNCS = \
+zbx_vc_get_values_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
 	-Wl,--wrap=zbx_mutex_destroy \
 	-Wl,--wrap=zbx_mem_create \
@@ -32,10 +32,10 @@ zbx_vc_get_value_range_WRAP_FUNCS = \
 	-Wl,--wrap=time \
 	-Wl,--wrap=yaml_parser_set_input_file
 
-zbx_vc_get_value_range_LDADD = $(VALUECACHE_LIBS)
+zbx_vc_get_values_LDADD = $(VALUECACHE_LIBS)
 
-zbx_vc_get_value_range_CFLAGS = \
-	 $(zbx_vc_get_value_range_WRAP_FUNCS) \
+zbx_vc_get_values_CFLAGS = \
+	 $(zbx_vc_get_values_WRAP_FUNCS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \

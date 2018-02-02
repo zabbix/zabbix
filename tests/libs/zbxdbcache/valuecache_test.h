@@ -22,7 +22,7 @@
 
 void	zbx_vc_set_mode(int mode);
 int	zbx_vc_get_cached_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_history_record_t *values);
-int	zbx_vc_precache_values(zbx_uint64_t itemid, int value_type, int seconds, int count, int end);
+int	zbx_vc_precache_values(zbx_uint64_t itemid, int value_type, int seconds, int count, const zbx_timespec_t *end);
 int	zbx_vc_get_item_state(zbx_uint64_t itemid, int *status, int *active_range, int *values_total,
 		int *db_cached_from);
 int	zbx_vc_get_cache_state(int *mode, zbx_uint64_t *hits, zbx_uint64_t *misses);

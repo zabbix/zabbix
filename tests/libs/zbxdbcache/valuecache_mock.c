@@ -700,18 +700,15 @@ void	zbx_vcmock_set_cache_size(zbx_mock_handle_t hitem, const char *key)
  *                                                                            *
  ******************************************************************************/
 void	zbx_vcmock_get_request_params(zbx_mock_handle_t handle, zbx_uint64_t *itemid, unsigned char *value_type,
-		int *seconds, int *count, int *end)
+		int *seconds, int *count, zbx_timespec_t *end)
 {
-	zbx_timespec_t		ts;
-
 	if (FAIL == is_uint64(zbx_mock_get_object_member_string(handle, "itemid"), itemid))
 		fail_msg("Invalid itemid value");
 
 	*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(handle, "value type"));
 	*seconds = atoi(zbx_mock_get_object_member_string(handle, "seconds"));
 	*count = atoi(zbx_mock_get_object_member_string(handle, "count"));
-	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "end"), &ts);
-	*end = ts.sec;
+	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "end"), end);
 }
 
 /*

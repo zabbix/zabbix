@@ -48,7 +48,7 @@ int	zbx_vc_get_cached_values(zbx_uint64_t itemid, unsigned char value_type, zbx_
 	return SUCCEED;
 }
 
-int	zbx_vc_precache_values(zbx_uint64_t itemid, int value_type, int seconds, int count, int end)
+int	zbx_vc_precache_values(zbx_uint64_t itemid, int value_type, int seconds, int count, const zbx_timespec_t *ts)
 {
 	zbx_vc_item_t			*item;
 	int				ret;
@@ -66,7 +66,7 @@ int	zbx_vc_precache_values(zbx_uint64_t itemid, int value_type, int seconds, int
 	/* perform request to cache values */
 	vc_item_addref(item);
 	zbx_history_record_vector_create(&values);
-	ret = vch_item_get_value_range(item, &values, seconds, count, end);
+	ret = vch_item_get_values(item, &values, seconds, count, ts);
 	zbx_history_record_vector_destroy(&values, value_type);
 	vc_item_release(item);
 

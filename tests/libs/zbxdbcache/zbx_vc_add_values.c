@@ -36,7 +36,7 @@ extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
  ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
-	int				err, seconds, count, end, item_status, item_active_range, item_db_cached_from,
+	int				err, seconds, count, item_status, item_active_range, item_db_cached_from,
 					item_values_total, cache_mode;
 	zbx_vector_history_record_t	expected, returned;
 	const char			*data;
@@ -71,8 +71,8 @@ void	zbx_mock_test_entry(void **state)
 			zbx_vcmock_set_mode(hitem, "cache mode");
 			zbx_vcmock_set_cache_size(hitem, "cache size");
 
-			zbx_vcmock_get_request_params(hitem, &itemid, &value_type, &seconds, &count, &end);
-			zbx_vc_precache_values(itemid, value_type, seconds, count, end);
+			zbx_vcmock_get_request_params(hitem, &itemid, &value_type, &seconds, &count, &ts);
+			zbx_vc_precache_values(itemid, value_type, seconds, count, &ts);
 		}
 	}
 
