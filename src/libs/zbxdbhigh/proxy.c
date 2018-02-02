@@ -3817,25 +3817,25 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
-		if (SUCCEED != process_host_availability_contents(&jp_data, &error_step))
+		if (SUCCEED != (ret = process_host_availability_contents(&jp_data, &error_step)))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
-		process_proxy_history_data_33(proxy, &jp_data, &unique_shift, &error_step);
-		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
+		if (SUCCEED != (ret = process_proxy_history_data_33(proxy, &jp_data, &unique_shift, &error_step)))
+			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
-		if (SUCCEED != process_discovery_data_contents(&jp_data, &error_step))
+		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, &error_step)))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTO_REGISTRATION, &jp_data))
 	{
-		if (SUCCEED != process_auto_registration_contents(&jp_data, proxy->hostid, &error_step))
+		if (SUCCEED != (ret = process_auto_registration_contents(&jp_data, proxy->hostid, &error_step)))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
@@ -3843,7 +3843,6 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		process_tasks_contents(&jp_data);
 
 	zbx_free(error_step);
-	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
