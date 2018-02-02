@@ -110,6 +110,103 @@ function inheritPermissions($groupid, $name) {
 }
 
 /**
+ * Add subgroups with tag filters inherited from main host group ($groupid) to all user groups in which tag filters for
+ * particular group are created.
+ *
+ * @param string $groupid  Host group ID.
+ * @param string $name     Host group name.
+ */
+function inheritTagFilters($groupid, $name) {
+	// Get child groupids.
+	$parent = $name.'/';
+	$len = strlen($parent);
+
+	// Select subgroups of particular host group.
+	$groups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'search' => ['name' => $parent],
+		'startSearch' => true
+	]);
+
+	$child_groupids = [];
+	foreach ($groups as $group) {
+		if (substr($group['name'], 0, $len) === $parent) {
+			$child_groupids[$group['groupid']] = true;
+		}
+	}
+
+	if (!$child_groupids) {
+		return;
+	}
+
+	// Select what tag filters particular host group already has for different user groups.
+	$db_host_group_tag_filters = DB::select('tag_filter', [
+		'output' => ['usrgrpid', 'tag', 'value'],
+		'filter' => ['groupid' => $groupid]
+	]);
+
+	$tag_filters = [];
+
+	foreach ($db_host_group_tag_filters as $db_host_group_tag_filter) {
+		$tag_filters[$db_host_group_tag_filter['usrgrpid']][] = [
+			'tag' => $db_host_group_tag_filter['tag'],
+			'value' => $db_host_group_tag_filter['value']
+		];
+	}
+
+	/**
+	 * Since tag filters with subgroups can already be added, but not always filter for the main group will be created,
+	 * it is necessary also select user groups in which tag filters are created with each of subgroups. Tag filters for
+	 * these subgroups will be deleted if in particular user group, the main hostgroup related tag filter is not
+	 * created.
+	 */
+	$db_subgroup_usrgrps = DB::select('tag_filter', [
+		'output' => ['usrgrpid'],
+		'filter' => ['groupid' => array_keys($child_groupids)]
+	]);
+	$db_subgroup_usrgrps = array_flip(zbx_objectValues($db_subgroup_usrgrps, 'usrgrpid'));
+
+	// Select affected user groups.
+	$usrgrps = API::UserGroup()->get([
+		'output' => ['usrgrpid'],
+		'usrgrpids' => array_keys($tag_filters + $db_subgroup_usrgrps),
+		'selectTagFilters' => ['groupid', 'tag', 'value']
+	]);
+
+	foreach ($usrgrps as $usrgrp) {
+		/**
+		 * Create an array of new tag filters for each user group. It contains all subgroups of particular host group,
+		 * as well as other tag filters which are not linked to subgroups of particular host group.
+		 */
+		$new_tag_filters = [];
+
+		if (array_key_exists($usrgrp['usrgrpid'], $tag_filters)) {
+			foreach ($child_groupids as $child_groupid => $val) {
+				foreach ($tag_filters[$usrgrp['usrgrpid']] as $tag_filter) {
+					$new_tag_filters[] = [
+						'groupid' => $child_groupid,
+						'value' => $tag_filter['value'],
+						'tag' => $tag_filter['tag']
+					];
+				}
+			}
+		}
+
+		foreach ($usrgrp['tag_filters'] as $tag_filter) {
+			if (!array_key_exists($tag_filter['groupid'], $child_groupids)) {
+				$new_tag_filters[] = $tag_filter;
+			}
+		}
+
+		// Update User Group.
+		API::UserGroup()->update([
+			'usrgrpid' => $usrgrp['usrgrpid'],
+			'tag_filters' => $new_tag_filters
+		]);
+	}
+}
+
+/**
  * Get sub-groups of elected host groups.
  *
  * @param array $groupids
