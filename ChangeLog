@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+..F....... [ZBX-13300] fixed addJsFile() name (agriscenko)
 .......P.. [ZBX-13030] removed proxy's ability to export unprocessed history data via loadable modules (MVekslers)
 ..FG...PS. [ZBXNEXT-3581] dropped plain text protocol support and made header mandatory; fixed IP fragmentation handling by including header in Zabbix get request, Zabbix server/proxy passive check request and frontend request to Zabbix server (Sasha, vso)
 ........S. [ZBX-13194] fixed incorrect processing of zabbix[wcache,value,*] internal check (Sergejs)
