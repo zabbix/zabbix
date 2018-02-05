@@ -115,10 +115,10 @@ foreach ($data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? (new CLinkAction(_('Enabled'), $statusLink))
+		? (new CLink(_('Enabled'), $statusLink))
 			->addClass(ZBX_STYLE_GREEN)
 			->addSID()
-		: (new CLinkAction(_('Disabled'), $statusLink))
+		: (new CLink(_('Disabled'), $statusLink))
 			->addClass(ZBX_STYLE_RED)
 			->addSID();
 
@@ -129,7 +129,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', $mediaType['mediatypeid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		media_type2str($mediaType['typeid']),
-		$status,
+		$status->addClass(ZBX_STYLE_LINK_ACTION),
 		$actionColumn,
 		$details
 	]);

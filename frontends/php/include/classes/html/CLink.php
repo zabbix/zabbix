@@ -59,7 +59,9 @@ class CLink extends CTag {
 	public function toString($destroy = true) {
 		$url = $this->url;
 
-		$this->setAttribute('role', ($url == null) ? 'button' : 'link');
+		if ($url === null) {
+			$this->setAttribute('role', 'button');
+		}
 
 		if ($this->use_sid) {
 			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
