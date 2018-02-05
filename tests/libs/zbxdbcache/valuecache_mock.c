@@ -773,20 +773,3 @@ void	zbx_vcmock_set_time(zbx_mock_handle_t hitem, const char *key)
 
 	vcmock_time = ts.sec;
 }
-
-/*
- * mock yaml open function to replace stdin with custom file for testing purposes
- */
-#include <yaml.h>
-static FILE	*input_file;
-
-FILE	*__real_fopen (const char *__restrict __filename, const char *__restrict __modes);
-void	__real_yaml_parser_set_input_file(yaml_parser_t *parser, FILE *file);
-
-void	__wrap_yaml_parser_set_input_file(yaml_parser_t *parser, FILE *file)
-{
-	ZBX_UNUSED(file);
-	input_file = file;
-	/* input_file = __real_fopen("/tmp/test.yaml", "r"); */
-	__real_yaml_parser_set_input_file(parser, input_file);
-}
