@@ -52,9 +52,18 @@ jQuery(function($) {
 	/**
 	 * Build menu popup for given elements.
 	 */
-	$(document).on('click', '[data-menu-popup]', function(event) {
+	$(document).on('keydown click', '[data-menu-popup]', function(event) {
 		var obj = $(this),
 			data = obj.data('menu-popup');
+
+		if (event.type === 'keydown') {
+			if (event.which != 13) {
+				return;
+			}
+
+			event.preventDefault();
+			event.target = this;
+		}
 
 		switch (data.type) {
 			case 'history':

@@ -459,10 +459,12 @@ var hintBox = {
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
+			var target = jQuery(this);
+
 			switch (e.type) {
 				case 'mouseenter' :
-					hintBox.showHint(e, this, jQuery('.hint-box', this).html(),
-						jQuery(this).data('hintbox-class'), false, jQuery(this).data('hintbox-style')
+					hintBox.showHint(e, this, jQuery('.hint-box', this).html(), target.data('hintbox-class'), false,
+						target.data('hintbox-style')
 					);
 					break;
 
@@ -475,17 +477,24 @@ var hintBox = {
 					break;
 
 				case 'keydown' :
-					if (e.which == 13) {
-						var offset = jQuery(this).offset();
-						this.clientX = offset.left;
-						this.clientY = offset.top;
+					if (e.which == 13 && target.data('hintbox-static') == 1) {
+						var offset = target.offset(),
+							w = jQuery(window);
+						e.clientX = offset.left - w.scrollLeft();
+						e.clientY = offset.top - w.scrollTop();
+						e.preventDefault();
+
+						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
+							target.data('hintbox-style')
+						);
 					}
+
 					break;
 
 				case 'click' :
-					if (jQuery(this).data('hintbox-static') == '1') {
-						hintBox.showStaticHint(e, this, jQuery(this).data('hintbox-class'), false,
-							jQuery(this).data('hintbox-style')
+					if (target.data('hintbox-static') == 1) {
+						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
+							target.data('hintbox-style')
 						);
 					}
 					break;
