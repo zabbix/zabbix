@@ -457,6 +457,96 @@ static int	DBpatch_3050036(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050037(void)
+{
+	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050038(void)
+{
+	const ZBX_FIELD field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050039(void)
+{
+	const ZBX_FIELD field = {"status_codes", "200", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050040(void)
+{
+	const ZBX_FIELD field = {"follow_redirects", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050041(void)
+{
+	const ZBX_FIELD field = {"post_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050042(void)
+{
+	const ZBX_FIELD field = {"http_proxy", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050043(void)
+{
+	const ZBX_FIELD	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050044(void)
+{
+	const ZBX_FIELD field = {"retrieve_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050045(void)
+{
+	const ZBX_FIELD field = {"request_method", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050046(void)
+{
+	const ZBX_FIELD field = {"output_format", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050047(void)
+{
+	const ZBX_FIELD field = {"ssl_key_password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050048(void)
+{
+	const ZBX_FIELD field = {"verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050049(void)
+{
+	const ZBX_FIELD field = {"verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
 #endif
 
 DBPATCH_START(3050)
@@ -496,5 +586,18 @@ DBPATCH_ADD(3050033, 0, 1)
 DBPATCH_ADD(3050034, 0, 1)
 DBPATCH_ADD(3050035, 0, 1)
 DBPATCH_ADD(3050036, 0, 1)
+DBPATCH_ADD(3050037, 0, 1)
+DBPATCH_ADD(3050038, 0, 1)
+DBPATCH_ADD(3050039, 0, 1)
+DBPATCH_ADD(3050040, 0, 1)
+DBPATCH_ADD(3050041, 0, 1)
+DBPATCH_ADD(3050042, 0, 1)
+DBPATCH_ADD(3050043, 0, 1)
+DBPATCH_ADD(3050044, 0, 1)
+DBPATCH_ADD(3050045, 0, 1)
+DBPATCH_ADD(3050046, 0, 1)
+DBPATCH_ADD(3050047, 0, 1)
+DBPATCH_ADD(3050048, 0, 1)
+DBPATCH_ADD(3050049, 0, 1)
 
 DBPATCH_END()
