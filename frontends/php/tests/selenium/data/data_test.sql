@@ -1442,3 +1442,34 @@ INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (93,0,0,99251,1508761528,128786843,'Test trigger with tag');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
+
+-- Tag based permissions
+INSERT INTO usrgrp (usrgrpid, name) VALUES (90, 'Selenium user group for tag permissions AAA');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (91, 'Selenium user group for tag permissions BBB');
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (90, 'Tag-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (90, 90, 90);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (91, 91, 90);
+-- Tag based permissions: host group, host, item, two triggers
+INSERT INTO groups (groupid, name, internal) VALUES (50004, 'Host group for tag permissions', 0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'Host for tag permissions', 'Host for tag permissions', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90280, 50009, 50004);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 50009, 50022);
+INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, params, description) VALUES (40066, 'tag.item', 'tag.key', 50009, 50022, '30s', 3, '', '');
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100027, 'Trigger for tag permissions MySQL', '{13083}=0', 0, 1, '1339761311', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (100028, 40066, 100027, 'last', '0');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (101, 'Service','MySQL', 100027);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100028, 'Trigger for tag permissions Oracle', '{13083}=0', 0, 1, '1339761311', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (100029, 40066, 100028, 'last', '0');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (102, 'Service','Oracle', 100028);
+-- Tag based permissions: triggers problems events
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (94,0,0,100027,1508751328,128786843,1,'Trigger for tag permissions MySQL');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (94,94,'Service','MySQL');
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (94,0,0,100027,1508751328,128786843,'Trigger for tag permissions MySQL');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (94,94,'Service','MySQL');
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (95,0,0,100028,1508761528,128786843,1,'Trigger for tag permissions Oracle');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (95,95,'Service','Oracle');
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (95,0,0,100028,1508761528,128786843,'Trigger for tag permissions Oracle');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (95,95,'Service','Oracle');
+-- Tag based permissions: Read-write permissions to host group
+INSERT INTO rights (rightid,groupid,permission,id) VALUES (1,90,3,50004);
+INSERT INTO rights (rightid,groupid,permission,id) VALUES (2,91,3,50004);
