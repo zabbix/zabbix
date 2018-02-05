@@ -1111,6 +1111,13 @@ if test "x$ipv6" = "xyes"; then
 	have_ipv6="yes"
 fi
 
+dnl Checking pakage manager support for *BSD
+AC_CHECK_PROG(is_pkg_cfg,pkg-config,yes)
+AS_CASE([$ARCH],[*bsd],
+    AS_IF([test "xyes" != "x$is_pkg_cfg"],[
+	AC_MSG_ERROR([pkg-config not found])
+]))
+
 if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	have_multirow_insert="no"
@@ -1613,6 +1620,11 @@ AS_IF([test "xyes" = "x$svn_ver"],[
 AC_SUBST(ZBX_REV)
 AM_CPPFLAGS="${AM_CPPFLAGS} -D'ZABBIX_VERSION_REVISION='\"${ZBX_REV}\"''"
 AC_SUBST(AM_CPPFLAGS)
+
+dnl Support libs from pakages for netbsd
+AS_IF([test "netbsd" = "$ARCH"],[
+	AS_IF([test -d /usr/pkg/lib], [LDFLAGS="${LDFLAGS} -R/usr/pkg/lib"])
+])
 
 dnl *****************************************************************
 dnl *                                                               *
