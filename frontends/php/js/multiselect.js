@@ -727,8 +727,7 @@ jQuery(function($) {
 				'data-prefix': prefix
 			}));
 
-			var close_btn = $('<a>', {
-				'href': 'javascript:void(0)',
+			var close_btn = $('<span>', {
 				'class': 'subfilter-disable-btn'
 			});
 
