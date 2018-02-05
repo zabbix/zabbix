@@ -505,6 +505,7 @@ class CEvent extends CApiService {
 			$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
+			$accessible_eventids = [];
 			while ($event = DBfetch($res)) {
 				$accessible_eventids[$event['eventid']] = true;
 			}
