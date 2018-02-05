@@ -106,25 +106,24 @@ if ($event['alerts']) {
 }
 
 if ($event['r_eventid'] != 0) {
-	$r_event = DBfetch(DBselect(
-		'SELECT er.userid,er.correlationid'.
-		' FROM event_recovery er'.
-		' WHERE er.r_eventid='.zbx_dbstr($event['r_eventid'])
-	));
+	$r_events = API::Event()->get([
+		'output' => ['correlationid', 'userid'],
+		'select_alerts' => $alert_options,
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
+		'eventids' => [$event['r_eventid']],
+		'objectids' => getRequest('triggerid')
+	]);
 
-	if ($r_event) {
+	if ($r_events) {
+		$r_event = reset($r_events);
+
 		$event['correlationid'] = $r_event['correlationid'];
 		$event['userid'] = $r_event['userid'];
 
-		$alerts = API::Alert()->get([
-			'output' => $alert_options,
-			'selectMediatypes' => ['maxattempts', 'description'],
-			'eventids' => [$event['r_eventid']]
-		]);
-
-		if ($alerts) {
+		if ($r_event['alerts']) {
 			CArrayHelper::sort($r_alerts, [['field' => 'alertid', 'order' => ZBX_SORT_DOWN]]);
-			foreach ($alerts as $alert) {
+			foreach ($r_event['alerts'] as $alert) {
 				if ($alert['p_eventid'] == $event['eventid']) {
 					$r_alerts[] = $alert;
 				}

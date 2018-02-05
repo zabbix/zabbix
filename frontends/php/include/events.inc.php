@@ -297,18 +297,15 @@ function make_small_eventlist($startEvent, $backurl) {
 	}
 	unset($r_eventids[0]);
 
-	$db_r_events = DBselect(
-		'SELECT e.eventid,e.clock,er.userid,er.correlationid'.
-		' FROM events e,event_recovery er'.
-		' WHERE er.r_eventid='.zbx_dbstr($event['r_eventid']).
-			' AND e.eventid=er.r_eventid'
-	);
-
-	$r_events = [];
-
-	while ($db_r_event = DBfetch($db_r_events)) {
-		$r_events[$db_r_event['eventid']] = $db_r_event;
-	}
+	$r_events = $r_eventids
+		? API::Event()->get([
+			'output' => ['clock', 'correlationid', 'userid'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'eventids' => array_keys($r_eventids),
+			'preservekeys' => true
+		])
+		: [];
 
 	foreach ($events as &$event) {
 		if (array_key_exists($event['r_eventid'], $r_events)) {

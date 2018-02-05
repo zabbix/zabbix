@@ -129,6 +129,7 @@ class CEvent extends CApiService {
 		$sqlParts['where'][] = 'e.object='.zbx_dbstr($options['object']);
 
 		// editable + PERMISSION CHECK
+		$fillter_condition = [];
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
@@ -153,8 +154,6 @@ class CEvent extends CApiService {
 
 					list($tag_filters, $full_access_groups)
 							= $this->calculateTagFilterRestriction($user_groups, array_keys($group_triggers));
-
-					$fillter_condition = [];
 
 					// Add condition to select events that must match host group only.
 					if ($full_access_groups) {
@@ -192,10 +191,11 @@ class CEvent extends CApiService {
 						}
 					}
 
-					if ($fillter_condition) {
-						$sqlParts['where'][] = '('.implode(' OR ', $fillter_condition).')';
-					}
-					else {
+					/**
+					 * At this point empty $fillter_condition means that user has no access to any of triggers or host
+					 * groups.
+					 */
+					if (!$fillter_condition) {
 						$options['objectids'] = [];
 					}
 				}
@@ -209,8 +209,6 @@ class CEvent extends CApiService {
 
 					list($tag_filters, $full_access_groups)
 						= $this->calculateTagFilterRestriction($user_groups, array_keys($host_groups));
-
-					$fillter_condition = [];
 
 					if ($host_groups) {
 						$triggers = API::Trigger()->get([
@@ -261,10 +259,11 @@ class CEvent extends CApiService {
 						')';
 					}
 
-					if ($fillter_condition) {
-						$sqlParts['where'][] = '('.implode(' OR ', $fillter_condition).')';
-					}
-					else {
+					/**
+					 * At this point empty $fillter_condition means that user has no access to any of triggers or host
+					 * groups.
+					 */
+					if (!$fillter_condition) {
 						$options['objectids'] = [];
 					}
 				}
@@ -308,12 +307,6 @@ class CEvent extends CApiService {
 							')';
 				}
 			}
-		}
-
-		// eventids
-		if (!is_null($options['eventids'])) {
-			zbx_value2array($options['eventids']);
-			$sqlParts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
 		}
 
 		// objectids
@@ -474,16 +467,6 @@ class CEvent extends CApiService {
 			$sqlParts['where'][] = 'e.clock<='.zbx_dbstr($options['time_till']);
 		}
 
-		// eventid_from
-		if ($options['eventid_from'] !== null) {
-			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
-		}
-
-		// eventid_till
-		if ($options['eventid_till'] !== null) {
-			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
-		}
-
 		// value
 		if (!is_null($options['value'])) {
 			zbx_value2array($options['value']);
@@ -503,6 +486,60 @@ class CEvent extends CApiService {
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
+		}
+
+		/**
+		 * Apply $fillter_condition to select accessible eventids. This should be done separately to get list of
+		 * accessible eventids and create additional condition to include into results not only accessible events but
+		 * also recovery events of accessible events that should not be accessible otherwise due the applied tag
+		 * filters.
+		 */
+		if ($fillter_condition) {
+			// Store current state of $sqlParts for later use.
+			$sql_parts_tmp = $sqlParts;
+
+			// Build version of query to select accessible eventids only.
+			$sqlParts['select'] = ['e.eventid'];
+			$sqlParts['where'][] = '('.implode(' OR ', $fillter_condition).')';
+
+			$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+
+			while ($event = DBfetch($res)) {
+				$accessible_eventids[$event['eventid']] = true;
+			}
+
+			// Set $sql_parts_tmp back to original $sqlParts.
+			$sqlParts = $sql_parts_tmp;
+			unset($sql_parts_tmp);
+
+			if ($accessible_eventids) {
+				$sqlParts['where'][] = '('.
+					dbConditionInt('e.eventid', array_keys($accessible_eventids)).
+					' OR EXISTS ('.
+						' SELECT NULL'.
+						' FROM event_recovery er2'.
+						' WHERE er2.r_eventid=e.eventid'.
+							' AND '.dbConditionInt('er2.eventid', array_keys($accessible_eventids)).
+					')'.
+				')';
+			}
+		}
+
+		// eventids
+		if (!is_null($options['eventids'])) {
+			zbx_value2array($options['eventids']);
+			$sqlParts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
+		}
+
+		// eventid_from
+		if ($options['eventid_from'] !== null) {
+			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
+		}
+
+		// eventid_till
+		if ($options['eventid_till'] !== null) {
+			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
