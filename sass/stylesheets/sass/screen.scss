@@ -3389,13 +3389,9 @@ $form-icon-btn: (
 .calendar {
 	width: 200px;
 
-	.selected {
-		background-color: $ui-bg-selected-color;
-		color: $white;
-
-		&:hover {
-			@extend .selected
-		}
+	.calendar-year.highlighted > span,
+	.calendar-month.highlighted > span {
+		background-color: $action-hover-color;
 	}
 
 	table {
@@ -3411,12 +3407,27 @@ $form-icon-btn: (
 			text-align: center;
 
 			td {
-				padding: 4px;
 				@include transition(background-color .2s ease-out);
 
-				&:hover {
+				&:hover,
+				&.highlighted {
 					background-color: $action-hover-color;
 					cursor: pointer;
+				}
+
+				&.selected {
+					background-color: $ui-bg-selected-color;
+					color: $white;
+
+					&:hover {
+						@extend .selected
+					}
+				}
+
+				span {
+					z-index: -1;
+					padding: 4px;
+					display: block;
 				}
 			}
 		}
