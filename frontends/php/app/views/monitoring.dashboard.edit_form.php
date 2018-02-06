@@ -23,6 +23,7 @@ $this->addJsFile('multiselect.js');
 $this->includeJSfile('app/views/monitoring.dashboard.edit_form.js.php');
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('dashboard_form')
 	->setAttribute('style', 'display: none;');
 
