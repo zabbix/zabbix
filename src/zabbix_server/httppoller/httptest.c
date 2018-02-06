@@ -356,7 +356,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	add_headers(char *headers, struct curl_slist **headers_slist)
+void	add_headers(char *headers, struct curl_slist **headers_slist)
 {
 	char      *p_begin;
 
