@@ -150,10 +150,6 @@ $http_popup_form_list
 		(new CTextBox('status_codes', $options['status_codes']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append tabs to form.
-$http_popup_tab = new CTabView();
-$http_popup_tab->addTab('scenarioStepTab', _('Step of web scenario'), $http_popup_form_list);
-
 $output['buttons'] = [
 	[
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
@@ -166,7 +162,7 @@ $output['buttons'] = [
 	]
 ];
 
-$http_popup_form->addItem($http_popup_tab);
+$http_popup_form->addItem($http_popup_form_list);
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();
