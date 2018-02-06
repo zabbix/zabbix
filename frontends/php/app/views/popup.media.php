@@ -83,7 +83,6 @@ $form = (new CForm())
 	->addVar('type', $options['type'])
 	->addVar('dstfrm', $options['dstfrm'])
 	->setId('media_form')
-	->addItem()
 	->addItem([
 		$media_form,
 		(new CInput('submit', 'submit'))->addStyle('display: none;'),
