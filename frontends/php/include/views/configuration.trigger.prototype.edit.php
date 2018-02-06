@@ -201,8 +201,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 			if ($data['limited']) {
 				// make all links inside inactive
 				foreach ($e['list'] as &$obj) {
-					if (gettype($obj) === 'object' && get_class($obj) === 'CLinkAction'
-							&& $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
+					if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
 						$obj = new CSpan($obj->items);
 					}
 				}
@@ -396,8 +395,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			if ($data['limited']) {
 				// make all links inside inactive
 				foreach ($e['list'] as &$obj) {
-					if (gettype($obj) === 'object' && get_class($obj) === 'CLinkAction'
-							&& $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
+					if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
 						$obj = new CSpan($obj->items);
 					}
 				}
