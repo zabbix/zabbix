@@ -109,6 +109,7 @@ Bug fixes:
 Changes for 3.4.7rc2
 
 Bug fixes:
+....I..... [ZBX-13055] fixed compilation failure in Alpine Linux due to missing res_ninit() function (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.7rc1
