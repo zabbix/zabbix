@@ -2281,6 +2281,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_MASTERITEM	*master;
 	ZBX_DC_PREPROCITEM	*preprocitem;
+	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
 
 	time_t			now;
@@ -2693,6 +2694,51 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
+		/* HTTP(s) check items */
+
+		if (ITEM_TYPE_HTTPCHECK == item->type)
+		{
+			httpitem = (ZBX_DC_HTTPITEM *)DCfind_id(&config->httpitems, itemid, sizeof(ZBX_DC_HTTPITEM),
+					&found);
+
+			DCstrpool_replace(found, &httpitem->timeout, row[39]);
+			DCstrpool_replace(found, &httpitem->url, row[40]);
+			DCstrpool_replace(found, &httpitem->status_codes, row[41]);
+			httpitem->follow_redirects = (unsigned char)atoi(row[42]);
+			httpitem->post_type = (unsigned char)atoi(row[43]);
+			DCstrpool_replace(found, &httpitem->http_proxy, row[44]);
+			DCstrpool_replace(found, &httpitem->headers, row[45]);
+			httpitem->retrieve_mode = (unsigned char)atoi(row[46]);
+			httpitem->request_method = (unsigned char)atoi(row[47]);
+			httpitem->output_format = (unsigned char)atoi(row[48]);
+			DCstrpool_replace(found, &httpitem->ssl_key_password, row[49]);
+			httpitem->verify_peer = (unsigned char)atoi(row[50]);
+			httpitem->verify_host = (unsigned char)atoi(row[51]);
+
+			httpitem->authtype = (unsigned char)atoi(row[19]);
+			DCstrpool_replace(found, &httpitem->username, row[20]);
+			DCstrpool_replace(found, &httpitem->password, row[21]);
+			DCstrpool_replace(found, &httpitem->publickey, row[22]);
+			DCstrpool_replace(found, &httpitem->privatekey, row[23]);
+			DCstrpool_replace(found, &httpitem->params, row[17]);
+		}
+		else if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid)))
+		{
+			zbx_strpool_release(httpitem->timeout);
+			zbx_strpool_release(httpitem->url);
+			zbx_strpool_release(httpitem->status_codes);
+			zbx_strpool_release(httpitem->http_proxy);
+			zbx_strpool_release(httpitem->headers);
+			zbx_strpool_release(httpitem->ssl_key_password);
+			zbx_strpool_release(httpitem->username);
+			zbx_strpool_release(httpitem->password);
+			zbx_strpool_release(httpitem->publickey);
+			zbx_strpool_release(httpitem->privatekey);
+			zbx_strpool_release(httpitem->params);
+
+			zbx_hashset_remove_direct(&config->httpitems, httpitem);
+		}
+
 		/* it is crucial to update type specific (config->snmpitems, config->ipmiitems, etc.) hashsets before */
 		/* attempting to requeue an item because type specific properties are used to arrange items in queues */
 
@@ -2892,6 +2938,27 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid);
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
+		}
+
+		/* HTTP(s) check items */
+
+		if (ITEM_TYPE_HTTPCHECK == item->type)
+		{
+			httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid);
+
+			zbx_strpool_release(httpitem->timeout);
+			zbx_strpool_release(httpitem->url);
+			zbx_strpool_release(httpitem->status_codes);
+			zbx_strpool_release(httpitem->http_proxy);
+			zbx_strpool_release(httpitem->headers);
+			zbx_strpool_release(httpitem->ssl_key_password);
+			zbx_strpool_release(httpitem->username);
+			zbx_strpool_release(httpitem->password);
+			zbx_strpool_release(httpitem->publickey);
+			zbx_strpool_release(httpitem->privatekey);
+			zbx_strpool_release(httpitem->params);
+
+			zbx_hashset_remove_direct(&config->httpitems, httpitem);
 		}
 
 		/* items */
@@ -4909,6 +4976,8 @@ void	DCsync_configuration(unsigned char mode)
 				config->jmxitems.num_data, config->jmxitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
 				config->calcitems.num_data, config->calcitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpitems  : %d (%d slots)", __function_name,
+				config->httpitems.num_data, config->httpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
@@ -5330,6 +5399,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->calcitems, 0);
 	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
+	CREATE_HASHSET(config->httpitems, 0);
 	CREATE_HASHSET(config->functions, 100);
 	CREATE_HASHSET(config->triggers, 100);
 	CREATE_HASHSET(config->trigdeps, 0);
@@ -5802,6 +5872,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_JMXITEM		*jmxitem;
 	const ZBX_DC_CALCITEM		*calcitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
+	const ZBX_DC_HTTPITEM		*httpitem;
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->type = src_item->type;
@@ -5916,6 +5987,61 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->publickey = NULL;
 			dst_item->privatekey = NULL;
 			dst_item->password = NULL;
+			break;
+		case ITEM_TYPE_HTTPCHECK:
+			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->timeout_orig, httpitem->timeout);
+				strscpy(dst_item->url_orig, httpitem->url);
+				strscpy(dst_item->status_codes_orig, httpitem->status_codes);
+				dst_item->follow_redirects = httpitem->follow_redirects;
+				dst_item->post_type = httpitem->post_type;
+				strscpy(dst_item->http_proxy_orig, httpitem->http_proxy);
+				dst_item->headers = zbx_strdup(NULL, httpitem->headers);
+				dst_item->retrieve_mode = httpitem->retrieve_mode;
+				dst_item->request_method = httpitem->request_method;
+				dst_item->output_format = httpitem->output_format;
+				strscpy(dst_item->ssl_key_password_orig, httpitem->ssl_key_password);
+				dst_item->verify_peer = httpitem->verify_peer;
+				dst_item->verify_host = httpitem->verify_host;
+				dst_item->authtype = httpitem->authtype;
+				strscpy(dst_item->username_orig, httpitem->username);
+				strscpy(dst_item->password_orig, httpitem->password);
+				strscpy(dst_item->publickey_orig, httpitem->publickey);
+				strscpy(dst_item->privatekey_orig, httpitem->privatekey);
+				dst_item->params = zbx_strdup(NULL, httpitem->params);
+			}
+			else
+			{
+				*dst_item->timeout_orig = '\0';
+				*dst_item->url_orig = '\0';
+				*dst_item->status_codes_orig = '\0';
+				dst_item->follow_redirects = 0;
+				dst_item->post_type = 0;
+				*dst_item->http_proxy_orig = '\0';
+				dst_item->headers = zbx_strdup(NULL, "");
+				dst_item->retrieve_mode = 0;
+				dst_item->request_method = 0;
+				dst_item->output_format = 0;
+				*dst_item->ssl_key_password_orig = '\0';
+				dst_item->verify_peer = 0;
+				dst_item->verify_host = 0;
+				dst_item->authtype = 0;
+				*dst_item->username_orig = '\0';
+				*dst_item->password_orig = '\0';
+				*dst_item->publickey_orig = '\0';
+				*dst_item->privatekey_orig = '\0';
+				dst_item->params = zbx_strdup(NULL, "");
+			}
+			dst_item->timeout = NULL;
+			dst_item->url = NULL;
+			dst_item->status_codes = NULL;
+			dst_item->http_proxy = NULL;
+			dst_item->ssl_key_password = NULL;
+			dst_item->username = NULL;
+			dst_item->password = NULL;
+			dst_item->publickey = NULL;
+			dst_item->privatekey = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
 			if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &src_item->itemid)))

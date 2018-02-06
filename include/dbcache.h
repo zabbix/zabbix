@@ -156,6 +156,13 @@ typedef struct
 	unsigned char		status;
 	unsigned char		history;
 	unsigned char		trends;
+	unsigned char		follow_redirects;
+	unsigned char		post_type;
+	unsigned char		retrieve_mode;
+	unsigned char		request_method;
+	unsigned char		output_format;
+	unsigned char		verify_peer;
+	unsigned char		verify_host;
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char			*units;
 	char			*delay;
@@ -178,6 +185,12 @@ typedef struct
 	char			password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 	char			snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 	char			jmx_endpoint_orig[ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
+	char			timeout_orig[ITEM_TIMEOUT_LEN_MAX], *timeout;
+	char			url_orig[ITEM_URL_LEN_MAX], *url;
+	char			status_codes_orig[ITEM_STATUS_CODES_LEN_MAX], *status_codes;
+	char			http_proxy_orig[ITEM_HTTP_PROXY_LEN_MAX], *http_proxy;
+	char			*headers;
+	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	char			*error;
 }
 DC_ITEM;
