@@ -383,6 +383,80 @@ static int	DBpatch_3050029(void)
 	return DBpatch_3040006();
 }
 
+static int	DBpatch_3050030(void)
+{
+	const ZBX_FIELD	field = {"custom_color", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050031(void)
+{
+	const ZBX_FIELD	field = {"problem_unack_color", "CC0000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3050032(void)
+{
+	const ZBX_FIELD	field = {"problem_ack_color", "CC0000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3050033(void)
+{
+	const ZBX_FIELD	field = {"ok_unack_color", "009900", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3050034(void)
+{
+	const ZBX_FIELD	field = {"ok_ack_color", "009900", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3050035(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update config"
+		" set custom_color=1"
+		" where problem_unack_color<>'DC0000'"
+			" or problem_ack_color<>'DC0000'"
+			" or ok_unack_color<>'00AA00'"
+			" or ok_ack_color<>'00AA00'");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050036(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update config"
+		" set problem_unack_color='CC0000',"
+			"problem_ack_color='CC0000',"
+			"ok_unack_color='009900',"
+			"ok_ack_color='009900'"
+		" where problem_unack_color='DC0000'"
+			" and problem_ack_color='DC0000'"
+			" and ok_unack_color='00AA00'"
+			" and ok_ack_color='00AA00'");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -415,5 +489,12 @@ DBPATCH_ADD(3050026, 0, 1)
 DBPATCH_ADD(3050027, 0, 1)
 DBPATCH_ADD(3050028, 0, 1)
 DBPATCH_ADD(3050029, 0, 0)
+DBPATCH_ADD(3050030, 0, 1)
+DBPATCH_ADD(3050031, 0, 1)
+DBPATCH_ADD(3050032, 0, 1)
+DBPATCH_ADD(3050033, 0, 1)
+DBPATCH_ADD(3050034, 0, 1)
+DBPATCH_ADD(3050035, 0, 1)
+DBPATCH_ADD(3050036, 0, 1)
 
 DBPATCH_END()

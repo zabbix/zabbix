@@ -109,6 +109,12 @@ $clock-hand-color: #fff;
 $clock-hand-sec-color: #999;
 $clock-lines-color: #888;
 
+// STATUSES
+$problem-unack-fg-color: #ff3333;
+$problem-ack-fg-color: #ff3333;
+$ok-unack-fg-color: #00ff00;
+$ok-ack-fg-color: #00ff00;
+
 
 // Important! @import string should come after variables
 @import 'screen.scss';

@@ -103,6 +103,13 @@ $clock-hand-color: #f2f2f2;
 $clock-hand-sec-color: #69808d;
 $clock-lines-color: #4f4f4f;
 
+// STATUSES
+$problem-unack-fg-color: #ff3333;
+$problem-ack-fg-color: #ff3333;
+$ok-unack-fg-color: #00ff00;
+$ok-ack-fg-color: #00ff00;
+
+
 .top-nav-help {
 	background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important;
 }

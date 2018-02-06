@@ -192,7 +192,7 @@ class CView {
 	 * Add Java Script file required for the view as <script src="..."></script>
 	 * @param string $filename name of java Script file
 	 */
-	public function addJSfile($filename) {
+	public function addJsFile($filename) {
 		$this->jsFiles[] = $filename;
 	}
 

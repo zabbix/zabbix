@@ -149,11 +149,11 @@ char	*CONFIG_SOCKET_PATH		= NULL;
 char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
 
-const char	title_message[] = "";
-const char	*usage_message[] = {NULL};
-const char	*help_message[] = {NULL};
-const char	*progname = NULL;
-const char	syslog_app_name[] = "";
+const char	title_message[] = "mock_title_message";
+const char	*usage_message[] = {"mock_usage_message", NULL};
+const char	*help_message[] = {"mock_help_message", NULL};
+const char	*progname = "mock_progname";
+const char	syslog_app_name[] = "mock_syslog_app_name";
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
