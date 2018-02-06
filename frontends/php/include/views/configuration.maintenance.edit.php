@@ -126,6 +126,7 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 						'"'.$maintenanceForm->getName().'", "del_timeperiodid['.$id.']", "1"'.
 					');')
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId()
 			])
 		))->addClass(ZBX_STYLE_NOWRAP)
 	]);

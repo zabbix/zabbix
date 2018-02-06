@@ -78,6 +78,7 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 				(new CButton('remove', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('remove_mapping')
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')

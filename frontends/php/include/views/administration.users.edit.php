@@ -352,11 +352,13 @@ if ($this->data['is_profile']) {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("javascript: testUserSound('messages_sounds.recovery');"),
+					->onClick("javascript: testUserSound('messages_sounds.recovery');")
+					->removeId(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('stop', _('Stop')))
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->onClick('javascript: AudioControl.stop();')
+					->removeId()
 			]
 		]);
 
@@ -386,11 +388,13 @@ if ($this->data['is_profile']) {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick( "javascript: testUserSound('messages_sounds.".$severity."');"),
+					->onClick("javascript: testUserSound('messages_sounds.".$severity."');")
+					->removeId(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('stop', _('Stop')))
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->onClick('javascript: AudioControl.stop();')
+					->removeId()
 			]
 		]);
 
@@ -424,7 +428,7 @@ if (!$data['is_profile']) {
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
 		$userTypeComboBox->setEnabled(false);
 		$permissionsFormList->addRow(_('User type'), [$userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))]);
-		$userForm->addVar('user_type', $data['user_type']);
+		$userForm->addItem((new CVar('user_type', $data['user_type']))->removeId());
 	}
 	else {
 		$permissionsFormList->addRow(_('User type'), $userTypeComboBox);

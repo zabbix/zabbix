@@ -31,7 +31,7 @@ $widget = (new CWidget())
 	->setTitle(_('Items'))
 	->setControls((new CForm('get'))
 		->cleanItems()
-		->addVar('hostid', $this->data['hostid'])
+		->addItem((new CVar('hostid', $data['hostid']))->removeId())
 		->addItem((new CList())->addItem($create_button))
 	);
 

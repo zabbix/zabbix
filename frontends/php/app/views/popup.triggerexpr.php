@@ -21,11 +21,12 @@
 
 // Create form.
 $expression_form = (new CForm())
+	->cleanItems()
 	->setName('expression')
 	->addVar('action', 'popup.triggerexpr')
 	->addVar('dstfrm', $data['dstfrm'])
 	->addVar('dstfld1', $data['dstfld1'])
-	->addVar('hostid', $data['hostid'])
+	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
 	->addVar('itemid', $data['itemid']);
 
@@ -78,7 +79,8 @@ if ($data['parent_discoveryid'] !== '') {
 				'dstfld2' => 'description',
 				'parent_discoveryid' => $data['parent_discoveryid']
 			]).');'
-		);
+		)
+		->removeId();
 }
 
 $expression_form_list->addRow((new CLabel(_('Item'), 'description'))->setAsteriskMark(), $item);
@@ -149,9 +151,7 @@ $expression_form_list->addRow(
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
-$expression_form->addItem(
-	(new CTabView())->addTab('expressionTab', _('Trigger expression condition'), $expression_form_list)
-);
+$expression_form->addItem((new CDiv($expression_form_list))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 
 $output = [
 	'header' => $data['title'],

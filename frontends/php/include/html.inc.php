@@ -777,6 +777,7 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 		(new CButton())
 			->addClass(ZBX_STYLE_ICON_CAL)
 			->onClick($onClick)
+			->removeId()
 	];
 
 	zbx_add_post_js('create_calendar(null,'.

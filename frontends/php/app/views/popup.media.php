@@ -76,6 +76,7 @@ $media_form = (new CFormList(_('Media')))
 	);
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('media_form')
 	->addVar('action', 'popup.media')
 	->addVar('add', '1')
@@ -83,7 +84,7 @@ $form = (new CForm())
 	->addVar('type', $options['type'])
 	->addVar('dstfrm', $options['dstfrm'])
 	->setId('media_form')
-	->addItem((new CTabView())->addTab('mediaTab', _('Media'), $media_form))
+	->addItem((new CDiv($media_form))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->addItem(
 		(new CTag('script'))
 			->addItem((new CRow([

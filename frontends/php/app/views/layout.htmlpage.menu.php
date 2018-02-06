@@ -18,10 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $icons = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
 		(new CForm('get', 'search.php'))
+			->cleanItems()
 			->addItem([
 				(new CTextBox('search', '', false, 255))
 					->setAttribute('autocomplete', 'off')

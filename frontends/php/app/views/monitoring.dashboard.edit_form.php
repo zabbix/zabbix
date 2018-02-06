@@ -53,6 +53,7 @@ $form->addItem((new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
+			->removeId()
 	)
 );
 

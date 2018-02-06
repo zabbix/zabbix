@@ -24,19 +24,19 @@ $controls = new CList();
 
 if (!$data['templateid']) {
 	$controls->addItem(
-		new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+		(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
 			'screens.php' => _('Screens'),
 			'slides.php' => _('Slide shows')
-		])
+		]))->removeId()
 	);
 }
 
-$controls->addItem(new CSubmit('form', _('Create screen')));
+$controls->addItem((new CSubmit('form', _('Create screen')))->removeId());
 
 $createForm = (new CForm('get'))->cleanItems();
 
 if ($data['templateid']) {
-	$createForm->addVar('templateid', $data['templateid']);
+	$createForm->addItem((new CVar('templateid', $data['templateid']))->removeId());
 	$widget->addItem(get_header_host_table('screens', $data['templateid']));
 }
 else {

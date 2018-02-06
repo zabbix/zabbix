@@ -34,6 +34,7 @@ $authenticationFormList->addRow(_('Default authentication'),
 		->addValue(_('LDAP'), ZBX_AUTH_LDAP, null, 'submit()')
 		->addValue(_('HTTP'), ZBX_AUTH_HTTP, null, 'submit()')
 		->setModern(true)
+		->removeId()
 );
 
 // append LDAP fields to form list

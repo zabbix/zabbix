@@ -133,6 +133,7 @@ foreach ($this->data['children'] as $child) {
 				(new CButton('remove', _('Remove')))
 					->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('children_'.$child['serviceid'])
 	);
@@ -202,6 +203,7 @@ foreach ($this->data['times'] as $serviceTime) {
 			(new CButton('remove', _('Remove')))
 				->onClick('javascript: removeTime(\''.$i.'\');')
 				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	$row->setId('times_'.$i);
@@ -282,12 +284,10 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		->addRow(
 			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
 			(new CDiv(createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')))
-				->setId('new_service_time_from')
 		)
 		->addRow(
 			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
 			(new CDiv(createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')))
-				->setId('new_service_time_to')
 		);
 }
 else {
@@ -333,7 +333,7 @@ else {
 					':',
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$timeFromMinuteTextBox
-			]))->setId('new_service_time_from')
+			]))
 		)
 		->addRow(
 			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
@@ -347,7 +347,7 @@ else {
 				':',
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$timeToMinuteTextBox
-			]))->setId('new_service_time_to')
+			]))
 		);
 	$servicesForm->addVar('new_service_time[note]', '');
 }

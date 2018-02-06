@@ -24,7 +24,11 @@ $widget = (new CWidget())
 		->cleanItems()
 		->addItem((new CList())
 			->addItem(new CSubmit('form', _('Create map')))
-			->addItem((new CButton('form', _('Import')))->onClick('redirect("map.import.php?rules_preset=map")'))
+			->addItem(
+				(new CButton('form', _('Import')))
+					->onClick('redirect("map.import.php?rules_preset=map")')
+					->removeId()
+				)
 		)
 	)
 	->addItem(

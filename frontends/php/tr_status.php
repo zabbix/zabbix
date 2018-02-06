@@ -467,6 +467,7 @@ else {
 }
 
 $form = (new CForm('get', 'zabbix.php'))
+	->cleanItems()
 	->setName('tr_status')
 	->addVar('backurl', $page['file'])
 	->addVar('acknowledge_type', ZBX_ACKNOWLEDGE_PROBLEM);
@@ -746,7 +747,7 @@ $triggerWidget = (new CWidget())
 	->setTitle(_('Triggers'))
 	->setControls(
 		(new CForm('get'))
-			->addVar('fullscreen', $_REQUEST['fullscreen'])
+			->addItem((new CVar('fullscreen', getRequest('fullscreen')))->removeId())
 			->addItem(
 				(new CList())
 					->addItem([

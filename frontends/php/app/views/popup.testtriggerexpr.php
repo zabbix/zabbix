@@ -91,12 +91,11 @@ $output = [
 	'body' => (new CDiv([
 		$data['message'],
 		(new CForm())
+			->cleanItems()
 			->setId('expression_testing_from')
-			->addVar('expression', $data['expression'])
-			->addVar('test_expression', 1)
-			->addItem(
-				(new CTabView())->addTab('test_tab', null, $form_list)
-			)
+			->addItem((new CVar('expression', $data['expression']))->removeId())
+			->addItem((new CVar('test_expression', 1))->removeId())
+			->addItem((new CDiv($form_list))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 		]))->toString(),
 	'buttons' => [
 		[

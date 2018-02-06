@@ -32,34 +32,37 @@ class CTableInfo extends CTable {
 	}
 
 	public function toString($destroy = true) {
-		$tableId = $this->getId();
+		$tableid = $this->getId();
 
-		if(!$tableId) {
-			$tableId = uniqid('t');
-			$this->setId($tableId);
+		if (!$tableid) {
+			$tableid = uniqid('t', true);
+			$this->setId($tableid);
 		}
 
 		$string = parent::toString($destroy);
 
 		if ($this->addMakeVerticalRotationJs) {
 			$string .= get_js(
-				'var makeVerticalRotationForTable = function() {'."\n".
-				'	jQuery("#'.$tableId.'").makeVerticalRotation();'."\n".
-				'}'."\n".
+				'var makeVerticalRotationForTable = function() {'.
+					'jQuery("#'.$tableid.'").makeVerticalRotation();'.
+				'}'.
 				"\n".
-				'if (!jQuery.isReady) {'."\n".
-				'	jQuery(document).ready(makeVerticalRotationForTable);'."\n".
-				'}'."\n".
-				'else {'."\n".
-				'	makeVerticalRotationForTable();'."\n".
+				'if (!jQuery.isReady) {'.
+					'jQuery(document).ready(makeVerticalRotationForTable);'.
+				'}'.
+				'else {'.
+					'makeVerticalRotationForTable();'.
 				'}',
-			true);
+				true
+			);
 		}
+
 		return $string;
 	}
 
 	public function setNoDataMessage($message) {
 		$this->message = $message;
+
 		return $this;
 	}
 
@@ -69,6 +72,7 @@ class CTableInfo extends CTable {
 	 */
 	public function makeVerticalRotation() {
 		$this->addMakeVerticalRotationJs = true;
+
 		return $this;
 	}
 
@@ -78,6 +82,7 @@ class CTableInfo extends CTable {
 			$ret .= $this->prepareRow(new CCol($this->message), ZBX_STYLE_NOTHING_TO_SHOW)->toString();
 		}
 		$ret .= parent::endToString();
+
 		return $ret;
 	}
 }

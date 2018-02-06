@@ -67,11 +67,13 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())
-			->addItem((new CComboBox('config', $config, 'submit();', [
-				QUEUE_OVERVIEW => _('Overview'),
-				QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
-				QUEUE_DETAILS => _('Details')
-			])))
+			->addItem(
+				(new CComboBox('config', $config, 'submit();', [
+					QUEUE_OVERVIEW => _('Overview'),
+					QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
+					QUEUE_DETAILS => _('Details')
+				]))->removeId()
+			)
 		)
 	);
 

@@ -22,7 +22,9 @@
 $output = [];
 
 // Create form.
-$services_form = (new CForm())->setName('services_form');
+$services_form = (new CForm())
+	->cleanItems()
+	->setName('services_form');
 
 if (array_key_exists('service', $data)) {
 	$services_form->addVar('serviceid', $data['service']['serviceid']);

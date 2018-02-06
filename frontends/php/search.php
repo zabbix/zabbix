@@ -137,7 +137,8 @@ $table = (new CTableInfo())
 		_('Graphs'),
 		_('Discovery'),
 		_('Web')
-	]);
+	])
+	->removeId();
 
 foreach ($hosts as $hnum => $host) {
 	$hostid = $host['hostid'];

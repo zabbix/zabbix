@@ -23,7 +23,7 @@ $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
 	->setControls((new CForm('get'))
 		->cleanItems()
-		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+		->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId())
 		->addItem((new CList())->addItem(new CSubmit('form', _('Create item prototype'))))
 	)
 	->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));

@@ -27,11 +27,12 @@ $output = [
 $options = $data['options'];
 
 $http_popup_form = (new CForm())
+	->cleanItems()
 	->setId('http_step')
 	->addVar('dstfrm', $options['dstfrm'])
 	->addVar('stepid', $options['stepid'])
 	->addVar('list_name', $options['list_name'])
-	->addVar('templated', $options['templated'])
+	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
 	->addVar('action', 'popup.httpstep');
@@ -42,6 +43,7 @@ $http_popup_form_list = (new CFormList())
 		(new CTextBox('name', $options['name'], (bool) $options['templated'], 64))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->removeId()
 	)
 	->addRow(
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
@@ -149,10 +151,6 @@ $http_popup_form_list
 		(new CTextBox('status_codes', $options['status_codes']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append tabs to form.
-$http_popup_tab = new CTabView();
-$http_popup_tab->addTab('scenarioStepTab', _('Step of web scenario'), $http_popup_form_list);
-
 $output['buttons'] = [
 	[
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
@@ -164,7 +162,7 @@ $output['buttons'] = [
 	]
 ];
 
-$http_popup_form->addItem($http_popup_tab);
+$http_popup_form->addItem((new CDiv($http_popup_form_list))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();

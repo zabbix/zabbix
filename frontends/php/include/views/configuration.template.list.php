@@ -34,6 +34,7 @@ $widget = (new CWidget())
 				->addItem(
 					(new CButton('form', _('Import')))
 						->onClick('redirect("conf.import.php?rules_preset=template")')
+						->removeId()
 				)
 		)
 	)
