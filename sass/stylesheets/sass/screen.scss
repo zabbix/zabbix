@@ -1209,6 +1209,17 @@ footer {
 		min-height: 20px;
 	}
 
+	&.search-disabled {
+		input[type="text"] {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 1px;
+			padding: 0;
+			margin: 0;
+		}
+	}
+
 	.multiselect-list {
 		padding-left: 2px;
 		padding-bottom: 2px;
