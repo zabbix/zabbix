@@ -743,7 +743,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	// Don't focus element in overlay, if the button is already focused.
-	overlayDialogueOnLoad(!button_focused, jQuery('[data-dialogueid="'+params.dialogueid+'"]').not('.overlay-bg'));
+	overlayDialogueOnLoad(!button_focused, jQuery('.overlay-dialogue[data-dialogueid="'+params.dialogueid+'"]'));
 }
 
 /**
