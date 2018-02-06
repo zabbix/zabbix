@@ -188,6 +188,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_CALCULATED:
+		case ITEM_TYPE_HTTPCHECK:
 			if (0 == CONFIG_POLLER_FORKS)
 				break;
 
@@ -6133,6 +6134,9 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 
 		switch (items[i].type)
 		{
+			case ITEM_TYPE_HTTPCHECK:
+				zbx_free(items[i].headers);
+				/* break; is not missing here */
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:

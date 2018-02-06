@@ -40,6 +40,7 @@
 #include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"
+#include "checks_http.h"
 #include "../../libs/zbxcrypto/tls.h"
 
 extern unsigned char	process_type, program_type;
@@ -391,6 +392,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
+			break;
+		case ITEM_TYPE_HTTPCHECK:
+#ifdef HAVE_LIBCURL
+			res = get_value_http(item, result);
+#else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTP(s) checks was not compiled in."));
+			res = CONFIG_ERROR;
+#endif
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
