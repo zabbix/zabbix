@@ -178,6 +178,112 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 	return SUCCEED;
 }
 
+static int	prepare_auth(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *result)
+{
+	if (HTTPTEST_AUTH_NONE != item->authtype)
+	{
+		long		curlauth = 0;
+		char		auth[MAX_STRING_LEN];
+		CURLcode	err;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "setting HTTPAUTH [%d]", item->authtype);
+
+		switch (item->authtype)
+		{
+			case HTTPTEST_AUTH_BASIC:
+				curlauth = CURLAUTH_BASIC;
+				break;
+			case HTTPTEST_AUTH_NTLM:
+				curlauth = CURLAUTH_NTLM;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				break;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set HTTP server authentication method: %s",
+					curl_easy_strerror(err)));
+			return FAIL;
+		}
+
+		zbx_snprintf(auth, sizeof(auth), "%s:%s", item->username, item->password);
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set user name and password: %s",
+					curl_easy_strerror(err)));
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	prepare_request(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *result)
+{
+	CURLcode	err;
+
+	switch (item->request_method)
+	{
+		case HTTP_CHECK_POST:
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
+						curl_easy_strerror(err)));
+				return FAIL;
+			}
+			break;
+		case HTTP_CHECK_GET:
+			if ('\0' == *item->params)
+				return SUCCEED;
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
+						curl_easy_strerror(err)));
+				return FAIL;
+			}
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CUSTOMREQUEST, "GET")))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify custom GET request: %s",
+						curl_easy_strerror(err)));
+				return FAIL;
+			}
+			break;
+		case HTTP_CHECK_HEAD:
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1L)))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify HEAD request: %s",
+						curl_easy_strerror(err)));
+				return FAIL;
+			}
+			break;
+		case HTTP_CHECK_PUT:
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
+						curl_easy_strerror(err)));
+				return FAIL;
+			}
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CUSTOMREQUEST, "PUT")))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify custom GET request: %s",
+						curl_easy_strerror(err)));
+				return FAIL;
+			}
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported request method"));
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char		*__function_name = "get_value_http";
@@ -199,12 +305,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set error buffer: %s", curl_easy_strerror(err)));
-		goto clean;
-	}
-
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set header function: %s", curl_easy_strerror(err)));
@@ -223,14 +323,17 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set error buffer: %s", curl_easy_strerror(err)));
+		goto clean;
+	}
+
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, item->http_proxy)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set proxy: %s", curl_easy_strerror(err)));
 		goto clean;
 	}
-
-	if (SUCCEED != prepare_https(easyhandle, item, result))
-		goto clean;
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION,
 			0 == item->follow_redirects ? 0L : 1L)))
@@ -239,113 +342,11 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (0 != item->follow_redirects)
+	if (0 != item->follow_redirects &&
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS, ZBX_CURLOPT_MAXREDIRS)))
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS, ZBX_CURLOPT_MAXREDIRS)))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set number of redirects allowed: %s",
-					curl_easy_strerror(err)));
-			goto clean;
-		}
-	}
-
-	if (HTTPTEST_AUTH_NONE != item->authtype)
-	{
-		long		curlauth = 0;
-		char		auth[MAX_STRING_LEN];
-
-		zabbix_log(LOG_LEVEL_DEBUG, "setting HTTPAUTH [%d]", item->authtype);
-
-		switch (item->authtype)
-		{
-			case HTTPTEST_AUTH_BASIC:
-				curlauth = CURLAUTH_BASIC;
-				break;
-			case HTTPTEST_AUTH_NTLM:
-				curlauth = CURLAUTH_NTLM;
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				break;
-		}
-
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set HTTP server authentication method: %s",
-					curl_easy_strerror(err)));
-			goto clean;
-		}
-
-		zbx_snprintf(auth, sizeof(auth), "%s:%s", item->username, item->password);
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set user name and password: %s",
-					curl_easy_strerror(err)));
-			goto clean;
-		}
-	}
-
-	switch (item->request_method)
-	{
-		case HTTP_CHECK_POST:
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
-						curl_easy_strerror(err)));
-				goto clean;
-			}
-			break;
-		case HTTP_CHECK_GET:
-			if ('\0' == *item->params)
-				break;
-
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
-						curl_easy_strerror(err)));
-				goto clean;
-			}
-
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CUSTOMREQUEST, "GET")))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify custom GET request: %s",
-						curl_easy_strerror(err)));
-				goto clean;
-			}
-			break;
-		case HTTP_CHECK_HEAD:
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1L)))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify HEAD request: %s",
-						curl_easy_strerror(err)));
-				goto clean;
-			}
-			break;
-		case HTTP_CHECK_PUT:
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
-						curl_easy_strerror(err)));
-				goto clean;
-			}
-
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CUSTOMREQUEST, "PUT")))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify custom GET request: %s",
-						curl_easy_strerror(err)));
-				goto clean;
-			}
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported request method"));
-			goto clean;
-	}
-
-	add_headers(item->headers, &headers_slist);
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set number of redirects allowed: %s",
+				curl_easy_strerror(err)));
 		goto clean;
 	}
 
@@ -361,9 +362,25 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, item->url)))
+	if (SUCCEED != prepare_https(easyhandle, item, result))
+		goto clean;
+
+	if (SUCCEED != prepare_auth(easyhandle, item, result))
+		goto clean;
+
+	if (SUCCEED != prepare_request(easyhandle, item, result))
+		goto clean;
+
+	add_headers(item->headers, &headers_slist);
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err)));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, item->url)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err)));
 		goto clean;
 	}
 
@@ -372,8 +389,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s", curl_easy_strerror(err)));
 		goto clean;
 	}
-
-	zabbix_log(LOG_LEVEL_TRACE, "received body '%s'", page.data);
 
 	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &response_code)))
 	{
@@ -388,6 +403,10 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
+	if (NULL == page.data)
+		page.data = zbx_strdup(NULL, "");
+
+	zabbix_log(LOG_LEVEL_TRACE, "received body '%s'", page.data);
 	SET_TEXT_RESULT(result, page.data);
 	page.data = NULL;
 	ret = SUCCEED;
