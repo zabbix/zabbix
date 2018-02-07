@@ -27,6 +27,10 @@ extern void	add_headers(char *headers, struct curl_slist **headers_slist);
 #define HTTP_CHECK_PUT	2
 #define HTTP_CHECK_HEAD	3
 
+#define HTTP_RETRIEVE_MODE_BODY	0
+#define HTTP_RETRIEVE_MODE_HEADER 1
+#define HTTP_RETRIEVE_MODE_HEADER_BODY 2
+
 extern char	*CONFIG_SOURCE_IP;
 
 extern char	*CONFIG_SSL_CA_LOCATION;
@@ -69,7 +73,7 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	return r_size;
 }
 
-static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	ZBX_UNUSED(ptr);
 	ZBX_UNUSED(userdata);
@@ -99,8 +103,8 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify source interface for outgoing traffic:"
-					" %s", curl_easy_strerror(err)));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify source interface for outgoing"
+					" traffic: %s", curl_easy_strerror(err)));
 			return FAIL;
 		}
 	}
@@ -134,8 +138,8 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERTTYPE, "PEM")))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify type of the client SSL certificate: %s",
-					curl_easy_strerror(err)));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify type of the client SSL certificate:"
+					" %s", curl_easy_strerror(err)));
 			return FAIL;
 		}
 	}
@@ -152,8 +156,8 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 
 		if (CURLE_OK != err)
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify private keyfile for TLS and SSL client cert: %s",
-					curl_easy_strerror(err)));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify private keyfile for TLS and"
+					" SSL client cert: %s", curl_easy_strerror(err)));
 			return FAIL;
 		}
 
@@ -293,7 +297,9 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	int			ret = NOTSUPPORTED, timeout_seconds;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
-	zbx_httppage_t		page = {0};
+	zbx_httppage_t		body = {0}, header = {0};
+	size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
+	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request '%s' url '%s'", __function_name,
 			zbx_request_string(item->request_method),item->url);
@@ -305,19 +311,47 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)))
+	switch (item->retrieve_mode)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set header function: %s", curl_easy_strerror(err)));
+		case HTTP_RETRIEVE_MODE_BODY:
+			curl_header_cb = curl_ignore_cb;
+			curl_body_cb = curl_write_cb;
+			break;
+		case HTTP_RETRIEVE_MODE_HEADER:
+			curl_header_cb = curl_write_cb;
+			curl_body_cb = curl_ignore_cb;
+			break;
+		case HTTP_RETRIEVE_MODE_HEADER_BODY:
+			curl_header_cb = curl_write_cb;
+			curl_body_cb = curl_write_cb;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid retrieve mode"));
+			goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, curl_header_cb)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set header function: %s",
+				curl_easy_strerror(err)));
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_write_cb)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERDATA, &header)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set header callback: %s",
+				curl_easy_strerror(err)));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_body_cb)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set write function: %s", curl_easy_strerror(err)));
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &page)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &body)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set write callback: %s", curl_easy_strerror(err)));
 		goto clean;
@@ -403,19 +437,39 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (NULL == page.data)
-		page.data = zbx_strdup(NULL, "");
+	switch (item->retrieve_mode)
+	{
+		case HTTP_RETRIEVE_MODE_BODY:
+			if (NULL == body.data)
+				body.data = zbx_strdup(NULL, "");
 
-	zabbix_log(LOG_LEVEL_TRACE, "received body '%s'", page.data);
-	SET_TEXT_RESULT(result, page.data);
-	page.data = NULL;
+			zabbix_log(LOG_LEVEL_TRACE, "received body '%s'", body.data);
+			SET_TEXT_RESULT(result, body.data);
+			body.data = NULL;
+			break;
+		case HTTP_RETRIEVE_MODE_HEADER:
+			if (NULL == header.data)
+				header.data = zbx_strdup(NULL, "");
+
+			zabbix_log(LOG_LEVEL_TRACE, "received header '%s'", header.data);
+			SET_TEXT_RESULT(result, header.data);
+			header.data = NULL;
+			break;
+		case HTTP_RETRIEVE_MODE_HEADER_BODY:
+			zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data, body.offset);
+			zabbix_log(LOG_LEVEL_TRACE, "received response '%s'", header.data);
+			SET_TEXT_RESULT(result, header.data);
+			header.data = NULL;
+			break;
+	}
+
 	ret = SUCCEED;
 clean:
 	if (NULL != headers_slist)
 		curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
 	curl_easy_cleanup(easyhandle);
-	zbx_free(page.data);
-
+	zbx_free(body.data);
+	zbx_free(header.data);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
