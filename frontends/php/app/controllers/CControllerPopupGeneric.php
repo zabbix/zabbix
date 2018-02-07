@@ -111,7 +111,11 @@ class CControllerPopupGeneric extends CController {
 			'proxies' => [
 				'title' => _('Proxies'),
 				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'hostid,host',
+				'allowed_src_fields' => 'proxyid,host',
+				'form' => [
+					'name' => 'proxiesform',
+					'id' => 'proxies'
+				],
 				'table_columns' => [
 					_('Name')
 				]
@@ -992,7 +996,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'proxies':
 				$options = [
-					'output' => ['hostid', 'host'],
+					'output' => ['proxyid', 'host'],
 					'preservekeys' => true
 				];
 
@@ -1002,6 +1006,7 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::Proxy()->get($options);
 				CArrayHelper::sort($records, ['host']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id', 'host' => 'name']);
 				break;
 
 			case 'scripts':

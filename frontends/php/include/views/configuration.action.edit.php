@@ -296,23 +296,21 @@ switch ($data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_PROXY:
-		$action_tab->addItem(new CVar('new_condition[value]', '0'));
-		$condition = [
-			(new CTextBox('proxy', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('btn1', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
-						'srctbl' => 'proxies',
-						'srcfld1' => 'hostid',
-						'srcfld2' => 'host',
-						'dstfrm' => $actionForm->getName(),
-						'dstfld1' => 'new_condition_value',
-						'dstfld2' => 'proxy'
-					]).');'
-				)
-		];
+		$condition = (new CMultiSelect([
+			'name' => 'new_condition[value]',
+			'objectName' => 'proxies',
+			'selectedLimit' => 1,
+			'defaultValue' => 0,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'proxies',
+					'srcfld1' => 'proxyid',
+					'srcfld2' => 'host',
+					'dstfrm' => $actionForm->getName(),
+					'dstfld1' => 'new_condition_value'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DHOST_IP:
