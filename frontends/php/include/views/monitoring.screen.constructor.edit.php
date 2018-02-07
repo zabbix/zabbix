@@ -269,6 +269,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
 					'only_hostid' => $data['screen']['templateid'],
+					'with_webitems' => '1',
 					'numeric' => '1'
 				]).', null, this);'
 			);
@@ -286,6 +287,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'dstfld2' => 'caption',
 					'real_hosts' => '1',
 					'with_simple_graph_items' => '1',
+					'with_webitems' => '1',
 					'numeric' => '1'
 				]).', null, this);'
 			);
@@ -451,6 +453,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
+					'with_webitems' => '1',
 					'only_hostid' => $data['screen']['templateid']
 				]).', null, this);'
 			);
@@ -466,6 +469,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
+					'with_webitems' => '1',
 					'real_hosts' => '1'
 				]).', null, this);'
 			);
@@ -773,6 +777,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'dstfld1' => 'resourceid',
 						'dstfld2' => 'caption',
 						'templated_hosts' => '1',
+						'with_webitems' => '1',
 						'only_hostid' => $data['screen']['templateid']
 					]).', null, this);'
 				);
@@ -788,6 +793,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
 						'dstfld2' => 'caption',
+						'with_webitems' => '1',
 						'real_hosts' => '1'
 					]).', null, this);'
 				);

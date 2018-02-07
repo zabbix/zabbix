@@ -563,7 +563,7 @@ class CControllerPopupGeneric extends CController {
 			'dstfld1' => $this->getInput('dstfld1', ''),
 			'dstfld2' => $this->getInput('dstfld2', ''),
 			'dstfld3' => $this->getInput('dstfld3', ''),
-			'dstfrm' => $this->getInput('dstfrm'),
+			'dstfrm' => $this->getInput('dstfrm', ''),
 			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
 			'excludeids' => $excludeids,

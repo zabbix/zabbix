@@ -136,7 +136,8 @@ $form->addItem(
 						'srcfld2' => 'name',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'itemid',
-						'dstfld2' => 'item'
+						'dstfld2' => 'item',
+						'with_webitems' => '1'
 					]).', null, this);'
 				)
 		])

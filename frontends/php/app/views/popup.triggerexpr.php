@@ -45,6 +45,7 @@ $popup_options = [
 	'dstfrm' => $expression_form->getName(),
 	'dstfld1' => 'itemid',
 	'dstfld2' => 'description',
+	'with_webitems' => '1',
 	'writeonly' => '1'
 ];
 if ($data['groupid'] && $data['hostid']) {

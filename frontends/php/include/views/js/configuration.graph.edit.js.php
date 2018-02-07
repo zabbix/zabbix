@@ -188,6 +188,7 @@
 				dstfld1: 'items_' + i + '_itemid',
 				dstfld2: 'items_' + i + '_name',
 				numeric: 1,
+				with_webitems: 1,
 				writeonly: 1
 			};
 			if (jQuery('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
