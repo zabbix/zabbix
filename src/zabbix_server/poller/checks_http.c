@@ -60,21 +60,13 @@ static const char	*zbx_request_string(int result)
 	}
 }
 
-static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t	r_size = size * nmemb;
 
 	ZBX_UNUSED(userdata);
 
-	/* first piece of data */
-	if (NULL == page.data)
-	{
-		page.allocated = MAX(8096, r_size);
-		page.offset = 0;
-		page.data = (char *)zbx_malloc(page.data, page.allocated);
-	}
-
-	zbx_strncpy_alloc(&page.data, &page.allocated, &page.offset, (char *)ptr, r_size);
+	zbx_strncpy_alloc(&page.data, &page.allocated, &page.offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
@@ -208,7 +200,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, item->http_proxy)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
@@ -379,6 +371,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	SET_TEXT_RESULT(result, page.data);
+	page.data = NULL;
 	ret = SUCCEED;
 clean:
 	if (NULL != headers_slist)
