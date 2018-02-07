@@ -278,7 +278,7 @@ jQuery(function($) {
 					var search = input.val();
 
 					// Replace trailing slashes to check if search term contains anything else.
-					if (!empty(search) && getSearchFieldVisibility(obj) == true) {
+					if (!empty(search)) {
 						if (input.data('lastSearch') != search) {
 							if (!values.isWaiting) {
 								values.isWaiting = true;
@@ -493,9 +493,8 @@ jQuery(function($) {
 					}
 				})
 				.focusin(function() {
-					if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-						$(obj).addClass('active');
-					}
+					$(obj).addClass('active');
+
 					if (getSearchFieldVisibility(obj) == false) {
 						$('.selected li:first-child', obj).addClass('selected');
 					}
