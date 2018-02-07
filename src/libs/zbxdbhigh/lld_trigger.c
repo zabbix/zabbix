@@ -2131,13 +2131,9 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
 		zbx_free(field_utf8);
 	}
 	else if ((field_len = zbx_strlen_utf8(field)) > field_len_max)
-	{
 		*error = zbx_strdcatf(*error, "Cannot create trigger tag: value \"%s\" is too long.\n", field);
-	}
 	else if (0 != (flag & ZBX_FLAG_LLD_TAG_UPDATE_TAG) && 0 == field_len)
-	{
 		*error = zbx_strdcatf(*error, "Cannot create trigger tag: empty tag name.\n");
-	}
 	else
 		return;
 
