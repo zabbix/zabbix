@@ -77,21 +77,21 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 	return size * nmemb;
 }
 
-static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, char **error)
+static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *result)
 {
 	CURLcode	err;
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0 == item->verify_peer ? 0L : 1L)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set verify the peer's SSL certificate: %s",
-				curl_easy_strerror(err));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set verify the peer's SSL certificate: %s",
+				curl_easy_strerror(err)));
 		return FAIL;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0 == item->verify_host ? 0L : 2L)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set verify the certificate's name against host: %s",
-				curl_easy_strerror(err));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set verify the certificate's name against host: %s",
+				curl_easy_strerror(err)));
 		return FAIL;
 	}
 
@@ -99,8 +99,8 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, char **error)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
 		{
-			*error = zbx_dsprintf(*error, "Cannot specify source interface for outgoing traffic: %s",
-					curl_easy_strerror(err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify source interface for outgoing traffic:"
+					" %s", curl_easy_strerror(err)));
 			return FAIL;
 		}
 	}
@@ -109,8 +109,8 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, char **error)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
 		{
-			*error = zbx_dsprintf(*error, "Cannot specify directory holding CA certificates: %s",
-					curl_easy_strerror(err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify directory holding CA certificates: %s",
+					curl_easy_strerror(err)));
 			return FAIL;
 		}
 	}
@@ -127,14 +127,15 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, char **error)
 
 		if (CURLE_OK != err)
 		{
-			*error = zbx_dsprintf(*error, "Cannot set SSL client certificate: %s", curl_easy_strerror(err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set SSL client certificate: %s",
+					curl_easy_strerror(err)));
 			return FAIL;
 		}
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERTTYPE, "PEM")))
 		{
-			*error = zbx_dsprintf(*error, "Cannot specify type of the client SSL certificate: %s",
-					curl_easy_strerror(err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify type of the client SSL certificate: %s",
+					curl_easy_strerror(err)));
 			return FAIL;
 		}
 	}
@@ -151,15 +152,15 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, char **error)
 
 		if (CURLE_OK != err)
 		{
-			*error = zbx_dsprintf(*error, "Cannot specify private keyfile for TLS and SSL client cert: %s",
-					curl_easy_strerror(err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify private keyfile for TLS and SSL client cert: %s",
+					curl_easy_strerror(err)));
 			return FAIL;
 		}
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")))
 		{
-			*error = zbx_dsprintf(*error, "Cannot set type of the private key file: %s",
-					curl_easy_strerror(err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set type of the private key file: %s",
+					curl_easy_strerror(err)));
 			return FAIL;
 		}
 	}
@@ -168,8 +169,8 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, char **error)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD, item->ssl_key_password)))
 		{
-			*error = zbx_dsprintf(*error, "Cannot set passphrase to private key: %s",
-					curl_easy_strerror(err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set passphrase to private key: %s",
+					curl_easy_strerror(err)));
 			return FAIL;
 		}
 	}
@@ -180,9 +181,9 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, char **error)
 int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char		*__function_name = "get_value_http";
-	CURL			*easyhandle = NULL;
+	CURL			*easyhandle;
 	CURLcode		err;
-	char			errbuf[CURL_ERROR_SIZE], *error = NULL;
+	char			errbuf[CURL_ERROR_SIZE];
 	int			ret = NOTSUPPORTED, timeout_seconds;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
@@ -228,11 +229,8 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (SUCCEED != prepare_https(easyhandle, item, &error))
-	{
-		SET_MSG_RESULT(result, error);
+	if (SUCCEED != prepare_https(easyhandle, item, result))
 		goto clean;
-	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION,
 			0 == item->follow_redirects ? 0L : 1L)))
