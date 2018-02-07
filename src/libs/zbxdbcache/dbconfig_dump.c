@@ -427,11 +427,12 @@ static void	DCdump_sshitem(const ZBX_DC_SSHITEM *sshitem)
 
 static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "http:[url:'%s']", httpitem->url);
-	zabbix_log(LOG_LEVEL_TRACE, "http:[headers:'%s']", httpitem->headers);
-	zabbix_log(LOG_LEVEL_TRACE, "http:[body:'%s']", httpitem->params);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[url:'%s']", httpitem->url);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[query fields:'%s']", httpitem->query_fields);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[headers:'%s']", httpitem->headers);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[posts:'%s']", httpitem->posts);
 
-	zabbix_log(LOG_LEVEL_TRACE, "http:[timeout:'%s' status codes:'%s' follow redirects:%u post type:%u"
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[timeout:'%s' status codes:'%s' follow redirects:%u post type:%u"
 			" http proxy:'%s' retrieve mode:%u request method:%u output format:%u]",
 			httpitem->timeout, httpitem->status_codes, httpitem->follow_redirects, httpitem->post_type,
 			httpitem->http_proxy, httpitem->retrieve_mode, httpitem->request_method,
@@ -440,7 +441,7 @@ static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[username:'%s' password:'%s' authtype:%u]",
 			httpitem->username, httpitem->password, httpitem->authtype);
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[publickey:'%s' privatekey:'%s' ssl key password:'%s' verify peer:%u"
-			" verify host:%u]", httpitem->publickey, httpitem->privatekey, httpitem->ssl_key_password,
+			" verify host:%u]", httpitem->ssl_cert_file, httpitem->ssl_key_file, httpitem->ssl_key_password,
 			httpitem->verify_peer, httpitem->verify_host);
 }
 

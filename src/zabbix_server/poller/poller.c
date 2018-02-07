@@ -565,13 +565,14 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_HTTPCHECK:
 				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
 				ZBX_STRDUP(items[i].url, items[i].url_orig);
+				ZBX_STRDUP(items[i].query_fields, items[i].query_fields_orig);
 				ZBX_STRDUP(items[i].status_codes, items[i].status_codes_orig);
 				ZBX_STRDUP(items[i].http_proxy, items[i].http_proxy_orig);
+				ZBX_STRDUP(items[i].ssl_cert_file, items[i].ssl_cert_file_orig);
+				ZBX_STRDUP(items[i].ssl_key_file, items[i].ssl_key_file_orig);
 				ZBX_STRDUP(items[i].ssl_key_password, items[i].ssl_key_password_orig);
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
-				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
-				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 				break;
 		}
 	}
@@ -715,10 +716,15 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_HTTPCHECK:
 				zbx_free(items[i].timeout);
 				zbx_free(items[i].url);
+				zbx_free(items[i].query_fields);
 				zbx_free(items[i].status_codes);
 				zbx_free(items[i].http_proxy);
+				zbx_free(items[i].ssl_cert_file);
+				zbx_free(items[i].ssl_key_file);
 				zbx_free(items[i].ssl_key_password);
-				/* break; is not missing here */
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
+				break;
 			case ITEM_TYPE_SSH:
 				zbx_free(items[i].publickey);
 				zbx_free(items[i].privatekey);

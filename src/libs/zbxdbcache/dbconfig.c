@@ -2704,38 +2704,40 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			DCstrpool_replace(found, &httpitem->timeout, row[39]);
 			DCstrpool_replace(found, &httpitem->url, row[40]);
-			DCstrpool_replace(found, &httpitem->status_codes, row[41]);
-			httpitem->follow_redirects = (unsigned char)atoi(row[42]);
-			httpitem->post_type = (unsigned char)atoi(row[43]);
-			DCstrpool_replace(found, &httpitem->http_proxy, row[44]);
-			DCstrpool_replace(found, &httpitem->headers, row[45]);
-			httpitem->retrieve_mode = (unsigned char)atoi(row[46]);
-			httpitem->request_method = (unsigned char)atoi(row[47]);
-			httpitem->output_format = (unsigned char)atoi(row[48]);
-			DCstrpool_replace(found, &httpitem->ssl_key_password, row[49]);
-			httpitem->verify_peer = (unsigned char)atoi(row[50]);
-			httpitem->verify_host = (unsigned char)atoi(row[51]);
+			DCstrpool_replace(found, &httpitem->query_fields, row[41]);
+			DCstrpool_replace(found, &httpitem->posts, row[42]);
+			DCstrpool_replace(found, &httpitem->status_codes, row[43]);
+			httpitem->follow_redirects = (unsigned char)atoi(row[44]);
+			httpitem->post_type = (unsigned char)atoi(row[45]);
+			DCstrpool_replace(found, &httpitem->http_proxy, row[46]);
+			DCstrpool_replace(found, &httpitem->headers, row[47]);
+			httpitem->retrieve_mode = (unsigned char)atoi(row[48]);
+			httpitem->request_method = (unsigned char)atoi(row[49]);
+			httpitem->output_format = (unsigned char)atoi(row[50]);
+			DCstrpool_replace(found, &httpitem->ssl_cert_file, row[51]);
+			DCstrpool_replace(found, &httpitem->ssl_key_file, row[52]);
+			DCstrpool_replace(found, &httpitem->ssl_key_password, row[53]);
+			httpitem->verify_peer = (unsigned char)atoi(row[54]);
+			httpitem->verify_host = (unsigned char)atoi(row[55]);
 
 			httpitem->authtype = (unsigned char)atoi(row[19]);
 			DCstrpool_replace(found, &httpitem->username, row[20]);
 			DCstrpool_replace(found, &httpitem->password, row[21]);
-			DCstrpool_replace(found, &httpitem->publickey, row[22]);
-			DCstrpool_replace(found, &httpitem->privatekey, row[23]);
-			DCstrpool_replace(found, &httpitem->params, row[17]);
 		}
 		else if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid)))
 		{
 			zbx_strpool_release(httpitem->timeout);
 			zbx_strpool_release(httpitem->url);
+			zbx_strpool_release(httpitem->query_fields);
+			zbx_strpool_release(httpitem->posts);
 			zbx_strpool_release(httpitem->status_codes);
 			zbx_strpool_release(httpitem->http_proxy);
 			zbx_strpool_release(httpitem->headers);
+			zbx_strpool_release(httpitem->ssl_cert_file);
+			zbx_strpool_release(httpitem->ssl_key_file);
 			zbx_strpool_release(httpitem->ssl_key_password);
 			zbx_strpool_release(httpitem->username);
 			zbx_strpool_release(httpitem->password);
-			zbx_strpool_release(httpitem->publickey);
-			zbx_strpool_release(httpitem->privatekey);
-			zbx_strpool_release(httpitem->params);
 
 			zbx_hashset_remove_direct(&config->httpitems, httpitem);
 		}
@@ -2949,15 +2951,16 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_strpool_release(httpitem->timeout);
 			zbx_strpool_release(httpitem->url);
+			zbx_strpool_release(httpitem->query_fields);
+			zbx_strpool_release(httpitem->posts);
 			zbx_strpool_release(httpitem->status_codes);
 			zbx_strpool_release(httpitem->http_proxy);
 			zbx_strpool_release(httpitem->headers);
+			zbx_strpool_release(httpitem->ssl_cert_file);
+			zbx_strpool_release(httpitem->ssl_key_file);
 			zbx_strpool_release(httpitem->ssl_key_password);
 			zbx_strpool_release(httpitem->username);
 			zbx_strpool_release(httpitem->password);
-			zbx_strpool_release(httpitem->publickey);
-			zbx_strpool_release(httpitem->privatekey);
-			zbx_strpool_release(httpitem->params);
 
 			zbx_hashset_remove_direct(&config->httpitems, httpitem);
 		}
@@ -5996,6 +5999,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			{
 				strscpy(dst_item->timeout_orig, httpitem->timeout);
 				strscpy(dst_item->url_orig, httpitem->url);
+				strscpy(dst_item->query_fields_orig, httpitem->query_fields);
 				strscpy(dst_item->status_codes_orig, httpitem->status_codes);
 				dst_item->follow_redirects = httpitem->follow_redirects;
 				dst_item->post_type = httpitem->post_type;
@@ -6004,20 +6008,21 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->retrieve_mode = httpitem->retrieve_mode;
 				dst_item->request_method = httpitem->request_method;
 				dst_item->output_format = httpitem->output_format;
+				strscpy(dst_item->ssl_cert_file_orig, httpitem->ssl_cert_file);
+				strscpy(dst_item->ssl_key_file_orig, httpitem->ssl_key_file);
 				strscpy(dst_item->ssl_key_password_orig, httpitem->ssl_key_password);
 				dst_item->verify_peer = httpitem->verify_peer;
 				dst_item->verify_host = httpitem->verify_host;
 				dst_item->authtype = httpitem->authtype;
 				strscpy(dst_item->username_orig, httpitem->username);
 				strscpy(dst_item->password_orig, httpitem->password);
-				strscpy(dst_item->publickey_orig, httpitem->publickey);
-				strscpy(dst_item->privatekey_orig, httpitem->privatekey);
-				dst_item->params = zbx_strdup(NULL, httpitem->params);
+				dst_item->posts = zbx_strdup(NULL, httpitem->posts);
 			}
 			else
 			{
 				*dst_item->timeout_orig = '\0';
 				*dst_item->url_orig = '\0';
+				*dst_item->query_fields_orig = '\0';
 				*dst_item->status_codes_orig = '\0';
 				dst_item->follow_redirects = 0;
 				dst_item->post_type = 0;
@@ -6026,25 +6031,26 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->retrieve_mode = 0;
 				dst_item->request_method = 0;
 				dst_item->output_format = 0;
+				*dst_item->ssl_cert_file_orig = '\0';
+				*dst_item->ssl_key_file_orig = '\0';
 				*dst_item->ssl_key_password_orig = '\0';
 				dst_item->verify_peer = 0;
 				dst_item->verify_host = 0;
 				dst_item->authtype = 0;
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
-				*dst_item->publickey_orig = '\0';
-				*dst_item->privatekey_orig = '\0';
-				dst_item->params = zbx_strdup(NULL, "");
+				dst_item->posts = zbx_strdup(NULL, "");
 			}
 			dst_item->timeout = NULL;
 			dst_item->url = NULL;
+			dst_item->query_fields = NULL;
 			dst_item->status_codes = NULL;
 			dst_item->http_proxy = NULL;
+			dst_item->ssl_cert_file = NULL;
+			dst_item->ssl_key_file = NULL;
 			dst_item->ssl_key_password = NULL;
 			dst_item->username = NULL;
 			dst_item->password = NULL;
-			dst_item->publickey = NULL;
-			dst_item->privatekey = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
 			if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
@@ -6138,7 +6144,8 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 		{
 			case ITEM_TYPE_HTTPCHECK:
 				zbx_free(items[i].headers);
-				/* break; is not missing here */
+				zbx_free(items[i].posts);
+				break;
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:

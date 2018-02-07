@@ -235,15 +235,16 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*timeout;
 	const char	*url;
+	const char	*query_fields;
 	const char	*status_codes;
 	const char	*http_proxy;
 	const char	*headers;
-	const char	*ssl_key_password;
 	const char	*username;
-	const char	*publickey;
-	const char	*privatekey;
+	const char	*ssl_cert_file;
+	const char	*ssl_key_file;
+	const char	*ssl_key_password;
 	const char	*password;
-	const char	*params;	/* post body */
+	const char	*posts;
 	unsigned char	authtype;
 	unsigned char	follow_redirects;
 	unsigned char	post_type;

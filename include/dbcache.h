@@ -187,9 +187,13 @@ typedef struct
 	char			jmx_endpoint_orig[ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
 	char			timeout_orig[ITEM_TIMEOUT_LEN_MAX], *timeout;
 	char			url_orig[ITEM_URL_LEN_MAX], *url;
+	char			query_fields_orig[ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
+	char			*posts;
 	char			status_codes_orig[ITEM_STATUS_CODES_LEN_MAX], *status_codes;
 	char			http_proxy_orig[ITEM_HTTP_PROXY_LEN_MAX], *http_proxy;
 	char			*headers;
+	char			ssl_cert_file_orig[ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
+	char			ssl_key_file_orig[ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
 	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	char			*error;
 }

@@ -119,11 +119,11 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 		}
 	}
 
-	if ('\0' != *item->publickey)
+	if ('\0' != *item->ssl_cert_file)
 	{
 		char	*file_name;
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, item->publickey);
+		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, item->ssl_cert_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL certificate file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);
@@ -144,11 +144,11 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 		}
 	}
 
-	if ('\0' != *item->privatekey)
+	if ('\0' != *item->ssl_key_file)
 	{
 		char	*file_name;
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, item->privatekey);
+		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, item->ssl_key_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL private key file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
@@ -231,7 +231,7 @@ static int	prepare_request(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *
 	switch (item->request_method)
 	{
 		case HTTP_CHECK_POST:
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->posts)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
 						curl_easy_strerror(err)));
@@ -239,10 +239,10 @@ static int	prepare_request(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *
 			}
 			break;
 		case HTTP_CHECK_GET:
-			if ('\0' == *item->params)
+			if ('\0' == *item->posts)
 				return SUCCEED;
 
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->posts)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
 						curl_easy_strerror(err)));
@@ -265,7 +265,7 @@ static int	prepare_request(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *
 			}
 			break;
 		case HTTP_CHECK_PUT:
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->params)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->posts)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
 						curl_easy_strerror(err)));
@@ -302,7 +302,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request '%s' url '%s'", __function_name,
-			zbx_request_string(item->request_method),item->url);
+			zbx_request_string(item->request_method), item->url);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{

@@ -1559,37 +1559,49 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[40], httpitem->url))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[41], httpitem->status_codes))
+		if (FAIL == dbsync_compare_str(dbrow[41], httpitem->query_fields))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[42], httpitem->follow_redirects))
+		if (FAIL == dbsync_compare_str(dbrow[42], httpitem->posts))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[43], httpitem->post_type))
+		if (FAIL == dbsync_compare_str(dbrow[43], httpitem->status_codes))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[44], httpitem->http_proxy))
+		if (FAIL == dbsync_compare_uchar(dbrow[44], httpitem->follow_redirects))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[45], httpitem->headers))
+		if (FAIL == dbsync_compare_uchar(dbrow[45], httpitem->post_type))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[46], httpitem->retrieve_mode))
+		if (FAIL == dbsync_compare_str(dbrow[46], httpitem->http_proxy))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[47], httpitem->request_method))
+		if (FAIL == dbsync_compare_str(dbrow[47], httpitem->headers))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[48], httpitem->output_format))
+		if (FAIL == dbsync_compare_uchar(dbrow[48], httpitem->retrieve_mode))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[49], httpitem->ssl_key_password))
+		if (FAIL == dbsync_compare_uchar(dbrow[49], httpitem->request_method))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[50], httpitem->verify_peer))
+		if (FAIL == dbsync_compare_uchar(dbrow[50], httpitem->output_format))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[51], httpitem->verify_host))
+		if (FAIL == dbsync_compare_str(dbrow[51], httpitem->ssl_cert_file))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[52], httpitem->ssl_key_file))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[53], httpitem->ssl_key_password))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[54], httpitem->verify_peer))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[55], httpitem->verify_host))
 			return FAIL;
 
 		if (FAIL == dbsync_compare_uchar(dbrow[19], httpitem->authtype))
@@ -1599,15 +1611,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 
 		if (FAIL == dbsync_compare_str(dbrow[21], httpitem->password))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[22], httpitem->publickey))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[23], httpitem->privatekey))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[17], httpitem->params))
 			return FAIL;
 	}
 	else if (NULL != httpitem)
@@ -1705,9 +1708,10 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
 				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,"
 				"i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error,i.jmx_endpoint,"
-				"i.master_itemid,i.timeout,i.url,i.status_codes,i.follow_redirects,i.post_type,"
-				"i.http_proxy,i.headers,i.retrieve_mode,i.request_method,i.output_format,"
-				"i.ssl_key_password,i.verify_peer,i.verify_host"
+				"i.master_itemid,i.timeout,i.url,i.query_fields,i.posts,i.status_codes,"
+				"i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,"
+				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
+				"i.verify_peer,i.verify_host"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
@@ -1718,7 +1722,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 52, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 56, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
