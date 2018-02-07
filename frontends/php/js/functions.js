@@ -767,7 +767,7 @@ function overlayDialogueOnLoad(focus, overlay) {
 
 	var focusable = jQuery(':focusable', overlay);
 
-	if (focusable.length > 0) {
+	if (focusable.length > 1) {
 		var first_focusable = focusable.filter(':first'),
 			last_focusable = focusable.filter(':last');
 
@@ -789,6 +789,15 @@ function overlayDialogueOnLoad(focus, overlay) {
 				if (e.which == 9 && !e.shiftKey) {
 					first_focusable.focus();
 
+					return false;
+				}
+			});
+	}
+	else {
+		focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				if (e.which == 9) {
 					return false;
 				}
 			});

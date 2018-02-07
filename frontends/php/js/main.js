@@ -695,6 +695,7 @@ function show_color_picker(id, event) {
 	color_picker.style.display = 'block';
 
 	addToOverlaysStack('color_picker', event.target, 'color_picker');
+	overlayDialogueOnLoad(true, color_picker);
 }
 
 function create_color_picker() {
