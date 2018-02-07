@@ -25,12 +25,14 @@ $sort_div = (new CSpan())
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
 	->setArgument('eventid', '')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
 
 $show_timeline = ($data['sortfield'] === 'clock');
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
@@ -154,8 +156,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	$description = (new CCol([
 		(new CSpan($problem['name']))
 			->setHint(
-				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
-				true
+				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen'],
+					$data['kioskmode']
+				), '', true
 			)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 	]));

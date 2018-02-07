@@ -2222,6 +2222,20 @@ $icon-widget-btn: (
 	@extend %btn-dashbrd;
 }
 
+.btn-dashbrd-normal {
+	position: fixed;
+	right: 45px;
+	top: 5px;
+	z-index: 1010;
+	@include box-shadow(1px 1px 2px $action-shadow-color);
+	@include opacity(1);
+	@include transition(opacity 1s);
+
+	&.hidden {
+		@include opacity(0);
+	}
+}
+
 %btn-widget {
 	width: 30px;
 	height: 28px;

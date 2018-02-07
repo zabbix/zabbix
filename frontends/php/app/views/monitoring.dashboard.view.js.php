@@ -147,6 +147,18 @@
 	jQuery(document).ready(function($) {
 		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
+
+		var $norm_mode_btn = jQuery('.btn-dashbrd-normal');
+		if ($norm_mode_btn.length) {
+			jQuery('body').on('mousemove keypress', function() {
+				clearTimeout($norm_mode_btn.data('timer'));
+				$norm_mode_btn
+					.removeClass('hidden')
+					.data('timer', setTimeout(function() {
+						$norm_mode_btn.addClass('hidden');
+					}, 2000));
+			}).trigger('mousemove');
+		}
 	});
 
 	function dashboardAddMessages(messages) {

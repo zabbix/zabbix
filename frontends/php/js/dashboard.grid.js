@@ -449,6 +449,7 @@
 
 		ajax_data = {
 			'fullscreen': data['options']['fullscreen'],
+			'kioskmode': data['options']['kioskmode'],
 			'dashboardid': data['dashboard']['id'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
@@ -1004,6 +1005,7 @@
 		init: function(options) {
 			var default_options = {
 				'fullscreen': 0,
+				'kioskmode': 0,
 				'widget-height': 70,
 				'widget-min-rows': 2,
 				'max-rows': 64,

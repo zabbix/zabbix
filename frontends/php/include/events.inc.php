@@ -405,10 +405,11 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param array  $config
  * @param int    $config['event_ack_enable']
  * @param int    $fullscreen
+ * @param int    $kioskmode
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, $fullscreen = 0) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, $fullscreen = 0, $kioskmode = 0) {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -516,6 +517,10 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			->setArgument('eventid', '');
 		if ($fullscreen == 1) {
 			$url_details->setArgument('fullscreen', $fullscreen);
+
+			if ($kioskmode == 1) {
+				$url_details->setArgument('kioskmode', $kioskmode);
+			}
 		}
 
 		foreach ($problems as $problem) {

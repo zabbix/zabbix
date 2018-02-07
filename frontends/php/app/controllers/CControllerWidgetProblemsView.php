@@ -30,6 +30,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fullscreen' => 'in 0,1',
+			'kioskmode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
@@ -73,6 +74,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
 		}
 
+		$fullscreen = $this->getInput('fullscreen', '0');
+		$kioskmode = $this->getInput('kioskmode', '0');
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'fields' => [
@@ -87,7 +91,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'info' => $info,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'fullscreen' => $this->getInput('fullscreen', 0),
+			'fullscreen' => $fullscreen,
+			'kioskmode' => ($kioskmode == '1' && $fullscreen == '1') ? '1' : '0',
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
