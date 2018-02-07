@@ -290,7 +290,7 @@ typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
 typedef struct
 {
 	const char	*mode;
-	int		(*function)(void);
+	int		(*function)(const char *devname, AGENT_RESULT *result);
 }
 MODE_FUNCTION;
 
