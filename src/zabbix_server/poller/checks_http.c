@@ -41,8 +41,6 @@ typedef struct
 }
 zbx_httppage_t;
 
-static zbx_httppage_t	page;
-
 static const char	*zbx_request_string(int result)
 {
 	switch (result)
@@ -63,10 +61,10 @@ static const char	*zbx_request_string(int result)
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t	r_size = size * nmemb;
+	zbx_httppage_t	*page;
 
-	ZBX_UNUSED(userdata);
-
-	zbx_strncpy_alloc(&page.data, &page.allocated, &page.offset, (const char *)ptr, r_size);
+	page = (zbx_httppage_t*)userdata;
+	zbx_strncpy_alloc(&page->data, &page->allocated, &page->offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
@@ -188,6 +186,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	int			ret = NOTSUPPORTED, timeout_seconds;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
+	zbx_httppage_t		page = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request '%s' url '%s'", __function_name,
 			zbx_request_string(item->request_method),item->url);
@@ -199,12 +198,33 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, item->http_proxy)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, curl_easy_strerror(err)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set error buffer: %s", curl_easy_strerror(err)));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set header function: %s", curl_easy_strerror(err)));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_write_cb)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set write function: %s", curl_easy_strerror(err)));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &page)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set write callback: %s", curl_easy_strerror(err)));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, item->http_proxy)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set proxy: %s", curl_easy_strerror(err)));
 		goto clean;
 	}
 
