@@ -1566,6 +1566,17 @@ return [
 				'length' => 2048,
 				'default' => '',
 			],
+			'query_fields' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			],
+			'posts' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
 			'status_codes' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -1612,6 +1623,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+			'ssl_cert_file' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'ssl_key_file' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
 			],
 			'ssl_key_password' => [
 				'null' => false,
