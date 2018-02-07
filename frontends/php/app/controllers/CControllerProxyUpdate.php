@@ -32,7 +32,6 @@ class CControllerProxyUpdate extends CController {
 			'useip' =>			'db       interface.useip  |in 0,1',
 			'port' =>			'db       interface.port',
 			'proxy_address' =>	'db       hosts.proxy_address',
-			'proxy_hostids' =>	'array_db hosts.hostid',
 			'description' =>	'db       hosts.description',
 			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				HOST_ENCRYPTION_CERTIFICATE,
@@ -96,18 +95,6 @@ class CControllerProxyUpdate extends CController {
 		}
 
 		DBstart();
-
-		if ($this->hasInput('proxy_hostids')) {
-			// skip discovered hosts
-			$proxy['hosts'] = API::Host()->get([
-				'output' => ['hostid'],
-				'hostids' => $this->getInput('proxy_hostids'),
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-			]);
-		}
-		else {
-			$proxy['hosts'] = [];
-		}
 
 		$result = API::Proxy()->update($proxy);
 

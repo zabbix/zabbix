@@ -290,50 +290,6 @@ var colorPalette = (function() {
 }());
 
 /**
- * Used for php ctweenbox object.
- * Moves item from 'from' select to 'to' select and adds or removes hidden fields to 'formname' for posting data.
- * Moving perserves alphabetical order.
- *
- * @formname string	form name where hidden fields will be added
- * @objname string	unique name for hidden field naming
- * @from string		from select id
- * @to string		to select id
- * @action string	action to perform with hidden field
- *
- * @return true
- */
-function moveListBoxSelectedItem(objname, from, to, action) {
-	to = jQuery('#' + to);
-
-	jQuery('#' + from).find('option:selected').each(function(i, fromel) {
-		var notApp = true;
-		to.find('option').each(function(j, toel) {
-			if (toel.innerHTML.toLowerCase() > fromel.innerHTML.toLowerCase()) {
-				jQuery(toel).before(fromel);
-				notApp = false;
-				return false;
-			}
-		});
-		if (notApp) {
-			to.append(fromel);
-		}
-		fromel = jQuery(fromel);
-		if (action.toLowerCase() == 'add') {
-			jQuery(this)
-				.closest('form')
-				.append("<input name='" + objname + '[' + fromel.val() + ']' + "' id='" + objname + '_' + fromel.val()
-					+ "' value='" + fromel.val() + "' type='hidden'>"
-				);
-		}
-		else if (action.toLowerCase() == 'rmv') {
-			jQuery('#' + objname + '_' + fromel.val()).remove();
-		}
-	});
-
-	return true;
-}
-
-/**
  * Returns the number of properties of an object.
  *
  * @param obj
