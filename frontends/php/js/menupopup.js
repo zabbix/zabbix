@@ -451,13 +451,13 @@ function getMenuPopupRefresh(options) {
 								}
 							});
 
-							obj.closest('.action-menu').fadeOut(100);
+							obj.closest('.action-menu').menuPopup('close', null);
 
 							jQuery('.dashbrd-grid-widget-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
-							obj.closest('.action-menu').fadeOut(100);
+							obj.closest('.action-menu').menuPopup('close', null);
 							// TODO: gentle message about failed saving of widget refresh rate
 						}
 					});
@@ -513,7 +513,7 @@ function getMenuPopupDashboard(options) {
 							}
 						});
 						// hide menu
-						obj.closest('.action-menu').fadeOut(100);
+						obj.closest('.action-menu').menuPopup('close', null);
 					}
 				}
 				break;
@@ -726,7 +726,7 @@ function getMenuPopupTriggerLog(options) {
 	items[items.length] = {
 		label: t('Create trigger'),
 		clickCallback: function(event) {
-			jQuery(this).closest('.action-menu').fadeOut(100);
+			jQuery(this).closest('.action-menu').menuPopup('close', null);
 
 			return PopUp('popup.triggerwizard', {
 				itemid: options.itemid
@@ -746,7 +746,7 @@ function getMenuPopupTriggerLog(options) {
 			triggers[triggers.length] = {
 				label: trigger.name,
 				clickCallback: function(event) {
-					jQuery(this).closest('.action-menu').fadeOut(100);
+					jQuery(this).closest('.action-menu-top').menuPopup('close', null);
 
 					return PopUp('popup.triggerwizard', {
 						itemid: options.itemid,
@@ -822,7 +822,7 @@ function getMenuPopupTriggerMacro(options) {
 
 				expressionInput.val(expression.string);
 
-				jQuery(this).closest('.action-menu').fadeOut(100);
+				jQuery(this).closest('.action-menu').menuPopup('close', null);
 			}
 		};
 	});
