@@ -391,6 +391,23 @@ class CItem extends CItemGeneral {
 			$result = zbx_cleanHashes($result);
 		}
 
+		// Decode ITEM_TYPE_HTTPCHECK encoded fields.
+		foreach ($result as &$item) {
+			if (array_key_exists('query_fields', $item)) {
+				$item['query_fields'] = json_decode($item['query_fields']);
+			}
+			if (array_key_exists('headers', $item)) {
+				$headers = [];
+
+				foreach (explode("\r\n", $item['headers']) as $header) {
+					list($k, $v) = explode(':', $header, 2);
+					$headers[$k] = $v;
+				}
+
+				$item['headers'] = $headers;
+			}
+		}
+
 		return $result;
 	}
 
@@ -429,6 +446,24 @@ class CItem extends CItemGeneral {
 		foreach ($items as &$item) {
 			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
 				$item['master_itemid'] = null;
+
+				if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+					if (array_key_exists('query_fields', $item)) {
+						$item['query_fields'] = json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE);
+					}
+					if (array_key_exists('headers', $item)) {
+						$headers = [];
+
+						foreach ($item['headers'] as $k => $v) {
+							$headers[] = $k.':'.$v;
+						}
+
+						$item['headers'] = implode("\r\n", $headers);
+					}
+				}
+				else {
+					unset($item['url'], $item['query_fields'], $item['headers']);
+				}
 			}
 		}
 		unset($item);
@@ -485,6 +520,25 @@ class CItem extends CItemGeneral {
 		$data = [];
 		foreach ($items as $item) {
 			unset($item['flags']); // flags cannot be changed
+
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				if (array_key_exists('query_fields', $item)) {
+					$item['query_fields'] = json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE);
+				}
+				if (array_key_exists('headers', $item)) {
+					$headers = [];
+
+					foreach ($item['headers'] as $k => $v) {
+						$headers[] = $k.':'.$v;
+					}
+
+					$item['headers'] = implode("\r\n", $headers);
+				}
+			}
+			else {
+				unset($item['url'], $item['query_fields'], $item['headers']);
+			}
+
 			$data[] = ['values' => $item, 'where' => ['itemid' => $item['itemid']]];
 			$itemids[] = $item['itemid'];
 		}

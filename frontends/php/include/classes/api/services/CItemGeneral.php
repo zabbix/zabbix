@@ -210,6 +210,10 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				$this->validateHTTPCheck($item, $update ? $dbItems[$item['itemid']] : []);
+			}
+
 			if ($update) {
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
 
@@ -1568,6 +1572,118 @@ abstract class CItemGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _('maximum number of dependency levels reached')
 					));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Validate item with type ITEM_TYPE_HTTPCHECK.
+	 *
+	 * @param array    $item       Array of item fields.
+	 * @param array    $db_item    Array of item database fields for update action or empty array for create action.
+	 *
+	 * @throws APIException for invalid data.
+	 */
+	protected function validateHTTPCheck($item, $db_item) {
+		$rules = [
+			'timeout' => [
+				'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN
+			],
+			'url' => [
+				'type' => API_URL, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO,
+				'length' => DB::getFieldLength('items', 'url'),
+			],
+			'status_codes' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'status_codes')
+			],
+			'follow_redirects' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
+			],
+			'post_type' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTP_BODY_RAW, HTTP_BODY_JSON, HTTP_BODY_XML])
+			],
+			'http_proxy' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')
+			],
+			'headers' => [
+				'type' => API_STRINGS_UTF8
+			],
+			'retrieve_mode' => [
+				'type' => API_INT32,
+				'in' => implode(',', [
+					HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
+					HTTPTEST_STEP_RETRIEVE_MODE_BOTH
+				])
+			],
+			'request_method' => [
+				'type' => API_INT32,
+				'in' => implode(',', [
+					HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD
+				])
+			],
+			'output_format' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])
+			],
+			'ssl_key_password' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password'),
+			],
+			'verify_peer' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])
+			],
+			'verify_host' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])
+			]
+		];
+
+		$data = array_intersect_key($item + $db_item, $rules);
+
+		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (array_key_exists('url', $item)
+				&& !in_array(strtolower(parse_url($item['url'], PHP_URL_SCHEME)), ['http', 'https'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.', $item['url'],
+				'url')
+			);
+		}
+
+		if (array_key_exists('query_fields', $item)) {
+			if (!is_array($item['query_fields'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
+					_('an array is expected'))
+				);
+			}
+
+			foreach ($item['query_fields'] as $v) {
+				if (!is_array($v) || count($v) > 1 || !is_string(reset($v)) || reset($v) === '' || key($v) === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
+						_('nonempty key and value pair expected'))
+					);
+				}
+			}
+
+			$json_string = json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE);
+
+			if (strlen($json_string) > DB::getFieldLength('items', 'query_fields')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
+					_('cannot convert to JSON, result value too long'))
+				);
+			}
+		}
+
+		if (array_key_exists('headers', $item)) {
+			foreach ($item['headers'] as $k => $v) {
+				if ($k === '' || strpos(':', $k) !== false || !is_string($v) || $v === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'headers',
+						_('nonempty key and value pair expected'))
+					);
 				}
 			}
 		}
