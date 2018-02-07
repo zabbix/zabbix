@@ -895,7 +895,7 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 					item.clickCallback = function(e) {
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
-						jQuery(this).closest('.action-menu-top').fadeOut(100);
+						jQuery(this).closest('.action-menu-top').menuPopup('close', null);
 					};
 				}
 
