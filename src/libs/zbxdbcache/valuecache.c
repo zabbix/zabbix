@@ -2894,7 +2894,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	zbx_vc_item_t	*item = NULL;
 	int 		ret = FAIL, cache_used = 1, found = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d timestamp:%d.%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d timestamp:%d.%09d",
 			__function_name, itemid, value_type, ts->sec, ts->ns);
 
 	vc_try_lock();
