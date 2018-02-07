@@ -480,8 +480,9 @@ var hintBox = {
 					if (e.which == 13 && target.data('hintbox-static') == 1) {
 						var offset = target.offset(),
 							w = jQuery(window);
+						// Emulate click on left middle point of link.
 						e.clientX = offset.left - w.scrollLeft();
-						e.clientY = offset.top - w.scrollTop();
+						e.clientY = offset.top - w.scrollTop() + (target.height() / 2);
 						e.preventDefault();
 
 						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
