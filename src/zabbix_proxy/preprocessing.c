@@ -27,19 +27,21 @@
  *                                                                            *
  * Purpose: perform item value preprocessing and dependend item processing    *
  *                                                                            *
- * Parameters: itemid     - [IN] the itemid                                   *
- *             item_flags - [IN] the item flags (e. g. lld rule)              *
- *             result     - [IN] agent result containing the value to add     *
- *             ts         - [IN] the value timestamp                          *
- *             state      - [IN] the item state                               *
- *             error      - [IN] the error message in case item state is      *
+ * Parameters: itemid          - [IN] the itemid                              *
+ *             item_value_type - [IN] the item value type                     *
+ *             item_flags      - [IN] the item flags (e. g. lld rule)         *
+ *             result          - [IN] agent result containing the value       *
+ *                               to add                                       *
+ *             ts              - [IN] the value timestamp                     *
+ *             state           - [IN] the item state                          *
+ *             error           - [IN] the error message in case item state is *
  *                               ITEM_STATE_NOTSUPPORTED                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
-		zbx_timespec_t *ts, unsigned char state, char *error)
+void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
+		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
-	dc_add_history(itemid, item_flags, result, ts, state, error);
+	dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
 }
 
 /******************************************************************************

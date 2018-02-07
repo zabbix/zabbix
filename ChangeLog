@@ -5,6 +5,10 @@ New features:
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+..F....... [ZBX-13300] fixed addJsFile() name (agriscenko)
+.......P.. [ZBX-13030] removed proxy's ability to export unprocessed history data via loadable modules (MVekslers)
+..FG...PS. [ZBXNEXT-3581] dropped plain text protocol support and made header mandatory; fixed IP fragmentation handling by including header in Zabbix get request, Zabbix server/proxy passive check request and frontend request to Zabbix server (Sasha, vso)
+........S. [ZBX-13194] fixed incorrect processing of zabbix[wcache,value,*] internal check (Sergejs)
 .......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
 ...G...... [ZBX-13233] added new memory metrics for Linux platform - "active", "anon", "inactive" and "slabs"; thanks to Tomasz Kłoczko for the original patch (viktors)
 ........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
@@ -102,11 +106,16 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
-Changes for 3.4.7rc1
-
-New features:
+Changes for 3.4.7rc2
 
 Bug fixes:
+....I..... [ZBX-13055] fixed compilation failure in Alpine Linux due to missing res_ninit() function (vso)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.7rc1
+
+Bug fixes:
+........S. [ZBX-13194] fixed incorrect processing of zabbix[wcache,value,*] internal check (Sergejs)
 .......PS. [ZBX-13060] added limitation for meaningless server reconnection attempts to incorrectly configured passive proxy (viktors)
 ...G...... [ZBX-13117] fixed vfs.dir.size with symbol links on Windows (MVekslers)
 ........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
@@ -1186,8 +1195,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.15rc1
-
-New features:
 
 Bug fixes:
 ........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)

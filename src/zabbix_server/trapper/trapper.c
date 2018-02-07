@@ -376,7 +376,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
-		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -397,7 +397,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)) ||
 					FAIL == is_uint31(limit_str, &limit))
 			{
-				zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
+				zbx_send_response(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
 				goto out;
 			}
 		}
@@ -405,7 +405,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (ZBX_GET_QUEUE_UNKNOWN == request_type)
 	{
-		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -491,7 +491,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
 
-	(void)zbx_tcp_send_raw(sock, json.buffer);
+	(void)zbx_tcp_send(sock, json.buffer);
 
 	DCfree_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);
@@ -847,7 +847,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user))
 	{
-		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -865,7 +865,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (ZBX_GET_STATUS_UNKNOWN == request_type)
 	{
-		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -890,7 +890,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
 
-	(void)zbx_tcp_send_raw(sock, json.buffer);
+	(void)zbx_tcp_send(sock, json.buffer);
 
 	zbx_json_free(&json);
 
