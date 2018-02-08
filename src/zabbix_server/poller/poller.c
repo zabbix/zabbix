@@ -42,6 +42,8 @@
 #include "checks_calculated.h"
 #include "checks_http.h"
 #include "../../libs/zbxcrypto/tls.h"
+#include "zbxjson.h"
+#include "zbxhttp.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -419,6 +421,72 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 	return res;
 }
 
+static int	parse_query_fields(DC_ITEM *item)
+{
+	struct zbx_json_parse	jp_array, jp_object;
+	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN];
+	const char		*member, *element = NULL;
+	size_t			alloc_len, offset;
+
+	if (SUCCEED != zbx_json_open(item->query_fields_orig, &jp_array))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
+		return FAIL;
+	}
+
+	if (NULL == (element = zbx_json_next(&jp_array, element)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: array is empty");
+		return FAIL;
+	}
+
+	do
+	{
+		char	*data = NULL;
+
+		if (SUCCEED != zbx_json_brackets_open(element, &jp_object))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
+			return FAIL;
+		}
+
+		if (NULL == (member = zbx_json_pair_next(&jp_object, NULL, name, sizeof(name))))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
+			return FAIL;
+		}
+
+		if (NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
+			return FAIL;
+		}
+
+		if (NULL == item->query_fields && NULL == strchr(item->url, '?'))
+			zbx_chrcpy_alloc(&item->query_fields, &alloc_len, &offset, '?');
+		else
+			zbx_chrcpy_alloc(&item->query_fields, &alloc_len, &offset, '&');
+
+		data = zbx_strdup(data, name);
+		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
+				MACRO_TYPE_ITEM_URL, NULL, 0);
+		zbx_http_url_encode(data, &data);
+		zbx_strcpy_alloc(&item->query_fields, &alloc_len, &offset, data);
+		zbx_chrcpy_alloc(&item->query_fields, &alloc_len, &offset, '=');
+
+		data = zbx_strdup(data, value);
+		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
+				MACRO_TYPE_ITEM_URL, NULL, 0);
+		zbx_http_url_encode(data, &data);
+		zbx_strcpy_alloc(&item->query_fields, &alloc_len, &offset, data);
+
+		free(data);
+	}
+	while (NULL != (element = zbx_json_next(&jp_array, element)));
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_values                                                       *
@@ -565,7 +633,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_HTTPCHECK:
 				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
 				ZBX_STRDUP(items[i].url, items[i].url_orig);
-				ZBX_STRDUP(items[i].query_fields, items[i].query_fields_orig);
+
 				ZBX_STRDUP(items[i].status_codes, items[i].status_codes_orig);
 				ZBX_STRDUP(items[i].http_proxy, items[i].http_proxy_orig);
 				ZBX_STRDUP(items[i].ssl_cert_file, items[i].ssl_cert_file_orig);
@@ -576,22 +644,34 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL, NULL,
-						&items[i].url, MACRO_TYPE_ITEM_URL, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].url, MACRO_TYPE_ITEM_URL, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].status_codes, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].http_proxy, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL, NULL,
-						&items[i].ssl_cert_file, MACRO_TYPE_ITEM_URL, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL, NULL,
-						&items[i].ssl_key_file, MACRO_TYPE_ITEM_URL, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].ssl_cert_file, MACRO_TYPE_ITEM_URL, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].ssl_key_file, MACRO_TYPE_ITEM_URL, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, &items[i].ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
+
+				if ('\0' == *items[i].query_fields_orig)
+					break;
+
+				if (FAIL == parse_query_fields(&items[i]))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
+				items[i].url = zbx_strdcat(items[i].url, items[i].query_fields);
 				break;
 		}
 	}

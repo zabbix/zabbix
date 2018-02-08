@@ -719,7 +719,7 @@ static const char	*zbx_json_copy_value(const char *p, size_t len, char *out, siz
 	return p + len;
 }
 
-static const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, int *is_null)
+const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, int *is_null)
 {
 	size_t	len;
 
