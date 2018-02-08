@@ -6,6 +6,7 @@ A.F....... [ZBXNEXT-4152] replaced double box select fields with multiselect fie
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+........S. [ZBX-11391] generated an error if expanding LLD macros results in an empty tag name (MVekslers)
 ..F....... [ZBX-13300] fixed addJsFile() name (agriscenko)
 .......P.. [ZBX-13030] removed proxy's ability to export unprocessed history data via loadable modules (MVekslers)
 ..FG...PS. [ZBXNEXT-3581] dropped plain text protocol support and made header mandatory; fixed IP fragmentation handling by including header in Zabbix get request, Zabbix server/proxy passive check request and frontend request to Zabbix server (Sasha, vso)
