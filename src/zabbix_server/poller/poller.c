@@ -633,7 +633,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_HTTPCHECK:
 				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
 				ZBX_STRDUP(items[i].url, items[i].url_orig);
-
 				ZBX_STRDUP(items[i].status_codes, items[i].status_codes_orig);
 				ZBX_STRDUP(items[i].http_proxy, items[i].http_proxy_orig);
 				ZBX_STRDUP(items[i].ssl_cert_file, items[i].ssl_cert_file_orig);
@@ -646,6 +645,10 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 						NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
 						NULL, &items[i].url, MACRO_TYPE_ITEM_URL, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].posts, MACRO_TYPE_ITEM_URL, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].headers, MACRO_TYPE_ITEM_URL, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].status_codes, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -661,17 +664,17 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 
-				if ('\0' == *items[i].query_fields_orig)
-					break;
-
-				if (FAIL == parse_query_fields(&items[i]))
+				if ('\0' != *items[i].query_fields_orig)
 				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
-					errcodes[i] = CONFIG_ERROR;
-					continue;
-				}
+					if (FAIL == parse_query_fields(&items[i]))
+					{
+						SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
+						errcodes[i] = CONFIG_ERROR;
+						continue;
+					}
 
-				items[i].url = zbx_strdcat(items[i].url, items[i].query_fields);
+					items[i].url = zbx_strdcat(items[i].url, items[i].query_fields);
+				}
 				break;
 		}
 	}
