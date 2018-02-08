@@ -2111,7 +2111,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field, zbx_uint64_t flag,
 		size_t field_len_max, char **error)
 {
-	size_t field_len;
+	size_t	field_len;
 
 	if (0 == (tag->flags & ZBX_FLAG_LLD_TAG_DISCOVERED))
 		return;
