@@ -210,8 +210,9 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
-				$this->validateHTTPCheck($item, $update ? $dbItems[$item['itemid']] : []);
+			if ((array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_HTTPCHECK)
+					|| $dbItems[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK) {
+				$this->validateHTTPCheck($fullItem, $update ? $dbItems[$item['itemid']] : []);
 			}
 
 			if ($update) {

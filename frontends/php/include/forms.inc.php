@@ -982,8 +982,47 @@ function getItemFormData(array $item = [], array $options = []) {
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
 		'templates' => [],
-		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT)
+		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT),
+		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+		'url' => getRequest('url'),
+		'query_fields' => getRequest('query_fields', []),
+		'posts' => getRequest('posts'),
+		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+		'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
+		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+		'http_proxy' => getRequest('http_proxy'),
+		'headers' => getRequest('headers', []),
+		'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
+		'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
+		'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+		'ssl_cert_file' => getRequest('ssl_cert_file'),
+		'ssl_key_file' => getRequest('ssl_key_file'),
+		'ssl_key_password' => getRequest('ssl_key_password'),
+		'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
+		'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
 	];
+
+	if ($data['type'] == ITEM_TYPE_HTTPCHECK) {
+		$query_fields = [];
+		if (array_key_exists('key', $data['query_fields']) && array_key_exists('value', $data['query_fields'])) {
+			foreach ($data['query_fields']['key'] as $index => $key) {
+				if (array_key_exists($index, $data['query_fields']['value'])) {
+					$query_fields[] = [$key => $data['query_fields']['value'][$index]];
+				}
+			}
+		}
+		$data['query_fields'] = $query_fields;
+
+		$headers = [];
+		if (array_key_exists('key', $data['headers']) && array_key_exists('value', $data['headers'])) {
+			foreach ($data['headers']['key'] as $index => $key) {
+				if (array_key_exists($index, $data['headers']['value'])) {
+					$headers[$key] = $data['headers']['value'][$index];
+				}
+			}
+		}
+		$data['headers'] = $headers;
+	}
 
 	// Dependent item initialization by master_itemid.
 	if (!hasRequest('form_refresh') && array_key_exists('master_item', $item)) {
@@ -1174,6 +1213,27 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['jmx_endpoint'] = $data['item']['jmx_endpoint'];
 		$data['new_application'] = getRequest('new_application', '');
+		// ITEM_TYPE_HTTPCHECK
+		$data['timeout'] = $data['item']['timeout'];
+		$data['url'] = $data['item']['url'];
+		$data['query_fields'] = $data['item']['query_fields'];
+		$data['posts'] = $data['item']['posts'];
+		$data['status_codes'] = $data['item']['status_codes'];
+		$data['follow_redirects'] = $data['item']['follow_redirects'];
+		$data['post_type'] = $data['item']['post_type'];
+		$data['http_proxy'] = $data['item']['http_proxy'];
+		$data['headers'] = $data['item']['headers'];
+		$data['retrieve_mode'] = $data['item']['retrieve_mode'];
+		$data['request_method'] = $data['item']['request_method'];
+		$data['output_format'] = $data['item']['output_format'];
+		$data['ssl_cert_file'] = $data['item']['ssl_cert_file'];
+		$data['ssl_key_file'] = $data['item']['ssl_key_file'];
+		$data['ssl_key_password'] = $data['item']['ssl_key_password'];
+		$data['verify_peer'] = $data['item']['verify_peer'];
+		$data['verify_host'] = $data['item']['verify_host'];
+		$data['http_authtype'] = $data['item']['authtype'];
+		$data['http_username'] = $data['item']['username'];
+		$data['http_password'] = $data['item']['password'];
 
 		if (!$data['is_discovery_rule']) {
 			$data['preprocessing'] = $data['item']['preprocessing'];

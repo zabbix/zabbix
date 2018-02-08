@@ -59,7 +59,9 @@ $fields = [
 	'type' =>					[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT]), 'isset({add}) || isset({update})'],
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED,
+			ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPCHECK
+			]), 'isset({add}) || isset({update})'],
 	'trends' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type}) && '.
 			IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
@@ -125,6 +127,23 @@ $fields = [
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
+	'timeout' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'url' =>            		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'follow_redirects' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'post_type' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_proxy' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'headers' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'retrieve_mode' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'request_method' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'output_format' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_cert_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'verify_peer' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'verify_host' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
@@ -550,8 +569,50 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'applications' => $applications,
 				'inventory_link' => getRequest('inventory_link', 0),
 				'description' => getRequest('description', ''),
-				'status' => getRequest('status', ITEM_STATUS_DISABLED)
+				'status' => getRequest('status', ITEM_STATUS_DISABLED),
 			];
+
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				$item += [
+					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+					'url' => getRequest('url'),
+					'query_fields' => getRequest('query_fields', []),
+					'posts' => getRequest('posts'),
+					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+					'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
+					'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+					'http_proxy' => getRequest('http_proxy'),
+					'headers' => getRequest('http_proxy', []),
+					'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
+					'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
+					'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+					'ssl_cert_file' => getRequest('ssl_cert_file'),
+					'ssl_key_file' => getRequest('ssl_key_file'),
+					'ssl_key_password' => getRequest('ssl_key_password'),
+					'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
+					'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
+				];
+
+				$query_fields = [];
+				if (array_key_exists('key', $item['query_fields']) && array_key_exists('value', $item['query_fields'])) {
+					foreach ($item['query_fields']['key'] as $index => $key) {
+						if ($key !== '' && array_key_exists($index, $item['query_fields']['value'])) {
+							$query_fields[] = [$key => $item['query_fields']['value'][$index]];
+						}
+					}
+				}
+				$item['query_fields'] = $query_fields;
+
+				$headers = [];
+				if (array_key_exists('key', $item['headers']) && array_key_exists('value', $item['headers'])) {
+					foreach ($item['headers']['key'] as $index => $key) {
+						if ($key !== '' && array_key_exists($index, $item['headers']['value'])) {
+							$headers[$key] = $item['headers']['value'][$index];
+						}
+					}
+				}
+				$item['headers'] = $headers;
+			}
 
 			if ($item['type'] == ITEM_TYPE_JMX) {
 				$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
@@ -574,7 +635,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
 					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'history',
 					'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description', 'status',
-					'templateid', 'flags', 'jmx_endpoint', 'master_itemid'
+					'templateid', 'flags', 'jmx_endpoint', 'master_itemid',
+					'timeout', 'url', 'query_fields', 'posts', 'status_codes', 'follow_redirects', 'post_type',
+					'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file',
+					'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params'],
@@ -709,6 +773,50 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
 				$item['master_itemid'] = getRequest('master_itemid');
+			}
+
+			if (getRequest('type') == ITEM_TYPE_HTTPCHECK) {
+				$posted = [
+					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+					'url' => getRequest('url'),
+					'query_fields' => getRequest('query_fields', []),
+					'posts' => getRequest('posts'),
+					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+					'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
+					'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+					'http_proxy' => getRequest('http_proxy'),
+					'headers' => getRequest('headers', []),
+					'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
+					'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
+					'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+					'ssl_cert_file' => getRequest('ssl_cert_file'),
+					'ssl_key_file' => getRequest('ssl_key_file'),
+					'ssl_key_password' => getRequest('ssl_key_password'),
+					'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
+					'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
+				];
+
+				$query_fields = [];
+				if (array_key_exists('key', $posted['query_fields']) && array_key_exists('value', $posted['query_fields'])) {
+					foreach ($posted['query_fields']['key'] as $index => $key) {
+						if ($key !== '' && array_key_exists($index, $posted['query_fields']['value'])) {
+							$query_fields[] = [$key => $posted['query_fields']['value'][$index]];
+						}
+					}
+				}
+				$posted['query_fields'] = $query_fields;
+
+				$headers = [];
+				if (array_key_exists('key', $posted['headers']) && array_key_exists('value', $posted['headers'])) {
+					foreach ($posted['headers']['key'] as $index => $key) {
+						if ($key !== '' && array_key_exists($index, $posted['headers']['value'])) {
+							$headers[$key] = $posted['headers']['value'][$index];
+						}
+					}
+				}
+				$posted['headers'] = $headers;
+
+				$item += $posted;
 			}
 
 			if ($item) {
@@ -1167,7 +1275,10 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid'
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
+				'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
+				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'verify_peer', 'verify_host'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],

@@ -400,7 +400,7 @@ class CItem extends CItemGeneral {
 				$headers = [];
 
 				foreach (explode("\r\n", $item['headers']) as $header) {
-					list($k, $v) = explode(':', $header, 2);
+					list($k, $v) = explode(': ', $header, 2);
 					$headers[$k] = $v;
 				}
 
@@ -455,7 +455,7 @@ class CItem extends CItemGeneral {
 						$headers = [];
 
 						foreach ($item['headers'] as $k => $v) {
-							$headers[] = $k.':'.$v;
+							$headers[] = $k.': '.$v;
 						}
 
 						$item['headers'] = implode("\r\n", $headers);
@@ -529,7 +529,7 @@ class CItem extends CItemGeneral {
 					$headers = [];
 
 					foreach ($item['headers'] as $k => $v) {
-						$headers[] = $k.':'.$v;
+						$headers[] = $k.': '.$v;
 					}
 
 					$item['headers'] = implode("\r\n", $headers);

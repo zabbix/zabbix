@@ -102,6 +102,235 @@ if (!$readonly) {
 
 $itemFormList->addRow((new CLabel(_('Key'), 'key'))->setAsteriskMark(), $key_controls);
 
+// ITEM_TYPE_HTTPCHECK URL field.
+$itemFormList->addRow(
+	(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
+	[
+		(new CTextBox('url', $data['url'], $readonly))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('httpcheck_parseurl', _('Parse ')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setAttribute('data-action', 'parse_url')
+	],
+	'url_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Query fields.
+$query_fields_data = [];
+if (is_array($data['query_fields'])) {
+	foreach ($data['query_fields'] as $pair) {
+		$query_fields_data[] = ['key' => key($pair), 'value' => reset($pair)];
+	}
+}
+$query_fields_data[] = ['key' => '', 'value' => ''];
+$query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
+$query_fields->items = [json_encode($query_fields_data, JSON_UNESCAPED_UNICODE)];
+
+$itemFormList->addRow(
+	new CLabel(_('Query fields'), 'query_fields_pairs'),
+	(new CDiv([
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
+			->setFooter(new CRow(
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setAttribute('data-row-action', 'add_row')
+				))->setColSpan(5)
+			)),
+		(new CTag('script', true))
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->addItem(new CRow([
+				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CTextBox('query_fields[key][#{index}]', '#{key}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				'&rArr;',
+				(new CTextBox('query_fields[value][#{index}]', '#{value}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-row-action', 'remove_row')
+			])),
+		$query_fields
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setId('query_fields_pairs')
+		->setAttribute('data-sortable-pairs-table', '')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
+	'query_fields_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Request type.
+$itemFormList->addRow(
+	new CLabel(_('Request type'), 'request_method'),
+	(new CComboBox('request_method', $data['request_method'], null, [
+		HTTPCHECK_REQUEST_GET => 'GET',
+		HTTPCHECK_REQUEST_POST => 'POST',
+		HTTPCHECK_REQUEST_PUT => 'PUT',
+		HTTPCHECK_REQUEST_HEAD => 'HEAD'
+	])),
+	'request_method_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Timeout field.
+$itemFormList->addRow(
+	new CLabel(_('Timeout'), 'timeout'),
+	(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	'timeout_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Request body type.
+$itemFormList->addRow(
+	new CLabel(_('Request body type'), 'post_type'),
+	(new CRadioButtonList('post_type', (int) $data['post_type']))
+		->addValue(_('Raw data'), HTTP_BODY_RAW)
+		->addValue(_('JSON data'), HTTP_BODY_JSON)
+		->addValue(_('XML data'), HTTP_BODY_XML)
+		->setModern(true),
+	'post_type_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Request body.
+$itemFormList->addRow(
+	new CLabel(_('Request body'), 'posts'),
+	(new CTextArea('posts', $data['posts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'posts_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Headers fields.
+$headers_data = [];
+if (is_array($data['headers'])) {
+	foreach ($data['headers'] as $k => $v) {
+		$headers_data[] = ['key' => $k, 'value' => $v];
+	}
+}
+$headers_data[] = ['key' => '', 'value' => ''];
+$headers = (new CTag('script', true))->setAttribute('type', 'text/json');
+$headers->items = [json_encode($headers_data, JSON_UNESCAPED_UNICODE)];
+
+$itemFormList->addRow(
+	new CLabel(_('Headers'), 'headers_pairs'),
+	(new CDiv([
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
+			->setFooter(new CRow(
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setAttribute('data-row-action', 'add_row')
+				))->setColSpan(5)
+			)),
+		(new CTag('script', true))
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->addItem(new CRow([
+				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CTextBox('headers[key][#{index}]', '#{key}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				'&rArr;',
+				(new CTextBox('headers[value][#{index}]', '#{value}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-row-action', 'remove_row')
+			])),
+		$headers
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setId('headers_pairs')
+		->setAttribute('data-sortable-pairs-table', '')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
+	'headers_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Required status codes.
+$itemFormList->addRow(
+	new CLabel(_('Required status codes'), 'status_codes'),
+	(new CTextBox('status_codes', $data['status_codes']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'status_codes_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Follow redirects.
+$itemFormList->addRow(
+	new CLabel(_('Follow redirects'), 'follow_redirects'),
+	(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+		->setChecked($data['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON),
+	'follow_redirects_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Retrieve mode.
+$itemFormList->addRow(
+	new CLabel(_('Retrieve mode'), 'retrieve_mode'),
+	(new CRadioButtonList('retrieve_mode', (int) $data['retrieve_mode']))
+			->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+			->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
+			->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
+			->setModern(true),
+	'retrieve_mode_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Convert to JSON.
+$itemFormList->addRow(
+	new CLabel(_('Convert to JSON'), 'output_format'),
+	(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
+		->setChecked($data['output_format'] == HTTPCHECK_STORE_JSON),
+	'output_format_row'
+);
+
+// ITEM_TYPE_HTTPCHECK HTTP proxy.
+$itemFormList->addRow(
+	new CLabel(_('HTTP proxy'), 'http_proxy'),
+	(new CTextBox('http_proxy', $data['http_proxy'], false, 255))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
+	'http_proxy_row'
+);
+
+// ITEM_TYPE_HTTPCHECK HTTP authentication.
+$itemFormList->addRow(
+	new CLabel(_('HTTP authentication'), 'http_authtype'),
+	(new CComboBox('http_authtype', $data['authtype'], null, [
+		HTTPTEST_AUTH_NONE => _('None'),
+		HTTPTEST_AUTH_BASIC => _('Basic'),
+		HTTPTEST_AUTH_NTLM => _('NTLM')
+	])),
+	'http_authtype_row'
+);
+
+// ITEM_TYPE_HTTPCHECK SSL verify peer.
+$itemFormList->addRow(
+	new CLabel(_('SSL verify peer'), 'verify_peer'),
+	(new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_OFF))
+		->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON),
+	'verify_peer_row'
+);
+
+// ITEM_TYPE_HTTPCHECK SSL verify host.
+$itemFormList->addRow(
+	new CLabel(_('SSL verify host'), 'verify_host'),
+	(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_OFF))
+		->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON),
+	'verify_host_row'
+);
+
+// ITEM_TYPE_HTTPCHECK SSL certificate file.
+$itemFormList->addRow(
+	new CLabel(_('SSL certificate file'), 'ssl_key_file'),
+	(new CTextBox('ssl_key_file', $data['ssl_key_file'], false, 255))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'ssl_key_file_row'
+);
+
+// ITEM_TYPE_HTTPCHECK SSL key password.
+$itemFormList->addRow(
+	new CLabel(_('SSL key password'), 'ssl_key_password'),
+	(new CTextBox('ssl_key_password', $data['ssl_key_password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'ssl_key_password_row'
+);
+
 // Append master item select.
 $master_item = [
 	(new CTextBox('master_itemname', $data['master_itemname'], true))

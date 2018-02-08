@@ -100,7 +100,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_JMX => _('JMX agent'),
 		ITEM_TYPE_CALCULATED => _('Calculated'),
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
-		ITEM_TYPE_DEPENDENT => _('Dependent item')
+		ITEM_TYPE_DEPENDENT => _('Dependent item'),
+		ITEM_TYPE_HTTPCHECK => _('HTTP(s) agent')
 	];
 	if (is_null($type)) {
 		return $types;
