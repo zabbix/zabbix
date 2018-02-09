@@ -23,14 +23,14 @@
 
 extern void	add_headers(char *headers, struct curl_slist **headers_slist);
 
-#define HTTP_CHECK_GET	0
-#define HTTP_CHECK_POST	1
-#define HTTP_CHECK_PUT	2
-#define HTTP_CHECK_HEAD	3
+#define HTTPCHECK_REQUEST_GET	0
+#define HTTPCHECK_REQUEST_POST	1
+#define HTTPCHECK_REQUEST_PUT	2
+#define HTTPCHECK_REQUEST_HEAD	3
 
-#define HTTP_RETRIEVE_MODE_BODY	0
-#define HTTP_RETRIEVE_MODE_HEADER 1
-#define HTTP_RETRIEVE_MODE_HEADER_BODY 2
+#define HTTPCHECK_RETRIEVE_MODE_CONTENT	0
+#define HTTPCHECK_RETRIEVE_MODE_HEADERS	1
+#define HTTPCHECK_RETRIEVE_MODE_BOTH	2
 
 extern char	*CONFIG_SOURCE_IP;
 
@@ -50,13 +50,13 @@ static const char	*zbx_request_string(int result)
 {
 	switch (result)
 	{
-		case HTTP_CHECK_GET:
+		case HTTPCHECK_REQUEST_GET:
 			return "GET";
-		case HTTP_CHECK_POST:
+		case HTTPCHECK_REQUEST_POST:
 			return "POST";
-		case HTTP_CHECK_PUT:
+		case HTTPCHECK_REQUEST_PUT:
 			return "PUT";
-		case HTTP_CHECK_HEAD:
+		case HTTPCHECK_REQUEST_HEAD:
 			return "HEAD";
 		default:
 			return "unknown";
@@ -234,7 +234,7 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 
 	switch (request_method)
 	{
-		case HTTP_CHECK_POST:
+		case HTTPCHECK_REQUEST_POST:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST: %s",
@@ -242,7 +242,7 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 				return FAIL;
 			}
 			break;
-		case HTTP_CHECK_GET:
+		case HTTPCHECK_REQUEST_GET:
 			if ('\0' == *posts)
 				return SUCCEED;
 
@@ -260,7 +260,7 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 				return FAIL;
 			}
 			break;
-		case HTTP_CHECK_HEAD:
+		case HTTPCHECK_REQUEST_HEAD:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1L)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify HEAD request: %s",
@@ -268,7 +268,7 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 				return FAIL;
 			}
 			break;
-		case HTTP_CHECK_PUT:
+		case HTTPCHECK_REQUEST_PUT:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST: %s",
@@ -318,15 +318,15 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	switch (item->retrieve_mode)
 	{
-		case HTTP_RETRIEVE_MODE_BODY:
+		case HTTPCHECK_RETRIEVE_MODE_CONTENT:
 			curl_header_cb = curl_ignore_cb;
 			curl_body_cb = curl_write_cb;
 			break;
-		case HTTP_RETRIEVE_MODE_HEADER:
+		case HTTPCHECK_RETRIEVE_MODE_HEADERS:
 			curl_header_cb = curl_write_cb;
 			curl_body_cb = curl_ignore_cb;
 			break;
-		case HTTP_RETRIEVE_MODE_HEADER_BODY:
+		case HTTPCHECK_RETRIEVE_MODE_BOTH:
 			curl_header_cb = curl_write_cb;
 			curl_body_cb = curl_write_cb;
 			break;
@@ -447,7 +447,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	switch (item->retrieve_mode)
 	{
-		case HTTP_RETRIEVE_MODE_BODY:
+		case HTTPCHECK_RETRIEVE_MODE_CONTENT:
 			if (NULL == body.data)
 				body.data = zbx_strdup(NULL, "");
 
@@ -455,7 +455,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			SET_TEXT_RESULT(result, body.data);
 			body.data = NULL;
 			break;
-		case HTTP_RETRIEVE_MODE_HEADER:
+		case HTTPCHECK_RETRIEVE_MODE_HEADERS:
 			if (NULL == header.data)
 				header.data = zbx_strdup(NULL, "");
 
@@ -463,7 +463,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			SET_TEXT_RESULT(result, header.data);
 			header.data = NULL;
 			break;
-		case HTTP_RETRIEVE_MODE_HEADER_BODY:
+		case HTTPCHECK_RETRIEVE_MODE_BOTH:
 			zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data, body.offset);
 			zabbix_log(LOG_LEVEL_TRACE, "received response '%s'", header.data);
 			SET_TEXT_RESULT(result, header.data);

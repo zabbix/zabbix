@@ -19,5 +19,7 @@
 
 #ifndef ZABBIX_HTTPTEST_H
 #define ZABBIX_HTTPTEST_H
+
 int	process_httptests(int httppoller_num, int now);
+
 #endif
