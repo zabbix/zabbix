@@ -211,7 +211,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if ((array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_HTTPCHECK)
-					|| $dbItems[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK) {
+					|| ($update && $dbItems[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK)) {
 				$this->validateHTTPCheck($fullItem, $update ? $dbItems[$item['itemid']] : []);
 			}
 
