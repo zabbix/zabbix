@@ -44,7 +44,7 @@ typedef struct
 	size_t	allocated;
 	size_t	offset;
 }
-zbx_httppage_t;
+zbx_http_response_t;
 
 static const char	*zbx_request_string(int result)
 {
@@ -65,11 +65,11 @@ static const char	*zbx_request_string(int result)
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	size_t	r_size = size * nmemb;
-	zbx_httppage_t	*page;
+	size_t			r_size = size * nmemb;
+	zbx_http_response_t	*response;
 
-	page = (zbx_httppage_t*)userdata;
-	zbx_strncpy_alloc(&page->data, &page->allocated, &page->offset, (const char *)ptr, r_size);
+	response = (zbx_http_response_t*)userdata;
+	zbx_strncpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
@@ -82,18 +82,20 @@ static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 	return size * nmemb;
 }
 
-static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *result)
+static int	prepare_https(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
+		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
+		AGENT_RESULT *result)
 {
 	CURLcode	err;
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0 == item->verify_peer ? 0L : 1L)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0 == verify_peer ? 0L : 1L)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set verify the peer's SSL certificate: %s",
 				curl_easy_strerror(err)));
 		return FAIL;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0 == item->verify_host ? 0L : 2L)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0 == verify_host ? 0L : 2L)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set verify the certificate's name against host: %s",
 				curl_easy_strerror(err)));
@@ -110,7 +112,7 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 		}
 	}
 
-	if (0 != item->verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
+	if (0 != verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
 		{
@@ -120,11 +122,11 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 		}
 	}
 
-	if ('\0' != *item->ssl_cert_file)
+	if ('\0' != *ssl_cert_file)
 	{
 		char	*file_name;
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, item->ssl_cert_file);
+		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, ssl_cert_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL certificate file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);
@@ -145,11 +147,11 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 		}
 	}
 
-	if ('\0' != *item->ssl_key_file)
+	if ('\0' != *ssl_key_file)
 	{
 		char	*file_name;
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, item->ssl_key_file);
+		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, ssl_key_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL private key file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
@@ -170,9 +172,9 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 		}
 	}
 
-	if ('\0' != *item->ssl_key_password)
+	if ('\0' != *ssl_key_password)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD, item->ssl_key_password)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD, ssl_key_password)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set passphrase to private key: %s",
 					curl_easy_strerror(err)));
@@ -183,17 +185,18 @@ static int	prepare_https(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *re
 	return SUCCEED;
 }
 
-static int	prepare_auth(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *result)
+static int	prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	if (HTTPTEST_AUTH_NONE != item->authtype)
+	if (HTTPTEST_AUTH_NONE != authtype)
 	{
 		long		curlauth = 0;
 		char		auth[MAX_STRING_LEN];
 		CURLcode	err;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "setting HTTPAUTH [%d]", item->authtype);
+		zabbix_log(LOG_LEVEL_DEBUG, "setting HTTPAUTH [%d]", authtype);
 
-		switch (item->authtype)
+		switch (authtype)
 		{
 			case HTTPTEST_AUTH_BASIC:
 				curlauth = CURLAUTH_BASIC;
@@ -213,7 +216,7 @@ static int	prepare_auth(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *res
 			return FAIL;
 		}
 
-		zbx_snprintf(auth, sizeof(auth), "%s:%s", item->username, item->password);
+		zbx_snprintf(auth, sizeof(auth), "%s:%s", username, password);
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set user name and password: %s",
@@ -225,14 +228,14 @@ static int	prepare_auth(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *res
 	return SUCCEED;
 }
 
-static int	prepare_request(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *result)
+static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char request_method, AGENT_RESULT *result)
 {
 	CURLcode	err;
 
-	switch (item->request_method)
+	switch (request_method)
 	{
 		case HTTP_CHECK_POST:
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->posts)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
 						curl_easy_strerror(err)));
@@ -240,10 +243,10 @@ static int	prepare_request(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *
 			}
 			break;
 		case HTTP_CHECK_GET:
-			if ('\0' == *item->posts)
+			if ('\0' == *posts)
 				return SUCCEED;
 
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->posts)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
 						curl_easy_strerror(err)));
@@ -266,7 +269,7 @@ static int	prepare_request(CURL *easyhandle, const DC_ITEM *item, AGENT_RESULT *
 			}
 			break;
 		case HTTP_CHECK_PUT:
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, item->posts)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
 						curl_easy_strerror(err)));
@@ -298,7 +301,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	int			ret = NOTSUPPORTED, timeout_seconds;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
-	zbx_httppage_t		body = {0}, header = {0};
+	zbx_http_response_t	body = {0}, header = {0};
 	size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 
@@ -397,13 +400,16 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (SUCCEED != prepare_https(easyhandle, item, result))
+	if (SUCCEED != prepare_https(easyhandle, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
+			item->verify_peer, item->verify_host, result))
+	{
+		goto clean;
+	}
+
+	if (SUCCEED != prepare_auth(easyhandle, item->authtype, item->username, item->password, result))
 		goto clean;
 
-	if (SUCCEED != prepare_auth(easyhandle, item, result))
-		goto clean;
-
-	if (SUCCEED != prepare_request(easyhandle, item, result))
+	if (SUCCEED != prepare_request(easyhandle, item->posts, item->request_method, result))
 		goto clean;
 
 	add_headers(item->headers, &headers_slist);
