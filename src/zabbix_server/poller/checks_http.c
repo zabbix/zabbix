@@ -473,8 +473,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	ret = SUCCEED;
 clean:
-	if (NULL != headers_slist)
-		curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
+	curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
 	curl_easy_cleanup(easyhandle);
 	zbx_free(body.data);
 	zbx_free(header.data);
