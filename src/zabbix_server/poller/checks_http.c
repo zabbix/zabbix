@@ -237,7 +237,7 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 		case HTTP_CHECK_POST:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST: %s",
 						curl_easy_strerror(err)));
 				return FAIL;
 			}
@@ -248,7 +248,7 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST: %s",
 						curl_easy_strerror(err)));
 				return FAIL;
 			}
@@ -271,7 +271,7 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 		case HTTP_CHECK_PUT:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST to server: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST: %s",
 						curl_easy_strerror(err)));
 				return FAIL;
 			}
@@ -305,8 +305,9 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request '%s' url '%s'", __function_name,
-			zbx_request_string(item->request_method), item->url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s' headers '%s' message body '%s'",
+			__function_name, zbx_request_string(item->request_method), item->url, item->headers,
+			item->posts);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
