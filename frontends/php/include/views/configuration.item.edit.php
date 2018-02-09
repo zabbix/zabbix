@@ -291,7 +291,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPCHECK HTTP authentication.
 $itemFormList->addRow(
 	new CLabel(_('HTTP authentication'), 'http_authtype'),
-	(new CComboBox('http_authtype', $data['authtype'], null, [
+	(new CComboBox('http_authtype', $data['http_authtype'], null, [
 		HTTPTEST_AUTH_NONE => _('None'),
 		HTTPTEST_AUTH_BASIC => _('Basic'),
 		HTTPTEST_AUTH_NTLM => _('NTLM')
@@ -299,10 +299,28 @@ $itemFormList->addRow(
 	'http_authtype_row'
 );
 
+// ITEM_TYPE_HTTPCHECK User name.
+$itemFormList->addRow(
+	(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
+	(new CTextBox('http_username', $data['http_username'], false, 64))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'http_username_row'
+);
+
+// ITEM_TYPE_HTTPCHECK Password.
+$itemFormList->addRow(
+	(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
+	(new CTextBox('http_password', $data['http_password'], false, 64))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'http_password_row'
+);
+
 // ITEM_TYPE_HTTPCHECK SSL verify peer.
 $itemFormList->addRow(
 	new CLabel(_('SSL verify peer'), 'verify_peer'),
-	(new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_OFF))
+	(new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
 		->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON),
 	'verify_peer_row'
 );
@@ -310,7 +328,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPCHECK SSL verify host.
 $itemFormList->addRow(
 	new CLabel(_('SSL verify host'), 'verify_host'),
-	(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_OFF))
+	(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
 		->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON),
 	'verify_host_row'
 );

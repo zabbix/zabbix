@@ -144,6 +144,9 @@ $fields = [
 	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'verify_peer' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'verify_host' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_authtype' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_username' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
@@ -593,6 +596,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
 				];
 
+				$item['authtype'] = getRequest('http_authtype', HTTPTEST_AUTH_NONE);
+				$item['username'] = getRequest('http_username', '');
+				$item['password'] = getRequest('http_password', '');
+
 				$query_fields = [];
 				if (is_array($item['query_fields']) && array_key_exists('key', $item['query_fields']) && array_key_exists('value', $item['query_fields'])) {
 					foreach ($item['query_fields']['key'] as $index => $key) {
@@ -795,6 +802,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
 					'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
 				];
+
+				$item['authtype'] = getRequest('http_authtype', HTTPTEST_AUTH_NONE);
+				$item['username'] = getRequest('http_username', '');
+				$item['password'] = getRequest('http_password', '');
 
 				$query_fields = [];
 				if (is_array($posted['headers']) && array_key_exists('key', $posted['query_fields']) && array_key_exists('value', $posted['query_fields'])) {

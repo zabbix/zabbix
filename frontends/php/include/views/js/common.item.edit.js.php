@@ -287,8 +287,7 @@ $ui_rows = [
 	ITEM_TYPE_HTTPCHECK => [
 		'url_row', 'query_fields_row', 'request_method_row', 'timeout_row', 'post_type_row', 'posts_row', 'headers_row',
 		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'http_proxy_row',
-		'http_authtype_row', 'verify_peer_row', 'verify_host_row', 'ssl_key_file_row', 'ssl_key_password_row',
-		// 'row_username', 'row_publickey', 'row_privatekey', 'row_password'
+		'http_authtype_row', 'verify_peer_row', 'verify_host_row', 'ssl_key_file_row', 'ssl_key_password_row'
 	]
 ];
 foreach ($ui_rows[ITEM_TYPE_HTTPCHECK] as $row) {
@@ -363,6 +362,16 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'p
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
+
+$data['http_auth_switcher'] = [
+	HTTPTEST_AUTH_BASIC => [
+		'http_username_row', 'http_password_row'
+	],
+	HTTPTEST_AUTH_NTLM => [
+		'http_username_row', 'http_password_row'
+	]
+];
+
 ?>
 <script type="text/javascript">
 	function setAuthTypeLabel() {
@@ -380,6 +389,9 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		if (!empty($this->data['authTypeVisibility'])) { ?>
 			var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
 				<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
+		<?php }
+		if (array_key_exists('http_auth_switcher', $data)) { ?>
+			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true); ?>);
 		<?php }
 		if (!empty($this->data['typeVisibility'])) { ?>
 			var typeSwitcher = new CViewSwitcher('type', 'change',

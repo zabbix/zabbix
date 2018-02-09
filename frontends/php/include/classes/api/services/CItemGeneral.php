@@ -1644,10 +1644,31 @@ abstract class CItemGeneral extends CApiService {
 			'verify_host' => [
 				'type' => API_INT32,
 				'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])
+			],
+			'authtype' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM])
 			]
 		];
 
-		$data = array_intersect_key($item + $db_item, $rules);
+		$data = $item + $db_item;
+
+		if (array_key_exists('authtype', $data)
+				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM)) {
+			$rules += [
+				'username' => [
+					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+					'length' => DB::getFieldLength('items', 'username')
+				],
+				'password' => [
+					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+					'length' => DB::getFieldLength('items', 'password')
+				]
+			];
+		}
+
+		// Keep values only for fields with defined validation rules.
+		$data = array_intersect_key($data, $rules);
 
 		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
