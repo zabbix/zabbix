@@ -112,6 +112,7 @@ Bug fixes:
 Changes for 3.4.7rc2
 
 Bug fixes:
+A.F....... [ZBX-12607] fixed performance of map.get API method and map-related views (miks, Sasha)
 ....I..... [ZBX-13055] fixed compilation failure in Alpine Linux due to missing res_ninit() function (vso)
 
 --------------------------------------------------------------------------------
