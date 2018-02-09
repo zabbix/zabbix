@@ -451,7 +451,9 @@ class CItem extends CItemGeneral {
 
 				if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
 					if (array_key_exists('query_fields', $item)) {
-						$item['query_fields'] = json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE);
+						$item['query_fields'] = $item['query_fields']
+							? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+							: '';
 					}
 					if (array_key_exists('headers', $item)) {
 						$headers = [];
@@ -525,7 +527,9 @@ class CItem extends CItemGeneral {
 
 			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
 				if (array_key_exists('query_fields', $item)) {
-					$item['query_fields'] = json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE);
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
 				}
 				if (array_key_exists('headers', $item)) {
 					$headers = [];

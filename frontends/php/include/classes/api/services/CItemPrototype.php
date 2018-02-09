@@ -354,6 +354,26 @@ class CItemPrototype extends CItemGeneral {
 			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
 				$item['master_itemid'] = null;
 			}
+
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				if (array_key_exists('query_fields', $item)) {
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
+				}
+				if (array_key_exists('headers', $item)) {
+					$headers = [];
+
+					foreach ($item['headers'] as $k => $v) {
+						$headers[] = $k.': '.$v;
+					}
+
+					$item['headers'] = implode("\r\n", $headers);
+				}
+			}
+			else {
+				unset($item['url'], $item['query_fields'], $item['headers']);
+			}
 		}
 		unset($item);
 		$itemids = DB::insert('items', $items);
@@ -458,6 +478,27 @@ class CItemPrototype extends CItemGeneral {
 
 		$data = [];
 		foreach ($items as $inum => $item) {
+
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				if (array_key_exists('query_fields', $item)) {
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
+				}
+				if (array_key_exists('headers', $item)) {
+					$headers = [];
+
+					foreach ($item['headers'] as $k => $v) {
+						$headers[] = $k.': '.$v;
+					}
+
+					$item['headers'] = implode("\r\n", $headers);
+				}
+			}
+			else {
+				unset($item['url'], $item['query_fields'], $item['headers']);
+			}
+
 			$data[] = ['values' => $item, 'where'=> ['itemid' => $item['itemid']]];
 		}
 
