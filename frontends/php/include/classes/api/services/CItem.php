@@ -400,7 +400,7 @@ class CItem extends CItemGeneral {
 				$headers = [];
 
 				foreach (explode("\r\n", $item['headers']) as $header) {
-					if ($headers) {
+					if ($header) {
 						list($k, $v) = explode(': ', $header, 2);
 						$headers[$k] = $v;
 					}

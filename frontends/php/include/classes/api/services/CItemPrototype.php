@@ -267,6 +267,25 @@ class CItemPrototype extends CItemGeneral {
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
 
+		// Decode ITEM_TYPE_HTTPCHECK encoded fields.
+		foreach ($result as &$item) {
+			if (array_key_exists('query_fields', $item)) {
+				$item['query_fields'] = json_decode($item['query_fields']);
+			}
+			if (array_key_exists('headers', $item)) {
+				$headers = [];
+
+				foreach (explode("\r\n", $item['headers']) as $header) {
+					if ($header) {
+						list($k, $v) = explode(': ', $header, 2);
+						$headers[$k] = $v;
+					}
+				}
+
+				$item['headers'] = $headers;
+			}
+		}
+
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
