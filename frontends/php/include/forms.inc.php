@@ -1004,9 +1004,10 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	if ($data['type'] == ITEM_TYPE_HTTPCHECK) {
 		$query_fields = [];
-		if (array_key_exists('key', $data['query_fields']) && array_key_exists('value', $data['query_fields'])) {
+		if (is_array($data['query_fields']) && array_key_exists('key', $data['query_fields'])
+				&& array_key_exists('value', $data['query_fields'])) {
 			foreach ($data['query_fields']['key'] as $index => $key) {
-				if (array_key_exists($index, $data['query_fields']['value'])) {
+				if ($key !== '' && array_key_exists($index, $data['query_fields']['value'])) {
 					$query_fields[] = [$key => $data['query_fields']['value'][$index]];
 				}
 			}
@@ -1014,9 +1015,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['query_fields'] = $query_fields;
 
 		$headers = [];
-		if (array_key_exists('key', $data['headers']) && array_key_exists('value', $data['headers'])) {
+		if (is_array($data['query_fields']) && array_key_exists('key', $data['headers'])
+				&& array_key_exists('value', $data['headers'])) {
 			foreach ($data['headers']['key'] as $index => $key) {
-				if (array_key_exists($index, $data['headers']['value'])) {
+				if ($key !== '' && array_key_exists($index, $data['headers']['value'])) {
 					$headers[$key] = $data['headers']['value'][$index];
 				}
 			}

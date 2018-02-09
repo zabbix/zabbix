@@ -210,12 +210,13 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			if ((array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_HTTPCHECK)
-					|| ($update && $dbItems[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK)) {
-				$this->validateHTTPCheck($fullItem, $update ? $dbItems[$item['itemid']] : []);
-			}
-
 			if ($update) {
+				$type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
+
+				if ($type == ITEM_TYPE_HTTPCHECK) {
+					$this->validateHTTPCheck($fullItem, $dbItems[$item['itemid']]);
+				}
+
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
 
 				$this->checkNoParameters(
@@ -254,6 +255,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 			else {
+				if ($fullItem['type'] == ITEM_TYPE_HTTPCHECK) {
+					$this->validateHTTPCheck($fullItem, []);
+				}
+
 				if (!isset($dbHosts[$item['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
@@ -1592,7 +1597,7 @@ abstract class CItemGeneral extends CApiService {
 				'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN
 			],
 			'url' => [
-				'type' => API_URL, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO,
+				'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
 				'length' => DB::getFieldLength('items', 'url'),
 			],
 			'status_codes' => [
@@ -1648,13 +1653,6 @@ abstract class CItemGeneral extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (array_key_exists('url', $item)
-				&& !in_array(strtolower(parse_url($item['url'], PHP_URL_SCHEME)), ['http', 'https'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.', $item['url'],
-				'url')
-			);
-		}
-
 		if (array_key_exists('query_fields', $item)) {
 			if (!is_array($item['query_fields'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
@@ -1663,7 +1661,8 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			foreach ($item['query_fields'] as $v) {
-				if (!is_array($v) || count($v) > 1 || !is_string(reset($v)) || reset($v) === '' || key($v) === '') {
+				if (!is_array($v) || count($v) > 1 || !is_string(reset($v)) || trim(reset($v)) === ''
+						|| key($v) === '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
 						_('nonempty key and value pair expected'))
 					);
@@ -1680,8 +1679,14 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('headers', $item)) {
+			if (!is_array($item['headers'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'headers',
+					_('an array is expected'))
+				);
+			}
+
 			foreach ($item['headers'] as $k => $v) {
-				if ($k === '' || strpos(':', $k) !== false || !is_string($v) || $v === '') {
+				if (trim($k) === '' || !is_string($v) || $v === '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'headers',
 						_('nonempty key and value pair expected'))
 					);
