@@ -582,18 +582,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'query_fields' => getRequest('query_fields', []),
 					'posts' => getRequest('posts'),
 					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-					'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
-					'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+					'follow_redirects' => (int) getRequest('follow_redirects'),
+					'post_type' => (int) getRequest('post_type'),
 					'http_proxy' => getRequest('http_proxy'),
 					'headers' => getRequest('headers', []),
-					'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
-					'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
-					'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+					'retrieve_mode' => (int) getRequest('retrieve_mode'),
+					'request_method' => (int) getRequest('request_method'),
+					'output_format' => (int) getRequest('output_format'),
 					'ssl_cert_file' => getRequest('ssl_cert_file'),
 					'ssl_key_file' => getRequest('ssl_key_file'),
 					'ssl_key_password' => getRequest('ssl_key_password'),
-					'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
-					'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
+					'verify_peer' => (int) getRequest('verify_peer'),
+					'verify_host' => (int) getRequest('verify_host'),
 				];
 
 				$item['authtype'] = getRequest('http_authtype', HTTPTEST_AUTH_NONE);
@@ -601,7 +601,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['password'] = getRequest('http_password', '');
 
 				$query_fields = [];
-				if (is_array($item['query_fields']) && array_key_exists('key', $item['query_fields']) && array_key_exists('value', $item['query_fields'])) {
+				if (is_array($item['query_fields']) && array_key_exists('key', $item['query_fields'])
+						&& array_key_exists('value', $item['query_fields'])) {
 					foreach ($item['query_fields']['key'] as $index => $key) {
 						if ($key !== '' && array_key_exists($index, $item['query_fields']['value'])) {
 							$query_fields[] = [$key => $item['query_fields']['value'][$index]];
@@ -611,7 +612,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['query_fields'] = $query_fields;
 
 				$headers = [];
-				if (is_array($item['headers']) && array_key_exists('key', $item['headers']) && array_key_exists('value', $item['headers'])) {
+				if (is_array($item['headers']) && array_key_exists('key', $item['headers'])
+						&& array_key_exists('value', $item['headers'])) {
 					foreach ($item['headers']['key'] as $index => $key) {
 						if ($key !== '' && array_key_exists($index, $item['headers']['value'])) {
 							$headers[$key] = $item['headers']['value'][$index];
@@ -789,18 +791,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'query_fields' => getRequest('query_fields', []),
 					'posts' => getRequest('posts'),
 					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-					'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
-					'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+					'follow_redirects' => (int) getRequest('follow_redirects'),
+					'post_type' => (int) getRequest('post_type'),
 					'http_proxy' => getRequest('http_proxy'),
 					'headers' => getRequest('headers', []),
-					'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
-					'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
-					'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+					'retrieve_mode' => getRequest('retrieve_mode', 0),
+					'request_method' => (int) getRequest('request_method'),
+					'output_format' => (int) getRequest('output_format'),
 					'ssl_cert_file' => getRequest('ssl_cert_file'),
 					'ssl_key_file' => getRequest('ssl_key_file'),
 					'ssl_key_password' => getRequest('ssl_key_password'),
-					'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
-					'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
+					'verify_peer' => (int) getRequest('verify_peer'),
+					'verify_host' => (int) getRequest('verify_host'),
 				];
 
 				$item['authtype'] = getRequest('http_authtype', HTTPTEST_AUTH_NONE);
@@ -808,7 +810,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['password'] = getRequest('http_password', '');
 
 				$query_fields = [];
-				if (is_array($posted['headers']) && array_key_exists('key', $posted['query_fields']) && array_key_exists('value', $posted['query_fields'])) {
+				if (is_array($posted['headers']) && array_key_exists('key', $posted['query_fields'])
+						&& array_key_exists('value', $posted['query_fields'])) {
 					foreach ($posted['query_fields']['key'] as $index => $key) {
 						if ($key !== '' && array_key_exists($index, $posted['query_fields']['value'])) {
 							$query_fields[] = [$key => $posted['query_fields']['value'][$index]];
@@ -818,7 +821,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$posted['query_fields'] = $query_fields;
 
 				$headers = [];
-				if (is_array($posted['headers']) && array_key_exists('key', $posted['headers']) && array_key_exists('value', $posted['headers'])) {
+				if (is_array($posted['headers']) && array_key_exists('key', $posted['headers'])
+						&& array_key_exists('value', $posted['headers'])) {
 					foreach ($posted['headers']['key'] as $index => $key) {
 						if ($key !== '' && array_key_exists($index, $posted['headers']['value'])) {
 							$headers[$key] = $posted['headers']['value'][$index];
