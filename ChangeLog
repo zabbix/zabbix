@@ -7,6 +7,7 @@ A.F....... [ZBXNEXT-4152] replaced double box select fields with multiselect fie
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
 Bug fixes:
+.......PS. [ZBX-13441] fixed crashes in case of failures (e.g. timeouts) during VMware hypervisor discovery (gleb)
 A.F....... [ZBX-12607] fixed performance of map.get API method and map-related views (miks, Sasha)
 ........S. [ZBX-11391] generated an error if expanding LLD macros results in an empty tag name (MVekslers)
 ..F....... [ZBX-13300] fixed addJsFile() name (agriscenko)
@@ -113,6 +114,7 @@ Bug fixes:
 Changes for 3.4.7rc2
 
 Bug fixes:
+.......PS. [ZBX-13441] fixed crashes in case of failures (e.g. timeouts) during VMware hypervisor discovery (gleb)
 A.F....... [ZBX-12607] fixed performance of map.get API method and map-related views (miks, Sasha)
 ....I..... [ZBX-13055] fixed compilation failure in Alpine Linux due to missing res_ninit() function (vso)
 
@@ -1202,6 +1204,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.15rc1
 
 Bug fixes:
+.......PS. [ZBX-13441] fixed crashes in case of failures (e.g. timeouts) during VMware hypervisor discovery (gleb)
 ........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
 A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
 ...G...... [ZBX-13055] fixed problems with DNS resolver interface on NetBSD (valdis)
