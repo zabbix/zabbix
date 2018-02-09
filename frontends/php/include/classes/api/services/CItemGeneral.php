@@ -1714,5 +1714,21 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 		}
+
+		/**
+		 * Field can contain: single usermacros or status codes/ranges.
+		 *
+		 * Made consistent to validation in CHttpTest check.
+		 */
+		if (array_key_exists('status_codes', $item)
+				&& (new CUserMacroParser())->parse($item['status_codes']) === CParser::PARSE_FAIL) {
+			foreach (explode(',', $item['status_codes']) as $v) {
+				if (trim($v) === '' || count(explode('-', $v)) > 2 || !ctype_digit(str_replace('-', '0', $v))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+						$item['status_codes'], 'status_codes')
+					);
+				}
+			}
+		}
 	}
 }
