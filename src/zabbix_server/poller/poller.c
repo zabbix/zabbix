@@ -646,7 +646,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
 						NULL, &items[i].url, MACRO_TYPE_ITEM_URL, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].posts, MACRO_TYPE_ITEM_URL, NULL, 0);
+						NULL, &items[i].posts, items[i].post_type == ZBX_POSTTYPE_JSON ?
+						MACRO_TYPE_ITEM_JSON_POST : MACRO_TYPE_ITEM_URL, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
 						NULL, &items[i].headers, MACRO_TYPE_ITEM_URL, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,

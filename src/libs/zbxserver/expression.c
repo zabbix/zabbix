@@ -3869,7 +3869,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					replace_to = zbx_strdup(replace_to, interface.addr);
 			}
 		}
-		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_ITEM_URL))
+		else if (0 == indexed_macro && (0 != (macro_type & (MACRO_TYPE_ITEM_URL | MACRO_TYPE_ITEM_JSON_POST))))
 		{
 			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
@@ -4040,6 +4040,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 			}
 		}
+
+		if (0 != (macro_type & MACRO_TYPE_ITEM_JSON_POST) && NULL != replace_to)
+			zbx_json_escape(&replace_to);
 
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{

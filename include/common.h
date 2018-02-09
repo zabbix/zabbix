@@ -1429,6 +1429,8 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 #define ZBX_POSTTYPE_RAW		0
 #define ZBX_POSTTYPE_FORM		1
+#define ZBX_POSTTYPE_JSON		2
+#define ZBX_POSTTYPE_XML		3
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
