@@ -128,7 +128,8 @@ $fields = [
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
 	'timeout' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'url' =>            		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'url' =>            		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_HTTPCHECK, _('URL')],
 	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],

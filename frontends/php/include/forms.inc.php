@@ -1028,6 +1028,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 		$data['headers'] = $headers;
 	}
+	else {
+		$data['headers'] = [];
+		$data['query_fields'] = [];
+	}
 
 	// Dependent item initialization by master_itemid.
 	if (!hasRequest('form_refresh') && array_key_exists('master_item', $item)) {
