@@ -312,8 +312,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize cURL library"));
-
-		return NOTSUPPORTED;
+		goto clean;
 	}
 
 	switch (item->retrieve_mode)
