@@ -18,6 +18,7 @@
 **/
 #ifdef HAVE_LIBCURL
 #include "checks_http.h"
+#ifdef HAVE_LIBCURL
 #include "log.h"
 
 extern void	add_headers(char *headers, struct curl_slist **headers_slist);
