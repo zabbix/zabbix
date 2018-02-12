@@ -158,11 +158,7 @@ $new_permissions_table = (new CTable())
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top')
 	])
-	->addRow([[
-		(new CCheckBox('subgroups')),
-		SPACE,
-		_('Include subgroups')
-	]])
+	->addRow([[(new CCheckBox('subgroups')), _('Include subgroups')]])
 	->addRow([
 		(new CSimpleButton(_('Add')))
 			->onClick('javascript: submitFormWithParam("'.$userGroupForm->getName().'", "add_permission", "1");')
@@ -252,7 +248,6 @@ $new_permissions_table = (new CTable())
 	])
 	->addRow([[
 		(new CCheckBox('tag_filter_subgroups'))->setChecked($data['tag_filter_subgroups'] == 1),
-		SPACE,
 		_('Include subgroups')
 	]])
 	->addRow([
