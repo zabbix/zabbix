@@ -460,12 +460,10 @@ $data['http_auth_switcher'] = [
 
 				switch ($(e.currentTarget).data('row-action')) {
 					case 'remove_row' :
-						if (rows > 1) {
-							rows -= 1;
-							table.sortable('option', 'disabled', rows < 2);
+						rows -= 1;
+						table.sortable('option', 'disabled', rows < 2);
 
-							$(e.currentTarget).closest('.'+table_row_class).remove();
-						}
+						$(e.currentTarget).closest('.'+table_row_class).remove();
 						break;
 
 					case 'add_row' :
