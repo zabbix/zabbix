@@ -391,7 +391,7 @@ $data['http_auth_switcher'] = [
 				<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
 		<?php }
 		if ($data['http_auth_switcher']) { ?>
-			if (jQuery('http_authtype').length) {
+			if (jQuery('#http_authtype').length) {
 				new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true); ?>);
 			}
 		<?php }
