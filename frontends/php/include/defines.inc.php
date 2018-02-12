@@ -824,10 +824,8 @@ define('ZBX_HTTPFIELD_QUERY_FIELD',	3);
 
 define('ZBX_POSTTYPE_RAW',	0);
 define('ZBX_POSTTYPE_FORM',	1);
-
-define('HTTP_BODY_RAW', 0);
-define('HTTP_BODY_JSON', 1);
-define('HTTP_BODY_XML', 2);
+define('ZBX_POSTTYPE_JSON',	2);
+define('ZBX_POSTTYPE_XML',	3);
 
 define('HTTPCHECK_STORE_RAW', 0);
 define('HTTPCHECK_STORE_JSON', 1);

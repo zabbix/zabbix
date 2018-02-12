@@ -1610,7 +1610,7 @@ abstract class CItemGeneral extends CApiService {
 			],
 			'post_type' => [
 				'type' => API_INT32,
-				'in' => implode(',', [HTTP_BODY_RAW, HTTP_BODY_JSON, HTTP_BODY_XML])
+				'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])
 			],
 			'http_proxy' => [
 				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')

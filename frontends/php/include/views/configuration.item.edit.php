@@ -185,9 +185,9 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	new CLabel(_('Request body type'), 'post_type'),
 	(new CRadioButtonList('post_type', (int) $data['post_type']))
-		->addValue(_('Raw data'), HTTP_BODY_RAW)
-		->addValue(_('JSON data'), HTTP_BODY_JSON)
-		->addValue(_('XML data'), HTTP_BODY_XML)
+		->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
+		->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
+		->addValue(_('XML data'), ZBX_POSTTYPE_XML)
 		->setModern(true),
 	'post_type_row'
 );
