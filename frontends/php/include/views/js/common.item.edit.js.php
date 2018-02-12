@@ -518,7 +518,8 @@ $data['http_auth_switcher'] = [
 
 			et.addRows(data);
 
-			if (t.data('data-sortable-pairs-table') !== '1') {
+			if (t.data('sortable-pairs-table') != 1) {
+				console.log('disabled');
 				table.sortable('option', 'disabled', true);
 			}
 

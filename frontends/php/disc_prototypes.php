@@ -171,26 +171,43 @@ $fields = [
 	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>		[T_ZBX_INT, O_OPT, null,
-		IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),	null],
+									IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
+									null
+								],
 	'post_type' =>				[T_ZBX_INT, O_OPT, null,
-		IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),	null],
+									IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
+									null
+								],
 	'http_proxy' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'headers' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'retrieve_mode' =>			[T_ZBX_INT, O_OPT, null,
-		IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
-			null],
+									IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
+										HTTPTEST_STEP_RETRIEVE_MODE_BOTH
+									]),
+									null
+								],
 	'request_method' =>			[T_ZBX_INT, O_OPT, null,
-		IN([HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),	null],
+									IN([HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT,
+										HTTPCHECK_REQUEST_HEAD
+									]),
+									null
+								],
 	'output_format' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_cert_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'verify_peer' =>			[T_ZBX_INT, O_OPT, null,	IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
-		null],
-	'verify_host' =>			[T_ZBX_INT, O_OPT, null,	IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
-		null],
+	'verify_peer' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
+									null
+								],
+	'verify_host' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+									null
+								],
 	'http_authtype' =>			[T_ZBX_INT, O_OPT, null,
-		IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),	null],
+									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
+									null
+								],
 	'http_username' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
@@ -483,9 +500,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if (is_array($item['query_fields']) && array_key_exists('key', $item['query_fields'])
 						&& array_key_exists('value', $item['query_fields'])) {
 					foreach ($item['query_fields']['key'] as $index => $key) {
-						if ($key !== '' && array_key_exists($index, $item['query_fields']['value'])) {
+						if (array_key_exists($index, $item['query_fields']['value'])) {
 							$query_fields[] = [$key => $item['query_fields']['value'][$index]];
 						}
+					}
+
+					// Ignore single row if it is empty.
+					if (count($query_fields) == 1 && $key === '' &&  $item['query_fields']['value'][$index] === '') {
+						$query_fields = [];
 					}
 				}
 				$item['query_fields'] = $query_fields;
@@ -494,9 +516,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if (is_array($item['headers']) && array_key_exists('key', $item['headers'])
 						&& array_key_exists('value', $item['headers'])) {
 					foreach ($item['headers']['key'] as $index => $key) {
-						if ($key !== '' && array_key_exists($index, $item['headers']['value'])) {
+						if (array_key_exists($index, $item['headers']['value'])) {
 							$headers[$key] = $item['headers']['value'][$index];
 						}
+					}
+
+					// Ignore single row if it is empty.
+					if (count($headers) == 1 && $key === '' &&  $item['headers']['value'][$index] === '') {
+						$headers = [];
 					}
 				}
 				$item['headers'] = $headers;
@@ -565,9 +592,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if (is_array($posted['headers']) && array_key_exists('key', $posted['query_fields'])
 						&& array_key_exists('value', $posted['query_fields'])) {
 					foreach ($posted['query_fields']['key'] as $index => $key) {
-						if ($key !== '' && array_key_exists($index, $posted['query_fields']['value'])) {
+						if (array_key_exists($index, $posted['query_fields']['value'])) {
 							$query_fields[] = [$key => $posted['query_fields']['value'][$index]];
 						}
+					}
+
+					// Ignore single row if it is empty.
+					if (count($query_fields) == 1 && $key === '' &&  $posted['query_fields']['value'][$index] === '') {
+						$query_fields = [];
 					}
 				}
 				$posted['query_fields'] = $query_fields;
@@ -576,9 +608,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if (is_array($posted['headers']) && array_key_exists('key', $posted['headers'])
 						&& array_key_exists('value', $posted['headers'])) {
 					foreach ($posted['headers']['key'] as $index => $key) {
-						if ($key !== '' && array_key_exists($index, $posted['headers']['value'])) {
+						if (array_key_exists($index, $posted['headers']['value'])) {
 							$headers[$key] = $posted['headers']['value'][$index];
 						}
+					}
+
+					// Ignore single row if it is empty.
+					if (count($headers) == 1 && $key === '' &&  $posted['headers']['value'][$index] === '') {
+						$headers = [];
 					}
 				}
 				$posted['headers'] = $headers;
