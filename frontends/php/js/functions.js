@@ -842,7 +842,7 @@ function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 					}
 				}
 			]
-		});
+		}, trigger_elmnt);
 	}
 	else {
 		execute();
