@@ -53,6 +53,23 @@ typedef struct
 	char			*description;
 	char			*port;
 	char			*jmx_endpoint;
+	char			*timeout;
+	char			*url;
+	char			*query_fields;
+	char			*posts;
+	char			*status_codes;
+	char			*http_proxy;
+	char			*headers;
+	char			*ssl_cert_file;
+	char			*ssl_key_file;
+	char			*ssl_key_password;
+	unsigned char		verify_peer;
+	unsigned char		verify_host;
+	unsigned char		follow_redirects;
+	unsigned char		post_type;
+	unsigned char		retrieve_mode;
+	unsigned char		request_method;
+	unsigned char		output_format;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		status;
@@ -106,24 +123,24 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME	__UINT64_C(0x0000000800000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT		__UINT64_C(0x0000001000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM		__UINT64_C(0x0000002000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE										\
-		(ZBX_FLAG_LLD_ITEM_UPDATE_NAME | ZBX_FLAG_LLD_ITEM_UPDATE_KEY | ZBX_FLAG_LLD_ITEM_UPDATE_TYPE |	\
-		ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE |								\
-		ZBX_FLAG_LLD_ITEM_UPDATE_DELAY |								\
-		ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY | ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS | ZBX_FLAG_LLD_ITEM_UPDATE_UNITS |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA | ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID | ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR | ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY |		\
-		ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID | ZBX_FLAG_LLD_ITEM_UPDATE_PORT |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME | ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL |	\
-		ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPROTOCOL | ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE |	\
-		ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPROTOCOL | ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE |	\
-		ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE | ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD | ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY | ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID | ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME |		\
-		ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT | ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT		__UINT64_C(0x0000004000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_URL			__UINT64_C(0x0000008000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS		__UINT64_C(0x0000010000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_POSTS			__UINT64_C(0x0000020000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES		__UINT64_C(0x0000040000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_FOLLOW_REDIRECTS	__UINT64_C(0x0000080000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_POST_TYPE		__UINT64_C(0x0000100000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_HTTP_PROXY		__UINT64_C(0x0000200000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS		__UINT64_C(0x0000400000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_RETRIEVE_MODE		__UINT64_C(0x0000800000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_REQUEST_METHOD		__UINT64_C(0x0001000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_OUTPUT_FORMAT		__UINT64_C(0x0002000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_CERT_FILE		__UINT64_C(0x0004000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE		__UINT64_C(0x0008000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD	__UINT64_C(0x0010000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER		__UINT64_C(0x0020000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST		__UINT64_C(0x0040000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE			(~ZBX_FLAG_LLD_ITEM_DISCOVERED)
 	zbx_uint64_t		flags;
 	char			*key_proto;
 	char			*name;
@@ -148,6 +165,26 @@ typedef struct
 	char			*description_orig;
 	char			*jmx_endpoint;
 	char			*jmx_endpoint_orig;
+	char			*timeout;
+	char			*timeout_orig;
+	char			*url;
+	char			*url_orig;
+	char			*query_fields;
+	char			*query_fields_orig;
+	char			*posts;
+	char			*posts_orig;
+	char			*status_codes;
+	char			*status_codes_orig;
+	char			*http_proxy;
+	char			*http_proxy_orig;
+	char			*headers;
+	char			*headers_orig;
+	char			*ssl_cert_file;
+	char			*ssl_cert_file_orig;
+	char			*ssl_key_file;
+	char			*ssl_key_file_orig;
+	char			*ssl_key_password;
+	char			*ssl_key_password_orig;
 	int			lastcheck;
 	int			ts_delete;
 	const zbx_lld_row_t	*lld_row;
@@ -423,6 +460,16 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_free(item_prototype->description);
 	zbx_free(item_prototype->port);
 	zbx_free(item_prototype->jmx_endpoint);
+	zbx_free(item_prototype->timeout);
+	zbx_free(item_prototype->url);
+	zbx_free(item_prototype->query_fields);
+	zbx_free(item_prototype->posts);
+	zbx_free(item_prototype->status_codes);
+	zbx_free(item_prototype->http_proxy);
+	zbx_free(item_prototype->headers);
+	zbx_free(item_prototype->ssl_cert_file);
+	zbx_free(item_prototype->ssl_key_file);
+	zbx_free(item_prototype->ssl_key_password);
 
 	zbx_vector_ptr_destroy(&item_prototype->lld_rows);
 
@@ -460,6 +507,26 @@ static void	lld_item_free(zbx_lld_item_t *item)
 	zbx_free(item->description_orig);
 	zbx_free(item->jmx_endpoint);
 	zbx_free(item->jmx_endpoint_orig);
+	zbx_free(item->timeout);
+	zbx_free(item->timeout_orig);
+	zbx_free(item->url);
+	zbx_free(item->url_orig);
+	zbx_free(item->query_fields);
+	zbx_free(item->query_fields_orig);
+	zbx_free(item->posts);
+	zbx_free(item->posts_orig);
+	zbx_free(item->status_codes);
+	zbx_free(item->status_codes_orig);
+	zbx_free(item->http_proxy);
+	zbx_free(item->http_proxy_orig);
+	zbx_free(item->headers);
+	zbx_free(item->headers_orig);
+	zbx_free(item->ssl_cert_file);
+	zbx_free(item->ssl_cert_file_orig);
+	zbx_free(item->ssl_key_file);
+	zbx_free(item->ssl_key_file_orig);
+	zbx_free(item->ssl_key_password);
+	zbx_free(item->ssl_key_password_orig);
 
 	zbx_vector_ptr_clear_ext(&item->preproc_ops, (zbx_clean_func_t)lld_item_preproc_free);
 	zbx_vector_ptr_destroy(&item->preproc_ops);
@@ -515,6 +582,9 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 				"i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,"
 				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
 				"i.description,i.interfaceid,i.snmpv3_contextname,i.jmx_endpoint,i.master_itemid,"
+				"i.timeout,i.url,i.query_fields,i.posts,i.status_codes,i.follow_redirects,i.post_type,"
+				"i.http_proxy,i.headers,i.retrieve_mode,i.request_method,i.output_format,"
+				"i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,i.verify_host,"
 				"id.parent_itemid"
 			" from item_discovery id"
 				" join items i"
@@ -528,7 +598,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(itemid, row[37]);
+		ZBX_STR2UINT64(itemid, row[54]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &itemid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -645,6 +715,57 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->jmx_endpoint_orig = NULL;
 
 		ZBX_DBROW2UINT64(item->master_itemid, row[36]);
+
+		item->timeout = zbx_strdup(NULL, row[37]);
+		item->timeout_orig = NULL;
+
+		item->url = zbx_strdup(NULL, row[38]);
+		item->url_orig = NULL;
+
+		item->query_fields = zbx_strdup(NULL, row[39]);
+		item->query_fields_orig = NULL;
+
+		item->posts = zbx_strdup(NULL, row[40]);
+		item->posts_orig = NULL;
+
+		item->status_codes = zbx_strdup(NULL, row[41]);
+		item->status_codes_orig = NULL;
+
+		if ((unsigned char)atoi(row[42]) != item_prototype->follow_redirects)
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_FOLLOW_REDIRECTS;
+
+		if ((unsigned char)atoi(row[43]) != item_prototype->post_type)
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_POST_TYPE;
+
+		item->http_proxy = zbx_strdup(NULL, row[44]);
+		item->http_proxy_orig = NULL;
+
+		item->headers = zbx_strdup(NULL, row[45]);
+		item->headers_orig = NULL;
+
+		if ((unsigned char)atoi(row[46]) != item_prototype->retrieve_mode)
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_RETRIEVE_MODE;
+
+		if ((unsigned char)atoi(row[47]) != item_prototype->request_method)
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_REQUEST_METHOD;
+
+		if ((unsigned char)atoi(row[48]) != item_prototype->output_format)
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_OUTPUT_FORMAT;
+
+		item->ssl_cert_file = zbx_strdup(NULL, row[49]);
+		item->ssl_cert_file_orig = NULL;
+
+		item->ssl_key_file = zbx_strdup(NULL, row[50]);
+		item->ssl_key_file_orig = NULL;
+
+		item->ssl_key_password = zbx_strdup(NULL, row[51]);
+		item->ssl_key_password_orig = NULL;
+
+		if ((unsigned char)atoi(row[52]) != item_prototype->verify_peer)
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER;
+
+		if ((unsigned char)atoi(row[53]) != item_prototype->verify_host)
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST;
 
 		item->lld_row = NULL;
 
@@ -829,6 +950,26 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 				ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION, ITEM_DESCRIPTION_LEN, error);
 		lld_validate_item_field(item, &item->jmx_endpoint, &item->jmx_endpoint_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT, ITEM_JMX_ENDPOINT_LEN, error);
+		lld_validate_item_field(item, &item->timeout, &item->timeout_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT, ITEM_TIMEOUT_LEN, error);
+		lld_validate_item_field(item, &item->url, &item->url_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_URL, ITEM_URL_LEN, error);
+		lld_validate_item_field(item, &item->query_fields, &item->query_fields_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS, ITEM_QUERY_FIELDS_LEN, error);
+		lld_validate_item_field(item, &item->posts, &item->posts_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_POSTS, ITEM_POSTS_LEN, error);
+		lld_validate_item_field(item, &item->status_codes, &item->status_codes_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES, ITEM_STATUS_CODES_LEN, error);
+		lld_validate_item_field(item, &item->http_proxy, &item->http_proxy_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_HTTP_PROXY, ITEM_HTTP_PROXY_LEN, error);
+		lld_validate_item_field(item, &item->headers, &item->headers_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS, ITEM_HEADERS_LEN, error);
+		lld_validate_item_field(item, &item->ssl_cert_file, &item->ssl_cert_file_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_CERT_FILE, ITEM_SSL_CERT_FILE_LEN, error);
+		lld_validate_item_field(item, &item->ssl_key_file, &item->ssl_key_file_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE, ITEM_SSL_KEY_FILE_LEN, error);
+		lld_validate_item_field(item, &item->ssl_key_password, &item->ssl_key_password_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD, ITEM_SSL_KEY_PASSWORD_LEN, error);
 	}
 
 	/* check duplicated item keys */
@@ -1137,6 +1278,56 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	substitute_lld_macros(&item->jmx_endpoint, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
+	item->timeout = zbx_strdup(NULL, item_prototype->timeout);
+	item->timeout_orig = NULL;
+	substitute_lld_macros(&item->timeout, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->timeout, ZBX_WHITESPACE);
+
+	item->url = zbx_strdup(NULL, item_prototype->url);
+	item->url_orig = NULL;
+	substitute_lld_macros(&item->url, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->url, ZBX_WHITESPACE);
+
+	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
+	item->query_fields_orig = NULL;
+	substitute_lld_macros(&item->query_fields, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/*zbx_lrtrim(item->query_fields, ZBX_WHITESPACE);*/
+
+	item->posts = zbx_strdup(NULL, item_prototype->posts);
+	item->posts_orig = NULL;
+	substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->posts, ZBX_WHITESPACE); is not missing here */
+
+	item->status_codes = zbx_strdup(NULL, item_prototype->status_codes);
+	item->status_codes_orig = NULL;
+	substitute_lld_macros(&item->status_codes, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->status_codes, ZBX_WHITESPACE);
+
+	item->http_proxy = zbx_strdup(NULL, item_prototype->http_proxy);
+	item->http_proxy_orig = NULL;
+	substitute_lld_macros(&item->http_proxy, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->http_proxy, ZBX_WHITESPACE);
+
+	item->headers = zbx_strdup(NULL, item_prototype->headers);
+	item->headers_orig = NULL;
+	substitute_lld_macros(&item->headers, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->headers, ZBX_WHITESPACE); is not missing here */
+
+	item->ssl_cert_file = zbx_strdup(NULL, item_prototype->ssl_cert_file);
+	item->ssl_cert_file_orig = NULL;
+	substitute_lld_macros(&item->ssl_cert_file, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
+
+	item->ssl_key_file = zbx_strdup(NULL, item_prototype->ssl_key_file);
+	item->ssl_key_file_orig = NULL;
+	substitute_lld_macros(&item->ssl_key_file, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
+
+	item->ssl_key_password = zbx_strdup(NULL, item_prototype->ssl_key_password);
+	item->ssl_key_password_orig = NULL;
+	substitute_lld_macros(&item->ssl_key_password, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
+
 	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	item->lld_row = lld_row;
 
@@ -1322,6 +1513,116 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->jmx_endpoint = buffer;
 		buffer = NULL;
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->timeout);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->timeout, buffer))
+	{
+		item->timeout_orig = item->timeout;
+		item->timeout = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->url);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->url, buffer))
+	{
+		item->url_orig = item->url;
+		item->url = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_URL;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->query_fields);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->query_fields, buffer))
+	{
+		item->query_fields_orig = item->query_fields;
+		item->query_fields = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->posts);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->posts, buffer))
+	{
+		item->posts_orig = item->posts;
+		item->posts = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_POSTS;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->status_codes);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->status_codes, buffer))
+	{
+		item->status_codes_orig = item->status_codes;
+		item->status_codes = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->http_proxy);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->http_proxy, buffer))
+	{
+		item->http_proxy_orig = item->http_proxy;
+		item->http_proxy = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_HTTP_PROXY;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->headers);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/*zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->headers, buffer))
+	{
+		item->headers_orig = item->headers;
+		item->headers = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->ssl_cert_file);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->ssl_cert_file, buffer))
+	{
+		item->ssl_cert_file_orig = item->ssl_cert_file;
+		item->ssl_cert_file = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SSL_CERT_FILE;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->ssl_key_file);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->ssl_key_file, buffer))
+	{
+		item->ssl_key_file_orig = item->ssl_key_file;
+		item->ssl_key_file = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->ssl_key_password);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->ssl_key_password, buffer))
+	{
+		item->ssl_key_password_orig = item->ssl_key_password;
+		item->ssl_key_password = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD;
 	}
 
 	item->flags |= ZBX_FLAG_LLD_ITEM_DISCOVERED;
@@ -1577,7 +1878,12 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				(int)item_prototype->authtype, item_prototype->username,
 				item_prototype->password, item_prototype->publickey, item_prototype->privatekey,
 				item->description, item_prototype->interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item_prototype->snmpv3_contextname, item->jmx_endpoint, item->master_itemid);
+				item_prototype->snmpv3_contextname, item->jmx_endpoint, item->master_itemid,
+				item->timeout, item->url, item->query_fields, item->posts, item->status_codes,
+				item_prototype->follow_redirects, item_prototype->post_type, item->http_proxy,
+				item->headers, item_prototype->retrieve_mode, item_prototype->request_method,
+				item_prototype->output_format, item->ssl_cert_file, item->ssl_key_file,
+				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host);
 
 		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, item->itemid,
 				item->parent_itemid, item_prototype->key);
@@ -1850,6 +2156,115 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%smaster_itemid=%s",
 				d, DBsql_id_ins(item->master_itemid));
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT))
+	{
+		value_esc = DBdyn_escape_string(item->timeout);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%stimeout='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_URL))
+	{
+		value_esc = DBdyn_escape_string(item->url);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%surl='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS))
+	{
+		value_esc = DBdyn_escape_string(item->query_fields);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%squery_fields='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_POSTS))
+	{
+		value_esc = DBdyn_escape_string(item->posts);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sposts='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES))
+	{
+		value_esc = DBdyn_escape_string(item->status_codes);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sstatus_codes='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_FOLLOW_REDIRECTS))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sfollow_redirects=%d", d,
+				(int)item_prototype->follow_redirects);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_POST_TYPE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%spost_type=%d", d, (int)item_prototype->post_type);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_HTTP_PROXY))
+	{
+		value_esc = DBdyn_escape_string(item->http_proxy);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%shttp_proxy='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS))
+	{
+		value_esc = DBdyn_escape_string(item->headers);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sheaders='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_RETRIEVE_MODE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sretrieve_mode=%d", d,
+				(int)item_prototype->retrieve_mode);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_REQUEST_METHOD))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%srequest_method=%d", d,
+				(int)item_prototype->request_method);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_OUTPUT_FORMAT))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%soutput_format=%d", d,
+				(int)item_prototype->output_format);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SSL_CERT_FILE))
+	{
+		value_esc = DBdyn_escape_string(item->ssl_cert_file);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_cert_file='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE))
+	{
+		value_esc = DBdyn_escape_string(item->ssl_key_file);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_key_file='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD))
+	{
+		value_esc = DBdyn_escape_string(item->ssl_key_password);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_key_password='%s'", d, value_esc);
+		zbx_free(value_esc);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sverify_peer=%d", d, (int)item_prototype->verify_peer);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sverify_host=%d", d, (int)item_prototype->verify_host);
 	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
@@ -1935,7 +2350,10 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				"snmpv3_securitylevel", "snmpv3_authprotocol", "snmpv3_authpassphrase",
 				"snmpv3_privprotocol", "snmpv3_privpassphrase", "authtype", "username", "password",
 				"publickey", "privatekey", "description", "interfaceid", "flags", "snmpv3_contextname",
-				"jmx_endpoint", "master_itemid", NULL);
+				"jmx_endpoint", "master_itemid", "timeout", "url", "query_fields", "posts",
+				"status_codes", "follow_redirects", "post_type", "http_proxy", "headers",
+				"retrieve_mode", "request_method", "output_format", "ssl_cert_file", "ssl_key_file",
+				"ssl_key_password", "verify_peer", "verify_host", NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", NULL);
@@ -3623,7 +4041,10 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 				"i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,"
 				"i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.authtype,"
 				"i.username,i.password,i.publickey,i.privatekey,i.description,i.interfaceid,"
-				"i.snmpv3_contextname,i.jmx_endpoint,i.master_itemid"
+				"i.snmpv3_contextname,i.jmx_endpoint,i.master_itemid,i.timeout,i.url,i.query_fields,"
+				"i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,"
+				"i.retrieve_mode,i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,"
+				"i.ssl_key_password,i.verify_peer,i.verify_host"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
@@ -3668,6 +4089,24 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		item_prototype->snmpv3_contextname = zbx_strdup(NULL, row[32]);
 		item_prototype->jmx_endpoint = zbx_strdup(NULL, row[33]);
 		ZBX_DBROW2UINT64(item_prototype->master_itemid, row[34]);
+
+		item_prototype->timeout = zbx_strdup(NULL, row[35]);
+		item_prototype->url = zbx_strdup(NULL, row[36]);
+		item_prototype->query_fields = zbx_strdup(NULL, row[37]);
+		item_prototype->posts = zbx_strdup(NULL, row[38]);
+		item_prototype->status_codes = zbx_strdup(NULL, row[39]);
+		ZBX_STR2UCHAR(item_prototype->follow_redirects, row[40]);
+		ZBX_STR2UCHAR(item_prototype->post_type, row[41]);
+		item_prototype->http_proxy = zbx_strdup(NULL, row[42]);
+		item_prototype->headers = zbx_strdup(NULL, row[43]);
+		ZBX_STR2UCHAR(item_prototype->retrieve_mode, row[44]);
+		ZBX_STR2UCHAR(item_prototype->request_method, row[45]);
+		ZBX_STR2UCHAR(item_prototype->output_format, row[46]);
+		item_prototype->ssl_cert_file = zbx_strdup(NULL, row[47]);
+		item_prototype->ssl_key_file = zbx_strdup(NULL, row[48]);
+		item_prototype->ssl_key_password = zbx_strdup(NULL, row[49]);
+		ZBX_STR2UCHAR(item_prototype->verify_peer, row[50]);
+		ZBX_STR2UCHAR(item_prototype->verify_host, row[51]);
 
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_ptr_create(&item_prototype->applications);
