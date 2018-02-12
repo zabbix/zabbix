@@ -973,16 +973,15 @@ class CUserGroup extends CApiService {
 
 		// adding usergroup tag filters
 		if ($options['selectTagFilters'] !== null && $options['selectTagFilters'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'tag_filterid', 'tag_filter');
+			foreach ($result as &$usrgrp) {
+				$usrgrp['tag_filters'] = [];
+			}
+			unset($usrgrp);
 
 			if (is_array($options['selectTagFilters'])) {
-				$pk_field = $this->pk('tag_filter');
+				$output_fields = [];
 
-				$output_fields = [
-					$pk_field => $this->fieldId($pk_field, 't')
-				];
-
-				foreach ($options['selectTagFilters'] as $field) {
+				foreach ($this->outputExtend($options['selectTagFilters'], ['usrgrpid']) as $field) {
 					if ($this->hasField($field, 'tag_filter')) {
 						$output_fields[$field] = $this->fieldId($field, 't');
 					}
@@ -994,19 +993,18 @@ class CUserGroup extends CApiService {
 				$output_fields = 't.*';
 			}
 
-			$db_tag_filters = DBfetchArray(DBselect(
+			$db_tag_filters = DBselect(
 				'SELECT '.$output_fields.
 				' FROM tag_filter t'.
-				' WHERE '.dbConditionInt('t.tag_filterid', $relationMap->getRelatedIds())
-			));
-			$db_tag_filters = zbx_toHash($db_tag_filters, 'tag_filterid');
+				' WHERE '.dbConditionInt('t.usrgrpid', array_keys($result))
+			);
 
-			foreach ($db_tag_filters as &$db_tag_filter) {
+			while ($db_tag_filter = DBfetch($db_tag_filters)) {
+				$usrgrpid = $db_tag_filter['usrgrpid'];
 				unset($db_tag_filter['tag_filterid'], $db_tag_filter['usrgrpid']);
-			}
-			unset($db_tag_filter);
 
-			$result = $relationMap->mapMany($result, $db_tag_filters, 'tag_filters');
+				$result[$usrgrpid]['tag_filters'][] = $db_tag_filter;
+			}
 		}
 
 		return $result;
