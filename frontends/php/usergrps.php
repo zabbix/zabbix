@@ -57,14 +57,14 @@ $fields = [
 	'add_permission' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'new_permission' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'groupids' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'tag_filter_groupids' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'subgroups' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'tag_filters' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'add_tag_filter' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'remove_tag_filter' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'tag_filter_subgroups' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag_filter_groupids' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'tag' =>					[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'value' =>					[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag_filter_subgroups' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'add_tag_filter' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
 	// form
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,		 null,	null],
@@ -263,7 +263,6 @@ if (hasRequest('form')) {
 		'form_refresh' => getRequest('form_refresh', 0),
 		'tag' => getRequest('tag', ''),
 		'value' => getRequest('value', ''),
-		'host_groups' => getRequest('host_groups', []),
 		'tag_filter_subgroups' => getRequest('tag_filter_subgroups', 0)
 	];
 
@@ -348,35 +347,19 @@ if (hasRequest('form')) {
 		);
 	}
 
+	$tag_filter_groupids = getRequest('tag_filter_groupids');
+
 	if (hasRequest('add_tag_filter')) {
-		$new_groupids = getRequest('tag_filter_groupids');
 		if (getRequest('value') !== '' && getRequest('tag') === '') {
 			show_error_message(_s('Empty tag for value "%1$s".', getRequest('value')));
-
-			$data['host_groups'] = [];
-
-			if ($new_groupids) {
-				$host_groups = API::HostGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $new_groupids
-				]);
-
-				foreach ($host_groups as $host_group) {
-					$data['host_groups'][] = [
-						'id' => $host_group['groupid'],
-						'name' => $host_group['name']
-					];
-				}
-			}
 		}
 		else {
 			// Add new tag filter with submit().
-			if ($new_groupids) {
+			if ($tag_filter_groupids) {
 				if (hasRequest('tag_filter_subgroups')) {
 					$parent_groups = API::HostGroup()->get([
 						'output' => ['groupid', 'name'],
-						'groupids' => $new_groupids,
-						'preservekeys' => true
+						'groupids' => $tag_filter_groupids
 					]);
 					$parent_groups_names = [];
 
@@ -397,7 +380,7 @@ if (hasRequest('form')) {
 				}
 				else {
 					$host_groups = API::HostGroup()->get([
-						'groupids' => $new_groupids,
+						'groupids' => $tag_filter_groupids,
 						'output' => ['groupid', 'name']
 					]);
 				}
@@ -413,9 +396,9 @@ if (hasRequest('form')) {
 					array_push($data['tag_filters'], $new_element);
 				}
 
+				$tag_filter_groupids = [];
 				$data['tag'] = '';
 				$data['value'] = '';
-				$data['host_groups'] = [];
 				$data['tag_filter_subgroups'] = 0;
 			}
 		}
@@ -425,6 +408,18 @@ if (hasRequest('form')) {
 		if (is_array($remove_tag_filter) && array_key_exists(key($remove_tag_filter), $data['tag_filters'])) {
 			unset($data['tag_filters'][key($remove_tag_filter)]);
 		}
+	}
+
+	if ($tag_filter_groupids) {
+		$host_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $tag_filter_groupids
+		]);
+
+		$data['host_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+	}
+	else {
+		$data['host_groups'] = [];
 	}
 
 	$unique_tag_filters = [];
