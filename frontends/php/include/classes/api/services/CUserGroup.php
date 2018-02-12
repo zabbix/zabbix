@@ -216,8 +216,8 @@ class CUserGroup extends CApiService {
 			]],
 			'tag_filters' =>	['type' => API_OBJECTS, 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag')],
-				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value')],
+				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
+				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
 			]],
 			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE]
 		]];
@@ -304,8 +304,8 @@ class CUserGroup extends CApiService {
 			]],
 			'tag_filters' =>	['type' => API_OBJECTS, 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag')],
-				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value')],
+				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
+				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
 			]],
 			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE]
 		]];
@@ -458,8 +458,7 @@ class CUserGroup extends CApiService {
 		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('tag_filters', $usrgrp)) {
 				foreach ($usrgrp['tag_filters'] as $tag_filter) {
-					if (array_key_exists('value', $tag_filter) && $tag_filter['value'] !== ''
-							&& (!array_key_exists('tag', $tag_filter) || $tag_filter['tag'] === '')) {
+					if ($tag_filter['tag'] === '' && $tag_filter['value'] !== '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Empty tag for value "%1$s".', $tag_filter['value'])
 						);
@@ -694,65 +693,78 @@ class CUserGroup extends CApiService {
 	 * @param string $method
 	 */
 	private function updateTagFilters(array $usrgrps, $method) {
-		$post_tag_filters = [];
+		$tag_filters = [];
 
 		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('tag_filters', $usrgrp)) {
-				$post_tag_filters[$usrgrp['usrgrpid']] = [];
+				$tag_filters[$usrgrp['usrgrpid']] = [];
 
 				foreach ($usrgrp['tag_filters'] as $tag_filter) {
-					$post_tag_filters[$usrgrp['usrgrpid']][$tag_filter['groupid']][] = [
-						'groupid' => $tag_filter['groupid'],
-						'tag' => array_key_exists('tag', $tag_filter) ? $tag_filter['tag'] : '',
-						'value' => array_key_exists('value', $tag_filter) ? $tag_filter['value'] : '',
-						'usrgrpid' => $usrgrp['usrgrpid']
-					];
+					$tag_filter['usrgrpid'] = $usrgrp['usrgrpid'];
+					$tag_filters[$usrgrp['usrgrpid']][] = $tag_filter;
 				}
+				CArrayHelper::sort($tag_filters[$usrgrp['usrgrpid']], ['groupid', 'tag', 'value']);
 			}
 		}
 
-		if (!$post_tag_filters) {
+		if (!$tag_filters) {
 			return;
 		}
 
 		$db_tag_filters = ($method === 'update')
 			? DB::select('tag_filter', [
 				'output' => ['tag_filterid', 'usrgrpid', 'groupid', 'tag', 'value'],
-				'filter' => ['usrgrpid' => array_keys($post_tag_filters)]
+				'filter' => ['usrgrpid' => array_keys($tag_filters)]
 			])
 			: [];
+		CArrayHelper::sort($db_tag_filters, ['usrgrpid', 'groupid', 'tag', 'value']);
 
-		// Delete unchanged database tag filters and posted tag filters that matched with existing database filters.
-		foreach ($db_tag_filters as $db_tag_f_key => $db_tag_f) {
-			if (array_key_exists($db_tag_f['groupid'], $post_tag_filters[$db_tag_f['usrgrpid']])) {
-				foreach ($post_tag_filters[$db_tag_f['usrgrpid']][$db_tag_f['groupid']] as $key => $post_tag_f) {
-					if ($db_tag_f['tag'] === $post_tag_f['tag'] && $db_tag_f['value'] === $post_tag_f['value']) {
-						unset($post_tag_filters[$db_tag_f['usrgrpid']][$db_tag_f['groupid']][$key],
-								$db_tag_filters[$db_tag_f_key]);
-					}
+		$ins_tag_filters = [];
+		$upd_tag_filters = [];
+		$del_tag_filterids = [];
+
+		foreach ($db_tag_filters as $db_tag_filter) {
+			if ($tag_filters[$db_tag_filter['usrgrpid']]) {
+				$tag_filter = array_shift($tag_filters[$db_tag_filter['usrgrpid']]);
+
+				$upd_tag_filter = [];
+
+				if (bccomp($tag_filter['groupid'], $db_tag_filter['groupid']) != 0) {
+					$upd_tag_filter['groupid'] = $tag_filter['groupid'];
 				}
+				if ($tag_filter['tag'] !== $db_tag_filter['tag']) {
+					$upd_tag_filter['tag'] = $tag_filter['tag'];
+				}
+				if ($tag_filter['value'] !== $db_tag_filter['value']) {
+					$upd_tag_filter['value'] = $tag_filter['value'];
+				}
+
+				if ($upd_tag_filter) {
+					$upd_tag_filters[] = [
+						'values' => $upd_tag_filter,
+						'where' => ['tag_filterid' => $db_tag_filter['tag_filterid']]
+					];
+				}
+			}
+			else {
+				$del_tag_filterids[] = $db_tag_filter['tag_filterid'];
 			}
 		}
 
-		// Get database records to delete.
-		$db_tag_filters = zbx_objectValues($db_tag_filters, 'tag_filterid');
-
-		// Flatten multidimensional array. Use serialized keys to prevent dupicates.
-		$ins_tag_filters = [];
-		foreach ($post_tag_filters as $usrgrp_tag_filters) {
-			foreach ($usrgrp_tag_filters as $group_tag_filter) {
-				foreach ($group_tag_filter as $tag_filter) {
-					$ins_tag_filters[serialize($tag_filter)] = $tag_filter;
-				}
-			}
+		foreach ($usrgrps as $usrgrp) {
+			$ins_tag_filters = array_merge($ins_tag_filters, $tag_filters[$usrgrp['usrgrpid']]);
 		}
 
 		if ($ins_tag_filters) {
 			DB::insertBatch('tag_filter', array_values($ins_tag_filters));
 		}
 
-		if ($db_tag_filters) {
-			DB::delete('tag_filter', ['tag_filterid' => $db_tag_filters]);
+		if ($upd_tag_filters) {
+			DB::update('tag_filter', array_values($upd_tag_filters));
+		}
+
+		if ($del_tag_filterids) {
+			DB::delete('tag_filter', ['tag_filterid' => $del_tag_filterids]);
 		}
 	}
 

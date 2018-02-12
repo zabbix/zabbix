@@ -139,6 +139,8 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if (hasRequest('update')) {
+		$user_group['tag_filters'][] = ['groupid' => 4, 'tag' => 'value', 'value' => 'value'];
+		$user_group['tag_filters'][] = ['groupid' => 4, 'tag' => 'value', 'value' => 'value'];
 		$user_group['usrgrpid'] = getRequest('usrgrpid');
 		$result = (bool) API::UserGroup()->update($user_group);
 
