@@ -104,8 +104,8 @@ if (hasRequest('form')) {
 			if ($result) {
 				// Apply permissions and tag filters to all subgroups.
 				if (getRequest('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					inheritTagFilters($groupId, $name);
 					inheritPermissions($groupId, $name);
+					inheritTagFilters($groupId, $name);
 				}
 			}
 		}
