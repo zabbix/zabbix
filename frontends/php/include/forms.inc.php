@@ -1072,7 +1072,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		unset($data['types'][ITEM_TYPE_AGGREGATE],
 			$data['types'][ITEM_TYPE_CALCULATED],
 			$data['types'][ITEM_TYPE_SNMPTRAP],
-			$data['types'][ITEM_TYPE_DEPENDENT]
+			$data['types'][ITEM_TYPE_DEPENDENT],
+			$data['types'][ITEM_TYPE_HTTPCHECK]
 		);
 	}
 

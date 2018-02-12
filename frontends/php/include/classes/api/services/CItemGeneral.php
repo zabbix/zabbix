@@ -91,7 +91,8 @@ abstract class CItemGeneral extends CApiService {
 			'lifetime'				=> [],
 			'preprocessing'			=> ['template' => 1],
 			'jmx_endpoint'			=> [],
-			'master_itemid'			=> ['template' => 1]
+			'master_itemid'			=> ['template' => 1],
+			'url'					=> ['template' => 1]
 		];
 
 		$this->errorMessages = array_merge($this->errorMessages, [

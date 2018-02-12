@@ -390,8 +390,10 @@ $data['http_auth_switcher'] = [
 			var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
 				<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
 		<?php }
-		if (array_key_exists('http_auth_switcher', $data)) { ?>
-			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true); ?>);
+		if ($data['http_auth_switcher']) { ?>
+			if (jQuery('http_authtype').length) {
+				new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true); ?>);
+			}
 		<?php }
 		if (!empty($this->data['typeVisibility'])) { ?>
 			var typeSwitcher = new CViewSwitcher('type', 'change',
@@ -415,6 +417,131 @@ $data['http_auth_switcher'] = [
 
 		jQuery('#authtype').bind('change', function() {
 			setAuthTypeLabel();
+		});
+
+		var $ = jQuery,
+			editableTable = function (elm, tmpl, tmpl_defaults) {
+			var table,
+				row_template,
+				row_default_values,
+				insert_point,
+				rows = 0,
+				table_row_class = 'editable_table_row';
+
+			table = $(elm);
+			insert_point = table.find('tbody tr[data-insert-point]');
+			row_template = new Template($(tmpl).html());
+			row_default_values = tmpl_defaults;
+
+			table.sortable({
+				disabled: true,
+				items: 'tbody tr.sortable',
+				axis: 'y',
+				containment: 'parent',
+				cursor: 'move',
+				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				helper: function(e, ui) {
+					ui.children('td').each(function() {
+						$(this).width($(this).width());
+					});
+
+					return ui;
+				},
+				start: function(e, ui) {
+					// Fix placeholder not to change height while object is being dragged.
+					$(ui.placeholder).height($(ui.helper).height());
+				}
+			}).disableSelection();
+
+			table.on('click', '[data-row-action]', function (e) {
+				e.preventDefault();
+
+				switch ($(e.currentTarget).data('row-action')) {
+					case 'remove_row' :
+						if (rows > 1) {
+							rows -= 1;
+							table.sortable('option', 'disabled', rows < 2);
+
+							$(e.currentTarget).closest('.'+table_row_class).remove();
+						}
+						break;
+
+					case 'add_row' :
+						var row_data = $(e.currentTarget).data('values'),
+							new_row = addRow($.extend({index: rows + 1}, row_data||{}));
+
+						if (!row_data) {
+							new_row.find('[type="text"]').val('');
+						}
+						break;
+				}
+			});
+
+			function addRow(values) {
+				rows += 1;
+				table.sortable('option', 'disabled', rows < 2);
+
+				return $(row_template.evaluate(values))
+					.addClass(table_row_class)
+					.addClass('sortable')
+					.data('row-values', values)
+					.insertBefore(insert_point);
+			}
+
+			function addRows(rows_values) {
+				$.each(rows_values, function(index, values) {
+					addRow($.extend({"index": index}, values));
+				});
+			}
+
+			return {
+				addRow: function(values) {
+					return addRow(values);
+				},
+				addRows: function(rows_values) {
+					addRows(rows_values);
+					return table;
+				},
+				clearTable: function() {
+					table.find('.'+table_row_class).remove();
+					return table;
+				}
+			}
+		};
+
+		$('[data-sortable-pairs-table]').each(function() {
+			var t = $(this),
+				table = t.find('table'),
+				data = JSON.parse(t.find('[type="text/json"]').text()),
+				template = t.find('[type="text/x-jquery-tmpl"]'),
+				et = new editableTable(table, template);
+
+			et.addRows(data);
+
+			t.data('editableTable', et);
+		});
+
+		$('[data-action="parse_url"]').click(function() {
+			var url = $(this).siblings('[name="url"]'),
+				table = $('#query_fields_pairs').data('editableTable'),
+				pos = url.val().indexOf('?');
+
+			if (pos != -1) {
+				var host = url.val().substring(0, pos),
+					query = url.val().substring(pos + 1),
+					parsed = [];
+
+				$.each(query.split('&'), function(i, pair) {
+					pair = pair.split('=', 2);
+					parsed.push({'key': pair[0], 'value': pair[1]});
+				});
+
+				url.val(host);
+				table.clearTable()
+				table.addRows(parsed);
+			}
 		});
 	});
 </script>
