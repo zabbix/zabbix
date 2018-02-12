@@ -152,7 +152,7 @@ $itemFormList->addRow(
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('query_fields_pairs')
-		->setAttribute('data-sortable-pairs-table', '')
+		->setAttribute('data-sortable-pairs-table', $readonly ? '0': '1')
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
 	'query_fields_row'
 );
@@ -191,7 +191,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPCHECK Request body.
 $itemFormList->addRow(
 	new CLabel(_('Request body'), 'posts'),
-	(new CTextArea('posts', $data['posts'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextArea('posts', $data['posts'], compact('readonly')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'posts_row'
 );
 
@@ -241,7 +241,7 @@ $itemFormList->addRow(
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('headers_pairs')
-		->setAttribute('data-sortable-pairs-table', '')
+		->setAttribute('data-sortable-pairs-table', $readonly ? '0': '1')
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
 	'headers_row'
 );
@@ -344,7 +344,7 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	new CLabel(_('SSL certificate file'), 'ssl_key_file'),
 	(new CTextBox('ssl_key_file', $data['ssl_key_file'], $readonly, 255))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_file_row'
 );
 
@@ -352,7 +352,7 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	new CLabel(_('SSL key password'), 'ssl_key_password'),
 	(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_password_row'
 );
 

@@ -518,6 +518,10 @@ $data['http_auth_switcher'] = [
 
 			et.addRows(data);
 
+			if (t.data('data-sortable-pairs-table') !== '1') {
+				table.sortable('option', 'disabled', true);
+			}
+
 			t.data('editableTable', et);
 		});
 

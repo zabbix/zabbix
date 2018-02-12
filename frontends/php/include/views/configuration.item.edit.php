@@ -112,6 +112,7 @@ $itemFormList->addRow(
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('httpcheck_parseurl', _('Parse ')))
 			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$readonly)
 			->setAttribute('data-action', 'parse_url')
 	],
 	'url_row'
@@ -125,7 +126,7 @@ if (is_array($data['query_fields']) && $data['query_fields']) {
 		$query_fields_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
-else {
+else if (!$readonly) {
 	$query_fields_data[] = ['key' => '', 'value' => ''];
 }
 
@@ -143,6 +144,7 @@ $itemFormList->addRow(
 				(new CCol(
 					(new CButton(null, _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
+						->setEnabled(!$readonly)
 						->setAttribute('data-row-action', 'add_row')
 				))->setColSpan(5)
 			)),
@@ -150,18 +152,19 @@ $itemFormList->addRow(
 			->setAttribute('type', 'text/x-jquery-tmpl')
 			->addItem(new CRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CTextBox('query_fields[key][#{index}]', '#{key}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('query_fields[key][#{index}]', '#{key}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('query_fields[value][#{index}]', '#{value}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled(!$readonly)
 					->setAttribute('data-row-action', 'remove_row')
 			])),
 		$query_fields
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('query_fields_pairs')
-		->setAttribute('data-sortable-pairs-table', '')
+		->setAttribute('data-sortable-pairs-table', $readonly ? '0': '1')
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
 	'query_fields_row'
 );
@@ -174,14 +177,14 @@ $itemFormList->addRow(
 		HTTPCHECK_REQUEST_POST => 'POST',
 		HTTPCHECK_REQUEST_PUT => 'PUT',
 		HTTPCHECK_REQUEST_HEAD => 'HEAD'
-	])),
+	]))->setEnabled(!$readonly),
 	'request_method_row'
 );
 
 // ITEM_TYPE_HTTPCHECK Timeout field.
 $itemFormList->addRow(
 	new CLabel(_('Timeout'), 'timeout'),
-	(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	(new CTextBox('timeout', $data['timeout'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'timeout_row'
 );
 
@@ -192,6 +195,7 @@ $itemFormList->addRow(
 		->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
 		->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
 		->addValue(_('XML data'), ZBX_POSTTYPE_XML)
+		->setEnabled(!$readonly)
 		->setModern(true),
 	'post_type_row'
 );
@@ -199,7 +203,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPCHECK Request body.
 $itemFormList->addRow(
 	new CLabel(_('Request body'), 'posts'),
-	(new CTextArea('posts', $data['posts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextArea('posts', $data['posts'], compact('readonly')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'posts_row'
 );
 
@@ -211,7 +215,7 @@ if (is_array($data['headers']) && $data['headers']) {
 		$headers_data[] = ['key' => $k, 'value' => $v];
 	}
 }
-else {
+else if (!$readonly) {
 	$headers_data[] = ['key' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -228,6 +232,7 @@ $itemFormList->addRow(
 				(new CCol(
 					(new CButton(null, _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
+						->setEnabled(!$readonly)
 						->setAttribute('data-row-action', 'add_row')
 				))->setColSpan(5)
 			)),
@@ -235,18 +240,19 @@ $itemFormList->addRow(
 			->setAttribute('type', 'text/x-jquery-tmpl')
 			->addItem(new CRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CTextBox('headers[key][#{index}]', '#{key}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('headers[key][#{index}]', '#{key}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('headers[value][#{index}]', '#{value}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled(!$readonly)
 					->setAttribute('data-row-action', 'remove_row')
 			])),
 		$headers
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('headers_pairs')
-		->setAttribute('data-sortable-pairs-table', '')
+		->setAttribute('data-sortable-pairs-table', $readonly ? '0': '1')
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
 	'headers_row'
 );
@@ -254,7 +260,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPCHECK Required status codes.
 $itemFormList->addRow(
 	new CLabel(_('Required status codes'), 'status_codes'),
-	(new CTextBox('status_codes', $data['status_codes']))
+	(new CTextBox('status_codes', $data['status_codes'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'status_codes_row'
 );
@@ -263,6 +269,7 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	new CLabel(_('Follow redirects'), 'follow_redirects'),
 	(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+		->setEnabled(!$readonly)
 		->setChecked($data['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON),
 	'follow_redirects_row'
 );
@@ -271,10 +278,11 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	new CLabel(_('Retrieve mode'), 'retrieve_mode'),
 	(new CRadioButtonList('retrieve_mode', (int) $data['retrieve_mode']))
-			->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
-			->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
-			->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-			->setModern(true),
+		->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+		->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
+		->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
+		->setEnabled(!$readonly)
+		->setModern(true),
 	'retrieve_mode_row'
 );
 
@@ -282,6 +290,7 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	new CLabel(_('Convert to JSON'), 'output_format'),
 	(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
+		->setEnabled(!$readonly)
 		->setChecked($data['output_format'] == HTTPCHECK_STORE_JSON),
 	'output_format_row'
 );
@@ -289,9 +298,9 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPCHECK HTTP proxy.
 $itemFormList->addRow(
 	new CLabel(_('HTTP proxy'), 'http_proxy'),
-	(new CTextBox('http_proxy', $data['http_proxy'], false, 255))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
+	(new CTextBox('http_proxy', $data['http_proxy'], $readonly, 255))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
 	'http_proxy_row'
 );
 
@@ -302,14 +311,14 @@ $itemFormList->addRow(
 		HTTPTEST_AUTH_NONE => _('None'),
 		HTTPTEST_AUTH_BASIC => _('Basic'),
 		HTTPTEST_AUTH_NTLM => _('NTLM')
-	])),
+	]))->setEnabled(!$readonly),
 	'http_authtype_row'
 );
 
 // ITEM_TYPE_HTTPCHECK User name.
 $itemFormList->addRow(
 	(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
-	(new CTextBox('http_username', $data['http_username'], false, 64))
+	(new CTextBox('http_username', $data['http_username'], $readonly, 64))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'http_username_row'
@@ -318,7 +327,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPCHECK Password.
 $itemFormList->addRow(
 	(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
-	(new CTextBox('http_password', $data['http_password'], false, 64))
+	(new CTextBox('http_password', $data['http_password'], $readonly, 64))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'http_password_row'
@@ -328,6 +337,7 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	new CLabel(_('SSL verify peer'), 'verify_peer'),
 	(new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
+		->setEnabled(!$readonly)
 		->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON),
 	'verify_peer_row'
 );
@@ -336,6 +346,7 @@ $itemFormList->addRow(
 $itemFormList->addRow(
 	new CLabel(_('SSL verify host'), 'verify_host'),
 	(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
+		->setEnabled(!$readonly)
 		->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON),
 	'verify_host_row'
 );
@@ -343,16 +354,14 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPCHECK SSL certificate file.
 $itemFormList->addRow(
 	new CLabel(_('SSL certificate file'), 'ssl_key_file'),
-	(new CTextBox('ssl_key_file', $data['ssl_key_file'], false, 255))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('ssl_key_file', $data['ssl_key_file'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_file_row'
 );
 
 // ITEM_TYPE_HTTPCHECK SSL key password.
 $itemFormList->addRow(
 	new CLabel(_('SSL key password'), 'ssl_key_password'),
-	(new CTextBox('ssl_key_password', $data['ssl_key_password'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_password_row'
 );
 
