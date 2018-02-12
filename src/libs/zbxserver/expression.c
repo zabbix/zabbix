@@ -5000,6 +5000,10 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 			ret = FAIL;
 		}
 	}
+	else if (0 != (flags & ZBX_MACRO_JSON))
+	{
+		zbx_json_escape(&replace_to);
+	}
 
 	(*data)[token->token.r + 1] = c;
 

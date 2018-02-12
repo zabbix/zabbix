@@ -1290,12 +1290,13 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
-	substitute_lld_macros(&item->query_fields, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->query_fields, jp_row, ZBX_MACRO_JSON, NULL, 0);
 	/*zbx_lrtrim(item->query_fields, ZBX_WHITESPACE);*/
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
-	substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->posts, jp_row, item_prototype->post_type == ZBX_POSTTYPE_JSON ? ZBX_MACRO_JSON :
+			ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->posts, ZBX_WHITESPACE); is not missing here */
 
 	item->status_codes = zbx_strdup(NULL, item_prototype->status_codes);
@@ -1538,7 +1539,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_JSON, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->query_fields, buffer))
 	{
@@ -1549,7 +1550,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->posts);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, item_prototype->post_type == ZBX_POSTTYPE_JSON ? ZBX_MACRO_JSON :
+			ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->posts, buffer))
 	{
