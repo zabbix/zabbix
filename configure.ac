@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.0alpha2])
+AC_INIT([Zabbix],[4.0.0alpha4])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -244,6 +244,69 @@ if test "x$zbx_sival_int" != "x"; then
 else
   AC_MSG_ERROR(Unable to find integer field name in union sigval of struct siginfo_t)
 fi
+
+AC_MSG_CHECKING(for res_ninit)
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	struct __res_state	res_state_local;
+
+	res_ninit(&res_state_local);
+],
+AC_DEFINE(HAVE_RES_NINIT,1,[Define to 1 if 'res_ninit' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for res_ndestroy)
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	struct __res_state	res_state_local;
+
+	res_ninit(&res_state_local);
+	res_ndestroy(&res_state_local);
+],
+AC_DEFINE(HAVE_RES_NDESTROY,1,[Define to 1 if 'res_ndestroy' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING(for union semun)
 AC_TRY_COMPILE(
@@ -1595,6 +1658,7 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxsysinfo/Makefile
 	tests/libs/zbxsysinfo/linux/Makefile
 	tests/libs/zbxsysinfo/common/Makefile
+	tests/libs/zbxcommshigh/Makefile
 )])
 
 AC_OUTPUT([

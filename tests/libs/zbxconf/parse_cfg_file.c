@@ -79,7 +79,7 @@ void	zbx_mock_test_entry(void **state)
 
 		if (0 == strcmp(tmp, "numeric"))
 		{
-			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expected", &handle)))
+			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expect", &handle)))
 			{
 				expected_values[parameter_count] = NULL;
 			}
@@ -99,23 +99,6 @@ void	zbx_mock_test_entry(void **state)
 			cfg[parameter_count].variable = zbx_malloc(NULL, sizeof(zbx_uint64_t));
 			*(zbx_uint64_t *)cfg[parameter_count].variable = (zbx_uint64_t)-1;
 
-			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expected", &handle)))
-			{
-				expected_values[parameter_count] = NULL;
-			}
-			else if (ZBX_MOCK_SUCCESS == error && ZBX_MOCK_SUCCESS == (error = zbx_mock_string(handle, &tmp)))
-			{
-				expected_values[parameter_count] = zbx_malloc(NULL, sizeof(zbx_uint64_t));
-
-				if (SUCCEED != is_uint64(tmp, expected_values[parameter_count]))
-				{
-					fail_msg("Expected value \"%s\" of parameter #%d is not numeric.", tmp,
-							parameter_count + 1);
-				}
-			}
-			else
-				break;
-
 			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "min", &handle)))
 			{
 				cfg[parameter_count].min = 0;
@@ -129,6 +112,8 @@ void	zbx_mock_test_entry(void **state)
 					fail_msg("Minimum allowed value \"%s\" of parameter #%d is not numeric.", tmp,
 							parameter_count + 1);
 				}
+
+				cfg[parameter_count].min = min;
 			}
 			else
 				break;
@@ -146,6 +131,8 @@ void	zbx_mock_test_entry(void **state)
 					fail_msg("Maximum allowed value \"%s\" of parameter #%d is not numeric.", tmp,
 							parameter_count + 1);
 				}
+
+				cfg[parameter_count].max = max;
 			}
 			else
 				break;
@@ -154,7 +141,7 @@ void	zbx_mock_test_entry(void **state)
 		}
 		else if (0 == strcmp(tmp, "string"))
 		{
-			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expected", &handle)))
+			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expect", &handle)))
 			{
 				expected_values[parameter_count] = NULL;
 			}
@@ -176,7 +163,7 @@ void	zbx_mock_test_entry(void **state)
 		{
 			expected_values[parameter_count] = zbx_malloc(NULL, sizeof(zbx_mock_handle_t));
 
-			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expected",
+			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expect",
 					expected_values[parameter_count])))
 			{
 				fail_msg("Missing expected field for parameter #%d of string list type, use [] instead.",
@@ -196,7 +183,7 @@ void	zbx_mock_test_entry(void **state)
 		{
 			expected_values[parameter_count] = zbx_malloc(NULL, sizeof(zbx_mock_handle_t));
 
-			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expected",
+			if (ZBX_MOCK_NO_SUCH_MEMBER == (error = zbx_mock_object_member(parameter, "expect",
 					expected_values[parameter_count])))
 			{
 				fail_msg("Missing expected field for parameter #%d of multi string type, use [] instead.",
@@ -333,7 +320,18 @@ void	zbx_mock_test_entry(void **state)
 				}
 				break;
 			case TYPE_STRING:
-				if (0 != strcmp(*(char **)cfg[i].variable, *(char **)expected_values[i]))
+				if (NULL == *(char **)cfg[i].variable && NULL != *(char **)expected_values[i])
+				{
+					fail_msg("No value of string parameter \"%s\" while expected \"%s\".",
+							cfg[i].parameter, *(char **)expected_values[i]);
+				}
+				else if (NULL != *(char **)cfg[i].variable && NULL == *(char **)expected_values[i])
+				{
+					fail_msg("Got value \"%s\" of string parameter \"%s\" none was expected.",
+							*(char **)cfg[i].variable, cfg[i].parameter);
+				}
+				else if (NULL != *(char **)cfg[i].variable && NULL != *(char **)expected_values[i] &&
+						0 != strcmp(*(char **)cfg[i].variable, *(char **)expected_values[i]))
 				{
 					fail_msg("Value \"%s\" of string parameter \"%s\" differs from expected \"%s\".",
 							*(char **)cfg[i].variable, cfg[i].parameter,

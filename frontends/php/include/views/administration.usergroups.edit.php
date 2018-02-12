@@ -25,13 +25,11 @@ $widget = (new CWidget())->setTitle(_('User groups'));
 $userGroupForm = (new CForm())
 	->setName('userGroupsForm')
 	->addVar('form', $data['form']);
+
 if ($data['usrgrpid'] != 0) {
 	$userGroupForm->addVar('usrgrpid', $data['usrgrpid']);
 }
 
-/*
- * User group tab
-*/
 $userGroupFormList = (new CFormList())
 	->addRow(
 		(new CLabel(_('Group name'), 'gname'))->setAsteriskMark(),
@@ -40,21 +38,25 @@ $userGroupFormList = (new CFormList())
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('maxlength', DB::getFieldLength('usrgrp', 'name'))
+	)
+	->addRow(
+		new CLabel(_('Users'), 'userids[]'),
+		(new CMultiSelect([
+			'name' => 'userids[]',
+			'objectName' => 'users',
+			'data' => $data['users_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'users',
+					'dstfrm' => $userGroupForm->getName(),
+					'dstfld1' => 'userids_',
+					'srcfld1' => 'userid',
+					'srcfld2' => 'fullname',
+					'multiselect' => '1'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
-
-// append groups to form list
-$groupsComboBox = (new CComboBox('selusrgrp', $data['selected_usrgrp'], 'submit()'))
-	->addItem(0, _('All'));
-foreach ($data['usergroups'] as $group) {
-	$groupsComboBox->addItem($group['usrgrpid'], $group['name']);
-}
-
-// append user tweenbox to form list
-$usersTweenBox = new CTweenBox($userGroupForm, 'group_users', $data['group_users'], 10);
-foreach ($data['users'] as $user) {
-	$usersTweenBox->addItem($user['userid'], getUserFullname($user));
-}
-$userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), [_('Other groups'), SPACE, $groupsComboBox]));
 
 // append frontend and user status to from list
 $isGranted = ($data['usrgrpid'] != 0) ? granted2update_group($data['usrgrpid']) : true;

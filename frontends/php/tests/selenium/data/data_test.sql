@@ -1419,6 +1419,11 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'Selenium user group in configur
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (5,'Selenium script','test',2,14,NULL,'selenium script description');
 UPDATE config SET alert_usrgrpid = 15 WHERE configid = 1;
 
+-- testPageApplication
+INSERT INTO applications (applicationid,hostid,name) VALUES (99000,10084,'Selenium test application');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags) VALUES (99000, 10084, 1, 0, 2, 'Selenium item for testPageApplication','item-with-app', '30s', '90d', 0, '', '', 0);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (99000,99000,99000);
+
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
 -- Super admin rows per page
