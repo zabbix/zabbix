@@ -301,14 +301,6 @@ function collapseTagFilters(array $tag_filters) {
 			['field' => 'tag', 'order' => ZBX_SORT_UP],
 			['field' => 'value', 'order' => ZBX_SORT_UP]
 		]);
-
-		$pre_name = '';
-		foreach ($tag_filters as &$tag_filter) {
-			if ($pre_name === $tag_filter['name']) {
-				$tag_filter['name'] = '';
-			}
-		}
-		unset($tag_filter);
 	}
 
 	return $tag_filters;
