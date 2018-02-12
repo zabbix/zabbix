@@ -36,7 +36,6 @@ $form_list->addRow((new CLabel(_('Type'), 'type')),
 $form_list->addRow(_('Name'),
 	(new CTextBox('name', $data['dialogue']['name']))
 		->setAttribute('placeholder', _('default'))
-		->setAttribute('autofocus', 'autofocus')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
