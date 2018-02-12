@@ -701,14 +701,12 @@ class CUserGroup extends CApiService {
 				$post_tag_filters[$usrgrp['usrgrpid']] = [];
 
 				foreach ($usrgrp['tag_filters'] as $tag_filter) {
-					if (array_key_exists('groupid', $tag_filter)) {
-						$post_tag_filters[$usrgrp['usrgrpid']][$tag_filter['groupid']][] = [
-							'groupid' => $tag_filter['groupid'],
-							'tag' => array_key_exists('tag', $tag_filter) ? $tag_filter['tag'] : '',
-							'value' => array_key_exists('value', $tag_filter) ? $tag_filter['value'] : '',
-							'usrgrpid' => $usrgrp['usrgrpid']
-						];
-					}
+					$post_tag_filters[$usrgrp['usrgrpid']][$tag_filter['groupid']][] = [
+						'groupid' => $tag_filter['groupid'],
+						'tag' => array_key_exists('tag', $tag_filter) ? $tag_filter['tag'] : '',
+						'value' => array_key_exists('value', $tag_filter) ? $tag_filter['value'] : '',
+						'usrgrpid' => $usrgrp['usrgrpid']
+					];
 				}
 			}
 		}
