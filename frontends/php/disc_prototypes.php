@@ -446,34 +446,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$db_item = $db_item[0];
 
-			$item = CArrayHelper::unsetEqualValues($item, $db_item);
-			$item['itemid'] = $itemId;
-
-			$db_item['applications'] = zbx_objectValues($db_item['applications'], 'applicationid');
-
-			// compare applications
-			natsort($db_item['applications']);
-			natsort($applications);
-
-			if (array_values($db_item['applications']) !== array_values($applications)) {
-				$item['applications'] = $applications;
-			}
-
-			// compare application prototypes
-			$db_application_prototype_names = zbx_objectValues($db_item['applicationPrototypes'], 'name');
-			natsort($db_application_prototype_names);
-
-			$application_prototype_names = zbx_objectValues($application_prototypes, 'name');
-			natsort($application_prototype_names);
-
-			if (array_values($db_application_prototype_names) !== array_values($application_prototype_names)) {
-				$item['applicationPrototypes'] = $application_prototypes;
-			}
-
-			if ($db_item['preprocessing'] !== $preprocessing) {
-				$item['preprocessing'] = $preprocessing;
-			}
-
 			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
 				$item += [
 					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
@@ -520,6 +492,34 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					}
 				}
 				$item['headers'] = $headers;
+			}
+
+			$item = CArrayHelper::unsetEqualValues($item, $db_item);
+			$item['itemid'] = $itemId;
+
+			$db_item['applications'] = zbx_objectValues($db_item['applications'], 'applicationid');
+
+			// compare applications
+			natsort($db_item['applications']);
+			natsort($applications);
+
+			if (array_values($db_item['applications']) !== array_values($applications)) {
+				$item['applications'] = $applications;
+			}
+
+			// compare application prototypes
+			$db_application_prototype_names = zbx_objectValues($db_item['applicationPrototypes'], 'name');
+			natsort($db_application_prototype_names);
+
+			$application_prototype_names = zbx_objectValues($application_prototypes, 'name');
+			natsort($application_prototype_names);
+
+			if (array_values($db_application_prototype_names) !== array_values($application_prototype_names)) {
+				$item['applicationPrototypes'] = $application_prototypes;
+			}
+
+			if ($db_item['preprocessing'] !== $preprocessing) {
+				$item['preprocessing'] = $preprocessing;
 			}
 
 			$result = API::ItemPrototype()->update($item);

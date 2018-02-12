@@ -988,7 +988,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'query_fields' => getRequest('query_fields', []),
 		'posts' => getRequest('posts'),
 		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-		'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
+		'follow_redirects' => (int) getRequest('follow_redirects'),
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 		'http_proxy' => getRequest('http_proxy'),
 		'headers' => getRequest('headers', []),

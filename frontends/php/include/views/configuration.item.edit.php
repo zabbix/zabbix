@@ -119,12 +119,16 @@ $itemFormList->addRow(
 
 // ITEM_TYPE_HTTPCHECK Query fields.
 $query_fields_data = [];
-if (is_array($data['query_fields'])) {
+
+if (is_array($data['query_fields']) && $data['query_fields']) {
 	foreach ($data['query_fields'] as $pair) {
 		$query_fields_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
-$query_fields_data[] = ['key' => '', 'value' => ''];
+else {
+	$query_fields_data[] = ['key' => '', 'value' => ''];
+}
+
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
 $query_fields->items = [json_encode($query_fields_data, JSON_UNESCAPED_UNICODE)];
 
@@ -201,12 +205,15 @@ $itemFormList->addRow(
 
 // ITEM_TYPE_HTTPCHECK Headers fields.
 $headers_data = [];
-if (is_array($data['headers'])) {
+
+if (is_array($data['headers']) && $data['headers']) {
 	foreach ($data['headers'] as $k => $v) {
 		$headers_data[] = ['key' => $k, 'value' => $v];
 	}
 }
-$headers_data[] = ['key' => '', 'value' => ''];
+else {
+	$headers_data[] = ['key' => '', 'value' => ''];
+}
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
 $headers->items = [json_encode($headers_data, JSON_UNESCAPED_UNICODE)];
 

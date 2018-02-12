@@ -109,12 +109,13 @@ $itemFormList->addRow(
 
 // ITEM_TYPE_HTTPCHECK Query fields.
 $query_fields_data = [];
-if (is_array($data['query_fields'])) {
+
+if (is_array($data['query_fields']) && $data['query_fields']) {
 	foreach ($data['query_fields'] as $pair) {
 		$query_fields_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
-if (!$readonly) {
+else if (!$readonly) {
 	$query_fields_data[] = ['key' => '', 'value' => ''];
 }
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -196,13 +197,13 @@ $itemFormList->addRow(
 
 // ITEM_TYPE_HTTPCHECK Headers fields.
 $headers_data = [];
-if (is_array($data['headers'])) {
+
+if (is_array($data['headers']) && $data['headers']) {
 	foreach ($data['headers'] as $k => $v) {
 		$headers_data[] = ['key' => $k, 'value' => $v];
 	}
 }
-
-if (!$readonly) {
+else if (!$readonly) {
 	$headers_data[] = ['key' => '', 'value' => ''];
 }
 
