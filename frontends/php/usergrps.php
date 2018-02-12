@@ -427,11 +427,17 @@ if (hasRequest('form')) {
 		}
 	}
 
-	$data['tag_filters'] = collapseTagFilters($data['tag_filters']);
+	$unique_tag_filters = [];
+	foreach ($data['tag_filters'] as $tag_filter) {
+		$tag_filter_uniqueness_identifier = serialize([
+			'groupid' => $tag_filter['groupid'],
+			'tag' => $tag_filter['tag'],
+			'value' => $tag_filter['value']
+		]);
+		$unique_tag_filters[$tag_filter_uniqueness_identifier] = $tag_filter;
+	}
 
-	$data['tag_filters'] = array_map('unserialize',
-		array_values(array_unique(array_map('serialize', $data['tag_filters'])))
-	);
+	$data['tag_filters'] = collapseTagFilters(array_values($unique_tag_filters));
 
 	// render view
 	$view = new CView('administration.usergroups.edit', $data);
