@@ -157,6 +157,10 @@ typedef struct
 	char			*units_orig;
 	char			*params;
 	char			*params_orig;
+	char			*username;
+	char			*username_orig;
+	char			*password;
+	char			*password_orig;
 	char			*ipmi_sensor;
 	char			*ipmi_sensor_orig;
 	char			*snmp_oid;
@@ -503,6 +507,10 @@ static void	lld_item_free(zbx_lld_item_t *item)
 	zbx_free(item->ipmi_sensor_orig);
 	zbx_free(item->snmp_oid);
 	zbx_free(item->snmp_oid_orig);
+	zbx_free(item->username);
+	zbx_free(item->username_orig);
+	zbx_free(item->password);
+	zbx_free(item->password_orig);
 	zbx_free(item->description);
 	zbx_free(item->description_orig);
 	zbx_free(item->jmx_endpoint);
@@ -689,11 +697,11 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		if ((unsigned char)atoi(row[27]) != item_prototype->authtype)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE;
 
-		if (0 != strcmp(row[28], item_prototype->username))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME;
+		item->username = zbx_strdup(NULL, row[28]);
+		item->username_orig = NULL;
 
-		if (0 != strcmp(row[29], item_prototype->password))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD;
+		item->password = zbx_strdup(NULL, row[29]);
+		item->password_orig = NULL;
 
 		if (0 != strcmp(row[30], item_prototype->publickey))
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY;
@@ -946,6 +954,10 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 				ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR, ITEM_IPMI_SENSOR_LEN, error);
 		lld_validate_item_field(item, &item->snmp_oid, &item->snmp_oid_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID, ITEM_SNMP_OID_LEN, error);
+		lld_validate_item_field(item, &item->username, &item->username_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME, ITEM_USERNAME_LEN, error);
+		lld_validate_item_field(item, &item->password, &item->password_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD, ITEM_PASSWORD_LEN, error);
 		lld_validate_item_field(item, &item->description, &item->description_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION, ITEM_DESCRIPTION_LEN, error);
 		lld_validate_item_field(item, &item->jmx_endpoint, &item->jmx_endpoint_orig,
@@ -1268,6 +1280,16 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
 	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 
+	item->username = zbx_strdup(NULL, item_prototype->username);
+	item->username_orig = NULL;
+	substitute_lld_macros(&item->username, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->username, ZBX_WHITESPACE); is not missing here */
+
+	item->password = zbx_strdup(NULL, item_prototype->password);
+	item->password_orig = NULL;
+	substitute_lld_macros(&item->password, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->password, ZBX_WHITESPACE); is not missing here */
+
 	item->description = zbx_strdup(NULL, item_prototype->description);
 	item->description_orig = NULL;
 	substitute_lld_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -1492,6 +1514,28 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->snmp_oid = buffer;
 		buffer = NULL;
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->username);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->username, buffer))
+	{
+		item->username_orig = item->username;
+		item->username = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->password);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->password, buffer))
+	{
+		item->password_orig = item->password;
+		item->password = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD;
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->description);
