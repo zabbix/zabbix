@@ -51,12 +51,6 @@ typedef struct
 }
 zbx_httppage_t;
 
-extern char	*CONFIG_SOURCE_IP;
-
-extern char	*CONFIG_SSL_CA_LOCATION;
-extern char	*CONFIG_SSL_CERT_LOCATION;
-extern char	*CONFIG_SSL_KEY_LOCATION;
-
 #define ZBX_RETRIEVE_MODE_CONTENT	0
 #define ZBX_RETRIEVE_MODE_HEADERS	1
 
@@ -354,42 +348,6 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-void	add_headers(char *headers, struct curl_slist **headers_slist)
-{
-	char      *p_begin;
-
-	p_begin = headers;
-
-	while ('\0' != *p_begin)
-	{
-		char    c, *p_end, *line;
-
-		while ('\r' == *p_begin || '\n' == *p_begin)
-			p_begin++;
-
-		p_end = p_begin;
-
-		while ('\0' != *p_end && '\r' != *p_end && '\n' != *p_end)
-			p_end++;
-
-		if (p_begin == p_end)
-			break;
-
-		if ('\0' != (c = *p_end))
-			*p_end = '\0';
-		line = zbx_strdup(NULL, p_begin);
-		if ('\0' != c)
-			*p_end = c;
-
-		zbx_lrtrim(line, " \t");
-		if ('\0' != *line)
-			*headers_slist = curl_slist_append(*headers_slist, line);
-		zbx_free(line);
-
-		p_begin = p_end;
-	}
 }
 
 /******************************************************************************
@@ -716,8 +674,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 #ifdef HAVE_LIBCURL
 	DB_ROW		row;
 	zbx_httpstat_t	stat;
-	char		*auth = NULL, errbuf[CURL_ERROR_SIZE];
-	size_t		auth_alloc = 0, auth_offset;
+	char		errbuf[CURL_ERROR_SIZE];
 	CURL		*easyhandle = NULL;
 	CURLcode	err;
 	zbx_httpstep_t	httpstep;
@@ -761,76 +718,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
-					0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
-					0 == httptest->httptest.verify_host ? 0L : 2L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP)
+	if (SUCCEED != zbx_prepare_https(easyhandle, httptest->httptest.ssl_cert_file, httptest->httptest.ssl_key_file,
+			httptest->httptest.ssl_key_password, httptest->httptest.verify_peer,
+			httptest->httptest.verify_host, &err_str))
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
-		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			goto clean;
-		}
-	}
-
-	if (0 != httptest->httptest.verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
-	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
-		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			goto clean;
-		}
-	}
-
-	if ('\0' != *httptest->httptest.ssl_cert_file)
-	{
-		char	*file_name;
-
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, httptest->httptest.ssl_cert_file);
-		zabbix_log(LOG_LEVEL_DEBUG, "using SSL certificate file: '%s'", file_name);
-
-		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);
-		zbx_free(file_name);
-
-		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERTTYPE, "PEM")))
-		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			goto clean;
-		}
-	}
-
-	if ('\0' != *httptest->httptest.ssl_key_file)
-	{
-		char	*file_name;
-
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, httptest->httptest.ssl_key_file);
-		zabbix_log(LOG_LEVEL_DEBUG, "using SSL private key file: '%s'", file_name);
-
-		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
-		zbx_free(file_name);
-
-		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")))
-		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			goto clean;
-		}
-	}
-
-	if ('\0' != *httptest->httptest.ssl_key_password)
-	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD,
-				httptest->httptest.ssl_key_password)))
-		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			goto clean;
-		}
+		goto clean;
 	}
 
 	httpstep.httptest = httptest;
@@ -937,9 +835,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		/* headers defined in a step overwrite headers defined in scenario */
 		if (NULL != httpstep.headers && '\0' != *httpstep.headers)
-			add_headers(httpstep.headers, &headers_slist);
+			zbx_add_httpheaders(httpstep.headers, &headers_slist);
 		else if (NULL != httptest->headers && '\0' != *httptest->headers)
-			add_headers(httptest->headers, &headers_slist);
+			zbx_add_httpheaders(httptest->headers, &headers_slist);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 		{
@@ -955,37 +853,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			goto httpstep_error;
 		}
 
-		if (HTTPTEST_AUTH_NONE != httptest->httptest.authentication)
+		if (SUCCEED != zbx_prepare_httpauth(easyhandle, httptest->httptest.authentication,
+				httptest->httptest.http_user, httptest->httptest.http_password, &err_str))
 		{
-			long	curlauth = 0;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() setting HTTPAUTH [%d]",
-					__function_name, httptest->httptest.authentication);
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() setting USERPWD for authentication", __function_name);
-
-			switch (httptest->httptest.authentication)
-			{
-				case HTTPTEST_AUTH_BASIC:
-					curlauth = CURLAUTH_BASIC;
-					break;
-				case HTTPTEST_AUTH_NTLM:
-					curlauth = CURLAUTH_NTLM;
-					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-					break;
-			}
-
-			auth_offset = 0;
-			zbx_snprintf_alloc(&auth, &auth_alloc, &auth_offset, "%s:%s", httptest->httptest.http_user,
-					httptest->httptest.http_password);
-
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
-			{
-				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				goto httpstep_error;
-			}
+			goto httpstep_error;
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() go to URL \"%s\"", __function_name, httpstep.url);
@@ -1121,8 +992,6 @@ httpstep_error:
 			break;
 		}
 	}
-
-	zbx_free(auth);
 clean:
 	curl_easy_cleanup(easyhandle);
 #else

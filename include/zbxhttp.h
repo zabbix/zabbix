@@ -26,5 +26,13 @@ int	zbx_http_punycode_encode(const char *text, char **output);
 void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
 
+#ifdef HAVE_LIBCURL
+int	zbx_prepare_https(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
+		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host, char **error);
+int	zbx_prepare_httpauth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
+		char **error);
+void	zbx_add_httpheaders(char *headers, struct curl_slist **headers_slist);
+#endif
+
 #endif
 
