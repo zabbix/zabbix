@@ -208,9 +208,10 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			ret = FAIL, i, n;
-	zbx_vector_ptr_t	tag_filters, conditions;
+	const int		condition_num = 2;
+	zbx_vector_ptr_t	tag_filters;
 	zbx_tag_filter_t	*tag_filter;
-	DB_CONDITION		*condition;
+	DB_CONDITION		conditions[condition_num];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -236,8 +237,6 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	if (0 == tag_filters.values_num)
 		ret = SUCCEED;
 
-	zbx_vector_ptr_sort(&tag_filters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
 	for (i = 0; i < tag_filters.values_num && SUCCEED != ret; i++)
 	{
 		tag_filter = (zbx_tag_filter_t *)tag_filters.values[i];
@@ -250,48 +249,32 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 		if (NULL != tag_filter->tag && 0 != strlen(tag_filter->tag))
 		{
-			zbx_vector_ptr_create(&conditions);
-
-			condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
-			memset(condition, 0, sizeof(DB_CONDITION));
-			condition->conditiontype = CONDITION_TYPE_HOST_GROUP;
-			condition->op = CONDITION_OPERATOR_EQUAL;
-			condition->value = zbx_dsprintf(NULL, ZBX_FS_UI64, tag_filter->hostgroupid);
-			zbx_vector_ptr_append(&conditions, condition);
-
-			condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
-			memset(condition, 0, sizeof(DB_CONDITION));
-			condition->conditiontype = CONDITION_TYPE_EVENT_TAG;
-			condition->op = CONDITION_OPERATOR_EQUAL;
-			condition->value = zbx_strdup(NULL, tag_filter->tag);
-			zbx_vector_ptr_append(&conditions, condition);
+			conditions[0].conditiontype = CONDITION_TYPE_HOST_GROUP;
+			conditions[0].op = CONDITION_OPERATOR_EQUAL;
+			conditions[0].value = zbx_dsprintf(NULL, ZBX_FS_UI64, tag_filter->hostgroupid);
 
 			if (NULL != tag_filter->value && 0 != strlen(tag_filter->value))
 			{
-				condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
-				memset(condition, 0, sizeof(DB_CONDITION));
-				condition->conditiontype = CONDITION_TYPE_EVENT_TAG_VALUE;
-				condition->op = CONDITION_OPERATOR_EQUAL;
-				condition->value2 = zbx_strdup(NULL, tag_filter->tag);
-				condition->value = zbx_strdup(NULL, tag_filter->value);
-				zbx_vector_ptr_append(&conditions, condition);
-			}
+				conditions[1].conditiontype = CONDITION_TYPE_EVENT_TAG_VALUE;
+				conditions[1].value2 = tag_filter->tag;
+				conditions[1].value = tag_filter->value;
 
-			for (n = 0; n < conditions.values_num; n++)
+			}
+			else
 			{
-				if (FAIL == check_action_condition(event, (DB_CONDITION *)conditions.values[n]))
+				conditions[1].conditiontype = CONDITION_TYPE_EVENT_TAG;
+				conditions[1].value = tag_filter->tag;
+			}
+			conditions[1].op = CONDITION_OPERATOR_EQUAL;
+
+			for (n = 0; n < condition_num; n++)
+			{
+				if (FAIL == check_action_condition(event, &conditions[n]))
 					break;
 			}
 
-			if (n == conditions.values_num)
+			if (condition_num == n)
 				ret = SUCCEED;
-
-			for (n = 0; n < conditions.values_num; n++)
-			{
-				zbx_db_condition_clean((DB_CONDITION *)conditions.values[n]);
-				zbx_free(conditions.values[n]);
-			}
-			zbx_vector_ptr_destroy(&conditions);
 		}
 		else
 			ret = SUCCEED;
