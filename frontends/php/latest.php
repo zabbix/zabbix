@@ -375,7 +375,7 @@ $filterColumn1 = (new CFormList())
 					'dstfld1' => 'application',
 					'real_hosts' => '1',
 					'with_applications' => '1'
-				]).');'
+				]).', null, this);'
 			)
 	]);
 

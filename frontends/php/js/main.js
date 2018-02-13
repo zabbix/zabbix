@@ -454,7 +454,8 @@ var jqBlink = {
 var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic, styles) {
-		var box = jQuery('<div></div>').addClass('overlay-dialogue');
+		var hintboxid = hintBox.getUniqueId(),
+			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue');
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
@@ -482,6 +483,9 @@ var hintBox = {
 		}
 
 		if (isStatic) {
+			target.hintboxid = hintboxid;
+			addToOverlaysStack(hintboxid, target, 'hintbox');
+
 			var close_link = jQuery('<button>', {
 					'class': 'overlay-close-btn'}
 				)
@@ -546,6 +550,10 @@ var hintBox = {
 		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic, styles);
 		hintBox.positionHint(e, target);
 		target.hintBoxItem.show();
+
+		if (target.isStatic) {
+			overlayDialogueOnLoad(true, target.hintBoxItem);
+		}
 	},
 
 	positionHint: function(e, target) {
@@ -628,6 +636,10 @@ var hintBox = {
 	},
 
 	deleteHint: function(target) {
+		if (typeof target.hintboxid !== 'undefined') {
+			removeFromOverlaysStack(target.hintboxid);
+		}
+
 		if (target.hintBoxItem) {
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
@@ -636,6 +648,15 @@ var hintBox = {
 				delete target.isStatic;
 			}
 		}
+	},
+
+	getUniqueId: function() {
+		var hintboxid = Math.random().toString(36).substring(7);
+		while (jQuery('[data-hintboxid="' + hintboxid + '"]').length) {
+			hintboxid = Math.random().toString(36).substring(7);
+		}
+
+		return hintboxid;
 	}
 };
 
@@ -652,9 +673,11 @@ function hide_color_picker() {
 	color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
 	curr_lbl = null;
 	curr_txt = null;
+
+	removeFromOverlaysStack('color_picker');
 }
 
-function show_color_picker(id) {
+function show_color_picker(id, event) {
 	if (!color_picker) {
 		return;
 	}
@@ -670,6 +693,9 @@ function show_color_picker(id) {
 	color_picker.style.left = (color_picker.x + 20) + 'px';
 	color_picker.style.top = color_picker.y + 'px';
 	color_picker.style.display = 'block';
+
+	addToOverlaysStack('color_picker', event.target, 'color_picker');
+	overlayDialogueOnLoad(true, color_picker);
 }
 
 function create_color_picker() {
