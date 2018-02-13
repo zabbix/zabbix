@@ -108,6 +108,7 @@ const char	*progname = NULL;
 #	define DEFAULT_CONFIG_FILE	"C:\\zabbix_agentd.conf"
 #else
 #	define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_agentd.conf"
+#	define DEFAULT_LOAD_MODULE_PATH	LIBDIR "/modules"
 #endif
 
 /* application TITLE */
@@ -186,6 +187,11 @@ const char	*help_message[] = {
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
 	"",
+#ifndef _WINDOWS
+	"Default loadable module location:",
+	"  LoadModulePath                 \"" DEFAULT_LOAD_MODULE_PATH "\"",
+	"",
+#endif
 #ifdef _WINDOWS
 	"Example: zabbix_agentd -c C:\\zabbix\\zabbix_agentd.conf",
 #else
@@ -568,7 +574,7 @@ static void	set_defaults(void)
 
 #ifndef _WINDOWS
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
-		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
 
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = (char *)"/tmp/zabbix_agentd.pid";
