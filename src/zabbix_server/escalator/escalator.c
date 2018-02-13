@@ -203,7 +203,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		const DB_EVENT *event)
 {
 	const char		*__function_name = "get_tag_based_permission";
-	char			*sql = NULL, *hostgroupid;
+	char			*sql = NULL, hostgroupid[ZBX_MAX_UINT64_LEN + 1];
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -236,6 +236,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 	if (0 < tag_filters.values_num)
 	{
+		conditions[0].value = hostgroupid;
 		conditions[0].conditiontype = CONDITION_TYPE_HOST_GROUP;
 		conditions[0].op = conditions[1].op = CONDITION_OPERATOR_EQUAL;
 	}
@@ -254,8 +255,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 		if (NULL != tag_filter->tag && 0 != strlen(tag_filter->tag))
 		{
-			hostgroupid = zbx_dsprintf(NULL, ZBX_FS_UI64, tag_filter->hostgroupid);
-			conditions[0].value = hostgroupid;
+			zbx_snprintf(hostgroupid, sizeof(hostgroupid), ZBX_FS_UI64, tag_filter->hostgroupid);
 
 			if (NULL != tag_filter->value && 0 != strlen(tag_filter->value))
 			{
@@ -277,8 +277,6 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 			if (condition_num == n)
 				ret = SUCCEED;
-
-			zbx_free(hostgroupid);
 		}
 		else
 			ret = SUCCEED;
