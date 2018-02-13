@@ -31,6 +31,7 @@ int	zbx_prepare_https(CURL *easyhandle, const char *ssl_cert_file, const char *s
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host, char **error);
 int	zbx_prepare_httpauth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		char **error);
+char	*zbx_get_httpheader(char **headers);
 void	zbx_add_httpheaders(char *headers, struct curl_slist **headers_slist);
 #endif
 

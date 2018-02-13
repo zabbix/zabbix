@@ -173,39 +173,49 @@ int	zbx_prepare_httpauth(CURL *easyhandle, unsigned char authtype, const char *u
 	return SUCCEED;
 }
 
-void	zbx_add_httpheaders(char *headers, struct curl_slist **headers_slist)
+char	*zbx_get_httpheader(char **headers)
 {
-	char	*p_begin;
-
-	p_begin = headers;
-
-	while ('\0' != *p_begin)
+	while ('\0' != **headers)
 	{
 		char	c, *p_end, *line;
 
-		while ('\r' == *p_begin || '\n' == *p_begin)
-			p_begin++;
+		while ('\r' == **headers || '\n' == **headers)
+			(*headers)++;
 
-		p_end = p_begin;
+		p_end = *headers;
 
 		while ('\0' != *p_end && '\r' != *p_end && '\n' != *p_end)
 			p_end++;
 
-		if (p_begin == p_end)
-			break;
+		if (*headers == p_end)
+			return NULL;
 
 		if ('\0' != (c = *p_end))
 			*p_end = '\0';
-		line = zbx_strdup(NULL, p_begin);
+		line = zbx_strdup(NULL, *headers);
 		if ('\0' != c)
 			*p_end = c;
 
-		zbx_lrtrim(line, " \t");
-		if ('\0' != *line)
-			*headers_slist = curl_slist_append(*headers_slist, line);
-		zbx_free(line);
+		*headers = p_end;
 
-		p_begin = p_end;
+		zbx_lrtrim(line, " \t");
+		if ('\0' == *line)
+			zbx_free(line);
+		else
+			return line;
+	}
+
+	return NULL;
+}
+
+void	zbx_add_httpheaders(char *headers, struct curl_slist **headers_slist)
+{
+	char	*line;
+
+	while (NULL != (line = zbx_get_httpheader(&headers)))
+	{
+		*headers_slist = curl_slist_append(*headers_slist, line);
+		zbx_free(line);
 	}
 }
 

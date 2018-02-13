@@ -19,6 +19,7 @@
 
 #include "checks_http.h"
 #include "zbxhttp.h"
+#include "zbxjson.h"
 #ifdef HAVE_LIBCURL
 #include "log.h"
 
@@ -30,6 +31,9 @@
 #define HTTPCHECK_RETRIEVE_MODE_CONTENT	0
 #define HTTPCHECK_RETRIEVE_MODE_HEADERS	1
 #define HTTPCHECK_RETRIEVE_MODE_BOTH	2
+
+#define HTTPCHECK_STORE_RAW		0
+#define HTTPCHECK_STORE_JSON		1
 
 typedef struct
 {
@@ -299,7 +303,10 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	{
 		case HTTPCHECK_RETRIEVE_MODE_CONTENT:
 			if (NULL == body.data)
-				body.data = zbx_strdup(NULL, "");
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty content"));
+				goto clean;
+			}
 
 			zabbix_log(LOG_LEVEL_TRACE, "received body '%s'", body.data);
 			SET_TEXT_RESULT(result, body.data);
@@ -307,17 +314,54 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case HTTPCHECK_RETRIEVE_MODE_HEADERS:
 			if (NULL == header.data)
-				header.data = zbx_strdup(NULL, "");
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
+				goto clean;
+			}
 
 			zabbix_log(LOG_LEVEL_TRACE, "received header '%s'", header.data);
 			SET_TEXT_RESULT(result, header.data);
 			header.data = NULL;
 			break;
 		case HTTPCHECK_RETRIEVE_MODE_BOTH:
-			zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data, body.offset);
-			zabbix_log(LOG_LEVEL_TRACE, "received response '%s'", header.data);
-			SET_TEXT_RESULT(result, header.data);
-			header.data = NULL;
+			if (HTTPCHECK_STORE_JSON == item->output_format)
+			{
+				struct zbx_json	json;
+
+				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+				if (NULL != header.data)
+				{
+					char	*headers, *line;
+
+					zbx_json_addarray(&json, "header");
+					headers = header.data;
+					while (NULL != (line = zbx_get_httpheader(&headers)))
+					{
+						zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
+						zbx_free(line);
+					}
+					zbx_json_close(&json);
+				}
+
+				if (NULL != body.data)
+				{
+					zbx_lrtrim(body.data, ZBX_WHITESPACE);
+					if ('\0' != *body.data)
+						zbx_json_addraw(&json, "body", body.data);
+				}
+
+				SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
+				zbx_json_free(&json);
+			}
+			else
+			{
+				zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset,
+						body.data, body.offset);
+				zabbix_log(LOG_LEVEL_TRACE, "received response '%s'", header.data);
+				SET_TEXT_RESULT(result, header.data);
+				header.data = NULL;
+			}
 			break;
 	}
 
