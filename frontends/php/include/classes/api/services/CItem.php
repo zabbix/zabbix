@@ -526,27 +526,6 @@ class CItem extends CItemGeneral {
 		$data = [];
 		foreach ($items as $item) {
 			unset($item['flags']); // flags cannot be changed
-
-			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
-				if (array_key_exists('query_fields', $item)) {
-					$item['query_fields'] = $item['query_fields']
-						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
-						: '';
-				}
-				if (array_key_exists('headers', $item)) {
-					$headers = [];
-
-					foreach ($item['headers'] as $k => $v) {
-						$headers[] = $k.': '.$v;
-					}
-
-					$item['headers'] = implode("\r\n", $headers);
-				}
-			}
-			else {
-				unset($item['url'], $item['query_fields'], $item['headers']);
-			}
-
 			$data[] = ['values' => $item, 'where' => ['itemid' => $item['itemid']]];
 			$itemids[] = $item['itemid'];
 		}
@@ -601,21 +580,81 @@ class CItem extends CItemGeneral {
 		self::validateInventoryLinks($items, true);
 		$this->validateDependentItems($items, API::Item());
 
-		$dbItems = $this->get([
-			'output' => ['flags', 'type', 'master_itemid'],
+		$db_items = $this->get([
+			'output' => ['flags', 'type', 'master_itemid', 'authtype'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $dbItems, ['flags', 'type']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+
+		$defaults = DB::getDefaults('items');
+		$clean = [
+			ITEM_TYPE_HTTPCHECK => [
+				'url' => '',
+				'query_fields' => '',
+				'timeout' => $defaults['timeout'],
+				'status_codes' => $defaults['status_codes'],
+				'follow_redirects' => $defaults['follow_redirects'],
+				'request_method' => $defaults['request_method'],
+				'post_type' => $defaults['post_type'],
+				'http_proxy' => '',
+				'headers' => '',
+				'retrieve_mode' => $defaults['retrieve_mode'],
+				'output_format' => $defaults['output_format'],
+				'ssl_key_password' => '',
+				'verify_peer' => $defaults['verify_peer'],
+				'verify_host' => $defaults['verify_host'],
+				'ssl_cert_file' => '',
+				'ssl_key_file' => '',
+				'posts' => ''
+			]
+		];
 
 		foreach ($items as &$item) {
-			if ($item['type'] != ITEM_TYPE_DEPENDENT && $dbItems[$item['itemid']]['master_itemid']) {
+			$type_change = ($item['type'] != $db_items[$item['itemid']]['type']);
+
+			if ($item['type'] != ITEM_TYPE_DEPENDENT && $db_items[$item['itemid']]['master_itemid']) {
 				$item['master_itemid'] = null;
 			}
 			elseif (!array_key_exists('master_itemid', $item)) {
-				$item['master_itemid'] = $dbItems[$item['itemid']]['master_itemid'];
+				$item['master_itemid'] = $db_items[$item['itemid']]['master_itemid'];
+			}
+
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK) {
+				$item = array_merge($item, $clean[ITEM_TYPE_HTTPCHECK]);
+
+				if ($item['type'] != ITEM_TYPE_SSH) {
+					$item['authtype'] = $defaults['authtype'];
+					$item['username'] = '';
+					$item['password'] = '';
+				}
+			}
+
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
+				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
+						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
+					$item['username'] = '';
+					$item['password'] = '';
+				}
+
+				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
+				}
+
+				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
+					$headers = [];
+
+					foreach ($item['headers'] as $k => $v) {
+						$headers[] = $k.': '.$v;
+					}
+
+					$item['headers'] = implode("\r\n", $headers);
+				}
 			}
 		}
 		unset($item);
