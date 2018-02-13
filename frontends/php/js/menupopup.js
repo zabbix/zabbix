@@ -893,9 +893,9 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
 					item.clickCallback = function(e) {
+						jQuery(this).closest('.action-menu-top').menuPopup('close', null, false);
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
-						jQuery(this).closest('.action-menu-top').menuPopup('close', null, false);
 					};
 				}
 
