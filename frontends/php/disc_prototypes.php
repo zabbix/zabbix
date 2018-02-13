@@ -729,6 +729,16 @@ if (isset($_REQUEST['form'])) {
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_']
 			];
 		}
+		else if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+			// Convert hash to array where every item is hash for single key value pair as it is used by view.
+			$headers = [];
+
+			foreach ($item['headers'] as $key => $value) {
+				$headers[] = [$key => $value];
+			}
+
+			$item['headers'] = $headers;
+		}
 	}
 	elseif (getRequest('master_itemid') && getRequest('parent_discoveryid')) {
 		$discovery_rule = API::DiscoveryRule()->get([

@@ -435,6 +435,26 @@ class CItem extends CItemGeneral {
 		unset($item);
 		$this->validateDependentItems($items, API::Item());
 
+		foreach ($items as &$item) {
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				if (array_key_exists('query_fields', $item)) {
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
+				}
+				if (array_key_exists('headers', $item)) {
+					$headers = [];
+
+					foreach ($item['headers'] as $k => $v) {
+						$headers[] = $k.': '.$v;
+					}
+
+					$item['headers'] = implode("\r\n", $headers);
+				}
+			}
+		}
+		unset($item);
+
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -450,26 +470,6 @@ class CItem extends CItemGeneral {
 		foreach ($items as &$item) {
 			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
 				$item['master_itemid'] = null;
-
-				if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
-					if (array_key_exists('query_fields', $item)) {
-						$item['query_fields'] = $item['query_fields']
-							? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
-							: '';
-					}
-					if (array_key_exists('headers', $item)) {
-						$headers = [];
-
-						foreach ($item['headers'] as $k => $v) {
-							$headers[] = $k.': '.$v;
-						}
-
-						$item['headers'] = implode("\r\n", $headers);
-					}
-				}
-				else {
-					unset($item['url'], $item['query_fields'], $item['headers']);
-				}
 			}
 		}
 		unset($item);

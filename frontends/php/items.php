@@ -1375,6 +1375,16 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
 			];
 		}
+		else if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+			// Convert hash to array where every item is hash for single key value pair as it is used by view.
+			$headers = [];
+
+			foreach ($item['headers'] as $key => $value) {
+				$headers[] = [$key => $value];
+			}
+
+			$item['headers'] = $headers;
+		}
 	}
 	else {
 		$hosts = API::Host()->get([

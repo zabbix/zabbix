@@ -364,18 +364,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 		$this->validateDependentItems($items, API::ItemPrototype());
 
-		$this->createReal($items);
-		$this->inherit($items);
-
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
-	}
-
-	protected function createReal(&$items) {
 		foreach ($items as &$item) {
-			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-				$item['master_itemid'] = null;
-			}
-
 			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
 				if (array_key_exists('query_fields', $item)) {
 					$item['query_fields'] = $item['query_fields']
@@ -392,8 +381,19 @@ class CItemPrototype extends CItemGeneral {
 					$item['headers'] = implode("\r\n", $headers);
 				}
 			}
-			else {
-				unset($item['url'], $item['query_fields'], $item['headers']);
+		}
+		unset($item);
+
+		$this->createReal($items);
+		$this->inherit($items);
+
+		return ['itemids' => zbx_objectValues($items, 'itemid')];
+	}
+
+	protected function createReal(&$items) {
+		foreach ($items as &$item) {
+			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = null;
 			}
 		}
 		unset($item);
