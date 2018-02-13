@@ -350,57 +350,27 @@ if (hasRequest('form')) {
 	$tag_filter_groupids = getRequest('tag_filter_groupids');
 
 	if (hasRequest('add_tag_filter')) {
-		if (getRequest('value') !== '' && getRequest('tag') === '') {
-			show_error_message(_s('Empty tag for value "%1$s".', getRequest('value')));
+		if ($data['value'] !== '' && $data['tag'] === '') {
+			show_error_message(_s('Empty tag for value "%1$s".', $data['value']));
 		}
-		else {
+		elseif ($tag_filter_groupids) {
 			// Add new tag filter with submit().
-			if ($tag_filter_groupids) {
-				if (hasRequest('tag_filter_subgroups')) {
-					$parent_groups = API::HostGroup()->get([
-						'output' => ['groupid', 'name'],
-						'groupids' => $tag_filter_groupids
-					]);
-					$parent_groups_names = [];
-
-					foreach ($parent_groups as $group) {
-						$parent_groups_names[] = $group['name'].'/';
-					}
-
-					if ($parent_groups_names) {
-						$child_groups = API::HostGroup()->get([
-							'output' => ['groupid', 'name'],
-							'search' => ['name' => $parent_groups_names],
-							'searchByAny' => true,
-							'startSearch' => true
-						]);
-
-						$host_groups = array_merge($parent_groups, $child_groups);
-					}
-				}
-				else {
-					$host_groups = API::HostGroup()->get([
-						'groupids' => $tag_filter_groupids,
-						'output' => ['groupid', 'name']
-					]);
-				}
-
-				foreach ($host_groups as $host_group) {
-					$new_element = [
-						'groupid' => $host_group['groupid'],
-						'tag' => getRequest('tag'),
-						'value' => getRequest('value'),
-						'name' => $host_group['name']
-					];
-
-					array_push($data['tag_filters'], $new_element);
-				}
-
-				$tag_filter_groupids = [];
-				$data['tag'] = '';
-				$data['value'] = '';
-				$data['tag_filter_subgroups'] = 0;
+			if (hasRequest('tag_filter_subgroups')) {
+				$tag_filter_groupids = getSubGroups($tag_filter_groupids);
 			}
+
+			foreach ($tag_filter_groupids as $groupid) {
+				$data['tag_filters'][] = [
+					'groupid' => $groupid,
+					'tag' => $data['tag'],
+					'value' => $data['value']
+				];
+			}
+
+			$tag_filter_groupids = [];
+			$data['tag'] = '';
+			$data['value'] = '';
+			$data['tag_filter_subgroups'] = 0;
 		}
 	}
 	elseif (hasRequest('remove_tag_filter')) {
