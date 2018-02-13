@@ -188,6 +188,7 @@
 				dstfld1: 'items_' + i + '_itemid',
 				dstfld2: 'items_' + i + '_name',
 				numeric: 1,
+				with_webitems: 1,
 				writeonly: 1
 			};
 			if (jQuery('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
@@ -208,7 +209,7 @@
 			<?php endif ?>
 
 			var nameLink = 'PopUp("popup.generic",'
-				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()));';
+				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()), null, this);';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
 	}
@@ -265,7 +266,7 @@
 
 				// rewrite color action
 				if (part1.substring(0, 3) === 'lbl') {
-					obj.attr('onclick', 'javascript: show_color_picker("items_' + i + '_color");');
+					obj.attr('onclick', 'javascript: show_color_picker("items_' + i + '_color", this);');
 				}
 				else if (part2 === 'color') {
 					obj.attr('onchange', 'javascript: set_color_by_name("items_' + i + '_color", this.value);');

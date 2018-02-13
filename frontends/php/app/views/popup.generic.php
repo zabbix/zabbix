@@ -644,10 +644,10 @@ jQuery(document).ready(function() {
 
 if ($form) {
 	$form->addItem($table);
-	$output['body'] = (new CDiv([$data['message'], $form]))->toString();
+	$output['body'] = (new CDiv([$data['messages'], $form]))->toString();
 }
 else {
-	$output['body'] = (new CDiv([$data['message'], $table]))->toString();
+	$output['body'] = (new CDiv([$data['messages'], $table]))->toString();
 }
 
 echo (new CJson())->encode($output);

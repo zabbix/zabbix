@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha4
 
 New features:
+..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
 

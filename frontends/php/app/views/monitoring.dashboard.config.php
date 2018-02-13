@@ -36,7 +36,6 @@ $form_list->addRow((new CLabel(_('Type'), 'type')),
 $form_list->addRow(_('Name'),
 	(new CTextBox('name', $data['dialogue']['name']))
 		->setAttribute('placeholder', _('default'))
-		->setAttribute('autofocus', 'autofocus')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
@@ -146,7 +145,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson($field->getPopupOptions($form->getName())).');')
+					CJs::encodeJson($field->getPopupOptions($form->getName())).', null, this);')
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {

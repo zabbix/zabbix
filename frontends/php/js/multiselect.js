@@ -565,8 +565,8 @@ jQuery(function($) {
 					popupButton.attr('disabled', true);
 				}
 				else {
-					popupButton.click(function() {
-						return PopUp('popup.generic', popup_options);
+					popupButton.click(function(event) {
+						return PopUp('popup.generic', popup_options, null, event.target);
 					});
 				}
 
