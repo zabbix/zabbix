@@ -211,8 +211,8 @@ $itemFormList->addRow(
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
-	foreach ($data['headers'] as $k => $v) {
-		$headers_data[] = ['key' => $k, 'value' => $v];
+	foreach ($data['headers'] as $pair) {
+		$headers_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
 else if (!$readonly) {

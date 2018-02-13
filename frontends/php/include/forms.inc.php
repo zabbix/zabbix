@@ -1006,37 +1006,19 @@ function getItemFormData(array $item = [], array $options = []) {
 	];
 
 	if ($data['type'] == ITEM_TYPE_HTTPCHECK) {
-		$query_fields = [];
-		if (is_array($data['query_fields']) && array_key_exists('key', $data['query_fields'])
-				&& array_key_exists('value', $data['query_fields'])) {
-			foreach ($data['query_fields']['key'] as $index => $key) {
-				if (array_key_exists($index, $data['query_fields']['value'])) {
-					$query_fields[] = [$key => $data['query_fields']['value'][$index]];
+		foreach (['query_fields', 'headers'] as $property) {
+			$values = [];
+
+			if (is_array($data[$property]) && array_key_exists('key', $data[$property])
+					&& array_key_exists('value', $data[$property])) {
+				foreach ($data[$property]['key'] as $index => $key) {
+					if (array_key_exists($index, $data[$property]['value'])) {
+						$values[] = [$key => $data[$property]['value'][$index]];
+					}
 				}
 			}
-
-			// Ignore single row if it is empty.
-			if (count($query_fields) == 1 && $key === '' && $data['query_fields']['value'][$index] === '') {
-				$query_fields = [];
-			}
+			$data[$property] = $values;
 		}
-		$data['query_fields'] = $query_fields;
-
-		$headers = [];
-		if (is_array($data['query_fields']) && array_key_exists('key', $data['headers'])
-				&& array_key_exists('value', $data['headers'])) {
-			foreach ($data['headers']['key'] as $index => $key) {
-				if (array_key_exists($index, $data['headers']['value'])) {
-					$headers[$key] = $data['headers']['value'][$index];
-				}
-			}
-
-			// Ignore single row if it is empty.
-			if (count($headers) == 1 && $key === '' && $data['headers']['value'][$index] === '') {
-				$headers = [];
-			}
-		}
-		$data['headers'] = $headers;
 	}
 	else {
 		$data['headers'] = [];

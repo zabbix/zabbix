@@ -199,14 +199,13 @@ $itemFormList->addRow(
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
-	foreach ($data['headers'] as $k => $v) {
-		$headers_data[] = ['key' => $k, 'value' => $v];
+	foreach ($data['headers'] as $pair) {
+		$headers_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
 else if (!$readonly) {
 	$headers_data[] = ['key' => '', 'value' => ''];
 }
-
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
 $headers->items = [json_encode($headers_data, JSON_UNESCAPED_UNICODE)];
 
