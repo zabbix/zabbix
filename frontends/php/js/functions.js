@@ -640,8 +640,12 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			}
 			var res = obj.action();
 
-			if (res !== false && (!('keepOpen' in obj) || obj.keepOpen === false)) {
-				jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
+			if (res !== false) {
+				cancel_action = null;
+
+				if (!('keepOpen' in obj) || obj.keepOpen === false) {
+					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
+				}
 			}
 
 			return false;
