@@ -415,6 +415,7 @@ if (hasRequest('form')) {
 			'output' => ['groupid', 'name'],
 			'groupids' => $tag_filter_groupids
 		]);
+		CArrayHelper::sort($host_groups, ['name']);
 
 		$data['host_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
 	}
