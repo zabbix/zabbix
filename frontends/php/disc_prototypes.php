@@ -506,7 +506,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					}
 
 					// Ignore single row if it is empty.
-					if (count($query_fields) == 1 && $key === '' &&  $item['query_fields']['value'][$index] === '') {
+					if (count($query_fields) == 1 && $key === '' && $item['query_fields']['value'][$index] === '') {
 						$query_fields = [];
 					}
 				}
@@ -522,7 +522,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					}
 
 					// Ignore single row if it is empty.
-					if (count($headers) == 1 && $key === '' &&  $item['headers']['value'][$index] === '') {
+					if (count($headers) == 1 && $key === '' && $item['headers']['value'][$index] === '') {
 						$headers = [];
 					}
 				}
@@ -598,7 +598,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					}
 
 					// Ignore single row if it is empty.
-					if (count($query_fields) == 1 && $key === '' &&  $posted['query_fields']['value'][$index] === '') {
+					if (count($query_fields) == 1 && $key === '' && $posted['query_fields']['value'][$index] === '') {
 						$query_fields = [];
 					}
 				}
@@ -614,7 +614,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					}
 
 					// Ignore single row if it is empty.
-					if (count($headers) == 1 && $key === '' &&  $posted['headers']['value'][$index] === '') {
+					if (count($headers) == 1 && $key === '' && $posted['headers']['value'][$index] === '') {
 						$headers = [];
 					}
 				}

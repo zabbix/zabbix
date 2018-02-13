@@ -1016,7 +1016,7 @@ function getItemFormData(array $item = [], array $options = []) {
 			}
 
 			// Ignore single row if it is empty.
-			if (count($query_fields) == 1 && $key === '' &&  $data['query_fields']['value'][$index] === '') {
+			if (count($query_fields) == 1 && $key === '' && $data['query_fields']['value'][$index] === '') {
 				$query_fields = [];
 			}
 		}
@@ -1032,7 +1032,7 @@ function getItemFormData(array $item = [], array $options = []) {
 			}
 
 			// Ignore single row if it is empty.
-			if (count($headers) == 1 && $key === '' &&  $data['headers']['value'][$index] === '') {
+			if (count($headers) == 1 && $key === '' && $data['headers']['value'][$index] === '') {
 				$headers = [];
 			}
 		}
