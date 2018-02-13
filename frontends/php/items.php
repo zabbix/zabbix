@@ -171,8 +171,18 @@ $fields = [
 									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
 									null
 								],
-	'http_username' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_username' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+									'(isset({add}) || isset({update})) && isset({http_authtype})'.
+										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
+											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+									_('Username')
+								],
+	'http_password' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+									'(isset({add}) || isset({update})) && isset({http_authtype})'.
+										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
+											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+									_('Password')
+								],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
