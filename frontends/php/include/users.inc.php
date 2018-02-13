@@ -274,33 +274,40 @@ function collapseHostGroupRights(array $groups_rights) {
  * @return array
  */
 function collapseTagFilters(array $tag_filters) {
-	$groupids = [];
+	CArrayHelper::sort($tag_filters, ['groupid', 'tag', 'value']);
 
-	foreach ($tag_filters as $tag_filter) {
-		$groupids[$tag_filter['groupid']] = true;
+	$groupids = [];
+	$prev_tag_filter = null;
+
+	foreach ($tag_filters as $key => $tag_filter) {
+		if ($prev_tag_filter !== null && $prev_tag_filter['groupid'] == $tag_filter['groupid']
+				&& ($prev_tag_filter['tag'] === '' || $prev_tag_filter['tag'] === $tag_filter['tag'])
+				&& ($prev_tag_filter['value'] === '' || $prev_tag_filter['value'] === $tag_filter['value'])) {
+			unset($tag_filters[$key]);
+		}
+		else {
+			$groupids[$tag_filter['groupid']] = true;
+			$prev_tag_filter = $tag_filter;
+		}
 	}
 
 	if ($groupids) {
-		$host_groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
+		$groups = API::HostGroup()->get([
+			'output' => ['name'],
 			'groupids' => array_keys($groupids),
 			'preservekeys' => true
 		]);
 
 		foreach ($tag_filters as $key => $tag_filter) {
-			if (array_key_exists($tag_filter['groupid'], $host_groups)) {
-				$tag_filters[$key]['name'] = $host_groups[$tag_filter['groupid']]['name'];
+			if (array_key_exists($tag_filter['groupid'], $groups)) {
+				$tag_filters[$key]['name'] = $groups[$tag_filter['groupid']]['name'];
 			}
 			else {
 				unset($tag_filters[$key]);
 			}
 		}
 
-		CArrayHelper::sort($tag_filters, [
-			['field' => 'name', 'order' => ZBX_SORT_UP],
-			['field' => 'tag', 'order' => ZBX_SORT_UP],
-			['field' => 'value', 'order' => ZBX_SORT_UP]
-		]);
+		CArrayHelper::sort($tag_filters, ['name', 'tag', 'value']);
 	}
 
 	return $tag_filters;

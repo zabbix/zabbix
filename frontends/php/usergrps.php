@@ -381,6 +381,8 @@ if (hasRequest('form')) {
 		}
 	}
 
+	$data['tag_filters'] = collapseTagFilters($data['tag_filters']);
+
 	if ($tag_filter_groupids) {
 		$host_groups = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
@@ -393,18 +395,6 @@ if (hasRequest('form')) {
 	else {
 		$data['host_groups'] = [];
 	}
-
-	$unique_tag_filters = [];
-	foreach ($data['tag_filters'] as $tag_filter) {
-		$tag_filter_uniqueness_identifier = serialize([
-			'groupid' => $tag_filter['groupid'],
-			'tag' => $tag_filter['tag'],
-			'value' => $tag_filter['value']
-		]);
-		$unique_tag_filters[$tag_filter_uniqueness_identifier] = $tag_filter;
-	}
-
-	$data['tag_filters'] = collapseTagFilters(array_values($unique_tag_filters));
 
 	// render view
 	$view = new CView('administration.usergroups.edit', $data);
