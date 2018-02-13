@@ -448,8 +448,8 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data = {
-			'fullscreen': data['options']['fullscreen'],
-			'kioskmode': data['options']['kioskmode'],
+			'fullscreen': data['options']['fullscreen'] ? 1 : 0,
+			'kioskmode': data['options']['kioskmode'] ? 1 : 0,
 			'dashboardid': data['dashboard']['id'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
@@ -804,7 +804,7 @@
 		});
 
 		var ajax_data = {
-			fullscreen: data['options']['fullscreen'],
+			fullscreen: data['options']['fullscreen'] ? 1 : 0,
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
@@ -897,20 +897,25 @@
 			$text = $('<h1>');
 
 		if (options['editable']) {
-			$text.append(
-				$('<a>', {'href':'#'})
-				.text(t('Add a new widget'))
-				.click(function(e){
-					// To prevent going by href link.
-					e.preventDefault();
+			if (options['kioskmode']) {
+				$text.text(t('Cannot add widgets in kiosk mode'));
+			}
+			else {
+				$text.append(
+					$('<a>', {'href':'#'})
+						.text(t('Add a new widget'))
+						.click(function(e){
+							// To prevent going by href link.
+							e.preventDefault();
 
-					if (!methods.isEditMode.call($obj)) {
-						showEditMode();
-					}
+							if (!methods.isEditMode.call($obj)) {
+								showEditMode();
+							}
 
-					methods.addNewWidget.call($obj);
-				})
-			);
+							methods.addNewWidget.call($obj);
+						})
+				);
+			}
 		}
 		else {
 			$text.addClass('disabled').text(t('Add a new widget'));
@@ -1004,8 +1009,8 @@
 	var	methods = {
 		init: function(options) {
 			var default_options = {
-				'fullscreen': 0,
-				'kioskmode': 0,
+				'fullscreen': false,
+				'kioskmode': false,
 				'widget-height': 70,
 				'widget-min-rows': 2,
 				'max-rows': 64,
@@ -1220,7 +1225,7 @@
 
 				url.unsetArgument('sid');
 				url.setArgument('action', 'dashboard.view');
-				if (data['options']['fullscreen'] == 1) {
+				if (data['options']['fullscreen']) {
 					url.setArgument('fullscreen', '1');
 				}
 				if (current_url.getArgument('dashboardid')) {

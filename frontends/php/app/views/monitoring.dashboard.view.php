@@ -69,7 +69,7 @@ else {
 
 	$widget = new CWidget();
 
-	if ($data['kioskmode'] == '0') {
+	if (!$data['kioskmode']) {
 		$widget
 			->setTitle($data['dashboard']['name'])
 			->setControls((new CForm('get'))
@@ -141,7 +141,7 @@ else {
 	if ($data['show_timeline']) {
 		$timeline = (new CFilter('web.dashbrd.filter.state'))->addNavigator();
 
-		if ($data['kioskmode'] == '1') {
+		if ($data['kioskmode']) {
 			$timeline->setHidden();
 		}
 	}

@@ -83,8 +83,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
-		$fullscreen = $this->getInput('fullscreen', '0');
-		$kioskmode = $this->getInput('kioskmode', '0');
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
 
 		list($this->dashboard, $error) = $this->getDashboard();
 
@@ -96,8 +96,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		elseif ($this->dashboard === null) {
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
-				->setArgument('fullscreen', $fullscreen == '1' ? '1' : null)
-				->setArgument('kioskmode', ($kioskmode == '1' && $fullscreen == '1')  ? '1' : null);
+				->setArgument('fullscreen', $fullscreen ? '1' : null);
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;
@@ -109,7 +108,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$data = [
 				'dashboard' => $dashboard,
 				'fullscreen' => $fullscreen,
-				'kioskmode' => ($kioskmode == '1' && $fullscreen == '1') ? '1' : '0',
+				'kioskmode' => $kioskmode,
 				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
 				'show_timeline' => self::showTimeline($this->dashboard['widgets']),

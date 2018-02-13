@@ -148,9 +148,9 @@
 		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
 
-		var $norm_mode_btn = jQuery('.btn-dashbrd-normal');
+		var $norm_mode_btn = $('.btn-dashbrd-normal');
 		if ($norm_mode_btn.length) {
-			jQuery('body').on('mousemove keypress', function() {
+			$(window).on('mousemove keypress scroll', function() {
 				clearTimeout($norm_mode_btn.data('timer'));
 				$norm_mode_btn
 					.removeClass('hidden')

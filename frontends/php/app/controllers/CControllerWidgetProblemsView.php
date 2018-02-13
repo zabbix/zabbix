@@ -36,6 +36,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 	}
 
 	protected function doAction() {
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
+
 		$fields = $this->getForm()->getFieldsData();
 
 		$config = select_config();
@@ -74,9 +77,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
 		}
 
-		$fullscreen = $this->getInput('fullscreen', '0');
-		$kioskmode = $this->getInput('kioskmode', '0');
-
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'fields' => [
@@ -92,7 +92,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'fullscreen' => $fullscreen,
-			'kioskmode' => ($kioskmode == '1' && $fullscreen == '1') ? '1' : '0',
+			'kioskmode' => $kioskmode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
