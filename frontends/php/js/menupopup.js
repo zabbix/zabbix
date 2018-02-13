@@ -895,7 +895,7 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 					item.clickCallback = function(e) {
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
-						jQuery(this).closest('.action-menu-top').menuPopup('close', null);
+						jQuery(this).closest('.action-menu-top').menuPopup('close', null, false);
 					};
 				}
 
@@ -930,12 +930,12 @@ jQuery(function($) {
 		}
 	};
 
-	function closeMenuPopup(trigger_elmnt, menuPopup) {
+	function closeMenuPopup(trigger_elmnt, menuPopup, return_focus) {
 		if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 			menuPopup.data('is-active', false);
 			menuPopup.fadeOut(0);
 
-			removeFromOverlaysStack('contextmenu');
+			removeFromOverlaysStack('contextmenu', return_focus);
 		}
 	}
 
@@ -1054,8 +1054,8 @@ jQuery(function($) {
 				closeMenuPopup(e, menuPopup);
 			});
 		},
-		close: function(trigger_elmnt) {
-			closeMenuPopup(trigger_elmnt, jQuery(this));
+		close: function(trigger_elmnt, return_focus) {
+			closeMenuPopup(trigger_elmnt, jQuery(this), return_focus);
 		}
 	};
 

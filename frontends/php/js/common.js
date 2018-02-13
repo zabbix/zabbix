@@ -552,11 +552,16 @@ function closeDialogHandler(event) {
 /*
  * Removed overlay from overlays stack and sets focus to source element.
  *
- * @param {string} dialogueid	Id of dialogue, that is beeing closed.
+ * @param {string} dialogueid		Id of dialogue, that is beeing closed.
+ * @param {boolean} return_focus	If not FALSE, the element stored in overlay.element will be focused.
  */
-function removeFromOverlaysStack(dialogueid) {
+function removeFromOverlaysStack(dialogueid, return_focus) {
 	var overlay = null,
 		index;
+
+	if (return_focus !== false) {
+		return_focus = true;
+	}
 
 	jQuery(overlays_stack).each(function(i, item) {
 		if (item.dialogueid === dialogueid) {
@@ -568,7 +573,9 @@ function removeFromOverlaysStack(dialogueid) {
 
 	if (overlay) {
 		// Focus UI element that was clicked to open an overlay.
-		jQuery(overlay.element).focus();
+		if (return_focus) {
+			jQuery(overlay.element).focus();
+		}
 
 		// Remove dialogue from the stack.
 		overlays_stack.splice(index, 1);
