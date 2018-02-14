@@ -66,17 +66,17 @@ class CStatusCodesParser {
 			$range = explode('-', $range);
 
 			if (count($range) > 2) {
-				return false;
+				return CParser::PARSE_FAIL;
 			}
 
 			foreach ($range as $part) {
 				if (!ctype_digit($part) && !($this->options['usermacros']
 						&& $this->user_macro_parser->parse($part) == CParser::PARSE_SUCCESS)) {
-					return false;
+					return CParser::PARSE_FAIL;
 				}
 			}
 		}
 
-		return true;
+		return CParser::PARSE_SUCCESS;
 	}
 }

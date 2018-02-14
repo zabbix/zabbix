@@ -27,34 +27,40 @@ class CStatusCodeParserTest extends PHPUnit_Framework_TestCase {
 	public function testProvider() {
 		return [
 			[
-				'{$MACRO}', ['usermacros' => true], true
+				'{$MACRO}', ['usermacros' => true], CParser::PARSE_SUCCESS
 			],
 			[
-				'{$MACRO}-{$MACRO}', ['usermacros' => true], true
+				'{$MACRO}-{$MACRO}', ['usermacros' => true], CParser::PARSE_SUCCESS
 			],
 			[
-				'200-{$MACRO}', ['usermacros' => true], true
+				'200-{$MACRO}', ['usermacros' => true], CParser::PARSE_SUCCESS
 			],
 			[
-				'{$MACRO}-200', ['usermacros' => true], true
+				'{$MACRO}-200', ['usermacros' => true], CParser::PARSE_SUCCESS
 			],
 			[
-				'200-400', [], true
+				'200-400', [], CParser::PARSE_SUCCESS
 			],
 			[
-				'200', [], true
+				'200', [], CParser::PARSE_SUCCESS
 			],
 			[
-				'200,301', [], true
+				'200,301', [], CParser::PARSE_SUCCESS
 			],
 			[
-				'{$MACRO}-{$MACRO},{$MACRO},{$MACRO}-200,200-{$MACRO},200-301', ['usermacros' => true], true
+				'{$MACRO}-{$MACRO},{$MACRO},{$MACRO}-200,200-{$MACRO},200-301', ['usermacros' => true], CParser::PARSE_SUCCESS
 			],
 			[
-				'{$MACRO}', [], false
+				'{$MACRO}', [], CParser::PARSE_FAIL
 			],
 			[
-				'200-{$MACRO}', ['usermacros' => false], false
+				'200-{$MACRO}', ['usermacros' => false], CParser::PARSE_FAIL
+			],
+			[
+				'', [], CParser::PARSE_FAIL
+			],
+			[
+				'', ['usermacros' => true], CParser::PARSE_FAIL
 			]
 		];
 	}
