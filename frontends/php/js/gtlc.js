@@ -895,7 +895,7 @@ var CScrollBar = Class.create({
 	},
 
 	//------- CALENDAR -------
-	calendarShowLeft: function() {
+	calendarShowLeft: function(event) {
 		if (this.disabled) {
 			return false;
 		}
@@ -908,10 +908,10 @@ var CScrollBar = Class.create({
 			pos.top -= 20;
 		}
 
-		this.clndrLeft.clndr.clndrshow(pos.top, pos.left);
+		this.clndrLeft.clndr.clndrshow(pos.top, pos.left, event.target);
 	},
 
-	calendarShowRight: function() {
+	calendarShowRight: function(event) {
 		if (this.disabled) {
 			return false;
 		}
@@ -925,7 +925,7 @@ var CScrollBar = Class.create({
 			pos.top -= 20;
 		}
 
-		this.clndrRight.clndr.clndrshow(pos.top, pos.left);
+		this.clndrRight.clndr.clndrshow(pos.top, pos.left, event.target);
 	},
 
 	setCalendarLeft: function(time) {

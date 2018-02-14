@@ -865,7 +865,7 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// application selection pop up
-				$('#application-select').click(function() {
+				$('#application-select').click(function(event) {
 					var data = $('#elementNameHost').multiSelect('getData'),
 						popup_options = {
 							srctbl: 'applications',
@@ -880,7 +880,7 @@ ZABBIX.apps.map = (function($) {
 						popup_options['hostid'] = data[0].id;
 					}
 
-					PopUp('popup.generic', popup_options);
+					PopUp('popup.generic', popup_options, null, event.target);
 				});
 
 				// mass update form

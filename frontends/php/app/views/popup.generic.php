@@ -154,6 +154,7 @@ $js_action_onclick = ' jQuery(this).removeAttr("onclick");'.
 switch ($data['popup_type']) {
 	case 'hosts':
 	case 'host_groups':
+	case 'proxies':
 	case 'host_templates':
 	case 'templates':
 	case 'applications':
@@ -568,21 +569,6 @@ switch ($data['popup_type']) {
 		}
 		break;
 
-	case 'proxies':
-		foreach ($data['table_records'] as $proxy) {
-			$proxy['hostid'] = $proxy['proxyid'];
-
-			$action = get_window_opener($options['dstfrm'], $options['dstfld1'], $proxy[$options['srcfld1']]);
-			if (array_key_exists('srcfld2', $options)) {
-				$action .= get_window_opener($options['dstfrm'], $options['dstfld2'], $proxy[$options['srcfld2']]);
-			}
-
-			$table->addRow(
-				(new CLink($proxy['host'], 'javascript:void(0);'))->onClick($action.$js_action_onclick)
-			);
-		}
-		break;
-
 	case 'scripts':
 		foreach ($data['table_records'] as $script) {
 			$description = new CLink($script['name'], 'javascript:void(0);');
@@ -645,7 +631,7 @@ if ($data['multiselect'] && $form !== null) {
 	];
 }
 
-$types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications'];
+$types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'proxies'];
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {
 	$output['script_inline'] .= 'var popup_reference = '.zbx_jsvalue($data['table_records'], true).';';
 }
@@ -658,10 +644,10 @@ jQuery(document).ready(function() {
 
 if ($form) {
 	$form->addItem($table);
-	$output['body'] = (new CDiv([$data['message'], $form]))->toString();
+	$output['body'] = (new CDiv([$data['messages'], $form]))->toString();
 }
 else {
-	$output['body'] = (new CDiv([$data['message'], $table]))->toString();
+	$output['body'] = (new CDiv([$data['messages'], $table]))->toString();
 }
 
 echo (new CJson())->encode($output);

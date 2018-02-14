@@ -126,7 +126,7 @@ $expression_row = [
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.CJs::encodeJson($popup_options).
-			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}));'
+			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}), null, this);'
 		)
 		->setEnabled(!$readonly)
 ];
@@ -260,7 +260,8 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value});')
+		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value}, null,'.
+					'this);')
 		->addClass(ZBX_STYLE_BTN_LINK);
 
 	if (!$allowed_testing) {
@@ -323,7 +324,7 @@ $recovery_expression_row = [
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
 			CJs::encodeJson($popup_options).
-				',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}));'
+				',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}), null, this);'
 		)
 		->setEnabled(!$readonly)
 ];
@@ -455,7 +456,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick('return PopUp("popup.testtriggerexpr",'.
-			'{expression: this.form.elements["recovery_expression"].value});')
+			'{expression: this.form.elements["recovery_expression"].value}, null, this);')
 		->addClass(ZBX_STYLE_BTN_LINK);
 
 	if (!$allowed_testing) {
@@ -626,7 +627,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'multiselect' => '1',
 						'with_triggers' => '1',
 						'noempty' => '1'
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 	]))
