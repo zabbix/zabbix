@@ -78,7 +78,7 @@ jQuery(function($) {
 				break;
 
 			case 'triggerLog':
-				data = getMenuPopupTriggerLog(data);
+				data = getMenuPopupTriggerLog(data, obj);
 				break;
 
 			case 'triggerMacro':

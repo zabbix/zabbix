@@ -715,22 +715,23 @@ function getMenuPopupTrigger(options) {
  * @param array  options['triggers']			triggers (optional)
  * @param string options['triggers'][n]['id']	trigger id
  * @param string options['triggers'][n]['name']	trigger name
+ * @param {object} trigger_elmnt				UI element that was clicked to open overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupTriggerLog(options) {
+function getMenuPopupTriggerLog(options, trigger_elmnt) {
 	var items = [],
 		dependent_items = getMenuPopupDependentItems(options.dependent_items);
 
 	// create
 	items[items.length] = {
 		label: t('Create trigger'),
-		clickCallback: function(event) {
+		clickCallback: function() {
 			jQuery(this).closest('.action-menu').menuPopup('close', null);
 
 			return PopUp('popup.triggerwizard', {
 				itemid: options.itemid
-			}, null, event.target);
+			}, null, trigger_elmnt);
 		}
 	};
 
@@ -745,13 +746,13 @@ function getMenuPopupTriggerLog(options) {
 		jQuery.each(options.triggers, function(i, trigger) {
 			triggers[triggers.length] = {
 				label: trigger.name,
-				clickCallback: function(event) {
+				clickCallback: function() {
 					jQuery(this).closest('.action-menu-top').menuPopup('close', null);
 
 					return PopUp('popup.triggerwizard', {
 						itemid: options.itemid,
 						triggerid: trigger.id
-					}, null, event.target);
+					}, null, trigger_elmnt);
 				}
 			};
 		});
