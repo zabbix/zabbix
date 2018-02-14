@@ -20,8 +20,14 @@
 #include "checks_http.h"
 #include "zbxhttp.h"
 #include "zbxjson.h"
-#ifdef HAVE_LIBCURL
 #include "log.h"
+#include "zbxserver.h"
+#ifdef HAVE_LIBCURL
+#ifdef HAVE_LIBXML2
+#	include <libxml/parser.h>
+#	include <libxml/tree.h>
+#	include <libxml/xpath.h>
+#endif
 
 #define HTTPCHECK_REQUEST_GET	0
 #define HTTPCHECK_REQUEST_POST	1
@@ -419,4 +425,75 @@ clean:
 
 	return ret;
 }
+
+#ifdef HAVE_LIBXML2
+static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_type, xmlNode *a_node)
+{
+	xmlNode		*cur_node;
+	xmlChar		*content;
+	char		*content_ptr, *content_esc;
+
+	for (cur_node = a_node; cur_node; cur_node = cur_node->next)
+	{
+		if (XML_TEXT_NODE == cur_node->type)
+		{
+			content = xmlNodeGetContent(cur_node);
+			content_ptr = zbx_strdup(NULL, (const char *)content);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL, NULL,
+					&content_ptr, macro_type, NULL, 0);
+			content_esc = xml_escape_dyn(content_ptr);
+
+			xmlNodeSetContent(cur_node, (xmlChar *)content_esc);
+
+			zbx_free(content_esc);
+			zbx_free(content_ptr);
+			xmlFree(content);
+		}
+
+		substitute_simple_macros_in_xml_elements(item, macro_type, cur_node->children);
+	}
+}
+
+int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, int macro_type, char *error, int maxerrlen)
+{
+	xmlDoc		*doc;
+	xmlErrorPtr	pErr;
+	xmlNode		*root_element;
+	xmlChar		*mem;
+	int		size, ret = FAIL;
+
+	if (NULL == (doc = xmlReadMemory(*data, strlen(*data), "noname.xml", NULL, 0)))
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+			zbx_snprintf(error, maxerrlen, "Cannot parse XML value: %s", pErr->message);
+		else
+			zbx_snprintf(error, maxerrlen, "Cannot parse XML value");
+
+		return FAIL;
+	}
+
+	if (NULL == (root_element = xmlDocGetRootElement(doc)))
+	{
+		zbx_snprintf(error, maxerrlen, "Cannot parse XML root");
+		goto clean;
+	}
+
+	substitute_simple_macros_in_xml_elements(item, macro_type, root_element);
+
+	xmlDocDumpMemory(doc, &mem, &size);
+	if (NULL == mem)
+	{
+		zbx_snprintf(error, maxerrlen, "Cannot save XML");
+		goto clean;
+	}
+
+	*data = zbx_strdup(*data, (const char *)mem);
+	xmlFree(mem);
+	ret = SUCCEED;
+clean:
+	xmlFreeDoc(doc);
+
+	return ret;
+}
+#endif
 #endif
