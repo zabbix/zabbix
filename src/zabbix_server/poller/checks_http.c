@@ -427,30 +427,54 @@ clean:
 }
 
 #ifdef HAVE_LIBXML2
-static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_type, xmlNode *a_node)
+static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_type, xmlNode *node)
 {
-	xmlNode		*cur_node;
-	xmlChar		*content;
-	char		*content_ptr, *content_esc;
+	xmlChar	*value;
+	char	*value_tmp, *value_esc;
 
-	for (cur_node = a_node; cur_node; cur_node = cur_node->next)
+	while (NULL != node)
 	{
-		if (XML_TEXT_NODE == cur_node->type)
+		if (XML_TEXT_NODE == node->type)
 		{
-			content = xmlNodeGetContent(cur_node);
-			content_ptr = zbx_strdup(NULL, (const char *)content);
+			if (NULL == (value = xmlNodeGetContent(node)))
+				continue;
+
+			value_tmp = zbx_strdup(NULL, (const char *)value);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL, NULL,
-					&content_ptr, macro_type, NULL, 0);
-			content_esc = xml_escape_dyn(content_ptr);
+					&value_tmp, macro_type, NULL, 0);
+			value_esc = xml_escape_dyn(value_tmp);
 
-			xmlNodeSetContent(cur_node, (xmlChar *)content_esc);
+			xmlNodeSetContent(node, (xmlChar *)value_esc);
 
-			zbx_free(content_esc);
-			zbx_free(content_ptr);
-			xmlFree(content);
+			zbx_free(value_esc);
+			zbx_free(value_tmp);
+			xmlFree(value);
 		}
 
-		substitute_simple_macros_in_xml_elements(item, macro_type, cur_node->children);
+		if (XML_ELEMENT_NODE == node->type)
+		{
+			xmlAttr	*attr;
+
+			for (attr = node->properties; NULL != attr; attr = attr->next)
+			{
+				if (NULL == (value = xmlGetProp(node, attr->name)))
+					continue;
+
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL, NULL,
+						&value_tmp, macro_type, NULL, 0);
+				value_esc = xml_escape_dyn(value_tmp);
+
+				xmlSetProp(node, attr->name, (xmlChar *)value_esc);
+
+				zbx_free(value_esc);
+				zbx_free(value_tmp);
+				xmlFree(value);
+			}
+		}
+
+		substitute_simple_macros_in_xml_elements(item, macro_type, node->children);
+		node = node->next;
 	}
 }
 
@@ -477,10 +501,10 @@ int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, int macro_ty
 		zbx_snprintf(error, maxerrlen, "Cannot parse XML root");
 		goto clean;
 	}
-
 	substitute_simple_macros_in_xml_elements(item, macro_type, root_element);
 
 	xmlDocDumpMemory(doc, &mem, &size);
+
 	if (NULL == mem)
 	{
 		zbx_snprintf(error, maxerrlen, "Cannot save XML");
