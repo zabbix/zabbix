@@ -786,6 +786,8 @@ class CItemPrototype extends CItemGeneral {
 		];
 
 		foreach ($items as &$item) {
+			$type_change = ($item['type'] != $db_items[$item['itemid']]['type']);
+
 			if ($item['type'] != ITEM_TYPE_DEPENDENT && $db_items[$item['itemid']]['master_itemid']) {
 				$item['master_itemid'] = null;
 			}
