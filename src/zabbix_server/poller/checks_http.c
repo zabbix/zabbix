@@ -432,7 +432,7 @@ static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_ty
 	xmlChar	*value;
 	char	*value_tmp, *value_esc;
 
-	while (NULL != node)
+	for (;NULL != node; node = node->next)
 	{
 		if (XML_TEXT_NODE == node->type)
 		{
@@ -474,7 +474,6 @@ static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_ty
 		}
 
 		substitute_simple_macros_in_xml_elements(item, macro_type, node->children);
-		node = node->next;
 	}
 }
 
@@ -501,8 +500,8 @@ int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, int macro_ty
 		zbx_snprintf(error, maxerrlen, "Cannot parse XML root");
 		goto clean;
 	}
-	substitute_simple_macros_in_xml_elements(item, macro_type, root_element);
 
+	substitute_simple_macros_in_xml_elements(item, macro_type, root_element);
 	xmlDocDumpMemory(doc, &mem, &size);
 
 	if (NULL == mem)
