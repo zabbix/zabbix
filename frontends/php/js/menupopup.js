@@ -976,7 +976,8 @@ jQuery(function($) {
 				});
 
 				// create sections
-				if (sections.length > 0) {
+				var sections_length = sections.length;
+				if (sections_length) {
 					$.each(sections, function(i, section) {
 						if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
 							var h3 = $('<h3>').text(section.label);
@@ -990,9 +991,16 @@ jQuery(function($) {
 						menuPopup.append(sectionItem);
 
 						$.each(section.items, function(i, item) {
+							if (sections_length > 1) {
+								item['ariaLabel'] = section.label + ', ' + item['label'];
+							}
 							menuPopup.append(createMenuItem(item));
 						});
 					});
+				}
+
+				if (sections_length == 1) {
+					menuPopup.attr({'aria-label': sections[0].label});
 				}
 
 				// Skip displaying empty menu sections.
@@ -1229,6 +1237,7 @@ jQuery(function($) {
 	 * Create menu item.
 	 *
 	 * @param string options['label']			link text
+	 * @param string options['ariaLabel']		aria-label text
 	 * @param string options['url']				link url
 	 * @param string options['css']				item class
 	 * @param array  options['data']			item data as key => value
@@ -1238,11 +1247,13 @@ jQuery(function($) {
 	 * @return object
 	 */
 	function createMenuItem(options) {
+		options = $.extend({ariaLabel: options.label}, options);
+
 		var item = $('<li>'),
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
-				'aria-label': options.label
+				'aria-label': options.ariaLabel
 			});
 
 		if (typeof options.label !== 'undefined') {
