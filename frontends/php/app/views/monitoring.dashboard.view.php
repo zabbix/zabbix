@@ -130,7 +130,8 @@ else {
 				->addItem($breadcrumbs)
 				->addClass(ZBX_STYLE_OBJECT_GROUP)
 			);
-	} else {
+	}
+	else {
 		$widget->addItem(get_icon('fullscreen', [
 			'fullscreen' => $data['fullscreen'],
 			'kioskmode' => $data['kioskmode']

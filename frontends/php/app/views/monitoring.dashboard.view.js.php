@@ -150,7 +150,7 @@
 
 		var $norm_mode_btn = $('.btn-dashbrd-normal');
 		if ($norm_mode_btn.length) {
-			$(window).on('mousemove keypress scroll', function() {
+			$(window).on('mousemove keyup scroll', function() {
 				clearTimeout($norm_mode_btn.data('timer'));
 				$norm_mode_btn
 					.removeClass('hidden')
