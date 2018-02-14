@@ -148,10 +148,11 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	const char		*__function_name = "get_value_http";
 	CURL			*easyhandle;
 	CURLcode		err;
-	char			errbuf[CURL_ERROR_SIZE], *error = NULL;
+	char			errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line;
 	int			ret = NOTSUPPORTED, timeout_seconds;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
+	struct zbx_json		json;
 	zbx_http_response_t	body = {0}, header = {0};
 	size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
@@ -308,9 +309,18 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				goto clean;
 			}
 
-			zabbix_log(LOG_LEVEL_TRACE, "received body '%s'", body.data);
-			SET_TEXT_RESULT(result, body.data);
-			body.data = NULL;
+			if (HTTPCHECK_STORE_JSON == item->output_format)
+			{
+				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+				zbx_json_addstring(&json, "body", body.data, ZBX_JSON_TYPE_STRING);
+				SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
+				zbx_json_free(&json);
+			}
+			else
+			{
+				SET_TEXT_RESULT(result, body.data);
+				body.data = NULL;
+			}
 			break;
 		case HTTPCHECK_RETRIEVE_MODE_HEADERS:
 			if (NULL == header.data)
@@ -319,36 +329,60 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				goto clean;
 			}
 
-			zabbix_log(LOG_LEVEL_TRACE, "received header '%s'", header.data);
-			SET_TEXT_RESULT(result, header.data);
-			header.data = NULL;
-			break;
-		case HTTPCHECK_RETRIEVE_MODE_BOTH:
 			if (HTTPCHECK_STORE_JSON == item->output_format)
 			{
-				struct zbx_json	json;
+				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+				zbx_json_addarray(&json, "header");
+				headers = header.data;
+				while (NULL != (line = zbx_get_httpheader(&headers)))
+				{
+					zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
+					zbx_free(line);
+				}
+				SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
+				zbx_json_free(&json);
+			}
+			else
+			{
+				SET_TEXT_RESULT(result, header.data);
+				header.data = NULL;
+			}
+			break;
+		case HTTPCHECK_RETRIEVE_MODE_BOTH:
+			if (NULL == header.data)
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
+				goto clean;
+			}
+
+			if (HTTPCHECK_STORE_JSON == item->output_format)
+			{
+				unsigned char	json_content = 0;
 
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
-				if (NULL != header.data)
+				zbx_json_addarray(&json, "header");
+				headers = header.data;
+				while (NULL != (line = zbx_get_httpheader(&headers)))
 				{
-					char	*headers, *line;
+					zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
 
-					zbx_json_addarray(&json, "header");
-					headers = header.data;
-					while (NULL != (line = zbx_get_httpheader(&headers)))
-					{
-						zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
-						zbx_free(line);
-					}
-					zbx_json_close(&json);
+					if (0 == json_content && 0 == strcmp(line, "Content-Type: application/json"))
+						json_content = 1;
+
+					zbx_free(line);
 				}
+				zbx_json_close(&json);
 
 				if (NULL != body.data)
 				{
-					zbx_lrtrim(body.data, ZBX_WHITESPACE);
-					if ('\0' != *body.data)
-						zbx_json_addraw(&json, "body", body.data);
+					if (1 == json_content)
+					{
+						zbx_lrtrim(body.data, ZBX_WHITESPACE);
+						if ('\0' != *body.data)
+							zbx_json_addraw(&json, "body", body.data);
+					}
+					else
+						zbx_json_addstring(&json, "body", body.data, ZBX_JSON_TYPE_STRING);
 				}
 
 				SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
@@ -358,7 +392,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			{
 				zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset,
 						body.data, body.offset);
-				zabbix_log(LOG_LEVEL_TRACE, "received response '%s'", header.data);
 				SET_TEXT_RESULT(result, header.data);
 				header.data = NULL;
 			}
