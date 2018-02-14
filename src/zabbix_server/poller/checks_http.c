@@ -436,22 +436,21 @@ static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_ty
 	{
 		if (XML_TEXT_NODE == node->type)
 		{
-			if (NULL == (value = xmlNodeGetContent(node)))
-				continue;
+			if (NULL != (value = xmlNodeGetContent(node)))
+			{
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL, NULL,
+						&value_tmp, macro_type, NULL, 0);
+				value_esc = xml_escape_dyn(value_tmp);
 
-			value_tmp = zbx_strdup(NULL, (const char *)value);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL, NULL,
-					&value_tmp, macro_type, NULL, 0);
-			value_esc = xml_escape_dyn(value_tmp);
+				xmlNodeSetContent(node, (xmlChar *)value_esc);
 
-			xmlNodeSetContent(node, (xmlChar *)value_esc);
-
-			zbx_free(value_esc);
-			zbx_free(value_tmp);
-			xmlFree(value);
+				zbx_free(value_esc);
+				zbx_free(value_tmp);
+				xmlFree(value);
+			}
 		}
-
-		if (XML_ELEMENT_NODE == node->type)
+		else if (XML_ELEMENT_NODE == node->type)
 		{
 			xmlAttr	*attr;
 
