@@ -2771,6 +2771,18 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   color: #4b0c0c;
   background-color: #e45959; }
 
+.problem-unack-fg {
+  color: #ff3333; }
+
+.problem-ack-fg {
+  color: #ff3333; }
+
+.ok-unack-fg {
+  color: #00ff00; }
+
+.ok-ack-fg {
+  color: #00ff00; }
+
 .list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .calendar .tree-item.selected:hover > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
   background-color: #222; }
 
@@ -3077,6 +3089,10 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     height: 20px; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
+  .input-color-picker.disabled {
+    opacity: 1; }
+    .input-color-picker.disabled div {
+      background: #7d7d7d !important; }
 
 .preloader-container {
   z-index: 10;
