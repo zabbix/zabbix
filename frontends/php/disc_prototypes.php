@@ -599,7 +599,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['password'] = getRequest('http_password', '');
 
 				$query_fields = [];
-				if (is_array($posted['headers']) && array_key_exists('key', $posted['query_fields'])
+				if (is_array($posted['query_fields']) && array_key_exists('key', $posted['query_fields'])
 						&& array_key_exists('value', $posted['query_fields'])) {
 					foreach ($posted['query_fields']['key'] as $index => $key) {
 						if (array_key_exists($index, $posted['query_fields']['value'])) {

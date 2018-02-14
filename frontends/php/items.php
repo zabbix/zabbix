@@ -1111,7 +1111,11 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'ipmi_sensor' => getRequest('ipmi_sensor'),
 				'applications' => $applications,
 				'status' => getRequest('status'),
-				'master_itemid' => getRequest('master_itemid')
+				'master_itemid' => getRequest('master_itemid'),
+				'url' =>  getRequest('url', ''),
+				'post_type' => getRequest('post_type'),
+				'posts' => getRequest('posts'),
+				'headers' => getRequest('headers')
 			];
 			if (hasRequest('preprocessing')) {
 				$preprocessing = getRequest('preprocessing');
@@ -1144,6 +1148,21 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 					unset($item[$key]);
 				}
 			}
+
+			if (is_array($item['headers']) && array_key_exists('key', $item['headers'])
+					&& array_key_exists('value', $item['headers'])) {
+				foreach ($item['headers']['key'] as $index => $key) {
+					if (array_key_exists($index, $item['headers']['value'])) {
+						$headers[] = [$key => $item['headers']['value'][$index]];
+					}
+				}
+
+				// Ignore single row if it is empty.
+				if (count($headers) == 1 && $key === '' && $item['headers']['value'][$index] === '') {
+					$headers = [];
+				}
+			}
+			$item['headers'] = $headers;
 
 			$discovered_item = [];
 			if (hasRequest('status')) {
@@ -1478,7 +1497,11 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'multiple_interface_types' => false,
 		'visible' => getRequest('visible', []),
 		'master_itemname' => getRequest('master_itemname', ''),
-		'master_itemid' => getRequest('master_itemid', 0)
+		'master_itemid' => getRequest('master_itemid', 0),
+		'url' =>  getRequest('url', ''),
+		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+		'posts' => getRequest('posts', ''),
+		'headers' => getRequest('headers')
 	];
 
 	$data['displayApplications'] = true;

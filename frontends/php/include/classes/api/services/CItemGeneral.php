@@ -1594,6 +1594,9 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function validateHTTPCheck($item, $db_item) {
 		$rules = [
+			'interfaceid' => [
+				'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY
+			],
 			'timeout' => [
 				'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN
 			],
@@ -1668,10 +1671,18 @@ abstract class CItemGeneral extends CApiService {
 			];
 		}
 
+		if (array_key_exists('post_type', $data)
+				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
+			$rules += [
+				'posts' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+				'length' => DB::getFieldLength('items', 'posts')
+			];
+		}
+
 		// Keep values only for fields with defined validation rules.
 		$data = array_intersect_key($data, $rules);
 
-		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, '/', $error)) {
+		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, '', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
@@ -1716,17 +1727,21 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		/**
-		 * Field can contain: single usermacros or status codes/ranges.
-		 *
-		 * Made consistent to validation in CHttpTest check.
-		 */
 		if (array_key_exists('status_codes', $item) && $item['status_codes']) {
 			$parser = new CStatusCodesParser(['usermacros' => true]);
 
 			if ($parser->parse($item['status_codes']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
 					$item['status_codes'], 'status_codes')
+				);
+			}
+		}
+
+		if (array_key_exists('post_type', $item)) {
+			if ($item['post_type'] == ZBX_POSTTYPE_XML
+					&& simplexml_load_string($data['posts'], null, LIBXML_IMPORT_FLAGS) === false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'posts',
+					_('valid XML string is expected'))
 				);
 			}
 		}

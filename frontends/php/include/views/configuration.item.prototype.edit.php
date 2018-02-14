@@ -95,7 +95,7 @@ $itemFormList->addRow((new CLabel(_('Key'), 'key'))->setAsteriskMark(), $key_con
 $itemFormList->addRow(
 	(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 	[
-		(new CTextBox('url', $data['url'], $readonly))
+		(new CTextBox('url', $data['url'], $readonly, DB::getFieldLength('items', 'url')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
