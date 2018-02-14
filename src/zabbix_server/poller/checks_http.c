@@ -156,6 +156,8 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	zbx_http_response_t	body = {0}, header = {0};
 	size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
+	char			application_json[] = {"Content-Type: application/json"};
+	char			application_xml[] = {"Content-Type: application/xml"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s' headers '%s' message body '%s'",
 			__function_name, zbx_request_string(item->request_method), item->url, item->headers,
@@ -268,7 +270,16 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != prepare_request(easyhandle, item->posts, item->request_method, result))
 		goto clean;
 
-	zbx_add_httpheaders(item->headers, &headers_slist);
+	if ('\0' == *item->headers)
+	{
+		if (ZBX_POSTTYPE_JSON == item->post_type)
+			zbx_add_httpheaders(application_json, &headers_slist);
+		else if (ZBX_POSTTYPE_XML == item->post_type)
+			zbx_add_httpheaders(application_xml, &headers_slist);
+	}
+	else
+		zbx_add_httpheaders(item->headers, &headers_slist);
+
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err)));
@@ -366,7 +377,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				{
 					zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
 
-					if (0 == json_content && 0 == strcmp(line, "Content-Type: application/json"))
+					if (0 == json_content && 0 == strcmp(line, application_json))
 						json_content = 1;
 
 					zbx_free(line);
