@@ -109,4 +109,4 @@ install-data-hook:
 	$(MKDIR_P) "$(EXSCRIPTS_DIR)"
 	$(MKDIR_P) "$(ALSCRIPTS_DIR)"
 	$(MKDIR_P) "$(MODULES_DIR)"
-	test -f "$(DESTDIR)@sysconfdir@/$(SERVER_CONFIG)" || cat "../../conf/$(SERVER_CONFIG)"|sed -e 's,$${libdir},'"$(MODULES_DIR)"',g' > "$(DESTDIR)@sysconfdir@/$(SERVER_CONFIG)"
+	test -f "$(DESTDIR)@sysconfdir@/$(SERVER_CONFIG)" || cp "../../conf/$(SERVER_CONFIG)" "$(DESTDIR)@sysconfdir@"
