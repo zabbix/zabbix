@@ -381,6 +381,10 @@ class CItemPrototype extends CItemGeneral {
 					$item['headers'] = implode("\r\n", $headers);
 				}
 			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
 		}
 		unset($item);
 
@@ -1085,9 +1089,32 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		foreach ($items as $inum => $item) {
-			$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+		foreach ($items as &$item) {
+			$item['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
+				}
+
+				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
+					$headers = [];
+
+					foreach ($item['headers'] as $k => $v) {
+						$headers[] = $k.': '.$v;
+					}
+
+					$item['headers'] = implode("\r\n", $headers);
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
 		}
+		unset($item);
 
 		$this->inherit($items, $data['hostids']);
 
