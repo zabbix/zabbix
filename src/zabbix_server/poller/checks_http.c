@@ -519,7 +519,9 @@ int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, char *error,
 		goto clean;
 	}
 
-	*data = zbx_strdup(*data, (const char *)mem);
+	zbx_free(*data);
+	*data = zbx_malloc(NULL, size + 1);
+	memcpy(*data, (const char *)mem, size + 1);
 	xmlFree(mem);
 	ret = SUCCEED;
 clean:
