@@ -1,3 +1,6 @@
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+  border: 1px solid rgba(43, 43, 43, 0.2) !important; }
+
 .top-nav-help {
   background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important; }
 
@@ -2694,6 +2697,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 1px solid #e79e0b;
   background-color: #f1a50b; }
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+  border: 1px solid rgba(242, 242, 242, 0.2); }
+
+.status-disabled-bg {
+  color: #525252;
+  background-color: #2b2b2b;
+  border: 1px solid rgba(242, 242, 242, 0.2); }
+
 .tag {
   display: inline-block;
   color: #f2f2f2;
@@ -2710,7 +2721,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .tag:last-child {
     margin: 0; }
 
-.status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow {
+.status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg, .status-disabled-bg {
   padding: 2px 3px 1px 3px;
   font-size: 0.917em;
   text-transform: uppercase;
@@ -2721,6 +2732,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
+  .status-green:not(:last-of-type), .status-red:not(:last-of-type), .status-grey:not(:last-of-type), .status-dark-grey:not(:last-of-type), .status-yellow:not(:last-of-type), .status-na-bg:not(:last-of-type), .status-info-bg:not(:last-of-type), .status-warning-bg:not(:last-of-type), .status-average-bg:not(:last-of-type), .status-high-bg:not(:last-of-type), .status-disaster-bg:not(:last-of-type), .status-disabled-bg:not(:last-of-type) {
+    border-right: none; }
 
 .green-bg, .normal-bg {
   background-color: #59db8f; }
