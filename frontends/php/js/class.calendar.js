@@ -831,6 +831,7 @@ calendar.prototype = {
 		this.clndr_month = document.createTextNode('');
 		this.clndr_month_wrap = document.createElement('span');
 		this.clndr_month_wrap.setAttribute('aria-live', 'assertive');
+		this.clndr_month_wrap.setAttribute('aria-atomic', 'true');
 		this.clndr_month_wrap.setAttribute('id', 'current-month'+this.id);
 		this.clndr_month_wrap.appendChild(this.clndr_month);
 		this.clndr_month_div.appendChild(this.clndr_month_wrap);
