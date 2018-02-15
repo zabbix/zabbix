@@ -40,10 +40,10 @@ a {
 	}
 
 	&:focus {
-		position: relative;
+		// position: relative;
 		color: $link-hover-color;
 		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, 0.35);
+		border-bottom: 2px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:active {
@@ -664,6 +664,10 @@ footer {
 	float: left;
 	display: block;
 	margin: 10px 10px 0 0;
+
+	&:focus {
+	@include box-shadow(0 0 0 2px rgba($blue, .35));
+	}
 }
 
 // Tables
@@ -3862,15 +3866,21 @@ a.link-action {
 	white-space: nowrap;
 	position: relative;
 
-	&:hover {
-
-		.progress-bar-label {
-			display: block;
-		}
-	}
-
 	a {
-		border: none;
+		border: none !important;
+
+		&:hover {
+			.progress-bar-label {
+				display: block;
+			}
+		}
+
+		&:focus {
+			outline: solid 2px rgba($link-hover-color, 0.5);
+			.progress-bar-label {
+				display: block;
+			}
+		}
 	}
 }
 

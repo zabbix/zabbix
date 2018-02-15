@@ -476,6 +476,48 @@ ul.top-nav-icons {
 	}
 }
 
+.header-logo {
+	&:focus {
+	@include box-shadow(0 0 0 2px $blue);
+	}
+}
+
+.checkbox-radio {
+	&:focus + label span {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+%form-input-style {
+	&:focus {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+.multiselect input[type="text"] {
+	&:focus {
+		@include box-shadow(0 0 0 2px $blue);
+	}
+}
+
+.progress-bar-container {
+	a {
+		&:hover {
+			.progress-bar-label {
+				color: white !important;
+			}
+		}
+
+		&:focus {
+			outline: solid 3px $link-hover-color;
+			.progress-bar-label {
+				color: white !important;
+			}
+		}
+	}
+}
 
 // SEVERITY STATUSES
 td.log-na-bg {
