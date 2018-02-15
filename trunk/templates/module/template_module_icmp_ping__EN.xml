@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>3.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Modules</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Module ICMP Ping</template>
+         <name>Template Module ICMP Ping</name>
+         <description>Template Module ICMP Ping version: 0.14</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Status</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>ICMP ping</name>
+               <type>3</type>
+               <snmp_community/>
+               <snmp_oid/>
+               <key>icmpping</key>
+               <delay>60</delay>
+               <history>1w</history>
+               <trends>365d</trends>
+               <status>0</status>
+               <value_type>3</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description/>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>ICMP loss</name>
+               <type>3</type>
+               <snmp_community/>
+               <snmp_oid/>
+               <key>icmppingloss</key>
+               <delay>60</delay>
+               <history>1w</history>
+               <trends>365d</trends>
+               <status>0</status>
+               <value_type>0</value_type>
+               <allowed_hosts/>
+               <units>%</units>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description/>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>ICMP response time</name>
+               <type>3</type>
+               <snmp_community/>
+               <snmp_oid/>
+               <key>icmppingsec</key>
+               <delay>60</delay>
+               <history>1w</history>
+               <trends>365d</trends>
+               <status>0</status>
+               <value_type>0</value_type>
+               <allowed_hosts/>
+               <units>s</units>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description/>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+         </items>
+         <discovery_rules/>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$ICMP_LOSS_WARN}</macro>
+               <value>20</value>
+            </macro>
+            <macro>
+               <macro>{$ICMP_RESPONSE_TIME_WARN}</macro>
+               <value>0.15</value>
+            </macro>
+         </macros>
+         <templates/>
+         <screens/>
+      </template>
+   </templates>
+   <graphs/>
+   <triggers>
+      <trigger>
+         <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>Unavailable by ICMP ping</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>4</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.
+Last three attempts returned timeout.  Please check device connectivity.</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Module ICMP Ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP Ping:icmppingloss.min(5m)}&lt;100</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>High ICMP ping loss</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>2</priority>
+         <description/>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies>
+            <dependency>
+               <name>Unavailable by ICMP ping</name>
+               <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
+               <recovery_expression/>
+            </dependency>
+         </dependencies>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Module ICMP Ping:icmppingsec.avg(5m)}&gt;{$ICMP_RESPONSE_TIME_WARN}</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>High ICMP ping response time</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>2</priority>
+         <description/>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies>
+            <dependency>
+               <name>Unavailable by ICMP ping</name>
+               <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
+               <recovery_expression/>
+            </dependency>
+            <dependency>
+               <name>High ICMP ping loss</name>
+               <expression>{Template Module ICMP Ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP Ping:icmppingloss.min(5m)}&lt;100</expression>
+               <recovery_expression/>
+            </dependency>
+         </dependencies>
+         <tags/>
+      </trigger>
+   </triggers>
+   <value_maps/>
+</zabbix_export>
