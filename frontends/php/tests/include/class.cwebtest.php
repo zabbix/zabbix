@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
-require_once dirname(__FILE__).'/class.cdbhelper.php';
+require_once dirname(__FILE__) . '/class.ctestdbhelper.php';
 require_once dirname(__FILE__).'/class.cexceptionhelper.php';
 
 define('TEST_GOOD', 0);

@@ -19,7 +19,7 @@
 **/
 
 
-class CDbHelper {
+class CTestDbHelper {
 
 	/**
 	 * Add host groups to user group with these rights.
