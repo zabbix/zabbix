@@ -1112,11 +1112,29 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'applications' => $applications,
 				'status' => getRequest('status'),
 				'master_itemid' => getRequest('master_itemid'),
-				'url' =>  getRequest('url', ''),
+				'url' =>  getRequest('url'),
 				'post_type' => getRequest('post_type'),
 				'posts' => getRequest('posts'),
 				'headers' => getRequest('headers')
 			];
+
+			if (is_array($item['headers']) && array_key_exists('key', $item['headers'])
+					&& array_key_exists('value', $item['headers'])) {
+				$headers = [];
+
+				foreach ($item['headers']['key'] as $index => $key) {
+					if (array_key_exists($index, $item['headers']['value'])) {
+						$headers[$key] = $item['headers']['value'][$index];
+					}
+				}
+
+				// Ignore single row if it is empty.
+				if (count($headers) == 1 && $key === '' && $item['headers']['value'][$index] === '') {
+					$headers = [];
+				}
+				$item['headers'] = $headers;
+			}
+
 			if (hasRequest('preprocessing')) {
 				$preprocessing = getRequest('preprocessing');
 
@@ -1148,21 +1166,6 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 					unset($item[$key]);
 				}
 			}
-
-			if (is_array($item['headers']) && array_key_exists('key', $item['headers'])
-					&& array_key_exists('value', $item['headers'])) {
-				foreach ($item['headers']['key'] as $index => $key) {
-					if (array_key_exists($index, $item['headers']['value'])) {
-						$headers[] = [$key => $item['headers']['value'][$index]];
-					}
-				}
-
-				// Ignore single row if it is empty.
-				if (count($headers) == 1 && $key === '' && $item['headers']['value'][$index] === '') {
-					$headers = [];
-				}
-			}
-			$item['headers'] = $headers;
 
 			$discovered_item = [];
 			if (hasRequest('status')) {
@@ -1506,6 +1509,22 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 	$data['displayApplications'] = true;
 	$data['displayInterfaces'] = true;
+	$headers = [];
+
+	if (is_array($data['headers']) && array_key_exists('key', $data['headers'])
+			&& array_key_exists('value', $data['headers'])) {
+		foreach ($data['headers']['key'] as $index => $key) {
+			if (array_key_exists($index, $data['headers']['value'])) {
+				$headers[] = [$key => $data['headers']['value'][$index]];
+			}
+		}
+
+		// Ignore single row if it is empty.
+		if (count($headers) == 1 && $key === '' && $data['headers']['value'][$index] === '') {
+			$headers = [];
+		}
+	}
+	$data['headers'] = $headers;
 
 	// hosts
 	$data['hosts'] = API::Host()->get([

@@ -1674,8 +1674,10 @@ abstract class CItemGeneral extends CApiService {
 		if (array_key_exists('post_type', $data)
 				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
 			$rules += [
-				'posts' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
-				'length' => DB::getFieldLength('items', 'posts')
+				'posts' => [
+					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+					'length' => DB::getFieldLength('items', 'posts')
+				]
 			];
 		}
 
@@ -1737,12 +1739,18 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		libxml_use_internal_errors(true);
 		if (array_key_exists('post_type', $item)) {
 			if ($item['post_type'] == ZBX_POSTTYPE_XML
 					&& simplexml_load_string($data['posts'], null, LIBXML_IMPORT_FLAGS) === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'posts',
-					_('valid XML string is expected'))
-				);
+				$errors = libxml_get_errors();
+				$error = reset($errors);
+				libxml_clear_errors();
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.',
+					_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
+					$error->line, $error->column
+				)));
 			}
 		}
 	}

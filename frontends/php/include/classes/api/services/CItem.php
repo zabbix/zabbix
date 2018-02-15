@@ -395,7 +395,7 @@ class CItem extends CItemGeneral {
 		foreach ($result as &$item) {
 			if (array_key_exists('query_fields', $item)) {
 				$item['query_fields'] = ($item['query_fields'] !== '')
-					? json_decode($item['query_fields'])
+					? json_decode($item['query_fields'], true)
 					: [];
 			}
 			if (array_key_exists('headers', $item)) {
