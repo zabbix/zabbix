@@ -262,7 +262,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 
 			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
 				->setHint($severityName.' ('.($mediaActive ? _('on') : _('off')).')', '', false)
-				->addClass($mediaActive ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY);
+				->addClass($mediaActive ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY);
 		}
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
@@ -279,7 +279,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-				$mediaSeverity,
+				(new CDiv($mediaSeverity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
 				$status,
 				(new CCol(
 					new CHorList([
