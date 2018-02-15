@@ -654,7 +654,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "before read");
 
-			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
+			if (SUCCEED == (ret = zbx_tcp_recv(&s)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "got [%s]", s.buffer);
 
@@ -996,12 +996,15 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "remove element [%d] Key:'%s:%s'", i, el->host, el->key);
+		if (NULL != el)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "remove element [%d] Key:'%s:%s'", i, el->host, el->key);
 
-		zbx_free(el->host);
-		zbx_free(el->key);
-		zbx_free(el->value);
-		zbx_free(el->source);
+			zbx_free(el->host);
+			zbx_free(el->key);
+			zbx_free(el->value);
+			zbx_free(el->source);
+		}
 
 		sz = (CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		memmove(&buffer.data[i], &buffer.data[i + 1], sz);

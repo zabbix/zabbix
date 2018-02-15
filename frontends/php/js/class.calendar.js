@@ -35,7 +35,7 @@ function getCalendarByID(clndr_id) {
 
 function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
 	if (typeof id === 'undefined' || id === null) {
-		id = CLNDR.length;
+		id = 'c' + CLNDR.length;
 	}
 
 	if ('undefined' == typeof(utime_field_id)) {
@@ -154,10 +154,12 @@ calendar.prototype = {
 		}
 		this.clndr_calendar.hide();
 		this.visible = 0;
+
 		jQuery(document).off('keydown', this.calendarKeyDownHandler);
+		removeFromOverlaysStack(this.id.toString());
 	},
 
-	clndrshow: function(top, left) {
+	clndrshow: function(top, left, trigger_elmnt) {
 		if (this.visible == 1) {
 			this.clndrhide();
 		}
@@ -188,6 +190,7 @@ calendar.prototype = {
 			this.visible = 1;
 
 			jQuery(document).on('keydown', {calandar: this}, this.calendarKeyDownHandler);
+			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
 			this.active_section = 2;
 			this.focusSection();
 		}
@@ -329,10 +332,6 @@ calendar.prototype = {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 					cal.focusSection();
 				}
-				break;
-
-			case 27: // ESC
-				cal.clndrhide();
 				break;
 		}
 	},

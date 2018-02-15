@@ -20,6 +20,8 @@
 
 jQuery.noConflict();
 
+var overlays_stack = [];
+
 function isset(key, obj) {
 	return (is_null(key) || is_null(obj)) ? false : (typeof(obj[key]) != 'undefined');
 }
@@ -398,13 +400,14 @@ function openWinCentered(url, name, width, height, params) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action		Popup controller related action.
- * @param {array} options		Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid	(optional) id of overlay dialogue.
+ * @param {string} action			Popup controller related action.
+ * @param {array} options			Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid		(optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt	(optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns false
  */
-function PopUp(action, options, dialogueid) {
+function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var ovelay_properties = {
 		'title': '',
 		'content': jQuery('<div>')
@@ -415,10 +418,10 @@ function PopUp(action, options, dialogueid) {
 			),
 		'class': 'modal-popup',
 		'buttons': [],
-		'dialogueid': (typeof dialogueid === 'undefined') ? getOverlayDialogueId() : dialogueid
+		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
 	};
-	var url = new Curl('zabbix.php');
 
+	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
 	jQuery.each(options, function(key, value) {
 		url.setArgument(key, value);
@@ -428,8 +431,8 @@ function PopUp(action, options, dialogueid) {
 		url: url.getUrl(),
 		type: 'get',
 		dataType: 'json',
-		beforeSend: function() {
-			overlayDialogue(ovelay_properties);
+		beforeSend: function(jqXHR) {
+			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
 		},
 		success: function(resp) {
 			if (typeof resp.errors !== 'undefined') {
@@ -459,6 +462,129 @@ function PopUp(action, options, dialogueid) {
 	});
 
 	return false;
+}
+
+/**
+ * Function to add details about overlay UI elements in global overlays_stack variable.
+ *
+ * @param {string} dialogueid	Unique overlay element identifier.
+ * @param {object} element		UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type			Type of overlay UI element.
+ * @param {object} xhr			(optional) XHR request used to load content. Used to abort loading. Currently used with
+ *								type 'popup' only.
+ */
+function addToOverlaysStack(id, element, type, xhr) {
+	var index = null,
+		id = id.toString();
+
+	jQuery(overlays_stack).each(function(i, item) {
+		if (item.dialogueid === id) {
+			index = i;
+			return;
+		}
+	});
+
+	if (index === null) {
+		// Add new overlay.
+		overlays_stack.push({
+			dialogueid: id,
+			element: element,
+			type: type,
+			xhr: xhr
+		});
+	}
+	else {
+		overlays_stack[index]['element'] = element;
+
+		// Move existing overlay to the end of array.
+		overlays_stack.push(overlays_stack[index]);
+		overlays_stack.splice(index, 1);
+	}
+
+	// Only one instance of handler should be present at any time.
+	jQuery(document)
+		.off('keydown', closeDialogHandler)
+		.on('keydown', closeDialogHandler);
+}
+
+// Keydown handler. Closes last opened overlay UI element.
+function closeDialogHandler(event) {
+	if (event.which == 27) { // ESC
+		var dialog = overlays_stack[overlays_stack.length - 1];
+		if (typeof dialog !== 'undefined') {
+			switch (dialog.type) {
+				// Close overlay popup.
+				case 'popup':
+					overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
+					break;
+
+				// Close overlay hintbox.
+				case 'hintbox':
+					hintBox.hideHint(null, dialog.element, true);
+					break;
+
+				// Close context menu overlays.
+				case 'contextmenu':
+					jQuery('.action-menu.action-menu-top:visible').menuPopup('close', dialog.element);
+					break;
+
+				// Close overlay time picker.
+				case 'clndr':
+					getCalendarByID(dialog.dialogueid.toString()).clndr.clndrhide();
+					break;
+
+				// Close overlay message.
+				case 'message':
+					jQuery(ZBX_MESSAGES).each(function(i, msg) {
+						msg.closeAllMessages();
+					});
+					break;
+
+				// Close overlay color picker.
+				case 'color_picker':
+					hide_color_picker();
+					break;
+			}
+		}
+	}
+}
+
+/*
+ * Removed overlay from overlays stack and sets focus to source element.
+ *
+ * @param {string} dialogueid		Id of dialogue, that is beeing closed.
+ * @param {boolean} return_focus	If not FALSE, the element stored in overlay.element will be focused.
+ */
+function removeFromOverlaysStack(dialogueid, return_focus) {
+	var overlay = null,
+		index;
+
+	if (return_focus !== false) {
+		return_focus = true;
+	}
+
+	jQuery(overlays_stack).each(function(i, item) {
+		if (item.dialogueid === dialogueid) {
+			overlay = item,
+			index = i;
+			return;
+		}
+	});
+
+	if (overlay) {
+		// Focus UI element that was clicked to open an overlay.
+		if (return_focus) {
+			jQuery(overlay.element).focus();
+		}
+
+		// Remove dialogue from the stack.
+		overlays_stack.splice(index, 1);
+	}
+
+	// Remove event listener.
+	if (overlays_stack.length == 0) {
+		jQuery(document).off('keydown', closeDialogHandler);
+	}
 }
 
 /**

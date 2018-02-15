@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use YAML::Syck qw(LoadFile Dump);
+use YAML::XS qw(LoadFile Dump);
 use Path::Tiny qw(path);
 use IPC::Run3 qw(run3);
 use Time::HiRes qw(clock);
@@ -22,9 +22,9 @@ sub escape_xml_entity($)
 {
 	my $entity = shift;
 
+	$entity =~ s/&/&amp;/g;
 	$entity =~ s/</&lt;/g;
 	$entity =~ s/>/&gt;/g;
-	$entity =~ s/&/&amp;/g;
 
 	return $entity;
 }

@@ -62,7 +62,7 @@ $servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setA
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.services",jQuery.extend('.
 			CJs::encodeJson($parent_service_popup_options).
-				',{parentid: this.form.parentid.value}));'
+				',{parentid: this.form.parentid.value}), null, this);'
 		)
 ]);
 
@@ -98,7 +98,7 @@ $servicesFormList->addRow(_('Trigger'), [
 				'dstfld2' => 'trigger',
 				'real_hosts' => '1',
 				'with_triggers' => '1'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 $servicesFormList->addRow((new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
@@ -153,7 +153,7 @@ $servicesDependenciesFormList->addRow(
 		(new CButton('add_child_service', _('Add')))
 			->onClick('return PopUp("popup.services",jQuery.extend('.
 				CJs::encodeJson($dep_service_popup_options).
-					',{parentid: this.form.parentid.value}));'
+					',{parentid: this.form.parentid.value}), null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]))
