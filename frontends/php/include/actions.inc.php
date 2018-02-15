@@ -828,7 +828,8 @@ function getActionOperationDescriptions(array $actions, $type) {
  *
  * @param array  $operations								Array of action operations or recovery operations.
  * @param string $operation['operationtype']				Action operation type.
- *															Possible values: OPERATION_TYPE_MESSAGE and OPERATION_TYPE_COMMAND
+ *															Possible values: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
+ *															OPERATION_TYPE_ACK_MESSAGE and OPERATION_TYPE_RECOVERY_MESSAGE
  * @param string $operation['opcommand']['type']			Action operation command type.
  *															Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
  *															ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
