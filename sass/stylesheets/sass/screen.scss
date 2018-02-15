@@ -3418,10 +3418,6 @@ $form-icon-btn: (
 				&.selected {
 					background-color: $ui-bg-selected-color;
 					color: $white;
-
-					&:hover {
-						@extend .selected
-					}
 				}
 
 				span {

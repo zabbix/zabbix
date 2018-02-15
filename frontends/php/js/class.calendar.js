@@ -600,7 +600,6 @@ calendar.prototype = {
 		this.syncBSDateBySDT();
 		this.syncCDT();
 		this.setCDate();
-		//this.clndr_selectedday.focus();
 	},
 
 	monthup: function() {
