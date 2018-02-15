@@ -3442,6 +3442,8 @@ $form-icon-btn: (
 .calendar-year {
 	height: 24px;
 	line-height: 26px;
+	display: table;
+	width: 100%;
 
 	button:first-child {
 		float: left;
