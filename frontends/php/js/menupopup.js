@@ -1086,9 +1086,7 @@ jQuery(function($) {
 
 		for (var item = $('li:first-child', menu); item.length > 0; item = item.next()) {
 			if (item[0] == li[0]) {
-				var display = $('ul', item[0]).css('display');
-
-				if (display !== 'block') {
+				if ($('ul', item[0]).is(':hidden')) {
 					$('ul:first', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
 
 					$('ul:first', item[0])
@@ -1098,11 +1096,12 @@ jQuery(function($) {
 							'display': 'block'
 						});
 				}
+				else {
+					$('ul', item[0]).actionMenuItemCollapse();
+				}
 			}
 			else {
-				var display = $('ul', item[0]).css('display');
-
-				if (display === 'block') {
+				if ($('ul', item[0]).is(':visible')) {
 					$('ul', item[0]).prev('[role="menuitem"]').removeClass('highlighted');
 					$('ul', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
 					$('ul', item[0]).css({'display': 'none'});
@@ -1314,11 +1313,6 @@ jQuery(function($) {
 
 			item.hover(function() {
 				$(this).actionMenuItemExpand();
-			});
-		}
-		else {
-			item.hover(function() {
-				$(this).actionMenuItemCollapse();
 			});
 		}
 
