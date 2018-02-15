@@ -361,13 +361,13 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 	j->status = ZBX_JSON_COMMA;
 }
 
-void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *string)
+void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data)
 {
 	size_t	len = 0, len_data;
 	char	*p, *psrc, *pdst;
 
 	assert(j);
-	len_data = strlen(string);
+	len_data = strlen(data);
 
 	if (ZBX_JSON_COMMA == j->status)
 		len++; /* , */
@@ -397,7 +397,7 @@ void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *string)
 		*p++ = ':';
 	}
 
-	memcpy(p, string, len_data);
+	memcpy(p, data, len_data);
 	p += len_data;
 
 	j->buffer_offset = p - j->buffer;
