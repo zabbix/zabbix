@@ -26,7 +26,7 @@
 #include "dbcache.h"
 
 int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result);
-int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, int macro_type, char *error, int maxerrlen);
+int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, char *error, int maxerrlen);
 #endif
 
 #endif

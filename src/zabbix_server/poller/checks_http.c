@@ -427,10 +427,10 @@ clean:
 }
 
 #ifdef HAVE_LIBXML2
-static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_type, xmlNode *node)
+static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, xmlNode *node)
 {
 	xmlChar	*value;
-	char	*value_tmp, *value_esc;
+	char	*value_tmp;
 
 	for (;NULL != node; node = node->next)
 	{
@@ -440,12 +440,10 @@ static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_ty
 			{
 				value_tmp = zbx_strdup(NULL, (const char *)value);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL, NULL,
-						&value_tmp, macro_type, NULL, 0);
-				value_esc = xml_escape_dyn(value_tmp);
+						&value_tmp, MACRO_TYPE_HTTPCHECK_XML, NULL, 0);
 
-				xmlNodeSetContent(node, (xmlChar *)value_esc);
+				xmlNodeSetContent(node, (xmlChar *)value_tmp);
 
-				zbx_free(value_esc);
 				zbx_free(value_tmp);
 				xmlFree(value);
 			}
@@ -456,7 +454,7 @@ static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_ty
 			{
 				value_tmp = zbx_strdup(NULL, (const char *)value);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL, NULL,
-						&value_tmp, macro_type, NULL, 0);
+						&value_tmp, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 
 				xmlNodeSetContent(node, (xmlChar *)value_tmp);
 
@@ -475,22 +473,20 @@ static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, int macro_ty
 
 				value_tmp = zbx_strdup(NULL, (const char *)value);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL, NULL,
-						&value_tmp, macro_type, NULL, 0);
-				value_esc = xml_escape_dyn(value_tmp);
+						&value_tmp, MACRO_TYPE_HTTPCHECK_XML, NULL, 0);
 
-				xmlSetProp(node, attr->name, (xmlChar *)value_esc);
+				xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
 
-				zbx_free(value_esc);
 				zbx_free(value_tmp);
 				xmlFree(value);
 			}
 		}
 
-		substitute_simple_macros_in_xml_elements(item, macro_type, node->children);
+		substitute_simple_macros_in_xml_elements(item, node->children);
 	}
 }
 
-int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, int macro_type, char *error, int maxerrlen)
+int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, char *error, int maxerrlen)
 {
 	xmlDoc		*doc;
 	xmlErrorPtr	pErr;
@@ -514,7 +510,7 @@ int	zbx_substitute_simple_macros_in_xml(char **data, DC_ITEM *item, int macro_ty
 		goto clean;
 	}
 
-	substitute_simple_macros_in_xml_elements(item, macro_type, root_element);
+	substitute_simple_macros_in_xml_elements(item, root_element);
 	xmlDocDumpMemory(doc, &mem, &size);
 
 	if (NULL == mem)

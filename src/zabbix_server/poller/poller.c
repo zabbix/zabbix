@@ -469,14 +469,14 @@ static int	parse_query_fields(DC_ITEM *item)
 
 		data = zbx_strdup(data, name);
 		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
-				MACRO_TYPE_ITEM_URL, NULL, 0);
+				MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 		zbx_http_url_encode(data, &data);
 		zbx_strcpy_alloc(&item->query_fields, &alloc_len, &offset, data);
 		zbx_chrcpy_alloc(&item->query_fields, &alloc_len, &offset, '=');
 
 		data = zbx_strdup(data, value);
 		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
-				MACRO_TYPE_ITEM_URL, NULL, 0);
+				MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 		zbx_http_url_encode(data, &data);
 		zbx_strcpy_alloc(&item->query_fields, &alloc_len, &offset, data);
 
@@ -644,13 +644,13 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].url, MACRO_TYPE_ITEM_URL, NULL, 0);
+						NULL, &items[i].url, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 
 				if (ZBX_POSTTYPE_XML == items[i].post_type)
 				{
 #ifdef HAVE_LIBXML2
 					if (SUCCEED != zbx_substitute_simple_macros_in_xml(&items[i].posts, &items[i],
-							MACRO_TYPE_ITEM_XML_POST, error, sizeof(error)))
+							error, sizeof(error)))
 					{
 						SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 						errcodes[i] = CONFIG_ERROR;
@@ -666,24 +666,24 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				else if (ZBX_POSTTYPE_JSON == items[i].post_type)
 				{
 					substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i],
-							NULL, NULL, &items[i].posts, MACRO_TYPE_ITEM_JSON_POST, NULL,
+							NULL, NULL, &items[i].posts, MACRO_TYPE_HTTPCHECK_JSON, NULL,
 							0);
 				}
 				else
 				{
 					substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i],
-							NULL, NULL, &items[i].posts, MACRO_TYPE_ITEM_URL, NULL, 0);
+							NULL, NULL, &items[i].posts, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 				}
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].headers, MACRO_TYPE_ITEM_URL, NULL, 0);
+						NULL, &items[i].headers, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].status_codes, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].ssl_cert_file, MACRO_TYPE_ITEM_URL, NULL, 0);
+						NULL, &items[i].ssl_cert_file, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].ssl_key_file, MACRO_TYPE_ITEM_URL, NULL, 0);
+						NULL, &items[i].ssl_key_file, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, &items[i].ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
