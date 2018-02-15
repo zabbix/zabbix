@@ -468,7 +468,7 @@ static void	substitute_simple_macros_in_xml_elements(DC_ITEM *item, xmlNode *nod
 
 			for (attr = node->properties; NULL != attr; attr = attr->next)
 			{
-				if (NULL == (value = xmlGetProp(node, attr->name)))
+				if (NULL == attr->name || NULL == (value = xmlGetProp(node, attr->name)))
 					continue;
 
 				value_tmp = zbx_strdup(NULL, (const char *)value);
