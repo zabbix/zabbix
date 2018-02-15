@@ -3128,6 +3128,10 @@ $form-icon-btn: (
 	border-bottom-color: darken($action-border-color, 1%);
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
+	&:focus {
+		outline: none;
+	}
+
 	li {
 		display: block;
 
