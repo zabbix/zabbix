@@ -254,14 +254,14 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_prepare_https(easyhandle, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
+	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
 			item->verify_peer, item->verify_host, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_prepare_httpauth(easyhandle, item->authtype, item->username, item->password, &error))
+	if (SUCCEED != zbx_http_prepare_auth(easyhandle, item->authtype, item->username, item->password, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		goto clean;
@@ -273,12 +273,12 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	if ('\0' == *item->headers)
 	{
 		if (ZBX_POSTTYPE_JSON == item->post_type)
-			zbx_add_httpheaders(application_json, &headers_slist);
+			zbx_http_add_headers(application_json, &headers_slist);
 		else if (ZBX_POSTTYPE_XML == item->post_type)
-			zbx_add_httpheaders(application_xml, &headers_slist);
+			zbx_http_add_headers(application_xml, &headers_slist);
 	}
 	else
-		zbx_add_httpheaders(item->headers, &headers_slist);
+		zbx_http_add_headers(item->headers, &headers_slist);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 	{
@@ -345,7 +345,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 				zbx_json_addarray(&json, "header");
 				headers = header.data;
-				while (NULL != (line = zbx_get_httpheader(&headers)))
+				while (NULL != (line = zbx_http_get_header(&headers)))
 				{
 					zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
 					zbx_free(line);
@@ -373,7 +373,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 				zbx_json_addarray(&json, "header");
 				headers = header.data;
-				while (NULL != (line = zbx_get_httpheader(&headers)))
+				while (NULL != (line = zbx_http_get_header(&headers)))
 				{
 					zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
 

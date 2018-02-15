@@ -28,7 +28,7 @@ extern char	*CONFIG_SSL_CA_LOCATION;
 extern char	*CONFIG_SSL_CERT_LOCATION;
 extern char	*CONFIG_SSL_KEY_LOCATION;
 
-int	zbx_prepare_https(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
+int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		char **error)
 {
@@ -130,7 +130,7 @@ int	zbx_prepare_https(CURL *easyhandle, const char *ssl_cert_file, const char *s
 	return SUCCEED;
 }
 
-int	zbx_prepare_httpauth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
+int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		char **error)
 {
 	if (HTTPTEST_AUTH_NONE != authtype)
@@ -173,7 +173,7 @@ int	zbx_prepare_httpauth(CURL *easyhandle, unsigned char authtype, const char *u
 	return SUCCEED;
 }
 
-char	*zbx_get_httpheader(char **headers)
+char	*zbx_http_get_header(char **headers)
 {
 	while ('\0' != **headers)
 	{
@@ -208,11 +208,11 @@ char	*zbx_get_httpheader(char **headers)
 	return NULL;
 }
 
-void	zbx_add_httpheaders(char *headers, struct curl_slist **headers_slist)
+void	zbx_http_add_headers(char *headers, struct curl_slist **headers_slist)
 {
 	char	*line;
 
-	while (NULL != (line = zbx_get_httpheader(&headers)))
+	while (NULL != (line = zbx_http_get_header(&headers)))
 	{
 		*headers_slist = curl_slist_append(*headers_slist, line);
 		zbx_free(line);

@@ -5512,9 +5512,6 @@ int	zbx_substitute_macros_xml(char **data, DC_ITEM *item, const struct zbx_json_
 
 	if (NULL == (doc = xmlReadMemory(*data, strlen(*data), "noname.xml", NULL, 0)))
 	{
-		if (NULL == error)
-			return FAIL;
-
 		if (NULL != (pErr = xmlGetLastError()))
 			zbx_snprintf(error, maxerrlen, "Cannot parse XML value: %s", pErr->message);
 		else
