@@ -984,7 +984,7 @@ jQuery(function($) {
 							var sectionItem = $('<li>').append(h3);
 						}
 
-						// Sdd section delimited for all sections except first one.
+						// Add section delimited for all sections except first one.
 						if (i > 0) {
 							menuPopup.append($('<li>').append($('<div>')));
 						}
