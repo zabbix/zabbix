@@ -21,14 +21,32 @@
 var CLNDR = new Array();
 var calendar = Class.create();
 
+function getCalendarByID(clndr_id) {
+	var ret = null;
+	jQuery(CLNDR).each(function(i, obj) {
+		if (obj.clndr.id === clndr_id) {
+			ret = obj;
+			return;
+		}
+	});
+
+	return ret;
+}
+
 function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
-	id = id || CLNDR.length;
+	if (typeof id === 'undefined' || id === null) {
+		id = CLNDR.length;
+	}
+
 	if ('undefined' == typeof(utime_field_id)) {
 		utime_field_id = null;
 	}
-	CLNDR[id] = new Object;
-	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid);
-	return CLNDR[id];
+
+	var clndr = new Object;
+	clndr.clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid);
+	CLNDR.push(clndr);
+
+	return clndr;
 }
 
 calendar.prototype = {

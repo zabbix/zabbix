@@ -717,8 +717,8 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  * @return array
  */
 function createDateSelector($name, $date) {
-	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
-		'_calendar"].clndr.clndrshow(pos.top, pos.left);';
+	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; getCalendarByID("'.$name.
+		'_calendar").clndr.clndrshow(pos.top, pos.left);';
 
 	if (is_array($date)) {
 		$y = $date['y'];
