@@ -696,7 +696,24 @@ class CConfigurationExportBuilder {
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt'],
 				'preprocessing' => $item['preprocessing'],
-				'jmx_endpoint' => $item['jmx_endpoint']
+				'jmx_endpoint' => $item['jmx_endpoint'],
+				'timeout' => $item['timeout'],
+				'url' => $item['url'],
+				'query_fields' => $item['query_fields'],
+				'posts' => $item['posts'],
+				'status_codes' => $item['status_codes'],
+				'follow_redirects' => $item['follow_redirects'],
+				'post_type' => $item['post_type'],
+				'http_proxy' => $item['http_proxy'],
+				'headers' => $item['headers'],
+				'retrieve_mode' => $item['retrieve_mode'],
+				'request_method' => $item['request_method'],
+				'output_format' => $item['output_format'],
+				'ssl_cert_file' => $item['ssl_cert_file'],
+				'ssl_key_file' => $item['ssl_key_file'],
+				'ssl_key_password' => $item['ssl_key_password'],
+				'verify_peer' => $item['verify_peer'],
+				'verify_host' => $item['verify_host']
 			];
 
 			$master_item = ($item['type'] == ITEM_TYPE_DEPENDENT) ? ['key' => $item['master_item']['key_']] : [];
@@ -711,6 +728,23 @@ class CConfigurationExportBuilder {
 
 			if (isset($item['interface_ref'])) {
 				$data['interface_ref'] = $item['interface_ref'];
+			}
+
+			if (is_array($item['query_fields'])) {
+				$query_fields = [];
+
+				foreach ($item['query_fields'] as $query_field) {
+					$query_fields[] = ['name' => key($query_field), 'value' => reset($query_field)];
+				}
+				$data['query_fields'] = $query_fields;
+			}
+			if (is_array($item['headers'])) {
+				$headers = [];
+
+				foreach ($item['headers'] as $name => $value) {
+					$headers[] = compact('name', 'value');
+				}
+				$data['headers'] = $headers;
 			}
 
 			$result[] = $data;
