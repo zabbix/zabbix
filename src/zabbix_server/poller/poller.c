@@ -657,7 +657,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 						continue;
 					}
 #else
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for XML was not compiled"
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for XML was not compiled"
 							" in."));
 					errcodes[i] = CONFIG_ERROR;
 					continue;

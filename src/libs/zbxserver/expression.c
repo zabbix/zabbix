@@ -5019,6 +5019,14 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 	{
 		zbx_json_escape(&replace_to);
 	}
+	else if (0 != (flags & ZBX_TOKEN_XML))
+	{
+		char	*replace_to_esc;
+
+		replace_to_esc = xml_escape_dyn(replace_to);
+		zbx_free(replace_to);
+		replace_to = replace_to_esc;
+	}
 
 	(*data)[token->token.r + 1] = c;
 

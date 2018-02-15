@@ -1319,9 +1319,19 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->posts_orig = NULL;
 
 	if (ZBX_POSTTYPE_JSON == item_prototype->post_type)
+	{
 		substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_JSON, NULL, 0);
+	}
 	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
-		ret = zbx_substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err));
+	{
+#ifdef HAVE_LIBXML2
+		if (FAIL == (ret = zbx_substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err))))
+			zbx_lrtrim(err, ZBX_WHITESPACE);
+#else
+		zbx_snprintf(err, sizeof(err), "Support for XML was not compiled in");
+		ret = FAIL;
+#endif
+	}
 	else
 		substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->posts, ZBX_WHITESPACE); is not missing here */
@@ -1601,9 +1611,21 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	buffer = zbx_strdup(buffer, item_prototype->posts);
 
 	if (ZBX_POSTTYPE_JSON == item_prototype->post_type)
+	{
 		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_JSON, NULL, 0);
+	}
 	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
-		zbx_substitute_macros_xml(&buffer, NULL, jp_row, NULL, 0);
+	{
+#ifdef HAVE_LIBXML2
+		if (FAIL == zbx_substitute_macros_xml(&buffer, NULL, jp_row, err, sizeof(err)))
+		{
+			zbx_lrtrim(err, ZBX_WHITESPACE);
+			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+		}
+#else
+		*error = zbx_strdcatf(*error, "Cannot update item: Support for XML was not compiled in.\n", err);
+#endif
+	}
 	else
 		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
