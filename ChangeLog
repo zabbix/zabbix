@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+..F....... [ZBX-13302] updated description of getActionOperationHints() (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha3
