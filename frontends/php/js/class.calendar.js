@@ -253,39 +253,37 @@ calendar.prototype = {
 							.removeClass('highlighted')
 							.attr('tabindex', '-1');
 
-						if (cal.hl_year == cal.year && cal.hl_month == cal.month) {
-							jQuery('td[data-date='+cal.hl_day+']', cal.clndr_calendar)
-								.addClass('highlighted')
-								.attr('tabindex', '0')
-								.focus();
-						}
-						else {
+						if (cal.hl_year != cal.year || cal.hl_month != cal.month) {
 							cal.year = cal.hl_year;
 							cal.month = cal.hl_month;
 							cal.day = cal.hl_day;
 							cal.syncCDT();
 							cal.setCDate();
-
-							jQuery('td[data-date='+cal.hl_day+']', cal.clndr_calendar)
-								.addClass('highlighted')
-								.attr('tabindex', '0')
-								.focus();
 						}
+
+						jQuery('td[data-date='+cal.hl_day+']', cal.clndr_calendar)
+							.addClass('highlighted')
+							.attr('tabindex', '0')
+							.focus();
 						break;
 
 					case '.calendar-year':
+						// Arrow left or arrow down.
 						if (event.which == 37 || event.which == 40) {
 							cal.yeardown();
 						}
+						// Arrow right or arrow up.
 						else if (event.which == 38 || event.which == 39) {
 							cal.yearup();
 						}
 						break;
 
 					case '.calendar-month':
+						// Arrow left or arrow down.
 						if (event.which == 37 || event.which == 40) {
 							cal.monthdown();
 						}
+						// Arrow right or arrow up.
 						else if (event.which == 38 || event.which == 39) {
 							cal.monthup();
 						}
