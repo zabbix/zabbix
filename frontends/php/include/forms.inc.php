@@ -452,7 +452,7 @@ function getItemFilterForm(&$items) {
 					',(jQuery("input[name=\'filter_hostid\']").length > 0)'.
 						' ? {hostid: jQuery("input[name=\'filter_hostid\']").val()}'.
 						' : {}'.
-					'));'
+					'), null, this);'
 				)
 		]
 	);

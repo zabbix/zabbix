@@ -285,7 +285,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).');'),
+							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).', null, this);'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$id.');')
@@ -302,7 +302,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				->onClick('return PopUp("popup.media",'.
 					CJs::encodeJson([
 						'dstfrm' => $userForm->getName()
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 		]))

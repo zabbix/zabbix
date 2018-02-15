@@ -38,7 +38,7 @@ $filterColumn->addRow(_('User'), [
 				'srcfld1' => 'alias',
 				'dstfrm' => 'zbx_filter',
 				'dstfld1' => 'alias'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 $filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action'], null, [

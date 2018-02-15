@@ -26,7 +26,7 @@
 						'action': function() {}
 					}
 				]
-			});
+			}, obj);
 		}
 	}
 </script>

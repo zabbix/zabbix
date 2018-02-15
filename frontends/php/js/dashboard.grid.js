@@ -689,7 +689,7 @@
 		return free;
 	}
 
-	function openConfigDialogue($obj, data, widget) {
+	function openConfigDialogue($obj, data, widget, trigger_elmnt) {
 		var edit_mode = (widget !== null);
 
 		data.dialogue = {};
@@ -714,7 +714,7 @@
 				}
 			],
 			'dialogueid': 'widgetConfg'
-		});
+		}, trigger_elmnt);
 
 		var overlay_dialogue = $('#overlay_dialogue');
 		data.dialogue.div = overlay_dialogue;
@@ -737,7 +737,7 @@
 			.attr('title', t('Edit'))
 			.click(function() {
 				doAction('beforeConfigLoad', $obj, data, widget);
-				methods.editWidget.call($obj, widget);
+				methods.editWidget.call($obj, widget, this);
 			});
 
 		var	btn_delete = $('<button>')
@@ -907,7 +907,7 @@
 						showEditMode();
 					}
 
-					methods.addNewWidget.call($obj);
+					methods.addNewWidget.call($obj, this);
 				})
 			);
 		}
@@ -1234,12 +1234,12 @@
 		},
 
 		// After pressing "Edit" button on widget
-		editWidget: function(widget) {
+		editWidget: function(widget, trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, widget);
+				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},
 
@@ -1335,7 +1335,7 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
-						overlayDialogueOnLoad(true);
+						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});
 			});
@@ -1549,12 +1549,12 @@
 			return ref;
 		},
 
-		addNewWidget: function() {
+		addNewWidget: function(trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, null);
+				openConfigDialogue($this, data, null, trigger_elmnt);
 			});
 		},
 
