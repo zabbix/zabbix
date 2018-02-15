@@ -649,7 +649,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				if (ZBX_POSTTYPE_XML == items[i].post_type)
 				{
 #ifdef HAVE_LIBXML2
-					if (SUCCEED != zbx_substitute_simple_macros_in_xml(&items[i].posts, &items[i],
+					if (SUCCEED != zbx_substitute_macros_xml(&items[i].posts, &items[i], NULL,
 							error, sizeof(error)))
 					{
 						SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));

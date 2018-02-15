@@ -1308,6 +1308,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 /* additional token flags */
 #define ZBX_TOKEN_NUMERIC	0x08000
 #define ZBX_TOKEN_JSON		0x10000
+#define ZBX_TOKEN_XML		0x20000
 
 /* location of a substring */
 typedef struct

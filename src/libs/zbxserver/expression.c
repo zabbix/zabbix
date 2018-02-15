@@ -25,6 +25,11 @@
 #include "zbxalgo.h"
 #include "valuecache.h"
 #include "macrofunc.h"
+#ifdef HAVE_LIBXML2
+#	include <libxml/parser.h>
+#	include <libxml/tree.h>
+#	include <libxml/xpath.h>
+#endif
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -5409,3 +5414,130 @@ out:
 
 	return ret;
 }
+
+#ifdef HAVE_LIBXML2
+static void	substitute_macros_in_xml_elements(DC_ITEM *item, const struct zbx_json_parse *jp_row, xmlNode *node)
+{
+	xmlChar	*value;
+	char	*value_tmp;
+
+	for (;NULL != node; node = node->next)
+	{
+		if (XML_TEXT_NODE == node->type)
+		{
+			if (NULL != (value = xmlNodeGetContent(node)))
+			{
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+
+				if (NULL != item)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+							NULL, &value_tmp, MACRO_TYPE_HTTPCHECK_XML, NULL, 0);
+				}
+				else
+					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
+
+				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+
+				zbx_free(value_tmp);
+				xmlFree(value);
+			}
+		}
+		else if (XML_CDATA_SECTION_NODE == node->type)
+		{
+			if (NULL != (value = xmlNodeGetContent(node)))
+			{
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+
+				if (NULL != item)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+							NULL, &value_tmp, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+				}
+				else
+					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+
+				zbx_free(value_tmp);
+				xmlFree(value);
+			}
+		}
+		else if (XML_ELEMENT_NODE == node->type)
+		{
+			xmlAttr	*attr;
+
+			for (attr = node->properties; NULL != attr; attr = attr->next)
+			{
+				if (NULL == attr->name || NULL == (value = xmlGetProp(node, attr->name)))
+					continue;
+
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+
+				if (NULL != item)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+							NULL, &value_tmp, MACRO_TYPE_HTTPCHECK_XML, NULL, 0);
+				}
+				else
+					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
+
+				xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
+
+				zbx_free(value_tmp);
+				xmlFree(value);
+			}
+		}
+
+		substitute_macros_in_xml_elements(item, jp_row, node->children);
+	}
+}
+
+int	zbx_substitute_macros_xml(char **data, DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
+		int maxerrlen)
+{
+	xmlDoc		*doc;
+	xmlErrorPtr	pErr;
+	xmlNode		*root_element;
+	xmlChar		*mem;
+	int		size, ret = FAIL;
+
+	if (NULL == (doc = xmlReadMemory(*data, strlen(*data), "noname.xml", NULL, 0)))
+	{
+		if (NULL == error)
+			return FAIL;
+
+		if (NULL != (pErr = xmlGetLastError()))
+			zbx_snprintf(error, maxerrlen, "Cannot parse XML value: %s", pErr->message);
+		else
+			zbx_snprintf(error, maxerrlen, "Cannot parse XML value");
+
+		return FAIL;
+	}
+
+	if (NULL == (root_element = xmlDocGetRootElement(doc)))
+	{
+		zbx_snprintf(error, maxerrlen, "Cannot parse XML root");
+		goto clean;
+	}
+
+	substitute_macros_in_xml_elements(item, jp_row, root_element);
+	xmlDocDumpMemory(doc, &mem, &size);
+
+	if (NULL == mem)
+	{
+		zbx_snprintf(error, maxerrlen, "Cannot save XML");
+		goto clean;
+	}
+
+	zbx_free(*data);
+	*data = zbx_malloc(NULL, size + 1);
+	memcpy(*data, (const char *)mem, size + 1);
+	xmlFree(mem);
+	ret = SUCCEED;
+clean:
+	xmlFreeDoc(doc);
+
+	return ret;
+}
+#endif

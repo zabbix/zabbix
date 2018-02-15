@@ -1317,8 +1317,13 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
-	substitute_lld_macros(&item->posts, jp_row, item_prototype->post_type == ZBX_POSTTYPE_JSON ? ZBX_MACRO_JSON :
-			ZBX_MACRO_ANY, NULL, 0);
+
+	if (ZBX_POSTTYPE_JSON == item_prototype->post_type)
+		substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_JSON, NULL, 0);
+	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
+		ret = zbx_substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err));
+	else
+		substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->posts, ZBX_WHITESPACE); is not missing here */
 
 	item->status_codes = zbx_strdup(NULL, item_prototype->status_codes);
@@ -1594,8 +1599,13 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->posts);
-	substitute_lld_macros(&buffer, jp_row, item_prototype->post_type == ZBX_POSTTYPE_JSON ? ZBX_MACRO_JSON :
-			ZBX_MACRO_ANY, NULL, 0);
+
+	if (ZBX_POSTTYPE_JSON == item_prototype->post_type)
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_JSON, NULL, 0);
+	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
+		zbx_substitute_macros_xml(&buffer, NULL, jp_row, NULL, 0);
+	else
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->posts, buffer))
 	{
