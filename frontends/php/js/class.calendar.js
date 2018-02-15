@@ -159,6 +159,10 @@ calendar.prototype = {
 				this.setCDate();
 			}
 			if ('undefined' != typeof(top) && 'undefined' != typeof(left)) {
+				var cw = jQuery(this.clndr_calendar).width();
+				if (document.body.clientWidth < +left + cw) {
+					left = document.body.clientWidth - cw;
+				}
 				this.clndr_calendar.style.top = top + 'px';
 				this.clndr_calendar.style.left = left + 'px';
 			}
