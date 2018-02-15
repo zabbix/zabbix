@@ -92,7 +92,23 @@ abstract class CItemGeneral extends CApiService {
 			'preprocessing'			=> ['template' => 1],
 			'jmx_endpoint'			=> [],
 			'master_itemid'			=> ['template' => 1],
-			'url'					=> ['template' => 1]
+			'url'					=> ['template' => 1],
+			'timeout'				=> [],
+			'query_fields'			=> [],
+			'posts'					=> [],
+			'status_codes'			=> [],
+			'follow_redirects'		=> [],
+			'post_type'				=> [],
+			'http_proxy'			=> [],
+			'headers'				=> [],
+			'retrieve_mode'			=> [],
+			'request_method'		=> [],
+			'output_format'			=> [],
+			'ssl_cert_file'			=> [],
+			'ssl_key_file'			=> [],
+			'ssl_key_password'		=> [],
+			'verify_peer'			=> [],
+			'verify_host'			=> []
 		];
 
 		$this->errorMessages = array_merge($this->errorMessages, [
@@ -1594,9 +1610,6 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function validateHTTPCheck($item, $db_item) {
 		$rules = [
-			'interfaceid' => [
-				'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY
-			],
 			'timeout' => [
 				'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN
 			],
@@ -1673,11 +1686,15 @@ abstract class CItemGeneral extends CApiService {
 
 		if (array_key_exists('post_type', $data)
 				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
-			$rules += [
-				'posts' => [
-					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('items', 'posts')
-				]
+			$rules['posts'] = [
+				'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+				'length' => DB::getFieldLength('items', 'posts')
+			];
+		}
+
+		if (array_key_exists('templateid', $data) && $data['templateid']) {
+			$rules['interfaceid'] = [
+				'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY
 			];
 		}
 
