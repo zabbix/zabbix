@@ -1,0 +1,177 @@
+--
+-- Zabbix
+-- Copyright (C) 2001-2018 Zabbix SIA
+--
+-- This program is free software; you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation; either version 2 of the License, or
+-- (at your option) any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+--
+
+TABLE |users
+FIELDS|userid|alias|name  |surname      |passwd                          |url|autologin|autologout|lang |refresh|type|theme  |rows_per_page|
+ROW   |1     |Admin|Zabbix|Administrator|5fce1b3e34b520afeffb37ce08c7cd66|   |1        |0         |en_GB|30s    |3   |default|50           |
+ROW   |2     |guest|      |             |d41d8cd98f00b204e9800998ecf8427e|   |0        |15m       |en_GB|30s    |1   |default|50           |
+
+TABLE |groups
+FIELDS|groupid|name                       |internal|flags|
+ROW   |1      |Templates                  |0       |0    |
+ROW   |2      |Linux servers              |0       |0    |
+ROW   |4      |Zabbix servers             |0       |0    |
+ROW   |5      |Discovered hosts           |1       |0    |
+ROW   |6      |Virtual machines           |0       |0    |
+ROW   |7      |Hypervisors                |0       |0    |
+ROW   |8      |Templates/Modules          |0       |0    |
+ROW   |9      |Templates/Network Devices  |0       |0    |
+ROW   |10     |Templates/Operating Systems|0       |0    |
+ROW   |11     |Templates/Servers Hardware |0       |0    |
+ROW   |12     |Templates/Applications     |0       |0    |
+ROW   |13     |Templates/Databases        |0       |0    |
+ROW   |14     |Templates/Virtualization   |0       |0    |
+
+TABLE |drules
+FIELDS|druleid|proxy_hostid|name         |iprange        |delay|status|
+ROW   |2      |NULL        |Local network|192.168.0.1-254|1h   |1     |
+
+TABLE |dchecks
+FIELDS|dcheckid|druleid|type|key_        |snmp_community|ports|snmpv3_securityname|snmpv3_securitylevel|snmpv3_authpassphrase|snmpv3_privpassphrase|uniq|snmpv3_authprotocol|snmpv3_privprotocol|snmpv3_contextname|
+ROW   |2       |2      |9   |system.uname|              |10050|                   |0                   |                     |                     |0   |0                  |0                  |                  |
+
+TABLE |media_type
+FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|maxsessions|maxattempts|attempt_interval|
+ROW   |1          |0   |Email      |mail.example.com|example.com|zabbix@example.com|         |          |                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |
+ROW   |2          |3   |Jabber     |                |           |                  |         |          |jabber@example.com|zabbix|0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |
+ROW   |3          |2   |SMS        |                |           |                  |         |/dev/ttyS0|                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |
+
+TABLE |usrgrp
+FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|
+ROW   |7       |Zabbix administrators    |0         |0           |0         |
+ROW   |8       |Guests                   |0         |0           |0         |
+ROW   |9       |Disabled                 |0         |1           |0         |
+ROW   |11      |Enabled debug mode       |0         |0           |1         |
+ROW   |12      |No access to the frontend|2         |0           |0         |
+
+TABLE |users_groups
+FIELDS|id|usrgrpid|userid|
+ROW   |2 |8       |2     |
+ROW   |4 |7       |1     |
+
+TABLE |scripts
+FIELDS|scriptid|name                   |command                          |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|
+ROW   |1       |Ping                   |/bin/ping -c 3 {HOST.CONN}       |2          |NULL    |NULL   |           |            |0   |2         |
+ROW   |2       |Traceroute             |/usr/bin/traceroute {HOST.CONN}  |2          |NULL    |NULL   |           |            |0   |2         |
+ROW   |3       |Detect operating system|sudo /usr/bin/nmap -O {HOST.CONN}|2          |7       |NULL   |           |            |0   |2         |
+
+TABLE |actions
+FIELDS|actionid|name                                          |eventsource|evaltype|status|esc_period|def_shortdata                              |def_longdata                                                                                                                                                                                      |r_shortdata                                |r_longdata                                                                                                                                                                                                                    |formula|maintenance_mode|ack_shortdata               |ack_longdata                                                                                                                                                 |
+ROW   |2       |Auto discovery. Linux servers.                |1          |0       |1     |0         |                                           |                                                                                                                                                                                                  |                                           |                                                                                                                                                                                                                              |       |1               |                            |                                                                                                                                                             |
+ROW   |3       |Report problems to Zabbix administrators      |0          |0       |1     |1h        |Problem: {TRIGGER.NAME}                    |Problem started at {EVENT.TIME} on {EVENT.DATE}&eol;Problem name: {TRIGGER.NAME}&eol;Host: {HOST.NAME}&eol;Severity: {TRIGGER.SEVERITY}&eol;&eol;Original problem ID: {EVENT.ID}&eol;{TRIGGER.URL}|Resolved: {TRIGGER.NAME}                   |Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&eol;Problem name: {TRIGGER.NAME}&eol;Host: {HOST.NAME}&eol;Severity: {TRIGGER.SEVERITY}&eol;&eol;Original problem ID: {EVENT.ID}&eol;{TRIGGER.URL}|       |1               |Acknowledged: {TRIGGER.NAME}|{USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME} with the following message:&eol;{ACK.MESSAGE}&eol;&eol;Current problem status is {EVENT.STATUS}|
+ROW   |4       |Report not supported items                    |3          |0       |1     |1h        |{ITEM.STATE}: {HOST.NAME}:{ITEM.NAME}      |Host: {HOST.NAME}&eol;Item: {ITEM.NAME}&eol;Key: {ITEM.KEY}&eol;State: {ITEM.STATE}                                                                                                               |{ITEM.STATE}: {HOST.NAME}:{ITEM.NAME}      |Host: {HOST.NAME}&eol;Item: {ITEM.NAME}&eol;Key: {ITEM.KEY}&eol;State: {ITEM.STATE}                                                                                                                                           |       |1               |                            |                                                                                                                                                             |
+ROW   |5       |Report not supported low level discovery rules|3          |0       |1     |1h        |{LLDRULE.STATE}: {HOST.NAME}:{LLDRULE.NAME}|Host: {HOST.NAME}&eol;Low level discovery rule: {LLDRULE.NAME}&eol;Key: {LLDRULE.KEY}&eol;State: {LLDRULE.STATE}                                                                                  |{LLDRULE.STATE}: {HOST.NAME}:{LLDRULE.NAME}|Host: {HOST.NAME}&eol;Low level discovery rule: {LLDRULE.NAME}&eol;Key: {LLDRULE.KEY}&eol;State: {LLDRULE.STATE}                                                                                                              |       |1               |                            |                                                                                                                                                             |
+ROW   |6       |Report unknown triggers                       |3          |0       |1     |1h        |{TRIGGER.STATE}: {TRIGGER.NAME}            |Trigger name: {TRIGGER.NAME}&eol;Expression: {TRIGGER.EXPRESSION}&eol;State: {TRIGGER.STATE}                                                                                                      |{TRIGGER.STATE}: {TRIGGER.NAME}            |Trigger name: {TRIGGER.NAME}&eol;Expression: {TRIGGER.EXPRESSION}&eol;State: {TRIGGER.STATE}                                                                                                                                  |       |1               |                            |                                                                                                                                                             |
+
+TABLE |operations
+FIELDS|operationid|actionid|operationtype|esc_period|esc_step_from|esc_step_to|evaltype|recovery|
+ROW   |1          |2       |6            |0         |1            |1          |0       |0       |
+ROW   |2          |2       |4            |0         |1            |1          |0       |0       |
+ROW   |3          |3       |0            |0         |1            |1          |0       |0       |
+ROW   |4          |4       |0            |0         |1            |1          |0       |0       |
+ROW   |5          |5       |0            |0         |1            |1          |0       |0       |
+ROW   |6          |6       |0            |0         |1            |1          |0       |0       |
+ROW   |7          |3       |11           |0         |1            |1          |0       |1       |
+ROW   |8          |4       |11           |0         |1            |1          |0       |1       |
+ROW   |9          |5       |11           |0         |1            |1          |0       |1       |
+ROW   |10         |6       |11           |0         |1            |1          |0       |1       |
+
+TABLE |opmessage
+FIELDS|operationid|default_msg|subject                                    |message                                                                                                                                                                                                                       |mediatypeid|
+ROW   |3          |1          |Problem: {TRIGGER.NAME}                    |Problem started at {EVENT.TIME} on {EVENT.DATE}&eol;Problem name: {TRIGGER.NAME}&eol;Host: {HOST.NAME}&eol;Severity: {TRIGGER.SEVERITY}&eol;&eol;Original problem ID: {EVENT.ID}&eol;{TRIGGER.URL}                            |NULL       |
+ROW   |4          |1          |                                           |                                                                                                                                                                                                                              |NULL       |
+ROW   |5          |1          |                                           |                                                                                                                                                                                                                              |NULL       |
+ROW   |6          |1          |                                           |                                                                                                                                                                                                                              |NULL       |
+ROW   |7          |1          |Resolved: {TRIGGER.NAME}                   |Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&eol;Problem name: {TRIGGER.NAME}&eol;Host: {HOST.NAME}&eol;Severity: {TRIGGER.SEVERITY}&eol;&eol;Original problem ID: {EVENT.ID}&eol;{TRIGGER.URL}|NULL       |
+ROW   |8          |1          |{ITEM.STATE}: {HOST.NAME}:{ITEM.NAME}      |Host: {HOST.NAME}&eol;Item: {ITEM.NAME}&eol;Key: {ITEM.KEY}&eol;State: {ITEM.STATE}                                                                                                                                           |NULL       |
+ROW   |9          |1          |{LLDRULE.STATE}: {HOST.NAME}:{LLDRULE.NAME}|Host: {HOST.NAME}&eol;Low level discovery rule: {LLDRULE.NAME}&eol;Key: {LLDRULE.KEY}&eol;State: {LLDRULE.STATE}                                                                                                              |NULL       |
+ROW   |10         |1          |{TRIGGER.STATE}: {TRIGGER.NAME}            |Trigger name: {TRIGGER.NAME}&eol;Expression: {TRIGGER.EXPRESSION}&eol;State: {TRIGGER.STATE}                                                                                                                                  |NULL       |
+
+TABLE |opmessage_grp
+FIELDS|opmessage_grpid|operationid|usrgrpid|
+ROW   |1              |3          |7       |
+ROW   |2              |4          |7       |
+ROW   |3              |5          |7       |
+ROW   |4              |6          |7       |
+
+TABLE |opgroup
+FIELDS|opgroupid|operationid|groupid|
+ROW   |1        |2          |2      |
+
+TABLE |conditions
+FIELDS|conditionid|actionid|conditiontype|operator|value|value2|
+ROW   |2          |2       |10           |0       |0    |      |
+ROW   |3          |2       |8            |0       |9    |      |
+ROW   |4          |2       |12           |2       |Linux|      |
+ROW   |6          |4       |23           |0       |0    |      |
+ROW   |7          |5       |23           |0       |2    |      |
+ROW   |8          |6       |23           |0       |4    |      |
+
+TABLE |config
+FIELDS|configid|refresh_unsupported|work_period    |alert_usrgrpid|discovery_groupid|
+ROW   |1       |10m                |1-5,09:00-18:00|7             |5                |
+
+TABLE |graph_theme
+FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|colorpalette|
+ROW   |1           |blue-theme|FFFFFF         |FFFFFF    |CCD5D9   |ACBBC2       |ACBBC2         |1F2C33   |E33734        |429E47             |E33734              |EBEBEB          |1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4
+ROW   |2           |dark-theme|2B2B2B         |2B2B2B    |454545   |4F4F4F       |4F4F4F         |F2F2F2   |E45959        |59DB8F             |E45959              |333333          |199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4
+ROW   |3           |hc-light  |FFFFFF         |FFFFFF    |555555   |000000       |333333         |000000   |333333        |000000             |000000              |EBEBEB          |1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4
+ROW   |4           |hc-dark   |000000         |000000    |666666   |888888       |4F4F4F         |FFFFFF   |FFFFFF        |FFFFFF             |FFFFFF              |333333          |199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4
+
+TABLE |globalmacro
+FIELDS|globalmacroid|macro            |value |
+ROW   |2            |{$SNMP_COMMUNITY}|public|
+
+TABLE |regexps
+FIELDS|regexpid|name                                        |test_string|
+ROW   |1       |File systems for discovery                  |ext3       |
+ROW   |2       |Network interfaces for discovery            |eth0       |
+ROW   |3       |Storage devices for SNMP discovery          |/boot      |
+ROW   |4       |Windows service names for discovery         |SysmonLog  |
+ROW   |5       |Windows service startup states for discovery|automatic  |
+
+TABLE |expressions
+FIELDS|expressionid|regexpid|expression                                                                                                                                                           |expression_type|exp_delimiter|case_sensitive|
+ROW   |1           |1       |^(btrfs&pipe;ext2&pipe;ext3&pipe;ext4&pipe;jfs&pipe;reiser&pipe;xfs&pipe;ffs&pipe;ufs&pipe;jfs&pipe;jfs2&pipe;vxfs&pipe;hfs&pipe;refs&pipe;ntfs&pipe;fat32&pipe;zfs)$|3              |,            |0             |
+ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                                       |4              |,            |1             |
+ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                                        |4              |,            |1             |
+ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                                 |3              |,            |1             |
+ROW   |7           |2       |^Software Loopback Interface                                                                                                                                         |4              |,            |1             |
+ROW   |8           |2       |^(In)?[Ll]oop[Bb]ack[0-9._]*$                                                                                                                                        |4              |,            |1             |
+ROW   |9           |2       |^NULL[0-9.]*$                                                                                                                                                        |4              |,            |1             |
+ROW   |10          |2       |^[Ll]o[0-9.]*$                                                                                                                                                       |4              |,            |1             |
+ROW   |11          |2       |^[Ss]ystem$                                                                                                                                                          |4              |,            |1             |
+ROW   |12          |2       |^Nu[0-9.]*$                                                                                                                                                          |4              |,            |1             |
+
+TABLE |dashboard
+FIELDS|dashboardid|name     |userid|private|
+ROW   |1          |Dashboard|1     |0      |
+
+TABLE |widget
+FIELDS|widgetid|dashboardid|type    |name|x|y|width|height|
+ROW   |1       |1          |favgrph |    |0|0|2    |3     |
+ROW   |2       |1          |favscr  |    |2|0|2    |3     |
+ROW   |3       |1          |favmap  |    |4|0|2    |3     |
+ROW   |4       |1          |problems|    |0|3|6    |6     |
+ROW   |5       |1          |webovr  |    |0|9|3    |4     |
+ROW   |6       |1          |dscvry  |    |3|9|3    |4     |
+ROW   |7       |1          |hoststat|    |6|0|6    |4     |
+ROW   |8       |1          |syssum  |    |6|4|6    |4     |
+ROW   |9       |1          |stszbx  |    |6|8|6    |5     |
+
