@@ -187,7 +187,13 @@ $icon-widget-btn: (
 }
 .btn-back-map {
 	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -162px -725px !important;
+		background: url(../img/icon-sprite.svg) no-repeat -244px -725px !important;
+	}
+}
+
+.btn-back-map-container {
+	a {
+		border-bottom: none !important;
 	}
 }
 

@@ -210,6 +210,12 @@ $icon-widget-btn: (
 	}
 }
 
+.btn-back-map-container {
+	a {
+		border-bottom: none !important;
+	}
+}
+
 .btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -354px -619px !important;
 }
