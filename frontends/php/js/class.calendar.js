@@ -85,7 +85,7 @@ calendar.prototype = {
 	active_section: null,		// Active calendar section. See 'sections' array. Default value set in method clndrshow.
 	monthname: new Array(locale['S_JANUARY'], locale['S_FEBRUARY'], locale['S_MARCH'], locale['S_APRIL'], locale['S_MAY'], locale['S_JUNE'], locale['S_JULY'], locale['S_AUGUST'], locale['S_SEPTEMBER'], locale['S_OCTOBER'], locale['S_NOVEMBER'], locale['S_DECEMBER']),
 	dayname: new Array(locale['S_SUNDAY'], locale['S_MONDAY'], locale['S_TUESDAY'], locale['S_WEDNESDAY'], locale['S_THURSDAY'], locale['S_FRIDAY'], locale['S_SATURDAY']),
-	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date', '.calendar-time > [name="hour"]', '.calendar-time > [name="minute"]', '.calendar-footer button:first', '.calendar-footer button:last'),
+	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date', '.calendar-time > [name="hour"]', '.calendar-time > [name="minute"]', '.calendar-now-btn', '.calendar-done-btn'),
 
 	initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid) {
 		this.id = id;
@@ -318,7 +318,7 @@ calendar.prototype = {
 					cal.focusSection();
 				}
 				else if (jQuery.inArray(active_section, new Array('.calendar-date', '.calendar-time > [name="hour"]',
-						'.calendar-time > [name="minute"]', '.calendar-footer button:last')) > -1) {
+						'.calendar-time > [name="minute"]', '.calendar-done-btn')) > -1) {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 					cal.setDone();
 				}
@@ -936,7 +936,7 @@ calendar.prototype = {
 
 		// now
 		this.clndr_now = document.createElement('button');
-		this.clndr_now.className = 'btn-grey';
+		this.clndr_now.className = 'btn-grey calendar-now-btn';
 		this.clndr_now.setAttribute('type', 'button');
 		this.clndr_now.setAttribute('value', locale['S_NOW']);
 		this.clndr_now.appendChild(document.createTextNode(locale['S_NOW']));
@@ -944,6 +944,7 @@ calendar.prototype = {
 
 		// done
 		this.clndr_done = document.createElement('button');
+		this.clndr_done.className = 'calendar-done-btn';
 		this.clndr_done.setAttribute('type', 'button');
 		this.clndr_done.appendChild(document.createTextNode(locale['S_DONE']));
 		line_div.appendChild(this.clndr_done);
