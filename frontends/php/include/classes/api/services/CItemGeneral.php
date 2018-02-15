@@ -1601,6 +1601,44 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Converts headers field text to hash with header name as key.
+	 *
+	 * @param string $headers   Headers string, one header per line, line delimiter "\r\n".
+	 *
+	 * @return array
+	 */
+	protected function headersStringToArray($headers) {
+		$result = [];
+
+		foreach (explode("\r\n", $headers) as $header) {
+			$header = explode(': ', $header, 2);
+
+			if (count($header) === 2) {
+				$result[$header[0]] = $header[1];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Converts headers fields hash to string.
+	 *
+	 * @param array $headers    Array of headers where key is header name.
+	 *
+	 * @return string
+	 */
+	protected function headersArrayToString($headers) {
+		$result = [];
+
+		foreach ($headers as $k => $v) {
+			$result[] = $k.': '.$v;
+		}
+
+		return implode("\r\n", $result);
+	}
+
+	/**
 	 * Validate item with type ITEM_TYPE_HTTPCHECK.
 	 *
 	 * @param array    $item       Array of item fields.

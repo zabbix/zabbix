@@ -399,16 +399,7 @@ class CItem extends CItemGeneral {
 					: [];
 			}
 			if (array_key_exists('headers', $item)) {
-				$headers = [];
-
-				foreach (explode("\r\n", $item['headers']) as $header) {
-					if ($header) {
-						list($k, $v) = explode(': ', $header, 2);
-						$headers[$k] = $v;
-					}
-				}
-
-				$item['headers'] = $headers;
+				$item['headers'] = $this->headersStringToArray($item['headers']);
 			}
 		}
 
@@ -443,13 +434,7 @@ class CItem extends CItemGeneral {
 						: '';
 				}
 				if (array_key_exists('headers', $item)) {
-					$headers = [];
-
-					foreach ($item['headers'] as $k => $v) {
-						$headers[] = $k.': '.$v;
-					}
-
-					$item['headers'] = implode("\r\n", $headers);
+					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
 			}
 			else {
@@ -651,13 +636,7 @@ class CItem extends CItemGeneral {
 				}
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
-					$headers = [];
-
-					foreach ($item['headers'] as $k => $v) {
-						$headers[] = $k.': '.$v;
-					}
-
-					$item['headers'] = implode("\r\n", $headers);
+					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
 			}
 		}
@@ -853,13 +832,7 @@ class CItem extends CItemGeneral {
 				}
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
-					$headers = [];
-
-					foreach ($item['headers'] as $k => $v) {
-						$headers[] = $k.': '.$v;
-					}
-
-					$item['headers'] = implode("\r\n", $headers);
+					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
 			}
 			else {
