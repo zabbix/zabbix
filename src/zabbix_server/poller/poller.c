@@ -652,6 +652,13 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
 						NULL, &items[i].url, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 
+				if (FAIL == parse_query_fields(&items[i], &items[i].query_fields))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
 				if (ZBX_POSTTYPE_XML == items[i].post_type)
 				{
 #ifdef HAVE_LIBXML2
@@ -696,13 +703,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 						NULL, NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
-
-				if (FAIL == parse_query_fields(&items[i], &items[i].query_fields))
-				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
-					errcodes[i] = CONFIG_ERROR;
-					continue;
-				}
 				break;
 		}
 	}
