@@ -322,6 +322,12 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				goto clean;
 			}
 
+			if (FAIL == zbx_is_utf8(body.data))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
+				goto clean;
+			}
+
 			if (HTTPCHECK_STORE_JSON == item->output_format)
 			{
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -339,6 +345,12 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			if (NULL == header.data)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
+				goto clean;
+			}
+
+			if (FAIL == zbx_is_utf8(header.data))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
 				goto clean;
 			}
 
@@ -368,6 +380,12 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				goto clean;
 			}
 
+			if (FAIL == zbx_is_utf8(header.data) || (NULL != body.data && FAIL == zbx_is_utf8(body.data)))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
+				goto clean;
+			}
+
 			if (HTTPCHECK_STORE_JSON == item->output_format)
 			{
 				unsigned char	json_content = 0;
@@ -375,6 +393,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 				zbx_json_addarray(&json, "header");
 				headers = header.data;
+
 				while (NULL != (line = zbx_http_get_header(&headers)))
 				{
 					zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
@@ -391,6 +410,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 					if (1 == json_content)
 					{
 						zbx_lrtrim(body.data, ZBX_WHITESPACE);
+
 						if ('\0' != *body.data)
 							zbx_json_addraw(&json, "body", body.data);
 					}
