@@ -1086,7 +1086,7 @@ jQuery(function($) {
 
 		for (var item = $('li:first-child', menu); item.length > 0; item = item.next()) {
 			if (item[0] == li[0]) {
-				if ($('ul', item[0]).is(':hidden')) {
+				if (!$('ul', item[0]).is(':visible')) {
 					$('ul:first', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
 
 					$('ul:first', item[0])
