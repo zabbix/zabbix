@@ -1134,6 +1134,7 @@ define('API_NORMALIZE',			0x08);
 define('API_DEPRECATED',		0x10);
 define('API_ALLOW_USER_MACRO',	0x20);
 define('API_ALLOW_COUNT',	0x40);
+define('API_ALLOW_LLD_MACRO',	0x80);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

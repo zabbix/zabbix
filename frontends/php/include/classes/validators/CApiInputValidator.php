@@ -949,7 +949,10 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => ($flags & API_ALLOW_USER_MACRO)]);
+		$simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
+		]);
 
 		if ($simple_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
