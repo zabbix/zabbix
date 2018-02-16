@@ -5428,7 +5428,7 @@ out:
  *                                                                            *
  * Function: substitute_macros_in_xml_elements                                *
  *                                                                            *
- * Comments: auxiliary function for zbx_substitute_macros_xml()               *
+ * Comments: auxiliary function for substitute_macros_xml()                   *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct zbx_json_parse *jp_row,
@@ -5513,7 +5513,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_substitute_macros_xml                                        *
+ * Function: substitute_macros_xml                                            *
  *                                                                            *
  * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
  *          a node or in CDATA section, validate XML                          *
@@ -5527,14 +5527,17 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
  * Return value: SUCCEED or FAIL if XML validation has failed                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
+int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
 		int maxerrlen)
 {
+	const char	*__function_name = "substitute_macros_xml";
 	xmlDoc		*doc;
 	xmlErrorPtr	pErr;
 	xmlNode		*root_element;
 	xmlChar		*mem;
 	int		size, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == (doc = xmlReadMemory(*data, strlen(*data), "noname.xml", NULL, 0)))
 	{
@@ -5568,6 +5571,8 @@ int	zbx_substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx
 	ret = SUCCEED;
 clean:
 	xmlFreeDoc(doc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
