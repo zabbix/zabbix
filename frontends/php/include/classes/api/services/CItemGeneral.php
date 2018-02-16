@@ -1794,8 +1794,8 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists('post_type', $item)
-				&& ($item['post_type'] == ZBX_POSTTYPE_JSON || $item['post_type'] == ZBX_POSTTYPE_XML)) {
+		if ((array_key_exists('post_type', $item) || array_key_exists('posts', $item))
+				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
 			$posts = $data['posts'];
 			libxml_use_internal_errors(true);
 
