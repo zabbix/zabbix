@@ -336,6 +336,11 @@ calendar.prototype = {
 
 			case 32: // Space
 				if (cal.sections[cal.active_section] === '.calendar-date') {
+					if (cal.hl_year != cal.year || cal.hl_month != cal.month) {
+						cal.hl_year = cal.year;
+						cal.hl_month = cal.month;
+					}
+
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 					cal.focusSection();
 				}
