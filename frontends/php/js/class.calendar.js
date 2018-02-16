@@ -209,8 +209,6 @@ calendar.prototype = {
 			case 38: // arrow up
 			case 39: // arrow right
 			case 40: // arrow down
-				event.preventDefault(); // Prevent page scrolling.
-
 				switch (cal.sections[cal.active_section]) {
 					case '.calendar-date':
 						var change = true;
@@ -291,7 +289,16 @@ calendar.prototype = {
 							cal.monthup();
 						}
 						break;
+
+					default:
+						// No prevention of default activity in other sections.
+						return true;
+						break;
 				}
+
+				// Prevent page scrolling.
+				event.preventDefault();
+
 				break;
 
 			case 9: // Tab
