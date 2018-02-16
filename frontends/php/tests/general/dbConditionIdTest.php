@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/func.inc.php';
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 require_once dirname(__FILE__).'/../../include/db.inc.php';
 
-class dbConditionIntTest extends CZabbixTest {
+class dbConditionIdTest extends CZabbixTest {
 
 	public static function provider() {
 		return [
@@ -37,7 +37,7 @@ class dbConditionIntTest extends CZabbixTest {
 			],
 			[
 				['field', [0]],
-				"field='0'"
+				"field IS NULL"
 			],
 			[
 				['field', [1]],
@@ -53,11 +53,23 @@ class dbConditionIntTest extends CZabbixTest {
 			],
 			[
 				['field', [0, 1]],
-				"field IN ('0','1')"
+				"(field='1' OR field IS NULL)"
+			],
+			[
+				['field', [0, 1, 2, 3]],
+				"(field IN ('1','2','3') OR field IS NULL)"
+			],
+			[
+				['field', [0, 1, 2, 3, 5, 6, 7, 8, 9, 10]],
+				"(field BETWEEN '5' AND '10' OR field IN ('1','2','3') OR field IS NULL)"
+			],
+			[
+				['field', [0, 1, 2, 3, 5, 6, 7, 8, 9, 10], true],
+				"NOT field BETWEEN '5' AND '10' AND field NOT IN ('1','2','3') AND field IS NOT NULL"
 			],
 			[
 				['field', [1, 0]],
-				"field IN ('0','1')"
+				"(field='1' OR field IS NULL)"
 			],
 			[
 				['field', [1], true],
@@ -138,7 +150,7 @@ class dbConditionIntTest extends CZabbixTest {
 	 * @dataProvider provider
 	 */
 	public function test($params, $expectedResult) {
-		$result = call_user_func_array('dbConditionInt', $params);
+		$result = call_user_func_array('dbConditionId', $params);
 
 		$this->assertSame($expectedResult, $result);
 	}

@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup config
+ */
 class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 	public static function allValues() {

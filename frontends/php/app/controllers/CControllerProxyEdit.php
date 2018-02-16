@@ -36,7 +36,6 @@ class CControllerProxyEdit extends CController {
 			'useip' =>			'db       interface.useip      |in 0,1',
 			'port' =>			'db       interface.port',
 			'proxy_address' =>	'db       hosts.proxy_address',
-			'proxy_hostids' =>	'array_db hosts.hostid',
 			'description' =>	'db       hosts.description',
 			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				HOST_ENCRYPTION_CERTIFICATE,
@@ -90,7 +89,6 @@ class CControllerProxyEdit extends CController {
 			'useip' => '1',
 			'port' => '10051',
 			'proxy_address' => '',
-			'proxy_hostids' => [],
 			'description' => '',
 			'tls_accept' => HOST_ENCRYPTION_NONE,
 			'tls_connect' => HOST_ENCRYPTION_NONE,
@@ -109,7 +107,6 @@ class CControllerProxyEdit extends CController {
 				'output' => ['host', 'status', 'proxy_address', 'description', 'tls_connect', 'tls_accept',
 					'tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'
 				],
-				'selectHosts' => ['hostid'],
 				'selectInterface' => ['interfaceid', 'dns', 'ip', 'useip', 'port'],
 				'proxyids' => $data['proxyid']
 			]);
@@ -131,7 +128,6 @@ class CControllerProxyEdit extends CController {
 				$data['useip'] = $proxy['interface']['useip'];
 				$data['port'] = $proxy['interface']['port'];
 			}
-			$data['proxy_hostids'] = zbx_objectValues($proxy['hosts'], 'hostid');
 			$data['description'] = $proxy['description'];
 		}
 
@@ -143,7 +139,6 @@ class CControllerProxyEdit extends CController {
 		$data['useip'] = $this->getInput('useip', $data['useip']);
 		$data['port'] = $this->getInput('port', $data['port']);
 		$data['proxy_address'] = $this->getInput('proxy_address', $data['proxy_address']);
-		$data['proxy_hostids'] = $this->getInput('proxy_hostids', $data['proxy_hostids']);
 		$data['description'] = $this->getInput('description', $data['description']);
 		$data['tls_accept'] = $this->getInput('tls_accept', $data['tls_accept']);
 		$data['tls_connect'] = $this->getInput('tls_connect', $data['tls_connect']);
@@ -156,15 +151,6 @@ class CControllerProxyEdit extends CController {
 		if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && $this->hasInput('interfaceid')) {
 			$data['interfaceid'] = $this->getInput('interfaceid');
 		}
-
-		// fetch available hosts, skip host prototypes
-		$data['all_hosts'] = DBfetchArray(DBselect(
-			'SELECT h.hostid,h.proxy_hostid,h.name,h.flags'.
-			' FROM hosts h'.
-			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND h.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
-		));
-		order_result($data['all_hosts'], 'name');
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of proxies'));
