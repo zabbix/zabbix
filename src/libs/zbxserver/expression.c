@@ -2538,7 +2538,7 @@ static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_al
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, DC_ITEM *dc_item,
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
 	const char		*__function_name = "substitute_simple_macros";
@@ -5424,7 +5424,15 @@ out:
 }
 
 #ifdef HAVE_LIBXML2
-static void	substitute_macros_in_xml_elements(DC_ITEM *item, const struct zbx_json_parse *jp_row, xmlNode *node)
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_in_xml_elements                                *
+ *                                                                            *
+ * Comments: auxiliary function for zbx_substitute_macros_xml()               *
+ *                                                                            *
+ ******************************************************************************/
+static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+		xmlNode *node)
 {
 	xmlChar	*value;
 	char	*value_tmp;
@@ -5501,7 +5509,23 @@ static void	substitute_macros_in_xml_elements(DC_ITEM *item, const struct zbx_js
 	}
 }
 
-int	zbx_substitute_macros_xml(char **data, DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_substitute_macros_xml                                        *
+ *                                                                            *
+ * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
+ *          a node or in CDATA section, validate XML                          *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] pointer to a buffer that contains XML        *
+ *             item   - [IN] item for simple macro substitution               *
+ *             jp_row - [IN] discovery data for LLD macro substitution        *
+ *             error  - [OUT] reason for XML parsing failure                  *
+ *             max_error_len - [IN] the size of error buffer                  *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL if XML validation has failed                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
 		int maxerrlen)
 {
 	xmlDoc		*doc;
