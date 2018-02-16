@@ -127,6 +127,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13141] fixed invalid value for "Update interval" field in mass update form on submit was redirecting to items list (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.7
