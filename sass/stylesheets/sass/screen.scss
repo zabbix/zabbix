@@ -3389,9 +3389,15 @@ $form-icon-btn: (
 .calendar {
 	width: 200px;
 
-	.calendar-year.highlighted,
-	.calendar-month.highlighted {
-		background-color: $action-hover-color;
+	.calendar-year,
+	.calendar-month {
+		&.highlighted {
+			background-color: $action-hover-color;
+		}
+
+		&:focus {
+			outline: none;
+		}
 	}
 
 	table {
