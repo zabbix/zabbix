@@ -158,10 +158,11 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 	char			application_json[] = {"Content-Type: application/json"};
 	char			application_xml[] = {"Content-Type: application/xml"};
+	char			url[ITEM_URL_LEN_MAX];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s' headers '%s' message body '%s'",
-			__function_name, zbx_request_string(item->request_method), item->url, item->headers,
-			item->posts);
+	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() request method '%s' URL '%s%s' headers '%s' message body"
+			" '%s'", __function_name, zbx_request_string(item->request_method), item->url,
+			item->query_fields, item->headers, item->posts);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -286,7 +287,8 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, item->url)))
+	zbx_snprintf(url, sizeof(url),"%s%s", item->url, item->query_fields);
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err)));
 		goto clean;

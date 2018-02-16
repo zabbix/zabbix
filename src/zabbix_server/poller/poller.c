@@ -428,6 +428,12 @@ static int	parse_query_fields(DC_ITEM *item)
 	const char		*member, *element = NULL;
 	size_t			alloc_len, offset;
 
+	if ('\0' == *item->query_fields_orig)
+	{
+		ZBX_STRDUP(item->query_fields, item->query_fields_orig);
+		return SUCCEED;
+	}
+
 	if (SUCCEED != zbx_json_open(item->query_fields_orig, &jp_array))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
@@ -691,16 +697,11 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 
-				if ('\0' != *items[i].query_fields_orig)
+				if (FAIL == parse_query_fields(&items[i]))
 				{
-					if (FAIL == parse_query_fields(&items[i]))
-					{
-						SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
-						errcodes[i] = CONFIG_ERROR;
-						continue;
-					}
-
-					items[i].url = zbx_strdcat(items[i].url, items[i].query_fields);
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
 				}
 				break;
 		}
