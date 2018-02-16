@@ -421,7 +421,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 	return res;
 }
 
-static int	parse_query_fields(DC_ITEM *item)
+static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN];
@@ -430,7 +430,7 @@ static int	parse_query_fields(DC_ITEM *item)
 
 	if ('\0' == *item->query_fields_orig)
 	{
-		ZBX_STRDUP(item->query_fields, item->query_fields_orig);
+		ZBX_STRDUP(*query_fields, item->query_fields_orig);
 		return SUCCEED;
 	}
 
@@ -468,23 +468,23 @@ static int	parse_query_fields(DC_ITEM *item)
 			return FAIL;
 		}
 
-		if (NULL == item->query_fields && NULL == strchr(item->url, '?'))
-			zbx_chrcpy_alloc(&item->query_fields, &alloc_len, &offset, '?');
+		if (NULL == *query_fields && NULL == strchr(item->url, '?'))
+			zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '?');
 		else
-			zbx_chrcpy_alloc(&item->query_fields, &alloc_len, &offset, '&');
+			zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '&');
 
 		data = zbx_strdup(data, name);
 		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
 				MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 		zbx_http_url_encode(data, &data);
-		zbx_strcpy_alloc(&item->query_fields, &alloc_len, &offset, data);
-		zbx_chrcpy_alloc(&item->query_fields, &alloc_len, &offset, '=');
+		zbx_strcpy_alloc(query_fields, &alloc_len, &offset, data);
+		zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '=');
 
 		data = zbx_strdup(data, value);
 		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
 				MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 		zbx_http_url_encode(data, &data);
-		zbx_strcpy_alloc(&item->query_fields, &alloc_len, &offset, data);
+		zbx_strcpy_alloc(query_fields, &alloc_len, &offset, data);
 
 		free(data);
 	}
@@ -697,7 +697,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 
-				if (FAIL == parse_query_fields(&items[i]))
+				if (FAIL == parse_query_fields(&items[i], &items[i].query_fields))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
 					errcodes[i] = CONFIG_ERROR;
