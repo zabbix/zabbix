@@ -5435,14 +5435,17 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 		xmlNode *node)
 {
 	xmlChar	*value;
+	xmlAttr	*attr;
 	char	*value_tmp;
 
 	for (;NULL != node; node = node->next)
 	{
-		if (XML_TEXT_NODE == node->type)
+		switch (node->type)
 		{
-			if (NULL != (value = xmlNodeGetContent(node)))
-			{
+			case XML_TEXT_NODE:
+				if (NULL == (value = xmlNodeGetContent(node)))
+					break;
+
 				value_tmp = zbx_strdup(NULL, (const char *)value);
 
 				if (NULL != item)
@@ -5457,12 +5460,11 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 
 				zbx_free(value_tmp);
 				xmlFree(value);
-			}
-		}
-		else if (XML_CDATA_SECTION_NODE == node->type)
-		{
-			if (NULL != (value = xmlNodeGetContent(node)))
-			{
+				break;
+			case XML_CDATA_SECTION_NODE:
+				if (NULL == (value = xmlNodeGetContent(node)))
+					break;
+
 				value_tmp = zbx_strdup(NULL, (const char *)value);
 
 				if (NULL != item)
@@ -5477,32 +5479,32 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 
 				zbx_free(value_tmp);
 				xmlFree(value);
-			}
-		}
-		else if (XML_ELEMENT_NODE == node->type)
-		{
-			xmlAttr	*attr;
-
-			for (attr = node->properties; NULL != attr; attr = attr->next)
-			{
-				if (NULL == attr->name || NULL == (value = xmlGetProp(node, attr->name)))
-					continue;
-
-				value_tmp = zbx_strdup(NULL, (const char *)value);
-
-				if (NULL != item)
+				break;
+			case XML_ELEMENT_NODE:
+				for (attr = node->properties; NULL != attr; attr = attr->next)
 				{
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
-							NULL, &value_tmp, MACRO_TYPE_HTTPCHECK_XML, NULL, 0);
+					if (NULL == attr->name || NULL == (value = xmlGetProp(node, attr->name)))
+						continue;
+
+					value_tmp = zbx_strdup(NULL, (const char *)value);
+
+					if (NULL != item)
+					{
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host,
+								item, NULL, NULL, &value_tmp, MACRO_TYPE_HTTPCHECK_XML,
+								NULL, 0);
+					}
+					else
+						substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
+
+					xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
+
+					zbx_free(value_tmp);
+					xmlFree(value);
 				}
-				else
-					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
-
-				xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
-
-				zbx_free(value_tmp);
-				xmlFree(value);
-			}
+				break;
+			default:
+				break;
 		}
 
 		substitute_macros_in_xml_elements(item, jp_row, node->children);
