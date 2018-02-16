@@ -191,7 +191,8 @@ calendar.prototype = {
 
 			jQuery(document).on('keydown', {calandar: this}, this.calendarKeyDownHandler);
 			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
-			this.active_section = 2;
+
+			this.active_section = this.sections.indexOf('.calendar-date');
 			this.focusSection();
 		}
 	},
@@ -332,6 +333,11 @@ calendar.prototype = {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 					cal.setDone();
 				}
+				else if (cal.sections[cal.active_section] === '.calendar-now-btn') {
+					cal.setNow();
+				}
+
+				return false;
 				break;
 
 			case 32: // Space
@@ -344,6 +350,11 @@ calendar.prototype = {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 					cal.focusSection();
 				}
+				else if (cal.sections[cal.active_section] === '.calendar-now-btn') {
+					cal.setNow();
+				}
+
+				return false;
 				break;
 		}
 	},
@@ -558,10 +569,16 @@ calendar.prototype = {
 		this.year = now.getFullYear();
 		this.hour = now.getHours();
 		this.minute = now.getMinutes();
+		this.hl_year = this.year;
+		this.hl_month = this.month;
+		this.hl_day = this.day;
 		this.syncSDT();
 		this.syncBSDateBySDT();
 		this.syncCDT();
 		this.setCDate();
+
+		this.active_section = this.sections.indexOf('.calendar-date');
+		this.focusSection();
 	},
 
 	setDone: function() {
