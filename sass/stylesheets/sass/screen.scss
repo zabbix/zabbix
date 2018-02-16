@@ -3425,6 +3425,9 @@ $form-icon-btn: (
 					background-color: $ui-bg-selected-color;
 					color: $white;
 				}
+				&:focus {
+					outline: none;
+				}
 
 				span {
 					z-index: -1;
