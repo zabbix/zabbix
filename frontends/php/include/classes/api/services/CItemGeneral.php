@@ -351,7 +351,7 @@ abstract class CItemGeneral extends CApiService {
 			// check if the item requires an interface
 			$itemInterfaceType = itemTypeInterface($fullItem['type']);
 			if ($itemInterfaceType !== false && $host['status'] != HOST_STATUS_TEMPLATE) {
-				if (!$fullItem['interfaceid']) {
+				if (!array_key_exists('interfaceid', $fullItem) || !$fullItem['interfaceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
 				}
 				elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
@@ -1794,10 +1794,13 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		libxml_use_internal_errors(true);
-		if (array_key_exists('post_type', $item)) {
-			if ($item['post_type'] == ZBX_POSTTYPE_XML
-					&& simplexml_load_string($data['posts'], null, LIBXML_IMPORT_FLAGS) === false) {
+		if (array_key_exists('post_type', $item)
+				&& ($item['post_type'] == ZBX_POSTTYPE_JSON || $item['post_type'] == ZBX_POSTTYPE_XML)) {
+			$posts = $data['posts'];
+			libxml_use_internal_errors(true);
+
+			if ($data['post_type'] == ZBX_POSTTYPE_XML
+					&& simplexml_load_string($posts, null, LIBXML_IMPORT_FLAGS) === false) {
 				$errors = libxml_get_errors();
 				$error = reset($errors);
 				libxml_clear_errors();
@@ -1806,6 +1809,27 @@ abstract class CItemGeneral extends CApiService {
 					_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
 					$error->line, $error->column
 				)));
+			}
+
+			if ($item['post_type'] == ZBX_POSTTYPE_JSON) {
+				$matches = (new CMacrosResolverGeneral)->getMacroPositions($posts, [
+					'usermacros' => true,
+					'lldmacros' => true,
+					'macros_n' => [
+						'{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}'
+					]
+				]);
+
+				foreach ($matches as $pos => $substr) {
+					$posts = substr_replace($posts, 'false', $pos, strlen($substr));
+				}
+
+				$posts = json_decode($posts);
+				$error = json_last_error();
+
+				if ($posts === null && ($error === JSON_ERROR_STATE_MISMATCH || $error === JSON_ERROR_SYNTAX)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+				}
 			}
 		}
 	}
