@@ -121,6 +121,11 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.7
+
+3.4.7rc2 was released as 3.4.7 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.4.7rc2
 
 Bug fixes:
