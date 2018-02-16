@@ -523,6 +523,18 @@ ul.top-nav-icons {
 	}
 }
 
+.multiselect-suggest {
+	li {
+		&.suggest-hover {
+			background-color: $ui-bg-color;
+		}
+	}
+}
+
+.suggest-found {
+	color: lighten($alt-yellow, 10%);
+}
+
 // SEVERITY STATUSES
 td.log-na-bg {
 	padding-left: 42px !important;
