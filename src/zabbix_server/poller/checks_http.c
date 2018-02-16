@@ -160,7 +160,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	char			application_xml[] = {"Content-Type: application/xml"};
 	char			url[ITEM_URL_LEN_MAX];
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() request method '%s' URL '%s%s' headers '%s' message body"
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s%s' headers '%s' message body"
 			" '%s'", __function_name, zbx_request_string(item->request_method), item->url,
 			item->query_fields, item->headers, item->posts);
 
