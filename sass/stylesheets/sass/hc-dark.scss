@@ -204,18 +204,6 @@ $icon-widget-btn: (
 .btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
-	}
-}
-
-.btn-back-map-container {
-	a {
-		border-bottom: none !important;
-	}
-}
-
 .btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -354px -619px !important;
 }
@@ -815,7 +803,7 @@ td.inactive-bg {
 	}
 }
 
-// GRAPH AND MAP SELECTIONS
+// GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.2);
 	border: 2px solid rgba($font-color,0.6);
@@ -828,4 +816,16 @@ td.inactive-bg {
 
 .map-element-selected {
 	border: 3px dashed $font-color;
+}
+
+.btn-back-map {
+	.btn-back-map-icon {
+		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
+	}
+}
+
+.btn-back-map-container {
+	a {
+		border-bottom: none;
+	}
 }
