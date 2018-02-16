@@ -3415,16 +3415,17 @@ $form-icon-btn: (
 			td {
 				@include transition(background-color .2s ease-out);
 
-				&:hover,
-				&.highlighted {
-					background-color: $action-hover-color;
-					cursor: pointer;
-				}
-
 				&.selected {
 					background-color: $ui-bg-selected-color;
 					color: $white;
 				}
+
+				&:hover,
+				&.highlighted {
+					@include btn-hover-active($btn-font-color, $btn-bg-color);
+					cursor: pointer;
+				}
+
 				&:focus {
 					outline: none;
 				}
