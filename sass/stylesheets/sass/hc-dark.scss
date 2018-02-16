@@ -361,6 +361,8 @@ a.link-action {
 		&:focus {
 			color: $link-main-nav-active-color;
 			background-color: lighten($ui-hover-color, 10%) !important;
+			@include box-shadow(0 0 0 2px $blue);
+			@include transition(box-shadow .2s ease-out);
 		}
 	}
 }
@@ -381,6 +383,8 @@ ul.top-nav-icons {
 		&:focus {
 			background-color: lighten($ui-hover-color, 10%) !important;
 			@include opacity(1);
+			@include box-shadow(0 0 0 2px $blue);
+			@include transition(box-shadow .2s ease-out);
 		}
 	}
 }
@@ -478,7 +482,8 @@ ul.top-nav-icons {
 
 .header-logo {
 	&:focus {
-	@include box-shadow(0 0 0 2px $blue);
+		@include box-shadow(0 0 0 2px $blue);
+		@include transition(box-shadow .2s ease-out);
 	}
 }
 
@@ -496,22 +501,21 @@ ul.top-nav-icons {
 	}
 }
 
-.multiselect input[type="text"] {
-	&:focus {
-		@include box-shadow(0 0 0 2px $blue);
+.multiselect {
+	&.active {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+	input[type="text"]{
+		&:focus {
+			box-shadow: none;
+		}
 	}
 }
 
 .progress-bar-container {
 	a {
-		&:hover {
-			.progress-bar-label {
-				color: white !important;
-			}
-		}
-
-		&:focus {
-			outline: solid 3px $link-hover-color;
+		&:hover, &:focus {
 			.progress-bar-label {
 				color: white !important;
 			}

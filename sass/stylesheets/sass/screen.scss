@@ -40,7 +40,6 @@ a {
 	}
 
 	&:focus {
-		// position: relative;
 		color: $link-hover-color;
 		outline: none;
 		border-bottom: 2px solid rgba($link-hover-color, 0.5);
@@ -3869,14 +3868,7 @@ a.link-action {
 	a {
 		border: none !important;
 
-		&:hover {
-			.progress-bar-label {
-				display: block;
-			}
-		}
-
-		&:focus {
-			outline: solid 2px rgba($link-hover-color, 0.5);
+		&:hover, &:focus {
 			.progress-bar-label {
 				display: block;
 			}
