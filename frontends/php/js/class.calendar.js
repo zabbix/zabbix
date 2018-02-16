@@ -350,6 +350,10 @@ calendar.prototype = {
 		if (section_to_focus === '.calendar-year' ||  section_to_focus === '.calendar-month') {
 			jQuery(section_to_focus, this.clndr_calendar).addClass('highlighted').focus();
 		}
+		else if (section_to_focus === '.calendar-time > [name="hour"]'
+				|| section_to_focus === '.calendar-time > [name="minute"]') {
+			jQuery(section_to_focus, this.clndr_calendar).select();
+		}
 		else if (section_to_focus === '.calendar-date') {
 			this.hl_year = this.hl_year || this.year;
 			this.hl_month = this.hl_month || this.month;
