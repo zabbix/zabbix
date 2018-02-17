@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+A......... [ZBX-6118] fixed poor performance of changing an item on the template which linked with many hosts (Sasha)
 ..F....... [ZBX-13454] fixed placeholder in Administration->Scrits form (Sasha)
 
 --------------------------------------------------------------------------------
