@@ -240,6 +240,13 @@ abstract class CItemGeneral extends CApiService {
 					}
 				}
 
+				if (!isset($item['key_'])) {
+					$item['key_'] = $fullItem['key_'];
+				}
+				if (!isset($item['hostid'])) {
+					$item['hostid'] = $fullItem['hostid'];
+				}
+
 				// if a templated item is being assigned to an interface with a different type, ignore it
 				$itemInterfaceType = itemTypeInterface($dbItems[$item['itemid']]['type']);
 				if ($fullItem['templateid'] && isset($item['interfaceid']) && isset($interfaces[$item['interfaceid']])
