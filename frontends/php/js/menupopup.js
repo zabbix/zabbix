@@ -952,8 +952,8 @@ jQuery(function($) {
 			if (menuPopup.length > 0) {
 				var display = menuPopup.css('display');
 
-				// hide all menu popups
-				$('.action-menu').css('display', 'none');
+				// Hide current action menu sub-levels.
+				$('.action-menu', menuPopup).css('display', 'none');
 
 				if (display === 'block') {
 					menuPopup.fadeOut(0);
