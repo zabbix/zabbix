@@ -3318,22 +3318,40 @@ $form-icon-btn: (
 
 // Map widget back to parent button.
 .btn-back-map-container {
-
 	text-align: left;
 	position: absolute;
 	left: -1px;
 
+	a {
+
+		&:focus,
+		&:hover {
+			outline: none;
+
+			.btn-back-map {
+				background-color: $btn-back-background-hover;
+				border: $btn-border-color solid 1px;
+
+				.btn-back-map-content {
+					display: inline-block;
+					line-height: 24px;
+					padding: 0 6px 0 0;
+				}
+			}
+		}
+	}
+
 	.btn-back-map {
-		margin-top: 10px;
-		border-radius: 0px 2px 2px 0px;
+		border: $ui-border-color solid 1px;
+		border-radius: 0 2px 2px 0;
 		background-color: $btn-back-map-background-color;
-		padding: 0px 0px 0px 0px;
+		color: $btn-back-text-color;
+		margin-top: 10px;
+		padding: 0;
 		display: inline-block;
 		height: 24px;
 		line-height: 24px;
 		vertical-align: middle;
-		border: $ui-border-color solid 1px;
-		color: $btn-back-text-color;
 		text-decoration: none;
 
 		.btn-back-map-content {
@@ -3347,17 +3365,6 @@ $form-icon-btn: (
 			height: 24px;
 			vertical-align: middle;
 			background: url(../img/icon-sprite.svg) no-repeat -85px -691px;
-		}
-
-		&:hover {
-			background-color: $btn-back-background-hover;
-			border: $btn-border-color solid 1px;
-
-			.btn-back-map-content {
-				display: inline-block;
-				line-height: 24px;
-				padding: 0px 6px 0px 0px;
-			}
 		}
 	}
 }
