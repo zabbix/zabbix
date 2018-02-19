@@ -35,7 +35,7 @@ $scriptFormList = (new CFormList())
 		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
+			->setAttribute('placeholder', _('<sub-menu/sub-menu/...>script'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Type'), 'type')),

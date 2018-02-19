@@ -3,6 +3,8 @@ $red: #ff5050;
 $light-red: #ff3a3a;
 $lighter-red: #ff5050;
 
+$orange: #ff7800;
+
 $dark-yellow: #e99003;
 $yellow: #a78820;
 $light-yellow: #2f280a;
@@ -12,7 +14,7 @@ $green: #23d545;
 $light-green: #23d545;
 $lighter-green: #44e763;
 
-$blue: #429ae3;
+$blue: white;
 
 $white: #000 !important;
 
@@ -260,9 +262,25 @@ ul.top-nav-icons {
 
 // COLORS AND GENERAL
 
+button {
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, 1));
+		background-color: darken($btn-bg-color, 10%)
+	}
+}
+
+.btn-alt {
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, 1));
+	}
+}
+
 .radio-segmented {
 	input[type="radio"] {
-
+			&:focus + label {
+				border-color: $form-border-focus-color !important;
+				background-color: $link-hover-color !important;
+			}
 		&:checked[disabled] + label {
 			background-color: #595959 !important;
 		}
@@ -279,17 +297,31 @@ a {
 	&:hover {
 		border-bottom: 1px solid $link-hover-color;
 	}
+	&:focus {
+		border-bottom: 3px solid $link-hover-color;
+	}
+}
+
+a.link-action {
+	border-bottom: 1px dotted;
+		&:hover {
+			border-bottom: 1px solid $link-hover-color;
+	}
 }
 
 .link-action {
 	&:hover {
 		color: $link-hover-color;
-		border-bottom: 1px dotted $link-hover-color;
+		border-bottom: 1px solid $link-hover-color;
 	}
 
 	&:active {
 		color: $link-hover-color;
 		border-bottom: 1px dotted $link-hover-color;
+	}
+	&:focus {
+		color: $link-hover-color;
+		border-bottom: 3px solid $link-hover-color;
 	}
 }
 
@@ -309,7 +341,7 @@ a {
 
 	&:focus {
 		color: $link-hover-color;
-		border-bottom: 1px solid $link-hover-color;
+		border-bottom: 3px solid $link-hover-color;
 	}
 
 	&:active {
@@ -318,10 +350,36 @@ a {
 	}
 }
 
+.top-nav {
+	a {
+		&:focus {
+			color: $link-main-nav-active-color;
+			background-color: lighten($ui-hover-color, 10%) !important;
+			@include box-shadow(0 0 0 2px $blue);
+			@include transition(box-shadow .2s ease-out);
+		}
+	}
+}
+
 .top-subnav a {
 	&.selected {
 		font-weight: bold;
 		border-bottom: 4px solid #000 !important;
+	}
+	&:focus {
+		border-bottom: 4px solid rgba($ui-hover-color, .7) !important;
+		outline: none;
+	}
+}
+
+ul.top-nav-icons {
+	a {
+		&:focus {
+			background-color: lighten($ui-hover-color, 10%) !important;
+			@include opacity(1);
+			@include box-shadow(0 0 0 2px $blue);
+			@include transition(box-shadow .2s ease-out);
+		}
 	}
 }
 
@@ -337,10 +395,32 @@ a {
 .btn-link {
 	font-weight: bold !important;
 	color: #fff !important;
+
+	&:focus {
+		margin-bottom: -3px !important;
+		border-bottom: 3px solid $link-hover-color !important;
+	}
+}
+
+.table-paging {
+	a {
+		&:focus {
+			background-color: $link-hover-color;
+				.arrow-right {
+					border-left-color: #000;
+				}
+				.arrow-left {
+					border-right-color: #000;
+				}
+		}
+	}
 }
 
 .paging-selected {
 	color: #000 !important;
+	&:focus {
+		background-color: $link-hover-color !important;
+	}
 }
 
 .filter-trigger {
@@ -353,13 +433,15 @@ a {
 	background-color: #000 !important;
 }
 
+
 .subfilter-disable-btn {
-	background-color: #000 !important;
+	background-color: $ui-bg-color !important;
 
 	&:active {
-	background-color: $red !important;
+		background-color: $ui-bg-color !important;
 	}
 }
+
 
 .tag {
 	color: $ui-bg-color;
@@ -367,6 +449,84 @@ a {
 
 .disabled {
 	@include opacity(0.6);
+}
+
+.multiselect {
+	.multiselect-list {
+		padding-left: 2px;
+		padding-bottom: 2px;
+
+		li {
+
+			&.selected {
+
+				.subfilter-enabled {
+					background-color: $ui-hover-color !important;
+					@include box-shadow(0 0 0 1px rgba($blue, 1));
+				}
+
+				.subfilter-disable-btn {
+					background-color: $ui-hover-color !important;
+					@include box-shadow(0 0 0 1px rgba($blue, 1));
+				}
+			}
+		}
+	}
+}
+
+.header-logo {
+	&:focus {
+		@include box-shadow(0 0 0 2px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+.checkbox-radio {
+	&:focus + label span {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+%form-input-style {
+	&:focus {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+.multiselect {
+	&.active {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+	input[type="text"]{
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
+
+.progress-bar-container {
+	a {
+		&:hover, &:focus {
+			.progress-bar-label {
+				color: white !important;
+			}
+		}
+	}
+}
+
+.multiselect-suggest {
+	li {
+		&.suggest-hover {
+			background-color: $ui-bg-color;
+		}
+	}
+}
+
+.suggest-found {
+	color: lighten($alt-yellow, 10%);
 }
 
 // SEVERITY STATUSES
@@ -387,7 +547,7 @@ td.na-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.na-bg .link-action {
+.na-bg a.link-action {
 	color: $link-color;
 }
 
@@ -436,7 +596,7 @@ td.normal-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.normal-bg .link-action {
+.normal-bg a.link-action {
 	color: $link-color;
 }
 
@@ -477,7 +637,7 @@ td.info-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.info-bg .link-action {
+.info-bg a.link-action {
 	color: $link-color;
 }
 
@@ -525,7 +685,7 @@ td.average-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.average-bg .link-action {
+.average-bg a.link-action {
 	color: $link-color;
 }
 
@@ -572,7 +732,7 @@ td.warning-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.warning-bg .link-action {
+.warning-bg a.link-action {
 	color: $link-color;
 }
 
@@ -624,7 +784,7 @@ td.high-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.high-bg .link-action {
+.high-bg a.link-action {
 	color: $link-color;
 }
 
@@ -676,7 +836,7 @@ td.disaster-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.disaster-bg .link-action {
+.disaster-bg a.link-action {
 	color: $link-color;
 }
 

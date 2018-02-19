@@ -658,7 +658,7 @@
 				}
 			});
 
-			// Remove acknowledgment operations IDs
+			// Remove acknowledgement operations IDs
 			var ack_operationid_RegExp = /ack_operations\[\d+\]\[operationid\]/;
 			jQuery('input[name^=ack_operations]').each(function() {
 				// Intentional usage of JS Prototype.
