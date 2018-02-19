@@ -3,6 +3,8 @@ $red: #990000;
 $light-red: #cc0000;
 $lighter-red: #cc0000;
 
+$orange: #ed3400;
+
 $dark-yellow: #e99003;
 $yellow: #a78820;
 $light-yellow: #f4f4f4;
@@ -12,7 +14,7 @@ $green: #009900;
 $light-green: #009900;
 $lighter-green: #00cc00;
 
-$blue: #429ae3;
+$blue: #111;
 
 // MAIN
 $main-nav-bg-color: #fff;
@@ -247,9 +249,25 @@ ul.top-nav-icons {
 
 // COLORS AND GENERAL
 
+button {
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, 1));
+		background-color: lighten($btn-bg-color, 10%)
+	}
+}
+
+.btn-alt {
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, 1));
+	}
+}
+
 .radio-segmented {
 	input[type="radio"] {
-
+			&:focus + label {
+				border-color: $form-border-focus-color !important;
+				background-color: #777 !important;
+			}
 		&:checked[disabled] + label {
 			background-color: #d3d3d3 !important;
 		}
@@ -266,17 +284,32 @@ a {
 	&:hover {
 		border-bottom: 1px solid $link-hover-color;
 	}
+	&:focus {
+		border-bottom: 3px solid $link-hover-color;
+	}
+}
+
+a.link-action {
+	border-bottom: 1px dotted;
+		&:hover {
+			border-bottom: 1px solid $link-hover-color;
+	}
 }
 
 .link-action {
 	&:hover {
 		color: $link-hover-color;
-		border-bottom: 1px dotted $link-hover-color;
+		border-bottom: 1px solid $link-hover-color;
 	}
 
 	&:active {
 		color: $link-hover-color;
 		border-bottom: 1px dotted $link-hover-color;
+	}
+
+	&:focus {
+		color: $link-hover-color;
+		border-bottom: 3px solid $link-hover-color;
 	}
 }
 
@@ -296,7 +329,7 @@ a {
 
 	&:focus {
 		color: $link-hover-color;
-		border-bottom: 1px solid $link-hover-color;
+		border-bottom: 3px solid $link-hover-color;
 	}
 
 	&:active {
@@ -305,10 +338,37 @@ a {
 	}
 }
 
+.top-nav {
+	a {
+		&:focus {
+			color: $link-main-nav-active-color;
+			background-color: darken($ui-hover-color, 3%) !important;
+			@include box-shadow(0 0 0 2px $blue);
+			@include transition(box-shadow .2s ease-out);
+		}
+	}
+}
+
 .top-subnav a {
 	&.selected {
 		font-weight: bold;
 		border-bottom: 4px solid #fff !important;
+	}
+	&:focus {
+		color: $link-main-subnav-active-color;
+		padding: 8px 0 4px 0;
+		border-bottom: 4px solid rgba($ui-hover-color, .8) !important;
+		outline: none;
+	}
+}
+
+ul.top-nav-icons {
+	a {
+		&:focus {
+			background-color: darken($ui-hover-color, 3%) !important;
+			@include box-shadow(0 0 0 2px $blue);
+			@include transition(box-shadow .2s ease-out);
+		}
 	}
 }
 
@@ -324,7 +384,27 @@ a {
 .btn-link {
 	font-weight: bold !important;
 	color: #000 !important;
+
+	&:focus {
+		margin-bottom: -3px !important;
+		border-bottom: 3px solid $link-hover-color !important;
+	}
 }
+
+.table-paging {
+	a {
+		&:focus {
+			background-color: #777 !important;
+		}
+	}
+}
+
+.paging-selected {
+	&:focus {
+		background-color: #777 !important;
+	}
+}
+
 
 .filter-trigger {
 	.arrow-down {
@@ -340,6 +420,83 @@ a {
 
 .disabled {
 	@include opacity(0.5);
+}
+
+.multiselect {
+	.multiselect-list {
+		padding-left: 2px;
+		padding-bottom: 2px;
+
+		li {
+
+			&.selected {
+
+				.subfilter-enabled {
+					background-color: #777 !important;
+					@include box-shadow(0 0 0 1px rgba($blue, 1));
+				}
+
+				.subfilter-disable-btn {
+					background-color: #777 !important;
+					@include box-shadow(0 0 0 1px rgba($blue, 1));
+				}
+			}
+		}
+	}
+}
+
+.header-logo {
+	&:focus {
+		@include box-shadow(0 0 0 2px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+.checkbox-radio {
+	&:focus + label span {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+%form-input-style {
+	&:focus {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+.multiselect {
+	&.active {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+	input[type="text"]{
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
+
+.multiselect-suggest {
+	li {
+		&.suggest-hover {
+			color: white;
+			background-color: black;
+
+			.grey {
+			color: gainsboro;
+			}
+
+			.suggest-found {
+				color: lighten($alt-yellow, 10%);
+			}
+		}
+	}
+}
+
+.suggest-found {
+	color: darken($dark-yellow, 10%);
 }
 
 // SEVERITY STATUSES
@@ -360,7 +517,7 @@ td.na-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.na-bg .link-action {
+.na-bg a.link-action {
 	color: $link-color;
 }
 
@@ -409,7 +566,7 @@ td.normal-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.normal-bg .link-action {
+.normal-bg a.link-action {
 	color: $link-color;
 }
 
@@ -450,7 +607,7 @@ td.info-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.info-bg .link-action {
+.info-bg a.link-action {
 	color: $link-color;
 }
 
@@ -498,7 +655,7 @@ td.average-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.average-bg .link-action {
+.average-bg a.link-action {
 	color: $link-color;
 }
 
@@ -545,7 +702,7 @@ td.warning-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.warning-bg .link-action {
+.warning-bg a.link-action {
 	color: $link-color;
 }
 
@@ -597,7 +754,7 @@ td.high-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.high-bg .link-action {
+.high-bg a.link-action {
 	color: $link-color;
 }
 
@@ -649,7 +806,7 @@ td.disaster-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.disaster-bg .link-action {
+.disaster-bg a.link-action {
 	color: $link-color;
 }
 
