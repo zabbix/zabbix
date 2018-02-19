@@ -404,7 +404,7 @@ abstract class CItemGeneral extends CApiService {
 						_('Type of information must be "Numeric (unsigned)" or "Numeric (float)" for aggregate items.'));
 			}
 
-			if ($fullItem['type'] == ITEM_TYPE_TRAPPER) {
+			if ($fullItem['type'] == ITEM_TYPE_TRAPPER && array_key_exists('trapper_hosts', $fullItem)) {
 				if ($fullItem['trapper_hosts'] !== '' && !$ip_range_parser->parse($fullItem['trapper_hosts'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', $ip_range_parser->getError())
