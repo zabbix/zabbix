@@ -1311,7 +1311,8 @@ jQuery(function($) {
 
 			item.append(menu);
 
-			item.hover(function() {
+			item.hover(function(e) {
+				e.stopPropagation();
 				$(this).actionMenuItemExpand();
 			});
 		}
