@@ -946,6 +946,9 @@ jQuery(function($) {
 				target = event.originalEvent.detail !== 0 ? event : event.target;
 			}
 
+			// Close other action menus.
+			$('.action-menu-top').not('#' + id).menuPopup('close');
+
 			if (menuPopup.length > 0) {
 				var display = menuPopup.css('display');
 
@@ -1031,8 +1034,8 @@ jQuery(function($) {
 					$('body').append(menuPopup);
 				}
 
-				// Hide all menu popups.
-				$('.action-menu').css('display', 'none');
+				// Hide current action menu sub-levels.
+				$('.action-menu', menuPopup).css('display', 'none');
 
 				// display
 				menuPopup
