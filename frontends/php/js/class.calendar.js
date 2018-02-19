@@ -353,11 +353,14 @@ calendar.prototype = {
 					cal.focusSection();
 				}
 				else if (jQuery.inArray(active_section, new Array('.calendar-date', '.calendar-time > [name="hour"]',
-						'.calendar-time > [name="minute"]', '.calendar-done-btn')) > -1) {
+						'.calendar-time > [name="minute"]')) > -1) {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 					cal.setDone();
 				}
-				else if (cal.sections[cal.active_section] === '.calendar-now-btn') {
+				else if (active_section === '.calendar-done-btn') {
+					cal.setDone();
+				}
+				else if (active_section === '.calendar-now-btn') {
 					cal.setNow();
 				}
 
