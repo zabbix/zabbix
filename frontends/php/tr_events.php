@@ -132,7 +132,7 @@ if ($event['r_eventid'] != 0) {
 	}
 }
 
-// Filter out acknowledgment notification messages.
+// Filter out acknowledgement notification messages.
 $all_alerts = [&$alerts, &$r_alerts];
 
 foreach ($all_alerts as &$alerts_data) {

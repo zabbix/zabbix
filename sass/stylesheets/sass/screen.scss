@@ -40,9 +40,9 @@ a {
 	}
 
 	&:focus {
-		position: relative;
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:active {
@@ -79,10 +79,7 @@ svg a {
 .link-action {
 	border-bottom: 1px dotted;
 	cursor: pointer;
-
-	&:link {
-		@extend %link-action-style;
-	}
+	color: $font-color;
 
 	&:visited {
 		@extend %link-action-style;
@@ -90,10 +87,18 @@ svg a {
 
 	&:hover {
 		@extend %link-action-style;
+		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.35);
 	}
 
 	&:active {
 		@extend %link-action-style;
+	}
+
+	&:focus {
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.35);
+
 	}
 }
 
@@ -121,7 +126,8 @@ svg a {
 
 	&:focus {
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.35);
 	}
 
 	&:active {
@@ -312,7 +318,7 @@ nav {
 
 		&:focus {
 			color: $link-main-nav-active-color;
-			background-color: $ui-hover-color;
+			background-color: $ui-hover-color !important;
 		}
 
 		&:active {
@@ -453,6 +459,9 @@ ul.top-nav-icons {
 
 	&:focus {
 		color: $link-main-subnav-active-color;
+		padding: 8px 0 4px 0;
+		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
+		outline: none;
 	}
 
 	&:active {
@@ -654,6 +663,10 @@ footer {
 	float: left;
 	display: block;
 	margin: 10px 10px 0 0;
+
+	&:focus {
+	@include box-shadow(0 0 0 2px rgba($blue, .35));
+	}
 }
 
 // Tables
@@ -791,6 +804,14 @@ footer {
 
 	a {
 		@extend %paging-btn;
+		&:focus {
+			.arrow-right {
+				border-left-color: $font-selected-color;
+			}
+			.arrow-left {
+				border-right-color: $font-selected-color;
+			}
+		}
 	}
 }
 
@@ -818,7 +839,7 @@ footer {
 	margin-left: -1px;
 	padding: 3px 11px;
 	background-color: $btn-form-bg-color;
-	border: 1px solid $form-border-color;
+	border: 1px solid $form-border-color !important;
 	text-decoration: none;
 	color: $font-color;
 	outline: 0;
@@ -830,9 +851,7 @@ footer {
 	}
 
 	&:focus {
-		color: $font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $form-border-focus-color;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 		z-index: 10;
 		position: relative;
 	}
@@ -854,7 +873,6 @@ footer {
 
 	&.paging-selected {
 		color: $font-selected-color;
-		border-color: $ui-bg-selected-color;
 		background-color: $ui-bg-selected-color;
 		position: relative;
 		z-index: 1;
@@ -864,14 +882,12 @@ footer {
 		}
 
 		&:focus {
-			background-color: darken($ui-bg-selected-color, 4%);
-			border-color: $form-border-focus-color;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 			position: relative;
 		}
 
 		&:active {
 			background-color: darken($ui-bg-selected-color, 4%);
-			border-color: $form-border-focus-color;
 			position: relative;
 		}
 	}
@@ -1194,6 +1210,17 @@ footer {
 		width: 100%;
 		padding-bottom: 2px;
 		min-height: 20px;
+	}
+
+	&.search-disabled {
+		input[type="text"] {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 0;
+			padding: 0;
+			margin: 0;
+		}
 	}
 
 	.multiselect-list {
@@ -1673,12 +1700,12 @@ footer {
 			}
 		}
 
-		&:focus + label {
-			border-color: $form-border-focus-color;
-			background-color: $btn-form-hover-color;
-			position: relative;
-			z-index: 2;
-		}
+			&:focus + label {
+				border-color: $form-border-focus-color;
+				background-color: $btn-form-hover-color;
+				position: relative;
+				z-index: 2;
+			}
 
 		&:checked + label {
 			color: $white;
@@ -1689,7 +1716,7 @@ footer {
 		}
 
 		&:checked:focus + label {
-			border-color: $form-border-focus-color;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 			position: relative;
 			z-index: 2;
 		}
@@ -2010,6 +2037,7 @@ button {
 	&:focus {
 		@include box-shadow(0 0 0 2px rgba($blue, .35));
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
 	}
 
 	&:active {
@@ -2093,6 +2121,7 @@ button {
 }
 
 .btn-link {
+	position: relative;
 	background-color: $transparent;
 	border: none;
 	color: $link-color;
@@ -2108,6 +2137,12 @@ button {
 
 	&:focus {
 		@extend .btn-link;
+		outline: none;
+		margin-bottom: -2px !important;
+		border-bottom: 2px solid rgba($link-hover-color, 0.5);
+		-webkit-box-shadow: 0 0 0 0px !important;
+		-moz-box-shadow: 0 0 0 0px !important;
+		box-shadow: 0 0 0 0px !important;
 	}
 
 	&:active {
@@ -3737,6 +3772,9 @@ $form-icon-btn: (
 
 a.green {
 	@extend .green;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .red {
@@ -3745,6 +3783,9 @@ a.green {
 
 a.red {
 	@extend .red;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 select.red {
@@ -3764,6 +3805,9 @@ select {
 
 a.orange {
 	@extend .orange;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .yellow {
@@ -3772,6 +3816,9 @@ a.orange {
 
 a.yellow {
 	@extend .yellow;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .grey {
@@ -3780,6 +3827,9 @@ a.yellow {
 
 a.grey {
 	@extend .grey;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .blue {
@@ -3788,6 +3838,9 @@ a.grey {
 
 a.blue {
 	@extend .blue;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .teal {
@@ -3796,6 +3849,34 @@ a.blue {
 
 a.teal {
 	@extend .teal;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
+}
+
+a.link-action {
+	color: $font-color;
+
+	&.red {
+		color: $red;
+	}
+
+	&.green {
+		color: $green;
+	}
+
+	&.orange {
+		color: $orange;
+	}
+
+	&:hover {
+		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+	}
+
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 .progress-bar-container {
@@ -3803,15 +3884,14 @@ a.teal {
 	white-space: nowrap;
 	position: relative;
 
-	&:hover {
-
-		.progress-bar-label {
-			display: block;
-		}
-	}
-
 	a {
-		border: none;
+		border: none !important;
+
+		&:hover, &:focus {
+			.progress-bar-label {
+				display: block;
+			}
+		}
 	}
 }
 
@@ -3948,6 +4028,10 @@ a.teal {
 .na-bg {
 	color: darken($alt-blue-grey,45%);
 
+	a.link-action {
+	color: darken($alt-blue-grey,45%);
+	}
+
 	input[type="radio"] {
 		&:checked + label {
 			@extend .na-bg;
@@ -3973,6 +4057,10 @@ td.na-bg {
 .normal-bg {
 	color: darken($alt-green,45%);
 	@extend .green-bg;
+
+	a.link-action {
+	color: darken($alt-green,45%);
+	}
 }
 
 .normal-bg.blink-hidden {
@@ -3985,6 +4073,10 @@ td.normal-bg {
 
 .info-bg {
 	color: darken($alt-dark-blue,45%);
+
+	a.link-action {
+	color: darken($alt-dark-blue,45%);
+	}
 
 	input[type="radio"] {
 		&:checked + label {
@@ -4009,6 +4101,10 @@ td.info-bg {
 .average-bg {
 	color: darken($alt-orange,45%);
 
+	a.link-action {
+	color: darken($alt-orange,45%);
+	}
+
 	input[type="radio"] {
 		&:checked + label {
 			@extend .average-bg;
@@ -4026,6 +4122,10 @@ td.average-bg {
 
 .warning-bg {
 	color: darken($alt-yellow,45%);
+
+	a.link-action {
+	color: darken($alt-yellow,45%);
+	}
 
 	input[type="radio"] {
 		&:checked + label {
@@ -4050,6 +4150,10 @@ td.warning-bg {
 .high-bg {
 	color: darken($alt-dark-orange,45%);
 
+	a.link-action {
+	color: darken($alt-dark-orange,45%);
+	}
+
 	input[type="radio"] {
 		&:checked + label {
 			@extend .high-bg;
@@ -4072,6 +4176,10 @@ td.high-bg {
 
 .disaster-bg {
 	color: darken($alt-red,45%);
+
+	a.link-action {
+	color: darken($alt-red,45%);
+	}
 
 	input[type="radio"] {
 		&:checked + label {
@@ -4425,6 +4533,10 @@ td.inactive-bg {
 	background-color: $transparent !important;
 	@extend %close-icon;
 	@include border-radius(2px);
+
+	&:focus {
+	box-shadow: none;
+	}
 }
 
 .overlay-close-btn {
@@ -4773,8 +4885,6 @@ svg {
 	max-height: 100%;
 	max-width: 100%;
 	display: flex;
-	align-items: center;
-	justify-content: center;
 }
 
 @supports (-ms-ime-align:auto) {
@@ -4912,6 +5022,13 @@ svg {
 					.import-items-btn:hover,
 					.add-child-btn:hover {
 						opacity: 1;
+					}
+					.edit-item-btn:focus,
+					.remove-item-btn:focus,
+					.import-items-btn:focus,
+					.add-child-btn:focus {
+						opacity: 1;
+						outline: none;
 					}
 					.add-child-btn {
 						background: url(../img/icon-sprite.svg) no-repeat -47px -551px;
