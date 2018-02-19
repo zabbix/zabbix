@@ -1689,6 +1689,12 @@ abstract class CItemGeneral extends CApiService {
 				'type' => API_INT32,
 				'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])
 			],
+			'ssl_cert_file' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file'),
+			],
+			'ssl_key_file' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file'),
+			],
 			'ssl_key_password' => [
 				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password'),
 			],

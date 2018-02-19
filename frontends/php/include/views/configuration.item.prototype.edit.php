@@ -341,17 +341,22 @@ $itemFormList->addRow(
 
 // ITEM_TYPE_HTTPCHECK SSL certificate file.
 $itemFormList->addRow(
-	new CLabel(_('SSL certificate file'), 'ssl_key_file'),
-	(new CTextBox('ssl_key_file', $data['ssl_key_file'], $readonly, 255))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CLabel(_('SSL certificate file'), 'ssl_cert_file'),
+	(new CTextBox('ssl_cert_file', $data['ssl_cert_file'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'ssl_cert_file_row'
+);
+
+// ITEM_TYPE_HTTPCHECK SSL key file.
+$itemFormList->addRow(
+	new CLabel(_('SSL key file'), 'ssl_key_file'),
+	(new CTextBox('ssl_key_file', $data['ssl_key_file'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_file_row'
 );
 
 // ITEM_TYPE_HTTPCHECK SSL key password.
 $itemFormList->addRow(
 	new CLabel(_('SSL key password'), 'ssl_key_password'),
-	(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly, 64))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_password_row'
 );
 
