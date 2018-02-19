@@ -125,12 +125,6 @@ $ok-ack-fg-color: #00ff00;
 .btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
-	}
-}
-
 .list-table {
 
 	thead th {
@@ -148,3 +142,14 @@ $ok-ack-fg-color: #00ff00;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+// GRAPH AND MAP
+.btn-back-map-container {
+
+	.btn-back-map {
+
+		.btn-back-map-icon {
+			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+		}
+	}
+}
