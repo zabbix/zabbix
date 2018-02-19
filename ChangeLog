@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+..F....... [ZBX-13307] fixed map scaling and position to the widget left side (ashubin)
 A......... [ZBX-6118] fixed poor performance of changing an item on the template which linked with many hosts (Sasha)
 ..F....... [ZBX-13454] fixed placeholder in Administration->Scrits form (Sasha)
 
@@ -128,6 +129,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13307] fixed map scaling and position to the widget left side (ashubin)
 A......... [ZBX-6118] fixed poor performance of changing an item on the template which linked with many hosts (Sasha)
 ..F....... [ZBX-13141] fixed invalid value for "Update interval" field in mass update form on submit was redirecting to items list (gcalenko)
 
