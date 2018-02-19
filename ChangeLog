@@ -4,6 +4,8 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+A......... [ZBX-6118] fixed poor performance of changing an item on the template which linked with many hosts (Sasha)
+..F....... [ZBX-13454] fixed placeholder in Administration->Scrits form (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha3
@@ -118,6 +120,20 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.8rc1
+
+New features:
+
+Bug fixes:
+A......... [ZBX-6118] fixed poor performance of changing an item on the template which linked with many hosts (Sasha)
+..F....... [ZBX-13141] fixed invalid value for "Update interval" field in mass update form on submit was redirecting to items list (gcalenko)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.7
+
+3.4.7rc2 was released as 3.4.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.7rc2

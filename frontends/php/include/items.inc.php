@@ -672,7 +672,7 @@ function copyItems($srcHostId, $dstHostId) {
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
-			$interface = CItem::findInterfaceForItem($srcItem, $dstHost['interfaces']);
+			$interface = CItem::findInterfaceForItem($srcItem['type'], $dstHost['interfaces']);
 			if ($interface) {
 				$srcItem['interfaceid'] = $interface['interfaceid'];
 			}
