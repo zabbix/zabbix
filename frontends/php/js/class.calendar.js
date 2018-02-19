@@ -49,6 +49,16 @@ function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
 	return clndr;
 }
 
+function dateSelectorOnClick(elmnt, name) {
+	var pos = getPosition(elmnt);
+	pos.top += 10;
+	pos.left += 16;
+
+	getCalendarByID(name).clndr.clndrshow(pos.top, pos.left, elmnt);
+
+	event.stopPropagation();
+}
+
 calendar.prototype = {
 	id: null,					// personal ID
 	cdt: new CDate(),			// Date object of current(viewed) date
@@ -155,7 +165,10 @@ calendar.prototype = {
 		this.clndr_calendar.hide();
 		this.visible = 0;
 
-		jQuery(document).off('keydown', this.calendarKeyDownHandler);
+		jQuery(document)
+			.off('click', this.calendarDocumentClickHandler)
+			.off('keydown', this.calendarKeyDownHandler);
+
 		removeFromOverlaysStack(this.id.toString());
 	},
 
@@ -189,12 +202,23 @@ calendar.prototype = {
 			this.clndr_calendar.show();
 			this.visible = 1;
 
-			jQuery(document).on('keydown', {calandar: this}, this.calendarKeyDownHandler);
+			jQuery(document)
+				.on('keydown', {calandar: this}, this.calendarKeyDownHandler)
+				.on('click', this.calendarDocumentClickHandler);
+
 			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
 
 			this.active_section = this.sections.indexOf('.calendar-date');
 			this.focusSection();
 		}
+	},
+
+	calendarDocumentClickHandler: function() {
+		jQuery(CLNDR).each(function(i, cal) {
+			if (cal.clndr.visible == 1) {
+				cal.clndr.clndrhide();
+			}
+		});
 	},
 
 	calendarKeyDownHandler: function(event) {
@@ -784,6 +808,10 @@ calendar.prototype = {
 		this.clndr_calendar.setAttribute('role', 'application');
 		this.clndr_calendar.setAttribute('tabindex', '0');
 		this.clndr_calendar.hide();
+
+		this.clndr_calendar.on('click', function(event) {
+			event.stopPropagation();
+		});
 
 		if (typeof(parentNodeid) === 'undefined' || !parentNodeid) {
 			document.body.appendChild(this.clndr_calendar);
