@@ -185,7 +185,7 @@ function get_icon($type, $params = []) {
 
 					$icon = (new CRedirectButton(' ', $url->getUrl()))
 						->setTitle(_('Kiosk mode'))
-						->addClass(ZBX_STYLE_BTN_MAX);
+						->addClass(ZBX_STYLE_BTN_KIOSK);
 				}
 			}
 			else {

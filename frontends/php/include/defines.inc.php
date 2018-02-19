@@ -1316,6 +1316,7 @@ define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
+define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
