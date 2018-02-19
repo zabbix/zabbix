@@ -49,7 +49,7 @@ function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
 	return clndr;
 }
 
-function dateSelectorOnClick(elmnt, name) {
+function dateSelectorOnClick(event, elmnt, name) {
 	var pos = getPosition(elmnt);
 	pos.top += 10;
 	pos.left += 16;
