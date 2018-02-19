@@ -329,21 +329,27 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// check if the item requires an interface
-			$itemInterfaceType = itemTypeInterface($fullItem['type']);
-			if ($itemInterfaceType !== false && $host['status'] != HOST_STATUS_TEMPLATE) {
-				if (!$fullItem['interfaceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
-				}
-				elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
-				}
-				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
-				}
+			if ($host['status'] == HOST_STATUS_TEMPLATE) {
+				unset($item['interfaceid']);
 			}
-			// no interface required, just set it to null
 			else {
-				$item['interfaceid'] = 0;
+				$itemInterfaceType = itemTypeInterface($fullItem['type']);
+
+				if ($itemInterfaceType !== false) {
+					if (!$fullItem['interfaceid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
+					}
+					elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
+					}
+					elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
+					}
+				}
+				// no interface required, just set it to null
+				else {
+					$item['interfaceid'] = 0;
+				}
 			}
 
 			// item key
