@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+..F....... [ZBX-13334] fixed translations of Widget parameters window (agriscenko)
 A......... [ZBX-6118] fixed poor performance of changing an item on the template which linked with many hosts (Sasha)
 ..F....... [ZBX-13454] fixed placeholder in Administration->Scrits form (Sasha)
 
@@ -128,6 +129,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13334] fixed translations of Widget parameters window (agriscenko)
 A......... [ZBX-13307] field trapper_hosts changed to optional for trapper item.create (ashubin)
 ..F....... [ZBX-13307] fixed map scaling and position to the widget left side (ashubin)
 A......... [ZBX-6118] fixed poor performance of changing an item on the template which linked with many hosts (Sasha)
