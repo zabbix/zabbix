@@ -171,6 +171,21 @@ abstract class CItemGeneral extends CApiService {
 				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
+
+			$discovery_rules = [];
+
+			if ($this instanceof CItemPrototype) {
+				$druleids = array_filter(zbx_objectValues($items, 'ruleid'));
+
+				if ($druleids) {
+					$discovery_rules = API::DiscoveryRule()->get([
+						'output' => ['hostid'],
+						'ruleids' => array_keys(array_flip($druleids)),
+						'preservekeys' => true
+					]);
+				}
+			}
+
 		}
 
 		// interfaces
@@ -288,6 +303,14 @@ abstract class CItemGeneral extends CApiService {
 					_('Cannot set "%1$s" for item "%2$s".'),
 					$item['name']
 				);
+
+				if ($this instanceof CItemPrototype && array_key_exists('ruleid', $fullItem)
+						&& (!array_key_exists($fullItem['ruleid'], $discovery_rules)
+						|| $discovery_rules[$fullItem['ruleid']]['hostid'] != $fullItem['hostid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
 			}
 
 			$host = $dbHosts[$fullItem['hostid']];
