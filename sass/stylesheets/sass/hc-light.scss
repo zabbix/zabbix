@@ -484,6 +484,10 @@ ul.top-nav-icons {
 			color: white;
 			background-color: black;
 
+			.grey {
+			color: gainsboro;
+			}
+
 			.suggest-found {
 				color: lighten($alt-yellow, 10%);
 			}
