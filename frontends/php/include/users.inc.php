@@ -267,16 +267,15 @@ function collapseHostGroupRights(array $groups_rights) {
 }
 
 /**
- * Returns the sorted list of tag filter.
+ * Returns the sorted list of the unique tag filters.
  *
  * @param array  $tag_filters
  *
  * @return array
  */
-function collapseTagFilters(array $tag_filters) {
+function uniqTagFilters(array $tag_filters) {
 	CArrayHelper::sort($tag_filters, ['groupid', 'tag', 'value']);
 
-	$groupids = [];
 	$prev_tag_filter = null;
 
 	foreach ($tag_filters as $key => $tag_filter) {
@@ -286,9 +285,27 @@ function collapseTagFilters(array $tag_filters) {
 			unset($tag_filters[$key]);
 		}
 		else {
-			$groupids[$tag_filter['groupid']] = true;
 			$prev_tag_filter = $tag_filter;
 		}
+	}
+
+	return $tag_filters;
+}
+
+/**
+ * Returns the sorted list of the unique tag filters and group names.
+ *
+ * @param array  $tag_filters
+ *
+ * @return array
+ */
+function collapseTagFilters(array $tag_filters) {
+	$tag_filters = uniqTagFilters($tag_filters);
+
+	$groupids = [];
+
+	foreach ($tag_filters as $tag_filter) {
+		$groupids[$tag_filter['groupid']] = true;
 	}
 
 	if ($groupids) {

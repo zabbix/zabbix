@@ -68,17 +68,6 @@ class CEvent extends CApiService {
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = []) {
-		$result = [];
-
-		$sqlParts = [
-			'select'	=> [$this->fieldId('eventid')],
-			'from'		=> ['e' => 'events e'],
-			'where'		=> [],
-			'order'		=> [],
-			'group'		=> [],
-			'limit'		=> null
-		];
-
 		$defOptions = [
 			'eventids'					=> null,
 			'groupids'					=> null,
@@ -124,148 +113,113 @@ class CEvent extends CApiService {
 
 		$this->validateGet($options);
 
+		if ($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER) {
+			if ($options['value'] !== null) {
+				zbx_value2array($options['value']);
+			}
+			else {
+				$options['value'] = [TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE];
+			}
+
+			$problems = in_array(TRIGGER_VALUE_TRUE, $options['value'])
+				? $this->getEvents(['value' => TRIGGER_VALUE_TRUE] + $options)
+				: [];
+			$recovery = in_array(TRIGGER_VALUE_FALSE, $options['value'])
+				? $this->getEvents(['value' => TRIGGER_VALUE_FALSE] + $options)
+				: [];
+			if ($options['countOutput'] && $options['groupCount']) {
+				$problems = zbx_toHash($problems, 'objectid');
+				$recovery = zbx_toHash($recovery, 'objectid');
+
+				foreach ($problems as $objectid => &$problem) {
+					if (array_key_exists($objectid, $recovery)) {
+						$problem['rowscount'] += $recovery['rowscount'];
+						unset($recovery[$objectid]);
+					}
+				}
+				unset($problem);
+
+				$result = array_values($problems + $recovery);
+			}
+			else {
+				$result = $problems + $recovery;
+			}
+		}
+		else {
+			$result = $this->getEvents($options);
+		}
+
+		if ($options['countOutput']) {
+			return $result;
+		}
+
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['object', 'objectid'], $options['output']);
+		}
+
+		// removing keys (hash -> array)
+		if (!$options['preservekeys']) {
+			$result = zbx_cleanHashes($result);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Returns the list of events.
+	 *
+	 * @param array     $options
+	 */
+	private function getEvents(array $options) {
+		$sqlParts = [
+			'select'	=> [$this->fieldId('eventid')],
+			'from'		=> ['e' => 'events e'],
+			'where'		=> [],
+			'order'		=> [],
+			'group'		=> [],
+			'limit'		=> null
+		];
+
 		// source and object
 		$sqlParts['where'][] = 'e.source='.zbx_dbstr($options['source']);
 		$sqlParts['where'][] = 'e.object='.zbx_dbstr($options['object']);
 
 		// editable + PERMISSION CHECK
-		$fillter_condition = [];
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				// specific triggers
 				$user_groups = getUserGroupsByUserId(self::$userData['userid']);
 
+				// specific triggers
 				if ($options['objectids'] !== null) {
-					$triggers = API::Trigger()->get([
-						'output' => ['triggerid'],
-						'selectGroups' => ['groupid'],
+					$options['objectids'] = array_keys(API::Trigger()->get([
+						'output' => [],
 						'triggerids' => $options['objectids'],
-						'editable' => $options['editable']
-					]);
-
-					$group_triggers = [];
-
-					foreach ($triggers as $trigger) {
-						foreach ($trigger['groups'] as $group) {
-							$group_triggers[$group['groupid']][$trigger['triggerid']] = $trigger['triggerid'];
-						}
-					}
-
-					list($tag_filters, $full_access_groups)
-							= $this->calculateTagFilterRestriction($user_groups, array_keys($group_triggers));
-
-					// Add condition to select events that must match host group only.
-					if ($full_access_groups) {
-						$allowed_triggers = [];
-
-						foreach ($full_access_groups as $groupid) {
-							if (array_key_exists($groupid, $group_triggers)) {
-								$allowed_triggers = array_merge($allowed_triggers, $group_triggers[$groupid]);
-							}
-						}
-
-						if ($allowed_triggers) {
-							$fillter_condition[] = dbConditionInt('e.objectid', $allowed_triggers);
-						}
-					}
-
-					// Add condition to select events that are filtered by tag filter.
-					foreach ($tag_filters as $groupid => $tag_filter) {
-						foreach ($tag_filter as $values) {
-							if (array_key_exists($groupid, $group_triggers)) {
-								$tag_value = '';
-								if ($values['value'] !== '') {
-									$tag_value = ' AND et.value = '.zbx_dbstr($values['value']);
-								}
-
-								$fillter_condition[] = 'EXISTS ('.
-									'SELECT NULL'.
-									' FROM event_tag et'.
-									' WHERE et.eventid = e.eventid'.
-										' AND '.dbConditionInt('e.objectid', $group_triggers[$groupid]).
-										' AND et.tag = '.zbx_dbstr($values['tag']).
-										$tag_value.
-								')';
-							}
-						}
-					}
-
-					/**
-					 * At this point empty $fillter_condition means that user has no access to any of triggers or host
-					 * groups.
-					 */
-					if (!$fillter_condition) {
-						$options['objectids'] = [];
-					}
+						'editable' => $options['editable'],
+						'preservekeys' => true
+					]));
 				}
 				// all triggers
 				else {
-					// Get all visible groups.
-					$host_groups = API::HostGroup()->get([
-						'output' => [],
-						'preservekeys' => true
-					]);
-
-					list($tag_filters, $full_access_groups)
-						= $this->calculateTagFilterRestriction($user_groups, array_keys($host_groups));
-
-					if ($host_groups) {
-						$triggers = API::Trigger()->get([
-							'output' => ['triggerid'],
-							'selectGroups' => ['groupid'],
-							'groupids' => array_keys($host_groups)
-						]);
-
-						$group_triggers = [];
-
-						foreach ($triggers as $trigger) {
-							foreach ($trigger['groups'] as $group) {
-								$group_triggers[$group['groupid']][$trigger['triggerid']] = $trigger['triggerid'];
-							}
-						}
-
-						// Add condition to select events that are filtered by tag filter.
-						foreach ($tag_filters as $groupid => $tag_filter) {
-							foreach ($tag_filter as $values) {
-								if (array_key_exists($groupid, $group_triggers)) {
-									$tag_value = '';
-									if ($values['value'] !== '') {
-										$tag_value = ' AND et.value = '.zbx_dbstr($values['value']);
-									}
-
-									$fillter_condition[] = 'EXISTS ('.
-										'SELECT NULL'.
-										' FROM event_tag et'.
-										' WHERE et.eventid = e.eventid'.
-											' AND '.dbConditionInt('e.objectid', $group_triggers[$groupid]).
-											' AND et.tag = '.zbx_dbstr($values['tag']).
-											$tag_value.
-									')';
-								}
-							}
-						}
-					}
-
-					// Add condition to select events that must match host group only.
-					if ($full_access_groups) {
-						$fillter_condition[] = 'EXISTS ('.
+					$sqlParts['where'][] = 'NOT EXISTS ('.
 						'SELECT NULL'.
 						' FROM functions f,items i,hosts_groups hgg'.
+							' LEFT JOIN rights r'.
+								' ON r.id=hgg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $user_groups).
 						' WHERE e.objectid=f.triggerid'.
 							' AND f.itemid=i.itemid'.
 							' AND i.hostid=hgg.hostid'.
-							' AND '.dbConditionInt('hgg.groupid', $full_access_groups).
-						')';
-					}
+						' GROUP BY i.hostid'.
+						' HAVING MAX(permission)<'.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
+							' OR MIN(permission) IS NULL'.
+							' OR MIN(permission)='.PERM_DENY.
+					')';
+				}
 
-					/**
-					 * At this point empty $fillter_condition means that user has no access to any of triggers or host
-					 * groups.
-					 */
-					if (!$fillter_condition) {
-						$options['objectids'] = [];
-					}
+				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
+					$sqlParts = self::addTagFilterSqlParts($user_groups, $sqlParts, $options['value']);
 				}
 			}
 			// items and LLD rules
@@ -291,22 +245,28 @@ class CEvent extends CApiService {
 				}
 				// all items and LLD rules
 				else {
-					$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+					$user_groups = getUserGroupsByUserId(self::$userData['userid']);
 
 					$sqlParts['where'][] = 'EXISTS ('.
-							'SELECT NULL'.
-							' FROM items i,hosts_groups hgg'.
-								' JOIN rights r'.
-									' ON r.id=hgg.groupid'.
-										' AND '.dbConditionInt('r.groupid', $userGroups).
-							' WHERE e.objectid=i.itemid'.
-								' AND i.hostid=hgg.hostid'.
-							' GROUP BY hgg.hostid'.
-							' HAVING MIN(r.permission)>'.PERM_DENY.
-								' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-							')';
+						'SELECT NULL'.
+						' FROM items i,hosts_groups hgg'.
+							' JOIN rights r'.
+								' ON r.id=hgg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $user_groups).
+						' WHERE e.objectid=i.itemid'.
+							' AND i.hostid=hgg.hostid'.
+						' GROUP BY hgg.hostid'.
+						' HAVING MIN(r.permission)>'.PERM_DENY.
+							' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
+					')';
 				}
 			}
+		}
+
+		// eventids
+		if (!is_null($options['eventids'])) {
+			zbx_value2array($options['eventids']);
+			$sqlParts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
 		}
 
 		// objectids
@@ -467,8 +427,18 @@ class CEvent extends CApiService {
 			$sqlParts['where'][] = 'e.clock<='.zbx_dbstr($options['time_till']);
 		}
 
+		// eventid_from
+		if ($options['eventid_from'] !== null) {
+			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
+		}
+
+		// eventid_till
+		if ($options['eventid_till'] !== null) {
+			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
+		}
+
 		// value
-		if (!is_null($options['value'])) {
+		if ($options['value'] !== null) {
 			zbx_value2array($options['value']);
 			$sqlParts['where'][] = dbConditionInt('e.value', $options['value']);
 		}
@@ -488,60 +458,7 @@ class CEvent extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		/**
-		 * Apply $fillter_condition to select accessible eventids. This should be done separately to get list of
-		 * accessible eventids and create additional condition to include into results not only accessible events but
-		 * also recovery events of accessible events that should not be accessible otherwise due the applied tag
-		 * filters.
-		 */
-		if ($fillter_condition) {
-			// Store current state of $sqlParts for later use.
-			$sql_parts_tmp = $sqlParts;
-
-			// Build version of query to select accessible eventids only.
-			$sqlParts['select'] = ['e.eventid'];
-			$sqlParts['where'][] = '('.implode(' OR ', $fillter_condition).')';
-
-			$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-			$accessible_eventids = [];
-			while ($event = DBfetch($res)) {
-				$accessible_eventids[$event['eventid']] = true;
-			}
-
-			// Set $sql_parts_tmp back to original $sqlParts.
-			$sqlParts = $sql_parts_tmp;
-			unset($sql_parts_tmp);
-
-			if ($accessible_eventids) {
-				$sqlParts['where'][] = '('.
-					dbConditionInt('e.eventid', array_keys($accessible_eventids)).
-					' OR EXISTS ('.
-						' SELECT NULL'.
-						' FROM event_recovery er2'.
-						' WHERE er2.r_eventid=e.eventid'.
-							' AND '.dbConditionInt('er2.eventid', array_keys($accessible_eventids)).
-					')'.
-				')';
-			}
-		}
-
-		// eventids
-		if (!is_null($options['eventids'])) {
-			zbx_value2array($options['eventids']);
-			$sqlParts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
-		}
-
-		// eventid_from
-		if ($options['eventid_from'] !== null) {
-			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
-		}
-
-		// eventid_till
-		if ($options['eventid_till'] !== null) {
-			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
-		}
+		$result = [];
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -558,20 +475,6 @@ class CEvent extends CApiService {
 			else {
 				$result[$event['eventid']] = $event;
 			}
-		}
-
-		if ($options['countOutput']) {
-			return $result;
-		}
-
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['object', 'objectid'], $options['output']);
-		}
-
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
 		}
 
 		return $result;
@@ -1077,133 +980,119 @@ class CEvent extends CApiService {
 	}
 
 	/**
-	 * Function calculates what access user has to given host groups and events that are generated by triggers which
-	 * belongs to hosts in given host groups.
+	 * Returns the list of unique tag filters.
 	 *
-	 * @param array $user_groups	A list of user groups.
-	 * @param array $host_groups	A list of host groups.
+	 * @param array $usrgrpids
 	 *
-	 * @return array	Contains two sub-arrays:
-	 *					- First sub-array contains host groups (groupid is used as a key) in which events are available
-	 *					  only in combination with specific tags (tag name-value pairs are used as values);
-	 *					- Second sub-array contains only list of host groups (only groupid) that can be applied without
-	 *					  tag filters.
+	 * @return array
 	 */
-	protected function calculateTagFilterRestriction(array $user_groups = [], array $host_groups = []) {
-		// Get rights.
-		$db_rights = DBselect(
-			'SELECT r.groupid,r.id'.
-			' FROM rights r'.
-			' WHERE '.dbConditionInt('r.groupid', $user_groups).
-				' AND '.dbConditionInt('r.id', $host_groups)
-		);
+	public static function getTagFilters(array $usrgrpids) {
+		$tag_filters = uniqTagFilters(DB::select('tag_filter', [
+			'output' => ['groupid', 'tag', 'value'],
+			'filter' => ['usrgrpid' => $usrgrpids]
+		]));
 
-		$rights = [];
+		$result = [];
 
-		while ($db_right = DBfetch($db_rights)) {
-			$rights[$db_right['groupid']][$db_right['id']] = true;
+		foreach ($tag_filters as $tag_filter) {
+			$result[$tag_filter['groupid']][] = [
+				'tag' => $tag_filter['tag'],
+				'value' => $tag_filter['value']
+			];
 		}
 
-		// Get tag filter.
-		$db_tag_filters = DBselect(
-			'SELECT tf.groupid,tf.tag,tf.value,tf.usrgrpid'.
-			' FROM tag_filter tf'.
-			' WHERE '.dbConditionInt('tf.usrgrpid', $user_groups)
-		);
+		return $result;
+	}
 
-		$tag_filters = [];
+	/**
+	 * Add sql parts related to tag-based permissions.
+	 *
+	 * @param array $usrgrpids
+	 * @param array $sqlParts
+	 * @param int   $value
+	 *
+	 * @return string
+	 */
+	protected static function addTagFilterSqlParts(array $usrgrpids, array $sqlParts, $value) {
+		$tag_filters = self::getTagFilters($usrgrpids);
 
-		/**
-		 * $host_groups_without_tags holds user groups and host groups on which access has been granted.
-		 *
-		 * Two type of values possible:
-		 *  - hard access (value 1) - if access is calculated usinghost group  permissions and tag filters;
-		 *  - soft access (value 0) - if access is granted from permissions tab only.
-		 *
-		 * Soft access can be removed if any other user group have more specific tag filter permissions set for
-		 * particular host group. Hard access cannot be removed once granted.
-		 *
-		 * Types of access are used internally in this function only.
-		 */
-		$host_groups_without_tags = [];
-		foreach ($rights as $usrgrpid => $groups) {
-			foreach ($groups as $groupid => $value) {
-				$host_groups_without_tags[$usrgrpid][$groupid] = 0;
-			}
+		if (!$tag_filters) {
+			return $sqlParts;
 		}
 
-		while ($db_tag_filter = DBfetch($db_tag_filters)) {
-			/**
-			 * If tag based permissions comes into force, delete soft access to particular host group if such has been
-			 * granted before.
-			 *
-			 * If hard access to particular host group has been already granted, simply jump to the next tag.
-			 */
-			foreach ($host_groups_without_tags as $usrgrpid => $groups) {
-				if (array_key_exists($db_tag_filter['groupid'], $groups)) {
-					foreach ($groups as $groupid => $val) {
-						if ($val == 0) {
-							unset($host_groups_without_tags[$usrgrpid][$groupid]);
-						}
-						else {
-							continue(2);
-						}
-					}
+		$sqlParts['from']['f'] = 'functions f';
+		$sqlParts['from']['i'] = 'items i';
+		$sqlParts['from']['hg'] = 'hosts_groups hg';
+		$sqlParts['where']['e-f'] = 'e.objectid=f.triggerid';
+		$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
+		$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
+
+		$tag_conditions = [];
+		$full_access_groupids = [];
+
+		foreach ($tag_filters as $groupid => $filters) {
+			$tags = [];
+			$tag_values = [];
+
+			foreach ($filters as $filter) {
+				if ($filter['tag'] === '') {
+					$full_access_groupids[] = $groupid;
+					continue 2;
+				}
+				elseif ($filter['value'] === '') {
+					$tags[] = $filter['tag'];
+				}
+				else {
+					$tag_values[$filter['tag']][] = $filter['value'];
 				}
 			}
 
-			/**
-			 * If <tag name> and <tag value> are not specified, but tag filter for host group is created (otherwise
-			 * wouldn't been such record in tag_filter table), simply grant hard access to particular host group.
-			 */
-			if ($db_tag_filter['tag'] === '' && $db_tag_filter['value'] === '') {
-				if (in_array($db_tag_filter['groupid'], $host_groups)) {
-					$host_groups_without_tags[$db_tag_filter['usrgrpid']][$db_tag_filter['groupid']] = 1;
-				}
+			$conditions = [];
 
-				/**
-				 * Since un-removable access to whole host group has been granted, it is not necessary to store tags
-				 * specified for particular host group anymore.
-				 */
-				if (array_key_exists($db_tag_filter['groupid'], $tag_filters)) {
-					unset($tag_filters[$db_tag_filter['groupid']]);
-				}
+			if ($tags) {
+				$conditions[] = dbConditionString('et.tag', $tags);
+			}
+			$parenthesis = $tags || count($tag_values) > 1;
+
+			foreach ($tag_values as $tag => $values) {
+				$condition = 'et.tag='.zbx_dbstr($tag).' AND '.dbConditionString('et.value', $values);
+				$conditions[] = $parenthesis ? '('.$condition.')' : $condition;
+			}
+
+			$conditions = (count($conditions) > 1) ? '('.implode(' OR ', $conditions).')' : $conditions[0];
+
+			$tag_conditions[] = 'hg.groupid='.zbx_dbstr($groupid).' AND '.$conditions;
+		}
+
+		if ($tag_conditions) {
+			if ($value == TRIGGER_VALUE_TRUE) {
+				$sqlParts['from']['et'] = 'event_tag et';
+				$sqlParts['where']['e-et'] = 'e.eventid=et.eventid';
 			}
 			else {
-				/**
-				 * If at least one tag is set for particular user group, we must review all host group permissions that
-				 * are added in particular user group. All host groups with soft access must be removed in particular
-				 * user group.
-				 */
-				if (array_key_exists($db_tag_filter['usrgrpid'], $host_groups_without_tags)) {
-					foreach ($host_groups_without_tags[$db_tag_filter['usrgrpid']] as $grpid => $val) {
-						if ($val == 0) {
-							unset($host_groups_without_tags[$db_tag_filter['usrgrpid']][$grpid]);
-						}
-					}
-				}
+				$sqlParts['from']['er'] = 'event_recovery er';
+				$sqlParts['from']['et'] = 'event_tag et';
+				$sqlParts['where']['e-er'] = 'e.eventid=er.r_eventid';
+				$sqlParts['where']['er-et'] = 'er.eventid=et.eventid';
+			}
 
-				// Grant access to host group problems with particular Tag only.
-				if (in_array($db_tag_filter['groupid'], $host_groups)) {
-					$tag_filters[$db_tag_filter['groupid']][] = [
-						'tag' => $db_tag_filter['tag'],
-						'value' => $db_tag_filter['value']
-					];
+			if ($full_access_groupids || count($tag_conditions) > 1) {
+				foreach ($tag_conditions as &$tag_condition) {
+					$tag_condition = '('.$tag_condition.')';
 				}
+				unset($tag_condition);
 			}
 		}
 
-		// Create SQL condition to select problems for particular host groups without specified tags.
-		$full_access_groups = [];
-		foreach ($host_groups_without_tags as $usrgrpid => $groups) {
-			foreach ($groups as $groupid => $value) {
-				$full_access_groups[$groupid] = true;
-			}
+		if ($full_access_groupids) {
+			$tag_conditions[] = dbConditionInt('hg.groupid', $full_access_groupids);
 		}
 
-		return [
-			$tag_filters,
-			array_keys($full_access_groups)
-		];
+		$sqlParts['where'][] = 'e.value='.zbx_dbstr($value);
+		$sqlParts['where'][] = (count($tag_conditions) > 1)
+			? '('.implode(' OR ', $tag_conditions).')'
+			: $tag_conditions[0];
+
+		return $sqlParts;
 	}
 }
