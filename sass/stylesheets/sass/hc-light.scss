@@ -776,14 +776,16 @@ td.inactive-bg {
 	border: 3px dashed $font-color;
 }
 
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
-	}
-}
-
 .btn-back-map-container {
+
 	a {
 		border-bottom: none;
+	}
+
+	.btn-back-map {
+
+		.btn-back-map-icon {
+			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+		}
 	}
 }
