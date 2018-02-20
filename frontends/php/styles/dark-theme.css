@@ -13,9 +13,6 @@
 .btn-search {
   background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important; }
 
-.btn-back-map .btn-back-map-icon {
-  background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important; }
-
 .list-table thead th {
   border-color: #404040 !important; }
 
@@ -2375,17 +2372,26 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   text-align: left;
   position: absolute;
   left: -1px; }
+  .btn-back-map-container a:focus, .btn-back-map-container a:hover {
+    outline: none; }
+    .btn-back-map-container a:focus .btn-back-map, .btn-back-map-container a:hover .btn-back-map {
+      background-color: #768d99;
+      border: #768d99 solid 1px; }
+      .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content {
+        display: inline-block;
+        line-height: 24px;
+        padding: 0 6px 0 0; }
   .btn-back-map-container .btn-back-map {
-    margin-top: 10px;
-    border-radius: 0px 2px 2px 0px;
+    border: #303030 solid 1px;
+    border-radius: 0 2px 2px 0;
     background-color: rgba(0, 0, 0, 0.8);
-    padding: 0px 0px 0px 0px;
+    color: white;
+    margin-top: 10px;
+    padding: 0;
     display: inline-block;
     height: 24px;
     line-height: 24px;
     vertical-align: middle;
-    border: #303030 solid 1px;
-    color: white;
     text-decoration: none; }
     .btn-back-map-container .btn-back-map .btn-back-map-content {
       display: none; }
@@ -2396,13 +2402,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       height: 24px;
       vertical-align: middle;
       background: url(../img/icon-sprite.svg) no-repeat -85px -691px; }
-    .btn-back-map-container .btn-back-map:hover {
-      background-color: #768d99;
-      border: #768d99 solid 1px; }
-      .btn-back-map-container .btn-back-map:hover .btn-back-map-content {
-        display: inline-block;
-        line-height: 24px;
-        padding: 0px 6px 0px 0px; }
 
 .overlay-dialogue-body {
   margin: 0 0 25px 0;
@@ -4523,3 +4522,6 @@ Widgets are used as containers to group any related information. Widget consists
 .top-subnav a:focus {
   border-bottom: 4px solid #787878 !important;
   outline: none; }
+
+.btn-back-map-container .btn-back-map .btn-back-map-icon {
+  background: url(../img/icon-sprite.svg) no-repeat -85px -725px; }
