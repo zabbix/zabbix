@@ -1273,8 +1273,10 @@ jQuery(function($) {
 			});
 		}
 
+		var no_event = false;
 		if (typeof options.disabled !== 'undefined' && options.disabled) {
 			link.addClass('action-menu-item-disabled');
+			no_event = true;
 		}
 		else {
 			link.addClass('action-menu-item');
@@ -1284,7 +1286,7 @@ jQuery(function($) {
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {
-				link.click(options.clickCallback);
+				link.on('click', options.clickCallback);
 			}
 		}
 
@@ -1297,6 +1299,13 @@ jQuery(function($) {
 				'aria-haspopup': 'true',
 				'aria-expanded': 'false',
 				'area-hidden': 'true'
+			});
+			no_event = true;
+		}
+
+		if (no_event) {
+			link.on('click', function(e) {
+				return false;
 			});
 		}
 
