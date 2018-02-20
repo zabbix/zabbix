@@ -1598,7 +1598,7 @@ AS_IF([test "xyes" = "x$svn_ver"],[
 	AS_IF([test "linux" = "${ARCH}"],[
 		ZBX_REV='$(shell svn info $(top_srcdir)|sed -n -e "/Last Changed Rev:/s/.*: \([[0-9]]*\)/\1/p")/$(shell svnversion -n $(top_srcdir))'
 	],[
-		ZBX_REV='$$(shell svn info $(top_srcdir)|sed -n -e "/Last Changed Rev:/s/.*: \([[0-9]]*\)/\1/p")/$$(svnversion -n $(top_srcdir))'
+		ZBX_REV='$$(svn info $(top_srcdir)|sed -n -e "/Last Changed Rev:/s/.*: \([[0-9]]*\)/\1/p")/$$(svnversion -n $(top_srcdir))'
 	])
 ])
 
