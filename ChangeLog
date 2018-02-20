@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+........S. [ZBX-13452] fixed Elasticsearch history storage default value types (viktors)
 A......... [ZBX-13248] field trapper_hosts changed to optional for trapper item.create (ashubin)
 ..F....... [ZBX-13307] fixed map scaling and position to the widget left side (ashubin)
 ..F....... [ZBX-12941] fixed checkbox overlay's position over the checkbox (miks)
@@ -133,6 +134,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13452] fixed Elasticsearch history storage default value types (viktors)
 ..F....... [ZBX-12941] fixed checkbox overlay's position over the checkbox (miks)
 ..F....... [ZBX-13334] fixed translations of Widget parameters window (agriscenko)
 A......... [ZBX-13307] field trapper_hosts changed to optional for trapper item.create (ashubin)
