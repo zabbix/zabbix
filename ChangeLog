@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+..F....... [ZBX-13307] fixed map scaling and position to the widget left side (ashubin)
 ..F....... [ZBX-12941] fixed checkbox overlay's position over the checkbox (miks)
 ..F....... [ZBX-13465] fixed back button style on the sub-maps (Andzs, ashubin)
 ..F....... [ZBX-13334] fixed translations of Widget parameters window (agriscenko)
