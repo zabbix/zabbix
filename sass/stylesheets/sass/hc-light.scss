@@ -218,8 +218,30 @@ $icon-widget-btn: (
 }
 
 .action-menu-item {
-	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -164px -835px !important;
+	&:hover,
+	&:focus,
+	&:active,
+	&.highlighted {
+		background-color: black !important;
+		color: white;
+
+		.arrow-right {
+			border-left-color: white !important;
+		}
+
+		&.selected {
+
+			&::before {
+				background: url(../img/icon-sprite.svg) no-repeat -317px -835px !important;
+			}
+		}
+	}
+
+	&.selected {
+
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -164px -835px !important;
+		}
 	}
 }
 

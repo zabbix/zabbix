@@ -3191,14 +3191,8 @@ $form-icon-btn: (
 		@extend %overflow-ellipsis;
 		@include transition(background-color .2s ease-out);
 
-		&:hover {
-			background-color: $action-hover-color;
-		}
-
-		&:focus {
-			background-color: $action-hover-color;
-		}
-
+		&:hover,
+		&:focus,
 		&:active,
 		&.highlighted {
 			background-color: $action-hover-color;
