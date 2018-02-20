@@ -113,19 +113,20 @@ class CEvent extends CApiService {
 
 		$this->validateGet($options);
 
+		if ($options['value'] !== null) {
+			zbx_value2array($options['value']);
+		}
+
 		if ($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER) {
-			if ($options['value'] !== null) {
-				zbx_value2array($options['value']);
-			}
-			else {
+			if ($options['value'] === null) {
 				$options['value'] = [TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE];
 			}
 
 			$problems = in_array(TRIGGER_VALUE_TRUE, $options['value'])
-				? $this->getEvents(['value' => TRIGGER_VALUE_TRUE] + $options)
+				? $this->getEvents(['value' => [TRIGGER_VALUE_TRUE]] + $options)
 				: [];
 			$recovery = in_array(TRIGGER_VALUE_FALSE, $options['value'])
-				? $this->getEvents(['value' => TRIGGER_VALUE_FALSE] + $options)
+				? $this->getEvents(['value' => [TRIGGER_VALUE_FALSE]] + $options)
 				: [];
 			if ($options['countOutput'] && $options['groupCount']) {
 				$problems = zbx_toHash($problems, 'objectid');
@@ -219,7 +220,7 @@ class CEvent extends CApiService {
 				}
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
-					$sqlParts = self::addTagFilterSqlParts($user_groups, $sqlParts, $options['value']);
+					$sqlParts = self::addTagFilterSqlParts($user_groups, $sqlParts, $options['value'][0]);
 				}
 			}
 			// items and LLD rules
@@ -439,7 +440,6 @@ class CEvent extends CApiService {
 
 		// value
 		if ($options['value'] !== null) {
-			zbx_value2array($options['value']);
 			$sqlParts['where'][] = dbConditionInt('e.value', $options['value']);
 		}
 
@@ -1088,7 +1088,6 @@ class CEvent extends CApiService {
 			$tag_conditions[] = dbConditionInt('hg.groupid', $full_access_groupids);
 		}
 
-		$sqlParts['where'][] = 'e.value='.zbx_dbstr($value);
 		$sqlParts['where'][] = (count($tag_conditions) > 1)
 			? '('.implode(' OR ', $tag_conditions).')'
 			: $tag_conditions[0];
