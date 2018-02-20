@@ -59,7 +59,7 @@
 
 		// test confirmation button
 		jQuery('#testConfirmation').click(function() {
-			executeScript(null, null, jQuery('#confirmation').val());
+			executeScript(null, null, jQuery('#confirmation').val(), this);
 		});
 
 		// host group selection

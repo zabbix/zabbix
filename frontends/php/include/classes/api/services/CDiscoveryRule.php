@@ -347,8 +347,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $ruleids,
 			'editable' => true,
-			'preservekeys' => true,
-			'selectHosts' => ['name']
+			'preservekeys' => true
 		]);
 
 		// TODO: remove $nopermissions hack
@@ -379,8 +378,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $childTuleids,
 			'nopermissions' => true,
-			'preservekeys' => true,
-			'selectHosts' => ['name']
+			'preservekeys' => true
 		]);
 
 		$delRules = array_merge($delRules, $delRulesChildren);
@@ -426,12 +424,6 @@ class CDiscoveryRule extends CItemGeneral {
 			];
 		}
 		DB::insertBatch('housekeeper', $insert);
-
-		// TODO: remove info from API
-		foreach ($delRules as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 
 		return ['ruleids' => $ruleids];
 	}
@@ -518,21 +510,21 @@ class CDiscoveryRule extends CItemGeneral {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$selectFields = [];
-		foreach ($this->fieldRules as $key => $rules) {
-			if (!isset($rules['system']) && !isset($rules['host'])) {
-				$selectFields[] = $key;
+		$output = [];
+		foreach ($this->fieldRules as $field_name => $rules) {
+			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
+				$output[] = $field_name;
 			}
 		}
 
-		$items = $this->get([
+		$tpl_items = $this->get([
+			'output' => $output,
 			'hostids' => $data['templateids'],
-			'preservekeys' => true,
-			'output' => $selectFields,
-			'selectFilter' => ['formula', 'evaltype', 'conditions']
+			'selectFilter' => ['formula', 'evaltype', 'conditions'],
+			'preservekeys' => true
 		]);
 
-		$this->inherit($items, $data['hostids']);
+		$this->inherit($tpl_items, $data['hostids']);
 
 		return true;
 	}
@@ -775,32 +767,12 @@ class CDiscoveryRule extends CItemGeneral {
 				$this->updateFormula($item['itemid'], $item['filter']['formula'], $itemConditions[$item['itemid']]);
 			}
 		}
-
-		// TODO: REMOVE info
-		$itemHosts = $this->get([
-			'itemids' => zbx_objectValues($items, 'itemid'),
-			'output' => ['key_', 'name'],
-			'selectHosts' => ['name'],
-			'nopermissions' => true
-		]);
-		foreach ($itemHosts as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Created: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 	}
 
 	protected function updateReal($items) {
 		$items = zbx_toArray($items);
 
 		$ruleIds = zbx_objectValues($items, 'itemid');
-		$exRules = $this->get([
-			'itemids' => $ruleIds,
-			'output' => ['key_', 'name'],
-			'selectHosts' => ['name'],
-			'selectFilter' => ['evaltype'],
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
 
 		$data = [];
 		foreach ($items as $item) {
@@ -864,12 +836,6 @@ class CDiscoveryRule extends CItemGeneral {
 			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				$this->updateFormula($item['itemid'], $item['filter']['formula'], $ruleConditions[$item['itemid']]);
 			}
-		}
-
-		// TODO: REMOVE info
-		foreach ($exRules as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Updated: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -1036,34 +1002,54 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	protected function inherit(array $items, array $hostids = null) {
-		if (empty($items)) {
-			return true;
+		if (!$items) {
+			return;
 		}
 
-		// prepare the child items
-		$newItems = $this->prepareInheritedItems($items, $hostids);
-		if (!$newItems) {
-			return true;
+		// Prepare the child discovery rules.
+		$new_items = $this->prepareInheritedItems($items, $hostids);
+		if (!$new_items) {
+			return;
 		}
 
-		$insertItems = [];
-		$updateItems = [];
-		foreach ($newItems as $newItem) {
-			if (isset($newItem['itemid'])) {
-				$updateItems[] = $newItem;
+		$ins_items = [];
+		$upd_items = [];
+		foreach ($new_items as $new_item) {
+			if (array_key_exists('itemid', $new_item)) {
+				$upd_items[] = $new_item;
 			}
 			else {
-				$newItem['flags'] = ZBX_FLAG_DISCOVERY_RULE;
-				$insertItems[] = $newItem;
+				$ins_items[] = $new_item;
 			}
 		}
 
-		// save the new items
-		$this->createReal($insertItems);
-		$this->updateReal($updateItems);
+		// Save the new items.
+		$this->createReal($ins_items);
+		$this->updateReal($upd_items);
 
-		// propagate the inheritance to the children
-		return $this->inherit(array_merge($updateItems, $insertItems));
+		$new_items = array_merge($upd_items, $ins_items);
+
+		// Inheriting items from the templates.
+		$tpl_items = DBselect(
+			'SELECT i.itemid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+		);
+
+		$tpl_itemids = [];
+		while ($tpl_item = DBfetch($tpl_items)) {
+			$tpl_itemids[$tpl_item['itemid']] = true;
+		}
+
+		foreach ($new_items as $index => $new_item) {
+			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
+				unset($new_items[$index]);
+			}
+		}
+
+		$this->inherit($new_items);
 	}
 
 	/**
@@ -1117,7 +1103,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
-			$interface = self::findInterfaceForItem($dstDiscovery, $dstHost['interfaces']);
+			$interface = self::findInterfaceForItem($dstDiscovery['type'], $dstHost['interfaces']);
 			if ($interface) {
 				$dstDiscovery['interfaceid'] = $interface['interfaceid'];
 			}
@@ -1251,7 +1237,7 @@ class CDiscoveryRule extends CItemGeneral {
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 					// find a matching interface
-					$interface = self::findInterfaceForItem($prototype, $dstHost['interfaces']);
+					$interface = self::findInterfaceForItem($prototype['type'], $dstHost['interfaces']);
 					if ($interface) {
 						$prototype['interfaceid'] = $interface['interfaceid'];
 					}
