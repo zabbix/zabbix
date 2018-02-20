@@ -75,11 +75,11 @@ class testPageDashboard extends CWebTest {
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'Favourite graphs');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Favourite screens');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Favourite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Problems');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Web monitoring');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'Discovery status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'Host status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'System status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Host status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Problems');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'System status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'Web monitoring');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'Discovery status');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//h4", 'Status of Zabbix');
 		}
 	}

@@ -2265,7 +2265,7 @@ class testFormItem extends CWebTest {
 			else {
 				$dbName = $name;
 			}
-			$this->zbxTestClickLinkTextWait($dbName);
+			$this->zbxTestClickXpath("//table[@class='list-table']/tbody/tr/td/a[text()='{$dbName}'");
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestAssertElementValue('key', $key);
