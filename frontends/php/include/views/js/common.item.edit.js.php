@@ -456,19 +456,18 @@ $data['http_auth_switcher'] = [
 			}).disableSelection();
 
 			table.on('click', '[data-row-action]', function (e) {
+				var row_node = $(e.currentTarget).closest('.'+table_row_class);
+
 				e.preventDefault();
 
 				switch ($(e.currentTarget).data('row-action')) {
 					case 'remove_row' :
-						rows -= 1;
-						table.sortable('option', 'disabled', rows < 2);
-
-						$(e.currentTarget).closest('.'+table_row_class).remove();
+						removeRow($(e.currentTarget).closest('.'+table_row_class));
 						break;
 
 					case 'add_row' :
 						var row_data = $(e.currentTarget).data('values'),
-							new_row = addRow($.extend({index: rows + 1}, row_data||{}));
+							new_row = addRow(row_data||{});
 
 						if (!row_data) {
 							new_row.find('[type="text"]').val('');
@@ -479,19 +478,26 @@ $data['http_auth_switcher'] = [
 
 			function addRow(values) {
 				rows += 1;
+				values.index = rows;
 				table.sortable('option', 'disabled', rows < 2);
 
 				return $(row_template.evaluate(values))
 					.addClass(table_row_class)
 					.addClass('sortable')
-					.data('row-values', values)
+					.data('values', values)
 					.insertBefore(insert_point);
 			}
 
 			function addRows(rows_values) {
 				$.each(rows_values, function(index, values) {
-					addRow($.extend({"index": index}, values));
+					addRow(values);
 				});
+			}
+
+			function removeRow(row_node) {
+				rows -= 1;
+				row_node.remove();
+				table.sortable('option', 'disabled', rows < 2);
 			}
 
 			return {
@@ -505,6 +511,9 @@ $data['http_auth_switcher'] = [
 				clearTable: function() {
 					table.find('.'+table_row_class).remove();
 					return table;
+				},
+				getTableRows: function() {
+					return table.find('.'+table_row_class);
 				}
 			}
 		};
@@ -514,15 +523,15 @@ $data['http_auth_switcher'] = [
 				table = t.find('table'),
 				data = JSON.parse(t.find('[type="text/json"]').text()),
 				template = t.find('[type="text/x-jquery-tmpl"]'),
-				et = new editableTable(table, template);
+				container = new editableTable(table, template);
 
-			et.addRows(data);
+			container.addRows(data);
 
 			if (t.data('sortable-pairs-table') != 1) {
 				table.sortable('option', 'disabled', true);
 			}
 
-			t.data('editableTable', et);
+			t.data('editableTable', container);
 		});
 
 		$('[data-action="parse_url"]').click(function() {
@@ -533,16 +542,71 @@ $data['http_auth_switcher'] = [
 			if (pos != -1) {
 				var host = url.val().substring(0, pos),
 					query = url.val().substring(pos + 1),
-					parsed = [];
+					pairs = {},
+					index,
+					valid = true;
 
 				$.each(query.split('&'), function(i, pair) {
-					pair = pair.split('=', 2);
-					parsed.push({'key': pair[0], 'value': pair[1]});
+					if ($.trim(pair)) {
+						pair = pair.split('=', 2);
+						pair.push('');
+
+						try {
+							if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
+								// Non-printable characters in URL.
+								throw null;
+							}
+
+							index = decodeURIComponent(pair[0].replace(/\+/g, ' '));
+							pairs[index] = {
+								'key': index,
+								'value': decodeURIComponent(pair[1].replace(/\+/g, ' '))
+							}
+						}
+						catch( e ) {
+							valid = false;
+						}
+					}
 				});
 
-				url.val(host);
-				table.clearTable()
-				table.addRows(parsed);
+				if (valid) {
+					$.each(table.getTableRows(), function(index, row_node) {
+						var key = $('[name*="[key]"]', row_node),
+							index = key.val();
+
+						if (index === '') {
+							index = Object.keys(pairs)[0];
+							key.val(index);
+						}
+
+						if (typeof pairs[index] !== 'undefined') {
+							$('[name*="[value]"]', row_node).val(pairs[index].value);
+							delete pairs[index];
+						}
+					});
+
+					$.each(pairs, function(index, row) {
+						table.addRow(row);
+					});
+
+					url.val(host);
+				}
+				else {
+					overlayDialogue({
+						'title': <?= CJs::encodeJson(_('Error')); ?>,
+						'content': $('<span>').html(<?=
+							CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+						?>),
+						'buttons': [
+							{
+								title: <?= CJs::encodeJson(_('Ok')); ?>,
+								class: 'btn-alt',
+								focused: true,
+								action: function() {}
+							}
+						]
+					});
+				}
 			}
 		});
 	});

@@ -1780,8 +1780,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			foreach ($item['query_fields'] as $v) {
-				if (!is_array($v) || count($v) > 1 || !is_string(reset($v)) || trim(reset($v)) === ''
-						|| key($v) === '') {
+				if (!is_array($v) || count($v) > 1 || key($v) === '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
 						_('nonempty key and value pair expected'))
 					);
