@@ -49,13 +49,12 @@ function isWritableHostGroups(array $groupids) {
 }
 
 /**
- * Apply host group rights to all subgroups.
+ * Returns list of child groups for selected group ID.
  *
  * @param string $groupid  Host group ID.
  * @param string $name     Host group name.
  */
-function inheritPermissions($groupid, $name) {
-	// Get child groupids.
+function getChildGroupIds($groupid, $name) {
 	$parent = $name.'/';
 	$len = strlen($parent);
 
@@ -68,45 +67,57 @@ function inheritPermissions($groupid, $name) {
 	$child_groupids = [];
 	foreach ($groups as $group) {
 		if (substr($group['name'], 0, $len) === $parent) {
-			$child_groupids[$group['groupid']] = true;
+			$child_groupids[] = $group['groupid'];
 		}
 	}
 
-	if ($child_groupids) {
-		$child_groupids = array_keys($child_groupids);
+	return $child_groupids;
+}
 
-		$usrgrps = API::UserGroup()->get([
-			'output' => ['usrgrpid'],
-			'selectRights' => ['id', 'permission']
-		]);
+/**
+ * Apply host group rights to all subgroups.
+ *
+ * @param string $groupid  Host group ID.
+ * @param string $name     Host group name.
+ */
+function inheritPermissions($groupid, $name) {
+	$child_groupids = getChildGroupIds($groupid, $name);
 
-		$upd_usrgrps = [];
+	if (!$child_groupids) {
+		return;
+	}
 
-		foreach ($usrgrps as $usrgrp) {
-			$rights = zbx_toHash($usrgrp['rights'], 'id');
+	$usrgrps = API::UserGroup()->get([
+		'output' => ['usrgrpid'],
+		'selectRights' => ['id', 'permission']
+	]);
 
-			if (array_key_exists($groupid, $rights)) {
-				foreach ($child_groupids as $child_groupid) {
-					$rights[$child_groupid] = [
-						'id' => $child_groupid,
-						'permission' => $rights[$groupid]['permission']
-					];
-				}
+	$upd_usrgrps = [];
+
+	foreach ($usrgrps as $usrgrp) {
+		$rights = zbx_toHash($usrgrp['rights'], 'id');
+
+		if (array_key_exists($groupid, $rights)) {
+			foreach ($child_groupids as $child_groupid) {
+				$rights[$child_groupid] = [
+					'id' => $child_groupid,
+					'permission' => $rights[$groupid]['permission']
+				];
 			}
-			else {
-				foreach ($child_groupids as $child_groupid) {
-					unset($rights[$child_groupid]);
-				}
+		}
+		else {
+			foreach ($child_groupids as $child_groupid) {
+				unset($rights[$child_groupid]);
 			}
-
-			$upd_usrgrps[] = [
-				'usrgrpid' => $usrgrp['usrgrpid'],
-				'rights' => $rights
-			];
 		}
 
-		API::UserGroup()->update($upd_usrgrps);
+		$upd_usrgrps[] = [
+			'usrgrpid' => $usrgrp['usrgrpid'],
+			'rights' => $rights
+		];
 	}
+
+	API::UserGroup()->update($upd_usrgrps);
 }
 
 /**
@@ -117,93 +128,44 @@ function inheritPermissions($groupid, $name) {
  * @param string $name     Host group name.
  */
 function inheritTagFilters($groupid, $name) {
-	// Get child groupids.
-	$parent = $name.'/';
-	$len = strlen($parent);
-
-	// Select subgroups of particular host group.
-	$groups = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'search' => ['name' => $parent],
-		'startSearch' => true
-	]);
-
-	$child_groupids = [];
-	foreach ($groups as $group) {
-		if (substr($group['name'], 0, $len) === $parent) {
-			$child_groupids[$group['groupid']] = true;
-		}
-	}
+	$child_groupids = getChildGroupIds($groupid, $name);
 
 	if (!$child_groupids) {
 		return;
 	}
 
-	// Select what tag filters particular host group already has for different user groups.
-	$db_host_group_tag_filters = DB::select('tag_filter', [
-		'output' => ['usrgrpid', 'tag', 'value'],
-		'filter' => ['groupid' => $groupid]
-	]);
-
-	$tag_filters = [];
-
-	foreach ($db_host_group_tag_filters as $db_host_group_tag_filter) {
-		$tag_filters[$db_host_group_tag_filter['usrgrpid']][] = [
-			'tag' => $db_host_group_tag_filter['tag'],
-			'value' => $db_host_group_tag_filter['value']
-		];
-	}
-
-	/**
-	 * Since tag filters with subgroups can already be added, but not always filter for the main group will be created,
-	 * it is necessary also select user groups in which tag filters are created with each of subgroups. Tag filters for
-	 * these subgroups will be deleted if in particular user group, the main hostgroup related tag filter is not
-	 * created.
-	 */
-	$db_subgroup_usrgrps = DB::select('tag_filter', [
-		'output' => ['usrgrpid'],
-		'filter' => ['groupid' => array_keys($child_groupids)]
-	]);
-	$db_subgroup_usrgrps = array_flip(zbx_objectValues($db_subgroup_usrgrps, 'usrgrpid'));
-
-	// Select affected user groups.
 	$usrgrps = API::UserGroup()->get([
 		'output' => ['usrgrpid'],
-		'usrgrpids' => array_keys($tag_filters + $db_subgroup_usrgrps),
 		'selectTagFilters' => ['groupid', 'tag', 'value']
 	]);
 
+	$upd_usrgrps = [];
+
 	foreach ($usrgrps as $usrgrp) {
-		/**
-		 * Create an array of new tag filters for each user group. It contains all subgroups of particular host group,
-		 * as well as other tag filters which are not linked to subgroups of particular host group.
-		 */
-		$new_tag_filters = [];
+		$tag_filters = zbx_toHash($usrgrp['tag_filters'], 'groupid');
 
-		if (array_key_exists($usrgrp['usrgrpid'], $tag_filters)) {
-			foreach ($child_groupids as $child_groupid => $val) {
-				foreach ($tag_filters[$usrgrp['usrgrpid']] as $tag_filter) {
-					$new_tag_filters[] = [
-						'groupid' => $child_groupid,
-						'value' => $tag_filter['value'],
-						'tag' => $tag_filter['tag']
-					];
-				}
+		if (array_key_exists($groupid, $tag_filters)) {
+			foreach ($child_groupids as $child_groupid) {
+				$tag_filters[$child_groupid] = [
+					'groupid' => $child_groupid,
+					'tag' => $tag_filters[$groupid]['tag'],
+					'value' => $tag_filters[$groupid]['value']
+				];
+			}
+		}
+		else {
+			foreach ($child_groupids as $child_groupid) {
+				unset($tag_filters[$child_groupid]);
 			}
 		}
 
-		foreach ($usrgrp['tag_filters'] as $tag_filter) {
-			if (!array_key_exists($tag_filter['groupid'], $child_groupids)) {
-				$new_tag_filters[] = $tag_filter;
-			}
-		}
-
-		// Update User Group.
-		API::UserGroup()->update([
+		$upd_usrgrps[] = [
 			'usrgrpid' => $usrgrp['usrgrpid'],
-			'tag_filters' => $new_tag_filters
-		]);
+			'tag_filters' => $tag_filters
+		];
 	}
+
+	API::UserGroup()->update($upd_usrgrps);
 }
 
 /**
