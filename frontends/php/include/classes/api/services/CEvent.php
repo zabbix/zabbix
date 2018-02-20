@@ -128,22 +128,31 @@ class CEvent extends CApiService {
 			$recovery = in_array(TRIGGER_VALUE_FALSE, $options['value'])
 				? $this->getEvents(['value' => [TRIGGER_VALUE_FALSE]] + $options)
 				: [];
-			if ($options['countOutput'] && $options['groupCount']) {
-				$problems = zbx_toHash($problems, 'objectid');
-				$recovery = zbx_toHash($recovery, 'objectid');
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
+					$problems = zbx_toHash($problems, 'objectid');
+					$recovery = zbx_toHash($recovery, 'objectid');
 
-				foreach ($problems as $objectid => &$problem) {
-					if (array_key_exists($objectid, $recovery)) {
-						$problem['rowscount'] += $recovery['rowscount'];
-						unset($recovery[$objectid]);
+					foreach ($problems as $objectid => &$problem) {
+						if (array_key_exists($objectid, $recovery)) {
+							$problem['rowscount'] += $recovery['rowscount'];
+							unset($recovery[$objectid]);
+						}
 					}
-				}
-				unset($problem);
+					unset($problem);
 
-				$result = array_values($problems + $recovery);
+					$result = array_values($problems + $recovery);
+				}
+				else {
+					$result = $problems + $recovery;
+				}
 			}
 			else {
-				$result = $problems + $recovery;
+				$result = self::sortResult($problems + $recovery, $options['sortfield'], $options['sortorder']);
+
+				if ($options['limit'] !== null) {
+					$result = array_slice($result, 0, $options['limit'], true);
+				}
 			}
 		}
 		else {
@@ -1093,5 +1102,40 @@ class CEvent extends CApiService {
 			: $tag_conditions[0];
 
 		return $sqlParts;
+	}
+
+	/**
+	 * Returns sorted array of events.
+	 *
+	 * @param array        $events
+	 * @param string|array $sortfield
+	 * @param string|array $sortorder
+	 *
+	 * @return array
+	 */
+	private static function sortResult(array $result, $sortfield, $sortorder) {
+		if ($sortfield === '' || $sortfield === []) {
+			return $result;
+		}
+
+		$fields = [];
+
+		foreach ((array) $sortfield as $i => $field) {
+			if (is_string($sortorder) && $sortorder === ZBX_SORT_DOWN) {
+				$order = ZBX_SORT_DOWN;
+			}
+			elseif (is_array($sortorder) && array_key_exists($i, $sortorder) && $sortorder[$i] === ZBX_SORT_DOWN) {
+				$order = ZBX_SORT_DOWN;
+			}
+			else {
+				$order = ZBX_SORT_UP;
+			}
+
+			$fields[] = ['field' => $field, 'order' => $order];
+		}
+
+		CArrayHelper::sort($result, $fields);
+
+		return $result;
 	}
 }
