@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+........S. [ZBX-13430] fixed use of uninitialized value ttl when elasticsearch is configured (MVekslers)
 ........S. [ZBX-13452] fixed Elasticsearch history storage default value types (viktors)
 A......... [ZBX-13248] field trapper_hosts changed to optional for trapper item.create (ashubin)
 ..F....... [ZBX-13307] fixed map scaling and position to the widget left side (ashubin)
