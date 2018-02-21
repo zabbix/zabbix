@@ -1111,13 +1111,6 @@ if test "x$ipv6" = "xyes"; then
 	have_ipv6="yes"
 fi
 
-dnl Checking pakage manager support for *BSD
-AC_CHECK_PROG(is_pkg_cfg,pkg-config,yes)
-AS_CASE([$ARCH],[*bsd],
-    AS_IF([test "xyes" != "x$is_pkg_cfg"],[
-	AC_MSG_ERROR([pkg-config not found])
-]))
-
 if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	have_multirow_insert="no"
@@ -1586,45 +1579,6 @@ case "x$ARCH" in
 		;;
 esac
 
-dnl Check svn revision
-VER_H=include/version.h
-REV_CLASS=src/zabbix_java/src/com/zabbix/gateway/Revision.java
-ZBX_REV="no"
-ZBX_REV_VAL="{ZABBIX_REVISION}"
-AC_CHECK_PROG(svn_ver,svnversion,yes)
-
-AS_IF([test "xyes" = "x$svn_ver"],[
-	ZBX_REV_VAL="$(svn info .|sed -n -e '/Last Changed Rev:/s/.*: \([[0-9]]*\)/\1/p')/$(svnversion -n .)"
-	AS_IF([test "linux" = "${ARCH}"],[
-		ZBX_REV='$(shell svn info $(top_srcdir)|sed -n -e "/Last Changed Rev:/s/.*: \([[0-9]]*\)/\1/p")/$(shell svnversion -n $(top_srcdir))'
-	],[
-		ZBX_REV='$$(svn info $(top_srcdir)|sed -n -e "/Last Changed Rev:/s/.*: \([[0-9]]*\)/\1/p")/$$(svnversion -n $(top_srcdir))'
-	])
-])
-
-AS_IF([test "$(grep -q "{ZABBIX_REVISION}" $VER_H || echo 0)" = "0"],[
-	ZBX_REV=$(sed -n -e '/^[[#\t ]]*define[[\t ]]*ZABBIX_VERSION_REVISION/s/[[#\t a-zA-Z_]]*REVISION[[\t ]]*\([[0-9A-Z/:]]*\)/\1/p' $VER_H)
-	ZBX_REV_VAL=$ZBX_REV
-])
-
-AS_IF([test "xyes" = "x$java"],[
-	echo "/*" > $REV_CLASS
-	grep "\*\*" $(ls src/zabbix_java/src/com/zabbix/gateway/*.java|sort -n|head -1) >> $REV_CLASS
-	printf "\npackage com.zabbix.gateway;\n\npublic interface Revision {\n\tstatic final String ZABBIX_VERSION_REVISION = \"$ZBX_REV_VAL\";\n}" >> $REV_CLASS	
-])
-
-AS_IF([test "xno" != "x$ZBX_REV"],[
-	AC_SUBST(ZBX_REV)
-	AM_CPPFLAGS="${AM_CPPFLAGS} -D'ZABBIX_VERSION_REVISION='\"${ZBX_REV}\"''"
-	AC_SUBST(AM_CPPFLAGS)
-],[
-	AC_SUBST(ZBX_REV,$ZBX_REV_VAL)
-])
-
-dnl Support libs from pakages for netbsd
-AS_IF([test "netbsd" = "$ARCH"],[
-	AS_IF([test -d /usr/pkg/lib], [LDFLAGS="${LDFLAGS} -R/usr/pkg/lib"])
-])
 
 dnl *****************************************************************
 dnl *                                                               *

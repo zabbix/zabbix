@@ -278,7 +278,6 @@ src/zabbix_java/Makefile
 src/zabbix_java/Makefile.in
 src/zabbix_java/bin/zabbix-java-gateway-*.jar
 src/zabbix_java/class
-src/zabbix_java/src/com/zabbix/gateway/Revision.java
 src/zabbix_proxy/.deps
 src/zabbix_proxy/Makefile
 src/zabbix_proxy/Makefile.in
