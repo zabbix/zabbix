@@ -1642,6 +1642,10 @@ case "x$ARCH" in
 		;;
 esac
 
+dnl Support libs from pakages for netbsd
+AS_IF([test "netbsd" = "$ARCH"],[
+	AS_IF([test -d /usr/pkg/lib], [LDFLAGS="${LDFLAGS} -R/usr/pkg/lib"])
+])
 
 dnl *****************************************************************
 dnl *                                                               *
