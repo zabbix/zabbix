@@ -934,8 +934,12 @@ static int	DBget_trigger_value(const char *expression, char **replace_to, int N_
  * Purpose: retrieve number of events (acknowledged or unacknowledged) for a  *
  *          trigger (in an OK or PROBLEM state) which generated an event      *
  *                                                                            *
- * Parameters: triggerid - trigger identifier from database                   *
- *             replace_to - pointer to result buffer                          *
+ * Parameters: triggerid    - [IN] trigger identifier from database           *
+ *             replace_to   - [IN/OUT] pointer to result buffer               *
+ *             problem_only - [IN] selected trigger status:                   *
+ *                             0 - TRIGGER_VALUE_PROBLEM and TRIGGER_VALUE_OK *
+ *                             1 - TRIGGER_VALUE_PROBLEM                      *
+ *             acknowledged - [IN] acknowledged event or not                  *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *

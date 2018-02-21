@@ -152,12 +152,11 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	}
 
 	$description = (new CCol([
-		(new CSpan($problem['name']))
+		(new CLinkAction($problem['name']))
 			->setHint(
 				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
 				true
 			)
-			->addClass(ZBX_STYLE_LINK_ACTION)
 	]));
 
 	$description_style = getSeverityStyle($trigger['priority']);
