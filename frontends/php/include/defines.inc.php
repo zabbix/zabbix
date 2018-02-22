@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha3');
+define('ZABBIX_VERSION',		'4.0.0alpha4');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
 define('ZABBIX_DB_VERSION',		3050036);
@@ -1274,6 +1274,11 @@ define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 // availability report modes
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
+
+// monitoring modes
+define('ZBX_MONITORED_BY_ANY', 0);
+define('ZBX_MONITORED_BY_SERVER', 1);
+define('ZBX_MONITORED_BY_PROXY', 2);
 
 // queue modes
 define('QUEUE_OVERVIEW', 0);

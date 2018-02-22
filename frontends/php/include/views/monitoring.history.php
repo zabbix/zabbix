@@ -138,7 +138,7 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 					'multiselect' => '1',
 					'real_hosts' => '1',
 					'value_types' => [$data['value_type']]
-				]).');'
+				]).', null, this);'
 			);
 		$deleteItemButton = null;
 

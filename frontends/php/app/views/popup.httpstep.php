@@ -35,7 +35,8 @@ $http_popup_form = (new CForm())
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
-	->addVar('action', 'popup.httpstep');
+	->addVar('action', 'popup.httpstep')
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $http_popup_form_list = (new CFormList())
 	->addRow(
@@ -156,13 +157,14 @@ $output['buttons'] = [
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
 		'class' => '',
 		'keepOpen' => true,
+		'isSubmit' => true,
 		'action' => 'return validateHttpStep("'.$http_popup_form->getId().'", '.
 						'jQuery(window.document.forms["'.$http_popup_form->getId().'"])' .
 							'.closest("[data-dialogueid]").attr("data-dialogueid"));'
 	]
 ];
 
-$http_popup_form->addItem((new CDiv($http_popup_form_list))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
+$http_popup_form->addItem($http_popup_form_list);
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();

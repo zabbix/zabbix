@@ -719,7 +719,7 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  */
 function createDateSelector($name, $date, $relatedCalendar = null) {
 	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
-		'_calendar"].clndr.clndrshow(pos.top, pos.left);';
+		'_calendar"].clndr.clndrshow(pos.top, pos.left, this);';
 	if ($relatedCalendar) {
 		$onClick .= ' CLNDR["'.$relatedCalendar.'_calendar"].clndr.clndrhide();';
 	}

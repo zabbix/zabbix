@@ -28,7 +28,8 @@ $expression_form = (new CForm())
 	->addVar('dstfld1', $data['dstfld1'])
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
-	->addVar('itemid', $data['itemid']);
+	->addVar('itemid', $data['itemid'])
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 if ($data['parent_discoveryid'] !== '') {
 	$expression_form->addVar('parent_discoveryid', $data['parent_discoveryid']);
@@ -45,6 +46,7 @@ $popup_options = [
 	'dstfrm' => $expression_form->getName(),
 	'dstfld1' => 'itemid',
 	'dstfld2' => 'description',
+	'with_webitems' => '1',
 	'writeonly' => '1'
 ];
 if ($data['groupid'] && $data['hostid']) {
@@ -62,7 +64,7 @@ $item = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).');')
+		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).', null, this);')
 ];
 
 if ($data['parent_discoveryid'] !== '') {
@@ -78,7 +80,7 @@ if ($data['parent_discoveryid'] !== '') {
 				'dstfld1' => 'itemid',
 				'dstfld2' => 'description',
 				'parent_discoveryid' => $data['parent_discoveryid']
-			]).');'
+			]).', null, this);'
 		)
 		->removeId();
 }
@@ -151,7 +153,7 @@ $expression_form_list->addRow(
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
-$expression_form->addItem((new CDiv($expression_form_list))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
+$expression_form->addItem($expression_form_list);
 
 $output = [
 	'header' => $data['title'],
@@ -161,6 +163,7 @@ $output = [
 			'title' => _('Insert'),
 			'class' => '',
 			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return validate_trigger_expression("expression", '.
 					'jQuery(window.document.forms["expression"]).closest("[data-dialogueid]").attr("data-dialogueid"));'
 		]

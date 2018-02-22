@@ -270,7 +270,7 @@ switch ($data['new_condition']['conditiontype']) {
 						'dstfrm' => $actionForm->getName(),
 						'dstfld1' => 'new_condition_value',
 						'dstfld2' => 'drule'
-					]).');'
+					]).', null, this);'
 				)
 		];
 		break;
@@ -291,29 +291,27 @@ switch ($data['new_condition']['conditiontype']) {
 						'dstfld1' => 'new_condition_value',
 						'dstfld2' => 'dcheck',
 						'writeonly' => '1'
-					]).');'
+					]).', null, this);'
 				)
 		];
 		break;
 
 	case CONDITION_TYPE_PROXY:
-		$action_tab->addItem(new CVar('new_condition[value]', '0'));
-		$condition = [
-			(new CTextBox('proxy', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('btn1', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
-						'srctbl' => 'proxies',
-						'srcfld1' => 'hostid',
-						'srcfld2' => 'host',
-						'dstfrm' => $actionForm->getName(),
-						'dstfld1' => 'new_condition_value',
-						'dstfld2' => 'proxy'
-					]).');'
-				)
-		];
+		$condition = (new CMultiSelect([
+			'name' => 'new_condition[value]',
+			'objectName' => 'proxies',
+			'selectedLimit' => 1,
+			'defaultValue' => 0,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'proxies',
+					'srcfld1' => 'proxyid',
+					'srcfld2' => 'host',
+					'dstfrm' => $actionForm->getName(),
+					'dstfld1' => 'new_condition_value'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DHOST_IP:
@@ -700,7 +698,7 @@ if (!empty($data['new_operation'])) {
 						'dstfrm' => $actionForm->getName(),
 						'dstfld1' => 'opmsgUsrgrpListFooter',
 						'multiselect' => '1'
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$usrgrpList->addRow(
@@ -722,7 +720,7 @@ if (!empty($data['new_operation'])) {
 						'dstfrm' => $actionForm->getName(),
 						'dstfld1' => 'opmsgUserListFooter',
 						'multiselect' => '1'
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$userList->addRow(
@@ -1453,7 +1451,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'recOpmsgUsrgrpListFooter',
 							'multiselect' => '1'
-						]).');'
+						]).', null, this);'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$usrgrpList->addRow(
@@ -1475,7 +1473,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'recOpmsgUserListFooter',
 							'multiselect' => '1'
-						]).');'
+						]).', null, this);'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$userList->addRow(
@@ -2000,7 +1998,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 										'dstfrm' => $actionForm->getName(),
 										'dstfld1' => 'ackOpmsgUsrgrpListFooter',
 										'multiselect' => '1'
-									]).');'
+									]).', null, this);'
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(2)
@@ -2022,7 +2020,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 										'dstfrm' => $actionForm->getName(),
 										'dstfld1' => 'ackOpmsgUserListFooter',
 										'multiselect' => '1'
-									]).');'
+									]).', null, this);'
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(2)

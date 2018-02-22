@@ -442,7 +442,7 @@ static void	zbx_set_defaults(void)
 		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
 
 	if (NULL == CONFIG_HISTORY_STORAGE_OPTS)
-		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "unum,float,char,log,text");
+		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "uint,dbl,str,log,text");
 #endif
 
 #ifdef HAVE_SQLITE3

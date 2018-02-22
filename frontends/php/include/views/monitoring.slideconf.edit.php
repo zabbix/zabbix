@@ -170,7 +170,7 @@ $addButtonColumn = (new CCol(
 					'srcfld1' => 'screenid',
 					'dstfrm' => $form->getName(),
 					'multiselect' => '1'
-				]).');'
+				]).', null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	))->setColSpan(5);
@@ -201,7 +201,7 @@ $add_user_group_btn = ([(new CButton(null, _('Add')))
 			'srcfld2' => 'name',
 			'dstfrm' => $form->getName(),
 			'multiselect' => '1'
-		]).');'
+		]).', null, this);'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -239,7 +239,7 @@ $add_user_btn = ([(new CButton(null, _('Add')))
 			'srcfld2' => 'fullname',
 			'dstfrm' => $form->getName(),
 			'multiselect' => '1'
-		]).');'
+		]).', null, this);'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 

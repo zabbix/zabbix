@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -17,17 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
 
-class GeneralInformation
-{
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "5 February 2018";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "4.0.0alpha4";
+class CLinkAction extends CLink {
 
-	static void printVersion()
-	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
+	public function __construct($items = null) {
+		parent::__construct($items);
+
+		$this->addClass(ZBX_STYLE_LINK_ACTION);
 	}
 }

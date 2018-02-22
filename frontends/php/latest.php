@@ -375,7 +375,7 @@ $filterColumn1 = (new CFormList())
 					'dstfld1' => 'application',
 					'real_hosts' => '1',
 					'with_applications' => '1'
-				]).');'
+				]).', null, this);'
 			)
 	]);
 
@@ -631,8 +631,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$hostName = (new CSpan($host['name']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
+	$hostName = (new CLinkAction($host['name']))
 		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
@@ -777,8 +776,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$hostName = (new CSpan($host['name']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
+	$hostName = (new CLinkAction($host['name']))
 		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);

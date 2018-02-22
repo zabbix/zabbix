@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.host.list.js.php';
+
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setControls((new CForm('get'))
@@ -36,20 +38,57 @@ $widget = (new CWidget())
 
 // filter
 $filter = (new CFilter('web.hosts.filter.state'))
-	->addColumn((new CFormList())->addRow(_('Name'),
-		(new CTextBox('filter_host', $data['filter']['host']))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
-	))
-	->addColumn((new CFormList())->addRow(_('DNS'),
-		(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	))
-	->addColumn((new CFormList())->addRow(_('IP'),
-		(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	))
-	->addColumn((new CFormList())->addRow(_('Port'),
-		(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	));
+	->addColumn(
+		(new CFormList())
+			->addRow(
+				_('Name'),
+				(new CTextBox('filter_host', $data['filter']['host']))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+			->addRow(
+				_('Monitored by'),
+				(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))
+					->addValue(_('Any'), ZBX_MONITORED_BY_ANY)
+					->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
+					->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
+					->setModern(true)
+			)
+			->addRow(
+				_('Proxy'),
+				(new CMultiSelect([
+					'name' => 'filter_proxyids[]',
+					'objectName' => 'proxies',
+					'data' => $data['proxies_ms'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'proxies',
+							'srcfld1' => 'proxyid',
+							'srcfld2' => 'host',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_proxyids_',
+							'multiselect' => '1'
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'filter_proxyids_row'
+			)
+	)
+	->addColumn(
+		(new CFormList())
+			->addRow(
+				_('DNS'),
+				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(
+				_('IP'),
+				(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(
+				_('Port'),
+				(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+	);
 
 $widget->addItem($filter);
 

@@ -84,8 +84,9 @@ $form = (new CForm())
 	->addVar('type', $options['type'])
 	->addVar('dstfrm', $options['dstfrm'])
 	->setId('media_form')
-	->addItem((new CDiv($media_form))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
-	->addItem(
+	->addItem([
+		$media_form,
+		(new CInput('submit', 'submit'))->addStyle('display: none;'),
 		(new CTag('script'))
 			->addItem((new CRow([
 				(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
@@ -100,7 +101,7 @@ $form = (new CForm())
 				->addClass('form_row'))
 				->setAttribute('type', 'text/x-jquery-tmpl')
 				->setAttribute('id', 'email_send_to_table_row')
-);
+	]);
 
 $output = [
 	'header' => $data['title'],
@@ -111,6 +112,7 @@ $output = [
 			'title' => ($options['media'] !== -1) ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return validateMedia("'.$form->getName().'");'
 		]
 	]

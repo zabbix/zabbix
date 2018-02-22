@@ -118,8 +118,8 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host');
-		$this->zbxTestTextPresent('Host "'.$host.'" cannot be without host group.');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+		$this->zbxTestTextPresent('Field "groups" is mandatory.');
 
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}

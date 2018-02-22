@@ -553,8 +553,7 @@ foreach ($triggers as $trigger) {
 		];
 	}
 
-	$description[] = (new CSpan(CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event))))
-		->addClass(ZBX_STYLE_LINK_ACTION)
+	$description[] = (new CLinkAction(CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event))))
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {

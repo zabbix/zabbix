@@ -95,13 +95,18 @@ $output = [
 			->setId('expression_testing_from')
 			->addItem((new CVar('expression', $data['expression']))->removeId())
 			->addItem((new CVar('test_expression', 1))->removeId())
-			->addItem((new CDiv($form_list))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
+			->addItem([
+				$form_list,
+				(new CInput('submit', 'submit'))->addStyle('display: none;')
+			])
 		]))->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),
 			'enabled' => $allowed_testing,
 			'class' => '',
+			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return reloadPopup(document.forms["expression_testing_from"], "popup.testtriggerexpr");'
 		]
 	]
