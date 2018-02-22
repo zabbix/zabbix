@@ -463,7 +463,7 @@ var hintBox = {
 
 			switch (e.type) {
 				case 'mouseenter' :
-					hintBox.showHint(e, this, jQuery('.hint-box', this).html(), target.data('hintbox-class'), false,
+					hintBox.showHint(e, this, jQuery('.hint-box', this.next('.hint-box-container')).html(), target.data('hintbox-class'), false,
 						target.data('hintbox-style')
 					);
 					break;
@@ -556,7 +556,7 @@ var hintBox = {
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = jQuery('.hint-box', target).html();
+				hintText = jQuery('.hint-box', target.next('.hint-box-container')).html();
 			}
 
 			target.isStatic = true;
