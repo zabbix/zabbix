@@ -110,13 +110,19 @@ function inheritPermissions($groupid, $name) {
 			}
 		}
 
-		$upd_usrgrps[] = [
-			'usrgrpid' => $usrgrp['usrgrpid'],
-			'rights' => $rights
-		];
+		$rights = array_values($rights);
+
+		if ($usrgrp['rights'] !== $rights) {
+			$upd_usrgrps[] = [
+				'usrgrpid' => $usrgrp['usrgrpid'],
+				'rights' => $rights
+			];
+		}
 	}
 
-	API::UserGroup()->update($upd_usrgrps);
+	if ($upd_usrgrps) {
+		API::UserGroup()->update($upd_usrgrps);
+	}
 }
 
 /**
@@ -141,15 +147,18 @@ function inheritTagFilters($groupid, $name) {
 	$upd_usrgrps = [];
 
 	foreach ($usrgrps as $usrgrp) {
-		$tag_filters = zbx_toHash($usrgrp['tag_filters'], 'groupid');
+		$tag_filters = [];
+
+		foreach ($usrgrp['tag_filters'] as $tag_filter) {
+			$tag_filters[$tag_filter['groupid']][] = [
+				'tag' => $tag_filter['tag'],
+				'value' => $tag_filter['value']
+			];
+		}
 
 		if (array_key_exists($groupid, $tag_filters)) {
 			foreach ($child_groupids as $child_groupid) {
-				$tag_filters[$child_groupid] = [
-					'groupid' => $child_groupid,
-					'tag' => $tag_filters[$groupid]['tag'],
-					'value' => $tag_filters[$groupid]['value']
-				];
+				$tag_filters[$child_groupid] = $tag_filters[$groupid];
 			}
 		}
 		else {
@@ -158,13 +167,25 @@ function inheritTagFilters($groupid, $name) {
 			}
 		}
 
-		$upd_usrgrps[] = [
-			'usrgrpid' => $usrgrp['usrgrpid'],
-			'tag_filters' => $tag_filters
-		];
+		$upd_tag_filters = [];
+
+		foreach ($tag_filters as $tag_filter_groupid => $tags) {
+			foreach ($tags as $tag) {
+				$upd_tag_filters[] = ['groupid' => (string) $tag_filter_groupid] + $tag;
+			}
+		}
+
+		if ($usrgrp['tag_filters'] !== $upd_tag_filters) {
+			$upd_usrgrps[] = [
+				'usrgrpid' => $usrgrp['usrgrpid'],
+				'tag_filters' => $upd_tag_filters
+			];
+		}
 	}
 
-	API::UserGroup()->update($upd_usrgrps);
+	if ($upd_usrgrps) {
+		API::UserGroup()->update($upd_usrgrps);
+	}
 }
 
 /**
