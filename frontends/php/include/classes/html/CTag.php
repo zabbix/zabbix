@@ -46,7 +46,7 @@ class CTag extends CObject {
 	protected $attrEncStrategy = self::ENC_ALL;
 
 	/**
-	 * Hint element for the current CTag
+	 * Hint element for the current CTag.
 	 *
 	 * @var CSpan
 	 */
