@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
+..F....... [ZBX-13118] improved readability of emails in action log by splitting them multiline (nikita)
 .......PS. [ZBX-13498] added optional MySQL upgrade patch for "problem" table to drop redundant index after another index that can be used to enforce the foreign key constraint has been created (vso)
 ........S. [ZBX-13430] fixed use of uninitialized value ttl when elasticsearch is configured (MVekslers)
 ........S. [ZBX-13452] fixed Elasticsearch history storage default value types (viktors)
