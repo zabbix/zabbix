@@ -217,30 +217,32 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu-item {
-	&:hover,
-	&:focus,
-	&:active,
-	&.highlighted {
-		background-color: black !important;
-		color: white;
+.action-menu {
+	.action-menu-item {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
+			background-color: black;
+			color: white;
 
-		.arrow-right {
-			border-left-color: white !important;
+			.arrow-right {
+				border-left-color: white;
+			}
+
+			&.selected {
+
+				&::before {
+					background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
+				}
+			}
 		}
 
 		&.selected {
 
 			&::before {
-				background: url(../img/icon-sprite.svg) no-repeat -317px -835px !important;
+				background: url(../img/icon-sprite.svg) no-repeat -164px -835px;
 			}
-		}
-	}
-
-	&.selected {
-
-		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -164px -835px !important;
 		}
 	}
 }
