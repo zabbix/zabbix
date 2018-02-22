@@ -98,7 +98,7 @@ class CTag extends CObject {
 		$res .= $this->bodyToString();
 		$res .= $this->endToString();
 
-		if (isset($this->hint)) {
+		if ($this->hint !== null) {
 			$res .= $this->hint->toString();
 		}
 
@@ -181,10 +181,8 @@ class CTag extends CObject {
 	 * @return CTag
 	 */
 	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
-		$this->hint = (new CSpan(
-			(new CSpan($text))->addClass('hint-box')
-		))
-			->addClass('hint-box-container')
+		$this->hint = (new CSpan($text))
+			->addClass('hint-box')
 			->setAttribute('style', 'display: none;');
 
 		$this->setAttribute('data-hintbox', '1');
