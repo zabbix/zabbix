@@ -294,8 +294,12 @@ function uniqTagFilters(array $tag_filters) {
 
 /**
  * Returns the sorted list of the unique tag filters and group names.
+ * The list will be enriched by group names. Tag filters with filled tags or values will be overwritten empty.
  *
  * @param array  $tag_filters
+ * @param string $tag_filters[]['groupid']
+ * @param string $tag_filters[]['tag']
+ * @param string $tag_filters[]['value']
  *
  * @return array
  */

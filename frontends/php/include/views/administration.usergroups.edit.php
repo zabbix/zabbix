@@ -218,7 +218,7 @@ $tag_filter_form_list->addRow(_('Permissions'),
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-$new_permissions_table = (new CTable())
+$new_tag_filter_table = (new CTable())
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'tag_filter_groupids[]',
@@ -257,7 +257,7 @@ $new_permissions_table = (new CTable())
 	]);
 
 $tag_filter_form_list->addRow(null,
-	(new CDiv($new_permissions_table))
+	(new CDiv($new_tag_filter_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
