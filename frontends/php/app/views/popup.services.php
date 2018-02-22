@@ -27,7 +27,7 @@ $services_form = (new CForm())
 	->setName('services_form');
 
 if (array_key_exists('service', $data)) {
-	$services_form->addVar('serviceid', $data['service']['serviceid']);
+	$services_form->addItem((new CVar('serviceid', $data['service']['serviceid']))->removeId());
 }
 
 // Create table.

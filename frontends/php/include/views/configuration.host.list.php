@@ -32,7 +32,11 @@ $widget = (new CWidget())
 				$data['pageFilter']->getGroupsCB()
 			])
 			->addItem(new CSubmit('form', _('Create host')))
-			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
+			->addItem(
+				(new CButton('form', _('Import')))
+					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->removeId()
+			)
 		)
 	);
 
