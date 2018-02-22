@@ -127,7 +127,7 @@ function inheritPermissions($groupid, $name) {
  * @param string $name     Host group name.
  */
 function inheritTagFilters($groupid, $name) {
-	$child_groupids = getChildGroupIds($groupid, $name);
+	$child_groupids = getChildGroupIds($name);
 
 	if (!$child_groupids) {
 		return;
