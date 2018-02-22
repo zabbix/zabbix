@@ -49,12 +49,11 @@ function isWritableHostGroups(array $groupids) {
 }
 
 /**
- * Returns list of child groups for selected group ID.
+ * Returns list of child groups for host group with given name..
  *
- * @param string $groupid  Host group ID.
  * @param string $name     Host group name.
  */
-function getChildGroupIds($groupid, $name) {
+function getChildGroupIds($name) {
 	$parent = $name.'/';
 	$len = strlen($parent);
 
@@ -81,7 +80,7 @@ function getChildGroupIds($groupid, $name) {
  * @param string $name     Host group name.
  */
 function inheritPermissions($groupid, $name) {
-	$child_groupids = getChildGroupIds($groupid, $name);
+	$child_groupids = getChildGroupIds($name);
 
 	if (!$child_groupids) {
 		return;
