@@ -1799,8 +1799,8 @@ CURL_SSL_CERT_LOCATION=`eval echo "${CURL_SSL_CERT_LOCATION}"`
 CURL_SSL_KEY_LOCATION=`eval echo "${CURL_SSL_KEY_LOCATION}"`
 CURL_SSL_KEY_LOCATION=`eval echo "${CURL_SSL_KEY_LOCATION}"`
 
-LOAD_MODULE_PATH=`eval echo "${MODULES_DIR}"`
-LOAD_MODULE_PATH=`eval echo "${MODULES_DIR}"`
+LOAD_MODULE_PATH=`eval echo "${LOAD_MODULE_PATH}"`
+LOAD_MODULE_PATH=`eval echo "${LOAD_MODULE_PATH}"`
 
 echo "
 
@@ -1865,8 +1865,8 @@ echo "  Server details:
     WEB Monitoring:        ${have_web_monitoring}"
 
 if test "x$have_web_monitoring" = "xcURL"; then
-echo "      SSL certificates:    ${CURL_SSL_CERT_LOCATION}
-      SSL keys:            ${CURL_SSL_KEY_LOCATION}"
+echo "      SSL certificates:      ${CURL_SSL_CERT_LOCATION}
+      SSL keys:              ${CURL_SSL_KEY_LOCATION}"
 fi
 
 echo "    Native Jabber:         ${have_jabber}
@@ -1894,8 +1894,8 @@ echo "  Proxy details:
     WEB Monitoring:        ${have_web_monitoring}"
 
 if test "x$have_web_monitoring" = "xcURL"; then
-echo "      SSL certificates:    ${CURL_SSL_CERT_LOCATION}
-      SSL keys:            ${CURL_SSL_KEY_LOCATION}"
+echo "      SSL certificates:      ${CURL_SSL_CERT_LOCATION}
+      SSL keys:              ${CURL_SSL_KEY_LOCATION}"
 fi
 
 echo "    SNMP:                  ${have_snmp}
@@ -1906,7 +1906,7 @@ echo "    SNMP:                  ${have_snmp}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}
     Config file:           ${PROXY_CONFIG_FILE}
-    Alert scripts:         ${ALERT_SCRIPTS_PATH}
+    External scripts:      ${EXTERNAL_SCRIPTS_PATH}
     Modules:               ${LOAD_MODULE_PATH}"
 
 fi
