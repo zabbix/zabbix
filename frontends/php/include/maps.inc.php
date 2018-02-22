@@ -417,6 +417,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		'info' => [],
 		'iconid' => $selement['iconid_off']
 	];
+	$config = select_config();
 
 	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
 			|| in_array($showUnack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))) {
@@ -444,7 +445,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 
 		$info['info']['unack'] = [
 			'msg' => $msg,
-			'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
+			'color' => $i['problem_unack'] ? $config['problem_unack_color'] : $config['problem_ack_color']
 		];
 
 		if (!array_key_exists('maintenance_title', $i)) {
@@ -476,7 +477,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => '009600'
+			'color' => $i['ack'] ? $config['ok_ack_color'] : $config['ok_unack_color']
 		];
 	}
 
@@ -501,6 +502,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		'iconid' => $selement['iconid_off']
 	];
 	$hasProblem = false;
+	$config = select_config();
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
@@ -528,14 +530,14 @@ function getHostsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
+				'color' => $i['problem_unack'] ? $config['problem_unack_color'] : $config['problem_ack_color']
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => '960000'
+				'color' => $config['problem_unack_color']
 			];
 		}
 
@@ -568,7 +570,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => '009600'
+			'color' => $i['ack'] ? $config['ok_ack_color'] : $config['ok_unack_color']
 		];
 	}
 
@@ -594,6 +596,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 	];
 	$hasProblem = false;
 	$hasStatus = false;
+	$config = select_config();
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
@@ -621,14 +624,14 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
+				'color' => $i['problem_unack'] ? $config['problem_unack_color'] : $config['problem_ack_color']
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => '960000'
+				'color' => $config['problem_unack_color']
 			];
 		}
 
@@ -668,7 +671,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => '009600'
+			'color' => $i['ack'] ? $config['ok_ack_color'] : $config['ok_unack_color']
 		];
 	}
 
@@ -695,6 +698,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 
 	$hasProblem = false;
 	$hasStatus = false;
+	$config = select_config();
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
@@ -722,14 +726,14 @@ function getMapsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
+				'color' => $i['problem_unack'] ? $config['problem_unack_color'] : $config['problem_ack_color']
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => '960000'
+				'color' => $config['problem_unack_color']
 			];
 		}
 
@@ -768,7 +772,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => '009600'
+			'color' => $i['ack'] ? $config['ok_ack_color'] : $config['ok_unack_color']
 		];
 	}
 
