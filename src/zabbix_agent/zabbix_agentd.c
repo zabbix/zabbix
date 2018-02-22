@@ -103,14 +103,6 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 const char	*progname = NULL;
 
-/* default config file location */
-#ifdef _WINDOWS
-#	define DEFAULT_CONFIG_FILE	"C:\\zabbix_agentd.conf"
-#else
-#	define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_agentd.conf"
-#	define DEFAULT_LOAD_MODULE_PATH	LIBDIR "/modules"
-#endif
-
 /* application TITLE */
 const char	title_message[] = "zabbix_agentd"
 #if defined(_WIN64)

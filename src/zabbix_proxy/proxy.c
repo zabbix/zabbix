@@ -62,12 +62,6 @@
 #include "../zabbix_server/ipmi/ipmi_poller.h"
 #endif
 
-#define DEFAULT_CONFIG_FILE		SYSCONFDIR "/zabbix_proxy.conf"
-#define DEFAULT_EXTERNAL_SCRIPTS_PATH	DATADIR "/zabbix/externalscripts"
-#define DEFAULT_SSL_CERT_LOCATION	DATADIR "/zabbix/ssl/certs"
-#define DEFAULT_SSL_KEY_LOCATION	DATADIR "/zabbix/ssl/keys"
-#define DEFAULT_LOAD_MODULE_PATH	LIBDIR "/modules"
-
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
