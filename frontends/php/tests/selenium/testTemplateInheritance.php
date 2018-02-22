@@ -84,7 +84,6 @@ class testTemplateInheritance extends CWebTest {
 				'testInheritance',
 				'key-item-inheritance',
 				[
-					'Created: Item "testInheritance" on "Inheritance test template".',
 					'Item "key-item-inheritance" already exists on "Template inheritance test host", inherited from '.
 					'another template.'
 				]
