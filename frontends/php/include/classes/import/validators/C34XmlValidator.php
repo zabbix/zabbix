@@ -398,7 +398,36 @@ class C34XmlValidator {
 									]]
 								]]
 							]],
-							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED]
+							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
+							'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
+							'url' =>					['type' => XML_STRING | XML_REQUIRED],
+							'query_fields' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED,
+								'prefix' => 'query_field', 'rules' => [
+									'query_field' =>		['type' => XML_ARRAY, 'rules' => [
+										'name' =>				['type' => XML_STRING | XML_REQUIRED],
+										'value' =>				['type' => XML_STRING | XML_REQUIRED]
+									]]
+							]],
+							'posts' =>					['type' => XML_STRING | XML_REQUIRED],
+							'status_codes' =>			['type' => XML_STRING | XML_REQUIRED],
+							'follow_redirects' =>		['type' => XML_STRING | XML_REQUIRED],
+							'post_type' =>				['type' => XML_STRING | XML_REQUIRED],
+							'http_proxy' =>				['type' => XML_STRING | XML_REQUIRED],
+							'headers' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED,
+								'prefix' => 'header', 'rules' => [
+									'header' =>				['type' => XML_ARRAY, 'rules' => [
+										'name' =>				['type' => XML_STRING | XML_REQUIRED],
+										'value' =>				['type' => XML_STRING | XML_REQUIRED]
+									]]
+							]],
+							'retrieve_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+							'request_method' =>			['type' => XML_STRING | XML_REQUIRED],
+							'output_format' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_cert_file' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
+							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
@@ -860,7 +889,36 @@ class C34XmlValidator {
 									]]
 								]]
 							]],
-							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED]
+							'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
+							'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
+							'url' =>					['type' => XML_STRING | XML_REQUIRED],
+							'query_fields' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED,
+								'prefix' => 'query_field', 'rules' => [
+									'query_field' =>		['type' => XML_ARRAY, 'rules' => [
+										'name' =>				['type' => XML_STRING | XML_REQUIRED],
+										'value' =>				['type' => XML_STRING | XML_REQUIRED]
+									]]
+							]],
+							'posts' =>					['type' => XML_STRING | XML_REQUIRED],
+							'status_codes' =>			['type' => XML_STRING | XML_REQUIRED],
+							'follow_redirects' =>		['type' => XML_STRING | XML_REQUIRED],
+							'post_type' =>				['type' => XML_STRING | XML_REQUIRED],
+							'http_proxy' =>				['type' => XML_STRING | XML_REQUIRED],
+							'headers' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED,
+								'prefix' => 'header', 'rules' => [
+									'header' =>				['type' => XML_ARRAY, 'rules' => [
+										'name' =>				['type' => XML_STRING | XML_REQUIRED],
+										'value' =>				['type' => XML_STRING | XML_REQUIRED]
+									]]
+							]],
+							'retrieve_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+							'request_method' =>			['type' => XML_STRING | XML_REQUIRED],
+							'output_format' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_cert_file' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
+							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [

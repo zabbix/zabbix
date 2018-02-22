@@ -57,7 +57,8 @@ $fields = [
 	'type' =>				[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-			ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX]), 'isset({add}) || isset({update})'],
+			ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_HTTPCHECK
+			]), 'isset({add}) || isset({update})'],
 	'authtype' =>			[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH],
 	'username' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -106,6 +107,62 @@ $fields = [
 	'jmx_endpoint' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
+	'timeout' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'url' =>            		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_HTTPCHECK, _('URL')],
+	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'follow_redirects' =>		[T_ZBX_INT, O_OPT, null,
+									IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
+									null
+								],
+	'post_type' =>				[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
+									null
+								],
+	'http_proxy' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'headers' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'retrieve_mode' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
+										HTTPTEST_STEP_RETRIEVE_MODE_BOTH
+									]),
+									null
+								],
+	'request_method' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT,
+										HTTPCHECK_REQUEST_HEAD
+									]),
+									null
+								],
+	'output_format' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_cert_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'verify_peer' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
+									null
+								],
+	'verify_host' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+									null
+								],
+	'http_authtype' =>			[T_ZBX_INT, O_OPT, null,
+									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
+									null
+								],
+	'http_username' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+									'(isset({add}) || isset({update})) && isset({http_authtype})'.
+										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
+											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+									_('Username')
+								],
+	'http_password' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+									'(isset({add}) || isset({update})) && isset({http_authtype})'.
+										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
+											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+									_('Password')
+								],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),
@@ -255,6 +312,64 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ipmi_sensor' => getRequest('ipmi_sensor'),
 			'lifetime' => getRequest('lifetime')
 		];
+
+		if ($newItem['type'] == ITEM_TYPE_HTTPCHECK) {
+			$newItem += [
+				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+				'url' => getRequest('url'),
+				'query_fields' => getRequest('query_fields', []),
+				'posts' => getRequest('posts'),
+				'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+				'follow_redirects' => (int) getRequest('follow_redirects'),
+				'post_type' => (int) getRequest('post_type'),
+				'http_proxy' => getRequest('http_proxy'),
+				'headers' => getRequest('headers', []),
+				'retrieve_mode' => (int) getRequest('retrieve_mode'),
+				'request_method' => (int) getRequest('request_method'),
+				'output_format' => (int) getRequest('output_format'),
+				'ssl_cert_file' => getRequest('ssl_cert_file'),
+				'ssl_key_file' => getRequest('ssl_key_file'),
+				'ssl_key_password' => getRequest('ssl_key_password'),
+				'verify_peer' => (int) getRequest('verify_peer'),
+				'verify_host' => (int) getRequest('verify_host'),
+			];
+
+			$newItem['authtype'] = getRequest('http_authtype', HTTPTEST_AUTH_NONE);
+			$newItem['username'] = getRequest('http_username', '');
+			$newItem['password'] = getRequest('http_password', '');
+
+			$query_fields = [];
+			if (is_array($newItem['query_fields']) && array_key_exists('key', $newItem['query_fields'])
+					&& array_key_exists('value', $newItem['query_fields'])) {
+				foreach ($newItem['query_fields']['key'] as $index => $key) {
+					if (array_key_exists($index, $newItem['query_fields']['value'])) {
+						$query_fields[] = [$key => $newItem['query_fields']['value'][$index]];
+					}
+				}
+
+				// Ignore single row if it is empty.
+				if (count($query_fields) == 1 && $key === '' && $newItem['query_fields']['value'][$index] === '') {
+					$query_fields = [];
+				}
+			}
+			$newItem['query_fields'] = $query_fields;
+
+			$headers = [];
+			if (is_array($newItem['headers']) && array_key_exists('key', $newItem['headers'])
+					&& array_key_exists('value', $newItem['headers'])) {
+				foreach ($newItem['headers']['key'] as $index => $key) {
+					if (array_key_exists($index, $newItem['headers']['value'])) {
+						$headers[$key] = $newItem['headers']['value'][$index];
+					}
+				}
+
+				// Ignore single row if it is empty.
+				if (count($headers) == 1 && $key === '' && $newItem['headers']['value'][$index] === '') {
+					$headers = [];
+				}
+			}
+			$newItem['headers'] = $headers;
+		}
 
 		if ($newItem['type'] == ITEM_TYPE_JMX) {
 			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');

@@ -266,6 +266,18 @@ class CDiscoveryRule extends CItemGeneral {
 			unset($rule);
 		}
 
+		// Decode ITEM_TYPE_HTTPCHECK encoded fields.
+		foreach ($result as &$item) {
+			if (array_key_exists('query_fields', $item)) {
+				$item['query_fields'] = ($item['query_fields'] !== '')
+					? json_decode($item['query_fields'], true)
+					: [];
+			}
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = $this->headersStringToArray($item['headers']);
+			}
+		}
+
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
@@ -283,6 +295,25 @@ class CDiscoveryRule extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
+
+		foreach ($items as &$item) {
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				if (array_key_exists('query_fields', $item)) {
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
+				}
+				if (array_key_exists('headers', $item)) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+		}
+		unset($item);
+
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -299,17 +330,44 @@ class CDiscoveryRule extends CItemGeneral {
 	public function update($items) {
 		$items = zbx_toArray($items);
 
-		$dbItems = $this->get([
-			'output' => ['itemid', 'name'],
+		$db_items = $this->get([
+			'output' => ['itemid', 'name', 'type'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
 		]);
 
-		$this->checkInput($items, true, $dbItems);
+		$this->checkInput($items, true, $db_items);
+
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+
+		$defaults = DB::getDefaults('items');
+		$clean = [
+			ITEM_TYPE_HTTPCHECK => [
+				'url' => '',
+				'query_fields' => '',
+				'timeout' => $defaults['timeout'],
+				'status_codes' => $defaults['status_codes'],
+				'follow_redirects' => $defaults['follow_redirects'],
+				'request_method' => $defaults['request_method'],
+				'post_type' => $defaults['post_type'],
+				'http_proxy' => '',
+				'headers' => '',
+				'retrieve_mode' => $defaults['retrieve_mode'],
+				'output_format' => $defaults['output_format'],
+				'ssl_key_password' => '',
+				'verify_peer' => $defaults['verify_peer'],
+				'verify_host' => $defaults['verify_host'],
+				'ssl_cert_file' => '',
+				'ssl_key_file' => '',
+				'posts' => ''
+			]
+		];
 
 		// set the default values required for updating
 		foreach ($items as &$item) {
+			$type_change = (array_key_exists('type', $item) && $item['type'] != $db_items[$item['itemid']]['type']);
+
 			if (isset($item['filter'])) {
 				foreach ($item['filter']['conditions'] as &$condition) {
 					$condition += [
@@ -317,6 +375,35 @@ class CDiscoveryRule extends CItemGeneral {
 					];
 				}
 				unset($condition);
+			}
+
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK) {
+				$item = array_merge($item, $clean[ITEM_TYPE_HTTPCHECK]);
+
+				if ($item['type'] != ITEM_TYPE_SSH) {
+					$item['authtype'] = $defaults['authtype'];
+					$item['username'] = '';
+					$item['password'] = '';
+				}
+			}
+
+			if ($db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK) {
+				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
+				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
+						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
+					$item['username'] = '';
+					$item['password'] = '';
+				}
+
+				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
+				}
+
+				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
 			}
 		}
 		unset($item);
@@ -531,6 +618,25 @@ class CDiscoveryRule extends CItemGeneral {
 			'output' => $selectFields,
 			'selectFilter' => ['formula', 'evaltype', 'conditions']
 		]);
+
+		foreach ($items as &$item) {
+			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
+					$item['query_fields'] = $item['query_fields']
+						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+						: '';
+				}
+
+				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+		}
+		unset($item);
 
 		$this->inherit($items, $data['hostids']);
 
