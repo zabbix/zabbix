@@ -262,6 +262,8 @@ if (hasRequest('form')) {
 		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
 		'userids' => hasRequest('form_refresh') ? getRequest('userids', []) : [],
 		'form_refresh' => getRequest('form_refresh', 0),
+		'new_permission' => getRequest('new_permission', PERM_NONE),
+		'subgroups' => getRequest('subgroups', 0),
 		'tag' => getRequest('tag', ''),
 		'value' => getRequest('value', ''),
 		'tag_filter_subgroups' => getRequest('tag_filter_subgroups', 0)
@@ -330,25 +332,47 @@ if (hasRequest('form')) {
 		));
 	}
 
+	$permission_groupids = getRequest('groupids', []);
+
 	if (hasRequest('add_permission')) {
-		// Add new permission with submit().
-		if (hasRequest('subgroups')) {
-			$groupids = [];
-			$groupids_subgroupids = getRequest('groupids', []);
+		if (!$permission_groupids) {
+			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
 		}
 		else {
-			$groupids = getRequest('groupids', []);
-			$groupids_subgroupids = [];
+			// Add new permission with submit().
+			if ($data['subgroups'] == 1) {
+				$groupids = [];
+				$groupids_subgroupids = $permission_groupids;
+			}
+			else {
+				$groupids = $permission_groupids;
+				$groupids_subgroupids = [];
+			}
+
+			$data['groups_rights'] = collapseHostGroupRights(
+				applyHostGroupRights($data['groups_rights'], $groupids, $groupids_subgroupids, $data['new_permission'])
+			);
+
+			$permission_groupids = [];
+			$data['new_permission'] = PERM_NONE;
+			$data['subgroups'] = 0;
 		}
-
-		$new_permission = getRequest('new_permission', PERM_NONE);
-
-		$data['groups_rights'] = collapseHostGroupRights(
-			applyHostGroupRights($data['groups_rights'], $groupids, $groupids_subgroupids, $new_permission)
-		);
 	}
 
-	$tag_filter_groupids = getRequest('tag_filter_groupids');
+	if ($permission_groupids) {
+		$host_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $permission_groupids
+		]);
+		CArrayHelper::sort($host_groups, ['name']);
+
+		$data['permission_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+	}
+	else {
+		$data['permission_groups'] = [];
+	}
+
+	$tag_filter_groupids = getRequest('tag_filter_groupids', []);
 
 	if (hasRequest('add_tag_filter')) {
 		if (!$tag_filter_groupids) {
@@ -359,7 +383,7 @@ if (hasRequest('form')) {
 		}
 		else {
 			// Add new tag filter with submit().
-			if (hasRequest('tag_filter_subgroups')) {
+			if ($data['tag_filter_subgroups'] == 1) {
 				$tag_filter_groupids = getSubGroups($tag_filter_groupids);
 			}
 
@@ -393,10 +417,10 @@ if (hasRequest('form')) {
 		]);
 		CArrayHelper::sort($host_groups, ['name']);
 
-		$data['host_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+		$data['tag_filter_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
 	}
 	else {
-		$data['host_groups'] = [];
+		$data['tag_filter_groups'] = [];
 	}
 
 	// render view

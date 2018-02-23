@@ -139,6 +139,7 @@ $new_permissions_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
+			'data' => $data['permission_groups'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -150,7 +151,7 @@ $new_permissions_table = (new CTable())
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
-			(new CRadioButtonList('new_permission', PERM_NONE))
+			(new CRadioButtonList('new_permission', (int) $data['new_permission']))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Deny'), PERM_DENY)
@@ -158,7 +159,7 @@ $new_permissions_table = (new CTable())
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top')
 	])
-	->addRow([[(new CCheckBox('subgroups')), _('Include subgroups')]])
+	->addRow([[(new CCheckBox('subgroups'))->setChecked($data['subgroups'] == 1), _('Include subgroups')]])
 	->addRow([
 		(new CSimpleButton(_('Add')))
 			->onClick('javascript: submitFormWithParam("'.$userGroupForm->getName().'", "add_permission", "1");')
@@ -223,7 +224,7 @@ $new_tag_filter_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'tag_filter_groupids[]',
 			'objectName' => 'hostGroup',
-			'data' => $data['host_groups'],
+			'data' => $data['tag_filter_groups'],
 			'styles' => ['margin-top' => '-.3em'],
 			'popup' => [
 				'parameters' => [
