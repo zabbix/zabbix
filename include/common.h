@@ -1067,6 +1067,7 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
+void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))

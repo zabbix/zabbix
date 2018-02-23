@@ -66,7 +66,7 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	zbx_http_response_t	*response;
 
 	response = (zbx_http_response_t*)userdata;
-	zbx_strncpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
+	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
