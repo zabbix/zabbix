@@ -460,7 +460,7 @@ class CUserGroup extends CApiService {
 				foreach ($usrgrp['tag_filters'] as $tag_filter) {
 					if ($tag_filter['tag'] === '' && $tag_filter['value'] !== '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Empty tag for value "%1$s".', $tag_filter['value'])
+							_s('Incorrect value for field "%1$s": %2$s.', _('tag'), _('cannot be empty'))
 						);
 					}
 				}
