@@ -3725,7 +3725,7 @@ $form-icon-btn: (
 .overlay-descr {
 	max-height: 150px;
 	overflow-y: auto;
-	padding: 0 11px 0 11px;
+	padding: 0;
 	margin: 5px 0;
 	background-color: $ui-bg-color;
 	@extend %webkit-scrollbar;
@@ -3733,7 +3733,8 @@ $form-icon-btn: (
 }
 
 .overlay-descr-url {
-	padding: 3px 11px 7px 11px;
+	padding: 3px 0 7px;
+	@extend %overflow-ellipsis;
 }
 
 %scroll-vert-shadow {
