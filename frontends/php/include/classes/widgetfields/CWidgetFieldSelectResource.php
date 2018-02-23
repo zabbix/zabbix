@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,6 +87,7 @@ class CWidgetFieldSelectResource extends CWidgetField {
 		switch ($this->getResourceType()) {
 			case WIDGET_FIELD_SELECT_RES_ITEM:
 				$popup_options['real_hosts'] = '1';
+				$popup_options['with_webitems'] = '1';
 				break;
 
 			case WIDGET_FIELD_SELECT_RES_GRAPH:
@@ -98,6 +99,7 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				$popup_options['numeric'] = '1';
 				$popup_options['real_hosts'] = '1';
 				$popup_options['with_simple_graph_items'] = '1';
+				$popup_options['with_webitems'] = '1';
 				break;
 		}
 

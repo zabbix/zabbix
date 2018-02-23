@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 	assert(NULL == *p_base64);		/* do not accept already allocated memory */
 
 	p_base64_alloc = ZBX_EMAIL_B64_MAXWORD_RFC2047 + sizeof(ZBX_EMAIL_ENCODED_WORD_SEPARATOR);
-	*p_base64 = zbx_malloc(NULL, p_base64_alloc);
+	*p_base64 = (char *)zbx_malloc(NULL, p_base64_alloc);
 	**p_base64 = '\0';
 
 	for (p0 = src; '\0' != *p0; p0 = p1)
@@ -239,7 +239,7 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 
 			if (pstart < angle_addr_start)	/* display name */
 			{
-				mailaddr->disp_name = zbx_malloc(mailaddr->disp_name,
+				mailaddr->disp_name = (char *)zbx_malloc(mailaddr->disp_name,
 						(size_t)(angle_addr_start - pstart + 1));
 				memcpy(mailaddr->disp_name, pstart, (size_t)(angle_addr_start - pstart));
 				*(mailaddr->disp_name + (angle_addr_start - pstart)) = '\0';
@@ -624,11 +624,14 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		const char *password, int timeout, char *error, size_t max_error_len)
 {
 #ifdef HAVE_SMTP_AUTHENTICATION
-	int			err, ret = FAIL, i;
-	CURL            	*easyhandle;
+	const char		*__function_name = "send_email_curl";
+
+	int			ret = FAIL, i;
+	CURL			*easyhandle;
+	CURLcode		err;
 	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE] = "";
 	size_t			url_offset= 0;
-	struct curl_slist	*recipients = NULL, *sender = NULL;
+	struct curl_slist	*recipients = NULL;
 	smtp_payload_status_t	payload_status;
 
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -693,17 +696,21 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		/*   - versions 7.34.0 and above support explicit CURLOPT_LOGIN_OPTIONS                             */
 	}
 
-	for (i = 0; i < from_mails->values_num; i++)
-		sender = curl_slist_append(sender, ((zbx_mailaddr_t *)from_mails->values[i])->addr);
+	if (0 <= from_mails->values_num)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() sender's address is not specified", __function_name);
+	}
+	else if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_FROM,
+			((zbx_mailaddr_t *)from_mails->values[0])->addr)))
+	{
+		goto error;
+	}
 
 	for (i = 0; i < to_mails->values_num; i++)
 		recipients = curl_slist_append(recipients, ((zbx_mailaddr_t *)to_mails->values[i])->addr);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_FROM, sender)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_RCPT, recipients)))
-	{
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_RCPT, recipients)))
 		goto error;
-	}
 
 	payload_status.payload = smtp_prepare_payload(from_mails, to_mails, mailsubject, mailbody);
 	payload_status.payload_len = strlen(payload_status.payload);
@@ -746,7 +753,6 @@ error:
 clean:
 	zbx_free(payload_status.payload);
 
-	curl_slist_free_all(sender);
 	curl_slist_free_all(recipients);
 	curl_easy_cleanup(easyhandle);
 out:

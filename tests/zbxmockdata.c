@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,13 @@
 static zbx_vector_ptr_t		handle_pool;		/* a place to store handles provided to mock data user */
 static zbx_vector_str_t		string_pool;		/* a place to store strings provided to mock data user */
 static yaml_document_t		test_case;		/* parsed YAML document with test case data */
+static const yaml_node_t	*root;                  /* the root document node */
 static const yaml_node_t	*in = NULL;		/* pointer to "in" section of test case document */
 static const yaml_node_t	*out = NULL;		/* pointer to "out" section of test case document */
 static const yaml_node_t	*db_data = NULL;	/* pointer to "db data" section of test case document */
 static const yaml_node_t	*files = NULL;		/* pointer to "files" section of test case document */
 static const yaml_node_t	*exit_code = NULL;	/* pointer to "exit code" section of test case document */
+
 
 typedef struct
 {
@@ -80,6 +82,18 @@ static int	zbx_yaml_scalar_cmp(const char *str, const yaml_node_t *node)
 	if (YAML_SCALAR_NODE != node->type)
 		fail_msg("Internal error: scalar comparison of nonscalar node.");
 
+	return strncmp(str, (const char *)node->data.scalar.value, node->data.scalar.length) ||
+			strlen(str) > node->data.scalar.length;
+}
+
+static int	zbx_yaml_scalar_ncmp(const char *str, size_t len, const yaml_node_t *node)
+{
+	if (YAML_SCALAR_NODE != node->type)
+		fail_msg("Internal error: scalar comparison of nonscalar node.");
+
+	if (len != node->data.scalar.length)
+		return -1;
+
 	return strncmp(str, (const char *)node->data.scalar.value, node->data.scalar.length);
 }
 
@@ -95,8 +109,6 @@ int	zbx_mock_data_init(void **state)
 
 	if (0 != yaml_parser_load(&parser, &test_case))
 	{
-		const yaml_node_t	*root;
-
 		if (NULL != (root = yaml_document_get_root_node(&test_case)))
 		{
 			yaml_document_t	tmp;
@@ -105,6 +117,8 @@ int	zbx_mock_data_init(void **state)
 			{
 				if (NULL == yaml_document_get_root_node(&tmp))
 				{
+					yaml_document_delete(&tmp);
+
 					if (YAML_MAPPING_NODE == root->type)
 					{
 						const yaml_node_pair_t	*pair;
@@ -283,12 +297,18 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Provided handle is not a string handle.";
 		case ZBX_MOCK_INTERNAL_ERROR:
 			return "Internal error, please report to maintainers.";
+		case ZBX_MOCK_INVALID_YAML_PATH:
+			return "Invalid YAML path syntax.";
+		case ZBX_MOCK_NOT_A_BINARY:
+			return "Provided handle is not a binary string.";
+		case ZBX_MOCK_NOT_AN_UINT64:
+			return "Provided handle is not an unsigned 64 bit integer handle.";
 		default:
 			return "Unknown error.";
 	}
 }
 
-static zbx_mock_error_t	zbx_mock_parameter(zbx_mock_parameter_t type, const char *name, zbx_mock_handle_t *parameter)
+static zbx_mock_error_t	zbx_mock_builtin_parameter(zbx_mock_parameter_t type, const char *name, zbx_mock_handle_t *parameter)
 {
 	const yaml_node_t	*source;
 	const yaml_node_pair_t	*pair;
@@ -338,22 +358,22 @@ static zbx_mock_error_t	zbx_mock_parameter(zbx_mock_parameter_t type, const char
 
 zbx_mock_error_t	zbx_mock_in_parameter(const char *name, zbx_mock_handle_t *parameter)
 {
-	return zbx_mock_parameter(ZBX_MOCK_IN, name, parameter);
+	return zbx_mock_builtin_parameter(ZBX_MOCK_IN, name, parameter);
 }
 
 zbx_mock_error_t	zbx_mock_out_parameter(const char *name, zbx_mock_handle_t *parameter)
 {
-	return zbx_mock_parameter(ZBX_MOCK_OUT, name, parameter);
+	return zbx_mock_builtin_parameter(ZBX_MOCK_OUT, name, parameter);
 }
 
 zbx_mock_error_t	zbx_mock_db_rows(const char *data_source, zbx_mock_handle_t *rows)
 {
-	return zbx_mock_parameter(ZBX_MOCK_DB_DATA, data_source, rows);
+	return zbx_mock_builtin_parameter(ZBX_MOCK_DB_DATA, data_source, rows);
 }
 
 zbx_mock_error_t	zbx_mock_file(const char *path, zbx_mock_handle_t *file)
 {
-	return zbx_mock_parameter(ZBX_MOCK_FILES, path, file);
+	return zbx_mock_builtin_parameter(ZBX_MOCK_FILES, path, file);
 }
 
 zbx_mock_error_t	zbx_mock_exit_code(int *status)
@@ -441,6 +461,220 @@ zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value)
 	tmp = zbx_malloc(tmp, handle->node->data.scalar.length + 1);
 	memcpy(tmp, handle->node->data.scalar.value, handle->node->data.scalar.length);
 	tmp[handle->node->data.scalar.length] = '\0';
+	zbx_vector_str_append(&string_pool, tmp);
 	*value = tmp;
+	return ZBX_MOCK_SUCCESS;
+}
+
+zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, size_t *length)
+{
+	const zbx_mock_pool_handle_t	*handle;
+	char				*tmp, *dst;
+	const char			*src;
+	size_t				i;
+
+	if (0 > binary || binary >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[binary];
+
+	if (YAML_SCALAR_NODE != handle->node->type)
+		return ZBX_MOCK_NOT_A_BINARY;
+
+	src = (char*)handle->node->data.scalar.value;
+	dst = tmp = zbx_malloc(NULL, handle->node->data.scalar.length);
+
+	for (i = 0; i < handle->node->data.scalar.length; i++)
+	{
+		if ('\\' == src[i])
+		{
+			if (i + 3 >= handle->node->data.scalar.length || 'x' != src[i + 1] ||
+					SUCCEED != is_hex_n_range(&src[i + 2], 2, dst, sizeof(char), 0, 0xff))
+			{
+				zbx_free(tmp);
+				return ZBX_MOCK_NOT_A_BINARY;
+			}
+
+			dst++;
+			i += 3;
+		}
+		else
+			*dst++ = src[i];
+	}
+
+	zbx_vector_str_append(&string_pool, tmp);
+	*value = tmp;
+	*length = dst - tmp;
+
+	return ZBX_MOCK_SUCCESS;
+}
+
+static zbx_mock_error_t	zbx_yaml_path_next(const char **pnext, const char **key, int *key_len, int *index)
+{
+	const char	*next = *pnext;
+	size_t		pos;
+	char		quotes;
+
+	while ('.' == *next)
+		next++;
+
+	/* process dot notation component */
+	if ('[' != *next)
+	{
+		*key = next;
+
+		while (0 != isalnum(*next) || '_' == *next)
+			next++;
+
+		if (*key == next)
+			return ZBX_MOCK_INVALID_YAML_PATH;
+
+		*key_len = next - *key;
+
+		if ('\0' != *next && '.' != *next && '[' != *next)
+			return ZBX_MOCK_INVALID_YAML_PATH;
+
+		*pnext = next;
+		*index = 0;
+
+		return ZBX_MOCK_SUCCESS;
+	}
+
+	while (*(++next) == ' ')
+		;
+
+	/* process array index component */
+	if (0 != isdigit(*next))
+	{
+		for (pos = 0; 0 != isdigit(next[pos]); pos++)
+			;
+
+		if (0 == pos)
+			return ZBX_MOCK_INVALID_YAML_PATH;
+
+		*key = next;
+		*key_len = pos;
+
+		next += pos;
+
+		while (*next == ' ')
+			next++;
+
+		if (']' != *next++)
+			return ZBX_MOCK_INVALID_YAML_PATH;
+
+		*pnext = next;
+		*index = 1;
+
+		return ZBX_MOCK_SUCCESS;
+	}
+
+	/* process bracket notation component */
+
+	if ('\'' != *next && '"' != *next)
+		return ZBX_MOCK_INVALID_YAML_PATH;
+
+	*key = next + 1;
+
+	for (quotes = *next++; quotes != *next; next++)
+	{
+		if ('\0' == *next)
+			return ZBX_MOCK_INVALID_YAML_PATH;
+	}
+
+	if (*key == next)
+		return ZBX_MOCK_INVALID_YAML_PATH;
+
+	*key_len = next - *key;
+
+	while (*(++next) == ' ')
+		;
+
+	if (']' != *next++)
+		return ZBX_MOCK_INVALID_YAML_PATH;
+
+	*pnext = next;
+	*index = 0;
+
+	return ZBX_MOCK_SUCCESS;
+}
+
+static zbx_mock_error_t	zbx_mock_parameter_rec(const yaml_node_t *node, const char *path, zbx_mock_handle_t *parameter)
+{
+	const yaml_node_pair_t	*pair;
+	const char		*pnext = path, *key_name;
+	int			err, key_len, index;
+
+	/* end of the path, return whatever has been found */
+	if ('\0' == *pnext)
+	{
+		*parameter = zbx_mock_handle_alloc(node);
+		return ZBX_MOCK_SUCCESS;
+	}
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_yaml_path_next(&pnext, &key_name, &key_len, &index)))
+		return err;
+
+	/* the path component is array index, attempt to extract sequence element */
+	if (0 != index)
+	{
+		const yaml_node_t	*element;
+
+		if (YAML_SEQUENCE_NODE != node->type)
+			return ZBX_MOCK_NOT_A_VECTOR;
+
+		index = atoi(key_name);
+
+		if (0 > index || index >= (node->data.sequence.items.top - node->data.sequence.items.start))
+			return ZBX_MOCK_END_OF_VECTOR;
+
+		element = yaml_document_get_node(&test_case, node->data.sequence.items.start[index]);
+		return zbx_mock_parameter_rec(element, pnext, parameter);
+	}
+
+	/* the patch component is object key, attempt to extract object member */
+
+	if (YAML_MAPPING_NODE != node->type)
+		return ZBX_MOCK_NOT_AN_OBJECT;
+
+	for (pair = node->data.mapping.pairs.start; pair < node->data.mapping.pairs.top; pair++)
+	{
+		const yaml_node_t	*key, *value;
+
+		key = yaml_document_get_node(&test_case, pair->key);
+
+		if (0 == zbx_yaml_scalar_ncmp(key_name, key_len, key))
+		{
+			value = yaml_document_get_node(&test_case, pair->value);
+			return zbx_mock_parameter_rec(value, pnext, parameter);
+		}
+	}
+
+	return ZBX_MOCK_NO_SUCH_MEMBER;
+}
+
+zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter)
+{
+	return zbx_mock_parameter_rec(root, path, parameter);
+}
+
+zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value)
+{
+	const zbx_mock_pool_handle_t	*handle;
+
+	if (0 > object || object >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[object];
+
+	if (YAML_SCALAR_NODE != handle->node->type || ZBX_MAX_UINT64_LEN < handle->node->data.scalar.length)
+		return ZBX_MOCK_NOT_AN_UINT64;
+
+	if (SUCCEED != is_uint64_n((const char *)handle->node->data.scalar.value, handle->node->data.scalar.length,
+			value))
+	{
+		return ZBX_MOCK_NOT_AN_UINT64;
+	}
+
 	return ZBX_MOCK_SUCCESS;
 }

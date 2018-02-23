@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,29 +19,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+class CLinkAction extends CLink {
 
-class testFormLoginWithRequest extends CWebTest {
-	// Returns layout data
-	public static function provider() {
-		return [
-			[
-				[
-					'request' => 'zabbix.php?action=proxy.list&ddreset=1',
-					'header' => 'Proxies'
-				]
-			]
-		];
-	}
+	public function __construct($items = null) {
+		parent::__construct($items);
 
-	/**
-	 * @dataProvider provider
-	 */
-	public function testFormLoginWithRequest_test($data) {
-		// Log in.
-		$this->zbxTestLogin($data['request']);
-
-		// Test page title.
-		$this->zbxTestCheckHeader($data['header']);
+		$this->addClass(ZBX_STYLE_LINK_ACTION);
 	}
 }

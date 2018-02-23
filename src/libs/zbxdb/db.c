@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,6 +270,21 @@ out:
 }
 
 #endif	/* HAVE_ORACLE */
+
+#ifdef HAVE_POSTGRESQL
+static void	zbx_postgresql_error(char **error, const PGresult *pg_result)
+{
+	char	*result_error_msg;
+	size_t	error_alloc = 0, error_offset = 0;
+
+	zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", PQresStatus(PQresultStatus(pg_result)));
+
+	result_error_msg = PQresultErrorMessage(pg_result);
+
+	if ('\0' != *result_error_msg)
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, ":%s", result_error_msg);
+}
+#endif /*HAVE_POSTGRESQL*/
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -954,8 +969,10 @@ int	zbx_db_commit(void)
 	rc = zbx_db_execute("%s", "commit;");
 #endif
 
-	if (ZBX_DB_OK > rc)
-		return rc; /* commit failed */
+	if (ZBX_DB_OK > rc) { /* commit failed */
+		txn_error = rc;
+		return rc;
+	}
 
 #ifdef HAVE_SQLITE3
 	zbx_mutex_unlock(&sqlite_access);
@@ -1457,9 +1474,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
-		error = zbx_dsprintf(error, "%s:%s",
-				PQresStatus(PQresultStatus(result)),
-				PQresultErrorMessage(result));
+		zbx_postgresql_error(&error, result);
 		zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
@@ -1621,7 +1636,7 @@ error:
 		result = (SQL_CD_TRUE == IBM_DB2server_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL)
-	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
+	result = (DB_RESULT)zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->result = NULL;
 
 	if (NULL == conn)
@@ -1799,15 +1814,20 @@ error:
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
-		error = zbx_dsprintf(error, "%s:%s",
-				PQresStatus(PQresultStatus(result->pg_result)),
-				PQresultErrorMessage(result->pg_result));
+		zbx_postgresql_error(&error, result->pg_result);
 		zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
-		DBfree_result(result);
-		result = (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result) ? (DB_RESULT)ZBX_DB_DOWN :
-				NULL);
+		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
+		{
+			DBfree_result(result);
+			result = (DB_RESULT)ZBX_DB_DOWN;
+		}
+		else
+		{
+			DBfree_result(result);
+			result = NULL;
+		}
 	}
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
@@ -1846,7 +1866,6 @@ lbl_get_table:
 	if (0 == txn_level)
 		zbx_mutex_unlock(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
-
 	if (0 != CONFIG_LOG_SLOW_QUERIES)
 	{
 		sec = zbx_time() - sec;
@@ -2396,7 +2415,7 @@ char	*zbx_db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_cha
 
 	len = zbx_db_get_escape_string_len(src, max_bytes, max_chars, flag);
 
-	dst = zbx_malloc(dst, len);
+	dst = (char *)zbx_malloc(dst, len);
 
 	zbx_db_escape_string(src, dst, len, flag);
 
@@ -2463,7 +2482,7 @@ static void	zbx_db_escape_like_pattern(const char *src, char *dst, int len)
 
 	assert(dst);
 
-	tmp = zbx_malloc(tmp, len);
+	tmp = (char *)zbx_malloc(tmp, len);
 
 	zbx_db_escape_string(src, tmp, len, ESCAPE_SEQUENCE_ON);
 
@@ -2501,7 +2520,7 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 
 	len = zbx_db_get_escape_like_pattern_len(src);
 
-	dst = zbx_malloc(dst, len);
+	dst = (char *)zbx_malloc(dst, len);
 
 	zbx_db_escape_like_pattern(src, dst, len);
 

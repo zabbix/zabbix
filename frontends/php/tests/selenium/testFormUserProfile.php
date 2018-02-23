@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -479,7 +479,8 @@ class testFormUserProfile extends CWebTest {
 		return [
 			[[
 				'expected' => TEST_BAD,
-				'error_msg' => 'Incorrect value for field "sendto": cannot be empty.'
+				'send_to' => '',
+				'error_msg' => 'Incorrect value for field "sendto_emails": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -546,18 +547,24 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);
 		}
 
-		if (array_key_exists('send_to', $data)) {
-			$this->zbxTestInputTypeOverwrite('sendto', $data['send_to']);
+		if (array_key_exists('send_to', $data) & !array_key_exists('type', $data)) {
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto_emails_0"]', $data['send_to']);
+		}
+		else {
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto"]', $data['send_to']);
 		}
 
 		if (array_key_exists('period', $data)) {
-			$this->zbxTestInputTypeOverwrite('period', $data['period']);
+			$this->webDriver->findElement(WebDriverBy::xpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]'))->clear();
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]', $data['period']);
 		}
 
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->zbxTestWaitForPageToLoad();
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 				$this->zbxTestClickWait('update');
 				$this->zbxTestCheckHeader('Dashboard');
 				$this->zbxTestCheckFatalErrors();
@@ -565,7 +572,7 @@ class testFormUserProfile extends CWebTest {
 				$this->assertEquals(1, DBcount($sql));
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));
 				$this->zbxTestTextPresent($data['error_msg']);
 				$this->zbxTestCheckFatalErrors();
 				break;

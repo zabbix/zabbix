@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,9 +34,10 @@ $widget = (new CWidget())
 $workingTimeView = (new CTabView())
 	->addTab('workingTime', _('Working time'),
 		(new CFormList())
-			->addRow(_('Working time'),
+			->addRow((new CLabel(_('Working time'), 'work_period'))->setAsteriskMark(),
 				(new CTextBox('work_period', $data['work_period']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
 			)
 	)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -895,7 +895,7 @@ var CScrollBar = Class.create({
 	},
 
 	//------- CALENDAR -------
-	calendarShowLeft: function() {
+	calendarShowLeft: function(event) {
 		if (this.disabled) {
 			return false;
 		}
@@ -908,10 +908,10 @@ var CScrollBar = Class.create({
 			pos.top -= 20;
 		}
 
-		this.clndrLeft.clndr.clndrshow(pos.top, pos.left);
+		this.clndrLeft.clndr.clndrshow(pos.top, pos.left, event.target);
 	},
 
-	calendarShowRight: function() {
+	calendarShowRight: function(event) {
 		if (this.disabled) {
 			return false;
 		}
@@ -925,7 +925,7 @@ var CScrollBar = Class.create({
 			pos.top -= 20;
 		}
 
-		this.clndrRight.clndr.clndrshow(pos.top, pos.left);
+		this.clndrRight.clndr.clndrshow(pos.top, pos.left, event.target);
 	},
 
 	setCalendarLeft: function(time) {
@@ -1283,6 +1283,8 @@ var CScrollBar = Class.create({
 			this.dom.linklist[links] = document.createElement('a');
 			this.dom.linklist[links].className = 'link-action';
 			this.dom.linklist[links].setAttribute('zoom', zooms[key]);
+			this.dom.linklist[links].setAttribute('role', 'button');
+			this.dom.linklist[links].setAttribute('href', 'javascript:void(0)');
 			this.dom.linklist[links].appendChild(document.createTextNode(caption));
 			this.dom.links.appendChild(this.dom.linklist[links]);
 			addListener(this.dom.linklist[links], 'click', this.setZoom.bindAsEventListener(this, zooms[key]), true);
@@ -1293,6 +1295,8 @@ var CScrollBar = Class.create({
 		this.dom.linklist[links] = document.createElement('a');
 		this.dom.linklist[links].className = 'link-action';
 		this.dom.linklist[links].setAttribute('zoom', this.maxperiod);
+		this.dom.linklist[links].setAttribute('role', 'button');
+		this.dom.linklist[links].setAttribute('href', 'javascript:void(0)');
 		this.dom.linklist[links].appendChild(document.createTextNode(locale['S_ALL_S']));
 		this.dom.links.appendChild(this.dom.linklist[links]);
 		addListener(this.dom.linklist[links], 'click', this.setFullPeriod.bindAsEventListener(this), true);
@@ -1332,6 +1336,8 @@ var CScrollBar = Class.create({
 			this.dom.nav_linklist[links].className = 'link-action';
 			this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 			this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
+			this.dom.nav_linklist[links].setAttribute('role', 'button');
+			this.dom.nav_linklist[links].setAttribute('href', 'javascript:void(0)');
 			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
 			addListener(this.dom.nav_linklist[links], 'click', this.navigateLeft.bindAsEventListener(this, moves[i]));
 
@@ -1354,6 +1360,8 @@ var CScrollBar = Class.create({
 			this.dom.nav_linklist[links] = document.createElement('a');
 			this.dom.nav_linklist[links].className = 'link-action';
 			this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
+			this.dom.nav_linklist[links].setAttribute('role', 'button');
+			this.dom.nav_linklist[links].setAttribute('href', 'javascript:void(0)');
 			this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
 			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
 			addListener(this.dom.nav_linklist[links], 'click', this.navigateRight.bindAsEventListener(this, moves[i]));
@@ -1431,6 +1439,8 @@ var CScrollBar = Class.create({
 
 		// left
 		this.dom.info_left = document.createElement('a');
+		this.dom.info_left.setAttribute('role', 'button');
+		this.dom.info_left.setAttribute('href', 'javascript:void(0)');
 		this.dom.timeline.appendChild(this.dom.info_left);
 		this.dom.info_left.className = 'info_left link-action';
 		this.dom.info_left.appendChild(document.createTextNode('01.01.1970 00:00:00'));
@@ -1443,6 +1453,8 @@ var CScrollBar = Class.create({
 
 		// right
 		this.dom.info_right = document.createElement('a');
+		this.dom.info_right.setAttribute('role', 'button');
+		this.dom.info_right.setAttribute('href', 'javascript:void(0)');
 		this.dom.timeline.appendChild(this.dom.info_right);
 		this.dom.info_right.className = 'info_right link-action';
 		this.dom.info_right.appendChild(document.createTextNode('01.01.1970 00:00:00'));
@@ -1521,6 +1533,8 @@ var CScrollBar = Class.create({
 		// state
 
 		this.dom.period_state = document.createElement('a');
+		this.dom.period_state.setAttribute('role', 'button');
+		this.dom.period_state.setAttribute('href', 'javascript:void(0)');
 		this.dom.period.appendChild(this.dom.period_state);
 		this.dom.period_state.className = 'period_state link-action';
 		this.dom.period_state.appendChild(document.createTextNode(this.fixedperiod == 1 ? locale['S_FIXED_SMALL'] : locale['S_DYNAMIC_SMALL']));

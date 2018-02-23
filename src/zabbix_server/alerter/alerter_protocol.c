@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ zbx_uint32_t	zbx_alerter_serialize_result(unsigned char **data, int errcode, con
 	zbx_serialize_prepare_value(data_len, errcode);
 	zbx_serialize_prepare_str(data_len, errmsg);
 
-	*data = zbx_malloc(NULL, data_len);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, errcode);
@@ -74,7 +74,7 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 	zbx_serialize_prepare_str(data_len, username);
 	zbx_serialize_prepare_str(data_len, password);
 
-	*data = zbx_malloc(NULL, data_len);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, alertid);
@@ -131,7 +131,7 @@ zbx_uint32_t	zbx_alerter_serialize_jabber(unsigned char **data, zbx_uint64_t ale
 	zbx_serialize_prepare_str(data_len, username);
 	zbx_serialize_prepare_str(data_len, password);
 
-	*data = zbx_malloc(NULL, data_len);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, alertid);
@@ -168,7 +168,7 @@ zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alerti
 	zbx_serialize_prepare_str(data_len, message);
 	zbx_serialize_prepare_str(data_len, gsm_modem);
 
-	*data = zbx_malloc(NULL, data_len);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, alertid);
@@ -203,7 +203,7 @@ zbx_uint32_t	zbx_alerter_serialize_eztexting(unsigned char **data, zbx_uint64_t 
 	zbx_serialize_prepare_str(data_len, password);
 	zbx_serialize_prepare_str(data_len, exec_path);
 
-	*data = zbx_malloc(NULL, data_len);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, alertid);
@@ -237,7 +237,7 @@ zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alert
 	zbx_serialize_prepare_value(data_len, alertid);
 	zbx_serialize_prepare_str(data_len, command);
 
-	*data = zbx_malloc(NULL, data_len);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, alertid);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ $user_menu = (new CList())
 		))->addStyle('padding-left: 0')
 	)
 	->addItem(
-		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.4/'))
+		(new CLink(SPACE, 'http://www.zabbix.com/documentation/4.0/'))
 			->addClass(ZBX_STYLE_TOP_NAV_HELP)
 			->setAttribute('target', '_blank')
 			->setTitle(_('Help'))

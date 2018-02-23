@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,7 +304,7 @@ static int	svc_RemoveEventSource()
 	return SUCCEED;
 }
 
-int	ZabbixRemoveService()
+int	ZabbixRemoveService(void)
 {
 	SC_HANDLE	mgr, service;
 	int		ret = FAIL;
@@ -336,7 +336,7 @@ int	ZabbixRemoveService()
 	return ret;
 }
 
-int	ZabbixStartService()
+int	ZabbixStartService(void)
 {
 	SC_HANDLE	mgr, service;
 	int		ret = FAIL;
@@ -365,7 +365,7 @@ int	ZabbixStartService()
 	return ret;
 }
 
-int	ZabbixStopService()
+int	ZabbixStopService(void)
 {
 	SC_HANDLE	mgr, service;
 	SERVICE_STATUS	status;
@@ -395,7 +395,7 @@ int	ZabbixStopService()
 	return ret;
 }
 
-void	set_parent_signal_handler()
+void	set_parent_signal_handler(void)
 {
 	signal(SIGINT, parent_signal_handler);
 	signal(SIGTERM, parent_signal_handler);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ static void	parse_db_monitor_item_params(const char *params, char **dsn, char **
 
 		if (NULL == *var)
 		{
-			*var = zbx_malloc(*var, pend - pvalue + 1);
+			*var = (char *)zbx_malloc(*var, pend - pvalue + 1);
 			memmove(*var, pvalue, pend - pvalue);
 			(*var)[pend - pvalue] = '\0';
 		}
@@ -499,7 +499,7 @@ static int	DBpatch_2010049(void)
 
 static int	DBpatch_2010050(void)
 {
-	char		*fields[] = {"ts_from", "ts_to", NULL};
+	const char	*fields[] = {"ts_from", "ts_to", NULL};
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		i;

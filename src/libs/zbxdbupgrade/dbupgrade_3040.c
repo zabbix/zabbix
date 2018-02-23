@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +61,23 @@ static int	DBpatch_3040005(void)
 	return DBadd_foreign_key("sessions", 1, &field);
 }
 
+int	DBpatch_3040006(void)
+{
+	if (FAIL == DBindex_exists("problem", "problem_3"))
+		return DBcreate_index("problem", "problem_3", "r_eventid", 0);
+
+	return SUCCEED;
+}
+
+int	DBpatch_3040007(void)
+{
+#ifdef HAVE_MYSQL	/* MySQL automatically creates index and might not remove it on some conditions */
+	if (SUCCEED == DBindex_exists("problem", "c_problem_2"))
+		return DBdrop_index("problem", "c_problem_2");
+#endif
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3040)
@@ -73,5 +90,7 @@ DBPATCH_ADD(3040002, 0, 0)
 DBPATCH_ADD(3040003, 0, 0)
 DBPATCH_ADD(3040004, 0, 0)
 DBPATCH_ADD(3040005, 0, 0)
+DBPATCH_ADD(3040006, 0, 0)
+DBPATCH_ADD(3040007, 0, 0)
 
 DBPATCH_END()

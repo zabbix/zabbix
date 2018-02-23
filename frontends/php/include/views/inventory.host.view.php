@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,7 @@ $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
  */
 $overviewFormList = new CFormList();
 
-$host_name = (new CSpan($data['host']['host']))
-	->addClass(ZBX_STYLE_LINK_ACTION)
+$host_name = (new CLinkAction($data['host']['host']))
 	->setMenuPopup(CMenuPopupHelper::getHost(
 		$data['host'],
 		$data['hostScripts'][$data['host']['hostid']],

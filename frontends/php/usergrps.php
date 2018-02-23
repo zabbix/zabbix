@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,12 +37,11 @@ $fields = [
 	// group
 	'usrgrpid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'group_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'selusrgrp' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'gname' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
 	'gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
 	'users_status' =>		[T_ZBX_INT, O_OPT, null,	IN([GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),	null],
 	'debug_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
-	'group_users' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'userids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'groups_rights' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'set_gui_access' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
 	// actions
@@ -115,7 +114,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		'users_status' => getRequest('users_status'),
 		'gui_access' => getRequest('gui_access'),
 		'debug_mode' => getRequest('debug_mode'),
-		'userids' => getRequest('group_users', []),
+		'userids' => getRequest('userids', []),
 		'rights' => [],
 	];
 
@@ -251,9 +250,16 @@ if (hasRequest('form')) {
 		'users_status' => hasRequest('form_refresh') ? getRequest('users_status') : GROUP_STATUS_ENABLED,
 		'gui_access' => getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM),
 		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
-		'group_users' => hasRequest('form_refresh') ? getRequest('group_users', []) : [],
+		'userids' => hasRequest('form_refresh') ? getRequest('userids', []) : [],
 		'form_refresh' => getRequest('form_refresh', 0)
 	];
+
+	$options = [
+		'output' => ['alias', 'name', 'surname'],
+		'preservekeys' => true
+	];
+
+	$users = [];
 
 	if ($data['usrgrpid'] != 0) {
 		// User group exists, but there might be no permissions set yet.
@@ -265,18 +271,39 @@ if (hasRequest('form')) {
 		$data['gui_access'] = getRequest('gui_access', $db_user_group['gui_access']);
 		$data['debug_mode'] = hasRequest('form_refresh') ? getRequest('debug_mode') : $db_user_group['debug_mode'];
 
-		if (!hasRequest('form_refresh')) {
-			$dbUsers = DBselect(
-				'SELECT ug.userid'.
-				' FROM users_groups ug'.
-				' WHERE ug.usrgrpid='.zbx_dbstr($data['usrgrpid'])
-			);
+		if (hasRequest('form_refresh')) {
+			$options['userids'] = $data['userids'];
+		}
+		else {
+			$options['usrgrpids'] = $data['usrgrpid'];
+		}
 
-			while ($dbUser = DBfetch($dbUsers)) {
-				$data['group_users'][] = $dbUser['userid'];
-			}
+		$users = API::User()->get($options);
+
+		if (!hasRequest('form_refresh')) {
+			$data['userids'] = array_keys($users);
 		}
 	}
+	elseif (hasRequest('form_refresh')) {
+		$options['userids'] = $data['userids'];
+
+		$users = API::User()->get($options);
+	}
+
+	$data['users_ms'] = [];
+
+	// Prepare data for multiselect. Skip silently deleted users.
+	foreach ($data['userids'] as $userid) {
+		if (!array_key_exists($userid, $users)) {
+			continue;
+		}
+
+		$data['users_ms'][] = [
+			'id' => $userid,
+			'name' => getUserFullname($users[$userid])
+		];
+	}
+	CArrayHelper::sort($data['users_ms'], ['name']);
 
 	$data['groups_rights'] = hasRequest('form_refresh')
 		? getRequest('groups_rights', [])
@@ -299,34 +326,6 @@ if (hasRequest('form')) {
 			applyHostGroupRights($data['groups_rights'], $groupids, $groupids_subgroupids, $new_permission)
 		);
 	}
-
-	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
-
-	// get users
-	if ($data['selected_usrgrp'] > 0) {
-		$sqlFrom = ',users_groups g';
-		$sqlWhere =
-			' WHERE '.dbConditionInt('u.userid', $data['group_users']).
-				' OR (u.userid=g.userid AND g.usrgrpid='.zbx_dbstr($data['selected_usrgrp']).')';
-	}
-	else {
-		$sqlFrom = '';
-		$sqlWhere = '';
-	}
-
-	$data['users'] = DBfetchArray(DBselect(
-		'SELECT DISTINCT u.userid,u.alias,u.name,u.surname'.
-		' FROM users u'.$sqlFrom.
-			$sqlWhere
-	));
-	order_result($data['users'], 'alias');
-
-	// get user groups
-	$data['usergroups'] = DBfetchArray(DBselect(
-		'SELECT ug.usrgrpid,ug.name FROM usrgrp ug'
-	));
-
-	order_result($data['usergroups'], 'name');
 
 	// render view
 	$view = new CView('administration.usergroups.edit', $data);

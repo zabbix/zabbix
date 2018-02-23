@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -435,7 +435,7 @@ void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions)
 
 	for (i = 0; i < expressions->values_num; i++)
 	{
-		zbx_expression_t	*regexp = expressions->values[i];
+		zbx_expression_t	*regexp = (zbx_expression_t *)expressions->values[i];
 
 		zbx_free(regexp->name);
 		zbx_free(regexp->expression);
@@ -450,7 +450,7 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 {
 	zbx_expression_t	*regexp;
 
-	regexp = zbx_malloc(NULL, sizeof(zbx_expression_t));
+	regexp = (zbx_expression_t *)zbx_malloc(NULL, sizeof(zbx_expression_t));
 
 	regexp->name = zbx_strdup(NULL, name);
 	regexp->expression = zbx_strdup(NULL, expression);
@@ -542,7 +542,7 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
  **********************************************************************************/
 static int	regexp_match_ex_substring(const char *string, const char *pattern, int case_sensitive)
 {
-	char	*ptr = NULL;
+	const char	*ptr = NULL;
 
 	switch (case_sensitive)
 	{
@@ -662,7 +662,7 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 
 	for (i = 0; i < regexps->values_num; i++)	/* loop over global regexp subexpressions */
 	{
-		const zbx_expression_t	*regexp = regexps->values[i];
+		const zbx_expression_t	*regexp = (zbx_expression_t *)regexps->values[i];
 
 		if (0 != strcmp(regexp->name, pattern))
 			continue;

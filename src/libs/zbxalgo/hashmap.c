@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,12 +39,12 @@ static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *s
 	{
 		slot->entries_num = 0;
 		slot->entries_alloc = 6;
-		slot->entries = hm->mem_malloc_func(NULL, slot->entries_alloc * sizeof(ZBX_HASHMAP_ENTRY_T));
+		slot->entries = (ZBX_HASHMAP_ENTRY_T *)hm->mem_malloc_func(NULL, slot->entries_alloc * sizeof(ZBX_HASHMAP_ENTRY_T));
 	}
 	else if (slot->entries_num == slot->entries_alloc)
 	{
 		slot->entries_alloc = slot->entries_alloc * ARRAY_GROWTH_FACTOR;
-		slot->entries = hm->mem_realloc_func(slot->entries, slot->entries_alloc * sizeof(ZBX_HASHMAP_ENTRY_T));
+		slot->entries = (ZBX_HASHMAP_ENTRY_T *)hm->mem_realloc_func(slot->entries, slot->entries_alloc * sizeof(ZBX_HASHMAP_ENTRY_T));
 	}
 }
 
@@ -55,7 +55,7 @@ static void	zbx_hashmap_init_slots(zbx_hashmap_t *hm, size_t init_size)
 	if (0 < init_size)
 	{
 		hm->num_slots = next_prime(init_size);
-		hm->slots = hm->mem_malloc_func(NULL, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
+		hm->slots = (ZBX_HASHMAP_SLOT_T *)hm->mem_malloc_func(NULL, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
 		memset(hm->slots, 0, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
 	}
 	else
@@ -179,7 +179,7 @@ void	zbx_hashmap_set(zbx_hashmap_t *hm, zbx_uint64_t key, int value)
 
 			inc_slots = next_prime(hm->num_slots * SLOT_GROWTH_FACTOR);
 
-			hm->slots = hm->mem_realloc_func(hm->slots, inc_slots * sizeof(ZBX_HASHMAP_SLOT_T));
+			hm->slots = (ZBX_HASHMAP_SLOT_T *)hm->mem_realloc_func(hm->slots, inc_slots * sizeof(ZBX_HASHMAP_SLOT_T));
 			memset(hm->slots + hm->num_slots, 0, (inc_slots - hm->num_slots) * sizeof(ZBX_HASHMAP_SLOT_T));
 
 			for (s = 0; s < hm->num_slots; s++)

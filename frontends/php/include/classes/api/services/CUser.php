@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -571,34 +571,57 @@ class CUser extends CApiService {
 				}
 			}
 
-			// Validate e-mails for all users.
-			if ($email_mediatypes) {
-				$max_length = DB::getFieldLength('media', 'sendto');
-				$email_validator = new CEmailValidator();
+			$max_length = DB::getFieldLength('media', 'sendto');
+			$email_validator = new CEmailValidator();
 
-				foreach ($users as $user) {
-					if (array_key_exists('user_medias', $user)) {
-						foreach ($user['user_medias'] as $media) {
-							if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
-								if (!is_array($media['sendto'])) {
-									$media['sendto'] = [$media['sendto']];
+			foreach ($users as $user) {
+				if (array_key_exists('user_medias', $user)) {
+					foreach ($user['user_medias'] as $media) {
+						/*
+						 * For non-email media types only one value allowed. Since value is normalized, need to validate
+						 * if array contains only one item. If there are more than one string, error message is
+						 * displayed, indicating that passed value is not a string.
+						 */
+						if (!array_key_exists($media['mediatypeid'], $email_mediatypes)
+								&& count($media['sendto']) > 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('a character string is expected'))
+							);
+						}
+
+						/*
+						 * If input value is an array with empty string, ApiInputValidator identifies it as valid since
+						 * values are normalized. That's why value must be revalidated.
+						 */
+						foreach ($media['sendto'] as $sendto) {
+							if ($sendto === '') {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('cannot be empty'))
+								);
+							}
+						}
+
+						/*
+						 * If media type is email, validate each given string against email pattern.
+						 * Additionally, total lenght of emails must be checked, because all media type emails are
+						 * separated by newline and stored as a string in single database field. Newline characters
+						 * consumes extra space, so additional validation must be made.
+						 */
+						if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
+							foreach ($media['sendto'] as $sendto) {
+								if (!$email_validator->validate($sendto)) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Invalid email address for media type with ID "%1$s".',
+											$media['mediatypeid']
+										)
+									);
 								}
-
-								foreach ($media['sendto'] as $sendto) {
-									if (!$email_validator->validate($sendto)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Invalid email address for media type with ID "%1$s".',
-												$media['mediatypeid']
-											)
-										);
-									}
-									elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
-												$media['mediatypeid']
-											)
-										);
-									}
+								elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
+											$media['mediatypeid']
+										)
+									);
 								}
 							}
 						}
@@ -766,10 +789,7 @@ class CUser extends CApiService {
 				$medias[$user['userid']] = [];
 
 				foreach ($user['user_medias'] as $media) {
-					if (is_array($media['sendto'])) {
-						$media['sendto'] = implode("\n", $media['sendto']);
-					}
-
+					$media['sendto'] = implode("\n", $media['sendto']);
 					$medias[$user['userid']][] = $media;
 				}
 			}

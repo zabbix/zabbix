@@ -3,6 +3,8 @@ $red: #ff5050;
 $light-red: #ff3a3a;
 $lighter-red: #ff5050;
 
+$orange: #ff7800;
+
 $dark-yellow: #e99003;
 $yellow: #a78820;
 $light-yellow: #2f280a;
@@ -12,7 +14,7 @@ $green: #23d545;
 $light-green: #23d545;
 $lighter-green: #44e763;
 
-$blue: #429ae3;
+$blue: white;
 
 $white: #000 !important;
 
@@ -107,6 +109,12 @@ $clock-hand-color: #fff;
 $clock-hand-sec-color: #999;
 $clock-lines-color: #888;
 
+// STATUSES
+$problem-unack-fg-color: #ff3333;
+$problem-ack-fg-color: #ff3333;
+$ok-unack-fg-color: #00ff00;
+$ok-ack-fg-color: #00ff00;
+
 
 // Important! @import string should come after variables
 @import 'screen.scss';
@@ -198,12 +206,6 @@ $icon-widget-btn: (
 .btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
-	}
-}
-
 .btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -354px -619px !important;
 }
@@ -260,9 +262,25 @@ ul.top-nav-icons {
 
 // COLORS AND GENERAL
 
+button {
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, 1));
+		background-color: darken($btn-bg-color, 10%)
+	}
+}
+
+.btn-alt {
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, 1));
+	}
+}
+
 .radio-segmented {
 	input[type="radio"] {
-
+			&:focus + label {
+				border-color: $form-border-focus-color !important;
+				background-color: $link-hover-color !important;
+			}
 		&:checked[disabled] + label {
 			background-color: #595959 !important;
 		}
@@ -279,17 +297,31 @@ a {
 	&:hover {
 		border-bottom: 1px solid $link-hover-color;
 	}
+	&:focus {
+		border-bottom: 3px solid $link-hover-color;
+	}
+}
+
+a.link-action {
+	border-bottom: 1px dotted;
+		&:hover {
+			border-bottom: 1px solid $link-hover-color;
+	}
 }
 
 .link-action {
 	&:hover {
 		color: $link-hover-color;
-		border-bottom: 1px dotted $link-hover-color;
+		border-bottom: 1px solid $link-hover-color;
 	}
 
 	&:active {
 		color: $link-hover-color;
 		border-bottom: 1px dotted $link-hover-color;
+	}
+	&:focus {
+		color: $link-hover-color;
+		border-bottom: 3px solid $link-hover-color;
 	}
 }
 
@@ -309,7 +341,7 @@ a {
 
 	&:focus {
 		color: $link-hover-color;
-		border-bottom: 1px solid $link-hover-color;
+		border-bottom: 3px solid $link-hover-color;
 	}
 
 	&:active {
@@ -318,10 +350,36 @@ a {
 	}
 }
 
+.top-nav {
+	a {
+		&:focus {
+			color: $link-main-nav-active-color;
+			background-color: lighten($ui-hover-color, 10%) !important;
+			@include box-shadow(0 0 0 2px $blue);
+			@include transition(box-shadow .2s ease-out);
+		}
+	}
+}
+
 .top-subnav a {
 	&.selected {
 		font-weight: bold;
 		border-bottom: 4px solid #000 !important;
+	}
+	&:focus {
+		border-bottom: 4px solid rgba($ui-hover-color, .7) !important;
+		outline: none;
+	}
+}
+
+ul.top-nav-icons {
+	a {
+		&:focus {
+			background-color: lighten($ui-hover-color, 10%) !important;
+			@include opacity(1);
+			@include box-shadow(0 0 0 2px $blue);
+			@include transition(box-shadow .2s ease-out);
+		}
 	}
 }
 
@@ -337,10 +395,32 @@ a {
 .btn-link {
 	font-weight: bold !important;
 	color: #fff !important;
+
+	&:focus {
+		margin-bottom: -3px !important;
+		border-bottom: 3px solid $link-hover-color !important;
+	}
+}
+
+.table-paging {
+	a {
+		&:focus {
+			background-color: $link-hover-color;
+				.arrow-right {
+					border-left-color: #000;
+				}
+				.arrow-left {
+					border-right-color: #000;
+				}
+		}
+	}
 }
 
 .paging-selected {
 	color: #000 !important;
+	&:focus {
+		background-color: $link-hover-color !important;
+	}
 }
 
 .filter-trigger {
@@ -353,13 +433,15 @@ a {
 	background-color: #000 !important;
 }
 
+
 .subfilter-disable-btn {
-	background-color: #000 !important;
+	background-color: $ui-bg-color !important;
 
 	&:active {
-	background-color: $red !important;
+		background-color: $ui-bg-color !important;
 	}
 }
+
 
 .tag {
 	color: $ui-bg-color;
@@ -369,33 +451,112 @@ a {
 	@include opacity(0.6);
 }
 
+.multiselect {
+	.multiselect-list {
+		padding-left: 2px;
+		padding-bottom: 2px;
+
+		li {
+
+			&.selected {
+
+				.subfilter-enabled {
+					background-color: $ui-hover-color !important;
+					@include box-shadow(0 0 0 1px rgba($blue, 1));
+				}
+
+				.subfilter-disable-btn {
+					background-color: $ui-hover-color !important;
+					@include box-shadow(0 0 0 1px rgba($blue, 1));
+				}
+			}
+		}
+	}
+}
+
+.header-logo {
+	&:focus {
+		@include box-shadow(0 0 0 2px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+.checkbox-radio {
+	&:focus + label span {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+%form-input-style {
+	&:focus {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+}
+
+.multiselect {
+	&.active {
+		@include box-shadow(0 0 0 1px $blue);
+		@include transition(box-shadow .2s ease-out);
+	}
+	input[type="text"]{
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
+
+.progress-bar-container {
+	a {
+		&:hover, &:focus {
+			.progress-bar-label {
+				color: white !important;
+			}
+		}
+	}
+}
+
+.multiselect-suggest {
+	li {
+		&.suggest-hover {
+			background-color: $ui-bg-color;
+		}
+	}
+}
+
+.suggest-found {
+	color: lighten($alt-yellow, 10%);
+}
+
 // SEVERITY STATUSES
+td.log-na-bg {
+	padding-left: 42px !important;
+	color: $font-color;
+}
+
 td.na-bg {
+	padding-left: 42px !important;
+	color: $font-color;
 	~ td.na-bg {
 		border-left: none;
 	}
 }
 
-.na-bg {
+.na-bg, .log-na-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.na-bg .link-action {
+.na-bg a.link-action {
 	color: $link-color;
 }
 
-.list-table .na-bg,
-.dashbrd-widget .list-table .na-bg,
-.dashbrd-grid-widget-content .list-table .na-bg {
-	padding-left: 42px;
-	color: $font-color;
+.log-na-bg:before {
+	color: darken($alt-blue-grey,45%) !important;
+	background-color: $alt-blue-grey !important;
 }
 
-.overlay-dialogue .list-table .na-bg {
-	padding-left: 42px;
-}
-
-.na-bg:before {
+.na-bg:before, .log-na-bg:before {
 	content: "";
 	width: 34px;
 	position: absolute;
@@ -406,7 +567,7 @@ td.na-bg {
 	min-height: 28px;
 }
 
-.na-bg:after {
+.na-bg:after, .log-na-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -106px -443px;
 	width: 22px;
@@ -428,28 +589,15 @@ td.na-bg {
 }
 
 td.normal-bg {
-	~ td.normal-bg {
-		border-left: none;
-	}
+	@extend td.na-bg;
 }
 
 .normal-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.normal-bg .link-action {
+.normal-bg a.link-action {
 	color: $link-color;
-}
-
-.list-table .normal-bg,
-.dashbrd-widget .list-table .normal-bg,
-.dashbrd-grid-widget-content .list-table .normal-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .normal-bg {
-	padding-left: 42px;
 }
 
 .normal-bg:before {
@@ -477,32 +625,28 @@ td.normal-bg {
 	content: none;
 }
 
-td.info-bg {
-	~ td.info-bg {
-		border-left: none;
-	}
+td.log-info-bg {
+	@extend td.log-na-bg;
 }
 
-.info-bg {
+td.info-bg {
+	@extend td.na-bg;
+}
+
+.info-bg, .log-info-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.info-bg .link-action {
+.info-bg a.link-action {
 	color: $link-color;
 }
 
-.list-table .info-bg,
-.dashbrd-widget .list-table .info-bg,
-.dashbrd-grid-widget-content .list-table .info-bg {
-	padding-left: 42px;
-	color: $font-color;
+.log-info-bg:before {
+	color: darken($alt-dark-blue,45%) !important;
+	background-color: $alt-dark-blue !important;
 }
 
-.overlay-dialogue .list-table .info-bg {
-	padding-left: 42px;
-}
-
-.info-bg:before {
+.info-bg:before, .log-info-bg:before {
 	content: "";
 	width: 34px;
 	position: absolute;
@@ -512,7 +656,7 @@ td.info-bg {
 	min-height: 28px;
 }
 
-.info-bg:after {
+.info-bg:after, .log-info-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -136px -443px;
 	width: 22px;
@@ -534,28 +678,15 @@ td.info-bg {
 }
 
 td.average-bg {
-	~ td.average-bg {
-		border-left: none;
-	}
+	@extend td.na-bg;
 }
 
 .average-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.average-bg .link-action {
+.average-bg a.link-action {
 	color: $link-color;
-}
-
-.list-table .average-bg,
-.dashbrd-widget .list-table .average-bg,
-.dashbrd-grid-widget-content .list-table .average-bg {
-	padding-left: 42px;
-	color: $font-color;
-}
-
-.overlay-dialogue .list-table .average-bg {
-	padding-left: 42px;
 }
 
 .average-bg:before {
@@ -589,32 +720,28 @@ td.average-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.warning-bg {
-	~ td.warning-bg {
-		border-left: none;
-	}
+td.log-warning-bg {
+	@extend td.log-na-bg;
 }
 
-.warning-bg {
+td.warning-bg {
+	@extend td.na-bg;
+}
+
+.warning-bg, .log-warning-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.warning-bg .link-action {
+.warning-bg a.link-action {
 	color: $link-color;
 }
 
-.list-table .warning-bg,
-.dashbrd-widget .list-table .warning-bg,
-.dashbrd-grid-widget-content .list-table .warning-bg {
-	padding-left: 42px;
-	color: $font-color;
+.log-warning-bg:before {
+	color: darken($alt-yellow,45%) !important;
+	background-color: $alt-yellow !important;
 }
 
-.overlay-dialogue .list-table .warning-bg {
-	padding-left: 42px;
-}
-
-.warning-bg:before {
+.warning-bg:before, .log-warning-bg:before {
 	content: "";
 	width: 34px;
 	position: absolute;
@@ -624,7 +751,7 @@ td.warning-bg {
 	min-height: 28px;
 }
 
-.warning-bg:after {
+.warning-bg:after, .log-warning-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -166px -443px;
 	width: 22px;
@@ -645,32 +772,28 @@ td.warning-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.high-bg {
-	~ td.high-bg {
-		border-left: none;
-	}
+td.log-high-bg {
+	@extend td.log-na-bg;
 }
 
-.high-bg {
+td.high-bg {
+	@extend td.na-bg;
+}
+
+.high-bg, .log-high-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.high-bg .link-action {
+.high-bg a.link-action {
 	color: $link-color;
 }
 
-.list-table .high-bg,
-.dashbrd-widget .list-table .high-bg,
-.dashbrd-grid-widget-content .list-table .high-bg {
-	padding-left: 42px;
-	color: $font-color;
+.log-high-bg:before {
+	color: darken($alt-dark-orange,45%) !important;
+	background-color: $alt-dark-orange !important;
 }
 
-.overlay-dialogue .list-table .high-bg {
-	padding-left: 42px;
-}
-
-.high-bg:before {
+.high-bg:before, .log-high-bg:before {
 	content: "";
 	width: 34px;
 	position: absolute;
@@ -680,7 +803,7 @@ td.high-bg {
 	min-height: 28px;
 }
 
-.high-bg:after {
+.high-bg:after, .log-high-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -226px -443px;
 	width: 22px;
@@ -701,32 +824,28 @@ td.high-bg {
 	background-color: $ui-bg-selected-color !important;
 }
 
-td.disaster-bg {
-	~ td.disaster-bg {
-		border-left: none;
-	}
+td.log-disaster-bg {
+	@extend td.log-na-bg;
 }
 
-.disaster-bg {
+td.disaster-bg {
+	@extend td.na-bg;
+}
+
+.disaster-bg, .log-disaster-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 }
 
-.disaster-bg .link-action {
+.disaster-bg a.link-action {
 	color: $link-color;
 }
 
-.list-table .disaster-bg,
-.dashbrd-widget .list-table .disaster-bg,
-.dashbrd-grid-widget-content .list-table .disaster-bg {
-	padding-left: 42px;
-	color: $font-color;
+.log-disaster-bg:before {
+	color: darken($alt-red,45%) !important;
+	background-color: $alt-red !important;
 }
 
-.overlay-dialogue .list-table .disaster-bg {
-	padding-left: 42px;
-}
-
-.disaster-bg:before {
+.disaster-bg:before, .log-disaster-bg:before {
 	content: "";
 	width: 34px;
 	position: absolute;
@@ -736,7 +855,7 @@ td.disaster-bg {
 	min-height: 28px;
 }
 
-.disaster-bg:after {
+.disaster-bg:after, .log-disaster-bg:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -256px -443px;
 	width: 22px;
@@ -772,6 +891,11 @@ td.disaster-bg {
 	margin: 0 0 0 -42px;
 }
 
+td.inactive-bg {
+	padding-left: 42px !important;
+	color: $font-color;
+}
+
 .inactive-bg {
 	background-color: rgba(0, 0, 0, 0.0) !important;
 	padding-left: 42px;
@@ -796,11 +920,6 @@ td.disaster-bg {
 	top: 5px;
 	left: 6px;
 	position: absolute;
-}
-
-.list-table .inactive-bg {
-	padding-left: 42px;
-	color: $font-color !important;
 }
 
 // ERROR MESSAGES
@@ -844,7 +963,7 @@ td.disaster-bg {
 	}
 }
 
-// GRAPH AND MAP SELECTIONS
+// GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.2);
 	border: 2px solid rgba($font-color,0.6);
@@ -857,4 +976,17 @@ td.disaster-bg {
 
 .map-element-selected {
 	border: 3px dashed $font-color;
+}
+
+.btn-back-map-container {
+
+	a {
+		border-bottom: none;
+	}
+
+	.btn-back-map {
+		.btn-back-map-icon {
+			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+		}
+	}
 }

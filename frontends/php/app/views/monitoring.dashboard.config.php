@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,14 +29,13 @@ $js_scripts = [];
 $form_list = new CFormList();
 
 // common fields
-$form_list->addRow(_('Type'),
-	new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $data['known_widget_types'])
+$form_list->addRow((new CLabel(_('Type'), 'type')),
+	(new CComboBox('type', $data['dialogue']['type'], 'updateWidgetConfigDialogue()', $data['known_widget_types']))
 );
 
 $form_list->addRow(_('Name'),
 	(new CTextBox('name', $data['dialogue']['name']))
 		->setAttribute('placeholder', _('default'))
-		->setAttribute('autofocus', 'autofocus')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
@@ -46,19 +45,22 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$form->addVar($field->getName(), $field->getValue());
 		continue;
 	}
+	$aria_required = ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
 
 	if ($field instanceof CWidgetFieldComboBox) {
-		$form_list->addRow($field->getLabel(),
-			new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues())
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			(new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
+				->setAriaRequired($aria_required)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldTextBox || $field instanceof CWidgetFieldUrl) {
-		$form_list->addRow($field->getLabel(),
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
 			(new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired($aria_required)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldCheckBox) {
-		$form_list->addRow($field->getLabel(), [
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required), [
 			new CVar($field->getName(), '0'),
 			(new CCheckBox($field->getName()))->setChecked((bool) $field->getValue())
 		]);
@@ -80,9 +82,13 @@ foreach ($data['dialogue']['fields'] as $field) {
 				]
 			],
 			'add_post_js' => false
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired($aria_required);
 
-		$form_list->addRow($field->getLabel(), $field_groupids);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName().'[]'))->setAsteriskMark($aria_required),
+			$field_groupids
+		);
 
 		$js_scripts[] = $field_groupids->getPostJS();
 	}
@@ -104,9 +110,12 @@ foreach ($data['dialogue']['fields'] as $field) {
 			],
 			'add_post_js' => false
 		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired($aria_required);
 
-		$form_list->addRow($field->getLabel(), $field_hostids);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName().'[]'))->setAsteriskMark($aria_required),
+			$field_hostids
+		);
 
 		$js_scripts[] = $field_hostids->getPostJS();
 	}
@@ -128,39 +137,50 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 		// Needed for popup script.
 		$form->addVar($field->getName(), $field->getValue());
-		$form_list->addRow($field->getLabel(), [
-			(new CTextBox($field->getName().'_caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required), [
+			(new CTextBox($field->getName().'_caption', $caption, true))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired($aria_required),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson($field->getPopupOptions($form->getName())).');')
+					CJs::encodeJson($field->getPopupOptions($form->getName())).', null, this);')
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldWidgetListComboBox) {
-		$form_list->addRow($field->getLabel(),
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
 			(new CComboBox($field->getName(), [], $field->getAction(), []))
-				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired($aria_required)
 		);
 
 		$form->addItem(new CJsScript(get_js($field->getJavascript(), true)));
 	}
 	elseif ($field instanceof CWidgetFieldNumericBox) {
-		$form_list->addRow($field->getLabel(),
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
 			(new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength()))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->setAriaRequired($aria_required)
 		);
 	}
 	elseif ($field instanceof CWidgetFieldRadioButtonList) {
 		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue()))
-			->setModern($field->getModern());
+			->setModern($field->getModern())
+			->setAriaRequired($aria_required);
+
 		foreach ($field->getValues() as $key => $value) {
 			$radio_button_list->addValue($value, $key, null, $field->getAction());
 		}
-		$form_list->addRow($field->getLabel(), $radio_button_list);
+
+		$form_list->addRow(
+			(new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$radio_button_list
+		);
 	}
 	elseif ($field instanceof CWidgetFieldSeverities) {
-		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+		$severities = (new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severities->addItem(
@@ -171,7 +191,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			);
 		}
 
-		$form_list->addRow($field->getLabel(), $severities);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$severities
+		);
 	}
 	elseif ($field instanceof CWidgetFieldTags) {
 		$tags = $field->getValue();
@@ -187,14 +209,16 @@ foreach ($data['dialogue']['fields'] as $field) {
 			$tags_table->addRow([
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
 					->setAttribute('placeholder', _('tag'))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAriaRequired($aria_required),
 				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
 					->addValue(_('Like'), TAG_OPERATOR_LIKE)
 					->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
 					->setModern(true),
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
 					->setAttribute('placeholder', _('value'))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAriaRequired($aria_required),
 				(new CCol(
 					(new CButton($field->getName().'['.$i.'][remove]', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
@@ -213,19 +237,23 @@ foreach ($data['dialogue']['fields'] as $field) {
 			))->setColSpan(3)
 		);
 
-		$form_list->addRow($field->getLabel(), $tags_table);
+		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
+			$tags_table
+		);
 
 		$jq_templates['tag-row'] = (new CRow([
 			(new CTextBox($field->getName().'[#{rowNum}][tag]'))
 				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAriaRequired($aria_required),
 			(new CRadioButtonList($field->getName().'[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
 				->addValue(_('Like'), TAG_OPERATOR_LIKE)
 				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
 				->setModern(true),
 			(new CTextBox($field->getName().'[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAriaRequired($aria_required),
 			(new CCol(
 				(new CButton($field->getName().'[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)

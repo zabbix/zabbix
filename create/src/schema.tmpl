@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2017 Zabbix SIA
+-- Copyright (C) 2001-2018 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -557,10 +557,10 @@ FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_NODATA
 FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_NODATA
 FIELD		|ok_period	|t_varchar(32)	|'30m'	|NOT NULL	|ZBX_NODATA
 FIELD		|blink_period	|t_varchar(32)	|'30m'	|NOT NULL	|ZBX_NODATA
-FIELD		|problem_unack_color|t_varchar(6)|'DC0000'|NOT NULL	|ZBX_NODATA
-FIELD		|problem_ack_color|t_varchar(6)	|'DC0000'|NOT NULL	|ZBX_NODATA
-FIELD		|ok_unack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_NODATA
-FIELD		|ok_ack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_NODATA
+FIELD		|problem_unack_color|t_varchar(6)|'CC0000'|NOT NULL	|ZBX_NODATA
+FIELD		|problem_ack_color|t_varchar(6)	|'CC0000'|NOT NULL	|ZBX_NODATA
+FIELD		|ok_unack_color	|t_varchar(6)	|'009900'|NOT NULL	|ZBX_NODATA
+FIELD		|ok_ack_color	|t_varchar(6)	|'009900'|NOT NULL	|ZBX_NODATA
 FIELD		|problem_unack_style|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|problem_ack_style|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|ok_unack_style	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
@@ -569,8 +569,8 @@ FIELD		|snmptrap_logging|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|server_check_interval|t_integer|'10'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_trigger|t_varchar(32)|'365d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_internal|t_varchar(32)|'1d'|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_discovery|t_varchar(32)|'1d'|NOT NULL	|ZBX_NODATA
+FIELD		|hk_events_internal|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
+FIELD		|hk_events_discovery|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_autoreg|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_services_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_services	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
@@ -585,6 +585,7 @@ FIELD		|hk_trends_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_inventory_mode|t_integer|'-1'	|NOT NULL	|ZBX_NODATA
+FIELD		|custom_color	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1387,6 +1388,7 @@ FIELD		|userid		|t_id		|	|NULL		|0			|-|users
 FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
 INDEX		|1		|source,object,objectid
 INDEX		|2		|r_clock
+INDEX		|3		|r_eventid
 
 TABLE|problem_tag|problemtagid|0
 FIELD		|problemtagid	|t_id		|	|NOT NULL	|0
@@ -1590,4 +1592,4 @@ INDEX		|6		|value_sysmapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050028	|3050028
+ROW		|3050037	|3050037

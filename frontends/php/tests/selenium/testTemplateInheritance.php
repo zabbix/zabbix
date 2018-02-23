@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,6 @@ class testTemplateInheritance extends CWebTest {
 				'testInheritance',
 				'key-item-inheritance',
 				[
-					'Created: Item "testInheritance" on "Inheritance test template".',
 					'Item "key-item-inheritance" already exists on "Template inheritance test host", inherited from '.
 					'another template.'
 				]
@@ -498,6 +497,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestTextPresent($this->templateName.': itemDiscovery');
 
 		$this->zbxTestClick('add_item');
+		$this->zbxTestLaunchOverlayDialog('Items');
 		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ void	zbx_http_url_encode(const char *source, char **result)
 	char		*target, *buffer;
 	const char	*hex = "0123456789ABCDEF";
 
-	buffer = zbx_malloc(NULL, strlen(source) * 3 + 1);
+	buffer = (char *)zbx_malloc(NULL, strlen(source) * 3 + 1);
 	target = buffer;
 
 	while ('\0' != *source)
@@ -77,7 +77,7 @@ void	zbx_http_url_encode(const char *source, char **result)
 int	zbx_http_url_decode(const char *source, char **result)
 {
 	const char	*url = source;
-	char		*target, *buffer = zbx_malloc(NULL, strlen(source) + 1);
+	char		*target, *buffer = (char *)zbx_malloc(NULL, strlen(source) + 1);
 
 	target = buffer;
 

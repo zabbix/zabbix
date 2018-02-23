@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,24 +42,25 @@ class testPageDashboard extends CWebTest {
 					$this->zbxTestCheckNoRealHostnames();
 					break;
 				case 'admin' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , 4);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//a[@href='zabbix.php?action=discovery.view&druleid=3']", 'External network');
+					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//a[@href='zabbix.php?action=discovery.view&druleid=3']", 'External network');
 					break;
 				case 'user';
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , 5);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
+					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 				case 'guest';
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
+					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 			}
 			if ($user != 'super-admin'){
@@ -68,18 +69,18 @@ class testPageDashboard extends CWebTest {
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//tr[@class='nothing-to-show']/td", 'No maps added.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No data found.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//tr[@class='nothing-to-show']/td", 'No data found.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No data found.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//tr[@class='nothing-to-show']/td", 'No data found.');
 			}
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'Favourite graphs');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Favourite screens');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Favourite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Problems');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Web monitoring');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'Discovery status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'Host status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'System status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//h4", 'Status of Zabbix');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Host status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Problems');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'System status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'Web monitoring');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//h4", 'Discovery status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'Status of Zabbix');
 		}
 	}
 

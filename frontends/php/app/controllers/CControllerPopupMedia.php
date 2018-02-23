@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,7 +105,8 @@ class CControllerPopupMedia extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
 			}
 
-			if (!parse_period($page_options['period'])) {
+			$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
+			if ($time_period_parser->parse($page_options['period']) != CParser::PARSE_SUCCESS) {
 				error(_s('Field "%1$s" is not correct: %2$s', _('When active'), _('a time period is expected')));
 			}
 

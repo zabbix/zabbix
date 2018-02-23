@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2181,8 +2181,8 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *parameters,
 
 	if (0 < values.values_num)
 	{
-		t = zbx_malloc(t, values.values_num * sizeof(double));
-		x = zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -2326,8 +2326,8 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *parameters,
 
 	if (0 < values.values_num)
 	{
-		t = zbx_malloc(t, values.values_num * sizeof(double));
-		x = zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -2671,18 +2671,85 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: add_value_suffix_normal                                          *
+ * Function: is_blacklisted_unit                                              *
  *                                                                            *
- * Purpose: Process normal values and add K,M,G,T                             *
+ * Purpose:  check if unit is blacklisted or not                              *
+ *                                                                            *
+ * Parameters: unit - unit to check                                           *
+ *                                                                            *
+ * Return value: SUCCEED - unit blacklisted                                   *
+ *               FAIL - unit is not blacklisted                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_blacklisted_unit(const char *unit)
+{
+	const char	*__function_name = "is_blacklisted_unit";
+
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	ret = str_in_list("%,ms,rpm,RPM", unit, ',');
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_value_units_no_kmgt                                          *
+ *                                                                            *
+ * Purpose: add only units to the value                                       *
  *                                                                            *
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
  *             units - units (bps, b, B, etc)                                 *
  *                                                                            *
  ******************************************************************************/
-static void	add_value_suffix_normal(char *value, size_t max_len, const char *units)
+static void	add_value_units_no_kmgt(char *value, size_t max_len, const char *units)
 {
-	const char	*__function_name = "add_value_suffix_normal";
+	const char	*__function_name = "add_value_units_no_kmgt";
+
+	const char	*minus = "";
+	char		tmp[64];
+	double		value_double;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 > (value_double = atof(value)))
+	{
+		minus = "-";
+		value_double = -value_double;
+	}
+
+	if (SUCCEED != zbx_double_compare(round(value_double), value_double))
+	{
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
+		del_zeroes(tmp);
+	}
+	else
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(0), value_double);
+
+	zbx_snprintf(value, max_len, "%s%s %s", minus, tmp, units);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_value_units_with_kmgt                                        *
+ *                                                                            *
+ * Purpose: add units with K,M,G,T prefix to the value                        *
+ *                                                                            *
+ * Parameters: value - value for adjusting                                    *
+ *             max_len - max len of the value                                 *
+ *             units - units (bps, b, B, etc)                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_value_units_with_kmgt(char *value, size_t max_len, const char *units)
+{
+	const char	*__function_name = "add_value_units_with_kmgt";
 
 	const char	*minus = "";
 	char		kmgt[8];
@@ -2700,7 +2767,7 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
 
 	base = (0 == strcmp(units, "B") || 0 == strcmp(units, "Bps") ? 1024 : 1000);
 
-	if (value_double < base || SUCCEED == str_in_list("%,ms,rpm,RPM", units, ','))
+	if (value_double < base)
 	{
 		strscpy(kmgt, "");
 	}
@@ -2775,8 +2842,12 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 				add_value_suffix_s(value, max_len);
 			else if (0 == strcmp(units, "uptime"))
 				add_value_suffix_uptime(value, max_len);
-			else if (0 != strlen(units))
-				add_value_suffix_normal(value, max_len, units);
+			else if ('!' == *units)
+				add_value_units_no_kmgt(value, max_len, (const char *)(units + 1));
+			else if (SUCCEED == is_blacklisted_unit(units))
+				add_value_units_no_kmgt(value, max_len, units);
+			else if ('\0' != *units)
+				add_value_units_with_kmgt(value, max_len, units);
 			break;
 		default:
 			;

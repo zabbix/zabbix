@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,7 +192,7 @@ class CView {
 	 * Add Java Script file required for the view as <script src="..."></script>
 	 * @param string $filename name of java Script file
 	 */
-	public function addJSfile($filename) {
+	public function addJsFile($filename) {
 		$this->jsFiles[] = $filename;
 	}
 

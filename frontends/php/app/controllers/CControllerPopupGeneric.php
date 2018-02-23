@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,7 +111,11 @@ class CControllerPopupGeneric extends CController {
 			'proxies' => [
 				'title' => _('Proxies'),
 				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'hostid,host',
+				'allowed_src_fields' => 'proxyid,host',
+				'form' => [
+					'name' => 'proxiesform',
+					'id' => 'proxies'
+				],
 				'table_columns' => [
 					_('Name')
 				]
@@ -341,26 +345,25 @@ class CControllerPopupGeneric extends CController {
 			'submit' =>						'string',
 			'excludeids' =>					'array',
 			'only_hostid' =>				'db hosts.hostid',
-			'monitored_hosts' =>			'in 0,1',
-			'templated_hosts' =>			'in 0,1',
-			'real_hosts' =>					'in 0,1',
-			'normal_only' =>				'in 0,1',
-			'with_applications' =>			'in 0,1',
-			'with_graphs' =>				'in 0,1',
-			'with_items' =>					'in 0,1',
-			'with_simple_graph_items' =>	'in 0,1',
-			'with_triggers' =>				'in 0,1',
-			'with_monitored_triggers' =>	'in 0,1',
+			'monitored_hosts' =>			'in 1',
+			'templated_hosts' =>			'in 1',
+			'real_hosts' =>					'in 1',
+			'normal_only' =>				'in 1',
+			'with_applications' =>			'in 1',
+			'with_graphs' =>				'in 1',
+			'with_items' =>					'in 1',
+			'with_simple_graph_items' =>	'in 1',
+			'with_triggers' =>				'in 1',
+			'with_monitored_triggers' =>	'in 1',
 			'itemtype' =>					'in '.implode(',', $this->allowed_item_types),
 			'value_types' =>				'array',
-			'numeric' =>					'in 0,1',
+			'numeric' =>					'in 1',
 			'reference' =>					'string',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
-			'select' =>						'in 1',
 			'submit_parent' =>				'in 1',
 			'templateid' =>					'db hosts.hostid',
-			'with_webitems' =>				'in 0,1'
+			'with_webitems' =>				'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -406,19 +409,19 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		// Check if requested element is accessible.
-		if ($this->getInput('only_hostid', 0) && !isReadableHostTemplates([$this->getInput('only_hostid')])) {
+		if ($this->hasInput('only_hostid') && !isReadableHostTemplates([$this->getInput('only_hostid')])) {
 			return false;
 		}
 		else {
-			if ($this->getInput('hostid', 0) && !isReadableHostTemplates([$this->getInput('hostid')])) {
+			if ($this->hasInput('hostid') && !isReadableHostTemplates([$this->getInput('hostid')])) {
 				return false;
 			}
-			if ($this->getInput('groupid', 0) && !isReadableHostGroups([$this->getInput('groupid')])) {
+			if ($this->hasInput('groupid') && !isReadableHostGroups([$this->getInput('groupid')])) {
 				return false;
 			}
 		}
 
-		if ($this->getInput('parent_discoveryid', 0)) {
+		if ($this->hasInput('parent_discoveryid')) {
 			$lld_rules = API::DiscoveryRule()->get([
 				'output' => [],
 				'itemids' => $this->getInput('parent_discoveryid')
@@ -434,17 +437,14 @@ class CControllerPopupGeneric extends CController {
 
 	protected function doAction() {
 		$excludeids = zbx_toHash($this->getInput('excludeids', []));
-		$monitored_hosts = $this->getInput('monitored_hosts', 0);
-		$templated_hosts = $this->getInput('templated_hosts', 0);
-		$real_hosts = $this->getInput('real_hosts', 0);
-
 		$records = [];
 
 		$value_types = null;
-		if ($this->getInput('value_types', false) !== false) {
+
+		if ($this->hasInput('value_types')) {
 			$value_types = $this->getInput('value_types');
 		}
-		elseif ($this->getInput('numeric', 0)) {
+		elseif ($this->hasInput('numeric')) {
 			$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
 		}
 
@@ -484,7 +484,7 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($hostids === null) {
-			$hostids = $this->getInput('hostid') ? $this->getInput('hostid') : null;
+			$hostids = $this->hasInput('hostid') ? $this->getInput('hostid') : null;
 		}
 
 		$options = [
@@ -495,7 +495,7 @@ class CControllerPopupGeneric extends CController {
 			'hostid' => $hostids
 		];
 
-		if ($this->getInput('writeonly', 0)) {
+		if ($this->hasInput('writeonly')) {
 			$options['groups']['editable'] = true;
 			$options['hosts']['editable'] = true;
 		}
@@ -503,16 +503,16 @@ class CControllerPopupGeneric extends CController {
 		$host_status = null;
 		$templated = null;
 
-		if ($monitored_hosts) {
+		if ($this->hasInput('monitored_hosts')) {
 			$options['groups']['monitored_hosts'] = true;
 			$options['hosts']['monitored_hosts'] = true;
 			$host_status = 'monitored_hosts';
 		}
-		elseif ($real_hosts) {
+		elseif ($this->hasInput('real_hosts')) {
 			$options['groups']['real_hosts'] = true;
 			$templated = 0;
 		}
-		elseif ($templated_hosts) {
+		elseif ($this->hasInput('templated_hosts')) {
 			$options['hosts']['templated_hosts'] = true;
 			$options['groups']['templated_hosts'] = true;
 			$templated = 1;
@@ -523,23 +523,23 @@ class CControllerPopupGeneric extends CController {
 			$options['hosts']['templated_hosts'] = true;
 		}
 
-		if ($this->getInput('with_applications', 0)) {
+		if ($this->hasInput('with_applications')) {
 			$options['groups']['with_applications'] = true;
 			$options['hosts']['with_applications'] = true;
 		}
-		elseif ($this->getInput('with_graphs', 0)) {
+		elseif ($this->hasInput('with_graphs')) {
 			$options['groups']['with_graphs'] = true;
 			$options['hosts']['with_graphs'] = true;
 		}
-		elseif ($this->getInput('with_simple_graph_items', 0)) {
+		elseif ($this->hasInput('with_simple_graph_items')) {
 			$options['groups']['with_simple_graph_items'] = true;
 			$options['hosts']['with_simple_graph_items'] = true;
 		}
-		elseif ($this->getInput('with_triggers', 0)) {
+		elseif ($this->hasInput('with_triggers')) {
 			$options['groups']['with_triggers'] = true;
 			$options['hosts']['with_triggers'] = true;
 		}
-		elseif ($this->getInput('with_monitored_triggers', 0)) {
+		elseif ($this->hasInput('with_monitored_triggers')) {
 			$options['groups']['with_monitored_triggers'] = true;
 			$options['hosts']['with_monitored_triggers'] = true;
 		}
@@ -567,13 +567,18 @@ class CControllerPopupGeneric extends CController {
 			'dstfld1' => $this->getInput('dstfld1', ''),
 			'dstfld2' => $this->getInput('dstfld2', ''),
 			'dstfld3' => $this->getInput('dstfld3', ''),
-			'dstfrm' => $this->getInput('dstfrm'),
+			'dstfrm' => $this->getInput('dstfrm', ''),
 			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
-			'excludeids' => $excludeids
+			'excludeids' => $excludeids,
+			'multiselect' => $this->getInput('multiselect', 0),
+			'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
+			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
 
-		if ($this->getInput('only_hostid', 0)) {
+		$page_options['parentid'] = $page_options['dstfld1'] !== '' ? zbx_jsvalue($page_options['dstfld1']) : 'null';
+
+		if ($this->hasInput('only_hostid')) {
 			$hostid = $this->getInput('only_hostid');
 
 			$only_hosts = API::Host()->get([
@@ -585,75 +590,26 @@ class CControllerPopupGeneric extends CController {
 
 			$page_options['only_hostid'] = $only_hosts[0];
 		}
-		if ($monitored_hosts) {
-			$page_options['monitored_hosts'] = true;
-		}
-		if ($real_hosts) {
-			$page_options['real_hosts'] = true;
-		}
-		if ($templated_hosts) {
-			$page_options['templated_hosts'] = true;
-		}
-		if ($this->getInput('with_applications', 0)) {
-			$page_options['with_applications'] = true;
-		}
-		if ($this->getInput('with_graphs', 0)) {
-			$page_options['with_graphs'] = true;
-		}
-		if ($this->getInput('submit_parent', 0)) {
-			$page_options['submit_parent'] = true;
-		}
-		if ($this->getInput('with_items', 0)) {
-			$page_options['with_items'] = true;
-		}
-		if ($this->getInput('host_templates', false) !== false) {
-			$page_options['host_templates'] = $this->getInput('host_templates');
-		}
-		if ($this->getInput('with_simple_graph_items', 0)) {
-			$page_options['with_simple_graph_items'] = true;
-		}
-		if ($this->getInput('with_triggers', 0)) {
-			$page_options['with_triggers'] = true;
-		}
-		if ($this->getInput('with_webitems', 0)) {
-			$page_options['with_webitems'] = true;
-		}
-		if ($this->getInput('multiselect', 0)) {
-			$page_options['multiselect'] = true;
-		}
-		if ($this->getInput('normal_only', 0)) {
-			$page_options['normal_only'] = true;
-		}
-		if ($this->getInput('with_monitored_triggers', false) !== false) {
-			$page_options['with_monitored_triggers'] = $this->getInput('with_monitored_triggers');
-		}
-		if ($this->getInput('value_types', false) !== false) {
-			$page_options['value_types'] = $this->getInput('value_types');
-		}
-		if ($this->getInput('itemtype', false) !== false) {
-			$page_options['itemtype'] = $this->getInput('itemtype');
-		}
-		if ($hostid) {
+
+		if ($hostid != 0) {
 			$page_options['hostid'] = $hostid;
 		}
-		if ($this->getInput('numeric', 0)) {
-			$page_options['numeric'] = $this->getInput('numeric');
+
+		$option_fields_binary = ['monitored_hosts', 'noempty', 'normal_only', 'numeric', 'real_hosts', 'submit_parent',
+			'templated_hosts', 'with_applications', 'with_graphs', 'with_items', 'with_monitored_triggers',
+			'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
+		foreach ($option_fields_binary as $field) {
+			if ($this->hasInput($field)) {
+				$page_options[$field] = true;
+			}
 		}
-		if ($this->getInput('writeonly', 0)) {
-			$page_options['writeonly'] = $this->getInput('writeonly');;
+
+		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'templateid', 'value_types'];
+		foreach ($option_fields_value as $field) {
+			if ($this->hasInput($field)) {
+				$page_options[$field] = $this->getInput($field);
+			}
 		}
-		if ($this->getInput('screenid', 0)) {
-			$page_options['screenid'] = $this->getInput('screenid');
-		}
-		if ($this->getInput('templateid', 0)) {
-			$page_options['templateid'] = $this->getInput('templateid');
-		}
-		if ($this->getInput('noempty', 0)) {
-			$page_options['noempty'] = $this->getInput('noempty');
-		}
-		$page_options['parent_discoveryid'] = $this->getInput('parent_discoveryid', 0);
-		$page_options['reference'] = $this->getInput('reference', $this->getInput('srcfld1', 'unknown'));
-		$page_options['parentid'] = $page_options['dstfld1'] ? zbx_jsvalue($page_options['dstfld1']) : 'null';
 
 		// Get data.
 		switch ($this->source_table) {
@@ -663,7 +619,7 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -677,7 +633,7 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -692,15 +648,16 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
 				$records = API::Template()->get($options);
 
 				// Do not show itself.
-				if (array_key_exists($templateid, $records)) {
-					unset($records[$templateid]);
+				if (array_key_exists('templateid', $page_options)
+						&& array_key_exists($page_options['templateid'], $records)) {
+					unset($records[$page_options['templateid']]);
 				}
 
 				CArrayHelper::sort($records, ['name']);
@@ -714,7 +671,7 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -731,7 +688,7 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -746,7 +703,7 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -770,14 +727,14 @@ class CControllerPopupGeneric extends CController {
 				];
 
 				if ($this->source_table === 'trigger_prototypes') {
-					if ($this->getInput('parent_discoveryid', 0)) {
-						$options['discoveryids'] = [$this->getInput('parent_discoveryid')];
+					if ($page_options['parent_discoveryid']) {
+						$options['discoveryids'] = [$page_options['parent_discoveryid']];
 					}
 					else {
 						$options['hostids'] = [$hostid];
 					}
 
-					if ($this->getInput('writeonly', 0)) {
+					if (array_key_exists('writeonly', $page_options)) {
 						$options['editable'] = true;
 					}
 
@@ -795,7 +752,7 @@ class CControllerPopupGeneric extends CController {
 						$options['hostids'] = [$hostid];
 					}
 
-					if ($this->getInput('writeonly', 0)) {
+					if (array_key_exists('writeonly', $page_options)) {
 						$options['editable'] = true;
 					}
 
@@ -803,11 +760,11 @@ class CControllerPopupGeneric extends CController {
 						$options['templated'] = $templated;
 					}
 
-					if ($this->getInput('with_monitored_triggers', 0)) {
+					if (array_key_exists('with_monitored_triggers', $page_options)) {
 						$options['monitored'] = true;
 					}
 
-					if ($this->getInput('normal_only', 0)) {
+					if (array_key_exists('normal_only', $page_options)) {
 						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 					}
 
@@ -825,8 +782,8 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('parent_discoveryid', 0)) {
-					$options['discoveryids'] = [$this->getInput('parent_discoveryid')];
+				if ($page_options['parent_discoveryid']) {
+					$options['discoveryids'] = [$page_options['parent_discoveryid']];
 				}
 				else {
 					$options['hostids'] = $hostid;
@@ -836,7 +793,7 @@ class CControllerPopupGeneric extends CController {
 					$options['templated'] = true;
 				}
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -848,11 +805,11 @@ class CControllerPopupGeneric extends CController {
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
-					if ($with_webitems) {
+					if (array_key_exists('with_webitems', $page_options)) {
 						$options['webitems'] = true;
 					}
 
-					if ($this->getInput('normal_only', 0)) {
+					if (array_key_exists('normal_only', $page_options)) {
 						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 					}
 
@@ -880,7 +837,7 @@ class CControllerPopupGeneric extends CController {
 				if (is_null($hostid)) {
 					$options['groupids'] = $groupids;
 				}
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 				if (!is_null($templated)) {
@@ -902,7 +859,7 @@ class CControllerPopupGeneric extends CController {
 						'preservekeys' => true
 					];
 
-					if ($this->getInput('writeonly', 0)) {
+					if (array_key_exists('writeonly', $page_options)) {
 						$options['editable'] = true;
 					}
 					if (!is_null($templated)) {
@@ -929,7 +886,7 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -942,7 +899,7 @@ class CControllerPopupGeneric extends CController {
 					'output' => ['screenid', 'name'],
 					'preservekeys' => true
 				];
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -958,14 +915,15 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
 				$records = API::Screen()->get($options);
 
 				foreach ($records as $item) {
-					if (check_screen_recursion($this->getInput('screenid'), $item['screenid'])) {
+					if (array_key_exists('screenid', $page_options)
+							&& check_screen_recursion($page_options['screenid'], $item['screenid'])) {
 						unset($records[$item['screenid']]);
 					}
 				}
@@ -992,16 +950,17 @@ class CControllerPopupGeneric extends CController {
 
 			case 'proxies':
 				$options = [
-					'output' => ['hostid', 'host'],
+					'output' => ['proxyid', 'host'],
 					'preservekeys' => true
 				];
 
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
 				$records = API::Proxy()->get($options);
 				CArrayHelper::sort($records, ['host']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id', 'host' => 'name']);
 				break;
 
 			case 'scripts':
@@ -1012,7 +971,7 @@ class CControllerPopupGeneric extends CController {
 				if ($hostid === null) {
 					$options['groupids'] = $groupids;
 				}
-				if ($this->getInput('writeonly', 0)) {
+				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}
 
@@ -1029,7 +988,7 @@ class CControllerPopupGeneric extends CController {
 				? $this->popup_properties[$this->source_table]['form']
 				: null,
 			'options' => $page_options,
-			'multiselect' => $this->getInput('multiselect', 0),
+			'multiselect' => $page_options['multiselect'],
 			'table_columns' => $this->popup_properties[$this->source_table]['table_columns'],
 			'table_records' => $records,
 			'allowed_item_types' => $this->allowed_item_types
@@ -1040,7 +999,7 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if (($messages = getMessages()) !== null) {
-			$data['messages'] = $messages->toString();
+			$data['messages'] = $messages;
 		}
 		else {
 			$data['messages'] = null;

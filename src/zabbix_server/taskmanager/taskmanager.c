@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
  *                                                                            *
  * Function: tm_try_task_close_problem                                        *
  *                                                                            *
- * Purpose: try to close problem by event acknowledgment action               *
+ * Purpose: try to close problem by event acknowledgement action              *
  *                                                                            *
  * Parameters: taskid - [IN] the task identifier                              *
  *                                                                            *
@@ -253,16 +253,16 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_process_acknowledgments                                       *
+ * Function: tm_process_acknowledgements                                      *
  *                                                                            *
- * Purpose: process acknowledgments for alerts sending                        *
+ * Purpose: process acknowledgements for alerts sending                       *
  *                                                                            *
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
+static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 {
-	const char		*__function_name = "tm_process_acknowledgments";
+	const char		*__function_name = "tm_process_acknowledgements";
 
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -313,7 +313,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	if (0 < ack_tasks.values_num)
 	{
 		zbx_vector_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		processed_num = process_actions_by_acknowledgments(&ack_tasks);
+		processed_num = process_actions_by_acknowledgements(&ack_tasks);
 	}
 
 	sql_offset = 0;
@@ -393,7 +393,7 @@ static int	tm_process_tasks(int now)
 	DBfree_result(result);
 
 	if (0 < ack_taskids.values_num)
-		processed_num += tm_process_acknowledgments(&ack_taskids);
+		processed_num += tm_process_acknowledgements(&ack_taskids);
 
 	zbx_vector_uint64_destroy(&ack_taskids);
 

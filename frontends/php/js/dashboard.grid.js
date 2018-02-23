@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -485,6 +485,7 @@
 
 				$('h4', widget['content_header']).text(resp.header);
 
+				widget['content_body'].find('[data-hintbox=1]').trigger('remove');
 				widget['content_body'].empty();
 				if (typeof(resp.messages) !== 'undefined') {
 					widget['content_body'].append(resp.messages);
@@ -689,7 +690,7 @@
 		return free;
 	}
 
-	function openConfigDialogue($obj, data, widget) {
+	function openConfigDialogue($obj, data, widget, trigger_elmnt) {
 		var edit_mode = (widget !== null);
 
 		data.dialogue = {};
@@ -714,7 +715,7 @@
 				}
 			],
 			'dialogueid': 'widgetConfg'
-		});
+		}, trigger_elmnt);
 
 		var overlay_dialogue = $('#overlay_dialogue');
 		data.dialogue.div = overlay_dialogue;
@@ -737,7 +738,7 @@
 			.attr('title', t('Edit'))
 			.click(function() {
 				doAction('beforeConfigLoad', $obj, data, widget);
-				methods.editWidget.call($obj, widget);
+				methods.editWidget.call($obj, widget, this);
 			});
 
 		var	btn_delete = $('<button>')
@@ -764,6 +765,7 @@
 		var index = widget['div'].data('widget-index');
 
 		// remove div from the grid
+		widget['div'].find('[data-hintbox=1]').trigger('remove');
 		widget['div'].remove();
 		data['widgets'].splice(index, 1);
 
@@ -907,7 +909,7 @@
 						showEditMode();
 					}
 
-					methods.addNewWidget.call($obj);
+					methods.addNewWidget.call($obj, this);
 				})
 			);
 		}
@@ -1234,12 +1236,12 @@
 		},
 
 		// After pressing "Edit" button on widget
-		editWidget: function(widget) {
+		editWidget: function(widget, trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, widget);
+				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},
 
@@ -1338,7 +1340,7 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
-						overlayDialogueOnLoad(true);
+						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});
 			});
@@ -1552,12 +1554,12 @@
 			return ref;
 		},
 
-		addNewWidget: function() {
+		addNewWidget: function(trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, null);
+				openConfigDialogue($this, data, null, trigger_elmnt);
 			});
 		},
 

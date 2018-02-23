@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,8 +42,7 @@ if ($data['templateid'] != 0) {
 $frmHost = (new CForm())
 	->setName('templatesForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $data['form'])
-	->addVar('groupid', $data['groupId']);
+	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
 	$frmHost->addVar('templateid', $data['templateid']);
@@ -74,96 +73,41 @@ $frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
 $templateList = (new CFormList('hostlist'))
-	->addRow(_('Template name'), (new CTextBox('template_name', $host, false, 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+	->addRow(
+		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
+		(new CTextBox('template_name', $host, false, 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow((new CLabel(_('Groups'), 'groups[]'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'groups[]',
+			'objectName' => 'hostGroup',
+			'objectOptions' => ['editable' => true],
+			'data' => $data['groups_ms'],
+			'addNew' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $frmHost->getName(),
+					'dstfld1' => 'groups_',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				]
+			]
+		]))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Description'),
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-$groupsTB = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
-
-if ($data['form'] === 'update') {
-	// Add existing template groups to list and, depending on permissions show name as enabled or disabled.
-
-	$groupsInList = [];
-
-	foreach ($data['groupsAll'] as $group) {
-		if (isset($data['groupIds'][$group['groupid']])) {
-			$groupsTB->addItem($group['groupid'], $group['name'], true,
-				isset($data['groupsAllowed'][$group['groupid']])
-			);
-			$groupsInList[] = $group['groupid'];
-		}
-	}
-
-	// Add other host groups that user has permissions to, if not yet added to list.
-	foreach ($data['groupsAllowed'] as $group) {
-		if (!in_array($group['groupid'], $groupsInList)) {
-			$groupsTB->addItem($group['groupid'], $group['name']);
-		}
-	}
-}
-else {
-	/*
-	 * When cloning a template or creating a new one, don't show read-only host groups in left box,
-	 * but show empty or posted groups in case of an error
-	 */
-
-	foreach ($data['groupsAllowed'] as $group) {
-		$groupsTB->addItem($group['groupid'], $group['name']);
-	}
-}
-
-$templateList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
-
-// FORM ITEM : new group text box [  ]
-$new_group = (new CTextBox('newgroup', $newgroup))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-$new_group_label = _('New group');
-if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-	$new_group_label .= ' '._('(Only super admins can create groups)');
-	$new_group->setReadonly(true);
-}
-$templateList->addRow(new CLabel($new_group_label, 'newgroup'),
-	(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-);
-
-// FORM ITEM : linked Hosts tween box [  ] [  ]
-$cmbGroups = new CComboBox('twb_groupid', $data['twb_groupid'], 'submit()');
-foreach ($data['groupsAllowed'] as $group) {
-	$cmbGroups->addItem($group['groupid'], $group['name']);
-}
-
-$hostsTB = new CTweenBox($frmHost, 'hosts', $data['hostIdsLinkedTo'], 20);
-
-foreach ($data['hostsAllowedToAdd'] as $host) {
-	if (bccomp($host['hostid'], $data['templateid']) == 0) {
-		continue;
-	}
-	if (isset($data['hostIdsLinkedTo'][$host['hostid']])) {
-		continue;
-	}
-	if (array_key_exists($host['hostid'], $data['linkedTemplates'])) {
-		continue;
-	}
-	$hostsTB->addItem($host['hostid'], $host['name']);
-}
-
-foreach ($data['hostsAll'] as $host) {
-	$hostsTB->addItem($host['hostid'], $host['name'], true, isset($data['hostsAllowed'][$host['hostid']]));
-}
-
-$templateList->addRow(_('Hosts / templates'), $hostsTB->Get(_('In'), [
-	_('Other | group').SPACE,
-	$cmbGroups
-]));
-
-$templateList->addRow(_('Description'),
-	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
-
-// FULL CLONE {
 if ($data['form'] === 'full_clone') {
 	// template applications
 	$templateApps = API::Application()->get([
@@ -436,10 +380,6 @@ foreach ($data['linkedTemplates'] as $template) {
 	], null, 'conditions_'.$template['templateid']);
 
 	$ignoredTemplates[$template['templateid']] = $template['name'];
-}
-
-foreach ($data['hostIdsLinkedTo'] as $templateid) {
-	$ignoredTemplates[$templateid] = '';
 }
 
 $tmplList->addRow(_('Linked templates'),

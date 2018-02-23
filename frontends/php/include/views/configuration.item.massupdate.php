@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -609,9 +609,8 @@ $master_item = (new CDiv([
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',
 				'only_hostid' => $data['hostid'],
-				'with_webitems' => '0',
 				'excludeids' => $data['itemids']
-			]).');'
+			]).', null, this);'
 		)
 ]))->setId('master_item');
 

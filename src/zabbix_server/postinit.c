@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 
 	*historical = FAIL;
 
-	replace = zbx_malloc(NULL, replace_alloc);
+	replace = (char *)zbx_malloc(NULL, replace_alloc);
 
 	name_alloc = name_len = strlen(trigger->description) + 1;
 
@@ -140,7 +140,11 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 
 			if (ZBX_HIST_MACRO_NONE != (macro_type = is_historical_macro(macro)))
 			{
-				macro_len = token.data.macro.name.r - token.data.macro.name.l + 1;
+				if (0 != isdigit(*(trigger->description + token.token.r - 1)))
+					macro_len = token.data.macro.name.r - token.data.macro.name.l;
+				else
+					macro_len = token.data.macro.name.r - token.data.macro.name.l + 1;
+
 				macro = convert_historical_macro(macro_type);
 
 				token.token.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc, &name_len,
@@ -321,8 +325,6 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
 
 	DBfree_result(result);
 
-	zbx_vc_reset();
-
 	return ret;
 }
 
@@ -350,7 +352,9 @@ static int	update_event_names(void)
 	if (0 == (triggers_num = get_trigger_count()))
 		goto out;
 
-	sql = zbx_malloc(NULL, sql_alloc);
+	memset(&trigger, 0, sizeof(DB_TRIGGER));
+
+	sql = (char *)zbx_malloc(NULL, sql_alloc);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(

@@ -188,6 +188,7 @@
 				dstfld1: 'items_' + i + '_itemid',
 				dstfld2: 'items_' + i + '_name',
 				numeric: 1,
+				with_webitems: 1,
 				writeonly: 1
 			};
 			if (jQuery('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
@@ -208,7 +209,7 @@
 			<?php endif ?>
 
 			var nameLink = 'PopUp("popup.generic",'
-				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()));';
+				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()), null, this);';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
 	}
@@ -265,7 +266,7 @@
 
 				// rewrite color action
 				if (part1.substring(0, 3) === 'lbl') {
-					obj.attr('onclick', 'javascript: show_color_picker("items_' + i + '_color");');
+					obj.attr('onclick', 'javascript: show_color_picker("items_' + i + '_color", this);');
 				}
 				else if (part2 === 'color') {
 					obj.attr('onchange', 'javascript: set_color_by_name("items_' + i + '_color", this.value);');
@@ -353,54 +354,60 @@
 <?php endif ?>
 
 	jQuery(function($) {
-		$('#tab_previewTab').click(function() {
-			var name = 'chart3.php';
-			var src = '&name=' + encodeURIComponent($('#name').val())
-						+ '&width=' + $('#width').val()
-						+ '&height=' + $('#height').val()
-						+ '&graphtype=' + $('#graphtype').val()
-						+ '&legend=' + ($('#show_legend').is(':checked') ? 1 : 0);
+		$('#tabs').on('tabsactivate', function(event, ui) {
+			if (ui.newPanel.selector === '#previewTab') {
+				var preview_chart = $('#previewChart'),
+					name = 'chart3.php',
+					src = '&name=' + encodeURIComponent($('#name').val()) +
+						'&width=' + $('#width').val() +
+						'&height=' + $('#height').val() +
+						'&graphtype=' + $('#graphtype').val() +
+						'&legend=' + ($('#show_legend').is(':checked') ? 1 : 0);
 
-			<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
+				if (preview_chart.hasClass('preloader')) {
+					return false;
+				}
+
+				<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
 				name = 'chart7.php';
 				src += '&graph3d=' + ($('#show_3d').is(':checked') ? 1 : 0);
 
-			<?php else: ?>
+				<?php else: ?>
 				<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-					src += '&percent_left=' + $('#percent_left').val()
-							+ '&percent_right=' + $('#percent_right').val();
+				src += '&percent_left=' + $('#percent_left').val()
+					+ '&percent_right=' + $('#percent_right').val();
 				<?php endif ?>
 
-				src += '&ymin_type=' + $('#ymin_type').val()
-							+ '&ymax_type=' + $('#ymax_type').val()
-							+ '&yaxismin=' + $('#yaxismin').val()
-							+ '&yaxismax=' + $('#yaxismax').val()
-							+ '&ymin_itemid=' + $('#ymin_itemid').val()
-							+ '&ymax_itemid=' + $('#ymax_itemid').val()
-							+ '&showworkperiod=' + ($('#show_work_period').is(':checked') ? 1 : 0)
-							+ '&showtriggers=' + ($('#show_triggers').is(':checked') ? 1 : 0);
-			<?php endif ?>
+				src += '&ymin_type=' + $('#ymin_type').val() +
+					'&ymax_type=' + $('#ymax_type').val() +
+					'&yaxismin=' + $('#yaxismin').val() +
+					'&yaxismax=' + $('#yaxismax').val() +
+					'&ymin_itemid=' + $('#ymin_itemid').val() +
+					'&ymax_itemid=' + $('#ymax_itemid').val() +
+					'&showworkperiod=' + ($('#show_work_period').is(':checked') ? 1 : 0) +
+					'&showtriggers=' + ($('#show_triggers').is(':checked') ? 1 : 0);
+				<?php endif ?>
 
-			$('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
-				if (!$.isEmptyObject(value) && value.name != null) {
-					src += '&' + value.name + '=' + value.value;
+				$('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
+					if (!$.isEmptyObject(value) && value.name != null) {
+						src += '&' + value.name + '=' + value.value;
+					}
+				});
+
+				var image = $('img', preview_chart);
+
+				if (image.length != 0) {
+					image.remove();
 				}
-			});
 
-			var image = $('#previewChar img');
+				preview_chart.attr('class', 'preloader');
 
-			if (image.length != 0) {
-				image.remove();
+				$('<img />').attr('src', name + '?period=3600' + src).load(function() {
+					preview_chart
+						.removeAttr('class')
+						.append($(this));
+				});
 			}
-
-			$('#previewChar')
-				.attr('class', 'preloader');
-
-			$('<img />').attr('src', name + '?period=3600' + src).load(function() {
-				$('#previewChar')
-					.removeAttr('class')
-					.append($(this));
-			});
 		});
 
 		<?php if ($readonly): ?>

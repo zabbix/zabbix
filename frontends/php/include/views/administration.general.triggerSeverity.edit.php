@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,44 +34,50 @@ $widget = (new CWidget())
 	);
 
 $severityTab = (new CFormList())
-	->addRow(_('Not classified'), [
+	->addRow((new CLabel(_('Not classified'), 'severity_name_0'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_0', $data['severity_name_0']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_0', $data['severity_color_0'])
 	])
-	->addRow(_('Information'), [
+	->addRow((new CLabel(_('Information'), 'severity_name_1'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_1', $data['severity_name_1']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_1', $data['severity_color_1'])
 	])
-	->addRow(_('Warning'), [
+	->addRow((new CLabel(_('Warning'), 'severity_name_2'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_2', $data['severity_name_2']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_2', $data['severity_color_2'])
 	])
-	->addRow(_('Average'), [
+	->addRow((new CLabel(_('Average'), 'severity_name_3'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_3', $data['severity_name_3']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_3', $data['severity_color_3'])
 	])
-	->addRow(_('High'), [
+	->addRow((new CLabel(_('High'), 'severity_name_4'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_4', $data['severity_name_4']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_4', $data['severity_color_4'])
 	])
-	->addRow(_('Disaster'), [
+	->addRow((new CLabel(_('Disaster'), 'severity_name_5'))->setAsteriskMark(), [
 		(new CTextBox('severity_name_5', $data['severity_name_5']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('maxlength', 32),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_5', $data['severity_color_5'])

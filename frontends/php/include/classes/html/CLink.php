@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,6 +59,10 @@ class CLink extends CTag {
 	public function toString($destroy = true) {
 		$url = $this->url;
 
+		if ($url === null) {
+			$this->setAttribute('role', 'button');
+		}
+
 		if ($this->use_sid) {
 			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
 				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
@@ -71,7 +75,7 @@ class CLink extends CTag {
 			$this->setAttribute('href', 'javascript:void(0)');
 		}
 		else {
-			$this->setAttribute('href', $url);
+			$this->setAttribute('href', ($url == null) ? 'javascript:void(0)' : $url);
 
 			if ($this->confirm_message !== '') {
 				$this->onClick('javascript: return Confirm('.CJs::encodeJson($this->confirm_message).');');

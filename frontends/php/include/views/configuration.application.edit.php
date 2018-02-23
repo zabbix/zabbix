@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,9 +36,10 @@ if (!empty($this->data['applicationid'])) {
 $applicationTab = (new CTabView())
 	->addTab('applicationTab', _('Application'),
 		(new CFormList())
-			->addRow(_('Name'),
+			->addRow((new CLabel(_('Name'), 'appname'))->setAsteriskMark(),
 				(new CTextBox('appname', $this->data['appname']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
 			)
 	);

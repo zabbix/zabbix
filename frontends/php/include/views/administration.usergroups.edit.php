@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,43 +26,50 @@ $userGroupForm = (new CForm())
 	->setName('userGroupsForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
+
 if ($data['usrgrpid'] != 0) {
 	$userGroupForm->addVar('usrgrpid', $data['usrgrpid']);
 }
 
-/*
- * User group tab
-*/
 $userGroupFormList = (new CFormList())
-	->addRow(_('Group name'),
+	->addRow(
+		(new CLabel(_('Group name'), 'gname'))->setAsteriskMark(),
 		(new CTextBox('gname', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('maxlength', DB::getFieldLength('usrgrp', 'name'))
+	)
+	->addRow(
+		new CLabel(_('Users'), 'userids[]'),
+		(new CMultiSelect([
+			'name' => 'userids[]',
+			'objectName' => 'users',
+			'data' => $data['users_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'users',
+					'dstfrm' => $userGroupForm->getName(),
+					'dstfld1' => 'userids_',
+					'srcfld1' => 'userid',
+					'srcfld2' => 'fullname',
+					'multiselect' => '1'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
-
-// append groups to form list
-$groupsComboBox = (new CComboBox('selusrgrp', $data['selected_usrgrp'], 'submit()'))
-	->addItem(0, _('All'));
-foreach ($data['usergroups'] as $group) {
-	$groupsComboBox->addItem($group['usrgrpid'], $group['name']);
-}
-
-// append user tweenbox to form list
-$usersTweenBox = new CTweenBox($userGroupForm, 'group_users', $data['group_users'], 10);
-foreach ($data['users'] as $user) {
-	$usersTweenBox->addItem($user['userid'], getUserFullname($user));
-}
-$userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), [_('Other groups'), SPACE, $groupsComboBox]));
 
 // append frontend and user status to from list
 $isGranted = ($data['usrgrpid'] != 0) ? granted2update_group($data['usrgrpid']) : true;
 if ($isGranted) {
-	$userGroupFormList->addRow(_('Frontend access'), new CComboBox('gui_access', $data['gui_access'], null, [
-		GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
-		GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
-		GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
-	]));
+	$userGroupFormList->addRow(
+		(new CLabel(_('Frontend access'), 'gui_access')),
+		(new CComboBox('gui_access', $data['gui_access'], null, [
+			GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
+			GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
+			GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
+		]))
+	);
 	$userGroupFormList->addRow(_('Enabled'),
 		(new CCheckBox('users_status'))->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)
 	);
@@ -133,7 +140,6 @@ $new_permissions_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
-			'styles' => ['margin-top' => '-.3em'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',

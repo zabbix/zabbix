@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,7 +189,7 @@ class CAction extends CApiService {
 
 			$sqlParts['from']['opmessage'] = 'opmessage om';
 			$sqlParts['from']['operations_media'] = 'operations omed';
-			$sqlParts['where'][] = dbConditionInt('om.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionId('om.mediatypeid', $options['mediatypeids']);
 			$sqlParts['where']['aomed'] = 'a.actionid=omed.actionid';
 			$sqlParts['where']['oom'] = 'omed.operationid=om.operationid';
 		}

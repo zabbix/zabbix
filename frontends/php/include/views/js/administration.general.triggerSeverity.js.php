@@ -46,7 +46,7 @@ $schema = DB::getSchema('config');
 						}
 					}
 				]
-			});
+			}, this);
 		});
 	});
 </script>

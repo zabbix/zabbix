@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,9 +58,11 @@ $triggersFormList = new CFormList('triggersFormList');
 if (!empty($data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $data['templates']);
 }
-$triggersFormList->addRow(_('Name'),
+$triggersFormList->addRow(
+	(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
 	(new CTextBox('description', $data['description'], $data['limited']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 )
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
@@ -89,7 +91,7 @@ $add_expression_button = (new CButton('insert', ($data['expression_constructor']
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
 		CJs::encodeJson($popup_options).
-			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}));'
+			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}), null, this);'
 	);
 if ($data['limited']) {
 	$add_expression_button->setAttribute('disabled', 'disabled');
@@ -99,7 +101,9 @@ $expression_row = [
 		$data['expression_field_name'],
 		$data['expression_field_value'],
 		['readonly' => $data['expression_field_readonly']]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_expression_button
 ];
@@ -156,7 +160,11 @@ elseif ($data['expression_constructor'] != IM_FORCED) {
 	$expression_row[] = [BR(), $input_method_toggle];
 }
 
-$triggersFormList->addRow(_('Expression'), $expression_row, 'expression_row');
+$triggersFormList->addRow(
+	(new CLabel(_('Expression'), $data['expression_field_name']))->setAsteriskMark(),
+	$expression_row,
+	'expression_row'
+);
 
 // Append expression table to form list.
 if ($data['expression_constructor'] == IM_TREE) {
@@ -194,10 +202,8 @@ if ($data['expression_constructor'] == IM_TREE) {
 			if ($data['limited']) {
 				// make all links inside inactive
 				foreach ($e['list'] as &$obj) {
-					if (gettype($obj) === 'object' && get_class($obj) === 'CSpan'
-							&& $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
-						$obj->removeAttribute('class');
-						$obj->onClick(null);
+					if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
+						$obj = new CSpan($obj->items);
 					}
 				}
 				unset($obj);
@@ -234,7 +240,8 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value});')
+		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value}, null,'.
+					'this);')
 		->addClass(ZBX_STYLE_BTN_LINK);
 	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
@@ -283,7 +290,7 @@ $add_recovery_expression_button = (new CButton('insert',
 			'dstfld1' => $data['recovery_expression_field_name'],
 			'parent_discoveryid' => $data['parent_discoveryid']
 		]).
-			',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}));'
+			',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}), null, this);'
 	);
 
 if ($data['limited']) {
@@ -295,7 +302,9 @@ $recovery_expression_row = [
 		$data['recovery_expression_field_name'],
 		$data['recovery_expression_field_value'],
 		['readonly' => $data['recovery_expression_field_readonly']]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_recovery_expression_button
 ];
@@ -344,7 +353,10 @@ elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
 	$recovery_expression_row[] = [BR(), $input_method_toggle];
 }
 
-$triggersFormList->addRow(_('Recovery expression'), $recovery_expression_row, null,
+$triggersFormList->addRow(
+	(new CLabel(_('Recovery expression'), $data['recovery_expression_field_name']))->setAsteriskMark(),
+	$recovery_expression_row,
+	null,
 	'recovery_expression_constructor_row'
 );
 
@@ -385,10 +397,8 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			if ($data['limited']) {
 				// make all links inside inactive
 				foreach ($e['list'] as &$obj) {
-					if (gettype($obj) === 'object' && get_class($obj) === 'CSpan'
-							&& $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
-						$obj->removeAttribute('class');
-						$obj->onClick(null);
+					if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
+						$obj = new CSpan($obj->items);
 					}
 				}
 				unset($obj);
@@ -426,7 +436,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick('return PopUp("popup.testtriggerexpr",'.
-			'{expression: this.form.elements["recovery_expression"].value});')
+			'{expression: this.form.elements["recovery_expression"].value}, null, this);')
 		->addClass(ZBX_STYLE_BTN_LINK);
 	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
@@ -471,9 +481,11 @@ $triggersFormList
 			->setEnabled(!$data['limited']),
 		'correlation_mode_row'
 	)
-	->addRow(_('Tag for matching'),
+	->addRow(
+		(new CLabel(_('Tag for matching'), 'correlation_tag'))->setAsteriskMark(),
 		(new CTextBox('correlation_tag', $data['correlation_tag'], $data['limited']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
 		'correlation_tag_row'
 	);
 
@@ -591,7 +603,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'noempty' => '1',
 						'hostid' => $data['hostid'],
 						'groupid' => $data['groupid']
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
@@ -602,7 +614,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'reference' => 'deptrigger',
 						'multiselect' => '1',
 						'parent_discoveryid' => $data['parent_discoveryid']
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 		])

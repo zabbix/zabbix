@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,9 +36,11 @@ if ($data['actionid']) {
 
 // Action tab.
 $action_tab = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['action']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -268,7 +270,7 @@ switch ($data['new_condition']['conditiontype']) {
 						'dstfrm' => $actionForm->getName(),
 						'dstfld1' => 'new_condition_value',
 						'dstfld2' => 'drule'
-					]).');'
+					]).', null, this);'
 				)
 		];
 		break;
@@ -289,29 +291,27 @@ switch ($data['new_condition']['conditiontype']) {
 						'dstfld1' => 'new_condition_value',
 						'dstfld2' => 'dcheck',
 						'writeonly' => '1'
-					]).');'
+					]).', null, this);'
 				)
 		];
 		break;
 
 	case CONDITION_TYPE_PROXY:
-		$action_tab->addItem(new CVar('new_condition[value]', '0'));
-		$condition = [
-			(new CTextBox('proxy', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('btn1', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
-						'srctbl' => 'proxies',
-						'srcfld1' => 'hostid',
-						'srcfld2' => 'host',
-						'dstfrm' => $actionForm->getName(),
-						'dstfld1' => 'new_condition_value',
-						'dstfld2' => 'proxy'
-					]).');'
-				)
-		];
+		$condition = (new CMultiSelect([
+			'name' => 'new_condition[value]',
+			'objectName' => 'proxies',
+			'selectedLimit' => 1,
+			'defaultValue' => 0,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'proxies',
+					'srcfld1' => 'proxyid',
+					'srcfld2' => 'host',
+					'dstfrm' => $actionForm->getName(),
+					'dstfld1' => 'new_condition_value'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DHOST_IP:
@@ -421,9 +421,11 @@ $action_tab->addRow(_('Enabled'),
 $operation_tab = new CFormList('operationlist');
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$operation_tab->addRow(_('Default operation step duration'), [
-		(new CTextBox('esc_period', $data['action']['esc_period']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	]);
+	$operation_tab->addRow((new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
+		(new CTextBox('esc_period', $data['action']['esc_period']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
+	);
 }
 
 $operation_tab
@@ -634,7 +636,9 @@ if (!empty($data['new_operation'])) {
 		foreach ($data['allowedOperations'][ACTION_OPERATION] as $operation) {
 			$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 		}
-		$new_operation_formlist->addRow(_('Operation type'), $operationTypeComboBox);
+		$new_operation_formlist->addRow((new CLabel(_('Operation type'), 'new_operation[operationtype]')),
+			$operationTypeComboBox
+		);
 	}
 
 	switch ($data['new_operation']['operationtype']) {
@@ -692,7 +696,7 @@ if (!empty($data['new_operation'])) {
 						'dstfrm' => $actionForm->getName(),
 						'dstfld1' => 'opmsgUsrgrpListFooter',
 						'multiselect' => '1'
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$usrgrpList->addRow(
@@ -714,7 +718,7 @@ if (!empty($data['new_operation'])) {
 						'dstfrm' => $actionForm->getName(),
 						'dstfld1' => 'opmsgUserListFooter',
 						'multiselect' => '1'
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$userList->addRow(
@@ -759,6 +763,7 @@ if (!empty($data['new_operation'])) {
 			zbx_add_post_js($js_insert);
 
 			$new_operation_formlist
+				->addRow('', (new CLabel(_('At least one user or user group must be selected.')))->setAsteriskMark())
 				->addRow(_('Send to User groups'),
 					(new CDiv($usrgrpList))
 						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -887,7 +892,8 @@ if (!empty($data['new_operation'])) {
 			zbx_add_post_js($js_insert);
 
 			// target list
-			$new_operation_formlist->addRow(_('Target list'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Target list'), 'opCmdList'))->setAsteriskMark(),
 				(new CDiv(
 					(new CTable())
 						->setAttribute('style', 'width: 100%;')
@@ -907,90 +913,111 @@ if (!empty($data['new_operation'])) {
 					->setId('opCmdList')
 			);
 
-			// type
-			$typeComboBox = new CComboBox('new_operation[opcommand][type]',
-				$data['new_operation']['opcommand']['type'],
-				'showOpTypeForm('.ACTION_OPERATION.')',	[
-					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
-					ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
-					ZBX_SCRIPT_TYPE_SSH => _('SSH'),
-					ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
-					ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-				]
-			);
-
 			$userScript = [
 				new CVar('new_operation[opcommand][scriptid]', $data['new_operation']['opcommand']['scriptid']),
-				(new CTextBox(
-					'new_operation[opcommand][script]', $data['new_operation']['opcommand']['script'], true
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CTextBox('new_operation[opcommand][script]', $data['new_operation']['opcommand']['script'], true))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('select_operation_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 			];
 
-			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-			$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP));
-
-			// script
-			$new_operation_formlist->addRow(_('Execute on'),
-				(new CRadioButtonList('new_operation[opcommand][execute_on]',
-					(int) $data['new_operation']['opcommand']['execute_on']
-				))
-					->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-					->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
-					->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-					->setModern(true)
-			);
-
-			// ssh
-			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]',
-				$data['new_operation']['opcommand']['authtype'],
-				'showOpTypeAuth('.ACTION_OPERATION.')', [
-					ITEM_AUTHTYPE_PASSWORD => _('Password'),
-					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-				]
-			);
-
-			$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
-			$new_operation_formlist->addRow(_('User name'),
-				(new CTextBox('new_operation[opcommand][username]', $data['new_operation']['opcommand']['username']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
-			$new_operation_formlist->addRow(_('Public key file'),
-				(new CTextBox('new_operation[opcommand][publickey]', $data['new_operation']['opcommand']['publickey']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
-			$new_operation_formlist->addRow(_('Private key file'),
-				(new CTextBox('new_operation[opcommand][privatekey]', $data['new_operation']['opcommand']['privatekey']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
-			$new_operation_formlist->addRow(_('Password'),
-				(new CTextBox('new_operation[opcommand][password]', $data['new_operation']['opcommand']['password']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
-
-			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
-			$passphraseCB = (new CTextBox('new_operation[opcommand][password]', $data['new_operation']['opcommand']['password']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setId('new_operation_opcommand_passphrase');
-			$new_operation_formlist->addRow(_('Key passphrase'), $passphraseCB);
-
-			// ssh && telnet
-			$new_operation_formlist->addRow(_('Port'),
-				(new CTextBox('new_operation[opcommand][port]', $data['new_operation']['opcommand']['port']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
-
-			// command
-			$new_operation_formlist->addRow(_('Commands'),
-				(new CTextArea('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			);
-			$new_operation_formlist->addRow(_('Commands'),
-				(new CTextBox('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setId('new_operation_opcommand_command_ipmi')
-			);
+			$new_operation_formlist
+				// type
+				->addRow(
+					(new CLabel(_('Type'), 'new_operation[opcommand][type]')),
+					(new CComboBox('new_operation[opcommand][type]',
+						$data['new_operation']['opcommand']['type'],
+						'showOpTypeForm('.ACTION_OPERATION.')',	[
+							ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
+							ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
+							ZBX_SCRIPT_TYPE_SSH => _('SSH'),
+							ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
+							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
+						]
+					))
+				)
+				->addRow(
+					(new CLabel(_('Script name'), 'new_operation_opcommand_script'))->setAsteriskMark(),
+					(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
+				)
+				// script
+				->addRow(
+					(new CLabel(_('Execute on'), 'new_operation[opcommand][execute_on]')),
+					(new CRadioButtonList('new_operation[opcommand][execute_on]',
+						(int) $data['new_operation']['opcommand']['execute_on']
+					))
+						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+						->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
+						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+						->setModern(true)
+				)
+				// ssh
+				->addRow(_('Authentication method'),
+					new CComboBox('new_operation[opcommand][authtype]',
+						$data['new_operation']['opcommand']['authtype'],
+						'showOpTypeAuth('.ACTION_OPERATION.')', [
+							ITEM_AUTHTYPE_PASSWORD => _('Password'),
+							ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+						]
+					)
+				)
+				->addRow(
+					(new CLabel(_('User name'), 'new_operation[opcommand][username]'))->setAsteriskMark(),
+					(new CTextBox('new_operation[opcommand][username]',
+						$data['new_operation']['opcommand']['username']
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
+				)
+				->addRow(
+					(new CLabel(_('Public key file'), 'new_operation[opcommand][publickey]'))->setAsteriskMark(),
+					(new CTextBox('new_operation[opcommand][publickey]',
+						$data['new_operation']['opcommand']['publickey']
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
+				)
+				->addRow(
+					(new CLabel(_('Private key file'), 'new_operation[opcommand][privatekey]'))->setAsteriskMark(),
+					(new CTextBox('new_operation[opcommand][privatekey]',
+						$data['new_operation']['opcommand']['privatekey']
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
+				)
+				->addRow(_('Password'),
+					(new CTextBox('new_operation[opcommand][password]',
+						$data['new_operation']['opcommand']['password']
+					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
+				->addRow(_('Key passphrase'),
+					(new CTextBox('new_operation[opcommand][password]',
+						$data['new_operation']['opcommand']['password']
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setId('new_operation_opcommand_passphrase')
+				)
+				// ssh && telnet
+				->addRow(_('Port'),
+					(new CTextBox('new_operation[opcommand][port]', $data['new_operation']['opcommand']['port']))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				// command
+				->addRow(
+					(new CLabel(_('Commands'), 'new_operation[opcommand][command]'))->setAsteriskMark(),
+					(new CTextArea('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired()
+				)
+				->addRow(
+					(new CLabel(_('Commands'), 'new_operation[opcommand][command]'))->setAsteriskMark(),
+					(new CTextBox('new_operation[opcommand][command]', $data['new_operation']['opcommand']['command']))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setId('new_operation_opcommand_command_ipmi')
+						->setAriaRequired()
+				);
 			break;
 
 		case OPERATION_TYPE_HOST_ADD:
@@ -1005,7 +1032,8 @@ if (!empty($data['new_operation'])) {
 
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
-			$new_operation_formlist->addRow(_('Host groups'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Host groups'), 'new_operation[groupids][]'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[groupids][]',
 					'objectName' => 'hostGroup',
@@ -1021,13 +1049,16 @@ if (!empty($data['new_operation'])) {
 							'multiselect' => '1'
 						]
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))
+					->setAriaRequired()
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			);
 			break;
 
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$new_operation_formlist->addRow(_('Templates'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Templates'), 'new_operation[templateids][]'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[templateids][]',
 					'objectName' => 'templates',
@@ -1045,12 +1076,15 @@ if (!empty($data['new_operation'])) {
 							'writeonly' => '1'
 						]
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))
+					->setAriaRequired()
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			);
 			break;
 
 		case OPERATION_TYPE_HOST_INVENTORY:
-			$new_operation_formlist->addRow(_('Inventory mode'),
+			$new_operation_formlist->addRow(
+				(new CLabel(_('Inventory mode'), 'new_operation[opinventory][inventory_mode]')),
 				(new CRadioButtonList('new_operation[opinventory][inventory_mode]',
 					(int) $data['new_operation']['opinventory']['inventory_mode']
 				))
@@ -1243,8 +1277,11 @@ $action_tabs = (new CTabView())
 	->addTab('actionTab', _('Action'), $action_tab)
 	->addTab('operationTab', _('Operations'), $operation_tab);
 
+$bottom_note = _('At least one operation must exist.');
+
 // Recovery operation tab.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
+	$bottom_note = _('At least one operation or recovery operation must exist.');
 	$recovery_tab = (new CFormList('operationlist'))
 		->addRow(_('Default subject'),
 			(new CTextBox('r_shortdata', $data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -1368,7 +1405,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			foreach ($data['allowedOperations'][ACTION_RECOVERY_OPERATION] as $operation) {
 				$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 			}
-			$new_operation_formlist->addRow(_('Operation type'), $operationTypeComboBox);
+			$new_operation_formlist->addRow((new CLabel(_('Operation type'), 'new_recovery_operation[operationtype]')),
+				$operationTypeComboBox
+			);
 		}
 
 		switch ($data['new_recovery_operation']['operationtype']) {
@@ -1408,7 +1447,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'recOpmsgUsrgrpListFooter',
 							'multiselect' => '1'
-						]).');'
+						]).', null, this);'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$usrgrpList->addRow(
@@ -1430,7 +1469,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'recOpmsgUserListFooter',
 							'multiselect' => '1'
-						]).');'
+						]).', null, this);'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$userList->addRow(
@@ -1475,6 +1514,10 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				zbx_add_post_js($js_insert);
 
 				$new_operation_formlist
+					->addRow('',
+						(new CLabel(_('At least one user or user group must be selected.')))
+							->setAsteriskMark()
+					)
 					->addRow(_('Send to User groups'),
 						(new CDiv($usrgrpList))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -1624,7 +1667,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				zbx_add_post_js($js_insert);
 
 				// target list
-				$new_operation_formlist->addRow(_('Target list'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Target list'), 'recOpCmdList'))->setAsteriskMark(),
 					(new CDiv(
 						(new CTable())
 							->setAttribute('style', 'width: 100%;')
@@ -1645,7 +1689,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				);
 
 				// type
-				$typeComboBox = new CComboBox('new_recovery_operation[opcommand][type]',
+				$typeComboBox = (new CComboBox('new_recovery_operation[opcommand][type]',
 					$data['new_recovery_operation']['opcommand']['type'],
 					'showOpTypeForm('.ACTION_RECOVERY_OPERATION.')', [
 						ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
@@ -1654,7 +1698,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 						ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
 					]
-				);
+				));
 
 				$userScript = [
 					new CVar('new_recovery_operation[opcommand][scriptid]',
@@ -1662,17 +1706,25 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					),
 					(new CTextBox('new_recovery_operation[opcommand][script]',
 						$data['new_recovery_operation']['opcommand']['script'], true
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired(),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('select_recovery_operation_opcommand_script', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 				];
 
-				$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-				$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP));
+				$new_operation_formlist->addRow((new CLabel(_('Type'), 'new_recovery_operation[opcommand][type]')),
+					$typeComboBox
+				);
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Script name'), 'new_recovery_operation[opcommand][script]'))->setAsteriskMark(),
+					(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
+				);
 
 				// script
-				$new_operation_formlist->addRow(_('Execute on'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Execute on'), 'new_recovery_operation[opcommand][execute_on]')),
 					(new CRadioButtonList('new_recovery_operation[opcommand][execute_on]',
 						(int) $data['new_recovery_operation']['opcommand']['execute_on']
 					))
@@ -1692,20 +1744,31 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				);
 
 				$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
-				$new_operation_formlist->addRow(_('User name'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('User name'), 'new_recovery_operation[opcommand][username]'))->setAsteriskMark(),
 					(new CTextBox('new_recovery_operation[opcommand][username]',
 						$data['new_recovery_operation']['opcommand']['username']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
 				);
-				$new_operation_formlist->addRow(_('Public key file'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Public key file'), 'new_recovery_operation[opcommand][publickey]'))
+						->setAsteriskMark(),
 					(new CTextBox('new_recovery_operation[opcommand][publickey]',
 						$data['new_recovery_operation']['opcommand']['publickey']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
 				);
-				$new_operation_formlist->addRow(_('Private key file'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Private key file'), 'new_recovery_operation[opcommand][privatekey]'))
+						->setAsteriskMark(),
 					(new CTextBox('new_recovery_operation[opcommand][privatekey]',
 						$data['new_recovery_operation']['opcommand']['privatekey']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
 				);
 				$new_operation_formlist->addRow(_('Password'),
 					(new CTextBox('new_recovery_operation[opcommand][password]',
@@ -1729,17 +1792,22 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				);
 
 				// command
-				$new_operation_formlist->addRow(_('Commands'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Commands'), 'new_recovery_operation[opcommand][command]'))->setAsteriskMark(),
 					(new CTextArea('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired()
 				);
-				$new_operation_formlist->addRow(_('Commands'),
+				$new_operation_formlist->addRow(
+					(new CLabel(_('Commands'), 'new_recovery_operation_opcommand_command_ipmi'))->setAsteriskMark(),
 					(new CTextBox('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
 					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('new_recovery_operation_opcommand_command_ipmi')
+						->setAriaRequired()
 				);
 				break;
 
@@ -1807,6 +1875,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 // Acknowledge operations
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	$bottom_note = _('At least one operation, recovery operation or acknowledge operation must exist.');
 	$action_formname = $actionForm->getName();
 
 	$acknowledge_tab = (new CFormList('operationlist'))
@@ -1901,7 +1970,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			$operationtype->addItem($operation, operation_type2str($operation));
 		}
 
-		$new_operation_formlist->addRow(_('Operation type'), $operationtype);
+		$new_operation_formlist->addRow((new CLabel(_('Operation type'), 'new_ack_operation[operationtype]')),
+			$operationtype
+		);
 
 		$usrgrp_list = null;
 		$user_list = null;
@@ -1922,7 +1993,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 										'dstfrm' => $actionForm->getName(),
 										'dstfld1' => 'ackOpmsgUsrgrpListFooter',
 										'multiselect' => '1'
-									]).');'
+									]).', null, this);'
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(2)
@@ -1944,7 +2015,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 										'dstfrm' => $actionForm->getName(),
 										'dstfld1' => 'ackOpmsgUserListFooter',
 										'multiselect' => '1'
-									]).');'
+									]).', null, this);'
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(2)
@@ -2071,7 +2142,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			$js_insert .= 'addPopupValues('.$group_values.');';
 			zbx_add_post_js($js_insert);
 
-			$new_operation_formlist->addRow(_('Target list'),
+			$new_operation_formlist->addRow(
+					(new CLabel(_('Target list'), 'ackOpCmdList'))->setAsteriskMark(),
 					(new CDiv(
 						(new CTable())
 							->addStyle('width: 100%;')
@@ -2090,29 +2162,36 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 					->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->setId('ackOpCmdList')
 				)
-				->addRow(_('Type'),
-					new CComboBox('new_ack_operation[opcommand][type]', $data['new_ack_operation']['opcommand']['type'],
+				->addRow(
+					(new CLabel(_('Type'), 'new_ack_operation[opcommand][type]')),
+					(new CComboBox('new_ack_operation[opcommand][type]',
+						$data['new_ack_operation']['opcommand']['type'],
 						'showOpTypeForm('.ACTION_ACKNOWLEDGE_OPERATION.')', [
 							ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 							ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
 							ZBX_SCRIPT_TYPE_SSH => _('SSH'),
 							ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 							ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-					])
+					]))
 				)
-				->addRow(_('Script name'), (new CDiv([
+				->addRow(
+					(new CLabel(_('Script name'), 'new_ack_operation[opcommand][script]'))->setAsteriskMark(),
+					(new CDiv([
 						new CVar('new_ack_operation[opcommand][scriptid]',
 							$data['new_ack_operation']['opcommand']['scriptid']
 						),
 						(new CTextBox('new_ack_operation[opcommand][script]',
 							$data['new_ack_operation']['opcommand']['script'], true
-						))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAriaRequired(),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton('select_ack_operation_opcommand_script', _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
 					]))->addClass(ZBX_STYLE_NOWRAP)
 				)
-				->addRow(_('Execute on'),
+				->addRow(
+					(new CLabel(_('Execute on'), 'new_ack_operation[opcommand][execute_on]')),
 					(new CRadioButtonList('new_ack_operation[opcommand][execute_on]',
 						(int) $data['new_ack_operation']['opcommand']['execute_on']
 					))
@@ -2129,20 +2208,28 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 							ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 					])
 				)
-				->addRow(_('User name'),
+				->addRow((new CLabel(_('User name'), 'new_ack_operation[opcommand][username]'))->setAsteriskMark(),
 					(new CTextBox('new_ack_operation[opcommand][username]',
 						$data['new_ack_operation']['opcommand']['username']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
 				)
-				->addRow(_('Public key file'),
+				->addRow(
+					(new CLabel(_('Public key file'), 'new_ack_operation[opcommand][publickey]'))->setAsteriskMark(),
 					(new CTextBox('new_ack_operation[opcommand][publickey]',
 						$data['new_ack_operation']['opcommand']['publickey']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
 				)
-				->addRow(_('Private key file'),
+				->addRow(
+					(new CLabel(_('Private key file'), 'new_ack_operation[opcommand][privatekey]'))->setAsteriskMark(),
 					(new CTextBox('new_ack_operation[opcommand][privatekey]',
 						$data['new_ack_operation']['opcommand']['privatekey']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
 				)
 				->addRow(_('Password'),
 					(new CTextBox('new_ack_operation[opcommand][password]',
@@ -2152,7 +2239,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				->addRow(_('Key passphrase'),
 					(new CTextBox('new_ack_operation[opcommand][password]',
 						$data['new_ack_operation']['opcommand']['password']
-					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setId('new_ack_operation_opcommand_passphrase')
 				)
 				->addRow(_('Port'),
@@ -2160,18 +2248,30 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 						$data['new_ack_operation']['opcommand']['port']
 					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				)
-				->addRow(_('Commands'),
+				->addRow(
+					(new CLabel(_('Commands'), 'new_ack_operation[opcommand][command]'))->setAsteriskMark(),
 					(new CTextArea('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired()
 				)
-				->addRow(_('Commands'),
+				->addRow(
+					(new CLabel(_('Commands'), 'new_ack_operation[opcommand][command]'))->setAsteriskMark(),
 					(new CTextBox('new_ack_operation[opcommand][command]',
 						$data['new_ack_operation']['opcommand']['command']
 					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('new_ack_operation_opcommand_command_ipmi')
+						->setAriaRequired()
 				);
+		}
+
+		if ($usrgrp_list || $user_list) {
+			$new_operation_formlist->addRow('',
+				(new CLabel(_('At least one user or user group must be selected.')))
+					->setAsteriskMark()
+			);
 		}
 
 		if ($usrgrp_list) {
@@ -2269,7 +2369,7 @@ if (!hasRequest('form_refresh')) {
 // Append buttons to form.
 $others = [];
 if ($data['actionid']) {
-	$action_tabs->setFooter(makeFormFooter(
+	$form_buttons = [
 		new CSubmit('update', _('Update')), [
 			new CButton('clone', _('Clone')),
 			new CButtonDelete(
@@ -2278,15 +2378,25 @@ if ($data['actionid']) {
 			),
 			new CButtonCancel(url_param('actiontype'))
 		]
-	));
+	];
 }
 else {
-	$action_tabs->setFooter(makeFormFooter(
+	$form_buttons = [
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel(url_param('actiontype'))]
-	));
+	];
 }
 
+$action_tabs->setFooter([
+	(new CList())
+		->addClass(ZBX_STYLE_TABLE_FORMS)
+		->addItem([
+			new CDiv(''),
+			(new CDiv((new CLabel($bottom_note))->setAsteriskMark()))
+				->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+		]),
+	makeFormFooter($form_buttons[0], $form_buttons[1])
+]);
 $actionForm->addItem($action_tabs);
 
 // Append form to widget.

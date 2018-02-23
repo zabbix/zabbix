@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ $filterColumn->addRow(_('User'), [
 				'srcfld1' => 'alias',
 				'dstfrm' => 'zbx_filter',
 				'dstfld1' => 'alias'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 $filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action'], null, [

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ $table_user_groups = (new CTable())
 							'srcfld2' => 'name',
 							'dstfrm' => $form->getName(),
 							'multiselect' => '1'
-						]).');'
+						]).', null, this);'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)
@@ -63,7 +63,7 @@ $table_users = (new CTable())
 							'srcfld2' => 'fullname',
 							'dstfrm' => $form->getName(),
 							'multiselect' => '1'
-						]).');'
+						]).', null, this);'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)

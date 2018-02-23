@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -442,7 +442,7 @@ static void	zbx_set_defaults(void)
 		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
 
 	if (NULL == CONFIG_HISTORY_STORAGE_OPTS)
-		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "unum,float,char,log,text");
+		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "uint,dbl,str,log,text");
 #endif
 
 #ifdef HAVE_SQLITE3
@@ -995,8 +995,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 	else if (ZBX_DB_SERVER != db_type)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix server cannot work with a"
-				" Zabbix proxy database", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": its \"users\" table is empty (is this the"
+				" Zabbix proxy database?)", CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1017,6 +1017,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	DBclose();
 
+	zbx_vc_enable();
+
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
 
@@ -1028,7 +1030,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
 			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS;
-	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
+	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -323,7 +323,7 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 
 	zbx_hashset_iter_reset(queue_stats, &iter);
 
-	while (NULL != (stats = zbx_hashset_iter_next(&iter)))
+	while (NULL != (stats = (zbx_queue_stats_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, id_name, stats->id);
@@ -340,7 +340,7 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 }
 
 /* queue item comparison function used to sort queue by nextcheck */
-static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
+static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_t **d2)
 {
 	zbx_queue_item_t	*i1 = *d1, *i2 = *d2;
 
@@ -376,7 +376,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
-		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -397,7 +397,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)) ||
 					FAIL == is_uint31(limit_str, &limit))
 			{
-				zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
+				zbx_send_response(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
 				goto out;
 			}
 		}
@@ -405,7 +405,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (ZBX_GET_QUEUE_UNKNOWN == request_type)
 	{
-		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -424,14 +424,14 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			/* gather queue stats by item type */
 			for (i = 0; i < queue.values_num; i++)
 			{
-				zbx_queue_item_t	*item = queue.values[i];
+				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 				zbx_uint64_t		id = item->type;
 
-				if (NULL == (stats = zbx_hashset_search(&queue_stats, &id)))
+				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
 				{
 					zbx_queue_stats_t	data = {.id = id};
 
-					stats = zbx_hashset_insert(&queue_stats, &data, sizeof(data));
+					stats = (zbx_queue_stats_t *)zbx_hashset_insert(&queue_stats, &data, sizeof(data));
 				}
 				queue_stats_update(stats, now - item->nextcheck);
 			}
@@ -449,14 +449,14 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			/* gather queue stats by proxy hostid */
 			for (i = 0; i < queue.values_num; i++)
 			{
-				zbx_queue_item_t	*item = queue.values[i];
+				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 				zbx_uint64_t		id = item->proxy_hostid;
 
-				if (NULL == (stats = zbx_hashset_search(&queue_stats, &id)))
+				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
 				{
 					zbx_queue_stats_t	data = {.id = id};
 
-					stats = zbx_hashset_insert(&queue_stats, &data, sizeof(data));
+					stats = (zbx_queue_stats_t *)zbx_hashset_insert(&queue_stats, &data, sizeof(data));
 				}
 				queue_stats_update(stats, now - item->nextcheck);
 			}
@@ -475,7 +475,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 			for (i = 0; i < queue.values_num && i < limit; i++)
 			{
-				zbx_queue_item_t	*item = queue.values[i];
+				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 
 				zbx_json_addobject(&json, NULL);
 				zbx_json_adduint64(&json, "itemid", item->itemid);
@@ -491,7 +491,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
 
-	(void)zbx_tcp_send_raw(sock, json.buffer);
+	(void)zbx_tcp_send(sock, json.buffer);
 
 	DCfree_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);
@@ -801,7 +801,7 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 					{
 						const zbx_proxy_counter_t	*proxy_counter;
 
-						proxy_counter = entry->info->counters.values[i];
+						proxy_counter = (zbx_proxy_counter_t *)entry->info->counters.values[i];
 						status_entry_export(json, entry, proxy_counter->counter_value,
 								&proxy_counter->proxyid);
 					}
@@ -847,7 +847,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user))
 	{
-		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -865,7 +865,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (ZBX_GET_STATUS_UNKNOWN == request_type)
 	{
-		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -890,7 +890,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
 
-	(void)zbx_tcp_send_raw(sock, json.buffer);
+	(void)zbx_tcp_send(sock, json.buffer);
 
 	zbx_json_free(&json);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,14 +27,12 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of maintenance periods');
 $page['file'] = 'maintenance.php';
-$page['scripts'] = ['class.calendar.js'];
+$page['scripts'] = ['class.calendar.js', 'multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hosts' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'groups' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostids' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'groupids' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
@@ -65,7 +63,6 @@ $fields = [
 	'timeperiods' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'edit_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
-	'twb_groupid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	// actions
 	'action' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null],
 	'add_timeperiod' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -408,22 +405,18 @@ if (!empty($data['form'])) {
 		CArrayHelper::sort($data['timeperiods'], ['timeperiod_type', 'start_date']);
 
 		// get hosts
-		$data['hostids'] = API::Host()->get([
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
 			'maintenanceids' => $data['maintenanceid'],
-			'real_hosts' => true,
-			'output' => ['hostid'],
 			'editable' => true
 		]);
-		$data['hostids'] = zbx_objectValues($data['hostids'], 'hostid');
 
-		// get groupids
-		$data['groupids'] = API::HostGroup()->get([
+		// get groups
+		$db_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
 			'maintenanceids' => $data['maintenanceid'],
-			'real_hosts' => true,
-			'output' => ['groupid'],
 			'editable' => true
 		]);
-		$data['groupids'] = zbx_objectValues($data['groupids'], 'groupid');
 	}
 	else {
 		$data['mname'] = getRequest('mname', '');
@@ -452,43 +445,32 @@ if (!empty($data['form'])) {
 		}
 		$data['description'] = getRequest('description', '');
 		$data['timeperiods'] = getRequest('timeperiods', []);
-		$data['hostids'] = getRequest('hostids', []);
-		$data['groupids'] = getRequest('groupids', []);
+
+		$hostids = getRequest('hostids', []);
+		$groupids = getRequest('groupids', []);
+
+		$db_hosts = $hostids
+			? API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $hostids,
+				'editable' => true
+			])
+			: [];
+
+		$db_groups = $groupids
+			? API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $groupids,
+				'editable' => true
+			])
+			: [];
 	}
 
-	// get groups
-	$data['all_groups'] = API::HostGroup()->get([
-		'editable' => true,
-		'output' => ['groupid', 'name'],
-		'real_hosts' => true,
-		'preservekeys' => true
-	]);
-	order_result($data['all_groups'], 'name');
+	$data['hosts_ms'] = CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']);
+	CArrayHelper::sort($data['hosts_ms'], ['name']);
 
-	$data['twb_groupid'] = getRequest('twb_groupid', 0);
-	if (!isset($data['all_groups'][$data['twb_groupid']])) {
-		$twb_groupid = reset($data['all_groups']);
-		$data['twb_groupid'] = $twb_groupid['groupid'];
-	}
-
-	// get hosts from selected twb group
-	$data['hosts'] = API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'real_hosts' => true,
-		'editable' => true,
-		'groupids' => $data['twb_groupid']
-	]);
-
-	// selected hosts
-	$hostsSelected = API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'real_hosts' => true,
-		'editable' => true,
-		'hostids' => $data['hostids']
-	]);
-	$data['hosts'] = array_merge($data['hosts'], $hostsSelected);
-	$data['hosts'] = zbx_toHash($data['hosts'], 'hostid');
-	order_result($data['hosts'], 'name');
+	$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
+	CArrayHelper::sort($data['groups_ms'], ['name']);
 
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.edit', $data);

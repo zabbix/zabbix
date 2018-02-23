@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
+require_once dirname(__FILE__) . '/class.ctestdbhelper.php';
 require_once dirname(__FILE__).'/class.cexceptionhelper.php';
 
 define('TEST_GOOD', 0);
@@ -363,7 +364,41 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	 * @param string $id  ID of the multiselect.
 	 */
 	public function zbxTestClickButtonMultiselect($id) {
-		$this->zbxTestClickXpath("//div[@id='$id']/..//button");
+		$this->zbxTestClickXpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/../div[@class='multiselect-button']/button"
+		);
+	}
+
+	public function zbxTestMultiselectNew($id, $string) {
+		$this->webDriver->findElement(
+			WebDriverBy::xpath("//div[contains(@class, 'multiselect') and @id='$id']/input")
+		)
+			->clear()
+			->sendKeys($string);
+		$this->zbxTestClickXpathWait(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
+			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
+		);
+		$this->zbxTestMultiselectAssertSelected($id, $string.' (new)');
+	}
+
+	public function zbxTestMultiselectAssertSelected($id, $string) {
+		$this->zbxTestAssertVisibleXpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']"
+		);
+	}
+
+	public function zbxTestMultiselectRemove($id, $string) {
+		$this->zbxTestClickXpathWait(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']/..".
+			"/span[@class='subfilter-disable-btn']"
+		);
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']"
+		));
 	}
 
 	public function zbxTestInputType($id, $str) {
@@ -379,9 +414,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
 	}
 
-	public function zbxTestInputTypeByXpath($xpath, $str) {
+	public function zbxTestInputTypeByXpath($xpath, $str, $validate = true) {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->sendKeys($str);
+
+		if ($validate) {
+			$this->zbxTestWaitUntilElementValuePresent(WebDriverBy::xpath($xpath), $str);
+		}
 	}
 
 	public function zbxTestInputTypeWait($id, $str) {
@@ -509,6 +548,18 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestWaitUntilElementVisible($by) {
 		$this->webDriver->wait(60, self::WAIT_ITERATION)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
+	}
+
+	public function zbxTestWaitUntilElementValuePresent($by, $value) {
+		$this->webDriver->wait(20, self::WAIT_ITERATION)->until(
+			function ($driver) use ($by, $value) {
+				try {
+					return $driver->findElement($by)->getAttribute('value') === $value;
+				} catch (StaleElementReferenceException $e) {
+					return null;
+				}
+			}
+		);
 	}
 
 	public function zbxTestWaitUntilElementNotVisible($by) {

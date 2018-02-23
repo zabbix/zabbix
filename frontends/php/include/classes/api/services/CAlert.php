@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -276,14 +276,14 @@ class CAlert extends CApiService {
 			if (!is_null($options['time_from']) || !is_null($options['time_till'])) {
 				$field = '(a.userid+0)';
 			}
-			$sqlParts['where'][] = dbConditionInt($field, $options['userids']);
+			$sqlParts['where'][] = dbConditionId($field, $options['userids']);
 		}
 
 		// mediatypeids
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
 
-			$sqlParts['where'][] = dbConditionInt('a.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionId('a.mediatypeid', $options['mediatypeids']);
 		}
 
 		// filter
