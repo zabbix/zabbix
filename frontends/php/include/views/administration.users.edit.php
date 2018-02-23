@@ -257,13 +257,13 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityName = getSeverityName($severity, $this->data['config']);
-			$severityStatusStyle = getSeverityStatusStyle($severity);
+			$severity_status_style = getSeverityStatusStyle($severity);
 
 			$mediaActive = ($media['severity'] & (1 << $severity));
 
 			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
 				->setHint($severityName.' ('.($mediaActive ? _('on') : _('off')).')', '', false)
-				->addClass($mediaActive ? $severityStatusStyle : ZBX_STYLE_STATUS_DISABLED_BG);
+				->addClass($mediaActive ? $severity_status_style : ZBX_STYLE_STATUS_DISABLED_BG);
 		}
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
