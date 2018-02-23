@@ -4018,16 +4018,11 @@ a.link-action {
 }
 
 .na-bg {
-	color: darken($alt-blue-grey,45%);
+	color: darken($alt-blue-grey, 45%);
 
-	a.link-action {
-	color: darken($alt-blue-grey,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .na-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-blue-grey, 45%);
 	}
 }
 
@@ -4064,16 +4059,11 @@ td.normal-bg {
 }
 
 .info-bg {
-	color: darken($alt-dark-blue,45%);
+	color: darken($alt-dark-blue, 45%);
 
-	a.link-action {
-	color: darken($alt-dark-blue,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .info-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-dark-blue, 45%);
 	}
 }
 
@@ -4091,16 +4081,11 @@ td.info-bg {
 }
 
 .average-bg {
-	color: darken($alt-orange,45%);
+	color: darken($alt-orange, 45%);
 
-	a.link-action {
-	color: darken($alt-orange,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .average-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-orange, 45%);
 	}
 }
 
@@ -4113,16 +4098,11 @@ td.average-bg {
 }
 
 .warning-bg {
-	color: darken($alt-yellow,45%);
+	color: darken($alt-yellow, 45%);
 
-	a.link-action {
-	color: darken($alt-yellow,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .warning-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-yellow, 45%);
 	}
 }
 
@@ -4140,16 +4120,11 @@ td.warning-bg {
 }
 
 .high-bg {
-	color: darken($alt-dark-orange,45%);
+	color: darken($alt-dark-orange, 45%);
 
-	a.link-action {
-	color: darken($alt-dark-orange,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .high-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-dark-orange, 45%);
 	}
 }
 
@@ -4167,16 +4142,11 @@ td.high-bg {
 }
 
 .disaster-bg {
-	color: darken($alt-red,45%);
+	color: darken($alt-red, 45%);
 
-	a.link-action {
-	color: darken($alt-red,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .disaster-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-red, 45%);
 	}
 }
 
