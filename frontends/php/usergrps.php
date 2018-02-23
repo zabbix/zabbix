@@ -357,7 +357,7 @@ if (hasRequest('form')) {
 		elseif ($data['value'] !== '' && $data['tag'] === '') {
 			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 		}
-		elseif ($tag_filter_groupids) {
+		else {
 			// Add new tag filter with submit().
 			if (hasRequest('tag_filter_subgroups')) {
 				$tag_filter_groupids = getSubGroups($tag_filter_groupids);
