@@ -49,7 +49,7 @@ function isWritableHostGroups(array $groupids) {
 }
 
 /**
- * Returns list of child groups for host group with given name..
+ * Returns list of child groups for host group with given name.
  *
  * @param string $name     Host group name.
  */

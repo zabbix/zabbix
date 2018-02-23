@@ -981,7 +981,7 @@ class CUserGroup extends CApiService {
 			$result = $relationMap->mapMany($result, $db_rights, 'rights');
 		}
 
-		// adding usergroup tag filters
+		// Adding usergroup tag filters.
 		if ($options['selectTagFilters'] !== null && $options['selectTagFilters'] != API_OUTPUT_COUNT) {
 			foreach ($result as &$usrgrp) {
 				$usrgrp['tag_filters'] = [];
