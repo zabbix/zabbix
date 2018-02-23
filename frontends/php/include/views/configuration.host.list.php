@@ -36,6 +36,7 @@ $widget = (new CWidget())
 			),
 		(new CTag('nav', true, (new CList())
 			->addItem(new CRedirectButton(_('Create host'), (new CUrl())
+				->removeArgument('hostid')
 				->setArgument('form', 'create')
 				->getUrl()
 			))
