@@ -1,3 +1,8 @@
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background-color: #333 !important;
+  color: #fff !important; }
+
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
 strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, .article, aside, canvas, details, embed, figure, figcaption, footer, .footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
@@ -2742,6 +2747,14 @@ a.link-action {
   border: 1px solid #e79e0b;
   background-color: #f1a50b; }
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+  border: 1px solid rgba(0, 0, 0, 0.2); }
+
+.status-disabled-bg {
+  color: #9f9f9f;
+  background-color: #f0f0f0;
+  border: 1px solid rgba(0, 0, 0, 0.2); }
+
 .tag {
   display: inline-block;
   color: #fff;
@@ -2758,7 +2771,7 @@ a.link-action {
   .tag:last-child {
     margin: 0; }
 
-.status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow {
+.status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg, .status-disabled-bg {
   padding: 2px 3px 1px 3px;
   font-size: 0.917em;
   text-transform: uppercase;
@@ -2769,6 +2782,8 @@ a.link-action {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
+  .status-green:not(:last-of-type), .status-red:not(:last-of-type), .status-grey:not(:last-of-type), .status-dark-grey:not(:last-of-type), .status-yellow:not(:last-of-type), .status-na-bg:not(:last-of-type), .status-info-bg:not(:last-of-type), .status-warning-bg:not(:last-of-type), .status-average-bg:not(:last-of-type), .status-high-bg:not(:last-of-type), .status-disaster-bg:not(:last-of-type), .status-disabled-bg:not(:last-of-type) {
+    border-right: none; }
 
 .green-bg, .normal-bg {
   background-color: #59db8f; }
