@@ -351,8 +351,11 @@ if (hasRequest('form')) {
 	$tag_filter_groupids = getRequest('tag_filter_groupids');
 
 	if (hasRequest('add_tag_filter')) {
-		if ($data['value'] !== '' && $data['tag'] === '') {
-			show_error_message(_s('Empty tag for value "%1$s".', $data['value']));
+		if (!$tag_filter_groupids) {
+			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
+		}
+		elseif ($data['value'] !== '' && $data['tag'] === '') {
+			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 		}
 		elseif ($tag_filter_groupids) {
 			// Add new tag filter with submit().
