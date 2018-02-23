@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXTASKS_H
 #define ZABBIX_ZBXTASKS_H
 
-#include "db.h"
+#include "zbxalgo.h"
 #include "zbxjson.h"
 
 #define ZBX_TASK_UPDATE_FREQUENCY	1
