@@ -99,7 +99,7 @@ $itemFormList->addRow(
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('httpcheck_parseurl', _('Parse ')))
+		(new CButton('httpcheck_parseurl', _('Parse')))
 			->setEnabled(!$readonly)
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setAttribute('data-action', 'parse_url')
