@@ -96,7 +96,7 @@ if (!$readonly) {
 				'dstfrm' => $itemForm->getName(),
 				'dstfld1' => 'key'
 			]).
-				',{itemtype: jQuery("#type option:selected").val()}));'
+				',{itemtype: jQuery("#type option:selected").val()}), null, this);'
 		);
 }
 
@@ -123,9 +123,8 @@ if (!$readonly) {
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',
 				'only_hostid' => $data['hostid'],
-				'with_webitems' => '0',
 				'excludeids' => [$data['itemid']]
-			]).');'
+			]).', null, this);'
 		);
 }
 

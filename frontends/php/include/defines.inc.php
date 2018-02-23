@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha3');
+define('ZABBIX_VERSION',		'4.0.0alpha4');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050036);
+define('ZABBIX_DB_VERSION',		3050037);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -176,6 +176,12 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
+
+define('ZBX_TCP_HEADER_DATA',		"ZBXD");
+define('ZBX_TCP_HEADER_VERSION',	"\1");
+define('ZBX_TCP_HEADER',			ZBX_TCP_HEADER_DATA.ZBX_TCP_HEADER_VERSION);
+define('ZBX_TCP_HEADER_LEN',		5);
+define('ZBX_TCP_DATALEN_LEN',		8);
 
 define('AUDIT_ACTION_ADD',		0);
 define('AUDIT_ACTION_UPDATE',	1);
@@ -1268,6 +1274,11 @@ define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 // availability report modes
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
+
+// monitoring modes
+define('ZBX_MONITORED_BY_ANY', 0);
+define('ZBX_MONITORED_BY_SERVER', 1);
+define('ZBX_MONITORED_BY_PROXY', 2);
 
 // queue modes
 define('QUEUE_OVERVIEW', 0);

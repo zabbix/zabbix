@@ -30,25 +30,11 @@ class testFormAdministrationUserGroups extends CWebTest {
 		$this->zbxTestCheckHeader('User groups');
 
 		$this->zbxTestTextPresent(['Group name', 'Users', 'Frontend access', 'Enabled', 'Debug mode']);
-		$this->zbxTestAssertAttribute('//input[@id=\'gname\']', 'maxlength', '255');
-
-		$this->zbxTestDropdownHasOptions('selusrgrp', ['All', 'Disabled', 'Enabled debug mode', 'Guests', 'No access to the frontend', 'Zabbix administrators']);
-		$this->zbxTestDropdownAssertSelected('selusrgrp', 'All');
-		$result = DBselect('select alias,name,surname from users');
-		while ($row = DBfetch($result)) {
-			$user = $row['alias'];
-			if ($row['alias'] == 'Admin') {
-				$user = $row['alias'].' ('.$row['name'].' '.$row['surname'].')';
-			}
-			$this->zbxTestDropdownHasOptions('group_users_right', [$user]);
-		}
+		$this->zbxTestAssertAttribute('//input[@id=\'gname\']', 'maxlength', '64');
 
 		$this->zbxTestDropdownHasOptions('gui_access', ['System default', 'Internal', 'Disabled']);
 		$this->zbxTestDropdownAssertSelected('gui_access', 'System default');
 		$this->zbxTestCheckboxSelected('users_status');
-
-		$this->zbxTestDropdownSelectWait('selusrgrp', 'Disabled');
-		$this->zbxTestDropdownHasOptions('group_users_right', ['disabled-user']);
 	}
 
 	public static function create() {
@@ -72,17 +58,9 @@ class testFormAdministrationUserGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Selenium autotest, add user group with very very very long group name',
-					'error_msg' => 'Cannot add group',
-					'error' => 'Invalid parameter "/1/name": value is too long.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
 					'name' => 'Selenium test add admin in disabled group',
 					'user_group' => 'Zabbix administrators',
-					'user' => 'Admin (Zabbix Administrator)',
+					'user' => 'Admin',
 					'enabled' => false,
 					'error_msg' => 'Cannot add group',
 					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
@@ -93,7 +71,7 @@ class testFormAdministrationUserGroups extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Selenium test add admin in group with disabled GUI access',
 					'user_group' => 'Zabbix administrators',
-					'user' => 'Admin (Zabbix Administrator)',
+					'user' => 'Admin',
 					'frontend_access' => 'Disabled',
 					'error_msg' => 'Cannot add group',
 					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
@@ -129,10 +107,9 @@ class testFormAdministrationUserGroups extends CWebTest {
 
 		$this->zbxTestInputTypeOverwrite('gname', $data['name']);
 		if (array_key_exists('user_group', $data)) {
-			$this->zbxTestDropdownSelectWait('selusrgrp', $data['user_group']);
-			$this->zbxTestDropdownSelect('group_users_right', $data['user']);
-			$this->zbxTestClickXpathWait("//table[@id='id']//button[@id='add']");
-			$this->zbxTestDropdownHasOptions('group_users_left', [$data['user']]);
+			$this->zbxTestClickButtonMultiselect('userids_');
+			$this->zbxTestLaunchOverlayDialog('Users');
+			$this->zbxTestClickLinkTextWait($data['user']);
 		}
 
 		if (array_key_exists('frontend_access', $data)) {
@@ -195,17 +172,9 @@ class testFormAdministrationUserGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Selenium autotest, update user group with very very very long group name',
-					'error_msg' => 'Cannot update group',
-					'error' => 'Invalid parameter "/1/name": value is too long.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
 					'name' => 'Selenium test group update, admin in disabled group',
 					'user_group' => 'Zabbix administrators',
-					'user' => 'Admin (Zabbix Administrator)',
+					'user' => 'Admin',
 					'enabled' => false,
 					'error_msg' => 'Cannot update group',
 					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
@@ -216,7 +185,7 @@ class testFormAdministrationUserGroups extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Selenium group update, admin in group with disabled GUI access',
 					'user_group' => 'Zabbix administrators',
-					'user' => 'Admin (Zabbix Administrator)',
+					'user' => 'Admin',
 					'frontend_access' => 'Disabled',
 					'error_msg' => 'Cannot update group',
 					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
@@ -247,10 +216,9 @@ class testFormAdministrationUserGroups extends CWebTest {
 
 		$this->zbxTestInputTypeOverwrite('gname', $data['name']);
 		if (array_key_exists('user_group', $data)) {
-			$this->zbxTestDropdownSelectWait('selusrgrp', $data['user_group']);
-			$this->zbxTestDropdownSelect('group_users_right', $data['user']);
-			$this->zbxTestClickXpathWait("//table[@id='id']//button[@id='add']");
-			$this->zbxTestDropdownHasOptions('group_users_left', [$data['user']]);
+			$this->zbxTestClickButtonMultiselect('userids_');
+			$this->zbxTestLaunchOverlayDialog('Users');
+			$this->zbxTestClickLinkTextWait($data['user']);
 		}
 
 		if (array_key_exists('frontend_access', $data)) {
@@ -319,7 +287,7 @@ class testFormAdministrationUserGroups extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Selenium user group in configuration',
-					'error' => 'User group "Selenium user group in configuration" is used in configuration for database down messages. '
+					'error' => 'User group "Selenium user group in configuration" is used in configuration for database down messages.'
 				]
 			],
 			[

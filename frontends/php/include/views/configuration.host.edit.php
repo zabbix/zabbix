@@ -45,9 +45,6 @@ if ($data['hostid'] != 0) {
 if ($data['clone_hostid'] != 0) {
 	$frmHost->addVar('clone_hostid', $data['clone_hostid']);
 }
-if ($data['groupid'] != 0) {
-	$frmHost->addVar('groupid', $data['groupid']);
-}
 
 $hostList = new CFormList('hostlist');
 
@@ -60,64 +57,40 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 }
 
-$hostList->addRow(
-	(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
-	(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired()
-		->setAttribute('autofocus', 'autofocus')
-);
-
-$hostList->addRow(_('Visible name'),
-	(new CTextBox('visiblename', $data['visiblename'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
-
-if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	// Groups for normal hosts.
-	$groups_tweenbox = new CTweenBox($frmHost, 'groups', $data['groups'], 10);
-
-	foreach ($data['groupsAll'] as $group) {
-		if (in_array($group['groupid'], $data['groups'])) {
-			$groups_tweenbox->addItem($group['groupid'], $group['name'], null,
-				array_key_exists($group['groupid'], $data['groupsAllowed'])
-			);
-		}
-		elseif (array_key_exists($group['groupid'], $data['groupsAllowed'])) {
-			$groups_tweenbox->addItem($group['groupid'], $group['name']);
-		}
-	}
-
-	$hostList->addRow((new CLabel(_('Groups'), 'groups_tweenbox'))->setAsteriskMark(),
-		$groups_tweenbox->get(_('In groups'), _('Other groups'))
+$hostList
+	->addRow(
+		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
+		(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Visible name'),
+		(new CTextBox('visiblename', $data['visiblename'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow((new CLabel(_('Groups'), 'groups[]'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'groups[]',
+			'objectName' => 'hostGroup',
+			'disabled' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
+			'objectOptions' => ['editable' => true],
+			'data' => $data['groups_ms'],
+			'addNew' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $frmHost->getName(),
+					'dstfld1' => 'groups_',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				]
+			]
+		]))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
-
-	$new_group = (new CTextBox('newgroup', $data['newgroup']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-	$new_group_label = _('New group');
-	if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-		$new_group_label .= ' '._('(Only super admins can create groups)');
-		$new_group->setReadonly(true);
-	}
-	$hostList->addRow(new CLabel($new_group_label, 'newgroup'),
-		(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-	);
-}
-else {
-	// Groups for discovered hosts.
-	$group_box = (new CListBox(null, null, 10))
-		->setEnabled(false)
-		->setId('host_groups');
-
-	foreach ($data['groupsAll'] as $group) {
-		if (in_array($group['groupid'], $data['groups'])) {
-			$group_box->addItem($group['groupid'], $group['name'], null,
-				array_key_exists($group['groupid'], $data['groupsAllowed'])
-			);
-		}
-	}
-	$hostList->addRow((new CLabel(_('Groups'), $group_box->getId()))->setAsteriskMark(), $group_box);
-	$hostList->addVar('groups', $data['groups']);
-}
 
 // interfaces for normal hosts
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {

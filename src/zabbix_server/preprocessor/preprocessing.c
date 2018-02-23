@@ -124,13 +124,14 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
  ******************************************************************************/
 static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_preproc_item_value_t *value)
 {
-	zbx_packed_field_t	fields[22], *offset = fields;	/* 22 - max field count */
+	zbx_packed_field_t	fields[23], *offset = fields;	/* 23 - max field count */
 	unsigned char		ts_marker, result_marker, log_marker;
 
 	ts_marker = (NULL != value->ts);
 	result_marker = (NULL != value->result);
 
 	*offset++ = PACKED_FIELD(&value->itemid, sizeof(zbx_uint64_t));
+	*offset++ = PACKED_FIELD(&value->item_value_type, sizeof(unsigned char));
 	*offset++ = PACKED_FIELD(&value->item_flags, sizeof(unsigned char));
 	*offset++ = PACKED_FIELD(&value->state, sizeof(unsigned char));
 	*offset++ = PACKED_FIELD(value->error, 0);
@@ -373,6 +374,7 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 	unsigned char	*offset = data, ts_marker, result_marker, log_marker;
 
 	offset += zbx_deserialize_uint64(offset, &value->itemid);
+	offset += zbx_deserialize_char(offset, &value->item_value_type);
 	offset += zbx_deserialize_char(offset, &value->item_flags);
 	offset += zbx_deserialize_char(offset, &value->state);
 	offset += zbx_deserialize_str(offset, &value->error, value_len);
@@ -636,17 +638,19 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                                                                            *
  * Purpose: perform item value preprocessing and dependend item processing    *
  *                                                                            *
- * Parameters: itemid     - [IN] the itemid                                   *
- *             item_flags - [IN] the item flags (e. g. lld rule)              *
- *             result     - [IN] agent result containing the value to add     *
- *             ts         - [IN] the value timestamp                          *
- *             state      - [IN] the item state                               *
- *             error      - [IN] the error message in case item state is      *
+ * Parameters: itemid          - [IN] the itemid                              *
+ *             item_value_type - [IN] the item value type                     *
+ *             item_flags      - [IN] the item flags (e. g. lld rule)         *
+ *             result          - [IN] agent result containing the value       *
+ *                               to add                                       *
+ *             ts              - [IN] the value timestamp                     *
+ *             state           - [IN] the item state                          *
+ *             error           - [IN] the error message in case item state is *
  *                               ITEM_STATE_NOTSUPPORTED                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
-		zbx_timespec_t *ts, unsigned char state, char *error)
+void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
+		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
 	const char			*__function_name = "zbx_preprocess_item_value";
 	zbx_preproc_item_value_t	value;
@@ -661,6 +665,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AG
 		goto out;
 	}
 	value.itemid = itemid;
+	value.item_value_type = item_value_type;
 	value.result = result;
 	value.error = error;
 	value.item_flags = item_flags;
