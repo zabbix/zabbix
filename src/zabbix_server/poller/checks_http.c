@@ -294,9 +294,18 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
+	*errbuf = '\0';
+
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s", curl_easy_strerror(err)));
+		if ('\0' == *errbuf)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s",
+					curl_easy_strerror(err)));
+		}
+		else
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s", errbuf));
+
 		goto clean;
 	}
 
