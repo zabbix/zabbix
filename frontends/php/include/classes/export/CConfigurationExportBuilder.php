@@ -345,11 +345,46 @@ class CConfigurationExportBuilder {
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
 				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
 				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes']),
-				'jmx_endpoint' => $discoveryRule['jmx_endpoint']
+				'jmx_endpoint' => $discoveryRule['jmx_endpoint'],
+				'timeout' => $discoveryRule['timeout'],
+				'url' => $discoveryRule['url'],
+				'query_fields' => $discoveryRule['query_fields'],
+				'posts' => $discoveryRule['posts'],
+				'status_codes' => $discoveryRule['status_codes'],
+				'follow_redirects' => $discoveryRule['follow_redirects'],
+				'post_type' => $discoveryRule['post_type'],
+				'http_proxy' => $discoveryRule['http_proxy'],
+				'headers' => $discoveryRule['headers'],
+				'retrieve_mode' => $discoveryRule['retrieve_mode'],
+				'request_method' => $discoveryRule['request_method'],
+				'output_format' => $discoveryRule['output_format'],
+				'ssl_cert_file' => $discoveryRule['ssl_cert_file'],
+				'ssl_key_file' => $discoveryRule['ssl_key_file'],
+				'ssl_key_password' => $discoveryRule['ssl_key_password'],
+				'verify_peer' => $discoveryRule['verify_peer'],
+				'verify_host' => $discoveryRule['verify_host']
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
+			}
+
+			if (is_array($discoveryRule['query_fields'])) {
+				$query_fields = [];
+
+				foreach ($discoveryRule['query_fields'] as $query_field) {
+					$query_fields[] = ['name' => key($query_field), 'value' => reset($query_field)];
+				}
+				$data['query_fields'] = $query_fields;
+			}
+
+			if (is_array($discoveryRule['headers'])) {
+				$headers = [];
+
+				foreach ($discoveryRule['headers'] as $name => $value) {
+					$headers[] = compact('name', 'value');
+				}
+				$data['headers'] = $headers;
 			}
 
 			$result[] = $data;
@@ -738,6 +773,7 @@ class CConfigurationExportBuilder {
 				}
 				$data['query_fields'] = $query_fields;
 			}
+
 			if (is_array($item['headers'])) {
 				$headers = [];
 
