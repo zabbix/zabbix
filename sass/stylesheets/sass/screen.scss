@@ -3155,6 +3155,21 @@ $form-icon-btn: (
 	}
 }
 
+.dashbrd-widget-graph-link {
+	display: block;
+	position: relative;
+
+	&:focus,
+	&:hover {
+		border: none;
+	}
+
+	> img,
+	> div {
+		max-width: 100%;
+	}
+}
+
 // Action Menus, Pop-up Menus
 .action-menu {
 	position: absolute;

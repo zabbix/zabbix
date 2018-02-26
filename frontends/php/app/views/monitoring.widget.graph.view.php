@@ -34,7 +34,11 @@ elseif ($data['graph']['unavailable_object']) {
 	];
 }
 else {
-	$flickerfree_item = (new CDiv((new CLink(null, $data['item_graph_url']))->setId($data['graph']['containerid'])))
+	$flickerfree_item = (new CDiv())
+		->addItem((new CLink(null, $data['item_graph_url']))
+			->setId($data['graph']['containerid'])
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
+		)
 		->addClass('flickerfreescreen')
 		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
