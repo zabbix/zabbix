@@ -139,6 +139,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-12754] fixed undefined index error in map import (gcalenko)
 ..F....... [ZBX-13166] fixed daily and yearly notification reports not including current day/last day of leap-year (nikita)
 .......PS. [ZBX-13498] added optional MySQL upgrade patch for "problem" table to drop redundant index after another index that can be used to enforce the foreign key constraint has been created (vso)
 ........S. [ZBX-13452] fixed Elasticsearch history storage default value types (viktors)
