@@ -1874,6 +1874,12 @@ function getMapLabels($map, $map_info) {
 		return;
 	}
 
+	$config = select_config();
+
+	if ($config['custom_color'] !== '1') {
+		$schema = DB::getSchema('config');
+	}
+
 	$selements = $map['selements'];
 
 	// set label type and custom label text for all selements
@@ -1943,6 +1949,7 @@ function getMapLabels($map, $map_info) {
 		}
 
 		$elementInfo = $map_info[$selementId];
+		$ack_unack = array_key_exists('ack', $elementInfo) && $elementInfo['ack'] === true ? 'ack' : 'unack';
 
 		foreach (['problem', 'unack', 'maintenance', 'ok', 'status'] as $caption) {
 			if (!isset($elementInfo['info'][$caption]) || zbx_empty($elementInfo['info'][$caption]['msg'])) {
@@ -1950,12 +1957,14 @@ function getMapLabels($map, $map_info) {
 			}
 
 			$msgs = explode("\n", $elementInfo['info'][$caption]['msg']);
+			$color_name = $caption . '_' . $ack_unack . '_color';
 
 			foreach ($msgs as $msg) {
 				$statusLines[$selementId][] = [
 					'content' => $msg,
 					'attributes' => [
-						'fill' => '#' . $elementInfo['info'][$caption]['color']
+						'fill' => '#' . ($config['custom_color'] === '1' ? $config[$color_name] :
+							$schema['fields'][$color_name]['default'])
 					]
 				];
 			}
