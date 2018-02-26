@@ -52,26 +52,44 @@ class CFilter extends CTag {
 
 	public function addColumn($column) {
 		$this->columns[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
+
 		return $this;
 	}
 
 	public function setFooter($footer) {
 		$this->footer = $footer;
+
 		return $this;
 	}
 
 	public function removeButtons() {
 		$this->show_buttons = false;
+
 		return $this;
 	}
 
 	public function addNavigator() {
 		$this->navigator = true;
+
 		return $this;
 	}
 
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+
+		return $this;
+	}
+
+	/**
+	 * Adds an item inside the form object.
+	 *
+	 * @param mixed $item  An item to add inside the form object.
+	 *
+	 * @return \CFilter
+	 */
+	public function addFormItem($item) {
+		$this->form->addItem($item);
+
 		return $this;
 	}
 
@@ -154,8 +172,6 @@ class CFilter extends CTag {
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 			);
-
-		return $buttons;
 	}
 
 	protected function startToString() {
