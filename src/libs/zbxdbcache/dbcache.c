@@ -2193,6 +2193,40 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
+static void	DCmass_prepare_history_export(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
+		const DC_ITEM *items, int history_num)
+{
+	int		i;
+	struct zbx_json	json;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < history_num; i++)
+	{
+		const ZBX_DC_HISTORY	*h = &history[i];
+		const DC_ITEM		*item;
+		int			index;
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
+			continue;
+
+		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		item = &items[index];
+
+		zbx_json_addobject(&json, "host");
+		zbx_json_addstring(&json, "name", item->host.name, ZBX_JSON_TYPE_STRING);
+		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
+		zbx_json_clean(&json);
+	}
+
+	zbx_json_free(&json);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCsync_history                                                   *
@@ -2326,6 +2360,10 @@ int	DCsync_history(int sync_type, int *total_num)
 
 	do
 	{
+		DC_ITEM			*items;
+		int			*errcodes;
+		zbx_vector_uint64_t	itemids;
+
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			zbx_vector_uint64_clear(&triggerids);
 
@@ -2353,10 +2391,8 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			int			i, trends_num = 0, *errcodes;
+			int			i, trends_num = 0;
 			ZBX_DC_TREND		*trends = NULL;
-			DC_ITEM			*items;
-			zbx_vector_uint64_t	itemids;
 
 			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
 			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
@@ -2373,7 +2409,6 @@ int	DCsync_history(int sync_type, int *total_num)
 
 			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
 					&inventory_values);
-			zbx_vector_uint64_destroy(&itemids);
 
 			/* process values only if they were successfully stored by the history backend */
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
@@ -2416,10 +2451,6 @@ int	DCsync_history(int sync_type, int *total_num)
 
 			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
 			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
-
-			DCconfig_clean_items(items, errcodes, history_num);
-			zbx_free(errcodes);
-			zbx_free(items);
 		}
 		else
 		{
@@ -2445,8 +2476,10 @@ int	DCsync_history(int sync_type, int *total_num)
 		*total_num += history_num;
 		candidate_num = history_items.values_num;
 
-		if (SUCCEED == ret && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && SUCCEED == ret)
 		{
+			DCmass_prepare_history_export(history, &itemids, items, history_num);
+
 			DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 					history_integer, &history_integer_num, history_string, &history_string_num,
 					history_text, &history_text_num, history_log, &history_log_num);
@@ -2463,6 +2496,14 @@ int	DCsync_history(int sync_type, int *total_num)
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)*total_num / (cache->history_num + *total_num) * 100);
 			sync_start = now;
+		}
+
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			zbx_vector_uint64_destroy(&itemids);
+			DCconfig_clean_items(items, errcodes, history_num);
+			zbx_free(errcodes);
+			zbx_free(items);
 		}
 
 		zbx_vector_ptr_clear(&history_items);
