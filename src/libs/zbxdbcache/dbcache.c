@@ -2242,6 +2242,7 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		DBfree_result(result);
 
 		zbx_json_close(&json);
+		zbx_json_close(&json);
 		zbx_json_adduint64(&json, "itemid", h->itemid);
 		zbx_snprintf(buffer, sizeof(buffer), "%d.%d", h->ts.sec, h->ts.ns);
 		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_INT);
