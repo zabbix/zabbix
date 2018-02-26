@@ -3,6 +3,7 @@ Changes for 4.0.0alpha5
 New features:
 
 Bug fixes:
+....I..... [ZBX-13398] fixed configure script for Debian GNU/Linux "buster" and "sid" to work with PostgreSQL (viktors)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha4
@@ -147,6 +148,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-13398] fixed configure script for Debian GNU/Linux "buster" and "sid" to work with PostgreSQL (viktors)
 ..F....... [ZBX-13428] fixed long name of map outside go back button in map widget (agriscenko, Sasha)
 A.F....... [ZBX-12754] fixed undefined index error in map import (gcalenko)
 ..F....... [ZBX-13166] fixed daily and yearly notification reports not including current day/last day of leap-year (nikita)
@@ -1271,6 +1273,7 @@ Changes for 3.0.15
 Changes for 3.0.15rc1
 
 Bug fixes:
+....I..... [ZBX-13398] fixed configure script for Debian GNU/Linux "buster" and "sid" to work with PostgreSQL (viktors)
 .......PS. [ZBX-13441] fixed crashes in case of failures (e.g. timeouts) during VMware hypervisor discovery (gleb)
 ........S. [ZBX-12643] improved error log message in case Zabbix server database cannot be used due to empty "users" table (vso)
 A......... [ZBX-13325] fixed trend.get() method with Oracle backend (Sasha)
