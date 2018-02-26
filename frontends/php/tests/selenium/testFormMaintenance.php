@@ -85,8 +85,9 @@ class testFormMaintenance extends CWebTest {
 
 		// Open "Hosts & Groups" tab and add group.
 		$this->zbxTestTabSwitchById('tab_hostTab', 'Hosts & Groups');
-		$this->zbxTestDropdownSelect('groupids_right', 'Zabbix servers');
-		$this->zbxTestClickXpath('//table[@name=\'groupids_tweenbox\']//button[@id=\'add\']');
+		$this->zbxTestClickButtonMultiselect('groupids_');
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+		$this->zbxTestClickLinkTextWait('Zabbix servers');
 
 		// Create maintenance and check the results in frontend.
 		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');

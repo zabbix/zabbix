@@ -45,8 +45,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
-	'hosts'				=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
-	'groups'			=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
+	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
 	'templates'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'add_templates'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
@@ -55,8 +54,6 @@ $fields = [
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
 	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
-	'twb_groupid'		=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
-	'newgroup'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
@@ -155,13 +152,39 @@ if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])) {
-	$_REQUEST['form'] = 'clone';
-	unset($_REQUEST['templateid'], $_REQUEST['hosts']);
-}
-elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
-	$_REQUEST['form'] = 'full_clone';
-	$_REQUEST['hosts'] = [];
+elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('templateid')) {
+	$_REQUEST['form'] = hasRequest('clone') ? 'clone' : 'full_clone';
+
+	$groups = getRequest('groups', []);
+	$groupids = [];
+
+	// Remove inaccessible groups from request, but leave "new".
+	foreach ($groups as $group) {
+		if (!is_array($group)) {
+			$groupids[] = $group;
+		}
+	}
+
+	if ($groupids) {
+		$groups_allowed = API::HostGroup()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($groups as $idx => $group) {
+			if (!is_array($group) && !array_key_exists($group, $groups_allowed)) {
+				unset($groups[$idx]);
+			}
+		}
+
+		$_REQUEST['groups'] = $groups;
+	}
+
+	if (hasRequest('clone')) {
+		unset($_REQUEST['templateid']);
+	}
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	try {
@@ -186,33 +209,25 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$auditAction = AUDIT_ACTION_UPDATE;
 		}
 
-		// groups
+		// Add new group.
 		$groups = getRequest('groups', []);
-		$groups = zbx_toObject($groups, 'groupid');
+		$new_groups = [];
 
-		// create new group
-		$newGroup = getRequest('newgroup');
+		foreach ($groups as $idx => $group) {
+			if (is_array($group) && array_key_exists('new', $group)) {
+				$new_groups[] = ['name' => $group['new']];
+				unset($groups[$idx]);
+			}
+		}
 
-		if (!zbx_empty($newGroup)) {
-			$result = API::HostGroup()->create([
-				'name' => $newGroup
-			]);
+		if ($new_groups) {
+			$new_groupid = API::HostGroup()->create($new_groups);
 
-			if (!$result) {
+			if (!$new_groupid) {
 				throw new Exception();
 			}
 
-			$newGroup = API::HostGroup()->get([
-				'groupids' => $result['groupids'],
-				'output' => API_OUTPUT_EXTEND
-			]);
-
-			if ($newGroup) {
-				$groups = array_merge($groups, $newGroup);
-			}
-			else {
-				throw new Exception();
-			}
+			$groups = array_merge($groups, $new_groupid['groupids']);
 		}
 
 		// linked templates
@@ -224,24 +239,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$templatesClear = getRequest('clear_templates', []);
 		$templatesClear = zbx_toObject($templatesClear, 'templateid');
-
-		// discovered hosts
-		$dbHosts = API::Host()->get([
-			'output' => ['hostid'],
-			'hostids' => getRequest('hosts', []),
-			'templated_hosts' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-		]);
-
 		$templateName = getRequest('template_name', '');
 
 		// create / update template
 		$template = [
 			'host' => $templateName,
 			'name' => getRequest('visiblename', ''),
-			'groups' => $groups,
+			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
-			'hosts' => $dbHosts,
 			'macros' => getRequest('macros', []),
 			'description' => getRequest('description', '')
 		];
@@ -442,8 +447,6 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
 if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
-		'groupId' => getRequest('groupid', 0),
-		'groupIds' => getRequest('groups', []),
 		'templateid' => getRequest('templateid', 0),
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
 	];
@@ -490,86 +493,69 @@ if (hasRequest('form')) {
 
 	CArrayHelper::sort($data['linkedTemplates'], ['name']);
 
-	// Get user allowed host groups and sort them by name.
-	$data['groupsAllowed'] = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'editable' => true,
-		'preservekeys' => true
-	]);
-	CArrayHelper::sort($data['groupsAllowed'], ['name']);
+	$groups = [];
 
-	// Get other host groups that user has also read permissions and sort by name.
-	$data['groupsAll'] = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'preservekeys' => true
-	]);
-	CArrayHelper::sort($data['groupsAll'], ['name']);
-
-	// "Other | group" tweenbox selector for hosts and templates
-	$data['twb_groupid'] = getRequest('twb_groupid', 0);
-	if ($data['twb_groupid'] == 0) {
-		$group = reset($data['groupsAllowed']);
-		$data['twb_groupid'] = $group['groupid'];
-	}
-
-	// Get allowed hosts from selected twb_groupid combobox.
-	$data['hostsAllowedToAdd'] = API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'groupids' => $data['twb_groupid'],
-		'templated_hosts' => true,
-		'editable' => true,
-		'preservekeys' => true,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-	]);
-	CArrayHelper::sort($data['hostsAllowedToAdd'], ['name']);
-
-	if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
-		$data['groupIds'] = zbx_objectValues($data['dbTemplate']['groups'], 'groupid');
-
-		// Get template hosts from DB.
-		$hostIdsLinkedTo = API::Host()->get([
-			'output' => ['hostid'],
-			'templateids' => $data['templateid'],
-			'templated_hosts' => true,
-			'preservekeys' => true
-		]);
-		$hostIdsLinkedTo = array_keys($hostIdsLinkedTo);
+	if (!hasRequest('form_refresh')) {
+		if ($data['templateid'] != 0) {
+			$groups = zbx_objectValues($data['dbTemplate']['groups'], 'groupid');
+		}
+		elseif (getRequest('groupid', 0) != 0) {
+			$groups[] = getRequest('groupid');
+		}
 	}
 	else {
-		if (!hasRequest('form_refresh') && $data['groupId'] != 0 && !$data['groupIds']) {
-			$data['groupIds'][] = $data['groupId'];
+		$groups = getRequest('groups', []);
+	}
+
+	$groupids = [];
+
+	foreach ($groups as $group) {
+		if (is_array($group) && array_key_exists('new', $group)) {
+			continue;
 		}
-		$hostIdsLinkedTo = getRequest('hosts', []);
+
+		$groupids[] = $group;
 	}
 
-	if ($data['groupIds']) {
-		$data['groupIds'] = array_combine($data['groupIds'], $data['groupIds']);
+	// Groups with R and RW permissions.
+	$groups_all = $groupids
+		? API::HostGroup()->get([
+			'output' => ['name'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		])
+		: [];
+
+	// Groups with RW permissions.
+	$groups_rw = $groupids && (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+		? API::HostGroup()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['groups_ms'] = [];
+
+	// Prepare data for multiselect.
+	foreach ($groups as $group) {
+		if (is_array($group) && array_key_exists('new', $group)) {
+			$data['groups_ms'][] = [
+				'id' => $group['new'],
+				'name' => $group['new'].' ('._x('new', 'new element in multiselect').')',
+				'isNew' => true
+			];
+		}
+		elseif (array_key_exists($group, $groups_all)) {
+			$data['groups_ms'][] = [
+				'id' => $group,
+				'name' => $groups_all[$group]['name'],
+				'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw)
+			];
+		}
 	}
-
-	if ($hostIdsLinkedTo) {
-		$hostIdsLinkedTo = array_combine($hostIdsLinkedTo, $hostIdsLinkedTo);
-	}
-
-	// Select allowed selected hosts.
-	$data['hostsAllowed'] = API::Host()->get([
-		'output' => ['hostid', 'name', 'flags'],
-		'hostids' => $hostIdsLinkedTo,
-		'templated_hosts' => true,
-		'editable' => true,
-		'preservekeys' => true,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-	]);
-	CArrayHelper::sort($data['hostsAllowed'], ['name']);
-
-	// Select selected hosts including read only.
-	$data['hostsAll'] = API::Host()->get([
-		'output' => ['hostid', 'name', 'flags'],
-		'hostids' => $hostIdsLinkedTo,
-		'templated_hosts' => true
-	]);
-	CArrayHelper::sort($data['hostsAll'], ['name']);
-
-	$data['hostIdsLinkedTo'] = $hostIdsLinkedTo;
+	CArrayHelper::sort($data['groups_ms'], ['name']);
 
 	$view = new CView('configuration.template.edit', $data);
 }
