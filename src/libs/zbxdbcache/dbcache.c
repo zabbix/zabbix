@@ -2208,9 +2208,9 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		int			index;
 		DB_RESULT		result;
 		DB_ROW			row;
-		char			buffer[21];
+		char			buffer[MAX_ID_LEN];
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
 
 		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -2244,8 +2244,32 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, "itemid", h->itemid);
 		zbx_snprintf(buffer, sizeof(buffer), "%d.%d", h->ts.sec, h->ts.ns);
-		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_UNKNOWN);
+		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_INT);
 
+		switch (h->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_json_addfloat(&json, "value", h->value.dbl);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_json_adduint64(&json, "value",  h->value.ui64);
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				zbx_json_addint64(&json, "timestamp",  h->value.log->timestamp);
+				zbx_json_addstring(&json, "source", ZBX_NULL2EMPTY_STR(h->value.log->source),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addint64(&json, "severity", h->value.log->severity);
+				zbx_json_addstring(&json, "value", h->value.log->value, ZBX_JSON_TYPE_STRING);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
 	}
 
