@@ -44,7 +44,6 @@ $http_popup_form_list = (new CFormList())
 		(new CTextBox('name', $options['name'], (bool) $options['templated'], 64))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->removeId()
 	)
 	->addRow(
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
