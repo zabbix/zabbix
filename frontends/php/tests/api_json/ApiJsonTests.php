@@ -33,6 +33,7 @@ require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
+require_once dirname(__FILE__).'/testMap.php';
 
 class ApiJsonTests {
 	public static function suite() {
@@ -52,6 +53,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
 		$suite->addTestSuite('testWebScenario');
+		$suite->addTestSuite('testMap');
 
 		return $suite;
 	}

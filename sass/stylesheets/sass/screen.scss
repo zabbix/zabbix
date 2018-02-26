@@ -3980,6 +3980,18 @@ a.link-action {
 	@extend %status;
 }
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border: 1px solid rgba($font-color, .2);
+	@extend %status;
+}
+
+.status-disabled-bg {
+	color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border: 1px solid rgba($font-color, .2);
+	@extend %status;
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
@@ -4007,6 +4019,10 @@ a.link-action {
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
+
+	&:not(:last-of-type) {
+		border-right: none;
+	}
 }
 
 .green-bg {
