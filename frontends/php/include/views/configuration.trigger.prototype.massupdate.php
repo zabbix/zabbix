@@ -100,7 +100,7 @@ $dependenciesDiv = (new CDiv([
 					'with_triggers' => '1',
 					'normal_only' => '1',
 					'noempty' => '1'
-				]).');'
+				]).', null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK),
 		(new CButton('add_dep_trigger_prototype', _('Add prototype')))
@@ -115,7 +115,7 @@ $dependenciesDiv = (new CDiv([
 					'multiselect' => '1',
 					'objname' => 'triggers',
 					'parent_discoveryid' => $data['parent_discoveryid']
-				]).');'
+				]).', null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	])

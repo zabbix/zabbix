@@ -130,39 +130,32 @@ class CMapHelper {
 			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
 		];
 
-		if ($sysmap['selements']) {
-			foreach ($sysmap['selements'] as &$selement) {
-				// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
-				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['permission'] < PERM_READ
-						&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
-					$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
-				}
+		foreach ($sysmap['selements'] as &$selement) {
+			// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['permission'] < PERM_READ
+					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+				$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
 			}
-			unset($selement);
 		}
+		unset($selement);
 
 		$areas = populateFromMapAreas($sysmap, $theme);
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
+		// Adding element names and removing inaccessible triggers from readable elements.
 		add_elementNames($sysmap['selements']);
 
 		foreach ($sysmap['selements'] as $id => &$element) {
+			if ($element['permission'] < PERM_READ) {
+				continue;
+			}
+
 			switch ($element['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
 					$map_info[$id]['name'] = _('Image');
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					// Skip inaccessible elements.
-					$selements_accessible = array_filter($element['elements'], function($elmn) {
-						return array_key_exists('elementName', $elmn);
-					});
-					if (($selements_accessible = reset($selements_accessible)) !== false) {
-						$map_info[$id]['name'] = $selements_accessible['elementName'];
-					} else {
-						$map_info[$id]['name'] = '';
-					}
-
 					// Move the trigger with problem and highiest priority to the beginning of the trigger list.
 					if (array_key_exists('triggerid', $map_info[$id])) {
 						$trigger_pos = 0;
@@ -180,17 +173,15 @@ class CMapHelper {
 							array_unshift($element['elements'], $trigger);
 						}
 					}
-
-					break;
+					// break; is not missing here
 
 				default:
 					$map_info[$id]['name'] = $element['elements'][0]['elementName'];
-					break;
 			}
 		}
 		unset($element);
 
-		$labels = getMapLabels($sysmap, $map_info, true);
+		$labels = getMapLabels($sysmap, $map_info);
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
 		$linktrigger_info = getMapLinktriggerInfo($sysmap, $options);

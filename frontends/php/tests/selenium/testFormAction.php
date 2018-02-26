@@ -700,7 +700,6 @@ class testFormAction extends CWebTest {
 			case 'Service port':
 				$this->zbxTestAssertElementPresentXpath('//input[@id=\'new_condition_value\']');
 				break;
-			case 'Proxy':
 			case 'Discovery rule':
 			case 'Discovery check':
 				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_condition_value\']');
@@ -755,10 +754,16 @@ class testFormAction extends CWebTest {
 			case 'Template':
 			case 'Host':
 			case 'Trigger':
-				$this->zbxTestAssertElementPresentXpath('//*[@id=\'new_condition_value_\']/input[@placeholder]');
+				$this->zbxTestAssertElementPresentXpath('//div[@id=\'new_condition_value_\']/input[@placeholder]');
 				break;
+
+			case 'Proxy':
+				$this->zbxTestAssertElementPresentXpath('//div[@id=\'new_condition_value\']/input[@placeholder]');
+				break;
+
 			default:
-				$this->zbxTestAssertElementNotPresentXpath('//*[@id=\'new_condition_value_\']/input[@placeholder]');
+				$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'new_condition_value_\']/input[@placeholder]');
+				$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'new_condition_value\']/input[@placeholder]');
 				break;
 		}
 
@@ -879,21 +884,8 @@ class testFormAction extends CWebTest {
 		}
 
 		switch ($new_condition_conditiontype) {
-			case 'Proxy':
-				$this->zbxTestAssertElementPresentXpath('//input[@id=\'proxy\']');
-				$this->zbxTestAssertAttribute('//input[@id=\'proxy\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'proxy\']', 'size', 20);
-				$this->zbxTestAssertAttribute('//input[@id=\'proxy\']', 'readonly');
-				break;
-			default:
-				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'proxy\']');
-				break;
-		}
-
-		switch ($new_condition_conditiontype) {
 			case 'Discovery rule':
 			case 'Discovery check':
-			case 'Proxy':
 				$this->zbxTestAssertElementPresentXpath('//button[@id=\'btn1\']');
 				$this->zbxTestAssertElementText('//button[@id=\'btn1\']', 'Select');
 				break;

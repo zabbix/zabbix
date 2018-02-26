@@ -193,8 +193,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 		// is activated
 		if (str_in_array($id, $subfilter)) {
 			$output[] = (new CSpan([
-				(new CSpan($element['name']))
-					->addClass(ZBX_STYLE_LINK_ACTION)
+				(new CLinkAction($element['name']))
 					->onClick(CHtml::encode(
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
@@ -217,8 +216,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					? new CSup('+'.$element['count'])
 					: new CSup($element['count']);
 
-				$link = (new CSpan($element['name']))
-					->addClass(ZBX_STYLE_LINK_ACTION)
+				$link = (new CLinkAction($element['name']))
 					->onClick(CHtml::encode(
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.
@@ -452,7 +450,7 @@ function getItemFilterForm(&$items) {
 					',(jQuery("input[name=\'filter_hostid\']").length > 0)'.
 						' ? {hostid: jQuery("input[name=\'filter_hostid\']").val()}'.
 						' : {}'.
-					'));'
+					'), null, this);'
 				)
 		]
 	);

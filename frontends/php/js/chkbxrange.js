@@ -56,7 +56,7 @@ var chkbxRange = {
 			}
 			// no checkboxes selected from cookies, check browser cache if checkboxes are still checked and update state
 			else {
-				var checkedFromCache = jQuery('.list-table tr:not(.header) input[type=checkbox]:checked:not(:disabled)');
+				var checkedFromCache = jQuery('.article .list-table tr:not(.header) input[type=checkbox]:checked:not(:disabled)');
 				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
 					return this.getObjectIdFromName(checkbox.name);
 				}, this));

@@ -31,6 +31,7 @@ require_once dirname(__FILE__).'/function_DBselect.php';
 require_once dirname(__FILE__).'/function_DBstart.php';
 require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
 require_once dirname(__FILE__).'/dbConditionIntTest.php';
+require_once dirname(__FILE__).'/dbConditionIdTest.php';
 require_once dirname(__FILE__).'/dbConditionStringTest.php';
 // require_once dirname(__FILE__).'/urlParamTest.php';
 
@@ -51,6 +52,7 @@ class GeneralTests {
 		$suite->addTestSuite('function_DBstart');
 		$suite->addTestSuite('zbx_dbcast_2bigintTest');
 		$suite->addTestSuite('dbConditionIntTest');
+		$suite->addTestSuite('dbConditionIdTest');
 		$suite->addTestSuite('dbConditionStringTest');
 //		$suite->addTestSuite('urlParamTest');
 
