@@ -2208,6 +2208,7 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		int			index;
 		DB_RESULT		result;
 		DB_ROW			row;
+		char			buffer[21];
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
@@ -2240,8 +2241,12 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
 		DBfree_result(result);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
+		zbx_json_close(&json);
+		zbx_json_adduint64(&json, "itemid", h->itemid);
+		zbx_snprintf(buffer, sizeof(buffer), "%d.%d", h->ts.sec, h->ts.ns);
+		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_UNKNOWN);
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
 	}
 
 	zbx_json_free(&json);
