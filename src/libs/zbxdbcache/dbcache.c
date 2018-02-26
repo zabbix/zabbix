@@ -2193,7 +2193,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-static void	DCmass_prepare_history_export(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
+static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
 		const DC_ITEM *items, int history_num)
 {
 	int		i;
@@ -2206,6 +2206,8 @@ static void	DCmass_prepare_history_export(const ZBX_DC_HISTORY *history, const z
 		const ZBX_DC_HISTORY	*h = &history[i];
 		const DC_ITEM		*item;
 		int			index;
+		DB_RESULT		result;
+		DB_ROW			row;
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
@@ -2218,10 +2220,28 @@ static void	DCmass_prepare_history_export(const ZBX_DC_HISTORY *history, const z
 
 		item = &items[index];
 
+		zbx_json_clean(&json);
 		zbx_json_addobject(&json, "host");
 		zbx_json_addstring(&json, "name", item->host.name, ZBX_JSON_TYPE_STRING);
+
+		if (NULL == (result = DBselect(
+				"select g.name"
+				" from groups g, hosts_groups hg"
+				" where hg.hostid=" ZBX_FS_UI64
+					" and g.groupid=hg.groupid",
+				item->host.hostid)))
+		{
+			continue;
+		}
+
+		zbx_json_addarray(&json, "groups");
+
+		while (NULL != (row = DBfetch(result)))
+			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+		DBfree_result(result);
+
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
-		zbx_json_clean(&json);
+
 	}
 
 	zbx_json_free(&json);
@@ -2478,7 +2498,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && SUCCEED == ret)
 		{
-			DCmass_prepare_history_export(history, &itemids, items, history_num);
+			DCexport_prepare_history(history, &itemids, items, history_num);
 
 			DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 					history_integer, &history_integer_num, history_string, &history_string_num,
