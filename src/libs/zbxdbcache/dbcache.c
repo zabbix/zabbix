@@ -2295,13 +2295,19 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		do
 		{
-			zbx_json_addstring(&json, "name", row[0], ZBX_JSON_TYPE_INT);
+			char *name;
+
+			name = zbx_strdup(NULL, row[0]);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL,
+					&name, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_json_addstring(&json, "name", name, ZBX_JSON_TYPE_INT);
+			zbx_free(name);
 		}
 		while (NULL != (row = DBfetch(result)));
 		DBfree_result(result);
 
 		if (NULL == (result = DBselect(
-				"select distinct a.name"
+				"select a.name"
 				" from applications a,items_applications i"
 				" where a.applicationid=i.applicationid"
 					" and i.itemid=" ZBX_FS_UI64,
