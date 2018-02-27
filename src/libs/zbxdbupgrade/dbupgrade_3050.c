@@ -457,6 +457,13 @@ static int	DBpatch_3050036(void)
 	return SUCCEED;
 }
 
+extern int	DBpatch_3040007(void);
+
+static int	DBpatch_3050037(void)
+{
+	return DBpatch_3040007();
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -496,5 +503,6 @@ DBPATCH_ADD(3050033, 0, 1)
 DBPATCH_ADD(3050034, 0, 1)
 DBPATCH_ADD(3050035, 0, 1)
 DBPATCH_ADD(3050036, 0, 1)
+DBPATCH_ADD(3050037, 0, 1)
 
 DBPATCH_END()

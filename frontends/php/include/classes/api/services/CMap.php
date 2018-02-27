@@ -954,8 +954,15 @@ class CMap extends CMapElement {
 				}
 			}
 
-			if (array_key_exists('selements', $map) && !is_array($map['selements'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			if (array_key_exists('selements', $map)) {
+				if (!is_array($map['selements'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif (!CMapHelper::checkSelementPermissions($map['selements'])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
 			}
 
 			// Map selement links.
@@ -1423,6 +1430,118 @@ class CMap extends CMapElement {
 				}
 			}
 		}
+
+		// Validate circular reference.
+		foreach ($maps as &$map) {
+			$map = array_merge($db_maps[$map['sysmapid']], $map);
+			$this->cref_maps[$map['sysmapid']] = $map;
+		}
+		unset($map);
+
+		$this->validateCircularReference($maps);
+	}
+
+	/**
+	 * Hash of maps data for circular reference validation. Map id is used as key.
+	 *
+	 * @var array
+	 */
+	protected $cref_maps;
+
+	/**
+	 * Validate maps for circular reference.
+	 *
+	 * @param array $maps   Array of maps to be validated for circular reference.
+	 *
+	 * @throws APIException if input is invalid.
+	 */
+	protected function validateCircularReference(array $maps) {
+		foreach ($maps as $map) {
+			if (!array_key_exists('selements', $map) || !$map['selements']) {
+				continue;
+			}
+			$cref_mapids = array_key_exists('sysmapid', $map) ? [$map['sysmapid']] : [];
+
+			foreach ($map['selements'] as $selement) {
+				if (!$this->validateCircularReferenceRecursive($selement, $cref_mapids)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot add "%1$s" element of the map "%2$s" due to circular reference.',
+							$selement['label'], $map['name'])
+					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Recursive map element circular reference validation.
+	 *
+	 * @param array $selement       Map selement data array.
+	 * @param array $cref_mapids    Array of map ids for current recursion step.
+	 *
+	 * @return bool
+	 */
+	protected function validateCircularReferenceRecursive(array $selement, &$cref_mapids) {
+		if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_MAP) {
+			return true;
+		}
+
+		$sysmapid = $selement['elements'][0]['sysmapid'];
+
+		if ($sysmapid !== null && !array_key_exists($sysmapid, $this->cref_maps)) {
+			$db_maps = DB::select($this->tableName, [
+				'output' => ['name'],
+				'filter' => ['sysmapid' => $sysmapid]
+			]);
+
+			if ($db_maps) {
+				$db_map = $db_maps[0];
+				$db_map['selements'] = [];
+				$selements = DB::select('sysmaps_elements', [
+					'output' => ['elementid'],
+					'filter' => [
+						'sysmapid' => $sysmapid,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
+					]
+				]);
+
+				foreach ($selements as $selement) {
+					$db_map['selements'][] = [
+						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP,
+						'elements' => [
+							['sysmapid' => $selement['elementid']]
+						]
+					];
+				}
+
+				$this->cref_maps[$sysmapid] = $db_map;
+				unset($selements);
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		if (in_array($sysmapid, $cref_mapids)) {
+			$cref_mapids[] = $sysmapid;
+			return false;
+		}
+
+		// Find maps that reference the current element, and if one has selements, check all of them recursively.
+		if ($sysmapid !== null && array_key_exists('selements', $this->cref_maps[$sysmapid])
+				&& is_array($this->cref_maps[$sysmapid]['selements'])) {
+			$cref_mapids[] = $sysmapid;
+
+			foreach ($this->cref_maps[$sysmapid]['selements'] as $selement) {
+				if (!$this->validateCircularReferenceRecursive($selement, $cref_mapids)) {
+					return false;
+				}
+			}
+
+			array_pop($cref_mapids);
+		}
+
+		return true;
 	}
 
 	/**
@@ -1808,6 +1927,11 @@ class CMap extends CMapElement {
 					$new_selement['sysmapid'] = $map['sysmapid'];
 					$selements_to_add[] = $new_selement;
 				}
+
+				foreach ($selement_diff['both'] as &$selement) {
+					$selement['sysmapid'] = $map['sysmapid'];
+				}
+				unset($selement);
 
 				$selements_to_update = array_merge($selements_to_update, $selement_diff['both']);
 				$selements_to_delete = array_merge($selements_to_delete, $selement_diff['second']);
