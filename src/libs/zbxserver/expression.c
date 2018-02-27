@@ -5568,7 +5568,11 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 
 	if (NULL == mem)
 	{
-		zbx_snprintf(error, maxerrlen, "Cannot save XML");
+		if (NULL != (pErr = xmlGetLastError()))
+			zbx_snprintf(error, maxerrlen, "Cannot save XML: %s", pErr->message);
+		else
+			zbx_snprintf(error, maxerrlen, "Cannot save XML");
+
 		goto clean;
 	}
 
