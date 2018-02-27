@@ -303,7 +303,7 @@ class testTagBasedPermissions extends CWebTest {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
-			$this->zbxTestClickLinkTextWait($name);
+			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->zbxTestClickButtonText('Apply');
 			$this->zbxTestTextPresent($name);
@@ -413,7 +413,7 @@ class testTagBasedPermissions extends CWebTest {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
-			$this->zbxTestClickLinkTextWait($name);
+			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->zbxTestClickButtonText('Apply');
 			$this->zbxTestTextPresent($name);
