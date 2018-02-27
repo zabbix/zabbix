@@ -4,6 +4,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
+..F....... [ZBX-13401] fixed successful items mass update with invalid update interval (agriscenko)
 A......... [ZBX-6167] fixed partial updating in maintenance.update (ashubin)
 ...G...... [ZBX-13062] banned using of mutex in threads of metrics collection (MVekslers)
 ........S. [ZBX-13236] fixed error message of function parameters parse (MVekslers)
@@ -18,7 +19,6 @@ New features:
 ..F....... [ZBXNEXT-4149] implemented keybord interaction in overlay popups (miks)
 
 Bug fixes:
-..F....... [ZBX-13401] fixed successful items mass update with invalid update interval (agriscenko)
 A.F....... [ZBX-12754] fixed undefined index error in map import (gcalenko)
 ..F....... [ZBX-13303] improved display of user media 'Use if severity' indicators (agriscenko, Andzs)
 ..F....... [ZBX-13166] fixed daily and yearly notification reports not including current day/last day of leap-year (nikita)
