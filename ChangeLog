@@ -3,6 +3,7 @@ Changes for 4.0.0alpha5
 New features:
 
 Bug fixes:
+A......... [ZBX-6167] fixed partial updating in maintenance.update (ashubin)
 ...G...... [ZBX-13062] banned using of mutex in threads of metrics collection (MVekslers)
 ........S. [ZBX-13236] fixed error message of function parameters parse (MVekslers)
 ....I..... [ZBX-10433] removed inaccurate configuration default values (viktors)
@@ -151,6 +152,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-6167] fixed partial updating in maintenance.update (ashubin)
 ...G...... [ZBX-13062] banned using of mutex in threads of metrics collection (MVekslers)
 ....I..... [ZBX-13398] fixed configure script for Debian GNU/Linux "buster" and "sid" to work with PostgreSQL (viktors)
 ..F....... [ZBX-13428] fixed long name of map outside go back button in map widget (agriscenko, Sasha)
@@ -1267,6 +1269,7 @@ Changes for 3.0.16rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-6167] fixed partial updating in maintenance.update (ashubin)
 ...G...... [ZBX-13062] banned using of mutex in threads of metrics collection (MVekslers)
 
 --------------------------------------------------------------------------------
