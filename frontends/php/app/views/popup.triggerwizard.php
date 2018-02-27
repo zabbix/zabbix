@@ -138,7 +138,7 @@ $form->addItem(
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'itemid',
 						'dstfld2' => 'item'
-					]).');'
+					]).', null, this);'
 				)
 		])
 		->addRow(_('Severity'), new CSeverity([
