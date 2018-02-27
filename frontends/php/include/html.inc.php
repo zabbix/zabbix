@@ -504,10 +504,12 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 }
 
 /**
- * Create CDiv with sysmap information
+ * Create breadcrumbs header object with sysmap parents information.
  *
- * @param int    $sysmapid
- * @param string $name
+ * @param int    $sysmapid      Used as value for sysmaid in map link generation.
+ * @param string $name          Used as label for map link generation.
+ * @param int    $fullscreen    Used as value for fullscreen in map link generation.
+ * @param int    $severity_min  Used as value for severity_min in map link generation.
  *
  * @return object
  */
@@ -531,18 +533,22 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 	// get map parent maps
 	$parent_sysmaps = get_parent_sysmaps($sysmapid);
 	if ($parent_sysmaps) {
-		$hor_list = new CHorList();
+		$parent_maps = (new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Upper level maps'))
+			->addClass(ZBX_STYLE_OBJECT_GROUP);
 
 		foreach ($parent_sysmaps as $parent_sysmap) {
-			$hor_list->addItem(
+			$parent_maps->addItem(
 				new CLink($parent_sysmap['name'], 'zabbix.php?action=map.view'.
 					'&sysmapid='.$parent_sysmap['sysmapid'].'&fullscreen='.$fullscreen.'&severity_min='.$severity_min
 				)
 			);
 		}
 
-		$list->addItem(new CSpan(_('Upper level maps').':'));
-		$list->addItem($hor_list);
+		$list->addItem(_('Upper level maps').':');
+
+		return new CHorList([$list, $parent_maps]);
 	}
 
 	return $list;
