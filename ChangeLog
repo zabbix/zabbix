@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-12883] fixed incorrect ordering the list of triggers after saving a map (agriscenko)
 ..F....... [ZBXNEXT-4150] fixed URL display in hint box and focus styles for radio buttons (ashubin, nikita)
 ..F....... [ZBX-12940] fixed content does not fit dialog window (agriscenko)
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
@@ -157,6 +158,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12883] fixed incorrect ordering the list of triggers after saving a map (agriscenko)
 ..F....... [ZBX-12940] fixed content does not fit dialog window (agriscenko)
 ..F....... [ZBX-13401] fixed successful items mass update with invalid update interval (agriscenko)
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
