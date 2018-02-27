@@ -1046,6 +1046,9 @@ jQuery(function($) {
 
 						clearTimeout(window.menuPopupTimeoutHandler);
 					})
+					.on('click', function() {
+						return false;
+					})
 					.position({
 						of: (opener.prop('tagName') === 'AREA') ? mapContainer : target,
 						my: 'left top',
@@ -1273,10 +1276,8 @@ jQuery(function($) {
 			});
 		}
 
-		var no_event = false;
 		if (typeof options.disabled !== 'undefined' && options.disabled) {
 			link.addClass('action-menu-item-disabled');
-			no_event = true;
 		}
 		else {
 			link.addClass('action-menu-item');
@@ -1299,13 +1300,6 @@ jQuery(function($) {
 				'aria-haspopup': 'true',
 				'aria-expanded': 'false',
 				'area-hidden': 'true'
-			});
-			no_event = true;
-		}
-
-		if (no_event) {
-			link.on('click', function(e) {
-				return false;
 			});
 		}
 
