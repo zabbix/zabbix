@@ -2641,16 +2641,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .overlay-descr {
   max-height: 150px;
   overflow-y: auto;
-  padding: 0 11px 0 11px;
+  padding: 0;
   margin: 5px 0;
   background-color: #2b2b2b; }
 
 .overlay-descr-url {
-  padding: 3px 11px 7px 11px; }
+  padding: 3px 0 7px; }
 
 .overlay-descr {
-  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
-  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), transparent), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), transparent) 0 100%;
+  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
+  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
   background-repeat: no-repeat;
   background-color: #2b2b2b;
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -2833,13 +2833,14 @@ a.link-action {
 .red-bg {
   background-color: #e45959; }
 
-.na-bg, .na-bg input[type="radio"]:checked + label {
+.na-bg {
   color: #2a353a; }
-  .na-bg a.link-action, .na-bg input[type="radio"]:checked + label a.link-action {
+  .na-bg a.link-action,
+  .na-bg input[type="radio"]:checked + label {
     color: #2a353a; }
 
-.na-bg.blink-hidden, .na-bg input[type="radio"]:checked + label.blink-hidden {
-  background-color: transparent; }
+.na-bg.blink-hidden {
+  background-color: rgba(0, 0, 0, 0); }
 
 td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg {
   border-left: 1px dotted #383838; }
@@ -2854,59 +2855,64 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #0e4123; }
 
 .normal-bg.blink-hidden {
-  background-color: transparent; }
+  background-color: rgba(0, 0, 0, 0); }
 
-.info-bg, .info-bg input[type="radio"]:checked + label {
+.info-bg {
   color: #00268e; }
-  .info-bg a.link-action, .info-bg input[type="radio"]:checked + label a.link-action {
+  .info-bg a.link-action,
+  .info-bg input[type="radio"]:checked + label {
     color: #00268e; }
 
-.info-bg.blink-hidden, .info-bg input[type="radio"]:checked + label.blink-hidden {
-  background-color: transparent; }
+.info-bg.blink-hidden {
+  background-color: rgba(0, 0, 0, 0); }
 
 .log-info-bg {
   color: #00268e;
   background-color: #7499ff; }
 
-.average-bg, .average-bg input[type="radio"]:checked + label {
+.average-bg {
   color: #733100; }
-  .average-bg a.link-action, .average-bg input[type="radio"]:checked + label a.link-action {
+  .average-bg a.link-action,
+  .average-bg input[type="radio"]:checked + label {
     color: #733100; }
 
-.average-bg.blink-hidden, .average-bg input[type="radio"]:checked + label.blink-hidden {
-  background-color: transparent; }
+.average-bg.blink-hidden {
+  background-color: rgba(0, 0, 0, 0); }
 
-.warning-bg, .warning-bg input[type="radio"]:checked + label {
+.warning-bg {
   color: #734d00; }
-  .warning-bg a.link-action, .warning-bg input[type="radio"]:checked + label a.link-action {
+  .warning-bg a.link-action,
+  .warning-bg input[type="radio"]:checked + label {
     color: #734d00; }
 
-.warning-bg.blink-hidden, .warning-bg input[type="radio"]:checked + label.blink-hidden {
-  background-color: transparent; }
+.warning-bg.blink-hidden {
+  background-color: rgba(0, 0, 0, 0); }
 
 .log-warning-bg {
   color: #734d00;
   background-color: #ffc859; }
 
-.high-bg, .high-bg input[type="radio"]:checked + label {
+.high-bg {
   color: #52190b; }
-  .high-bg a.link-action, .high-bg input[type="radio"]:checked + label a.link-action {
+  .high-bg a.link-action,
+  .high-bg input[type="radio"]:checked + label {
     color: #52190b; }
 
-.high-bg.blink-hidden, .high-bg input[type="radio"]:checked + label.blink-hidden {
-  background-color: transparent; }
+.high-bg.blink-hidden {
+  background-color: rgba(0, 0, 0, 0); }
 
 .log-high-bg {
   color: #52190b;
   background-color: #e97659; }
 
-.disaster-bg, .disaster-bg input[type="radio"]:checked + label {
+.disaster-bg {
   color: #4b0c0c; }
-  .disaster-bg a.link-action, .disaster-bg input[type="radio"]:checked + label a.link-action {
+  .disaster-bg a.link-action,
+  .disaster-bg input[type="radio"]:checked + label {
     color: #4b0c0c; }
 
-.disaster-bg.blink-hidden, .disaster-bg input[type="radio"]:checked + label.blink-hidden {
-  background-color: transparent; }
+.disaster-bg.blink-hidden {
+  background-color: rgba(0, 0, 0, 0); }
 
 .log-disaster-bg {
   color: #4b0c0c;
@@ -3341,7 +3347,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .notif-body h4, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }

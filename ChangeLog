@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBXNEXT-4150] fixed URL display in hint box and focus styles for radio buttons (ashubin, nikita)
 ..F....... [ZBX-12940] fixed content does not fit dialog window (agriscenko)
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
 ..F....... [ZBX-13401] fixed successful items mass update with invalid update interval (agriscenko)
