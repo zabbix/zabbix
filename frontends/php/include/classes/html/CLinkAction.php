@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -17,21 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VERSION_H
-#define ZABBIX_VERSION_H
 
-#define ZBX_STR2(str)	#str
-#define ZBX_STR(str)	ZBX_STR2(str)
+class CLinkAction extends CLink {
 
-#define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"26 February 2018"
-#define ZABBIX_VERSION_MAJOR	4
-#define ZABBIX_VERSION_MINOR	0
-#define ZABBIX_VERSION_PATCH	0
-#define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
-#define ZABBIX_VERSION_RC	"alpha5"
-#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
-				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
-#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
+	public function __construct($items = null) {
+		parent::__construct($items);
 
-#endif
+		$this->addClass(ZBX_STYLE_LINK_ACTION);
+	}
+}

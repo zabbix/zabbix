@@ -1984,16 +1984,16 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 /******************************************************************************
  *                                                                            *
- * Function: process_actions_by_acknowledgments                               *
+ * Function: process_actions_by_acknowledgements                              *
  *                                                                            *
- * Purpose: process actions for each acknowledgment in the array              *
+ * Purpose: process actions for each acknowledgement in the array             *
  *                                                                            *
  * Parameters: event_ack        - [IN] vector for eventid/ackid pairs         *
  *                                                                            *
  ******************************************************************************/
-int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
+int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 {
-	const char		*__function_name = "process_actions_by_acknowledgments";
+	const char		*__function_name = "process_actions_by_acknowledgements";
 
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];

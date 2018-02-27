@@ -273,7 +273,7 @@ jQuery(function($) {
 					}
 
 					if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
-						setReadonly(obj);
+						setSearchFieldVisibility(false, obj, options);
 						return false;
 					}
 
@@ -426,10 +426,13 @@ jQuery(function($) {
 
 						case KEY.ARROW_RIGHT:
 							if ($('.selected li.selected', obj).length > 0) {
-								var next = $('.selected li.selected', obj).removeClass('selected').next();
+								var next = $('.selected li.selected', obj).removeClass('selected').next('li');
 
 								if (next.length > 0) {
 									next.addClass('selected');
+								}
+								else if (getSearchFieldVisibility(obj) == false) {
+									$('.selected li:first-child', obj).addClass('selected');
 								}
 							}
 							break;
@@ -500,12 +503,14 @@ jQuery(function($) {
 					}
 				})
 				.focusin(function() {
-					if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-						$(obj).addClass('active');
+					$(obj).addClass('active');
+
+					if (getSearchFieldVisibility(obj) == false) {
+						$('.selected li:first-child', obj).addClass('selected');
 					}
 				})
 				.focusout(function() {
-					$(obj).removeClass('active');
+					$(obj).removeClass('active').find('li.selected').removeClass('selected');
 					cleanSearchInput(obj);
 				});
 				if (obj.attr('aria-required')) {
@@ -774,7 +779,7 @@ jQuery(function($) {
 
 			// set readonly
 			if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
-				setReadonly(obj);
+				setSearchFieldVisibility(false, obj, options);
 			}
 		}
 	}
@@ -796,7 +801,8 @@ jQuery(function($) {
 		cleanLastSearch(obj);
 
 		if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-			$('input[type="text"]', obj).css({'display': ''}).focus();
+			setSearchFieldVisibility(true, obj, options);
+			$('input[type="text"]', obj).focus();
 		}
 	}
 
@@ -983,9 +989,27 @@ jQuery(function($) {
 		}
 	}
 
-	function setReadonly(obj) {
-		$('input[type="text"]', obj).css({'display': 'none'});
-		$(obj).removeClass('active');
+	function setSearchFieldVisibility(visible, container, options) {
+		if (visible) {
+			container.removeClass('search-disabled')
+				.find('input[type="text"]')
+				.attr({
+					placeholder: options.labels['type here to search'],
+					readonly: false
+				});
+		}
+		else {
+			container.addClass('search-disabled')
+				.find('input[type="text"]')
+				.attr({
+					placeholder: '',
+					readonly: true
+				});
+		}
+	}
+
+	function getSearchFieldVisibility(container) {
+		return container.not('.search-disabled').length > 0;
 	}
 
 	function getLimit(values, options) {

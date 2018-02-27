@@ -52,7 +52,8 @@ function SVGCanvas(options, shadowBuffer) {
 			'viewBox': '0 0 ' + options.width + ' ' + options.height,
 			'width': '100%',
 			'height': '100%',
-			'style': 'max-width: ' + options.width + 'px; max-height: ' + options.height + 'px;'
+			'style': 'max-width: ' + options.width + 'px; max-height: ' + options.height + 'px;',
+			'preserveAspectRatio': 'xMinYMin meet'
 		}
 		: {
 			'width': options.width,

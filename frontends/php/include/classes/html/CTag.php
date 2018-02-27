@@ -45,6 +45,13 @@ class CTag extends CObject {
 	 */
 	protected $attrEncStrategy = self::ENC_ALL;
 
+	/**
+	 * Hint element for the current CTag.
+	 *
+	 * @var CSpan
+	 */
+	protected $hint = null;
+
 	public function __construct($tagname, $paired = false, $body = null) {
 		parent::__construct();
 
@@ -90,6 +97,11 @@ class CTag extends CObject {
 		$res = $this->startToString();
 		$res .= $this->bodyToString();
 		$res .= $this->endToString();
+
+		if ($this->hint !== null) {
+			$res .= $this->hint->toString();
+		}
+
 		if ($destroy) {
 			$this->destroy();
 		}
@@ -169,20 +181,20 @@ class CTag extends CObject {
 	 * @return CTag
 	 */
 	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
-		$this->addItem(
-			(new CSpan(
-				(new CSpan($text))->addClass('hint-box')
-			))->setAttribute('style', 'display: none;')
-		);
+		$this->hint = (new CSpan($text))
+			->addClass('hint-box')
+			->setAttribute('style', 'display: none;');
 
-		$this->onMouseover(
-			'hintBox.HintWrapper(event, this, "'.$span_class.'", "'.$styles.'");'
-		);
+		$this->setAttribute('data-hintbox', '1');
 
+		if ($span_class !== '') {
+			$this->setAttribute('data-hintbox-class', $span_class);
+		}
+		if ($styles !== '') {
+			$this->setAttribute('data-hintbox-style', $styles);
+		}
 		if ($freeze_on_click) {
-			$this->onClick(
-				'hintBox.showStaticHint(event, this, "'.$span_class.'", false, "'.$styles.'");'
-			);
+			$this->setAttribute('data-hintbox-static', '1');
 		}
 
 		return $this;

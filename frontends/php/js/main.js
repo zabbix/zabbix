@@ -453,6 +453,56 @@ var jqBlink = {
  */
 var hintBox = {
 
+	/**
+	 * Initialize hint box event handlers.
+	 * Event 'remove' is triggered on widget update by updateWidgetContent() and widget remove by deleteWidget().
+	 */
+	bindEvents: function () {
+		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
+			var target = jQuery(this);
+
+			switch (e.type) {
+				case 'mouseenter' :
+					hintBox.showHint(e, this, target.next('.hint-box').html(), target.data('hintbox-class'), false,
+						target.data('hintbox-style')
+					);
+					break;
+
+				case 'mouseleave' :
+					hintBox.hideHint(e, this);
+					break;
+
+				case 'remove' :
+					hintBox.deleteHint(this);
+					break;
+
+				case 'keydown' :
+					if (e.which == 13 && target.data('hintbox-static') == 1) {
+						var offset = target.offset(),
+							w = jQuery(window);
+						// Emulate click on left middle point of link.
+						e.clientX = offset.left - w.scrollLeft();
+						e.clientY = offset.top - w.scrollTop() + (target.height() / 2);
+						e.preventDefault();
+
+						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
+							target.data('hintbox-style')
+						);
+					}
+
+					break;
+
+				case 'click' :
+					if (target.data('hintbox-static') == 1) {
+						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
+							target.data('hintbox-style')
+						);
+					}
+					break;
+			}
+		});
+	},
+
 	createBox: function(e, target, hintText, className, isStatic, styles) {
 		var hintboxid = hintBox.getUniqueId(),
 			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue');
@@ -500,35 +550,13 @@ var hintBox = {
 		return box;
 	},
 
-	HintWrapper: function(e, target, className, styles) {
-		target.isStatic = false;
-
-		var	hintText = jQuery('.hint-box', target).html();
-
-		jQuery(target).on('mouseenter', function(e, d) {
-			if (d) {
-				e = d;
-			}
-			hintBox.showHint(e, target, hintText, className, false, styles);
-
-		}).on('mouseleave', function(e) {
-			hintBox.hideHint(e, target);
-
-		}).on('remove', function(e) {
-			hintBox.deleteHint(target);
-		});
-
-		jQuery(target).removeAttr('onmouseover');
-		jQuery(target).trigger('mouseenter', e);
-	},
-
 	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = jQuery('.hint-box', target).html();
+				hintText = jQuery(target).next('.hint-box').html();
 			}
 
 			target.isStatic = true;

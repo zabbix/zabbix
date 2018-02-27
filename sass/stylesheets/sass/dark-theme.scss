@@ -109,6 +109,9 @@ $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border: 1px solid rgba($ui-bg-color, .2) !important;
+}
 
 .top-nav-help {
 	background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important;
@@ -125,12 +128,6 @@ $ok-ack-fg-color: #00ff00;
 .btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
-	}
-}
-
 .list-table {
 
 	thead th {
@@ -148,3 +145,21 @@ $ok-ack-fg-color: #00ff00;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+.top-subnav a {
+	&:focus {
+		border-bottom: 4px solid lighten($main-nav-bg-color, 30%) !important;
+		outline: none;
+	}
+}
+
+// GRAPH AND MAP
+.btn-back-map-container {
+
+	.btn-back-map {
+
+		.btn-back-map-icon {
+			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+		}
+	}
+}

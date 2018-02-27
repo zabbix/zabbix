@@ -1272,6 +1272,9 @@ static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 	if (ITEM_STATE_NOTSUPPORTED == hdata->state)
 		goto out;
 
+	if (0 == (hdata->flags & ZBX_DC_FLAG_NOHISTORY))
+		hdata->ttl = item->history_sec;
+
 	if (item->value_type == hdata->value_type)
 	{
 		/* truncate text based values if necessary */
@@ -1319,7 +1322,6 @@ static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 	}
 
 	ret = dc_history_set_value(hdata, item->value_type, &value_var);
-	hdata->ttl = item->history_sec;
 	zbx_variant_clear(&value_var);
 out:
 	return ret;

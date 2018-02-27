@@ -375,6 +375,10 @@ tests/Makefile.in
 tests/libs/.deps
 tests/libs/Makefile
 tests/libs/Makefile.in
+tests/libs/zbxcommon/.deps
+tests/libs/zbxcommon/Makefile
+tests/libs/zbxcommon/Makefile.in
+tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
 tests/libs/zbxcommshigh/Makefile.in
