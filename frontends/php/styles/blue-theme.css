@@ -2333,6 +2333,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;
+      width: 100%;
       max-height: calc(100vh - 190px);
       max-width: inherit;
       margin: 0 0 10px 0; }
