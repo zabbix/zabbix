@@ -1130,7 +1130,7 @@ jQuery(function($) {
 
 		// Close actual menu level.
 		parent_menu.not('.action-menu-top').css({'display': 'none'});
-		parent_menu.prev('[role="menuitem"]').not('.action-menu-top').attr({'aria-expanded': 'false'});
+		parent_menu.prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
 
 		return this;
 	};
@@ -1147,8 +1147,8 @@ jQuery(function($) {
 			items;
 
 		// Find active menu level.
-		while ($('[aria-expanded="true"]', level).length) {
-			level = $('[aria-expanded="true"]', level).next('[role="menu"]');
+		while ($('[aria-expanded="true"]:visible', level).length) {
+			level = $('[aria-expanded="true"]:visible:first', level.get(0)).next('[role="menu"]');
 		}
 
 		// Find active menu items.
@@ -1307,9 +1307,12 @@ jQuery(function($) {
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
 			var menu = $('<ul>', {
-				class : 'action-menu',
-				role: 'menu'
-			});
+					class : 'action-menu',
+					role: 'menu'
+				})
+				.on('mouseenter', function(e) {
+					e.stopPropagation();
+				});
 
 			$.each(options.items, function(i, item) {
 				menu.append(createMenuItem(item));
@@ -1317,7 +1320,7 @@ jQuery(function($) {
 
 			item.append(menu);
 
-			item.hover(function(e) {
+			item.on('mouseenter', function(e) {
 				e.stopPropagation();
 				$(this).actionMenuItemExpand();
 			});
