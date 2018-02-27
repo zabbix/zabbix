@@ -2237,8 +2237,18 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		zbx_json_addarray(&json, "groups");
 
-		while (NULL != (row = DBfetch(result)))
+		if (NULL == (row = DBfetch(result)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
+			DBfree_result(result);
+			continue;
+		}
+
+		do
+		{
 			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+		}
+		while (NULL != (row = DBfetch(result)));
 		DBfree_result(result);
 
 		zbx_json_close(&json);
@@ -2276,8 +2286,18 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		if (NULL == (result = DBselect("select name from items where itemid=" ZBX_FS_UI64, h->itemid)))
 				continue;
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL == (row = DBfetch(result)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item name");
+			DBfree_result(result);
+			continue;
+		}
+
+		do
+		{
 			zbx_json_addstring(&json, "name", row[0], ZBX_JSON_TYPE_INT);
+		}
+		while (NULL != (row = DBfetch(result)));
 		DBfree_result(result);
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
