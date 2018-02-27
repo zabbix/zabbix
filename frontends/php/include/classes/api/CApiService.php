@@ -877,9 +877,19 @@ class CApiService {
 			zbx_value2array($value);
 
 			$fieldName = $this->fieldId($field, $tableShort);
-			$filter[$field] = DB::isNumericFieldType($tableSchema['fields'][$field]['type'])
-				? dbConditionInt($fieldName, $value)
-				: dbConditionString($fieldName, $value);
+			switch ($tableSchema['fields'][$field]['type']) {
+				case DB::FIELD_TYPE_ID:
+					$filter[$field] = dbConditionId($fieldName, $value);
+					break;
+
+				case DB::FIELD_TYPE_INT:
+				case DB::FIELD_TYPE_UINT:
+					$filter[$field] = dbConditionInt($fieldName, $value);
+					break;
+
+				default:
+					$filter[$field] = dbConditionString($fieldName, $value);
+			}
 		}
 
 		if ($filter) {

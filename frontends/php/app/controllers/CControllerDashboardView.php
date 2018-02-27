@@ -436,38 +436,42 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	private static function getWidgets($widgets) {
 		$grid_widgets = [];
 
-		foreach ($widgets as $widget) {
-			if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
-				continue;
+		if ($widgets) {
+			CArrayHelper::sort($widgets, ['y', 'x']);
+
+			foreach ($widgets as $widget) {
+				if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
+					continue;
+				}
+
+				$widgetid = $widget['widgetid'];
+				$fields = self::convertWidgetFields($widget['fields']);
+
+				$rf_rate = (array_key_exists('rf_rate', $fields))
+					? ($fields['rf_rate'] == -1)
+						? CWidgetConfig::getDefaultRfRate($widget['type'])
+						: $fields['rf_rate']
+					: CWidgetConfig::getDefaultRfRate($widget['type']);
+
+				$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($fields));
+				if ($widget_form->validate()) {
+					$fields = $widget_form->getFieldsData();
+				}
+
+				$grid_widgets[] = [
+					'widgetid' => $widgetid,
+					'type' => $widget['type'],
+					'header' => $widget['name'],
+					'pos' => [
+						'x' => (int) $widget['x'],
+						'y' => (int) $widget['y'],
+						'width' => (int) $widget['width'],
+						'height' => (int) $widget['height']
+					],
+					'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $rf_rate, $widgetid),
+					'fields' => $fields
+				];
 			}
-
-			$widgetid = $widget['widgetid'];
-			$fields = self::convertWidgetFields($widget['fields']);
-
-			$rf_rate = (array_key_exists('rf_rate', $fields))
-				? ($fields['rf_rate'] == -1)
-					? CWidgetConfig::getDefaultRfRate($widget['type'])
-					: $fields['rf_rate']
-				: CWidgetConfig::getDefaultRfRate($widget['type']);
-
-			$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($fields));
-			if ($widget_form->validate()) {
-				$fields = $widget_form->getFieldsData();
-			}
-
-			$grid_widgets[$widgetid] = [
-				'widgetid' => $widgetid,
-				'type' => $widget['type'],
-				'header' => $widget['name'],
-				'pos' => [
-					'x' => (int) $widget['x'],
-					'y' => (int) $widget['y'],
-					'width' => (int) $widget['width'],
-					'height' => (int) $widget['height']
-				],
-				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $rf_rate, $widgetid),
-				'fields' => $fields
-			];
 		}
 
 		return $grid_widgets;

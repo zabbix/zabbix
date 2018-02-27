@@ -159,6 +159,48 @@ else {
 	);
 }
 
+// Get list of host groups to remove if unsuccessful submit.
+$host_groups_to_remove = null;
+
+if (getRequest('remove_groups')) {
+	$groups = API::HostGroup()->get([
+		'groupids' => getRequest('remove_groups'),
+		'output' => ['groupid', 'name'],
+		'editable' => true
+	]);
+	foreach ($groups as $group) {
+		$host_groups_to_remove[] = [
+			'id' => $group['groupid'],
+			'name' => $group['name']
+		];
+	}
+}
+
+// Remove host groups control.
+$hostFormList->addRow(
+	(new CVisibilityBox('visible[remove_groups]', 'remove_groups', _('Original')))
+		->setLabel(_('Remove host groups'))
+		->setChecked(array_key_exists('remove_groups', $data['visible'])),
+	(new CDiv(
+		(new CMultiSelect([
+			'name' => 'remove_groups[]',
+			'objectName' => 'hostGroup',
+			'objectOptions' => ['editable' => true],
+			'data' => $host_groups_to_remove,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $hostView->getName(),
+					'dstfld1' => 'remove_groups_',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))->setId('remove_groups')
+);
+
 // append description to form list
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))
