@@ -2300,7 +2300,7 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			name = zbx_strdup(NULL, row[0]);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL,
 					&name, MACRO_TYPE_COMMON, NULL, 0);
-			zbx_json_addstring(&json, "name", name, ZBX_JSON_TYPE_INT);
+			zbx_json_addstring(&json, "name", name, ZBX_JSON_TYPE_STRING);
 			zbx_free(name);
 		}
 		while (NULL != (row = DBfetch(result)));
