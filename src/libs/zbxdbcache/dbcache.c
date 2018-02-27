@@ -2262,15 +2262,24 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				zbx_json_addint64(&json, "timestamp",  h->value.log->timestamp);
+				zbx_json_addint64(&json, "timestamp", h->value.log->timestamp);
 				zbx_json_addstring(&json, "source", ZBX_NULL2EMPTY_STR(h->value.log->source),
 						ZBX_JSON_TYPE_STRING);
 				zbx_json_addint64(&json, "severity", h->value.log->severity);
 				zbx_json_addstring(&json, "value", h->value.log->value, ZBX_JSON_TYPE_STRING);
+				zbx_json_addint64(&json, "logeventid", h->value.log->logeventid);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
+
+		if (NULL == (result = DBselect("select name from items where itemid=" ZBX_FS_UI64, h->itemid)))
+				continue;
+
+		if (NULL != (row = DBfetch(result)))
+			zbx_json_addstring(&json, "name", row[0], ZBX_JSON_TYPE_INT);
+		DBfree_result(result);
+
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
 	}
 
