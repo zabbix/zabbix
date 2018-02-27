@@ -135,7 +135,6 @@ $fields = [
 									]),
 									null
 								],
-	'output_format' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_cert_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -326,7 +325,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'headers' => getRequest('headers', []),
 				'retrieve_mode' => (int) getRequest('retrieve_mode'),
 				'request_method' => (int) getRequest('request_method'),
-				'output_format' => (int) getRequest('output_format'),
 				'ssl_cert_file' => getRequest('ssl_cert_file'),
 				'ssl_key_file' => getRequest('ssl_key_file'),
 				'ssl_key_password' => getRequest('ssl_key_password'),

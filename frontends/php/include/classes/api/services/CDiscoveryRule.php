@@ -303,9 +303,12 @@ class CDiscoveryRule extends CItemGeneral {
 						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
 						: '';
 				}
+
 				if (array_key_exists('headers', $item)) {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
+
+				unset($item['output_format']);
 			}
 			else {
 				$item['query_fields'] = '';
@@ -404,6 +407,8 @@ class CDiscoveryRule extends CItemGeneral {
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
+
+				unset($item['output_format']);
 			}
 		}
 		unset($item);

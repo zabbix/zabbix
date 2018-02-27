@@ -254,15 +254,6 @@ $itemFormList->addRow(
 	'retrieve_mode_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Convert to JSON.
-$itemFormList->addRow(
-	new CLabel(_('Convert to JSON'), 'output_format'),
-	(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
-		->setEnabled(!$data['limited'])
-		->setChecked($data['output_format'] == HTTPCHECK_STORE_JSON),
-	'output_format_row'
-);
-
 // ITEM_TYPE_HTTPCHECK HTTP proxy.
 $itemFormList->addRow(
 	new CLabel(_('HTTP proxy'), 'http_proxy'),
