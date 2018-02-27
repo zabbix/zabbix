@@ -2300,6 +2300,22 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		while (NULL != (row = DBfetch(result)));
 		DBfree_result(result);
 
+		if (NULL == (result = DBselect(
+				"select distinct a.name"
+				" from applications a,items_applications i"
+				" where a.applicationid=i.applicationid"
+					" and i.itemid=" ZBX_FS_UI64,
+				h->itemid)))
+		{
+			continue;
+		}
+
+		zbx_json_addarray(&json, "applications");
+
+		while (NULL != (row = DBfetch(result)))
+			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+		DBfree_result(result);
+
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
 	}
 
