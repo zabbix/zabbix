@@ -36,6 +36,7 @@ class CTableInfo extends CTable {
 
 		if (!$tableid) {
 			$tableid = uniqid('t', true);
+			$tableid = str_replace('.', '', $tableid);
 			$this->setId($tableid);
 		}
 
