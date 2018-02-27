@@ -2220,6 +2220,7 @@ button {
 
 $icon-btn: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
+	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -259px,
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
 	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
@@ -2259,6 +2260,20 @@ $icon-widget-btn: (
 .btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
 	@extend %btn-dashbrd;
+}
+
+.btn-dashbrd-normal {
+	position: fixed;
+	right: 45px;
+	top: 5px;
+	z-index: 1010;
+	@include box-shadow(1px 1px 2px $action-shadow-color);
+	@include opacity(1);
+	@include transition(opacity 1s);
+
+	&.hidden {
+		@include opacity(0);
+	}
 }
 
 %btn-widget {

@@ -1511,6 +1511,9 @@ button {
 .btn-conf {
   background: #0275b8 url(../img/icon-sprite.svg) no-repeat -7px -187px; }
 
+.btn-kiosk {
+  background: #0275b8 url(../img/icon-sprite.svg) no-repeat -79px -259px; }
+
 .btn-max {
   background: #0275b8 url(../img/icon-sprite.svg) no-repeat -7px -223px; }
 
@@ -1562,6 +1565,23 @@ button {
 .btn-dashbrd-conf {
   background: url(../img/icon-sprite.svg) no-repeat -42px -619px; }
 
+.btn-dashbrd-normal {
+  position: fixed;
+  right: 45px;
+  top: 5px;
+  z-index: 1010;
+  -webkit-box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5);
+  -moz-box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5);
+  box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5);
+  opacity: 1;
+  filter: alpha(opacity=100);
+  -webkit-transition: opacity 1s;
+  -moz-transition: opacity 1s;
+  transition: opacity 1s; }
+  .btn-dashbrd-normal.hidden {
+    opacity: 0;
+    filter: alpha(opacity=0); }
+
 .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off {
   width: 30px;
   height: 28px; }
@@ -1585,7 +1605,7 @@ button {
     -moz-box-shadow: none;
     box-shadow: none; }
 
-.btn-conf, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
+.btn-conf, .btn-kiosk, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
   height: auto;
   padding: 0; }

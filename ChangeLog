@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha5
 
 New features:
+..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
