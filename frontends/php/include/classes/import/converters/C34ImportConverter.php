@@ -67,13 +67,7 @@ class C34ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertItems(array $items) {
-		$default = array_intersect_key(DB::getDefaults('items'), array_fill_keys([
-			'timeout', 'url', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'retrieve_mode',
-			'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-			'verify_host'
-		], ''));
-		$default['query_fields'] = [];
-		$default['headers'] = [];
+		$default = $this->getItemDefaultFields();
 
 		foreach ($items as &$item) {
 			$item = $item + $default;
@@ -91,11 +85,33 @@ class C34ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertDiscoveryRules(array $discovery_rules) {
+		$default = $this->getItemDefaultFields();
+
 		foreach ($discovery_rules as &$discovery_rule) {
 			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule = $discovery_rule + $default;
 		}
 		unset($discovery_rule);
 
 		return $discovery_rules;
+	}
+
+	/**
+	 * Return associative array of item default fields.
+	 *
+	 * @return array
+	 */
+	protected function getItemDefaultFields() {
+		$default = array_intersect_key(DB::getDefaults('items'),
+			array_fill_keys([
+				'timeout', 'url', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'verify_peer', 'verify_host'
+			], ''
+		));
+		$default['query_fields'] = [];
+		$default['headers'] = [];
+
+		return $default;
 	}
 }
