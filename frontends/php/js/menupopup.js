@@ -951,7 +951,7 @@ jQuery(function($) {
 				target = opener.closest('svg').length > 0 ? event : event.target;
 			}
 			else {
-				target = event.originalEvent.detail !== 0 ? event : event.target;
+				target = (event.originalEvent.detail !== 0 || event.type === 'contextmenu') ? event : event.target;
 			}
 
 			if (menuPopup.length > 0) {
