@@ -2292,13 +2292,35 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		zbx_snprintf(buffer, sizeof(buffer), "%d.%d", h->ts.sec, h->ts.ns);
 		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_INT);
 
+		if (NULL != trend)
+			zbx_json_addint64(&json_trend, "time", trend->clock);
+
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
 				zbx_json_addfloat(&json, "value", h->value.dbl);
+
+				if (NULL != trend)
+				{
+					zbx_json_addfloat(&json_trend, "avg", trend->value_avg.dbl);
+					zbx_json_addfloat(&json_trend, "min", trend->value_min.dbl);
+					zbx_json_addfloat(&json_trend, "max", trend->value_max.dbl);
+				}
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_json_adduint64(&json, "value",  h->value.ui64);
+				zbx_json_adduint64(&json, "value", h->value.ui64);
+
+				if (NULL != trend)
+				{
+					zbx_uint128_t	avg;
+
+					/* calculate the trend average value */
+					udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+
+					zbx_json_adduint64(&json_trend, "avg", avg.lo);
+					zbx_json_adduint64(&json_trend, "min", trend->value_min.ui64);
+					zbx_json_adduint64(&json_trend, "max", trend->value_max.ui64);
+				}
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
@@ -2317,6 +2339,9 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
+
+		if (NULL != trend)
+			zbx_json_addint64(&json_trend, "count", trend->num);
 
 		if (NULL == (result = DBselect("select name from items where itemid=" ZBX_FS_UI64, h->itemid)))
 				continue;
