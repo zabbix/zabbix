@@ -282,13 +282,41 @@ button {
 }
 
 .radio-segmented {
-	input[type="radio"] {
+
+	.average-bg,
+	.disaster-bg,
+	.high-bg,
+	.info-bg,
+	.na-bg,
+	.warning-bg {
+
+		&:before,
+		&:after {
+			display: none;
+		}
+	}
+
+	li {
+
+		input[type="radio"] {
+
+			&:checked:not([disabled]) + label,
 			&:focus + label {
-				border-color: $form-border-focus-color !important;
+				border-color: $form-border-focus-color;
+				color: $white;
+			}
+
+			&:checked + label {
+				background-color: $ui-bg-selected-color;
+			}
+
+			&:checked[disabled] + label {
+				background-color: #595959 !important;
+			}
+
+			&:focus + label {
 				background-color: $link-hover-color !important;
 			}
-		&:checked[disabled] + label {
-			background-color: #595959 !important;
 		}
 	}
 }
@@ -587,13 +615,6 @@ td.na-bg {
 	content: none;
 }
 
-.radio-segmented .na-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.normal-bg {
 	@extend td.na-bg;
 }
@@ -676,13 +697,6 @@ td.info-bg {
 	content: none;
 }
 
-.radio-segmented .info-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -717,13 +731,6 @@ td.average-bg {
 
 .average-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .average-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 td.log-warning-bg {
@@ -771,13 +778,6 @@ td.warning-bg {
 	content: none;
 }
 
-.radio-segmented .warning-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.log-high-bg {
 	@extend td.log-na-bg;
 }
@@ -823,13 +823,6 @@ td.high-bg {
 	content: none;
 }
 
-.radio-segmented .high-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.log-disaster-bg {
 	@extend td.log-na-bg;
 }
@@ -873,13 +866,6 @@ td.disaster-bg {
 
 .disaster-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .disaster-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 .notif-body li {
