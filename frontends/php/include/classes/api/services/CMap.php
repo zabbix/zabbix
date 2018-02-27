@@ -2330,10 +2330,12 @@ class CMap extends CMapElement {
 				}
 				unset($selement);
 
-				$selement_triggers = API::getApiService()->select('sysmap_element_trigger', [
-					'output' => ['selementid', 'triggerid'],
-					'filter' => ['selementid' => array_keys($selements)]
-				]);
+				$selement_triggers = DBselect(
+					'SELECT st.selementid,st.triggerid'.
+					' FROM sysmap_element_trigger st'.
+					' WHERE '.dbConditionInt('st.selementid', array_keys($selements)).
+					' ORDER BY st.selement_triggerid'
+				);
 				foreach ($selement_triggers as $selement_trigger) {
 					$selements[$selement_trigger['selementid']]['elements'][] = [
 						'triggerid' => $selement_trigger['triggerid']
