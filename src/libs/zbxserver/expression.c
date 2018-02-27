@@ -5510,6 +5510,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 		substitute_macros_in_xml_elements(item, jp_row, node->children);
 	}
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -5530,6 +5531,13 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
 		int maxerrlen)
 {
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(jp_row);
+	zbx_snprintf(error, maxerrlen, "Support for XML was not compiled in");
+	return FAIL;
+#else
 	const char	*__function_name = "substitute_macros_xml";
 	xmlDoc		*doc;
 	xmlErrorPtr	pErr;
@@ -5546,7 +5554,7 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 		else
 			zbx_snprintf(error, maxerrlen, "Cannot parse XML value");
 
-		return FAIL;
+		goto exit;
 	}
 
 	if (NULL == (root_element = xmlDocGetRootElement(doc)))
@@ -5571,9 +5579,10 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 	ret = SUCCEED;
 clean:
 	xmlFreeDoc(doc);
-
+exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
 #endif
+}
+

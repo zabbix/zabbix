@@ -661,20 +661,13 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 				if (ZBX_POSTTYPE_XML == items[i].post_type)
 				{
-#ifdef HAVE_LIBXML2
 					if (SUCCEED != substitute_macros_xml(&items[i].posts, &items[i], NULL,
 							error, sizeof(error)))
 					{
-						SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+						SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
 						errcodes[i] = CONFIG_ERROR;
 						continue;
 					}
-#else
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for XML was not compiled"
-							" in."));
-					errcodes[i] = CONFIG_ERROR;
-					continue;
-#endif
 				}
 				else if (ZBX_POSTTYPE_JSON == items[i].post_type)
 				{

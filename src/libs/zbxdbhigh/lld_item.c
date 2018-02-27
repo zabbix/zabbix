@@ -1324,13 +1324,8 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	}
 	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
 	{
-#ifdef HAVE_LIBXML2
 		if (FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err))))
 			zbx_lrtrim(err, ZBX_WHITESPACE);
-#else
-		zbx_snprintf(err, sizeof(err), "Support for XML was not compiled in");
-		ret = FAIL;
-#endif
 	}
 	else
 		substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -1616,15 +1611,11 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
 	{
-#ifdef HAVE_LIBXML2
 		if (FAIL == substitute_macros_xml(&buffer, NULL, jp_row, err, sizeof(err)))
 		{
 			zbx_lrtrim(err, ZBX_WHITESPACE);
 			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
 		}
-#else
-		*error = zbx_strdcatf(*error, "Cannot update item: Support for XML was not compiled in.\n", err);
-#endif
 	}
 	else
 		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
