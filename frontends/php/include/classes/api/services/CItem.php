@@ -398,6 +398,7 @@ class CItem extends CItemGeneral {
 					? json_decode($item['query_fields'], true)
 					: [];
 			}
+
 			if (array_key_exists('headers', $item)) {
 				$item['headers'] = $this->headersStringToArray($item['headers']);
 			}
@@ -433,6 +434,7 @@ class CItem extends CItemGeneral {
 						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
 						: '';
 				}
+
 				if (array_key_exists('headers', $item)) {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}

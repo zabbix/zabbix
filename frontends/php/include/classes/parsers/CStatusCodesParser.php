@@ -55,10 +55,11 @@ class CStatusCodesParser {
 
 	/**
 	 * Validate comma-separated status code ranges.
+	 * Will return CParser::PARSE_SUCCESS or CParser::PARSE_FAIL values.
 	 *
 	 * @param string $ranges
 	 *
-	 * @return bool
+	 * @return int
 	 */
 	public function parse($ranges) {
 		foreach (explode(',', $ranges) as $range) {
