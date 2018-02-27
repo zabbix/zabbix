@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-12940] fixed content does not fit dialog window (agriscenko)
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
 ..F....... [ZBX-13401] fixed successful items mass update with invalid update interval (agriscenko)
 A......... [ZBX-6167] fixed partial updating in maintenance.update (ashubin)
@@ -155,6 +156,7 @@ Changes for 3.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12940] fixed content does not fit dialog window (agriscenko)
 ..F....... [ZBX-13401] fixed successful items mass update with invalid update interval (agriscenko)
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
 A......... [ZBX-6167] fixed partial updating in maintenance.update (ashubin)
