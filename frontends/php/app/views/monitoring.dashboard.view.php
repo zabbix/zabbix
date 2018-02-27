@@ -34,20 +34,26 @@ else {
 	$edit_form = include 'monitoring.dashboard.edit_form.php';
 	$breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
-	$item_groupid = null;
-	$item_hostid = null;
+	$main_filter_form = null;
 
 	if ($data['dynamic']['has_dynamic_widgets']) {
-		$item_groupid = [
-			new CLabel(_('Group'), 'groupid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$data['pageFilter']->getGroupsCB()
-		];
-		$item_hostid = [
-			new CLabel(_('Host'), 'hostid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$data['pageFilter']->getHostsCB()
-		];
+		$main_filter_form = (new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addVar('action', 'dashboard.view')
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getGroupsCB()
+				])
+				->addItem([
+					new CLabel(_('Host'), 'hostid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getHostsCB()
+				])
+		);
 	}
 
 	$url_create = (new CUrl('zabbix.php'))
@@ -71,17 +77,7 @@ else {
 		->setTitle($data['dashboard']['name'])
 		->setControls((new CList())
 			->setId('dashbrd-control')
-			->addItem((new CForm('get'))
-				->cleanItems()
-				->setAttribute('aria-label', _('Main filter'))
-				->addVar('action', 'dashboard.view')
-				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-				// $item_groupid and $item_hostid will be hidden, when 'Edit Dashboard' will be clicked.
-				->addItem((new CList())
-					->addItem($item_groupid)
-					->addItem($item_hostid)
-				)
-			)
+			->addItem($main_filter_form)
 			->addItem((new CTag('nav', true, [
 				(new CList())
 					->addItem(
