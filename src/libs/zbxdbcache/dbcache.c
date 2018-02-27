@@ -2194,18 +2194,20 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 }
 
 static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
-		const DC_ITEM *items, int history_num)
+		const DC_ITEM *items, int history_num, const ZBX_DC_TREND *trends, int trends_num)
 {
 	int		i;
-	struct zbx_json	json;
+	struct zbx_json	json, json_trend;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_init(&json_trend, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0; i < history_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 		const DC_ITEM		*item;
-		int			index;
+		const ZBX_DC_TREND	*trend = NULL;
+		int			index, j;
 		DB_RESULT		result;
 		DB_ROW			row;
 		char			buffer[MAX_ID_LEN];
@@ -2221,9 +2223,28 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		item = &items[index];
 
+		if (0 == (ZBX_DC_FLAGS_NOT_FOR_TRENDS & h->flags))
+		{
+			for (j = 0; j < trends_num; j++)
+			{
+				if (trends[j].itemid == item->itemid)
+				{
+					trend = &trends[j];
+					break;
+				}
+			}
+		}
+
 		zbx_json_clean(&json);
 		zbx_json_addobject(&json, "host");
 		zbx_json_addstring(&json, "name", item->host.name, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != trend)
+		{
+			zbx_json_clean(&json_trend);
+			zbx_json_addobject(&json_trend, "host");
+			zbx_json_addstring(&json_trend, "name", item->host.name, ZBX_JSON_TYPE_STRING);
+		}
 
 		if (NULL == (result = DBselect(
 				"select g.name"
@@ -2237,6 +2258,9 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		zbx_json_addarray(&json, "groups");
 
+		if (NULL != trend)
+			zbx_json_addarray(&json_trend, "groups");
+
 		if (NULL == (row = DBfetch(result)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
@@ -2247,13 +2271,24 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		do
 		{
 			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+
+			if (NULL != trend)
+				zbx_json_addstring(&json_trend, NULL, row[0], ZBX_JSON_TYPE_STRING);
 		}
 		while (NULL != (row = DBfetch(result)));
 		DBfree_result(result);
 
 		zbx_json_close(&json);
 		zbx_json_close(&json);
-		zbx_json_adduint64(&json, "itemid", h->itemid);
+		zbx_json_adduint64(&json, "itemid", item->itemid);
+
+		if (NULL != trend)
+		{
+			zbx_json_close(&json_trend);
+			zbx_json_close(&json_trend);
+			zbx_json_adduint64(&json_trend, "itemid", item->itemid);
+		}
+
 		zbx_snprintf(buffer, sizeof(buffer), "%d.%d", h->ts.sec, h->ts.ns);
 		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_INT);
 
@@ -2301,6 +2336,10 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL,
 					&name, MACRO_TYPE_COMMON, NULL, 0);
 			zbx_json_addstring(&json, "name", name, ZBX_JSON_TYPE_STRING);
+
+			if (NULL != trend)
+				zbx_json_addstring(&json_trend, "name", name, ZBX_JSON_TYPE_STRING);
+
 			zbx_free(name);
 		}
 		while (NULL != (row = DBfetch(result)));
@@ -2318,14 +2357,24 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		zbx_json_addarray(&json, "applications");
 
+		if (NULL != trend)
+			zbx_json_addarray(&json_trend, "applications");
+
 		while (NULL != (row = DBfetch(result)))
+		{
 			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+
+			if (NULL != trend)
+				zbx_json_addstring(&json_trend, NULL, row[0], ZBX_JSON_TYPE_STRING);
+		}
 		DBfree_result(result);
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
+		zabbix_log(LOG_LEVEL_INFORMATION, "json_trend.buffer '%s'", json_trend.buffer);
 	}
 
 	zbx_json_free(&json);
+	zbx_json_free(&json_trend);
 }
 
 /******************************************************************************
@@ -2462,8 +2511,9 @@ int	DCsync_history(int sync_type, int *total_num)
 	do
 	{
 		DC_ITEM			*items;
-		int			*errcodes;
+		int			*errcodes, trends_num = 0;
 		zbx_vector_uint64_t	itemids;
+		ZBX_DC_TREND		*trends = NULL;
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			zbx_vector_uint64_clear(&triggerids);
@@ -2492,8 +2542,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			int			i, trends_num = 0;
-			ZBX_DC_TREND		*trends = NULL;
+			int	i;
 
 			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
 			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
@@ -2548,8 +2597,6 @@ int	DCsync_history(int sync_type, int *total_num)
 			}
 
 			DCconfig_unlock_triggers(&triggerids);
-			zbx_free(trends);
-
 			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
 			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
 		}
@@ -2579,7 +2626,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && SUCCEED == ret)
 		{
-			DCexport_prepare_history(history, &itemids, items, history_num);
+			DCexport_prepare_history(history, &itemids, items, history_num, trends, trends_num);
 
 			DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 					history_integer, &history_integer_num, history_string, &history_string_num,
@@ -2601,6 +2648,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
+			zbx_free(trends);
 			zbx_vector_uint64_destroy(&itemids);
 			DCconfig_clean_items(items, errcodes, history_num);
 			zbx_free(errcodes);
