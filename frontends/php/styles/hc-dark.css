@@ -1,3 +1,8 @@
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  background-color: #ddd !important;
+  color: #000 !important; }
+
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
 strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, .article, aside, canvas, details, embed, figure, figcaption, footer, .footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
@@ -1511,6 +1516,9 @@ button {
 .btn-conf {
   background: #e0e0e0 url(../img/icon-sprite.svg) no-repeat -7px -187px; }
 
+.btn-kiosk {
+  background: #e0e0e0 url(../img/icon-sprite.svg) no-repeat -79px -259px; }
+
 .btn-max {
   background: #e0e0e0 url(../img/icon-sprite.svg) no-repeat -7px -223px; }
 
@@ -1562,6 +1570,23 @@ button {
 .btn-dashbrd-conf {
   background: url(../img/icon-sprite.svg) no-repeat -42px -619px; }
 
+.btn-dashbrd-normal {
+  position: fixed;
+  right: 45px;
+  top: 5px;
+  z-index: 1010;
+  -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  opacity: 1;
+  filter: alpha(opacity=100);
+  -webkit-transition: opacity 1s;
+  -moz-transition: opacity 1s;
+  transition: opacity 1s; }
+  .btn-dashbrd-normal.hidden {
+    opacity: 0;
+    filter: alpha(opacity=0); }
+
 .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off {
   width: 30px;
   height: 28px; }
@@ -1585,7 +1610,7 @@ button {
     -moz-box-shadow: none;
     box-shadow: none; }
 
-.btn-conf, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
+.btn-conf, .btn-kiosk, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
   height: auto;
   padding: 0; }
@@ -2313,6 +2338,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;
+      width: 100%;
       max-height: calc(100vh - 190px);
       max-width: inherit;
       margin: 0 0 10px 0; }
@@ -2594,12 +2620,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .overlay-descr {
   max-height: 150px;
   overflow-y: auto;
-  padding: 0 11px 0 11px;
+  padding: 0;
   margin: 5px 0;
   background-color: #000; }
 
 .overlay-descr-url {
-  padding: 3px 11px 7px 11px; }
+  padding: 3px 0 7px; }
 
 .overlay-descr {
   background: linear-gradient(#000 30%, transparent), linear-gradient(transparent, #000 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
@@ -2742,6 +2768,14 @@ a.link-action {
   border: 1px solid #e79e0b;
   background-color: #f1a50b; }
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+  border: 1px solid rgba(255, 255, 255, 0.2); }
+
+.status-disabled-bg {
+  color: #7d7d7d;
+  background-color: #000;
+  border: 1px solid rgba(255, 255, 255, 0.2); }
+
 .tag {
   display: inline-block;
   color: #fff;
@@ -2758,7 +2792,7 @@ a.link-action {
   .tag:last-child {
     margin: 0; }
 
-.status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow {
+.status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg, .status-disabled-bg {
   padding: 2px 3px 1px 3px;
   font-size: 0.917em;
   text-transform: uppercase;
@@ -2769,6 +2803,8 @@ a.link-action {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
+  .status-green:not(:last-of-type), .status-red:not(:last-of-type), .status-grey:not(:last-of-type), .status-dark-grey:not(:last-of-type), .status-yellow:not(:last-of-type), .status-na-bg:not(:last-of-type), .status-info-bg:not(:last-of-type), .status-warning-bg:not(:last-of-type), .status-average-bg:not(:last-of-type), .status-high-bg:not(:last-of-type), .status-disaster-bg:not(:last-of-type), .status-disabled-bg:not(:last-of-type) {
+    border-right: none; }
 
 .green-bg, .normal-bg {
   background-color: #59db8f; }
@@ -2776,12 +2812,13 @@ a.link-action {
 .red-bg {
   background-color: #e45959; }
 
-.na-bg, .na-bg input[type="radio"]:checked + label {
+.na-bg {
   color: #2a353a; }
-  .na-bg a.link-action, .na-bg input[type="radio"]:checked + label a.link-action {
+  .na-bg a.link-action,
+  .na-bg input[type="radio"]:checked + label {
     color: #2a353a; }
 
-.na-bg.blink-hidden, .na-bg input[type="radio"]:checked + label.blink-hidden {
+.na-bg.blink-hidden {
   background-color: transparent; }
 
 td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg {
@@ -2799,56 +2836,61 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
 .normal-bg.blink-hidden {
   background-color: transparent; }
 
-.info-bg, .info-bg input[type="radio"]:checked + label {
+.info-bg {
   color: #00268e; }
-  .info-bg a.link-action, .info-bg input[type="radio"]:checked + label a.link-action {
+  .info-bg a.link-action,
+  .info-bg input[type="radio"]:checked + label {
     color: #00268e; }
 
-.info-bg.blink-hidden, .info-bg input[type="radio"]:checked + label.blink-hidden {
+.info-bg.blink-hidden {
   background-color: transparent; }
 
 .log-info-bg {
   color: #00268e;
   background-color: #7499ff; }
 
-.average-bg, .average-bg input[type="radio"]:checked + label {
+.average-bg {
   color: #733100; }
-  .average-bg a.link-action, .average-bg input[type="radio"]:checked + label a.link-action {
+  .average-bg a.link-action,
+  .average-bg input[type="radio"]:checked + label {
     color: #733100; }
 
-.average-bg.blink-hidden, .average-bg input[type="radio"]:checked + label.blink-hidden {
+.average-bg.blink-hidden {
   background-color: transparent; }
 
-.warning-bg, .warning-bg input[type="radio"]:checked + label {
+.warning-bg {
   color: #734d00; }
-  .warning-bg a.link-action, .warning-bg input[type="radio"]:checked + label a.link-action {
+  .warning-bg a.link-action,
+  .warning-bg input[type="radio"]:checked + label {
     color: #734d00; }
 
-.warning-bg.blink-hidden, .warning-bg input[type="radio"]:checked + label.blink-hidden {
+.warning-bg.blink-hidden {
   background-color: transparent; }
 
 .log-warning-bg {
   color: #734d00;
   background-color: #ffc859; }
 
-.high-bg, .high-bg input[type="radio"]:checked + label {
+.high-bg {
   color: #52190b; }
-  .high-bg a.link-action, .high-bg input[type="radio"]:checked + label a.link-action {
+  .high-bg a.link-action,
+  .high-bg input[type="radio"]:checked + label {
     color: #52190b; }
 
-.high-bg.blink-hidden, .high-bg input[type="radio"]:checked + label.blink-hidden {
+.high-bg.blink-hidden {
   background-color: transparent; }
 
 .log-high-bg {
   color: #52190b;
   background-color: #e97659; }
 
-.disaster-bg, .disaster-bg input[type="radio"]:checked + label {
+.disaster-bg {
   color: #4b0c0c; }
-  .disaster-bg a.link-action, .disaster-bg input[type="radio"]:checked + label a.link-action {
+  .disaster-bg a.link-action,
+  .disaster-bg input[type="radio"]:checked + label {
     color: #4b0c0c; }
 
-.disaster-bg.blink-hidden, .disaster-bg input[type="radio"]:checked + label.blink-hidden {
+.disaster-bg.blink-hidden {
   background-color: transparent; }
 
 .log-disaster-bg {
@@ -3284,7 +3326,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .notif-body h4, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -4531,6 +4573,9 @@ Widgets are used as containers to group any related information. Widget consists
 .btn-conf {
   background: #e0e0e0 url(../img/icon-sprite.svg) no-repeat -43px -187px; }
 
+.btn-kiosk {
+  background: #e0e0e0 url(../img/icon-sprite.svg) no-repeat -79px -223px; }
+
 .btn-max {
   background: #e0e0e0 url(../img/icon-sprite.svg) no-repeat -43px -223px; }
 
@@ -4640,11 +4685,27 @@ button:focus {
   -moz-box-shadow: 0 0 0 2px white;
   box-shadow: 0 0 0 2px white; }
 
-.radio-segmented input[type="radio"]:focus + label {
-  border-color: #bbb !important;
-  background-color: #fff !important; }
-.radio-segmented input[type="radio"]:checked[disabled] + label {
+.radio-segmented .average-bg:before, .radio-segmented .average-bg:after,
+.radio-segmented .disaster-bg:before,
+.radio-segmented .disaster-bg:after,
+.radio-segmented .high-bg:before,
+.radio-segmented .high-bg:after,
+.radio-segmented .info-bg:before,
+.radio-segmented .info-bg:after,
+.radio-segmented .na-bg:before,
+.radio-segmented .na-bg:after,
+.radio-segmented .warning-bg:before,
+.radio-segmented .warning-bg:after {
+  display: none; }
+.radio-segmented li input[type="radio"]:checked:not([disabled]) + label, .radio-segmented li input[type="radio"]:focus + label {
+  border-color: #bbb;
+  color: #000 !important; }
+.radio-segmented li input[type="radio"]:checked + label {
+  background-color: #ddd; }
+.radio-segmented li input[type="radio"]:checked[disabled] + label {
   background-color: #595959 !important; }
+.radio-segmented li input[type="radio"]:focus + label {
+  background-color: #fff !important; }
 
 a:link {
   border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
@@ -4823,17 +4884,17 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg {
     border-left: none; }
 
-.na-bg, .na-bg input[type="radio"]:checked + label, .log-na-bg {
+.na-bg, .log-na-bg {
   background-color: transparent !important; }
 
-.na-bg a.link-action, .na-bg input[type="radio"]:checked + label a.link-action {
+.na-bg a.link-action {
   color: #f8f8f8; }
 
 .log-na-bg:before {
   color: #2a353a !important;
   background-color: #97aab3 !important; }
 
-.na-bg:before, .na-bg input[type="radio"]:checked + label:before, .log-na-bg:before {
+.na-bg:before, .log-na-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4843,7 +4904,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   background-color: #59db8f;
   min-height: 28px; }
 
-.na-bg:after, .na-bg input[type="radio"]:checked + label:after, .log-na-bg:after {
+.na-bg:after, .log-na-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -106px -443px;
   width: 22px;
@@ -4852,16 +4913,8 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   left: 6px;
   position: absolute; }
 
-.na-bg.blink-hidden:after, .na-bg input[type="radio"]:checked + label.blink-hidden:after {
+.na-bg.blink-hidden:after {
   content: none; }
-
-.radio-segmented .na-bg, .radio-segmented .na-bg input[type="radio"]:checked + label, .na-bg .radio-segmented input[type="radio"]:checked + label {
-  color: #000 !important !important;
-  background-color: #ddd !important; }
-  .radio-segmented .na-bg::before, .radio-segmented .na-bg input[type="radio"]:checked + label::before, .na-bg .radio-segmented input[type="radio"]:checked + label::before {
-    content: none; }
-  .radio-segmented .na-bg::after, .radio-segmented .na-bg input[type="radio"]:checked + label::after, .na-bg .radio-segmented input[type="radio"]:checked + label::after {
-    content: none; }
 
 .normal-bg {
   background-color: transparent !important; }
@@ -4891,17 +4944,17 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .normal-bg.blink-hidden:after {
   content: none; }
 
-.info-bg, .info-bg input[type="radio"]:checked + label, .log-info-bg {
+.info-bg, .log-info-bg {
   background-color: transparent !important; }
 
-.info-bg a.link-action, .info-bg input[type="radio"]:checked + label a.link-action {
+.info-bg a.link-action {
   color: #f8f8f8; }
 
 .log-info-bg:before {
   color: #00268e !important;
   background-color: #7499ff !important; }
 
-.info-bg:before, .info-bg input[type="radio"]:checked + label:before, .log-info-bg:before {
+.info-bg:before, .log-info-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4910,7 +4963,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   bottom: 0;
   min-height: 28px; }
 
-.info-bg:after, .info-bg input[type="radio"]:checked + label:after, .log-info-bg:after {
+.info-bg:after, .log-info-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -136px -443px;
   width: 22px;
@@ -4919,24 +4972,16 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   left: 6px;
   position: absolute; }
 
-.info-bg.blink-hidden:after, .info-bg input[type="radio"]:checked + label.blink-hidden:after {
+.info-bg.blink-hidden:after {
   content: none; }
 
-.radio-segmented .info-bg, .radio-segmented .info-bg input[type="radio"]:checked + label, .info-bg .radio-segmented input[type="radio"]:checked + label {
-  color: #000 !important !important;
-  background-color: #ddd !important; }
-  .radio-segmented .info-bg::before, .radio-segmented .info-bg input[type="radio"]:checked + label::before, .info-bg .radio-segmented input[type="radio"]:checked + label::before {
-    content: none; }
-  .radio-segmented .info-bg::after, .radio-segmented .info-bg input[type="radio"]:checked + label::after, .info-bg .radio-segmented input[type="radio"]:checked + label::after {
-    content: none; }
-
-.average-bg, .average-bg input[type="radio"]:checked + label {
+.average-bg {
   background-color: transparent !important; }
 
-.average-bg a.link-action, .average-bg input[type="radio"]:checked + label a.link-action {
+.average-bg a.link-action {
   color: #f8f8f8; }
 
-.average-bg:before, .average-bg input[type="radio"]:checked + label:before {
+.average-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4945,7 +4990,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   bottom: 0;
   min-height: 28px; }
 
-.average-bg:after, .average-bg input[type="radio"]:checked + label:after {
+.average-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -196px -442px;
   width: 22px;
@@ -4954,28 +4999,20 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   left: 6px;
   position: absolute; }
 
-.average-bg.blink-hidden:after, .average-bg input[type="radio"]:checked + label.blink-hidden:after {
+.average-bg.blink-hidden:after {
   content: none; }
 
-.radio-segmented .average-bg, .radio-segmented .average-bg input[type="radio"]:checked + label, .average-bg .radio-segmented input[type="radio"]:checked + label {
-  color: #000 !important !important;
-  background-color: #ddd !important; }
-  .radio-segmented .average-bg::before, .radio-segmented .average-bg input[type="radio"]:checked + label::before, .average-bg .radio-segmented input[type="radio"]:checked + label::before {
-    content: none; }
-  .radio-segmented .average-bg::after, .radio-segmented .average-bg input[type="radio"]:checked + label::after, .average-bg .radio-segmented input[type="radio"]:checked + label::after {
-    content: none; }
-
-.warning-bg, .warning-bg input[type="radio"]:checked + label, .log-warning-bg {
+.warning-bg, .log-warning-bg {
   background-color: transparent !important; }
 
-.warning-bg a.link-action, .warning-bg input[type="radio"]:checked + label a.link-action {
+.warning-bg a.link-action {
   color: #f8f8f8; }
 
 .log-warning-bg:before {
   color: #734d00 !important;
   background-color: #ffc859 !important; }
 
-.warning-bg:before, .warning-bg input[type="radio"]:checked + label:before, .log-warning-bg:before {
+.warning-bg:before, .log-warning-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -4984,7 +5021,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   bottom: 0;
   min-height: 28px; }
 
-.warning-bg:after, .warning-bg input[type="radio"]:checked + label:after, .log-warning-bg:after {
+.warning-bg:after, .log-warning-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -166px -443px;
   width: 22px;
@@ -4993,28 +5030,20 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   left: 6px;
   position: absolute; }
 
-.warning-bg.blink-hidden:after, .warning-bg input[type="radio"]:checked + label.blink-hidden:after {
+.warning-bg.blink-hidden:after {
   content: none; }
 
-.radio-segmented .warning-bg, .radio-segmented .warning-bg input[type="radio"]:checked + label, .warning-bg .radio-segmented input[type="radio"]:checked + label {
-  color: #000 !important !important;
-  background-color: #ddd !important; }
-  .radio-segmented .warning-bg::before, .radio-segmented .warning-bg input[type="radio"]:checked + label::before, .warning-bg .radio-segmented input[type="radio"]:checked + label::before {
-    content: none; }
-  .radio-segmented .warning-bg::after, .radio-segmented .warning-bg input[type="radio"]:checked + label::after, .warning-bg .radio-segmented input[type="radio"]:checked + label::after {
-    content: none; }
-
-.high-bg, .high-bg input[type="radio"]:checked + label, .log-high-bg {
+.high-bg, .log-high-bg {
   background-color: transparent !important; }
 
-.high-bg a.link-action, .high-bg input[type="radio"]:checked + label a.link-action {
+.high-bg a.link-action {
   color: #f8f8f8; }
 
 .log-high-bg:before {
   color: #52190b !important;
   background-color: #e97659 !important; }
 
-.high-bg:before, .high-bg input[type="radio"]:checked + label:before, .log-high-bg:before {
+.high-bg:before, .log-high-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -5023,7 +5052,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   bottom: 0;
   min-height: 28px; }
 
-.high-bg:after, .high-bg input[type="radio"]:checked + label:after, .log-high-bg:after {
+.high-bg:after, .log-high-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -226px -443px;
   width: 22px;
@@ -5032,28 +5061,20 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   left: 6px;
   position: absolute; }
 
-.high-bg.blink-hidden:after, .high-bg input[type="radio"]:checked + label.blink-hidden:after {
+.high-bg.blink-hidden:after {
   content: none; }
 
-.radio-segmented .high-bg, .radio-segmented .high-bg input[type="radio"]:checked + label, .high-bg .radio-segmented input[type="radio"]:checked + label {
-  color: #000 !important !important;
-  background-color: #ddd !important; }
-  .radio-segmented .high-bg::before, .radio-segmented .high-bg input[type="radio"]:checked + label::before, .high-bg .radio-segmented input[type="radio"]:checked + label::before {
-    content: none; }
-  .radio-segmented .high-bg::after, .radio-segmented .high-bg input[type="radio"]:checked + label::after, .high-bg .radio-segmented input[type="radio"]:checked + label::after {
-    content: none; }
-
-.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .log-disaster-bg {
+.disaster-bg, .log-disaster-bg {
   background-color: transparent !important; }
 
-.disaster-bg a.link-action, .disaster-bg input[type="radio"]:checked + label a.link-action {
+.disaster-bg a.link-action {
   color: #f8f8f8; }
 
 .log-disaster-bg:before {
   color: #4b0c0c !important;
   background-color: #e45959 !important; }
 
-.disaster-bg:before, .disaster-bg input[type="radio"]:checked + label:before, .log-disaster-bg:before {
+.disaster-bg:before, .log-disaster-bg:before {
   content: "";
   width: 34px;
   position: absolute;
@@ -5062,7 +5083,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   bottom: 0;
   min-height: 28px; }
 
-.disaster-bg:after, .disaster-bg input[type="radio"]:checked + label:after, .log-disaster-bg:after {
+.disaster-bg:after, .log-disaster-bg:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -256px -443px;
   width: 22px;
@@ -5071,16 +5092,8 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   left: 6px;
   position: absolute; }
 
-.disaster-bg.blink-hidden:after, .disaster-bg input[type="radio"]:checked + label.blink-hidden:after {
+.disaster-bg.blink-hidden:after {
   content: none; }
-
-.radio-segmented .disaster-bg, .radio-segmented .disaster-bg input[type="radio"]:checked + label, .disaster-bg .radio-segmented input[type="radio"]:checked + label {
-  color: #000 !important !important;
-  background-color: #ddd !important; }
-  .radio-segmented .disaster-bg::before, .radio-segmented .disaster-bg input[type="radio"]:checked + label::before, .disaster-bg .radio-segmented input[type="radio"]:checked + label::before {
-    content: none; }
-  .radio-segmented .disaster-bg::after, .radio-segmented .disaster-bg input[type="radio"]:checked + label::after, .disaster-bg .radio-segmented input[type="radio"]:checked + label::after {
-    content: none; }
 
 .notif-body li {
   padding: 0 0 10px 42px; }

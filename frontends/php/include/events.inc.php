@@ -404,11 +404,11 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $backurl							URL to return to.
  * @param array  $config
  * @param int    $config['event_ack_enable']
- * @param int    $fullscreen
+ * @param bool   $fullscreen
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, $fullscreen = 0) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, $fullscreen = false) {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -513,10 +513,8 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 
 		$url_details = (new CUrl('tr_events.php'))
 			->setArgument('triggerid', '')
-			->setArgument('eventid', '');
-		if ($fullscreen == 1) {
-			$url_details->setArgument('fullscreen', $fullscreen);
-		}
+			->setArgument('eventid', '')
+			->setArgument('fullscreen', $fullscreen ? '1' : null);
 
 		foreach ($problems as $problem) {
 			if (array_key_exists($problem['r_eventid'], $r_events)) {
