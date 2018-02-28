@@ -139,6 +139,22 @@ static int	http_prepare_request(CURL *easyhandle, const char *posts, unsigned ch
 	return SUCCEED;
 }
 
+static void	http_add_json_header(struct zbx_json *json, char *line)
+{
+	char	*colon;
+
+	if (NULL != (colon = strchr(line, ':')))
+	{
+		zbx_ltrim(colon + 1, " \t");
+
+		*colon = '\0';
+		zbx_json_addstring(json, line, colon + 1, ZBX_JSON_TYPE_STRING);
+		*colon = ':';
+	}
+	else
+		zbx_json_addstring(json, line, "", ZBX_JSON_TYPE_STRING);
+}
+
 int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char		*__function_name = "get_value_http";
@@ -365,11 +381,11 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			if (HTTPCHECK_STORE_JSON == item->output_format)
 			{
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-				zbx_json_addarray(&json, "header");
+				zbx_json_addobject(&json, "header");
 				headers = header.data;
 				while (NULL != (line = zbx_http_get_header(&headers)))
 				{
-					zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
+					http_add_json_header(&json, line);
 					zbx_free(line);
 				}
 				SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
@@ -399,16 +415,15 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				unsigned char	json_content = 0;
 
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-				zbx_json_addarray(&json, "header");
+				zbx_json_addobject(&json, "header");
 				headers = header.data;
 
 				while (NULL != (line = zbx_http_get_header(&headers)))
 				{
-					zbx_json_addstring(&json, NULL, line, ZBX_JSON_TYPE_STRING);
-
 					if (0 == json_content && 0 == strcmp(line, application_json))
 						json_content = 1;
 
+					http_add_json_header(&json, line);
 					zbx_free(line);
 				}
 				zbx_json_close(&json);
