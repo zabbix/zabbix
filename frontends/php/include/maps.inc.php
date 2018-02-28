@@ -445,7 +445,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 
 		$info['info']['unack'] = [
 			'msg' => $msg,
-			'color' => $i['problem_unack'] ? $config['problem_unack_color'] : $config['problem_ack_color']
+			'color' => getSelementColor(true, !$i['problem_unack'])
 		];
 
 		if (!array_key_exists('maintenance_title', $i)) {
@@ -477,7 +477,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => $i['ack'] ? $config['ok_ack_color'] : $config['ok_unack_color']
+			'color' => getSelementColor(false, $i['ack'])
 		];
 	}
 
@@ -530,14 +530,14 @@ function getHostsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => $i['problem_unack'] ? $config['problem_unack_color'] : $config['problem_ack_color']
+				'color' => getSelementColor(true, !$i['problem_unack'])
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => $config['problem_unack_color']
+				'color' => getSelementColor(true, false)
 			];
 		}
 
@@ -570,7 +570,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => $i['ack'] ? $config['ok_ack_color'] : $config['ok_unack_color']
+			'color' => getSelementColor(false, $i['ack'])
 		];
 	}
 
@@ -624,14 +624,14 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => $i['problem_unack'] ? $config['problem_unack_color'] : $config['problem_ack_color']
+				'color' => getSelementColor(true, !$i['problem_unack'])
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => $config['problem_unack_color']
+				'color' => getSelementColor(true, false)
 			];
 		}
 
@@ -671,7 +671,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => $i['ack'] ? $config['ok_ack_color'] : $config['ok_unack_color']
+			'color' => getSelementColor(false, $i['ack'])
 		];
 	}
 
@@ -726,14 +726,14 @@ function getMapsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => $i['problem_unack'] ? $config['problem_unack_color'] : $config['problem_ack_color']
+				'color' => getSelementColor(true, !$i['problem_unack'])
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => $config['problem_unack_color']
+				'color' => getSelementColor(true, false)
 			];
 		}
 
@@ -772,7 +772,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => $i['ack'] ? $config['ok_ack_color'] : $config['ok_unack_color']
+			'color' => getSelementColor(false, $i['ack'])
 		];
 	}
 
@@ -1949,7 +1949,6 @@ function getMapLabels($map, $map_info) {
 		}
 
 		$elementInfo = $map_info[$selementId];
-		$ack_unack = array_key_exists('ack', $elementInfo) && $elementInfo['ack'] === true ? 'ack' : 'unack';
 
 		foreach (['problem', 'unack', 'maintenance', 'ok', 'status'] as $caption) {
 			if (!isset($elementInfo['info'][$caption]) || zbx_empty($elementInfo['info'][$caption]['msg'])) {
@@ -1958,23 +1957,11 @@ function getMapLabels($map, $map_info) {
 
 			$msgs = explode("\n", $elementInfo['info'][$caption]['msg']);
 
-			if ($caption === 'problem' || $caption === 'ok') {
-				if ($config['custom_color'] === '1') {
-					$fill_color = $config[$caption . '_' . $ack_unack . '_color'];
-				}
-				else {
-					$fill_color = $schema['fields'][$caption . '_' . $ack_unack . '_color']['default'];
-				}
-			}
-			else {
-				$fill_color = $elementInfo['info'][$caption]['color'];
-			}
-
 			foreach ($msgs as $msg) {
 				$statusLines[$selementId][] = [
 					'content' => $msg,
 					'attributes' => [
-						'fill' => '#' . $fill_color
+						'fill' => '#' . $elementInfo['info'][$caption]['color']
 					]
 				];
 			}
@@ -2160,4 +2147,34 @@ function getMapLinktriggerInfo($sysmap, $options) {
 		'preservekeys' => true,
 		'triggerids' => $triggerids
 	]);
+}
+
+/**
+ * Get map selement color based on problem and acknowledgement state
+ * as well as taking custom event status color settings into account.
+ *
+ * @throws APIException if the given table does not exist
+ *
+ * @param bool $is_problem
+ * @param bool $is_ack
+ *
+ * @return string
+ */
+function getSelementColor($is_problem, $is_ack) {
+	static $config = null;
+	static $schema = null;
+
+	if ($config === null) {
+		$config = select_config();
+		$schema = DB::getSchema('config');
+	}
+
+	$ack_unack = $is_ack ? 'ack' : 'unack';
+	$ok_problem = $is_problem ? 'problem' : 'ok';
+
+	if ($config['custom_color'] === '1') {
+		return $config[$ok_problem . '_' . $ack_unack . '_color'];
+	}
+
+	return $schema['fields'][$ok_problem . '_' . $ack_unack . '_color']['default'];
 }
