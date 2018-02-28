@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-13513] fixed input maxlength for users media of type script (nikita)
 ...G...PS. [ZBX-13523] fixed error message for empty TCP response in case agent dropped connection because of access permissions (vso)
 ..F....... [ZBX-12883] fixed incorrect ordering the list of triggers after saving a map (agriscenko)
 ..F....... [ZBXNEXT-4150] fixed URL display in hint box and focus styles for radio buttons (ashubin, nikita)

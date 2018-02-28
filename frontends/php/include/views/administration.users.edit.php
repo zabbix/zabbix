@@ -268,9 +268,10 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
 			$media['sendto'] = implode(', ', $media['sendto']);
-			if (strlen($media['sendto']) > 50) {
-				$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
-			}
+		}
+
+		if (mb_strlen($media['sendto']) > 50) {
+			$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
 		}
 
 		$mediaTableInfo->addRow(
