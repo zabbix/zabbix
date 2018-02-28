@@ -94,14 +94,14 @@ function item_type2str($type = null) {
 		ITEM_TYPE_AGGREGATE => _('Zabbix aggregate'),
 		ITEM_TYPE_EXTERNAL => _('External check'),
 		ITEM_TYPE_DB_MONITOR => _('Database monitor'),
+		ITEM_TYPE_HTTPCHECK => _('HTTP agent'),
 		ITEM_TYPE_IPMI => _('IPMI agent'),
 		ITEM_TYPE_SSH => _('SSH agent'),
 		ITEM_TYPE_TELNET => _('TELNET agent'),
 		ITEM_TYPE_JMX => _('JMX agent'),
 		ITEM_TYPE_CALCULATED => _('Calculated'),
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
-		ITEM_TYPE_DEPENDENT => _('Dependent item'),
-		ITEM_TYPE_HTTPCHECK => _('HTTP(S) check')
+		ITEM_TYPE_DEPENDENT => _('Dependent item')
 	];
 	if (is_null($type)) {
 		return $types;
