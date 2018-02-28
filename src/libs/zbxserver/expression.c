@@ -3883,9 +3883,13 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				pos = token.token.r;
 			}
 			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			{
 				replace_to = zbx_strdup(replace_to, dc_host->host);
+			}
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
+			{
 				replace_to = zbx_strdup(replace_to, dc_host->name);
+			}
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
@@ -5523,7 +5527,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
  *             item   - [IN] item for simple macro substitution               *
  *             jp_row - [IN] discovery data for LLD macro substitution        *
  *             error  - [OUT] reason for XML parsing failure                  *
- *             max_error_len - [IN] the size of error buffer                  *
+ *             maxerrlen - [IN] the size of error buffer                      *
  *                                                                            *
  * Return value: SUCCEED or FAIL if XML validation has failed                 *
  *                                                                            *

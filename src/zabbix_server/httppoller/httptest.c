@@ -724,9 +724,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, httptest->httptest.ssl_cert_file, httptest->httptest.ssl_key_file,
-			httptest->httptest.ssl_key_password, httptest->httptest.verify_peer,
-			httptest->httptest.verify_host, &err_str))
+	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, httptest->httptest.ssl_cert_file,
+			httptest->httptest.ssl_key_file, httptest->httptest.ssl_key_password,
+			httptest->httptest.verify_peer, httptest->httptest.verify_host, &err_str))
 	{
 		goto clean;
 	}

@@ -450,19 +450,9 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
 	{
 		char	*data = NULL;
 
-		if (SUCCEED != zbx_json_brackets_open(element, &jp_object))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
-			return FAIL;
-		}
-
-		if (NULL == (member = zbx_json_pair_next(&jp_object, NULL, name, sizeof(name))))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
-			return FAIL;
-		}
-
-		if (NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
+		if (SUCCEED != zbx_json_brackets_open(element, &jp_object) ||
+				NULL == (member = zbx_json_pair_next(&jp_object, NULL, name, sizeof(name))) ||
+				NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
 			return FAIL;
@@ -659,27 +649,29 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					continue;
 				}
 
-				if (ZBX_POSTTYPE_XML == items[i].post_type)
+				switch (items[i].post_type)
 				{
-					if (SUCCEED != substitute_macros_xml(&items[i].posts, &items[i], NULL,
-							error, sizeof(error)))
-					{
-						SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
-						errcodes[i] = CONFIG_ERROR;
-						continue;
-					}
+					case ZBX_POSTTYPE_XML:
+						if (SUCCEED != substitute_macros_xml(&items[i].posts, &items[i], NULL,
+								error, sizeof(error)))
+						{
+							SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
+							errcodes[i] = CONFIG_ERROR;
+							continue;
+						}
+						break;
+					case ZBX_POSTTYPE_JSON:
+						substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host,
+								&items[i], NULL, NULL, &items[i].posts,
+								MACRO_TYPE_HTTPCHECK_JSON, NULL, 0);
+						break;
+					default:
+						substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host,
+								&items[i], NULL, NULL, &items[i].posts,
+								MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+						break;
 				}
-				else if (ZBX_POSTTYPE_JSON == items[i].post_type)
-				{
-					substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i],
-							NULL, NULL, &items[i].posts, MACRO_TYPE_HTTPCHECK_JSON, NULL,
-							0);
-				}
-				else
-				{
-					substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i],
-							NULL, NULL, &items[i].posts, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
-				}
+
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
 						NULL, &items[i].headers, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,

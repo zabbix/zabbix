@@ -1318,18 +1318,20 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
 
-	if (ZBX_POSTTYPE_JSON == item_prototype->post_type)
+	switch (item_prototype->post_type)
 	{
-		substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_JSON, NULL, 0);
+		case ZBX_POSTTYPE_JSON:
+			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_JSON, NULL, 0);
+			break;
+		case ZBX_POSTTYPE_XML:
+			if (FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err))))
+				zbx_lrtrim(err, ZBX_WHITESPACE);
+			break;
+		default:
+			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			/* zbx_lrtrim(item->posts, ZBX_WHITESPACE); is not missing here */
+			break;
 	}
-	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
-	{
-		if (FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err))))
-			zbx_lrtrim(err, ZBX_WHITESPACE);
-	}
-	else
-		substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
-	/* zbx_lrtrim(item->posts, ZBX_WHITESPACE); is not missing here */
 
 	item->status_codes = zbx_strdup(NULL, item_prototype->status_codes);
 	item->status_codes_orig = NULL;
