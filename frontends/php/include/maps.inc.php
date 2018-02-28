@@ -1957,14 +1957,24 @@ function getMapLabels($map, $map_info) {
 			}
 
 			$msgs = explode("\n", $elementInfo['info'][$caption]['msg']);
-			$color_name = $caption . '_' . $ack_unack . '_color';
+
+			if ($caption === 'problem' || $caption === 'ok') {
+				if ($config['custom_color'] === '1') {
+					$fill_color = $config[$caption . '_' . $ack_unack . '_color'];
+				}
+				else {
+					$fill_color = $schema['fields'][$caption . '_' . $ack_unack . '_color']['default'];
+				}
+			}
+			else {
+				$fill_color = $elementInfo['info'][$caption]['color'];
+			}
 
 			foreach ($msgs as $msg) {
 				$statusLines[$selementId][] = [
 					'content' => $msg,
 					'attributes' => [
-						'fill' => '#' . ($config['custom_color'] === '1' ? $config[$color_name] :
-							$schema['fields'][$color_name]['default'])
+						'fill' => '#' . $fill_color
 					]
 				];
 			}
