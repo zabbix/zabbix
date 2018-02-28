@@ -459,7 +459,7 @@ static int	DBpatch_3050036(void)
 
 static int	DBpatch_3050037(void)
 {
-	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"timeout", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("items", &field);
 }
