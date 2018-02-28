@@ -2210,7 +2210,7 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		int			index, j;
 		DB_RESULT		result;
 		DB_ROW			row;
-		char			buffer[MAX_ID_LEN];
+		char			buffer[MAX_ID_LEN], *name;
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
@@ -2289,6 +2289,27 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			zbx_json_adduint64(&json_trend, "itemid", item->itemid);
 		}
 
+		if (NULL == (result = DBselect("select name from items where itemid=" ZBX_FS_UI64, h->itemid)))
+			continue;
+
+		if (NULL == (row = DBfetch(result)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item name");
+			DBfree_result(result);
+			continue;
+		}
+
+		name = zbx_strdup(NULL, row[0]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL,
+				&name, MACRO_TYPE_COMMON, NULL, 0);
+		zbx_json_addstring(&json, "name", name, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != trend)
+			zbx_json_addstring(&json_trend, "name", name, ZBX_JSON_TYPE_STRING);
+
+		zbx_free(name);
+		DBfree_result(result);
+
 		zbx_snprintf(buffer, sizeof(buffer), "%d.%d", h->ts.sec, h->ts.ns);
 		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_INT);
 
@@ -2342,33 +2363,6 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		if (NULL != trend)
 			zbx_json_addint64(&json_trend, "count", trend->num);
-
-		if (NULL == (result = DBselect("select name from items where itemid=" ZBX_FS_UI64, h->itemid)))
-				continue;
-
-		if (NULL == (row = DBfetch(result)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item name");
-			DBfree_result(result);
-			continue;
-		}
-
-		do
-		{
-			char *name;
-
-			name = zbx_strdup(NULL, row[0]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL,
-					&name, MACRO_TYPE_COMMON, NULL, 0);
-			zbx_json_addstring(&json, "name", name, ZBX_JSON_TYPE_STRING);
-
-			if (NULL != trend)
-				zbx_json_addstring(&json_trend, "name", name, ZBX_JSON_TYPE_STRING);
-
-			zbx_free(name);
-		}
-		while (NULL != (row = DBfetch(result)));
-		DBfree_result(result);
 
 		if (NULL == (result = DBselect(
 				"select a.name"
