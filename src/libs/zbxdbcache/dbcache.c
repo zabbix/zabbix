@@ -2280,11 +2280,42 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		zbx_json_close(&json);
 		zbx_json_close(&json);
-		zbx_json_adduint64(&json, "itemid", item->itemid);
 
 		if (NULL != trend)
 		{
 			zbx_json_close(&json_trend);
+			zbx_json_close(&json_trend);
+		}
+
+		if (NULL == (result = DBselect(
+				"select a.name"
+				" from applications a,items_applications i"
+				" where a.applicationid=i.applicationid"
+					" and i.itemid=" ZBX_FS_UI64,
+				h->itemid)))
+		{
+			continue;
+		}
+
+		zbx_json_addarray(&json, "applications");
+
+		if (NULL != trend)
+			zbx_json_addarray(&json_trend, "applications");
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+
+			if (NULL != trend)
+				zbx_json_addstring(&json_trend, NULL, row[0], ZBX_JSON_TYPE_STRING);
+		}
+		DBfree_result(result);
+
+		zbx_json_close(&json);
+		zbx_json_adduint64(&json, "itemid", item->itemid);
+
+		if (NULL != trend)
+		{
 			zbx_json_close(&json_trend);
 			zbx_json_adduint64(&json_trend, "itemid", item->itemid);
 		}
@@ -2323,8 +2354,8 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 				if (NULL != trend)
 				{
-					zbx_json_addfloat(&json_trend, "avg", trend->value_avg.dbl);
 					zbx_json_addfloat(&json_trend, "min", trend->value_min.dbl);
+					zbx_json_addfloat(&json_trend, "avg", trend->value_avg.dbl);
 					zbx_json_addfloat(&json_trend, "max", trend->value_max.dbl);
 				}
 				break;
@@ -2333,13 +2364,11 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 				if (NULL != trend)
 				{
-					zbx_uint128_t	avg;
+					zbx_uint128_t	avg;	/* calculate the trend average value */
 
-					/* calculate the trend average value */
-					udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
-
-					zbx_json_adduint64(&json_trend, "avg", avg.lo);
 					zbx_json_adduint64(&json_trend, "min", trend->value_min.ui64);
+					udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+					zbx_json_adduint64(&json_trend, "avg", avg.lo);
 					zbx_json_adduint64(&json_trend, "max", trend->value_max.ui64);
 				}
 				break;
@@ -2354,8 +2383,8 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 				zbx_json_addstring(&json, "source", ZBX_NULL2EMPTY_STR(h->value.log->source),
 						ZBX_JSON_TYPE_STRING);
 				zbx_json_addint64(&json, "severity", h->value.log->severity);
-				zbx_json_addstring(&json, "value", h->value.log->value, ZBX_JSON_TYPE_STRING);
 				zbx_json_addint64(&json, "logeventid", h->value.log->logeventid);
+				zbx_json_addstring(&json, "value", h->value.log->value, ZBX_JSON_TYPE_STRING);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -2363,30 +2392,6 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		if (NULL != trend)
 			zbx_json_addint64(&json_trend, "count", trend->num);
-
-		if (NULL == (result = DBselect(
-				"select a.name"
-				" from applications a,items_applications i"
-				" where a.applicationid=i.applicationid"
-					" and i.itemid=" ZBX_FS_UI64,
-				h->itemid)))
-		{
-			continue;
-		}
-
-		zbx_json_addarray(&json, "applications");
-
-		if (NULL != trend)
-			zbx_json_addarray(&json_trend, "applications");
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
-
-			if (NULL != trend)
-				zbx_json_addstring(&json_trend, NULL, row[0], ZBX_JSON_TYPE_STRING);
-		}
-		DBfree_result(result);
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
 		zabbix_log(LOG_LEVEL_INFORMATION, "json_trend.buffer '%s'", json_trend.buffer);
