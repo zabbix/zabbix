@@ -79,7 +79,7 @@ static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 	return size * nmemb;
 }
 
-static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char request_method, AGENT_RESULT *result)
+static int	http_prepare_request(CURL *easyhandle, const char *posts, unsigned char request_method, char **error)
 {
 	CURLcode	err;
 
@@ -88,8 +88,7 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 		case HTTPCHECK_REQUEST_POST:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST: %s",
-						curl_easy_strerror(err)));
+				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s", curl_easy_strerror(err));
 				return FAIL;
 			}
 			break;
@@ -99,44 +98,41 @@ static int	prepare_request(CURL *easyhandle, const char *posts, unsigned char re
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST: %s",
-						curl_easy_strerror(err)));
+				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s", curl_easy_strerror(err));
 				return FAIL;
 			}
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CUSTOMREQUEST, "GET")))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify custom GET request: %s",
-						curl_easy_strerror(err)));
+				*error = zbx_dsprintf(*error, "Cannot specify custom GET request: %s",
+						curl_easy_strerror(err));
 				return FAIL;
 			}
 			break;
 		case HTTPCHECK_REQUEST_HEAD:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1L)))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify HEAD request: %s",
-						curl_easy_strerror(err)));
+				*error = zbx_dsprintf(*error, "Cannot specify HEAD request: %s", curl_easy_strerror(err));
 				return FAIL;
 			}
 			break;
 		case HTTPCHECK_REQUEST_PUT:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify data to POST: %s",
-						curl_easy_strerror(err)));
+				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s", curl_easy_strerror(err));
 				return FAIL;
 			}
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CUSTOMREQUEST, "PUT")))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify custom GET request: %s",
-						curl_easy_strerror(err)));
+				*error = zbx_dsprintf(*error, "Cannot specify custom GET request: %s",
+						curl_easy_strerror(err));
 				return FAIL;
 			}
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported request method"));
+			*error = zbx_strdup(*error, "Unsupported request method");
 			return FAIL;
 	}
 
@@ -268,8 +264,11 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (SUCCEED != prepare_request(easyhandle, item->posts, item->request_method, result))
+	if (SUCCEED != http_prepare_request(easyhandle, item->posts, item->request_method, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		goto clean;
+	}
 
 	if ('\0' == *item->headers)
 	{
