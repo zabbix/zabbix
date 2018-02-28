@@ -538,7 +538,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
 				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_HTTPCHECK);
+				ITEM_TYPE_HTTPAGENT);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{

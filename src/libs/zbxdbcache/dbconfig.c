@@ -188,7 +188,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_CALCULATED:
-		case ITEM_TYPE_HTTPCHECK:
+		case ITEM_TYPE_HTTPAGENT:
 			if (0 == CONFIG_POLLER_FORKS)
 				break;
 
@@ -2695,9 +2695,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
-		/* HTTP(s) check items */
+		/* HTTP agent items */
 
-		if (ITEM_TYPE_HTTPCHECK == item->type)
+		if (ITEM_TYPE_HTTPAGENT == item->type)
 		{
 			httpitem = (ZBX_DC_HTTPITEM *)DCfind_id(&config->httpitems, itemid, sizeof(ZBX_DC_HTTPITEM),
 					&found);
@@ -2943,9 +2943,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
-		/* HTTP(s) check items */
+		/* HTTP agent items */
 
-		if (ITEM_TYPE_HTTPCHECK == item->type)
+		if (ITEM_TYPE_HTTPAGENT == item->type)
 		{
 			httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid);
 
@@ -5992,7 +5992,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->privatekey = NULL;
 			dst_item->password = NULL;
 			break;
-		case ITEM_TYPE_HTTPCHECK:
+		case ITEM_TYPE_HTTPAGENT:
 			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &src_item->itemid)))
 			{
 				strscpy(dst_item->timeout_orig, httpitem->timeout);
@@ -6140,7 +6140,7 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 
 		switch (items[i].type)
 		{
-			case ITEM_TYPE_HTTPCHECK:
+			case ITEM_TYPE_HTTPAGENT:
 				zbx_free(items[i].headers);
 				zbx_free(items[i].posts);
 				break;

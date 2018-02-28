@@ -395,7 +395,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
 			break;
-		case ITEM_TYPE_HTTPCHECK:
+		case ITEM_TYPE_HTTPAGENT:
 #ifdef HAVE_LIBCURL
 			res = get_value_http(item, result);
 #else
@@ -465,14 +465,14 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
 
 		data = zbx_strdup(data, name);
 		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
-				MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+				MACRO_TYPE_HTTP_RAW, NULL, 0);
 		zbx_http_url_encode(data, &data);
 		zbx_strcpy_alloc(query_fields, &alloc_len, &offset, data);
 		zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '=');
 
 		data = zbx_strdup(data, value);
 		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
-				MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+				MACRO_TYPE_HTTP_RAW, NULL, 0);
 		zbx_http_url_encode(data, &data);
 		zbx_strcpy_alloc(query_fields, &alloc_len, &offset, data);
 
@@ -626,7 +626,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, &items[i].jmx_endpoint, MACRO_TYPE_JMX_ENDPOINT, NULL, 0);
 				break;
-			case ITEM_TYPE_HTTPCHECK:
+			case ITEM_TYPE_HTTPAGENT:
 				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
 				ZBX_STRDUP(items[i].url, items[i].url_orig);
 				ZBX_STRDUP(items[i].status_codes, items[i].status_codes_orig);
@@ -640,7 +640,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].url, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+						NULL, &items[i].url, MACRO_TYPE_HTTP_RAW, NULL, 0);
 
 				if (FAIL == parse_query_fields(&items[i], &items[i].query_fields))
 				{
@@ -663,25 +663,25 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					case ZBX_POSTTYPE_JSON:
 						substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host,
 								&items[i], NULL, NULL, &items[i].posts,
-								MACRO_TYPE_HTTPCHECK_JSON, NULL, 0);
+								MACRO_TYPE_HTTP_JSON, NULL, 0);
 						break;
 					default:
 						substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host,
 								&items[i], NULL, NULL, &items[i].posts,
-								MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+								MACRO_TYPE_HTTP_RAW, NULL, 0);
 						break;
 				}
 
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].headers, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+						NULL, &items[i].headers, MACRO_TYPE_HTTP_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].status_codes, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, &items[i].http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].ssl_cert_file, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+						NULL, &items[i].ssl_cert_file, MACRO_TYPE_HTTP_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
-						NULL, &items[i].ssl_key_file, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+						NULL, &items[i].ssl_key_file, MACRO_TYPE_HTTP_RAW, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, &items[i].ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -828,7 +828,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				zbx_free(items[i].snmp_community);
 				zbx_free(items[i].snmp_oid);
 				break;
-			case ITEM_TYPE_HTTPCHECK:
+			case ITEM_TYPE_HTTPAGENT:
 				zbx_free(items[i].timeout);
 				zbx_free(items[i].url);
 				zbx_free(items[i].query_fields);

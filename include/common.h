@@ -159,7 +159,7 @@ typedef enum
 	ITEM_TYPE_JMX,
 	ITEM_TYPE_SNMPTRAP,
 	ITEM_TYPE_DEPENDENT,
-	ITEM_TYPE_HTTPCHECK	/* 19 */
+	ITEM_TYPE_HTTPAGENT	/* 19 */
 }
 zbx_item_type_t;
 const char	*zbx_agent_type_string(zbx_item_type_t item_type);

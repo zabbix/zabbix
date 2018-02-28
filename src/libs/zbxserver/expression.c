@@ -3874,8 +3874,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					replace_to = zbx_strdup(replace_to, interface.addr);
 			}
 		}
-		else if (0 == indexed_macro && (0 != (macro_type & (MACRO_TYPE_HTTPCHECK_RAW |
-				MACRO_TYPE_HTTPCHECK_JSON | MACRO_TYPE_HTTPCHECK_XML))))
+		else if (0 == indexed_macro && (0 != (macro_type & (MACRO_TYPE_HTTP_RAW | MACRO_TYPE_HTTP_JSON |
+				MACRO_TYPE_HTTP_XML))))
 		{
 			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
@@ -4051,10 +4051,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			}
 		}
 
-		if (0 != (macro_type & MACRO_TYPE_HTTPCHECK_JSON) && NULL != replace_to)
+		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
 			zbx_json_escape(&replace_to);
 
-		if (0 != (macro_type & MACRO_TYPE_HTTPCHECK_XML) && NULL != replace_to)
+		if (0 != (macro_type & MACRO_TYPE_HTTP_XML) && NULL != replace_to)
 		{
 			char	*replace_to_esc;
 
@@ -5455,7 +5455,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 				if (NULL != item)
 				{
 					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
-							NULL, &value_tmp, MACRO_TYPE_HTTPCHECK_XML, NULL, 0);
+							NULL, &value_tmp, MACRO_TYPE_HTTP_XML, NULL, 0);
 				}
 				else
 					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
@@ -5474,7 +5474,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 				if (NULL != item)
 				{
 					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
-							NULL, &value_tmp, MACRO_TYPE_HTTPCHECK_RAW, NULL, 0);
+							NULL, &value_tmp, MACRO_TYPE_HTTP_RAW, NULL, 0);
 				}
 				else
 					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -5495,7 +5495,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 					if (NULL != item)
 					{
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host,
-								item, NULL, NULL, &value_tmp, MACRO_TYPE_HTTPCHECK_XML,
+								item, NULL, NULL, &value_tmp, MACRO_TYPE_HTTP_XML,
 								NULL, 0);
 					}
 					else

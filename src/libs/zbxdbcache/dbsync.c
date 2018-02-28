@@ -1548,7 +1548,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		return FAIL;
 
 	httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&dbsync_env.cache->httpitems, &item->itemid);
-	if (ITEM_TYPE_HTTPCHECK == item->type)
+	if (ITEM_TYPE_HTTPAGENT == item->type)
 	{
 		if (NULL == httpitem)
 			return FAIL;

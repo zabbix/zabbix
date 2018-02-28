@@ -23,17 +23,17 @@
 #include "log.h"
 #ifdef HAVE_LIBCURL
 
-#define HTTPCHECK_REQUEST_GET	0
-#define HTTPCHECK_REQUEST_POST	1
-#define HTTPCHECK_REQUEST_PUT	2
-#define HTTPCHECK_REQUEST_HEAD	3
+#define HTTP_REQUEST_GET	0
+#define HTTP_REQUEST_POST	1
+#define HTTP_REQUEST_PUT	2
+#define HTTP_REQUEST_HEAD	3
 
-#define HTTPCHECK_RETRIEVE_MODE_CONTENT	0
-#define HTTPCHECK_RETRIEVE_MODE_HEADERS	1
-#define HTTPCHECK_RETRIEVE_MODE_BOTH	2
+#define HTTP_RETRIEVE_MODE_CONTENT	0
+#define HTTP_RETRIEVE_MODE_HEADERS	1
+#define HTTP_RETRIEVE_MODE_BOTH		2
 
-#define HTTPCHECK_STORE_RAW		0
-#define HTTPCHECK_STORE_JSON		1
+#define HTTP_STORE_RAW		0
+#define HTTP_STORE_JSON		1
 
 typedef struct
 {
@@ -47,13 +47,13 @@ static const char	*zbx_request_string(int result)
 {
 	switch (result)
 	{
-		case HTTPCHECK_REQUEST_GET:
+		case HTTP_REQUEST_GET:
 			return "GET";
-		case HTTPCHECK_REQUEST_POST:
+		case HTTP_REQUEST_POST:
 			return "POST";
-		case HTTPCHECK_REQUEST_PUT:
+		case HTTP_REQUEST_PUT:
 			return "PUT";
-		case HTTPCHECK_REQUEST_HEAD:
+		case HTTP_REQUEST_HEAD:
 			return "HEAD";
 		default:
 			return "unknown";
@@ -85,14 +85,14 @@ static int	http_prepare_request(CURL *easyhandle, const char *posts, unsigned ch
 
 	switch (request_method)
 	{
-		case HTTPCHECK_REQUEST_POST:
+		case HTTP_REQUEST_POST:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
 				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s", curl_easy_strerror(err));
 				return FAIL;
 			}
 			break;
-		case HTTPCHECK_REQUEST_GET:
+		case HTTP_REQUEST_GET:
 			if ('\0' == *posts)
 				return SUCCEED;
 
@@ -109,14 +109,14 @@ static int	http_prepare_request(CURL *easyhandle, const char *posts, unsigned ch
 				return FAIL;
 			}
 			break;
-		case HTTPCHECK_REQUEST_HEAD:
+		case HTTP_REQUEST_HEAD:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1L)))
 			{
 				*error = zbx_dsprintf(*error, "Cannot specify HEAD request: %s", curl_easy_strerror(err));
 				return FAIL;
 			}
 			break;
-		case HTTPCHECK_REQUEST_PUT:
+		case HTTP_REQUEST_PUT:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
 				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s", curl_easy_strerror(err));
@@ -148,6 +148,7 @@ static void	http_add_json_header(struct zbx_json *json, char *line)
 		zbx_ltrim(colon + 1, " \t");
 
 		*colon = '\0';
+		zabbix_log(LOG_LEVEL_INFORMATION,"colon '%s'", colon + 1);
 		zbx_json_addstring(json, line, colon + 1, ZBX_JSON_TYPE_STRING);
 		*colon = ':';
 	}
@@ -184,15 +185,15 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	switch (item->retrieve_mode)
 	{
-		case HTTPCHECK_RETRIEVE_MODE_CONTENT:
+		case HTTP_RETRIEVE_MODE_CONTENT:
 			curl_header_cb = curl_ignore_cb;
 			curl_body_cb = curl_write_cb;
 			break;
-		case HTTPCHECK_RETRIEVE_MODE_HEADERS:
+		case HTTP_RETRIEVE_MODE_HEADERS:
 			curl_header_cb = curl_write_cb;
 			curl_body_cb = curl_ignore_cb;
 			break;
-		case HTTPCHECK_RETRIEVE_MODE_BOTH:
+		case HTTP_RETRIEVE_MODE_BOTH:
 			curl_header_cb = curl_write_cb;
 			curl_body_cb = curl_write_cb;
 			break;
@@ -339,7 +340,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	switch (item->retrieve_mode)
 	{
-		case HTTPCHECK_RETRIEVE_MODE_CONTENT:
+		case HTTP_RETRIEVE_MODE_CONTENT:
 			if (NULL == body.data)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty content"));
@@ -352,7 +353,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				goto clean;
 			}
 
-			if (HTTPCHECK_STORE_JSON == item->output_format)
+			if (HTTP_STORE_JSON == item->output_format)
 			{
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 				zbx_json_addstring(&json, "body", body.data, ZBX_JSON_TYPE_STRING);
@@ -365,7 +366,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				body.data = NULL;
 			}
 			break;
-		case HTTPCHECK_RETRIEVE_MODE_HEADERS:
+		case HTTP_RETRIEVE_MODE_HEADERS:
 			if (NULL == header.data)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
@@ -378,7 +379,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				goto clean;
 			}
 
-			if (HTTPCHECK_STORE_JSON == item->output_format)
+			if (HTTP_STORE_JSON == item->output_format)
 			{
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 				zbx_json_addobject(&json, "header");
@@ -397,7 +398,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				header.data = NULL;
 			}
 			break;
-		case HTTPCHECK_RETRIEVE_MODE_BOTH:
+		case HTTP_RETRIEVE_MODE_BOTH:
 			if (NULL == header.data)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
@@ -410,7 +411,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				goto clean;
 			}
 
-			if (HTTPCHECK_STORE_JSON == item->output_format)
+			if (HTTP_STORE_JSON == item->output_format)
 			{
 				unsigned char	json_content = 0;
 
