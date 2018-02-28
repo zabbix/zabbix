@@ -148,7 +148,6 @@ static void	http_add_json_header(struct zbx_json *json, char *line)
 		zbx_ltrim(colon + 1, " \t");
 
 		*colon = '\0';
-		zabbix_log(LOG_LEVEL_INFORMATION,"colon '%s'", colon + 1);
 		zbx_json_addstring(json, line, colon + 1, ZBX_JSON_TYPE_STRING);
 		*colon = ':';
 	}
