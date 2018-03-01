@@ -110,7 +110,7 @@ $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
-	border: 1px solid rgba($ui-bg-color, .2) !important;
+	border-color: rgba($ui-bg-color, .2) !important;
 }
 
 .top-nav-help {
