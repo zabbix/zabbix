@@ -3455,7 +3455,11 @@ $form-icon-btn: (
 					color: $white;
 				}
 
-				&:hover,
+				&:hover {
+					background-color: $action-hover-color;
+					cursor: pointer;
+				}
+
 				&.highlighted {
 					@include btn-hover-active($btn-font-color, $btn-bg-color);
 					cursor: pointer;
