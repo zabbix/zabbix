@@ -195,7 +195,7 @@ calendar.prototype = {
 			this.visible = 1;
 
 			jQuery(document)
-				.on('keydown', {calandar: this}, this.calendarKeyDownHandler)
+				.on('keydown', {calendar: this}, this.calendarKeyDownHandler)
 				.on('click', this.calendarDocumentClickHandler);
 
 			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
@@ -214,7 +214,7 @@ calendar.prototype = {
 	},
 
 	calendarKeyDownHandler: function(event) {
-		var cal = event.data.calandar,
+		var cal = event.data.calendar,
 			hl_date;
 
 		if (cal.active_section < 0 || cal.active_section > cal.sections.length) {
@@ -341,7 +341,6 @@ calendar.prototype = {
 				}
 				else if (active_section === '.calendar-date') {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
-					cal.setDone();
 				}
 
 				return false;
@@ -597,6 +596,7 @@ calendar.prototype = {
 		this.syncBSDateBySDT();
 		this.syncCDT();
 		this.setCDate();
+		this.setDone();
 	},
 
 	monthup: function() {
