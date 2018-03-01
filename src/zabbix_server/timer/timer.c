@@ -86,7 +86,6 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 			DCconfig_triggers_apply_changes(&trigger_diff);
 			zbx_db_save_trigger_changes(&trigger_diff);
 		}
-		zbx_clean_events();
 
 		DBcommit();
 
@@ -96,6 +95,9 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 		zbx_vector_uint64_clear(&triggerids);
 
 		DCfree_triggers(&trigger_order);
+
+		zbx_prepare_events_for_export();
+		zbx_clean_events();
 	}
 
 	zbx_vector_uint64_destroy(&triggerids);

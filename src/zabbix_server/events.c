@@ -1579,6 +1579,26 @@ void	zbx_clean_events(void)
 	zbx_hashset_clear(&event_recovery);
 }
 
+void	zbx_prepare_events_for_export()
+{
+	size_t		i;
+	struct zbx_json	json;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < events_num; i++)
+	{
+		if (EVENT_SOURCE_TRIGGERS != events[i].source)
+			continue;
+
+		zbx_json_clean(&json);
+		zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
+		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
+	}
+
+	zbx_json_free(&json);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: flush_events                                                     *
