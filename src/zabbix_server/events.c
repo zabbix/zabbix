@@ -1578,8 +1578,18 @@ void	zbx_clean_events(void)
 
 	zbx_hashset_clear(&event_recovery);
 }
+static void	get_hosts_by_expression(zbx_hashset_t *hosts, const char *expression, const char *recovery_expression)
+{
+	zbx_vector_uint64_t	functionids;
 
-void	zbx_prepare_events_for_export()
+	zbx_vector_uint64_create(&functionids);
+	get_functionids(&functionids, expression);
+	get_functionids(&functionids, recovery_expression);
+	DCget_hosts_by_functionids(&functionids, hosts);
+	zbx_vector_uint64_destroy(&functionids);
+}
+
+void	zbx_export_events(void)
 {
 	size_t		i;
 	struct zbx_json	json;
@@ -1592,7 +1602,31 @@ void	zbx_prepare_events_for_export()
 			continue;
 
 		zbx_json_clean(&json);
-		zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&json, "eventid", events[i].eventid);
+		zbx_json_addint64(&json, "clock", events[i].clock);
+		zbx_json_addint64(&json, "ns", events[i].ns);
+
+		if (TRIGGER_VALUE_PROBLEM == events[i].value)
+		{
+			DC_HOST			*host;
+			zbx_hashset_t		hosts;
+			zbx_hashset_iter_t	iter;
+
+			zbx_hashset_create(&hosts, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			get_hosts_by_expression(&hosts, events[i].trigger.expression,
+					events[i].trigger.recovery_expression);
+
+			zbx_hashset_iter_reset(&hosts, &iter);
+			zbx_json_addarray(&json, "hosts");
+			while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
+				zbx_json_addstring(&json, NULL, host->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json);
+			zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
+
+			zbx_hashset_destroy(&hosts);
+		}
+
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
 	}
 
@@ -2271,6 +2305,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		DBupdate_itservices(&trigger_diff);
 
 		zbx_clean_events();
+		zbx_export_events();
 		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		zbx_vector_ptr_destroy(&trigger_diff);
 	}

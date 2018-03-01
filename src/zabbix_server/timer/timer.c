@@ -96,7 +96,7 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		DCfree_triggers(&trigger_order);
 
-		zbx_prepare_events_for_export();
+		zbx_export_events();
 		zbx_clean_events();
 	}
 

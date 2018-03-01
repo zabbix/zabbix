@@ -33,6 +33,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
 void	zbx_clean_events(void);
+void	zbx_export_events(void);
 int	zbx_flush_correlated_events(void);
 
 #endif

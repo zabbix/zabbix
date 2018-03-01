@@ -9735,6 +9735,46 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hostids->values_num);
 }
 
+static void	zbx_dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
+		zbx_hashset_t *hosts)
+{
+	ZBX_DC_FUNCTION	*dc_function;
+	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
+	DC_HOST		host;
+	int		i;
+
+	for (i = 0; i < functionids_num; i++)
+	{
+		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+			continue;
+
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+			continue;
+
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		DCget_host(&host, dc_host);
+		zbx_hashset_insert(hosts, &host, sizeof(host));
+	}
+}
+
+void	DCget_hosts_by_functionids(zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts)
+{
+	const char	*__function_name = "DCget_hostids_by_functionids";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	LOCK_CACHE;
+
+	zbx_dc_get_hosts_by_functionids(functionids->values, functionids->values_num, hosts);
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hosts->num_data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_config_get                                                   *
