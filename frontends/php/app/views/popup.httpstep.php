@@ -40,10 +40,11 @@ $http_popup_form = (new CForm())
 
 $http_popup_form_list = (new CFormList())
 	->addRow(
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CLabel(_('Name'), 'step_name'))->setAsteriskMark(),
 		(new CTextBox('name', $options['name'], (bool) $options['templated'], 64))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('step_name')
 	)
 	->addRow(
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
