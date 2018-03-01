@@ -2287,6 +2287,9 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	if (0 == hostids.values_num)
+		goto clean;
+
 	zbx_hashset_create(&hosts, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	get_hosts_by_hostid(&hosts, &hostids);
@@ -2480,9 +2483,10 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 	zbx_json_free(&json);
 	zbx_json_free(&json_trend);
-	zbx_vector_uint64_destroy(&hostids);
 	clean_hosts(&hosts);
 	zbx_hashset_destroy(&hosts);
+clean:
+	zbx_vector_uint64_destroy(&hostids);
 }
 
 /******************************************************************************
