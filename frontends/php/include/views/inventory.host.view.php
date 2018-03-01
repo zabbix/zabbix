@@ -19,7 +19,13 @@
 **/
 
 
-$hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
+$fullscreen = getRequest('fullscreen');
+
+$hostInventoryWidget = (new CWidget())
+	->setTitle(_('Host inventory'))
+	->setControls((new CList())
+		->addItem(get_icon('fullscreen', ['fullscreen' => $fullscreen]))
+	);
 
 /*
  * Overview tab
@@ -132,25 +138,33 @@ if ($data['host']['description'] !== '') {
 	);
 }
 
+$fullscreen_param = $fullscreen ? '&fullscreen=1' : '';
+
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
-		new CLink(_('Web'), 'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')),
+		new CLink(_('Web'),
+			'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')
+		),
 		new CLink(_('Latest data'),
-			'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostids[]='.$data['host']['hostid']
+			'latest.php?form=1&select=&show_details=1&filter_set=Filter'.$fullscreen_param.
+			'&hostids[]='.$data['host']['hostid']
 		),
 		new CLink(_('Triggers'),
 			'tr_status.php?filter_set=1&show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
-			'&txt_select=&show_maintenance=1&hostid='.$data['host']['hostid'].url_param('groupid')
+			'&txt_select=&show_maintenance=1&hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')
 		),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
 				->setArgument('filter_hostids[]', $data['host']['hostid'])
 				->setArgument('filter_set', '1')
+				->setArgument('fullscreen', $fullscreen ? '1' : null)
 		),
-		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')),
-		new CLink(_('Screens'), 'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid'))
+		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')),
+		new CLink(_('Screens'),
+			'host_screen.php?hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')
+		)
 	])
 );
 

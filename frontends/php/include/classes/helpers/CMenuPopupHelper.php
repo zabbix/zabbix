@@ -50,19 +50,25 @@ class CMenuPopupHelper {
 	 * @param string $scripts[]['name']			script name
 	 * @param string $scripts[]['scriptid']		script id
 	 * @param string $scripts[]['confirmation']	confirmation text
-	 * @param bool   $hasGoTo					"Go to" block in popup
+	 * @param bool   $has_goto					"Go to" block in popup
+	 * @param bool   $fullscreen				fullscreen mode
 	 *
 	 * @return array
 	 */
-	public static function getHost(array $host, array $scripts = null, $hasGoTo = true) {
+	public static function getHost(array $host, array $scripts = null, $has_goto = true, $fullscreen = false) {
+
 		$data = [
 			'type' => 'host',
 			'hostid' => $host['hostid'],
 			'showGraphs' => (bool) $host['graphs'],
 			'showScreens' => (bool) $host['screens'],
 			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
-			'hasGoTo' => $hasGoTo
+			'hasGoTo' => $has_goto
 		];
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
+		}
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
@@ -184,10 +190,11 @@ class CMenuPopupHelper {
 	 * @param string $acknowledge['eventid']			event ID
 	 * @param string $acknowledge['screenid']			screen ID (optional)
 	 * @param string $acknowledge['backurl']			return URL (optional)
+	 * @param bool   $fullscreen				        fullscreen mode
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(array $trigger, array $acknowledge = null) {
+	public static function getTrigger(array $trigger, array $acknowledge = null, $fullscreen = false) {
 		$hosts = [];
 		$showEvents = true;
 
@@ -235,6 +242,10 @@ class CMenuPopupHelper {
 
 		if ($acknowledge !== null) {
 			$data['acknowledge'] = $acknowledge;
+		}
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
 		}
 
 		if ($trigger['url'] !== '') {

@@ -71,12 +71,14 @@ function getMenuPopupHistory(options) {
  * @param bool   options['showScreens']		link to host screen page
  * @param bool   options['showTriggers']	link to Monitoring->Triggers page
  * @param bool   options['hasGoTo']			"Go to" block in popup
+ * @param bool   options['fullscreen']		fullscreen mode
  * @param {object} trigger_elmnt			UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
 function getMenuPopupHost(options, trigger_elmnt) {
-	var sections = [];
+	var sections = [],
+		fullscreen = '';
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
@@ -86,18 +88,22 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		};
 	}
 
+	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
+		fullscreen = '&fullscreen=1';
+	}
+
 	// go to section
 	if (options.hasGoTo) {
 		var gotos = [],
 			// inventory
 			host_inventory = {
 				label: t('Host inventory'),
-				url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+				url: new Curl('hostinventories.php?hostid=' + options.hostid + fullscreen).getUrl()
 			},
 			// latest
 			latest_data = {
 				label: t('Latest data'),
-				url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid).getUrl()
+				url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid + fullscreen).getUrl()
 			},
 			// triggers
 			triggers = {
@@ -116,21 +122,21 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			triggers.disabled = true;
 		}
 		else {
-			triggers.url = new Curl('tr_status.php?hostid=' + options.hostid).getUrl();
+			triggers.url = new Curl('tr_status.php?hostid=' + options.hostid + fullscreen).getUrl();
 		}
 
 		if (!options.showGraphs) {
 			graphs.disabled = true;
 		}
 		else {
-			graphs.url = new Curl('charts.php?hostid=' + options.hostid).getUrl();
+			graphs.url = new Curl('charts.php?hostid=' + options.hostid + fullscreen).getUrl();
 		}
 
 		if (!options.showScreens) {
 			screens.disabled = true;
 		}
 		else {
-			screens.url = new Curl('host_screen.php?hostid=' + options.hostid).getUrl();
+			screens.url = new Curl('host_screen.php?hostid=' + options.hostid + fullscreen).getUrl();
 		}
 
 		gotos[gotos.length] = host_inventory;
@@ -620,16 +626,23 @@ function showDialogForm(form, options, formData, trigger_elmnt) {
  * @param string options['acknowledge']['backurl']	return url
  * @param object options['configuration']			link to trigger configuration page (optional)
  * @param string options['url']						trigger url link (optional)
+ * @param bool   options['fullscreen']				fullscreen mode
  *
  * @return array
  */
 function getMenuPopupTrigger(options) {
-	var sections = [], items = [];
+	var sections = [],
+		items = [],
+		fullscreen = false;
 
 	// events
 	var events = {
 		label: t('Problems')
 	};
+
+	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
+		fullscreen = true;
+	}
 
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		var url = new Curl('zabbix.php');
@@ -637,6 +650,10 @@ function getMenuPopupTrigger(options) {
 		url.setArgument('filter_triggerids[]', options.triggerid);
 		url.setArgument('filter_set', '1');
 		url.unsetArgument('sid');
+
+		if (fullscreen) {
+			url.setArgument('fullscreen', 1);
+		}
 
 		events.url = url.getUrl();
 	}
@@ -653,6 +670,10 @@ function getMenuPopupTrigger(options) {
 		url.setArgument('action', 'acknowledge.edit');
 		url.setArgument('eventids[]', options.acknowledge.eventid);
 		url.setArgument('backurl', options.acknowledge.backurl);
+
+		if (fullscreen) {
+			url.setArgument('fullscreen', 1);
+		}
 
 		items[items.length] = {
 			label: t('Acknowledge'),
@@ -691,6 +712,10 @@ function getMenuPopupTrigger(options) {
 			var url = new Curl('history.php');
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
+
+			if (fullscreen) {
+				url.setArgument('fullscreen', 1);
+			}
 
 			items[items.length] = {
 				label: item.name,

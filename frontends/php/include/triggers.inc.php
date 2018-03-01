@@ -731,10 +731,12 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  * @param string 	$pageFile						the page where the element is displayed
  * @param int    	$viewMode						table display style: either hosts on top, or host on the left side
  * @param string 	$screenId						the ID of the screen, that contains the trigger overview table
+ * @param bool 	    $fullscreen						display mode
  *
  * @return CTableInfo
  */
-function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
+function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null,
+		$fullscreen = false) {
 	$data = [];
 	$host_names = [];
 	$trcounter = [];
@@ -804,7 +806,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
 						$pageFile,
-						$screenId
+						$screenId,
+						$fullscreen
 					);
 				}
 				$triggerTable->addRow($columns);
@@ -830,7 +833,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 		foreach ($host_names as $hostId => $host_name) {
 			$name = (new CLinkAction($host_name))
-				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
@@ -838,7 +841,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
 						$pageFile,
-						$screenId
+						$screenId,
+						$fullscreen
 					);
 				}
 			}
@@ -855,13 +859,14 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  *
  * @see getTriggersOverview()
  *
- * @param array  $trigger
- * @param string $pageFile		the page where the element is displayed
- * @param string $screenid
+ * @param array     $trigger
+ * @param string    $pageFile		the page where the element is displayed
+ * @param string    $screenid
+ * @param bool      $fullscreen     display mode
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
+function getTriggerOverviewCells($trigger, $pageFile, $screenid = null, $fullscreen = false) {
 	$ack = null;
 	$css = null;
 	$desc = [];
@@ -914,7 +919,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		$isDependencyFound = false;
 		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.zbx_dbstr($triggerId));
 		while ($dbDependency = DBfetch($dbDependencies)) {
-			$dependencyTable->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_up']));
+			$dependencyTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_up']));
 			$isDependencyFound = true;
 		}
 
@@ -932,7 +937,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		$isDependencyFound = false;
 		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.zbx_dbstr($triggerId));
 		while ($dbDependency = DBfetch($dbDependencies)) {
-			$dependencyTable->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_down']));
+			$dependencyTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_down']));
 			$isDependencyFound = true;
 		}
 
@@ -962,7 +967,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $fullscreen));
 	}
 
 	return $column;
@@ -2234,12 +2239,13 @@ function getTriggersHostsList(array $triggers) {
  * @param string $triggers_hosts[<triggerid>][]['maintenanceid']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_status']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
- * @param int    $triggers_hosts[<triggerid>][]['graphs']             the number of graphs
- * @param int    $triggers_hosts[<triggerid>][]['screens']            the number of screens
+ * @param int    $triggers_hosts[<triggerid>][]['graphs']               the number of graphs
+ * @param int    $triggers_hosts[<triggerid>][]['screens']              the number of screens
+ * @param bool   $fullscreen				                            fullscreen mode
  *
  * @return array
  */
-function makeTriggersHostsList(array $triggers_hosts) {
+function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 	$db_maintenances = [];
 	$scripts_by_hosts = [];
 
@@ -2274,9 +2280,8 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			$scripts_by_host = array_key_exists($host['hostid'], $scripts_by_hosts)
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
-
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true, $fullscreen));
 
 			// add maintenance icon with hint if host is in maintenance
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {

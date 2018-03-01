@@ -25,7 +25,10 @@ $historyWidget = new CWidget();
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($this->data['items'])),
-	'right' => (new CForm('get'))->addVar('itemids', getRequest('itemids'))->addVar('page', 1)
+	'right' => (new CForm('get'))
+		->addVar('itemids', getRequest('itemids'))
+		->addVar('page', 1)
+		->addVar('fullscreen', $data['fullscreen'])
 ];
 $header_row = [];
 $first_item = reset($this->data['items']);
