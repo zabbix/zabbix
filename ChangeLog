@@ -159,6 +159,7 @@ Bug fixes:
 Changes for 3.4.8rc1
 
 New features:
+A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zalex_ua)
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
