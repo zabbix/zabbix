@@ -1621,16 +1621,19 @@ void	zbx_export_events(void)
 			zbx_hashset_iter_t	iter;
 
 			zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
+
 			get_hosts_by_expression(&hosts, events[i].trigger.expression,
 					events[i].trigger.recovery_expression);
 
-			zbx_hashset_iter_reset(&hosts, &iter);
 			zbx_json_addarray(&json, "hosts");
+
+			zbx_hashset_iter_reset(&hosts, &iter);
 			while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
 			{
 				zbx_json_addstring(&json, NULL, host->name, ZBX_JSON_TYPE_STRING);
 				zbx_vector_uint64_append(&hostids, host->hostid);
 			}
+
 			zbx_json_close(&json);
 
 			sql_offset = 0;
@@ -1646,6 +1649,7 @@ void	zbx_export_events(void)
 			result = DBselect("%s", sql);
 
 			zbx_json_addarray(&json, "groups");
+
 			while (NULL != (row = DBfetch(result)))
 				zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
 			DBfree_result(result);

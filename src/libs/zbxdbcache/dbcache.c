@@ -2192,12 +2192,104 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 		zabbix_log(LOG_LEVEL_DEBUG, "synced %d log values with modules", history_log_num);
 	}
 }
+typedef struct
+{
+	zbx_uint64_t		hostid;
+	zbx_vector_ptr_t	groups;
+}
+zbx_host_t;
 
+static void	clean_hosts(zbx_hashset_t *hosts)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_host_t		*host;
+
+	zbx_hashset_iter_reset(hosts, &iter);
+	while (NULL != (host = (zbx_host_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_ptr_clear_ext(&host->groups, zbx_default_mem_free_func);
+		zbx_vector_ptr_destroy(&host->groups);
+	}
+}
+
+static void	get_hosts_by_hostid(zbx_hashset_t *hosts, const zbx_vector_uint64_t *hostids)
+{
+	int			i;
+	size_t			sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+
+	for (i = 0; i < hostids->values_num; i++)
+	{
+		zbx_host_t	host = {.hostid = hostids->values[i]};
+
+		zbx_vector_ptr_create(&host.groups);
+		zbx_hashset_insert(hosts, &host, sizeof(host));
+	}
+
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct hg.hostid, g.name"
+				" from groups g, hosts_groups hg"
+				" where g.groupid=hg.groupid"
+					" and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids->values, hostids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	hostid;
+		zbx_host_t	*host;
+
+		ZBX_DBROW2UINT64(hostid, row[0]);
+
+		if (NULL == (host = (zbx_host_t *)zbx_hashset_search(hosts, &hostid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_vector_ptr_append(&host->groups, zbx_strdup(NULL, row[1]));
+	}
+	DBfree_result(result);
+}
 static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
 		const DC_ITEM *items, int history_num, const ZBX_DC_TREND *trends, int trends_num)
 {
-	int		i;
-	struct zbx_json	json, json_trend;
+	int			i;
+	struct zbx_json		json, json_trend;
+	zbx_vector_uint64_t	hostids;
+	zbx_hashset_t		hosts;
+
+	zbx_vector_uint64_create(&hostids);
+
+	for (i = 0; i < history_num; i++)
+	{
+		const ZBX_DC_HISTORY	*h = &history[i];
+		const DC_ITEM		*item;
+		int			index;
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
+			continue;
+
+		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		item = &items[index];
+		zbx_vector_uint64_append(&hostids, item->host.hostid);
+	}
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_create(&hosts, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	get_hosts_by_hostid(&hosts, &hostids);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_init(&json_trend, ZBX_JSON_STAT_BUF_LEN);
@@ -2211,6 +2303,7 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		DB_RESULT		result;
 		DB_ROW			row;
 		char			buffer[MAX_ID_LEN], *name;
+		zbx_host_t		*host;
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
@@ -2246,37 +2339,25 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			zbx_json_addstring(&json_trend, "name", item->host.name, ZBX_JSON_TYPE_STRING);
 		}
 
-		if (NULL == (result = DBselect(
-				"select g.name"
-				" from groups g, hosts_groups hg"
-				" where hg.hostid=" ZBX_FS_UI64
-					" and g.groupid=hg.groupid",
-				item->host.hostid)))
-		{
-			continue;
-		}
-
 		zbx_json_addarray(&json, "groups");
 
 		if (NULL != trend)
 			zbx_json_addarray(&json_trend, "groups");
 
-		if (NULL == (row = DBfetch(result)))
+		if (NULL == (host = (zbx_host_t *)zbx_hashset_search(&hosts, &item->host.hostid)) ||
+				0 == host->groups.values_num)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
-			DBfree_result(result);
 			continue;
 		}
 
-		do
+		for (j = 0; j < host->groups.values_num; j++)
 		{
-			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, NULL, host->groups.values[j], ZBX_JSON_TYPE_STRING);
 
 			if (NULL != trend)
-				zbx_json_addstring(&json_trend, NULL, row[0], ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_trend, NULL, host->groups.values[j], ZBX_JSON_TYPE_STRING);
 		}
-		while (NULL != (row = DBfetch(result)));
-		DBfree_result(result);
 
 		zbx_json_close(&json);
 		zbx_json_close(&json);
@@ -2399,6 +2480,9 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 	zbx_json_free(&json);
 	zbx_json_free(&json_trend);
+	zbx_vector_uint64_destroy(&hostids);
+	clean_hosts(&hosts);
+	zbx_hashset_destroy(&hosts);
 }
 
 /******************************************************************************
