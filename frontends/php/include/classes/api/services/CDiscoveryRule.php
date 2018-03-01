@@ -276,6 +276,8 @@ class CDiscoveryRule extends CItemGeneral {
 			if (array_key_exists('headers', $item)) {
 				$item['headers'] = $this->headersStringToArray($item['headers']);
 			}
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
 		}
 
 		if (!$options['preservekeys']) {
@@ -307,13 +309,13 @@ class CDiscoveryRule extends CItemGeneral {
 				if (array_key_exists('headers', $item)) {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
-
-				unset($item['output_format']);
 			}
 			else {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
 			}
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
 		}
 		unset($item);
 
@@ -334,7 +336,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'type'],
+			'output' => ['itemid', 'name', 'type', 'authtype'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
@@ -407,9 +409,13 @@ class CDiscoveryRule extends CItemGeneral {
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
-
-				unset($item['output_format']);
 			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
 		}
 		unset($item);
 
@@ -640,6 +646,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
 			}
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
 		}
 		unset($item);
 

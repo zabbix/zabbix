@@ -641,6 +641,10 @@ class CItem extends CItemGeneral {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
 			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
 		}
 		unset($item);
 

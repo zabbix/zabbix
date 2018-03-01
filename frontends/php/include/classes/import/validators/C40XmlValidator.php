@@ -22,7 +22,7 @@
 /**
  * Validate import data from Zabbix 4.0.x.
  */
-class C34XmlValidator {
+class C40XmlValidator {
 
 	/**
 	 * @var string
@@ -422,7 +422,6 @@ class C34XmlValidator {
 							]],
 							'retrieve_mode' =>			['type' => XML_STRING | XML_REQUIRED],
 							'request_method' =>			['type' => XML_STRING | XML_REQUIRED],
-							'output_format' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_cert_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
@@ -913,7 +912,6 @@ class C34XmlValidator {
 							]],
 							'retrieve_mode' =>			['type' => XML_STRING | XML_REQUIRED],
 							'request_method' =>			['type' => XML_STRING | XML_REQUIRED],
-							'output_format' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_cert_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],

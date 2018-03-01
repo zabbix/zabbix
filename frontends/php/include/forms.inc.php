@@ -1226,7 +1226,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['headers'] = $data['item']['headers'];
 		$data['retrieve_mode'] = $data['item']['retrieve_mode'];
 		$data['request_method'] = $data['item']['request_method'];
-		$data['output_format'] = $data['item']['output_format'];
 		$data['ssl_cert_file'] = $data['item']['ssl_cert_file'];
 		$data['ssl_key_file'] = $data['item']['ssl_key_file'];
 		$data['ssl_key_password'] = $data['item']['ssl_key_password'];
@@ -1238,6 +1237,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 		if (!$data['is_discovery_rule']) {
 			$data['preprocessing'] = $data['item']['preprocessing'];
+			$data['output_format'] = $data['item']['output_format'];
 		}
 
 		if ($data['parent_discoveryid'] != 0) {

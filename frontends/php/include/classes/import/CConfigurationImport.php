@@ -903,6 +903,22 @@ class CConfigurationImport {
 
 				$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
 
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$headers = [];
+
+					foreach ($item['headers'] as $header) {
+						$headers[$header['name']] = $header['value'];
+					}
+					$item['headers'] = $headers;
+
+					$query_fields = [];
+
+					foreach ($item['query_fields'] as $query_field) {
+						$query_fields[] = [$query_field['name'] => $query_field['value']];
+					}
+					$item['query_fields'] = $query_fields;
+				}
+
 				if ($itemId) {
 					$item['itemid'] = $itemId;
 					$itemsToUpdate[] = $item;

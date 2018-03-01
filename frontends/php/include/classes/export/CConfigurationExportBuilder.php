@@ -357,7 +357,6 @@ class CConfigurationExportBuilder {
 				'headers' => $discoveryRule['headers'],
 				'retrieve_mode' => $discoveryRule['retrieve_mode'],
 				'request_method' => $discoveryRule['request_method'],
-				'output_format' => $discoveryRule['output_format'],
 				'ssl_cert_file' => $discoveryRule['ssl_cert_file'],
 				'ssl_key_file' => $discoveryRule['ssl_key_file'],
 				'ssl_key_password' => $discoveryRule['ssl_key_password'],
