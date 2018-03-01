@@ -38,7 +38,7 @@ function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
 		id = 'c' + CLNDR.length;
 	}
 
-	if ('undefined' == typeof(utime_field_id)) {
+	if (typeof utime_field_id === 'undefined') {
 		utime_field_id = null;
 	}
 
@@ -71,20 +71,16 @@ calendar.prototype = {
 	clndr_calendar: null,		// html obj of calendar
 	clndr_month_div: null,		// html obj
 	clndr_year_div: null,		// html obj
-	clndr_minute: null,			// html from obj
-	clndr_hour: null,			// html from obj
 	clndr_days: null,			// html obj
 	clndr_month: null,			// html obj
 	clndr_year: null,			// html obj
 	clndr_selectedday: null,	// html obj, selected day
+	clndr_year_wrap: null,		// html obj
+	clndr_month_wrap: null,		// html obj
 	clndr_monthup: null,		// html bttn obj
 	clndr_monthdown: null,		// html bttn obj
 	clndr_yearup: null,			// html bttn obj
-	clndr_year_wrap: null,		// html obj
-	clndr_month_wrap: null,		// html obj
 	clndr_yeardown: null,		// html bttn obj
-	clndr_now: null,			// html bttn obj
-	clndr_done: null,			// html bttn obj
 	clndr_utime_field: null,	// html obj where unix date representation is saved
 	timeobjects: new Array(),	// object list where will be saved date
 	status: false,				// status of timeobjects
@@ -95,7 +91,7 @@ calendar.prototype = {
 	active_section: null,		// Active calendar section. See 'sections' array. Default value set in method clndrshow.
 	monthname: new Array(locale['S_JANUARY'], locale['S_FEBRUARY'], locale['S_MARCH'], locale['S_APRIL'], locale['S_MAY'], locale['S_JUNE'], locale['S_JULY'], locale['S_AUGUST'], locale['S_SEPTEMBER'], locale['S_OCTOBER'], locale['S_NOVEMBER'], locale['S_DECEMBER']),
 	dayname: new Array(locale['S_SUNDAY'], locale['S_MONDAY'], locale['S_TUESDAY'], locale['S_WEDNESDAY'], locale['S_THURSDAY'], locale['S_FRIDAY'], locale['S_SATURDAY']),
-	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date', '.calendar-time > [name="hour"]', '.calendar-time > [name="minute"]', '.calendar-now-btn', '.calendar-done-btn'),
+	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
 
 	initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid) {
 		this.id = id;
@@ -109,10 +105,6 @@ calendar.prototype = {
 		addListener(this.clndr_monthup, 'click', this.monthup.bindAsEventListener(this));
 		addListener(this.clndr_yeardown, 'click', this.yeardown.bindAsEventListener(this));
 		addListener(this.clndr_yearup, 'click', this.yearup.bindAsEventListener(this));
-		addListener(this.clndr_hour, 'blur', this.sethour.bindAsEventListener(this));
-		addListener(this.clndr_minute, 'blur', this.setminute.bindAsEventListener(this));
-		addListener(this.clndr_now, 'click', this.setNow.bindAsEventListener(this));
-		addListener(this.clndr_done, 'click', this.setDone.bindAsEventListener(this));
 
 		for (var i = 0; i < this.timeobjects.length; i++) {
 			if (typeof(this.timeobjects[i]) != 'undefined' && !empty(this.timeobjects[i])) {
@@ -314,11 +306,6 @@ calendar.prototype = {
 							cal.monthup();
 						}
 						break;
-
-					default:
-						// No prevention of default activity in other sections.
-						return true;
-						break;
 				}
 
 				// Prevent page scrolling.
@@ -352,36 +339,16 @@ calendar.prototype = {
 					cal.active_section++;
 					cal.focusSection();
 				}
-				else if (jQuery.inArray(active_section, new Array('.calendar-date', '.calendar-time > [name="hour"]',
-						'.calendar-time > [name="minute"]')) > -1) {
+				else if (active_section === '.calendar-date') {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 					cal.setDone();
-				}
-				else if (active_section === '.calendar-done-btn') {
-					cal.setDone();
-				}
-				else if (active_section === '.calendar-now-btn') {
-					cal.setNow();
 				}
 
 				return false;
 				break;
 
 			case 32: // Space
-				if (cal.sections[cal.active_section] === '.calendar-date') {
-					if (cal.hl_year != cal.year || cal.hl_month != cal.month) {
-						cal.hl_year = cal.year;
-						cal.hl_month = cal.month;
-					}
-
-					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
-					cal.focusSection();
-				}
-				else if (cal.sections[cal.active_section] === '.calendar-now-btn') {
-					cal.setNow();
-				}
-
-				return false;
+				return false; // Prevent page scrolling.
 				break;
 		}
 	},
@@ -392,10 +359,6 @@ calendar.prototype = {
 		jQuery('.highlighted', this.clndr_calendar).removeClass('highlighted').blur();
 		if (section_to_focus === '.calendar-year' ||  section_to_focus === '.calendar-month') {
 			jQuery(section_to_focus, this.clndr_calendar).addClass('highlighted').focus();
-		}
-		else if (section_to_focus === '.calendar-time > [name="hour"]'
-				|| section_to_focus === '.calendar-time > [name="minute"]') {
-			jQuery(section_to_focus, this.clndr_calendar).select();
 		}
 		else if (section_to_focus === '.calendar-date') {
 			this.hl_year = this.hl_year || this.year;
@@ -410,9 +373,6 @@ calendar.prototype = {
 				.addClass('highlighted')
 				.attr('tabindex', '0')
 				.focus();
-		}
-		else {
-			jQuery(section_to_focus, this.clndr_calendar).focus();
 		}
 	},
 
@@ -613,28 +573,6 @@ calendar.prototype = {
 		this.ondateselected();
 	},
 
-	setminute: function() {
-		var minute = parseInt(this.clndr_minute.value, 10);
-		if (minute > -1 && minute < 60) {
-			this.minute = minute;
-			this.syncSDT();
-		}
-		else {
-			this.clndr_minute.value = this.minute;
-		}
-	},
-
-	sethour: function() {
-		var hour = parseInt(this.clndr_hour.value, 10);
-		if (hour > -1 && hour < 24) {
-			this.hour = hour;
-			this.syncSDT();
-		}
-		else {
-			this.clndr_hour.value = this.hour;
-		}
-	},
-
 	setday: function(e, day, month, year) {
 		if (!is_null(this.clndr_selectedday)) {
 			this.clndr_selectedday.removeClassName('selected');
@@ -734,10 +672,6 @@ calendar.prototype = {
 	},
 
 	setCDate: function() {
-		this.clndr_minute.value = this.minute;
-		this.clndr_minute.onchange();
-		this.clndr_hour.value = this.hour;
-		this.clndr_hour.onchange();
 		this.clndr_month.textContent = this.monthname[this.month];
 		this.clndr_year.textContent = this.year;
 		this.createDaysTab();
@@ -957,59 +891,5 @@ calendar.prototype = {
 		Element.extend(this.clndr_days);
 		this.clndr_days.setAttribute('class', 'calendar-date');
 		table.appendChild(this.clndr_days);
-
-		/*
-		 * Hours & minutes
-		 */
-		var line_div = document.createElement('div');
-		line_div.className = 'calendar-time';
-
-		// hour
-		this.clndr_hour = document.createElement('input');
-		this.clndr_hour.setAttribute('type', 'text');
-		this.clndr_hour.setAttribute('name', 'hour');
-		this.clndr_hour.setAttribute('value', 'hh');
-		this.clndr_hour.setAttribute('maxlength', '2');
-		this.clndr_hour.setAttribute('aria-label', locale['S_hour']);
-		this.clndr_hour.onchange = function() { validateDatePartBox(this, 0, 23, 2); };
-		this.clndr_hour.className = 'calendar_textbox';
-
-		// minutes
-		this.clndr_minute = document.createElement('input');
-		this.clndr_minute.setAttribute('type', 'text');
-		this.clndr_minute.setAttribute('name', 'minute');
-		this.clndr_minute.setAttribute('value', 'mm');
-		this.clndr_minute.setAttribute('maxlength', '2');
-		this.clndr_minute.setAttribute('aria-label', locale['S_minute']);
-		this.clndr_minute.onchange = function() { validateDatePartBox(this, 0, 59, 2); };
-		this.clndr_minute.className = 'calendar_textbox';
-
-		line_div.appendChild(document.createTextNode(locale['S_TIME'] + " "));
-		line_div.appendChild(this.clndr_hour);
-		line_div.appendChild(document.createTextNode(' : '));
-		line_div.appendChild(this.clndr_minute);
-		this.clndr_calendar.appendChild(line_div);
-
-		/*
-		 * Footer
-		 */
-		var line_div = document.createElement('div');
-		line_div.className = 'calendar-footer';
-
-		// now
-		this.clndr_now = document.createElement('button');
-		this.clndr_now.className = 'btn-grey calendar-now-btn';
-		this.clndr_now.setAttribute('type', 'button');
-		this.clndr_now.setAttribute('value', locale['S_NOW']);
-		this.clndr_now.appendChild(document.createTextNode(locale['S_NOW']));
-		line_div.appendChild(this.clndr_now);
-
-		// done
-		this.clndr_done = document.createElement('button');
-		this.clndr_done.className = 'calendar-done-btn';
-		this.clndr_done.setAttribute('type', 'button');
-		this.clndr_done.appendChild(document.createTextNode(locale['S_DONE']));
-		line_div.appendChild(this.clndr_done);
-		this.clndr_calendar.appendChild(line_div);
 	}
 }
