@@ -1847,9 +1847,11 @@ abstract class CItemGeneral extends CApiService {
 						'{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}'
 					]
 				]);
+				$shift = 0;
 
 				foreach ($matches as $pos => $substr) {
-					$posts = substr_replace($posts, 'false', $pos, strlen($substr));
+					$posts = substr_replace($posts, '1', $pos + $shift, strlen($substr));
+					$shift = $shift + 1 - strlen($substr);
 				}
 
 				$posts = json_decode($posts);
