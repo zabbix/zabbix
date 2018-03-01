@@ -9762,7 +9762,7 @@ static void	zbx_dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int
 
 void	DCget_hosts_by_functionids(zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts)
 {
-	const char	*__function_name = "DCget_hostids_by_functionids";
+	const char	*__function_name = "DCget_hosts_by_functionids";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
