@@ -3953,11 +3953,11 @@ a.link-action {
 			@include border-radius(2px)
 		}
 
-		&:first-child:not(:only-child) {
+		&:first-of-type:not(:only-child) {
 			@include border-radius(2px 0 0 2px);
 		}
 
-		&:last-child:not(:only-child) {
+		&:last-of-type:not(:only-child) {
 			@include border-radius(0 2px 2px 0);
 		}
 	}

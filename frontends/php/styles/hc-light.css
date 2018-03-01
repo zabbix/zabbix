@@ -1,5 +1,5 @@
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
   background-color: #333 !important;
   color: #fff !important; }
 
@@ -2735,11 +2735,11 @@ a.link-action {
       -webkit-border-radius: 2px;
       -moz-border-radius: 2px;
       border-radius: 2px; }
-    .status-container span:first-child:not(:only-child) {
+    .status-container span:first-of-type:not(:only-child) {
       -webkit-border-radius: 2px 0 0 2px;
       -moz-border-radius: 2px 0 0 2px;
       border-radius: 2px 0 0 2px; }
-    .status-container span:last-child:not(:only-child) {
+    .status-container span:last-of-type:not(:only-child) {
       -webkit-border-radius: 0 2px 2px 0;
       -moz-border-radius: 0 2px 2px 0;
       border-radius: 0 2px 2px 0; }
