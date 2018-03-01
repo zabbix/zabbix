@@ -417,7 +417,6 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		'info' => [],
 		'iconid' => $selement['iconid_off']
 	];
-	$config = select_config();
 
 	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
 			|| in_array($showUnack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))) {
@@ -502,7 +501,6 @@ function getHostsInfo($selement, $i, $show_unack) {
 		'iconid' => $selement['iconid_off']
 	];
 	$hasProblem = false;
-	$config = select_config();
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
@@ -596,7 +594,6 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 	];
 	$hasProblem = false;
 	$hasStatus = false;
-	$config = select_config();
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
@@ -698,7 +695,6 @@ function getMapsInfo($selement, $i, $show_unack) {
 
 	$hasProblem = false;
 	$hasStatus = false;
-	$config = select_config();
 
 	if ($i['problem']) {
 		if (in_array($show_unack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
@@ -1872,12 +1868,6 @@ function get_parent_sysmaps($sysmapid) {
 function getMapLabels($map, $map_info) {
 	if ($map['label_type'] == MAP_LABEL_TYPE_NOTHING && $map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {
 		return;
-	}
-
-	$config = select_config();
-
-	if ($config['custom_color'] !== '1') {
-		$schema = DB::getSchema('config');
 	}
 
 	$selements = $map['selements'];
