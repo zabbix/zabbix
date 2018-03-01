@@ -391,7 +391,7 @@ class CItem extends CItemGeneral {
 			$result = zbx_cleanHashes($result);
 		}
 
-		// Decode ITEM_TYPE_HTTPCHECK encoded fields.
+		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
 		foreach ($result as &$item) {
 			if (array_key_exists('query_fields', $item)) {
 				$item['query_fields'] = ($item['query_fields'] !== '')
@@ -428,7 +428,7 @@ class CItem extends CItemGeneral {
 		$this->validateDependentItems($items, API::Item());
 
 		foreach ($items as &$item) {
-			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item)) {
 					$item['query_fields'] = $item['query_fields']
 						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
@@ -582,7 +582,7 @@ class CItem extends CItemGeneral {
 
 		$defaults = DB::getDefaults('items');
 		$clean = [
-			ITEM_TYPE_HTTPCHECK => [
+			ITEM_TYPE_HTTPAGENT => [
 				'url' => '',
 				'query_fields' => '',
 				'timeout' => $defaults['timeout'],
@@ -613,8 +613,8 @@ class CItem extends CItemGeneral {
 				$item['master_itemid'] = $db_items[$item['itemid']]['master_itemid'];
 			}
 
-			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK) {
-				$item = array_merge($item, $clean[ITEM_TYPE_HTTPCHECK]);
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
+				$item = array_merge($item, $clean[ITEM_TYPE_HTTPAGENT]);
 
 				if ($item['type'] != ITEM_TYPE_SSH) {
 					$item['authtype'] = $defaults['authtype'];
@@ -623,7 +623,7 @@ class CItem extends CItemGeneral {
 				}
 			}
 
-			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
 				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
 						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
@@ -826,7 +826,7 @@ class CItem extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item['applications'] = zbx_objectValues($item['applications'], 'applicationid');
 
-			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
 					$item['query_fields'] = $item['query_fields']
 						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)

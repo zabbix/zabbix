@@ -60,7 +60,7 @@ $fields = [
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED,
-			ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPCHECK
+			ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT
 			]), 'isset({add}) || isset({update})'],
 	'trends' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type}) && '.
@@ -129,7 +129,7 @@ $fields = [
 	],
 	'timeout' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'url' =>            		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_HTTPCHECK, _('URL')],
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_HTTPAGENT, _('URL')],
 	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -210,7 +210,7 @@ $fields = [
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 		ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 		ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
-		ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPCHECK]), null],
+		ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT]), null],
 	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_snmp_community' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_snmpv3_securityname' => [T_ZBX_STR, O_OPT, null, null,		null],
@@ -611,7 +611,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'status' => getRequest('status', ITEM_STATUS_DISABLED),
 			];
 
-			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				$item += [
 					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 					'url' => getRequest('url'),
@@ -830,7 +830,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
-			if (getRequest('type') == ITEM_TYPE_HTTPCHECK) {
+			if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
 				$posted = [
 					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 					'url' => getRequest('url'),
@@ -1397,7 +1397,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
 			];
 		}
-		else if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+		else if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 			// Convert hash to array where every item is hash for single key value pair as it is used by view.
 			$headers = [];
 

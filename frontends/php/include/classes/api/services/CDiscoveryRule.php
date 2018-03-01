@@ -266,7 +266,7 @@ class CDiscoveryRule extends CItemGeneral {
 			unset($rule);
 		}
 
-		// Decode ITEM_TYPE_HTTPCHECK encoded fields.
+		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
 		foreach ($result as &$item) {
 			if (array_key_exists('query_fields', $item)) {
 				$item['query_fields'] = ($item['query_fields'] !== '')
@@ -297,7 +297,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->checkInput($items);
 
 		foreach ($items as &$item) {
-			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item)) {
 					$item['query_fields'] = $item['query_fields']
 						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
@@ -346,7 +346,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$defaults = DB::getDefaults('items');
 		$clean = [
-			ITEM_TYPE_HTTPCHECK => [
+			ITEM_TYPE_HTTPAGENT => [
 				'url' => '',
 				'query_fields' => '',
 				'timeout' => $defaults['timeout'],
@@ -380,8 +380,8 @@ class CDiscoveryRule extends CItemGeneral {
 				unset($condition);
 			}
 
-			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK) {
-				$item = array_merge($item, $clean[ITEM_TYPE_HTTPCHECK]);
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
+				$item = array_merge($item, $clean[ITEM_TYPE_HTTPAGENT]);
 
 				if ($item['type'] != ITEM_TYPE_SSH) {
 					$item['authtype'] = $defaults['authtype'];
@@ -390,7 +390,7 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 			}
 
-			if ($db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPCHECK) {
+			if ($db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
 				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
 				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
 						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
@@ -625,7 +625,7 @@ class CDiscoveryRule extends CItemGeneral {
 		]);
 
 		foreach ($items as &$item) {
-			if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
 					$item['query_fields'] = $item['query_fields']
 						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)

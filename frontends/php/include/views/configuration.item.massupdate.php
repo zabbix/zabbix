@@ -97,7 +97,7 @@ $itemFormList->addRow(
 	(new CTextBox('jmx_endpoint', $data['jmx_endpoint']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
-// ITEM_TYPE_HTTPCHECK URL field.
+// ITEM_TYPE_HTTPAGENT URL field.
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[url]', 'url', _('Original')))
 		->setLabel(_('URL'))
@@ -106,7 +106,7 @@ $itemFormList->addRow(
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
-// ITEM_TYPE_HTTPCHECK Request body type.
+// ITEM_TYPE_HTTPAGENT Request body type.
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[post_type]', 'post_type_container', _('Original')))
 		->setLabel(_('Request body type'))
@@ -120,7 +120,7 @@ $itemFormList->addRow(
 	))->setId('post_type_container')
 );
 
-// ITEM_TYPE_HTTPCHECK Request body.
+// ITEM_TYPE_HTTPAGENT Request body.
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[posts]', 'posts', _('Original')))
 		->setLabel(_('Request body'))
@@ -128,7 +128,7 @@ $itemFormList->addRow(
 	(new CTextArea('posts', $data['posts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
-// ITEM_TYPE_HTTPCHECK Headers fields.
+// ITEM_TYPE_HTTPAGENT Headers fields.
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {

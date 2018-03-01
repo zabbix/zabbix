@@ -102,7 +102,7 @@ if (!$readonly) {
 
 $itemFormList->addRow((new CLabel(_('Key'), 'key'))->setAsteriskMark(), $key_controls);
 
-// ITEM_TYPE_HTTPCHECK URL field.
+// ITEM_TYPE_HTTPAGENT URL field.
 $itemFormList->addRow(
 	(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 	[
@@ -118,7 +118,7 @@ $itemFormList->addRow(
 	'url_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Query fields.
+// ITEM_TYPE_HTTPAGENT Query fields.
 $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
@@ -169,7 +169,7 @@ $itemFormList->addRow(
 	'query_fields_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Request type.
+// ITEM_TYPE_HTTPAGENT Request type.
 $itemFormList->addRow(
 	new CLabel(_('Request type'), 'request_method'),
 	(new CComboBox('request_method', $data['request_method'], null, [
@@ -181,14 +181,14 @@ $itemFormList->addRow(
 	'request_method_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Timeout field.
+// ITEM_TYPE_HTTPAGENT Timeout field.
 $itemFormList->addRow(
 	new CLabel(_('Timeout'), 'timeout'),
 	(new CTextBox('timeout', $data['timeout'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'timeout_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Request body type.
+// ITEM_TYPE_HTTPAGENT Request body type.
 $itemFormList->addRow(
 	new CLabel(_('Request body type'), 'post_type'),
 	(new CRadioButtonList('post_type', (int) $data['post_type']))
@@ -200,14 +200,14 @@ $itemFormList->addRow(
 	'post_type_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Request body.
+// ITEM_TYPE_HTTPAGENT Request body.
 $itemFormList->addRow(
 	new CLabel(_('Request body'), 'posts'),
 	(new CTextArea('posts', $data['posts'], compact('readonly')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'posts_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Headers fields.
+// ITEM_TYPE_HTTPAGENT Headers fields.
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
@@ -257,7 +257,7 @@ $itemFormList->addRow(
 	'headers_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Required status codes.
+// ITEM_TYPE_HTTPAGENT Required status codes.
 $itemFormList->addRow(
 	new CLabel(_('Required status codes'), 'status_codes'),
 	(new CTextBox('status_codes', $data['status_codes'], $readonly))
@@ -265,7 +265,7 @@ $itemFormList->addRow(
 	'status_codes_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Follow redirects.
+// ITEM_TYPE_HTTPAGENT Follow redirects.
 $itemFormList->addRow(
 	new CLabel(_('Follow redirects'), 'follow_redirects'),
 	(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
@@ -274,7 +274,7 @@ $itemFormList->addRow(
 	'follow_redirects_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Retrieve mode.
+// ITEM_TYPE_HTTPAGENT Retrieve mode.
 $itemFormList->addRow(
 	new CLabel(_('Retrieve mode'), 'retrieve_mode'),
 	(new CRadioButtonList('retrieve_mode', (int) $data['retrieve_mode']))
@@ -286,7 +286,7 @@ $itemFormList->addRow(
 	'retrieve_mode_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Convert to JSON.
+// ITEM_TYPE_HTTPAGENT Convert to JSON.
 $itemFormList->addRow(
 	new CLabel(_('Convert to JSON'), 'output_format'),
 	(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
@@ -295,7 +295,7 @@ $itemFormList->addRow(
 	'output_format_row'
 );
 
-// ITEM_TYPE_HTTPCHECK HTTP proxy.
+// ITEM_TYPE_HTTPAGENT HTTP proxy.
 $itemFormList->addRow(
 	new CLabel(_('HTTP proxy'), 'http_proxy'),
 	(new CTextBox('http_proxy', $data['http_proxy'], $readonly, 255))
@@ -304,7 +304,7 @@ $itemFormList->addRow(
 	'http_proxy_row'
 );
 
-// ITEM_TYPE_HTTPCHECK HTTP authentication.
+// ITEM_TYPE_HTTPAGENT HTTP authentication.
 $itemFormList->addRow(
 	new CLabel(_('HTTP authentication'), 'http_authtype'),
 	(new CComboBox('http_authtype', $data['http_authtype'], null, [
@@ -315,7 +315,7 @@ $itemFormList->addRow(
 	'http_authtype_row'
 );
 
-// ITEM_TYPE_HTTPCHECK User name.
+// ITEM_TYPE_HTTPAGENT User name.
 $itemFormList->addRow(
 	(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
 	(new CTextBox('http_username', $data['http_username'], $readonly, 64))
@@ -324,7 +324,7 @@ $itemFormList->addRow(
 	'http_username_row'
 );
 
-// ITEM_TYPE_HTTPCHECK Password.
+// ITEM_TYPE_HTTPAGENT Password.
 $itemFormList->addRow(
 	(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
 	(new CTextBox('http_password', $data['http_password'], $readonly, 64))
@@ -333,7 +333,7 @@ $itemFormList->addRow(
 	'http_password_row'
 );
 
-// ITEM_TYPE_HTTPCHECK SSL verify peer.
+// ITEM_TYPE_HTTPAGENT SSL verify peer.
 $itemFormList->addRow(
 	new CLabel(_('SSL verify peer'), 'verify_peer'),
 	(new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
@@ -342,7 +342,7 @@ $itemFormList->addRow(
 	'verify_peer_row'
 );
 
-// ITEM_TYPE_HTTPCHECK SSL verify host.
+// ITEM_TYPE_HTTPAGENT SSL verify host.
 $itemFormList->addRow(
 	new CLabel(_('SSL verify host'), 'verify_host'),
 	(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
@@ -351,21 +351,21 @@ $itemFormList->addRow(
 	'verify_host_row'
 );
 
-// ITEM_TYPE_HTTPCHECK SSL certificate file.
+// ITEM_TYPE_HTTPAGENT SSL certificate file.
 $itemFormList->addRow(
 	new CLabel(_('SSL certificate file'), 'ssl_cert_file'),
 	(new CTextBox('ssl_cert_file', $data['ssl_cert_file'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_cert_file_row'
 );
 
-// ITEM_TYPE_HTTPCHECK SSL key file.
+// ITEM_TYPE_HTTPAGENT SSL key file.
 $itemFormList->addRow(
 	new CLabel(_('SSL key file'), 'ssl_key_file'),
 	(new CTextBox('ssl_key_file', $data['ssl_key_file'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_file_row'
 );
 
-// ITEM_TYPE_HTTPCHECK SSL key password.
+// ITEM_TYPE_HTTPAGENT SSL key password.
 $itemFormList->addRow(
 	new CLabel(_('SSL key password'), 'ssl_key_password'),
 	(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

@@ -735,7 +735,7 @@ class CConfigurationImport {
 					unset($item[$xml_itemkey]);
 				}
 
-				if ($item['type'] == ITEM_TYPE_HTTPCHECK) {
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 					$headers = [];
 
 					foreach ($item['headers'] as $header) {
@@ -1013,7 +1013,7 @@ class CConfigurationImport {
 						unset($prototype[$xml_itemprototype_key]);
 					}
 
-					if ($prototype['type'] == ITEM_TYPE_HTTPCHECK) {
+					if ($prototype['type'] == ITEM_TYPE_HTTPAGENT) {
 						$headers = [];
 
 						foreach ($prototype['headers'] as $header) {

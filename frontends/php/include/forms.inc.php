@@ -1005,7 +1005,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'http_password' => getRequest('http_password', '')
 	];
 
-	if ($data['type'] == ITEM_TYPE_HTTPCHECK) {
+	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
 		foreach (['query_fields', 'headers'] as $property) {
 			$values = [];
 
@@ -1214,7 +1214,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['jmx_endpoint'] = $data['item']['jmx_endpoint'];
 		$data['new_application'] = getRequest('new_application', '');
-		// ITEM_TYPE_HTTPCHECK
+		// ITEM_TYPE_HTTPAGENT
 		$data['timeout'] = $data['item']['timeout'];
 		$data['url'] = $data['item']['url'];
 		$data['query_fields'] = $data['item']['query_fields'];

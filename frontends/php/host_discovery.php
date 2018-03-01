@@ -57,7 +57,7 @@ $fields = [
 	'type' =>				[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-			ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_HTTPCHECK
+			ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
 			]), 'isset({add}) || isset({update})'],
 	'authtype' =>			[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH],
@@ -109,7 +109,7 @@ $fields = [
 	],
 	'timeout' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'url' =>            		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_HTTPCHECK, _('URL')],
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_HTTPAGENT, _('URL')],
 	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -312,7 +312,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'lifetime' => getRequest('lifetime')
 		];
 
-		if ($newItem['type'] == ITEM_TYPE_HTTPCHECK) {
+		if ($newItem['type'] == ITEM_TYPE_HTTPAGENT) {
 			$newItem += [
 				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 				'url' => getRequest('url'),
@@ -524,7 +524,7 @@ if (isset($_REQUEST['form'])) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 	}
 
-	if ($data['type'] == ITEM_TYPE_HTTPCHECK) {
+	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
 		// Convert hash to array where every item is hash for single key value pair as it is used by view.
 		$headers = [];
 

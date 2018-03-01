@@ -245,7 +245,7 @@ abstract class CItemGeneral extends CApiService {
 			if ($update) {
 				$type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
 
-				if ($type == ITEM_TYPE_HTTPCHECK) {
+				if ($type == ITEM_TYPE_HTTPAGENT) {
 					$this->validateHTTPCheck($fullItem, $dbItems[$item['itemid']]);
 				}
 
@@ -287,7 +287,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 			else {
-				if ($fullItem['type'] == ITEM_TYPE_HTTPCHECK) {
+				if ($fullItem['type'] == ITEM_TYPE_HTTPAGENT) {
 					$this->validateHTTPCheck($fullItem, []);
 				}
 
@@ -1662,7 +1662,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate item with type ITEM_TYPE_HTTPCHECK.
+	 * Validate item with type ITEM_TYPE_HTTPAGENT.
 	 *
 	 * @param array    $item       Array of item fields.
 	 * @param array    $db_item    Array of item database fields for update action or empty array for create action.
