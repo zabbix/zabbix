@@ -1591,10 +1591,19 @@ static void	get_hosts_by_expression(zbx_hashset_t *hosts, const char *expression
 
 void	zbx_export_events(void)
 {
-	size_t		i;
-	struct zbx_json	json;
+	size_t			i;
+	struct zbx_json		json;
+	size_t			sql_alloc = 256, sql_offset;
+	char			*sql = NULL;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_hashset_t		hosts;
+	zbx_vector_uint64_t	hostids;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+	zbx_hashset_create(&hosts, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_create(&hostids);
 
 	for (i = 0; i < events_num; i++)
 	{
@@ -1609,27 +1618,48 @@ void	zbx_export_events(void)
 		if (TRIGGER_VALUE_PROBLEM == events[i].value)
 		{
 			DC_HOST			*host;
-			zbx_hashset_t		hosts;
 			zbx_hashset_iter_t	iter;
 
-			zbx_hashset_create(&hosts, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
 			get_hosts_by_expression(&hosts, events[i].trigger.expression,
 					events[i].trigger.recovery_expression);
 
 			zbx_hashset_iter_reset(&hosts, &iter);
 			zbx_json_addarray(&json, "hosts");
 			while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
+			{
 				zbx_json_addstring(&json, NULL, host->name, ZBX_JSON_TYPE_STRING);
+				zbx_vector_uint64_append(&hostids, host->hostid);
+			}
 			zbx_json_close(&json);
-			zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
 
-			zbx_hashset_destroy(&hosts);
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"select distinct g.name"
+						" from groups g, hosts_groups hg"
+						" where g.groupid=hg.groupid"
+							" and");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values,
+					hostids.values_num);
+
+			result = DBselect("%s", sql);
+
+			zbx_json_addarray(&json, "groups");
+			while (NULL != (row = DBfetch(result)))
+				zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+			DBfree_result(result);
+
+			zbx_hashset_clear(&hosts);
+			zbx_vector_uint64_clear(&hostids);
 		}
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
 	}
 
+	zbx_hashset_destroy(&hosts);
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_free(sql);
 	zbx_json_free(&json);
 }
 
