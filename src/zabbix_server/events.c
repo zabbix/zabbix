@@ -1549,12 +1549,12 @@ void	zbx_uninitialize_events(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: clean_events                                                     *
+ * Function: zbx_clean_events                                                 *
  *                                                                            *
  * Purpose: cleans all array entries and resets events_num                    *
  *                                                                            *
  ******************************************************************************/
-static void	clean_events(void)
+void	zbx_clean_events(void)
 {
 	size_t	i;
 
@@ -2192,8 +2192,6 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		zbx_vector_ptr_destroy(&trigger_events);
 		zbx_vector_ptr_destroy(&internal_ok_events);
-
-		clean_events();
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
@@ -2252,7 +2250,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		DCconfig_triggers_apply_changes(&trigger_diff);
 		DBupdate_itservices(&trigger_diff);
 
-		clean_events();
+		zbx_clean_events();
 		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		zbx_vector_ptr_destroy(&trigger_diff);
 	}
@@ -2304,7 +2302,7 @@ int	zbx_flush_correlated_events(void)
 
 		DBupdate_itservices(&trigger_diff);
 
-		clean_events();
+		zbx_clean_events();
 	}
 
 	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);

@@ -2329,8 +2329,9 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			DBfree_result(result);
 			continue;
 		}
-
 		name = zbx_strdup(NULL, row[0]);
+		DBfree_result(result);
+
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL,
 				&name, MACRO_TYPE_COMMON, NULL, 0);
 		zbx_json_addstring(&json, "name", name, ZBX_JSON_TYPE_STRING);
@@ -2339,7 +2340,6 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			zbx_json_addstring(&json_trend, "name", name, ZBX_JSON_TYPE_STRING);
 
 		zbx_free(name);
-		DBfree_result(result);
 
 		zbx_snprintf(buffer, sizeof(buffer), "%d.%d", h->ts.sec, h->ts.ns);
 		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_INT);
@@ -2612,6 +2612,8 @@ int	DCsync_history(int sync_type, int *total_num)
 						DCupdate_trends(&trends_diff);
 						DBupdate_itservices(&trigger_diff);
 					}
+					else
+						zbx_clean_events();
 
 					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 
@@ -2672,6 +2674,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
+			zbx_clean_events();
 			zbx_free(trends);
 			zbx_vector_uint64_destroy(&itemids);
 			DCconfig_clean_items(items, errcodes, history_num);
