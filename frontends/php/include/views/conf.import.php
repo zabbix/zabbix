@@ -107,6 +107,7 @@ $form_list = (new CFormList())
 		(new CFile('import_file'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Rules'), new CDiv($rulesTable));
 
