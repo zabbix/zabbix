@@ -1282,6 +1282,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.16rc1
 
 New features:
+A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 ..F....... [ZBX-13434] fixed incorrect trigger dependencies being set after copying triggers to multiple hosts; thanks to Kotaro Miyashita for the patch (Ivo)
