@@ -207,11 +207,10 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			ret = FAIL, i, n;
-	const int		condition_num = 2;
+	int			ret = FAIL, i;
 	zbx_vector_ptr_t	tag_filters;
 	zbx_tag_filter_t	*tag_filter;
-	DB_CONDITION		conditions[condition_num];
+	DB_CONDITION		condition;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -234,15 +233,6 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	zbx_free(sql);
 	DBfree_result(result);
 
-	if (0 < tag_filters.values_num)
-	{
-		conditions[0].value = hostgroupid;
-		conditions[0].conditiontype = CONDITION_TYPE_HOST_GROUP;
-		conditions[0].op = conditions[1].op = CONDITION_OPERATOR_EQUAL;
-	}
-	else
-		ret = SUCCEED;
-
 	for (i = 0; i < tag_filters.values_num && SUCCEED != ret; i++)
 	{
 		tag_filter = (zbx_tag_filter_t *)tag_filters.values[i];
@@ -259,24 +249,17 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 			if (NULL != tag_filter->value && 0 != strlen(tag_filter->value))
 			{
-				conditions[1].conditiontype = CONDITION_TYPE_EVENT_TAG_VALUE;
-				conditions[1].value2 = tag_filter->tag;
-				conditions[1].value = tag_filter->value;
+				condition.conditiontype = CONDITION_TYPE_EVENT_TAG_VALUE;
+				condition.value2 = tag_filter->tag;
+				condition.value = tag_filter->value;
 			}
 			else
 			{
-				conditions[1].conditiontype = CONDITION_TYPE_EVENT_TAG;
-				conditions[1].value = tag_filter->tag;
+				condition.conditiontype = CONDITION_TYPE_EVENT_TAG;
+				condition.value = tag_filter->tag;
 			}
 
-			for (n = 0; n < condition_num; n++)
-			{
-				if (FAIL == check_action_condition(problem_event, &conditions[n]))
-					break;
-			}
-
-			if (condition_num == n)
-				ret = SUCCEED;
+			ret = check_action_condition(problem_event, &condition);
 		}
 		else
 			ret = SUCCEED;
