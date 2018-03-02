@@ -11096,34 +11096,48 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_reschedule_items                                          *
+ * Function: zbx_dc_process_check_now_tasks                                   *
  *                                                                            *
- * Purpose: forces listed items to be queued by normal pollers at the         *
- *          specified time                                                    *
+ * Purpose: process check now tasks                                           *
  *                                                                            *
- * Parameter: itemids     - [IN] the item identifiers                         *
- *            itemids_num - [IN] the number of tiems to reschedule            *
- *            nextchec    - [IN] the time when items must be polled           *
- *                                or unresolved dependencies                  *
+ * Parameter: tasks - [IN/OUT] the tasks                                      *
+ *                                                                            *
+ * Comments: This function will set corresponding task->proxy_hostid values   *
+ *           for items monitored by proxies.                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_reschedule_items(zbx_uint64_t *itemids, int itemids_num, int nextcheck)
+void	zbx_dc_process_check_now_tasks(zbx_vector_ptr_t *tasks)
 {
-	int		i;
-	ZBX_DC_ITEM	*dc_item;
-	ZBX_DC_HOST	*dc_host;
+	int			i, now;
+	ZBX_DC_ITEM		*dc_item;
+	ZBX_DC_HOST		*dc_host;
+	zbx_tm_task_t		*task;
+	zbx_tm_check_now_t	*data;
+
+	now = time(NULL);
 
 	LOCK_CACHE;
 
-	for (i = 0; i < itemids_num; i++)
+	for (i = 0; i < tasks->values_num; i++)
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])) ||
+		task = (zbx_tm_task_t *)tasks->values[i];
+
+		if (ZBX_TM_STATUS_NEW != task->status)
+			continue;
+
+
+		data = (zbx_tm_check_now_t *)task->data;
+
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &data->itemid)) ||
 				NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 		{
 			continue;
 		}
 
-		dc_requeue_item_at(dc_item, dc_host, nextcheck);
+		if (0 == dc_host->proxy_hostid)
+			dc_requeue_item_at(dc_item, dc_host, now);
+		else
+			task->proxy_hostid = dc_host->proxy_hostid;
 	}
 
 	UNLOCK_CACHE;

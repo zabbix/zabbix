@@ -72,6 +72,12 @@ zbx_tm_remote_command_result_t;
 
 typedef struct
 {
+	zbx_uint64_t	itemid;
+}
+zbx_tm_check_now_t;
+
+typedef struct
+{
 	/* the task identifier */
 	zbx_uint64_t	taskid;
 	/* the target proxy hostid or 0 if the task must be on server, ignored by proxy */
@@ -102,6 +108,8 @@ zbx_tm_remote_command_t	*zbx_tm_remote_command_create(int commandtype, const cha
 
 zbx_tm_remote_command_result_t	*zbx_tm_remote_command_result_create(zbx_uint64_t parent_taskid, int status,
 		const char *error);
+
+zbx_tm_check_now_t	*zbx_tm_check_now_create(zbx_uint64_t itemid);
 
 void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks);
 int	zbx_tm_save_task(zbx_tm_task_t *task);
