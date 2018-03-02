@@ -984,11 +984,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_export_init();
-
 	if (SUCCEED != zbx_history_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_export_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}

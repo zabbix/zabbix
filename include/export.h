@@ -21,7 +21,7 @@
 #define ZABBIX_EXPOT_H
 
 int	zbx_is_export_enabled(void);
-void	zbx_export_init(void);
+int	zbx_export_init(char **error);
 
 void	zbx_problems_export_init(const char *process_name, int process_num);
 int	zbx_problems_export_write(const char *buf, size_t count);

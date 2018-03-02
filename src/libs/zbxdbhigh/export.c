@@ -40,15 +40,38 @@ int	zbx_is_export_enabled(void)
 	return SUCCEED;
 }
 
-void	zbx_export_init(void)
+int	zbx_export_init(char **error)
 {
+	struct stat	fs;
+
 	if (FAIL == zbx_is_export_enabled())
-		return;
+		return SUCCEED;
+
+	if (0 != stat(CONFIG_EXPORT_DIR, &fs))
+	{
+		*error = zbx_dsprintf(*error, "Failed to stat the specified path \"%s\": %s.", CONFIG_EXPORT_DIR,
+				zbx_strerror(errno));
+		return FAIL;
+	}
+
+	if (0 == S_ISDIR(fs.st_mode))
+	{
+		*error = zbx_dsprintf(*error, "The specified path \"%s\" is not a directory.", CONFIG_EXPORT_DIR);
+		return FAIL;
+	}
+
+	if (0 != access(CONFIG_EXPORT_DIR, W_OK | R_OK))
+	{
+		*error = zbx_dsprintf(*error, "Cannot access path \"%s\": %s.", CONFIG_EXPORT_DIR, zbx_strerror(errno));
+		return FAIL;
+	}
 
 	export_dir = zbx_strdup(NULL, CONFIG_EXPORT_DIR);
 
 	if ('/' == export_dir[strlen(export_dir) - 1])
 		export_dir[strlen(export_dir) - 1] = '\0';
+
+	return SUCCEED;
 }
 
 void	zbx_history_export_init(const char *process_name, int process_num)
