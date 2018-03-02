@@ -464,6 +464,29 @@ static int	DBpatch_3050037(void)
 	return DBpatch_3040007();
 }
 
+static int	DBpatch_3050038(void)
+{
+	const ZBX_TABLE table =
+			{"task_check_now", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050039(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_check_now", 1, &field);
+}
+
+
 #endif
 
 DBPATCH_START(3050)
@@ -504,5 +527,7 @@ DBPATCH_ADD(3050034, 0, 1)
 DBPATCH_ADD(3050035, 0, 1)
 DBPATCH_ADD(3050036, 0, 1)
 DBPATCH_ADD(3050037, 0, 1)
+DBPATCH_ADD(3050038, 0, 1)
+DBPATCH_ADD(3050039, 0, 1)
 
 DBPATCH_END()
