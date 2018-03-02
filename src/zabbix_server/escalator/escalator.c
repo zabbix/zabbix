@@ -190,17 +190,17 @@ out:
  *                                                                            *
  * Purpose: Check user access to event by tags                                *
  *                                                                            *
- * Parameters: userid       - user id                                         *
- *             hostgroupids - list of host groups in which trigger was to     *
+ * Parameters: userid        - user id                                        *
+ *             hostgroupids  - list of host groups in which trigger was to    *
  *                            be found                                        *
- *             event        - checked event for access                        *
+ *             problem_event - checked event for access                       *
  *                                                                            *
  * Return value: SUCCEED - user has access                                    *
  *               FAIL    - user does not have access                          *
  *                                                                            *
  ******************************************************************************/
 static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids,
-		const DB_EVENT *event)
+		const DB_EVENT *problem_event)
 {
 	const char		*__function_name = "get_tag_based_permission";
 	char			*sql = NULL, hostgroupid[ZBX_MAX_UINT64_LEN + 1];
@@ -271,7 +271,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 			for (n = 0; n < condition_num; n++)
 			{
-				if (FAIL == check_action_condition(event, &conditions[n]))
+				if (FAIL == check_action_condition(problem_event, &conditions[n]))
 					break;
 			}
 
@@ -299,7 +299,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
+int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t eventid, const DB_EVENT *problem_event)
 {
 	const char		*__function_name = "get_trigger_permission";
 	int			perm = PERM_DENY;
@@ -323,7 +323,7 @@ int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
 			" join functions f on i.itemid=f.itemid"
 			" join hosts_groups hg on hg.hostid = i.hostid"
 				" and f.triggerid=" ZBX_FS_UI64,
-			event->objectid);
+			eventid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -335,7 +335,7 @@ int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (PERM_DENY < (perm = get_hostgroups_permission(userid, &hostgroupids)) &&
-			FAIL == check_tag_based_permission(userid, &hostgroupids, event))
+			FAIL == check_tag_based_permission(userid, &hostgroupids, problem_event))
 	{
 		perm = PERM_DENY;
 	}
@@ -490,7 +490,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event))
+				if (PERM_READ > get_trigger_permission(userid, event->objectid, event))
 					continue;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -544,6 +544,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid, mediatypeid;
+	const DB_EVENT	*c_event;
 	int		message_type;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
@@ -561,11 +562,15 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 
 	if (NULL != r_event)
 	{
+		c_event = r_event;
 		message_type = MACRO_TYPE_MESSAGE_RECOVERY;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or eventid=" ZBX_FS_UI64, r_event->eventid);
 	}
 	else
+	{
+		c_event = event;
 		message_type = MACRO_TYPE_MESSAGE_NORMAL;
+	}
 
 	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
@@ -587,15 +592,15 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 
 		ZBX_STR2UINT64(mediatypeid, row[1]);
 
-		switch (event->object)
+		switch (c_event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event))
+				if (PERM_READ > get_trigger_permission(userid, c_event->objectid, event))
 					continue;
 				break;
 			case EVENT_OBJECT_ITEM:
 			case EVENT_OBJECT_LLDRULE:
-				if (PERM_READ > get_item_permission(userid, event->objectid))
+				if (PERM_READ > get_item_permission(userid, c_event->objectid))
 					continue;
 				break;
 		}
@@ -663,8 +668,11 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 		if (ack->userid == userid)
 			continue;
 
-		if (SUCCEED != check_perm2system(userid) || PERM_READ > get_trigger_permission(userid, event))
+		if (SUCCEED != check_perm2system(userid) ||
+				PERM_READ > get_trigger_permission(userid, event->objectid, event))
+		{
 			continue;
+		}
 
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
