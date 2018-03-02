@@ -2344,6 +2344,11 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			zbx_json_addstring(&json_trend, "name", item->host.name, ZBX_JSON_TYPE_STRING);
 		}
 
+		zbx_json_close(&json);
+
+		if (NULL != trend)
+			zbx_json_close(&json_trend);
+
 		zbx_json_addarray(&json, "groups");
 
 		if (NULL != trend)
@@ -2365,13 +2370,9 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		}
 
 		zbx_json_close(&json);
-		zbx_json_close(&json);
 
 		if (NULL != trend)
-		{
 			zbx_json_close(&json_trend);
-			zbx_json_close(&json_trend);
-		}
 
 		if (NULL == (result = DBselect(
 				"select a.name"
