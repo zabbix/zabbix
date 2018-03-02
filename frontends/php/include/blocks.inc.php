@@ -181,9 +181,9 @@ function getSystemStatusData(array $filter, array $config) {
 		// Get acknowledges and tags.
 		$problems_data = ($config['event_ack_enable']
 				&& in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))
-			? API::Problem()->get([
+			? API::Event()->get([
 				'output' => [],
-				'selectAcknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
+				'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
 				'eventids' => array_keys($problems),
 				'preservekeys' => true
 			])
