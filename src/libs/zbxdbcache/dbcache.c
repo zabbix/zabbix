@@ -2307,7 +2307,7 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		int			index, j;
 		DB_RESULT		result;
 		DB_ROW			row;
-		char			buffer[MAX_ID_LEN], *name;
+		char			*name;
 		zbx_host_t		*host;
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
@@ -2428,8 +2428,8 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 		zbx_free(name);
 
-		zbx_snprintf(buffer, sizeof(buffer), "%d.%d", h->ts.sec, h->ts.ns);
-		zbx_json_addstring(&json, "time", buffer, ZBX_JSON_TYPE_INT);
+		zbx_json_addint64(&json, "clock", h->ts.sec);
+		zbx_json_addint64(&json, "ns", h->ts.ns);
 
 		if (NULL != trend)
 			zbx_json_addint64(&json_trend, "time", trend->clock);
