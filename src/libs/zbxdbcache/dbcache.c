@@ -2215,10 +2215,10 @@ static void	clean_hosts(zbx_hashset_t *hosts)
 
 static void	get_hosts_by_hostid(zbx_hashset_t *hosts, const zbx_vector_uint64_t *hostids)
 {
-	int			i;
-	size_t			sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	int		i;
+	size_t		sql_offset = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	for (i = 0; i < hostids->values_num; i++)
 	{

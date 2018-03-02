@@ -1601,6 +1601,9 @@ void	zbx_export_events(void)
 	zbx_hashset_t		hosts;
 	zbx_vector_uint64_t	hostids;
 
+	if (0 == events_num)
+		return;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_hashset_create(&hosts, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
