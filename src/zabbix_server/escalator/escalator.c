@@ -544,7 +544,6 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid, mediatypeid;
-	const DB_EVENT	*c_event;
 	int		message_type;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
@@ -562,15 +561,11 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 
 	if (NULL != r_event)
 	{
-		c_event = r_event;
 		message_type = MACRO_TYPE_MESSAGE_RECOVERY;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or eventid=" ZBX_FS_UI64, r_event->eventid);
 	}
 	else
-	{
-		c_event = event;
 		message_type = MACRO_TYPE_MESSAGE_NORMAL;
-	}
 
 	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
@@ -592,15 +587,15 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 
 		ZBX_STR2UINT64(mediatypeid, row[1]);
 
-		switch (c_event->object)
+		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, c_event))
+				if (PERM_READ > get_trigger_permission(userid, event))
 					continue;
 				break;
 			case EVENT_OBJECT_ITEM:
 			case EVENT_OBJECT_LLDRULE:
-				if (PERM_READ > get_item_permission(userid, c_event->objectid))
+				if (PERM_READ > get_item_permission(userid, event->objectid))
 					continue;
 				break;
 		}
