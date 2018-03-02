@@ -1659,6 +1659,21 @@ void	zbx_export_events(void)
 			zbx_hashset_clear(&hosts);
 			zbx_vector_uint64_clear(&hostids);
 		}
+		else
+		{
+			zbx_hashset_iter_t	iter;
+			zbx_event_recovery_t	*recovery_local;
+
+			zbx_hashset_iter_reset(&event_recovery, &iter);
+			while (NULL != (recovery_local = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
+			{
+				if (events[i].eventid == events[recovery_local->r_event_index].eventid)
+				{
+					zbx_json_adduint64(&json, "eventid", recovery_local->eventid);
+					break;
+				}
+			}
+		}
 
 		zbx_problems_export_write(json.buffer, json.buffer_size);
 	}
