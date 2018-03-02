@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-13538] fixed example configuration for Elasticsearch (nikita)
 ..F....... [ZBX-13434] fixed incorrect trigger dependencies being set after copying triggers to multiple hosts; thanks to Kotaro Miyashita for the patch (Ivo)
 ..F....... [ZBX-13513] fixed input maxlength for users media of type script (nikita)
 ...G...PS. [ZBX-13523] fixed error message for empty TCP response in case agent dropped connection because of access permissions (vso)
