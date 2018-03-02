@@ -1290,6 +1290,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+....I..... [ZBX-13472] fixed description of "Server" and "ServerActive" configuration options (Sasha)
 ........S. [ZBX-13455] added frontend error message when templates cannot be linked to LLD host (viktors)
 ..F....... [ZBX-13434] fixed incorrect trigger dependencies being set after copying triggers to multiple hosts; thanks to Kotaro Miyashita for the patch (Ivo)
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
