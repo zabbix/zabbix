@@ -34,6 +34,7 @@
 #define ZBX_TM_TASK_REMOTE_COMMAND_RESULT		3
 #define ZBX_TM_TASK_ACKNOWLEDGE				4
 #define ZBX_TM_TASK_UPDATE_EVENTNAMES			5
+#define ZBX_TM_TASK_CHECK_NOW				6
 
 /* task manager task states */
 #define ZBX_TM_STATUS_NEW			1

@@ -755,4 +755,6 @@ zbx_trigger_dep_t;
 
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
+void	zbx_dc_reschedule_items(zbx_uint64_t *itemids, int itemids_num, int nextcheck);
+
 #endif
