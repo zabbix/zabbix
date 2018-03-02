@@ -1623,6 +1623,7 @@ void	zbx_export_events(void)
 		{
 			DC_HOST			*host;
 			zbx_hashset_iter_t	iter;
+			int			j;
 
 			zbx_json_adduint64(&json, "eventid", events[i].eventid);
 			zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
@@ -1658,6 +1659,19 @@ void	zbx_export_events(void)
 			while (NULL != (row = DBfetch(result)))
 				zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
 			DBfree_result(result);
+
+			zbx_json_close(&json);
+
+			zbx_json_addarray(&json, "tags");
+			for (j = 0; j < events[i].tags.values_num; j++)
+			{
+				zbx_tag_t	*tag = (zbx_tag_t *)events[i].tags.values[j];
+
+				zbx_json_addobject(&json, NULL);
+				zbx_json_addstring(&json, "name", tag->tag, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, "value", tag->value, ZBX_JSON_TYPE_STRING);
+				zbx_json_close(&json);
+			}
 
 			zbx_hashset_clear(&hosts);
 			zbx_vector_uint64_clear(&hostids);
