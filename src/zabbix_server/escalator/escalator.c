@@ -258,6 +258,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 				condition.conditiontype = CONDITION_TYPE_EVENT_TAG;
 				condition.value = tag_filter->tag;
 			}
+			condition.op = CONDITION_OPERATOR_EQUAL;
 
 			ret = check_action_condition(problem_event, &condition);
 		}
