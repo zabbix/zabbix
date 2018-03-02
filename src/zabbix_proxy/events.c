@@ -83,7 +83,7 @@ void	zbx_clean_events(void)
 
 void	zbx_export_events(void)
 {
-
+	THIS_SHOULD_NEVER_HAPPEN;
 }
 
 int	zbx_flush_correlated_events(void)

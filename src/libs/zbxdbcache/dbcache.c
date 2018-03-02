@@ -2256,6 +2256,7 @@ static void	get_hosts_by_hostid(zbx_hashset_t *hosts, const zbx_vector_uint64_t 
 	}
 	DBfree_result(result);
 }
+
 static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
 		const DC_ITEM *items, int history_num, const ZBX_DC_TREND *trends, int trends_num)
 {

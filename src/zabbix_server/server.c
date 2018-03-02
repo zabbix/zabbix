@@ -1206,7 +1206,6 @@ void	zbx_on_exit(void)
 
 	zbx_ipc_service_free_env();
 
-
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	if (SUCCEED == zbx_is_export_enabled())
