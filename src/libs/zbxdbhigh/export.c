@@ -76,7 +76,7 @@ int	zbx_export_init(char **error)
 
 void	zbx_history_export_init(const char *process_name, int process_num)
 {
-	history_file_name = zbx_strdcatf(NULL, "%s/history-%s-%d.ndjson", export_dir, process_name, process_num);
+	history_file_name = zbx_dsprintf(NULL, "%s/history-%s-%d.ndjson", export_dir, process_name, process_num);
 
 	if (NULL == (history_file = fopen(history_file_name, "a")))
 	{
@@ -104,9 +104,34 @@ void	zbx_problems_export_init(const char *process_name, int process_num)
 	}
 }
 
-static	int	file_write(const char *buf, size_t count, FILE *file)
+static	int	file_write(const char *buf, size_t count, FILE **file, char *name)
 {
-	if (count != fwrite(buf, 1, count, file) || '\n' != fputc('\n', file))
+	if ((int)count > ZBX_GIBIBYTE)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "maximum file size is too small");
+		return FAIL;
+	}
+
+	if (ZBX_GIBIBYTE <= (long)count + ftell(*file) + 1)
+	{
+		char	filename_old[MAX_STRING_LEN];
+
+		strscpy(filename_old, name);
+		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
+		remove(filename_old);
+		fclose(*file);
+
+		if (0 != rename(name, filename_old))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot rename file: %s", zbx_strerror(errno));
+
+		if (NULL == (*file = fopen(name, "a")))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s", history_file_name,
+					zbx_strerror(errno));
+		}
+	}
+
+	if (count != fwrite(buf, 1, count, *file) || '\n' != fputc('\n', *file))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to write '%s': %s", buf, zbx_strerror(errno));
 		return FAIL;
@@ -117,17 +142,17 @@ static	int	file_write(const char *buf, size_t count, FILE *file)
 
 int	zbx_problems_export_write(const char *buf, size_t count)
 {
-	return file_write(buf, count, problems_file);
+	return file_write(buf, count, &problems_file, problems_file_name);
 }
 
 int	zbx_history_export_write(const char *buf, size_t count)
 {
-	return file_write(buf, count, history_file);
+	return file_write(buf, count, &history_file, history_file_name);
 }
 
 int	zbx_trends_export_write(const char *buf, size_t count)
 {
-	return file_write(buf, count, trends_file);
+	return file_write(buf, count, &trends_file, trends_file_name);
 }
 
 void	zbx_problems_export_flush(void)
