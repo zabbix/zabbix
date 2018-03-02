@@ -20,6 +20,8 @@
 #include "common.h"
 #include "log.h"
 
+extern char	*CONFIG_EXPORT_DIR;
+
 static char	*history_file_name;
 static FILE	*history_file;
 
@@ -28,31 +30,54 @@ static FILE	*trends_file;
 
 static char	*problems_file_name;
 static FILE	*problems_file;
+static char	*export_dir;
+
+int	zbx_is_export_enabled(void)
+{
+	if (NULL == CONFIG_EXPORT_DIR)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+void	zbx_export_init(void)
+{
+	if (FAIL == zbx_is_export_enabled())
+		return;
+
+	export_dir = zbx_strdup(NULL, CONFIG_EXPORT_DIR);
+
+	if ('/' == export_dir[strlen(export_dir) - 1])
+		export_dir[strlen(export_dir) - 1] = '\0';
+}
 
 void	zbx_history_export_init(const char *process_name, int process_num)
 {
-	history_file_name = zbx_dsprintf(NULL, "history-%s-%d.ndjson", process_name, process_num);
+	history_file_name = zbx_strdcatf(NULL, "%s/history-%s-%d.ndjson", export_dir, process_name, process_num);
 
 	if (NULL == (history_file = fopen(history_file_name, "a")))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file: %s", zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s", history_file_name,
+				zbx_strerror(errno));
 	}
 
-	trends_file_name = zbx_dsprintf(NULL, "trends-%s-%d.ndjson", process_name, process_num);
+	trends_file_name = zbx_dsprintf(NULL, "%s/trends-%s-%d.ndjson", export_dir, process_name, process_num);
 
 	if (NULL == (trends_file = fopen(trends_file_name, "a")))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file: %s", zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s", trends_file_name,
+				zbx_strerror(errno));
 	}
 }
 
 void	zbx_problems_export_init(const char *process_name, int process_num)
 {
-	problems_file_name = zbx_dsprintf(NULL, "problems-%s-%d.ndjson", process_name, process_num);
+	problems_file_name = zbx_dsprintf(NULL, "%s/problems-%s-%d.ndjson", export_dir, process_name, process_num);
 
 	if (NULL == (problems_file = fopen(problems_file_name, "a")))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file: %s", zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s", problems_file_name,
+				zbx_strerror(errno));
 	}
 }
 
@@ -85,7 +110,7 @@ int	zbx_trends_export_write(const char *buf, size_t count)
 void	zbx_problems_export_flush(void)
 {
 	if (0 != fflush(problems_file))
-		zabbix_log(LOG_LEVEL_WARNING, "failed to flush into '%s': %s", history_file_name, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "failed to flush into '%s': %s", problems_file_name, zbx_strerror(errno));
 }
 
 void	zbx_history_export_flush(void)

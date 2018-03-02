@@ -97,7 +97,9 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		DCfree_triggers(&trigger_order);
 
-		zbx_export_events();
+		if (SUCCEED == zbx_is_export_enabled())
+			zbx_export_events();
+
 		zbx_clean_events();
 	}
 
@@ -651,7 +653,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	if (0 != (ZBX_PROGRAM_TYPE_SERVER & program_type))
+	if (SUCCEED == zbx_is_export_enabled())
 		zbx_problems_export_init("timer", process_num);
 
 	for (;;)

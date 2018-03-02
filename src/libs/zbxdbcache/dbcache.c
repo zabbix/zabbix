@@ -33,6 +33,7 @@
 #include "valuecache.h"
 #include "zbxmodules.h"
 #include "module.h"
+#include "export.h"
 
 #include "zbxhistory.h"
 
@@ -2747,8 +2748,11 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && SUCCEED == ret)
 		{
-			DCexport_prepare_history(history, &itemids, items, history_num, trends, trends_num);
-			zbx_export_events();
+			if (SUCCEED == zbx_is_export_enabled())
+			{
+				DCexport_prepare_history(history, &itemids, items, history_num, trends, trends_num);
+				zbx_export_events();
+			}
 
 			DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 					history_integer, &history_integer_num, history_string, &history_string_num,
