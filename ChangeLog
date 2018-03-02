@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+........S. [ZBX-13455] added frontend error message when templates cannot be linked to LLD host (viktors)
 ..F....... [ZBX-13538] fixed example configuration for Elasticsearch (nikita)
 ..F....... [ZBX-13434] fixed incorrect trigger dependencies being set after copying triggers to multiple hosts; thanks to Kotaro Miyashita for the patch (Ivo)
 ..F....... [ZBX-13513] fixed input maxlength for users media of type script (nikita)
@@ -164,6 +165,7 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-13455] added frontend error message when templates cannot be linked to LLD host (viktors)
 ..F....... [ZBX-13434] fixed incorrect trigger dependencies being set after copying triggers to multiple hosts; thanks to Kotaro Miyashita for the patch (Ivo)
 ..F....... [ZBX-12883] fixed incorrect ordering the list of triggers after saving a map (agriscenko)
 ..F....... [ZBX-12940] fixed content does not fit dialog window (agriscenko)
@@ -1288,6 +1290,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-13455] added frontend error message when templates cannot be linked to LLD host (viktors)
 ..F....... [ZBX-13434] fixed incorrect trigger dependencies being set after copying triggers to multiple hosts; thanks to Kotaro Miyashita for the patch (Ivo)
 ..F....... [ZBX-13342] fixed order by query in frontend Maintenance tab (agriscenko)
 A......... [ZBX-6167] fixed partial updating in maintenance.update (ashubin)
