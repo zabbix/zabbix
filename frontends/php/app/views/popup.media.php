@@ -55,7 +55,7 @@ $media_form = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $options['mediatypeid'], null, $data['db_mediatypes']))
 	->addRow(
 		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
-		(new CTextBox('sendto', $options['sendto'], false, 100))
+		(new CTextBox('sendto', $options['sendto'], false, 1024))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'mediatype_send_to'
