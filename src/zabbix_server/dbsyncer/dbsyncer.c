@@ -26,6 +26,7 @@
 
 #include "dbcache.h"
 #include "dbsyncer.h"
+#include "export.h"
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
@@ -62,6 +63,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	if (0 != (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		zbx_export_init("hystory-syncer", process_num);
 
 	for (;;)
 	{

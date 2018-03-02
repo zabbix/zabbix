@@ -2284,11 +2284,11 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		zbx_vector_uint64_append(&hostids, item->host.hostid);
 	}
 
-	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	if (0 == hostids.values_num)
 		goto clean;
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create(&hosts, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -2477,9 +2477,16 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		if (NULL != trend)
 			zbx_json_addint64(&json_trend, "count", trend->num);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
-		zabbix_log(LOG_LEVEL_INFORMATION, "json_trend.buffer '%s'", json_trend.buffer);
+		zbx_history_export_write(json.buffer, json.buffer_size);
+
+		if (NULL != trend)
+			zbx_trends_export_write(json_trend.buffer, json_trend.buffer_size);
 	}
+
+	zbx_history_export_flush();
+
+	if (trends_num)
+		zbx_trends_export_flush();
 
 	zbx_json_free(&json);
 	zbx_json_free(&json_trend);
