@@ -258,19 +258,21 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityName = getSeverityName($severity, $this->data['config']);
+			$severity_status_style = getSeverityStatusStyle($severity);
 
 			$mediaActive = ($media['severity'] & (1 << $severity));
 
 			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
 				->setHint($severityName.' ('.($mediaActive ? _('on') : _('off')).')', '', false)
-				->addClass($mediaActive ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY);
+				->addClass($mediaActive ? $severity_status_style : ZBX_STYLE_STATUS_DISABLED_BG);
 		}
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
 			$media['sendto'] = implode(', ', $media['sendto']);
-			if (strlen($media['sendto']) > 50) {
-				$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
-			}
+		}
+
+		if (mb_strlen($media['sendto']) > 50) {
+			$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
 		}
 
 		$mediaTableInfo->addRow(
@@ -280,7 +282,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-				$mediaSeverity,
+				(new CDiv($mediaSeverity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
 				$status,
 				(new CCol(
 					new CHorList([

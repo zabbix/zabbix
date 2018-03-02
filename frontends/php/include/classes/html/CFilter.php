@@ -29,6 +29,7 @@ class CFilter extends CTag {
 	private $name = 'zbx_filter';
 	private $opened = true;
 	private $show_buttons = true;
+	private $hidden = false;
 
 	public function __construct($filterid) {
 		parent::__construct(null);
@@ -72,6 +73,13 @@ class CFilter extends CTag {
 
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+		return $this;
+	}
+
+	public function setHidden() {
+		$this->hidden = true;
+		$this->addStyle('display: none;');
+
 		return $this;
 	}
 
@@ -180,7 +188,7 @@ class CFilter extends CTag {
 		}
 
 		$wrapper = (new CDiv([
-				$this->getHeader(),
+				($this->hidden == false) ? $this->getHeader() : null,
 				(new CDiv([$this->items, $this->form]))
 					->addClass($this->attributes['class'])
 					->setId($this->attributes['id'])
