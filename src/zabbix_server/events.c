@@ -24,6 +24,7 @@
 #include "actions.h"
 #include "events.h"
 #include "zbxserver.h"
+#include "export.h"
 
 /* event recovery data */
 typedef struct
@@ -1611,7 +1612,7 @@ void	zbx_export_events(void)
 			continue;
 
 		zbx_json_clean(&json);
-		zbx_json_adduint64(&json, "eventid", events[i].eventid);
+
 		zbx_json_addint64(&json, "clock", events[i].clock);
 		zbx_json_addint64(&json, "ns", events[i].ns);
 
@@ -1620,6 +1621,7 @@ void	zbx_export_events(void)
 			DC_HOST			*host;
 			zbx_hashset_iter_t	iter;
 
+			zbx_json_adduint64(&json, "eventid", events[i].eventid);
 			zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
 
 			get_hosts_by_expression(&hosts, events[i].trigger.expression,
@@ -1658,8 +1660,10 @@ void	zbx_export_events(void)
 			zbx_vector_uint64_clear(&hostids);
 		}
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
+		zbx_problems_export_write(json.buffer, json.buffer_size);
 	}
+
+	zbx_problems_export_flush();
 
 	zbx_hashset_destroy(&hosts);
 	zbx_vector_uint64_destroy(&hostids);

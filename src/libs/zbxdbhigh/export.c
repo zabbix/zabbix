@@ -26,18 +26,39 @@ static FILE	*history_file;
 static char	*trends_file_name;
 static FILE	*trends_file;
 
-void	zbx_export_init(const char *process_name, int process_num)
+static char	*problems_file_name;
+static FILE	*problems_file;
+
+void	zbx_history_export_init(const char *process_name, int process_num)
 {
 	history_file_name = zbx_dsprintf(NULL, "history-%s-%d.ndjson", process_name, process_num);
-	history_file = fopen(history_file_name, "a");
+
+	if (NULL == (history_file = fopen(history_file_name, "a")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file: %s", zbx_strerror(errno));
+	}
 
 	trends_file_name = zbx_dsprintf(NULL, "trends-%s-%d.ndjson", process_name, process_num);
-	trends_file = fopen(trends_file_name, "a");
+
+	if (NULL == (trends_file = fopen(trends_file_name, "a")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file: %s", zbx_strerror(errno));
+	}
 }
 
-int	zbx_history_export_write(const char *buf, size_t count)
+void	zbx_problems_export_init(const char *process_name, int process_num)
 {
-	if (count != fwrite(buf, 1, count, history_file) || '\n' != fputc('\n', history_file))
+	problems_file_name = zbx_dsprintf(NULL, "problems-%s-%d.ndjson", process_name, process_num);
+
+	if (NULL == (problems_file = fopen(problems_file_name, "a")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file: %s", zbx_strerror(errno));
+	}
+}
+
+static	int	file_write(const char *buf, size_t count, FILE *file)
+{
+	if (count != fwrite(buf, 1, count, file) || '\n' != fputc('\n', file))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to write '%s': %s", buf, zbx_strerror(errno));
 		return FAIL;
@@ -45,22 +66,34 @@ int	zbx_history_export_write(const char *buf, size_t count)
 
 	return SUCCEED;
 }
+
+int	zbx_problems_export_write(const char *buf, size_t count)
+{
+	return file_write(buf, count, problems_file);
+}
+
+int	zbx_history_export_write(const char *buf, size_t count)
+{
+	return file_write(buf, count, history_file);
+}
+
+int	zbx_trends_export_write(const char *buf, size_t count)
+{
+	return file_write(buf, count, trends_file);
+}
+
+void	zbx_problems_export_flush(void)
+{
+	if (0 != fflush(problems_file))
+		zabbix_log(LOG_LEVEL_WARNING, "failed to flush into '%s': %s", history_file_name, zbx_strerror(errno));
+}
+
 void	zbx_history_export_flush(void)
 {
 	if (0 != fflush(history_file))
 		zabbix_log(LOG_LEVEL_WARNING, "failed to flush into '%s': %s", history_file_name, zbx_strerror(errno));
 }
 
-int	zbx_trends_export_write(const char *buf, size_t count)
-{
-	if (count != fwrite(buf, 1, count, trends_file) || 1 != fputc("\n", trends_file))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to write '%s': %s", buf, zbx_strerror(errno));
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
 void	zbx_trends_export_flush(void)
 {
 	if (0 != fflush(trends_file))

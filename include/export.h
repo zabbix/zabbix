@@ -20,10 +20,15 @@
 #ifndef ZABBIX_EXPORT_H
 #define ZABBIX_EXPOT_H
 
-void	zbx_export_init(const char *process_name, int process_num);
+void	zbx_problems_export_init(const char *process_name, int process_num);
+int	zbx_problems_export_write(const char *buf, size_t count);
+void	zbx_problems_export_flush(void);
+
+void	zbx_history_export_init(const char *process_name, int process_num);
 int	zbx_history_export_write(const char *buf, size_t count);
 void	zbx_history_export_flush(void);
 int	zbx_trends_export_write(const char *buf, size_t count);
 void	zbx_trends_export_flush(void);
+
 
 #endif

@@ -67,6 +67,7 @@
 #include "zbxipcservice.h"
 #include "zbxhistory.h"
 #include "postinit.h"
+#include "export.h"
 
 #ifdef ZBX_CUNIT
 #include "../libs/zbxcunit/zbxcunit.h"
@@ -979,6 +980,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_history_export_init("main-process", 0);
+	zbx_problems_export_init("main-process", 0);
 
 	if (SUCCEED != zbx_history_init(&error))
 	{
