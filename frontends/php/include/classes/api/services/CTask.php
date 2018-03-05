@@ -35,16 +35,17 @@ class CTask extends CApiService {
 	 * @return array
 	 */
 	public function create(array $tasks) {
-		$this->validateCreate($tasks);
+		$tasks = $this->validateCreate($tasks);
 
 		$tasks_to_create = [];
+		$time = time();
 
 		foreach ($tasks as $task) {
 			foreach ($task['itemids'] as $itemid) {
 				$tasks_to_create[] = [
 					'type' => $task['type'],
 					'status' => ZBX_TM_STATUS_NEW,
-					'clock' => time(),
+					'clock' => $time,
 					'ttl' => SEC_PER_DAY
 				];
 			}
@@ -75,7 +76,9 @@ class CTask extends CApiService {
 	 *
 	 * @param array $tasks  Array of tasks to validate.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array  Returns an array of valid tasks.
 	 */
 	protected function validateCreate(array $tasks) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
@@ -193,5 +196,7 @@ class CTask extends CApiService {
 				);
 			}
 		}
+
+		return $tasks;
 	}
 }
