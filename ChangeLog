@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha5
 
 New features:
+A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, Sergejs)
 ..F....... [ZBXNEXT-4045] implemented maximum size for graphs in widgets (gcalenko)
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
