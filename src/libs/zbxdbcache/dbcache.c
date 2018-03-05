@@ -2419,7 +2419,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, const DC
 	zbx_json_free(&json);
 }
 
-static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items, int items_num,
+static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_hashset_t *hosts, zbx_hashset_t *items_info)
 {
 	const ZBX_DC_HISTORY	*h;
@@ -2431,7 +2431,7 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < items_num; i++)
+	for (i = 0; i < history_num; i++)
 	{
 		h = &history[i];
 
@@ -2518,10 +2518,11 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, const zbx
 		const DC_ITEM *items, int history_num, const ZBX_DC_TREND *trends, int trends_num)
 {
 	int			i;
-	zbx_vector_uint64_t	hostids;
+	zbx_vector_uint64_t	hostids, item_info_ids;
 	zbx_hashset_t		hosts, items_info;
 
 	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&item_info_ids);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2539,22 +2540,24 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, const zbx
 		}
 
 		item = &items[index];
+
 		zbx_vector_uint64_append(&hostids, item->host.hostid);
+		zbx_vector_uint64_append(&item_info_ids, item->itemid);
 	}
 
-	if (0 == hostids.values_num)
+	if (0 == item_info_ids.values_num)
 		goto clean;
 
 	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create(&hosts, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_hashset_create(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&items_info, item_info_ids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	get_hosts_by_hostid(&hosts, &hostids);
 
-	get_items_info_by_itemid(&items_info, itemids);
+	get_items_info_by_itemid(&items_info, &item_info_ids);
 
 	if (0 != history_num)
 		DCexport_history(history, items, history_num, itemids, &hosts, &items_info);
@@ -2566,7 +2569,9 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, const zbx
 	clean_items_info(&items_info);
 	zbx_hashset_destroy(&hosts);
 	zbx_hashset_destroy(&items_info);
+
 clean:
+	zbx_vector_uint64_destroy(&item_info_ids);
 	zbx_vector_uint64_destroy(&hostids);
 }
 
