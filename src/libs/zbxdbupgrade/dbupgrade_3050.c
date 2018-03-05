@@ -575,6 +575,13 @@ static int	DBpatch_3050053(void)
 
 	return DBadd_field("items", &field);
 }
+
+static int	DBpatch_3050054(void)
+{
+	const ZBX_FIELD field = {"allow_traps", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
 #endif
 
 DBPATCH_START(3050)
@@ -631,5 +638,6 @@ DBPATCH_ADD(3050050, 0, 1)
 DBPATCH_ADD(3050051, 0, 1)
 DBPATCH_ADD(3050052, 0, 1)
 DBPATCH_ADD(3050053, 0, 1)
+DBPATCH_ADD(3050054, 0, 1)
 
 DBPATCH_END()

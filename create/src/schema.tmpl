@@ -353,6 +353,7 @@ FIELD		|ssl_key_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -1609,4 +1610,4 @@ INDEX		|6		|value_sysmapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050053	|3050053
+ROW		|3050054	|3050054
