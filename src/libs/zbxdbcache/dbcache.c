@@ -2193,6 +2193,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 		zabbix_log(LOG_LEVEL_DEBUG, "synced %d log values with modules", history_log_num);
 	}
 }
+
 typedef struct
 {
 	zbx_uint64_t		hostid;
@@ -2216,7 +2217,7 @@ static void	clean_hosts(zbx_hashset_t *hosts)
 static void	get_hosts_by_hostid(zbx_hashset_t *hosts, const zbx_vector_uint64_t *hostids)
 {
 	int		i;
-	size_t		sql_offset = 0;
+	size_t		sql_offset;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -2257,13 +2258,91 @@ static void	get_hosts_by_hostid(zbx_hashset_t *hosts, const zbx_vector_uint64_t 
 	DBfree_result(result);
 }
 
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	char			*name;
+	zbx_vector_ptr_t	applications;
+}
+zbx_item_info_t;
+
+static void	get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
+{
+	size_t		sql_offset = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,name from items where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		zbx_item_info_t	item_info;
+
+		ZBX_DBROW2UINT64(item_info.itemid, row[0]);
+
+		item_info.name = zbx_strdup(NULL, row[1]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &itemid, NULL, NULL, NULL, NULL, &item_info.name,
+				MACRO_TYPE_COMMON, NULL, 0);
+
+		zbx_vector_ptr_create(&item_info.applications);
+		zbx_hashset_insert(items_info, &item_info, sizeof(item_info));
+	}
+	DBfree_result(result);
+
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select i.itemid,a.name"
+			" from applications a,items_applications i"
+			" where a.applicationid=i.applicationid"
+				" and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids->values, itemids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		zbx_item_info_t	*item_info;
+
+		ZBX_DBROW2UINT64(itemid, row[0]);
+
+		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &itemid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_vector_ptr_append(&item_info->applications, zbx_strdup(NULL, row[1]));
+	}
+	DBfree_result(result);
+}
+
+static void	clean_items_info(zbx_hashset_t *items_info)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_item_info_t		*item_info;
+
+	zbx_hashset_iter_reset(items_info, &iter);
+	while (NULL != (item_info = (zbx_item_info_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_ptr_clear_ext(&item_info->applications, zbx_default_mem_free_func);
+		zbx_vector_ptr_destroy(&item_info->applications);
+		zbx_free(item_info->name);
+	}
+}
+
 static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
 		const DC_ITEM *items, int history_num, const ZBX_DC_TREND *trends, int trends_num)
 {
 	int			i;
 	struct zbx_json		json, json_trend;
 	zbx_vector_uint64_t	hostids;
-	zbx_hashset_t		hosts;
+	zbx_hashset_t		hosts, items_info;
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -2293,8 +2372,12 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create(&hosts, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	get_hosts_by_hostid(&hosts, &hostids);
+
+	get_items_info_by_itemid(&items_info, itemids);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_init(&json_trend, ZBX_JSON_STAT_BUF_LEN);
@@ -2305,10 +2388,8 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		const DC_ITEM		*item;
 		const ZBX_DC_TREND	*trend = NULL;
 		int			index, j;
-		DB_RESULT		result;
-		DB_ROW			row;
-		char			*name;
 		zbx_host_t		*host;
+		zbx_item_info_t		*item_info;
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
@@ -2334,20 +2415,13 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		}
 
 		zbx_json_clean(&json);
-		zbx_json_addobject(&json, "host");
-		zbx_json_addstring(&json, "name", item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
 
 		if (NULL != trend)
 		{
 			zbx_json_clean(&json_trend);
-			zbx_json_addobject(&json_trend, "host");
-			zbx_json_addstring(&json_trend, "name", item->host.name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_trend, "host", item->host.name, ZBX_JSON_TYPE_STRING);
 		}
-
-		zbx_json_close(&json);
-
-		if (NULL != trend)
-			zbx_json_close(&json_trend);
 
 		zbx_json_addarray(&json, "groups");
 
@@ -2374,29 +2448,25 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 		if (NULL != trend)
 			zbx_json_close(&json_trend);
 
-		if (NULL == (result = DBselect(
-				"select a.name"
-				" from applications a,items_applications i"
-				" where a.applicationid=i.applicationid"
-					" and i.itemid=" ZBX_FS_UI64,
-				h->itemid)))
-		{
-			continue;
-		}
-
 		zbx_json_addarray(&json, "applications");
 
 		if (NULL != trend)
 			zbx_json_addarray(&json_trend, "applications");
 
-		while (NULL != (row = DBfetch(result)))
+		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(&items_info, &item->itemid)))
 		{
-			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item");
+			continue;
+		}
+
+		for (j = 0; j < item_info->applications.values_num; j++)
+		{
+			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
 
 			if (NULL != trend)
-				zbx_json_addstring(&json_trend, NULL, row[0], ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_trend, NULL, item_info->applications.values[j],
+						ZBX_JSON_TYPE_STRING);
 		}
-		DBfree_result(result);
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, "itemid", item->itemid);
@@ -2407,26 +2477,10 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 			zbx_json_adduint64(&json_trend, "itemid", item->itemid);
 		}
 
-		if (NULL == (result = DBselect("select name from items where itemid=" ZBX_FS_UI64, h->itemid)))
-			continue;
-
-		if (NULL == (row = DBfetch(result)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item name");
-			DBfree_result(result);
-			continue;
-		}
-		name = zbx_strdup(NULL, row[0]);
-		DBfree_result(result);
-
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL,
-				&name, MACRO_TYPE_COMMON, NULL, 0);
-		zbx_json_addstring(&json, "name", name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
 
 		if (NULL != trend)
-			zbx_json_addstring(&json_trend, "name", name, ZBX_JSON_TYPE_STRING);
-
-		zbx_free(name);
+			zbx_json_addstring(&json_trend, "name", item_info->name, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addint64(&json, "clock", h->ts.sec);
 		zbx_json_addint64(&json, "ns", h->ts.ns);
@@ -2494,7 +2548,9 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 	zbx_json_free(&json);
 	zbx_json_free(&json_trend);
 	clean_hosts(&hosts);
+	clean_items_info(&items_info);
 	zbx_hashset_destroy(&hosts);
+	zbx_hashset_destroy(&items_info);
 clean:
 	zbx_vector_uint64_destroy(&hostids);
 }
