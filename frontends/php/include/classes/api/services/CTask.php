@@ -193,7 +193,5 @@ class CTask extends CApiService {
 				);
 			}
 		}
-
-		self::exception(ZBX_API_ERROR_PARAMETERS, _('stop'));
 	}
 }
