@@ -6,6 +6,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-13360] fixed HTML5 placeholder color that previously appeared like actual input data (nikita)
 ...G...PS. [ZBX-13351] improved OpenSSL error messages (viktors)
 ..F....... [ZBX-13147] fixed inconsistent number on map navigation tree (nikita)
 ..F....... [ZBX-13537] fixed "Inaccessible user" in Dashboard System status widgets acknowledgement popup (agriscenko)
@@ -172,6 +173,7 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-13360] fixed HTML5 placeholder color that previously appeared like actual input data (nikita)
 ...G...PS. [ZBX-13351] improved OpenSSL error messages (viktors)
 ..F....... [ZBX-13147] fixed inconsistent number on map navigation tree (nikita)
 ..F....... [ZBX-13537] fixed "Inaccessible user" in Dashboard System status widgets acknowledgement popup (agriscenko)
