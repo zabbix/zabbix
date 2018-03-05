@@ -11098,7 +11098,8 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
  *                                                                            *
  * Function: zbx_dc_process_check_now_tasks                                   *
  *                                                                            *
- * Purpose: process check now tasks                                           *
+ * Purpose: process check now tasks by requeueing items monitored by server   *
+ *          at current time                                                   *
  *                                                                            *
  * Parameter: tasks - [IN/OUT] the tasks                                      *
  *                                                                            *
