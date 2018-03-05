@@ -172,9 +172,9 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	char			application_xml[] = {"Content-Type: application/xml"};
 	char			url[ITEM_URL_LEN_MAX];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s%s' headers '%s' message body"
-			" '%s'", __function_name, zbx_request_string(item->request_method), item->url,
-			item->query_fields, item->headers, item->posts);
+	zabbix_log(LOG_LEVEL_ERR, "In %s() request method '%s' URL '%s%s' headers '%s' message body '%s'",
+			__function_name, zbx_request_string(item->request_method), item->url, item->query_fields,
+			item->headers, item->posts);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -313,14 +313,8 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		if ('\0' == *errbuf)
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s",
-					curl_easy_strerror(err)));
-		}
-		else
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s", errbuf));
-
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s",
+				'\0' == *errbuf ? curl_easy_strerror(err) : errbuf));
 		goto clean;
 	}
 

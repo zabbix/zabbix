@@ -399,7 +399,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 #ifdef HAVE_LIBCURL
 			res = get_value_http(item, result);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTP(s) checks was not compiled in."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTP agent checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
