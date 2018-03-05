@@ -27,11 +27,10 @@ else {
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('dashboard.grid.js');
 	$this->addJsFile('class.calendar.js');
+	$this->addJsFile('multiselect.js');
 
 	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
-	$sharing_form = include 'monitoring.dashboard.sharing_form.php';
-	$edit_form = include 'monitoring.dashboard.edit_form.php';
 	$breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
 	$item_groupid = null;
@@ -150,8 +149,6 @@ else {
 	$widget
 		->addItem($timeline)
 		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
-		->addItem($edit_form)
-		->addItem($sharing_form)
 		->show();
 
 	/*

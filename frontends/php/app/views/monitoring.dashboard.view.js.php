@@ -63,21 +63,64 @@
 <script type="text/javascript">
 	// Change dashboard settings.
 	function dashbrd_config() {
-		var form = jQuery('form[name="dashboard_form"]');
+		var dashboard = jQuery('.dashbrd-grid-widget-container').data('dashboardGrid'),
+			options = {
+				dashboardid: <?=$this->data['dashboard']['dashboardid'];?>,
+				userid: dashboard['dashboard']['userid'],
+				name: dashboard['dashboard']['name']
+			};
 
-		showDialogForm(
-			form,
-			{
-				'title': <?= CJs::encodeJson(_('Dashboard properties')) ?>,
-				'action_title': <?= CJs::encodeJson(_('Apply')) ?>
-			},
-			{
-				'name': form.data('data').name,
-				'owner': form.data('data').owner
-			},
-			this
-		);
+		if (options.dashboardid == 0) {
+			options.new = '1';
+		}
+
+		PopUp('popup.dashbrd.properties', options, 'dashboard_prop', this);
 	};
+
+	function dashbrdApplyProperties() {
+		var dashboard = jQuery('.dashbrd-grid-widget-container'),
+			form = jQuery('[name=dashboard_form]'),
+			form_data;
+
+		form.trimValues(['#name']);
+		form_data = form.serializeJSON();
+
+		dashboard.dashboardGrid('setDashboardData', {
+			name: form_data['name'],
+			userid: form_data['userid'] || 0
+		});
+
+		jQuery('div.article .header-title .cell:first h1').text(form_data['name']);
+		jQuery('#dashboard-direct-link').text(form_data['name']);
+
+		overlayDialogueDestroy('dashboard_prop');
+	}
+
+	function dashbrdConfirmSharing() {
+		var form = window.document.forms['dashboard_sharing_form'];
+
+		jQuery.ajax({
+			data: jQuery(form).serialize(),
+			url: jQuery(form).attr('action'),
+			success: function (response) {
+				var errors = [];
+				if (typeof response === 'object') {
+					if ('errors' in response) {
+						errors = response.errors;
+					}
+				}
+
+				if (errors.length) {
+					jQuery(errors).insertBefore(jQuery(form));
+				}
+				else {
+					overlayDialogueDestroy('dashbrdShare');
+				}
+			}
+		});
+
+		return false;
+	}
 
 	// Save changes and cancel editing dashboard.
 	function dashbrd_save_changes() {
@@ -118,18 +161,8 @@
 		timeControl.removeAllSBox();
 	};
 
-	// This method is related to forms: "sharing", "dashboard properties".
-	jQuery.fn.fillForm = function(data) {
-		if (typeof data.name) {
-			this.find('#name').val(data.name);
-		}
-		if ('owner' in data) {
-			if ('id' in data.owner) {
-				this.find('#userid').multiSelect('addData', data.owner);
-			} else {
-				this.find('#userid').multiSelect('clean');
-			}
-		}
+	// Method to fill data in dashboard sharing form.
+	jQuery.fn.fillDashbrdSharingForm = function(data) {
 		if (typeof data.private !== 'undefined') {
 			addPopupValues({'object': 'private', 'values': [data.private] });
 		}
@@ -160,6 +193,11 @@
 					}, 2000));
 			}).trigger('mousemove');
 		}
+
+		<?php if ($this->data['dashboard']['dashboardid'] == 0) { ?>
+		showEditMode();
+		dashbrd_config();
+		<?php } ?>
 	});
 
 	function dashboardAddMessages(messages) {

@@ -395,7 +395,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return array
 	 */
-	private function getNewDashboard() {
+	public function getNewDashboard() {
 		return [
 			'dashboardid' => 0,
 			'name' => _('New dashboard'),
@@ -406,13 +406,13 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	/**
-	 * Get owner datails.
+	 * Get owner details.
 	 *
 	 * @param string $userid
 	 *
 	 * @return array
 	 */
-	private function getOwnerData($userid) {
+	public function getOwnerData($userid) {
 		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
 
 		$users = API::User()->get([

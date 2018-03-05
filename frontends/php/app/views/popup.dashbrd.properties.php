@@ -19,12 +19,7 @@
 **/
 
 
-$this->addJsFile('multiselect.js');
-$this->includeJSfile('app/views/monitoring.dashboard.edit_form.js.php');
-
-$form = (new CForm())
-	->setName('dashboard_form')
-	->setAttribute('style', 'display: none;');
+$form = (new CForm())->setName('dashboard_form');
 
 $multiselect = (new CMultiSelect([
 	'name' => 'userid',
@@ -42,28 +37,44 @@ $multiselect = (new CMultiSelect([
 	],
 	'callPostEvent' => true
 ]))
-	->setAttribute('data-default-owner', CJs::encodeJson($data['dashboard']['owner']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAriaRequired();
 
-$form->addItem((new CFormList())
-	->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect)
-	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-	)
-);
-
-if ($data['dashboard']['dashboardid'] == 0) {
-	// Edit Form should be opened after multiselect initialization
-	$this->addPostJS(
-		'jQuery(document).on("'.$multiselect->getJsEventName().'", function() {'.
-			'showEditMode();'.
-			'dashbrd_config();'.
-		'});'
+$form
+	->addItem(getMessages())
+	->addItem((new CFormList())
+		->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect)
+		->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+			(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
+		)
+		->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
 	);
+
+$js_scripts = [
+	$multiselect->getPostJS(),
+	'jQuery("#userid").multiSelect("addData", '. json_encode($data['dashboard']['owner']).');'
+];
+
+$output = [
+	'header' => _('Dashboard properties'),
+	'script_inline' => implode("\n", $js_scripts),
+	'body' => $form->toString(),
+	'buttons' => [
+		[
+			'title' => _('Apply'),
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'return dashbrdApplyProperties();'
+		]
+	]
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-return $form;
+echo (new CJson())->encode($output);

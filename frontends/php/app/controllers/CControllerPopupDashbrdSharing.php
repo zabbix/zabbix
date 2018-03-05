@@ -19,25 +19,26 @@
 **/
 
 
-/**
- * Controller to get dashboard data.
- */
-class CControllerDashboardGet extends CController {
+class CControllerPopupDashbrdSharing extends CController {
 
 	private $dashboard;
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' => 'required|db dashboard.dashboardid',
-			'editable' => 'in 0,1'
+			'dashboardid' => 'required|db dashboard.dashboardid'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['messages' => [getMessages()->toString()]])
-			]));
+			$errors = CJs::encodeJson(['errors' => [getMessages()->toString()]]);
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => $errors]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -49,7 +50,7 @@ class CControllerDashboardGet extends CController {
 			'selectUsers' => ['userid', 'permission'],
 			'selectUserGroups' => ['usrgrpid', 'permission'],
 			'dashboardids' => $this->getInput('dashboardid'),
-			'editable' => (bool) $this->getInput('editable', false)
+			'editable' => true
 		]);
 
 		if (!$dashboards) {
@@ -65,19 +66,17 @@ class CControllerDashboardGet extends CController {
 		$this->dashboard['users'] = $this->prepareUsers($this->dashboard['users']);
 		$this->dashboard['userGroups'] = $this->prepareUserGroups($this->dashboard['userGroups']);
 
-		$this->setResponse(new CControllerResponseData([
-			'main_block' => CJs::encodeJson(['data' => $this->dashboard])
-		]));
+		$this->setResponse(new CControllerResponseData(['dashboard' => $this->dashboard]));
 	}
 
 	/**
-	 * Extend dashboard users data
+	 * Extend dashboard users data.
 	 *
 	 * @param array $users
 	 *
 	 * @return array
 	 */
-	private function prepareUsers(array $users) {
+	private function prepareUsers(array $users = []) {
 		$users = zbx_toHash($users, 'userid');
 
 		$db_users = API::User()->get([
@@ -105,7 +104,7 @@ class CControllerDashboardGet extends CController {
 	 *
 	 * @return array
 	 */
-	private function prepareUserGroups(array $usrgrps) {
+	private function prepareUserGroups(array $usrgrps = []) {
 		$usrgrps = zbx_toHash($usrgrps, 'usrgrpid');
 
 		$db_usrgrps = API::UserGroup()->get([
