@@ -6,6 +6,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+...G...PS. [ZBX-13351] improved OpenSSL error messages (viktors)
 ..F....... [ZBX-13147] fixed inconsistent number on map navigation tree (nikita)
 ..F....... [ZBX-13537] fixed "Inaccessible user" in Dashboard System status widgets acknowledgement popup (agriscenko)
 ....I..... [ZBX-13472] fixed description of "Server" and "ServerActive" configuration options (Sasha)
@@ -171,6 +172,7 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+...G...PS. [ZBX-13351] improved OpenSSL error messages (viktors)
 ..F....... [ZBX-13147] fixed inconsistent number on map navigation tree (nikita)
 ..F....... [ZBX-13537] fixed "Inaccessible user" in Dashboard System status widgets acknowledgement popup (agriscenko)
 ....I..... [ZBX-13472] fixed description of "Server" and "ServerActive" configuration options (Sasha)
@@ -1299,6 +1301,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+...G...PS. [ZBX-13351] improved OpenSSL error messages (viktors)
 .......PS. [ZBX-13362] fixed potentially wrong rows deleting by housekeeper in PostgreSQL (Sergejs)
 ....I..... [ZBX-13472] fixed description of "Server" and "ServerActive" configuration options (Sasha)
 ........S. [ZBX-13455] added frontend error message when templates cannot be linked to LLD host (viktors)
