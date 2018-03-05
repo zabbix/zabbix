@@ -216,7 +216,7 @@ static int	tm_process_tasks(int now)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
-	int			ret, processed_num = 0, clock, ttl;
+	int			processed_num = 0, clock, ttl;
 	zbx_uint64_t		taskid;
 	unsigned char		type;
 	zbx_vector_uint64_t	check_now_taskids;
@@ -248,7 +248,6 @@ static int	tm_process_tasks(int now)
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				ret = FAIL;
 				break;
 		}
 	}
