@@ -1406,9 +1406,9 @@ function getActionMessages(array $alerts, array $r_alerts) {
 
 			$recipient = $alert['userid']
 				? array_key_exists($alert['userid'], $dbUsers)
-					? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
+					? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
 					: _('Inaccessible user')
-				: $alert['sendto'];
+				: zbx_nl2br($alert['sendto']);
 
 			$info_icons = [];
 			if ($alert['error'] !== ''

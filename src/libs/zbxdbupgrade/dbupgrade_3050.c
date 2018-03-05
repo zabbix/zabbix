@@ -457,7 +457,14 @@ static int	DBpatch_3050036(void)
 	return SUCCEED;
 }
 
+extern int	DBpatch_3040007(void);
+
 static int	DBpatch_3050037(void)
+{
+	return DBpatch_3040007();
+}
+
+static int	DBpatch_3050038(void)
 {
 	const ZBX_TABLE table =
 			{"tag_filter", "tag_filterid", 0,
@@ -475,14 +482,14 @@ static int	DBpatch_3050037(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050038(void)
+static int	DBpatch_3050039(void)
 {
 	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("tag_filter", 1, &field);
 }
 
-static int	DBpatch_3050039(void)
+static int	DBpatch_3050040(void)
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -531,5 +538,6 @@ DBPATCH_ADD(3050036, 0, 1)
 DBPATCH_ADD(3050037, 0, 1)
 DBPATCH_ADD(3050038, 0, 1)
 DBPATCH_ADD(3050039, 0, 1)
+DBPATCH_ADD(3050040, 0, 1)
 
 DBPATCH_END()

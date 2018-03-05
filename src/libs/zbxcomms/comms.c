@@ -1654,7 +1654,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing data length. Message ignored.", s->peer);
 		nbytes = ZBX_PROTO_ERROR;
 	}
-	else
+	else if (0 != buf_stat_bytes)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header. Message ignored.", s->peer);
 		nbytes = ZBX_PROTO_ERROR;
