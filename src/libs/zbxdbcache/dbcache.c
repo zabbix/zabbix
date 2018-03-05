@@ -2336,11 +2336,188 @@ static void	clean_items_info(zbx_hashset_t *items_info)
 	}
 }
 
-static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
+static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, const DC_ITEM *items,
+		const zbx_vector_uint64_t *itemids, zbx_hashset_t *hosts, zbx_hashset_t *items_info)
+{
+	struct zbx_json		json;
+	const ZBX_DC_TREND	*trend = NULL;
+	int			i, j, index;
+	const DC_ITEM		*item;
+	zbx_host_t		*host;
+	zbx_item_info_t		*item_info;
+	zbx_uint128_t		avg;	/* calculate the trend average value */
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < trends_num; i++)
+	{
+		trend = &trends[i];
+
+		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, trend->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		item = &items[index];
+
+		zbx_json_clean(&json);
+		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json, "groups");
+
+		if (NULL == (host = (zbx_host_t *)zbx_hashset_search(hosts, &item->host.hostid)) ||
+				0 == host->groups.values_num)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
+			continue;
+		}
+
+		for (j = 0; j < host->groups.values_num; j++)
+			zbx_json_addstring(&json, NULL, host->groups.values[j], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json);
+
+		if (NULL != trend)
+			zbx_json_addarray(&json, "applications");
+
+		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &item->itemid)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item");
+			continue;
+		}
+
+		for (j = 0; j < item_info->applications.values_num; j++)
+			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json);
+		zbx_json_adduint64(&json, "itemid", item->itemid);
+		zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addint64(&json, "time", trend->clock);
+		zbx_json_addint64(&json, "count", trend->num);
+
+		switch (trend->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_json_addfloat(&json, "min", trend->value_min.dbl);
+				zbx_json_addfloat(&json, "avg", trend->value_avg.dbl);
+				zbx_json_addfloat(&json, "max", trend->value_max.dbl);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_json_adduint64(&json, "min", trend->value_min.ui64);
+				udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+				zbx_json_adduint64(&json, "avg", avg.lo);
+				zbx_json_adduint64(&json, "max", trend->value_max.ui64);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+		zbx_trends_export_write(json.buffer, json.buffer_size);
+	}
+
+	zbx_trends_export_flush();
+	zbx_json_free(&json);
+}
+
+static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items, int items_num,
+		const zbx_vector_uint64_t *itemids, zbx_hashset_t *hosts, zbx_hashset_t *items_info)
+{
+	const ZBX_DC_HISTORY	*h;
+	const DC_ITEM		*item;
+	int			i, j;
+	zbx_host_t		*host;
+	zbx_item_info_t		*item_info;
+	struct zbx_json		json;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < items_num; i++)
+	{
+		h = &history[i];
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
+			continue;
+
+		if (FAIL == (j = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		item = &items[j];
+
+		zbx_json_clean(&json);
+		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json, "groups");
+
+		if (NULL == (host = (zbx_host_t *)zbx_hashset_search(hosts, &item->host.hostid)) ||
+				0 == host->groups.values_num)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
+			continue;
+		}
+
+		for (j = 0; j < host->groups.values_num; j++)
+			zbx_json_addstring(&json, NULL, host->groups.values[j], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json);
+
+		zbx_json_addarray(&json, "applications");
+
+		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &item->itemid)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item");
+			continue;
+		}
+
+		for (j = 0; j < item_info->applications.values_num; j++)
+			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json);
+		zbx_json_adduint64(&json, "itemid", item->itemid);
+
+		zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addint64(&json, "clock", h->ts.sec);
+		zbx_json_addint64(&json, "ns", h->ts.ns);
+
+		switch (h->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_json_addfloat(&json, "value", h->value.dbl);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_json_adduint64(&json, "value", h->value.ui64);
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				zbx_json_addint64(&json, "timestamp", h->value.log->timestamp);
+				zbx_json_addstring(&json, "source", ZBX_NULL2EMPTY_STR(h->value.log->source),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addint64(&json, "severity", h->value.log->severity);
+				zbx_json_addint64(&json, "logeventid", h->value.log->logeventid);
+				zbx_json_addstring(&json, "value", h->value.log->value, ZBX_JSON_TYPE_STRING);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+		zbx_history_export_write(json.buffer, json.buffer_size);
+	}
+
+	zbx_history_export_flush();
+	zbx_json_free(&json);
+}
+
+static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
 		const DC_ITEM *items, int history_num, const ZBX_DC_TREND *trends, int trends_num)
 {
 	int			i;
-	struct zbx_json		json, json_trend;
 	zbx_vector_uint64_t	hostids;
 	zbx_hashset_t		hosts, items_info;
 
@@ -2379,174 +2556,12 @@ static void	DCexport_prepare_history(const ZBX_DC_HISTORY *history, const zbx_ve
 
 	get_items_info_by_itemid(&items_info, itemids);
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_init(&json_trend, ZBX_JSON_STAT_BUF_LEN);
+	if (0 != history_num)
+		DCexport_history(history, items, history_num, itemids, &hosts, &items_info);
 
-	for (i = 0; i < history_num; i++)
-	{
-		const ZBX_DC_HISTORY	*h = &history[i];
-		const DC_ITEM		*item;
-		const ZBX_DC_TREND	*trend = NULL;
-		int			index, j;
-		zbx_host_t		*host;
-		zbx_item_info_t		*item_info;
+	if (0 != trends_num)
+		DCexport_trends(trends, trends_num, items, itemids, &hosts, &items_info);
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
-			continue;
-
-		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		item = &items[index];
-
-		if (0 == (ZBX_DC_FLAGS_NOT_FOR_TRENDS & h->flags))
-		{
-			for (j = 0; j < trends_num; j++)
-			{
-				if (trends[j].itemid == item->itemid)
-				{
-					trend = &trends[j];
-					break;
-				}
-			}
-		}
-
-		zbx_json_clean(&json);
-		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
-
-		if (NULL != trend)
-		{
-			zbx_json_clean(&json_trend);
-			zbx_json_addstring(&json_trend, "host", item->host.name, ZBX_JSON_TYPE_STRING);
-		}
-
-		zbx_json_addarray(&json, "groups");
-
-		if (NULL != trend)
-			zbx_json_addarray(&json_trend, "groups");
-
-		if (NULL == (host = (zbx_host_t *)zbx_hashset_search(&hosts, &item->host.hostid)) ||
-				0 == host->groups.values_num)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
-			continue;
-		}
-
-		for (j = 0; j < host->groups.values_num; j++)
-		{
-			zbx_json_addstring(&json, NULL, host->groups.values[j], ZBX_JSON_TYPE_STRING);
-
-			if (NULL != trend)
-				zbx_json_addstring(&json_trend, NULL, host->groups.values[j], ZBX_JSON_TYPE_STRING);
-		}
-
-		zbx_json_close(&json);
-
-		if (NULL != trend)
-			zbx_json_close(&json_trend);
-
-		zbx_json_addarray(&json, "applications");
-
-		if (NULL != trend)
-			zbx_json_addarray(&json_trend, "applications");
-
-		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(&items_info, &item->itemid)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item");
-			continue;
-		}
-
-		for (j = 0; j < item_info->applications.values_num; j++)
-		{
-			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
-
-			if (NULL != trend)
-				zbx_json_addstring(&json_trend, NULL, item_info->applications.values[j],
-						ZBX_JSON_TYPE_STRING);
-		}
-
-		zbx_json_close(&json);
-		zbx_json_adduint64(&json, "itemid", item->itemid);
-
-		if (NULL != trend)
-		{
-			zbx_json_close(&json_trend);
-			zbx_json_adduint64(&json_trend, "itemid", item->itemid);
-		}
-
-		zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
-
-		if (NULL != trend)
-			zbx_json_addstring(&json_trend, "name", item_info->name, ZBX_JSON_TYPE_STRING);
-
-		zbx_json_addint64(&json, "clock", h->ts.sec);
-		zbx_json_addint64(&json, "ns", h->ts.ns);
-
-		if (NULL != trend)
-			zbx_json_addint64(&json_trend, "time", trend->clock);
-
-		switch (h->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_json_addfloat(&json, "value", h->value.dbl);
-
-				if (NULL != trend)
-				{
-					zbx_json_addfloat(&json_trend, "min", trend->value_min.dbl);
-					zbx_json_addfloat(&json_trend, "avg", trend->value_avg.dbl);
-					zbx_json_addfloat(&json_trend, "max", trend->value_max.dbl);
-				}
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				zbx_json_adduint64(&json, "value", h->value.ui64);
-
-				if (NULL != trend)
-				{
-					zbx_uint128_t	avg;	/* calculate the trend average value */
-
-					zbx_json_adduint64(&json_trend, "min", trend->value_min.ui64);
-					udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
-					zbx_json_adduint64(&json_trend, "avg", avg.lo);
-					zbx_json_adduint64(&json_trend, "max", trend->value_max.ui64);
-				}
-				break;
-			case ITEM_VALUE_TYPE_STR:
-				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
-				break;
-			case ITEM_VALUE_TYPE_TEXT:
-				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
-				break;
-			case ITEM_VALUE_TYPE_LOG:
-				zbx_json_addint64(&json, "timestamp", h->value.log->timestamp);
-				zbx_json_addstring(&json, "source", ZBX_NULL2EMPTY_STR(h->value.log->source),
-						ZBX_JSON_TYPE_STRING);
-				zbx_json_addint64(&json, "severity", h->value.log->severity);
-				zbx_json_addint64(&json, "logeventid", h->value.log->logeventid);
-				zbx_json_addstring(&json, "value", h->value.log->value, ZBX_JSON_TYPE_STRING);
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
-
-		if (NULL != trend)
-			zbx_json_addint64(&json_trend, "count", trend->num);
-
-		zbx_history_export_write(json.buffer, json.buffer_size);
-
-		if (NULL != trend)
-			zbx_trends_export_write(json_trend.buffer, json_trend.buffer_size);
-	}
-
-	zbx_history_export_flush();
-
-	if (trends_num)
-		zbx_trends_export_flush();
-
-	zbx_json_free(&json);
-	zbx_json_free(&json_trend);
 	clean_hosts(&hosts);
 	clean_items_info(&items_info);
 	zbx_hashset_destroy(&hosts);
@@ -2808,7 +2823,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		{
 			if (SUCCEED == zbx_is_export_enabled())
 			{
-				DCexport_prepare_history(history, &itemids, items, history_num, trends, trends_num);
+				DCexport_history_and_trends(history, &itemids, items, history_num, trends, trends_num);
 				zbx_export_events();
 			}
 
