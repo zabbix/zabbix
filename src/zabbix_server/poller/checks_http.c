@@ -420,8 +420,12 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 				while (NULL != (line = zbx_http_get_header(&headers)))
 				{
-					if (0 == json_content && 0 == strcmp(line, application_json))
+					if (0 == json_content &&
+							0 == strncmp(line, "Content-Type:", strlen("Content-Type:")) &&
+							NULL != strstr(line, "application/json"))
+					{
 						json_content = 1;
+					}
 
 					http_add_json_header(&json, line);
 					zbx_free(line);
