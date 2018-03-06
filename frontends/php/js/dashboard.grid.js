@@ -1292,9 +1292,16 @@
 					// Take values from form.
 					fields = form.serializeJSON();
 					ajax_data['type'] = fields['type'];
-					ajax_data['name'] = fields['name'];
 					delete fields['type'];
-					delete fields['name'];
+
+					if (data.dialogue['widget_type'] === ajax_data['type']) {
+						ajax_data['name'] = fields['name'];
+						delete fields['name'];
+					}
+					else {
+						// Get default config if widget type changed.
+						fields = {};
+					}
 				}
 				else if (widget !== null) {
 					// Open form with current config.
@@ -1306,6 +1313,9 @@
 					// Get default config for new widget.
 					fields = {};
 				}
+
+				data.dialogue['widget_type'] = ajax_data['type'];
+
 				if (Object.keys(fields).length != 0) {
 					ajax_data['fields'] = JSON.stringify(fields);
 				}
