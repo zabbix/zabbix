@@ -1165,8 +1165,6 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$result = false;
-
 	$items = API::Item()->get([
 		'output' => ['itemid'],
 		'itemids' => getRequest('group_itemid'),

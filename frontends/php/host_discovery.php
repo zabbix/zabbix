@@ -387,8 +387,6 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
-	$result = false;
-
 	$discovery_rules = API::DiscoveryRule()->get([
 		'output' => ['itemid'],
 		'itemids' => getRequest('g_hostdruleid'),
