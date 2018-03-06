@@ -20,44 +20,40 @@
 
 
 /**
- * Class containing methods for operations with tasks.
+ * Class containing methods for operations with task.
  */
 class CTask extends CApiService {
 
 	/**
-	 * @param array        $tasks             Array of tasks to create.
-	 * @param string|array $tasks['itemids']  Array of item and LLD rule IDs to create tasks for.
+	 * @param array        $task             Task to create.
+	 * @param string|array $task['itemids']  Array of item and LLD rule IDs to create tasks for.
 	 *
 	 * @return array
 	 */
-	public function create(array $tasks) {
-		$this->validateCreate($tasks);
+	public function create(array $task) {
+		$this->validateCreate($task);
 
 		$tasks_to_create = [];
 		$time = time();
 
-		foreach ($tasks as $task) {
-			foreach ($task['itemids'] as $itemid) {
-				$tasks_to_create[] = [
-					'type' => $task['type'],
-					'status' => ZBX_TM_STATUS_NEW,
-					'clock' => $time,
-					'ttl' => SEC_PER_DAY
-				];
-			}
+		foreach ($task['itemids'] as $itemid) {
+			$tasks_to_create[] = [
+				'type' => $task['type'],
+				'status' => ZBX_TM_STATUS_NEW,
+				'clock' => $time,
+				'ttl' => SEC_PER_DAY
+			];
 		}
 
 		$taskids = DB::insert('task', $tasks_to_create);
 
 		$check_now_to_create = [];
 
-		foreach ($tasks as $idx => $task) {
-			foreach ($task['itemids'] as $itemid) {
-				$check_now_to_create[] = [
-					'taskid' => $taskids[$idx],
-					'itemid' => $itemid
-				];
-			}
+		foreach ($task['itemids'] as $idx => $itemid) {
+			$check_now_to_create[] = [
+				'taskid' => $taskids[$idx],
+				'itemid' => $itemid
+			];
 		}
 
 		DB::insert('task_check_now', $check_now_to_create);
@@ -70,46 +66,40 @@ class CTask extends CApiService {
 	 * if user has permissions to given items and LLD rules, checks item and LLD rule types, checks if items and
 	 * LLD rules are enabled, checks if host is monitored and it's not a template. And checks if tasks don't exist.
 	 *
-	 * @param array $tasks  Array of tasks to validate.
+	 * @param array $task  Task to validate.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array &$tasks) {
+	protected function validateCreate(array &$task) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_TASK_CHECK_NOW])],
 			'itemids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $tasks, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $task, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		// Check if user has permissions to items and LLD rules.
-		$itemids = [];
-
-		foreach ($tasks as $task) {
-			$itemids = array_merge($itemids, $task['itemids']);
-		}
-
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'hostid', 'status'],
-			'itemids' => $itemids,
+			'itemids' => $task['itemids'],
 			'templated' => false,
 			'editable' => true
 		]);
 
 		$discovery_rules = [];
-		$itemids_cnt = count($itemids);
+		$itemids_cnt = count($task['itemids']);
 		$items_cnt = count($items);
 
 		if ($items_cnt != $itemids_cnt) {
 			$discovery_rules = API::DiscoveryRule()->get([
 				'output' => ['itemid', 'type', 'hostid', 'status'],
-				'itemids' => $itemids,
+				'itemids' => $task['itemids'],
 				'templated' => false,
 				'editable' => true
 			]);
