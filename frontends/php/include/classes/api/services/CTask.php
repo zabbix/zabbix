@@ -124,8 +124,10 @@ class CTask extends CApiService {
 		// Validate item and LLD rule types and statuses, and collect host IDs for later.
 		$hostids = [];
 
+		$allowed_types = checkNowAllowedTypes();
+
 		foreach ($items as $item) {
-			if (!in_array($item['type'], checkNowAllowedTypes())) {
+			if (!in_array($item['type'], $allowed_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', _('wrong item type')));
 			}
 
@@ -137,7 +139,7 @@ class CTask extends CApiService {
 		}
 
 		foreach ($discovery_rules as $discovery_rule) {
-			if (!in_array($discovery_rule['type'], checkNowAllowedTypes())) {
+			if (!in_array($discovery_rule['type'], $allowed_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot send request: %1$s.', _('wrong discovery rule type'))
 				);
