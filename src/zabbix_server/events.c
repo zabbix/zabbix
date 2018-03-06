@@ -2429,6 +2429,9 @@ int	zbx_flush_correlated_events(void)
 
 		DBupdate_itservices(&trigger_diff);
 
+		if (SUCCEED == zbx_is_export_enabled())
+			zbx_export_events();
+
 		zbx_clean_events();
 	}
 
