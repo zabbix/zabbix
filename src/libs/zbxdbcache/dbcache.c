@@ -895,17 +895,10 @@ typedef struct
 }
 zbx_host_info_t;
 
-static void	clean_hosts(zbx_hashset_t *hosts_info)
+static void	zbx_host_info_clean(zbx_host_info_t *host_info)
 {
-	zbx_hashset_iter_t	iter;
-	zbx_host_info_t		*host_info;
-
-	zbx_hashset_iter_reset(hosts_info, &iter);
-	while (NULL != (host_info = (zbx_host_info_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_vector_ptr_clear_ext(&host_info->groups, zbx_default_mem_free_func);
-		zbx_vector_ptr_destroy(&host_info->groups);
-	}
+	zbx_vector_ptr_clear_ext(&host_info->groups, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&host_info->groups);
 }
 
 static void	db_get_hosts_by_hostid(zbx_hashset_t *hosts_info, const zbx_vector_uint64_t *hostids)
@@ -1020,18 +1013,11 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 	DBfree_result(result);
 }
 
-static void	clean_items_info(zbx_hashset_t *items_info)
+static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 {
-	zbx_hashset_iter_t	iter;
-	zbx_item_info_t		*item_info;
-
-	zbx_hashset_iter_reset(items_info, &iter);
-	while (NULL != (item_info = (zbx_item_info_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_vector_ptr_clear_ext(&item_info->applications, zbx_default_mem_free_func);
-		zbx_vector_ptr_destroy(&item_info->applications);
-		zbx_free(item_info->name);
-	}
+	zbx_vector_ptr_clear_ext(&item_info->applications, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&item_info->applications);
+	zbx_free(item_info->name);
 }
 
 static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hashset_t *hosts,
@@ -1230,8 +1216,9 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&item_info_ids);
-	zbx_hashset_create(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create_ext(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_item_info_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1297,7 +1284,9 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_create(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create_ext(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_host_info_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	db_get_hosts_by_hostid(&hosts_info, &hostids);
 
@@ -1309,10 +1298,8 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	if (0 != trends_num)
 		DCexport_trends(trends, trends_num, &hosts_info, &items_info);
 
-	clean_hosts(&hosts_info);
 	zbx_hashset_destroy(&hosts_info);
 clean:
-	clean_items_info(&items_info);
 	zbx_hashset_destroy(&items_info);
 	zbx_vector_uint64_destroy(&item_info_ids);
 	zbx_vector_uint64_destroy(&hostids);
