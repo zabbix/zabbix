@@ -396,12 +396,10 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masschec
 		'preservekeys' => true
 	]);
 
-	$discovery_ruleids = zbx_objectValues($discovery_rules, 'itemid');
-
-	if ($discovery_ruleids) {
+	if ($discovery_rules) {
 		$result = (bool) API::Task()->create([
 			'type' => ZBX_TM_TASK_CHECK_NOW,
-			'itemids' => $discovery_ruleids
+			'itemids' => array_keys($discovery_rules)
 		]);
 	}
 	else {

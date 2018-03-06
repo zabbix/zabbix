@@ -1174,12 +1174,10 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' &&
 		'preservekeys' => true
 	]);
 
-	$itemids = zbx_objectValues($items, 'itemid');
-
-	if ($itemids) {
+	if ($items) {
 		$result = (bool) API::Task()->create([
 			'type' => ZBX_TM_TASK_CHECK_NOW,
-			'itemids' => $itemids
+			'itemids' => array_keys($items)
 		]);
 	}
 	else {
