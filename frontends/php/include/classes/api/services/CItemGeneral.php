@@ -1840,13 +1840,20 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if ($item['post_type'] == ZBX_POSTTYPE_JSON) {
-				$matches = (new CMacrosResolverGeneral)->getMacroPositions($posts, [
+				$types = [
 					'usermacros' => true,
-					'lldmacros' => true,
 					'macros_n' => [
-						'{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}'
+						'{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}',
+						'{ITEM.KEY}'
 					]
-				]);
+				];
+
+				if (get_class($this) === 'CItemPrototype') {
+					$types['lldmacros'] = true;
+				}
+
+				$matches = (new CMacrosResolverGeneral)->getMacroPositions($posts, $types);
+
 				$shift = 0;
 
 				foreach ($matches as $pos => $substr) {
