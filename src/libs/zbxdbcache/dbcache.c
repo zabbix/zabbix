@@ -972,13 +972,12 @@ static void	get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	itemid;
 		zbx_item_info_t	item_info;
 
 		ZBX_DBROW2UINT64(item_info.itemid, row[0]);
 
 		item_info.name = zbx_strdup(NULL, row[1]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &itemid, NULL, NULL, NULL, NULL, &item_info.name,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &item_info.name,
 				MACRO_TYPE_COMMON, NULL, 0);
 
 		zbx_vector_ptr_create(&item_info.applications);
