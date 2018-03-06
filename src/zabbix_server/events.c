@@ -1673,7 +1673,7 @@ void	zbx_export_events(void)
 				zbx_tag_t	*tag = (zbx_tag_t *)events[i].tags.values[j];
 
 				zbx_json_addobject(&json, NULL);
-				zbx_json_addstring(&json, "name", tag->tag, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, "tag", tag->tag, ZBX_JSON_TYPE_STRING);
 				zbx_json_addstring(&json, "value", tag->value, ZBX_JSON_TYPE_STRING);
 				zbx_json_close(&json);
 			}
