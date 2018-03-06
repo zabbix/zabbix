@@ -24,10 +24,6 @@
  */
 class CTask extends CApiService {
 
-	protected $tableName = 'task';
-	protected $tableAlias = 't';
-	protected $sortColumns = ['taskid'];
-
 	/**
 	 * @param array        $tasks             Array of tasks to create.
 	 * @param string|array $tasks['itemids']  Array of item and LLD rule IDs to create tasks for.
