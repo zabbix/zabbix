@@ -1592,6 +1592,8 @@ static void	get_hosts_by_expression(zbx_hashset_t *hosts, const char *expression
 
 void	zbx_export_events(void)
 {
+	const char		*__function_name = "zbx_export_events";
+
 	size_t			i;
 	struct zbx_json		json;
 	size_t			sql_alloc = 256, sql_offset;
@@ -1601,8 +1603,10 @@ void	zbx_export_events(void)
 	zbx_hashset_t		hosts;
 	zbx_vector_uint64_t	hostids;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __function_name, events_num);
+
 	if (0 == events_num)
-		return;
+		goto exit;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	sql = (char *)zbx_malloc(sql, sql_alloc);
@@ -1701,6 +1705,8 @@ void	zbx_export_events(void)
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
 	zbx_json_free(&json);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
