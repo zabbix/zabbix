@@ -104,15 +104,21 @@ class CTask extends CApiService {
 			'editable' => true
 		]);
 
-		$discovery_rules = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'type', 'hostid', 'status'],
-			'itemids' => $itemids,
-			'templated' => false,
-			'editable' => true
-		]);
+		$discovery_rules = [];
+		$itemids_cnt = count($itemids);
+		$items_cnt = count($items);
 
-		if (!$items && !$discovery_rules) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		if ($items_cnt != $itemids_cnt) {
+			$discovery_rules = API::DiscoveryRule()->get([
+				'output' => ['itemid', 'type', 'hostid', 'status'],
+				'itemids' => $itemids,
+				'templated' => false,
+				'editable' => true
+			]);
+
+			if (count($discovery_rules) + $items_cnt != $itemids_cnt) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
 		}
 
 		// Validate item and LLD rule types and statuses, and collect host IDs for later.
