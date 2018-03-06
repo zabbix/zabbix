@@ -100,12 +100,14 @@ class CTask extends CApiService {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'hostid', 'status'],
 			'itemids' => $itemids,
+			'templated' => false,
 			'editable' => true
 		]);
 
 		$discovery_rules = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'type', 'hostid', 'status'],
 			'itemids' => $itemids,
+			'templated' => false,
 			'editable' => true
 		]);
 
@@ -147,12 +149,9 @@ class CTask extends CApiService {
 		// Check if those are actually hosts because given hostids could actually be templateids.
 		$hosts = API::Host()->get([
 			'output' => ['status'],
-			'hostids' => array_keys($hostids)
+			'hostids' => array_keys($hostids),
+			'nopermissions' => true
 		]);
-
-		if (!$hosts) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
 
 		// Check host status. Allow only monitored hosts.
 		foreach ($hosts as $host) {
