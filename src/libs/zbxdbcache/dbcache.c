@@ -892,22 +892,22 @@ typedef struct
 	zbx_uint64_t		hostid;
 	zbx_vector_ptr_t	groups;
 }
-zbx_host_t;
+zbx_host_info_t;
 
-static void	clean_hosts(zbx_hashset_t *hosts)
+static void	clean_hosts(zbx_hashset_t *hosts_info)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_host_t		*host;
+	zbx_host_info_t		*host_info;
 
-	zbx_hashset_iter_reset(hosts, &iter);
-	while (NULL != (host = (zbx_host_t *)zbx_hashset_iter_next(&iter)))
+	zbx_hashset_iter_reset(hosts_info, &iter);
+	while (NULL != (host_info = (zbx_host_info_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_clear_ext(&host->groups, zbx_default_mem_free_func);
-		zbx_vector_ptr_destroy(&host->groups);
+		zbx_vector_ptr_clear_ext(&host_info->groups, zbx_default_mem_free_func);
+		zbx_vector_ptr_destroy(&host_info->groups);
 	}
 }
 
-static void	get_hosts_by_hostid(zbx_hashset_t *hosts, const zbx_vector_uint64_t *hostids)
+static void	get_hosts_by_hostid(zbx_hashset_t *hosts_info, const zbx_vector_uint64_t *hostids)
 {
 	int		i;
 	size_t		sql_offset;
@@ -916,10 +916,10 @@ static void	get_hosts_by_hostid(zbx_hashset_t *hosts, const zbx_vector_uint64_t 
 
 	for (i = 0; i < hostids->values_num; i++)
 	{
-		zbx_host_t	host = {.hostid = hostids->values[i]};
+		zbx_host_info_t	host_info = {.hostid = hostids->values[i]};
 
-		zbx_vector_ptr_create(&host.groups);
-		zbx_hashset_insert(hosts, &host, sizeof(host));
+		zbx_vector_ptr_create(&host_info.groups);
+		zbx_hashset_insert(hosts_info, &host_info, sizeof(host_info));
 	}
 
 	sql_offset = 0;
@@ -936,17 +936,17 @@ static void	get_hosts_by_hostid(zbx_hashset_t *hosts, const zbx_vector_uint64_t 
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	hostid;
-		zbx_host_t	*host;
+		zbx_host_info_t	*host_info;
 
 		ZBX_DBROW2UINT64(hostid, row[0]);
 
-		if (NULL == (host = (zbx_host_t *)zbx_hashset_search(hosts, &hostid)))
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts_info, &hostid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		zbx_vector_ptr_append(&host->groups, zbx_strdup(NULL, row[1]));
+		zbx_vector_ptr_append(&host_info->groups, zbx_strdup(NULL, row[1]));
 	}
 	DBfree_result(result);
 }
@@ -1036,7 +1036,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, const DC
 	const ZBX_DC_TREND	*trend = NULL;
 	int			i, j, index;
 	const DC_ITEM		*item;
-	zbx_host_t		*host;
+	zbx_host_info_t		*host;
 	zbx_item_info_t		*item_info;
 	zbx_uint128_t		avg;	/* calculate the trend average value */
 
@@ -1061,7 +1061,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, const DC
 		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json, "groups");
 
-		if (NULL == (host = (zbx_host_t *)zbx_hashset_search(hosts, &item->host.hostid)) ||
+		if (NULL == (host = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)) ||
 				0 == host->groups.values_num)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
@@ -1121,7 +1121,7 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items
 	const ZBX_DC_HISTORY	*h;
 	const DC_ITEM		*item;
 	int			i, j;
-	zbx_host_t		*host;
+	zbx_host_info_t		*host_info;
 	zbx_item_info_t		*item_info;
 	struct zbx_json		json;
 
@@ -1149,15 +1149,15 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items
 		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json, "groups");
 
-		if (NULL == (host = (zbx_host_t *)zbx_hashset_search(hosts, &item->host.hostid)) ||
-				0 == host->groups.values_num)
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)) ||
+				0 == host_info->groups.values_num)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
 			continue;
 		}
 
-		for (j = 0; j < host->groups.values_num; j++)
-			zbx_json_addstring(&json, NULL, host->groups.values[j], ZBX_JSON_TYPE_STRING);
+		for (j = 0; j < host_info->groups.values_num; j++)
+			zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 
@@ -1220,7 +1220,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	const char		*__function_name = "DCexport_history_and_trends";
 	int			i, index;
 	zbx_vector_uint64_t	hostids, item_info_ids;
-	zbx_hashset_t		hosts, items_info;
+	zbx_hashset_t		hosts_info, items_info;
 	const DC_ITEM		*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __function_name, history_num, trends_num);
@@ -1280,23 +1280,23 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_create(&hosts, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&items_info, item_info_ids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	get_hosts_by_hostid(&hosts, &hostids);
+	get_hosts_by_hostid(&hosts_info, &hostids);
 
 	get_items_info_by_itemid(&items_info, &item_info_ids);
 
 	if (0 != history_num)
-		DCexport_history(history, items, errcodes, history_num, itemids, &hosts, &items_info);
+		DCexport_history(history, items, errcodes, history_num, itemids, &hosts_info, &items_info);
 
 	if (0 != trends_num)
-		DCexport_trends(trends, trends_num, items, errcodes, itemids, &hosts, &items_info);
+		DCexport_trends(trends, trends_num, items, errcodes, itemids, &hosts_info, &items_info);
 
-	clean_hosts(&hosts);
+	clean_hosts(&hosts_info);
 	clean_items_info(&items_info);
-	zbx_hashset_destroy(&hosts);
+	zbx_hashset_destroy(&hosts_info);
 	zbx_hashset_destroy(&items_info);
 clean:
 	zbx_vector_uint64_destroy(&item_info_ids);
