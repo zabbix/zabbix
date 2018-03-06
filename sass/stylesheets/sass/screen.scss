@@ -1135,7 +1135,6 @@ footer {
 	.link-action {
 		color: $font-selected-color;
 		text-decoration: none;
-		cursor: default;
 
 		&:focus {
 			color: $font-selected-color;
@@ -1146,7 +1145,6 @@ footer {
 			color: $font-selected-color;
 			border-bottom: 1px solid rgba($font-selected-color, 0.7);
 		}
-
 	}
 
 	sup {
