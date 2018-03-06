@@ -84,6 +84,7 @@ void	zbx_history_export_init(const char *process_name, int process_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s", history_file_name,
 				zbx_strerror(errno));
+		exit(EXIT_FAILURE);
 	}
 
 	trends_file_name = zbx_dsprintf(NULL, "%s/trends-%s-%d.ndjson", export_dir, process_name, process_num);
@@ -92,6 +93,7 @@ void	zbx_history_export_init(const char *process_name, int process_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s", trends_file_name,
 				zbx_strerror(errno));
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -103,6 +105,7 @@ void	zbx_problems_export_init(const char *process_name, int process_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s", problems_file_name,
 				zbx_strerror(errno));
+		exit(EXIT_FAILURE);
 	}
 }
 
