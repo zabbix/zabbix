@@ -134,7 +134,9 @@ class CTask extends CApiService {
 			]);
 
 			if (count($discovery_rules) + $items_cnt != $itemids_cnt) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
