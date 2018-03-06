@@ -34,7 +34,8 @@ $http_popup_form = (new CForm())
 	->addVar('templated', $options['templated'])
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
-	->addVar('action', 'popup.httpstep');
+	->addVar('action', 'popup.httpstep')
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $http_popup_form_list = (new CFormList())
 	->addRow(
@@ -149,22 +150,19 @@ $http_popup_form_list
 		(new CTextBox('status_codes', $options['status_codes']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append tabs to form.
-$http_popup_tab = new CTabView();
-$http_popup_tab->addTab('scenarioStepTab', _('Step of web scenario'), $http_popup_form_list);
-
 $output['buttons'] = [
 	[
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
 		'class' => '',
 		'keepOpen' => true,
+		'isSubmit' => true,
 		'action' => 'return validateHttpStep("'.$http_popup_form->getId().'", '.
 						'jQuery(window.document.forms["'.$http_popup_form->getId().'"])' .
 							'.closest("[data-dialogueid]").attr("data-dialogueid"));'
 	]
 ];
 
-$http_popup_form->addItem($http_popup_tab);
+$http_popup_form->addItem($http_popup_form_list);
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();

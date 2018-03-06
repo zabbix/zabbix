@@ -36,6 +36,7 @@ if (!empty($DB['DB'])) {
 	$theme = getUserTheme($data['user']);
 
 	$pageHeader->addStyle(getTriggerSeverityCss($config));
+	$pageHeader->addStyle(getTriggerStatusCss($config));
 
 	// perform Zabbix server check only for standard pages
 	if ($config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
@@ -52,7 +53,7 @@ $path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.$data['user']['lang'].'&
 $pageHeader->addJsFile($path);
 
 if ($scripts) {
-	$pageHeader->addJsFile('jsLoader.php?'.'files[]='.implode('&amp;files[]=', $scripts));
+	$pageHeader->addJsFile('jsLoader.php?'.'files[]='.implode('&amp;files[]=', $scripts).'&amp;lang='.$data['user']['lang']);
 }
 $pageHeader->display();
 

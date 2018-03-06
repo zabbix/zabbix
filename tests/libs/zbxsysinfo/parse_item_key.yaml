@@ -18,7 +18,7 @@ in:
   key: 'key[][]'
 out:
   key: 'key'
-  parameters: ['', '']
+  parameters: [']['] # frontend's interpretation is: ['', '']
 ---
 test case: valid key with quoted empty string in brackets
 in:
@@ -100,16 +100,17 @@ out:
 test case: valid key with a couple of bracket pairs, each containing quoted parameters
 in:
   key: 'key["a","b","c"]["d"]'
-out:
-  key: 'key'
-  parameters: ['a', 'b', 'c', 'd']
+# server thinks this key is invalid; frontend's interpretation is:
+#out:
+#  key: 'key'
+#  parameters: ['a', 'b', 'c', 'd']
 ---
 test case: valid key with several quoted parameters and an array in brackets
 in:
   key: 'key["a","b","c",[["d", ["e\",]" ] ], f"]]'
 out:
   key: 'key'
-  parameters: ['a', 'b', 'c', '["d", ["e\",]" ] ], f"']
+  parameters: ['a', 'b', 'c', '["d",["e\",]"]],f"'] # frontend's interpretation is: ['a', 'b', 'c', '["d", ["e\",]" ] ], f"']
 ---
 test case: valid key with many quoted/unquoted parameters with/without trailing/leading spaces also featuring escaping
 in:

@@ -130,17 +130,24 @@ WRAP_FS_FUNCS = \
 WRAP_EXIT = \
 	-Wl,--wrap=exit
 
+WRAP_COMM_FUNCS = \
+	-Wl,--wrap=read \
+	-Wl,--wrap=connect
+
 COMMON_WRAP_FUNCS = \
 	$(WRAP_DB_FUNCS) \
 	$(WRAP_IO_FUNCS) \
 	$(WRAP_FS_FUNCS) \
-	$(WRAP_EXIT)
+	$(WRAP_EXIT) \
+	$(WRAP_COMM_FUNCS)
 
-tests:
+tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
-	./tests_run.pl
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml"
+
+tests: tests_build
+	tests/tests_run.pl
 endif
 
 .PHONY: test tests

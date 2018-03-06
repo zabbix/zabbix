@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
+require_once dirname(__FILE__) . '/class.ctestdbhelper.php';
 require_once dirname(__FILE__).'/class.cexceptionhelper.php';
 
 define('TEST_GOOD', 0);
@@ -363,7 +364,41 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	 * @param string $id  ID of the multiselect.
 	 */
 	public function zbxTestClickButtonMultiselect($id) {
-		$this->zbxTestClickXpath("//div[@id='$id']/..//button");
+		$this->zbxTestClickXpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/../div[@class='multiselect-button']/button"
+		);
+	}
+
+	public function zbxTestMultiselectNew($id, $string) {
+		$this->webDriver->findElement(
+			WebDriverBy::xpath("//div[contains(@class, 'multiselect') and @id='$id']/input")
+		)
+			->clear()
+			->sendKeys($string);
+		$this->zbxTestClickXpathWait(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
+			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
+		);
+		$this->zbxTestMultiselectAssertSelected($id, $string.' (new)');
+	}
+
+	public function zbxTestMultiselectAssertSelected($id, $string) {
+		$this->zbxTestAssertVisibleXpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']"
+		);
+	}
+
+	public function zbxTestMultiselectRemove($id, $string) {
+		$this->zbxTestClickXpathWait(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']/..".
+			"/span[@class='subfilter-disable-btn']"
+		);
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']"
+		));
 	}
 
 	public function zbxTestInputType($id, $str) {

@@ -672,7 +672,7 @@ function copyItems($srcHostId, $dstHostId) {
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
-			$interface = CItem::findInterfaceForItem($srcItem, $dstHost['interfaces']);
+			$interface = CItem::findInterfaceForItem($srcItem['type'], $dstHost['interfaces']);
 			if ($interface) {
 				$srcItem['interfaceid'] = $interface['interfaceid'];
 			}
@@ -1035,8 +1035,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 		foreach ($host_names as $hostId => $host_name) {
 			$host = $hosts[$hostId];
 
-			$name = (new CSpan($host['name']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
+			$name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
 			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];

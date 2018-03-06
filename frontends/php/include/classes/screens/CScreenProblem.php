@@ -848,9 +848,8 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$description = [
-					(new CSpan($problem['name']))
+					(new CLinkAction($problem['name']))
 						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
-						->addClass(ZBX_STYLE_LINK_ACTION)
 				];
 
 				if ($this->data['filter']['details'] == 1) {

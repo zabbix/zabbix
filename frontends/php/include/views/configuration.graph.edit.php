@@ -188,10 +188,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymin_itemid',
 					'dstfld2' => 'ymin_name',
+					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
 				]).
-					',getOnlyHostParam()));'
+					',getOnlyHostParam()), null, this);'
 			)
 			->setEnabled(!$readonly);
 
@@ -210,7 +211,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'dstfld2' => 'ymin_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
-					]).');'
+					]).', null, this);'
 				);
 		}
 	}
@@ -268,10 +269,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymax_itemid',
 					'dstfld2' => 'ymax_name',
+					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
 				]).
-					',getOnlyHostParam()));'
+					',getOnlyHostParam()), null, this);'
 			)
 			->setEnabled(!$readonly);
 
@@ -290,7 +292,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'dstfld2' => 'ymax_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
-					]).');'
+					]).', null, this);'
 				);
 		}
 	}
@@ -347,7 +349,8 @@ $popup_options_add = [
 	'dstfrm' => $graphForm->getName(),
 	'numeric' => '1',
 	'writeonly' => '1',
-	'multiselect' => '1'
+	'multiselect' => '1',
+	'with_webitems' => '1'
 ];
 if ($data['normal_only']) {
 	$popup_options_add['normal_only'] = '1';
@@ -382,13 +385,13 @@ $items_table->addRow(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
 						->onClick('return PopUp("popup.generic",jQuery.extend('.
-							CJs::encodeJson($popup_options_add).',getOnlyHostParam()));'
+							CJs::encodeJson($popup_options_add).',getOnlyHostParam()), null, this);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
 							->onClick('return PopUp("popup.generic",'.
-								CJs::encodeJson($popup_options_add_prototype).');'
+								CJs::encodeJson($popup_options_add_prototype).', null, this);'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
@@ -436,7 +439,7 @@ $graphPreviewTable = (new CTable())
 	->addStyle('width: 100%;')
 	->addRow(
 		(new CRow(
-			(new CDiv())->setId('previewChar')
+			(new CDiv())->setId('previewChart')
 		))->addClass(ZBX_STYLE_CENTER)
 	);
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);

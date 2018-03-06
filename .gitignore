@@ -375,6 +375,15 @@ tests/Makefile.in
 tests/libs/.deps
 tests/libs/Makefile
 tests/libs/Makefile.in
+tests/libs/zbxcommon/.deps
+tests/libs/zbxcommon/Makefile
+tests/libs/zbxcommon/Makefile.in
+tests/libs/zbxcommon/zbx_function_find
+tests/libs/zbxcommshigh/.deps
+tests/libs/zbxcommshigh/Makefile
+tests/libs/zbxcommshigh/Makefile.in
+tests/libs/zbxcommshigh/zbx_tcp_recv_ext
+tests/libs/zbxcommshigh/zbx_tcp_recv_raw_ext
 tests/libs/zbxconf/.deps
 tests/libs/zbxconf/Makefile
 tests/libs/zbxconf/Makefile.in
@@ -401,6 +410,9 @@ tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC
 tests/libs/zbxsysinfo/linux/Makefile
 tests/libs/zbxsysinfo/linux/Makefile.in
 tests/libs/zbxsysinfo/linux/NET_IF_DISCOVERY
+tests/libs/zbxsysinfo/linux/NET_IF_IN
+tests/libs/zbxsysinfo/linux/NET_IF_OUT
+tests/libs/zbxsysinfo/linux/NET_IF_TOTAL
 tests/libs/zbxsysinfo/linux/SYSTEM_BOOTTIME
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_INTR
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES

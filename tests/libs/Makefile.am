@@ -2,6 +2,7 @@ SUBDIRS = \
 	zbxconf \
 	zbxdbhigh \
 	zbxjson \
-	zbxsysinfo
-	
+	zbxsysinfo \
+	zbxcommshigh \
+	zbxcommon	
 

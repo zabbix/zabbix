@@ -18,6 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/**
+ * Get trigger severity status css style.
+ *
+ * @param  int         $severity trigger severity
+ * @return string|null
+ */
+function getSeverityStatusStyle($severity) {
+	switch ($severity) {
+		case TRIGGER_SEVERITY_DISASTER:
+			return ZBX_STYLE_STATUS_DISASTER_BG;
+		case TRIGGER_SEVERITY_HIGH:
+			return ZBX_STYLE_STATUS_HIGH_BG;
+		case TRIGGER_SEVERITY_AVERAGE:
+			return ZBX_STYLE_STATUS_AVERAGE_BG;
+		case TRIGGER_SEVERITY_WARNING:
+			return ZBX_STYLE_STATUS_WARNING_BG;
+		case TRIGGER_SEVERITY_INFORMATION:
+			return ZBX_STYLE_STATUS_INFO_BG;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return ZBX_STYLE_STATUS_NA_BG;
+		default:
+			return null;
+	}
+}
 
 function getSeverityStyle($severity, $type = true) {
 	if (!$type) {
@@ -126,8 +150,8 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 }
 
 /**
- * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
- * Settings and colors are kept in 'config' database table
+ * Add color style and blinking to an object like CSpan or CDiv depending on trigger status.
+ * Settings and colors are kept in 'config' database table.
  *
  * @param mixed $object             object like CSpan, CDiv, etc.
  * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
@@ -137,26 +161,29 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
 	$config = select_config();
 
-	// color of text and blinking depends on trigger value and whether event is acknowledged
+	$color_class = null;
+	$blinks = null;
+
+	// Color class for text and blinking depends on trigger value and whether event is acknowledged.
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
-		$color = $config['problem_unack_color'];
+		$color_class = ZBX_STYLE_PROBLEM_UNACK_FG;
 		$blinks = $config['problem_unack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_TRUE && $isAcknowledged) {
-		$color = $config['problem_ack_color'];
+		$color_class = ZBX_STYLE_PROBLEM_ACK_FG;
 		$blinks = $config['problem_ack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && !$isAcknowledged) {
-		$color = $config['ok_unack_color'];
+		$color_class = ZBX_STYLE_OK_UNACK_FG;
 		$blinks = $config['ok_unack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && $isAcknowledged) {
-		$color = $config['ok_ack_color'];
+		$color_class = ZBX_STYLE_OK_ACK_FG;
 		$blinks = $config['ok_ack_style'];
 	}
-	if (isset($color) && isset($blinks)) {
-		// color
-		$object->addStyle('color: #'.$color);
+
+	if ($color_class != null && $blinks != null) {
+		$object->addClass($color_class);
 
 		// blinking
 		$timeSinceLastChange = time() - $triggerLastChange;
@@ -467,8 +494,8 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 								 * Dependency is within same host according to $src_hostid parameter or dep trigger has
 								 * single host.
 								 */
-								if ($dst_trigger['srcTriggerContextHostId'] ==
-										$dst_dep_trigger['srcTriggerContextHostId']) {
+								if ($dst_trigger['srcTriggerContextHostId'] == $dst_dep_trigger['srcTriggerContextHostId']
+										&& $dst_dep_trigger['newTriggerHostId'] == $dst_trigger['newTriggerHostId']) {
 									$depTriggerId = $dst_dep_trigger['newTriggerId'];
 									break;
 								}
@@ -802,8 +829,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($host_names as $hostId => $host_name) {
-			$name = (new CSpan($host_name))->addClass(ZBX_STYLE_LINK_ACTION);
-			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
+			$name = (new CLinkAction($host_name))
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
@@ -1133,9 +1160,8 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	foreach ($hosts as $host) {
-		$hostNames[] = (new CSpan($host['name']))
-			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]))
-			->addClass(ZBX_STYLE_LINK_ACTION);
+		$hostNames[] = (new CLinkAction($host['name']))
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 		$hostNames[] = ', ';
 	}
 	array_pop($hostNames);
@@ -1291,8 +1317,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 						$expressionId = 'recovery_expr_'.$element['id'];
 					}
 
-					$url = (new CSpan($element['expression']))
-						->addClass(ZBX_STYLE_LINK_ACTION)
+					$url = (new CLinkAction($element['expression']))
 						->setId($expressionId)
 						->onClick('javascript: copy_expression("'.$expressionId.'", '.$type.');');
 				}
@@ -2250,8 +2275,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
 
-			$host_name = (new CSpan($host['name']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
+			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host));
 
 			// add maintenance icon with hint if host is in maintenance
@@ -2332,4 +2356,3 @@ function getTriggerLastProblems(array $triggerids, array $output) {
 
 	return $problems;
 }
-

@@ -69,7 +69,7 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 		if ($map_mapid) {
 			$maps = API::Map()->get([
 				'output' => [],
-				'sysmapids' => [$map_mapid]
+				'sysmapids' => $map_mapid
 			]);
 
 			if (!$maps) {
@@ -98,7 +98,8 @@ class CControllerWidgetNavigationtreeItemEdit extends CController {
 					foreach ($submap['selements'] as $selement) {
 						if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
 								&& $selement['permission'] >= PERM_READ) {
-							if (($element = reset($selement['elements'])) !== false) {
+							$element = reset($selement['elements']);
+							if ($element !== false) {
 								$maps_relations[$submap['sysmapid']][] = $element['sysmapid'];
 
 								$maps_depth = $this->getInput('depth', 0) + 1;

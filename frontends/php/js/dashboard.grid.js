@@ -448,7 +448,8 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data = {
-			'fullscreen': data['options']['fullscreen'],
+			'fullscreen': data['options']['fullscreen'] ? 1 : 0,
+			'kioskmode': data['options']['kioskmode'] ? 1 : 0,
 			'dashboardid': data['dashboard']['id'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
@@ -484,7 +485,13 @@
 				stopPreloader(widget);
 
 				$('h4', widget['content_header']).text(resp.header);
+				if ('period_string' in resp) {
+					$('h4', widget['content_header']).append(
+						$('<span class="dashbrd-grid-widget-head-period-string">').text(resp.period_string)
+					);
+				}
 
+				widget['content_body'].find('[data-hintbox=1]').trigger('remove');
 				widget['content_body'].empty();
 				if (typeof(resp.messages) !== 'undefined') {
 					widget['content_body'].append(resp.messages);
@@ -689,7 +696,7 @@
 		return free;
 	}
 
-	function openConfigDialogue($obj, data, widget) {
+	function openConfigDialogue($obj, data, widget, trigger_elmnt) {
 		var edit_mode = (widget !== null);
 
 		data.dialogue = {};
@@ -714,7 +721,7 @@
 				}
 			],
 			'dialogueid': 'widgetConfg'
-		});
+		}, trigger_elmnt);
 
 		var overlay_dialogue = $('#overlay_dialogue');
 		data.dialogue.div = overlay_dialogue;
@@ -737,7 +744,7 @@
 			.attr('title', t('Edit'))
 			.click(function() {
 				doAction('beforeConfigLoad', $obj, data, widget);
-				methods.editWidget.call($obj, widget);
+				methods.editWidget.call($obj, widget, this);
 			});
 
 		var	btn_delete = $('<button>')
@@ -764,6 +771,7 @@
 		var index = widget['div'].data('widget-index');
 
 		// remove div from the grid
+		widget['div'].find('[data-hintbox=1]').trigger('remove');
 		widget['div'].remove();
 		data['widgets'].splice(index, 1);
 
@@ -803,7 +811,7 @@
 		});
 
 		var ajax_data = {
-			fullscreen: data['options']['fullscreen'],
+			fullscreen: data['options']['fullscreen'] ? 1 : 0,
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
@@ -896,20 +904,25 @@
 			$text = $('<h1>');
 
 		if (options['editable']) {
-			$text.append(
-				$('<a>', {'href':'#'})
-				.text(t('Add a new widget'))
-				.click(function(e){
-					// To prevent going by href link.
-					e.preventDefault();
+			if (options['kioskmode']) {
+				$text.text(t('Cannot add widgets in kiosk mode'));
+			}
+			else {
+				$text.append(
+					$('<a>', {'href':'#'})
+						.text(t('Add a new widget'))
+						.click(function(e){
+							// To prevent going by href link.
+							e.preventDefault();
 
-					if (!methods.isEditMode.call($obj)) {
-						showEditMode();
-					}
+							if (!methods.isEditMode.call($obj)) {
+								showEditMode();
+							}
 
-					methods.addNewWidget.call($obj);
-				})
-			);
+							methods.addNewWidget.call($obj, this);
+						})
+				);
+			}
 		}
 		else {
 			$text.addClass('disabled').text(t('Add a new widget'));
@@ -1003,7 +1016,8 @@
 	var	methods = {
 		init: function(options) {
 			var default_options = {
-				'fullscreen': 0,
+				'fullscreen': false,
+				'kioskmode': false,
 				'widget-height': 70,
 				'widget-min-rows': 2,
 				'max-rows': 64,
@@ -1218,7 +1232,7 @@
 
 				url.unsetArgument('sid');
 				url.setArgument('action', 'dashboard.view');
-				if (data['options']['fullscreen'] == 1) {
+				if (data['options']['fullscreen']) {
 					url.setArgument('fullscreen', '1');
 				}
 				if (current_url.getArgument('dashboardid')) {
@@ -1234,12 +1248,12 @@
 		},
 
 		// After pressing "Edit" button on widget
-		editWidget: function(widget) {
+		editWidget: function(widget, trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, widget);
+				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},
 
@@ -1278,9 +1292,16 @@
 					// Take values from form.
 					fields = form.serializeJSON();
 					ajax_data['type'] = fields['type'];
-					ajax_data['name'] = fields['name'];
 					delete fields['type'];
-					delete fields['name'];
+
+					if (data.dialogue['widget_type'] === ajax_data['type']) {
+						ajax_data['name'] = fields['name'];
+						delete fields['name'];
+					}
+					else {
+						// Get default config if widget type changed.
+						fields = {};
+					}
 				}
 				else if (widget !== null) {
 					// Open form with current config.
@@ -1292,6 +1313,9 @@
 					// Get default config for new widget.
 					fields = {};
 				}
+
+				data.dialogue['widget_type'] = ajax_data['type'];
+
 				if (Object.keys(fields).length != 0) {
 					ajax_data['fields'] = JSON.stringify(fields);
 				}
@@ -1335,7 +1359,7 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
-						overlayDialogueOnLoad(true);
+						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});
 			});
@@ -1549,12 +1573,12 @@
 			return ref;
 		},
 
-		addNewWidget: function() {
+		addNewWidget: function(trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, null);
+				openConfigDialogue($this, data, null, trigger_elmnt);
 			});
 		},
 
