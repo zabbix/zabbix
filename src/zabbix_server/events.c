@@ -1611,7 +1611,7 @@ void	zbx_export_events(void)
 
 	for (i = 0; i < events_num; i++)
 	{
-		if (EVENT_SOURCE_TRIGGERS != events[i].source)
+		if (EVENT_SOURCE_TRIGGERS != events[i].source || 0 == (events[i].flags & ZBX_FLAGS_DB_EVENT_CREATE))
 			continue;
 
 		zbx_json_clean(&json);
