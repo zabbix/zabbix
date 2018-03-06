@@ -33,6 +33,35 @@ class CTask extends CApiService {
 	public function create(array $task) {
 		$this->validateCreate($task);
 
+		// Check if tasks for items and LLD rules already exist.
+		$item_tasks = DBfetchArray(DBselect(
+			'SELECT t.taskid,tcn.itemid'.
+			' FROM task t'.
+			' LEFT JOIN task_check_now tcn ON t.taskid = tcn.taskid'.
+			' WHERE t.type = '.ZBX_TM_TASK_CHECK_NOW.
+				' AND '.dbConditionId('tcn.itemid', $task['itemids']).
+				' AND (t.status = '.ZBX_TM_STATUS_NEW.' OR t.status = '.ZBX_TM_STATUS_INPROGRESS.')'
+		));
+
+		$itemids_cnt = count($task['itemids']);
+		$item_task_cnt = count($item_tasks);
+
+		// All given items and LLD rules have tasks, so there is nothing more to do.
+		if ($item_task_cnt == $itemids_cnt) {
+			return ['taskids' => zbx_objectValues($item_tasks, 'taskid')];
+		}
+
+		$taskids = [];
+
+		foreach ($task['itemids'] as $idx => $itemid) {
+			foreach ($item_tasks as $item_task) {
+				if ($item_task['itemid'] == $itemid) {
+					$taskids[] = $item_task['taskid'];
+					unset($task['itemids'][$idx]);
+				}
+			}
+		}
+
 		$tasks_to_create = [];
 		$time = time();
 
@@ -45,20 +74,20 @@ class CTask extends CApiService {
 			];
 		}
 
-		$taskids = DB::insert('task', $tasks_to_create);
+		$new_taskids = DB::insert('task', $tasks_to_create);
 
 		$check_now_to_create = [];
 
-		foreach ($task['itemids'] as $idx => $itemid) {
+		foreach (array_values($task['itemids']) as $idx => $itemid) {
 			$check_now_to_create[] = [
-				'taskid' => $taskids[$idx],
+				'taskid' => $new_taskids[$idx],
 				'itemid' => $itemid
 			];
 		}
 
 		DB::insert('task_check_now', $check_now_to_create);
 
-		return ['taskids' => $taskids];
+		return ['taskids' => array_merge($taskids, $new_taskids)];
 	}
 
 	/**
@@ -153,38 +182,6 @@ class CTask extends CApiService {
 		foreach ($hosts as $host) {
 			if ($host['status'] != HOST_STATUS_MONITORED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', _('host is not monitored')));
-			}
-		}
-
-		// Check if task already exists.
-		$itemids = zbx_objectValues($items, 'itemid');
-		$discovery_ruleids = zbx_objectValues($discovery_rules, 'itemid');
-
-		foreach ($items as $item) {
-			if (DBfetch(DBselect(
-					'SELECT t.taskid'.
-					' FROM task t'.
-					' LEFT JOIN task_check_now tcn ON t.taskid = tcn.taskid'.
-					' WHERE t.type = '.ZBX_TM_TASK_CHECK_NOW.
-						' AND '.dbConditionId('tcn.itemid', $itemids).
-						' AND (t.status = '.ZBX_TM_STATUS_NEW.' OR t.status = '.ZBX_TM_STATUS_INPROGRESS.')'))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot send request: %1$s.', _('item is already being checked'))
-				);
-			}
-		}
-
-		foreach ($discovery_rules as $discovery_rule) {
-			if (DBfetch(DBselect(
-					'SELECT t.taskid'.
-					' FROM task t'.
-					' LEFT JOIN task_check_now tcn ON t.taskid = tcn.taskid'.
-					' WHERE t.type = '.ZBX_TM_TASK_CHECK_NOW.
-						' AND '.dbConditionId('tcn.itemid', $discovery_ruleids).
-						' AND (t.status = '.ZBX_TM_STATUS_NEW.' OR t.status = '.ZBX_TM_STATUS_INPROGRESS.')'))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot send request: %1$s.', _('discovery rule is already being checked'))
-				);
 			}
 		}
 	}
