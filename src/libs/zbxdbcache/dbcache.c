@@ -78,6 +78,7 @@ extern unsigned char	program_type;
 #define ZBX_DC_FLAGS_NOT_FOR_HISTORY	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOHISTORY)
 #define ZBX_DC_FLAGS_NOT_FOR_TRENDS	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOTRENDS)
 #define ZBX_DC_FLAGS_NOT_FOR_MODULES	(ZBX_DC_FLAGS_NOT_FOR_HISTORY | ZBX_DC_FLAG_LLD)
+#define ZBX_DC_FLAGS_NOT_FOR_EXPORT	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF)
 
 typedef struct
 {
@@ -907,7 +908,7 @@ static void	clean_hosts(zbx_hashset_t *hosts_info)
 	}
 }
 
-static void	get_hosts_by_hostid(zbx_hashset_t *hosts_info, const zbx_vector_uint64_t *hostids)
+static void	db_get_hosts_by_hostid(zbx_hashset_t *hosts_info, const zbx_vector_uint64_t *hostids)
 {
 	int		i;
 	size_t		sql_offset;
@@ -955,11 +956,12 @@ typedef struct
 {
 	zbx_uint64_t		itemid;
 	char			*name;
+	const DC_ITEM		*item;
 	zbx_vector_ptr_t	applications;
 }
 zbx_item_info_t;
 
-static void	get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
+static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
 {
 	size_t		sql_offset = 0;
 	DB_RESULT	result;
@@ -972,16 +974,20 @@ static void	get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_item_info_t	item_info;
+		zbx_uint64_t	itemid;
+		zbx_item_info_t	*item_info;
 
-		ZBX_DBROW2UINT64(item_info.itemid, row[0]);
+		ZBX_DBROW2UINT64(itemid, row[0]);
 
-		item_info.name = zbx_strdup(NULL, row[1]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &item_info.name,
-				MACRO_TYPE_COMMON, NULL, 0);
+		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &itemid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
 
-		zbx_vector_ptr_create(&item_info.applications);
-		zbx_hashset_insert(items_info, &item_info, sizeof(item_info));
+		item_info->name = zbx_strdup(item_info->name, row[1]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &item_info->item->host.hostid, NULL, NULL, NULL, NULL,
+				&item_info->name, MACRO_TYPE_COMMON, NULL, 0);
 	}
 	DBfree_result(result);
 
@@ -1028,14 +1034,14 @@ static void	clean_items_info(zbx_hashset_t *items_info)
 	}
 }
 
-static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, const DC_ITEM *items, const int *errcodes,
-		const zbx_vector_uint64_t *itemids, zbx_hashset_t *hosts, zbx_hashset_t *items_info)
+static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hashset_t *hosts,
+		zbx_hashset_t *items_info)
 {
 	struct zbx_json		json;
 	const ZBX_DC_TREND	*trend = NULL;
-	int			i, j, index;
+	int			i, j;
 	const DC_ITEM		*item;
-	zbx_host_info_t		*host;
+	zbx_host_info_t		*host_info;
 	zbx_item_info_t		*item_info;
 	zbx_uint128_t		avg;	/* calculate the trend average value */
 
@@ -1045,41 +1051,40 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, const DC
 	{
 		trend = &trends[i];
 
-		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, trend->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &trend->itemid)))
+			continue;
+
+		item = item_info->item;
+
+		if (NULL == item_info->name)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "item was deleted during export");
+			continue;
+		}
+
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		if (SUCCEED != errcodes[index])
+		if (0 == host_info->groups.values_num)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "host group was deleted during export '%s'", item->host.name);
 			continue;
-
-		item = &items[index];
+		}
 
 		zbx_json_clean(&json);
 		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json, "groups");
 
-		if (NULL == (host = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)) ||
-				0 == host->groups.values_num)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
-			continue;
-		}
-
-		for (j = 0; j < host->groups.values_num; j++)
-			zbx_json_addstring(&json, NULL, host->groups.values[j], ZBX_JSON_TYPE_STRING);
+		for (j = 0; j < host_info->groups.values_num; j++)
+			zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 
 		if (NULL != trend)
 			zbx_json_addarray(&json, "applications");
-
-		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &item->itemid)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item");
-			continue;
-		}
 
 		for (j = 0; j < item_info->applications.values_num; j++)
 			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
@@ -1114,8 +1119,8 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, const DC
 	zbx_json_free(&json);
 }
 
-static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items, const int *errcodes,
-		int history_num, const zbx_vector_uint64_t *itemids, zbx_hashset_t *hosts, zbx_hashset_t *items_info)
+static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx_hashset_t *hosts,
+		zbx_hashset_t *items_info)
 {
 	const ZBX_DC_HISTORY	*h;
 	const DC_ITEM		*item;
@@ -1133,27 +1138,32 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
 
-		if (FAIL == (j = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &h->itemid)))
+			continue;
+
+		item = item_info->item;
+
+		if (NULL == item_info->name)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "item was deleted during export");
+			continue;
+		}
+
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		if (SUCCEED != errcodes[j])
+		if (0 == host_info->groups.values_num)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "host group was deleted during export '%s'", item->host.name);
 			continue;
-
-		item = &items[j];
+		}
 
 		zbx_json_clean(&json);
 		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json, "groups");
-
-		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)) ||
-				0 == host_info->groups.values_num)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find groups for a host '%s'", item->host.name);
-			continue;
-		}
 
 		for (j = 0; j < host_info->groups.values_num; j++)
 			zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
@@ -1162,18 +1172,11 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, const DC_ITEM *items
 
 		zbx_json_addarray(&json, "applications");
 
-		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &item->itemid)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find item");
-			continue;
-		}
-
 		for (j = 0; j < item_info->applications.values_num; j++)
 			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, "itemid", item->itemid);
-
 		zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addint64(&json, "clock", h->ts.sec);
@@ -1221,17 +1224,20 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	zbx_vector_uint64_t	hostids, item_info_ids;
 	zbx_hashset_t		hosts_info, items_info;
 	const DC_ITEM		*item;
+	zbx_item_info_t		item_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __function_name, history_num, trends_num);
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&item_info_ids);
+	zbx_hashset_create(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < history_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_EXPORT & h->flags))
 			continue;
 
 		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -1247,6 +1253,12 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 
 		zbx_vector_uint64_append(&hostids, item->host.hostid);
 		zbx_vector_uint64_append(&item_info_ids, item->itemid);
+
+		item_info.itemid = item->itemid;
+		item_info.name = NULL;
+		item_info.item = item;
+		zbx_vector_ptr_create(&item_info.applications);
+		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 	}
 
 	if (0 == history_num)
@@ -1269,6 +1281,12 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 
 			zbx_vector_uint64_append(&hostids, item->host.hostid);
 			zbx_vector_uint64_append(&item_info_ids, item->itemid);
+
+			item_info.itemid = item->itemid;
+			item_info.name = NULL;
+			item_info.item = item;
+			zbx_vector_ptr_create(&item_info.applications);
+			zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 		}
 	}
 
@@ -1280,24 +1298,22 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_hashset_create(&items_info, item_info_ids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	get_hosts_by_hostid(&hosts_info, &hostids);
+	db_get_hosts_by_hostid(&hosts_info, &hostids);
 
-	get_items_info_by_itemid(&items_info, &item_info_ids);
+	db_get_items_info_by_itemid(&items_info, &item_info_ids);
 
 	if (0 != history_num)
-		DCexport_history(history, items, errcodes, history_num, itemids, &hosts_info, &items_info);
+		DCexport_history(history, history_num, &hosts_info, &items_info);
 
 	if (0 != trends_num)
-		DCexport_trends(trends, trends_num, items, errcodes, itemids, &hosts_info, &items_info);
+		DCexport_trends(trends, trends_num, &hosts_info, &items_info);
 
 	clean_hosts(&hosts_info);
-	clean_items_info(&items_info);
 	zbx_hashset_destroy(&hosts_info);
-	zbx_hashset_destroy(&items_info);
 clean:
+	clean_items_info(&items_info);
+	zbx_hashset_destroy(&items_info);
 	zbx_vector_uint64_destroy(&item_info_ids);
 	zbx_vector_uint64_destroy(&hostids);
 
