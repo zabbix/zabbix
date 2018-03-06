@@ -1622,6 +1622,8 @@ void	zbx_export_events(void)
 
 		zbx_json_addint64(&json, "clock", events[i].clock);
 		zbx_json_addint64(&json, "ns", events[i].ns);
+		zbx_json_addint64(&json, "value", events[i].value);
+		zbx_json_adduint64(&json, "eventid", events[i].eventid);
 
 		if (TRIGGER_VALUE_PROBLEM == events[i].value)
 		{
@@ -1629,7 +1631,6 @@ void	zbx_export_events(void)
 			zbx_hashset_iter_t	iter;
 			int			j;
 
-			zbx_json_adduint64(&json, "eventid", events[i].eventid);
 			zbx_json_addstring(&json, "name", events[i].name, ZBX_JSON_TYPE_STRING);
 
 			get_hosts_by_expression(&hosts, events[i].trigger.expression,
@@ -1690,7 +1691,7 @@ void	zbx_export_events(void)
 			{
 				if (events[i].eventid == events[recovery_local->r_event_index].eventid)
 				{
-					zbx_json_adduint64(&json, "eventid", recovery_local->eventid);
+					zbx_json_adduint64(&json, "p_eventid", recovery_local->eventid);
 					break;
 				}
 			}
