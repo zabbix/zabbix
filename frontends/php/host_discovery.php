@@ -429,7 +429,6 @@ if (isset($_REQUEST['form'])) {
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
-	$data['item'] = $formItem;
 	$data['host'] = $host;
 
 	// update form
