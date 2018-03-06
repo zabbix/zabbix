@@ -7,6 +7,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+....I..... [ZBX-11994] changed "awk" to "sed" for getting info about "Last Changed Revision" (MVekslers)
 ..F....... [ZBX-13360] fixed HTML5 placeholder color that previously appeared like actual input data (nikita)
 ...G...PS. [ZBX-13351] improved OpenSSL error messages (viktors)
 ..F....... [ZBX-13147] fixed inconsistent number on map navigation tree (nikita)
