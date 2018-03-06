@@ -31,7 +31,7 @@ class CTask extends CApiService {
 	 * @return array
 	 */
 	public function create(array $tasks) {
-		$tasks = $this->validateCreate($tasks);
+		$this->validateCreate($tasks);
 
 		$tasks_to_create = [];
 		$time = time();
@@ -73,10 +73,8 @@ class CTask extends CApiService {
 	 * @param array $tasks  Array of tasks to validate.
 	 *
 	 * @throws APIException if the input is invalid.
-	 *
-	 * @return array  Returns an array of valid tasks.
 	 */
-	protected function validateCreate(array $tasks) {
+	protected function validateCreate(array &$tasks) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -199,7 +197,5 @@ class CTask extends CApiService {
 				);
 			}
 		}
-
-		return $tasks;
 	}
 }
