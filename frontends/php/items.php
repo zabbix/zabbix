@@ -1166,7 +1166,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
 	$items = API::Item()->get([
-		'output' => ['itemid'],
+		'output' => [],
 		'itemids' => getRequest('group_itemid'),
 		'editable' => true,
 		'monitored' => true,

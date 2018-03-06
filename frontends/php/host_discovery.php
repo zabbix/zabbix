@@ -388,7 +388,7 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
 	$discovery_rules = API::DiscoveryRule()->get([
-		'output' => ['itemid'],
+		'output' => [],
 		'itemids' => getRequest('g_hostdruleid'),
 		'editable' => true,
 		'monitored' => true,
