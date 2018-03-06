@@ -949,7 +949,7 @@ typedef struct
 {
 	zbx_uint64_t		itemid;
 	char			*name;
-	const DC_ITEM		*item;
+	DC_ITEM			*item;
 	zbx_vector_ptr_t	applications;
 }
 zbx_item_info_t;
@@ -978,9 +978,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 			continue;
 		}
 
-		item_info->name = zbx_strdup(item_info->name, row[1]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &item_info->item->host.hostid, NULL, NULL, NULL, NULL,
-				&item_info->name, MACRO_TYPE_COMMON, NULL, 0);
+		zbx_substitute_item_name_macros(item_info->item, row[1], &item_info->name);
 	}
 	DBfree_result(result);
 
@@ -1202,14 +1200,14 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 }
 
 static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int history_num,
-		const zbx_vector_uint64_t *itemids, const DC_ITEM *items, const int *errcodes,
+		const zbx_vector_uint64_t *itemids, DC_ITEM *items, const int *errcodes,
 		const ZBX_DC_TREND *trends, int trends_num)
 {
 	const char		*__function_name = "DCexport_history_and_trends";
 	int			i, index;
 	zbx_vector_uint64_t	hostids, item_info_ids;
 	zbx_hashset_t		hosts_info, items_info;
-	const DC_ITEM		*item;
+	DC_ITEM		*item;
 	zbx_item_info_t		item_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __function_name, history_num, trends_num);
