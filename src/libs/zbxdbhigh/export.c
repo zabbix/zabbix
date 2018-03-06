@@ -32,6 +32,8 @@ static char	*problems_file_name;
 static FILE	*problems_file;
 static char	*export_dir;
 
+#define ZBX_EXPORT_WAIT_FAIL 10
+
 int	zbx_is_export_enabled(void)
 {
 	if (NULL == CONFIG_EXPORT_DIR)
@@ -104,7 +106,7 @@ void	zbx_problems_export_init(const char *process_name, int process_num)
 	}
 }
 
-static	int	file_write(const char *buf, size_t count, FILE **file, char *name)
+static	int	file_write(const char *buf, size_t count, FILE **file, const char *name)
 {
 	if ((int)count > ZBX_GIBIBYTE)
 	{
@@ -119,15 +121,16 @@ static	int	file_write(const char *buf, size_t count, FILE **file, char *name)
 		strscpy(filename_old, name);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
 		remove(filename_old);
-		fclose(*file);
+		zbx_fclose(*file);
 
 		if (0 != rename(name, filename_old))
-			zabbix_log(LOG_LEVEL_WARNING, "cannot rename file: %s", zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "cannot rename export file '%s': %s", name, zbx_strerror(errno));
 
-		if (NULL == (*file = fopen(name, "a")))
+		while (NULL == (*file = fopen(name, "a")))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s", history_file_name,
-					zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_CRIT, "failed to open export file '%s': %s: retrying in %d seconds",
+					name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
+			sleep(ZBX_EXPORT_WAIT_FAIL);
 		}
 	}
 
