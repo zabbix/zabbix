@@ -1217,10 +1217,13 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 		const zbx_vector_uint64_t *itemids, const DC_ITEM *items, const int *errcodes,
 		const ZBX_DC_TREND *trends, int trends_num)
 {
+	const char		*__function_name = "DCexport_history_and_trends";
 	int			i, index;
 	zbx_vector_uint64_t	hostids, item_info_ids;
 	zbx_hashset_t		hosts, items_info;
 	const DC_ITEM		*item;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __function_name, history_num, trends_num);
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&item_info_ids);
@@ -1298,6 +1301,8 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 clean:
 	zbx_vector_uint64_destroy(&item_info_ids);
 	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1332,7 +1337,7 @@ static void	DCsync_trends(void)
 
 	UNLOCK_TRENDS;
 
-	if (SUCCEED == zbx_is_export_enabled())
+	if (SUCCEED == zbx_is_export_enabled() && 0 != trends_num)
 	{
 		DC_ITEM			*items;
 		zbx_vector_uint64_t	itemids;
