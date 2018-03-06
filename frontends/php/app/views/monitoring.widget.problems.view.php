@@ -25,7 +25,8 @@ $sort_div = (new CSpan())
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')

@@ -52,7 +52,8 @@ $fields = [
 	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'outer' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
 	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
-	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null]
+	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'widget_view' =>	[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -167,13 +168,23 @@ $graph->setLeftPercentage(getRequest('percent_left', 0));
 $graph->setRightPercentage(getRequest('percent_right', 0));
 $graph->setOuter(getRequest('outer', 0));
 
+if (getRequest('widget_view') === '1') {
+	$graph->draw_header = false;
+	$graph->with_vertical_padding = false;
+}
+
 foreach ($graph_items as $graph_item) {
 	$graph->addItem($graph_item);
 }
 
 if (getRequest('onlyHeight', '0') === '1') {
 	$graph->drawDimensions();
-	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+	$height = $graph->getHeight();
+
+	if (getRequest('widget_view') === '1') {
+		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
+	}
+	header('X-ZBX-SBOX-HEIGHT: '.$height);
 }
 else {
 	$graph->draw();
