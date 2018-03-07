@@ -83,8 +83,8 @@ class CTask extends CApiService {
 				$item_tasks[$itemid] = $taskid++;
 			}
 
-			DB::insert('task', $ins_tasks, false);
-			DB::insert('task_check_now', $ins_check_now_tasks);
+			DB::insertBatch('task', $ins_tasks, false);
+			DB::insertBatch('task_check_now', $ins_check_now_tasks);
 		}
 
 		return ['taskids' => array_values($item_tasks)];
