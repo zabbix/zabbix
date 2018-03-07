@@ -1046,8 +1046,8 @@ jQuery(function($) {
 
 						clearTimeout(window.menuPopupTimeoutHandler);
 					})
-					.on('click', function() {
-						return false;
+					.on('click', function(e) {
+						e.stopPropagation();
 					})
 					.position({
 						of: (opener.prop('tagName') === 'AREA') ? mapContainer : target,
