@@ -706,6 +706,7 @@ void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids
 {
 	const char	*__function_name = "op_template_add";
 	zbx_uint64_t	hostid;
+	char		*error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -718,7 +719,11 @@ void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	DBcopy_template_elements(hostid, lnk_templateids);
+	if (SUCCEED != DBcopy_template_elements(hostid, lnk_templateids, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s", error);
+		zbx_free(error);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -739,6 +744,7 @@ void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids
 {
 	const char	*__function_name = "op_template_del";
 	zbx_uint64_t	hostid;
+	char		*error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -751,7 +757,11 @@ void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	DBdelete_template_elements(hostid, del_templateids);
+	if (SUCCEED != DBdelete_template_elements(hostid, del_templateids, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
+		zbx_free(error);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

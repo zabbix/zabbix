@@ -61,6 +61,8 @@ $scrollbar-track-color: #999;
 $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
 
+$input-placeholder-color: #777;
+
 // BUTTONS
 $btn-font-color: #fff;
 $btn-bg-color: #555;
@@ -114,7 +116,7 @@ $ok-unack-fg-color: #009900;
 $ok-ack-fg-color: #009900;
 
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
-	border: 1px solid rgba($ui-bg-color, .2) !important;
+	border-color: rgba($ui-bg-color, .2) !important;
 	background-color: $ui-bg-selected-color !important;
 	color: $ui-bg-color !important;
 }
@@ -262,13 +264,41 @@ button {
 }
 
 .radio-segmented {
-	input[type="radio"] {
+
+	.average-bg,
+	.disaster-bg,
+	.high-bg,
+	.info-bg,
+	.na-bg,
+	.warning-bg {
+
+		&:before,
+		&:after {
+			display: none;
+		}
+	}
+
+	li {
+
+		input[type="radio"] {
+
+			&:checked:not([disabled]) + label,
 			&:focus + label {
-				border-color: $form-border-focus-color !important;
+				border-color: $form-border-focus-color;
+				color: $white;
+			}
+
+			&:checked + label {
+				background-color: $ui-bg-selected-color;
+			}
+
+			&:checked[disabled] + label {
+				background-color: #d3d3d3 !important;
+			}
+
+			&:focus + label {
 				background-color: #777 !important;
 			}
-		&:checked[disabled] + label {
-			background-color: #d3d3d3 !important;
 		}
 	}
 }
@@ -550,13 +580,6 @@ content: "";
 	content: none;
 }
 
-.radio-segmented .na-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.normal-bg {
 	@extend td.na-bg;
 }
@@ -639,13 +662,6 @@ td.info-bg {
 	content: none;
 }
 
-.radio-segmented .info-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -680,13 +696,6 @@ td.average-bg {
 
 .average-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .average-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 td.log-warning-bg {
@@ -734,13 +743,6 @@ td.warning-bg {
 	content: none;
 }
 
-.radio-segmented .warning-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.log-high-bg {
 	@extend td.log-na-bg;
 }
@@ -786,13 +788,6 @@ td.high-bg {
 	content: none;
 }
 
-.radio-segmented .high-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.log-disaster-bg {
 	@extend td.log-na-bg;
 }
@@ -836,13 +831,6 @@ td.disaster-bg {
 
 .disaster-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .disaster-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 .notif-body li {
