@@ -222,9 +222,9 @@ class CPieGraphDraw extends CGraphDraw {
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 
-			$item['source'] = ($item['trends'] == 0
-					|| ($item['history'] * SEC_PER_DAY > time() - ($from_time + $this->period / 2)))
-					? 'history' : 'trends';
+			$item['source'] = ($item['trends'] == 0 || ($item['history'] > time() - ($from_time + $this->period / 2)))
+				? 'history'
+				: 'trends';
 			$items[] = $item;
 		}
 
@@ -235,6 +235,7 @@ class CPieGraphDraw extends CGraphDraw {
 			if (array_key_exists($item['itemid'], $results)) {
 				$result = $results[$item['itemid']];
 				$this->dataFrom = $result['source'];
+				$type = $this->items[$i]['calc_type'];
 
 				foreach ($result['data'] as $row) {
 					$this->data[$item['itemid']][$type]['min'] = $row['min'];
