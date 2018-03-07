@@ -1207,7 +1207,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	int			i, index;
 	zbx_vector_uint64_t	hostids, item_info_ids;
 	zbx_hashset_t		hosts_info, items_info;
-	DC_ITEM		*item;
+	DC_ITEM			*item;
 	zbx_item_info_t		item_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __function_name, history_num, trends_num);
