@@ -1319,12 +1319,12 @@ jQuery(function($) {
 			});
 
 			item.append(menu);
-
-			item.on('mouseenter', function(e) {
-				e.stopPropagation();
-				$(this).actionMenuItemExpand();
-			});
 		}
+
+		item.on('mouseenter', function(e) {
+			e.stopPropagation();
+			$(this).actionMenuItemExpand();
+		});
 
 		return item;
 	}
