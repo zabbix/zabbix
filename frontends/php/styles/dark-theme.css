@@ -16,9 +16,6 @@
 .btn-search {
   background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important; }
 
-.list-table thead th {
-  border-color: #404040 !important; }
-
 .timeline-axis {
   border-right-color: #454f55 !important; }
   .timeline-axis::before {
@@ -807,10 +804,15 @@ footer, .footer {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
-  .subfilter-enabled a {
+  .subfilter-enabled .link-action {
     color: #f2f2f2;
-    text-decoration: none;
-    cursor: default; }
+    text-decoration: none; }
+    .subfilter-enabled .link-action:focus {
+      color: #f2f2f2;
+      border-bottom: 2px solid rgba(242, 242, 242, 0.7); }
+    .subfilter-enabled .link-action:hover {
+      color: #f2f2f2;
+      border-bottom: 1px solid rgba(242, 242, 242, 0.7); }
   .subfilter-enabled sup {
     color: #8f8f8f; }
 
@@ -4580,6 +4582,9 @@ Widgets are used as containers to group any related information. Widget consists
 </div>
 ```
 */
+.list-table thead th {
+  border-color: #404040; }
+
 .top-subnav a:focus {
   border-bottom: 4px solid #787878 !important;
   outline: none; }
