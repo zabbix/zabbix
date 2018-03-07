@@ -545,7 +545,7 @@ class CEvent extends CApiService {
 			];
 		}
 
-		$taskids = DB::insert('task', $tasks);
+		$taskids = DB::insertBatch('task', $tasks);
 
 		$tasks_ack = [];
 
@@ -556,7 +556,7 @@ class CEvent extends CApiService {
 			];
 		}
 
-		DB::insert('task_acknowledge', $tasks_ack, false);
+		DB::insertBatch('task_acknowledge', $tasks_ack, false);
 
 		return ['eventids' => array_values($eventids)];
 	}
