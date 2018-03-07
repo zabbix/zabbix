@@ -185,9 +185,6 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-:-ms-input-placeholder {
-  color: #6d6d6d !important; }
-
 nav, .nav {
   background-color: #454545; }
 
@@ -3681,6 +3678,25 @@ svg {
     -ms-animation: fadein .5s;
     -o-animation: fadein .5s;
     animation: fadein .5s; }
+
+::-webkit-input-placeholder {
+  color: #9d9d9d; }
+
+:-ms-input-placeholder {
+  color: #9d9d9d !important; }
+
+::-ms-input-placeholder {
+  color: #9d9d9d; }
+
+::-moz-placeholder {
+  color: #9d9d9d;
+  opacity: 1; }
+
+:-moz-placeholder {
+  color: #9d9d9d; }
+
+:placeholder-shown {
+  color: #9d9d9d; }
 
 /*doc
 ---

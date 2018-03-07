@@ -164,9 +164,6 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-:-ms-input-placeholder {
-  color: #6d6d6d !important; }
-
 nav, .nav {
   background-color: #000; }
 
@@ -3660,6 +3657,25 @@ svg {
     -ms-animation: fadein .5s;
     -o-animation: fadein .5s;
     animation: fadein .5s; }
+
+::-webkit-input-placeholder {
+  color: #777; }
+
+:-ms-input-placeholder {
+  color: #777 !important; }
+
+::-ms-input-placeholder {
+  color: #777; }
+
+::-moz-placeholder {
+  color: #777;
+  opacity: 1; }
+
+:-moz-placeholder {
+  color: #777; }
+
+:placeholder-shown {
+  color: #777; }
 
 /*doc
 ---
