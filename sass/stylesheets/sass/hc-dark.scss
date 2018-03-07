@@ -219,8 +219,31 @@ $icon-widget-btn: (
 }
 
 .list-table {
+
+	.subfilter-enabled {
+		background-color: $ui-bg-color;
+		box-shadow: 0 0 0 1px $link-hover-color;
+	}
+
 	thead th {
-		border-color: lighten($table-border-color, 3%) !important;
+		border-color: lighten($table-border-color, 3%);
+	}
+}
+
+.subfilter-enabled {
+
+	.link-action {
+		color: $link-hover-color;
+
+		&:focus {
+			color: $link-hover-color;
+			border-bottom: 3px solid $link-hover-color;
+		}
+
+		&:hover {
+			color: $link-hover-color;
+			border-bottom: 1px solid $link-hover-color;
+		}
 	}
 }
 
@@ -466,7 +489,7 @@ ul.top-nav-icons {
 }
 
 .subfilter-enabled {
-	background-color: #000 !important;
+	background-color: #000;
 }
 
 
