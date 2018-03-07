@@ -791,7 +791,7 @@ class testFormWebStep extends CWebTest {
 		$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 
 		if (array_key_exists('step_name', $data)) {
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $data['step_name']);
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $data['step_name']);
 		}
 
 		if (array_key_exists('url', $data)) {

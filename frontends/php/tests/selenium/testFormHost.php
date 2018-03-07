@@ -305,7 +305,7 @@ class testFormHost extends CWebTest {
 
 		// this should be a separate test
 		// should check that items, triggers, graphs and applications are not linked to the template anymore
-		$this->zbxTestHrefClickWait('items.php?filter_set=1&hostid='.$hostid);
+		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&hostid=".$hostid."')]", 'filter_application');
 		$this->zbxTestTextNotPresent($template.':');
 		// using "host navigation bar" at the top of entity list
 		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
@@ -364,7 +364,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
-		$this->zbxTestHrefClickWait('items.php?filter_set=1&hostid='.$hostid);
+		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&hostid=".$hostid."')]", 'filter_application');
 		$this->zbxTestTextNotPresent($template.':');
 
 		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
