@@ -179,7 +179,6 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-..F....... [ZBX-13412] fixed JS error and wrong form behaviour when changing item type, type of information, data type (agriscenko)
 ..F....... [ZBX-13340] fixed pie graphs displaying incorrect data (Ivo)
 ..F....... [ZBX-13412] fixed JS error and wrong form behaviour when changing item type, type of information, data type (agriscenko)
 ..F....... [ZBX-13257] fixed display of the latest item in Audit log (agriscenko)
