@@ -1305,6 +1305,45 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
+{
+	DC_ITEM			*items;
+	zbx_vector_uint64_t	itemids;
+	int			*errcodes, i, num;
+
+	zabbix_log(LOG_LEVEL_WARNING, "exporting trend data...");
+
+	while (0 < trends_num)
+	{
+		num = MIN(ZBX_HC_SYNC_MAX, trends_num);
+
+		items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)num);
+		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)num);
+
+		zbx_vector_uint64_create(&itemids);
+		zbx_vector_uint64_reserve(&itemids, num);
+
+		for (i = 0; i < num; i++)
+			zbx_vector_uint64_append(&itemids, trends[i].itemid);
+
+		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		DCconfig_get_items_by_itemids(items, itemids.values, errcodes, num);
+
+		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, num);
+
+		DCconfig_clean_items(items, errcodes, num);
+		zbx_vector_uint64_destroy(&itemids);
+		zbx_free(items);
+		zbx_free(errcodes);
+
+		trends += num;
+		trends_num -= num;
+	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "exporting trend data done");
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCsync_trends                                                    *
@@ -1338,31 +1377,8 @@ static void	DCsync_trends(void)
 	UNLOCK_TRENDS;
 
 	if (SUCCEED == zbx_is_export_enabled() && 0 != trends_num)
-	{
-		DC_ITEM			*items;
-		zbx_vector_uint64_t	itemids;
-		int			*errcodes, i;
+		DCexport_all_trends(trends, trends_num);
 
-		items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)trends_num);
-		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)trends_num);
-
-		zbx_vector_uint64_create(&itemids);
-		zbx_vector_uint64_reserve(&itemids, trends_num);
-
-		for (i = 0; i < trends_num; i++)
-			zbx_vector_uint64_append(&itemids, trends[i].itemid);
-
-		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		DCconfig_get_items_by_itemids(items, itemids.values, errcodes, trends_num);
-
-		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, trends_num);
-
-		DCconfig_clean_items(items, errcodes, trends_num);
-		zbx_vector_uint64_destroy(&itemids);
-		zbx_free(items);
-		zbx_free(errcodes);
-	}
 	DBbegin();
 
 	while (trends_num > 0)
