@@ -84,7 +84,7 @@ class CTask extends CApiService {
 			}
 
 			DB::insertBatch('task', $ins_tasks, false);
-			DB::insertBatch('task_check_now', $ins_check_now_tasks);
+			DB::insertBatch('task_check_now', $ins_check_now_tasks, false);
 		}
 
 		return ['taskids' => array_values($item_tasks)];
