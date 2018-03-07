@@ -34,20 +34,23 @@ class CTask extends CApiService {
 		$this->validateCreate($task);
 
 		// Check if tasks for items and LLD rules already exist.
-		$item_tasks = DBfetchArray(DBselect(
+		$item_tasks = DBfetchArrayAssoc(DBselect(
 			'SELECT t.taskid,tcn.itemid'.
 			' FROM task t'.
-			' LEFT JOIN task_check_now tcn ON t.taskid = tcn.taskid'.
-			' WHERE t.type = '.ZBX_TM_TASK_CHECK_NOW.
+			' JOIN task_check_now tcn ON t.taskid=tcn.taskid'.
+			' WHERE t.type='.ZBX_TM_TASK_CHECK_NOW.
 				' AND '.dbConditionId('tcn.itemid', $task['itemids']).
-				' AND (t.status = '.ZBX_TM_STATUS_NEW.' OR t.status = '.ZBX_TM_STATUS_INPROGRESS.')'
-		));
+				' AND t.status='.ZBX_TM_STATUS_NEW
+		), 'itemid');
 
 		$itemids_cnt = count($task['itemids']);
 		$item_task_cnt = count($item_tasks);
 
 		// All given items and LLD rules have tasks, so there is nothing more to do.
 		if ($item_task_cnt == $itemids_cnt) {
+			// Sort ouptut $item_tasks array according to input array $task['itemids'].
+			$item_tasks = array_replace(array_combine($task['itemids'], $task['itemids']), $item_tasks);
+
 			return ['taskids' => zbx_objectValues($item_tasks, 'taskid')];
 		}
 
@@ -93,7 +96,7 @@ class CTask extends CApiService {
 	/**
 	 * Validates the input for create method. Checks if user is at least a regular admin, validates user input, checks
 	 * if user has permissions to given items and LLD rules, checks item and LLD rule types, checks if items and
-	 * LLD rules are enabled, checks if host is monitored and it's not a template. And checks if tasks don't exist.
+	 * LLD rules are enabled, checks if host is monitored and it's not a template.
 	 *
 	 * @param array $task  Task to validate.
 	 *
