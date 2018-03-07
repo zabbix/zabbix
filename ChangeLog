@@ -7,6 +7,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-13471] fixed contrast in selected item filters (Andzs)
 ..F....... [ZBX-13428] fixed long name of map outside go back button in map widget (agriscenko, Sasha)
 ..F....... [ZBX-13340] fixed pie graphs displaying incorrect data (Ivo)
 ..F....... [ZBX-13257] fixed display of the latest item in Audit log (agriscenko)

@@ -786,10 +786,15 @@ footer, .footer {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
-  .subfilter-enabled a {
+  .subfilter-enabled .link-action {
     color: #fff;
-    text-decoration: none;
-    cursor: default; }
+    text-decoration: none; }
+    .subfilter-enabled .link-action:focus {
+      color: #fff;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.7); }
+    .subfilter-enabled .link-action:hover {
+      color: #fff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7); }
   .subfilter-enabled sup {
     color: white; }
 
@@ -4661,8 +4666,20 @@ Widgets are used as containers to group any related information. Widget consists
 .btn-dashbrd-conf {
   background: url(../img/icon-sprite.svg) no-repeat -354px -619px !important; }
 
+.list-table .subfilter-enabled {
+  background-color: #000;
+  box-shadow: 0 0 0 1px #fff; }
 .list-table thead th {
-  border-color: #3b3b3b !important; }
+  border-color: #3b3b3b; }
+
+.subfilter-enabled .link-action {
+  color: #fff; }
+  .subfilter-enabled .link-action:focus {
+    color: #fff;
+    border-bottom: 3px solid #fff; }
+  .subfilter-enabled .link-action:hover {
+    color: #fff;
+    border-bottom: 1px solid #fff; }
 
 .timeline-axis {
   border-right-color: #b2b2b2 !important; }
@@ -4822,7 +4839,7 @@ ul.top-nav-icons a:focus {
   border-top-color: #000 !important; }
 
 .subfilter-enabled {
-  background-color: #000 !important; }
+  background-color: #000; }
 
 .subfilter-disable-btn {
   background-color: #000 !important; }

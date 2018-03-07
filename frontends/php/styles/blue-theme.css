@@ -781,10 +781,15 @@ footer, .footer {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
-  .subfilter-enabled a {
+  .subfilter-enabled .link-action {
     color: #fff;
-    text-decoration: none;
-    cursor: default; }
+    text-decoration: none; }
+    .subfilter-enabled .link-action:focus {
+      color: #fff;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.7); }
+    .subfilter-enabled .link-action:hover {
+      color: #fff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7); }
   .subfilter-enabled sup {
     color: #bfcacf; }
 
