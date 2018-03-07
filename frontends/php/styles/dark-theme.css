@@ -1,5 +1,5 @@
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
-  border: 1px solid rgba(43, 43, 43, 0.2) !important; }
+  border-color: rgba(43, 43, 43, 0.2) !important; }
 
 .top-nav-help {
   background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important; }
@@ -184,9 +184,6 @@ pre {
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
-
-:-ms-input-placeholder {
-  color: #6d6d6d !important; }
 
 nav, .nav {
   background-color: #454545; }
@@ -2397,7 +2394,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .btn-back-map-container {
   text-align: left;
   position: absolute;
-  left: -1px; }
+  left: -1px;
+  max-width: 100%; }
   .btn-back-map-container a:focus, .btn-back-map-container a:hover {
     outline: none; }
     .btn-back-map-container a:focus .btn-back-map, .btn-back-map-container a:hover .btn-back-map {
@@ -2406,7 +2404,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content {
         display: inline-block;
         line-height: 24px;
-        padding: 0 6px 0 0; }
+        padding: 0 6px 0 0;
+        flex: auto; }
   .btn-back-map-container .btn-back-map {
     border: #303030 solid 1px;
     border-radius: 0 2px 2px 0;
@@ -2414,7 +2413,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     color: white;
     margin-top: 10px;
     padding: 0;
-    display: inline-block;
+    display: flex;
     height: 24px;
     line-height: 24px;
     vertical-align: middle;
@@ -2424,6 +2423,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .btn-back-map-container .btn-back-map .btn-back-map-icon {
       margin-left: 5px;
       display: inline-block;
+      flex: 1 0 auto;
       width: 28px;
       height: 24px;
       vertical-align: middle;
@@ -2649,8 +2649,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 3px 0 7px; }
 
 .overlay-descr {
-  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
-  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
+  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
+  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), transparent), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), transparent) 0 100%;
   background-repeat: no-repeat;
   background-color: #2b2b2b;
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -2756,11 +2756,11 @@ a.link-action {
       -webkit-border-radius: 2px;
       -moz-border-radius: 2px;
       border-radius: 2px; }
-    .status-container span:first-child:not(:only-child) {
+    .status-container span:first-of-type:not(:only-child) {
       -webkit-border-radius: 2px 0 0 2px;
       -moz-border-radius: 2px 0 0 2px;
       border-radius: 2px 0 0 2px; }
-    .status-container span:last-child:not(:only-child) {
+    .status-container span:last-of-type:not(:only-child) {
       -webkit-border-radius: 0 2px 2px 0;
       -moz-border-radius: 0 2px 2px 0;
       border-radius: 0 2px 2px 0; }
@@ -2840,7 +2840,7 @@ a.link-action {
     color: #2a353a; }
 
 .na-bg.blink-hidden {
-  background-color: rgba(0, 0, 0, 0); }
+  background-color: transparent; }
 
 td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg {
   border-left: 1px dotted #383838; }
@@ -2855,7 +2855,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #0e4123; }
 
 .normal-bg.blink-hidden {
-  background-color: rgba(0, 0, 0, 0); }
+  background-color: transparent; }
 
 .info-bg {
   color: #00268e; }
@@ -2864,7 +2864,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #00268e; }
 
 .info-bg.blink-hidden {
-  background-color: rgba(0, 0, 0, 0); }
+  background-color: transparent; }
 
 .log-info-bg {
   color: #00268e;
@@ -2877,7 +2877,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #733100; }
 
 .average-bg.blink-hidden {
-  background-color: rgba(0, 0, 0, 0); }
+  background-color: transparent; }
 
 .warning-bg {
   color: #734d00; }
@@ -2886,7 +2886,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #734d00; }
 
 .warning-bg.blink-hidden {
-  background-color: rgba(0, 0, 0, 0); }
+  background-color: transparent; }
 
 .log-warning-bg {
   color: #734d00;
@@ -2899,7 +2899,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #52190b; }
 
 .high-bg.blink-hidden {
-  background-color: rgba(0, 0, 0, 0); }
+  background-color: transparent; }
 
 .log-high-bg {
   color: #52190b;
@@ -2912,7 +2912,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #4b0c0c; }
 
 .disaster-bg.blink-hidden {
-  background-color: rgba(0, 0, 0, 0); }
+  background-color: transparent; }
 
 .log-disaster-bg {
   color: #4b0c0c;
@@ -3347,7 +3347,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -3681,6 +3681,25 @@ svg {
     -ms-animation: fadein .5s;
     -o-animation: fadein .5s;
     animation: fadein .5s; }
+
+::-webkit-input-placeholder {
+  color: #9d9d9d; }
+
+:-ms-input-placeholder {
+  color: #9d9d9d !important; }
+
+::-ms-input-placeholder {
+  color: #9d9d9d; }
+
+::-moz-placeholder {
+  color: #9d9d9d;
+  opacity: 1; }
+
+:-moz-placeholder {
+  color: #9d9d9d; }
+
+:placeholder-shown {
+  color: #9d9d9d; }
 
 /*doc
 ---
