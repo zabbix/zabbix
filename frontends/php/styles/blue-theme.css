@@ -2368,7 +2368,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .btn-back-map-container {
   text-align: left;
   position: absolute;
-  left: -1px; }
+  left: -1px;
+  max-width: 100%; }
   .btn-back-map-container a:focus, .btn-back-map-container a:hover {
     outline: none; }
     .btn-back-map-container a:focus .btn-back-map, .btn-back-map-container a:hover .btn-back-map {
@@ -2377,7 +2378,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content {
         display: inline-block;
         line-height: 24px;
-        padding: 0 6px 0 0; }
+        padding: 0 6px 0 0;
+        flex: auto; }
   .btn-back-map-container .btn-back-map {
     border: #dfe4e7 solid 1px;
     border-radius: 0 2px 2px 0;
@@ -2385,7 +2387,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     color: #0275b8;
     margin-top: 10px;
     padding: 0;
-    display: inline-block;
+    display: flex;
     height: 24px;
     line-height: 24px;
     vertical-align: middle;
@@ -2395,6 +2397,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .btn-back-map-container .btn-back-map .btn-back-map-icon {
       margin-left: 5px;
       display: inline-block;
+      flex: 1 0 auto;
       width: 28px;
       height: 24px;
       vertical-align: middle;
@@ -3318,7 +3321,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
