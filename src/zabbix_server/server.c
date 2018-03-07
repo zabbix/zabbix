@@ -1157,6 +1157,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
+	if (SUCCEED == zbx_is_export_enabled())
+	{
+		zbx_history_export_init("main-process", 0);
+		zbx_problems_export_init("main-process", 0);
+	}
+
 	while (-1 == wait(&i))	/* wait for any child to exit */
 	{
 		if (EINTR != errno)
@@ -1210,12 +1216,6 @@ void	zbx_on_exit(void)
 	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
-
-	if (SUCCEED == zbx_is_export_enabled())
-	{
-		zbx_history_export_init("main-process", 0);
-		zbx_problems_export_init("main-process", 0);
-	}
 
 	free_database_cache();
 
