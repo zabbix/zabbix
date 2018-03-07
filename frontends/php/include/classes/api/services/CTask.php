@@ -34,63 +34,60 @@ class CTask extends CApiService {
 		$this->validateCreate($task);
 
 		// Check if tasks for items and LLD rules already exist.
-		$item_tasks = DBfetchArrayAssoc(DBselect(
+		$db_tasks = DBselect(
 			'SELECT t.taskid,tcn.itemid'.
-			' FROM task t'.
-			' JOIN task_check_now tcn ON t.taskid=tcn.taskid'.
-			' WHERE t.type='.ZBX_TM_TASK_CHECK_NOW.
-				' AND '.dbConditionId('tcn.itemid', $task['itemids']).
-				' AND t.status='.ZBX_TM_STATUS_NEW
-		), 'itemid');
+			' FROM task t,task_check_now tcn'.
+			' WHERE t.taskid=tcn.taskid'.
+				' AND t.type='.ZBX_TM_TASK_CHECK_NOW.
+				' AND t.status='.ZBX_TM_STATUS_NEW.
+				' AND '.dbConditionId('tcn.itemid', $task['itemids'])
+		);
 
-		$itemids_cnt = count($task['itemids']);
-		$item_task_cnt = count($item_tasks);
+		$item_tasks = [];
 
-		// All given items and LLD rules have tasks, so there is nothing more to do.
-		if ($item_task_cnt == $itemids_cnt) {
-			// Sort ouptut $item_tasks array according to input array $task['itemids'].
-			$item_tasks = array_replace(array_combine($task['itemids'], $task['itemids']), $item_tasks);
-
-			return ['taskids' => zbx_objectValues($item_tasks, 'taskid')];
+		foreach ($task['itemids'] as $itemid) {
+			$item_tasks[$itemid] = 0;
 		}
 
-		$taskids = [];
+		while ($db_task = DBfetch($db_tasks)) {
+			$item_tasks[$db_task['itemid']] = $db_task['taskid'];
+		}
 
-		foreach ($task['itemids'] as $idx => $itemid) {
-			foreach ($item_tasks as $item_task) {
-				if ($item_task['itemid'] == $itemid) {
-					$taskids[] = $item_task['taskid'];
-					unset($task['itemids'][$idx]);
-				}
+		$itemids = [];
+
+		foreach ($item_tasks as $itemid => $taskid) {
+			if ($taskid == 0) {
+				$itemids[] = $itemid;
 			}
 		}
 
-		$tasks_to_create = [];
-		$time = time();
+		if ($itemids) {
+			$taskid = DB::reserveIds('task', count($itemids));
+			$ins_tasks = [];
+			$ins_check_now_tasks = [];
+			$time = time();
 
-		foreach ($task['itemids'] as $itemid) {
-			$tasks_to_create[] = [
-				'type' => $task['type'],
-				'status' => ZBX_TM_STATUS_NEW,
-				'clock' => $time,
-				'ttl' => SEC_PER_DAY
-			];
+			foreach ($itemids as $i => $itemid) {
+				$ins_tasks[] = [
+					'taskid' => $taskid,
+					'type' => $task['type'],
+					'status' => ZBX_TM_STATUS_NEW,
+					'clock' => $time,
+					'ttl' => SEC_PER_DAY
+				];
+				$ins_check_now_tasks[] = [
+					'taskid' => $taskid,
+					'itemid' => $itemid
+				];
+
+				$item_tasks[$itemid] = $taskid++;
+			}
+
+			DB::insert('task', $ins_tasks, false);
+			DB::insert('task_check_now', $ins_check_now_tasks);
 		}
 
-		$new_taskids = DB::insert('task', $tasks_to_create);
-
-		$check_now_to_create = [];
-
-		foreach (array_values($task['itemids']) as $idx => $itemid) {
-			$check_now_to_create[] = [
-				'taskid' => $new_taskids[$idx],
-				'itemid' => $itemid
-			];
-		}
-
-		DB::insert('task_check_now', $check_now_to_create);
-
-		return ['taskids' => array_merge($taskids, $new_taskids)];
+		return ['taskids' => array_values($item_tasks)];
 	}
 
 	/**
@@ -108,8 +105,8 @@ class CTask extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_TASK_CHECK_NOW])],
-			'itemids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true]
+			'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_TASK_CHECK_NOW])],
+			'itemids' =>	['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $task, '/', $error)) {
@@ -145,7 +142,6 @@ class CTask extends CApiService {
 
 		// Validate item and LLD rule types and statuses, and collect host IDs for later.
 		$hostids = [];
-
 		$allowed_types = checkNowAllowedTypes();
 
 		foreach ($items as $item) {
