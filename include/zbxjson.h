@@ -112,6 +112,25 @@
 #define ZBX_PROTO_VALUE_GET_STATUS_PING		"ping"
 #define ZBX_PROTO_VALUE_GET_STATUS_FULL		"full"
 
+#define ZBX_EXPORT_TAG_CLOCK			"clock"
+#define ZBX_EXPORT_TAG_NS			"ns"
+#define ZBX_EXPORT_TAG_VALUE			"value"
+#define ZBX_EXPORT_TAG_EVENTID			"eventid"
+#define ZBX_EXPORT_TAG_NAME			"name"
+#define ZBX_EXPORT_TAG_HOSTS			"hosts"
+#define ZBX_EXPORT_TAG_HOST			"host"
+#define ZBX_EXPORT_TAG_GROUPS			"groups"
+#define ZBX_EXPORT_TAG_APPLICATIONS		"applications"
+#define ZBX_EXPORT_TAG_TAGS			"tags"
+#define ZBX_EXPORT_TAG_TAG			"tag"
+#define ZBX_EXPORT_TAG_VALUE			"value"
+#define ZBX_EXPORT_TAG_PROBLEM_EVENTID		"p_eventid"
+#define ZBX_EXPORT_TAG_ITEMID			"itemid"
+#define ZBX_EXPORT_TAG_TIMESTAMP		"timestamp"
+#define ZBX_EXPORT_TAG_SOURCE			"source"
+#define ZBX_EXPORT_TAG_SEVERITY			"severity"
+#define ZBX_EXPORT_TAG_LOGEVENTID		"logeventid"
+
 typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,

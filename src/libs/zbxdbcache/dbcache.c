@@ -34,7 +34,7 @@
 #include "zbxmodules.h"
 #include "module.h"
 #include "export.h"
-
+#include "zbxjson.h"
 #include "zbxhistory.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
@@ -1128,49 +1128,50 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 		}
 
 		zbx_json_clean(&json);
-		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addarray(&json, "groups");
+		zbx_json_addstring(&json, ZBX_EXPORT_TAG_HOST, item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json, ZBX_EXPORT_TAG_GROUPS);
 
 		for (j = 0; j < host_info->groups.values_num; j++)
 			zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 
-		zbx_json_addarray(&json, "applications");
+		zbx_json_addarray(&json, ZBX_EXPORT_TAG_APPLICATIONS);
 
 		for (j = 0; j < item_info->applications.values_num; j++)
 			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
-		zbx_json_adduint64(&json, "itemid", item->itemid);
+		zbx_json_adduint64(&json, ZBX_EXPORT_TAG_ITEMID, item->itemid);
 
 		if (NULL != item_info->name)
-			zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_EXPORT_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addint64(&json, "clock", h->ts.sec);
-		zbx_json_addint64(&json, "ns", h->ts.ns);
+		zbx_json_addint64(&json, ZBX_EXPORT_TAG_CLOCK, h->ts.sec);
+		zbx_json_addint64(&json, ZBX_EXPORT_TAG_NS, h->ts.ns);
 
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_json_addfloat(&json, "value", h->value.dbl);
+				zbx_json_addfloat(&json, ZBX_EXPORT_TAG_VALUE, h->value.dbl);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_json_adduint64(&json, "value", h->value.ui64);
+				zbx_json_adduint64(&json, ZBX_EXPORT_TAG_VALUE, h->value.ui64);
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_EXPORT_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				zbx_json_addstring(&json, "value", h->value.str, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_EXPORT_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				zbx_json_addint64(&json, "timestamp", h->value.log->timestamp);
-				zbx_json_addstring(&json, "source", ZBX_NULL2EMPTY_STR(h->value.log->source),
+				zbx_json_addint64(&json, ZBX_EXPORT_TAG_TIMESTAMP, h->value.log->timestamp);
+				zbx_json_addstring(&json, ZBX_EXPORT_TAG_SOURCE, ZBX_NULL2EMPTY_STR(h->value.log->source),
 						ZBX_JSON_TYPE_STRING);
-				zbx_json_addint64(&json, "severity", h->value.log->severity);
-				zbx_json_addint64(&json, "logeventid", h->value.log->logeventid);
-				zbx_json_addstring(&json, "value", h->value.log->value, ZBX_JSON_TYPE_STRING);
+				zbx_json_addint64(&json, ZBX_EXPORT_TAG_SEVERITY, h->value.log->severity);
+				zbx_json_addint64(&json, ZBX_EXPORT_TAG_LOGEVENTID, h->value.log->logeventid);
+				zbx_json_addstring(&json, ZBX_EXPORT_TAG_VALUE, h->value.log->value,
+						ZBX_JSON_TYPE_STRING);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
