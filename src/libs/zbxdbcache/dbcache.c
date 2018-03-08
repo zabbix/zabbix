@@ -895,16 +895,35 @@ typedef struct
 }
 zbx_host_info_t;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_info_clean                                              *
+ *                                                                            *
+ * Purpose: frees resources allocated to store host groups names              *
+ *                                                                            *
+ * Parameters: host_info - [IN] host information                              *
+ *                                                                            *
+ ******************************************************************************/
 static void	zbx_host_info_clean(zbx_host_info_t *host_info)
 {
 	zbx_vector_ptr_clear_ext(&host_info->groups, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&host_info->groups);
 }
 
-static void	db_get_hosts_by_hostid(zbx_hashset_t *hosts_info, const zbx_vector_uint64_t *hostids)
+/******************************************************************************
+ *                                                                            *
+ * Function: db_get_hosts_info_by_hostid                                      *
+ *                                                                            *
+ * Purpose: get hosts groups names                                            *
+ *                                                                            *
+ * Parameters: hosts_info - [IN/OUT] output names of host groups for a host   *
+ *             hostids    - [IN] hosts identifiers                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vector_uint64_t *hostids)
 {
 	int		i;
-	size_t		sql_offset;
+	size_t		sql_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -916,7 +935,6 @@ static void	db_get_hosts_by_hostid(zbx_hashset_t *hosts_info, const zbx_vector_u
 		zbx_hashset_insert(hosts_info, &host_info, sizeof(host_info));
 	}
 
-	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct hg.hostid, g.name"
 				" from groups g, hosts_groups hg"
@@ -954,6 +972,16 @@ typedef struct
 }
 zbx_item_info_t;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: db_get_items_info_by_itemid                                      *
+ *                                                                            *
+ * Purpose: get items name and applications                                   *
+ *                                                                            *
+ * Parameters: items_info - [IN/OUT] output item name and applications        *
+ *             itemids    - [IN] the item identifiers                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
 {
 	size_t		sql_offset = 0;
@@ -1011,6 +1039,15 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 	DBfree_result(result);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_item_info_clean                                              *
+ *                                                                            *
+ * Purpose: frees resources allocated to store item applications and name     *
+ *                                                                            *
+ * Parameters: item_info - [IN] item information                              *
+ *                                                                            *
+ ******************************************************************************/
 static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 {
 	zbx_vector_ptr_clear_ext(&item_info->applications, zbx_ptr_free);
@@ -1018,6 +1055,18 @@ static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 	zbx_free(item_info->name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCexport_trends                                                  *
+ *                                                                            *
+ * Purpose: export trends                                                     *
+ *                                                                            *
+ * Parameters: trends     - [IN] trends from cache                            *
+ *             trends_num - [IN] number of trends                             *
+ *             hosts_info - [IN] hosts groups names                           *
+ *             items_info - [IN] item names and applications                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hashset_t *hosts_info,
 		zbx_hashset_t *items_info)
 {
@@ -1094,6 +1143,18 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_json_free(&json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCexport_history                                                 *
+ *                                                                            *
+ * Purpose: export history                                                    *
+ *                                                                            *
+ * Parameters: history     - [IN/OUT] array of history data                   *
+ *             history_num - [IN] number of history structures                *
+ *             hosts_info  - [IN] hosts groups names                          *
+ *             items_info  - [IN] item names and applications                 *
+ *                                                                            *
+ ******************************************************************************/
 static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx_hashset_t *hosts_info,
 		zbx_hashset_t *items_info)
 {
@@ -1184,9 +1245,25 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 	zbx_json_free(&json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCexport_history_and_trends                                      *
+ *                                                                            *
+ * Purpose: export history and trends                                         *
+ *                                                                            *
+ * Parameters: history     - [IN/OUT] array of history data                   *
+ *             history_num - [IN] number of history structures                *
+ *             itemids     - [IN] the item identifiers                        *
+ *                                (used for item lookup)                      *
+ *             items       - [IN] the items                                   *
+ *             errcodes    - [IN] item error codes                            *
+ *             trends      - [IN] trends from cache                           *
+ *             trends_num  - [IN] number of trends                            *
+ *                                                                            *
+ ******************************************************************************/
 static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int history_num,
-		const zbx_vector_uint64_t *itemids, DC_ITEM *items, const int *errcodes,
-		const ZBX_DC_TREND *trends, int trends_num)
+		const zbx_vector_uint64_t *itemids, DC_ITEM *items, const int *errcodes, const ZBX_DC_TREND *trends,
+		int trends_num)
 {
 	const char		*__function_name = "DCexport_history_and_trends";
 	int			i, index;
@@ -1271,7 +1348,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_host_info_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	db_get_hosts_by_hostid(&hosts_info, &hostids);
+	db_get_hosts_info_by_hostid(&hosts_info, &hostids);
 
 	db_get_items_info_by_itemid(&items_info, &item_info_ids);
 
@@ -1290,6 +1367,16 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCexport_all_trends                                              *
+ *                                                                            *
+ * Purpose: export all trends                                                 *
+ *                                                                            *
+ * Parameters: trends     - [IN] trends from cache                            *
+ *             trends_num - [IN] number of trends                             *
+ *                                                                            *
+ ******************************************************************************/
 static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 {
 	DC_ITEM			*items;
