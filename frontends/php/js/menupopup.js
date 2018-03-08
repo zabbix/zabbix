@@ -1102,11 +1102,9 @@ jQuery(function($) {
 							'display': 'block'
 						});
 				}
-				else {
-					$('ul', item[0]).actionMenuItemCollapse();
-				}
 			}
 			else {
+				// Closes all other submenus from this level, if they were open.
 				if ($('ul', item[0]).is(':visible')) {
 					$('ul', item[0]).prev('[role="menuitem"]').removeClass('highlighted');
 					$('ul', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
@@ -1311,6 +1309,7 @@ jQuery(function($) {
 					role: 'menu'
 				})
 				.on('mouseenter', function(e) {
+					// Prevent 'mouseenter' event in parent item, that would call actionMenuItemExpand() for parent.
 					e.stopPropagation();
 				});
 
