@@ -1579,6 +1579,14 @@ void	zbx_clean_events(void)
 
 	zbx_hashset_clear(&event_recovery);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_hosts_by_expression                                          *
+ *                                                                            *
+ * Purpose:  get hosts that are used in expression                            *
+ *                                                                            *
+ ******************************************************************************/
 static void	get_hosts_by_expression(zbx_hashset_t *hosts, const char *expression, const char *recovery_expression)
 {
 	zbx_vector_uint64_t	functionids;

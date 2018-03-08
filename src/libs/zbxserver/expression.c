@@ -770,6 +770,18 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_substitute_item_name_macros                                  *
+ *                                                                            *
+ * Purpose: substitute key macros and use it to substitute item name macros if*
+ *          item name is specified                                            *
+ *                                                                            *
+ * Parameters: dc_item    - [IN] item information used in substitution        *
+ *             name       - [IN] optional item name to substitute             *
+ *             replace_to - [OUT] expanded item name or key if name is absent *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to)
 {
 	int	ret;
