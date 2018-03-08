@@ -1839,7 +1839,7 @@ abstract class CItemGeneral extends CApiService {
 				)));
 			}
 
-			if ($item['post_type'] == ZBX_POSTTYPE_JSON) {
+			if ($data['post_type'] == ZBX_POSTTYPE_JSON) {
 				$types = [
 					'usermacros' => true,
 					'macros_n' => [
