@@ -66,13 +66,27 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 				<?= zbx_jsvalue($this->data['valueTypeVisibility'], true) ?>);
 		<?php } ?>
 
+		var old_value,
+			value_type = $('#value_type');
+
 		$('#type').change(function() {
 				typeChangeHandler();
+
+				var type = $(this).val();
+				old_value = value_type.val();
+
+				if (type == <?= ITEM_TYPE_AGGREGATE ?> || type == <?= ITEM_TYPE_CALCULATED ?>) {
+					if (!(old_value == <?= ITEM_VALUE_TYPE_UINT64 ?> || old_value == <?= ITEM_VALUE_TYPE_FLOAT ?>)) {
+						value_type.val(<?= ITEM_VALUE_TYPE_UINT64 ?>);
+					}
+
+					value_type.trigger('change');
+				}
 			})
 			.trigger('change');
 
 		// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
-		$('#value_type').on('focus', function () {
+		value_type.on('focus', function () {
 			old_value = $(this).val();
 		}).change(function() {
 			var new_value = $(this).val(),
