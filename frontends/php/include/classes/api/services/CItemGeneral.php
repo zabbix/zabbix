@@ -1848,7 +1848,7 @@ abstract class CItemGeneral extends CApiService {
 					]
 				];
 
-				if (get_class($this) === 'CItemPrototype') {
+				if ($this instanceof CItemPrototype) {
 					$types['lldmacros'] = true;
 				}
 
@@ -1861,10 +1861,10 @@ abstract class CItemGeneral extends CApiService {
 					$shift = $shift + 1 - strlen($substr);
 				}
 
-				$posts = json_decode($posts);
-				$error = json_last_error();
+				$json = new CJson();
+				$json->decode($posts);
 
-				if ($posts === null && ($error === JSON_ERROR_STATE_MISMATCH || $error === JSON_ERROR_SYNTAX)) {
+				if ($json->hasError()) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
 				}
 			}
