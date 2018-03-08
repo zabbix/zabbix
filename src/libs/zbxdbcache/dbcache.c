@@ -1047,8 +1047,8 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		}
 
 		zbx_json_clean(&json);
-		zbx_json_addstring(&json, ZBX_EXPORT_TAG_HOST, item->host.name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addarray(&json, ZBX_EXPORT_TAG_GROUPS);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
 
 		for (j = 0; j < host_info->groups.values_num; j++)
 			zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
@@ -1056,32 +1056,32 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		zbx_json_close(&json);
 
 		if (NULL != trend)
-			zbx_json_addarray(&json, ZBX_EXPORT_TAG_APPLICATIONS);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_APPLICATIONS);
 
 		for (j = 0; j < item_info->applications.values_num; j++)
 			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
-		zbx_json_adduint64(&json, ZBX_EXPORT_TAG_ITEMID, item->itemid);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
 
 		if (NULL != item_info->name)
-			zbx_json_addstring(&json, ZBX_EXPORT_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addint64(&json, ZBX_EXPORT_TAG_CLOCK, trend->clock);
-		zbx_json_addint64(&json, ZBX_EXPORT_TAG_COUNT, trend->num);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, trend->clock);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_COUNT, trend->num);
 
 		switch (trend->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_json_addfloat(&json, ZBX_EXPORT_TAG_MIN, trend->value_min.dbl);
-				zbx_json_addfloat(&json, ZBX_EXPORT_TAG_AVG, trend->value_avg.dbl);
-				zbx_json_addfloat(&json, ZBX_EXPORT_TAG_MAX, trend->value_max.dbl);
+				zbx_json_addfloat(&json, ZBX_PROTO_TAG_MIN, trend->value_min.dbl);
+				zbx_json_addfloat(&json, ZBX_PROTO_TAG_AVG, trend->value_avg.dbl);
+				zbx_json_addfloat(&json, ZBX_PROTO_TAG_MAX, trend->value_max.dbl);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_json_adduint64(&json, ZBX_EXPORT_TAG_MIN, trend->value_min.ui64);
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MIN, trend->value_min.ui64);
 				udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
-				zbx_json_adduint64(&json, ZBX_EXPORT_TAG_AVG, avg.lo);
-				zbx_json_adduint64(&json, ZBX_EXPORT_TAG_MAX, trend->value_max.ui64);
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_AVG, avg.lo);
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MAX, trend->value_max.ui64);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -1128,49 +1128,49 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 		}
 
 		zbx_json_clean(&json);
-		zbx_json_addstring(&json, ZBX_EXPORT_TAG_HOST, item->host.name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addarray(&json, ZBX_EXPORT_TAG_GROUPS);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
 
 		for (j = 0; j < host_info->groups.values_num; j++)
 			zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 
-		zbx_json_addarray(&json, ZBX_EXPORT_TAG_APPLICATIONS);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_APPLICATIONS);
 
 		for (j = 0; j < item_info->applications.values_num; j++)
 			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
-		zbx_json_adduint64(&json, ZBX_EXPORT_TAG_ITEMID, item->itemid);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
 
 		if (NULL != item_info->name)
-			zbx_json_addstring(&json, ZBX_EXPORT_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addint64(&json, ZBX_EXPORT_TAG_CLOCK, h->ts.sec);
-		zbx_json_addint64(&json, ZBX_EXPORT_TAG_NS, h->ts.ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, h->ts.sec);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, h->ts.ns);
 
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_json_addfloat(&json, ZBX_EXPORT_TAG_VALUE, h->value.dbl);
+				zbx_json_addfloat(&json, ZBX_PROTO_TAG_VALUE, h->value.dbl);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_json_adduint64(&json, ZBX_EXPORT_TAG_VALUE, h->value.ui64);
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_VALUE, h->value.ui64);
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				zbx_json_addstring(&json, ZBX_EXPORT_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				zbx_json_addstring(&json, ZBX_EXPORT_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				zbx_json_addint64(&json, ZBX_EXPORT_TAG_TIMESTAMP, h->value.log->timestamp);
-				zbx_json_addstring(&json, ZBX_EXPORT_TAG_SOURCE, ZBX_NULL2EMPTY_STR(h->value.log->source),
+				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, h->value.log->timestamp);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, ZBX_NULL2EMPTY_STR(h->value.log->source),
 						ZBX_JSON_TYPE_STRING);
-				zbx_json_addint64(&json, ZBX_EXPORT_TAG_SEVERITY, h->value.log->severity);
-				zbx_json_addint64(&json, ZBX_EXPORT_TAG_LOGEVENTID, h->value.log->logeventid);
-				zbx_json_addstring(&json, ZBX_EXPORT_TAG_VALUE, h->value.log->value,
+				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, h->value.log->severity);
+				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGEVENTID, h->value.log->logeventid);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.log->value,
 						ZBX_JSON_TYPE_STRING);
 				break;
 			default:

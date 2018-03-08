@@ -1620,10 +1620,10 @@ void	zbx_export_events(void)
 
 		zbx_json_clean(&json);
 
-		zbx_json_addint64(&json, ZBX_EXPORT_TAG_CLOCK, events[i].clock);
-		zbx_json_addint64(&json, ZBX_EXPORT_TAG_NS, events[i].ns);
-		zbx_json_addint64(&json, ZBX_EXPORT_TAG_VALUE, events[i].value);
-		zbx_json_adduint64(&json, ZBX_EXPORT_TAG_EVENTID, events[i].eventid);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, events[i].clock);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, events[i].ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_VALUE, events[i].value);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_EVENTID, events[i].eventid);
 
 		if (TRIGGER_VALUE_PROBLEM == events[i].value)
 		{
@@ -1631,12 +1631,12 @@ void	zbx_export_events(void)
 			zbx_hashset_iter_t	iter;
 			int			j;
 
-			zbx_json_addstring(&json, ZBX_EXPORT_TAG_NAME, events[i].name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, events[i].name, ZBX_JSON_TYPE_STRING);
 
 			get_hosts_by_expression(&hosts, events[i].trigger.expression,
 					events[i].trigger.recovery_expression);
 
-			zbx_json_addarray(&json, ZBX_EXPORT_TAG_HOSTS);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_HOSTS);
 
 			zbx_hashset_iter_reset(&hosts, &iter);
 			while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
@@ -1659,7 +1659,7 @@ void	zbx_export_events(void)
 
 			result = DBselect("%s", sql);
 
-			zbx_json_addarray(&json, ZBX_EXPORT_TAG_GROUPS);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
 
 			while (NULL != (row = DBfetch(result)))
 				zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
@@ -1667,14 +1667,14 @@ void	zbx_export_events(void)
 
 			zbx_json_close(&json);
 
-			zbx_json_addarray(&json, ZBX_EXPORT_TAG_TAGS);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_TAGS);
 			for (j = 0; j < events[i].tags.values_num; j++)
 			{
 				zbx_tag_t	*tag = (zbx_tag_t *)events[i].tags.values[j];
 
 				zbx_json_addobject(&json, NULL);
-				zbx_json_addstring(&json, ZBX_EXPORT_TAG_TAG, tag->tag, ZBX_JSON_TYPE_STRING);
-				zbx_json_addstring(&json, ZBX_EXPORT_TAG_VALUE, tag->value, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, tag->tag, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, tag->value, ZBX_JSON_TYPE_STRING);
 				zbx_json_close(&json);
 			}
 
@@ -1691,7 +1691,7 @@ void	zbx_export_events(void)
 			{
 				if (events[i].eventid == events[recovery->r_event_index].eventid)
 				{
-					zbx_json_adduint64(&json, ZBX_EXPORT_TAG_PROBLEM_EVENTID, recovery->eventid);
+					zbx_json_adduint64(&json, ZBX_PROTO_TAG_PROBLEM_EVENTID, recovery->eventid);
 					break;
 				}
 			}
