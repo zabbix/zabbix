@@ -936,8 +936,8 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct hg.hostid, g.name"
-				" from groups g, hosts_groups hg"
+				"select distinct hg.hostid,g.name"
+				" from groups g,hosts_groups hg"
 				" where g.groupid=hg.groupid"
 					" and");
 
