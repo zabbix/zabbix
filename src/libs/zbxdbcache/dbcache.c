@@ -1040,21 +1040,9 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 		item = item_info->item;
 
-		if (NULL == item_info->name)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "item was deleted during export");
-			continue;
-		}
-
 		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		if (0 == host_info->groups.values_num)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "host group was deleted during export '%s'", item->host.name);
 			continue;
 		}
 
@@ -1075,7 +1063,10 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, "itemid", item->itemid);
-		zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != item_info->name)
+			zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
+
 		zbx_json_addint64(&json, "time", trend->clock);
 		zbx_json_addint64(&json, "count", trend->num);
 
@@ -1123,25 +1114,16 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 			continue;
 
 		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &h->itemid)))
-			continue;
-
-		item = item_info->item;
-
-		if (NULL == item_info->name)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "item was deleted during export");
-			continue;
-		}
-
-		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		if (0 == host_info->groups.values_num)
+		item = item_info->item;
+
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "host group was deleted during export '%s'", item->host.name);
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
@@ -1161,7 +1143,9 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, "itemid", item->itemid);
-		zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != item_info->name)
+			zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addint64(&json, "clock", h->ts.sec);
 		zbx_json_addint64(&json, "ns", h->ts.ns);

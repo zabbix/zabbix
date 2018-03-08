@@ -1695,6 +1695,9 @@ void	zbx_export_events(void)
 					break;
 				}
 			}
+
+			if (NULL == recovery_local)
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
 		zbx_problems_export_write(json.buffer, json.buffer_size);
