@@ -1104,8 +1104,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 		zbx_json_close(&json);
 
-		if (NULL != trend)
-			zbx_json_addarray(&json, ZBX_PROTO_TAG_APPLICATIONS);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_APPLICATIONS);
 
 		for (j = 0; j < item_info->applications.values_num; j++)
 			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
@@ -1227,8 +1226,8 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, h->value.log->timestamp);
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, ZBX_NULL2EMPTY_STR(h->value.log->source),
-						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE,
+						ZBX_NULL2EMPTY_STR(h->value.log->source), ZBX_JSON_TYPE_STRING);
 				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, h->value.log->severity);
 				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGEVENTID, h->value.log->logeventid);
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.log->value,
