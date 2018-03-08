@@ -713,25 +713,25 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *
- * @param array  	$hosts							an array of hosts with host IDs as keys
- * @param string 	$hosts[hostid][name]
- * @param string 	$hosts[hostid][hostid]
- * @param array		$triggers
- * @param string	$triggers[][triggerid]
- * @param string	$triggers[][description]
- * @param string	$triggers[][expression]
- * @param int		$triggers[][value]
- * @param int		$triggers[][lastchange]
- * @param int		$triggers[][flags]
- * @param array		$triggers[][url]
- * @param int		$triggers[][priority]
- * @param array		$triggers[][hosts]
- * @param string	$triggers[][hosts][][hostid]
- * @param string	$triggers[][hosts][][name]
- * @param string 	$pageFile						the page where the element is displayed
- * @param int    	$viewMode						table display style: either hosts on top, or host on the left side
- * @param string 	$screenId						the ID of the screen, that contains the trigger overview table
- * @param bool 	    $fullscreen						display mode
+ * @param array  $hosts                        An array of hosts with host IDs as keys.
+ * @param string $hosts[hostid][name]
+ * @param string $hosts[hostid][hostid]
+ * @param array  $triggers
+ * @param string $triggers[][triggerid]
+ * @param string $triggers[][description]
+ * @param string $triggers[][expression]
+ * @param int    $triggers[][value]
+ * @param int    $triggers[][lastchange]
+ * @param int    $triggers[][flags]
+ * @param array  $triggers[][url]
+ * @param int    $triggers[][priority]
+ * @param array  $triggers[][hosts]
+ * @param string $triggers[][hosts][][hostid]
+ * @param string $triggers[][hosts][][name]
+ * @param string $pageFile                     The page where the element is displayed.
+ * @param int    $viewMode                     Table display style: either hosts on top, or host on the left side.
+ * @param string $screenId                     The ID of the screen, that contains the trigger overview table.
+ * @param bool   $fullscreen                   Display mode.
  *
  * @return CTableInfo
  */
@@ -859,10 +859,10 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  *
  * @see getTriggersOverview()
  *
- * @param array     $trigger
- * @param string    $pageFile		the page where the element is displayed
- * @param string    $screenid
- * @param bool      $fullscreen     display mode
+ * @param array  $trigger
+ * @param string $pageFile    The page where the element is displayed.
+ * @param string $screenid
+ * @param bool   $fullscreen  Display mode.
  *
  * @return CCol
  */
@@ -2239,9 +2239,9 @@ function getTriggersHostsList(array $triggers) {
  * @param string $triggers_hosts[<triggerid>][]['maintenanceid']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_status']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
- * @param int    $triggers_hosts[<triggerid>][]['graphs']               the number of graphs
- * @param int    $triggers_hosts[<triggerid>][]['screens']              the number of screens
- * @param bool   $fullscreen				                            fullscreen mode
+ * @param int    $triggers_hosts[<triggerid>][]['graphs']              The number of graphs.
+ * @param int    $triggers_hosts[<triggerid>][]['screens']             The number of screens.
+ * @param bool   $fullscreen				                           Fullscreen mode.
  *
  * @return array
  */

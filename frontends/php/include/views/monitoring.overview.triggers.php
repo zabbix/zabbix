@@ -134,7 +134,7 @@ if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
 	$dataTable = getTriggersOverview($this->data['hosts'], $this->data['triggers'], $page['file'],
-		$this->data['view_style']
+		$this->data['view_style'], null, (bool) $data['fullscreen']
 	);
 }
 else {

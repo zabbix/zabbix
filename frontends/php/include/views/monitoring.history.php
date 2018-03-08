@@ -28,7 +28,7 @@ $header = [
 	'right' => (new CForm('get'))
 		->addVar('itemids', getRequest('itemids'))
 		->addVar('page', 1)
-		->addVar('fullscreen', $data['fullscreen'])
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 ];
 $header_row = [];
 $first_item = reset($this->data['items']);
