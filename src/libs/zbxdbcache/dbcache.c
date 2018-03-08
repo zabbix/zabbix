@@ -1018,7 +1018,7 @@ static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 	zbx_free(item_info->name);
 }
 
-static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hashset_t *hosts,
+static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hashset_t *hosts_info,
 		zbx_hashset_t *items_info)
 {
 	struct zbx_json		json;
@@ -1040,7 +1040,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 		item = item_info->item;
 
-		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)))
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts_info, &item->host.hostid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -1094,7 +1094,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_json_free(&json);
 }
 
-static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx_hashset_t *hosts,
+static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx_hashset_t *hosts_info,
 		zbx_hashset_t *items_info)
 {
 	const ZBX_DC_HISTORY	*h;
@@ -1121,7 +1121,7 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 
 		item = item_info->item;
 
-		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts, &item->host.hostid)))
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts_info, &item->host.hostid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
