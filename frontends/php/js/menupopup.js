@@ -88,7 +88,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		};
 	}
 
-	if (options.fullscreen) {
+	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
 		fullscreen = '&fullscreen=1';
 	}
 
@@ -632,12 +632,17 @@ function showDialogForm(form, options, formData, trigger_elmnt) {
  */
 function getMenuPopupTrigger(options) {
 	var sections = [],
-		items = [];
+		items = [],
+		fullscreen = false;
 
 	// events
 	var events = {
 		label: t('Problems')
 	};
+
+	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
+		fullscreen = true;
+	}
 
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		var url = new Curl('zabbix.php');
@@ -646,7 +651,7 @@ function getMenuPopupTrigger(options) {
 		url.setArgument('filter_set', '1');
 		url.unsetArgument('sid');
 
-		if (options.fullscreen) {
+		if (fullscreen) {
 			url.setArgument('fullscreen', 1);
 		}
 
@@ -666,7 +671,7 @@ function getMenuPopupTrigger(options) {
 		url.setArgument('eventids[]', options.acknowledge.eventid);
 		url.setArgument('backurl', options.acknowledge.backurl);
 
-		if (options.fullscreen) {
+		if (fullscreen) {
 			url.setArgument('fullscreen', 1);
 		}
 
@@ -708,7 +713,7 @@ function getMenuPopupTrigger(options) {
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
 
-			if (options.fullscreen) {
+			if (fullscreen) {
 				url.setArgument('fullscreen', 1);
 			}
 
