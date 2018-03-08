@@ -56,19 +56,15 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getHost(array $host, array $scripts = null, $has_goto = true, $fullscreen = false) {
-
 		$data = [
 			'type' => 'host',
 			'hostid' => $host['hostid'],
 			'showGraphs' => (bool) $host['graphs'],
 			'showScreens' => (bool) $host['screens'],
 			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
-			'hasGoTo' => $has_goto
+			'hasGoTo' => $has_goto,
+			'fullscreen' => $fullscreen
 		];
-
-		if ($fullscreen) {
-			$data['fullscreen'] = true;
-		}
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
@@ -237,15 +233,12 @@ class CMenuPopupHelper {
 			'triggerid' => $trigger['triggerid'],
 			'items' => $items,
 			'showEvents' => $showEvents,
-			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
+			'fullscreen' => $fullscreen
 		];
 
 		if ($acknowledge !== null) {
 			$data['acknowledge'] = $acknowledge;
-		}
-
-		if ($fullscreen) {
-			$data['fullscreen'] = true;
 		}
 
 		if ($trigger['url'] !== '') {
