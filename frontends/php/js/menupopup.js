@@ -77,8 +77,7 @@ function getMenuPopupHistory(options) {
  * @return array
  */
 function getMenuPopupHost(options, trigger_elmnt) {
-	var sections = [],
-		fullscreen = '';
+	var sections = [];
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
@@ -88,12 +87,14 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		};
 	}
 
-	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
-		fullscreen = '&fullscreen=1';
-	}
-
 	// go to section
 	if (options.hasGoTo) {
+		var	fullscreen = '';
+
+		if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
+			fullscreen = '&fullscreen=1';
+		}
+
 		var gotos = [],
 			// inventory
 			host_inventory = {
