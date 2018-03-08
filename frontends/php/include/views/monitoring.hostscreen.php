@@ -37,31 +37,25 @@ if (empty($data['screen']) || empty($data['host'])) {
 }
 else {
 	$screen_widget->setTitle([
-		$data['screen']['name'],
-		' ',
-		_('on'),
-		' ',
+		$data['screen']['name'].' '._('on').' ',
 		(new CSpan($data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
 	]);
 
+	$url = (new CUrl('host_screen.php'))
+		->setArgument('hostid', $data['hostid'])
+		->setArgument('screenid', $data['screenid'])
+		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+
 	// host screen list
 	if (!empty($data['screens'])) {
-		$screen_combobox = new CComboBox(
-			'screenList',
-			'host_screen.php?'.http_build_query([
-				'hostid' => $data['hostid'],
-				'screenid' => $data['screenid'],
-				'fullscreen' => $data['fullscreen']
-			]),
+		$screen_combobox = new CComboBox('screenList', $url->toString(),
 			'javascript: redirect(this.options[this.selectedIndex].value);'
 		);
 		foreach ($data['screens'] as $screen) {
 			$screen_combobox->addItem(
-				'host_screen.php?'.http_build_query([
-					'hostid' => $data['hostid'],
-					'screenid' => $screen['screenid'],
-					'fullscreen' => $data['fullscreen']
-				]),
+				$url
+					->setArgument('screenid', $screen['screenid'])
+					->toString(),
 				$screen['name']
 			);
 		}
