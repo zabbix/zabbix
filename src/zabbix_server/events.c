@@ -1590,6 +1590,13 @@ static void	get_hosts_by_expression(zbx_hashset_t *hosts, const char *expression
 	zbx_vector_uint64_destroy(&functionids);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_export_events                                                *
+ *                                                                            *
+ * Purpose: export events                                                     *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_export_events(void)
 {
 	const char		*__function_name = "zbx_export_events";
