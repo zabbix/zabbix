@@ -1047,8 +1047,8 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		}
 
 		zbx_json_clean(&json);
-		zbx_json_addstring(&json, "host", item->host.name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addarray(&json, "groups");
+		zbx_json_addstring(&json, ZBX_EXPORT_TAG_HOST, item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json, ZBX_EXPORT_TAG_GROUPS);
 
 		for (j = 0; j < host_info->groups.values_num; j++)
 			zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
@@ -1056,32 +1056,32 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		zbx_json_close(&json);
 
 		if (NULL != trend)
-			zbx_json_addarray(&json, "applications");
+			zbx_json_addarray(&json, ZBX_EXPORT_TAG_APPLICATIONS);
 
 		for (j = 0; j < item_info->applications.values_num; j++)
 			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
-		zbx_json_adduint64(&json, "itemid", item->itemid);
+		zbx_json_adduint64(&json, ZBX_EXPORT_TAG_ITEMID, item->itemid);
 
 		if (NULL != item_info->name)
-			zbx_json_addstring(&json, "name", item_info->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_EXPORT_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addint64(&json, "time", trend->clock);
-		zbx_json_addint64(&json, "count", trend->num);
+		zbx_json_addint64(&json, ZBX_EXPORT_TAG_CLOCK, trend->clock);
+		zbx_json_addint64(&json, ZBX_EXPORT_TAG_COUNT, trend->num);
 
 		switch (trend->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_json_addfloat(&json, "min", trend->value_min.dbl);
-				zbx_json_addfloat(&json, "avg", trend->value_avg.dbl);
-				zbx_json_addfloat(&json, "max", trend->value_max.dbl);
+				zbx_json_addfloat(&json, ZBX_EXPORT_TAG_MIN, trend->value_min.dbl);
+				zbx_json_addfloat(&json, ZBX_EXPORT_TAG_AVG, trend->value_avg.dbl);
+				zbx_json_addfloat(&json, ZBX_EXPORT_TAG_MAX, trend->value_max.dbl);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_json_adduint64(&json, "min", trend->value_min.ui64);
+				zbx_json_adduint64(&json, ZBX_EXPORT_TAG_MIN, trend->value_min.ui64);
 				udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
-				zbx_json_adduint64(&json, "avg", avg.lo);
-				zbx_json_adduint64(&json, "max", trend->value_max.ui64);
+				zbx_json_adduint64(&json, ZBX_EXPORT_TAG_AVG, avg.lo);
+				zbx_json_adduint64(&json, ZBX_EXPORT_TAG_MAX, trend->value_max.ui64);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

@@ -130,6 +130,10 @@
 #define ZBX_EXPORT_TAG_SOURCE			"source"
 #define ZBX_EXPORT_TAG_SEVERITY			"severity"
 #define ZBX_EXPORT_TAG_LOGEVENTID		"logeventid"
+#define ZBX_EXPORT_TAG_COUNT			"count"
+#define ZBX_EXPORT_TAG_MIN			"min"
+#define ZBX_EXPORT_TAG_AVG			"avg"
+#define ZBX_EXPORT_TAG_MAX			"max"
 
 typedef enum
 {
