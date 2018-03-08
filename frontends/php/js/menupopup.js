@@ -633,16 +633,12 @@ function showDialogForm(form, options, formData, trigger_elmnt) {
 function getMenuPopupTrigger(options) {
 	var sections = [],
 		items = [],
-		fullscreen = false;
+		fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen);
 
 	// events
 	var events = {
 		label: t('Problems')
 	};
-
-	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
-		fullscreen = true;
-	}
 
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		var url = new Curl('zabbix.php');
