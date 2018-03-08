@@ -19,12 +19,10 @@
 **/
 
 
-$fullscreen = getRequest('fullscreen');
-
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CList())
-		->addItem(get_icon('fullscreen', ['fullscreen' => $fullscreen]))
+		->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 	);
 
 /*
@@ -138,7 +136,7 @@ if ($data['host']['description'] !== '') {
 	);
 }
 
-$fullscreen_param = $fullscreen ? '&fullscreen=1' : '';
+$fullscreen_param = $data['fullscreen'] ? '&fullscreen=1' : '';
 
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
@@ -159,7 +157,7 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('action', 'problem.view')
 				->setArgument('filter_hostids[]', $data['host']['hostid'])
 				->setArgument('filter_set', '1')
-				->setArgument('fullscreen', $fullscreen ? '1' : null)
+				->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 		),
 		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')),
 		new CLink(_('Screens'),

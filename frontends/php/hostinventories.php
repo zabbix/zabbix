@@ -71,7 +71,9 @@ $hostId = getRequest('hostid', 0);
  * Display
  */
 if ($hostId > 0) {
-	$data = [];
+	$data = [
+		'fullscreen' => getRequest('fullscreen', 0)
+	];
 
 	// host scripts
 	$data['hostScripts'] = API::Script()->getScriptsByHosts([$hostId]);
