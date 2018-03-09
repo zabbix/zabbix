@@ -79,8 +79,8 @@ typedef struct
 }
 zbx_ipmi_control_t;
 
-#define _IPMI_FIELD_PREFIX_ID	"id:"
-#define _IPMI_FIELD_PREFIX_NAME	"name:"
+#define IPMI_FIELD_PREFIX_ID	"id:"
+#define IPMI_FIELD_PREFIX_NAME	"name:"
 
 typedef struct zbx_ipmi_host
 {
@@ -1487,8 +1487,8 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 	zbx_ipmi_control_t	*c = NULL;
-	size_t			pr_sz = 0, id_sz = strlen(_IPMI_FIELD_PREFIX_ID),
-				name_sz = strlen(_IPMI_FIELD_PREFIX_NAME);
+	size_t			pr_sz = 0;
+	const size_t		id_sz = sizeof(IPMI_FIELD_PREFIX_ID) -1, name_sz = sizeof(IPMI_FIELD_PREFIX_NAME) -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
@@ -1510,9 +1510,9 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 		return h->ret;
 	}
 
-	if (0 == strncmp(sensor, _IPMI_FIELD_PREFIX_ID, id_sz))
+	if (0 == strncmp(sensor, IPMI_FIELD_PREFIX_ID, id_sz))
 		pr_sz = id_sz;
-	else if (0 == strncmp(sensor, _IPMI_FIELD_PREFIX_NAME, name_sz))
+	else if (0 == strncmp(sensor, IPMI_FIELD_PREFIX_NAME, name_sz))
 		pr_sz = name_sz;
 
 	if (0 == pr_sz || id_sz == pr_sz)
@@ -1624,8 +1624,8 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 	const char		*__function_name = "zbx_set_ipmi_control_value";
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
-	size_t			pr_sz = 0, id_sz = strlen(_IPMI_FIELD_PREFIX_ID),
-				name_sz = strlen(_IPMI_FIELD_PREFIX_NAME);
+	size_t			pr_sz = 0;
+	const size_t		id_sz = sizeof(IPMI_FIELD_PREFIX_ID) -1, name_sz = sizeof(IPMI_FIELD_PREFIX_NAME) -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 "control:%s value:%d",
 			__function_name, hostid, sensor, value);
@@ -1649,9 +1649,9 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 		return h->ret;
 	}
 
-	if (0 == strncmp(sensor, _IPMI_FIELD_PREFIX_ID, id_sz))
+	if (0 == strncmp(sensor, IPMI_FIELD_PREFIX_ID, id_sz))
 		pr_sz = id_sz;
-	else if (0 == strncmp(sensor, _IPMI_FIELD_PREFIX_NAME, name_sz))
+	else if (0 == strncmp(sensor, IPMI_FIELD_PREFIX_NAME, name_sz))
 		pr_sz = name_sz;
 
 	if (0 == pr_sz || id_sz == pr_sz)
