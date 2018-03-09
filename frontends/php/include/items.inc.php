@@ -850,12 +850,13 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  * Retrieve overview table object for items.
  *
  * @param array|null $groupids
- * @param string     $application  IDs of applications to filter items by
+ * @param string     $application  IDs of applications to filter items by.
  * @param int        $viewMode
+ * @param bool       $fullscreen   Display mode.
  *
  * @return CTableInfo
  */
-function getItemsDataOverview(array $groupids, $application, $viewMode) {
+function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscreen = false) {
 	// application filter
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
@@ -1036,7 +1037,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 			$host = $hosts[$hostId];
 
 			$name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true, $fullscreen));
 
 			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
