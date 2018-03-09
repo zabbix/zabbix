@@ -29,11 +29,14 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 		$this->setType(WIDGET_DISCOVERY_STATUS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
 	protected function doAction() {
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+
 		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
 			$drules = API::DRule()->get([
 				'output' => ['druleid', 'name'],
@@ -68,6 +71,7 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'drules' => $drules,
 			'error' => $error,
+			'fullscreen' => $fullscreen,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
