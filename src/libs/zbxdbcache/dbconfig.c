@@ -9737,6 +9737,66 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_get_hosts_by_functionids                                      *
+ *                                                                            *
+ * Purpose: get hosts for the specified list of functions                     *
+ *                                                                            *
+ * Parameters: functionids     - [IN] the function ids                        *
+ *             functionids_num - [IN] the number of function ids              *
+ *             hosts           - [OUT] hosts                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int functionids_num, zbx_hashset_t *hosts)
+{
+	ZBX_DC_FUNCTION	*dc_function;
+	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
+	DC_HOST		host;
+	int		i;
+
+	for (i = 0; i < functionids_num; i++)
+	{
+		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+			continue;
+
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+			continue;
+
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		DCget_host(&host, dc_host);
+		zbx_hashset_insert(hosts, &host, sizeof(host));
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_hosts_by_functionids                                       *
+ *                                                                            *
+ * Purpose: get hosts for the specified list of functions                     *
+ *                                                                            *
+ * Parameters: functionids - [IN] the function ids                            *
+ *             hosts       - [OUT] hosts                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts)
+{
+	const char	*__function_name = "DCget_hosts_by_functionids";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	LOCK_CACHE;
+
+	dc_get_hosts_by_functionids(functionids->values, functionids->values_num, hosts);
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hosts->num_data);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_config_get                                                   *
  *                                                                            *
  * Purpose: get global configuration data                                     *
@@ -9981,7 +10041,7 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
  * Parameters: condition - [IN] the condition data to free                    *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_db_condition_clean(DB_CONDITION *condition)
+void	zbx_db_condition_clean(DB_CONDITION *condition)
 {
 	zbx_free(condition->value2);
 	zbx_free(condition->value);
