@@ -30,7 +30,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',
-			'fullscreen' => 'in 0,1',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
