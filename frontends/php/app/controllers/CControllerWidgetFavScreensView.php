@@ -29,11 +29,14 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 		$this->setType(WIDGET_FAVOURITE_SCREENS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
 	protected function doAction() {
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+
 		$screens = [];
 		$ids = ['screenid' => [], 'slideshowid' => []];
 
@@ -77,6 +80,7 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_SCREENS]),
 			'screens' => $screens,
+			'fullscreen' => $fullscreen,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
