@@ -75,8 +75,12 @@ typedef struct
 	char			*c_name;
 	int			num_values;	/* order of structure elements changed to avoid padding */
 	int			*val;		/* when the structure is an element of array */
+	char			*full_name;	/* full name of the control */
 }
 zbx_ipmi_control_t;
+
+#define _IPMI_FIELD_PREFIX_ID	"id:"
+#define _IPMI_FIELD_PREFIX_NAME	"name:"
 
 typedef struct zbx_ipmi_host
 {
@@ -308,8 +312,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	enum ipmi_str_type_e	id_type;
 	int			id_sz;
 	size_t			sz;
-	char			domain_name[11];	/* max int length */
-	char			full_name[MAX_STRING_LEN];
+	char			domain_name[IPMI_DOMAIN_NAME_LEN], full_name[IPMI_SENSOR_NAME_LEN];
 
 	id_sz = ipmi_sensor_get_id_length(sensor);
 	memset(id, 0, sizeof(id));
@@ -347,7 +350,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
-				"('%s') type:0x%x ('%s') domain:'%s' full_name:'%s'", h->ip, h->port, s->id_type,
+				"('%s') type:0x%x ('%s') domain:'%s' name:'%s'", h->ip, h->port, s->id_type,
 				s->id_sz, zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
 				s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor), s->type,
 				ipmi_sensor_get_sensor_type_string(s->sensor), domain_name, s->full_name);
@@ -419,7 +422,7 @@ static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_name(zbx_ipmi_host_t *h, cons
 	int			i;
 	zbx_ipmi_control_t	*c = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@[%s]:%d", __function_name, c_name, h->ip, h->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control: %s@[%s]:%d", __function_name, c_name, h->ip, h->port);
 
 	for (i = 0; i < h->control_count; i++)
 	{
@@ -435,18 +438,48 @@ static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_name(zbx_ipmi_host_t *h, cons
 	return c;
 }
 
+static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_full_name(zbx_ipmi_host_t *h, const char *full_name)
+{
+	const char		*__function_name = "zbx_get_ipmi_control_by_full_name";
+	int			i;
+	zbx_ipmi_control_t	*c = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d", __function_name, full_name, h->ip, h->port);
+
+	for (i = 0; i < h->control_count; i++)
+	{
+		if (0 == strcmp(h->controls[i].full_name, full_name))
+		{
+			c = &h->controls[i];
+			break;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, c);
+
+	return c;
+}
+
 static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
 	const char		*__function_name = "zbx_allocate_ipmi_control";
-	size_t			sz;
+	size_t			sz, dm_sz;
 	zbx_ipmi_control_t	*c;
 	char			*c_name = NULL;
+	char			domain_name[IPMI_DOMAIN_NAME_LEN], full_name[IPMI_SENSOR_NAME_LEN];
 
 	sz = (size_t)ipmi_control_get_id_length(control);
 	c_name = (char *)zbx_malloc(c_name, sz + 1);
 	ipmi_control_get_id(control, c_name, sz);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d'", __function_name, c_name, h->ip, h->port);
+	ipmi_control_get_name(control, full_name, sizeof(full_name));
+	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
+	dm_sz = strlen(domain_name);
+	if (dm_sz >= strlen(full_name) || 0 != strncmp(domain_name, full_name, dm_sz))
+		dm_sz = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() Added control: host'%s:%d' id:'%s' domain:'%s' name:'%s'",
+			__function_name, h->ip, h->port, c_name, domain_name, full_name + dm_sz);
 
 	h->control_count++;
 	sz = (size_t)h->control_count * sizeof(zbx_ipmi_control_t);
@@ -466,6 +499,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	sz = sizeof(int) * (size_t)c->num_values;
 	c->val = (int *)zbx_malloc(c->val, sz);
 	memset(c->val, 0, sz);
+	c->full_name = zbx_strdup(NULL, full_name + dm_sz);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, c);
 
@@ -491,6 +525,7 @@ static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 
 		zbx_free(h->controls[i].c_name);
 		zbx_free(h->controls[i].val);
+		zbx_free(h->controls[i].full_name);
 
 		h->control_count--;
 		if (h->control_count != i)
@@ -1452,6 +1487,8 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 	zbx_ipmi_control_t	*c = NULL;
+	size_t			pr_sz = 0, id_sz = strlen(_IPMI_FIELD_PREFIX_ID),
+				name_sz = strlen(_IPMI_FIELD_PREFIX_NAME);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
@@ -1473,12 +1510,24 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 		return h->ret;
 	}
 
-	s = zbx_get_ipmi_sensor_by_id(h, sensor);
-	if (NULL == s)
-		s = zbx_get_ipmi_sensor_by_full_name(h, sensor);
+	if (0 == strncmp(sensor, _IPMI_FIELD_PREFIX_ID, id_sz))
+		pr_sz = id_sz;
+	else if (0 == strncmp(sensor, _IPMI_FIELD_PREFIX_NAME, name_sz))
+		pr_sz = name_sz;
 
-	if (NULL == s)
-		c = zbx_get_ipmi_control_by_name(h, sensor);
+	if (0 == pr_sz || id_sz == pr_sz)
+	{
+		s = zbx_get_ipmi_sensor_by_id(h, sensor + pr_sz);
+		if (NULL == s)
+			c = zbx_get_ipmi_control_by_name(h, sensor + pr_sz);
+	}
+	else
+	{
+		s = zbx_get_ipmi_sensor_by_full_name(h, sensor + pr_sz);
+		if (NULL == s)
+			c = zbx_get_ipmi_control_by_full_name(h, sensor + pr_sz);
+
+	}
 
 	if (NULL == s && NULL == c)
 	{
@@ -1506,6 +1555,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 		else
 			*value = zbx_dsprintf(*value, ZBX_FS_UI64, s->value.discrete);
 	}
+
 	if (NULL != c)
 		*value = zbx_dsprintf(*value, "%d", c->val[0]);
 
@@ -1574,6 +1624,8 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 	const char		*__function_name = "zbx_set_ipmi_control_value";
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
+	size_t			pr_sz = 0, id_sz = strlen(_IPMI_FIELD_PREFIX_ID),
+				name_sz = strlen(_IPMI_FIELD_PREFIX_NAME);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 "control:%s value:%d",
 			__function_name, hostid, sensor, value);
@@ -1597,7 +1649,15 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 		return h->ret;
 	}
 
-	c = zbx_get_ipmi_control_by_name(h, sensor);
+	if (0 == strncmp(sensor, _IPMI_FIELD_PREFIX_ID, id_sz))
+		pr_sz = id_sz;
+	else if (0 == strncmp(sensor, _IPMI_FIELD_PREFIX_NAME, name_sz))
+		pr_sz = name_sz;
+
+	if (0 == pr_sz || id_sz == pr_sz)
+		c = zbx_get_ipmi_control_by_name(h, sensor + pr_sz);
+	else
+		c = zbx_get_ipmi_control_by_full_name(h, sensor + pr_sz);
 
 	if (NULL == c)
 	{
