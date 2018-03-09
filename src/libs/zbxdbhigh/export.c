@@ -110,7 +110,7 @@ void	zbx_problems_export_init(const char *process_name, int process_num)
 	}
 }
 
-static	int	file_write(const char *buf, size_t count, FILE **file, const char *name)
+static	void	file_write(const char *buf, size_t count, FILE **file, const char *name)
 {
 	size_t	ret;
 
@@ -157,23 +157,21 @@ static	int	file_write(const char *buf, size_t count, FILE **file, const char *na
 				name, zbx_strerror(errno), ZBX_EXPORT_WAIT_FAIL);
 		sleep(ZBX_EXPORT_WAIT_FAIL);
 	}
-
-	return SUCCEED;
 }
 
-int	zbx_problems_export_write(const char *buf, size_t count)
+void	zbx_problems_export_write(const char *buf, size_t count)
 {
-	return file_write(buf, count, &problems_file, problems_file_name);
+	file_write(buf, count, &problems_file, problems_file_name);
 }
 
-int	zbx_history_export_write(const char *buf, size_t count)
+void	zbx_history_export_write(const char *buf, size_t count)
 {
-	return file_write(buf, count, &history_file, history_file_name);
+	file_write(buf, count, &history_file, history_file_name);
 }
 
-int	zbx_trends_export_write(const char *buf, size_t count)
+void	zbx_trends_export_write(const char *buf, size_t count)
 {
-	return file_write(buf, count, &trends_file, trends_file_name);
+	file_write(buf, count, &trends_file, trends_file_name);
 }
 
 void	zbx_problems_export_flush(void)
