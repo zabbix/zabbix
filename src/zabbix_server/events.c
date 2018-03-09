@@ -24,6 +24,7 @@
 #include "actions.h"
 #include "events.h"
 #include "zbxserver.h"
+#include "export.h"
 
 /* event recovery data */
 typedef struct
@@ -1549,12 +1550,12 @@ void	zbx_uninitialize_events(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: clean_events                                                     *
+ * Function: zbx_clean_events                                                 *
  *                                                                            *
  * Purpose: cleans all array entries and resets events_num                    *
  *                                                                            *
  ******************************************************************************/
-static void	clean_events(void)
+void	zbx_clean_events(void)
 {
 	size_t	i;
 
@@ -1577,6 +1578,156 @@ static void	clean_events(void)
 	events_num = 0;
 
 	zbx_hashset_clear(&event_recovery);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_hosts_by_expression                                          *
+ *                                                                            *
+ * Purpose:  get hosts that are used in expression                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_hosts_by_expression(zbx_hashset_t *hosts, const char *expression, const char *recovery_expression)
+{
+	zbx_vector_uint64_t	functionids;
+
+	zbx_vector_uint64_create(&functionids);
+	get_functionids(&functionids, expression);
+	get_functionids(&functionids, recovery_expression);
+	DCget_hosts_by_functionids(&functionids, hosts);
+	zbx_vector_uint64_destroy(&functionids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_export_events                                                *
+ *                                                                            *
+ * Purpose: export events                                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_export_events(void)
+{
+	const char		*__function_name = "zbx_export_events";
+
+	size_t			i;
+	struct zbx_json		json;
+	size_t			sql_alloc = 256, sql_offset;
+	char			*sql = NULL;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_hashset_t		hosts;
+	zbx_vector_uint64_t	hostids;
+	zbx_hashset_iter_t	iter;
+	zbx_event_recovery_t	*recovery;
+	DB_EVENT		*event;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __function_name, events_num);
+
+	if (0 == events_num)
+		goto exit;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+	zbx_hashset_create(&hosts, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_create(&hostids);
+
+	for (i = 0; i < events_num; i++)
+	{
+		DC_HOST	*host;
+		int	j;
+
+		if (EVENT_SOURCE_TRIGGERS != events[i].source || 0 == (events[i].flags & ZBX_FLAGS_DB_EVENT_CREATE))
+			continue;
+
+		if (TRIGGER_VALUE_PROBLEM != events[i].value)
+			continue;
+
+		zbx_json_clean(&json);
+
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, events[i].clock);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, events[i].ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_VALUE, events[i].value);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_EVENTID, events[i].eventid);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, events[i].name, ZBX_JSON_TYPE_STRING);
+
+		get_hosts_by_expression(&hosts, events[i].trigger.expression,
+				events[i].trigger.recovery_expression);
+
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_HOSTS);
+
+		zbx_hashset_iter_reset(&hosts, &iter);
+		while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
+		{
+			zbx_json_addstring(&json, NULL, host->name, ZBX_JSON_TYPE_STRING);
+			zbx_vector_uint64_append(&hostids, host->hostid);
+		}
+
+		zbx_json_close(&json);
+
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select distinct g.name"
+					" from groups g, hosts_groups hg"
+					" where g.groupid=hg.groupid"
+						" and");
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values,
+				hostids.values_num);
+
+		result = DBselect("%s", sql);
+
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
+
+		while (NULL != (row = DBfetch(result)))
+			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+		DBfree_result(result);
+
+		zbx_json_close(&json);
+
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_TAGS);
+		for (j = 0; j < events[i].tags.values_num; j++)
+		{
+			zbx_tag_t	*tag = (zbx_tag_t *)events[i].tags.values[j];
+
+			zbx_json_addobject(&json, NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, tag->tag, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, tag->value, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json);
+		}
+
+		zbx_hashset_clear(&hosts);
+		zbx_vector_uint64_clear(&hostids);
+
+		zbx_problems_export_write(json.buffer, json.buffer_size);
+	}
+
+	zbx_hashset_iter_reset(&event_recovery, &iter);
+	while (NULL != (recovery = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
+	{
+		event = &events[recovery->r_event_index];
+
+		if (EVENT_SOURCE_TRIGGERS != event->source)
+			continue;
+
+		zbx_json_clean(&json);
+
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, event->clock);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, event->ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_VALUE, event->value);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_EVENTID, event->eventid);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PROBLEM_EVENTID, recovery->eventid);
+
+		zbx_problems_export_write(json.buffer, json.buffer_size);
+	}
+
+	zbx_problems_export_flush();
+
+	zbx_hashset_destroy(&hosts);
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_free(sql);
+	zbx_json_free(&json);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2194,8 +2345,6 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		zbx_vector_ptr_destroy(&trigger_events);
 		zbx_vector_ptr_destroy(&internal_ok_events);
-
-		clean_events();
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
@@ -2254,7 +2403,10 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		DCconfig_triggers_apply_changes(&trigger_diff);
 		DBupdate_itservices(&trigger_diff);
 
-		clean_events();
+		if (SUCCEED == zbx_is_export_enabled())
+			zbx_export_events();
+
+		zbx_clean_events();
 		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		zbx_vector_ptr_destroy(&trigger_diff);
 	}
@@ -2306,7 +2458,10 @@ int	zbx_flush_correlated_events(void)
 
 		DBupdate_itservices(&trigger_diff);
 
-		clean_events();
+		if (SUCCEED == zbx_is_export_enabled())
+			zbx_export_events();
+
+		zbx_clean_events();
 	}
 
 	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
