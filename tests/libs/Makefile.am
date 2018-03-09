@@ -3,6 +3,6 @@ SUBDIRS = \
 	zbxdbhigh \
 	zbxjson \
 	zbxsysinfo \
-	zbxcommshigh
-	
+	zbxcommshigh \
+	zbxcommon	
 

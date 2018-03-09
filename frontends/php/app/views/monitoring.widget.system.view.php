@@ -21,7 +21,8 @@
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
 
 $table = makeSystemStatus($data['filter'], $data['data'], $data['config'], $backurl->getUrl(), $data['fullscreen']);
 

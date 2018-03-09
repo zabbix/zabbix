@@ -162,21 +162,40 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
+			$fullscreen = (bool) $params['fullscreen'];
+			$kioskmode = array_key_exists('kioskmode', $params) ? (bool) $params['kioskmode'] : null;
+
 			$url = new CUrl();
 
-			if ($params['fullscreen'] == 0) {
-				$url->setArgument('fullscreen', '1');
+			if ($fullscreen) {
+				if ($kioskmode === null || $kioskmode) {
+					$url
+						->setArgument('fullscreen', null)
+						->setArgument('kioskmode', null);
 
-				$icon = (new CRedirectButton(SPACE, $url->getUrl()))
-					->setTitle(_('Fullscreen'))
-					->addClass(ZBX_STYLE_BTN_MAX);
+					$icon = (new CRedirectButton(' ', $url->getUrl()))
+						->setTitle(_('Normal view'))
+						->addClass(ZBX_STYLE_BTN_MIN)
+						->addClass($kioskmode ? ZBX_STYLE_BTN_DASHBRD_NORMAL : null);
+				}
+				else {
+					$url
+						->setArgument('fullscreen', '1')
+						->setArgument('kioskmode', '1');
+
+					$icon = (new CRedirectButton(' ', $url->getUrl()))
+						->setTitle(_('Kiosk mode'))
+						->addClass(ZBX_STYLE_BTN_KIOSK);
+				}
 			}
 			else {
-				$url->setArgument('fullscreen', '0');
+				$url
+					->setArgument('fullscreen', '1')
+					->setArgument('kioskmode', null);
 
-				$icon = (new CRedirectButton(SPACE, $url->getUrl()))
-					->setTitle(_('Normal view'))
-					->addClass(ZBX_STYLE_BTN_MIN);
+				$icon = (new CRedirectButton(' ', $url->getUrl()))
+					->setTitle(_('Fullscreen'))
+					->addClass(ZBX_STYLE_BTN_MAX);
 			}
 
 			return $icon;

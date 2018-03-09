@@ -10041,7 +10041,7 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
  * Parameters: condition - [IN] the condition data to free                    *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_db_condition_clean(DB_CONDITION *condition)
+void	zbx_db_condition_clean(DB_CONDITION *condition)
 {
 	zbx_free(condition->value2);
 	zbx_free(condition->value);

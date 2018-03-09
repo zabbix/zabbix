@@ -110,7 +110,7 @@ $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
-	border: 1px solid rgba($ui-bg-color, .2) !important;
+	border-color: rgba($ui-bg-color, .2) !important;
 }
 
 .top-nav-help {
@@ -128,12 +128,6 @@ $ok-ack-fg-color: #00ff00;
 .btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
-.list-table {
-
-	thead th {
-		border-color: lighten($table-border-color, 3%) !important;
-	}
-}
 
 .timeline-axis {
 	border-right-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
@@ -145,6 +139,13 @@ $ok-ack-fg-color: #00ff00;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+.list-table {
+
+	thead th {
+		border-color: lighten($table-border-color, 3%);
+	}
+}
 
 .top-subnav a {
 	&:focus {

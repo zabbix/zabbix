@@ -77,9 +77,9 @@ class testPageProblems extends CWebTest {
 		// Change tags select to "OR" option
 		$this->zbxTestClickXpath('//label[@for="filter_evaltype_1"]');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText('//tbody/tr[1]/td[10]/a', 'Test trigger with tag');
-		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/a', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 2 of 2 found');
+		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/a', 'Test trigger with tag');
+		$this->zbxTestAssertElementText('//tbody/tr[4]/td[10]/a', 'Test trigger to check tag filter on problem page');
+		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 4 of 4 found');
 	}
 
 	/**
@@ -154,6 +154,7 @@ class testPageProblems extends CWebTest {
 		// Select host
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('spanid10084');
 
 		// Type application
