@@ -281,10 +281,10 @@ switch ($data['method']) {
 
 			case 'items':
 				$items = API::Item()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['itemid', 'hostid', 'name', 'key_'],
 					'selectHosts' => ['name'],
-					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);
 
@@ -294,7 +294,7 @@ switch ($data['method']) {
 						['field' => 'name_expanded', 'order' => ZBX_SORT_UP]
 					]);
 
-					if (isset($data['limit'])) {
+					if (array_key_exists('limit', $data)) {
 						$items = array_slice($items, 0, $data['limit']);
 					}
 
