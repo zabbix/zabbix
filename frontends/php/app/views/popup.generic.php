@@ -442,7 +442,7 @@ switch ($data['popup_type']) {
 
 			if ($data['multiselect']) {
 				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-					zbx_jsvalue($item['itemid']).', '.zbx_jsvalue($options['dstfld1']).');';
+					zbx_jsvalue($item['itemid']).', '.$options['parentid'].');';
 			}
 			else {
 				$values = [];

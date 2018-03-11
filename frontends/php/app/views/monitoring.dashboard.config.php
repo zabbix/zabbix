@@ -122,12 +122,11 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldItem) {
 		// multiselect.js must be preloaded in parent view.
 
-		$popup_parameters = [
+		$parameters = [
 			'srctbl' => 'items',
 			'dstfrm' => $form->getName(),
 			'dstfld1' => $field->getName().'_',
 			'srcfld1' => 'itemid',
-			'reference' => 'id',
 			'selectLimit' => $field->getValuesLimit(),
 			'multiselect' => '1'
 		];
@@ -137,7 +136,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'items',
 			'data' => $data['captions']['ms']['items'][$field->getName()],
 			'selectedLimit' => $field->getValuesLimit(),
-			'popup' => [ 'parameters' => $popup_parameters ],
+			'popup' => [
+				'parameters' => $parameters
+			],
 			'add_post_js' => false
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
