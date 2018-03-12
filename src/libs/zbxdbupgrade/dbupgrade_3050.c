@@ -486,7 +486,6 @@ static int	DBpatch_3050039(void)
 	return DBadd_foreign_key("task_check_now", 1, &field);
 }
 
-
 #endif
 
 DBPATCH_START(3050)
