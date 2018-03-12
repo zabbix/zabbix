@@ -106,7 +106,7 @@ class C34ImportConverter extends CConverter {
 			array_fill_keys([
 				'timeout', 'url', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host'
+				'verify_peer', 'verify_host', 'allow_traps'
 			], ''
 		));
 		$default['query_fields'] = [];

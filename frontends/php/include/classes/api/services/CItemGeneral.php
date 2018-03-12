@@ -104,6 +104,7 @@ abstract class CItemGeneral extends CApiService {
 			'retrieve_mode'			=> [],
 			'request_method'		=> [],
 			'output_format'			=> [],
+			'allow_traps'			=> [],
 			'ssl_cert_file'			=> [],
 			'ssl_key_file'			=> [],
 			'ssl_key_password'		=> [],
@@ -1711,6 +1712,10 @@ abstract class CItemGeneral extends CApiService {
 			'output_format' => [
 				'type' => API_INT32,
 				'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])
+			],
+			'allow_traps' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])
 			],
 			'ssl_cert_file' => [
 				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file'),

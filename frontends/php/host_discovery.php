@@ -135,6 +135,9 @@ $fields = [
 									]),
 									null
 								],
+	'allow_traps' =>			[T_ZBX_INT, O_OPT, null,	IN([HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]),
+									null
+								],
 	'ssl_cert_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -325,6 +328,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'headers' => getRequest('headers', []),
 				'retrieve_mode' => (int) getRequest('retrieve_mode'),
 				'request_method' => (int) getRequest('request_method'),
+				'allow_traps' => (int) getRequest('allow_traps'),
 				'ssl_cert_file' => getRequest('ssl_cert_file'),
 				'ssl_key_file' => getRequest('ssl_key_file'),
 				'ssl_key_password' => getRequest('ssl_key_password'),

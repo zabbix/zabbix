@@ -759,6 +759,7 @@ class CItemPrototype extends CItemGeneral {
 				'status_codes' => '',
 				'follow_redirects' => $defaults['follow_redirects'],
 				'request_method' => $defaults['request_method'],
+				'allow_traps' => $defaults['allow_traps'],
 				'post_type' => $defaults['post_type'],
 				'http_proxy' => '',
 				'headers' => '',

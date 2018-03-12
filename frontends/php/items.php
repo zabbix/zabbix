@@ -155,7 +155,10 @@ $fields = [
 									]),
 									null
 								],
-	'output_format' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'output_format' =>			[T_ZBX_INT, O_OPT, null,	IN([HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]), null],
+	'allow_traps' =>			[T_ZBX_INT, O_OPT, null,	IN([HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]),
+									null
+								],
 	'ssl_cert_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -625,6 +628,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'retrieve_mode' => (int) getRequest('retrieve_mode'),
 					'request_method' => (int) getRequest('request_method'),
 					'output_format' => (int) getRequest('output_format'),
+					'allow_traps' => (int) getRequest('allow_traps'),
 					'ssl_cert_file' => getRequest('ssl_cert_file'),
 					'ssl_key_file' => getRequest('ssl_key_file'),
 					'ssl_key_password' => getRequest('ssl_key_password'),
@@ -693,7 +697,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'templateid', 'flags', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
 					'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-					'verify_peer', 'verify_host'
+					'verify_peer', 'verify_host', 'allow_traps'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params'],
@@ -844,6 +848,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'retrieve_mode' => getRequest('retrieve_mode', 0),
 					'request_method' => (int) getRequest('request_method'),
 					'output_format' => (int) getRequest('output_format'),
+					'allow_traps' => (int) getRequest('allow_traps'),
 					'ssl_cert_file' => getRequest('ssl_cert_file'),
 					'ssl_key_file' => getRequest('ssl_key_file'),
 					'ssl_key_password' => getRequest('ssl_key_password'),
@@ -1371,7 +1376,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
 				'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
 				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host'
+				'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],

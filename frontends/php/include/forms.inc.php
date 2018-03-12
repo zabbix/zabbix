@@ -995,6 +995,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
 		'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
 		'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+		'allow_traps' => getRequest('allow_traps', DB::getDefault('items', 'allow_traps')),
 		'ssl_cert_file' => getRequest('ssl_cert_file'),
 		'ssl_key_file' => getRequest('ssl_key_file'),
 		'ssl_key_password' => getRequest('ssl_key_password'),
@@ -1226,6 +1227,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['headers'] = $data['item']['headers'];
 		$data['retrieve_mode'] = $data['item']['retrieve_mode'];
 		$data['request_method'] = $data['item']['request_method'];
+		$data['allow_traps'] = $data['item']['allow_traps'];
 		$data['ssl_cert_file'] = $data['item']['ssl_cert_file'];
 		$data['ssl_key_file'] = $data['item']['ssl_key_file'];
 		$data['ssl_key_password'] = $data['item']['ssl_key_password'];

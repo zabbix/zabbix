@@ -254,6 +254,15 @@ $itemFormList->addRow(
 	'retrieve_mode_row'
 );
 
+// ITEM_TYPE_HTTPAGENT Enable trapping.
+$itemFormList->addRow(
+	new CLabel(_('Enable trapping'), 'allow_traps'),
+	(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
+		->setEnabled(!$data['limited'])
+		->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON),
+	'allow_traps_row'
+);
+
 // ITEM_TYPE_HTTPAGENT HTTP proxy.
 $itemFormList->addRow(
 	new CLabel(_('HTTP proxy'), 'http_proxy'),
