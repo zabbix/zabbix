@@ -391,16 +391,15 @@ $data['http_auth_switcher'] = [
 			var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
 				<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
 		<?php }
-		if ($data['http_auth_switcher']) { ?>
-			if (jQuery('#http_authtype').length) {
-				new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true); ?>);
-			}
-		<?php }
 		if (!empty($this->data['typeVisibility'])) { ?>
 			var typeSwitcher = new CViewSwitcher('type', 'change',
 				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>,
 				<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
-		<?php }
+		<?php } ?>
+		if (jQuery('#http_authtype').length) {
+			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true); ?>);
+		}
+		<?php
 		if (!empty($this->data['securityLevelVisibility'])) { ?>
 			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
 				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
@@ -413,6 +412,19 @@ $data['http_auth_switcher'] = [
 				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
 
 				setAuthTypeLabel();
+
+				// Check HTTP auth and toggle HTTP username and password fields.
+				if (jQuery(this).val() == <?= ITEM_TYPE_HTTPAGENT ?>) {
+					if (jQuery('#http_authtype').val() == <?= HTTPTEST_AUTH_NONE ?>) {
+						jQuery('#http_username_row, #http_password_row').hide();
+					}
+					else {
+						jQuery('#http_username_row, #http_password_row').show();
+					}
+				}
+				else {
+					jQuery('#http_username_row, #http_password_row').hide();
+				}
 			})
 			.trigger('change');
 
