@@ -8,6 +8,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-13526] fixed widget placeholder jumping instead of resizing while dashboard edit (ashubin)
 .......PS. [ZBX-13362] fixed potentially wrong rows deleting by housekeeper in PostgreSQL (Sergejs)
 ..F....... [ZBX-13506] fixed linked trigger is moved to sibling map element (agriscenko)
 ........S. [ZBX-13586] fixed trigger-based event correlation - suspend creation of event if no problems are recovered by it (viktors, wiper)
@@ -187,6 +188,7 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-13526] fixed widget placeholder jumping instead of resizing while dashboard edit (ashubin)
 .......PS. [ZBX-13362] fixed potentially wrong rows deleting by housekeeper in PostgreSQL (Sergejs)
 ..F....... [ZBX-13506] fixed linked trigger is moved to sibling map element (agriscenko)
 ........S. [ZBX-13586] fixed trigger-based event correlation - suspend creation of event if no problems are recovered by it (viktors, wiper)
