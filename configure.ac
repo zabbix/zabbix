@@ -1418,7 +1418,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
-	AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 fi
 
 dnl Check if Zabbix internal IPC services are used
