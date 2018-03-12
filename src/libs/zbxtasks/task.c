@@ -338,15 +338,15 @@ static int	tm_save_remote_command_result_tasks(zbx_tm_task_t **tasks, int tasks_
  ******************************************************************************/
 static int	tm_save_check_now_tasks(zbx_tm_task_t **tasks, int tasks_num)
 {
-	int				i, ret;
-	zbx_db_insert_t			db_insert;
+	int			i, ret;
+	zbx_db_insert_t		db_insert;
 	zbx_tm_check_now_t	*data;
 
 	zbx_db_insert_prepare(&db_insert, "task_check_now", "taskid", "itemid", NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
-		zbx_tm_task_t	*task = tasks[i];
+		const zbx_tm_task_t	*task = tasks[i];
 
 		switch (task->type)
 		{
