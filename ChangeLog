@@ -188,6 +188,7 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A.F....... [ZBX-13458,ZBX-13494] fixed resolving of the macros in map labels for non-superadmin users (Sasha)
 ..F....... [ZBX-13526] fixed widget placeholder jumping instead of resizing while dashboard edit (ashubin)
 .......PS. [ZBX-13362] fixed potentially wrong rows deleting by housekeeper in PostgreSQL (Sergejs)
 ..F....... [ZBX-13506] fixed linked trigger is moved to sibling map element (agriscenko)
