@@ -11122,10 +11122,6 @@ void	zbx_dc_process_check_now_tasks(zbx_vector_ptr_t *tasks)
 	for (i = 0; i < tasks->values_num; i++)
 	{
 		task = (zbx_tm_task_t *)tasks->values[i];
-
-		if (ZBX_TM_STATUS_NEW != task->status)
-			continue;
-
 		data = (zbx_tm_check_now_t *)task->data;
 
 		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &data->itemid)) ||

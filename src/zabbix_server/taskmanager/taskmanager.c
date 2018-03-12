@@ -350,17 +350,21 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t		tasks;
-	zbx_uint64_t			taskid, itemid;
+	zbx_vector_uint64_t		done_taskids;
+	zbx_uint64_t			taskid, itemid, proxy_hostid;
 	zbx_tm_task_t			*task;
+	unsigned char			status;
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, taskids->values_num);
 
 	zbx_vector_uint64_sort(taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&tasks);
+	zbx_vector_uint64_create(&done_taskids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.taskid,t.status,td.itemid"
+			"select t.taskid,t.status,t.proxy_hostid,td.itemid"
 			" from task t"
 			" left join task_check_now td"
 				" on t.taskid=td.taskid"
@@ -371,7 +375,25 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(taskid, row[0]);
-		ZBX_STR2UINT64(itemid, row[2]);
+
+		if (SUCCEED == DBis_null(row[3]))
+		{
+			zbx_vector_uint64_append(&done_taskids, taskid);
+			continue;
+		}
+
+		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
+		if (0 != proxy_hostid)
+		{
+			if (ZBX_TM_STATUS_INPROGRESS == (status = atoi(row[1])))
+			{
+				/* task has been sent to proxy, mark as done */
+				zbx_vector_uint64_append(&done_taskids, taskid);
+			}
+			continue;
+		}
+
+		ZBX_STR2UINT64(itemid, row[3]);
 
 		task = zbx_tm_task_create(taskid, ZBX_TM_TASK_CHECK_NOW, atoi(row[1]), 0, 0, 0);
 		task->data = (void *)zbx_tm_check_now_create(itemid);
@@ -379,43 +401,52 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	}
 	DBfree_result(result);
 
-	if (0 == tasks.values_num)
-		goto out;
-
-	zbx_dc_process_check_now_tasks(&tasks);
-
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < tasks.values_num; i++)
+	if (0 != tasks.values_num)
 	{
-		task = (zbx_tm_task_t *)tasks.values[i];
+		zbx_dc_process_check_now_tasks(&tasks);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset , "update task set");
+		sql_offset = 0;
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		/* close server tasks (processed) and in progress proxy tasks (sent) */
-		if (ZBX_TM_STATUS_INPROGRESS == task->status || 0 == task->proxy_hostid)
+		for (i = 0; i < tasks.values_num; i++)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " status=%d", ZBX_TM_STATUS_DONE);
-		}
-		else
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " proxy_hostid=" ZBX_FS_UI64,
-					task->proxy_hostid);
-		}
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " where taskid=" ZBX_FS_UI64 ";\n", task->taskid);
+			task = (zbx_tm_task_t *)tasks.values[i];
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset , "update task set");
+
+			/* close server tasks (processed) and in progress proxy tasks (sent) */
+			if (ZBX_TM_STATUS_INPROGRESS == task->status || 0 == task->proxy_hostid)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " status=%d", ZBX_TM_STATUS_DONE);
+			}
+			else
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " proxy_hostid=" ZBX_FS_UI64,
+						task->proxy_hostid);
+			}
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " where taskid=" ZBX_FS_UI64 ";\n", task->taskid);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+			DBexecute("%s", sql);
+
+		zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 	}
 
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != done_taskids.values_num)
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset ,"update task set status=%d where",
+				ZBX_TM_STATUS_DONE);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", done_taskids.values,
+				done_taskids.values_num);
 		DBexecute("%s", sql);
+	}
 
 	zbx_free(sql);
-
-	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
-
-out:
+	zbx_vector_uint64_destroy(&done_taskids);
 	zbx_vector_ptr_destroy(&tasks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
@@ -437,13 +468,13 @@ static int	tm_process_tasks(int now)
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			type, processed_num = 0, clock, ttl;
-	zbx_uint64_t		taskid, proxy_hostid;
+	zbx_uint64_t		taskid;
 	zbx_vector_uint64_t	ack_taskids, check_now_taskids;
 
 	zbx_vector_uint64_create(&ack_taskids);
 	zbx_vector_uint64_create(&check_now_taskids);
 
-	result = DBselect("select taskid,type,clock,ttl,proxy_hostid"
+	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
 				" where status in (%d,%d)"
 				" order by taskid",
@@ -455,7 +486,6 @@ static int	tm_process_tasks(int now)
 		ZBX_STR2UCHAR(type, row[1]);
 		clock = atoi(row[2]);
 		ttl = atoi(row[3]);
-		ZBX_DBROW2UINT64(proxy_hostid, row[4]);
 
 		switch (type)
 		{
