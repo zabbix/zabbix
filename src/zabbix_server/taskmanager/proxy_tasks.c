@@ -75,7 +75,10 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
 				if (SUCCEED == DBis_null(row[4]))
+				{
+					zbx_free(task);
 					continue;
+				}
 
 				ZBX_DBROW2UINT64(alertid, row[13]);
 				ZBX_DBROW2UINT64(parent_taskid, row[14]);
@@ -85,6 +88,12 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 						parent_taskid, hostid, alertid);
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
+				if (SUCCEED == DBis_null(row[16]))
+				{
+					zbx_free(task);
+					continue;
+				}
+
 				ZBX_DBROW2UINT64(itemid, row[16]);
 				task->data = (void *)zbx_tm_check_now_create(itemid);
 				break;
