@@ -342,19 +342,18 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 {
-	const char			*__function_name = "tm_process_check_now";
+	const char		*__function_name = "tm_process_check_now";
 
-	DB_ROW				row;
-	DB_RESULT			result;
-	int				i, processed_num = 0;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_vector_ptr_t		tasks;
-	zbx_vector_uint64_t		done_taskids;
-	zbx_uint64_t			taskid, itemid, proxy_hostid;
-	zbx_tm_task_t			*task;
-	unsigned char			status;
-
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			i, processed_num = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_ptr_t	tasks;
+	zbx_vector_uint64_t	done_taskids;
+	zbx_uint64_t		taskid, itemid, proxy_hostid;
+	zbx_tm_task_t		*task;
+	unsigned char		status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, taskids->values_num);
 
