@@ -101,7 +101,9 @@ $widget->addItem($filter);
 // data table
 if ($data['pageFilter']->groupsSelected) {
 	$groupids = ($this->data['pageFilter']->groupids !== null) ? $this->data['pageFilter']->groupids : [];
-	$table = getItemsDataOverview($groupids, $this->data['filter']['application'], $this->data['view_style']);
+	$table = getItemsDataOverview($groupids, $this->data['filter']['application'], $this->data['view_style'],
+		(bool) $data['fullscreen']
+	);
 }
 else {
 	$table = new CTableInfo();
