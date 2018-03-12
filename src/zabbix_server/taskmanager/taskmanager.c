@@ -414,8 +414,8 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset , "update task set");
 
-			/* close server tasks (processed) and in progress proxy tasks (sent) */
-			if (ZBX_TM_STATUS_INPROGRESS == task->status || 0 == task->proxy_hostid)
+			/* close in progress proxy tasks (sent) */
+			if (0 == task->proxy_hostid)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " status=%d", ZBX_TM_STATUS_DONE);
 			}
