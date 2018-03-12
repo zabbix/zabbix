@@ -11126,12 +11126,13 @@ void	zbx_dc_process_check_now_tasks(zbx_vector_ptr_t *tasks)
 		if (ZBX_TM_STATUS_NEW != task->status)
 			continue;
 
-
 		data = (zbx_tm_check_now_t *)task->data;
 
 		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &data->itemid)) ||
 				NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for itemid [" ZBX_FS_UI64 "]"
+					": item is not in cache");
 			continue;
 		}
 
