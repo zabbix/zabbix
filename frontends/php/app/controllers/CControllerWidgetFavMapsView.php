@@ -35,8 +35,6 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-
 		$maps = [];
 		$mapids = [];
 
@@ -63,7 +61,7 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_MAPS]),
 			'maps' => $maps,
-			'fullscreen' => $fullscreen,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

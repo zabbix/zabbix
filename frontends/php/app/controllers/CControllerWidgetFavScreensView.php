@@ -35,8 +35,6 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-
 		$screens = [];
 		$ids = ['screenid' => [], 'slideshowid' => []];
 
@@ -80,7 +78,7 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_SCREENS]),
 			'screens' => $screens,
-			'fullscreen' => $fullscreen,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

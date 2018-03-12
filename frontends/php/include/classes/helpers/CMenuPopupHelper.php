@@ -93,26 +93,30 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for map menu popup.
 	 *
-	 * @param string $hostId					host id
-	 * @param array  $scripts					host scripts (optional)
-	 * @param string $scripts[]['name']			script name
-	 * @param string $scripts[]['scriptid']		script id
-	 * @param string $scripts[]['confirmation']	confirmation text
-	 * @param array  $gotos						goto links (optional)
-	 * @param array  $gotos['graphs']			link to host graphs page with url parameters ("name" => "value") (optional)
-	 * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value") (optional)
-	 * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value") (optional)
-	 * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value") (optional)
-	 * @param array  $gotos['events']			link to events page with url parameters ("name" => "value") (optional)
-	 * @param array  $urls						local and global map urls (optional)
-	 * @param string $urls[]['name']			url name
-	 * @param string $urls[]['url']				url
+	 * @param string $hostId                     Host ID.
+	 * @param array  $scripts                    Host scripts.
+	 * @param string $scripts[]['name']          Script name.
+	 * @param string $scripts[]['scriptid']      Script ID.
+	 * @param string $scripts[]['confirmation']  Confirmation text.
+	 * @param array  $gotos                      Enable goto links.
+	 * @param array  $gotos['graphs']            Link to host graphs page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['screens']           Link to host screen page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['triggerStatus']     Link to trigger status page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['submap']            Link to submap page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['events']            Link to events page with url parameters ("name" => "value") (optional).
+	 * @param array  $urls                       Local and global map links (optional).
+	 * @param string $urls[]['name']             Link name.
+	 * @param string $urls[]['url']              Link url.
+	 * @param bool   $fullscreen                 Fullscreen mode.
 	 *
 	 * @return array
 	 */
-	public static function getMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
+	public static function getMap($hostId, array $scripts = null, array $gotos = null, array $urls = null,
+			$fullscreen = false) {
+
 		$data = [
-			'type' => 'map'
+			'type' => 'map',
+			'fullscreen' => $fullscreen
 		];
 
 		if ($scripts) {

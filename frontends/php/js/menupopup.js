@@ -21,8 +21,8 @@
 /**
  * Get menu popup history section data.
  *
- * @param string options['itemid']				item id
- * @param bool   options['hasLatestGraphs']		link to history page with showgraph action (optional)
+ * @param string options['itemid']           Item ID.
+ * @param bool   options['hasLatestGraphs']  Link to history page with showgraph action (optional).
  *
  * @return array
  */
@@ -62,17 +62,17 @@ function getMenuPopupHistory(options) {
 /**
  * Get menu popup host section data.
  *
- * @param string options['hostid']			host id
- * @param array  options['scripts']			host scripts (optional)
- * @param string options[]['name']			script name
- * @param string options[]['scriptid']		script id
- * @param string options[]['confirmation']	confirmation text
- * @param bool   options['showGraphs']		link to host graphs page
- * @param bool   options['showScreens']		link to host screen page
- * @param bool   options['showTriggers']	link to Monitoring->Triggers page
- * @param bool   options['hasGoTo']			"Go to" block in popup
- * @param bool   options['fullscreen']		fullscreen mode
- * @param {object} trigger_elmnt			UI element which triggered opening of overlay dialogue.
+ * @param string options['hostid']          Host ID.
+ * @param array  options['scripts']         Host scripts (optional).
+ * @param string options[]['name']          Script name.
+ * @param string options[]['scriptid']      Script ID.
+ * @param string options[]['confirmation']  Confirmation text.
+ * @param bool   options['showGraphs']      Link to host graphs page.
+ * @param bool   options['showScreens']     Link to host screen page.
+ * @param bool   options['showTriggers']    Link to Monitoring->Triggers page.
+ * @param bool   options['hasGoTo']         "Go to" block in popup.
+ * @param bool   options['fullscreen']      Fullscreen mode.
+ * @param {object} trigger_elmnt            UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -89,23 +89,18 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 	// go to section
 	if (options.hasGoTo) {
-		var	fullscreen = '';
-
-		if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
-			fullscreen = '&fullscreen=1';
-		}
-
 		var gotos = [],
+			fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen),
 			// inventory
 			host_inventory = {
-				label: t('Host inventory'),
-				url: new Curl('hostinventories.php?hostid=' + options.hostid + fullscreen).getUrl()
+				label: t('Host inventory')
 			},
+			host_inventory_url = new Curl('hostinventories.php'),
 			// latest
 			latest_data = {
-				label: t('Latest data'),
-				url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid + fullscreen).getUrl()
+				label: t('Latest data')
 			},
+			latest_data_url = new Curl('latest.php'),
 			// triggers
 			triggers = {
 				label: t('Triggers')
@@ -119,25 +114,58 @@ function getMenuPopupHost(options, trigger_elmnt) {
 				label: t('Host screens')
 			};
 
+		// inventory link
+		host_inventory_url.setArgument('hostid', options.hostid);
+		if (fullscreen) {
+			host_inventory_url.setArgument('fullscreen', '1');
+		}
+		host_inventory.url = host_inventory_url.getUrl();
+
+		// latest data link
+		latest_data_url.setArgument('hostids[]', options.hostid);
+		latest_data_url.setArgument('filter_set', '1');
+		if (fullscreen) {
+			latest_data_url.setArgument('fullscreen', '1');
+		}
+		latest_data.url = latest_data_url.getUrl();
+
 		if (!options.showTriggers) {
 			triggers.disabled = true;
 		}
 		else {
-			triggers.url = new Curl('tr_status.php?hostid=' + options.hostid + fullscreen).getUrl();
+			var triggers_url = new Curl('tr_status.php');
+
+			triggers_url.setArgument('hostid', options.hostid);
+			if (fullscreen) {
+				triggers_url.setArgument('fullscreen', '1');
+			}
+			triggers.url = triggers_url.getUrl();
 		}
 
 		if (!options.showGraphs) {
 			graphs.disabled = true;
 		}
 		else {
-			graphs.url = new Curl('charts.php?hostid=' + options.hostid + fullscreen).getUrl();
+			var graphs_url = new Curl('charts.php');
+
+			graphs_url.setArgument('hostid', options.hostid);
+			if (fullscreen) {
+				graphs_url.setArgument('fullscreen', '1');
+			}
+			graphs.url = graphs_url.getUrl();
 		}
 
 		if (!options.showScreens) {
 			screens.disabled = true;
 		}
 		else {
-			screens.url = new Curl('host_screen.php?hostid=' + options.hostid + fullscreen).getUrl();
+			var screens_url = new Curl('host_screen.php');
+
+			screens_url.setArgument('hostid', options.hostid);
+			if (fullscreen) {
+				screens_url.setArgument('fullscreen', '1');
+			}
+			screens.url = screens_url.getUrl();
 		}
 
 		gotos[gotos.length] = host_inventory;
@@ -158,27 +186,28 @@ function getMenuPopupHost(options, trigger_elmnt) {
 /**
  * Get menu popup map section data.
  *
- * @param string options['hostid']					host id
- * @param array  options['scripts']					host scripts (optional)
- * @param string options[]['name']					script name
- * @param string options[]['scriptid']				script id
- * @param string options[]['confirmation']			confirmation text
- * @param object options['gotos']					links section (optional)
- * @param array  options['gotos']['latestData']		link to latest data page
- * @param array  options['gotos']['inventory']		link to host inventory page
- * @param array  options['gotos']['graphs']			link to host graph page with url parameters ("name" => "value")
- * @param array  options['gotos']['showGraphs']		display "Graphs" link enabled or disabled
- * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
- * @param array  options['gotos']['showScreens']	display "Screens" link enabled or disabled
- * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
- * @param array  options['gotos']['showTriggers']	display "Triggers" link enabled or disabled
- * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
- * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
- * @param array  options['gotos']['showEvents']		display "Events" link enabled or disabled
- * @param array  options['urls']					local and global map urls (optional)
- * @param string options['url'][]['label']			url label
- * @param string options['url'][]['url']			url
- * @param {object} trigger_elmnt					UI element which triggered opening of overlay dialogue.
+ * @param string options['hostid']                  Host ID.
+ * @param array  options['scripts']                 Host scripts (optional).
+ * @param string options[]['name']                  Script name.
+ * @param string options[]['scriptid']              Script ID.
+ * @param string options[]['confirmation']          Confirmation text.
+ * @param object options['gotos']                   Links section (optional).
+ * @param array  options['gotos']['latestData']     Link to latest data page.
+ * @param array  options['gotos']['inventory']      Link to host inventory page.
+ * @param array  options['gotos']['graphs']         Link to host graph page with url parameters ("name" => "value").
+ * @param array  options['gotos']['showGraphs']     Display "Graphs" link enabled or disabled.
+ * @param array  options['gotos']['screens']        Link to host screen page with url parameters ("name" => "value").
+ * @param array  options['gotos']['showScreens']    Display "Screens" link enabled or disabled.
+ * @param array  options['gotos']['triggerStatus']  Link to trigger status page with url parameters ("name" => "value").
+ * @param array  options['gotos']['showTriggers']   Display "Triggers" link enabled or disabled.
+ * @param array  options['gotos']['submap']         Link to submap page with url parameters ("name" => "value").
+ * @param array  options['gotos']['events']         Link to events page with url parameters ("name" => "value").
+ * @param array  options['gotos']['showEvents']     Display "Events" link enabled or disabled.
+ * @param array  options['urls']                    Local and global map link (optional).
+ * @param string options['url'][]['label']          Link label.
+ * @param string options['url'][]['url']            Link url.
+ * @param bool   options['fullscreen']              Fullscreen mode.
+ * @param {object} trigger_elmnt                    UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -197,11 +226,15 @@ function getMenuPopupMap(options, trigger_elmnt) {
 	 * Gotos section
 	 */
 	if (typeof options.gotos !== 'undefined') {
-		var gotos = [];
+		var gotos = [],
+			fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen);
 
 		// inventory
 		if (typeof options.gotos.inventory !== 'undefined') {
 			var url = new Curl('hostinventories.php');
+			if (fullscreen) {
+				url.setArgument('fullscreen', '1');
+			}
 
 			jQuery.each(options.gotos.inventory, function(name, value) {
 				if (value !== null) {
@@ -218,6 +251,9 @@ function getMenuPopupMap(options, trigger_elmnt) {
 		// latest
 		if (typeof options.gotos.latestData !== 'undefined') {
 			var url = new Curl('latest.php?filter_set=1');
+			if (fullscreen) {
+				url.setArgument('fullscreen', '1');
+			}
 
 			jQuery.each(options.gotos.latestData, function(name, value) {
 				if (value !== null) {
@@ -242,6 +278,9 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			}
 			else {
 				var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
+				if (fullscreen) {
+					url.setArgument('fullscreen', '1');
+				}
 
 				jQuery.each(options.gotos.triggerStatus, function(name, value) {
 					if (value !== null) {
@@ -266,6 +305,9 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			}
 			else {
 				var url = new Curl('charts.php');
+				if (fullscreen) {
+					url.setArgument('fullscreen', '1');
+				}
 
 				jQuery.each(options.gotos.graphs, function(name, value) {
 					if (value !== null) {
@@ -290,6 +332,9 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			}
 			else {
 				var url = new Curl('host_screen.php');
+				if (fullscreen) {
+					url.setArgument('fullscreen', '1');
+				}
 
 				jQuery.each(options.gotos.screens, function(name, value) {
 					if (value !== null) {
@@ -349,6 +394,9 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				if (typeof options.gotos.events.severity_min !== 'undefined') {
 					url.setArgument('filter_severity', options.gotos.events.severity_min);
 				}
+				if (fullscreen) {
+					url.setArgument('fullscreen', '1');
+				}
 
 				events.url = url.getUrl();
 			}
@@ -376,11 +424,11 @@ function getMenuPopupMap(options, trigger_elmnt) {
 /**
  * Get menu popup refresh section data.
  *
- * @param string   options['widgetName']   widget name
- * @param string   options['currentRate']  current rate value
- * @param bool     options['multiplier']   multiplier or time mode
- * @param array    options['params']       (optoinal) url parameters
- * @param callback options['callback']     (optional) callback function on success
+ * @param string   options['widgetName']   Widget name.
+ * @param string   options['currentRate']  Current rate value.
+ * @param bool     options['multiplier']   Multiplier or time mode.
+ * @param array    options['params']       Url parameters (optional).
+ * @param callback options['callback']     Callback function on success (optional).
  *
  * @return array
  */
@@ -618,16 +666,16 @@ function showDialogForm(form, options, formData, trigger_elmnt) {
 /**
  * Get menu popup trigger section data.
  *
- * @param string options['triggerid']				trigger id
- * @param object options['items']					link to trigger item history page (optional)
- * @param string options['items'][]['name']			item name
- * @param object options['items'][]['params']		item url parameters ("name" => "value")
- * @param object options['acknowledge']				link to acknowledge page (optional)
- * @param string options['acknowledge']['eventid']	event id
- * @param string options['acknowledge']['backurl']	return url
- * @param object options['configuration']			link to trigger configuration page (optional)
- * @param string options['url']						trigger url link (optional)
- * @param bool   options['fullscreen']				fullscreen mode
+ * @param string options['triggerid']               Trigger ID.
+ * @param object options['items']                   Link to trigger item history page (optional).
+ * @param string options['items'][]['name']         Item name.
+ * @param object options['items'][]['params']       Item url parameters ("name" => "value").
+ * @param object options['acknowledge']             Link to acknowledge page (optional).
+ * @param string options['acknowledge']['eventid']  Event ID
+ * @param string options['acknowledge']['backurl']  Return url.
+ * @param object options['configuration']           Link to trigger configuration page (optional).
+ * @param string options['url']                     Trigger url link (optional).
+ * @param bool   options['fullscreen']              Fullscreen mode.
  *
  * @return array
  */
@@ -732,11 +780,11 @@ function getMenuPopupTrigger(options) {
 /**
  * Get menu popup trigger log section data.
  *
- * @param string options['itemid']				item id
- * @param string options['itemName']			item name
- * @param array  options['triggers']			triggers (optional)
- * @param string options['triggers'][n]['id']	trigger id
- * @param string options['triggers'][n]['name']	trigger name
+ * @param string options['itemid']               Item ID.
+ * @param string options['itemName']             Item name.
+ * @param array  options['triggers']             Triggers (optional).
+ * @param string options['triggers'][n]['id']    Trigger ID.
+ * @param string options['triggers'][n]['name']  Trigger name.
  *
  * @return array
  */
@@ -798,9 +846,9 @@ function getMenuPopupTriggerLog(options) {
 /**
  * Get menu structure for dependent items.
  *
- * @param array options['item_name']    Menu label.
- * @param array options['add_label']    Add dependent item menu element label
- * @param array options['add_url']      Add dependent item menu element url
+ * @param array options['item_name']  Menu label.
+ * @param array options['add_label']  Add dependent item menu element label.
+ * @param array options['add_url']    Add dependent item menu element url.
  *
  * @return array
  */
@@ -858,9 +906,9 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param array scripts				Scripts names.
- * @param array hostId				Host id.
- * @param {object} trigger_elmnt	UI element which triggered opening of overlay dialogue.
+ * @param array scripts           Scripts names.
+ * @param array hostId            Host ID.
+ * @param {object} trigger_elmnt  UI element which triggered opening of overlay dialogue.
  *
  * @returns array
  */
@@ -936,10 +984,10 @@ jQuery(function($) {
 	/**
 	 * Menu popup.
 	 *
-	 * @param array  sections				menu sections
-	 * @param string sections[n]['label']	(optional) section title
-	 * @param array  sections[n]['items']	section menu data (see createMenuItem() for available options)
-	 * @param object event					menu popup call event
+	 * @param array  sections              Menu sections.
+	 * @param string sections[n]['label']  Section title (optional).
+	 * @param array  sections[n]['items']  Section menu data (see createMenuItem() for available options).
+	 * @param object event                 Menu popup call event.
 	 *
 	 * @see createMenuItem()
 	 */
@@ -1084,12 +1132,12 @@ jQuery(function($) {
 	/**
 	 * Create menu item.
 	 *
-	 * @param string options['label']			link text
-	 * @param string options['url']				link url
-	 * @param string options['css']				item class
-	 * @param array  options['data']			item data as key => value
-	 * @param array  options['items']			item sub menu
-	 * @param object options['clickCallback']	item click callback
+	 * @param string options['label']          Link label.
+	 * @param string options['url']            Link url.
+	 * @param string options['css']            Item class.
+	 * @param array  options['data']           Item data ("key" => "value").
+	 * @param array  options['items']          Item sub menu.
+	 * @param object options['clickCallback']  Item click callback.
 	 *
 	 * @return object
 	 */

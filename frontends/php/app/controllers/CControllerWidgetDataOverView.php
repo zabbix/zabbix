@@ -35,8 +35,6 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-
 		$fields = $this->getForm()->getFieldsData();
 
 		$this->setResponse(new CControllerResponseData([
@@ -44,7 +42,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'groupids' => getSubGroups($fields['groupids']),
 			'application' => $fields['application'],
 			'style' => $fields['style'],
-			'fullscreen' => $fullscreen,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

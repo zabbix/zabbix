@@ -35,8 +35,6 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-
 		$graphs = [];
 		$ids = ['graphid' => [], 'itemid' => []];
 
@@ -85,7 +83,7 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'graphs' => $graphs,
-			'fullscreen' => $fullscreen,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

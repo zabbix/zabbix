@@ -35,8 +35,6 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-
 		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
 			$drules = API::DRule()->get([
 				'output' => ['druleid', 'name'],
@@ -71,7 +69,7 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'drules' => $drules,
 			'error' => $error,
-			'fullscreen' => $fullscreen,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
