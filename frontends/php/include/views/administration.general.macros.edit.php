@@ -39,7 +39,7 @@ foreach ($data['macros'] as $i => $macro) {
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->setAttribute('placeholder', '{$MACRO}');
 
-	if ($i === 0) {
+	if ($i == 0) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 

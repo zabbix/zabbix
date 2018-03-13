@@ -52,7 +52,7 @@ if (!$data['is_profile']) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
-		->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
+			->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
 	);
 	$form_autofocus = true;
 	$userFormList->addRow(_x('Name', 'user first name'),
