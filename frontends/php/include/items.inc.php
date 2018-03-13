@@ -1052,7 +1052,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 	return $table;
 }
 
-function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
+function getItemDataOverviewCells($tableRow, $ithosts, $hostName, $fullscreen = false) {
 	$ack = null;
 	$css = '';
 	$value = UNKNOWN_VALUE;
@@ -1071,7 +1071,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 				if ($ack) {
 					$ack = reset($ack);
 					$ack = ($ack['acknowledged'] == 1)
-						? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
+						? [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
 						: null;
 				}
 			}

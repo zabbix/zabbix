@@ -24,34 +24,37 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for item history menu popup.
 	 *
-	 * @param array $item				item data
-	 * @param int   $item['itemid']		item id
-	 * @param int   $item['value_type']	item value type
+	 * @param array $item                Item data.
+	 * @param int   $item['itemid']      Item ID.
+	 * @param int   $item['value_type']  Item value type.
+	 * @param bool  $fullscreen          Fullscreen mode.
 	 *
 	 * @return array
 	 */
-	public static function getHistory(array $item) {
+	public static function getHistory(array $item, $fullscreen = true) {
+
 		return [
 			'type' => 'history',
 			'itemid' => $item['itemid'],
-			'hasLatestGraphs' => in_array($item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
+			'hasLatestGraphs' => in_array($item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]),
+			'fullscreen' => $fullscreen
 		];
 	}
 
 	/**
 	 * Prepare data for host menu popup.
 	 *
-	 * @param array  $host						host data
-	 * @param string $host['hostid']			host id
-	 * @param string $host['status']			host status
-	 * @param array  $host['graphs']			host graphs
-	 * @param array  $host['screens']			host screens
-	 * @param array  $scripts					host scripts (optional)
-	 * @param string $scripts[]['name']			script name
-	 * @param string $scripts[]['scriptid']		script id
-	 * @param string $scripts[]['confirmation']	confirmation text
-	 * @param bool   $has_goto					"Go to" block in popup
-	 * @param bool   $fullscreen				fullscreen mode
+	 * @param array  $host                       Host data.
+	 * @param string $host['hostid']             Host ID.
+	 * @param string $host['status']             Host status.
+	 * @param array  $host['graphs']             Host graphs.
+	 * @param array  $host['screens']            Host screens.
+	 * @param array  $scripts                    Host scripts (optional).
+	 * @param string $scripts[]['name']          Script name.
+	 * @param string $scripts[]['scriptid']      Script ID.
+	 * @param string $scripts[]['confirmation']  Confirmation text.
+	 * @param bool   $has_goto                   "Go to" block in popup.
+	 * @param bool   $fullscreen                 Fullscreen mode.
 	 *
 	 * @return array
 	 */
@@ -63,12 +66,9 @@ class CMenuPopupHelper {
 			'showGraphs' => (bool) $host['graphs'],
 			'showScreens' => (bool) $host['screens'],
 			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
-			'hasGoTo' => $has_goto
+			'hasGoTo' => $has_goto,
+			'fullscreen' => $fullscreen
 		];
-
-		if ($fullscreen) {
-			$data['fullscreen'] = true;
-		}
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
@@ -176,25 +176,25 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for trigger menu popup.
 	 *
-	 * @param array  $trigger							trigger data
-	 * @param string $trigger['triggerid']				trigger ID
-	 * @param int    $trigger['flags']					trigger flags (TRIGGER_FLAG_DISCOVERY*)
-	 * @param array  $trigger['hosts']					hosts, used by trigger expression
-	 * @param string $trigger['hosts'][]['hostid']		host ID
-	 * @param string $trigger['hosts'][]['name']		host name
-	 * @param string $trigger['hosts'][]['status']		host status
-	 * @param array  $trigger['items']					trigger items
-	 * @param string $trigger['items'][]['itemid']		item ID
-	 * @param string $trigger['items'][]['hostid']		host ID
-	 * @param string $trigger['items'][]['name']		item name
-	 * @param string $trigger['items'][]['key_']		item key
-	 * @param string $trigger['items'][]['value_type']	type of information of the item
-	 * @param string $trigger['url']					trigger URL
-	 * @param array  $acknowledge						acknowledge link parameters (optional)
-	 * @param string $acknowledge['eventid']			event ID
-	 * @param string $acknowledge['screenid']			screen ID (optional)
-	 * @param string $acknowledge['backurl']			return URL (optional)
-	 * @param bool   $fullscreen				        fullscreen mode
+	 * @param array  $trigger                           Trigger data.
+	 * @param string $trigger['triggerid']              Trigger ID.
+	 * @param int    $trigger['flags']                  Trigger flags (TRIGGER_FLAG_DISCOVERY*).
+	 * @param array  $trigger['hosts']                  Hosts, used by trigger expression.
+	 * @param string $trigger['hosts'][]['hostid']      Host ID.
+	 * @param string $trigger['hosts'][]['name']        Host name.
+	 * @param string $trigger['hosts'][]['status']      Host status.
+	 * @param array  $trigger['items']                  Trigger items.
+	 * @param string $trigger['items'][]['itemid']      Item ID.
+	 * @param string $trigger['items'][]['hostid']      Host ID.
+	 * @param string $trigger['items'][]['name']        Item name.
+	 * @param string $trigger['items'][]['key_']        Item key.
+	 * @param string $trigger['items'][]['value_type']  Type of information of the item.
+	 * @param string $trigger['url']                    Trigger URL.
+	 * @param array  $acknowledge                       Acknowledge link parameters (optional).
+	 * @param string $acknowledge['eventid']            Event ID.
+	 * @param string $acknowledge['screenid']           Screen ID (optional).
+	 * @param string $acknowledge['backurl']            Return URL (optional).
+	 * @param bool   $fullscreen                        Fullscreen mode.
 	 *
 	 * @return array
 	 */
@@ -241,15 +241,12 @@ class CMenuPopupHelper {
 			'triggerid' => $trigger['triggerid'],
 			'items' => $items,
 			'showEvents' => $showEvents,
-			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
+			'fullscreen' => $fullscreen
 		];
 
 		if ($acknowledge !== null) {
 			$data['acknowledge'] = $acknowledge;
-		}
-
-		if ($fullscreen) {
-			$data['fullscreen'] = true;
 		}
 
 		if ($trigger['url'] !== '') {

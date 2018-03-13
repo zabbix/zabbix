@@ -27,31 +27,45 @@
  * @return array
  */
 function getMenuPopupHistory(options) {
-	var items = [];
+	var items = [],
+		url = new Curl('history.php');
+
+	url.setArgument('itemids[]', options.itemid);
+
+	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
+		url.setArgument('fullscreen', '1');
+	}
 
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
-		items[items.length] = {
+		url.setArgument('action', 'showgraph');
+
+		url.setArgument('period', '3600');
+		items.push({
 			label: t('Last hour graph'),
-			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=3600').getUrl()
-		};
+			url: url.getUrl()
+		});
 
-		items[items.length] = {
+		url.setArgument('period', '604800');
+		items.push({
 			label: t('Last week graph'),
-			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=604800').getUrl()
-		};
+			url: url.getUrl()
+		});
 
-		items[items.length] = {
+		url.setArgument('period', '2678400');
+		items.push({
 			label: t('Last month graph'),
-			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
-		};
+			url: url.getUrl()
+		});
 	}
 
 	// latest values
-	items[items.length] = {
+	url.setArgument('action', 'showvalues');
+	url.setArgument('period', '3600');
+	items.push({
 		label: t('Latest values'),
-		url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showvalues&period=3600').getUrl()
-	};
+		url: url.getUrl()
+	});
 
 	return [{
 		label: t('History'),
@@ -81,16 +95,15 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
-		sections[sections.length] = {
+		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
-		};
+		});
 	}
 
 	// go to section
 	if (options.hasGoTo) {
-		var gotos = [],
-			fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen),
+		var fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen),
 			// inventory
 			host_inventory = {
 				label: t('Host inventory')
@@ -168,16 +181,16 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			screens.url = screens_url.getUrl();
 		}
 
-		gotos[gotos.length] = host_inventory;
-		gotos[gotos.length] = latest_data;
-		gotos[gotos.length] = triggers;
-		gotos[gotos.length] = graphs;
-		gotos[gotos.length] = screens;
-
-		sections[sections.length] = {
+		sections.push({
 			label: t('Go to'),
-			items: gotos
-		};
+			items: [
+				host_inventory,
+				latest_data,
+				triggers,
+				graphs,
+				screens
+			]
+		});
 	}
 
 	return sections;
@@ -216,10 +229,10 @@ function getMenuPopupMap(options, trigger_elmnt) {
 
 	// scripts
 	if (typeof options.scripts !== 'undefined') {
-		sections[sections.length] = {
+		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
-		};
+		});
 	}
 
 	/*
@@ -242,15 +255,16 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				}
 			});
 
-			gotos[gotos.length] = {
+			gotos.push({
 				label: t('Host inventory'),
 				url: url.getUrl()
-			};
+			});
 		}
 
 		// latest
 		if (typeof options.gotos.latestData !== 'undefined') {
-			var url = new Curl('latest.php?filter_set=1');
+			var url = new Curl('latest.php');
+			url.setArgument('filter_set', '1');
 			if (fullscreen) {
 				url.setArgument('fullscreen', '1');
 			}
@@ -261,10 +275,10 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				}
 			});
 
-			gotos[gotos.length] = {
+			gotos.push({
 				label: t('Latest data'),
 				url: url.getUrl()
-			};
+			});
 		}
 
 		// trigger status
@@ -277,7 +291,9 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				triggers.disabled = true;
 			}
 			else {
-				var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
+				var url = new Curl('tr_status.php');
+				url.setArgument('filter_set', '1');
+				url.setArgument('show_maintenance', '1');
 				if (fullscreen) {
 					url.setArgument('fullscreen', '1');
 				}
@@ -291,7 +307,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				triggers.url = url.getUrl();
 			}
 
-			gotos[gotos.length] = triggers;
+			gotos.push(triggers);
 		}
 
 		// graphs
@@ -318,7 +334,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				graphs.url = url.getUrl();
 			}
 
-			gotos[gotos.length] = graphs;
+			gotos.push(graphs);
 		}
 
 		// screens
@@ -345,12 +361,13 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				screens.url = url.getUrl();
 			}
 
-			gotos[gotos.length] = screens;
+			gotos.push(screens);
 		}
 
 		// submap
 		if (typeof options.gotos.submap !== 'undefined') {
-			var url = new Curl('zabbix.php?action=map.view');
+			var url = new Curl('zabbix.php');
+			url.setArgument('action', 'map.view');
 
 			jQuery.each(options.gotos.submap, function(name, value) {
 				if (value !== null) {
@@ -358,22 +375,23 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				}
 			});
 
-			gotos[gotos.length] = {
+			gotos.push({
 				label: t('Submap'),
 				url: url.getUrl()
-			};
+			});
 		}
 		else if (typeof options.navigatetos !== 'undefined'
 			&& typeof options.navigatetos.submap.widget_uniqueid !== 'undefined') {
-				var url = new Curl('javascript: navigateToSubmap('+options.navigatetos.submap.sysmapid+', "'+
-					options.navigatetos.submap.widget_uniqueid+'");');
+
+			var url = new Curl('javascript: navigateToSubmap('+options.navigatetos.submap.sysmapid+', "'+
+				options.navigatetos.submap.widget_uniqueid+'");');
 
 			url.unsetArgument('sid');
 
-			gotos[gotos.length] = {
+			gotos.push({
 				label: t('Submap'),
 				url: url.getUrl()
-			};
+			});
 		}
 
 		// events
@@ -401,21 +419,21 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				events.url = url.getUrl();
 			}
 
-			gotos[gotos.length] = events;
+			gotos.push(events);
 		}
 
-		sections[sections.length] = {
+		sections.push({
 			label: t('Go to'),
 			items: gotos
-		};
+		});
 	}
 
 	// urls
 	if (typeof options.urls !== 'undefined') {
-		sections[sections.length] = {
+		sections.push({
 			label: t('URLs'),
 			items: options.urls
-		};
+		});
 	}
 
 	return sections;
