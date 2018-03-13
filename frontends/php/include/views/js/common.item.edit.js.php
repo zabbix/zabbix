@@ -287,7 +287,7 @@ $ui_rows = [
 	ITEM_TYPE_HTTPAGENT => [
 		'url_row', 'query_fields_row', 'request_method_row', 'timeout_row', 'post_type_row', 'posts_row', 'headers_row',
 		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'allow_traps_row',
-		'http_proxy_row', 'http_authtype_row', 'verify_peer_row', 'verify_host_row', 'ssl_key_file_row',
+		'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row', 'ssl_key_file_row',
 		'ssl_cert_file_row', 'ssl_key_password_row'
 	]
 ];
@@ -364,14 +364,11 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
-$data['http_auth_switcher'] = [
-	HTTPTEST_AUTH_BASIC => [
-		'http_username_row', 'http_password_row'
-	],
-	HTTPTEST_AUTH_NTLM => [
-		'http_username_row', 'http_password_row'
-	]
-];
+$data['http_auth_switcher'] = [];
+zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_BASIC, 'http_username_row');
+zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_BASIC, 'http_password_row');
+zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_username_row');
+zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_password_row');
 
 ?>
 <script type="text/javascript">
@@ -412,19 +409,6 @@ $data['http_auth_switcher'] = [
 				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
 
 				setAuthTypeLabel();
-
-				// Check HTTP auth and toggle HTTP username and password fields.
-				if (jQuery(this).val() == <?= ITEM_TYPE_HTTPAGENT ?>) {
-					if (jQuery('#http_authtype').val() == <?= HTTPTEST_AUTH_NONE ?>) {
-						jQuery('#http_username_row, #http_password_row').hide();
-					}
-					else {
-						jQuery('#http_username_row, #http_password_row').show();
-					}
-				}
-				else {
-					jQuery('#http_username_row, #http_password_row').hide();
-				}
 			})
 			.trigger('change');
 
