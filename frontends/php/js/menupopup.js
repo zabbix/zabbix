@@ -1104,6 +1104,11 @@ jQuery(function($) {
 				}
 			}
 			else {
+				// Remove activity from item that has been selected by keyboard and now is deselected using mouse.
+				if ($('>a', item[0]).hasClass('highlighted')) {
+					$('>a', item[0]).removeClass('highlighted').blur();
+				}
+
 				// Closes all other submenus from this level, if they were open.
 				if ($('ul', item[0]).is(':visible')) {
 					$('ul', item[0]).prev('[role="menuitem"]').removeClass('highlighted');
