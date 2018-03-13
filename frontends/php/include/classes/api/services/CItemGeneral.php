@@ -1627,7 +1627,7 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Converts headers field text to hash with header name as key.
 	 *
-	 * @param string $headers   Headers string, one header per line, line delimiter "\r\n".
+	 * @param string $headers  Headers string, one header per line, line delimiter "\r\n".
 	 *
 	 * @return array
 	 */
@@ -1637,7 +1637,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach (explode("\r\n", $headers) as $header) {
 			$header = explode(': ', $header, 2);
 
-			if (count($header) === 2) {
+			if (count($header) == 2) {
 				$result[$header[0]] = $header[1];
 			}
 		}
@@ -1648,11 +1648,11 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Converts headers fields hash to string.
 	 *
-	 * @param array $headers    Array of headers where key is header name.
+	 * @param array $headers  Array of headers where key is header name.
 	 *
 	 * @return string
 	 */
-	protected function headersArrayToString($headers) {
+	protected function headersArrayToString(array $headers) {
 		$result = [];
 
 		foreach ($headers as $k => $v) {
