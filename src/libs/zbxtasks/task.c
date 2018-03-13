@@ -789,19 +789,17 @@ out:
  ******************************************************************************/
 static zbx_tm_check_now_t	*tm_json_deserialize_check_now(const struct zbx_json_parse *jp)
 {
-	char			value[MAX_STRING_LEN];
+	char			value[MAX_ID_LEN + 1];
 	zbx_uint64_t		itemid;
 	zbx_tm_check_now_t	*data = NULL;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_ITEMID, value, sizeof(value)) ||
 			SUCCEED != is_uint64(value, &itemid))
 	{
-		goto out;
+		return NULL;
 	}
 
-	data = zbx_tm_check_now_create(itemid);
-out:
-	return data;
+	return zbx_tm_check_now_create(itemid);
 }
 
 /******************************************************************************
