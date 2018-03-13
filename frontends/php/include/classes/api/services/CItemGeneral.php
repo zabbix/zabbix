@@ -1673,7 +1673,10 @@ abstract class CItemGeneral extends CApiService {
 	protected function validateHTTPCheck($item, $db_item) {
 		$rules = [
 			'timeout' => [
-				'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '1:'.SEC_PER_MIN
+				'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
+					? API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+					: API_ALLOW_USER_MACRO,
+				'in' => '1:'.SEC_PER_MIN
 			],
 			'url' => [
 				'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
