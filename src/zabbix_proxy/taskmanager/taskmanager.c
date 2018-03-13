@@ -149,24 +149,22 @@ finish:
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 {
-	const char			*__function_name = "tm_process_check_now";
+	const char		*__function_name = "tm_process_check_now";
 
-	DB_ROW				row;
-	DB_RESULT			result;
-	int				processed_num = 0;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_vector_ptr_t		tasks;
-	zbx_vector_uint64_t		done_taskids;
-	zbx_uint64_t			taskid, itemid;
-	zbx_tm_task_t			*task;
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			processed_num = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_ptr_t	tasks;
+	zbx_uint64_t		taskid, itemid;
+	zbx_tm_task_t		*task;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, taskids->values_num);
 
 	zbx_vector_uint64_sort(taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&tasks);
-	zbx_vector_uint64_create(&done_taskids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select taskid,itemid from task_check_now where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
@@ -175,13 +173,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(taskid, row[0]);
-
-		if (SUCCEED == DBis_null(row[1]))
-		{
-			zbx_vector_uint64_append(&done_taskids, taskid);
-			continue;
-		}
-
 		ZBX_STR2UINT64(itemid, row[1]);
 
 		task = zbx_tm_task_create(taskid, ZBX_TM_TASK_CHECK_NOW, ZBX_TM_STATUS_NEW, 0, 0, 0);
@@ -193,9 +184,11 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	if (0 != tasks.values_num)
 	{
 		zbx_dc_process_check_now_tasks(&tasks);
+		processed_num = tasks.values_num;
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , "update task set status=%d where", ZBX_TM_STATUS_DONE);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where",
+				ZBX_TM_STATUS_DONE);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
 
 		DBexecute("%s", sql);
@@ -203,18 +196,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 	}
 
-	if (0 != done_taskids.values_num)
-	{
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset ,"update task set status=%d where",
-				ZBX_TM_STATUS_DONE);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", done_taskids.values,
-				done_taskids.values_num);
-		DBexecute("%s", sql);
-	}
-
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&done_taskids);
 	zbx_vector_ptr_destroy(&tasks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
