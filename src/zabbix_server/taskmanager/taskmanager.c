@@ -353,7 +353,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_vector_uint64_t	done_taskids;
 	zbx_uint64_t		taskid, itemid, proxy_hostid;
 	zbx_tm_task_t		*task;
-	unsigned char		status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, taskids->values_num);
 
@@ -384,7 +383,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
 		if (0 != proxy_hostid)
 		{
-			if (ZBX_TM_STATUS_INPROGRESS == (status = atoi(row[1])))
+			if (ZBX_TM_STATUS_INPROGRESS == atoi(row[1]))
 			{
 				/* task has been sent to proxy, mark as done */
 				zbx_vector_uint64_append(&done_taskids, taskid);
@@ -416,14 +415,16 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			/* close in progress proxy tasks (sent) */
 			if (0 == task->proxy_hostid)
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " status=%d", ZBX_TM_STATUS_DONE);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " status=%d", ZBX_TM_STATUS_DONE);
 			}
 			else
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " proxy_hostid=" ZBX_FS_UI64,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " proxy_hostid=" ZBX_FS_UI64,
 						task->proxy_hostid);
 			}
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , " where taskid=" ZBX_FS_UI64 ";\n", task->taskid);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where taskid=" ZBX_FS_UI64 ";\n",
+					task->taskid);
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
@@ -439,7 +440,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	if (0 != done_taskids.values_num)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset ,"update task set status=%d where",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where",
 				ZBX_TM_STATUS_DONE);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", done_taskids.values,
 				done_taskids.values_num);
