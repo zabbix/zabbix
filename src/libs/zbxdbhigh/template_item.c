@@ -56,6 +56,23 @@ typedef struct
 	char			*lifetime;
 	char			*port;
 	char			*jmx_endpoint;
+	char			*timeout;
+	char			*url;
+	char			*query_fields;
+	char			*posts;
+	char			*status_codes;
+	char			*http_proxy;
+	char			*headers;
+	char			*ssl_cert_file;
+	char			*ssl_key_file;
+	char			*ssl_key_password;
+	unsigned char		verify_peer;
+	unsigned char		verify_host;
+	unsigned char		follow_redirects;
+	unsigned char		post_type;
+	unsigned char		retrieve_mode;
+	unsigned char		request_method;
+	unsigned char		output_format;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		status;
@@ -160,7 +177,10 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
 				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.description,"
 				"ti.inventory_link,ti.lifetime,ti.snmpv3_contextname,hi.itemid,ti.evaltype,ti.port,"
-				"ti.jmx_endpoint,ti.master_itemid,ti.allow_traps"
+				"ti.jmx_endpoint,ti.master_itemid,ti.timeout,ti.url,ti.query_fields,ti.posts,"
+				"ti.status_codes,ti.follow_redirects,ti.post_type,ti.http_proxy,ti.headers,"
+				"ti.retrieve_mode,ti.request_method,ti.output_format,ti.ssl_cert_file,ti.ssl_key_file,"
+				"ti.ssl_key_password,ti.verify_peer,ti.verify_host,ti.allow_traps"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -186,7 +206,6 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->flags, row[29]);
 		ZBX_STR2UCHAR(item->inventory_link, row[31]);
 		ZBX_STR2UCHAR(item->evaltype, row[35]);
-		ZBX_STR2UCHAR(item->allow_traps, row[39]);
 
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
@@ -242,6 +261,24 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			item->itemid = 0;
 		}
 
+		item->timeout = zbx_strdup(NULL, row[39]);
+		item->url = zbx_strdup(NULL, row[40]);
+		item->query_fields = zbx_strdup(NULL, row[41]);
+		item->posts = zbx_strdup(NULL, row[42]);
+		item->status_codes = zbx_strdup(NULL, row[43]);
+		ZBX_STR2UCHAR(item->follow_redirects, row[44]);
+		ZBX_STR2UCHAR(item->post_type, row[45]);
+		item->http_proxy = zbx_strdup(NULL, row[46]);
+		item->headers = zbx_strdup(NULL, row[47]);
+		ZBX_STR2UCHAR(item->retrieve_mode, row[48]);
+		ZBX_STR2UCHAR(item->request_method, row[49]);
+		ZBX_STR2UCHAR(item->output_format, row[50]);
+		item->ssl_cert_file = zbx_strdup(NULL, row[51]);
+		item->ssl_key_file = zbx_strdup(NULL, row[52]);
+		item->ssl_key_password = zbx_strdup(NULL, row[53]);
+		ZBX_STR2UCHAR(item->verify_peer, row[54]);
+		ZBX_STR2UCHAR(item->verify_host, row[55]);
+		ZBX_STR2UCHAR(item->allow_traps, row[56]);
 		zbx_vector_ptr_create(&item->dependent_items);
 		zbx_vector_ptr_append(items, item);
 	}
@@ -506,7 +543,9 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			*logtimefmt_esc, *params_esc, *ipmi_sensor_esc, *snmp_community_esc, *snmp_oid_esc,
 			*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc, *username_esc,
 			*password_esc, *publickey_esc, *privatekey_esc, *description_esc, *lifetime_esc,
-			*snmpv3_contextname_esc, *port_esc, *jmx_endpoint_esc;
+			*snmpv3_contextname_esc, *port_esc, *jmx_endpoint_esc, *timeout_esc, *url_esc,
+			*query_fields_esc, *posts_esc, *status_codes_esc, *http_proxy_esc, *headers_esc,
+			*ssl_cert_file_esc, *ssl_key_file_esc, *ssl_key_password_esc;
 
 		name_esc = DBdyn_escape_string(item->name);
 		delay_esc = DBdyn_escape_string(item->delay);
@@ -532,6 +571,16 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		snmpv3_contextname_esc = DBdyn_escape_string(item->snmpv3_contextname);
 		port_esc = DBdyn_escape_string(item->port);
 		jmx_endpoint_esc = DBdyn_escape_string(item->jmx_endpoint);
+		timeout_esc = DBdyn_escape_string(item->timeout);
+		url_esc = DBdyn_escape_string(item->url);
+		query_fields_esc = DBdyn_escape_string(item->query_fields);
+		posts_esc = DBdyn_escape_string(item->posts);
+		status_codes_esc = DBdyn_escape_string(item->status_codes);
+		http_proxy_esc = DBdyn_escape_string(item->http_proxy);
+		headers_esc = DBdyn_escape_string(item->headers);
+		ssl_cert_file_esc = DBdyn_escape_string(item->ssl_cert_file);
+		ssl_key_file_esc = DBdyn_escape_string(item->ssl_key_file);
+		ssl_key_password_esc = DBdyn_escape_string(item->ssl_key_password);
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 				"update items"
@@ -573,6 +622,23 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					"port='%s',"
 					"jmx_endpoint='%s',"
 					"master_itemid=%s,"
+					"timeout='%s',"
+					"url='%s',"
+					"query_fields='%s',"
+					"posts='%s',"
+					"status_codes='%s',"
+					"follow_redirects=%d,"
+					"post_type=%d,"
+					"http_proxy='%s',"
+					"headers='%s',"
+					"retrieve_mode=%d,"
+					"request_method=%d,"
+					"output_format=%d,"
+					"ssl_cert_file='%s',"
+					"ssl_key_file='%s',"
+					"ssl_key_password='%s',"
+					"verify_peer=%d,"
+					"verify_host=%d,"
 					"allow_traps=%d"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				name_esc, (int)item->type, (int)item->value_type, delay_esc,
@@ -585,6 +651,10 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				privatekey_esc, item->templateid, (int)item->flags, description_esc,
 				(int)item->inventory_link, DBsql_id_ins(item->interfaceid), lifetime_esc,
 				(int)item->evaltype, port_esc, jmx_endpoint_esc, DBsql_id_ins(item->master_itemid),
+				timeout_esc, url_esc, query_fields_esc, posts_esc, status_codes_esc,
+				item->follow_redirects, item->post_type, http_proxy_esc, headers_esc,
+				item->retrieve_mode, item->request_method, item->output_format, ssl_cert_file_esc,
+				ssl_key_file_esc, ssl_key_password_esc, item->verify_peer, item->verify_host,
 				item->allow_traps, item->itemid);
 
 		zbx_free(jmx_endpoint_esc);
@@ -611,6 +681,16 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		zbx_free(history_esc);
 		zbx_free(delay_esc);
 		zbx_free(name_esc);
+		zbx_free(timeout_esc);
+		zbx_free(url_esc);
+		zbx_free(query_fields_esc);
+		zbx_free(posts_esc);
+		zbx_free(status_codes_esc);
+		zbx_free(http_proxy_esc);
+		zbx_free(headers_esc);
+		zbx_free(ssl_cert_file_esc);
+		zbx_free(ssl_key_file_esc);
+		zbx_free(ssl_key_password_esc);
 	}
 	else
 	{
@@ -624,7 +704,11 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->username, item->password, item->publickey, item->privatekey, item->templateid,
 				(int)item->flags, item->description, (int)item->inventory_link, item->interfaceid,
 				item->lifetime, item->snmpv3_contextname, (int)item->evaltype, item->port,
-				item->jmx_endpoint, item->master_itemid, item->allow_traps);
+				item->jmx_endpoint, item->master_itemid, item->timeout, item->url, item->query_fields,
+				item->posts, item->status_codes, item->follow_redirects, item->post_type,
+				item->http_proxy, item->headers, item->retrieve_mode, item->request_method,
+				item->output_format, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
+				item->verify_peer, item->verify_host, item->allow_traps);
 
 		item->itemid = (*itemid)++;
 	}
@@ -682,7 +766,10 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				"snmpv3_privpassphrase", "authtype", "username", "password", "publickey", "privatekey",
 				"templateid", "flags", "description", "inventory_link", "interfaceid", "lifetime",
 				"snmpv3_contextname", "evaltype", "port", "jmx_endpoint", "master_itemid",
-				"allow_traps", NULL);
+				"timeout", "url", "query_fields", "posts", "status_codes", "follow_redirects",
+				"post_type", "http_proxy", "headers", "retrieve_mode", "request_method",
+				"output_format", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "verify_peer",
+				"verify_host", "allow_traps", NULL);
 	}
 
 	if (0 != upd_items)
@@ -1050,6 +1137,16 @@ out:
  ******************************************************************************/
 static void	free_template_item(zbx_template_item_t *item)
 {
+	zbx_free(item->timeout);
+	zbx_free(item->url);
+	zbx_free(item->query_fields);
+	zbx_free(item->posts);
+	zbx_free(item->status_codes);
+	zbx_free(item->http_proxy);
+	zbx_free(item->headers);
+	zbx_free(item->ssl_cert_file);
+	zbx_free(item->ssl_key_file);
+	zbx_free(item->ssl_key_password);
 	zbx_free(item->jmx_endpoint);
 	zbx_free(item->port);
 	zbx_free(item->snmpv3_contextname);
