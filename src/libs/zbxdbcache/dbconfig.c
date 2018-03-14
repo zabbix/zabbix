@@ -11112,10 +11112,10 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
  ******************************************************************************/
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids)
 {
-	int			i;
-	ZBX_DC_ITEM		*dc_item;
-	ZBX_DC_HOST		*dc_host;
-	zbx_uint64_t		proxy_hostid;
+	int		i;
+	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
+	zbx_uint64_t	proxy_hostid;
 
 	LOCK_CACHE;
 
@@ -11129,11 +11129,8 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 			proxy_hostid = 0;
 		}
-		else
-		{
-			if (0 == (proxy_hostid = dc_host->proxy_hostid))
-				dc_requeue_item_at(dc_item, dc_host, nextcheck);
-		}
+		else if (0 == (proxy_hostid = dc_host->proxy_hostid))
+			dc_requeue_item_at(dc_item, dc_host, nextcheck);
 
 		if (NULL != proxy_hostids)
 			proxy_hostids[i] = proxy_hostid;
