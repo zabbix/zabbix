@@ -573,7 +573,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					"port='%s',"
 					"jmx_endpoint='%s',"
 					"master_itemid=%s,"
-					"allow_traps=ds"
+					"allow_traps=%d"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				name_esc, (int)item->type, (int)item->value_type, delay_esc,
 				history_esc, trends_esc, (int)item->status, trapper_hosts_esc, units_esc,
