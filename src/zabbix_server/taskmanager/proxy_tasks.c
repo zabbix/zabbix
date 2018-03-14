@@ -94,7 +94,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 					continue;
 				}
 
-				ZBX_DBROW2UINT64(itemid, row[16]);
+				ZBX_STR2UINT64(itemid, row[16]);
 				task->data = (void *)zbx_tm_check_now_create(itemid);
 				break;
 		}
