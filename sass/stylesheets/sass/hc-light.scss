@@ -218,6 +218,11 @@ $icon-widget-btn: (
 }
 
 .action-menu {
+
+	.action-menu-item-disabled {
+		color: $form-disabled-font-color;
+	}
+
 	.action-menu-item {
 		&:hover,
 		&:focus,

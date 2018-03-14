@@ -240,6 +240,10 @@ $icon-widget-btn: (
 	background-color: $form-bg-color;
 	border: 1px solid $form-border-color;
 
+	.action-menu-item-disabled {
+		color: $form-disabled-font-color;
+	}
+
 	.action-menu-item {
 		&:hover,
 		&:focus,
