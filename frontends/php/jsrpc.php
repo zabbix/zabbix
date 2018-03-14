@@ -283,7 +283,6 @@ switch ($data['method']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'key_'],
 					'selectHosts' => ['name'],
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);
