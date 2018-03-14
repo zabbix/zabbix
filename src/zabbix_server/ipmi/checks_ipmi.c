@@ -340,8 +340,10 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	s->type = ipmi_sensor_get_sensor_type(sensor);
 
 	ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
+
 	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 	sz = strlen(domain_name);
+
 	if (sz >= strlen(full_name) || 0 != strncmp(domain_name, full_name, sz))
 		sz = 0;
 
@@ -473,8 +475,10 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	ipmi_control_get_id(control, c_name, sz);
 
 	ipmi_control_get_name(control, full_name, sizeof(full_name));
+
 	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 	dm_sz = strlen(domain_name);
+
 	if (dm_sz >= strlen(full_name) || 0 != strncmp(domain_name, full_name, dm_sz))
 		dm_sz = 0;
 
