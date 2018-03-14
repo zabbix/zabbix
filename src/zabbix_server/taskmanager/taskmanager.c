@@ -458,6 +458,27 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_expire_generic_tasks                                          *
+ *                                                                            *
+ * Purpose: expires tasks that don't require specific expiration handling     *
+ *                                                                            *
+ * Return value: The number of successfully expired tasks                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where", ZBX_TM_STATUS_EXPIRED);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
+	DBexecute("%s", sql);
+
+	return taskids->values_num;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_process_tasks                                                 *
  *                                                                            *
  * Purpose: process task manager tasks depending on task type                 *
@@ -469,12 +490,13 @@ static int	tm_process_tasks(int now)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
-	int			type, processed_num = 0, clock, ttl;
+	int			type, processed_num = 0, expired_num = 0, clock, ttl;
 	zbx_uint64_t		taskid;
-	zbx_vector_uint64_t	ack_taskids, check_now_taskids;
+	zbx_vector_uint64_t	ack_taskids, check_now_taskids, expire_taskids;
 
 	zbx_vector_uint64_create(&ack_taskids);
 	zbx_vector_uint64_create(&check_now_taskids);
+	zbx_vector_uint64_create(&expire_taskids);
 
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
@@ -499,8 +521,10 @@ static int	tm_process_tasks(int now)
 			case ZBX_TM_TASK_REMOTE_COMMAND:
 				/* both - 'new' and 'in progress' remote tasks should expire */
 				if (0 != ttl && clock + ttl < now)
+				{
 					tm_expire_remote_command(taskid);
-				processed_num++;
+					expired_num++;
+				}
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				/* close problem tasks will never have 'in progress' status */
@@ -511,7 +535,10 @@ static int	tm_process_tasks(int now)
 				zbx_vector_uint64_append(&ack_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
-				zbx_vector_uint64_append(&check_now_taskids, taskid);
+				if (0 != ttl && clock + ttl < now)
+					zbx_vector_uint64_append(&expire_taskids, taskid);
+				else
+					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -527,10 +554,14 @@ static int	tm_process_tasks(int now)
 	if (0 < check_now_taskids.values_num)
 		processed_num += tm_process_check_now(&check_now_taskids);
 
+	if (0 < expire_taskids.values_num)
+		expired_num += tm_expire_generic_tasks(&expire_taskids);
+
+	zbx_vector_uint64_destroy(&expire_taskids);
 	zbx_vector_uint64_destroy(&check_now_taskids);
 	zbx_vector_uint64_destroy(&ack_taskids);
 
-	return processed_num;
+	return processed_num + expired_num;
 }
 
 /******************************************************************************

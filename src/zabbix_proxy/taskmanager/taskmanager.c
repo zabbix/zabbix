@@ -185,7 +185,10 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	{
 		zbx_dc_process_check_now_tasks(&tasks);
 		processed_num = tasks.values_num;
+	}
 
+	if (0 != taskids->values_num)
+	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where",
 				ZBX_TM_STATUS_DONE);
