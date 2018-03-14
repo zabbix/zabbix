@@ -42,8 +42,8 @@
  ******************************************************************************/
 void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	/* skip tasks past expiry data - task manager will handle them */
 	result = DBselect(
@@ -101,8 +101,6 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 
 		zbx_vector_ptr_append(tasks, task);
 	}
-
 	DBfree_result(result);
 }
-
 
