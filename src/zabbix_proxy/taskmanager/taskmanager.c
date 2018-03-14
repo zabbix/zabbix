@@ -156,35 +156,28 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	int			processed_num = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_vector_ptr_t	tasks;
-	zbx_uint64_t		taskid, itemid;
-	zbx_tm_task_t		*task;
+	zbx_vector_uint64_t	itemids;
+	zbx_uint64_t		itemid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, taskids->values_num);
 
-	zbx_vector_uint64_sort(taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_create(&itemids);
 
-	zbx_vector_ptr_create(&tasks);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select taskid,itemid from task_check_now where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from task_check_now where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(taskid, row[0]);
-		ZBX_STR2UINT64(itemid, row[1]);
-
-		task = zbx_tm_task_create(taskid, ZBX_TM_TASK_CHECK_NOW, ZBX_TM_STATUS_NEW, 0, 0, 0);
-		task->data = (void *)zbx_tm_check_now_create(itemid);
-		zbx_vector_ptr_append(&tasks, task);
+		ZBX_STR2UINT64(itemid, row[0]);
+		zbx_vector_uint64_append(&itemids, itemid);
 	}
 	DBfree_result(result);
 
-	if (0 != tasks.values_num)
+	if (0 != itemids.values_num)
 	{
-		zbx_dc_process_check_now_tasks(&tasks);
-		processed_num = tasks.values_num;
+		zbx_dc_reschedule_items(&itemids, time(NULL), NULL);
+		processed_num = itemids.values_num;
 	}
 
 	if (0 != taskids->values_num)
@@ -195,12 +188,10 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
 
 		DBexecute("%s", sql);
-
-		zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 	}
 
 	zbx_free(sql);
-	zbx_vector_ptr_destroy(&tasks);
+	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
 

@@ -11096,46 +11096,47 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_process_check_now_tasks                                   *
+ * Function: zbx_dc_reschedule_items                                          *
  *                                                                            *
- * Purpose: process check now tasks by requeueing items monitored by server   *
- *          at current time                                                   *
+ * Purpose: reschedules items that are processed by the target daemon         *
  *                                                                            *
- * Parameter: tasks - [IN/OUT] the tasks                                      *
+ * Parameter: itemids       - [IN] the item identifiers                       *
+ *            nextcheck     - [IN] the schedueld time                         *
+ *            proxy_hostids - [OUT] the proxy_hostids of the given itemids    *
+ *                                  (optional, can be NULL)                   *
  *                                                                            *
- * Comments: This function will set corresponding task->proxy_hostid values   *
- *           for items monitored by proxies.                                  *
+ * Comments: On server this function reschedules items monitored by server.   *
+ *           On proxy only items monitored by the proxy is accessible, so     *
+ *           all items can be safely rescheduled.                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_process_check_now_tasks(zbx_vector_ptr_t *tasks)
+void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids)
 {
-	int			i, now;
+	int			i;
 	ZBX_DC_ITEM		*dc_item;
 	ZBX_DC_HOST		*dc_host;
-	zbx_tm_task_t		*task;
-	zbx_tm_check_now_t	*data;
-
-	now = time(NULL);
+	zbx_uint64_t		proxy_hostid;
 
 	LOCK_CACHE;
 
-	for (i = 0; i < tasks->values_num; i++)
+	for (i = 0; i < itemids->values_num; i++)
 	{
-		task = (zbx_tm_task_t *)tasks->values[i];
-		data = (zbx_tm_check_now_t *)task->data;
-
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &data->itemid)) ||
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids->values[i])) ||
 				NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for itemid [" ZBX_FS_UI64 "]"
-					": item is not in cache", data->itemid);
-			continue;
+					": item is not in cache", itemids->values[i]);
+
+			proxy_hostid = 0;
+		}
+		else
+		{
+			if (0 == (proxy_hostid = dc_host->proxy_hostid))
+				dc_requeue_item_at(dc_item, dc_host, nextcheck);
 		}
 
-		if (0 == dc_host->proxy_hostid)
-			dc_requeue_item_at(dc_item, dc_host, now);
-		else
-			task->proxy_hostid = dc_host->proxy_hostid;
+		if (NULL != proxy_hostids)
+			proxy_hostids[i] = proxy_hostid;
 	}
 
 	UNLOCK_CACHE;
