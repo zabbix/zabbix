@@ -424,7 +424,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset , "update task set");
 
-			if (0 == proxy_hostids[0])
+			if (0 == proxy_hostids[i])
 			{
 				/* close tasks managed by server -                  */
 				/* items either have been rescheduled or not cached */
@@ -436,7 +436,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			{
 				/* uddate target proxy hostid */
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " proxy_hostid=" ZBX_FS_UI64,
-						proxy_hostids[0]);
+						proxy_hostids[i]);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where taskid=" ZBX_FS_UI64 ";\n",
