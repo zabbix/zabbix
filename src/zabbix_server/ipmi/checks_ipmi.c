@@ -1491,7 +1491,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 	zbx_ipmi_control_t	*c = NULL;
-	size_t			pr_sz = 0;
+	size_t			offset = 0;
 	const size_t		id_sz = sizeof(ZBX_IPMI_FIELD_PREFIX_ID) - 1,
 				name_sz = sizeof(ZBX_IPMI_FIELD_PREFIX_NAME) - 1;
 
@@ -1516,21 +1516,21 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	}
 
 	if (0 == strncmp(sensor, ZBX_IPMI_FIELD_PREFIX_ID, id_sz))
-		pr_sz = id_sz;
+		offset = id_sz;
 	else if (0 == strncmp(sensor, ZBX_IPMI_FIELD_PREFIX_NAME, name_sz))
-		pr_sz = name_sz;
+		offset = name_sz;
 
-	if (0 == pr_sz || id_sz == pr_sz)
+	if (0 == offset || id_sz == offset)
 	{
-		s = zbx_get_ipmi_sensor_by_id(h, sensor + pr_sz);
+		s = zbx_get_ipmi_sensor_by_id(h, sensor + offset);
 		if (NULL == s)
-			c = zbx_get_ipmi_control_by_name(h, sensor + pr_sz);
+			c = zbx_get_ipmi_control_by_name(h, sensor + offset);
 	}
 	else
 	{
-		s = zbx_get_ipmi_sensor_by_full_name(h, sensor + pr_sz);
+		s = zbx_get_ipmi_sensor_by_full_name(h, sensor + offset);
 		if (NULL == s)
-			c = zbx_get_ipmi_control_by_full_name(h, sensor + pr_sz);
+			c = zbx_get_ipmi_control_by_full_name(h, sensor + offset);
 
 	}
 
@@ -1629,7 +1629,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 	const char		*__function_name = "zbx_set_ipmi_control_value";
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
-	size_t			pr_sz = 0;
+	size_t			offset = 0;
 	const size_t		id_sz = sizeof(ZBX_IPMI_FIELD_PREFIX_ID) - 1,
 				name_sz = sizeof(ZBX_IPMI_FIELD_PREFIX_NAME) - 1;
 
@@ -1656,14 +1656,14 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 	}
 
 	if (0 == strncmp(sensor, ZBX_IPMI_FIELD_PREFIX_ID, id_sz))
-		pr_sz = id_sz;
+		offset = id_sz;
 	else if (0 == strncmp(sensor, ZBX_IPMI_FIELD_PREFIX_NAME, name_sz))
-		pr_sz = name_sz;
+		offset = name_sz;
 
-	if (0 == pr_sz || id_sz == pr_sz)
-		c = zbx_get_ipmi_control_by_name(h, sensor + pr_sz);
+	if (0 == offset || id_sz == offset)
+		c = zbx_get_ipmi_control_by_name(h, sensor + offset);
 	else
-		c = zbx_get_ipmi_control_by_full_name(h, sensor + pr_sz);
+		c = zbx_get_ipmi_control_by_full_name(h, sensor + offset);
 
 	if (NULL == c)
 	{
