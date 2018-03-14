@@ -153,7 +153,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 	DB_ROW			row;
 	DB_RESULT		result;
-	int			processed_num = 0;
+	int			processed_num;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
@@ -174,11 +174,8 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	}
 	DBfree_result(result);
 
-	if (0 != itemids.values_num)
-	{
+	if (0 != (processed_num = itemids.values_num))
 		zbx_dc_reschedule_items(&itemids, time(NULL), NULL);
-		processed_num = itemids.values_num;
-	}
 
 	if (0 != taskids->values_num)
 	{

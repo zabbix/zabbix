@@ -431,10 +431,12 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " status=%d", ZBX_TM_STATUS_DONE);
 				if (0 != task->proxy_hostid)
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",proxy_hostid=null");
+
+				processed_num++;
 			}
 			else
 			{
-				/* uddate target proxy hostid */
+				/* update target proxy hostid */
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " proxy_hostid=" ZBX_FS_UI64,
 						proxy_hostids[i]);
 			}
