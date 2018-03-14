@@ -753,10 +753,11 @@ function makeAcknowledgesTable($acknowledges, $users) {
  * @param string $events[]['tags']['tag']
  * @param string $events[]['tags']['value']
  * @param bool   $html
+ * @param int    $list_tags_count
  *
  * @return CTableInfo
  */
-function makeEventsTags($events, $html = true) {
+function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT) {
 	$tags = [];
 
 	foreach ($events as $event) {
@@ -765,10 +766,10 @@ function makeEventsTags($events, $html = true) {
 		$tags[$event['eventid']] = [];
 
 		if ($html) {
-			// Show first 3 tags and "..." with hint box if there are more.
+			// Show first n tags and "..." with hint box if there are more.
 
 			$tags_count = count($event['tags']);
-			$tags_shown = array_slice($event['tags'], 0, EVENTS_LIST_TAGS_COUNT);
+			$tags_shown = array_slice($event['tags'], 0, $list_tags_count);
 
 			foreach ($tags_shown as $tag) {
 				$value = $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);

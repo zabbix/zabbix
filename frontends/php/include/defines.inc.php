@@ -1549,6 +1549,12 @@ if (function_exists('bcscale')) {
 // Maximum number of tags to display in events list.
 define('EVENTS_LIST_TAGS_COUNT', 3);
 
+// Number of tags to display in Problems widget and Monitoring > Problems.
+define('PROBLEMS_SHOW_TAGS_NONE', 0);
+define('PROBLEMS_SHOW_TAGS_1', 1);
+define('PROBLEMS_SHOW_TAGS_2', 2);
+define('PROBLEMS_SHOW_TAGS_3', 3);
+
 // HTTP headers
 /*
  * Value of HTTP X-Frame-options header.

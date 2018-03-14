@@ -71,7 +71,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		], $config, true);
 
 		if ($fields['show_tags']) {
-			$data['tags'] = makeEventsTags($data['problems']);
+			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags']);
 		}
 		if ($data['problems']) {
 			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);

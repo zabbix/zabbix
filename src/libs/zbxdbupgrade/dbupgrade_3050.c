@@ -496,6 +496,22 @@ static int	DBpatch_3050040(void)
 	return DBadd_foreign_key("tag_filter", 2, &field);
 }
 
+static int	DBpatch_3050041(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update widget_field wf"
+		" set wf.value_int=3"
+		" where wf.name='show_tags'"
+			" and wf.widgetid in (select w.widgetid from widget w where w.type='problems')");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -539,5 +555,6 @@ DBPATCH_ADD(3050037, 0, 1)
 DBPATCH_ADD(3050038, 0, 1)
 DBPATCH_ADD(3050039, 0, 1)
 DBPATCH_ADD(3050040, 0, 1)
+DBPATCH_ADD(3050041, 0, 1)
 
 DBPATCH_END()
