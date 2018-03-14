@@ -65,7 +65,7 @@ typedef struct
 						/* Discrete, 'digital' Discrete. */
 	int			type;		/* "Sensor Type Code", e.g. Temperature, Voltage, */
 						/* Current, Fan, Physical Security (Chassis Intrusion), etc. */
-	char			*full_name;	/* Full name of the sensor */
+	char			*full_name;
 }
 zbx_ipmi_sensor_t;
 
@@ -73,9 +73,9 @@ typedef struct
 {
 	ipmi_control_t		*control;
 	char			*c_name;
-	int			num_values;	/* order of structure elements changed to avoid padding */
-	int			*val;		/* when the structure is an element of array */
-	char			*full_name;	/* full name of the control */
+	int			num_values;
+	int			*val;
+	char			*full_name;
 }
 zbx_ipmi_control_t;
 
