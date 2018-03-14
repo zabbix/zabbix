@@ -1522,16 +1522,13 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 
 	if (0 == offset || id_sz == offset)
 	{
-		s = zbx_get_ipmi_sensor_by_id(h, sensor + offset);
-		if (NULL == s)
+		if (NULL == (s = zbx_get_ipmi_sensor_by_id(h, sensor + offset)))
 			c = zbx_get_ipmi_control_by_name(h, sensor + offset);
 	}
 	else
 	{
-		s = zbx_get_ipmi_sensor_by_full_name(h, sensor + offset);
-		if (NULL == s)
+		if (NULL == (s = zbx_get_ipmi_sensor_by_full_name(h, sensor + offset)))
 			c = zbx_get_ipmi_control_by_full_name(h, sensor + offset);
-
 	}
 
 	if (NULL == s && NULL == c)
