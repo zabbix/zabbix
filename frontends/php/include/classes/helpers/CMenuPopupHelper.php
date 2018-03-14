@@ -31,14 +31,18 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getHistory(array $item, $fullscreen = true) {
-
-		return [
+	public static function getHistory(array $item, $fullscreen = false) {
+		$data = [
 			'type' => 'history',
 			'itemid' => $item['itemid'],
-			'hasLatestGraphs' => in_array($item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]),
-			'fullscreen' => $fullscreen
+			'hasLatestGraphs' => in_array($item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
 		];
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
+		}
+
+		return $data;
 	}
 
 	/**
@@ -59,16 +63,18 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getHost(array $host, array $scripts = null, $has_goto = true, $fullscreen = false) {
-
 		$data = [
 			'type' => 'host',
 			'hostid' => $host['hostid'],
 			'showGraphs' => (bool) $host['graphs'],
 			'showScreens' => (bool) $host['screens'],
 			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
-			'hasGoTo' => $has_goto,
-			'fullscreen' => $fullscreen
+			'hasGoTo' => $has_goto
 		];
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
+		}
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
@@ -115,9 +121,12 @@ class CMenuPopupHelper {
 			$fullscreen = false) {
 
 		$data = [
-			'type' => 'map',
-			'fullscreen' => $fullscreen
+			'type' => 'map'
 		];
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
+		}
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
@@ -241,9 +250,12 @@ class CMenuPopupHelper {
 			'triggerid' => $trigger['triggerid'],
 			'items' => $items,
 			'showEvents' => $showEvents,
-			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
-			'fullscreen' => $fullscreen
+			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
+		}
 
 		if ($acknowledge !== null) {
 			$data['acknowledge'] = $acknowledge;

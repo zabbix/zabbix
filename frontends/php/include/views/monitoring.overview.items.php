@@ -70,7 +70,7 @@ $widget = (new CWidget())
 
 // filter
 $filter = (new CFilter('web.overview.filter.state'))
-	->addVar('fullscreen', $data['fullscreen']);
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $column = new CFormList();
 

@@ -108,7 +108,7 @@ $header['right']->addItem($action_list);
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm = (new CFilter('web.history.filter.state'))
-			->addVar('fullscreen', $this->data['fullscreen'])
+			->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null)
 			->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {
 			$filterForm->addVar('itemids['.$itemId.']', $itemId);
@@ -249,7 +249,7 @@ else {
 				)
 			);
 			$filterForm->removeButtons();
-			$filterForm->addVar('fullscreen', $this->data['fullscreen']);
+			$filterForm->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null);
 			$filterForm->addVar('action', $this->data['action']);
 			$filterForm->addVar('itemids', $this->data['itemids']);
 		}

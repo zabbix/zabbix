@@ -1014,7 +1014,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 			foreach ($item_data as $ithosts) {
 				$tableRow = [nbsp($item_name)];
 				foreach ($host_names as $host_name) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
 				}
 				$table->addRow($tableRow);
 			}
@@ -1042,7 +1042,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
 				foreach ($item_data as $ithosts) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
 				}
 			}
 			$table->addRow($tableRow);
@@ -1090,7 +1090,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName, $fullscreen = 
 
 	if (isset($ithosts[$hostName])) {
 		$column
-			->setMenuPopup(CMenuPopupHelper::getHistory($item))
+			->setMenuPopup(CMenuPopupHelper::getHistory($item, $fullscreen))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->addClass(ZBX_STYLE_NOWRAP);
 	}

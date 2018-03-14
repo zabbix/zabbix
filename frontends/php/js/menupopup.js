@@ -715,7 +715,7 @@ function getMenuPopupTrigger(options) {
 		url.unsetArgument('sid');
 
 		if (fullscreen) {
-			url.setArgument('fullscreen', 1);
+			url.setArgument('fullscreen', '1');
 		}
 
 		events.url = url.getUrl();
@@ -735,7 +735,7 @@ function getMenuPopupTrigger(options) {
 		url.setArgument('backurl', options.acknowledge.backurl);
 
 		if (fullscreen) {
-			url.setArgument('fullscreen', 1);
+			url.setArgument('fullscreen', '1');
 		}
 
 		items[items.length] = {
@@ -777,7 +777,7 @@ function getMenuPopupTrigger(options) {
 			url.setArgument('itemids[]', item.params.itemid);
 
 			if (fullscreen) {
-				url.setArgument('fullscreen', 1);
+				url.setArgument('fullscreen', '1');
 			}
 
 			items[items.length] = {
