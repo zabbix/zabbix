@@ -77,6 +77,7 @@ typedef struct
 	unsigned char		snmpv3_authprotocol;
 	unsigned char		snmpv3_privprotocol;
 	unsigned char		authtype;
+	unsigned char		allow_traps;
 	zbx_vector_ptr_t	lld_rows;
 	zbx_vector_ptr_t	applications;
 	zbx_vector_ptr_t	preproc_ops;
@@ -140,6 +141,7 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD	__UINT64_C(0x0010000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER		__UINT64_C(0x0020000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST		__UINT64_C(0x0040000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS		__UINT64_C(0x0080000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE			(~ZBX_FLAG_LLD_ITEM_DISCOVERED)
 	zbx_uint64_t		flags;
 	char			*key_proto;
@@ -593,7 +595,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 				"i.timeout,i.url,i.query_fields,i.posts,i.status_codes,i.follow_redirects,i.post_type,"
 				"i.http_proxy,i.headers,i.retrieve_mode,i.request_method,i.output_format,"
 				"i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,i.verify_host,"
-				"id.parent_itemid"
+				"id.parent_itemid,i.allow_traps"
 			" from item_discovery id"
 				" join items i"
 					" on id.itemid=i.itemid"
@@ -774,6 +776,9 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 		if ((unsigned char)atoi(row[53]) != item_prototype->verify_host)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST;
+
+		if ((unsigned char)atoi(row[55]) != item_prototype->allow_traps)
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS;
 
 		item->lld_row = NULL;
 
@@ -1954,7 +1959,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				item_prototype->follow_redirects, item_prototype->post_type, item->http_proxy,
 				item->headers, item_prototype->retrieve_mode, item_prototype->request_method,
 				item_prototype->output_format, item->ssl_cert_file, item->ssl_key_file,
-				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host);
+				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host,
+				item_prototype->allow_traps);
 
 		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, item->itemid,
 				item->parent_itemid, item_prototype->key);
@@ -2336,6 +2342,11 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST))
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sverify_host=%d", d, (int)item_prototype->verify_host);
+		d = ",";
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sallow_traps=%d", d, (int)item_prototype->allow_traps);
 	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
@@ -2424,7 +2435,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				"jmx_endpoint", "master_itemid", "timeout", "url", "query_fields", "posts",
 				"status_codes", "follow_redirects", "post_type", "http_proxy", "headers",
 				"retrieve_mode", "request_method", "output_format", "ssl_cert_file", "ssl_key_file",
-				"ssl_key_password", "verify_peer", "verify_host", NULL);
+				"ssl_key_password", "verify_peer", "verify_host", "allow_traps", NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", NULL);
@@ -4115,7 +4126,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 				"i.snmpv3_contextname,i.jmx_endpoint,i.master_itemid,i.timeout,i.url,i.query_fields,"
 				"i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,"
 				"i.retrieve_mode,i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,"
-				"i.ssl_key_password,i.verify_peer,i.verify_host"
+				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
@@ -4178,6 +4189,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		item_prototype->ssl_key_password = zbx_strdup(NULL, row[49]);
 		ZBX_STR2UCHAR(item_prototype->verify_peer, row[50]);
 		ZBX_STR2UCHAR(item_prototype->verify_host, row[51]);
+		ZBX_STR2UCHAR(item_prototype->allow_traps, row[52]);
 
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_ptr_create(&item_prototype->applications);

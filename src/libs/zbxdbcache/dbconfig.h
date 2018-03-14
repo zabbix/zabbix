@@ -253,6 +253,7 @@ typedef struct
 	unsigned char	output_format;
 	unsigned char	verify_peer;
 	unsigned char	verify_host;
+	unsigned char	allow_traps;
 }
 ZBX_DC_HTTPITEM;
 

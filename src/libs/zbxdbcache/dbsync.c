@@ -1612,6 +1612,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 
 		if (FAIL == dbsync_compare_str(dbrow[21], httpitem->password))
 			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[56], httpitem->allow_traps))
+			return FAIL;
 	}
 	else if (NULL != httpitem)
 		return FAIL;
@@ -1711,7 +1714,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.master_itemid,i.timeout,i.url,i.query_fields,i.posts,i.status_codes,"
 				"i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,"
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
-				"i.verify_peer,i.verify_host"
+				"i.verify_peer,i.verify_host,i.allow_traps"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
@@ -1722,7 +1725,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 56, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 57, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

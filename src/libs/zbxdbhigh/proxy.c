@@ -3015,7 +3015,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 	if (0 != item->host.proxy_hostid)
 		return FAIL;
 
-	if (ITEM_TYPE_TRAPPER != item->type)
+	if (ITEM_TYPE_TRAPPER != item->type && (ITEM_TYPE_HTTPAGENT != item->type || 0 == item->allow_traps))
 		return FAIL;
 
 	if ('\0' != *item->trapper_hosts)	/* list of allowed hosts not empty */

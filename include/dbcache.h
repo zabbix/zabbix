@@ -163,6 +163,7 @@ typedef struct
 	unsigned char		output_format;
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
+	unsigned char		allow_traps;
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char			*units;
 	char			*delay;

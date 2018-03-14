@@ -2719,6 +2719,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCstrpool_replace(found, &httpitem->ssl_key_password, row[53]);
 			httpitem->verify_peer = (unsigned char)atoi(row[54]);
 			httpitem->verify_host = (unsigned char)atoi(row[55]);
+			httpitem->allow_traps = (unsigned char)atoi(row[56]);
 
 			httpitem->authtype = (unsigned char)atoi(row[19]);
 			DCstrpool_replace(found, &httpitem->username, row[20]);
@@ -6015,6 +6016,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				strscpy(dst_item->username_orig, httpitem->username);
 				strscpy(dst_item->password_orig, httpitem->password);
 				dst_item->posts = zbx_strdup(NULL, httpitem->posts);
+				dst_item->allow_traps = httpitem->allow_traps;
 			}
 			else
 			{
@@ -6038,6 +6040,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
 				dst_item->posts = zbx_strdup(NULL, "");
+				dst_item->allow_traps = 0;
 			}
 			dst_item->timeout = NULL;
 			dst_item->url = NULL;

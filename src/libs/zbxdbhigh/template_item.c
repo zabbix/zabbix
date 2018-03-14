@@ -66,6 +66,7 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		inventory_link;
 	unsigned char		evaltype;
+	unsigned char		allow_traps;
 	zbx_vector_ptr_t	dependent_items;
 }
 zbx_template_item_t;
@@ -159,7 +160,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
 				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.description,"
 				"ti.inventory_link,ti.lifetime,ti.snmpv3_contextname,hi.itemid,ti.evaltype,ti.port,"
-				"ti.jmx_endpoint,ti.master_itemid"
+				"ti.jmx_endpoint,ti.master_itemid,ti.allow_traps"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -185,6 +186,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->flags, row[29]);
 		ZBX_STR2UCHAR(item->inventory_link, row[31]);
 		ZBX_STR2UCHAR(item->evaltype, row[35]);
+		ZBX_STR2UCHAR(item->allow_traps, row[39]);
 
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
@@ -570,7 +572,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					"evaltype=%d,"
 					"port='%s',"
 					"jmx_endpoint='%s',"
-					"master_itemid=%s"
+					"master_itemid=%s,"
+					"allow_traps=ds"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				name_esc, (int)item->type, (int)item->value_type, delay_esc,
 				history_esc, trends_esc, (int)item->status, trapper_hosts_esc, units_esc,
@@ -582,7 +585,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				privatekey_esc, item->templateid, (int)item->flags, description_esc,
 				(int)item->inventory_link, DBsql_id_ins(item->interfaceid), lifetime_esc,
 				(int)item->evaltype, port_esc, jmx_endpoint_esc, DBsql_id_ins(item->master_itemid),
-				item->itemid);
+				item->allow_traps, item->itemid);
 
 		zbx_free(jmx_endpoint_esc);
 		zbx_free(port_esc);
@@ -621,7 +624,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->username, item->password, item->publickey, item->privatekey, item->templateid,
 				(int)item->flags, item->description, (int)item->inventory_link, item->interfaceid,
 				item->lifetime, item->snmpv3_contextname, (int)item->evaltype, item->port,
-				item->jmx_endpoint, item->master_itemid);
+				item->jmx_endpoint, item->master_itemid, item->allow_traps);
 
 		item->itemid = (*itemid)++;
 	}
@@ -678,7 +681,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				"snmpv3_authprotocol", "snmpv3_authpassphrase", "snmpv3_privprotocol",
 				"snmpv3_privpassphrase", "authtype", "username", "password", "publickey", "privatekey",
 				"templateid", "flags", "description", "inventory_link", "interfaceid", "lifetime",
-				"snmpv3_contextname", "evaltype", "port", "jmx_endpoint", "master_itemid", NULL);
+				"snmpv3_contextname", "evaltype", "port", "jmx_endpoint", "master_itemid",
+				"allow_traps", NULL);
 	}
 
 	if (0 != upd_items)
