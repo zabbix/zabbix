@@ -395,7 +395,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		task = zbx_tm_task_create(taskid, ZBX_TM_TASK_CHECK_NOW, atoi(row[1]), 0, 0, proxy_hostid);
 		task->data = (void *)zbx_tm_check_now_create(itemid);
 		zbx_vector_ptr_append(&tasks, task);
-		zbx_vector_uint64_append(&itemids, itemid);
 	}
 	DBfree_result(result);
 
