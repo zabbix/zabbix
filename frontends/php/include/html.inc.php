@@ -637,7 +637,7 @@ function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($ts_delete),
+			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
 		);
@@ -664,7 +664,7 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($ts_delete),
+			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
 		);
@@ -691,7 +691,7 @@ function getApplicationLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($ts_delete),
+			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
 		);
@@ -718,7 +718,7 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($ts_delete),
+			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
 		);
