@@ -79,9 +79,6 @@ typedef struct
 }
 zbx_ipmi_control_t;
 
-#define ZBX_IPMI_FIELD_PREFIX_ID	"id:"
-#define ZBX_IPMI_FIELD_PREFIX_NAME	"name:"
-
 typedef struct zbx_ipmi_host
 {
 	char			*ip;
@@ -1484,6 +1481,44 @@ void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: has_name_prefix                                                  *
+ *                                                                            *
+ * Purpose: Check if a string starts with one of predefined prefixes and      *
+ *          set prefix length                                                 *
+ *                                                                            *
+ * Parameters: str        - [IN] string to examine                            *
+ *             prefix_len - [OUT] length of the prefix                        *
+ *                                                                            *
+ * Return value: 1 - the string starts with the name prefix,                  *
+ *               0 - otherwise (no prefix or other prefix was found)          *
+ *                                                                            *
+ ******************************************************************************/
+static int	has_name_prefix(const char *str, size_t *prefix_len)
+{
+#define ZBX_ID_PREFIX	"id:"
+#define ZBX_NAME_PREFIX	"name:"
+
+	const size_t	id_len = sizeof(ZBX_ID_PREFIX) - 1, name_len = sizeof(ZBX_NAME_PREFIX) - 1;
+
+	if (0 == strncmp(str, ZBX_NAME_PREFIX, name_len))
+	{
+		*prefix_len = name_len;
+		return 1;
+	}
+
+	if (0 == strncmp(str, ZBX_ID_PREFIX, id_len))
+		*prefix_len = id_len;
+	else
+		*prefix_len = 0;
+
+	return 0;
+
+#undef ZBX_ID_PREFIX
+#undef ZBX_NAME_PREFIX
+}
+
 int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
 		unsigned char privilege, const char *username, const char *password, const char *sensor, char **value)
 {
@@ -1491,9 +1526,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 	zbx_ipmi_control_t	*c = NULL;
-	size_t			offset = 0;
-	const size_t		id_sz = sizeof(ZBX_IPMI_FIELD_PREFIX_ID) - 1,
-				name_sz = sizeof(ZBX_IPMI_FIELD_PREFIX_NAME) - 1;
+	size_t			offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
@@ -1515,12 +1548,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 		return h->ret;
 	}
 
-	if (0 == strncmp(sensor, ZBX_IPMI_FIELD_PREFIX_ID, id_sz))
-		offset = id_sz;
-	else if (0 == strncmp(sensor, ZBX_IPMI_FIELD_PREFIX_NAME, name_sz))
-		offset = name_sz;
-
-	if (0 == offset || id_sz == offset)
+	if (0 == has_name_prefix(sensor, &offset))
 	{
 		if (NULL == (s = zbx_get_ipmi_sensor_by_id(h, sensor + offset)))
 			c = zbx_get_ipmi_control_by_name(h, sensor + offset);
@@ -1626,9 +1654,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 	const char		*__function_name = "zbx_set_ipmi_control_value";
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
-	size_t			offset = 0;
-	const size_t		id_sz = sizeof(ZBX_IPMI_FIELD_PREFIX_ID) - 1,
-				name_sz = sizeof(ZBX_IPMI_FIELD_PREFIX_NAME) - 1;
+	size_t			offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 "control:%s value:%d",
 			__function_name, hostid, sensor, value);
@@ -1652,12 +1678,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 		return h->ret;
 	}
 
-	if (0 == strncmp(sensor, ZBX_IPMI_FIELD_PREFIX_ID, id_sz))
-		offset = id_sz;
-	else if (0 == strncmp(sensor, ZBX_IPMI_FIELD_PREFIX_NAME, name_sz))
-		offset = name_sz;
-
-	if (0 == offset || id_sz == offset)
+	if (0 == has_name_prefix(sensor, &offset))
 		c = zbx_get_ipmi_control_by_name(h, sensor + offset);
 	else
 		c = zbx_get_ipmi_control_by_full_name(h, sensor + offset);
