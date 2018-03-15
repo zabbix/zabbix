@@ -392,7 +392,9 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 		ZBX_STR2UINT64(itemid, row[3]);
 
-		task = zbx_tm_task_create(taskid, ZBX_TM_TASK_CHECK_NOW, atoi(row[1]), 0, 0, proxy_hostid);
+		/* zbx_task_t here is used only to store taskid, proxyhostid, data->itemid - */
+		/* the rest of task properties are not used                                  */
+		task = zbx_tm_task_create(taskid, 0, 0, 0, 0, proxy_hostid);
 		task->data = (void *)zbx_tm_check_now_create(itemid);
 		zbx_vector_ptr_append(&tasks, task);
 	}
