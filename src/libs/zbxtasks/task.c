@@ -79,6 +79,9 @@ void	zbx_tm_task_clear(zbx_tm_task_t *task)
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				tm_remote_command_result_clear((zbx_tm_remote_command_result_t *)task->data);
 				break;
+			case ZBX_TM_TASK_CHECK_NOW:
+				/* nothing to clear */
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -176,6 +179,27 @@ zbx_tm_remote_command_result_t	*zbx_tm_remote_command_result_create(zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_tm_check_now_create                                          *
+ *                                                                            *
+ * Purpose: create a check now task data                                      *
+ *                                                                            *
+ * Parameters: itemid - [IN] the item identifier                              *
+ *                                                                            *
+ * Return value: The created check now data.                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_tm_check_now_t	*zbx_tm_check_now_create(zbx_uint64_t itemid)
+{
+	zbx_tm_check_now_t	*data;
+
+	data = (zbx_tm_check_now_t *)zbx_malloc(NULL, sizeof(zbx_tm_check_now_t));
+	data->itemid = itemid;
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tm_task_create                                               *
  *                                                                            *
  * Purpose: create a new task                                                 *
@@ -258,7 +282,7 @@ static int	tm_save_remote_command_tasks(zbx_tm_task_t **tasks, int tasks_num)
  *                                                                            *
  * Function: tm_save_remote_command_result_tasks                              *
  *                                                                            *
- * Purpose: saves remote command task data in database                        *
+ * Purpose: saves remote command result task data in database                 *
  *                                                                            *
  * Parameters: tasks     - [IN] the tasks                                     *
  *             tasks_num - [IN] the number of tasks to process                *
@@ -299,6 +323,47 @@ static int	tm_save_remote_command_result_tasks(zbx_tm_task_t **tasks, int tasks_
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_save_check_now_tasks                                          *
+ *                                                                            *
+ * Purpose: saves remote command task data in database                        *
+ *                                                                            *
+ * Parameters: tasks     - [IN] the tasks                                     *
+ *             tasks_num - [IN] the number of tasks to process                *
+ *                                                                            *
+ * Return value: SUCCEED - the data was saved successfully                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: The tasks array can contain mixture of task types.               *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_save_check_now_tasks(zbx_tm_task_t **tasks, int tasks_num)
+{
+	int			i, ret;
+	zbx_db_insert_t		db_insert;
+	zbx_tm_check_now_t	*data;
+
+	zbx_db_insert_prepare(&db_insert, "task_check_now", "taskid", "itemid", NULL);
+
+	for (i = 0; i < tasks_num; i++)
+	{
+		const zbx_tm_task_t	*task = tasks[i];
+
+		switch (task->type)
+		{
+			case ZBX_TM_TASK_CHECK_NOW:
+				data = (zbx_tm_check_now_t *)task->data;
+				zbx_db_insert_add_values(&db_insert, task->taskid, data->itemid);
+		}
+	}
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_save_tasks                                                    *
  *                                                                            *
  * Purpose: saves tasks into database                                         *
@@ -312,7 +377,7 @@ static int	tm_save_remote_command_result_tasks(zbx_tm_task_t **tasks, int tasks_
  ******************************************************************************/
 static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 {
-	int		i, ret, remote_command_num = 0, remote_command_result_num = 0, ids_num = 0;
+	int		i, ret, remote_command_num = 0, remote_command_result_num = 0, check_now_num = 0, ids_num = 0;
 	zbx_uint64_t	taskid;
 	zbx_db_insert_t	db_insert;
 
@@ -334,6 +399,9 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				remote_command_result_num++;
+				break;
+			case ZBX_TM_TASK_CHECK_NOW:
+				check_now_num++;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -363,6 +431,9 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 
 	if (SUCCEED == ret && 0 != remote_command_result_num)
 		ret = tm_save_remote_command_result_tasks(tasks, tasks_num);
+
+	if (SUCCEED == ret && 0 != check_now_num)
+		ret = tm_save_check_now_tasks(tasks, tasks_num);
 
 	return ret;
 }
@@ -516,6 +587,21 @@ static void	tm_json_serialize_remote_command_result(struct zbx_json *json,
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_json_serialize_check_now                                      *
+ *                                                                            *
+ * Purpose: serializes check now data in json format                          *
+ *                                                                            *
+ * Parameters: json - [OUT] the json data                                     *
+ *             data - [IN] the check now to serialize                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_json_serialize_check_now(struct zbx_json *json, const zbx_tm_check_now_t *data)
+{
+	zbx_json_addint64(json, ZBX_PROTO_TAG_ITEMID, data->itemid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tm_json_serialize_tasks                                      *
  *                                                                            *
  * Purpose: serializes remote command data in json format                     *
@@ -544,6 +630,9 @@ void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				tm_json_serialize_remote_command_result(json, (zbx_tm_remote_command_result_t *)task->data);
+				break;
+			case ZBX_TM_TASK_CHECK_NOW:
+				tm_json_serialize_check_now(json, (zbx_tm_check_now_t *)task->data);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -688,6 +777,32 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_json_deserialize_check_now                                    *
+ *                                                                            *
+ * Purpose: deserializes check now from json data                             *
+ *                                                                            *
+ * Parameters: jp - [IN] the json data                                        *
+ *                                                                            *
+ * Return value: The deserialized check now data or NULL if deserialization   *
+ *               failed.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_tm_check_now_t	*tm_json_deserialize_check_now(const struct zbx_json_parse *jp)
+{
+	char		value[MAX_ID_LEN + 1];
+	zbx_uint64_t	itemid;
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_ITEMID, value, sizeof(value)) ||
+			SUCCEED != is_uint64(value, &itemid))
+	{
+		return NULL;
+	}
+
+	return zbx_tm_check_now_create(itemid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_json_deserialize_task                                         *
  *                                                                            *
  * Purpose: deserializes common task data from json data                      *
@@ -760,6 +875,9 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
 				task->data = tm_json_deserialize_remote_command_result(&jp_task);
+				break;
+			case ZBX_TM_TASK_CHECK_NOW:
+				task->data = tm_json_deserialize_check_now(&jp_task);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
