@@ -1227,25 +1227,27 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_item_options = [
-				'itemids'	=> $item['master_itemid'],
-				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'itemids' => $item['master_itemid'],
+				'webitems' => true
 			];
 		}
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output'			=> ['status'],
-			'hostids'			=> getRequest('hostid'),
-			'templated_hosts'	=> true
+			'output' => ['status'],
+			'hostids' => getRequest('hostid'),
+			'templated_hosts' => true
 		]);
 		$item = [];
 		$host = $hosts[0];
 
-		if ($host && getRequest('master_itemid')) {
+		if (getRequest('master_itemid')) {
 			$master_item_options = [
-				'itemids' => getRequest('master_itemid'),
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'filter' => ['hostid' => $host['hostid']]
+				'itemids' => getRequest('master_itemid'),
+				'hostids' => $host['hostid'],
+				'webitems' => true
 			];
 		}
 	}
@@ -1625,7 +1627,7 @@ else {
 		}
 
 		// resolve name macros
-		$data['items'] = expandItemNamesWithMasterItems($data['items'], API::Item());
+		$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
 
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
