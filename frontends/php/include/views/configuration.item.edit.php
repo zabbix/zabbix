@@ -751,6 +751,14 @@ if (!hasRequest('form_refresh')) {
 if ($data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
+	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
+		$buttons[] = (new CSubmit('check_now', _('Check now')))
+			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
+					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
+					&& $data['host']['status'] == HOST_STATUS_MONITORED
+			);
+	}
+
 	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$buttons[] = new CButtonQMessage(
 			'del_history',

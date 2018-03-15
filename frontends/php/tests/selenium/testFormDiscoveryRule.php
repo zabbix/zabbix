@@ -1357,7 +1357,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'discovery-simple-check',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1366,7 +1367,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'discovery-snmpv1-agent',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1385,7 +1387,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'discovery-snmpv3-agent',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1418,7 +1421,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
 					'key' => 'discovery-zabbix-internal',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1438,7 +1442,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'discovery-external-check',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1473,6 +1478,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'username' => 'zabbix',
 					'params_es' => 'executed script',
 					'dbCheck' => true,
+					'formCheck' => true,
 					'remove' => true
 				]
 			],
@@ -1729,6 +1735,18 @@ class testFormDiscoveryRule extends CWebTest {
 					break;
 				default:
 					$this->zbxTestAssertNotVisibleId('interfaceid');
+			}
+
+			// "Check now" button availability
+			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent',
+					'Zabbix internal', 'External check', 'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent',
+					'JMX agent'])) {
+				$this->zbxTestClick('check_now');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+				$this->zbxTestCheckFatalErrors();
+			}
+			else {
+				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
 			}
 
 			if (isset($data['ipmi_sensor'])) {
