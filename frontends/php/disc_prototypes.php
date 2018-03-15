@@ -511,9 +511,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['username'] = getRequest('http_username', '');
 				$item['password'] = getRequest('http_password', '');
 
-				$query_fields = [];
-				if (is_array($item['query_fields']) && array_key_exists('key', $item['query_fields'])
-						&& array_key_exists('value', $item['query_fields'])) {
+				if ($item['query_fields']) {
+					$query_fields = [];
+
 					foreach ($item['query_fields']['key'] as $index => $key) {
 						if (array_key_exists($index, $item['query_fields']['value'])) {
 							$query_fields[] = [$key => $item['query_fields']['value'][$index]];
@@ -524,12 +524,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (count($query_fields) == 1 && $key === '' && $item['query_fields']['value'][$index] === '') {
 						$query_fields = [];
 					}
-				}
-				$item['query_fields'] = $query_fields;
 
-				$headers = [];
-				if (is_array($item['headers']) && array_key_exists('key', $item['headers'])
-						&& array_key_exists('value', $item['headers'])) {
+					$item['query_fields'] = $query_fields;
+				}
+
+				if ($item['headers']) {
+					$headers = [];
+
 					foreach ($item['headers']['key'] as $index => $key) {
 						if (array_key_exists($index, $item['headers']['value'])) {
 							$headers[$key] = $item['headers']['value'][$index];
@@ -540,8 +541,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (count($headers) == 1 && $key === '' && $item['headers']['value'][$index] === '') {
 						$headers = [];
 					}
+
+					$item['headers'] = $headers;
 				}
-				$item['headers'] = $headers;
 			}
 
 			$item = CArrayHelper::unsetEqualValues($item, $db_item);
@@ -604,9 +606,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['username'] = getRequest('http_username', '');
 				$item['password'] = getRequest('http_password', '');
 
-				$query_fields = [];
-				if (is_array($posted['query_fields']) && array_key_exists('key', $posted['query_fields'])
-						&& array_key_exists('value', $posted['query_fields'])) {
+				if ($posted['query_fields']) {
+					$query_fields = [];
+
 					foreach ($posted['query_fields']['key'] as $index => $key) {
 						if (array_key_exists($index, $posted['query_fields']['value'])) {
 							$query_fields[] = [$key => $posted['query_fields']['value'][$index]];
@@ -617,12 +619,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (count($query_fields) == 1 && $key === '' && $posted['query_fields']['value'][$index] === '') {
 						$query_fields = [];
 					}
-				}
-				$posted['query_fields'] = $query_fields;
 
-				$headers = [];
-				if (is_array($posted['headers']) && array_key_exists('key', $posted['headers'])
-						&& array_key_exists('value', $posted['headers'])) {
+					$posted['query_fields'] = $query_fields;
+				}
+
+				if ($posted['headers']) {
+					$headers = [];
+
 					foreach ($posted['headers']['key'] as $index => $key) {
 						if (array_key_exists($index, $posted['headers']['value'])) {
 							$headers[$key] = $posted['headers']['value'][$index];
@@ -633,8 +636,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (count($headers) == 1 && $key === '' && $posted['headers']['value'][$index] === '') {
 						$headers = [];
 					}
+
+					$posted['headers'] = $headers;
 				}
-				$posted['headers'] = $headers;
 
 				$item += $posted;
 			}

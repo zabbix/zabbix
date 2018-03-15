@@ -640,9 +640,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['username'] = getRequest('http_username', '');
 				$item['password'] = getRequest('http_password', '');
 
-				$query_fields = [];
-				if (is_array($item['query_fields']) && array_key_exists('key', $item['query_fields'])
-						&& array_key_exists('value', $item['query_fields'])) {
+				if ($item['query_fields']) {
+					$query_fields = [];
+
 					foreach ($item['query_fields']['key'] as $index => $key) {
 						if (array_key_exists($index, $item['query_fields']['value'])) {
 							$query_fields[] = [$key => $item['query_fields']['value'][$index]];
@@ -653,12 +653,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (count($query_fields) == 1 && $key === '' && $item['query_fields']['value'][$index] === '') {
 						$query_fields = [];
 					}
-				}
-				$item['query_fields'] = $query_fields;
 
-				$headers = [];
-				if (is_array($item['headers']) && array_key_exists('key', $item['headers'])
-						&& array_key_exists('value', $item['headers'])) {
+					$item['query_fields'] = $query_fields;
+				}
+
+				if ($item['headers']) {
+					$headers = [];
+
 					foreach ($item['headers']['key'] as $index => $key) {
 						if (array_key_exists($index, $item['headers']['value'])) {
 							$headers[$key] = $item['headers']['value'][$index];
@@ -669,8 +670,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (count($headers) == 1 && $key === '' && $item['headers']['value'][$index] === '') {
 						$headers = [];
 					}
+
+					$item['headers'] = $headers;
 				}
-				$item['headers'] = $headers;
 			}
 
 			if ($item['type'] == ITEM_TYPE_JMX) {
@@ -860,9 +862,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['username'] = getRequest('http_username', '');
 				$item['password'] = getRequest('http_password', '');
 
-				$query_fields = [];
-				if (is_array($posted['headers']) && array_key_exists('key', $posted['query_fields'])
-						&& array_key_exists('value', $posted['query_fields'])) {
+				if ($posted['query_fields']) {
+					$query_fields = [];
+
 					foreach ($posted['query_fields']['key'] as $index => $key) {
 						if (array_key_exists($index, $posted['query_fields']['value'])) {
 							$query_fields[] = [$key => $posted['query_fields']['value'][$index]];
@@ -873,12 +875,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (count($query_fields) == 1 && $key === '' && $posted['query_fields']['value'][$index] === '') {
 						$query_fields = [];
 					}
-				}
-				$posted['query_fields'] = $query_fields;
 
-				$headers = [];
-				if (is_array($posted['headers']) && array_key_exists('key', $posted['headers'])
-						&& array_key_exists('value', $posted['headers'])) {
+					$posted['query_fields'] = $query_fields;
+				}
+
+				if ($posted['headers']) {
+					$headers = [];
+
 					foreach ($posted['headers']['key'] as $index => $key) {
 						if (array_key_exists($index, $posted['headers']['value'])) {
 							$headers[$key] = $posted['headers']['value'][$index];
@@ -889,8 +892,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (count($headers) == 1 && $key === '' && $posted['headers']['value'][$index] === '') {
 						$headers = [];
 					}
+
+					$posted['headers'] = $headers;
 				}
-				$posted['headers'] = $headers;
 
 				$item += $posted;
 			}
@@ -1120,11 +1124,10 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'url' =>  getRequest('url'),
 				'post_type' => getRequest('post_type'),
 				'posts' => getRequest('posts'),
-				'headers' => getRequest('headers')
+				'headers' => getRequest('headers', [])
 			];
 
-			if (is_array($item['headers']) && array_key_exists('key', $item['headers'])
-					&& array_key_exists('value', $item['headers'])) {
+			if ($item['headers']) {
 				$headers = [];
 
 				foreach ($item['headers']['key'] as $index => $key) {
@@ -1402,7 +1405,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
 			];
 		}
-		else if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+		elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 			// Convert hash to array where every item is hash for single key value pair as it is used by view.
 			$headers = [];
 
@@ -1509,15 +1512,14 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'url' =>  getRequest('url', ''),
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 		'posts' => getRequest('posts', ''),
-		'headers' => getRequest('headers')
+		'headers' => getRequest('headers', [])
 	];
 
 	$data['displayApplications'] = true;
 	$data['displayInterfaces'] = true;
-	$headers = [];
 
-	if (is_array($data['headers']) && array_key_exists('key', $data['headers'])
-			&& array_key_exists('value', $data['headers'])) {
+	$headers = [];
+	if ($data['headers']) {
 		foreach ($data['headers']['key'] as $index => $key) {
 			if (array_key_exists($index, $data['headers']['value'])) {
 				$headers[] = [$key => $data['headers']['value'][$index]];

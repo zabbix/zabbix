@@ -340,9 +340,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$newItem['username'] = getRequest('http_username', '');
 			$newItem['password'] = getRequest('http_password', '');
 
-			$query_fields = [];
-			if (is_array($newItem['query_fields']) && array_key_exists('key', $newItem['query_fields'])
-					&& array_key_exists('value', $newItem['query_fields'])) {
+			if ($newItem['query_fields']) {
+				$query_fields = [];
+
 				foreach ($newItem['query_fields']['key'] as $index => $key) {
 					if (array_key_exists($index, $newItem['query_fields']['value'])) {
 						$query_fields[] = [$key => $newItem['query_fields']['value'][$index]];
@@ -353,12 +353,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if (count($query_fields) == 1 && $key === '' && $newItem['query_fields']['value'][$index] === '') {
 					$query_fields = [];
 				}
-			}
-			$newItem['query_fields'] = $query_fields;
 
-			$headers = [];
-			if (is_array($newItem['headers']) && array_key_exists('key', $newItem['headers'])
-					&& array_key_exists('value', $newItem['headers'])) {
+				$newItem['query_fields'] = $query_fields;
+			}
+
+			if ($newItem['headers']) {
+				$headers = [];
+
 				foreach ($newItem['headers']['key'] as $index => $key) {
 					if (array_key_exists($index, $newItem['headers']['value'])) {
 						$headers[$key] = $newItem['headers']['value'][$index];
@@ -369,8 +370,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if (count($headers) == 1 && $key === '' && $newItem['headers']['value'][$index] === '') {
 					$headers = [];
 				}
+
+				$newItem['headers'] = $headers;
 			}
-			$newItem['headers'] = $headers;
 		}
 
 		if ($newItem['type'] == ITEM_TYPE_JMX) {

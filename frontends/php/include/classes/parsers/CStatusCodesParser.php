@@ -46,11 +46,10 @@ class CStatusCodesParser {
 		if (array_key_exists('usermacros', $options)) {
 			$this->options['usermacros'] = $options['usermacros'];
 
-			if ($options['usermacros']) {
+			if ($this->options['usermacros']) {
 				$this->user_macro_parser = new CUserMacroParser();
 			}
 		}
-
 	}
 
 	/**

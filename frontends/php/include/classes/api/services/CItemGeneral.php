@@ -186,7 +186,6 @@ abstract class CItemGeneral extends CApiService {
 					]);
 				}
 			}
-
 		}
 
 		// interfaces
