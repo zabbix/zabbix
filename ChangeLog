@@ -8,6 +8,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+A......... [ZBX-13331] removed "recovery" property from action.get API method response (nikita)
 ..F....... [ZBX-13309] fixed displaying of Problem/Recovery time (agriscenko, ashubin, Sasha)
 .......PS. [ZBX-13450] fixed server and proxy compilation problem for Solaris 10 (MVekslers)
 A.F....... [ZBX-13458,ZBX-13494] fixed resolving of the macros in map labels for non-superadmin users (Sasha)
@@ -191,6 +192,7 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-13331] removed "recovery" property from action.get API method response (nikita)
 ..F....... [ZBX-13309] fixed displaying of Problem/Recovery time (agriscenko, ashubin, Sasha)
 .......PS. [ZBX-13450] fixed server and proxy compilation problem for Solaris 10 (MVekslers)
 A.F....... [ZBX-13458,ZBX-13494] fixed resolving of the macros in map labels for non-superadmin users (Sasha)
