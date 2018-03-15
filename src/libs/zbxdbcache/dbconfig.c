@@ -10894,6 +10894,9 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
+		if (ZBX_LOC_NOWHERE != dc_item->location)
+			continue;
+
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
 			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
