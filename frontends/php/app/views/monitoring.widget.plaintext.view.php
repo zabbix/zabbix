@@ -19,17 +19,17 @@
 **/
 
 
-$history_table = new CTableInfo();
+$table = new CTableInfo();
 
 if ($data['error'] != null) {
-	$history_table->setNoDataMessage($data['error']);
+	$table->setNoDataMessage($data['error']);
 }
 else {
 	$table_header = [(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH)];
 	$names_at_top = ($data['name_location'] == STYLE_TOP && count($data['items']) > 1);
 
 	if ($names_at_top) {
-		$history_table->makeVerticalRotation();
+		$table->makeVerticalRotation();
 
 		foreach ($data['items'] as $item) {
 			$column_name = ($data['same_host'] === false)
@@ -46,14 +46,14 @@ else {
 		}
 		$table_header[] = _('Value');
 	}
-	$history_table->setHeader($table_header);
+	$table->setHeader($table_header);
 
 	$clock = null;
 	$row_values = [];
 	foreach ($data['history_data'] as $history_item) {
 		if ($names_at_top) {
 			if ($history_item['clock'] != $clock || array_key_exists($history_item['itemid'], $row_values)) {
-				if ($clock != null && count($row_values)) {
+				if ($clock !== null && count($row_values)) {
 					$table_row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))
 						->addClass(ZBX_STYLE_NOWRAP)];
 					foreach ($data['items'] as $item) {
@@ -61,7 +61,7 @@ else {
 							? $row_values[$item['itemid']]
 							: '';
 					}
-					$history_table->addRow($table_row);
+					$table->addRow($table_row);
 					$row_values = [];
 				}
 				$clock = $history_item['clock'];
@@ -77,10 +77,10 @@ else {
 					: $history_item['item_name'];
 			}
 			$table_row[] = $history_item['value'];
-			$history_table->addRow($table_row);
+			$table->addRow($table_row);
 		}
 
-		if ($history_table->getNumRows() >= $data['show_lines']) {
+		if ($table->getNumRows() >= $data['show_lines']) {
 			break;
 		}
 	}
@@ -88,7 +88,7 @@ else {
 
 $output = [
 	'header' => $data['name'],
-	'body' => $history_table->toString(),
+	'body' => $table->toString(),
 	'footer' => (new CList())
 		->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
 		->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT)
