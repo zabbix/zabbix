@@ -95,7 +95,7 @@ if (!$this->data['is_profile']) {
 			->setAriaRequired()
 	);
 }
-$data['auth_type'] = ZBX_AUTH_LDAP;
+
 // append password to form list
 if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
