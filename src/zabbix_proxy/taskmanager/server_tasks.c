@@ -62,7 +62,6 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 		zbx_tm_task_t	*task;
 
 		ZBX_STR2UINT64(taskid, row[0]);
-
 		ZBX_DBROW2UINT64(parent_taskid, row[5]);
 
 		task = zbx_tm_task_create(taskid, atoi(row[1]), ZBX_TM_STATUS_NEW, atoi(row[2]), atoi(row[3]), 0);
