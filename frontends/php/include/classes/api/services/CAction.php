@@ -847,7 +847,14 @@ class CAction extends CApiService {
 					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$db_opmessage = $db_ack_operations[$ack_operation['operationid']]['opmessage'];
+							$db_opmessage = array_key_exists('opmessage', $db_ack_operations[$ack_operation['operationid']])
+								? $db_ack_operations[$ack_operation['operationid']]['opmessage']
+								: [
+									'default_msg'	=> 0,
+									'mediatypeid'	=> 0,
+									'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+									'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+								];
 							$default_msg = array_key_exists('default_msg', $opmessage)
 								? $opmessage['default_msg']
 								: $db_opmessage['default_msg'];
