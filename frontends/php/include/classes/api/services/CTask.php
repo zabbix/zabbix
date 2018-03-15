@@ -73,7 +73,7 @@ class CTask extends CApiService {
 					'type' => $task['type'],
 					'status' => ZBX_TM_STATUS_NEW,
 					'clock' => $time,
-					'ttl' => SEC_PER_DAY
+					'ttl' => SEC_PER_HOUR
 				];
 				$ins_check_now_tasks[] = [
 					'taskid' => $taskid,
