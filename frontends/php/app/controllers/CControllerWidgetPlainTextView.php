@@ -39,32 +39,33 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$error = null;
 
-		$itemids = $fields['itemids'];
-		$name_location = $fields['name_location'];
-		$show_lines = $fields['show_lines'];
-		$style = $fields['style'];
-		$dynamic = $fields['dynamic'];
-
 		$same_host = null;
 		$items = [];
 		$history_data = [];
 
-		if (count($itemids)) {
+		if ($fields['itemids']) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
 				'selectHosts' => ['name'],
-				'itemids' => $itemids,
-				'webitems' => true
+				'itemids' => $fields['itemids'],
+				'webitems' => true,
+				'preservekeys' => true
 			]);
 
 			$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
-			if ($items && $dynamic && $dynamic_hostid) {
+
+			$keys = [];
+			foreach ($items as $item) {
+				$keys[] = $item['key_'];
+			}
+
+			if ($items && $fields['dynamic'] && $dynamic_hostid) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
 					'selectHosts' => ['name'],
 					'filter' => [
 						'hostid' => $dynamic_hostid,
-						'key_' => array_column($items, 'key_')
+						'key_' => $keys
 					],
 					'webitems' => true
 				]);
@@ -75,15 +76,11 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 		else {
-			$items = zbx_toHash($items, 'itemid');
 			$items = CMacrosResolverHelper::resolveItemNames($items);
 
 			// Grouping items ids by value type and detect same host.
 			$itemsids_by_type = [];
 			foreach ($items as $item) {
-				if (! array_key_exists($item['value_type'], $itemsids_by_type)) {
-					$itemsids_by_type[$item['value_type']] = [];
-				}
 				$itemsids_by_type[$item['value_type']][] = $item['itemid'];
 
 				if ($same_host !== false) {
@@ -96,14 +93,14 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				}
 			}
 
-			foreach ($itemsids_by_type as $value_type => $ids) {
+			foreach ($itemsids_by_type as $value_type => $itemids) {
 				$histories = API::History()->get([
 					'output' => API_OUTPUT_EXTEND,
 					'history' => $value_type,
-					'itemids' => $ids,
+					'itemids' => $itemids,
 					'sortorder' => ZBX_SORT_DOWN,
-					'sortfield' => 'clock',
-					'limit' => $show_lines
+					'sortfield' => ['clock', 'itemid'],
+					'limit' => $fields['show_lines']
 				]);
 
 				if ($histories) {
@@ -116,7 +113,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 							case ITEM_VALUE_TYPE_TEXT:
 							case ITEM_VALUE_TYPE_STR:
 							case ITEM_VALUE_TYPE_LOG:
-								$value = $style ? new CJsScript($history['value']) : $history['value'];
+								$value = $fields['style'] ? new CJsScript($history['value']) : $history['value'];
 								break;
 							default:
 								$value = $history['value'];
@@ -129,7 +126,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 							$value = applyValueMap($value, $item['valuemapid']);
 						}
 
-						if ($style == 0) {
+						if ($fields['style'] == 0) {
 							$value = new CPre($value);
 						}
 
@@ -166,9 +163,9 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			'name' => $this->getInput('name', $dynamic_widget_name),
 			'items' => $items,
 			'history_data' => $history_data,
-			'name_location' => $name_location,
+			'name_location' => $fields['name_location'],
 			'same_host' => $same_host,
-			'show_lines' => $show_lines,
+			'show_lines' => $fields['show_lines'],
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
