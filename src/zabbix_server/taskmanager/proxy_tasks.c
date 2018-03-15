@@ -58,7 +58,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 				" on t.taskid=cn.taskid"
 			" where t.status=%d"
 				" and t.proxy_hostid=" ZBX_FS_UI64
-				" and t.ttl=0 or t.clock+t.ttl>%d"
+				" and (t.ttl=0 or t.clock+t.ttl>%d)"
 			" order by t.taskid",
 			ZBX_TM_STATUS_NEW, proxy_hostid, time(NULL));
 
