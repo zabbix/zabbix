@@ -73,8 +73,9 @@ else {
 				->addClass(ZBX_STYLE_NOWRAP)];
 			if ($data['name_location'] == STYLE_LEFT) {
 				$table_row[] = ($data['same_host'] === false)
-					? $history_item['host_name'].NAME_DELIMITER.$history_item['item_name']
-					: $history_item['item_name'];
+					? $data['items'][$history_item['itemid']]['hosts'][0]['name'].NAME_DELIMITER.
+						$data['items'][$history_item['itemid']]['name_expanded']
+					: $data['items'][$history_item['itemid']]['name_expanded'];
 			}
 			$table_row[] = $history_item['value'];
 			$table->addRow($table_row);

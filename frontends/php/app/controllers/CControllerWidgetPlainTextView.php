@@ -67,7 +67,8 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 						'hostid' => $dynamic_hostid,
 						'key_' => $keys
 					],
-					'webitems' => true
+					'webitems' => true,
+					'preservekeys' => true
 				]);
 			}
 		}
@@ -132,8 +133,6 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 						$history_data[] = [
 							'itemid' => $history['itemid'],
-							'host_name' => $item['hosts'][0]['name'],
-							'item_name' => $item['name_expanded'],
 							'value' => $value,
 							'clock' => $history['clock'],
 							'ns' => $history['ns']
