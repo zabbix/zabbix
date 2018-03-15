@@ -2573,9 +2573,10 @@ class CAction extends CApiService {
 			}
 		}
 
-		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'actionid' ,'operationtype'],
+		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'operationtype'],
 			$ack_options
 		);
+
 		return $ack_operations;
 	}
 
