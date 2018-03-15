@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha5');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050039);
+define('ZABBIX_DB_VERSION',		3050042);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -1315,6 +1315,10 @@ define('ZBX_STYLE_ARROW_UP', 'arrow-up');
 define('ZBX_STYLE_BLUE', 'blue');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
+define('ZBX_STYLE_BTN_BACK_MAP', 'btn-back-map');
+define('ZBX_STYLE_BTN_BACK_MAP_CONTAINER', 'btn-back-map-container');
+define('ZBX_STYLE_BTN_BACK_MAP_CONTENT', 'btn-back-map-content');
+define('ZBX_STYLE_BTN_BACK_MAP_ICON', 'btn-back-map-icon');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');

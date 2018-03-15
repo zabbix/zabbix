@@ -77,5 +77,6 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, c
 int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len);
+int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
 
 #endif

@@ -769,23 +769,26 @@ ZABBIX.apps.map = (function($) {
 					switch (obj.val()) {
 						// host
 						case '0':
-							jQuery('#elementNameHost').multiSelect('clean');
+							$('#elementNameHost').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
 							break;
 
 						// triggers
 						case '2':
-							jQuery('#elementNameTriggers').multiSelect('clean');
+							$('#elementNameTriggers').multiSelect('clean');
 							$('#triggerContainer tbody').html('');
 							break;
 
 						// host group
 						case '3':
-							jQuery('#elementNameHostGroup').multiSelect('clean');
+							$('#elementNameHostGroup').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
 							break;
 
 						// others types
 						default:
 							$('input[name=elementName]').val('');
+							$('#triggerContainer tbody').html('');
 					}
 				});
 
@@ -1340,7 +1343,7 @@ ZABBIX.apps.map = (function($) {
 
 				// Clean trigger selement.
 				if ($('#elementType').val() == 2) {
-					jQuery('#elementNameTriggers').multiSelect('clean');
+					$('#elementNameTriggers').multiSelect('clean');
 					$('#triggerContainer tbody').html('');
 				}
 			},

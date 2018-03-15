@@ -26,6 +26,7 @@
 #include "zbxtasks.h"
 #include "../events.h"
 #include "../actions.h"
+#include "export.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -617,6 +618,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (SUCCEED == zbx_is_export_enabled())
+		zbx_problems_export_init("task-manager", process_num);
 
 	sec1 = zbx_time();
 
