@@ -62,7 +62,7 @@ function getLocales() {
 		'ka_GE' => ['name' => _('Georgian (ka_GE)'),	'display' => false],
 		'de_DE' => ['name' => _('German (de_DE)'),	'display' => false],
 		'el_GR' => ['name' => _('Greek (el_GR)'),	'display' => false],
-		'he_IL' => ['name' => _('Hebrew (he_IL)'),	'display' => false],
+		'he_IL' => ['name' => _('Hebrew (he_IL)'),	'display' => true],
 		'hu_HU' => ['name' => _('Hungarian (hu_HU)'),	'display' => false],
 		'id_ID' => ['name' => _('Indonesian (id_ID)'),	'display' => false],
 		'it_IT' => ['name' => _('Italian (it_IT)'),	'display' => true],

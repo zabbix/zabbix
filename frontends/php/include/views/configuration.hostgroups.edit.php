@@ -38,7 +38,7 @@ $form_list = (new CFormList('hostgroupFormList'))
 if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$form_list->addRow(null,
 		(new CCheckBox('subgroups'))
-			->setLabel(_('Apply permissions to all subgroups'))
+			->setLabel(_('Apply permissions and tag filters to all subgroups'))
 			->setChecked($data['subgroups'])
 	);
 }
