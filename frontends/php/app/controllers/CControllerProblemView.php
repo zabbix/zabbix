@@ -165,7 +165,7 @@ class CControllerProblemView extends CController {
 				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.details', $this->getInput('filter_details', 0), PROFILE_TYPE_INT);
-			CProfile::update('web.problem.filter.show_tags', $this->getInput('filter_show_tags',PROBLEMS_SHOW_TAGS_3),
+			CProfile::update('web.problem.filter.show_tags', $this->getInput('filter_show_tags', PROBLEMS_SHOW_TAGS_3),
 				PROFILE_TYPE_INT
 			);
 		}
