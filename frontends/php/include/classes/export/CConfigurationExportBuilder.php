@@ -369,7 +369,7 @@ class CConfigurationExportBuilder {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
 			}
 
-			if (is_array($discoveryRule['query_fields'])) {
+			if ($discoveryRule['query_fields']) {
 				$query_fields = [];
 
 				foreach ($discoveryRule['query_fields'] as $query_field) {
@@ -378,7 +378,7 @@ class CConfigurationExportBuilder {
 				$data['query_fields'] = $query_fields;
 			}
 
-			if (is_array($discoveryRule['headers'])) {
+			if ($discoveryRule['headers']) {
 				$headers = [];
 
 				foreach ($discoveryRule['headers'] as $name => $value) {
@@ -766,7 +766,7 @@ class CConfigurationExportBuilder {
 				$data['interface_ref'] = $item['interface_ref'];
 			}
 
-			if (is_array($item['query_fields'])) {
+			if ($item['query_fields']) {
 				$query_fields = [];
 
 				foreach ($item['query_fields'] as $query_field) {
@@ -775,7 +775,7 @@ class CConfigurationExportBuilder {
 				$data['query_fields'] = $query_fields;
 			}
 
-			if (is_array($item['headers'])) {
+			if ($item['headers']) {
 				$headers = [];
 
 				foreach ($item['headers'] as $name => $value) {
