@@ -32,10 +32,9 @@ else {
 		$table->makeVerticalRotation();
 
 		foreach ($data['items'] as $item) {
-			$column_name = ($data['same_host'] === false)
-				? $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
-				: $item['name_expanded'];
-			$table_header[] = (new CColHeader($column_name))
+			$table_header[] = (new CColHeader(
+				(($data['same_host'] === false) ? $item['hosts'][0]['name'].NAME_DELIMITER : '').$item['name_expanded']
+			))
 				->addClass('vertical_rotation')
 				->setTitle($item['name_expanded']);
 		}
@@ -50,41 +49,46 @@ else {
 
 	$clock = null;
 	$row_values = [];
-	foreach ($data['history_data'] as $history_item) {
-		if ($names_at_top) {
-			if ($history_item['clock'] != $clock || array_key_exists($history_item['itemid'], $row_values)) {
-				if ($clock !== null && count($row_values)) {
-					$table_row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))
-						->addClass(ZBX_STYLE_NOWRAP)];
-					foreach ($data['items'] as $item) {
-						$table_row[] = array_key_exists($item['itemid'], $row_values)
-							? $row_values[$item['itemid']]
-							: '';
-					}
-					$table->addRow($table_row);
-					$row_values = [];
-				}
-				$clock = $history_item['clock'];
-			}
-			$row_values[$history_item['itemid']] = $history_item['value'];
-		}
-		else {
-			$table_row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])))
-				->addClass(ZBX_STYLE_NOWRAP)];
+
+	do {
+		$history_item = array_shift($data['history_data']);
+
+		if ($history_item !== null && !$names_at_top) {
+			$table_row = [
+				(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])))->addClass(ZBX_STYLE_NOWRAP)
+			];
 			if ($data['name_location'] == STYLE_LEFT) {
-				$table_row[] = ($data['same_host'] === false)
-					? $data['items'][$history_item['itemid']]['hosts'][0]['name'].NAME_DELIMITER.
-						$data['items'][$history_item['itemid']]['name_expanded']
-					: $data['items'][$history_item['itemid']]['name_expanded'];
+				$table_row[] = (($data['same_host'] === false)
+					? $data['items'][$history_item['itemid']]['hosts'][0]['name'].NAME_DELIMITER
+					: '').
+					$data['items'][$history_item['itemid']]['name_expanded'];
 			}
 			$table_row[] = $history_item['value'];
 			$table->addRow($table_row);
 		}
+		else {
+			if (($history_item === null && count($row_values))
+				|| ($clock !== null && $history_item['clock'] != $clock)
+				|| array_key_exists($history_item['itemid'], $row_values)
+			) {
+				$table_row = [
+					(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))->addClass(ZBX_STYLE_NOWRAP)
+				];
+				foreach ($data['items'] as $item) {
+					$table_row[] = array_key_exists($item['itemid'], $row_values)
+						? $row_values[$item['itemid']]
+						: '';
+				}
+				$table->addRow($table_row);
+				$row_values = [];
+			}
 
-		if ($table->getNumRows() >= $data['show_lines']) {
-			break;
+			if ($history_item !== null) {
+				$clock = $history_item['clock'];
+				$row_values[$history_item['itemid']] = $history_item['value'];
+			}
 		}
-	}
+	} while ($history_item !== null && $table->getNumRows() < $data['show_lines']);
 }
 
 $output = [

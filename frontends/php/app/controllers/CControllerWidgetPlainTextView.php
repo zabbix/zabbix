@@ -101,7 +101,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 					'itemids' => $itemids,
 					'sortorder' => ZBX_SORT_DOWN,
 					'sortfield' => ['clock', 'itemid'],
-					'limit' => $fields['show_lines']
+					'limit' => $fields['show_lines'] * count($itemids)
 				]);
 
 				if ($histories) {
