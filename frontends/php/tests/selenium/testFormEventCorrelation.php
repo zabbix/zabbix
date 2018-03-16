@@ -62,7 +62,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 
 		if (array_key_exists('description', $data)) {
-		$this->zbxTestInputType('description', $data['description']);
+			$this->zbxTestInputType('description', $data['description']);
 		}
 
 		$this->zbxTestTabSwitch('Operations');
@@ -139,24 +139,31 @@ class testFormEventCorrelation extends CWebTest {
 
 		$this->zbxTestCheckFatalErrors();
 
-		if 	(array_key_exists('name', $data) and $data['name'] == 'Event correlation for update') {
+		if 	(array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 			$this->assertEquals(1, DBcount($sql));
 		}
 
-		if (array_key_exists('name', $data) and $data['name'] != 'Event correlation for update') {
+		if (array_key_exists('name', $data) && $data['name'] != 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 			$this->assertEquals(0, DBcount($sql));
 		}
 	}
 
 	public function testFormEventCorrelation_LongNameValidation() {
+		$name = 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_'
+				. 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_'
+				. 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name';
+		$db_name = 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_'
+				. 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_'
+				. 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_';
+
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
 		$this->zbxTestCheckTitle('Event correlation rules');
 
-		$this->zbxTestInputType('name', 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name');
+		$this->zbxTestInputType('name', $name);
 		$this->zbxTestInputType('new_condition_tag', 'Test tag');
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 
@@ -166,9 +173,10 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
 		$this->zbxTestCheckFatalErrors();
-		$sql = "SELECT NULL FROM correlation WHERE name='Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_'";
+		// Name longer than 255 symbols is truncated on frontend, check the shortened name in DB
+		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($db_name);
 		$this->assertEquals(1, DBcount($sql));
-		}
+	}
 
 	public static function tags() {
 		return [
@@ -292,6 +300,8 @@ class testFormEventCorrelation extends CWebTest {
 	 * @dataProvider tags
 	 */
 	public function testFormEventCorrelation_TestTags($data) {
+		$host_group = 'Zabbix servers';
+
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -299,34 +309,28 @@ class testFormEventCorrelation extends CWebTest {
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
 
-		if ($data['select_tag'] == 'New event host group') {
+		if ($data['select_tag'] === 'New event host group') {
 			$this->zbxTestClickButtonMultiselect('new_condition_groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->zbxTestClickWait('spanid4');
+			$this->zbxTestClickLinkText($host_group);
 		}
 
-		if ($data['select_tag'] == 'Event tag pair') {
-			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestInputType('new_condition_oldtag', $data['oldtag']);
+		if ($data['select_tag'] === 'Event tag pair') {
+			$this->zbxTestInputTypeWait('new_condition_oldtag', $data['oldtag']);
 			$this->zbxTestInputType('new_condition_newtag', $data['newtag']);
 		}
 
-		if ($data['select_tag'] == 'Old event tag value') {
+		if ($data['select_tag'] === 'Old event tag value' || $data['select_tag'] === 'New event tag value') {
 			$this->zbxTestInputType('new_condition_tag', $data['tag']);
 			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
 			$this->zbxTestInputType('new_condition_value', $data['value']);
 		}
 
-		if ($data['select_tag'] == 'New event tag value') {
-			$this->zbxTestInputType('new_condition_tag', $data['tag']);
-			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
-			$this->zbxTestInputType('new_condition_value', $data['value']);
-		}
-
-		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+		$this->zbxTestWaitForPageToLoad();
 
 		$this->zbxTestTabSwitch('Operations');
 		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'add_operation\')]');
@@ -401,11 +405,11 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
 		$this->zbxTestWaitForPageToLoad();
 
-		if ($data['select_tag'] == 'Event tag pair' and array_key_exists('newtag', $data)) {
+		if ($data['select_tag'] === 'Event tag pair' && array_key_exists('newtag', $data)) {
 			$this->zbxTestInputType('new_condition_newtag', $data['newtag']);
 		}
 
-		if ($data['select_tag'] == 'Event tag pair' and array_key_exists('oldtag', $data)) {
+		if ($data['select_tag'] === 'Event tag pair' && array_key_exists('oldtag', $data)) {
 			$this->zbxTestInputType('new_condition_oldtag', $data['oldtag']);
 		}
 
@@ -630,20 +634,20 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestTextPresent('Cloned correlation');
 		$this->zbxTestCheckFatalErrors();
 
-		$sql = "SELECT NULL FROM correlation WHERE name='Cloned correlation'";
+		$sql = "SELECT NULL FROM correlation WHERE name='Cloned correlation' AND description='Test description clone'";
 		$this->assertEquals(1, DBcount($sql));
 
-		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for clone'";
+		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for clone' AND description='Test description clone'";
 		$this->assertEquals(1, DBcount($sql));
-
-		$sql = "SELECT NULL FROM correlation WHERE description='Test description clone'";
-		$this->assertEquals(2, DBcount($sql));
 
 		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='clone tag'";
 		$this->assertEquals(2, DBcount($sql));
 	}
 
 	public function testFormEventCorrelation_UpdateNone() {
+		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
+		$old_hash = DBhash($sql_hash);
+
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for update');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -655,14 +659,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestTextPresent('Event correlation for update');
 		$this->zbxTestCheckFatalErrors();
 
-		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for update'";
-		$this->assertEquals(1, DBcount($sql));
-
-		$sql = "SELECT NULL FROM correlation WHERE description='Test description update'";
-		$this->assertEquals(1, DBcount($sql));
-
-		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='update tag'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function testFormEventCorrelation_UpdateAllFields() {
@@ -690,16 +687,10 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestTextPresent('New event correlation for update');
 		$this->zbxTestCheckFatalErrors();
 
-		$sql = "SELECT NULL FROM correlation WHERE name='New event correlation for update'";
+		$sql = "SELECT NULL FROM correlation WHERE name='New event correlation for update' AND description='New test description update'";
 		$this->assertEquals(1, DBcount($sql));
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for update'";
-		$this->assertEquals(0, DBcount($sql));
-
-		$sql = "SELECT NULL FROM correlation WHERE description='New test description update'";
-		$this->assertEquals(1, DBcount($sql));
-
-		$sql = "SELECT NULL FROM correlation WHERE description='Test description update'";
 		$this->assertEquals(0, DBcount($sql));
 
 		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='New update tag'";
@@ -726,6 +717,9 @@ class testFormEventCorrelation extends CWebTest {
 	}
 
 	public function testFormEventCorrelation_Cancel() {
+		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
+		$old_hash = DBhash($sql_hash);
+
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for cancel');
 		$this->zbxTestCheckHeader('Event correlation rules');
@@ -736,13 +730,6 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestTextPresent('Event correlation for cancel');
 		$this->zbxTestCheckFatalErrors();
 
-		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for cancel'";
-		$this->assertEquals(1, DBcount($sql));
-
-		$sql = "SELECT NULL FROM correlation WHERE description='Test description cancel'";
-		$this->assertEquals(1, DBcount($sql));
-
-		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='cancel tag'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 }
