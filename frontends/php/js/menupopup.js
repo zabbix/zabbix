@@ -734,10 +734,6 @@ function getMenuPopupTrigger(options) {
 		url.setArgument('eventids[]', options.acknowledge.eventid);
 		url.setArgument('backurl', options.acknowledge.backurl);
 
-		if (fullscreen) {
-			url.setArgument('fullscreen', '1');
-		}
-
 		items[items.length] = {
 			label: t('Acknowledge'),
 			url: url.getUrl()
