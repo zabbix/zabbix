@@ -300,6 +300,32 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_full_name(const zbx_ipmi_host_t
 	return s;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_domain_offset                                                *
+ *                                                                            *
+ * Purpose: Check if a item name start from domain name and set prefix offset *
+ *                                                                            *
+ * Parameters: h         - [IN] ipmi host                                     *
+ *             full_name - [IN] string to examine                             *
+ *                                                                            *
+ * Return value: 0 or offset which equal name of domain                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_domain_offset(zbx_ipmi_host_t *h, const char *full_name)
+{
+	char	domain_name[IPMI_DOMAIN_NAME_LEN];
+	size_t	offset;
+
+	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
+	offset = strlen(domain_name);
+
+	if (offset >= strlen(full_name) || 0 != strncmp(domain_name, full_name, offset))
+		offset = 0;
+
+	return offset;
+}
+
 static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	const char		*__function_name = "zbx_allocate_ipmi_sensor";
@@ -309,7 +335,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	enum ipmi_str_type_e	id_type;
 	int			id_sz;
 	size_t			sz;
-	char			domain_name[IPMI_DOMAIN_NAME_LEN], full_name[IPMI_SENSOR_NAME_LEN];
+	char			full_name[IPMI_SENSOR_NAME_LEN];
 
 	id_sz = ipmi_sensor_get_id_length(sensor);
 	memset(id, 0, sizeof(id));
@@ -337,22 +363,15 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	s->type = ipmi_sensor_get_sensor_type(sensor);
 
 	ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
-
-	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
-	sz = strlen(domain_name);
-
-	if (sz >= strlen(full_name) || 0 != strncmp(domain_name, full_name, sz))
-		sz = 0;
-
-	s->full_name = zbx_strdup(NULL, full_name + sz);
+	s->full_name = zbx_strdup(NULL, full_name + get_domain_offset(h, full_name));
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
-				"('%s') type:0x%x ('%s') domain:'%s' name:'%s'", h->ip, h->port, s->id_type,
+				"('%s') type:0x%x ('%s') domain:'%u' name:'%s'", h->ip, h->port, s->id_type,
 				s->id_sz, zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
 				s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor), s->type,
-				ipmi_sensor_get_sensor_type_string(s->sensor), domain_name, s->full_name);
+				ipmi_sensor_get_sensor_type_string(s->sensor), h->domain_nr, s->full_name);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, s);
@@ -465,22 +484,17 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	size_t			sz, dm_sz;
 	zbx_ipmi_control_t	*c;
 	char			*c_name = NULL;
-	char			domain_name[IPMI_DOMAIN_NAME_LEN], full_name[IPMI_SENSOR_NAME_LEN];
+	char			full_name[IPMI_SENSOR_NAME_LEN];
 
 	sz = (size_t)ipmi_control_get_id_length(control);
 	c_name = (char *)zbx_malloc(c_name, sz + 1);
 	ipmi_control_get_id(control, c_name, sz);
 
 	ipmi_control_get_name(control, full_name, sizeof(full_name));
+	dm_sz = get_domain_offset(h, full_name);
 
-	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
-	dm_sz = strlen(domain_name);
-
-	if (dm_sz >= strlen(full_name) || 0 != strncmp(domain_name, full_name, dm_sz))
-		dm_sz = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() Added control: host'%s:%d' id:'%s' domain:'%s' name:'%s'",
-			__function_name, h->ip, h->port, c_name, domain_name, full_name + dm_sz);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() Added control: host'%s:%d' id:'%s' domain:'%u' name:'%s'",
+			__function_name, h->ip, h->port, c_name, h->domain_nr, full_name + dm_sz);
 
 	h->control_count++;
 	sz = (size_t)h->control_count * sizeof(zbx_ipmi_control_t);
