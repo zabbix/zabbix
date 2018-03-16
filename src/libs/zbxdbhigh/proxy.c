@@ -3031,7 +3031,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 
 				if (FAIL == ret)
 				{
-					*error = zbx_dsprintf(*error,  "cannot process trapper item \"%s\": %s",
+					*error = zbx_dsprintf(*error, "cannot process trapper item \"%s\": %s",
 							item->key_orig, zbx_socket_strerror());
 					return FAIL;
 				}
@@ -3039,7 +3039,11 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 			if (0 == item->allow_traps)
+			{
+				*error = zbx_dsprintf(*error, "cannot process HTTP agent item \"%s\":"
+						" traps are not allowed", item->key_orig, zbx_socket_strerror());
 				return FAIL;
+			}
 			break;
 		default:
 			return FAIL;
