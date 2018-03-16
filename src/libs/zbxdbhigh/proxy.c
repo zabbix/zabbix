@@ -3041,11 +3041,13 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 			if (0 == item->allow_traps)
 			{
 				*error = zbx_dsprintf(*error, "cannot process HTTP agent item \"%s\":"
-						" traps are not allowed", item->key_orig);
+						" trapping is not enabled", item->key_orig);
 				return FAIL;
 			}
 			break;
 		default:
+			*error = zbx_dsprintf(*error, "cannot process item \"%s\": item type \"%d\" is not supported",
+					item->key_orig, item->type);
 			return FAIL;
 	}
 
