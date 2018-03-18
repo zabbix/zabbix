@@ -67,10 +67,9 @@ else {
 			$table->addRow($table_row);
 		}
 		else {
-			if (($history_item === null && count($row_values))
-				|| ($clock !== null && $history_item['clock'] != $clock)
-				|| array_key_exists($history_item['itemid'], $row_values)
-			) {
+			if (($history_item === null && $row_values)
+					|| ($clock !== null && $history_item['clock'] != $clock)
+					|| array_key_exists($history_item['itemid'], $row_values)) {
 				$table_row = [
 					(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))->addClass(ZBX_STYLE_NOWRAP)
 				];
