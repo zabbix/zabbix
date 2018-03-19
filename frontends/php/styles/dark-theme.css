@@ -2261,6 +2261,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .action-menu:focus {
+    outline: none; }
   .action-menu li {
     display: block; }
     .action-menu li div {
@@ -2281,11 +2283,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -webkit-transition: background-color 0.2s ease-out;
     -moz-transition: background-color 0.2s ease-out;
     transition: background-color 0.2s ease-out; }
-    .action-menu .action-menu-item:hover {
-      background-color: #454545; }
-    .action-menu .action-menu-item:focus {
-      background-color: #454545; }
-    .action-menu .action-menu-item:active {
+    .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
       background-color: #454545; }
     .action-menu .action-menu-item.selected::before {
       display: block;

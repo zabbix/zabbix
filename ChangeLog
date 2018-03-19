@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha5
 
 New features:
+..F....... [ZBXNEXT-4313] implemented keyboard interaction in context menus (miks)
 A.F.I...S. [ZBXNEXT-4426] added option to execute cached passive checks at the current time (Ivo, wiper)
 ........S. [ZBXNEXT-4417] added real time export of events, history and trends in newline delimited JSON format (vso)
 ..F....... [ZBXNEXT-4374] implemented the widget configuration fields clearing when changing the type (ashubin)
