@@ -504,7 +504,11 @@ static int	DBpatch_3050041(void)
 		"update widget_field wf"
 		" set value_int=3"
 		" where wf.name='show_tags'"
-			" and exists (select w.widgetid from widget w where w.type='problems')");
+			" and exists (select null"
+			" from widget w"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='problems'"
+			")");
 
 	if (ZBX_DB_OK > res)
 		return FAIL;
