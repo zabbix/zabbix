@@ -641,7 +641,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 						NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
 						NULL, &items[i].url, MACRO_TYPE_HTTP_RAW, NULL, 0);
-
+				zbx_http_punycode_encode_url(&items[i].url);
 				if (FAIL == parse_query_fields(&items[i], &items[i].query_fields))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
