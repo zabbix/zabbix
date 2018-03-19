@@ -501,13 +501,14 @@ static int	DBpatch_3050041(void)
 	int	res;
 
 	res = DBexecute(
-		"update widget_field wf"
+		"update widget_field"
 		" set value_int=3"
-		" where wf.name='show_tags'"
-			" and exists (select null"
-			" from widget w"
-			" where wf.widgetid=w.widgetid"
-				" and w.type='problems'"
+		" where name='show_tags'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='problems'"
 			")");
 
 	if (ZBX_DB_OK > res)
