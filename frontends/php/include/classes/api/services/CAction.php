@@ -847,7 +847,14 @@ class CAction extends CApiService {
 					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$db_opmessage = $db_ack_operations[$ack_operation['operationid']]['opmessage'];
+							$db_opmessage = array_key_exists('opmessage', $db_ack_operations[$ack_operation['operationid']])
+								? $db_ack_operations[$ack_operation['operationid']]['opmessage']
+								: [
+									'default_msg'	=> 0,
+									'mediatypeid'	=> 0,
+									'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+									'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+								];
 							$default_msg = array_key_exists('default_msg', $opmessage)
 								? $opmessage['default_msg']
 								: $db_opmessage['default_msg'];
@@ -2040,7 +2047,7 @@ class CAction extends CApiService {
 
 			foreach ($ack_operations as $ack_operation) {
 				$actionid = $ack_operation['actionid'];
-				unset($ack_operation['actionid']);
+				unset($ack_operation['actionid'], $ack_operation['recovery']);
 				$result[$actionid]['acknowledgeOperations'][] = $ack_operation;
 			}
 		}
@@ -2076,6 +2083,8 @@ class CAction extends CApiService {
 			$opinventory = [];
 
 			foreach ($operations as $operationid => $operation) {
+				unset($operations[$operationid]['recovery']);
+
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$opmessage[] = $operationid;
@@ -2294,6 +2303,8 @@ class CAction extends CApiService {
 			$op_recovery_message = [];
 
 			foreach ($recovery_operations as $recovery_operationid => $recovery_operation) {
+				unset($recovery_operations[$recovery_operationid]['recovery']);
+
 				switch ($recovery_operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$opmessage[] = $recovery_operationid;
@@ -2569,9 +2580,10 @@ class CAction extends CApiService {
 			}
 		}
 
-		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'actionid' ,'operationtype'],
+		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'operationtype'],
 			$ack_options
 		);
+
 		return $ack_operations;
 	}
 

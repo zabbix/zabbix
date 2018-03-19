@@ -63,6 +63,8 @@ $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #999;
 $scrollbar-thumb-color-darken: 30%;
 
+$input-placeholder-color: #bbb;
+
 // BUTTONS
 $btn-font-color: #333;
 $btn-bg-color: #e0e0e0;
@@ -115,6 +117,11 @@ $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border-color: rgba($ui-bg-color, .2) !important;
+	background-color: $ui-bg-selected-color !important;
+	color: $ui-bg-color !important;
+}
 
 // Important! @import string should come after variables
 @import 'screen.scss';
@@ -156,6 +163,7 @@ $form-icon-btn: (
 
 $icon-btn: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -187px,
+	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -223px,
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -223px,
 	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -259px,
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -295px,
@@ -206,19 +214,36 @@ $icon-widget-btn: (
 .btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
-	}
-}
-
 .btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -354px -619px !important;
 }
 
 .list-table {
+
+	.subfilter-enabled {
+		background-color: $ui-bg-color;
+		box-shadow: 0 0 0 1px $link-hover-color;
+	}
+
 	thead th {
-		border-color: lighten($table-border-color, 3%) !important;
+		border-color: lighten($table-border-color, 3%);
+	}
+}
+
+.subfilter-enabled {
+
+	.link-action {
+		color: $link-hover-color;
+
+		&:focus {
+			color: $link-hover-color;
+			border-bottom: 3px solid $link-hover-color;
+		}
+
+		&:hover {
+			color: $link-hover-color;
+			border-bottom: 1px solid $link-hover-color;
+		}
 	}
 }
 
@@ -306,13 +331,41 @@ button {
 }
 
 .radio-segmented {
-	input[type="radio"] {
+
+	.average-bg,
+	.disaster-bg,
+	.high-bg,
+	.info-bg,
+	.na-bg,
+	.warning-bg {
+
+		&:before,
+		&:after {
+			display: none;
+		}
+	}
+
+	li {
+
+		input[type="radio"] {
+
+			&:checked:not([disabled]) + label,
 			&:focus + label {
-				border-color: $form-border-focus-color !important;
+				border-color: $form-border-focus-color;
+				color: $white;
+			}
+
+			&:checked + label {
+				background-color: $ui-bg-selected-color;
+			}
+
+			&:checked[disabled] + label {
+				background-color: #595959 !important;
+			}
+
+			&:focus + label {
 				background-color: $link-hover-color !important;
 			}
-		&:checked[disabled] + label {
-			background-color: #595959 !important;
 		}
 	}
 }
@@ -460,7 +513,7 @@ ul.top-nav-icons {
 }
 
 .subfilter-enabled {
-	background-color: #000 !important;
+	background-color: #000;
 }
 
 
@@ -611,13 +664,6 @@ td.na-bg {
 	content: none;
 }
 
-.radio-segmented .na-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.normal-bg {
 	@extend td.na-bg;
 }
@@ -700,13 +746,6 @@ td.info-bg {
 	content: none;
 }
 
-.radio-segmented .info-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -741,13 +780,6 @@ td.average-bg {
 
 .average-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .average-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 td.log-warning-bg {
@@ -795,13 +827,6 @@ td.warning-bg {
 	content: none;
 }
 
-.radio-segmented .warning-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.log-high-bg {
 	@extend td.log-na-bg;
 }
@@ -847,13 +872,6 @@ td.high-bg {
 	content: none;
 }
 
-.radio-segmented .high-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.log-disaster-bg {
 	@extend td.log-na-bg;
 }
@@ -897,13 +915,6 @@ td.disaster-bg {
 
 .disaster-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .disaster-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 .notif-body li {
@@ -993,7 +1004,7 @@ td.inactive-bg {
 	}
 }
 
-// GRAPH AND MAP SELECTIONS
+// GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.2);
 	border: 2px solid rgba($font-color,0.6);
@@ -1006,4 +1017,17 @@ td.inactive-bg {
 
 .map-element-selected {
 	border: 3px dashed $font-color;
+}
+
+.btn-back-map-container {
+
+	a {
+		border-bottom: none;
+	}
+
+	.btn-back-map {
+		.btn-back-map-icon {
+			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+		}
+	}
 }
