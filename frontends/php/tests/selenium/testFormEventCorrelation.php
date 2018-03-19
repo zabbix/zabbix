@@ -483,12 +483,12 @@ class testFormEventCorrelation extends CWebTest {
 			$this->zbxTestDropdownSelectWait('new_condition_type', $tag['select_tag']);
 			$this->zbxTestInputType('new_condition_tag', $tag['tag_name']);
 
-			if (isset($tag['operator'])) {
+			if (array_key_exists('operator', $tag)) {
 				$this->zbxTestDropdownSelectWait('new_condition_operator', $tag['operator']);
 				$this->zbxTestInputType('new_condition_value', $tag['value']);
 				}
 
-			if (isset($tag['calculation'])) {
+			if (array_key_exists('calculation', $tag)) {
 				$this->zbxTestDropdownSelect('evaltype', $tag['calculation']);
 				if ($tag['calculation'] === 'Custom expression') {
 					$this->zbxTestInputType('formula', $tag['formula']);
@@ -516,7 +516,7 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> '' ]
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'formula'=> '' ]
 					],
 					'error_message' => 'Incorrect custom expression "Test create with empty expression" for correlation "": expression is empty.'
 				]
@@ -527,7 +527,7 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> 'A or B' ]
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'formula'=> 'A or B' ]
 					],
 					'error_message' => 'Condition "C" is not used in formula "A or B" for correlation "Test create with missing argument".'
 				]
@@ -538,7 +538,7 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> '(A or B) and (C or D)' ]
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'formula'=> '(A or B) and (C or D)' ]
 					],
 					'error_message' => 'Condition "D" used in formula "(A or B) and (C or D)" for correlation "Test create with extra argument" is not defined.'
 				]
@@ -549,7 +549,7 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> 'Wrong formula']
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'formula'=> 'Wrong formula']
 					],
 					'error_message' => 'Incorrect custom expression "Test create with wrong formula" for correlation "Wrong formula": check expression starting from "Wrong formula".'
 				]
@@ -572,19 +572,18 @@ class testFormEventCorrelation extends CWebTest {
 			$this->zbxTestDropdownSelectWait('new_condition_type', $tag['select_tag']);
 			$this->zbxTestInputType('new_condition_tag', $tag['tag_name']);
 
-			if (isset($tag['operator'])) {
+			if (array_key_exists('operator', $tag)) {
 				$this->zbxTestDropdownSelectWait('new_condition_operator', $tag['operator']);
 				$this->zbxTestInputType('new_condition_value', $tag['value']);
-				}
-			if (isset($tag['calculation'])) {
-				$this->zbxTestDropdownSelect('evaltype', $tag['calculation']);
-				$this->zbxTestInputType('formula', $tag['formula']);
 				}
 
 			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 		}
 
+		$this->zbxTestDropdownSelectWait('evaltype', 'Custom expression');
+		$this->zbxTestInputType('formula', $tag['formula']);
 		$this->zbxTestClick('add');
+
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation');
 		$error = $this->zbxTestGetText('//ul[@class=\'msg-details-border\']');
 		$this->assertContains($data['error_message'], $error);
@@ -592,32 +591,6 @@ class testFormEventCorrelation extends CWebTest {
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	public static function correlationClone() {
-		return [
-			[
-				[
-					'name' => 'NEW Event correlation for clone'
-				]
-			],
-			[
-				[
-					'select_tag' => 'New event tag',
-					'tag' => 'NEW clone tag'
-				]
-			],
-			[
-				[
-					'description' => 'NEW Test description clone'
-				]
-			],
-			[
-				[
-					'operation' => 'Close new event'
-				]
-			]
-		];
 	}
 
 	public function testFormEventCorrelation_Clone() {
