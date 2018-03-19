@@ -283,7 +283,7 @@ static int	vc_history_record_compare_desc_func(const zbx_history_record_t *d1, c
 void	zbx_mock_test_entry(void **state)
 {
 	char				*error = NULL;
-	int				err, start, end, count, value_type;
+	int				err, start, end, count, value_type, seconds;
 	zbx_uint64_t			itemid;
 	zbx_timespec_t			ts;
 	zbx_vector_history_record_t	values_received, values_expected;
@@ -300,7 +300,8 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.end"), &ts);
 	end = ts.sec;
-	start = end - atoi(zbx_mock_get_parameter_string("in.seconds"));
+	seconds = atoi(zbx_mock_get_parameter_string("in.seconds"));
+	start = (0 == seconds ? 0 : end - seconds);
 	count = atoi(zbx_mock_get_parameter_string("in.count"));
 	value_type = zbx_mock_str_to_value_type(zbx_mock_get_parameter_string("in['value type']"));
 
