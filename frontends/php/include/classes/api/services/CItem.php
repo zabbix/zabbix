@@ -169,7 +169,7 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
+			$sqlParts['where']['interfaceid'] = dbConditionId('i.interfaceid', $options['interfaceids']);
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.interfaceid';
@@ -194,7 +194,7 @@ class CItem extends CItemGeneral {
 			zbx_value2array($options['proxyids']);
 
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionId('h.proxy_hostid', $options['proxyids']);
 			$sqlParts['where'][] = 'h.hostid=i.hostid';
 
 			if ($options['groupCount']) {
@@ -487,22 +487,11 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		if (!empty($itemApplications)) {
-			DB::insert('items_applications', $itemApplications);
+		if ($itemApplications) {
+			DB::insertBatch('items_applications', $itemApplications);
 		}
 
 		$this->createItemPreprocessing($items);
-
-		$itemHosts = $this->get([
-			'output' => ['name'],
-			'itemids' => $itemids,
-			'selectHosts' => ['name'],
-			'nopermissions' => true
-		]);
-		foreach ($itemHosts as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Created: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 	}
 
 	/**
@@ -540,21 +529,10 @@ class CItem extends CItemGeneral {
 
 		if (!empty($applicationids)) {
 			DB::delete('items_applications', ['itemid' => $applicationids]);
-			DB::insert('items_applications', $itemApplications);
+			DB::insertBatch('items_applications', $itemApplications);
 		}
 
 		$this->updateItemPreprocessing($items);
-
-		$itemHosts = $this->get([
-			'output' => ['name'],
-			'itemids' => $itemids,
-			'selectHosts' => ['name'],
-			'nopermissions' => true
-		]);
-		foreach ($itemHosts as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Updated: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 	}
 
 	/**
@@ -672,7 +650,6 @@ class CItem extends CItemGeneral {
 
 		$delItems = $this->get([
 			'output' => ['itemid', 'name', 'templateid', 'flags'],
-			'selectHosts' => ['name'],
 			'itemids' => $itemIds,
 			'editable' => true,
 			'preservekeys' => true
@@ -713,7 +690,6 @@ class CItem extends CItemGeneral {
 			$db_dependent_items = $this->get([
 				'output' => ['itemid', 'name'],
 				'filter' => ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
-				'selectHosts' => ['name'],
 				'preservekeys' => true
 			]);
 			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_items);
@@ -797,12 +773,6 @@ class CItem extends CItemGeneral {
 
 		DB::insertBatch('housekeeper', $insert);
 
-		// TODO: remove info from API
-		$delItems += $dependent_items;
-		foreach ($delItems as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 		$itemids = array_map('strval', array_values($itemIds));
 
 		return ['itemids' => $itemids];
@@ -812,44 +782,44 @@ class CItem extends CItemGeneral {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$selectFields = [];
-		foreach ($this->fieldRules as $key => $rules) {
-			if (!isset($rules['system']) && !isset($rules['host'])) {
-				$selectFields[] = $key;
+		$output = [];
+		foreach ($this->fieldRules as $field_name => $rules) {
+			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
+				$output[] = $field_name;
 			}
 		}
 
-		$items = $this->get([
-			'output' => $selectFields,
-			'hostids' => $data['templateids'],
-			'preservekeys' => true,
+		$tpl_items = $this->get([
+			'output' => $output,
 			'selectApplications' => ['applicationid'],
 			'selectPreprocessing' => ['type', 'params'],
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			'hostids' => $data['templateids'],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+			'preservekeys' => true
 		]);
 
-		foreach ($items as &$item) {
-			$item['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+		foreach ($tpl_items as &$tpl_item) {
+			$tpl_item['applications'] = zbx_objectValues($tpl_item['applications'], 'applicationid');
 
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields']
-						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {
+					$tpl_item['query_fields'] = $tpl_item['query_fields']
+						? json_encode($tpl_item['query_fields'], JSON_UNESCAPED_UNICODE)
 						: '';
 				}
 
-				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
-					$item['headers'] = $this->headersArrayToString($item['headers']);
+				if (array_key_exists('headers', $tpl_item) && is_array($tpl_item['headers'])) {
+					$tpl_item['headers'] = $this->headersArrayToString($tpl_item['headers']);
 				}
 			}
 			else {
-				$item['query_fields'] = '';
-				$item['headers'] = '';
+				$tpl_item['query_fields'] = '';
+				$tpl_item['headers'] = '';
 			}
 		}
-		unset($item);
+		unset($tpl_item);
 
-		$this->inherit($items, $data['hostids']);
+		$this->inherit($tpl_items, $data['hostids']);
 
 		return true;
 	}
@@ -885,44 +855,64 @@ class CItem extends CItemGeneral {
 	}
 
 	protected function inherit(array $items, array $hostids = null) {
-		if (empty($items)) {
-			return true;
+		if (!$items) {
+			return;
 		}
 
-		// prepare the child items
-		$newItems = $this->prepareInheritedItems($items, $hostids);
-		if (!$newItems) {
-			return true;
+		// Prepare the child items.
+		$new_items = $this->prepareInheritedItems($items, $hostids);
+		if (!$new_items) {
+			return;
 		}
 
-		$insertItems = [];
-		$updateItems = [];
-		foreach ($newItems as $newItem) {
-			if (isset($newItem['itemid'])) {
-				$updateItems[] = $newItem;
+		$ins_items = [];
+		$upd_items = [];
+		foreach ($new_items as $new_item) {
+			if (array_key_exists('itemid', $new_item)) {
+				$upd_items[] = $new_item;
 			}
 			else {
-				$newItem['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-				$insertItems[] = $newItem;
+				$ins_items[] = $new_item;
 			}
 		}
 
-		// save the new items
-		if (!zbx_empty($insertItems)) {
-			self::validateInventoryLinks($insertItems, false); // false means 'create'
-			$this->createReal($insertItems);
+		// Save the new items.
+		if ($ins_items) {
+			self::validateInventoryLinks($ins_items, false); // false means 'create'
+			$this->createReal($ins_items);
 		}
 
-		if (!zbx_empty($updateItems)) {
-			self::validateInventoryLinks($updateItems, true); // true means 'update'
-			$this->updateReal($updateItems);
+		if ($upd_items) {
+			self::validateInventoryLinks($upd_items, true); // true means 'update'
+			$this->updateReal($upd_items);
 		}
+
+		$new_items = array_merge($upd_items, $ins_items);
 
 		// Update master_itemid for inserted or updated inherited dependent items.
-		$this->inheritDependentItems(array_merge($updateItems, $insertItems));
+		$this->inheritDependentItems($new_items);
 
-		// propagate the inheritance to the children
-		return $this->inherit(array_merge($updateItems, $insertItems));
+		// Inheriting items from the templates.
+		$tpl_items = DBselect(
+			'SELECT i.itemid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+		);
+
+		$tpl_itemids = [];
+		while ($tpl_item = DBfetch($tpl_items)) {
+			$tpl_itemids[$tpl_item['itemid']] = true;
+		}
+
+		foreach ($new_items as $index => $new_item) {
+			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
+				unset($new_items[$index]);
+			}
+		}
+
+		$this->inherit($new_items);
 	}
 
 	/**

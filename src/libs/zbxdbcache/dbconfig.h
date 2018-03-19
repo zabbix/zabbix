@@ -95,7 +95,7 @@ typedef struct
 	unsigned char		location;
 	unsigned char		flags;
 	unsigned char		status;
-	unsigned char		unreachable;
+	unsigned char		queue_priority;
 	unsigned char		schedulable;
 	unsigned char		update_triggers;
 }

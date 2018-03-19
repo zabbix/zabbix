@@ -25,6 +25,7 @@
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "service.h"
+#	include "sysinfo.h"
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
@@ -251,6 +252,22 @@ static void	unlock_log(void)
 
 	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");
+}
+#else
+static void	lock_log(void)
+{
+#ifdef ZABBIX_AGENT
+	if (0 == (ZBX_MUTEX_LOGGING_DENIED & get_thread_global_mutex_flag()))
+#endif
+		LOCK_LOG;
+}
+
+static void	unlock_log(void)
+{
+#ifdef ZABBIX_AGENT
+	if (0 == (ZBX_MUTEX_LOGGING_DENIED & get_thread_global_mutex_flag()))
+#endif
+		UNLOCK_LOG;
 }
 #endif
 

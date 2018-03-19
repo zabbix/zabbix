@@ -26,8 +26,7 @@ $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
  */
 $overviewFormList = new CFormList();
 
-$host_name = (new CSpan($data['host']['host']))
-	->addClass(ZBX_STYLE_LINK_ACTION)
+$host_name = (new CLinkAction($data['host']['host']))
 	->setMenuPopup(CMenuPopupHelper::getHost(
 		$data['host'],
 		$data['hostScripts'][$data['host']['hostid']],

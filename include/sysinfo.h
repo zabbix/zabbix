@@ -290,7 +290,7 @@ typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
 typedef struct
 {
 	const char	*mode;
-	int		(*function)(void);
+	int		(*function)(const char *devname, AGENT_RESULT *result);
 }
 MODE_FUNCTION;
 
@@ -302,5 +302,12 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 #define ZBX_SYSINFO_PROC_NAME		0x0002
 #define ZBX_SYSINFO_PROC_CMDLINE	0x0004
 #define ZBX_SYSINFO_PROC_USER		0x0008
+
+#ifdef _WINDOWS
+#define ZBX_MUTEX_ALL_ALLOW		0
+#define ZBX_MUTEX_THREAD_DENIED		1
+#define ZBX_MUTEX_LOGGING_DENIED	2
+zbx_uint32_t get_thread_global_mutex_flag();
+#endif
 
 #endif

@@ -144,7 +144,7 @@ class CHttpTest extends CApiService {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts['where'][] = dbConditionInt('ht.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionId('ht.applicationid', $options['applicationids']);
 		}
 
 		// inherited

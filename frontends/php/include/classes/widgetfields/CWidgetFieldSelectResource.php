@@ -87,6 +87,7 @@ class CWidgetFieldSelectResource extends CWidgetField {
 		switch ($this->getResourceType()) {
 			case WIDGET_FIELD_SELECT_RES_ITEM:
 				$popup_options['real_hosts'] = '1';
+				$popup_options['with_webitems'] = '1';
 				break;
 
 			case WIDGET_FIELD_SELECT_RES_GRAPH:
@@ -98,6 +99,7 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				$popup_options['numeric'] = '1';
 				$popup_options['real_hosts'] = '1';
 				$popup_options['with_simple_graph_items'] = '1';
+				$popup_options['with_webitems'] = '1';
 				break;
 		}
 

@@ -67,6 +67,7 @@
 #include "zbxipcservice.h"
 #include "zbxhistory.h"
 #include "postinit.h"
+#include "export.h"
 
 #ifdef ZBX_CUNIT
 #include "../libs/zbxcunit/zbxcunit.h"
@@ -192,6 +193,7 @@ zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE		= ZBX_GIBIBYTE;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -208,6 +210,7 @@ char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
+char	*CONFIG_EXPORT_DIR		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -442,7 +445,7 @@ static void	zbx_set_defaults(void)
 		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
 
 	if (NULL == CONFIG_HISTORY_STORAGE_OPTS)
-		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "unum,float,char,log,text");
+		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "uint,dbl,str,log,text");
 #endif
 
 #ifdef HAVE_SQLITE3
@@ -698,6 +701,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HistoryStorageTypes",		&CONFIG_HISTORY_STORAGE_OPTS,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
+		{"ExportDir",			&CONFIG_EXPORT_DIR,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"ExportFileSize",		&CONFIG_EXPORT_FILE_SIZE,		TYPE_UINT64,
+			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{NULL}
 	};
 
@@ -987,6 +994,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (FAIL == zbx_export_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
@@ -1141,6 +1155,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				threads[i] = zbx_thread_start(alert_manager_thread, &thread_args);
 				break;
 		}
+	}
+
+	if (SUCCEED == zbx_is_export_enabled())
+	{
+		zbx_history_export_init("main-process", 0);
+		zbx_problems_export_init("main-process", 0);
 	}
 
 	while (-1 == wait(&i))	/* wait for any child to exit */

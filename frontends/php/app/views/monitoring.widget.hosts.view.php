@@ -120,8 +120,7 @@ foreach ($data['groups'] as $group) {
 					break;
 				}
 			}
-			$lastUnack_count = (new CSpan($data['hosts_data'][$group['groupid']]['lastUnack']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
+			$lastUnack_count = (new CLinkAction($data['hosts_data'][$group['groupid']]['lastUnack']))
 				->setHint($table_inf);
 		}
 		else {
@@ -179,8 +178,7 @@ foreach ($data['groups'] as $group) {
 				break;
 			}
 		}
-		$problematic_count = (new CSpan($data['hosts_data'][$group['groupid']]['problematic']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
+		$problematic_count = (new CLinkAction($data['hosts_data'][$group['groupid']]['problematic']))
 			->setHint($table_inf);
 	}
 	else {

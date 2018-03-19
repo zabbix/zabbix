@@ -84,5 +84,6 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 		char *error, size_t max_error_len);
 int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
 		int maxerrlen);
+int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
 
 #endif

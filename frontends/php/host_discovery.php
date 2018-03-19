@@ -167,7 +167,9 @@ $fields = [
 								],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),
+								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable",'.
+									'"discoveryrule.masscheck_now"'
+								),
 								null
 							],
 	'g_hostdruleid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
@@ -176,6 +178,7 @@ $fields = [
 	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'check_now' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
@@ -230,6 +233,14 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
+}
+elseif (hasRequest('check_now') && hasRequest('itemid')) {
+	$result = (bool) API::Task()->create([
+		'type' => ZBX_TM_TASK_CHECK_NOW,
+		'itemids' => getRequest('itemid')
+	]);
+
+	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	$result = true;
@@ -486,13 +497,39 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') == 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
+elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
 	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
+}
+elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
+	$discovery_rules = API::DiscoveryRule()->get([
+		'output' => [],
+		'itemids' => getRequest('g_hostdruleid'),
+		'editable' => true,
+		'monitored' => true,
+		'filter' => ['type' => checkNowAllowedTypes()],
+		'preservekeys' => true
+	]);
+
+	if ($discovery_rules) {
+		$result = (bool) API::Task()->create([
+			'type' => ZBX_TM_TASK_CHECK_NOW,
+			'itemids' => array_keys($discovery_rules)
+		]);
+	}
+	else {
+		$result = true;
+	}
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+
+	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
 /*
@@ -507,6 +544,7 @@ if (isset($_REQUEST['form'])) {
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
+	$data['host'] = $host;
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {

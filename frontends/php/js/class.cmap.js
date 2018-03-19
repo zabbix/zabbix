@@ -769,23 +769,26 @@ ZABBIX.apps.map = (function($) {
 					switch (obj.val()) {
 						// host
 						case '0':
-							jQuery('#elementNameHost').multiSelect('clean');
+							$('#elementNameHost').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
 							break;
 
 						// triggers
 						case '2':
-							jQuery('#elementNameTriggers').multiSelect('clean');
+							$('#elementNameTriggers').multiSelect('clean');
 							$('#triggerContainer tbody').html('');
 							break;
 
 						// host group
 						case '3':
-							jQuery('#elementNameHostGroup').multiSelect('clean');
+							$('#elementNameHostGroup').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
 							break;
 
 						// others types
 						default:
 							$('input[name=elementName]').val('');
+							$('#triggerContainer tbody').html('');
 					}
 				});
 
@@ -865,7 +868,7 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// application selection pop up
-				$('#application-select').click(function() {
+				$('#application-select').click(function(event) {
 					var data = $('#elementNameHost').multiSelect('getData'),
 						popup_options = {
 							srctbl: 'applications',
@@ -880,7 +883,7 @@ ZABBIX.apps.map = (function($) {
 						popup_options['hostid'] = data[0].id;
 					}
 
-					PopUp('popup.generic', popup_options);
+					PopUp('popup.generic', popup_options, null, event.target);
 				});
 
 				// mass update form
@@ -1340,7 +1343,7 @@ ZABBIX.apps.map = (function($) {
 
 				// Clean trigger selement.
 				if ($('#elementType').val() == 2) {
-					jQuery('#elementNameTriggers').multiSelect('clean');
+					$('#elementNameTriggers').multiSelect('clean');
 					$('#triggerContainer tbody').html('');
 				}
 			},

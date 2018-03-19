@@ -15,11 +15,6 @@ zabbix_proxy_SOURCES = \
 	preprocessing.c \
 	proxy.c
 	
-	
-if PROXY_IPCSERVICE
-LIBIPCSERVICE = $(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a
-endif
-	
 zabbix_proxy_LDADD = \
 	heart/libzbxheart.a \
 	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
@@ -31,7 +26,6 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
-	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
 	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
 	taskmanager/libzbxtaskmanager.a \
@@ -50,8 +44,6 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	${LIBIPCSERVICE} \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -67,6 +59,16 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a 
+
+if PROXY_IPCSERVICE
+zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a
+endif
+
+zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
+
+if HAVE_IPMI
+zabbix_proxy_LDADD += $(top_srcdir)/src/zabbix_server/ipmi/libipmi.a
+endif
 	
 zabbix_proxy_LDADD += @PROXY_LIBS@
 

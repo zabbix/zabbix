@@ -1988,7 +1988,7 @@ class CLineGraphDraw extends CGraphDraw {
 			return true;
 		}
 
-		$leftXShift = 20;
+		$leftXShift = 15;
 		$units = [GRAPH_YAXIS_SIDE_LEFT => 0, GRAPH_YAXIS_SIDE_RIGHT => 0];
 
 		// draw item legend
@@ -2550,6 +2550,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$x_offsets = $this->shiftXleft + $this->shiftXright + 1;
 		$y_offsets = $this->shiftY + self::legendOffsetY;
+
+		if (!$this->with_vertical_padding) {
+			$y_offsets -= $this->m_showTriggers
+				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
+				: static::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;
 
@@ -2704,6 +2711,7 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		set_image_header();
+		$this->calculateTopPadding();
 
 		// $this->sizeX is required for selectData() method
 		$this->expandItems();
@@ -2840,9 +2848,9 @@ class CLineGraphDraw extends CGraphDraw {
 
 		if ($debug_mode) {
 			$str = sprintf('%0.2f', microtime(true) - $start_time);
-			$str = _s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str);
-			$str_size = imageTextSize(6, 0, $str);
-			imageText($this->im, 6, 0, $this->fullSizeX - $str_size['width'] - 5, $this->fullSizeY - 5, $this->getColor('Gray'), $str);
+			imageText($this->im, 6, 90, $this->fullSizeX - 2, $this->fullSizeY - 5, $this->getColor('Gray'),
+				_s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str)
+			);
 		}
 
 		unset($this->items, $this->data);

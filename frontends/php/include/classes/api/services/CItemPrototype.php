@@ -411,10 +411,10 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
-		DB::insert('item_discovery', $insertItemDiscovery);
+		DB::insertBatch('item_discovery', $insertItemDiscovery);
 
-		if (!empty($itemApplications)) {
-			DB::insert('items_applications', $itemApplications);
+		if ($itemApplications) {
+			DB::insertBatch('items_applications', $itemApplications);
 		}
 
 		$item_application_prototypes = [];
@@ -451,7 +451,7 @@ class CItemPrototype extends CItemGeneral {
 				$new_ids = [];
 
 				if ($application_prototypes_to_create) {
-					$new_ids = DB::insert('application_prototype', $application_prototypes_to_create);
+					$new_ids = DB::insertBatch('application_prototype', $application_prototypes_to_create);
 				}
 
 				$ids = array_merge($new_ids, zbx_objectValues($db_application_prototypes, 'application_prototypeid'));
@@ -467,22 +467,10 @@ class CItemPrototype extends CItemGeneral {
 
 		// Link item prototypes to application prototypes.
 		if ($item_application_prototypes) {
-			DB::insert('item_application_prototype', $item_application_prototypes);
+			DB::insertBatch('item_application_prototype', $item_application_prototypes);
 		}
 
 		$this->createItemPreprocessing($items);
-
-// TODO: REMOVE info
-		$itemHosts = $this->get([
-			'itemids' => $itemids,
-			'output' => ['name'],
-			'selectHosts' => ['name'],
-			'nopermissions' => true
-		]);
-		foreach ($itemHosts as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Created: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 	}
 
 	protected function updateReal($items) {
@@ -518,7 +506,7 @@ class CItemPrototype extends CItemGeneral {
 
 		if (!empty($itemidsWithApplications)) {
 			DB::delete('items_applications', ['itemid' => $itemidsWithApplications]);
-			DB::insert('items_applications', $itemApplications);
+			DB::insertBatch('items_applications', $itemApplications);
 		}
 
 		// application prototypes that are no longer linked to items will be deleted from database
@@ -658,7 +646,7 @@ class CItemPrototype extends CItemGeneral {
 
 				// Create new application prototypes, get new IDs.
 				if ($application_prototypes_to_create) {
-					$ids = DB::insert('application_prototype', $application_prototypes_to_create);
+					$ids = DB::insertBatch('application_prototype', $application_prototypes_to_create);
 
 					foreach ($ids as $id) {
 						$new_records[] = [
@@ -713,19 +701,6 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		$this->updateItemPreprocessing($items);
-
-// TODO: REMOVE info
-		$itemHosts = $this->get([
-			'itemids' => $itemids,
-			'output' => ['name'],
-			'selectHosts' => ['name'],
-			'nopermissions' => true
-		]);
-
-		foreach ($itemHosts as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Updated: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 	}
 
 	/**
@@ -847,8 +822,7 @@ class CItemPrototype extends CItemGeneral {
 			'itemids' => $prototypeids,
 			'editable' => true,
 			'preservekeys' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['name']
+			'output' => API_OUTPUT_EXTEND
 		];
 		$delItemPrototypes = $this->get($options);
 
@@ -883,7 +857,6 @@ class CItemPrototype extends CItemGeneral {
 			$db_dependent_items = $this->get([
 				'output' => ['itemid', 'name'],
 				'filter' => ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
-				'selectHosts' => ['name'],
 				'preservekeys' => true
 			]);
 			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_itemprototypes);
@@ -892,16 +865,6 @@ class CItemPrototype extends CItemGeneral {
 		$dependent_itemprototypeids = array_keys($dependent_itemprototypes);
 		$childPrototypeids += array_combine($dependent_itemprototypeids, $dependent_itemprototypeids);
 
-		$options = [
-			'output' => API_OUTPUT_EXTEND,
-			'itemids' => $childPrototypeids,
-			'nopermissions' => true,
-			'preservekeys' => true,
-			'selectHosts' => ['name']
-		];
-		$delItemPrototypesChildren = $this->get($options);
-
-		$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChildren);
 		$prototypeids = array_merge($prototypeids, $childPrototypeids);
 
 		// Delete graphs or leave them if graphs still have at least one item prototype.
@@ -982,13 +945,6 @@ class CItemPrototype extends CItemGeneral {
 // ITEM PROTOTYPES
 		DB::delete('items', ['itemid' => $prototypeids]);
 
-
-// TODO: remove info from API
-		$delItemPrototypes = zbx_toHash($delItemPrototypes, 'itemid') + $dependent_itemprototypes;
-		foreach ($delItemPrototypes as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 		$prototypeids = array_map('strval', $prototypeids);
 
 		return ['prototypeids' => $prototypeids];
@@ -1059,15 +1015,15 @@ class CItemPrototype extends CItemGeneral {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$selectFields = [];
-		foreach ($this->fieldRules as $key => $rules) {
-			if (!isset($rules['system']) && !isset($rules['host'])) {
-				$selectFields[] = $key;
+		$output = [];
+		foreach ($this->fieldRules as $field_name => $rules) {
+			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
+				$output[] = $field_name;
 			}
 		}
 
-		$items = $this->get([
-			'output' => $selectFields,
+		$tpl_items = $this->get([
+			'output' => $output,
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
 			'selectPreprocessing' => ['type', 'params'],
@@ -1075,28 +1031,28 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		foreach ($items as &$item) {
-			$item['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+		foreach ($tpl_items as &$tpl_item) {
+			$tpl_item['applications'] = zbx_objectValues($tpl_item['applications'], 'applicationid');
 
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields']
-						? json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE)
+			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {
+					$tpl_item['query_fields'] = $tpl_item['query_fields']
+						? json_encode($tpl_item['query_fields'], JSON_UNESCAPED_UNICODE)
 						: '';
 				}
 
-				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
-					$item['headers'] = $this->headersArrayToString($item['headers']);
+				if (array_key_exists('headers', $tpl_item) && is_array($tpl_item['headers'])) {
+					$tpl_item['headers'] = $this->headersArrayToString($tpl_item['headers']);
 				}
 			}
 			else {
-				$item['query_fields'] = '';
-				$item['headers'] = '';
+				$tpl_item['query_fields'] = '';
+				$tpl_item['headers'] = '';
 			}
 		}
-		unset($item);
+		unset($tpl_item);
 
-		$this->inherit($items, $data['hostids']);
+		$this->inherit($tpl_items, $data['hostids']);
 
 		return true;
 	}
@@ -1133,59 +1089,64 @@ class CItemPrototype extends CItemGeneral {
 
 	protected function inherit(array $items, array $hostids = null) {
 		if (!$items) {
-			return true;
-		}
-
-		// fetch the corresponding discovery rules for the child items
-		$ruleids = [];
-		$dbResult = DBselect(
-			'SELECT i.itemid AS ruleid,id.itemid,i.hostid'.
-			' FROM items i,item_discovery id'.
-			' WHERE i.templateid=id.parent_itemid'.
-				' AND '.dbConditionInt('id.itemid', zbx_objectValues($items, 'itemid'))
-		);
-		while ($rule = DBfetch($dbResult)) {
-			if (!isset($ruleids[$rule['itemid']])) {
-				$ruleids[$rule['itemid']] = [];
-			}
-			$ruleids[$rule['itemid']][$rule['hostid']] = $rule['ruleid'];
+			return;
 		}
 
 		// prepare the child items
-		$newItems = $this->prepareInheritedItems($items, $hostids);
-		if (!$items) {
-			return true;
+		$new_items = $this->prepareInheritedItems($items, $hostids);
+		if (!$new_items) {
+			return;
 		}
 
-		$insertItems = [];
-		$updateItems = [];
-		foreach ($newItems as $newItem) {
-			if (isset($newItem['itemid'])) {
-				unset($newItem['ruleid']);
-				$updateItems[] = $newItem;
+		$ins_items = [];
+		$upd_items = [];
+		foreach ($new_items as $new_item) {
+			if (array_key_exists('itemid', $new_item)) {
+				unset($new_item['ruleid']);
+				$upd_items[] = $new_item;
 			}
 			else {
 				// set the corresponding discovery rule id for the new items
-				$newItem['ruleid'] = $ruleids[$newItem['templateid']][$newItem['hostid']];
-				$newItem['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-				$insertItems[] = $newItem;
+				$ins_items[] = $new_item;
 			}
 		}
 
 		// save the new items
-		if ($insertItems) {
-			$this->createReal($insertItems);
+		if ($ins_items) {
+			$this->createReal($ins_items);
 		}
 
-		if ($updateItems) {
-			$this->updateReal($updateItems);
+		if ($upd_items) {
+			$this->updateReal($upd_items);
 		}
+
+		$new_items = array_merge($upd_items, $ins_items);
 
 		// Update master_itemid for inserted or updated inherited dependent items.
-		$this->inheritDependentItems(array_merge($updateItems, $insertItems));
+		$this->inheritDependentItems($new_items);
 
-		// propagate the inheritance to the children
-		$this->inherit(array_merge($insertItems, $updateItems));
+		// Inheriting items from the templates.
+		$tpl_items = DBselect(
+			'SELECT i.itemid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+		);
+
+		$tpl_itemids = [];
+		while ($tpl_item = DBfetch($tpl_items)) {
+			$tpl_itemids[$tpl_item['itemid']] = true;
+		}
+
+		foreach ($new_items as $index => $new_item) {
+			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
+				unset($new_items[$index]);
+			}
+		}
+
+		// Inheriting items from the templates.
+		$this->inherit($new_items);
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
