@@ -515,6 +515,7 @@ else {
 		],
 		'editable' => true,
 		'sortfield' => $sortField,
+		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	];
 

@@ -18,6 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/**
+ * Get trigger severity status css style.
+ *
+ * @param  int         $severity trigger severity
+ * @return string|null
+ */
+function getSeverityStatusStyle($severity) {
+	switch ($severity) {
+		case TRIGGER_SEVERITY_DISASTER:
+			return ZBX_STYLE_STATUS_DISASTER_BG;
+		case TRIGGER_SEVERITY_HIGH:
+			return ZBX_STYLE_STATUS_HIGH_BG;
+		case TRIGGER_SEVERITY_AVERAGE:
+			return ZBX_STYLE_STATUS_AVERAGE_BG;
+		case TRIGGER_SEVERITY_WARNING:
+			return ZBX_STYLE_STATUS_WARNING_BG;
+		case TRIGGER_SEVERITY_INFORMATION:
+			return ZBX_STYLE_STATUS_INFO_BG;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return ZBX_STYLE_STATUS_NA_BG;
+		default:
+			return null;
+	}
+}
 
 function getSeverityStyle($severity, $type = true) {
 	if (!$type) {
@@ -470,8 +494,8 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 								 * Dependency is within same host according to $src_hostid parameter or dep trigger has
 								 * single host.
 								 */
-								if ($dst_trigger['srcTriggerContextHostId'] ==
-										$dst_dep_trigger['srcTriggerContextHostId']) {
+								if ($dst_trigger['srcTriggerContextHostId'] == $dst_dep_trigger['srcTriggerContextHostId']
+										&& $dst_dep_trigger['newTriggerHostId'] == $dst_trigger['newTriggerHostId']) {
 									$depTriggerId = $dst_dep_trigger['newTriggerId'];
 									break;
 								}
@@ -2332,4 +2356,3 @@ function getTriggerLastProblems(array $triggerids, array $output) {
 
 	return $problems;
 }
-
