@@ -33,7 +33,7 @@ else {
 
 		foreach ($data['items'] as $item) {
 			$table_header[] = (new CColHeader(
-				(($data['same_host'] === false) ? $item['hosts'][0]['name'].NAME_DELIMITER : '').$item['name_expanded']
+				($data['same_host'] ? '' : $item['hosts'][0]['name'].NAME_DELIMITER).$item['name_expanded']
 			))
 				->addClass('vertical_rotation')
 				->setTitle($item['name_expanded']);
@@ -47,20 +47,20 @@ else {
 	}
 	$table->setHeader($table_header);
 
-	$clock = null;
+	$clock = 0;
 	$row_values = [];
 
 	do {
-		$history_item = array_shift($data['history_data']);
+		$history_item = array_shift($data['histories']);
 
 		if ($history_item !== null && !$names_at_top) {
 			$table_row = [
 				(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])))->addClass(ZBX_STYLE_NOWRAP)
 			];
 			if ($data['name_location'] == STYLE_LEFT) {
-				$table_row[] = (($data['same_host'] === false)
-					? $data['items'][$history_item['itemid']]['hosts'][0]['name'].NAME_DELIMITER
-					: '').
+				$table_row[] = ($data['same_host']
+					? ''
+					: $data['items'][$history_item['itemid']]['hosts'][0]['name'].NAME_DELIMITER).
 					$data['items'][$history_item['itemid']]['name_expanded'];
 			}
 			$table_row[] = $history_item['value'];
@@ -68,7 +68,7 @@ else {
 		}
 		else {
 			if (($history_item === null && $row_values)
-					|| ($clock !== null && $history_item['clock'] != $clock)
+					|| ($clock != 0 && $history_item['clock'] != $clock)
 					|| array_key_exists($history_item['itemid'], $row_values)) {
 				$table_row = [
 					(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))->addClass(ZBX_STYLE_NOWRAP)

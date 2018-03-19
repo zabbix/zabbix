@@ -39,9 +39,10 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$error = null;
 
-		$same_host = null;
+		$dynamic_widget_name = $this->getDefaultHeader();
+		$same_host = true;
 		$items = [];
-		$history_data = [];
+		$histories = [];
 
 		if ($fields['itemids']) {
 			$items = API::Item()->get([
@@ -56,7 +57,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 			$keys = [];
 			foreach ($items as $item) {
-				$keys[] = $item['key_'];
+				$keys[$item['key_']] = true;
 			}
 
 			if ($items && $fields['dynamic'] && $dynamic_hostid) {
@@ -65,7 +66,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 					'selectHosts' => ['name'],
 					'filter' => [
 						'hostid' => $dynamic_hostid,
-						'key_' => $keys
+						'key_' => array_keys($keys)
 					],
 					'webitems' => true,
 					'preservekeys' => true
@@ -78,90 +79,66 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		}
 		else {
 			$items = CMacrosResolverHelper::resolveItemNames($items);
+			$histories = Manager::History()->getLastValues($items, $fields['show_lines']);
 
-			// Grouping items ids by value type and detect same host.
-			$itemsids_by_type = [];
-			foreach ($items as $item) {
-				$itemsids_by_type[$item['value_type']][] = $item['itemid'];
+			if ($histories) {
+				$histories = call_user_func_array('array_merge', $histories);
 
-				if ($same_host !== false) {
-					if ($same_host == null) {
-						$same_host = $item['hosts'][0]['name'];
+				foreach ($histories as &$history) {
+
+					switch ($items) {
+						case ITEM_VALUE_TYPE_FLOAT:
+							sscanf($history['value'], '%f', $history['value']);
+							break;
+						case ITEM_VALUE_TYPE_TEXT:
+						case ITEM_VALUE_TYPE_STR:
+						case ITEM_VALUE_TYPE_LOG:
+							if ($fields['style']) {
+								$history['value'] = new CJsScript($history['value']);
+							}
+							break;
 					}
-					elseif ($same_host !== null && $same_host != $item['hosts'][0]['name']) {
-						$same_host = false;
+
+					if ($items[$history['itemid']]['valuemapid'] != 0) {
+						$history['value'] = applyValueMap($history['value'], $items[$history['itemid']]['valuemapid']);
 					}
-				}
-			}
 
-			foreach ($itemsids_by_type as $value_type => $itemids) {
-				$histories = API::History()->get([
-					'output' => API_OUTPUT_EXTEND,
-					'history' => $value_type,
-					'itemids' => $itemids,
-					'sortorder' => ZBX_SORT_DOWN,
-					'sortfield' => ['clock', 'itemid'],
-					'limit' => ($fields['show_lines'] * count($itemids))
-				]);
-
-				if ($histories) {
-					foreach ($histories as $history) {
-
-						switch ($value_type) {
-							case ITEM_VALUE_TYPE_FLOAT:
-								sscanf($history['value'], '%f', $value);
-								break;
-							case ITEM_VALUE_TYPE_TEXT:
-							case ITEM_VALUE_TYPE_STR:
-							case ITEM_VALUE_TYPE_LOG:
-								$value = $fields['style'] ? new CJsScript($history['value']) : $history['value'];
-								break;
-							default:
-								$value = $history['value'];
-								break;
-						}
-
-						$item = $items[$history['itemid']];
-
-						if ($item['valuemapid'] != 0) {
-							$value = applyValueMap($value, $item['valuemapid']);
-						}
-
-						if ($fields['style'] == 0) {
-							$value = new CPre($value);
-						}
-
-						$history_data[] = [
-							'itemid' => $history['itemid'],
-							'value' => $value,
-							'clock' => $history['clock'],
-							'ns' => $history['ns']
-						];
+					if ($fields['style'] == 0) {
+						$history['value'] = new CPre($history['value']);
 					}
 				}
+				unset($history);
 			}
 
-			CArrayHelper::sort($history_data, [
+			CArrayHelper::sort($histories, [
 				['field' => 'clock', 'order' => ZBX_SORT_DOWN],
 				['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 			]);
-		}
 
-		$dynamic_widget_name = $this->getDefaultHeader();
+			$host_name = '';
+			foreach ($items as $item) {
+				if ($host_name === '') {
+					$host_name = $item['hosts'][0]['name'];
+				}
+				elseif ($host_name !== $item['hosts'][0]['name']) {
+					$same_host = false;
+				}
+			}
 
-		$items_count = count($items);
-		if ($items_count == 1) {
-			$item = reset($items);
-			$dynamic_widget_name = $same_host.NAME_DELIMITER.$item['name_expanded'];
-		}
-		elseif ($same_host && $items_count > 1) {
-			$dynamic_widget_name = $same_host.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
+			$items_count = count($items);
+			if ($items_count == 1) {
+				$item = reset($items);
+				$dynamic_widget_name = $host_name.NAME_DELIMITER.$item['name_expanded'];
+			}
+			elseif ($same_host && $items_count > 1) {
+				$dynamic_widget_name = $host_name.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $dynamic_widget_name),
 			'items' => $items,
-			'history_data' => $history_data,
+			'histories' => $histories,
 			'name_location' => $fields['name_location'],
 			'same_host' => $same_host,
 			'show_lines' => $fields['show_lines'],
