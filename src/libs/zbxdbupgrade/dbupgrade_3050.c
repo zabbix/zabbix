@@ -518,6 +518,12 @@ static int	DBpatch_3050042(void)
 	return DBadd_foreign_key("task_check_now", 1, &field);
 }
 
+static int	DBpatch_3050043(void)
+{
+	const ZBX_FIELD	field = {"compress", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
 #endif
 
 DBPATCH_START(3050)
@@ -563,5 +569,6 @@ DBPATCH_ADD(3050039, 0, 1)
 DBPATCH_ADD(3050040, 0, 1)
 DBPATCH_ADD(3050041, 0, 1)
 DBPATCH_ADD(3050042, 0, 1)
+DBPATCH_ADD(3050043, 0, 1)
 
 DBPATCH_END()
