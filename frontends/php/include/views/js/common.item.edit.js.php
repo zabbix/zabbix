@@ -450,7 +450,7 @@ zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_passwor
 					// Fix placeholder not to change height while object is being dragged.
 					$(ui.placeholder).height($(ui.helper).height());
 				}
-			}).disableSelection();
+			});
 
 			table.on('click', '[data-row-action]', function (e) {
 				var row_node = $(e.currentTarget).closest('.'+table_row_class);
