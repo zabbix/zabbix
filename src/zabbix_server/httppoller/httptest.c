@@ -365,13 +365,13 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
  ******************************************************************************/
 static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 {
-	int			type, ansi = 1, ret = SUCCEED;
+	int			type, ret = SUCCEED;
 	DB_RESULT		result;
 	DB_ROW			row;
 	size_t			alloc_len = 0, offset;
 	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers, query_fields, post_fields;
-	char			*key, *value, *url = NULL, query_delimiter = '?', *domain, *tmp;
+	char			*key, *value, *url = NULL, query_delimiter = '?';
 
 	httpstep->url = NULL;
 	httpstep->posts = NULL;
@@ -477,63 +477,12 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 		httpstep_pairs_join(&url, &alloc_len, &offset, "=", "&", &query_fields);
 	}
 
-	if (NULL == (domain = strchr(url, '@')))
+	if (SUCCEED != (ret = zbx_http_punycode_encode_url(&url)))
 	{
-		if (NULL == (domain = strstr(url, "://")))
-			domain = url;
-		else
-			domain += ZBX_CONST_STRLEN("://");
-	}
-	else
-		domain++;
-
-	tmp = domain;
-
-	while ('\0' != *tmp && ':' != *tmp && '/' != *tmp)
-	{
-		if (0 != ((*tmp) & 0x80))
-			ansi = 0;
-		tmp++;
-	}
-
-	if (0 == ansi)
-	{
-		/* non-ansi URL, conversion to the punicode is needed */
-
-		char	*rest = NULL, *encoded_url = NULL, *encoded_domain = NULL, delimiter;
-
-		delimiter = *tmp;
-
-		if ('\0' != delimiter)
-		{
-			rest = tmp + 1;
-			*tmp = '\0';
-		}
-
-		if (SUCCEED != (ret = zbx_http_punycode_encode(domain, &encoded_domain)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot encode unicode URL into punycode");
-			httppairs_free(&httpstep->variables);
-			zbx_free(url);
-			goto out;
-		}
-
-		/* schema, schema separator and authority part (if any) */
-		zbx_strncpy_alloc(&encoded_url, &alloc_len, &offset, url, domain - url);
-		/* domain */
-		zbx_strcpy_alloc(&encoded_url, &alloc_len, &offset, encoded_domain);
-		zbx_free(encoded_domain);
-
-		if ('\0' != delimiter)
-		{
-			/* rest of the URL (if any) */
-
-			zbx_chrcpy_alloc(&encoded_url, &alloc_len, &offset, delimiter);
-			zbx_strcpy_alloc(&encoded_url, &alloc_len, &offset, rest);
-		}
-
+		zabbix_log(LOG_LEVEL_WARNING, "cannot encode unicode URL into punycode");
+		httppairs_free(&httpstep->variables);
 		zbx_free(url);
-		url = encoded_url;
+		goto out;
 	}
 
 	httpstep->url = url;

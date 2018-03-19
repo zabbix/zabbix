@@ -23,7 +23,6 @@
 #include "common.h"
 
 int	zbx_http_punycode_encode_url(char **url);
-int	zbx_http_punycode_encode(const char *text, char **output);
 void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
 
