@@ -40,7 +40,6 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$storage = $this->getInput('storage', []);
 		$uniqueid = $this->getInput('uniqueid');
-		$initial_load = $this->getInput('initial_load', 1);
 		$sysmap_data = null;
 		$previous_map = null;
 		$sysmapid = null;
@@ -60,15 +59,13 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 			}
 		}
 
-		// Get requested map.
-		$options = [
-			'fullscreen' => $this->getInput('fullscreen', 0)
-		];
-
 		$sysmapid = array_key_exists('current_sysmapid', $storage)
 			? $storage['current_sysmapid']
 			: (array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null);
-		$sysmap_data = CMapHelper::get(($sysmapid === null ? [] : [$sysmapid]), $options);
+
+		$sysmap_data = CMapHelper::get(($sysmapid === null) ? [] : [$sysmapid], [
+			'fullscreen' => (bool) $this->getInput('fullscreen', false)
+		]);
 
 		if ($sysmapid === null || $sysmap_data['id'] < 0) {
 			$error = _('No permissions to referred object or it does not exist!');
@@ -98,7 +95,7 @@ class CControllerWidgetSysmapView extends CControllerWidget {
 					: null,
 				'source_type' => $fields['source_type'],
 				'previous_map' => $previous_map,
-				'initial_load' => $initial_load,
+				'initial_load' => $this->getInput('initial_load', 1),
 				'uniqueid' => $uniqueid,
 				'error' => $error
 			],
