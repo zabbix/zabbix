@@ -447,16 +447,6 @@ class testFormEventCorrelation extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Test create with calculation Or',
-					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Or']
-					]
-				]
-			],
-			[
-				[
 					'name' => 'Test create with calculation Custom',
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
