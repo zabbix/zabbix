@@ -1420,6 +1420,8 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AC_SUBST(OPENIPMI_CFLAGS)
 fi
 
+AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
+
 dnl Check if Zabbix internal IPC services are used
 have_ipcservice="no"
 if test "x$have_ipmi" = "xyes"; then

@@ -535,7 +535,7 @@ static void	DCdump_items(ZBX_DC_CONFIG *config)
 		zabbix_log(LOG_LEVEL_TRACE, "  history:%d", item->history);
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
-		zabbix_log(LOG_LEVEL_TRACE, "  unreachable:%u schedulable:%u", item->unreachable, item->schedulable);
+		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{

@@ -1,12 +1,27 @@
 Changes for 4.0.0alpha5
 
 New features:
+A.F.I...S. [ZBXNEXT-4426] added option to execute cached passive checks at the current time (Ivo, wiper)
+........S. [ZBXNEXT-4417] added real time export of events, history and trends in newline delimited JSON format (vso)
 ..F....... [ZBXNEXT-4374] implemented the widget configuration fields clearing when changing the type (ashubin)
 A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, Sergejs)
 ..F....... [ZBXNEXT-4045] implemented maximum size for graphs in widgets (gcalenko)
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-13464] fixed fullscreen attribute included in host context menu links (ashubin)
+A.F....... [ZBX-13424] added possibility to select web items as master items and improved copying of dependent items to destination hosts and templates (Ivo)
+..F....... [ZBX-13573] fixed undefined index message changing Action "Acknowledgment operations" from "Remote command" to "Notify all involved" (agriscenko)
+..F....... [ZBX-13570] fixed undefined index in API call (agriscenko)
+A......... [ZBX-13331] removed "recovery" property from action.get API method response (nikita)
+..F....... [ZBX-13309] fixed displaying of Problem/Recovery time (agriscenko, ashubin, Sasha)
+.......PS. [ZBX-13450] fixed server and proxy compilation problem for Solaris 10 (MVekslers)
+A.F....... [ZBX-13458,ZBX-13494] fixed resolving of the macros in map labels for non-superadmin users (Sasha)
+..F....... [ZBX-13526] fixed widget placeholder jumping instead of resizing while dashboard edit (ashubin)
+.......PS. [ZBX-13362] fixed potentially wrong rows deleting by housekeeper in PostgreSQL (Sergejs)
+..F....... [ZBX-13506] fixed linked trigger is moved to sibling map element (agriscenko)
+........S. [ZBX-13586] fixed trigger-based event correlation - suspend creation of event if no problems are recovered by it (viktors, wiper)
+........S. [ZBX-13339] improved deallocation of memory (MVekslers)
 ..F....... [ZBX-13412] fixed JS error and wrong form behaviour when changing item type, type of information (agriscenko)
 ..F....... [ZBX-13471] fixed contrast in selected item filters (Andzs)
 ..F....... [ZBX-13428] fixed long name of map outside go back button in map widget (agriscenko, Sasha)
@@ -182,6 +197,18 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A.F....... [ZBX-13424] added possibility to select web items as master items and improved copying of dependent items to destination hosts and templates (Ivo)
+..F....... [ZBX-13573] fixed undefined index message changing Action "Acknowledgment operations" from "Remote command" to "Notify all involved" (agriscenko)
+..F....... [ZBX-13570] fixed undefined index in API call (agriscenko)
+A......... [ZBX-13331] removed "recovery" property from action.get API method response (nikita)
+..F....... [ZBX-13309] fixed displaying of Problem/Recovery time (agriscenko, ashubin, Sasha)
+.......PS. [ZBX-13450] fixed server and proxy compilation problem for Solaris 10 (MVekslers)
+A.F....... [ZBX-13458,ZBX-13494] fixed resolving of the macros in map labels for non-superadmin users (Sasha)
+..F....... [ZBX-13526] fixed widget placeholder jumping instead of resizing while dashboard edit (ashubin)
+.......PS. [ZBX-13362] fixed potentially wrong rows deleting by housekeeper in PostgreSQL (Sergejs)
+..F....... [ZBX-13506] fixed linked trigger is moved to sibling map element (agriscenko)
+........S. [ZBX-13586] fixed trigger-based event correlation - suspend creation of event if no problems are recovered by it (viktors, wiper)
+........S. [ZBX-13339] improved deallocation of memory (MVekslers)
 ..F....... [ZBX-13340] fixed pie graphs displaying incorrect data (Ivo)
 ..F....... [ZBX-13412] fixed JS error and wrong form behaviour when changing item type, type of information, data type (agriscenko)
 ..F....... [ZBX-13257] fixed display of the latest item in Audit log (agriscenko)
@@ -1316,6 +1343,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-13339] improved deallocation of memory (MVekslers)
 ..F....... [ZBX-13412] fixed JS error and wrong form behaviour when changing item type, type of information, data type (agriscenko)
 ..F....... [ZBX-13257] fixed display of the latest item in Audit log (agriscenko)
 ...G...PS. [ZBX-13351] improved OpenSSL error messages (viktors)
