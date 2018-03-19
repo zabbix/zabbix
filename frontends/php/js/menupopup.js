@@ -799,22 +799,23 @@ function getMenuPopupTrigger(options) {
  * @param array  options['triggers']             Triggers (optional).
  * @param string options['triggers'][n]['id']    Trigger ID.
  * @param string options['triggers'][n]['name']  Trigger name.
+ * @param {object} trigger_elmnt				UI element that was clicked to open overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupTriggerLog(options) {
+function getMenuPopupTriggerLog(options, trigger_elmnt) {
 	var items = [],
 		dependent_items = getMenuPopupDependentItems(options.dependent_items);
 
 	// create
 	items[items.length] = {
 		label: t('Create trigger'),
-		clickCallback: function(event) {
+		clickCallback: function() {
 			jQuery(this).closest('.action-menu').menuPopup('close', null);
 
 			return PopUp('popup.triggerwizard', {
 				itemid: options.itemid
-			}, null, event.target);
+			}, null, trigger_elmnt);
 		}
 	};
 
@@ -829,13 +830,13 @@ function getMenuPopupTriggerLog(options) {
 		jQuery.each(options.triggers, function(i, trigger) {
 			triggers[triggers.length] = {
 				label: trigger.name,
-				clickCallback: function(event) {
+				clickCallback: function() {
 					jQuery(this).closest('.action-menu-top').menuPopup('close', null);
 
 					return PopUp('popup.triggerwizard', {
 						itemid: options.itemid,
 						triggerid: trigger.id
-					}, null, event.target);
+					}, null, trigger_elmnt);
 				}
 			};
 		});
@@ -1014,15 +1015,6 @@ jQuery(function($) {
 		}
 	};
 
-	function closeMenuPopup(trigger_elmnt, menuPopup, return_focus) {
-		if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
-			menuPopup.data('is-active', false);
-			menuPopup.fadeOut(0);
-
-			removeFromOverlaysStack('contextmenu', return_focus);
-		}
-	}
-
 	var methods = {
 		init: function(sections, event) {
 			var opener = $(this),
@@ -1038,11 +1030,14 @@ jQuery(function($) {
 				target = event.originalEvent.detail !== 0 ? event : event.target;
 			}
 
+			// Close other action menus.
+			$('.action-menu-top').not('#' + id).menuPopup('close');
+
 			if (menuPopup.length > 0) {
 				var display = menuPopup.css('display');
 
-				// hide all menu popups
-				$('.action-menu').css('display', 'none');
+				// Hide current action menu sub-levels.
+				$('.action-menu', menuPopup).css('display', 'none');
 
 				if (display === 'block') {
 					menuPopup.fadeOut(0);
@@ -1061,42 +1056,52 @@ jQuery(function($) {
 				id = new Date().getTime();
 
 				menuPopup = $('<ul>', {
-					id: id,
-					'class': 'action-menu action-menu-top'
+					'id': id,
+					'role': 'menu',
+					'class': 'action-menu action-menu-top',
+					'tabindex': 0
 				});
 
 				// create sections
-				if (sections.length > 0) {
+				var sections_length = sections.length;
+				if (sections_length) {
 					$.each(sections, function(i, section) {
 						if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
 							var h3 = $('<h3>').text(section.label);
 							var sectionItem = $('<li>').append(h3);
 						}
 
-						// add section delimited for all sections except first one
+						// Add section delimited for all sections except first one.
 						if (i > 0) {
 							menuPopup.append($('<li>').append($('<div>')));
 						}
 						menuPopup.append(sectionItem);
 
 						$.each(section.items, function(i, item) {
+							if (sections_length > 1) {
+								item['ariaLabel'] = section.label + ', ' + item['label'];
+							}
 							menuPopup.append(createMenuItem(item));
 						});
 					});
 				}
 
-				// skip displaying empty menu sections
+				if (sections_length == 1) {
+					menuPopup.attr({'aria-label': sections[0].label});
+				}
+
+				// Skip displaying empty menu sections.
 				if (menuPopup.children().length == 0) {
 					return;
 				}
 
-				// set menu popup for map area
+				// Set menu popup for map area.
 				if (opener.prop('tagName') === 'AREA') {
 					$('.menuPopupContainer').remove();
 
 					mapContainer = $('<div>', {
 						'class': 'menuPopupContainer',
-						css: {
+						'css': {
 							position: 'absolute',
 							top: event.pageY,
 							left: event.pageX
@@ -1106,15 +1111,15 @@ jQuery(function($) {
 
 					$('body').append(mapContainer);
 				}
-				// set menu popup for common html elements
+				// Set menu popup for common html elements.
 				else {
 					opener.data('menu-popup-id', id);
 
 					$('body').append(menuPopup);
 				}
 
-				// hide all menu popups
-				$('.action-menu').css('display', 'none');
+				// Hide current action menu sub-levels.
+				$('.action-menu', menuPopup).css('display', 'none');
 
 				// display
 				menuPopup
@@ -1125,6 +1130,9 @@ jQuery(function($) {
 
 						clearTimeout(window.menuPopupTimeoutHandler);
 					})
+					.on('click', function(e) {
+						e.stopPropagation();
+					})
 					.position({
 						of: (opener.prop('tagName') === 'AREA') ? mapContainer : target,
 						my: 'left top',
@@ -1134,19 +1142,196 @@ jQuery(function($) {
 
 			addToOverlaysStack('contextmenu', event.target, 'contextmenu');
 
-			$(document).click(function(e) {
-				closeMenuPopup(e, menuPopup);
-			});
+			$(document)
+				.on('click', {menu: menuPopup}, menuPopupDocumentCloseHandler)
+				.on('keydown', {menu: menuPopup}, menuPopupKeyDownHandler);
+
+			menuPopup.focus();
 		},
 		close: function(trigger_elmnt, return_focus) {
-			closeMenuPopup(trigger_elmnt, jQuery(this), return_focus);
+			var menuPopup = $(this);
+			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
+				menuPopup.data('is-active', false);
+				menuPopup.fadeOut(0);
+
+				$('.highlighted', menuPopup).removeClass('highlighted');
+				$('[aria-expanded="true"]', menuPopup).attr({'aria-expanded': 'false'});
+
+				$(document)
+					.off('click', menuPopupDocumentCloseHandler)
+					.off('keydown', menuPopupKeyDownHandler);
+
+				removeFromOverlaysStack('contextmenu', return_focus);
+			}
 		}
 	};
+
+	/**
+	 * Expends hovered/selected context menu item.
+	 */
+	$.fn.actionMenuItemExpand = function() {
+		var li = $(this),
+			pos = li.position(),
+			menu = li.closest('.action-menu');
+
+		for (var item = $('li:first-child', menu); item.length > 0; item = item.next()) {
+			if (item[0] == li[0]) {
+				$('>a', li[0]).addClass('highlighted');
+
+				if (!$('ul', item[0]).is(':visible')) {
+					$('ul:first', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
+
+					$('ul:first', item[0])
+						.css({
+							'top': pos.top - 6,
+							'left': pos.left + li.outerWidth() + 14,
+							'display': 'block'
+						});
+				}
+			}
+			else {
+				// Remove activity from item that has been selected by keyboard and now is deselected using mouse.
+				if ($('>a', item[0]).hasClass('highlighted')) {
+					$('>a', item[0]).removeClass('highlighted').blur();
+				}
+
+				// Closes all other submenus from this level, if they were open.
+				if ($('ul', item[0]).is(':visible')) {
+					$('ul', item[0]).prev('[role="menuitem"]').removeClass('highlighted');
+					$('ul', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
+					$('ul', item[0]).css({'display': 'none'});
+				}
+			}
+		}
+
+		return this;
+	};
+
+	/**
+	 * Collapses context menu item that has lost focus or is not selected anymore.
+	 */
+	$.fn.actionMenuItemCollapse = function() {
+		// Remove style and close sub-menus in deeper levels.
+		var parent_menu = $(this).closest('.action-menu');
+		$('.highlighted', parent_menu).removeClass('highlighted');
+		$('[aria-expanded]', parent_menu).attr({'aria-expanded': 'false'});
+		$('.action-menu', parent_menu).css({'display': 'none'});
+
+		// Close actual menu level.
+		parent_menu.not('.action-menu-top').css({'display': 'none'});
+		parent_menu.prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
+
+		return this;
+	};
+
+	function menuPopupDocumentCloseHandler(event) {
+		$(event.data.menu[0]).menuPopup('close');
+	}
+
+	function menuPopupKeyDownHandler(event) {
+		var link_selector = '.action-menu-item',
+			menu_popup = $(event.data.menu[0]),
+			level = menu_popup,
+			selected,
+			items;
+
+		// Find active menu level.
+		while ($('[aria-expanded="true"]:visible', level).length) {
+			level = $('[aria-expanded="true"]:visible:first', level.get(0)).next('[role="menu"]');
+		}
+
+		// Find active menu items.
+		items = $('>li', level).filter(function() {
+			return $(this).has('.action-menu-item').length;
+		});
+
+		// Find an element that was selected when key was pressed.
+		if ($('.action-menu-item.highlighted', level).length) {
+			selected = $(link_selector + '.highlighted', level).closest('li');
+		}
+		else if ($('.action-menu-item', level).filter(function() {
+			return this == document.activeElement;
+		}).length) {
+			selected = $(document.activeElement).closest('li');
+		}
+
+		// Perform action based on keydown event.
+		switch (event.which) {
+			case 37: // arrow left
+				if (typeof selected !== 'undefined' && selected.has('.action-menu')) {
+					if (level != menu_popup) {
+						selected.actionMenuItemCollapse();
+
+						// Must focus previous element, otherwise screen reader will exit menu.
+						selected.closest('.action-menu').prev('[role="menuitem"]').addClass('highlighted').focus();
+					}
+				}
+				break;
+
+			case 38: // arrow up
+				if (typeof selected === 'undefined') {
+					$(link_selector + ':last', level).addClass('highlighted').focus();
+				}
+				else {
+					var prev = items[items.index(selected) - 1];
+					if (typeof prev === 'undefined') {
+						prev = items[items.length - 1];
+					}
+
+					$(link_selector, selected).removeClass('highlighted');
+					$(link_selector + ':first', prev).addClass('highlighted').focus();
+				}
+
+				// Prevent page scrolling.
+				event.preventDefault();
+				break;
+
+			case 39: // arrow right
+				if (typeof selected !== 'undefined' && selected.has('.action-menu')) {
+					selected.actionMenuItemExpand();
+					$('ul > li ' + link_selector + ':first', selected).addClass('highlighted').focus();
+				}
+				break;
+
+			case 40: // arrow down
+				if (typeof selected === 'undefined') {
+					$(link_selector + ':first', items[0]).addClass('highlighted').focus();
+				}
+				else {
+					var next = items[items.index(selected) + 1];
+					if (typeof next === 'undefined') {
+						next = items[0];
+					}
+
+					$(link_selector, selected).removeClass('highlighted');
+					$(link_selector + ':first', next).addClass('highlighted').focus();
+				}
+
+				// Prevent page scrolling.
+				event.preventDefault();
+				break;
+
+			case 27: // ESC
+				$(menu_popup).menuPopup('close', null);
+				break;
+
+			case 13: // Enter
+				$('>' + link_selector, selected)[0].click();
+				break;
+
+			case 9: // Tab
+				event.preventDefault();
+				break;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Create menu item.
 	 *
 	 * @param string options['label']          Link label.
+	 * @param string options['ariaLabel']	   Aria-label text.
 	 * @param string options['url']            Link url.
 	 * @param string options['css']            Item class.
 	 * @param array  options['data']           Item data ("key" => "value").
@@ -1156,8 +1341,14 @@ jQuery(function($) {
 	 * @return object
 	 */
 	function createMenuItem(options) {
+		options = $.extend({ariaLabel: options.label}, options);
+
 		var item = $('<li>'),
-			link = $('<a>');
+			link = $('<a>', {
+				role: 'menuitem',
+				tabindex: '-1',
+				'aria-label': options.ariaLabel
+			});
 
 		if (typeof options.label !== 'undefined') {
 			link.text(options.label);
@@ -1185,7 +1376,7 @@ jQuery(function($) {
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {
-				link.click(options.clickCallback);
+				link.on('click', options.clickCallback);
 			}
 		}
 
@@ -1193,50 +1384,37 @@ jQuery(function($) {
 			link.addClass('selected');
 		}
 
+		if (typeof options.items !== 'undefined' && options.items.length > 0) {
+			link.attr({
+				'aria-haspopup': 'true',
+				'aria-expanded': 'false',
+				'area-hidden': 'true'
+			});
+		}
+
 		item.append(link);
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
-			var menu = $('<ul>', {'class' : 'action-menu'});
+			var menu = $('<ul>', {
+					class : 'action-menu',
+					role: 'menu'
+				})
+				.on('mouseenter', function(e) {
+					// Prevent 'mouseenter' event in parent item, that would call actionMenuItemExpand() for parent.
+					e.stopPropagation();
+				});
 
 			$.each(options.items, function(i, item) {
 				menu.append(createMenuItem(item));
 			});
 
 			item.append(menu);
-
-			item.hover(function() {
-				var li = $(this),
-					pos = li.position(),
-					menu = li.closest('.action-menu');
-
-				for (var item = $('li:first-child', menu); item.length > 0; item = item.next()) {
-					if (item[0] == li[0]) {
-						var display = $('ul', item[0]).css('display');
-
-						if (display !== 'block') {
-							$('ul:first', item[0])
-								.css({
-									'top': pos.top - 6,
-									'left': pos.left + li.outerWidth() + 14,
-									'display': 'block'
-								});
-						}
-					}
-					else {
-						var display = $('ul', item[0]).css('display');
-
-						if (display === 'block') {
-							$('ul', item[0]).css({'display': 'none'});
-						}
-					}
-				}
-			});
 		}
-		else {
-			item.hover(function() {
-				$('li ul', $(this).closest('.action-menu')).css({'display': 'none'});
-			});
-		}
+
+		item.on('mouseenter', function(e) {
+			e.stopPropagation();
+			$(this).actionMenuItemExpand();
+		});
 
 		return item;
 	}
