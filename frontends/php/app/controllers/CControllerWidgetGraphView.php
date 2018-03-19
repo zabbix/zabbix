@@ -36,7 +36,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'content_width' => 'int32',
 			'content_height' => 'int32',
 			'only_footer' => 'in 1',
-			'period' => 'int32'
+			'period' => 'int32',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -54,6 +55,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 			return;
 		}
+
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
 
 		$fields = $this->getForm()->getFieldsData();
 
@@ -360,7 +363,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$item_graph_url
 				->setArgument('period', $timeline['period'])
 				->setArgument('stime', $timeline['stime'])
-				->setArgument('isNow', $timeline['isNow']);
+				->setArgument('isNow', $timeline['isNow'])
+				->setArgument('fullscreen', $fullscreen ? '1' : null);
 		}
 
 		$response = [
