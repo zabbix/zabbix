@@ -522,8 +522,8 @@ static int	DBpatch_3050043(void)
 {
 	const char	*sql =
 		"delete from profiles"
-		" where (idx='web.paging.lastpage' or idx='web.menu.view.last') and value_str='tr_status.php'"
-		" or idx like 'web.tr_status%'";
+		" where idx in ('web.paging.lastpage','web.menu.view.last') and value_str='tr_status.php'"
+			" or idx like 'web.tr_status%'";
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		return SUCCEED;
@@ -586,7 +586,7 @@ DBPATCH_ADD(3050039, 0, 1)
 DBPATCH_ADD(3050040, 0, 1)
 DBPATCH_ADD(3050041, 0, 1)
 DBPATCH_ADD(3050042, 0, 1)
-DBPATCH_ADD(3050043, 0, 0)
-DBPATCH_ADD(3050044, 0, 0)
+DBPATCH_ADD(3050043, 0, 1)
+DBPATCH_ADD(3050044, 0, 1)
 
 DBPATCH_END()
