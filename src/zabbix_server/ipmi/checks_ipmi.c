@@ -304,15 +304,16 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_full_name(const zbx_ipmi_host_t
  *                                                                            *
  * Function: get_domain_offset                                                *
  *                                                                            *
- * Purpose: Check if a item name start from domain name and set prefix offset *
+ * Purpose: Check if an item name starts from domain name and find the domain *
+ *          name length                                                       *
  *                                                                            *
  * Parameters: h         - [IN] ipmi host                                     *
- *             full_name - [IN] string to examine                             *
+ *             full_name - [IN] item name                                     *
  *                                                                            *
- * Return value: 0 or offset which equal name of domain                       *
+ * Return value: 0 or offset for skipping the domain name                     *
  *                                                                            *
  ******************************************************************************/
-static int	get_domain_offset(zbx_ipmi_host_t *h, const char *full_name)
+static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
 {
 	char	domain_name[IPMI_DOMAIN_NAME_LEN];
 	size_t	offset;
