@@ -38,7 +38,7 @@ class CControllerAcknowledgeEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$backurl = $this->getInput('backurl', 'tr_status.php');
+			$backurl = $this->getInput('backurl', 'zabbix.php?action=problem.view');
 
 			switch (parse_url($backurl, PHP_URL_PATH)) {
 				case 'overview.php':
@@ -46,7 +46,6 @@ class CControllerAcknowledgeEdit extends CController {
 				case 'screens.php':
 				case 'slides.php':
 				case 'tr_events.php':
-				case 'tr_status.php':
 				case 'zabbix.php':
 					break;
 
@@ -80,7 +79,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'message' => $this->getInput('message', ''),
 			'close_problem' => $this->getInput('close_problem', ZBX_ACKNOWLEDGE_ACTION_NONE),
 			'acknowledge_type' => $this->getInput('acknowledge_type', ZBX_ACKNOWLEDGE_SELECTED),
-			'backurl' => $this->getInput('backurl', 'tr_status.php'),
+			'backurl' => $this->getInput('backurl', 'zabbix.php?action=problem.view'),
 			'unack_problem_events_count' => 0,
 			'unack_events_count' => 0
 		];

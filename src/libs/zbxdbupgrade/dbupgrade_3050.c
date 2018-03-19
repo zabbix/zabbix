@@ -518,6 +518,29 @@ static int	DBpatch_3050042(void)
 	return DBadd_foreign_key("task_check_now", 1, &field);
 }
 
+static int	DBpatch_3050043(void)
+{
+	const char	*sql =
+		"delete from profiles"
+		" where (idx='web.paging.lastpage' or idx='web.menu.view.last') and value_str='tr_status.php'"
+		" or idx like 'web.tr_status%'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3050044(void)
+{
+	const char	*sql = "update users set url='zabbix.php?action=problem.view' where url like '%tr_status.php%'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -563,5 +586,7 @@ DBPATCH_ADD(3050039, 0, 1)
 DBPATCH_ADD(3050040, 0, 1)
 DBPATCH_ADD(3050041, 0, 1)
 DBPATCH_ADD(3050042, 0, 1)
+DBPATCH_ADD(3050043, 0, 0)
+DBPATCH_ADD(3050044, 0, 0)
 
 DBPATCH_END()

@@ -69,7 +69,7 @@ function getMenuPopupHistory(options) {
  * @param string options[]['confirmation']	confirmation text
  * @param bool   options['showGraphs']		link to host graphs page
  * @param bool   options['showScreens']		link to host screen page
- * @param bool   options['showTriggers']	link to Monitoring->Triggers page
+ * @param bool   options['showTriggers']	link to Monitoring->Problems page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  * @param {object} trigger_elmnt			UI element which triggered opening of overlay dialogue.
  *
@@ -100,8 +100,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 				url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid).getUrl()
 			},
 			// triggers
-			triggers = {
-				label: t('Triggers')
+			problems = {
+				label: t('Problems')
 			},
 			// graphs
 			graphs = {
@@ -113,10 +113,14 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			};
 
 		if (!options.showTriggers) {
-			triggers.disabled = true;
+			problems.disabled = true;
 		}
 		else {
-			triggers.url = new Curl('tr_status.php?hostid=' + options.hostid).getUrl();
+			var url = new Curl('zabbix.php');
+			url.setArgument('action', 'problem.view');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
+			problems.url = url.getUrl();
 		}
 
 		if (!options.showGraphs) {
@@ -135,7 +139,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		gotos[gotos.length] = host_inventory;
 		gotos[gotos.length] = latest_data;
-		gotos[gotos.length] = triggers;
+		gotos[gotos.length] = problems;
 		gotos[gotos.length] = graphs;
 		gotos[gotos.length] = screens;
 
@@ -164,7 +168,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
  * @param array  options['gotos']['showScreens']	display "Screens" link enabled or disabled
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
- * @param array  options['gotos']['showTriggers']	display "Triggers" link enabled or disabled
+ * @param array  options['gotos']['showTriggers']	display "Problems" link enabled or disabled
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
  * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
  * @param array  options['gotos']['showEvents']		display "Events" link enabled or disabled
@@ -224,17 +228,20 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			};
 		}
 
-		// trigger status
+		// problems
 		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var triggers = {
-				label: t('Triggers')
+			var problems = {
+				label: t('Problems')
 			};
 
 			if (!options.gotos.showTriggers) {
-				triggers.disabled = true;
+				problems.disabled = true;
 			}
 			else {
-				var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
+				var url = new Curl('zabbix.php');
+				url.setArgument('action', 'problem.view');
+				url.setArgument('filter_maintenance', '1');
+				url.setArgument('filter_set', '1');
 
 				jQuery.each(options.gotos.triggerStatus, function(name, value) {
 					if (value !== null) {
@@ -242,10 +249,10 @@ function getMenuPopupMap(options, trigger_elmnt) {
 					}
 				});
 
-				triggers.url = url.getUrl();
+				problems.url = url.getUrl();
 			}
 
-			gotos[gotos.length] = triggers;
+			gotos[gotos.length] = problems;
 		}
 
 		// graphs
@@ -659,6 +666,18 @@ function getMenuPopupTrigger(options) {
 			url: url.getUrl()
 		};
 	}
+
+	// description
+	items[items.length] = {
+		label: t('Description'),
+		clickCallback: function(event) {
+			jQuery(this).closest('.action-menu').menuPopup('close', null);
+
+			return PopUp('popup.triggerdesc', {
+				triggerid: options.triggerid
+			}, null, event.target);
+		}
+	};
 
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration) {

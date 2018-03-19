@@ -2356,3 +2356,24 @@ function getTriggerLastProblems(array $triggerids, array $output) {
 
 	return $problems;
 }
+
+/**
+ * Function returns dependent triggers for each given trigger.
+ *
+ * @param array $triggerids		List of triggers.
+ *
+ * @return array
+ */
+function getTriggerDependencies(array $triggerids = []) {
+	$db_trigger_dependencies = DBselect(
+		'SELECT triggerid_down,triggerid_up'.
+		' FROM trigger_depends'.
+		' WHERE '.dbConditionInt('triggerid_up', $triggerids)
+	);
+	$trigger_dependencies = [];
+	while ($row = DBfetch($db_trigger_dependencies)) {
+		$trigger_dependencies[$row['triggerid_up']][] = intval($row['triggerid_down']);
+	}
+
+	return $trigger_dependencies;
+}

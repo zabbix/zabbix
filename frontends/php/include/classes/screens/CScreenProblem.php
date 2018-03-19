@@ -328,6 +328,7 @@ class CScreenProblem extends CScreenBase {
 						'selectHosts' => ['hostid', 'name', 'status'],
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 						'triggerids' => array_keys($triggerids),
+						'selectDependencies' => ['triggerid'],
 						'monitored' => true,
 						'skipDependent' => true,
 						'preservekeys' => true
@@ -770,6 +771,9 @@ class CScreenProblem extends CScreenBase {
 			$last_clock = 0;
 			$today = strtotime('today');
 
+			// Get trigger dependencies.
+			$trigger_ids_down = getTriggerDependencies(array_keys($data['triggers']));
+
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
 
@@ -847,10 +851,47 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
-				$description = [
-					(new CLinkAction($problem['name']))
-						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
-				];
+				$description = [];
+				if ($trigger['dependencies']) {
+					$dependencies_table = (new CTable())
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+						->addRow(_('Depends on').':');
+
+					foreach ($trigger['dependencies'] as $dependency) {
+						$dependencies_table
+							->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
+					}
+
+					$description[] = (new CSpan())
+						->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
+						->addClass(ZBX_STYLE_CURSOR_POINTER)
+						->setHint($dependencies_table);
+				}
+
+				$dependency = false;
+				if (array_key_exists($trigger['triggerid'], $trigger_ids_down)) {
+					$dependencies_table = (new CTable())
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+						->addRow(_('Dependent').':');
+
+					$dep_trs = CMacrosResolverHelper::resolveTriggerNameByIds($trigger_ids_down[$trigger['triggerid']]);
+
+					foreach ($dep_trs as $dep_trigger) {
+						$dependencies_table->addRow(' - '.$dep_trigger['description']);
+						$dependency = true;
+					}
+				}
+
+				if ($dependency) {
+					$description[] = (new CSpan())
+						->addClass(ZBX_STYLE_ICON_DEPEND_UP)
+						->addClass(ZBX_STYLE_CURSOR_POINTER)
+						->setHint($dependencies_table);
+				}
+				unset($dependencies_table, $dependency);
+
+				$description[] = (new CLinkAction($problem['name']))
+									->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();
