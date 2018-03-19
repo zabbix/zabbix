@@ -999,7 +999,10 @@ int	num_param(const char *p)
 			else if ('"' == *p)
 				state = 1;
 			else if ('[' == *p)
-				array++;
+			{
+				if (0 == array)
+					array++;
+			}
 			else if (']' == *p && 0 != array)
 			{
 				array--;
@@ -1011,6 +1014,8 @@ int	num_param(const char *p)
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 0;	/* incorrect syntax */
 			}
+			else if (']' == *p && 0 == array)
+				return 0;		/* incorrect syntax */
 			else if (' ' != *p)
 				state = 2;
 			break;
@@ -1037,6 +1042,8 @@ int	num_param(const char *p)
 				p--;
 				state = 0;
 			}
+			else if (']' == *p && 0 == array)
+				return 0;		/* incorrect syntax */
 			break;
 		}
 	}
