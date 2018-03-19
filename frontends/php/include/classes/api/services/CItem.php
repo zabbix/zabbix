@@ -392,11 +392,12 @@ class CItem extends CItemGeneral {
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
+		$cjson = new CJson();
+
 		foreach ($result as &$item) {
 			if (array_key_exists('query_fields', $item)) {
-				$item['query_fields'] = ($item['query_fields'] !== '')
-					? json_decode($item['query_fields'], true)
-					: [];
+				$query_fields = ($item['query_fields'] !== '') ? $cjson->decode($item['query_fields'], true) : [];
+				$item['query_fields'] = $cjson->hasError() ? [] : $query_fields;
 			}
 
 			if (array_key_exists('headers', $item)) {
