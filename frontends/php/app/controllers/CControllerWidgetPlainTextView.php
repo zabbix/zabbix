@@ -85,7 +85,6 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				$histories = call_user_func_array('array_merge', $histories);
 
 				foreach ($histories as &$history) {
-
 					switch ($items) {
 						case ITEM_VALUE_TYPE_FLOAT:
 							sscanf($history['value'], '%f', $history['value']);
