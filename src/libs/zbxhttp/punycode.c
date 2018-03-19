@@ -229,6 +229,17 @@ static int	punycode_encode_part(zbx_uint32_t *codepoints, zbx_uint32_t count, ch
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_http_punycode_encode_url                                     *
+ *                                                                            *
+ * Purpose: encodes unicode domain name in URL into punycode                  *
+ *                                                                            *
+ * Parameters: url - [IN/OUT] URL to encode                                   *
+ *                                                                            *
+ * Return value: SUCCEED if encoding was successful. FAIL on error.           *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_http_punycode_encode_url(char **url)
 {
 	char	*domain, *ptr, ascii = 1, delimiter, *iri = NULL;
