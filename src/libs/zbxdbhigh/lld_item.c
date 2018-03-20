@@ -1954,8 +1954,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				(int)item_prototype->snmpv3_securitylevel,
 				(int)item_prototype->snmpv3_authprotocol, item_prototype->snmpv3_authpassphrase,
 				(int)item_prototype->snmpv3_privprotocol, item_prototype->snmpv3_privpassphrase,
-				(int)item_prototype->authtype, item_prototype->username,
-				item_prototype->password, item_prototype->publickey, item_prototype->privatekey,
+				(int)item_prototype->authtype, item->username,
+				item->password, item_prototype->publickey, item_prototype->privatekey,
 				item->description, item_prototype->interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
 				item_prototype->snmpv3_contextname, item->jmx_endpoint, item->master_itemid,
 				item->timeout, item->url, item->query_fields, item->posts, item->status_codes,
@@ -2389,7 +2389,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	zbx_lld_item_t	*item;
 	zbx_uint64_t	itemid, itemdiscoveryid;
 	zbx_db_insert_t	db_insert, db_insert_idiscovery;
-
+	zabbix_increase_log_level();
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == items->values_num)
@@ -2490,7 +2490,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
+	zabbix_decrease_log_level();
 	return ret;
 }
 
