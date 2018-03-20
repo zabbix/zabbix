@@ -10,6 +10,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+........S. [ZBX-13470] improved searching IPMI items by full name (MVekslers)
 ..F....... [ZBX-13566] fixed create dashboard button size in dashboard list (Andzs)
 ..F....... [ZBX-13464] fixed fullscreen attribute included in host context menu links (ashubin)
 A.F....... [ZBX-13424] added possibility to select web items as master items and improved copying of dependent items to destination hosts and templates (Ivo)
