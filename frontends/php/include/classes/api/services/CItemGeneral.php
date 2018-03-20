@@ -313,7 +313,7 @@ abstract class CItemGeneral extends CApiService {
 					$item['name']
 				);
 
-				if ($this instanceof CItemPrototype	&& (!array_key_exists($fullItem['ruleid'], $discovery_rules)
+				if ($this instanceof CItemPrototype && (!array_key_exists($fullItem['ruleid'], $discovery_rules)
 						|| $discovery_rules[$fullItem['ruleid']]['hostid'] != $fullItem['hostid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('No permissions to referred object or it does not exist!')
