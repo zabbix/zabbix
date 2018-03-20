@@ -32,7 +32,7 @@ void	zbx_mock_test_entry(void **state)
 	size_t 			func_pos, par_l, par_r;
 	size_t 			func_pos_exp, par_l_exp, par_r_exp;
 	const int 		max_error_len = 255;
-	char 			error_text[max_error_len];
+	char 			error_text[max_error_len] = {0};
 
 	ZBX_UNUSED(state);
 
