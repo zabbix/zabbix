@@ -131,7 +131,7 @@ $showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTI
  * Display
  */
 $data = [
-	'fullscreen' => $_REQUEST['fullscreen'],
+	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'type' => $type,
 	'view_style' => $viewStyle,
 	'config' => $config

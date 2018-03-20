@@ -70,7 +70,7 @@ $today = strtotime('today');
 $last_clock = 0;
 
 if ($data['data']['problems']) {
-	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
+	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
 if ($data['config']['event_ack_enable']) {
 	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
