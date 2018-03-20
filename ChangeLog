@@ -202,7 +202,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), F
 Bug fixes:
 ........S. [ZBX-13571] fixed regression that resulted in slow history data queries on partitioned tables (wiper)
 A.F....... [ZBX-13424] added possibility to select web items as master items and improved copying of dependent items to destination hosts and templates (Ivo)
-..F....... [ZBX-13573] fixed undefined index message changing Action "Acknowledgment operations" from "Remote command" to "Notify all involved" (agriscenko)
+A......... [ZBX-13573] fixed undefined index message changing Action "Acknowledgment operations" from "Remote command" to "Notify all involved" (agriscenko)
 A......... [ZBX-13570] fixed undefined index in API call (agriscenko)
 A......... [ZBX-13331] removed "recovery" property from action.get API method response (nikita)
 ..F....... [ZBX-13309] fixed displaying of Problem/Recovery time (agriscenko, ashubin, Sasha)
