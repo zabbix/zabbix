@@ -777,7 +777,10 @@ class CHttpTest extends CApiService {
 	 * @throws APIException if the status code range is invalid.
 	 */
 	private function checkStatusCodes(array $httptests) {
-		$parser = new CStatusCodesParser(['usermacros' => true]);
+		$validator = new CStatusCodeRangesValidator([
+			'usermacros' => true,
+			'messageInvalid' => 'Invalid response code "%1$s".'
+		]);
 
 		foreach ($httptests as $httptest) {
 			if (!array_key_exists('steps', $httptest)) {
@@ -789,10 +792,8 @@ class CHttpTest extends CApiService {
 					continue;
 				}
 
-				if ($parser->parse($httpstep['status_codes']) == CParser::PARSE_FAIL) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid response code "%1$s".', $httpstep['status_codes'])
-					);
+				if (!$validator->validate($httpstep['status_codes'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $validator->getError());
 				}
 			}
 		}

@@ -1984,9 +1984,11 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('status_codes', $item) && $item['status_codes']) {
-			$parser = new CStatusCodesParser(['usermacros' => true]);
+			$validator = new CStatusCodeRangesValidator([
+				'usermacros' => true
+			]);
 
-			if ($parser->parse($item['status_codes']) != CParser::PARSE_SUCCESS) {
+			if (!$validator->validate($item['status_codes'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value "%1$s" for "%2$s" field.', $item['status_codes'], 'status_codes')
 				);
