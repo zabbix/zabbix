@@ -92,7 +92,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 						case ITEM_VALUE_TYPE_TEXT:
 						case ITEM_VALUE_TYPE_STR:
 						case ITEM_VALUE_TYPE_LOG:
-							if ($fields['style']) {
+							if ($fields['show_as_html']) {
 								$history['value'] = new CJsScript($history['value']);
 							}
 							break;
@@ -102,7 +102,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 						$history['value'] = applyValueMap($history['value'], $items[$history['itemid']]['valuemapid']);
 					}
 
-					if ($fields['style'] == 0) {
+					if (!$fields['show_as_html']) {
 						$history['value'] = new CPre($history['value']);
 					}
 				}
@@ -138,7 +138,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			'name' => $this->getInput('name', $dynamic_widget_name),
 			'items' => $items,
 			'histories' => $histories,
-			'name_location' => $fields['name_location'],
+			'style' => $fields['style'],
 			'same_host' => $same_host,
 			'show_lines' => $fields['show_lines'],
 			'error' => $error,

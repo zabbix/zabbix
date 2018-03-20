@@ -35,15 +35,15 @@ class CPlainTextWidgetForm extends CWidgetForm {
 		$this->fields[] = $field_items;
 
 		// Location of the item names.
-		$field_style = (new CWidgetFieldRadioButtonList('name_location', _('Items location'), [
+		$field_style = (new CWidgetFieldRadioButtonList('style', _('Items location'), [
 			STYLE_LEFT => _('Left'),
 			STYLE_TOP => _('Top')
 		]))
 			->setDefault(STYLE_LEFT)
 			->setModern(true);
 
-		if (array_key_exists('name_location', $this->data)) {
-			$field_style->setValue($this->data['name_location']);
+		if (array_key_exists('style', $this->data)) {
+			$field_style->setValue($this->data['style']);
 		}
 		$this->fields[] = $field_style;
 
@@ -61,10 +61,10 @@ class CPlainTextWidgetForm extends CWidgetForm {
 		$this->fields[] = $field_lines;
 
 		// Show text as HTML.
-		$field_text_as_html = (new CWidgetFieldCheckBox('style', _('Show text as HTML')))->setDefault(0);
+		$field_text_as_html = (new CWidgetFieldCheckBox('show_as_html', _('Show text as HTML')))->setDefault(0);
 
-		if (array_key_exists('style', $this->data)) {
-			$field_text_as_html->setValue($this->data['style']);
+		if (array_key_exists('show_as_html', $this->data)) {
+			$field_text_as_html->setValue($this->data['show_as_html']);
 		}
 
 		$this->fields[] = $field_text_as_html;

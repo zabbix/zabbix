@@ -26,7 +26,7 @@ if ($data['error'] != null) {
 }
 else {
 	$table_header = [(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH)];
-	$names_at_top = ($data['name_location'] == STYLE_TOP && count($data['items']) > 1);
+	$names_at_top = ($data['style'] == STYLE_TOP && count($data['items']) > 1);
 
 	if ($names_at_top) {
 		$table->makeVerticalRotation();
@@ -40,7 +40,7 @@ else {
 		}
 	}
 	else {
-		if ($data['name_location'] == STYLE_LEFT) {
+		if ($data['style'] == STYLE_LEFT) {
 			$table_header[] = _('Name');
 		}
 		$table_header[] = _('Value');
@@ -57,7 +57,7 @@ else {
 			$table_row = [
 				(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])))->addClass(ZBX_STYLE_NOWRAP)
 			];
-			if ($data['name_location'] == STYLE_LEFT) {
+			if ($data['style'] == STYLE_LEFT) {
 				$table_row[] = ($data['same_host']
 					? ''
 					: $data['items'][$history_item['itemid']]['hosts'][0]['name'].NAME_DELIMITER).

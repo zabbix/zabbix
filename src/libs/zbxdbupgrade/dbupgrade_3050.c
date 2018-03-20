@@ -518,6 +518,48 @@ static int	DBpatch_3050042(void)
 	return DBadd_foreign_key("task_check_now", 1, &field);
 }
 
+static int	DBpatch_3050043(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update widget_field"
+		" set name = 'show_as_html'"
+		" where name='style'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='plaintext'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050044(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update widget_field"
+		" set name = 'itemids'"
+		" where name='itemid'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='plaintext'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -563,5 +605,7 @@ DBPATCH_ADD(3050039, 0, 1)
 DBPATCH_ADD(3050040, 0, 1)
 DBPATCH_ADD(3050041, 0, 1)
 DBPATCH_ADD(3050042, 0, 1)
+DBPATCH_ADD(3050043, 0, 1)
+DBPATCH_ADD(3050044, 0, 1)
 
 DBPATCH_END()
