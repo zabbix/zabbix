@@ -93,7 +93,7 @@ AC_HELP_STRING([--with-zlib=DIR], [use zlib from given base install directory (D
 	fi
 
 	if test "x$found_zlib" = "xyes"; then
-		AC_DEFINE([HAVE_ZLIB_H], 1, [Define to 1 if you have the 'zlib' library (-lz)])
+		AC_DEFINE([HAVE_ZLIB], 1, [Define to 1 if you have the 'zlib' library (-lz)])
 		AC_MSG_RESULT(yes)
 	else
 		ZLIB_CFLAGS=""
