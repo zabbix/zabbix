@@ -48,6 +48,8 @@ class testFormEventCorrelation extends CWebTest {
 	}
 
 	/**
+	 * Test creation of a event correlation with all possible fields and with default values.
+	 *
 	 * @dataProvider create
 	 */
 	public function testFormEventCorrelation_Create($data) {
@@ -115,6 +117,8 @@ class testFormEventCorrelation extends CWebTest {
 	}
 
 	/**
+	 * Test form validations.
+	 *
 	 * @dataProvider validation
 	 */
 	public function testFormEventCorrelation_CreateValidation($data) {
@@ -297,6 +301,8 @@ class testFormEventCorrelation extends CWebTest {
 	}
 
 	/**
+	 * Test creation with different conditions.
+	 *
 	 * @dataProvider tags
 	 */
 	public function testFormEventCorrelation_TestTags($data) {
@@ -393,6 +399,8 @@ class testFormEventCorrelation extends CWebTest {
 	}
 
 	/**
+	 * Test condition value validations.
+	 *
 	 * @dataProvider tagsValidation
 	 */
 	public function testFormEventCorrelation_CheckEmptyTagsValue($data) {
@@ -429,9 +437,8 @@ class testFormEventCorrelation extends CWebTest {
 				[
 					'name' => 'Test create with calculation And/Or',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value' ]
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2'],
 					]
 				]
 			],
@@ -439,26 +446,41 @@ class testFormEventCorrelation extends CWebTest {
 				[
 					'name' => 'Test create with calculation And',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'And']
-					]
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2']
+					],
+					'calculation' => 'And'
+				]
+			],
+			[
+				[
+					'name' => 'Test create with calculation OR',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2'],
+					],
+					'calculation' => 'Or'
 				]
 			],
 			[
 				[
 					'name' => 'Test create with calculation Custom',
 					'tags'=>[
-						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'calculation' => 'Custom expression', 'formula'=> 'A or (B and C)']
-					]
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag3'],
+
+					],
+				'calculation' => 'Custom expression',
+				'formula' => 'A or (B and C)'
 				]
-			],
+			]
 		];
 	}
 
 	/**
+	 * Test all types of calculation.
+	 *
 	 * @dataProvider calculation
 	 */
 	public function testFormEventCorrelation_CreateCalculation($data) {
@@ -472,19 +494,14 @@ class testFormEventCorrelation extends CWebTest {
 		foreach ($data['tags'] as $tag) {
 			$this->zbxTestDropdownSelectWait('new_condition_type', $tag['select_tag']);
 			$this->zbxTestInputType('new_condition_tag', $tag['tag_name']);
-
-			if (array_key_exists('operator', $tag)) {
-				$this->zbxTestDropdownSelectWait('new_condition_operator', $tag['operator']);
-				$this->zbxTestInputType('new_condition_value', $tag['value']);
-				}
-
-			if (array_key_exists('calculation', $tag)) {
-				$this->zbxTestDropdownSelect('evaltype', $tag['calculation']);
-				if ($tag['calculation'] === 'Custom expression') {
-					$this->zbxTestInputType('formula', $tag['formula']);
-					}
-				}
 			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
+		}
+
+		if (array_key_exists('calculation', $data)) {
+			$this->zbxTestDropdownSelect('evaltype', $data['calculation']);
+			if ($data['calculation'] === 'Custom expression') {
+				$this->zbxTestInputType('formula', $data['formula']);
+			}
 		}
 
 		$this->zbxTestTabSwitch('Operations');
@@ -506,19 +523,20 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'formula'=> '' ]
 					],
+					'formula'=> '',
 					'error_message' => 'Incorrect custom expression "Test create with empty expression" for correlation "": expression is empty.'
 				]
 			],
-						[
+			[
 				[
 					'name' => 'Test create with missing argument',
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'formula'=> 'A or B' ]
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
 					],
+					'formula'=> 'A or B',
 					'error_message' => 'Condition "C" is not used in formula "A or B" for correlation "Test create with missing argument".'
 				]
 			],
@@ -528,8 +546,9 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'formula'=> '(A or B) and (C or D)' ]
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
 					],
+					'formula'=> '(A or B) and (C or D)',
 					'error_message' => 'Condition "D" used in formula "(A or B) and (C or D)" for correlation "Test create with extra argument" is not defined.'
 				]
 			],
@@ -539,8 +558,9 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value', 'formula'=> 'Wrong formula']
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
 					],
+					'formula'=> 'Wrong formula',
 					'error_message' => 'Incorrect custom expression "Test create with wrong formula" for correlation "Wrong formula": check expression starting from "Wrong formula".'
 				]
 			],
@@ -548,6 +568,8 @@ class testFormEventCorrelation extends CWebTest {
 	}
 
 	/**
+	 * Test custom expression field validation.
+	 *
 	 * @dataProvider formulaValidation
 	 */
 	public function testFormEventCorrelation_FormulaValidation($data) {
@@ -565,13 +587,13 @@ class testFormEventCorrelation extends CWebTest {
 			if (array_key_exists('operator', $tag)) {
 				$this->zbxTestDropdownSelectWait('new_condition_operator', $tag['operator']);
 				$this->zbxTestInputType('new_condition_value', $tag['value']);
-				}
+			}
 
 			$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
 		}
 
 		$this->zbxTestDropdownSelectWait('evaltype', 'Custom expression');
-		$this->zbxTestInputType('formula', $tag['formula']);
+		$this->zbxTestInputType('formula', $data['formula']);
 		$this->zbxTestClick('add');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation');
@@ -607,6 +629,9 @@ class testFormEventCorrelation extends CWebTest {
 		$this->assertEquals(2, DBcount($sql));
 	}
 
+	/**
+	 * Test update without any modification of event correlation data.
+	 */
 	public function testFormEventCorrelation_UpdateNone() {
 		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
 		$old_hash = DBhash($sql_hash);
