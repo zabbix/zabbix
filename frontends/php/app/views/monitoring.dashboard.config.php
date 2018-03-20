@@ -127,8 +127,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'dstfrm' => $form->getName(),
 			'dstfld1' => $field->getName().'_',
 			'srcfld1' => 'itemid',
-			'selectLimit' => $field->getValuesLimit(),
-			'multiselect' => '1'
+			'real_hosts' => '1',
+			'multiselect' => '1',
+			'selectLimit' => $field->getValuesLimit()
 		];
 
 		$field_itemsids = (new CMultiSelect([
