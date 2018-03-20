@@ -91,7 +91,7 @@ class CScreenHttpTest extends CScreenBase {
 				->setArgument('action', 'web.view')
 				->setArgument('groupid', $this->data['groupid'])
 				->setArgument('hostid', $this->hostid)
-				->setArgument('fullscreen', $this->data['fullscreen']);
+				->setArgument('fullscreen', $this->data['fullscreen'] ? '1' : null);
 
 			$paging = getPagingLine($httptests, $sort_order, $url);
 			$httptests = resolveHttpTestMacros($httptests, true, false);

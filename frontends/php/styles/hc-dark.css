@@ -2243,6 +2243,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .action-menu:focus {
+    outline: none; }
   .action-menu li {
     display: block; }
     .action-menu li div {
@@ -2263,11 +2265,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -webkit-transition: background-color 0.2s ease-out;
     -moz-transition: background-color 0.2s ease-out;
     transition: background-color 0.2s ease-out; }
-    .action-menu .action-menu-item:hover {
-      background-color: #454545; }
-    .action-menu .action-menu-item:focus {
-      background-color: #454545; }
-    .action-menu .action-menu-item:active {
+    .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
       background-color: #454545; }
     .action-menu .action-menu-item.selected::before {
       display: block;
@@ -4689,8 +4687,18 @@ Widgets are used as containers to group any related information. Widget consists
 .icon .center {
   background: url(../img/icon-sprite.svg) no-repeat -325px -799px !important; }
 
-.action-menu-item::before {
-  background: url(../img/icon-sprite.svg) no-repeat -317px -835px !important; }
+.action-menu {
+  background-color: #383838;
+  border: 1px solid #666; }
+  .action-menu .action-menu-item-disabled {
+    color: #7d7d7d; }
+  .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
+    background-color: black;
+    color: white; }
+    .action-menu .action-menu-item:hover .arrow-right, .action-menu .action-menu-item:focus .arrow-right, .action-menu .action-menu-item:active .arrow-right, .action-menu .action-menu-item.highlighted .arrow-right {
+      border-left-color: white; }
+  .action-menu .action-menu-item.selected::before {
+    background: url(../img/icon-sprite.svg) no-repeat -317px -835px; }
 
 ul.top-nav-icons input {
   border: 1px solid #666 !important;

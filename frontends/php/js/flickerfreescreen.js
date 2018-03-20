@@ -294,7 +294,7 @@
 							}
 						});
 
-						$('.msg-bad').remove();
+						$('.article .msg-bad').remove();
 
 						// set message
 						if (msg_bad) {
