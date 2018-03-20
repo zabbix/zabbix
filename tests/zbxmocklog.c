@@ -19,9 +19,7 @@
 
 /* make sure that __wrap_*() prototypes match unwrapped counterparts */
 
-#include "zbxmocktest.h"
-#include "zbxmockdata.h"
-
+#include "common.h"
 #include "log.h"
 
 void	__wrap___zbx_zabbix_log(int level, const char *fmt, ...)
