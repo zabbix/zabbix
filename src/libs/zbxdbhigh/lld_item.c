@@ -2178,14 +2178,14 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME))
 	{
-		value_esc = DBdyn_escape_string(item_prototype->username);
+		value_esc = DBdyn_escape_string(item->username);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%susername='%s'", d, value_esc);
 		zbx_free(value_esc);
 		d = ",";
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD))
 	{
-		value_esc = DBdyn_escape_string(item_prototype->password);
+		value_esc = DBdyn_escape_string(item->password);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%spassword='%s'", d, value_esc);
 		zbx_free(value_esc);
 		d = ",";
