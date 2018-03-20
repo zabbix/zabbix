@@ -3,7 +3,7 @@
 #
 # Checks for zlib.
 #
-# This macro #defines HAVE_PCREPOSIX_H if required header files are
+# This macro #defines HAVE_ZLIB_H if required header files are
 # found, and sets @ZLIB_LDFLAGS@ and @ZLIB_CFLAGS@ to the necessary
 # values.
 #
