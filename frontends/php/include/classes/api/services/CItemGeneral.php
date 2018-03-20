@@ -176,12 +176,12 @@ abstract class CItemGeneral extends CApiService {
 			$discovery_rules = [];
 
 			if ($this instanceof CItemPrototype) {
-				$druleids = array_filter(zbx_objectValues($items, 'ruleid'));
+				$druleids = zbx_objectValues($items, 'ruleid');
 
 				if ($druleids) {
 					$discovery_rules = API::DiscoveryRule()->get([
 						'output' => ['hostid'],
-						'ruleids' => array_keys(array_flip($druleids)),
+						'itemids' => $druleids,
 						'preservekeys' => true
 					]);
 				}
