@@ -215,7 +215,7 @@
 							// Fix placeholder not to change height while object is being dragged.
 							$(ui.placeholder).height($(ui.helper).height());
 						}
-					}).disableSelection();
+					});
 
 					table.on('click', '[data-row-action]', function (e) {
 						e.preventDefault();
