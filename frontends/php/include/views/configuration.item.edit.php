@@ -154,7 +154,8 @@ $itemFormList->addRow(
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CTextBox('query_fields[key][#{index}]', '#{key}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->setEnabled(!$readonly)
@@ -307,7 +308,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPAGENT HTTP proxy.
 $itemFormList->addRow(
 	new CLabel(_('HTTP proxy'), 'http_proxy'),
-	(new CTextBox('http_proxy', $data['http_proxy'], $readonly, 255))
+	(new CTextBox('http_proxy', $data['http_proxy'], $readonly, DB::getFieldLength('items', 'http_proxy')))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
 	'http_proxy_row'
@@ -327,7 +328,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPAGENT User name.
 $itemFormList->addRow(
 	(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
-	(new CTextBox('http_username', $data['http_username'], $readonly, 64))
+	(new CTextBox('http_username', $data['http_username'], $readonly, DB::getFieldLength('items', 'username')))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'http_username_row'
@@ -336,7 +337,7 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPAGENT Password.
 $itemFormList->addRow(
 	(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
-	(new CTextBox('http_password', $data['http_password'], $readonly, 64))
+	(new CTextBox('http_password', $data['http_password'], $readonly, DB::getFieldLength('items', 'password')))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'http_password_row'
@@ -363,21 +364,25 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPAGENT SSL certificate file.
 $itemFormList->addRow(
 	new CLabel(_('SSL certificate file'), 'ssl_cert_file'),
-	(new CTextBox('ssl_cert_file', $data['ssl_cert_file'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('ssl_cert_file', $data['ssl_cert_file'], $readonly, DB::getFieldLength('items', 'ssl_cert_file')))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_cert_file_row'
 );
 
 // ITEM_TYPE_HTTPAGENT SSL key file.
 $itemFormList->addRow(
 	new CLabel(_('SSL key file'), 'ssl_key_file'),
-	(new CTextBox('ssl_key_file', $data['ssl_key_file'], $readonly, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('ssl_key_file', $data['ssl_key_file'], $readonly, DB::getFieldLength('items', 'ssl_key_file')))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_file_row'
 );
 
 // ITEM_TYPE_HTTPAGENT SSL key password.
 $itemFormList->addRow(
 	new CLabel(_('SSL key password'), 'ssl_key_password'),
-	(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly,
+		DB::getFieldLength('items', 'ssl_key_password')
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'ssl_key_password_row'
 );
 

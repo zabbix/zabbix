@@ -790,8 +790,8 @@ class CHttpTest extends CApiService {
 				}
 
 				if ($parser->parse($httpstep['status_codes']) == CParser::PARSE_FAIL) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".',
-						$httpstep['status_codes'])
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid response code "%1$s".', $httpstep['status_codes'])
 					);
 				}
 			}

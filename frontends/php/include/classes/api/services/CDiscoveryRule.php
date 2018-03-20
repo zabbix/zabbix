@@ -274,9 +274,11 @@ class CDiscoveryRule extends CItemGeneral {
 				$query_fields = ($item['query_fields'] !== '') ? $cjson->decode($item['query_fields'], true) : [];
 				$item['query_fields'] = $cjson->hasError() ? [] : $query_fields;
 			}
+
 			if (array_key_exists('headers', $item)) {
 				$item['headers'] = $this->headersStringToArray($item['headers']);
 			}
+
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
@@ -315,6 +317,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
 			}
+
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
@@ -416,6 +419,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
 			}
+
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
@@ -640,6 +644,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
 			}
+
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}

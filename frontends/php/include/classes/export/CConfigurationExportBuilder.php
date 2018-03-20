@@ -373,8 +373,12 @@ class CConfigurationExportBuilder {
 				$query_fields = [];
 
 				foreach ($discoveryRule['query_fields'] as $query_field) {
-					$query_fields[] = ['name' => key($query_field), 'value' => reset($query_field)];
+					$query_fields[] = [
+						'name' => key($query_field),
+						'value' => reset($query_field)
+					];
 				}
+
 				$data['query_fields'] = $query_fields;
 			}
 
@@ -384,6 +388,7 @@ class CConfigurationExportBuilder {
 				foreach ($discoveryRule['headers'] as $name => $value) {
 					$headers[] = compact('name', 'value');
 				}
+
 				$data['headers'] = $headers;
 			}
 
@@ -770,8 +775,12 @@ class CConfigurationExportBuilder {
 				$query_fields = [];
 
 				foreach ($item['query_fields'] as $query_field) {
-					$query_fields[] = ['name' => key($query_field), 'value' => reset($query_field)];
+					$query_fields[] = [
+						'name' => key($query_field),
+						'value' => reset($query_field)
+					];
 				}
+
 				$data['query_fields'] = $query_fields;
 			}
 
@@ -781,6 +790,7 @@ class CConfigurationExportBuilder {
 				foreach ($item['headers'] as $name => $value) {
 					$headers[] = compact('name', 'value');
 				}
+
 				$data['headers'] = $headers;
 			}
 

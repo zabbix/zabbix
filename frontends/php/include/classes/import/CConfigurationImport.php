@@ -741,6 +741,7 @@ class CConfigurationImport {
 					foreach ($item['headers'] as $header) {
 						$headers[$header['name']] = $header['value'];
 					}
+
 					$item['headers'] = $headers;
 
 					$query_fields = [];
@@ -748,6 +749,7 @@ class CConfigurationImport {
 					foreach ($item['query_fields'] as $query_field) {
 						$query_fields[] = [$query_field['name'] => $query_field['value']];
 					}
+
 					$item['query_fields'] = $query_fields;
 				}
 
@@ -909,6 +911,7 @@ class CConfigurationImport {
 					foreach ($item['headers'] as $header) {
 						$headers[$header['name']] = $header['value'];
 					}
+
 					$item['headers'] = $headers;
 
 					$query_fields = [];
@@ -916,6 +919,7 @@ class CConfigurationImport {
 					foreach ($item['query_fields'] as $query_field) {
 						$query_fields[] = [$query_field['name'] => $query_field['value']];
 					}
+
 					$item['query_fields'] = $query_fields;
 				}
 
@@ -1035,6 +1039,7 @@ class CConfigurationImport {
 						foreach ($prototype['headers'] as $header) {
 							$headers[$header['name']] = $header['value'];
 						}
+
 						$prototype['headers'] = $headers;
 
 						$query_fields = [];
@@ -1042,6 +1047,7 @@ class CConfigurationImport {
 						foreach ($prototype['query_fields'] as $query_field) {
 							$query_fields[] = [$query_field['name'] => $query_field['value']];
 						}
+
 						$prototype['query_fields'] = $query_fields;
 					}
 

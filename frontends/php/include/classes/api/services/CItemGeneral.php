@@ -1828,12 +1828,12 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Validate item with type ITEM_TYPE_HTTPAGENT.
 	 *
-	 * @param array    $item       Array of item fields.
-	 * @param array    $db_item    Array of item database fields for update action or empty array for create action.
+	 * @param array $item     Array of item fields.
+	 * @param array $db_item  Array of item database fields for update action or empty array for create action.
 	 *
 	 * @throws APIException for invalid data.
 	 */
-	protected function validateHTTPCheck($item, $db_item) {
+	protected function validateHTTPCheck(array $item, array $db_item) {
 		$rules = [
 			'timeout' => [
 				'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
@@ -1945,15 +1945,15 @@ abstract class CItemGeneral extends CApiService {
 
 		if (array_key_exists('query_fields', $item)) {
 			if (!is_array($item['query_fields'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
-					_('an array is expected'))
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', 'query_fields', _('an array is expected'))
 				);
 			}
 
 			foreach ($item['query_fields'] as $v) {
 				if (!is_array($v) || count($v) > 1 || key($v) === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
-						_('nonempty key and value pair expected'))
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'query_fields', _('nonempty key and value pair expected'))
 					);
 				}
 			}
@@ -1962,22 +1962,22 @@ abstract class CItemGeneral extends CApiService {
 
 			if (strlen($json_string) > DB::getFieldLength('items', 'query_fields')) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
-					_('cannot convert to JSON, result value too long'))
-				);
+					_('cannot convert to JSON, result value too long')
+				));
 			}
 		}
 
 		if (array_key_exists('headers', $item)) {
 			if (!is_array($item['headers'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'headers',
-					_('an array is expected'))
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', 'headers', _('an array is expected'))
 				);
 			}
 
 			foreach ($item['headers'] as $k => $v) {
 				if (trim($k) === '' || !is_string($v) || $v === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'headers',
-						_('nonempty key and value pair expected'))
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'headers', _('nonempty key and value pair expected'))
 					);
 				}
 			}
@@ -1987,8 +1987,8 @@ abstract class CItemGeneral extends CApiService {
 			$parser = new CStatusCodesParser(['usermacros' => true]);
 
 			if ($parser->parse($item['status_codes']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-					$item['status_codes'], 'status_codes')
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $item['status_codes'], 'status_codes')
 				);
 			}
 		}

@@ -174,7 +174,7 @@ $itemFormList->addRow(
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('headers_pairs')
 		->setAttribute('data-sortable-pairs-table', '1')
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // append snmp community to form list

@@ -287,8 +287,8 @@ $ui_rows = [
 	ITEM_TYPE_HTTPAGENT => [
 		'url_row', 'query_fields_row', 'request_method_row', 'timeout_row', 'post_type_row', 'posts_row', 'headers_row',
 		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'allow_traps_row',
-		'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row', 'ssl_key_file_row',
-		'ssl_cert_file_row', 'ssl_key_password_row'
+		'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row',
+		'ssl_key_file_row', 'ssl_cert_file_row', 'ssl_key_password_row'
 	]
 ];
 foreach ($ui_rows[ITEM_TYPE_HTTPAGENT] as $row) {
@@ -394,7 +394,7 @@ zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_passwor
 				<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
 		<?php } ?>
 		if (jQuery('#http_authtype').length) {
-			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true); ?>);
+			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true) ?>);
 		}
 		<?php
 		if (!empty($this->data['securityLevelVisibility'])) { ?>
@@ -453,18 +453,16 @@ zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_passwor
 			});
 
 			table.on('click', '[data-row-action]', function (e) {
-				var row_node = $(e.currentTarget).closest('.'+table_row_class);
-
 				e.preventDefault();
 
 				switch ($(e.currentTarget).data('row-action')) {
 					case 'remove_row' :
-						removeRow($(e.currentTarget).closest('.'+table_row_class));
+						removeRow($(e.currentTarget).closest('.' + table_row_class));
 						break;
 
 					case 'add_row' :
 						var row_data = $(e.currentTarget).data('values'),
-							new_row = addRow(row_data||{});
+							new_row = addRow(row_data || {});
 
 						if (!row_data) {
 							new_row.find('[type="text"]').val('');
@@ -512,7 +510,7 @@ zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_passwor
 				getTableRows: function() {
 					return table.find('.'+table_row_class);
 				}
-			}
+			};
 		};
 
 		$('[data-sortable-pairs-table]').each(function() {
