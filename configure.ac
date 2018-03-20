@@ -1,3 +1,4 @@
+
 dnl
 dnl Zabbix
 dnl Copyright (C) 2001-2018 Zabbix SIA
@@ -62,7 +63,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h event.h)
+  dlfcn.h sys/utsname.h sys/un.h event.h zlib.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -1418,6 +1419,20 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
+	
+	dnl Check for zlib, used by Zabbix server-proxy communications
+	ZLIB_CHECK_CONFIG([no])
+	if test "x$found_zlib" != "xyes"; then
+		AC_MSG_ERROR([Unable to use zlib (zlib check failed)])
+	fi
+	
+	SERVER_LDFLAGS="$LDFLAGS $ZLIB_LDFLAGS"
+	SERVER_LIBS="$LIBS $ZLIB_LIBS"
+	
+	PROXY_LDFLAGS="$LDFLAGS $ZLIB_LDFLAGS"
+	PROXY_LIBS="$LIBS $ZLIB_LIBS"
+	
+	AC_SUBST(ZLIB_CFLAGS)
 fi
 
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
@@ -1801,6 +1816,10 @@ fi
 
 if test "x$ICONV_CFLAGS" != "x"; then
 	echo "    iconv:                 ${ICONV_CFLAGS}"
+fi
+
+if test "x$ZLIB_CFLAGS" != "x"; then
+	echo "    zlib:                  ${ZLIB_CFLAGS}"
 fi
 
 echo "
