@@ -2389,7 +2389,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	zbx_lld_item_t	*item;
 	zbx_uint64_t	itemid, itemdiscoveryid;
 	zbx_db_insert_t	db_insert, db_insert_idiscovery;
-	zabbix_increase_log_level();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == items->values_num)
@@ -2490,7 +2490,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-	zabbix_decrease_log_level();
+
 	return ret;
 }
 
