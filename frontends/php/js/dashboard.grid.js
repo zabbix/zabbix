@@ -102,54 +102,43 @@
 	}
 
 	function getDivPosition($obj, data, $div) {
-		var	target_pos = $div.position(),
-			widget_width_px = Math.floor($obj.width() / data['options']['max-columns']),
-			target_top = target_pos.top + 25,
-			target_left = target_pos.left + 25,
-			target_height = $div.height() + 25,
-			target_width = $div.width() + 25,
-			x = (target_left - (target_left % widget_width_px)) / widget_width_px,
-			y = (target_top - (target_top % data['options']['widget-height'])) / data['options']['widget-height'],
-			width = (target_width - (target_width % widget_width_px)) / widget_width_px,
-			height = (target_height - (target_height % data['options']['widget-height'])) /
-				data['options']['widget-height'];
+		var pos = $div.position(),
+			cell_w = data['cell-width'],
+			cell_h = data['options']['widget-height'],
+			place_x = Math.round(pos.left / cell_w),
+			place_y = Math.round(pos.top / cell_h),
+			place_w = Math.round(($div.width() + (pos.left - place_x * cell_w)) / cell_w),
+			place_h = Math.round(($div.height() + (pos.top - place_y * cell_h)) / cell_h);
 
-		if (x > data['options']['max-columns'] - width) {
-			x = data['options']['max-columns'] - width;
+		if (data['pos-action'] === 'resize') {
+			place_w = Math.min(place_w, place_w + place_x, data['options']['max-columns'] - place_x);
+			place_h = Math.min(place_h, place_h + place_y, data['options']['max-rows'] - place_y);
 		}
 
-		if (x < 0) {
-			x = 0;
-		}
+		place_x = Math.min(place_x, data['options']['max-columns'] - place_w);
+		place_y = Math.min(place_y, data['options']['max-rows'] - place_h);
 
-		if (y < 0) {
-			y = 0;
+		return {
+			x: Math.max(place_x, 0),
+			y: Math.max(place_y, 0),
+			width: Math.max(place_w, 1),
+			height: Math.max(place_h, data['options']['widget-min-rows'])
 		}
-
-		if (y > data['options']['max-rows'] - height) {
-			y = data['options']['max-rows'] - height;
-		}
-
-		if (width < 1) {
-			width = 1;
-		}
-		else if (width > data['options']['max-columns']) {
-			width = data['options']['max-columns'];
-		}
-
-		if (height < data['options']['widget-min-rows']) {
-			height = data['options']['widget-min-rows'];
-		}
-
-		return {'x': x, 'y': y, 'width': width, 'height': height};
 	}
 
-	function setDivPosition($div, data, pos) {
+	function getCurrentCellWidth(data) {
+		return $('.dashbrd-grid-widget-container').width() / data['options']['max-columns'];
+	}
+
+	function setDivPosition($div, data, pos, is_placeholder) {
+		var cell_w = is_placeholder ? data['cell-width'] : data['options']['widget-width'],
+			unit = is_placeholder ? 'px' : '%';
+
 		$div.css({
-			'left': '' + (data['options']['widget-width'] * pos['x']) + '%',
-			'top': '' + (data['options']['widget-height'] * pos['y']) + 'px',
-			'width': '' + (data['options']['widget-width'] * pos['width']) + '%',
-			'height': '' + (data['options']['widget-height'] * pos['height']) + 'px'
+			left: cell_w * pos['x'] + unit,
+			top: data['options']['widget-height'] * pos['y'] + 'px',
+			width: cell_w * pos['width'] + unit,
+			height: data['options']['widget-height'] * pos['height'] + 'px'
 		});
 	}
 
@@ -160,6 +149,7 @@
 	}
 
 	function startWidgetPositioning($div, data) {
+		data['cell-width'] = getCurrentCellWidth(data);
 		data['placeholder'].show();
 		$('.dashbrd-grid-widget-mask', $div).show();
 
@@ -216,7 +206,7 @@
 		$.each(data['widgets'], function() {
 			if (!posEquals(this['pos'], this['current_pos'])) {
 				this['pos'] = this['current_pos'];
-				setDivPosition(this['div'], data, this['pos']);
+				setDivPosition(this['div'], data, this['pos'], false);
 			}
 
 			delete this['current_pos'];
@@ -227,7 +217,7 @@
 		var	widget = getWidgetByTarget(data['widgets'], $div),
 			pos = getDivPosition($obj, data, $div);
 
-		setDivPosition(data['placeholder'], data, pos);
+		setDivPosition(data['placeholder'], data, pos, true);
 
 		if (!posEquals(pos, widget['current_pos'])) {
 			resetCurrentPositions(data['widgets']);
@@ -237,7 +227,7 @@
 
 			$.each(data['widgets'], function() {
 				if (widget != this) {
-					setDivPosition(this['div'], data, this['current_pos']);
+					setDivPosition(this['div'], data, this['current_pos'], false);
 				}
 			});
 		}
@@ -286,7 +276,7 @@
 			// should be present only while dragging
 			delete this['current_pos'];
 		});
-		setDivPosition($div, data, widget['pos']);
+		setDivPosition($div, data, widget['pos'], false);
 		resizeDashboardGrid($obj, data);
 	}
 
@@ -296,7 +286,9 @@
 
 		widget['div'].draggable({
 			handle: widget['content_header'],
+			scroll: false,
 			start: function(event, ui) {
+				data['pos-action'] = 'drag';
 				startWidgetPositioning($(event.target), data);
 			},
 			drag: function(event, ui) {
@@ -334,7 +326,10 @@
 		widget['div'].resizable({
 			handles: handles,
 			autoHide: true,
+			scroll: false,
+			minWidth: getCurrentCellWidth(data),
 			start: function(event, ui) {
+				data['pos-action'] = 'resize';
 				startWidgetPositioning($(event.target), data);
 			},
 			resize: function(event, ui) {
@@ -1129,7 +1124,7 @@
 				data['widgets'].push(widget);
 				$this.append(widget['div']);
 
-				setDivPosition(widget['div'], data, widget['pos']);
+				setDivPosition(widget['div'], data, widget['pos'], false);
 				checkWidgetOverlap($this, data, widget);
 
 				resizeDashboardGrid($this, data);

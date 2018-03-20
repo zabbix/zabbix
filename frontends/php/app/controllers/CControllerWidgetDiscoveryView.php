@@ -29,7 +29,8 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 		$this->setType(WIDGET_DISCOVERY_STATUS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -68,6 +69,7 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'drules' => $drules,
 			'error' => $error,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
