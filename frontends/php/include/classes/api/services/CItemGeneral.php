@@ -387,7 +387,7 @@ abstract class CItemGeneral extends CApiService {
 				$itemInterfaceType = itemTypeInterface($fullItem['type']);
 
 				if ($itemInterfaceType !== false) {
-					if (!$fullItem['interfaceid']) {
+					if (!array_key_exists('interfaceid', $fullItem) || !$fullItem['interfaceid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
 					}
 					elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
