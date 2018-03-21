@@ -140,14 +140,19 @@ $itemFormList->addRow(
 );
 
 // ITEM_TYPE_HTTPAGENT Request type.
-$request_method = $data['limited'] ? [new CVar('request_method', $data['request_method'])] : [];
-$request_method[] = (new CComboBox($data['limited'] ? '' : 'request_method', $data['request_method'], null, [
-	HTTPCHECK_REQUEST_GET => 'GET',
-	HTTPCHECK_REQUEST_POST => 'POST',
-	HTTPCHECK_REQUEST_PUT => 'PUT',
-	HTTPCHECK_REQUEST_HEAD => 'HEAD'
-]))->setEnabled(!$data['limited']);
-$itemFormList->addRow(new CLabel(_('Request type'), 'request_method'), $request_method, 'request_method_row');
+$itemFormList->addRow(
+	new CLabel(_('Request type'), 'request_method'),
+	[
+		$data['limited'] ? new CVar('request_method', $data['request_method']) : null,
+		(new CComboBox($data['limited'] ? '' : 'request_method', $data['request_method'], null, [
+			HTTPCHECK_REQUEST_GET => 'GET',
+			HTTPCHECK_REQUEST_POST => 'POST',
+			HTTPCHECK_REQUEST_PUT => 'PUT',
+			HTTPCHECK_REQUEST_HEAD => 'HEAD'
+		]))->setEnabled(!$data['limited'])
+	],
+	'request_method_row'
+);
 
 // ITEM_TYPE_HTTPAGENT Timeout field.
 $itemFormList->addRow(
@@ -276,13 +281,14 @@ $itemFormList->addRow(
 // ITEM_TYPE_HTTPAGENT HTTP authentication.
 $itemFormList->addRow(
 	new CLabel(_('HTTP authentication'), 'http_authtype'),
-	$data['limited']
-	? [
-		new CVar('http_authtype', $data['http_authtype'], 'http_authtype'),
-		(new CTextBox('http_typename', itemHttpAuthType($data['http_authtype']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	]
-	: new CComboBox('http_authtype', $data['http_authtype'], null, itemHttpAuthType()),
+	[
+		$data['limited'] ? new CVar('http_authtype', $data['http_authtype']) : null,
+		(new CComboBox($data['limited'] ? '' : 'http_authtype', $data['http_authtype'], null, [
+			HTTPTEST_AUTH_NONE => _('None'),
+			HTTPTEST_AUTH_BASIC => _('Basic'),
+			HTTPTEST_AUTH_NTLM => _('NTLM')
+		]))->setEnabled(!$data['limited'])
+	],
 	'http_authtype_row'
 );
 

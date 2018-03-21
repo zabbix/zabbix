@@ -115,27 +115,6 @@ function item_type2str($type = null) {
 }
 
 /**
- * Get available http agent authentication types as array or string for passed authentication type.
- *
- * @param int $single_value     Get label for defined type.
- *
- * @return array|string
- */
-function itemHttpAuthType($single_value = null) {
-	$http_auth = [
-		HTTPTEST_AUTH_NONE => _('None'),
-		HTTPTEST_AUTH_BASIC => _('Basic'),
-		HTTPTEST_AUTH_NTLM => _('NTLM')
-	];
-
-	if ($single_value === null) {
-		return $http_auth;
-	}
-
-	return array_key_exists($single_value, $http_auth) ? $http_auth[$single_value] : _('Unknown');
-}
-
-/**
  * Returns human readable an item value type
  *
  * @param int $valueType

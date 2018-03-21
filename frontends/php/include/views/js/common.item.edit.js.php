@@ -364,12 +364,6 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
-$data['http_auth_switcher'] = [];
-zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_BASIC, 'http_username_row');
-zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_BASIC, 'http_password_row');
-zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_username_row');
-zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_password_row');
-
 ?>
 <script type="text/javascript">
 	function setAuthTypeLabel() {
@@ -394,7 +388,10 @@ zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_passwor
 				<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
 		<?php } ?>
 		if (jQuery('#http_authtype').length) {
-			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue($data['http_auth_switcher'], true) ?>);
+			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue([
+				HTTPTEST_AUTH_BASIC => ['http_username_row', 'http_password_row'],
+				HTTPTEST_AUTH_NTLM => ['http_username_row', 'http_password_row']
+			], true) ?>);
 		}
 		<?php
 		if (!empty($this->data['securityLevelVisibility'])) { ?>
