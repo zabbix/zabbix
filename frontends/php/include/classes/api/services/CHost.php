@@ -797,6 +797,11 @@ class CHost extends CHostGeneral {
 			);
 		}
 
+		// Property 'compress' is not supported for hosts.
+		if (array_key_exists('compress', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+		}
+
 		/*
 		 * Update hosts properties
 		 */
