@@ -99,7 +99,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 				label: t('Latest data'),
 				url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid).getUrl()
 			},
-			// triggers
+			// problems
 			problems = {
 				label: t('Problems')
 			},
