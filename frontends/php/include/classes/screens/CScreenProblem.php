@@ -171,12 +171,13 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $config['search_limit']
 	 * @param int    $config['event_ack_enable']
 	 * @param bool   $get_comments
+	 * @param bool   $select_dependencies						 Returns dependencies for selected triggers.
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, array $config, $get_comments = false) {
+	public static function getData(array $filter, array $config, $get_comments = false, $select_dependencies = false) {
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
@@ -328,7 +329,6 @@ class CScreenProblem extends CScreenBase {
 						'selectHosts' => ['hostid', 'name', 'status'],
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 						'triggerids' => array_keys($triggerids),
-						'selectDependencies' => ['triggerid'],
 						'monitored' => true,
 						'skipDependent' => true,
 						'preservekeys' => true
@@ -339,6 +339,9 @@ class CScreenProblem extends CScreenBase {
 					}
 					if ($get_comments) {
 						$options['output'][] = 'comments';
+					}
+					if ($select_dependencies) {
+						$options['selectDependencies'] = ['triggerid'];
 					}
 					if (array_key_exists('maintenance', $filter) && $filter['maintenance'] == 0) {
 						$options['maintenance'] = false;
@@ -688,7 +691,7 @@ class CScreenProblem extends CScreenBase {
 			->setArgument('action', 'problem.view')
 			->setArgument('fullscreen', $this->data['fullscreen']);
 
-		$data = self::getData($this->data['filter'], $this->config);
+		$data = self::getData($this->data['filter'], $this->config, false, true);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
 
 		$paging = getPagingLine($data['problems'], ZBX_SORT_UP, clone $url);
