@@ -150,7 +150,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param string $filter['inventory'][]['field']
 	 * @param string $filter['inventory'][]['value']
 	 * @param string $filter['application']           (optional)
-	 * @param string $filter['name']				  (optional)
+	 * @param string $filter['name']                  (optional)
 	 * @param int    $filter['show']                  TRIGGERS_OPTION_*
 	 * @param int    $filter['stime']                 (optional) usable together with 'period' and only for
 	 *                                                           TRIGGERS_OPTION_ALL
@@ -171,7 +171,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $config['search_limit']
 	 * @param int    $config['event_ack_enable']
 	 * @param bool   $get_comments
-	 * @param bool   $select_dependencies						 Returns dependencies for selected triggers.
+	 * @param bool   $select_dependencies             Returns dependencies for selected triggers.
 	 *
 	 * @static
 	 *
