@@ -768,8 +768,20 @@ function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TA
 		if ($html) {
 			// Show first n tags and "..." with hint box if there are more.
 
+			$filter_tags = [];
+			$event_tags = $event['tags'];
+
+			foreach ($event_tags as $t => $tag) {
+				if (array_key_exists('priority', $tag)) {
+					$filter_tags[] = $tag;
+					unset($event_tags[$t]);
+				}
+			}
+
+			$event_tags = $filter_tags + $event_tags;
+
 			$tags_count = count($event['tags']);
-			$tags_shown = array_slice($event['tags'], 0, $list_tags_count);
+			$tags_shown = array_slice($event_tags, 0, $list_tags_count);
 
 			foreach ($tags_shown as $tag) {
 				$value = $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);

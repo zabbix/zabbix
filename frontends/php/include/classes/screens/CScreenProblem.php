@@ -764,6 +764,17 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			if ($this->data['filter']['show_tags']) {
+				foreach ($data['problems'] as $p => $problem) {
+					foreach ($problem['tags'] as $t => $tag) {
+						foreach ($this->data['filter']['tags'] as $filter_tag) {
+							if ($filter_tag['tag'] == $tag['tag'] && ($filter_tag['value'] == ''
+									|| stripos($tag['value'], $filter_tag['value']) !== false)) {
+								$data['problems'][$p]['tags'][$t]['priority'] = 1;
+							}
+						}
+					}
+				}
+
 				$tags = makeEventsTags($data['problems'], true, $this->data['filter']['show_tags']);
 			}
 
