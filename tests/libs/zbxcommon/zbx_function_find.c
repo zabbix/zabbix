@@ -114,19 +114,19 @@ void	zbx_mock_test_entry(void **state)
 	{
 		if (func_pos != func_pos_exp)
 		{
-			fail_msg("Position "ZBX_FS_UI64" of 'function' not equal expected "ZBX_FS_UI64". Error:%s",
+			fail_msg("Position "ZBX_FS_SIZE_T" of 'function' not equal expected "ZBX_FS_SIZE_T". Error:%s",
 				func_pos, func_pos_exp, error_text);
 		}
 
 		if (par_l != par_l_exp)
 		{
-			fail_msg("Position "ZBX_FS_UI64" of left '(' not equal expected "ZBX_FS_UI64". Error:%s",
+			fail_msg("Position "ZBX_FS_SIZE_T" of left '(' not equal expected "ZBX_FS_SIZE_T". Error:%s",
 				par_l, par_l_exp, error_text);
 		}
 
 		if (par_r != par_r_exp)
 		{
-			fail_msg("Position "ZBX_FS_UI64" of right ')' not equal expected "ZBX_FS_UI64". Error:%s",
+			fail_msg("Position "ZBX_FS_SIZE_T" of right ')' not equal expected "ZBX_FS_SIZE_T". Error:%s",
 				par_r, par_r_exp, error_text);
 		}
 	}
