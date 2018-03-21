@@ -115,7 +115,7 @@ void	zbx_mock_test_entry(void **state)
 		if (func_pos != func_pos_exp)
 		{
 			fail_msg("Position "ZBX_FS_UI64" of 'function' not equal expected "ZBX_FS_UI64". Error:%s",
-				func_pos, func_pos_exp,	error_text);
+				func_pos, func_pos_exp, error_text);
 		}
 
 		if (par_l != par_l_exp)
