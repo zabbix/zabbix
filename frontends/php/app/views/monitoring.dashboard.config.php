@@ -128,6 +128,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'dstfld1' => $field->getName().'_',
 			'srcfld1' => 'itemid',
 			'real_hosts' => '1',
+			'with_webitems' => '1',
 			'multiselect' => '1',
 			'selectLimit' => $field->getValuesLimit()
 		];

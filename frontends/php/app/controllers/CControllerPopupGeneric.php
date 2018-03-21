@@ -356,6 +356,7 @@ class CControllerPopupGeneric extends CController {
 			'with_simple_graph_items' =>	'in 1',
 			'with_triggers' =>				'in 1',
 			'with_monitored_triggers' =>	'in 1',
+			'with_webitems' =>	            'in 1',
 			'itemtype' =>					'in '.implode(',', $this->allowed_item_types),
 			'value_types' =>				'array',
 			'numeric' =>					'in 1',
@@ -363,8 +364,7 @@ class CControllerPopupGeneric extends CController {
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
 			'submit_parent' =>				'in 1',
-			'templateid' =>					'db hosts.hostid',
-			'with_webitems' =>				'in 1'
+			'templateid' =>					'db hosts.hostid'
 		];
 
 		// Set destination and source field validation roles.
