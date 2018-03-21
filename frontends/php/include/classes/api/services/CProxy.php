@@ -212,6 +212,9 @@ class CProxy extends CApiService {
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)) {
 				$proxy['interface']['main'] = INTERFACE_PRIMARY;
 			}
+
+			// Newly created proxies will use compression by default.
+			$proxy['compress'] = HOST_COMPRESSION_ON;
 		}
 		unset($proxy);
 
@@ -676,6 +679,11 @@ class CProxy extends CApiService {
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
 				$hostids = array_merge($hostids, zbx_objectValues($proxy['hosts'], 'hostid'));
 			}
+
+			// Propery 'compress' is read-only.
+			if (array_key_exists('compress', $proxy)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
 		}
 
 		if ($hostids) {
@@ -735,6 +743,11 @@ class CProxy extends CApiService {
 				if ($proxy['host'] !== $db_proxies[$proxy['proxyid']]['host']) {
 					$names[$proxy['host']] = true;
 				}
+			}
+
+			// Propery 'compress' is read-only.
+			if (array_key_exists('compress', $proxy)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
 

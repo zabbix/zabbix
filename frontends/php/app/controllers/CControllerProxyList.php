@@ -105,7 +105,7 @@ class CControllerProxyList extends CController {
 		$data['paging'] = getPagingLine($data['proxies'], $sortOrder, $url);
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept'],
+			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'compress'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'proxyids' => array_keys($data['proxies']),
 			'editable' => true,
