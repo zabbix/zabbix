@@ -55,7 +55,7 @@ if ($data['widget']['initial_load'] == 1) {
 			'function zbx_graph_widget_resize_end(img_id) {'.
 				'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
 					'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
-					'new_width = content.width(),'.
+					'new_width = content.width() - 1,'.
 					'new_height = content.height() - 4,'.
 					'src = jQuery("#"+img_id).attr("src");'.
 

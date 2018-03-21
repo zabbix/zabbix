@@ -171,7 +171,7 @@ var timeControl = {
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
 					var graphUrl = new Curl(obj.src);
 					graphUrl.unsetArgument('sid');
-					graphUrl.setArgument('width', obj.objDims.width);
+					graphUrl.setArgument('width', obj.objDims.width - 1);
 
 					obj.src = graphUrl.getUrl();
 				}
