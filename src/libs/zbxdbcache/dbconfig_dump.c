@@ -131,8 +131,6 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 					host->tls_dc_psk->refcount);
 		}
 #endif
-		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", host->proxy_address);
-
 		for (j = 0; j < host->interfaces_v.values_num; j++)
 		{
 			ZBX_DC_INTERFACE	*interface = (ZBX_DC_INTERFACE *)host->interfaces_v.values[j];
@@ -170,6 +168,9 @@ static void	DCdump_proxies(ZBX_DC_CONFIG *config)
 		proxy = (ZBX_DC_PROXY *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " timediff:%d location:%u", proxy->hostid,
 				proxy->timediff, proxy->location);
+		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", proxy->proxy_address);
+		zabbix_log(LOG_LEVEL_TRACE, "  compres:%d", proxy->compress);
+
 	}
 
 	zbx_vector_ptr_destroy(&index);

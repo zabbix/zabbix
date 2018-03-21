@@ -43,7 +43,8 @@ SERVER_SUBDIRS = \
 	zbxmedia \
 	zbxself \
 	zbxtasks \
-	zbxhistory
+	zbxhistory \
+	zbxcompress
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -58,7 +59,8 @@ PROXY_SUBDIRS = \
 	zbxicmpping \
 	zbxself \
 	zbxtasks \
-	zbxhistory
+	zbxhistory \
+	zbxcompress
 endif
 endif
 

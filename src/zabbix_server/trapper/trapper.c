@@ -172,7 +172,8 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		goto out;
 	}
 
-	zbx_proxy_update_version(&proxy, jp);
+	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
 	if (SUCCEED != (ret = process_proxy_history_data(&proxy, jp, ts, &error)))
 	{
@@ -180,10 +181,8 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 				proxy.host, sock->peer, error);
 		goto out;
 	}
-
-	update_proxy_lastaccess(proxy.hostid, time(NULL));
 out:
-	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+	zbx_send_response_ext(sock, ret, error, NULL, sock->protocol, CONFIG_TIMEOUT);
 
 	zbx_free(error);
 
@@ -228,9 +227,9 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_proxy_heartbeat";
 
-	char		*error = NULL;
-	int		ret;
-	DC_PROXY	proxy;
+	char			*error = NULL;
+	int			ret;
+	DC_PROXY		proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -248,11 +247,10 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_proxy_update_version(&proxy, jp);
-
-	update_proxy_lastaccess(proxy.hostid, time(NULL));
+	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 out:
-	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+	zbx_send_response_ext(sock, ret, error, NULL, sock->protocol, CONFIG_TIMEOUT);
 
 	zbx_free(error);
 

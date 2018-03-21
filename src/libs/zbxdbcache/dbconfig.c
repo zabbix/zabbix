@@ -1077,7 +1077,6 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		DCstrpool_replace(found, &host->proxy_address, row[35]);
 		DCstrpool_replace(found, &host->tls_issuer, row[31]);
 		DCstrpool_replace(found, &host->tls_subject, row[32]);
 
@@ -1267,8 +1266,6 @@ done:
 				zbx_hashset_insert(&psk_owners, &psk_owner_local, sizeof(psk_owner_local));
 			}
 		}
-#else
-		DCstrpool_replace(found, &host->proxy_address, row[31]);
 #endif
 		ZBX_STR2UCHAR(host->tls_connect, row[29]);
 		ZBX_STR2UCHAR(host->tls_accept, row[30]);
@@ -1378,6 +1375,9 @@ done:
 				proxy->last_cfg_error_time = 0;
 			}
 
+			proxy->compress = atoi(row[32 + ZBX_HOST_TLS_OFFSET]);
+			DCstrpool_replace(found, &proxy->proxy_address, row[31 + ZBX_HOST_TLS_OFFSET]);
+
 			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
 			{
 				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
@@ -1403,6 +1403,7 @@ done:
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
 
+			zbx_strpool_release(proxy->proxy_address);
 			zbx_hashset_remove_direct(&config->proxies, proxy);
 		}
 
@@ -1437,6 +1438,7 @@ done:
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
 
+			zbx_strpool_release(proxy->proxy_address);
 			zbx_hashset_remove_direct(&config->proxies, proxy);
 		}
 
@@ -1467,7 +1469,6 @@ done:
 
 		zbx_strpool_release(host->host);
 		zbx_strpool_release(host->name);
-		zbx_strpool_release(host->proxy_address);
 
 		zbx_strpool_release(host->error);
 		zbx_strpool_release(host->snmp_error);
@@ -8432,11 +8433,13 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
 	dst_proxy->version = src_proxy->version;
+	dst_proxy->lastaccess = src_proxy->lastaccess;
+	dst_proxy->compress = src_proxy->compress;
 
 	if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
 		strscpy(dst_proxy->host, host->host);
-		strscpy(dst_proxy->proxy_address, host->proxy_address);
+		strscpy(dst_proxy->proxy_address, src_proxy->proxy_address);
 
 		dst_proxy->tls_connect = host->tls_connect;
 		dst_proxy->tls_accept = host->tls_accept;
@@ -10789,29 +10792,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_update_proxy_version                                      *
- *                                                                            *
- * Purpose: updates proxy version in configuration cache                      *
- *                                                                            *
- * Parameters:                                                                *
- *     hostid  - [IN] the proxy identifier                                    *
- *     version - [IN] the new proxy version                                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version)
-{
-	ZBX_DC_PROXY	*dc_proxy;
-
-	LOCK_CACHE;
-
-	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		dc_proxy->version = version;
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dc_items_update_nextcheck                                    *
  *                                                                            *
  * Purpose: updates item nextcheck values in configuration cache              *
@@ -10855,57 +10835,6 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 	}
 
 	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_dc_update_proxy_lastaccess                                   *
- *                                                                            *
- * Purpose: updates proxy last access timestamp in configuration cache        *
- *                                                                            *
- * Parameter: hostid     - [IN] the proxy identifier (hostid)                 *
- *            lastaccess - [IN] the last time proxy data was received/sent    *
- *            proxy_diff - [OUT] last access updates for proxies that need    *
- *                               to be synced with database                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess, zbx_vector_uint64_pair_t *proxy_diff)
-{
-	ZBX_DC_PROXY	*proxy;
-	int		now;
-
-	LOCK_CACHE;
-
-	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-	{
-		if (lastaccess < config->proxy_lastaccess_ts)
-			proxy->lastaccess = config->proxy_lastaccess_ts;
-		else
-			proxy->lastaccess = lastaccess;
-	}
-
-	if (ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY < (now = time(NULL)) - config->proxy_lastaccess_ts)
-	{
-		zbx_hashset_iter_t	iter;
-
-		zbx_hashset_iter_reset(&config->proxies, &iter);
-
-		while (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
-		{
-			if (proxy->lastaccess >= config->proxy_lastaccess_ts)
-			{
-				zbx_uint64_pair_t	pair = {proxy->hostid, proxy->lastaccess};
-
-				zbx_vector_uint64_pair_append(proxy_diff, pair);
-			}
-		}
-
-		config->proxy_lastaccess_ts = now;
-	}
-
-	UNLOCK_CACHE;
-
-	zbx_vector_uint64_pair_sort(proxy_diff, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -11199,3 +11128,97 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 	UNLOCK_CACHE;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_update_proxy                                              *
+ *                                                                            *
+ * Purpose: updates changed proxy data in configuration cache and updates     *
+ *          diff flags to reflect the updated data                            *
+ *                                                                            *
+ * Parameter: diff - [IN/OUT] the properties to update                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
+{
+	ZBX_DC_PROXY	*proxy;
+
+	LOCK_CACHE;
+
+	if (diff->lastaccess < config->proxy_lastaccess_ts)
+		diff->lastaccess = config->proxy_lastaccess_ts;
+
+	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &diff->hostid)))
+	{
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS))
+		{
+			if (proxy->lastaccess != diff->lastaccess)
+				proxy->lastaccess = diff->lastaccess;
+
+			/* proxy last access in database is updated separately in  */
+			/* ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY bulks             */
+			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS);
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
+		{
+			if (proxy->version != diff->version)
+				proxy->version = diff->version;
+			else
+				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION);
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
+		{
+			if (proxy->compress != diff->compress)
+				proxy->compress = diff->compress;
+			else
+				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS);
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_proxy_lastaccess                                      *
+ *                                                                            *
+ * Purpose: returns proxy lastaccess changes since last lastaccess request    *
+ *                                                                            *
+ * Parameter: lastaccess - [OUT] last access updates for proxies that need    *
+ *                               to be synced with database, sorted by        *
+ *                               hostid                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
+{
+	ZBX_DC_PROXY	*proxy;
+	int		now;
+
+	if (ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY < (now = time(NULL)) - config->proxy_lastaccess_ts)
+	{
+		zbx_hashset_iter_t	iter;
+
+		LOCK_CACHE;
+
+		zbx_hashset_iter_reset(&config->proxies, &iter);
+
+		while (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
+		{
+			if (proxy->lastaccess >= config->proxy_lastaccess_ts)
+			{
+				zbx_uint64_pair_t	pair = {proxy->hostid, proxy->lastaccess};
+
+				zbx_vector_uint64_pair_append(lastaccess, pair);
+			}
+		}
+
+		config->proxy_lastaccess_ts = now;
+
+		UNLOCK_CACHE;
+
+		zbx_vector_uint64_pair_sort(lastaccess, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+}

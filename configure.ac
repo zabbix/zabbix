@@ -1425,15 +1425,25 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	if test "x$found_zlib" != "xyes"; then
 		AC_MSG_ERROR([Unable to use zlib (zlib check failed)])
 	fi
-	
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $ZLIB_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $ZLIB_LIBS"
-	
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $ZLIB_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $ZLIB_LIBS"
-	
+
 	AC_SUBST(ZLIB_CFLAGS)
 fi
+
+SERVER_LDFLAGS="$SERVER_LDFLAGS $ZLIB_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $ZLIB_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $ZLIB_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $ZLIB_LIBS"
+
+AGENT_LDFLAGS="$AGENT_LDFLAGS $ZLIB_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $ZLIB_LIBS"
+
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $ZLIB_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $ZLIB_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $ZLIB_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS"
+
 
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 
@@ -1730,6 +1740,7 @@ AC_OUTPUT([
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxipcservice/Makefile
 	src/libs/zbxhistory/Makefile
+	src/libs/zbxcompress/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile

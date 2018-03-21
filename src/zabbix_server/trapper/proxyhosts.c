@@ -58,7 +58,8 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_proxy_update_version(&proxy, jp);
+	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
 	if (SUCCEED != (ret = process_host_availability(jp, &error)))
 	{
