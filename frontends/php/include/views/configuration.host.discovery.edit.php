@@ -140,16 +140,14 @@ $itemFormList->addRow(
 );
 
 // ITEM_TYPE_HTTPAGENT Request type.
-$itemFormList->addRow(
-	new CLabel(_('Request type'), 'request_method'),
-	(new CComboBox('request_method', $data['request_method'], null, [
-		HTTPCHECK_REQUEST_GET => 'GET',
-		HTTPCHECK_REQUEST_POST => 'POST',
-		HTTPCHECK_REQUEST_PUT => 'PUT',
-		HTTPCHECK_REQUEST_HEAD => 'HEAD'
-	]))->setEnabled(!$data['limited']),
-	'request_method_row'
-);
+$request_method = $data['limited'] ? [new CVar('request_method', $data['request_method'])] : [];
+$request_method[] = (new CComboBox($data['limited'] ? '' : 'request_method', $data['request_method'], null, [
+	HTTPCHECK_REQUEST_GET => 'GET',
+	HTTPCHECK_REQUEST_POST => 'POST',
+	HTTPCHECK_REQUEST_PUT => 'PUT',
+	HTTPCHECK_REQUEST_HEAD => 'HEAD'
+]))->setEnabled(!$data['limited']);
+$itemFormList->addRow(new CLabel(_('Request type'), 'request_method'), $request_method, 'request_method_row');
 
 // ITEM_TYPE_HTTPAGENT Timeout field.
 $itemFormList->addRow(

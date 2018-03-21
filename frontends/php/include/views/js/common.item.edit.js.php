@@ -286,7 +286,7 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DEPENDENT, 'row_maste
 $ui_rows = [
 	ITEM_TYPE_HTTPAGENT => [
 		'url_row', 'query_fields_row', 'request_method_row', 'timeout_row', 'post_type_row', 'posts_row', 'headers_row',
-		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'allow_traps_row',
+		'status_codes_row', 'follow_redirects_row', 'output_format_row', 'allow_traps_row', 'request_method',
 		'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row',
 		'ssl_key_file_row', 'ssl_cert_file_row', 'ssl_key_password_row'
 	]
@@ -401,6 +401,14 @@ zbx_subarray_push($data['http_auth_switcher'], HTTPTEST_AUTH_NTLM, 'http_passwor
 			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
 				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
 		<?php } ?>
+
+		if (jQuery('#request_method').length) {
+			new CViewSwitcher('request_method', 'change', <?= zbx_jsvalue([
+				HTTPCHECK_REQUEST_GET => ['retrieve_mode_row'],
+				HTTPCHECK_REQUEST_POST => ['retrieve_mode_row'],
+				HTTPCHECK_REQUEST_PUT => ['retrieve_mode_row'],
+			], true) ?>);
+		}
 
 		jQuery('#type')
 			.change(function() {
