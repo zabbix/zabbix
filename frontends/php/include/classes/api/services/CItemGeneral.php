@@ -1925,7 +1925,7 @@ abstract class CItemGeneral extends CApiService {
 		if (array_key_exists('post_type', $data)
 				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
 			$rules['posts'] = [
-				'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+				'type' => API_STRING_UTF8,
 				'length' => DB::getFieldLength('items', 'posts')
 			];
 		}
@@ -2003,16 +2003,25 @@ abstract class CItemGeneral extends CApiService {
 			if ($data['post_type'] == ZBX_POSTTYPE_XML
 					&& simplexml_load_string($posts, null, LIBXML_IMPORT_FLAGS) === false) {
 				$errors = libxml_get_errors();
-				$error = reset($errors);
 				libxml_clear_errors();
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.',
-					_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
-					$error->line, $error->column
-				)));
+				if (!$errors) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.', _('XML is empty')));
+				}
+				else {
+					$error = reset($errors);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.',
+						_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
+						$error->line, $error->column
+					)));
+				}
 			}
 
 			if ($data['post_type'] == ZBX_POSTTYPE_JSON) {
+				if (trim($posts, " \r\n") === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+				}
+
 				$types = [
 					'usermacros' => true,
 					'macros_n' => [

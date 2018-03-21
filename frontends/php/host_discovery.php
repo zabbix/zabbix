@@ -609,17 +609,6 @@ if (isset($_REQUEST['form'])) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 	}
 
-	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
-		// Convert hash to array where every item is hash for single key value pair as it is used by view.
-		$headers = [];
-
-		foreach ($data['headers'] as $key => $value) {
-			$headers[] = [$key => $value];
-		}
-
-		$data['headers'] = $headers;
-	}
-
 	// render view
 	$itemView = new CView('configuration.host.discovery.edit', $data);
 	$itemView->render();

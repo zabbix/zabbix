@@ -1454,16 +1454,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'webitems' => true
 			];
 		}
-		elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-			// Convert hash to array where every item is hash for single key value pair as it is used by view.
-			$headers = [];
-
-			foreach ($item['headers'] as $key => $value) {
-				$headers[] = [$key => $value];
-			}
-
-			$item['headers'] = $headers;
-		}
 	}
 	else {
 		$hosts = API::Host()->get([

@@ -1235,6 +1235,17 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
 
+		if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
+			// Convert hash to array where every item is hash for single key value pair as it is used by view.
+			$headers = [];
+
+			foreach ($data['headers'] as $key => $value) {
+				$headers[] = [$key => $value];
+			}
+
+			$data['headers'] = $headers;
+		}
+
 		if (!$data['is_discovery_rule']) {
 			$data['preprocessing'] = $data['item']['preprocessing'];
 			$data['output_format'] = $data['item']['output_format'];
