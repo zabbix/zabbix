@@ -524,7 +524,7 @@ static int	DBpatch_3050043(void)
 
 	res = DBexecute(
 		"update widget_field"
-		" set name = 'show_as_html'"
+		" set name='show_as_html'"
 		" where name='style'"
 			" and exists ("
 				"select null"
@@ -545,7 +545,7 @@ static int	DBpatch_3050044(void)
 
 	res = DBexecute(
 		"update widget_field"
-		" set name = 'itemids'"
+		" set name='itemids'"
 		" where name='itemid'"
 			" and exists ("
 				"select null"
