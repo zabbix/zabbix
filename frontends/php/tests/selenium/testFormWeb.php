@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1507,11 +1507,12 @@ class testFormWeb extends CWebTest {
 				$this->zbxTestClickWait('add_step');
 				$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 				$step = $item['step'].' step';
-				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $step);
+				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $step, false);
 				$url = $step.' url';
 				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $url);
 				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 				$this->zbxTestWaitForPageToLoad();
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 
 				if (isset($item['remove'])) {
 					$this->zbxTestClickWait('remove_0');

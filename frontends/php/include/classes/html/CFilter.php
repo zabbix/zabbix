@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ class CFilter extends CTag {
 	private $name = 'zbx_filter';
 	private $opened = true;
 	private $show_buttons = true;
+	private $hidden = false;
 
 	public function __construct($filterid) {
 		parent::__construct('div', true);
@@ -72,6 +73,13 @@ class CFilter extends CTag {
 
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+		return $this;
+	}
+
+	public function setHidden() {
+		$this->hidden = true;
+		$this->addStyle('display: none;');
+
 		return $this;
 	}
 
@@ -159,7 +167,7 @@ class CFilter extends CTag {
 	}
 
 	protected function startToString() {
-		$ret = $this->getHeader()->toString();
+		$ret = ($this->hidden == false) ? $this->getHeader()->toString() : '';
 		$ret .= parent::startToString();
 		return $ret;
 	}

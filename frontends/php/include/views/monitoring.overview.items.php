@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,12 +45,12 @@ $widget = (new CWidget())
 			->addItem([
 				new CLabel(_('Group'), 'groupid'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
+				$data['pageFilter']->getGroupsCB()
 			])
 			->addItem([
 				new CLabel(_('Type'), 'type'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('type', $this->data['type'], 'submit()', [
+				new CComboBox('type', $data['type'], 'submit()', [
 					SHOW_TRIGGERS => _('Triggers'),
 					SHOW_DATA => _('Data')
 				])
@@ -58,25 +58,25 @@ $widget = (new CWidget())
 			->addItem([
 				new CLabel(_('Hosts location'), 'view_style'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+				new CComboBox('view_style', $data['view_style'], 'submit()', [
 					STYLE_TOP => _('Top'),
 					STYLE_LEFT => _('Left')
 				])
 			])
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 			->addItem($help)
 		)
 	);
 
 // filter
 $filter = (new CFilter('web.overview.filter.state'))
-	->addVar('fullscreen', $this->data['fullscreen']);
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $column = new CFormList();
 
 // application
 $column->addRow(_('Application'), [
-	(new CTextBox('application', $this->data['filter']['application']))
+	(new CTextBox('application', $data['filter']['application']))
 		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -90,7 +90,7 @@ $column->addRow(_('Application'), [
 				'dstfld1' => 'application',
 				'real_hosts' => '1',
 				'with_applications' => '1'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 
@@ -100,8 +100,8 @@ $widget->addItem($filter);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
-	$groupids = ($this->data['pageFilter']->groupids !== null) ? $this->data['pageFilter']->groupids : [];
-	$table = getItemsDataOverview($groupids, $this->data['filter']['application'], $this->data['view_style']);
+	$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
+	$table = getItemsDataOverview($groupids, $data['filter']['application'], $data['view_style'], $data['fullscreen']);
 }
 else {
 	$table = new CTableInfo();

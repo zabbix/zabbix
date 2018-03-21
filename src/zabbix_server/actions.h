@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ zbx_ack_escalation_t;
 
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition);
 void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint64_pair_t *closed_events);
-int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks);
+int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks);
 void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actions);
 void	free_db_action(DB_ACTION *action);
 

@@ -19,7 +19,7 @@ EXTRA_DIST = \
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
-	@zabbix_revision=`svn info|grep "Last Changed Rev"|awk '{print $$4;}'`; \
+	@zabbix_revision=`svn info $(top_srcdir)|sed -n -e "/Last Changed Rev:/s/.*: \([[0-9]]*\)/\1/p"`; \
 	cat $(top_distdir)/include/version.h|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > $(top_distdir)/include/version.h.new; \
 	mv $(top_distdir)/include/version.h.new $(top_distdir)/include/version.h; \
 	cat $(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > \
@@ -130,17 +130,24 @@ WRAP_FS_FUNCS = \
 WRAP_EXIT = \
 	-Wl,--wrap=exit
 
+WRAP_COMM_FUNCS = \
+	-Wl,--wrap=read \
+	-Wl,--wrap=connect
+
 COMMON_WRAP_FUNCS = \
 	$(WRAP_DB_FUNCS) \
 	$(WRAP_IO_FUNCS) \
 	$(WRAP_FS_FUNCS) \
-	$(WRAP_EXIT)
+	$(WRAP_EXIT) \
+	$(WRAP_COMM_FUNCS)
 
-tests:
+tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml" && \
-	./tests_run.pl
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml"
+
+tests: tests_build
+	tests/tests_run.pl
 endif
 
 .PHONY: test tests

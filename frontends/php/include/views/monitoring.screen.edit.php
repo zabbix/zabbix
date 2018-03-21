@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,16 +91,21 @@ if (!$data['screen']['templateid']) {
 		$multiselect_data['data'] = $owner_data;
 
 		// Append multiselect to screen tab.
-		$screen_tab->addRow(_('Owner'),
-			(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		$screen_tab->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
+			(new CMultiSelect($multiselect_data))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
 		);
 	}
 	else {
-		$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$multiselect_userid = (new CMultiSelect($multiselect_data))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired();
 
 		// Administrators can change screen owner, but cannot see users from other groups.
 		if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-			$screen_tab->addRow(_('Owner'), $multiselect_userid)
+			$screen_tab
+				->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect_userid)
 				->addRow('', _('Inaccessible user'), 'inaccessible_user');
 		}
 		else {
@@ -115,16 +120,22 @@ if (!$data['screen']['templateid']) {
 	}
 }
 
-$screen_tab->addRow(_('Name'),
+$screen_tab->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['screen']['name']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Columns'),
-		(new CNumericBox('hsize', $data['screen']['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Columns'), 'hsize'))->setAsteriskMark(),
+		(new CNumericBox('hsize', $data['screen']['hsize'], 3))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Rows'),
-		(new CNumericBox('vsize', $data['screen']['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Rows'), 'vsize'))->setAsteriskMark(),
+		(new CNumericBox('vsize', $data['screen']['vsize'], 3))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	);
 
 // append tab to form
@@ -143,7 +154,7 @@ if (!$data['screen']['templateid']) {
 				'srcfld2' => 'name',
 				'dstfrm' => $form->getName(),
 				'multiselect' => '1'
-			]).');'
+			]).', null, this);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -179,7 +190,7 @@ if (!$data['screen']['templateid']) {
 				'srcfld2' => 'fullname',
 				'dstfrm' => $form->getName(),
 				'multiselect' => '1'
-			]).');'
+			]).', null, this);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)]);
 

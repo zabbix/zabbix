@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2363,12 +2363,13 @@ out:
  * Function: lld_templates_link                                               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_templates_link(const zbx_vector_ptr_t *hosts)
+static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 {
 	const char	*__function_name = "lld_templates_link";
 
 	int		i;
 	zbx_lld_host_t	*host;
+	char		*err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2380,10 +2381,22 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts)
 			continue;
 
 		if (0 != host->del_templateids.values_num)
-			DBdelete_template_elements(host->hostid, &host->del_templateids);
+		{
+			if (SUCCEED != DBdelete_template_elements(host->hostid, &host->del_templateids, &err))
+			{
+				*error = zbx_strdcatf(*error, "Cannot unlink template: %s.\n", err);
+				zbx_free(err);
+			}
+		}
 
 		if (0 != host->lnk_templateids.values_num)
-			DBcopy_template_elements(host->hostid, &host->lnk_templateids);
+		{
+			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, &err))
+			{
+				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);
+				zbx_free(err);
+			}
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -3152,7 +3165,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 				&del_hostmacroids);
 
 		/* linking of the templates */
-		lld_templates_link(&hosts);
+		lld_templates_link(&hosts, error);
 
 		lld_hosts_remove(&hosts, lifetime, lastcheck);
 		lld_groups_remove(&groups, lifetime, lastcheck);

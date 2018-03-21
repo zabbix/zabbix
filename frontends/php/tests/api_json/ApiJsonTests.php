@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,13 @@ require_once dirname(__FILE__).'/testHostGroup.php';
 require_once dirname(__FILE__).'/testIconMap.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testScripts.php';
+require_once dirname(__FILE__).'/testTaskCreate.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
+require_once dirname(__FILE__).'/testMap.php';
 
 class ApiJsonTests {
 	public static function suite() {
@@ -47,11 +49,13 @@ class ApiJsonTests {
 		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testScripts');
+		$suite->addTestSuite('testTaskCreate');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
 		$suite->addTestSuite('testWebScenario');
+		$suite->addTestSuite('testMap');
 
 		return $suite;
 	}

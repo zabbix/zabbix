@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -921,6 +921,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']//select[@name='hostid']"));
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
 			$this->zbxTestClickLinkText($this->itemSimple);
@@ -935,6 +936,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']//select[@name='hostid']"));
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
 			$this->zbxTestClickLinkText($this->itemSimple);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,30 +30,16 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestLogin('hostgroups.php?form=Create+host+group');
 		$this->zbxTestCheckTitle('Configuration of host groups');
 		$this->zbxTestCheckHeader('Host groups');
-		$this->zbxTestTextPresent(['Group name', 'Hosts', 'Hosts in', 'Other hosts | Group']);
+		$this->zbxTestTextPresent(['Group name']);
 
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
 
-		$this->zbxTestAssertElementPresentId('twb_groupid');
-
-		$this->zbxTestAssertElementPresentId('hosts_left');
-		$this->zbxTestAssertAttribute("//select[@id='hosts_left']", 'size', 25);
-		$this->zbxTestAssertAttribute("//select[@id='hosts_left']", 'style', 'width: 280px;');
-
-		$this->zbxTestAssertElementPresentId('add');
-		$this->zbxTestAssertElementPresentId('remove');
-
-		$this->zbxTestAssertElementPresentId('hosts_right');
-		$this->zbxTestAssertAttribute("//select[@id='hosts_right']", 'size', 25);
-		$this->zbxTestAssertAttribute("//select[@id='hosts_right']", 'style', 'width: 280px;');
-
 		$this->zbxTestAssertElementPresentXpath("//button[@id='add' and @type='submit']");
 		$this->zbxTestAssertElementNotPresentId('clone');
 		$this->zbxTestAssertElementNotPresentId('delete');
 		$this->zbxTestAssertElementPresentId('cancel');
-
 	}
 
 	public function testFormHostGroup_CreateEmpty() {

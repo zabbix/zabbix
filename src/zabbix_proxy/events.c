@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,6 +74,16 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 	THIS_SHOULD_NEVER_HAPPEN;
 	return 0;
+}
+
+void	zbx_clean_events(void)
+{
+	THIS_SHOULD_NEVER_HAPPEN;
+}
+
+void	zbx_export_events(void)
+{
+	THIS_SHOULD_NEVER_HAPPEN;
 }
 
 int	zbx_flush_correlated_events(void)

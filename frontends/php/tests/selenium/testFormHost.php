@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,8 +118,8 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host');
-		$this->zbxTestTextPresent('Host "'.$host.'" cannot be without host group.');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+		$this->zbxTestTextPresent('Field "groups" is mandatory.');
 
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ $filterColumn->addRow(_('Recipient'), [
 				'srcfld1' => 'alias',
 				'dstfrm' => 'zbx_filter',
 				'dstfld1' => 'alias'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 
@@ -102,8 +102,8 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])
-		? [bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), $alert['sendto']]
-		: $alert['sendto'];
+		? [bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
+		: zbx_nl2br($alert['sendto']);
 
 	$auditTable->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),

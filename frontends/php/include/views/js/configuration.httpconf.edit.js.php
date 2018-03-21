@@ -42,7 +42,7 @@
 			allPairs = {};
 
 		/**
-		 * Creates HTML for parir, inserts it in page
+		 * Creates HTML for pair, inserts it in page.
 		 *
 		 * @param {string}	formid	Id of current form HTML form element.
 		 * @param {object}	pair	Object with pair data.
@@ -169,13 +169,18 @@
 			/**
 			 * Delete pair with given ID from allPairs.
 			 *
-			 * @param {number}	pairId		Id of current form HTML form element.
+			 * @param {number}	pairId		Id of pair, that should be removed.
 			 */
 			remove: function(pairId) {
 				delete allPairs[pairId];
 				refreshContainers();
 			},
 
+			/**
+			 * Add listeners to HTML elements in web scenario and web step forms.
+			 *
+			 * @param {string}	formid		Id of current form HTML form element.
+			 */
 			initControls: function(formid) {
 				var $form = jQuery('#'+formid);
 				$form.on('click', 'button.remove', function() {
@@ -219,6 +224,9 @@
 					.trigger('change');
 			},
 
+			/**
+			 * Makes sortable handler inactive, if nothing to sort.
+			 */
 			refresh: function() {
 				refreshContainers();
 			},
@@ -273,7 +281,12 @@
 				refreshContainers();
 			},
 
-			// Removes all new pairs with empty name and value (of given type withing given form).
+			/**
+			 * Removes all new pairs with empty name and value (of given type withing given form).
+			 *
+			 * @param {string}	formid	Id of current form HTML element.
+			 * @param {string}	type	Type of pairs that should be cleaned.
+			 */
 			cleanup: function(formid, type) {
 				var pairs = this.getPairsByType(formid, type);
 
@@ -285,7 +298,12 @@
 				}
 			},
 
-			// Finds all pairs of given type within given form.
+			/**
+			 * Finds all pairs of given type within given form.
+			 *
+			 * @param {string}	formid	Id of current form HTML element.
+			 * @param {string}	type	Type of pairs that should be found.
+			 */
 			getPairsByType: function(formid, type) {
 				var	pairs = [],
 					existingPairs = Object.keys(allPairs);
@@ -319,6 +337,11 @@
 		};
 	}());
 
+	/**
+	 * Removes step, when Remove button in step is clicked.
+	 *
+	 * @param {obj}	obj	Step remove button object.
+	 */
 	function removeStep(obj) {
 		var step = obj.getAttribute('remove_step'),
 			table = jQuery('#httpStepTable');
@@ -336,7 +359,8 @@
 		recalculateSortOrder();
 	}
 
-	/* Changes ID's of steps in table (data in row and all hidden fields with step data),
+	/**
+	 * Changes ID's of steps in table (data in row and all hidden fields with step data),
 	 * after one of existing steps is deleted.
 	 */
 	function recalculateSortOrder() {
@@ -442,7 +466,7 @@
 
 		// Http step add pop up.
 		<?php if (!$this->data['templated']) : ?>
-			$('#add_step').click(function() {
+			$('#add_step').click(function(event) {
 				var form = $(this).parents('form');
 
 				// Append existing step names.
@@ -456,13 +480,13 @@
 					popup_options['steps_names'] = step_names;
 				}
 
-				return PopUp('popup.httpstep', popup_options);
+				return PopUp('popup.httpstep', popup_options, null, event.target);
 			});
 		<?php endif ?>
 
 		// Http step edit pop up.
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
-			$('#name_<?= $i ?>').click(function() {
+			$('#name_<?= $i ?>').click(function(event) {
 				// Append existing step names.
 				var step_names = [];
 				var form = $(this).parents('form');
@@ -493,7 +517,7 @@
 
 				return PopUp('popup.httpstep',jQuery.extend(popup_options,{
 					stepid: jQuery(this).attr('name_step')
-				}));
+				}), null, event.target);
 			});
 		<?php endforeach ?>
 
@@ -516,7 +540,12 @@
 		$('#authentication').trigger('change');
 	});
 
-	// Inital post time selection.
+	/**
+	 * Inital post type selection for "Post type" field.
+	 *
+	 * @param {string}	formid	Id of current form HTML element.
+	 * @param {int}		type	Value for "Post type" field.
+	 */
 	function setPostType(formid, type) {
 		var $form = jQuery('#'+formid);
 		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
@@ -531,6 +560,12 @@
 		jQuery('input[name="post_type"][value="' + type + '"]', $form).prop('checked', true);
 	}
 
+	/**
+	 * Converts "Form data" pairs to "Raw data" text and vice versa for post values.
+	 *
+	 * @param {string}	formid	Id of current form HTML element.
+	 * @param {int}		type	New value for "Post type" field.
+	 */
 	function switchToPostType(formid, type) {
 		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
 			var	posts = jQuery('#posts', jQuery('#'+formid)).val(),
@@ -636,7 +671,11 @@
 		setPostType(formid, type);
 	}
 
-	// Parse actin for URL field.
+	/**
+	 * Parse action for URL field. Parses "URL" field string to "Query fields" pairs.
+	 *
+	 * @param {string}	formid	Id of current form HTML element.
+	 */
 	function parseUrl(formid) {
 		var i,
 			query,
@@ -718,6 +757,12 @@
 		target.val(url);
 	}
 
+	/**
+	 * Adds new step to web scenario form with data from popup.
+	 *
+	 * @param {string}	formname	Web monitoring scenario form name.
+	 * @param {obj}		httpstep	Object with web scenario step values.
+	 */
 	function add_httpstep(formname, httpstep) {
 		var form = window.document.forms[formname];
 		if (!form) {
@@ -740,6 +785,13 @@
 		return true;
 	}
 
+	/**
+	 * Updates existing step in web scenario form with data from popup.
+	 *
+	 * @param {string}	formname	Web monitoring scenario form name.
+	 * @param {string}	list_name	List name.
+	 * @param {obj}		httpstep	Object with web scenario step values.
+	 */
 	function update_httpstep(formname, list_name, httpstep) {
 		var prefix,
 			form = window.document.forms[formname];
@@ -765,6 +817,13 @@
 		return true;
 	}
 
+	/**
+	 * Adds step value as hidden field to web scenario form.
+	 *
+	 * @param {obj}		obj		Web monitoring scenario form name.
+	 * @param {string}	name	Field or single pair name.
+	 * @param {mixed}	value	Value that will be added for field with given name.
+	 */
 	function add_var_to_opener_obj(obj, name, value) {
 		var input = window.document.createElement('input');
 
@@ -774,6 +833,14 @@
 		obj.appendChild(input);
 	}
 
+	/**
+	 * Prepares names for web scenario step pairs to be added to web scenario form.
+	 * Removes all previous steps, before adding new.
+	 *
+	 * @param {obj}		obj			Web monitoring scenario form name.
+	 * @param {string}	name		Field name.
+	 * @param {obj}		stepPairs	Object with web scenario step values.
+	 */
 	function addPairsToOpenerObject(obj, name, stepPairs) {
 		var prefix,
 			keys,

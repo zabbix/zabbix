@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -181,9 +181,9 @@ function getSystemStatusData(array $filter, array $config) {
 		// Get acknowledges and tags.
 		$problems_data = ($config['event_ack_enable']
 				&& in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))
-			? API::Problem()->get([
+			? API::Event()->get([
 				'output' => [],
-				'selectAcknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
+				'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
 				'eventids' => array_keys($problems),
 				'preservekeys' => true
 			])
@@ -361,8 +361,7 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 
 			$allTriggersNum = $stat['count'];
 			if ($allTriggersNum) {
-				$allTriggersNum = (new CSpan($allTriggersNum))
-					->addClass(ZBX_STYLE_LINK_ACTION)
+				$allTriggersNum = (new CLinkAction($allTriggersNum))
 					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $backurl, $data['actions'],
 						$config
 					));
@@ -370,8 +369,7 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 
 			$unackTriggersNum = $stat['count_unack'];
 			if ($unackTriggersNum) {
-				$unackTriggersNum = (new CSpan($unackTriggersNum))
-					->addClass(ZBX_STYLE_LINK_ACTION)
+				$unackTriggersNum = (new CLinkAction($unackTriggersNum))
 					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $backurl, $data['actions'],
 						$config
 					));
@@ -629,8 +627,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		foreach ($trigger['hosts'] as $trigger_host) {
 			$host = $hosts[$trigger_host['hostid']];
 
-			$host_name = (new CSpan($host['name']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
+			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -700,9 +697,8 @@ function make_latest_issues(array $filter = [], $backurl) {
 		// description
 		if (array_key_exists('lastEvent', $trigger) || $trigger['comments'] !== '' || $trigger['url'] !== '') {
 			$eventid = array_key_exists('lastEvent', $trigger) ? $trigger['lastEvent']['eventid'] : 0;
-			$description = (new CSpan($description))
-				->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $config),'', true, 'max-width: 500px')
-				->addClass(ZBX_STYLE_LINK_ACTION);
+			$description = (new CLinkAction($description))
+				->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $config),'', true, 'max-width: 500px');
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 

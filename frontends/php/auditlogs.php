@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ if (!empty($data['actions'])) {
 }
 
 // get paging
-$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_DOWN, new CUrl('auditlogs.php'));
+$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlogs.php'));
 
 // get timeline
 unset($sqlWhere['from'], $sqlWhere['till']);

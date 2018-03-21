@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -258,14 +258,6 @@ class CMediatype extends CApiService {
 								'smtp_authentication',
 								$mediatype['description']
 							));
-						}
-
-						if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
-								&& (!array_key_exists('passwd', $mediatype) || $mediatype['passwd'] === ''
-									|| $mediatype['passwd'] === null)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Password required for media type "%1$s".', $mediatype['description'])
-							);
 						}
 					}
 
@@ -578,44 +570,6 @@ class CMediatype extends CApiService {
 								$mediatype['description']
 							));
 						}
-
-						if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
-							// Check 'passwd' field when auth is set to 'normal' manually.
-
-							if ($db_mediatype['smtp_authentication'] == $mediatype['smtp_authentication']
-									&& array_key_exists('passwd', $mediatype)
-									&& ($mediatype['passwd'] === '' || $mediatype['passwd'] === null)) {
-								/*
-								 * When auth is set to 'normal', check if password field is set manually.
-								 * Otherwise the password is not changed.
-								 */
-
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Password required for media type "%1$s".', $mediatype['description'])
-								);
-							}
-							elseif ($db_mediatype['smtp_authentication'] != $mediatype['smtp_authentication']
-									&& (!array_key_exists('passwd', $mediatype)
-										|| $mediatype['passwd'] === '' || $mediatype['passwd'] === null)) {
-								/*
-								 * First check if 'passwd' field exists when authentication is changed from
-								 * 'none' to 'normal' and then validate it.
-								 */
-
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Password required for media type "%1$s".', $mediatype['description'])
-								);
-							}
-						}
-					}
-					elseif ($db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
-							&& array_key_exists('passwd', $mediatype)
-							&& ($mediatype['passwd'] === '' || $mediatype['passwd'] === null)) {
-						// Check 'passwd' field depeding on authentication set from DB and when it is set to 'normal'.
-
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Password required for media type "%1$s".', $mediatype['description'])
-						);
 					}
 
 					// Validate optional 'smtp_port' field.

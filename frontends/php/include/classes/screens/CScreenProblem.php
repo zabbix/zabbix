@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -685,7 +685,7 @@ class CScreenProblem extends CScreenBase {
 
 		$url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'problem.view')
-			->setArgument('fullscreen', $this->data['fullscreen']);
+			->setArgument('fullscreen', $this->data['fullscreen'] ? '1' : null);
 
 		$data = self::getData($this->data['filter'], $this->config);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
@@ -848,9 +848,8 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$description = [
-					(new CSpan($problem['name']))
+					(new CLinkAction($problem['name']))
 						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
-						->addClass(ZBX_STYLE_LINK_ACTION)
 				];
 
 				if ($this->data['filter']['details'] == 1) {

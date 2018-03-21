@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,8 @@ $triggersFormList = (new CFormList('triggersFormList'))
 	->addRow(
 		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
 			->setLabel(_('Severity'))
-			->setChecked(isset($data['visible']['priority'])),
+			->setChecked(isset($data['visible']['priority']))
+			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv(
 			new CSeverity([
 				'name' => 'priority',
@@ -99,7 +100,7 @@ $dependenciesDiv = (new CDiv([
 				'multiselect' => '1',
 				'with_triggers' => '1',
 				'noempty' => '1'
-			]).');'
+			]).', null, this);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]))

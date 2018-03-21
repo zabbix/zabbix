@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,12 +81,12 @@ $widget = (new CWidget())
 			->addItem([
 				new CLabel(_('Group'), 'groupid'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
+				$data['pageFilter']->getGroupsCB()
 			])
 			->addItem([
 				new CLabel(_('Type'), 'type'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('type', $this->data['type'], 'submit()', [
+				new CComboBox('type', $data['type'], 'submit()', [
 					SHOW_TRIGGERS => _('Triggers'),
 					SHOW_DATA => _('Data')
 				])
@@ -94,18 +94,18 @@ $widget = (new CWidget())
 			->addItem([
 				new CLabel(_('Hosts location'), 'view_style'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+				new CComboBox('view_style', $data['view_style'], 'submit()', [
 					STYLE_TOP => _('Top'),
 					STYLE_LEFT => _('Left')
 				])
 			])
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 			->addItem($help)
 		)
 	);
 
 // filter
-$filter = $this->data['filter'];
+$filter = $data['filter'];
 $filterFormView = new CView('common.filter.trigger', [
 	'overview' => true,
 	'filter' => [
@@ -119,9 +119,9 @@ $filterFormView = new CView('common.filter.trigger', [
 		'application' => $filter['application'],
 		'inventory' => $filter['inventory'],
 		'showMaintenance' => $filter['showMaintenance'],
-		'hostId' => $this->data['hostid'],
-		'groupId' => $this->data['groupid'],
-		'fullScreen' => $this->data['fullscreen']
+		'hostId' => $data['hostid'],
+		'groupId' => $data['groupid'],
+		'fullScreen' => $data['fullscreen']
 	],
 	'config' => $data['config']
 ]);
@@ -133,8 +133,8 @@ $widget->addItem($filterForm);
 if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
-	$dataTable = getTriggersOverview($this->data['hosts'], $this->data['triggers'], $page['file'],
-		$this->data['view_style']
+	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style'], null,
+		$data['fullscreen']
 	);
 }
 else {

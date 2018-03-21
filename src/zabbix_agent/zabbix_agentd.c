@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
-#include "zbxself.h"
 #include "comms.h"
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
@@ -1045,6 +1044,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				threads[i] = zbx_thread_start(active_checks_thread, thread_args);
 				break;
 		}
+#ifndef _WINDOWS
+		zbx_free(thread_args);
+#endif
 	}
 
 #ifdef _WINDOWS

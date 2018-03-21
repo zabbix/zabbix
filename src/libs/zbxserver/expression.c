@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -772,6 +772,50 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_substitute_item_name_macros                                  *
+ *                                                                            *
+ * Purpose: substitute key macros and use it to substitute item name macros if*
+ *          item name is specified                                            *
+ *                                                                            *
+ * Parameters: dc_item    - [IN] item information used in substitution        *
+ *             name       - [IN] optional item name to substitute             *
+ *             replace_to - [OUT] expanded item name or key if name is absent *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to)
+{
+	int	ret;
+	char	*key;
+
+	if (INTERFACE_TYPE_UNKNOWN == dc_item->interface.type)
+		ret = DCconfig_get_interface(&dc_item->interface, dc_item->host.hostid, 0);
+	else
+		ret = SUCCEED;
+
+	if (ret == FAIL)
+		return FAIL;
+
+	key = zbx_strdup(NULL, dc_item->key_orig);
+	substitute_key_macros(&key, NULL, dc_item, NULL, MACRO_TYPE_ITEM_KEY,
+			NULL, 0);
+
+	if (NULL != name)
+	{
+		*replace_to = zbx_strdup(*replace_to, name);
+		item_description(replace_to, key, dc_item->host.hostid);
+		zbx_free(key);
+	}
+	else	/* ZBX_REQUEST_ITEM_KEY */
+	{
+		zbx_free(*replace_to);
+		*replace_to = key;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_item_value                                                 *
  *                                                                            *
  * Purpose: retrieve a particular value associated with the item              *
@@ -786,7 +830,6 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DC_ITEM		dc_item;
-	char		*key;
 	zbx_uint64_t	proxy_hostid;
 	int		ret = FAIL, errcode;
 
@@ -824,37 +867,20 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
+
+				if (SUCCEED == errcode)
+					ret = zbx_substitute_item_name_macros(&dc_item, row[3], replace_to);
+
+				DCconfig_clean_items(&dc_item, &errcode, 1);
+				break;
 			case ZBX_REQUEST_ITEM_KEY:
 				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
-				{
-					if (INTERFACE_TYPE_UNKNOWN == dc_item.interface.type)
-						ret = DCconfig_get_interface(&dc_item.interface, dc_item.host.hostid, 0);
-					else
-						ret = SUCCEED;
+					ret = zbx_substitute_item_name_macros(&dc_item, NULL, replace_to);
 
-					if (SUCCEED == ret)
-					{
-						key = zbx_strdup(NULL, dc_item.key_orig);
-						substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY,
-								NULL, 0);
-
-						if (ZBX_REQUEST_ITEM_NAME == request)
-						{
-							*replace_to = zbx_strdup(*replace_to, row[3]);
-							item_description(replace_to, key, dc_item.host.hostid);
-							zbx_free(key);
-						}
-						else	/* ZBX_REQUEST_ITEM_KEY */
-						{
-							zbx_free(*replace_to);
-							*replace_to = key;
-						}
-					}
-
-					DCconfig_clean_items(&dc_item, &errcode, 1);
-				}
+				DCconfig_clean_items(&dc_item, &errcode, 1);
 				break;
 			case ZBX_REQUEST_ITEM_NAME_ORIG:
 				*replace_to = zbx_strdup(*replace_to, row[3]);
@@ -934,8 +960,12 @@ static int	DBget_trigger_value(const char *expression, char **replace_to, int N_
  * Purpose: retrieve number of events (acknowledged or unacknowledged) for a  *
  *          trigger (in an OK or PROBLEM state) which generated an event      *
  *                                                                            *
- * Parameters: triggerid - trigger identifier from database                   *
- *             replace_to - pointer to result buffer                          *
+ * Parameters: triggerid    - [IN] trigger identifier from database           *
+ *             replace_to   - [IN/OUT] pointer to result buffer               *
+ *             problem_only - [IN] selected trigger status:                   *
+ *                             0 - TRIGGER_VALUE_PROBLEM and TRIGGER_VALUE_OK *
+ *                             1 - TRIGGER_VALUE_PROBLEM                      *
+ *             acknowledged - [IN] acknowledged event or not                  *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *

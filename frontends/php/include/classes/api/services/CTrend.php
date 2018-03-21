@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ class CTrend extends CApiService {
 
 					$res = DBselect(
 						'SELECT '.implode(',', $sql_fields).
-						' FROM '.$sql_from.' AS t'.
+						' FROM '.$sql_from.' t'.
 						' WHERE '.implode(' AND ', $sql_where),
 						$sql_limit
 					);
@@ -174,7 +174,7 @@ class CTrend extends CApiService {
 
 					$res = DBselect(
 						'SELECT COUNT(*) AS rowscount'.
-						' FROM '.$sql_from.' AS t'.
+						' FROM '.$sql_from.' t'.
 						' WHERE '.implode(' AND ', $sql_where)
 					);
 

@@ -16,9 +16,9 @@ zbx_jsonpath_next_SOURCES = \
 	../../zbxmocktest.h
 
 zbx_jsonpath_next_LDADD = $(JSON_LIBS)
-	
+
 zbx_jsonpath_next_CFLAGS = -I@top_srcdir@/tests
-	
+
 zbx_json_path_open_SOURCES = \
 	zbx_json_path_open.c \
 	../../zbxmocktest.h

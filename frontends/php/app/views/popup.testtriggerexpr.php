@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,15 +94,18 @@ $output = [
 			->setId('expression_testing_from')
 			->addVar('expression', $data['expression'])
 			->addVar('test_expression', 1)
-			->addItem(
-				(new CTabView())->addTab('test_tab', null, $form_list)
-			)
+			->addItem([
+				$form_list,
+				(new CInput('submit', 'submit'))->addStyle('display: none;')
+			])
 		]))->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),
 			'enabled' => $allowed_testing,
 			'class' => '',
+			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return reloadPopup(document.forms["expression_testing_from"], "popup.testtriggerexpr");'
 		]
 	]

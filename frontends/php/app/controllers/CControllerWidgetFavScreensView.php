@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 		$this->setType(WIDGET_FAVOURITE_SCREENS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -77,6 +78,7 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_SCREENS]),
 			'screens' => $screens,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

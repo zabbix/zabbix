@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -435,7 +435,7 @@ class CHistoryManager {
 			];
 
 			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = 'Math.floor((params.width*(((long)doc[\'clock\'].value/1000+params.delta)%params.size))'.
+			$formula = 'Math.floor((params.width*((doc[\'clock\'].date.getMillis()/1000+params.delta)%params.size))'.
 					'/params.size)';
 
 			$script = [
@@ -562,13 +562,6 @@ class CHistoryManager {
 					' AND clock<='.zbx_dbstr($time_to).
 				' GROUP BY '.$group_by
 			);
-
-			$sql = 'SELECT itemid,'.$sql_select.$sql_select_extra.',MAX(clock) AS clock'.
-				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-					' AND clock>='.zbx_dbstr($time_from).
-					' AND clock<='.zbx_dbstr($time_to).
-				' GROUP BY '.$group_by;
 
 			$data = [];
 			while (($row = DBfetch($result)) !== false) {

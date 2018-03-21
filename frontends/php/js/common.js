@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 
 jQuery.noConflict();
+
+var overlays_stack = [];
 
 function isset(key, obj) {
 	return (is_null(key) || is_null(obj)) ? false : (typeof(obj[key]) != 'undefined');
@@ -398,13 +400,14 @@ function openWinCentered(url, name, width, height, params) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action		Popup controller related action.
- * @param {array} options		Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid	(optional) id of overlay dialogue.
+ * @param {string} action			Popup controller related action.
+ * @param {array} options			Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid		(optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt	(optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns false
  */
-function PopUp(action, options, dialogueid) {
+function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var ovelay_properties = {
 		'title': '',
 		'content': jQuery('<div>')
@@ -415,10 +418,10 @@ function PopUp(action, options, dialogueid) {
 			),
 		'class': 'modal-popup',
 		'buttons': [],
-		'dialogueid': (typeof dialogueid === 'undefined') ? getOverlayDialogueId() : dialogueid
+		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
 	};
-	var url = new Curl('zabbix.php');
 
+	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
 	jQuery.each(options, function(key, value) {
 		url.setArgument(key, value);
@@ -428,8 +431,8 @@ function PopUp(action, options, dialogueid) {
 		url: url.getUrl(),
 		type: 'get',
 		dataType: 'json',
-		beforeSend: function() {
-			overlayDialogue(ovelay_properties);
+		beforeSend: function(jqXHR) {
+			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
 		},
 		success: function(resp) {
 			if (typeof resp.errors !== 'undefined') {
@@ -459,6 +462,129 @@ function PopUp(action, options, dialogueid) {
 	});
 
 	return false;
+}
+
+/**
+ * Function to add details about overlay UI elements in global overlays_stack variable.
+ *
+ * @param {string} dialogueid	Unique overlay element identifier.
+ * @param {object} element		UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type			Type of overlay UI element.
+ * @param {object} xhr			(optional) XHR request used to load content. Used to abort loading. Currently used with
+ *								type 'popup' only.
+ */
+function addToOverlaysStack(id, element, type, xhr) {
+	var index = null,
+		id = id.toString();
+
+	jQuery(overlays_stack).each(function(i, item) {
+		if (item.dialogueid === id) {
+			index = i;
+			return;
+		}
+	});
+
+	if (index === null) {
+		// Add new overlay.
+		overlays_stack.push({
+			dialogueid: id,
+			element: element,
+			type: type,
+			xhr: xhr
+		});
+	}
+	else {
+		overlays_stack[index]['element'] = element;
+
+		// Move existing overlay to the end of array.
+		overlays_stack.push(overlays_stack[index]);
+		overlays_stack.splice(index, 1);
+	}
+
+	// Only one instance of handler should be present at any time.
+	jQuery(document)
+		.off('keydown', closeDialogHandler)
+		.on('keydown', closeDialogHandler);
+}
+
+// Keydown handler. Closes last opened overlay UI element.
+function closeDialogHandler(event) {
+	if (event.which == 27) { // ESC
+		var dialog = overlays_stack[overlays_stack.length - 1];
+		if (typeof dialog !== 'undefined') {
+			switch (dialog.type) {
+				// Close overlay popup.
+				case 'popup':
+					overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
+					break;
+
+				// Close overlay hintbox.
+				case 'hintbox':
+					hintBox.hideHint(null, dialog.element, true);
+					break;
+
+				// Close context menu overlays.
+				case 'contextmenu':
+					jQuery('.action-menu.action-menu-top:visible').menuPopup('close', dialog.element);
+					break;
+
+				// Close overlay time picker.
+				case 'clndr':
+					CLNDR[dialog.dialogueid].clndr.clndrhide();
+					break;
+
+				// Close overlay message.
+				case 'message':
+					jQuery(ZBX_MESSAGES).each(function(i, msg) {
+						msg.closeAllMessages();
+					});
+					break;
+
+				// Close overlay color picker.
+				case 'color_picker':
+					hide_color_picker();
+					break;
+			}
+		}
+	}
+}
+
+/*
+ * Removed overlay from overlays stack and sets focus to source element.
+ *
+ * @param {string} dialogueid		Id of dialogue, that is beeing closed.
+ * @param {boolean} return_focus	If not FALSE, the element stored in overlay.element will be focused.
+ */
+function removeFromOverlaysStack(dialogueid, return_focus) {
+	var overlay = null,
+		index;
+
+	if (return_focus !== false) {
+		return_focus = true;
+	}
+
+	jQuery(overlays_stack).each(function(i, item) {
+		if (item.dialogueid === dialogueid) {
+			overlay = item,
+			index = i;
+			return;
+		}
+	});
+
+	if (overlay) {
+		// Focus UI element that was clicked to open an overlay.
+		if (return_focus) {
+			jQuery(overlay.element).focus();
+		}
+
+		// Remove dialogue from the stack.
+		overlays_stack.splice(index, 1);
+	}
+
+	// Remove event listener.
+	if (overlays_stack.length == 0) {
+		jQuery(document).off('keydown', closeDialogHandler);
+	}
 }
 
 /**
@@ -613,32 +739,6 @@ function add_media(formname, media, mediatypeid, sendto, period, active, severit
 }
 
 /**
- * Send media form data to server for validation before adding them to user media tab.
- *
- * @param {string} formname		form name that is sent to server for validation
- */
-function validate_media(formname) {
-	var form = window.document.forms[formname];
-
-	jQuery.ajax({
-		url: jQuery(form).attr('action'),
-		data: jQuery(form).serialize(),
-		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
-
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
-			}
-			else {
-				add_media(ret.dstfrm, ret.media, ret.mediatypeid, ret.sendto, ret.period, ret.active, ret.severity);
-			}
-		},
-		dataType: 'json',
-		type: 'post'
-	});
-}
-
-/**
  * Send trigger expression form data to server for validation before adding it to trigger expression field.
  *
  * @param {string} formname		form name that is sent to server for validation
@@ -683,49 +783,12 @@ function validate_trigger_expression(formname, dialogueid) {
 	});
 }
 
-/**
- * Send http test step form data to server for validation before adding it to web scenarion tab.
- *
- * @param {string} formname		form name that is sent to server for validation
- * @param {string} dialogueid	(optional) id of overlay dialogue.
- */
-function validate_httpstep(formname, dialogueid) {
-	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action')),
-		dialogueid = dialogueid || null;
-
-	url.setArgument('validate', 1);
-
-	jQuery.ajax({
-		url: url.getUrl(),
-		data: jQuery(form).serialize(),
-		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
-
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore(jQuery(form));
-			}
-			else {
-				if (typeof ret.params.stepid !== 'undefined') {
-					update_httpstep(ret.dstfrm, ret.list_name, ret.params);
-				}
-				else {
-					add_httpstep(ret.dstfrm, ret.params);
-				}
-
-				if (dialogueid) {
-					overlayDialogueDestroy(dialogueid);
-				}
-			}
-		},
-		dataType: 'json',
-		type: 'post'
-	});
-}
-
-function redirect(uri, method, needle, invert_needle) {
+function redirect(uri, method, needle, invert_needle, add_sid) {
+	if (typeof add_sid === 'undefined') {
+		add_sid = true;
+	}
 	method = method || 'get';
-	var url = new Curl(uri);
+	var url = new Curl(uri, add_sid);
 
 	if (method.toLowerCase() == 'get') {
 		window.location = url.getUrl();
@@ -879,7 +942,10 @@ jQuery.fn.trimValues = function(selectors) {
 
 	jQuery.each(selectors, function(i, value) {
 		obj = jQuery(value, form);
-		obj.val(jQuery.trim(obj.val()));
+
+		jQuery(obj).each(function() {
+			jQuery(this).val(jQuery.trim(jQuery(this).val()));
+		});
 	});
 };
 

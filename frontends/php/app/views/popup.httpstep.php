@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => ''
+	'script_inline' => require 'app/views/popup.httpstep.js.php'
 ];
 
 $options = $data['options'];
@@ -34,16 +34,21 @@ $http_popup_form = (new CForm())
 	->addVar('templated', $options['templated'])
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
-	->addVar('action', 'popup.httpstep');
+	->addVar('action', 'popup.httpstep')
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $http_popup_form_list = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $options['name'], (bool) $options['templated'], 64))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('URL'),
+	->addRow(
+		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 		new CDiv([
 			(new CTextBox('url', $options['url'], false, null))
+				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('parse', _('Parse')))
@@ -133,8 +138,9 @@ $http_popup_form_list
 		(new CCheckBox('retrieve_mode'))
 			->setChecked($options['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 	)
-	->addRow(_('Timeout'),
+	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $options['timeout']))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Required string'),
@@ -144,22 +150,19 @@ $http_popup_form_list
 		(new CTextBox('status_codes', $options['status_codes']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append tabs to form.
-$http_popup_tab = new CTabView();
-$http_popup_tab->addTab('scenarioStepTab', _('Step of web scenario'), $http_popup_form_list);
-
 $output['buttons'] = [
 	[
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
 		'class' => '',
 		'keepOpen' => true,
-		'action' => 'return validate_httpstep("'.$http_popup_form->getId().'", '.
+		'isSubmit' => true,
+		'action' => 'return validateHttpStep("'.$http_popup_form->getId().'", '.
 						'jQuery(window.document.forms["'.$http_popup_form->getId().'"])' .
 							'.closest("[data-dialogueid]").attr("data-dialogueid"));'
 	]
 ];
 
-$http_popup_form->addItem($http_popup_tab);
+$http_popup_form->addItem($http_popup_form_list);
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ class CScreenHttpTest extends CScreenBase {
 				->setArgument('action', 'web.view')
 				->setArgument('groupid', $this->data['groupid'])
 				->setArgument('hostid', $this->hostid)
-				->setArgument('fullscreen', $this->data['fullscreen']);
+				->setArgument('fullscreen', $this->data['fullscreen'] ? '1' : null);
 
 			$paging = getPagingLine($httptests, $sort_order, $url);
 			$httptests = resolveHttpTestMacros($httptests, true, false);

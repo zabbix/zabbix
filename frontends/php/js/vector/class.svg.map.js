@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -753,7 +753,7 @@ SVGMapElement.prototype.updateLabel = function() {
 			'anchor': anchor,
 			background: {
 				fill: '#' + this.map.options.theme.backgroundcolor,
-				opacity: 0.5
+				opacity: 0.7
 			}
 		}, this.options.label);
 

@@ -74,7 +74,8 @@
 			{
 				'name': form.data('data').name,
 				'owner': form.data('data').owner
-			}
+			},
+			this
 		);
 	};
 
@@ -95,7 +96,7 @@
 
 	// Add new widget.
 	function dashbrd_add_widget() {
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget', this);
 	};
 
 	var showEditMode = function showEditMode() {
@@ -147,6 +148,18 @@
 	jQuery(document).ready(function($) {
 		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
+
+		var $norm_mode_btn = $('.btn-dashbrd-normal');
+		if ($norm_mode_btn.length) {
+			$(window).on('mousemove keyup scroll', function() {
+				clearTimeout($norm_mode_btn.data('timer'));
+				$norm_mode_btn
+					.removeClass('hidden')
+					.data('timer', setTimeout(function() {
+						$norm_mode_btn.addClass('hidden');
+					}, 2000));
+			}).trigger('mousemove');
+		}
 	});
 
 	function dashboardAddMessages(messages) {

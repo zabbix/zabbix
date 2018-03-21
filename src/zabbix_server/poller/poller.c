@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -629,8 +629,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			if (0 == add_results.values_num)
 			{
 				items[i].state = ITEM_STATE_NORMAL;
-				zbx_preprocess_item_value(items[i].itemid, items[i].flags, &results[i], &timespec,
-						items[i].state, NULL);
+				zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+						&results[i], &timespec, items[i].state, NULL);
 			}
 			else
 			{
@@ -646,14 +646,16 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					if (ISSET_MSG(add_result))
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
-						zbx_preprocess_item_value(items[i].itemid, items[i].flags, NULL,
-								&ts_tmp, items[i].state, add_result->msg);
+						zbx_preprocess_item_value(items[i].itemid, items[i].value_type,
+								items[i].flags, NULL, &ts_tmp, items[i].state,
+								add_result->msg);
 					}
 					else
 					{
 						items[i].state = ITEM_STATE_NORMAL;
-						zbx_preprocess_item_value(items[i].itemid, items[i].flags, add_result,
-								&ts_tmp, items[i].state, NULL);
+						zbx_preprocess_item_value(items[i].itemid, items[i].value_type,
+								items[i].flags, add_result, &ts_tmp, items[i].state,
+								NULL);
 					}
 
 					/* ensure that every log item value timestamp is unique */
@@ -668,8 +670,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(items[i].itemid, items[i].flags, NULL, &timespec, items[i].state,
-					results[i].msg);
+			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
+					items[i].state, results[i].msg);
 		}
 
 		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &errcodes[i], 1, poller_type,

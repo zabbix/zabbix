@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,9 +74,25 @@ class testPageDiscoveryRules extends CWebTest {
 			);
 			$this->zbxTestTextNotPresent('Info');
 		}
+
+		$this->zbxTestAssertElementText("//button[@value='discoveryrule.masscheck_now'][@disabled]", 'Check now');
+
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Delete');
 		$this->zbxTestTextPresent('0 selected');
+	}
+
+	/**
+	 * @dataProvider data
+	 */
+	public function testPageDiscoveryRules_CheckNowAll($data) {
+		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
+		$this->zbxTestCheckHeader('Discovery rules');
+
+		$this->zbxTestClick('all_items');
+		$this->zbxTestClickButtonText('Check now');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**

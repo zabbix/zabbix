@@ -2541,25 +2541,25 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'DC0000',
+				'default' => 'CC0000',
 			],
 			'problem_ack_color' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'DC0000',
+				'default' => 'CC0000',
 			],
 			'ok_unack_color' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => '00AA00',
+				'default' => '009900',
 			],
 			'ok_ack_color' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => '00AA00',
+				'default' => '009900',
 			],
 			'problem_unack_style' => [
 				'null' => false,
@@ -2704,6 +2704,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '-1',
+			],
+			'custom_color' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -6367,6 +6373,42 @@ return [
 			],
 		],
 	],
+	'tag_filter' => [
+		'key' => 'tag_filterid',
+		'fields' => [
+			'tag_filterid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid',
+			],
+			'groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'groups',
+				'ref_field' => 'groupid',
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
 	'event_recovery' => [
 		'key' => 'eventid',
 		'fields' => [
@@ -7236,6 +7278,25 @@ return [
 				'length' => 20,
 				'ref_table' => 'sysmaps',
 				'ref_field' => 'sysmapid',
+			],
+		],
+	],
+	'task_check_now' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
 			],
 		],
 	],

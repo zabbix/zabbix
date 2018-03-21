@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,3 +76,70 @@ zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, co
 	return member;
 }
 
+zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	zbx_uint64_t		parameter;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &parameter)))
+	{
+		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+	}
+
+	return parameter;
+}
+
+zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const char *name)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	zbx_uint64_t		member;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &member)))
+	{
+		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+	}
+
+	return member;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_str_to_return_code                                      *
+ *                                                                            *
+ * Purpose: converts common function return code from text format             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_mock_str_to_return_code(const char *str)
+{
+	if (0 == strcmp(str, "SUCCEED"))
+		return SUCCEED;
+
+	if (0 == strcmp(str, "FAIL"))
+		return FAIL;
+
+	if (0 == strcmp(str, "NOTSUPPORTED"))
+		return NOTSUPPORTED;
+
+	if (0 == strcmp(str, "NETWORK_ERROR"))
+		return NETWORK_ERROR;
+
+	if (0 == strcmp(str, "TIMEOUT_ERROR"))
+		return TIMEOUT_ERROR;
+
+	if (0 == strcmp(str, "AGENT_ERROR"))
+		return AGENT_ERROR;
+
+	if (0 == strcmp(str, "GATEWAY_ERROR"))
+		return GATEWAY_ERROR;
+
+	if (0 == strcmp(str, "CONFIG_ERROR"))
+		return CONFIG_ERROR;
+
+
+	fail_msg("Unknown return code  \"%s\"", str);
+	return 0;
+}

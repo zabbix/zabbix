@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ $this->addJsFile('class.svg.map.js');
 			->cleanItems()
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])
-			->addVar('fullscreen', $data['fullscreen'])
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->addItem(
 				(new CList())
 					->addItem([

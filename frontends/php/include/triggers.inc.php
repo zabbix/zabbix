@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/**
+ * Get trigger severity status css style.
+ *
+ * @param  int         $severity trigger severity
+ * @return string|null
+ */
+function getSeverityStatusStyle($severity) {
+	switch ($severity) {
+		case TRIGGER_SEVERITY_DISASTER:
+			return ZBX_STYLE_STATUS_DISASTER_BG;
+		case TRIGGER_SEVERITY_HIGH:
+			return ZBX_STYLE_STATUS_HIGH_BG;
+		case TRIGGER_SEVERITY_AVERAGE:
+			return ZBX_STYLE_STATUS_AVERAGE_BG;
+		case TRIGGER_SEVERITY_WARNING:
+			return ZBX_STYLE_STATUS_WARNING_BG;
+		case TRIGGER_SEVERITY_INFORMATION:
+			return ZBX_STYLE_STATUS_INFO_BG;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return ZBX_STYLE_STATUS_NA_BG;
+		default:
+			return null;
+	}
+}
 
 function getSeverityStyle($severity, $type = true) {
 	if (!$type) {
@@ -126,8 +150,8 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 }
 
 /**
- * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
- * Settings and colors are kept in 'config' database table
+ * Add color style and blinking to an object like CSpan or CDiv depending on trigger status.
+ * Settings and colors are kept in 'config' database table.
  *
  * @param mixed $object             object like CSpan, CDiv, etc.
  * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
@@ -137,26 +161,29 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
 	$config = select_config();
 
-	// color of text and blinking depends on trigger value and whether event is acknowledged
+	$color_class = null;
+	$blinks = null;
+
+	// Color class for text and blinking depends on trigger value and whether event is acknowledged.
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
-		$color = $config['problem_unack_color'];
+		$color_class = ZBX_STYLE_PROBLEM_UNACK_FG;
 		$blinks = $config['problem_unack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_TRUE && $isAcknowledged) {
-		$color = $config['problem_ack_color'];
+		$color_class = ZBX_STYLE_PROBLEM_ACK_FG;
 		$blinks = $config['problem_ack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && !$isAcknowledged) {
-		$color = $config['ok_unack_color'];
+		$color_class = ZBX_STYLE_OK_UNACK_FG;
 		$blinks = $config['ok_unack_style'];
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && $isAcknowledged) {
-		$color = $config['ok_ack_color'];
+		$color_class = ZBX_STYLE_OK_ACK_FG;
 		$blinks = $config['ok_ack_style'];
 	}
-	if (isset($color) && isset($blinks)) {
-		// color
-		$object->addStyle('color: #'.$color);
+
+	if ($color_class != null && $blinks != null) {
+		$object->addClass($color_class);
 
 		// blinking
 		$timeSinceLastChange = time() - $triggerLastChange;
@@ -467,8 +494,8 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 								 * Dependency is within same host according to $src_hostid parameter or dep trigger has
 								 * single host.
 								 */
-								if ($dst_trigger['srcTriggerContextHostId'] ==
-										$dst_dep_trigger['srcTriggerContextHostId']) {
+								if ($dst_trigger['srcTriggerContextHostId'] == $dst_dep_trigger['srcTriggerContextHostId']
+										&& $dst_dep_trigger['newTriggerHostId'] == $dst_trigger['newTriggerHostId']) {
 									$depTriggerId = $dst_dep_trigger['newTriggerId'];
 									break;
 								}
@@ -686,28 +713,30 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *
- * @param array  	$hosts							an array of hosts with host IDs as keys
- * @param string 	$hosts[hostid][name]
- * @param string 	$hosts[hostid][hostid]
- * @param array		$triggers
- * @param string	$triggers[][triggerid]
- * @param string	$triggers[][description]
- * @param string	$triggers[][expression]
- * @param int		$triggers[][value]
- * @param int		$triggers[][lastchange]
- * @param int		$triggers[][flags]
- * @param array		$triggers[][url]
- * @param int		$triggers[][priority]
- * @param array		$triggers[][hosts]
- * @param string	$triggers[][hosts][][hostid]
- * @param string	$triggers[][hosts][][name]
- * @param string 	$pageFile						the page where the element is displayed
- * @param int    	$viewMode						table display style: either hosts on top, or host on the left side
- * @param string 	$screenId						the ID of the screen, that contains the trigger overview table
+ * @param array  $hosts                        An array of hosts with host IDs as keys.
+ * @param string $hosts[hostid][name]
+ * @param string $hosts[hostid][hostid]
+ * @param array  $triggers
+ * @param string $triggers[][triggerid]
+ * @param string $triggers[][description]
+ * @param string $triggers[][expression]
+ * @param int    $triggers[][value]
+ * @param int    $triggers[][lastchange]
+ * @param int    $triggers[][flags]
+ * @param array  $triggers[][url]
+ * @param int    $triggers[][priority]
+ * @param array  $triggers[][hosts]
+ * @param string $triggers[][hosts][][hostid]
+ * @param string $triggers[][hosts][][name]
+ * @param string $pageFile                     The page where the element is displayed.
+ * @param int    $viewMode                     Table display style: either hosts on top, or host on the left side.
+ * @param string $screenId                     The ID of the screen, that contains the trigger overview table.
+ * @param bool   $fullscreen                   Display mode.
  *
  * @return CTableInfo
  */
-function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
+function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null,
+		$fullscreen = false) {
 	$data = [];
 	$host_names = [];
 	$trcounter = [];
@@ -777,7 +806,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
 						$pageFile,
-						$screenId
+						$screenId,
+						$fullscreen
 					);
 				}
 				$triggerTable->addRow($columns);
@@ -802,8 +832,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($host_names as $hostId => $host_name) {
-			$name = (new CSpan($host_name))->addClass(ZBX_STYLE_LINK_ACTION);
-			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
+			$name = (new CLinkAction($host_name))
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
@@ -811,7 +841,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
 						$pageFile,
-						$screenId
+						$screenId,
+						$fullscreen
 					);
 				}
 			}
@@ -829,12 +860,13 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @see getTriggersOverview()
  *
  * @param array  $trigger
- * @param string $pageFile		the page where the element is displayed
+ * @param string $pageFile    The page where the element is displayed.
  * @param string $screenid
+ * @param bool   $fullscreen  Display mode.
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
+function getTriggerOverviewCells($trigger, $pageFile, $screenid = null, $fullscreen = false) {
 	$ack = null;
 	$css = null;
 	$desc = [];
@@ -887,7 +919,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		$isDependencyFound = false;
 		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.zbx_dbstr($triggerId));
 		while ($dbDependency = DBfetch($dbDependencies)) {
-			$dependencyTable->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_up']));
+			$dependencyTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_up']));
 			$isDependencyFound = true;
 		}
 
@@ -905,7 +937,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		$isDependencyFound = false;
 		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.zbx_dbstr($triggerId));
 		while ($dbDependency = DBfetch($dbDependencies)) {
-			$dependencyTable->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_down']));
+			$dependencyTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_down']));
 			$isDependencyFound = true;
 		}
 
@@ -935,7 +967,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $fullscreen));
 	}
 
 	return $column;
@@ -1133,9 +1165,8 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	foreach ($hosts as $host) {
-		$hostNames[] = (new CSpan($host['name']))
-			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]))
-			->addClass(ZBX_STYLE_LINK_ACTION);
+		$hostNames[] = (new CLinkAction($host['name']))
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 		$hostNames[] = ', ';
 	}
 	array_pop($hostNames);
@@ -1291,8 +1322,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 						$expressionId = 'recovery_expr_'.$element['id'];
 					}
 
-					$url = (new CSpan($element['expression']))
-						->addClass(ZBX_STYLE_LINK_ACTION)
+					$url = (new CLinkAction($element['expression']))
 						->setId($expressionId)
 						->onClick('javascript: copy_expression("'.$expressionId.'", '.$type.');');
 				}
@@ -2209,12 +2239,13 @@ function getTriggersHostsList(array $triggers) {
  * @param string $triggers_hosts[<triggerid>][]['maintenanceid']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_status']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
- * @param int    $triggers_hosts[<triggerid>][]['graphs']             the number of graphs
- * @param int    $triggers_hosts[<triggerid>][]['screens']            the number of screens
+ * @param int    $triggers_hosts[<triggerid>][]['graphs']              The number of graphs.
+ * @param int    $triggers_hosts[<triggerid>][]['screens']             The number of screens.
+ * @param bool   $fullscreen				                           Fullscreen mode.
  *
  * @return array
  */
-function makeTriggersHostsList(array $triggers_hosts) {
+function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 	$db_maintenances = [];
 	$scripts_by_hosts = [];
 
@@ -2249,10 +2280,8 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			$scripts_by_host = array_key_exists($host['hostid'], $scripts_by_hosts)
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
-
-			$host_name = (new CSpan($host['name']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host));
+			$host_name = (new CLinkAction($host['name']))
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true, $fullscreen));
 
 			// add maintenance icon with hint if host is in maintenance
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -2332,4 +2361,3 @@ function getTriggerLastProblems(array $triggerids, array $output) {
 
 	return $problems;
 }
-

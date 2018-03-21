@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -669,9 +669,10 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 #elif defined(HAVE_POSTGRESQL)
 		return DBexecute(
 				"delete from %s"
-				" where ctid = any(array(select ctid from %s"
+				" where %s and ctid = any(array(select ctid from %s"
 					" where %s limit %d))",
 				tablename,
+				filter,
 				tablename,
 				filter,
 				limit);
@@ -689,7 +690,7 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_problem_cleanup                                              *
+ * Function: hk_problem_cleanup                                               *
  *                                                                            *
  * Purpose: perform problem table cleanup                                     *
  *                                                                            *

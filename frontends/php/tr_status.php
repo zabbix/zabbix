@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -552,8 +552,7 @@ foreach ($triggers as $trigger) {
 		];
 	}
 
-	$description[] = (new CSpan(CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event))))
-		->addClass(ZBX_STYLE_LINK_ACTION)
+	$description[] = (new CLinkAction(CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event))))
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {

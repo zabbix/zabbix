@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	if (NOTSUPPORTED == ping_result)
 	{
 		item.state = ITEM_STATE_NOTSUPPORTED;
-		zbx_preprocess_item_value(item.itemid, item.flags, NULL, ts, item.state, error);
+		zbx_preprocess_item_value(item.itemid, item.value_type, item.flags, NULL, ts, item.state, error);
 	}
 	else
 	{
@@ -91,7 +91,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 			SET_DBL_RESULT(&value, *value_dbl);
 
 		item.state = ITEM_STATE_NORMAL;
-		zbx_preprocess_item_value(item.itemid, item.flags, &value, ts, item.state, NULL);
+		zbx_preprocess_item_value(item.itemid, item.value_type, item.flags, &value, ts, item.state, NULL);
 
 		free_result(&value);
 	}
@@ -445,7 +445,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 			zbx_timespec(&ts);
 
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(items[i].itemid, items[i].flags, NULL, &ts, items[i].state, error);
+			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags, NULL, &ts,
+					items[i].state, error);
 
 			DCrequeue_items(&items[i].itemid, &items[i].state, &ts.sec, &errcode, 1);
 		}

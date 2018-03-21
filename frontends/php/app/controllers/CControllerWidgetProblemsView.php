@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,11 +30,15 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fullscreen' => 'in 0,1',
+			'kioskmode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
 
 	protected function doAction() {
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
+
 		$fields = $this->getForm()->getFieldsData();
 
 		$config = select_config();
@@ -87,7 +91,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'info' => $info,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'fullscreen' => $this->getInput('fullscreen', 0),
+			'fullscreen' => $fullscreen,
+			'kioskmode' => $kioskmode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ foreach ($data['screens'] as $screen) {
 		: "rm4favorites('screenid','".$screen['screenid']."')";
 
 	$table->addRow([
-		new CLink($screen['label'], $url),
+		new CLink($screen['label'], $url->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)),
 		(new CButton())
 			->onClick($on_click)
 			->addClass(ZBX_STYLE_REMOVE_BTN)

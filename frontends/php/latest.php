@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,13 +120,18 @@ if ($filter['groupids'] !== null) {
 		'preservekeys' => true
 	]);
 
-	foreach ($filterGroups as $group) {
-		$multiSelectHostGroupData[] = [
-			'id' => $group['groupid'],
-			'name' => $group['name']
-		];
+	if ($filterGroups) {
+		foreach ($filterGroups as $group) {
+			$multiSelectHostGroupData[] = [
+				'id' => $group['groupid'],
+				'name' => $group['name']
+			];
 
-		$child_groups[] = $group['name'].'/';
+			$child_groups[] = $group['name'].'/';
+		}
+	}
+	else {
+		$filter['groupids'] = [];
 	}
 }
 
@@ -370,7 +375,7 @@ $filterColumn1 = (new CFormList())
 					'dstfld1' => 'application',
 					'real_hosts' => '1',
 					'with_applications' => '1'
-				]).');'
+				]).', null, this);'
 			)
 	]);
 
@@ -626,8 +631,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$hostName = (new CSpan($host['name']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
+	$hostName = (new CLinkAction($host['name']))
 		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
@@ -772,8 +776,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$hostName = (new CSpan($host['name']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
+	$hostName = (new CLinkAction($host['name']))
 		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);

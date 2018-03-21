@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem($create_button)
 		->addItem((new CList())
+			->addItem($create_button)
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	);

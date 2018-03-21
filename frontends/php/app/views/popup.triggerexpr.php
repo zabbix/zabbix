@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@ $expression_form = (new CForm())
 	->addVar('dstfld1', $data['dstfld1'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('groupid', $data['groupid'])
-	->addVar('itemid', $data['itemid']);
+	->addVar('itemid', $data['itemid'])
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 if ($data['parent_discoveryid'] !== '') {
 	$expression_form->addVar('parent_discoveryid', $data['parent_discoveryid']);
@@ -44,6 +45,7 @@ $popup_options = [
 	'dstfrm' => $expression_form->getName(),
 	'dstfld1' => 'itemid',
 	'dstfld2' => 'description',
+	'with_webitems' => '1',
 	'writeonly' => '1'
 ];
 if ($data['groupid'] && $data['hostid']) {
@@ -55,11 +57,13 @@ if ($data['parent_discoveryid'] !== '') {
 }
 
 $item = [
-	(new CTextBox('description', $data['description'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('description', $data['description'], true))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).');')
+		->onClick('return PopUp("popup.generic",'.CJs::encodeJson($popup_options).', null, this);')
 ];
 
 if ($data['parent_discoveryid'] !== '') {
@@ -75,11 +79,11 @@ if ($data['parent_discoveryid'] !== '') {
 				'dstfld1' => 'itemid',
 				'dstfld2' => 'description',
 				'parent_discoveryid' => $data['parent_discoveryid']
-			]).');'
+			]).', null, this);'
 		);
 }
 
-$expression_form_list->addRow(_('Item'), $item);
+$expression_form_list->addRow((new CLabel(_('Item'), 'description'))->setAsteriskMark(), $item);
 
 $function_combo_box = new CComboBox('expr_type', $data['expr_type'], 'reloadPopup(this.form, "popup.triggerexpr")');
 foreach ($data['functions'] as $id => $f) {
@@ -140,11 +144,14 @@ else {
 	$expression_form->addVar('paramtype', PARAM_TYPE_TIME);
 }
 
-$expression_form_list->addRow('N', (new CTextBox('value', $data['value']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH));
-
-$expression_form->addItem(
-	(new CTabView())->addTab('expressionTab', _('Trigger expression condition'), $expression_form_list)
+$expression_form_list->addRow(
+	(new CLabel(_('N'), 'value'))->setAsteriskMark(),
+	(new CTextBox('value', $data['value']))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
+
+$expression_form->addItem($expression_form_list);
 
 $output = [
 	'header' => $data['title'],
@@ -154,6 +161,7 @@ $output = [
 			'title' => _('Insert'),
 			'class' => '',
 			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return validate_trigger_expression("expression", '.
 					'jQuery(window.document.forms["expression"]).closest("[data-dialogueid]").attr("data-dialogueid"));'
 		]

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,9 @@ $widget = (new CWidget())
 		(new CSpan())
 			->addClass(ZBX_STYLE_SELECTED)
 			->addItem(
-				new CLink($data['screen']['name'], 'screens.php?elementid='.$data['screen']['screenid'].
-					'&fullscreen='.$data['fullscreen']
+				new CLink($data['screen']['name'], (new CUrl('screens.php'))
+					->setArgument('elementid', $data['screen']['screenid'])
+					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 				)
 			)
 	]))
@@ -46,7 +47,7 @@ $controls = (new CList())->addItem(
 // Append screens combobox to page header.
 $form = (new CForm())
 	->setName('headerForm')
-	->addVar('fullscreen', $data['fullscreen']);
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
 
 if (check_dynamic_items($data['screen']['screenid'], 0)) {
 	$pageFilter = new CPageFilter([
@@ -82,7 +83,7 @@ if (check_dynamic_items($data['screen']['screenid'], 0)) {
 $controls
 	->addItem($data['screen']['editable']
 		? (new CButton('edit', _('Edit screen')))
-			->onClick('redirect("screenedit.php?screenid='.$data['screen']['screenid'].'")')
+			->onClick('redirect("screenedit.php?screenid='.$data['screen']['screenid'].'", "get", "", false, false)')
 		: null
 	)
 	->addItem(get_icon('favourite',

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ foreach ($data['proxies'] as $proxy) {
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? $out_encryption : $in_encryption,
-		$proxy['lastaccess'] == 0
+		($proxy['lastaccess'] == 0)
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
 		array_key_exists('host_count', $proxy) ? $proxy['host_count'] : '',

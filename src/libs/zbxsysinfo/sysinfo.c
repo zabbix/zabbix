@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -430,7 +430,7 @@ void	test_parameter(const char *key)
 	fflush(stdout);
 }
 
-void	test_parameters()
+void	test_parameters(void)
 {
 	int	i;
 	char	*key = NULL;
@@ -1329,13 +1329,15 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	{
 		if (0 == WIFEXITED(status))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated unexpectedly."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Data gathering process terminated unexpectedly with"
+					" error %d.", status));
 			kill(pid, SIGKILL);
 			ret = SYSINFO_RET_FAIL;
 		}
 		else if (EXIT_SUCCESS != WEXITSTATUS(status))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated with error."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Data gathering process terminated with error %d.",
+					status));
 			ret = SYSINFO_RET_FAIL;
 		}
 		else
@@ -1350,11 +1352,19 @@ out:
 }
 #else
 
+ZBX_THREAD_LOCAL static zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
+
+zbx_uint32_t get_thread_global_mutex_flag()
+{
+	return mutex_flag;
+}
+
 typedef struct
 {
 	zbx_metric_func_t	func;
 	AGENT_REQUEST		*request;
 	AGENT_RESULT		*result;
+	zbx_uint32_t		mutex_flag; /* in regular case should always be = ZBX_MUTEX_ALL_ALLOW */
 	int			agent_ret;
 }
 zbx_metric_thread_args_t;
@@ -1362,6 +1372,7 @@ zbx_metric_thread_args_t;
 ZBX_THREAD_ENTRY(agent_metric_thread, data)
 {
 	zbx_metric_thread_args_t	*args = (zbx_metric_thread_args_t *)((zbx_thread_args_t *)data)->args;
+	mutex_flag = args->mutex_flag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "executing in data thread for key:'%s'", args->request->key);
 
@@ -1395,7 +1406,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	ZBX_THREAD_HANDLE		thread;
 	zbx_thread_args_t		args;
-	zbx_metric_thread_args_t	metric_args = {metric_func, request, result};
+	zbx_metric_thread_args_t	metric_args = {metric_func, request, result, ZBX_MUTEX_THREAD_DENIED |
+							ZBX_MUTEX_LOGGING_DENIED};
 	DWORD				rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -713,8 +713,7 @@ clean:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
-		char *error, size_t max_error_len)
+static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "validate_host";
 	DB_RESULT	tresult;
@@ -723,7 +722,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	DB_ROW		hrow;
 	char		*sql = NULL, *name_esc;
 	size_t		sql_alloc = 256, sql_offset;
-	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
+	ZBX_GRAPH_ITEMS	*gitems = NULL, *chd_gitems = NULL;
 	size_t		gitems_alloc = 0, gitems_num = 0,
 			chd_gitems_alloc = 0, chd_gitems_num = 0;
 	int		ret = SUCCEED, i;
@@ -913,7 +912,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	zbx_free(gitems);
 	zbx_free(chd_gitems);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -2557,15 +2556,14 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids)
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids, char **error)
 {
 	const char		*__function_name = "DBdelete_template_elements";
 
-	char			*sql = NULL;
+	char			*sql = NULL, err[MAX_STRING_LEN];
 	size_t			sql_alloc = 128, sql_offset = 0;
 	zbx_vector_uint64_t	templateids;
 	int			i, index, res = SUCCEED;
-	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2589,9 +2587,9 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 	if (0 == del_templateids->values_num)
 		goto clean;
 
-	if (SUCCEED != (res = validate_linked_templates(&templateids, error, sizeof(error))))
+	if (SUCCEED != (res = validate_linked_templates(&templateids, err, sizeof(err))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
+		*error = zbx_strdup(NULL, err);
 		goto clean;
 	}
 
@@ -4842,13 +4840,13 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  ******************************************************************************/
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error)
 {
 	const char		*__function_name = "DBcopy_template_elements";
 	zbx_vector_uint64_t	templateids;
 	zbx_uint64_t		hosttemplateid;
 	int			i, res = SUCCEED;
-	char			error[MAX_STRING_LEN], *template_names;
+	char			*template_names, err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4874,23 +4872,21 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (SUCCEED != (res = validate_linked_templates(&templateids, error, sizeof(error))))
+	if (SUCCEED != (res = validate_linked_templates(&templateids, err, sizeof(err))))
 	{
 		template_names = get_template_names(lnk_templateids);
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s to host \"%s\": %s",
-				template_names, zbx_host_string(hostid), error);
+		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
 
 		zbx_free(template_names);
 		goto clean;
 	}
 
-	if (SUCCEED != (res = validate_host(hostid, lnk_templateids, error, sizeof(error))))
+	if (SUCCEED != (res = validate_host(hostid, lnk_templateids, err, sizeof(err))))
 	{
 		template_names = get_template_names(lnk_templateids);
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s to host \"%s\": %s",
-				template_names, zbx_host_string(hostid), error);
+		*error = zbx_dsprintf(NULL, "%s to host \"%s\": %s", template_names, zbx_host_string(hostid), err);
 
 		zbx_free(template_names);
 		goto clean;

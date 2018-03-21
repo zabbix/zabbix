@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha2');
+define('ZABBIX_VERSION',		'4.0.0alpha5');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050028);
+define('ZABBIX_DB_VERSION',		3050042);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2017');
+define('ZABBIX_COPYRIGHT_TO',	'2018');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -176,6 +176,12 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
+
+define('ZBX_TCP_HEADER_DATA',		"ZBXD");
+define('ZBX_TCP_HEADER_VERSION',	"\1");
+define('ZBX_TCP_HEADER',			ZBX_TCP_HEADER_DATA.ZBX_TCP_HEADER_VERSION);
+define('ZBX_TCP_HEADER_LEN',		5);
+define('ZBX_TCP_DATALEN_LEN',		8);
 
 define('AUDIT_ACTION_ADD',		0);
 define('AUDIT_ACTION_UPDATE',	1);
@@ -557,6 +563,9 @@ define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
 
+define('EVENT_CUSTOM_COLOR_DISABLED',	0);
+define('EVENT_CUSTOM_COLOR_ENABLED',	1);
+
 define('ALERT_STATUS_NOT_SENT', 0);
 define('ALERT_STATUS_SENT',		1);
 define('ALERT_STATUS_FAILED',	2);
@@ -847,8 +856,10 @@ define('ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM',	0x01);
 
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
+define('ZBX_TM_TASK_CHECK_NOW',		6);
 
-define('ZBX_TM_STATUS_NEW', 1);
+define('ZBX_TM_STATUS_NEW',			1);
+define('ZBX_TM_STATUS_INPROGRESS',	2);
 
 define('EVENT_SOURCE_TRIGGERS',				0);
 define('EVENT_SOURCE_DISCOVERY',			1);
@@ -1266,6 +1277,11 @@ define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
+// monitoring modes
+define('ZBX_MONITORED_BY_ANY', 0);
+define('ZBX_MONITORED_BY_SERVER', 1);
+define('ZBX_MONITORED_BY_PROXY', 2);
+
 // queue modes
 define('QUEUE_OVERVIEW', 0);
 define('QUEUE_OVERVIEW_BY_PROXY', 1);
@@ -1299,13 +1315,19 @@ define('ZBX_STYLE_ARROW_UP', 'arrow-up');
 define('ZBX_STYLE_BLUE', 'blue');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
+define('ZBX_STYLE_BTN_BACK_MAP', 'btn-back-map');
+define('ZBX_STYLE_BTN_BACK_MAP_CONTAINER', 'btn-back-map-container');
+define('ZBX_STYLE_BTN_BACK_MAP_CONTENT', 'btn-back-map-content');
+define('ZBX_STYLE_BTN_BACK_MAP_ICON', 'btn-back-map-icon');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
+define('ZBX_STYLE_BTN_DASHBRD_NORMAL', 'btn-dashbrd-normal');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
+define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
@@ -1346,6 +1368,10 @@ define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
+define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
+define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
+define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
+define('ZBX_STYLE_OK_ACK_FG', 'ok-ack-fg');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
@@ -1441,11 +1467,18 @@ define('ZBX_STYLE_SIGNIN_CONTAINER', 'signin-container');
 define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
 define('ZBX_STYLE_SIGN_IN_TXT', 'sign-in-txt');
+define('ZBX_STYLE_STATUS_AVERAGE_BG', 'status-average-bg');
 define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
 define('ZBX_STYLE_STATUS_DARK_GREY', 'status-dark-grey');
+define('ZBX_STYLE_STATUS_DISABLED_BG', 'status-disabled-bg');
+define('ZBX_STYLE_STATUS_DISASTER_BG', 'status-disaster-bg');
 define('ZBX_STYLE_STATUS_GREEN', 'status-green');
 define('ZBX_STYLE_STATUS_GREY', 'status-grey');
+define('ZBX_STYLE_STATUS_HIGH_BG', 'status-high-bg');
+define('ZBX_STYLE_STATUS_INFO_BG', 'status-info-bg');
+define('ZBX_STYLE_STATUS_NA_BG', 'status-na-bg');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
+define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
 define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');
 define('ZBX_STYLE_TABLE', 'table');
@@ -1482,6 +1515,7 @@ define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
+define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

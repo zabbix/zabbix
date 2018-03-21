@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,69 +19,74 @@
 **/
 
 
-$screenWidget = new CWidget();
+$screen_widget = new CWidget();
 
 $form = (new CFilter('web.hostscreen.filter.state'))->addNavigator();
 
-$screenWidget->addItem($form);
+$screen_widget->addItem($form);
 
-if (empty($this->data['screen']) || empty($this->data['host'])) {
-	$screenWidget
+if (empty($data['screen']) || empty($data['host'])) {
+	$screen_widget
 		->setTitle(_('Screens'))
 		->addItem(new CTableInfo());
 
-	$screenBuilder = new CScreenBuilder();
+	$screen_builder = new CScreenBuilder();
 	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screenBuilder->timeline
+		'timeline' => $screen_builder->timeline
 	]);
 }
 else {
-	$screenWidget->setTitle([
-		$this->data['screen']['name'],
-		SPACE,
-		_('on'),
-		SPACE,
-		(new CSpan($this->data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
+	$screen_widget->setTitle([
+		$data['screen']['name'].' '._('on').' ',
+		(new CSpan($data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
 	]);
 
+	$url = (new CUrl('host_screen.php'))
+		->setArgument('hostid', $data['hostid'])
+		->setArgument('screenid', $data['screenid'])
+		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+
 	// host screen list
-	if (!empty($this->data['screens'])) {
-		$screenComboBox = new CComboBox(
-			'screenList',
-			'host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$this->data['screenid'],
+	if (!empty($data['screens'])) {
+		$screen_combobox = new CComboBox('screenList', $url->toString(),
 			'javascript: redirect(this.options[this.selectedIndex].value);'
 		);
-		foreach ($this->data['screens'] as $screen) {
-			$screenComboBox->addItem('host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$screen['screenid'], $screen['name']);
+		foreach ($data['screens'] as $screen) {
+			$screen_combobox->addItem(
+				$url
+					->setArgument('screenid', $screen['screenid'])
+					->toString(),
+				$screen['name']
+			);
 		}
 
-		$screenWidget->setControls((new CList())
-			->addItem($screenComboBox)
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+		$screen_widget->setControls((new CList())
+			->addItem($screen_combobox)
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		);
 	}
 
 	// append screens to widget
-	$screenBuilder = new CScreenBuilder([
-		'screen' => $this->data['screen'],
+	$screen_builder = new CScreenBuilder([
+		'screen' => $data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
-		'hostid' => $this->data['hostid'],
-		'period' => $this->data['period'],
-		'stime' => $this->data['stime'],
-		'isNow' => $this->data['isNow'],
+		'hostid' => $data['hostid'],
+		'period' => $data['period'],
+		'stime' => $data['stime'],
+		'isNow' => $data['isNow'],
 		'profileIdx' => 'web.screens',
-		'profileIdx2' => $this->data['screen']['screenid']
+		'profileIdx2' => $data['screen']['screenid']
 	]);
 
-	$screenWidget->addItem(
-		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+	$screen_widget->addItem(
+		(new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 	);
 
 	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screenBuilder->timeline,
-		'profileIdx' => $screenBuilder->profileIdx,
-		'profileIdx2' => $screenBuilder->profileIdx2
+		'timeline' => $screen_builder->timeline,
+		'profileIdx' => $screen_builder->profileIdx,
+		'profileIdx2' => $screen_builder->profileIdx2
 	]);
 }
 
-return $screenWidget;
+return $screen_widget;

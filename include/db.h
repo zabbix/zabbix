@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -547,8 +547,8 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
 
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error);
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids, char **error);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);

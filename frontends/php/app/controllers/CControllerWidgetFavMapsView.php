@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 		$this->setType(WIDGET_FAVOURITE_MAPS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -60,6 +61,7 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_MAPS]),
 			'maps' => $maps,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

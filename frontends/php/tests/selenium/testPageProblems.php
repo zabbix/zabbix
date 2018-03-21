@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,16 +70,16 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestClick('filter_tags_add');
 		$this->zbxTestInputTypeWait('filter_tags_1_tag', 'Database');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/span', 'Test trigger to check tag filter on problem page');
+		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestTextNotPresent('Test trigger with tag');
 
 		// Change tags select to "OR" option
 		$this->zbxTestClickXpath('//label[@for="filter_evaltype_1"]');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText('//tbody/tr[1]/td[10]/span', 'Test trigger with tag');
-		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/span', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 2 of 2 found');
+		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/a', 'Test trigger with tag');
+		$this->zbxTestAssertElementText('//tbody/tr[4]/td[10]/a', 'Test trigger to check tag filter on problem page');
+		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 4 of 4 found');
 	}
 
 	/**
@@ -94,7 +94,7 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestInputType('filter_tags_0_tag', 'service');
 		$this->zbxTestInputType('filter_tags_0_value', 'abc');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/span', 'Test trigger to check tag filter on problem page');
+		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestTextNotPresent('Test trigger with tag');
 
@@ -126,14 +126,14 @@ class testPageProblems extends CWebTest {
 
 		// Search and check result
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText('//tbody/tr[1]/td[10]/span', 'Test trigger with tag');
-		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/span', 'Test trigger to check tag filter on problem page');
+		$this->zbxTestAssertElementText('//tbody/tr[1]/td[10]/a', 'Test trigger with tag');
+		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 2 of 2 found');
 
 		// Remove first tag option
 		$this->zbxTestClick('filter_tags_0_remove');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/span', 'Test trigger to check tag filter on problem page');
+		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 	}
 
@@ -154,6 +154,7 @@ class testPageProblems extends CWebTest {
 		// Select host
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('spanid10084');
 
 		// Type application
@@ -184,7 +185,7 @@ class testPageProblems extends CWebTest {
 
 		// Apply filter and check result
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/span', 'Test trigger to check tag filter on problem page');
+		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestClickButtonText('Reset');
 	}

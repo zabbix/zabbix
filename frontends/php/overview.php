@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ $showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTI
  * Display
  */
 $data = [
-	'fullscreen' => $_REQUEST['fullscreen'],
+	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'type' => $type,
 	'view_style' => $viewStyle,
 	'config' => $config

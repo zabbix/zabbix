@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -191,12 +191,13 @@ abstract class CHostGeneral extends CHostBase {
 				'templateids' => $hostTplIds['templateid']
 			]);
 
+			// Fist link web items, so that later regular items can use web item as their master item.
+			Manager::HttpTest()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
+
 			API::Item()->syncTemplates([
 				'hostids' => $hostTplIds['hostid'],
 				'templateids' => $hostTplIds['templateid']
 			]);
-
-			Manager::HttpTest()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
 		}
 
 		// we do linkage in two separate loops because for triggers you need all items already created on host
@@ -968,6 +969,7 @@ abstract class CHostGeneral extends CHostBase {
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
 			'hostids' => array_merge($hostids, $templateids),
+			'webitems' => true,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
 		]);

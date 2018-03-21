@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -180,8 +180,8 @@ next:
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
-				zbx_preprocess_item_value(items[i].itemid, items[i].flags, &results[i], ts,
-						items[i].state, NULL);
+				zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+						&results[i], ts, items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
@@ -189,8 +189,8 @@ next:
 				break;
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
-				zbx_preprocess_item_value(items[i].itemid, items[i].flags, NULL, ts, items[i].state,
-						results[i].msg);
+				zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags, NULL,
+						ts, items[i].state, results[i].msg);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;

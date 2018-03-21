@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ class CClockWidgetForm extends CWidgetForm {
 		// Item field
 		if ($field_time_type->getValue() === TIME_TYPE_HOST) {
 			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);

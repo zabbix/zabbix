@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -267,7 +267,7 @@ elseif ($config == QUEUE_DETAILS) {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $itemData['nextcheck']),
 			zbx_date2age($itemData['nextcheck']),
-			(isset($proxies[$hosts[$item['hostid']]['proxy_hostid']]))
+			isset($proxies[$hosts[$item['hostid']]['proxy_hostid']])
 				? $proxies[$hosts[$item['hostid']]['proxy_hostid']]['host'].NAME_DELIMITER.$host['name']
 				: $host['name'],
 			$item['name_expanded']
