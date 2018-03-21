@@ -71,18 +71,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		], $config, true);
 
 		if ($fields['show_tags']) {
-			foreach ($data['problems'] as $p => $problem) {
-				foreach ($problem['tags'] as $t => $tag) {
-					foreach ($fields['tags'] as $filter_tag) {
-						if ($filter_tag['tag'] == $tag['tag'] && ($filter_tag['value'] == ''
-								|| stripos($tag['value'], $filter_tag['value']) !== false)) {
-							$data['problems'][$p]['tags'][$t]['priority'] = 1;
-						}
-					}
-				}
-			}
-
-			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags']);
+			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags']);
 		}
 
 		if ($data['problems']) {

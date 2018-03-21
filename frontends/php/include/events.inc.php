@@ -754,10 +754,13 @@ function makeAcknowledgesTable($acknowledges, $users) {
  * @param string $events[]['tags']['value']
  * @param bool   $html
  * @param int    $list_tags_count
+ * @param array  $filter_tags
+ * @param string $filter_tags[]['tag']
+ * @param string $filter_tags[]['value']
  *
  * @return CTableInfo
  */
-function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT) {
+function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT, array $filter_tags = []) {
 	$tags = [];
 
 	foreach ($events as $event) {
@@ -768,19 +771,24 @@ function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TA
 		if ($html) {
 			// Show first n tags and "..." with hint box if there are more.
 
-			$filter_tags = [];
 			$event_tags = $event['tags'];
 
-			foreach ($event_tags as $t => $tag) {
-				if (array_key_exists('priority', $tag)) {
-					$filter_tags[] = $tag;
-					unset($event_tags[$t]);
+			if ($filter_tags) {
+				$first_tags = [];
+
+				foreach ($event_tags as $t => $tag) {
+					foreach ($filter_tags as $filter_tag) {
+						if ($filter_tag['tag'] == $tag['tag'] && ($filter_tag['value'] == ''
+								|| stripos($tag['value'], $filter_tag['value']) !== false)) {
+							$first_tags[] = $tag;
+							unset($event_tags[$t]);
+						}
+					}
 				}
+
+				$event_tags = $first_tags + $event_tags;
 			}
 
-			$event_tags = $filter_tags + $event_tags;
-
-			$tags_count = count($event['tags']);
 			$tags_shown = array_slice($event_tags, 0, $list_tags_count);
 
 			foreach ($tags_shown as $tag) {
@@ -790,7 +798,7 @@ function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TA
 					->setHint($value);
 			}
 
-			if ($tags_count > count($tags_shown)) {
+			if (count($event['tags']) > count($tags_shown)) {
 				// Display all tags in hint box.
 
 				$hint_content = [];
