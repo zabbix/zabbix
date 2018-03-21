@@ -775,7 +775,9 @@ class CScreenProblem extends CScreenBase {
 			$today = strtotime('today');
 
 			// Get trigger dependencies.
-			$trigger_ids_down = getTriggerDependencies(array_keys($data['triggers']));
+			$trigger_ids_down = $data['triggers']
+				? getTriggerDependencies(array_keys($data['triggers']))
+				: [];
 
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];

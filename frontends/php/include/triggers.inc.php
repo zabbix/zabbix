@@ -2364,7 +2364,7 @@ function getTriggerLastProblems(array $triggerids, array $output) {
  *
  * @return array
  */
-function getTriggerDependencies(array $triggerids = []) {
+function getTriggerDependencies(array $triggerids) {
 	$db_trigger_dependencies = DBselect(
 		'SELECT triggerid_down,triggerid_up'.
 		' FROM trigger_depends'.
@@ -2372,7 +2372,7 @@ function getTriggerDependencies(array $triggerids = []) {
 	);
 	$trigger_dependencies = [];
 	while ($row = DBfetch($db_trigger_dependencies)) {
-		$trigger_dependencies[$row['triggerid_up']][] = intval($row['triggerid_down']);
+		$trigger_dependencies[$row['triggerid_up']][] = $row['triggerid_down'];
 	}
 
 	return $trigger_dependencies;
