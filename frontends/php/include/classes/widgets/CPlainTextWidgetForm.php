@@ -61,13 +61,13 @@ class CPlainTextWidgetForm extends CWidgetForm {
 		$this->fields[] = $field_lines;
 
 		// Show text as HTML.
-		$field_text_as_html = (new CWidgetFieldCheckBox('show_as_html', _('Show text as HTML')))->setDefault(0);
+		$field_show_as_html = (new CWidgetFieldCheckBox('show_as_html', _('Show text as HTML')))->setDefault(0);
 
 		if (array_key_exists('show_as_html', $this->data)) {
-			$field_text_as_html->setValue($this->data['show_as_html']);
+			$field_show_as_html->setValue($this->data['show_as_html']);
 		}
 
-		$this->fields[] = $field_text_as_html;
+		$this->fields[] = $field_show_as_html;
 
 		// Use dynamic items.
 		$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic items')))->setDefault(WIDGET_SIMPLE_ITEM);
