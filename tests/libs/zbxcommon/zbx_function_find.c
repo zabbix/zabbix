@@ -31,8 +31,10 @@ void	zbx_mock_test_entry(void **state)
 	int			expected_result = FAIL, actual_result = FAIL;
 	size_t 			func_pos, par_l, par_r;
 	size_t 			func_pos_exp, par_l_exp, par_r_exp;
-	const int 		max_error_len = 255;
-	char 			error_text[max_error_len] = {0};
+	const int 		max_error_len = MAX_STRING_LEN;
+	char 			error_text[MAX_STRING_LEN];
+
+	*error_text = '\0';
 
 	ZBX_UNUSED(state);
 
@@ -112,20 +114,20 @@ void	zbx_mock_test_entry(void **state)
 	{
 		if (func_pos != func_pos_exp)
 		{
-			fail_msg("Position %i of 'function' not equal expected %i. Error:%s", func_pos, func_pos_exp,
-				error_text);
+			fail_msg("Position "ZBX_FS_UI64" of 'function' not equal expected "ZBX_FS_UI64". Error:%s",
+				func_pos, func_pos_exp,	error_text);
 		}
 
 		if (par_l != par_l_exp)
 		{
-			fail_msg("Position %i of left '(' not equal expected %i. Error:%s", par_l, par_l_exp,
-				error_text);
+			fail_msg("Position "ZBX_FS_UI64" of left '(' not equal expected "ZBX_FS_UI64". Error:%s",
+				par_l, par_l_exp, error_text);
 		}
 
 		if (par_r != par_r_exp)
 		{
-			fail_msg("Position %i of right ')' not equal expected %i. Error:%s", par_r, par_r_exp,
-				error_text);
+			fail_msg("Position "ZBX_FS_UI64" of right ')' not equal expected "ZBX_FS_UI64". Error:%s",
+				par_r, par_r_exp, error_text);
 		}
 	}
 	else /* SYSINFO_RET_FAIL == expected_result */
