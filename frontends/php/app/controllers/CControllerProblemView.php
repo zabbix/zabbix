@@ -54,10 +54,10 @@ class CControllerProblemView extends CController {
 			'filter_inventory' =>		'array',
 			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>			'array',
+			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
 			'filter_maintenance' =>		'in 1',
 			'filter_unacknowledged' =>	'in 1',
 			'filter_details' =>			'in 1',
-			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
 			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
 			'stime' =>					'time',
 			'isNow' =>					'in 0,1'
@@ -158,6 +158,9 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.problem.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 
+			CProfile::update('web.problem.filter.show_tags', $this->getInput('filter_show_tags', PROBLEMS_SHOW_TAGS_3),
+				PROFILE_TYPE_INT
+			);
 			CProfile::update('web.problem.filter.maintenance', $this->getInput('filter_maintenance', 0),
 				PROFILE_TYPE_INT
 			);
@@ -165,9 +168,6 @@ class CControllerProblemView extends CController {
 				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.details', $this->getInput('filter_details', 0), PROFILE_TYPE_INT);
-			CProfile::update('web.problem.filter.show_tags', $this->getInput('filter_show_tags', PROBLEMS_SHOW_TAGS_3),
-				PROFILE_TYPE_INT
-			);
 		}
 		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.problem.filter.show');
@@ -185,10 +185,10 @@ class CControllerProblemView extends CController {
 			CProfile::deleteIdx('web.problem.filter.tags.tag');
 			CProfile::deleteIdx('web.problem.filter.tags.value');
 			CProfile::deleteIdx('web.problem.filter.tags.operator');
+			CProfile::delete('web.problem.filter.show_tags');
 			CProfile::delete('web.problem.filter.maintenance');
 			CProfile::delete('web.problem.filter.unacknowledged');
 			CProfile::delete('web.problem.filter.details');
-			CProfile::delete('web.problem.filter.show_tags');
 		}
 
 		$config = select_config();
@@ -282,10 +282,10 @@ class CControllerProblemView extends CController {
 				'inventory' => $filter_inventory,
 				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND),
 				'tags' => $filter_tags,
+				'show_tags' => CProfile::get('web.problem.filter.show_tags', PROBLEMS_SHOW_TAGS_3),
 				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),
 				'unacknowledged' => CProfile::get('web.problem.filter.unacknowledged', 0),
-				'details' => CProfile::get('web.problem.filter.details', 0),
-				'show_tags' => CProfile::get('web.problem.filter.show_tags', PROBLEMS_SHOW_TAGS_3)
+				'details' => CProfile::get('web.problem.filter.details', 0)
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable']

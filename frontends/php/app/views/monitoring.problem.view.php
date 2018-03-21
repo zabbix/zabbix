@@ -41,10 +41,10 @@ $options = [
 			'inventory' => $data['filter']['inventory'],
 			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
+			'show_tags' => $data['filter']['show_tags'],
 			'maintenance' => $data['filter']['maintenance'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
-			'details' => $data['filter']['details'],
-			'show_tags' => $data['filter']['show_tags']
+			'details' => $data['filter']['details']
 		]
 	]
 ];
@@ -263,6 +263,14 @@ if ($data['action'] == 'problem.view') {
 	$filter_column2 = (new CFormList())
 		->addRow(_('Host inventory'), $filter_inventory_table)
 		->addRow(_('Tags'), $filter_tags_table)
+		->addRow(_('Show tags'),
+			(new CRadioButtonList('filter_show_tags', (int) $data['filter']['show_tags']))
+				->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
+				->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
+				->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
+				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
+				->setModern(true)
+		)
 		->addRow(_('Show hosts in maintenance'),
 			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1)
 		);
@@ -274,15 +282,7 @@ if ($data['action'] == 'problem.view') {
 	}
 
 	$filter_column2
-		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1))
-		->addRow(_('Show tags'),
-			(new CRadioButtonList('filter_show_tags', (int) $data['filter']['show_tags']))
-				->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
-				->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
-				->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
-				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
-				->setModern(true)
-		);
+		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
 
 	$filter = (new CFilter('web.problem.filter.state'))
 		->addVar('action', 'problem.view')
