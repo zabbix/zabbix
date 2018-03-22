@@ -1714,7 +1714,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 				s->buffer = out;
 				s->read_bytes = reserved;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): received " ZBX_FS_SIZE_T " bytes with"
+				zabbix_log(LOG_LEVEL_TRACE, "%s(): received " ZBX_FS_SIZE_T " bytes with"
 						" compression ratio %.1f", __function_name,
 						buf_stat_bytes + buf_dyn_bytes,
 						(double)reserved / (buf_stat_bytes + buf_dyn_bytes));
