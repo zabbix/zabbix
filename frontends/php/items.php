@@ -847,7 +847,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
-			if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
+			if (getRequest('type') == ITEM_TYPE_HTTPAGENT && !($db_item['flags'] & ZBX_FLAG_DISCOVERY_CREATED)) {
 				$posted = [
 					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 					'url' => getRequest('url'),
