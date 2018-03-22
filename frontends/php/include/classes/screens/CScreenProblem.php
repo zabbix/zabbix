@@ -764,10 +764,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			if ($this->data['filter']['show_tags']) {
-				$tags = makeEventsTags(
-					$data['problems'],
-					true,
-					$this->data['filter']['show_tags'],
+				$tags = makeEventsTags($data['problems'], true, $this->data['filter']['show_tags'],
 					$this->data['filter']['tags']
 				);
 			}
