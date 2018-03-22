@@ -212,9 +212,6 @@ class CProxy extends CApiService {
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)) {
 				$proxy['interface']['main'] = INTERFACE_PRIMARY;
 			}
-
-			// Newly created proxies will use compression by default.
-			$proxy['compress'] = HOST_COMPRESSION_ON;
 		}
 		unset($proxy);
 
