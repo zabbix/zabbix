@@ -685,7 +685,7 @@ class CScreenProblem extends CScreenBase {
 
 		$url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'problem.view')
-			->setArgument('fullscreen', $this->data['fullscreen']);
+			->setArgument('fullscreen', $this->data['fullscreen'] ? '1' : null);
 
 		$data = self::getData($this->data['filter'], $this->config);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
