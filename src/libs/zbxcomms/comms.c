@@ -760,6 +760,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 		{
 			if (SUCCEED != zbx_compress(data, len, &compressed_data, &send_len))
 			{
+				zbx_set_socket_strerror("cannot compress data: %s", zbx_compress_strerror());
 				ret = FAIL;
 				goto cleanup;
 			}
@@ -807,7 +808,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 		else
 			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, send_len - (size_t)written);
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, data + written, send_bytes)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, send_data + written, send_bytes)))
 		{
 			ret = FAIL;
 			goto cleanup;
@@ -1702,8 +1703,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 				if (FAIL == zbx_uncompress(s->buffer, buf_stat_bytes + buf_dyn_bytes, out, reserved))
 				{
 					zbx_free(out);
-					zabbix_log(LOG_LEVEL_WARNING, "Message from %s cannot be uncompressed."
-							" Message ignored.", s->peer);
+					zbx_set_socket_strerror("cannot uncompress data: %s", zbx_compress_strerror());
 					nbytes = ZBX_PROTO_ERROR;
 					goto out;
 				}

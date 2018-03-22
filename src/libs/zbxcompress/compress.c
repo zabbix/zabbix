@@ -23,36 +23,41 @@
 #ifdef HAVE_ZLIB
 #include "zlib.h"
 
+#define ZBX_COMPRESS_STRERROR_LEN	512
+
+static int	zbx_zlib_errno = 0;
+
 /******************************************************************************
  *                                                                            *
- * Function: zbx_zlib_strerror                                                *
+ * Function: zbx_compress_strerror                                            *
  *                                                                            *
- * Purpose: converts zlib error code into error message                       *
- *                                                                            *
- * Parameters: in      - [IN] the error code                                  *
- *             message - [OUT] the output message                             *
+ * Purpose: returns last conversion error message                             *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_zlib_strerror(int err, char **message)
+const char	*zbx_compress_strerror()
 {
-	switch (err)
+	static char	message[ZBX_COMPRESS_STRERROR_LEN];
+
+	switch (zbx_zlib_errno)
 	{
 		case Z_ERRNO:
-			*message = zbx_strdup(*message, zbx_strerror(errno));
+			zbx_strlcpy(message, zbx_strerror(errno), sizeof(message));
 			break;
 		case Z_MEM_ERROR:
-			*message = zbx_strdup(*message, "not enough memory");
+			zbx_strlcpy(message, "not enough memory", sizeof(message));
 			break;
 		case Z_BUF_ERROR:
-			*message = zbx_strdup(*message, "not enough space in output buffer");
+			zbx_strlcpy(message, "not enough space in output buffer", sizeof(message));
 			break;
 		case Z_DATA_ERROR:
-			*message = zbx_strdup(*message, "corrupted input data");
+			zbx_strlcpy(message, "corrupted input data", sizeof(message));
 			break;
 		default:
-			*message = zbx_dsprintf(*message, "unknown error (%d)", err);
+			zbx_snprintf(message, sizeof(message), "unknown error (%d)", zbx_zlib_errno);
 			break;
 	}
+
+	return message;
 }
 
 /******************************************************************************
@@ -75,19 +80,12 @@ static void	zbx_zlib_strerror(int err, char **message)
  ******************************************************************************/
 int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 {
-	int	ret_zlib;
-
 	*size_out = compressBound(size_in);
 	*out = (char *)zbx_malloc(NULL, *size_out);
 
-	if (Z_OK != (ret_zlib = compress((unsigned char *)*out, size_out, (unsigned char *)in, size_in)))
+	if (Z_OK != (zbx_zlib_errno = compress((unsigned char *)*out, size_out, (unsigned char *)in, size_in)))
 	{
-		char	*errmsg = NULL;
-
 		zbx_free(*out);
-		zbx_zlib_strerror(ret_zlib, &errmsg);
-		zabbix_log(LOG_LEVEL_ERR, "Cannot compress data, returned error: %s", errmsg);
-		zbx_free(errmsg);
 		return FAIL;
 	}
 
@@ -111,18 +109,10 @@ int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
  ******************************************************************************/
 int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t size_out)
 {
-	int	ret_zlib;
 	size_t	len = size_out;
 
-	if (Z_OK != (ret_zlib = uncompress((unsigned char *)out, &len, (unsigned char *)in, size_in)))
-	{
-		char	*errmsg = NULL;
-
-		zbx_zlib_strerror(ret_zlib, &errmsg);
-		zabbix_log(LOG_LEVEL_ERR, "Cannot uncompress data, returned error: %s", errmsg);
-		zbx_free(errmsg);
+	if (Z_OK != (zbx_zlib_errno = uncompress((unsigned char *)out, &len, (unsigned char *)in, size_in)))
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
