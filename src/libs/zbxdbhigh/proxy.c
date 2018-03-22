@@ -3017,38 +3017,37 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 
 	switch(item->type)
 	{
-		case ITEM_TYPE_TRAPPER:
-			if ('\0' != *item->trapper_hosts)	/* list of allowed hosts not empty */
-			{
-				char	*allowed_peers;
-				int	ret;
-
-				allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL,
-						&allowed_peers, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
-				ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
-				zbx_free(allowed_peers);
-
-				if (FAIL == ret)
-				{
-					*error = zbx_dsprintf(*error, "cannot process trapper item \"%s\": %s",
-							item->key_orig, zbx_socket_strerror());
-					return FAIL;
-				}
-			}
-			break;
 		case ITEM_TYPE_HTTPAGENT:
 			if (0 == item->allow_traps)
 			{
-				*error = zbx_dsprintf(*error, "cannot process HTTP agent item \"%s\":"
+				*error = zbx_dsprintf(*error, "cannot process HTTP agent item \"%s\" trap:"
 						" trapping is not enabled", item->key_orig);
 				return FAIL;
 			}
 			break;
 		default:
-			*error = zbx_dsprintf(*error, "cannot process item \"%s\": item type \"%d\" is not supported",
-					item->key_orig, item->type);
+			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap:"
+					" item type \"%d\" cannot be used with traps", item->key_orig, item->type);
 			return FAIL;
+	}
+
+	if ('\0' != *item->trapper_hosts)	/* list of allowed hosts not empty */
+	{
+		char	*allowed_peers;
+		int	ret;
+
+		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL,
+				&allowed_peers, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
+		zbx_free(allowed_peers);
+
+		if (FAIL == ret)
+		{
+			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap: %s",
+					item->key_orig, zbx_socket_strerror());
+			return FAIL;
+		}
 	}
 
 	rights = (zbx_host_rights_t *)args;

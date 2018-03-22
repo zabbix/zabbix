@@ -245,6 +245,7 @@ typedef struct
 	const char	*ssl_key_password;
 	const char	*password;
 	const char	*posts;
+	const char	*trapper_hosts;
 	unsigned char	authtype;
 	unsigned char	follow_redirects;
 	unsigned char	post_type;
