@@ -45,6 +45,18 @@ class CStatusCodeRangesValidatorTest extends CValidatorTest {
 				['usermacros' => true], '{$MACRO}-200'
 			],
 			[
+				['lldmacros' => true], '{#SCODE}'
+			],
+			[
+				['lldmacros' => true], '{#SCODE_MIN}-{#SCODE_MAX}'
+			],
+			[
+				['lldmacros' => true], '200-{#SCODE_MAX}'
+			],
+			[
+				['lldmacros' => true], '{#SCODE_MIN}-200'
+			],
+			[
 				[], '200-400'
 			],
 			[
@@ -54,7 +66,18 @@ class CStatusCodeRangesValidatorTest extends CValidatorTest {
 				[], '200,301'
 			],
 			[
+				[], "200,\t301,\r\n100\t-\r\n    200\t"
+			],
+			[
 				['usermacros' => true], '{$MACRO}-{$MACRO},{$MACRO},{$MACRO}-200,200-{$MACRO},200-301'
+			],
+			[
+				['lldmacros' => true], '{#SCODE_MIN}-{#SCODE_MAX},{#SCODE},{#SCODE_MIN}-200,200-{#SCODE_MAX},200-301'
+			],
+			[
+				['usermacros' => true, 'lldmacros' => true],
+				'{$MACRO}-{$MACRO},{$MACRO},{$MACRO}-200,200-{$MACRO},200-301,{#SCODE_MIN}-{#SCODE_MAX},{#SCODE},'.
+					'{#SCODE_MIN}-200,200-{#SCODE_MAX},200-301,{#SCODE}-{$MACRO}'
 			]
 		];
 	}
@@ -68,6 +91,16 @@ class CStatusCodeRangesValidatorTest extends CValidatorTest {
 			],
 			[
 				['messageInvalid' => 'Invalid value "%1$s"'],
+				'{#SCODE}',
+				'Invalid value "{#SCODE}"'
+			],
+			[
+				['messageInvalid' => 'Invalid value "%1$s"'],
+				'200-',
+				'Invalid value "200-"'
+			],
+			[
+				['messageInvalid' => 'Invalid value "%1$s"'],
 				'200-300-500',
 				'Invalid value "200-300-500"'
 			],
@@ -75,6 +108,26 @@ class CStatusCodeRangesValidatorTest extends CValidatorTest {
 				['usermacros' => false, 'messageInvalid' => 'Invalid value "%1$s"'],
 				'200-{$MACRO}',
 				'Invalid value "200-{$MACRO}"'
+			],
+			[
+				['usermacros' => true, 'messageInvalid' => 'Invalid value "%1$s"'],
+				'200-{#SCODE}',
+				'Invalid value "200-{#SCODE}"'
+			],
+			[
+				['lldmacros' => false, 'messageInvalid' => 'Invalid value "%1$s"'],
+				'200-{#SCODE}',
+				'Invalid value "200-{#SCODE}"'
+			],
+			[
+				['lldmacros' => true, 'messageInvalid' => 'Invalid value "%1$s"'],
+				'200-{$MACRO}',
+				'Invalid value "200-{$MACRO}"'
+			],
+			[
+				['messageInvalid' => 'Invalid value "%1$s"'],
+				'500-100',
+				'Invalid value "500-100"'
 			],
 			[
 				['messageInvalid' => 'Invalid value "%1$s"'],

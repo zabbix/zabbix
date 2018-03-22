@@ -21,9 +21,9 @@
 
 /**
  * Class to validate status code ranges.
- * Ranges can be list of comma separated numeric strings or user macroses.
+ * Comma separated list of numeric strings, user macroses, lld macroses.
  *
- * Examples: '100-199, 301, 404, 500-550, {$MACRO}-200, {$MACRO}-{$MACRO}'
+ * Example: '100-199, 301, 404, 500-550, {$MACRO}-200, {$MACRO}-{$MACRO}, {#SCODE}-{$MACRO}'
  */
 class CStatusCodeRangesValidator extends CValidator {
 
@@ -40,6 +40,18 @@ class CStatusCodeRangesValidator extends CValidator {
 	public $usermacros = false;
 
 	/**
+	 * @var CLLDMacroParser
+	 */
+	private $lld_macro_parser;
+
+	/**
+	 * If set to true, lld macros can be used as part or value in status code ranges.
+	 *
+	 * @var bool
+	 */
+	public $lldmacros = false;
+
+	/**
 	 * Error message if the status codes range string is invalid.
 	 *
 	 * @var string
@@ -52,6 +64,13 @@ class CStatusCodeRangesValidator extends CValidator {
 			$this->user_macro_parser = new CUserMacroParser();
 			unset($options['usermacros']);
 		}
+
+		if (array_key_exists('lldmacros', $options)) {
+			$this->lldmacros = $options['lldmacros'];
+			$this->lld_macro_parser = new CLLDMacroParser();
+			unset($options['lldmacros']);
+		}
+
 		parent::__construct($options);
 	}
 
@@ -78,11 +97,18 @@ class CStatusCodeRangesValidator extends CValidator {
 				return false;
 			}
 
-			foreach ($range_parts as $part) {
+			foreach ($range_parts as $index => $part) {
 				$part = trim($part, " \t\r\n");
 
-				if (!ctype_digit($part) && !($this->usermacros
-						&& $this->user_macro_parser->parse($part) == CParser::PARSE_SUCCESS)) {
+				if (!ctype_digit($part)) {
+					if (!($this->usermacros && $this->user_macro_parser->parse($part) == CParser::PARSE_SUCCESS)
+							&& !($this->lldmacros && $this->lld_macro_parser->parse($part) == CParser::PARSE_SUCCESS)) {
+						$this->error($this->messageInvalid, $value);
+
+						return false;
+					}
+				}
+				else if ($index > 0 && ctype_digit($range_parts[$index - 1]) && $range_parts[$index - 1] > $part) {
 					$this->error($this->messageInvalid, $value);
 
 					return false;
