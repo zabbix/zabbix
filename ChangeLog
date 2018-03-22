@@ -10,6 +10,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+........S. [ZBX-13571] fixed regression that resulted in slow history data queries on partitioned tables (wiper)
 ..F....... [ZBX-13490] fixed autofocus in forms (nikita)
 ........S. [ZBX-13470] improved searching IPMI items by full name (MVekslers)
 ..F....... [ZBX-13566] fixed create dashboard button size in dashboard list (Andzs)
