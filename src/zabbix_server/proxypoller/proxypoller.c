@@ -734,8 +734,6 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 
 	zbx_free(answer);
 out:
-	zbx_update_proxy_data(proxy, proxy->version, time(NULL), proxy->compress);
-
 	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
 	else

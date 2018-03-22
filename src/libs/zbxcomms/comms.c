@@ -1705,6 +1705,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 					zabbix_log(LOG_LEVEL_WARNING, "Message from %s cannot be uncompressed."
 							" Message ignored.", s->peer);
 					nbytes = ZBX_PROTO_ERROR;
+					goto out;
 				}
 
 				if (ZBX_BUF_TYPE_DYN == s->buf_type)

@@ -3912,7 +3912,6 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
 				ZBX_COMPONENT_VERSION_MAJOR(diff.version),
 				ZBX_COMPONENT_VERSION_MINOR(diff.version));
-
 	}
 
 	proxy->version = version;

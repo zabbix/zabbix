@@ -82,11 +82,11 @@ int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 
 	if (Z_OK != (ret_zlib = compress((unsigned char *)*out, size_out, (unsigned char *)in, size_in)))
 	{
-		char	*errmsg;
+		char	*errmsg = NULL;
 
 		zbx_free(*out);
 		zbx_zlib_strerror(ret_zlib, &errmsg);
-		zabbix_log(LOG_LEVEL_ERR, "Cannot compress data, returned error: %s", ret_zlib, errmsg);
+		zabbix_log(LOG_LEVEL_ERR, "Cannot compress data, returned error: %s", errmsg);
 		zbx_free(errmsg);
 		return FAIL;
 	}
@@ -116,10 +116,10 @@ int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t size_out)
 
 	if (Z_OK != (ret_zlib = uncompress((unsigned char *)out, &len, (unsigned char *)in, size_in)))
 	{
-		char	*errmsg;
+		char	*errmsg = NULL;
 
 		zbx_zlib_strerror(ret_zlib, &errmsg);
-		zabbix_log(LOG_LEVEL_ERR, "Cannot uncompress data, returned error: %s", ret_zlib, errmsg);
+		zabbix_log(LOG_LEVEL_ERR, "Cannot uncompress data, returned error: %s", errmsg);
 		zbx_free(errmsg);
 		return FAIL;
 	}

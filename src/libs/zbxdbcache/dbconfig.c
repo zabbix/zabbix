@@ -11157,7 +11157,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 				proxy->lastaccess = diff->lastaccess;
 
 			/* proxy last access in database is updated separately in  */
-			/* ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY bulks             */
+			/* every ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY seconds     */
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS);
 		}
 
