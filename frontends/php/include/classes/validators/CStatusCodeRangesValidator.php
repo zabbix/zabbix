@@ -108,7 +108,7 @@ class CStatusCodeRangesValidator extends CValidator {
 						return false;
 					}
 				}
-				else if ($index > 0 && ctype_digit($range_parts[$index - 1]) && $range_parts[$index - 1] > $part) {
+				elseif ($index > 0 && ctype_digit($range_parts[$index - 1]) && $range_parts[$index - 1] > $part) {
 					$this->error($this->messageInvalid, $value);
 
 					return false;

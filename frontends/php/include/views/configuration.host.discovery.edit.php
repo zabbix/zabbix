@@ -94,7 +94,7 @@ if (is_array($data['query_fields']) && $data['query_fields']) {
 		$query_fields_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
-else if (!$data['limited']) {
+elseif (!$data['limited']) {
 	$query_fields_data[] = ['key' => '', 'value' => ''];
 }
 
@@ -188,7 +188,7 @@ if (is_array($data['headers']) && $data['headers']) {
 		$headers_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
-else if (!$data['limited']) {
+elseif (!$data['limited']) {
 	$headers_data[] = ['key' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');

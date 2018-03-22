@@ -115,7 +115,7 @@ if (is_array($data['query_fields']) && $data['query_fields']) {
 		$query_fields_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
-else if (!$readonly) {
+elseif (!$readonly) {
 	$query_fields_data[] = ['key' => '', 'value' => ''];
 }
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -207,7 +207,7 @@ if (is_array($data['headers']) && $data['headers']) {
 		$headers_data[] = ['key' => key($pair), 'value' => reset($pair)];
 	}
 }
-else if (!$readonly) {
+elseif (!$readonly) {
 	$headers_data[] = ['key' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
