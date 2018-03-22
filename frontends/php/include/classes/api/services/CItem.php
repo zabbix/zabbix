@@ -581,7 +581,7 @@ class CItem extends CItemGeneral {
 				'posts' => ''
 			]
 		];
-		$cjson = CJson();
+		$cjson = new CJson();
 
 		foreach ($items as &$item) {
 			$type_change = ($item['type'] != $db_items[$item['itemid']]['type']);
