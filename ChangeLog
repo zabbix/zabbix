@@ -10,6 +10,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+.......PS. [ZBX-13510] fixed error of execution "make dbschema" for NetBSD (MVekslers)
 ...G...... [ZBX-13544] fixed agent crashes when using regex with 'Log' item for Mac OSX (MVekslers)
 ........S. [ZBX-13611] fixed lld rules not always saving their state/error message changes (wiper)
 ........S. [ZBX-13571] fixed regression that resulted in slow history data queries on partitioned tables (wiper)
