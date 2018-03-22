@@ -10,6 +10,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+........S. [ZBX-13613] improved a history syncer when backend elasticsearch is not available (MVekslers)
 .......PS. [ZBX-13510] fixed error of execution "make dbschema" for NetBSD (MVekslers)
 ...G...... [ZBX-13544] fixed agent crashes when using regex with 'Log' item for Mac OSX (MVekslers)
 ........S. [ZBX-13611] fixed lld rules not always saving their state/error message changes (wiper)
@@ -205,6 +206,7 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-13613] improved a history syncer when backend elasticsearch is not available (MVekslers)
 ...G...... [ZBX-13544] fixed agent crashes when using regex with 'Log' item for Mac OSX (MVekslers)
 ........S. [ZBX-13611] fixed lld rules not always saving their state/error message changes (wiper)
 ........S. [ZBX-13571] fixed regression that resulted in slow history data queries on partitioned tables (wiper)
