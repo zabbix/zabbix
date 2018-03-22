@@ -529,7 +529,7 @@ static int	DBpatch_3050044(void)
 {
 	int	ret;
 
-	/* 5 - HOST_STATUS_PROXY_ACTIVE, 6 - HOST_STATUS_PROXY_PASSIVE*/
+	/* 5 - HOST_STATUS_PROXY_ACTIVE, 6 - HOST_STATUS_PROXY_PASSIVE */
 	ret = DBexecute("update hosts set compress=0 where status=5 or status=6");
 
 	if (ZBX_DB_OK > ret)
