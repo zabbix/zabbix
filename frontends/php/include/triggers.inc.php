@@ -689,6 +689,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		'monitored' => true,
 		'skipDependent' => true,
 		'sortfield' => 'description',
+		'selectDependencies' => ['triggerid'],
 		'preservekeys' => true
 	] + $trigger_options;
 
@@ -728,6 +729,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  * @param array		$triggers[][hosts]
  * @param string	$triggers[][hosts][][hostid]
  * @param string	$triggers[][hosts][][name]
+ * @param string	$triggers[][dependencies]
  * @param string 	$pageFile						the page where the element is displayed
  * @param int    	$viewMode						table display style: either hosts on top, or host on the left side
  * @param string 	$screenId						the ID of the screen, that contains the trigger overview table
@@ -740,6 +742,12 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 	$trcounter = [];
 
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers, true);
+
+	// Make trigger dependencies.
+	if ($triggers) {
+		$triggers = getDependentTriggers($triggers);
+		$triggers = makeTriggerDependencies($triggers);
+	}
 
 	foreach ($triggers as $trigger) {
 		$trigger_name = $trigger['description'];
@@ -768,7 +776,9 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'flags' => $trigger['flags'],
 				'url' => $trigger['url'],
 				'hosts' => $trigger['hosts'],
-				'items' => $trigger['items']
+				'items' => $trigger['items'],
+				'dependencies' => $trigger['dependencies'],
+				'dependent_triggers' => $trigger['dependent_triggers']
 			];
 			$trcounter[$host['name']][$trigger_name]++;
 		}
@@ -906,40 +916,34 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 		// dependency: triggers on which depends this
 		$triggerId = empty($trigger['triggerid']) ? 0 : $trigger['triggerid'];
 
-		// trigger dependency DOWN
-		$dependencyTable = (new CTableInfo())
-			->setAttribute('style', 'width: 200px;')
-			->addRow(bold(_('Depends on').':'));
+		// Trigger dependency DOWN.
+		if ($trigger['dependencies']) {
+			$dependency_table = (new CTableInfo())
+				->setAttribute('style', 'width: 200px;')
+				->addRow(bold(_('Depends on').':'));
 
-		$isDependencyFound = false;
-		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.zbx_dbstr($triggerId));
-		while ($dbDependency = DBfetch($dbDependencies)) {
-			$dependencyTable->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_up']));
-			$isDependencyFound = true;
-		}
+			foreach ($trigger['dependencies'] as $dep) {
+				$dependency_table->addRow(' - '.$dep['description']);
+			}
 
-		if ($isDependencyFound) {
 			$desc[] = (new CSpan())
 				->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
-				->setHint($dependencyTable, '', false);
+				->setHint($dependency_table, '', false);
 		}
 
-		// trigger dependency UP
-		$dependencyTable = (new CTableInfo())
-			->setAttribute('style', 'width: 200px;')
-			->addRow(bold(_('Dependent').':'));
+		// Trigger dependency UP.
+		if ($trigger['dependent_triggers']) {
+			$dependency_table = (new CTableInfo())
+				->setAttribute('style', 'width: 200px;')
+				->addRow(bold(_('Dependent').':'));
 
-		$isDependencyFound = false;
-		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.zbx_dbstr($triggerId));
-		while ($dbDependency = DBfetch($dbDependencies)) {
-			$dependencyTable->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_down']));
-			$isDependencyFound = true;
-		}
+			foreach ($trigger['dependent_triggers'] as $dep) {
+				$dependency_table->addRow(' - '.$dep['description']);
+			}
 
-		if ($isDependencyFound) {
 			$desc[] = (new CSpan())
 				->addClass(ZBX_STYLE_ICON_DEPEND_UP)
-				->setHint($dependencyTable, '', false);
+				->setHint($dependency_table, '', false);
 		}
 	}
 
@@ -2358,22 +2362,88 @@ function getTriggerLastProblems(array $triggerids, array $output) {
 }
 
 /**
- * Function returns dependent triggers for each given trigger.
+ * Extends $triggers array by sub-array of dependent triggers.
  *
- * @param array $triggerids		List of triggers.
+ * @param array $triggers
+ * @param int	$triggers[<triggerid>]['triggerid']
  *
  * @return array
  */
-function getTriggerDependencies(array $triggerids) {
+function getDependentTriggers(array $triggers) {
+	$triggerids = [];
+	foreach ($triggers as &$trigger) {
+		$triggerids[] = $trigger['triggerid'];
+		$trigger['dependent_triggers'] = [];
+	}
+	unset($trigger);
+
 	$db_trigger_dependencies = DBselect(
 		'SELECT triggerid_down,triggerid_up'.
 		' FROM trigger_depends'.
 		' WHERE '.dbConditionInt('triggerid_up', $triggerids)
 	);
-	$trigger_dependencies = [];
+
 	while ($row = DBfetch($db_trigger_dependencies)) {
-		$trigger_dependencies[$row['triggerid_up']][] = $row['triggerid_down'];
+		$triggers[$row['triggerid_up']]['dependent_triggers'][] = [
+			'triggerid' => $row['triggerid_down']
+		];
 	}
 
-	return $trigger_dependencies;
+	return $triggers;
+}
+
+/**
+ * Extends 'dependencies' and 'dependent_triggers' sub-array by resolved trigger names.
+ *
+ * @param array  $triggers
+ * @param int	 $triggers[<triggerid>]['triggerid']
+ * @param array	 $triggers[<triggerid>]['dependencies']				(optional)
+ * @param array	 $triggers[<triggerid>]['dependent_triggers']		(optional)
+ *
+ * @return array
+ */
+function makeTriggerDependencies(array $triggers) {
+	$dependent_triggers = [];
+	foreach ($triggers as &$trigger) {
+		if (array_key_exists('dependencies', $trigger)) {
+			foreach ($trigger['dependencies'] as $dependency) {
+				$dependent_triggers[] = $dependency['triggerid'];
+			}
+		}
+		if (array_key_exists('dependent_triggers', $trigger)) {
+			foreach ($trigger['dependent_triggers'] as $dependency) {
+				$dependent_triggers[] = $dependency['triggerid'];
+			}
+		}
+	}
+	unset($trigger);
+
+	if ($dependent_triggers) {
+		$dependent_triggers = API::Trigger()->get([
+			'output' => ['expression', 'description'],
+			'triggerids' => array_keys(array_flip($dependent_triggers)),
+			'preservekeys' => true
+		]);
+
+		$dependent_triggers = CMacrosResolverHelper::resolveTriggerNames($dependent_triggers);
+
+		foreach ($triggers as &$trigger) {
+			if (array_key_exists('dependencies', $trigger)) {
+				foreach ($trigger['dependencies'] as &$dep) {
+					$dep['description'] = $dependent_triggers[$dep['triggerid']]['description'];
+				}
+				unset($dep);
+			}
+
+			if (array_key_exists('dependent_triggers', $trigger)) {
+				foreach ($trigger['dependent_triggers'] as &$dep) {
+					$dep['description'] = $dependent_triggers[$dep['triggerid']]['description'];
+				}
+				unset($dep);
+			}
+		}
+		unset($trigger);
+	}
+
+	return $triggers;
 }

@@ -774,30 +774,10 @@ class CScreenProblem extends CScreenBase {
 			$last_clock = 0;
 			$today = strtotime('today');
 
-			// Get trigger dependencies.
-			$trigger_ids_down = $data['triggers']
-				? getTriggerDependencies(array_keys($data['triggers']))
-				: [];
-
-			// Resolve dependent triggers.
-			$dependent_triggers = [];
-			foreach ($data['triggers'] as $trigger) {
-				foreach ($trigger['dependencies'] as $dependency) {
-					$dependent_triggers[] = $dependency['triggerid'];
-				}
-				if (array_key_exists($trigger['triggerid'], $trigger_ids_down)) {
-					$dependent_triggers = array_merge($dependent_triggers, $trigger_ids_down[$trigger['triggerid']]);
-				}
-			}
-
-			if ($dependent_triggers) {
-				$dependent_triggers = API::Trigger()->get([
-					'output' => ['expression', 'description'],
-					'triggerids' => array_keys(array_flip($dependent_triggers)),
-					'preservekeys' => true
-				]);
-
-				$dependent_triggers = CMacrosResolverHelper::resolveTriggerNames($dependent_triggers);
+			// Make trigger dependencies.
+			if ($data['triggers']) {
+				$data['triggers'] = getDependentTriggers($data['triggers']);
+				$data['triggers'] = makeTriggerDependencies($data['triggers']);
 			}
 
 			foreach ($data['problems'] as $eventid => $problem) {
@@ -884,7 +864,7 @@ class CScreenProblem extends CScreenBase {
 						->addRow(_('Depends on').':');
 
 					foreach ($trigger['dependencies'] as $dependency) {
-						$dependencies_table->addRow(' - '.$dependent_triggers[$dependency['triggerid']]['description']);
+						$dependencies_table->addRow(' - '.$dependency['description']);
 					}
 
 					$description[] = (new CSpan())
@@ -893,25 +873,22 @@ class CScreenProblem extends CScreenBase {
 						->setHint($dependencies_table);
 				}
 
-				$dependency = false;
-				if (array_key_exists($trigger['triggerid'], $trigger_ids_down)) {
+				if ($trigger['dependent_triggers']) {
 					$dependencies_table = (new CTable())
 						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 						->addRow(_('Dependent').':');
 
-					foreach ($trigger_ids_down[$trigger['triggerid']] as $triggerid) {
-						$dependencies_table->addRow(' - '.$dependent_triggers[$triggerid]['description']);
-						$dependency = true;
+					foreach ($trigger['dependent_triggers'] as $dependent_trigger) {
+						$dependencies_table->addRow(' - '.$dependent_trigger['description']);
 					}
-				}
 
-				if ($dependency) {
 					$description[] = (new CSpan())
 						->addClass(ZBX_STYLE_ICON_DEPEND_UP)
 						->addClass(ZBX_STYLE_CURSOR_POINTER)
 						->setHint($dependencies_table);
 				}
-				unset($dependencies_table, $dependency);
+
+				unset($dependencies_table);
 
 				$description[] = (new CLinkAction($problem['name']))
 									->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
