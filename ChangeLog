@@ -10,6 +10,7 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+...G...... [ZBX-13544] fixed agent crashes when using regex with 'Log' item for Mac OSX (MVekslers)
 ........S. [ZBX-13611] fixed lld rules not always saving their state/error message changes (wiper)
 ........S. [ZBX-13571] fixed regression that resulted in slow history data queries on partitioned tables (wiper)
 ..F....... [ZBX-13490] fixed autofocus in forms (nikita)
@@ -203,6 +204,7 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+...G...... [ZBX-13544] fixed agent crashes when using regex with 'Log' item for Mac OSX (MVekslers)
 ........S. [ZBX-13611] fixed lld rules not always saving their state/error message changes (wiper)
 ........S. [ZBX-13571] fixed regression that resulted in slow history data queries on partitioned tables (wiper)
 A.F....... [ZBX-13424] added possibility to select web items as master items and improved copying of dependent items to destination hosts and templates (Ivo)
