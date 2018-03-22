@@ -1958,7 +1958,8 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			$json_string = json_encode($item['query_fields'], JSON_UNESCAPED_UNICODE);
+			$cjson = new CJson();
+			$json_string = $cjson->encode($item['query_fields']);
 
 			if (strlen($json_string) > DB::getFieldLength('items', 'query_fields')) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',

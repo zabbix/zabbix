@@ -99,7 +99,7 @@ else if (!$data['limited']) {
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
-$query_fields->items = [json_encode($query_fields_data, JSON_UNESCAPED_UNICODE)];
+$query_fields->items = [CJs::encodeJson($query_fields_data)];
 
 $itemFormList->addRow(
 	new CLabel(_('Query fields'), 'query_fields_pairs'),
@@ -192,7 +192,7 @@ else if (!$data['limited']) {
 	$headers_data[] = ['key' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [json_encode($headers_data, JSON_UNESCAPED_UNICODE)];
+$headers->items = [CJs::encodeJson($headers_data)];
 
 $itemFormList->addRow(
 	new CLabel(_('Headers'), 'headers_pairs'),

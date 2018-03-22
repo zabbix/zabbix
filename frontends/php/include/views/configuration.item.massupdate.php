@@ -140,7 +140,7 @@ else {
 	$headers_data[] = ['key' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [json_encode($headers_data, JSON_UNESCAPED_UNICODE)];
+$headers->items = [CJs::encodeJson($headers_data)];
 
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[headers]', 'headers_pairs', _('Original')))
