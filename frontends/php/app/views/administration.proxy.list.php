@@ -129,16 +129,14 @@ foreach ($data['proxies'] as $proxy) {
 		$out_encryption = (new CDiv($out_encryption_array))->addClass(ZBX_STYLE_STATUS_CONTAINER);
 	}
 
-	$compression = ($proxy['compress'] == HOST_COMPRESSION_ON)
-		? (new CSpan(_('On')))->addClass(ZBX_STYLE_STATUS_GREEN)
-		: (new CSpan(_('OFF')))->addClass(ZBX_STYLE_STATUS_GREY);
-
 	$proxyTable->addRow([
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', $proxy['proxyid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? $out_encryption : $in_encryption,
-		$compression,
+		($proxy['compress'] == HOST_COMPRESSION_ON)
+			? (new CSpan(_('On')))->addClass(ZBX_STYLE_STATUS_GREEN)
+			: (new CSpan(_('Off')))->addClass(ZBX_STYLE_STATUS_GREY),
 		($proxy['lastaccess'] == 0)
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
