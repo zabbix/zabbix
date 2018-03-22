@@ -550,7 +550,7 @@ class CItem extends CItemGeneral {
 		$this->validateDependentItems($items, API::Item());
 
 		$db_items = $this->get([
-			'output' => ['flags', 'type', 'master_itemid', 'authtype'],
+			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -601,6 +601,10 @@ class CItem extends CItemGeneral {
 					$item['username'] = '';
 					$item['password'] = '';
 				}
+
+				if ($item['type'] != ITEM_TYPE_TRAPPER) {
+					$item['trapper_hosts'] = '';
+				}
 			}
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -609,6 +613,11 @@ class CItem extends CItemGeneral {
 						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
 					$item['username'] = '';
 					$item['password'] = '';
+				}
+
+				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF
+						&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
+					$item['trapper_hosts'] = '';
 				}
 
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {

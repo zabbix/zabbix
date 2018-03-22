@@ -287,15 +287,6 @@ $itemFormList->addRow(
 	'output_format_row'
 );
 
-// ITEM_TYPE_HTTPAGENT Enable trapping.
-$itemFormList->addRow(
-	new CLabel(_('Enable trapping'), 'allow_traps'),
-	(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
-		->setEnabled(!$readonly)
-		->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON),
-	'allow_traps_row'
-);
-
 // ITEM_TYPE_HTTPAGENT HTTP proxy.
 $itemFormList->addRow(
 	new CLabel(_('HTTP proxy'), 'http_proxy'),
@@ -689,19 +680,25 @@ else {
 		$valuemapComboBox->addItem($valuemap['valuemapid'], CHtml::encode($valuemap['name']));
 	}
 }
-$link = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))
-	->setAttribute('target', '_blank');
-$itemFormList->addRow(_('Show value'), [$valuemapComboBox, SPACE, $link], 'row_valuemap');
-$itemFormList->addRow(_('Allowed hosts'),
-	(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	'row_trapper_hosts');
-
-// append applications to form list
-$itemFormList->addRow(new CLabel(_('New application'), 'new_application'),
-	(new CSpan(
-		(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-);
+$link = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank');
+$itemFormList
+	->addRow(_('Show value'), [$valuemapComboBox, SPACE, $link], 'row_valuemap')
+	->addRow(
+		new CLabel(_('Enable trapping'), 'allow_traps'),
+		(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
+			->setEnabled(!$readonly)
+			->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON),
+		'allow_traps_row'
+	)
+	->addRow(_('Allowed hosts'),
+		(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'row_trapper_hosts'
+	)
+	->addRow(new CLabel(_('New application'), 'new_application'),
+		(new CSpan(
+			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+	);
 
 $applicationComboBox = new CListBox('applications[]', $this->data['applications'], 6);
 $applicationComboBox->addItem(0, '-'._('None').'-');

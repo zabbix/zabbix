@@ -1144,7 +1144,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'url' =>  getRequest('url'),
 					'post_type' => getRequest('post_type'),
 					'posts' => getRequest('posts'),
-					'headers' => getRequest('headers', [])
+					'headers' => getRequest('headers', []),
+					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF)
 				];
 
 				if ($item['headers']) {
@@ -1552,7 +1553,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'url' =>  getRequest('url', ''),
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 		'posts' => getRequest('posts', ''),
-		'headers' => getRequest('headers', [])
+		'headers' => getRequest('headers', []),
+		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF)
 	];
 
 	$data['displayApplications'] = true;

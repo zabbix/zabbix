@@ -339,7 +339,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'type', 'authtype'],
+			'output' => ['itemid', 'name', 'type', 'authtype', 'allow_traps'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
@@ -395,6 +395,10 @@ class CDiscoveryRule extends CItemGeneral {
 					$item['username'] = '';
 					$item['password'] = '';
 				}
+
+				if ($item['type'] != ITEM_TYPE_TRAPPER) {
+					$item['trapper_hosts'] = '';
+				}
 			}
 
 			if ($db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -403,6 +407,11 @@ class CDiscoveryRule extends CItemGeneral {
 						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
 					$item['username'] = '';
 					$item['password'] = '';
+				}
+
+				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF
+						&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
+					$item['trapper_hosts'] = '';
 				}
 
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {

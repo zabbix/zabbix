@@ -725,23 +725,6 @@ function get_item_by_itemid($itemid) {
 	return false;
 }
 
-function get_item_by_itemid_limited($itemid) {
-	$row = DBfetch(DBselect(
-		'SELECT i.itemid,i.interfaceid,i.name,i.key_,i.hostid,i.delay,i.history,i.status,i.type,i.lifetime,'.
-			'i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.port,i.units,i.snmpv3_contextname,'.
-			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,i.snmpv3_authpassphrase,'.
-			'i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.trends,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,'.
-			'i.templateid,i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,i.description,'.
-			'i.inventory_link'.
-		' FROM items i'.
-		' WHERE i.itemid='.zbx_dbstr($itemid)));
-	if ($row) {
-		return $row;
-	}
-	error(_s('No item with itemid "%1$s".', $itemid));
-	return false;
-}
-
 /**
  * Description:
  * Replace items for specified host

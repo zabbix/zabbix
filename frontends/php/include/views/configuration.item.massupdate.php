@@ -553,21 +553,27 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 $valueMapLink = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))
 	->setAttribute('target', '_blank');
 
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
-		->setLabel(_('Show value'))
-		->setChecked(isset($this->data['visible']['valuemapid'])),
-	(new CDiv([$valueMapsComboBox, SPACE, $valueMapLink]))
-		->setId('valuemap')
-);
-
-// append trapper hosts to form list
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))
-		->setLabel(_('Allowed hosts'))
-		->setChecked(isset($this->data['visible']['trapper_hosts'])),
-	(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
+$itemFormList
+	->addRow(
+		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
+			->setLabel(_('Show value'))
+			->setChecked(isset($this->data['visible']['valuemapid'])),
+		(new CDiv([$valueMapsComboBox, SPACE, $valueMapLink]))
+			->setId('valuemap')
+	)
+	->addRow(
+		(new CVisibilityBox('visible[allow_traps]', 'allow_traps', _('Original')))
+			->setLabel(_('Enable trapping'))
+			->setChecked(array_key_exists('allow_traps', $data['visible'])),
+		(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
+			->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON)
+	)
+	->addRow(
+		(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))
+			->setLabel(_('Allowed hosts'))
+			->setChecked(array_key_exists('trapper_hosts', $data['visible'])),
+		(new CTextBox('trapper_hosts', $data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // append applications to form list
 if ($this->data['displayApplications']) {
