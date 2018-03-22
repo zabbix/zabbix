@@ -745,6 +745,43 @@ function makeAcknowledgesTable($acknowledges, $users) {
 }
 
 /**
+ * Place filter tags at the beginning of tags array.
+ *
+ * @param array  $event_tags
+ * @param string $event_tags[]['tag']
+ * @param string $event_tags[]['value']
+ * @param array  $filter_tags
+ * @param string $filter_tags[]['tag']
+ * @param string $filter_tags[]['value']
+ * @param string $filter_tags[]['operator']
+ *
+ * @return array
+ */
+function orderEventTags($event_tags, $filter_tags) {
+	$tags = [];
+	$first_tags = [];
+
+	foreach ($event_tags as $t => $tag) {
+		foreach ($filter_tags as $filter_tag) {
+			if ($filter_tag['tag'] == $tag['tag']
+				&& ((!$filter_tag['operator'] && stripos($tag['value'], $filter_tag['value']) !== false)
+					|| ($filter_tag['operator'] && $filter_tag['value'] == $tag['value']))) {
+				$first_tags[] = $tag;
+				unset($event_tags[$t]);
+			}
+		}
+	}
+
+	foreach ([$first_tags, $event_tags] as $array) {
+		foreach ($array as $tag) {
+			$tags[] = $tag;
+		}
+	}
+
+	return $tags;
+}
+
+/**
  * Create element with event tags.
  *
  * @param array  $events
@@ -758,7 +795,7 @@ function makeAcknowledgesTable($acknowledges, $users) {
  * @param string $filter_tags[]['tag']
  * @param string $filter_tags[]['value']
  *
- * @return CTableInfo
+ * @return array
  */
 function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT, array $filter_tags = []) {
 	$tags = [];
@@ -771,24 +808,7 @@ function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TA
 		if ($html) {
 			// Show first n tags and "..." with hint box if there are more.
 
-			$event_tags = $event['tags'];
-
-			if ($filter_tags) {
-				$first_tags = [];
-
-				foreach ($event_tags as $t => $tag) {
-					foreach ($filter_tags as $filter_tag) {
-						if ($filter_tag['tag'] == $tag['tag'] && ($filter_tag['value'] == ''
-								|| stripos($tag['value'], $filter_tag['value']) !== false)) {
-							$first_tags[] = $tag;
-							unset($event_tags[$t]);
-						}
-					}
-				}
-
-				$event_tags = $first_tags + $event_tags;
-			}
-
+			$event_tags = $filter_tags ? orderEventTags($event['tags'], $filter_tags) : $event['tags'];
 			$tags_shown = array_slice($event_tags, 0, $list_tags_count);
 
 			foreach ($tags_shown as $tag) {
