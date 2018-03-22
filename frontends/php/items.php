@@ -858,7 +858,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'post_type' => (int) getRequest('post_type'),
 					'http_proxy' => getRequest('http_proxy'),
 					'headers' => getRequest('headers', []),
-					'retrieve_mode' => getRequest('retrieve_mode', 0),
+					'retrieve_mode' => getRequest('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT),
 					'request_method' => (int) getRequest('request_method'),
 					'output_format' => (int) getRequest('output_format'),
 					'allow_traps' => (int) getRequest('allow_traps'),
@@ -872,6 +872,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['authtype'] = getRequest('http_authtype', HTTPTEST_AUTH_NONE);
 				$item['username'] = getRequest('http_username', '');
 				$item['password'] = getRequest('http_password', '');
+
+				if ($posted['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+					$posted['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+				}
 
 				if ($posted['query_fields']) {
 					$query_fields = [];

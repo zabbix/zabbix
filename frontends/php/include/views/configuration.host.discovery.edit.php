@@ -255,7 +255,7 @@ $itemFormList->addRow(
 		->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 		->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 		->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-		->setEnabled(!$data['limited'])
+		->setEnabled(!($data['limited'] || $data['request_method'] == HTTPCHECK_REQUEST_HEAD))
 		->setModern(true),
 	'retrieve_mode_row'
 );

@@ -1922,6 +1922,10 @@ abstract class CItemGeneral extends CApiService {
 			];
 		}
 
+		if (array_key_exists('request_method', $data) && $data['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+			$rules['retrieve_mode']['in'] = (string) HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+		}
+
 		if (array_key_exists('post_type', $data)
 				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
 			$rules['posts'] = [
