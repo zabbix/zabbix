@@ -520,9 +520,21 @@ static int	DBpatch_3050042(void)
 
 static int	DBpatch_3050043(void)
 {
-	const ZBX_FIELD	field = {"compress", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"compress", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_3050044(void)
+{
+	int	ret;
+
+	ret = DBexecute("update hosts set compress=0");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
 }
 #endif
 
@@ -570,5 +582,6 @@ DBPATCH_ADD(3050040, 0, 1)
 DBPATCH_ADD(3050041, 0, 1)
 DBPATCH_ADD(3050042, 0, 1)
 DBPATCH_ADD(3050043, 0, 1)
+DBPATCH_ADD(3050044, 0, 1)
 
 DBPATCH_END()

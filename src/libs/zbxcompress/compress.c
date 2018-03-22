@@ -131,11 +131,19 @@ int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t size_out)
 
 int zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 {
+	ZBX_UNUSED(in);
+	ZBX_UNUSED(size_in);
+	ZBX_UNUSED(out);
+	ZBX_UNUSED(size_out);
 	return FAIL;
 }
 
 int zbx_uncompress(const char *in, size_t size_in, char *out, size_t size_out)
 {
+	ZBX_UNUSED(in);
+	ZBX_UNUSED(size_in);
+	ZBX_UNUSED(out);
+	ZBX_UNUSED(size_out);
 	return FAIL;
 }
 
