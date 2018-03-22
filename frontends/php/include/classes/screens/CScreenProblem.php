@@ -779,6 +779,27 @@ class CScreenProblem extends CScreenBase {
 				? getTriggerDependencies(array_keys($data['triggers']))
 				: [];
 
+			// Resolve dependent triggers.
+			$dependent_triggers = [];
+			foreach ($data['triggers'] as $trigger) {
+				foreach ($trigger['dependencies'] as $dependency) {
+					$dependent_triggers[] = $dependency['triggerid'];
+				}
+				if (array_key_exists($trigger['triggerid'], $trigger_ids_down)) {
+					$dependent_triggers = array_merge($dependent_triggers, $trigger_ids_down[$trigger['triggerid']]);
+				}
+			}
+
+			if ($dependent_triggers) {
+				$dependent_triggers = API::Trigger()->get([
+					'output' => ['expression', 'description'],
+					'triggerids' => array_keys(array_flip($dependent_triggers)),
+					'preservekeys' => true
+				]);
+
+				$dependent_triggers = CMacrosResolverHelper::resolveTriggerNames($dependent_triggers);
+			}
+
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
 
@@ -863,8 +884,7 @@ class CScreenProblem extends CScreenBase {
 						->addRow(_('Depends on').':');
 
 					foreach ($trigger['dependencies'] as $dependency) {
-						$dependencies_table
-							->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
+						$dependencies_table->addRow(' - '.$dependent_triggers[$dependency['triggerid']]['description']);
 					}
 
 					$description[] = (new CSpan())
@@ -879,10 +899,8 @@ class CScreenProblem extends CScreenBase {
 						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 						->addRow(_('Dependent').':');
 
-					$dep_trs = CMacrosResolverHelper::resolveTriggerNameByIds($trigger_ids_down[$trigger['triggerid']]);
-
-					foreach ($dep_trs as $dep_trigger) {
-						$dependencies_table->addRow(' - '.$dep_trigger['description']);
+					foreach ($trigger_ids_down[$trigger['triggerid']] as $triggerid) {
+						$dependencies_table->addRow(' - '.$dependent_triggers[$triggerid]['description']);
 						$dependency = true;
 					}
 				}
