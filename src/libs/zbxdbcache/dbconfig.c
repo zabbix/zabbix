@@ -2512,7 +2512,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[15])
 		{
 			trapitem = (ZBX_DC_TRAPITEM *)DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
-			zbx_trim_str_list(row[15], ',');
 			DCstrpool_replace(found, &trapitem->trapper_hosts, row[15]);
 		}
 		else if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems, &itemid)))
@@ -2729,10 +2728,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			httpitem->authtype = (unsigned char)atoi(row[19]);
 			DCstrpool_replace(found, &httpitem->username, row[20]);
 			DCstrpool_replace(found, &httpitem->password, row[21]);
-
-			zbx_trim_str_list(row[15], ',');
 			DCstrpool_replace(found, &httpitem->trapper_hosts, row[15]);
-
 		}
 		else if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid)))
 		{

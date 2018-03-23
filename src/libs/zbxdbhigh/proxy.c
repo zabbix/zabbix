@@ -3025,6 +3025,8 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 				return FAIL;
 			}
 			break;
+		case ITEM_TYPE_TRAPPER:
+			break;
 		default:
 			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap:"
 					" item type \"%d\" cannot be used with traps", item->key_orig, item->type);

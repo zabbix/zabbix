@@ -1404,10 +1404,10 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&dbsync_env.cache->trapitems, &item->itemid);
 	if (ITEM_TYPE_TRAPPER == item->type && '\0' != *dbrow[15])
 	{
+		zbx_trim_str_list(dbrow[15], ',');
+
 		if (NULL == trapitem)
 			return FAIL;
-
-		zbx_trim_str_list(dbrow[15], ',');
 
 		if (FAIL == dbsync_compare_str(dbrow[15], trapitem->trapper_hosts))
 			return FAIL;
@@ -1550,6 +1550,8 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&dbsync_env.cache->httpitems, &item->itemid);
 	if (ITEM_TYPE_HTTPAGENT == item->type)
 	{
+		zbx_trim_str_list(dbrow[15], ',');
+
 		if (NULL == httpitem)
 			return FAIL;
 
