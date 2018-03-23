@@ -220,7 +220,9 @@ function getActionsBySysmap($sysmap, array $options = []) {
 
 		order_result($elem['urls'], 'name');
 
-		$map = CMenuPopupHelper::getMap($hostId, $scripts, $gotos, $elem['urls']);
+		$map = CMenuPopupHelper::getMap($hostId, $scripts, $gotos, $elem['urls'],
+			array_key_exists('fullscreen', $options) ? $options['fullscreen'] : false
+		);
 		if ($map == ['type' => 'map']) {
 			$map = null;
 		}

@@ -24,7 +24,8 @@ $back_url = (new CUrl('zabbix.php'))
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
 
-$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style']);
+$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style'], null,
+	$data['fullscreen']);
 
 $output = [
 	'header' => $data['name'],
