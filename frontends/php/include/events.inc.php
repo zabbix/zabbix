@@ -756,7 +756,7 @@ function makeAcknowledgesTable($acknowledges, $users) {
  *
  * @return array
  */
-function orderEventTags($event_tags, $f_tags) {
+function orderEventTags(array $event_tags, array $f_tags) {
 	$first_tags = [];
 
 	foreach ($event_tags as $i => $tag) {
@@ -793,7 +793,8 @@ function orderEventTags($event_tags, $f_tags) {
  *
  * @return array
  */
-function makeEventsTags($events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT, array $filter_tags = []) {
+function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT,
+		array $filter_tags = []) {
 	$tags = [];
 
 	// Convert $filter_tags to a more usable format.
