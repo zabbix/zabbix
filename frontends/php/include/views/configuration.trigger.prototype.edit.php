@@ -63,7 +63,6 @@ $triggersFormList->addRow(
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
-		->removeId()
 	)
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
 
