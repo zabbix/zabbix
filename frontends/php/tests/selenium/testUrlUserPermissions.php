@@ -106,16 +106,6 @@ class testUrlUserPermissions extends CWebTest {
 				]
 			]],
 			[[
-				'url' => 'tr_status.php',
-				'title' =>	'Triggers [refreshed every 30 sec.]',
-				'header' =>	'Triggers',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'charts.php',
 				'title' =>	'Custom graphs [refreshed every 30 sec.]',
 				'header' =>	'Graphs',
