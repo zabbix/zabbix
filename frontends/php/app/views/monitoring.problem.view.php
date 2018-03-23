@@ -277,7 +277,7 @@ if ($data['action'] == 'problem.view') {
 
 	$filter = (new CFilter('web.problem.filter.state'))
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
-		->addFormItem((new CVar('fullscreen', $data['fullscreen']))->removeId())
+		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
 		->addFormItem((new CVar('page', $data['page']))->removeId())
 		->addColumn($filter_column1)
 		->addColumn($filter_column2);
@@ -292,7 +292,7 @@ if ($data['action'] == 'problem.view') {
 			(new CForm('get'))
 				->cleanItems()
 				->addVar('action', 'problem.view')
-				->addVar('fullscreen', $data['fullscreen'])
+				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 				->addVar('page', $data['page'])
 				->addItem(
 					(new CList())

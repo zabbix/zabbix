@@ -29,6 +29,7 @@ class CFilter extends CTag {
 	private $name = 'zbx_filter';
 	private $opened = true;
 	private $show_buttons = true;
+	private $hidden = false;
 
 	public function __construct($filterid) {
 		parent::__construct('div', true);
@@ -89,6 +90,13 @@ class CFilter extends CTag {
 	 */
 	public function addFormItem($item) {
 		$this->form->addItem($item);
+
+		return $this;
+	}
+
+	public function setHidden() {
+		$this->hidden = true;
+		$this->addStyle('display: none;');
 
 		return $this;
 	}
@@ -175,7 +183,7 @@ class CFilter extends CTag {
 	}
 
 	protected function startToString() {
-		$ret = $this->getHeader()->toString();
+		$ret = ($this->hidden == false) ? $this->getHeader()->toString() : '';
 		$ret .= parent::startToString();
 		return $ret;
 	}

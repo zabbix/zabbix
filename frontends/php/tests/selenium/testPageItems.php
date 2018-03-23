@@ -74,7 +74,23 @@ class testPageItems extends CWebTest {
 			);
 			$this->zbxTestTextNotPresent('Info');
 		}
+
+		$this->zbxTestAssertElementText("//button[@value='item.masscheck_now'][@disabled]", 'Check now');
+
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history', 'Delete');
+	}
+
+	/**
+	 * @dataProvider data
+	 */
+	public function testPageItems_CheckNowAll($data) {
+		$this->zbxTestLogin('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
+		$this->zbxTestCheckHeader('Items');
+
+		$this->zbxTestClick('all_items');
+		$this->zbxTestClickButtonText('Check now');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		$this->zbxTestCheckFatalErrors();
 	}
 }

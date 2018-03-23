@@ -753,7 +753,7 @@ SVGMapElement.prototype.updateLabel = function() {
 			'anchor': anchor,
 			background: {
 				fill: '#' + this.map.options.theme.backgroundcolor,
-				opacity: 0.5
+				opacity: 0.7
 			}
 		}, this.options.label);
 

@@ -215,10 +215,6 @@ pre {
 	word-wrap: break-word;
 }
 
-:-ms-input-placeholder {
-	color: #6d6d6d !important;
-}
-
 // Main Navigation
 nav {
 	background-color: $main-subnav-bg-color;
@@ -1132,10 +1128,19 @@ footer {
 	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
 
-	a {
+	.link-action {
 		color: $font-selected-color;
 		text-decoration: none;
-		cursor: default;
+
+		&:focus {
+			color: $font-selected-color;
+			border-bottom: 2px solid rgba($font-selected-color, 0.7);
+		}
+
+		&:hover {
+			color: $font-selected-color;
+			border-bottom: 1px solid rgba($font-selected-color, 0.7);
+		}
 	}
 
 	sup {
@@ -2220,6 +2225,7 @@ button {
 
 $icon-btn: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
+	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -259px,
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
 	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
@@ -2259,6 +2265,20 @@ $icon-widget-btn: (
 .btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
 	@extend %btn-dashbrd;
+}
+
+.btn-dashbrd-normal {
+	position: fixed;
+	right: 45px;
+	top: 5px;
+	z-index: 1010;
+	@include box-shadow(1px 1px 2px $action-shadow-color);
+	@include opacity(1);
+	@include transition(opacity 1s);
+
+	&.hidden {
+		@include opacity(0);
+	}
 }
 
 %btn-widget {
@@ -3167,6 +3187,10 @@ $form-icon-btn: (
 	border-bottom-color: darken($action-border-color, 1%);
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
+	&:focus {
+		outline: none;
+	}
+
 	li {
 		display: block;
 
@@ -3191,15 +3215,10 @@ $form-icon-btn: (
 		@extend %overflow-ellipsis;
 		@include transition(background-color .2s ease-out);
 
-		&:hover {
-			background-color: $action-hover-color;
-		}
-
-		&:focus {
-			background-color: $action-hover-color;
-		}
-
-		&:active {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
 			background-color: $action-hover-color;
 		}
 
@@ -3288,6 +3307,7 @@ $form-icon-btn: (
 		.overlay-dialogue-body {
 			overflow: auto;
 			overflow-x: hidden;
+			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
 			margin: 0 0 10px 0;
@@ -3360,6 +3380,7 @@ $form-icon-btn: (
 	text-align: left;
 	position: absolute;
 	left: -1px;
+	max-width: 100%;
 
 	a {
 
@@ -3375,6 +3396,8 @@ $form-icon-btn: (
 					display: inline-block;
 					line-height: 24px;
 					padding: 0 6px 0 0;
+					flex: auto;
+					@extend %overflow-ellipsis;
 				}
 			}
 		}
@@ -3387,7 +3410,7 @@ $form-icon-btn: (
 		color: $btn-back-text-color;
 		margin-top: 10px;
 		padding: 0;
-		display: inline-block;
+		display: flex;
 		height: 24px;
 		line-height: 24px;
 		vertical-align: middle;
@@ -3400,6 +3423,7 @@ $form-icon-btn: (
 		.btn-back-map-icon {
 			margin-left: 5px;
 			display: inline-block;
+			flex: 1 0 auto;
 			width: 28px;
 			height: 24px;
 			vertical-align: middle;
@@ -3725,7 +3749,7 @@ $form-icon-btn: (
 .overlay-descr {
 	max-height: 150px;
 	overflow-y: auto;
-	padding: 0 11px 0 11px;
+	padding: 0;
 	margin: 5px 0;
 	background-color: $ui-bg-color;
 	@extend %webkit-scrollbar;
@@ -3733,7 +3757,8 @@ $form-icon-btn: (
 }
 
 .overlay-descr-url {
-	padding: 3px 11px 7px 11px;
+	padding: 3px 0 7px;
+	@extend %overflow-ellipsis;
 }
 
 %scroll-vert-shadow {
@@ -3936,11 +3961,11 @@ a.link-action {
 			@include border-radius(2px)
 		}
 
-		&:first-child:not(:only-child) {
+		&:first-of-type:not(:only-child) {
 			@include border-radius(2px 0 0 2px);
 		}
 
-		&:last-child:not(:only-child) {
+		&:last-of-type:not(:only-child) {
 			@include border-radius(0 2px 2px 0);
 		}
 	}
@@ -3980,6 +4005,18 @@ a.link-action {
 	@extend %status;
 }
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border: 1px solid rgba($font-color, .2);
+	@extend %status;
+}
+
+.status-disabled-bg {
+	color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border: 1px solid rgba($font-color, .2);
+	@extend %status;
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
@@ -4007,6 +4044,10 @@ a.link-action {
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
+
+	&:not(:last-of-type) {
+		border-right: none;
+	}
 }
 
 .green-bg {
@@ -4018,16 +4059,11 @@ a.link-action {
 }
 
 .na-bg {
-	color: darken($alt-blue-grey,45%);
+	color: darken($alt-blue-grey, 45%);
 
-	a.link-action {
-	color: darken($alt-blue-grey,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .na-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-blue-grey, 45%);
 	}
 }
 
@@ -4064,16 +4100,11 @@ td.normal-bg {
 }
 
 .info-bg {
-	color: darken($alt-dark-blue,45%);
+	color: darken($alt-dark-blue, 45%);
 
-	a.link-action {
-	color: darken($alt-dark-blue,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .info-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-dark-blue, 45%);
 	}
 }
 
@@ -4091,16 +4122,11 @@ td.info-bg {
 }
 
 .average-bg {
-	color: darken($alt-orange,45%);
+	color: darken($alt-orange, 45%);
 
-	a.link-action {
-	color: darken($alt-orange,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .average-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-orange, 45%);
 	}
 }
 
@@ -4113,16 +4139,11 @@ td.average-bg {
 }
 
 .warning-bg {
-	color: darken($alt-yellow,45%);
+	color: darken($alt-yellow, 45%);
 
-	a.link-action {
-	color: darken($alt-yellow,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .warning-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-yellow, 45%);
 	}
 }
 
@@ -4140,16 +4161,11 @@ td.warning-bg {
 }
 
 .high-bg {
-	color: darken($alt-dark-orange,45%);
+	color: darken($alt-dark-orange, 45%);
 
-	a.link-action {
-	color: darken($alt-dark-orange,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .high-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-dark-orange, 45%);
 	}
 }
 
@@ -4167,16 +4183,11 @@ td.high-bg {
 }
 
 .disaster-bg {
-	color: darken($alt-red,45%);
+	color: darken($alt-red, 45%);
 
-	a.link-action {
-	color: darken($alt-red,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .disaster-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-red, 45%);
 	}
 }
 
@@ -5148,6 +5159,31 @@ svg {
 			animation: fadein .5s;
 		}
 	}
+}
+
+::-webkit-input-placeholder {
+	color: $input-placeholder-color;
+}
+
+:-ms-input-placeholder {
+	color: $input-placeholder-color !important;
+}
+
+::-ms-input-placeholder {
+	color: $input-placeholder-color;
+}
+
+::-moz-placeholder {
+	color: $input-placeholder-color;
+	opacity: 1;
+}
+
+:-moz-placeholder {
+	color: $input-placeholder-color;
+}
+
+:placeholder-shown {
+	color: $input-placeholder-color;
 }
 
 /*doc

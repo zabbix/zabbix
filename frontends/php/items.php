@@ -128,7 +128,8 @@ $fields = [
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
-										'"item.massdisable","item.massenable","item.massupdateform"'
+										'"item.massdisable","item.massenable","item.massupdateform",'.
+										'"item.masscheck_now"'
 									),
 									null
 								],
@@ -139,6 +140,7 @@ $fields = [
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'massupdate' =>				[T_ZBX_STR, O_OPT, P_SYS, null,	null],
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'check_now' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	// filter
@@ -736,6 +738,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		uncheckTableRows(getRequest('hostid'));
 	}
 }
+elseif (hasRequest('check_now') && hasRequest('itemid')) {
+	$result = (bool) API::Task()->create([
+		'type' => ZBX_TM_TASK_CHECK_NOW,
+		'itemids' => getRequest('itemid')
+	]);
+
+	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
+}
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = false;
@@ -829,184 +839,186 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 		$applications = [];
 	}
 
-	try {
-		DBstart();
+	if ($result) {
+		try {
+			DBstart();
 
-		// add new or existing applications
-		if (isset($visible['new_applications']) && !empty($_REQUEST['new_applications'])) {
-			foreach ($_REQUEST['new_applications'] as $newApplication) {
-				if (is_array($newApplication) && isset($newApplication['new'])) {
-					$newApplications[] = [
-						'name' => $newApplication['new'],
-						'hostid' => getRequest('hostid')
-					];
-				}
-				else {
-					$existApplication[] = $newApplication;
-				}
-			}
-
-			if (isset($newApplications)) {
-				if (!$createdApplication = API::Application()->create($newApplications)) {
-					throw new Exception();
-				}
-				if (isset($existApplication)) {
-					$existApplication = array_merge($existApplication, $createdApplication['applicationids']);
-				}
-				else {
-					$existApplication = $createdApplication['applicationids'];
-				}
-			}
-		}
-
-		if (isset($visible['applications'])) {
-			if (isset($_REQUEST['applications'])) {
-				if (isset($existApplication)) {
-					$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
-				}
-				else {
-					$applications = $_REQUEST['applications'];
-				}
-			}
-			else {
-				if (isset($existApplication)){
-					$applications = $existApplication;
-				}
-				else {
-					$applications = [];
-				}
-			}
-		}
-
-		// add applications
-		if (!empty($existApplication) && (!isset($visible['applications']) || !isset($_REQUEST['applications']))) {
-			foreach ($existApplication as $linkApp) {
-				$linkApplications[] = ['applicationid' => $linkApp];
-			}
-			foreach ($itemids as $itemid) {
-				$link_items[] = ['itemid' => $itemid];
-			}
-			$linkApp = [
-				'applications' => $linkApplications,
-				'items' => $link_items
-			];
-			API::Application()->massAdd($linkApp);
-		}
-
-		$items = API::Item()->get([
-			'output' => ['itemid', 'flags', 'type'],
-			'itemids' => $itemids,
-			'preservekeys' => true
-		]);
-		$items_to_update = [];
-
-		if ($items) {
-			$item = [
-				'interfaceid' => getRequest('interfaceid'),
-				'description' => getRequest('description'),
-				'delay' => $delay,
-				'history' => getRequest('history'),
-				'type' => getRequest('type'),
-				'snmp_community' => getRequest('snmp_community'),
-				'snmp_oid' => getRequest('snmp_oid'),
-				'value_type' => getRequest('value_type'),
-				'trapper_hosts' => getRequest('trapper_hosts'),
-				'port' => getRequest('port'),
-				'units' => getRequest('units'),
-				'snmpv3_contextname' => getRequest('snmpv3_contextname'),
-				'snmpv3_securityname' => getRequest('snmpv3_securityname'),
-				'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
-				'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
-				'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
-				'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
-				'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-				'trends' => getRequest('trends'),
-				'logtimefmt' => getRequest('logtimefmt'),
-				'valuemapid' => getRequest('valuemapid'),
-				'authtype' => getRequest('authtype'),
-				'jmx_endpoint' => getRequest('jmx_endpoint'),
-				'username' => getRequest('username'),
-				'password' => getRequest('password'),
-				'publickey' => getRequest('publickey'),
-				'privatekey' => getRequest('privatekey'),
-				'ipmi_sensor' => getRequest('ipmi_sensor'),
-				'applications' => $applications,
-				'status' => getRequest('status'),
-				'master_itemid' => getRequest('master_itemid')
-			];
-			if (hasRequest('preprocessing')) {
-				$preprocessing = getRequest('preprocessing');
-
-				foreach ($preprocessing as &$step) {
-					switch ($step['type']) {
-						case ZBX_PREPROC_MULTIPLIER:
-						case ZBX_PREPROC_RTRIM:
-						case ZBX_PREPROC_LTRIM:
-						case ZBX_PREPROC_TRIM:
-						case ZBX_PREPROC_XPATH:
-						case ZBX_PREPROC_JSONPATH:
-							$step['params'] = $step['params'][0];
-							break;
-
-						case ZBX_PREPROC_REGSUB:
-							$step['params'] = implode("\n", $step['params']);
-							break;
-
-						default:
-							$step['params'] = '';
-					}
-				}
-				unset($step);
-
-				$item['preprocessing'] = $preprocessing;
-			}
-			foreach ($item as $key => $field) {
-				if ($field === null) {
-					unset($item[$key]);
-				}
-			}
-
-			$discovered_item = [];
-			if (hasRequest('status')) {
-				$discovered_item['status'] = getRequest('status');
-			}
-
-			foreach ($itemids as $itemid) {
-				if (array_key_exists($itemid, $items)) {
-					if ($items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-						if ($item) {
-							$items_to_update[] = ['itemid' => $itemid] + $item;
-						}
+			// add new or existing applications
+			if (isset($visible['new_applications']) && !empty($_REQUEST['new_applications'])) {
+				foreach ($_REQUEST['new_applications'] as $newApplication) {
+					if (is_array($newApplication) && isset($newApplication['new'])) {
+						$newApplications[] = [
+							'name' => $newApplication['new'],
+							'hostid' => getRequest('hostid')
+						];
 					}
 					else {
-						if ($discovered_item) {
-							$items_to_update[] = ['itemid' => $itemid] + $discovered_item;
+						$existApplication[] = $newApplication;
+					}
+				}
+
+				if (isset($newApplications)) {
+					if (!$createdApplication = API::Application()->create($newApplications)) {
+						throw new Exception();
+					}
+					if (isset($existApplication)) {
+						$existApplication = array_merge($existApplication, $createdApplication['applicationids']);
+					}
+					else {
+						$existApplication = $createdApplication['applicationids'];
+					}
+				}
+			}
+
+			if (isset($visible['applications'])) {
+				if (isset($_REQUEST['applications'])) {
+					if (isset($existApplication)) {
+						$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
+					}
+					else {
+						$applications = $_REQUEST['applications'];
+					}
+				}
+				else {
+					if (isset($existApplication)){
+						$applications = $existApplication;
+					}
+					else {
+						$applications = [];
+					}
+				}
+			}
+
+			// add applications
+			if (!empty($existApplication) && (!isset($visible['applications']) || !isset($_REQUEST['applications']))) {
+				foreach ($existApplication as $linkApp) {
+					$linkApplications[] = ['applicationid' => $linkApp];
+				}
+				foreach ($itemids as $itemid) {
+					$link_items[] = ['itemid' => $itemid];
+				}
+				$linkApp = [
+					'applications' => $linkApplications,
+					'items' => $link_items
+				];
+				API::Application()->massAdd($linkApp);
+			}
+
+			$items = API::Item()->get([
+				'output' => ['itemid', 'flags', 'type'],
+				'itemids' => $itemids,
+				'preservekeys' => true
+			]);
+			$items_to_update = [];
+
+			if ($items) {
+				$item = [
+					'interfaceid' => getRequest('interfaceid'),
+					'description' => getRequest('description'),
+					'delay' => $delay,
+					'history' => getRequest('history'),
+					'type' => getRequest('type'),
+					'snmp_community' => getRequest('snmp_community'),
+					'snmp_oid' => getRequest('snmp_oid'),
+					'value_type' => getRequest('value_type'),
+					'trapper_hosts' => getRequest('trapper_hosts'),
+					'port' => getRequest('port'),
+					'units' => getRequest('units'),
+					'snmpv3_contextname' => getRequest('snmpv3_contextname'),
+					'snmpv3_securityname' => getRequest('snmpv3_securityname'),
+					'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
+					'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
+					'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
+					'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
+					'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
+					'trends' => getRequest('trends'),
+					'logtimefmt' => getRequest('logtimefmt'),
+					'valuemapid' => getRequest('valuemapid'),
+					'authtype' => getRequest('authtype'),
+					'jmx_endpoint' => getRequest('jmx_endpoint'),
+					'username' => getRequest('username'),
+					'password' => getRequest('password'),
+					'publickey' => getRequest('publickey'),
+					'privatekey' => getRequest('privatekey'),
+					'ipmi_sensor' => getRequest('ipmi_sensor'),
+					'applications' => $applications,
+					'status' => getRequest('status'),
+					'master_itemid' => getRequest('master_itemid')
+				];
+				if (hasRequest('preprocessing')) {
+					$preprocessing = getRequest('preprocessing');
+
+					foreach ($preprocessing as &$step) {
+						switch ($step['type']) {
+							case ZBX_PREPROC_MULTIPLIER:
+							case ZBX_PREPROC_RTRIM:
+							case ZBX_PREPROC_LTRIM:
+							case ZBX_PREPROC_TRIM:
+							case ZBX_PREPROC_XPATH:
+							case ZBX_PREPROC_JSONPATH:
+								$step['params'] = $step['params'][0];
+								break;
+
+							case ZBX_PREPROC_REGSUB:
+								$step['params'] = implode("\n", $step['params']);
+								break;
+
+							default:
+								$step['params'] = '';
+						}
+					}
+					unset($step);
+
+					$item['preprocessing'] = $preprocessing;
+				}
+				foreach ($item as $key => $field) {
+					if ($field === null) {
+						unset($item[$key]);
+					}
+				}
+
+				$discovered_item = [];
+				if (hasRequest('status')) {
+					$discovered_item['status'] = getRequest('status');
+				}
+
+				foreach ($itemids as $itemid) {
+					if (array_key_exists($itemid, $items)) {
+						if ($items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+							if ($item) {
+								$items_to_update[] = ['itemid' => $itemid] + $item;
+							}
+						}
+						else {
+							if ($discovered_item) {
+								$items_to_update[] = ['itemid' => $itemid] + $discovered_item;
+							}
 						}
 					}
 				}
 			}
-		}
 
-		if ($items_to_update) {
-			foreach ($items_to_update as &$update_item) {
-				$type = array_key_exists('type', $update_item)
-					? $update_item['type']
-					: $items[$update_item['itemid']]['type'];
+			if ($items_to_update) {
+				foreach ($items_to_update as &$update_item) {
+					$type = array_key_exists('type', $update_item)
+						? $update_item['type']
+						: $items[$update_item['itemid']]['type'];
 
-				if ($type != ITEM_TYPE_JMX) {
-					unset($update_item['jmx_endpoint']);
+					if ($type != ITEM_TYPE_JMX) {
+						unset($update_item['jmx_endpoint']);
+					}
 				}
+				unset($update_item);
+
+				$result = API::Item()->update($items_to_update);
 			}
-			unset($update_item);
-
-			$result = API::Item()->update($items_to_update);
 		}
-	}
-	catch (Exception $e) {
-		$result = false;
-	}
+		catch (Exception $e) {
+			$result = false;
+		}
 
-	$result = DBend($result);
+		$result = DBend($result);
+	}
 
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['form']);
@@ -1152,6 +1164,32 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
+elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
+	$items = API::Item()->get([
+		'output' => [],
+		'itemids' => getRequest('group_itemid'),
+		'editable' => true,
+		'monitored' => true,
+		'filter' => ['type' => checkNowAllowedTypes()],
+		'preservekeys' => true
+	]);
+
+	if ($items) {
+		$result = (bool) API::Task()->create([
+			'type' => ZBX_TM_TASK_CHECK_NOW,
+			'itemids' => array_keys($items)
+		]);
+	}
+	else {
+		$result = true;
+	}
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+
+	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
+}
 
 /*
  * Display
@@ -1189,25 +1227,27 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_item_options = [
-				'itemids'	=> $item['master_itemid'],
-				'output'	=> ['itemid', 'type', 'hostid', 'name', 'key_']
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'itemids' => $item['master_itemid'],
+				'webitems' => true
 			];
 		}
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output'			=> ['status'],
-			'hostids'			=> getRequest('hostid'),
-			'templated_hosts'	=> true
+			'output' => ['status'],
+			'hostids' => getRequest('hostid'),
+			'templated_hosts' => true
 		]);
 		$item = [];
 		$host = $hosts[0];
 
-		if ($host && getRequest('master_itemid')) {
+		if (getRequest('master_itemid')) {
 			$master_item_options = [
-				'itemids' => getRequest('master_itemid'),
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'filter' => ['hostid' => $host['hostid']]
+				'itemids' => getRequest('master_itemid'),
+				'hostids' => $host['hostid'],
+				'webitems' => true
 			];
 		}
 	}
@@ -1587,7 +1627,7 @@ else {
 		}
 
 		// resolve name macros
-		$data['items'] = expandItemNamesWithMasterItems($data['items'], API::Item());
+		$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
 
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
