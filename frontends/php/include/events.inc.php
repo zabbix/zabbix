@@ -771,7 +771,6 @@ function orderEventTags(array $event_tags, array $f_tags) {
 			}
 		}
 	}
-	unset($tag);
 
 	return array_merge($first_tags, $event_tags);
 }
