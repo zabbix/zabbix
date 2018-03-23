@@ -91,35 +91,33 @@ class CControllerMapView extends CController {
 	protected function doAction() {
 		CProfile::update('web.maps.sysmapid', $this->sysmapid, PROFILE_TYPE_ID);
 
-		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0)
-		];
-
 		$maps = API::Map()->get([
 			'output' => ['name', 'severity_min'],
 			'sysmapids' => [$this->sysmapid]
 		]);
-		$data['map'] = reset($maps);
 
-		$maps_rw = API::Map()->get([
+		$map = reset($maps);
+
+		$map['editable'] = (bool) API::Map()->get([
 			'output' => [],
 			'sysmapids' => [$this->sysmapid],
 			'editable' => true
 		]);
 
-		$data['map']['editable'] = (bool) $maps_rw;
-
-		$data['pageFilter'] = new CPageFilter([
+		$page_filter = new CPageFilter([
 			'severitiesMin' => [
-				'default' => $data['map']['severity_min'],
+				'default' => $map['severity_min'],
 				'mapId' => $this->sysmapid
 			],
 			'severityMin' => $this->hasInput('severity_min') ? $this->getInput('severity_min') : null
 		]);
 
-		$data['severity_min'] = $data['pageFilter']->severityMin;
-
-		$response = new CControllerResponseData($data);
+		$response = new CControllerResponseData([
+			'map' => $map,
+			'pageFilter' => $page_filter,
+			'severity_min' => $page_filter->severityMin,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false)
+		]);
 		$response->setTitle(_('Network maps'));
 		$this->setResponse($response);
 	}
