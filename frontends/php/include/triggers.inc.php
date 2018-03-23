@@ -714,25 +714,26 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *
- * @param array  	$hosts							an array of hosts with host IDs as keys
- * @param string 	$hosts[hostid][name]
- * @param string 	$hosts[hostid][hostid]
- * @param array		$triggers
- * @param string	$triggers[][triggerid]
- * @param string	$triggers[][description]
- * @param string	$triggers[][expression]
- * @param int		$triggers[][value]
- * @param int		$triggers[][lastchange]
- * @param int		$triggers[][flags]
- * @param array		$triggers[][url]
- * @param int		$triggers[][priority]
- * @param array		$triggers[][hosts]
- * @param string	$triggers[][hosts][][hostid]
- * @param string	$triggers[][hosts][][name]
- * @param string	$triggers[][dependencies]
- * @param string 	$pageFile						the page where the element is displayed
- * @param int    	$viewMode						table display style: either hosts on top, or host on the left side
- * @param string 	$screenId						the ID of the screen, that contains the trigger overview table
+ * @param array  $hosts                         an array of hosts with host IDs as keys
+ * @param string $hosts[hostid][name]
+ * @param string $hosts[hostid][hostid]
+ * @param array  $triggers
+ * @param string $triggers[<triggerid>]['triggerid']
+ * @param string $triggers[<triggerid>]['description']
+ * @param string $triggers[<triggerid>]['expression']
+ * @param int    $triggers[<triggerid>]['value']
+ * @param int    $triggers[<triggerid>]['lastchange']
+ * @param int    $triggers[<triggerid>]['flags']
+ * @param array  $triggers[<triggerid>]['url']
+ * @param int    $triggers[<triggerid>]['priority']
+ * @param array  $triggers[<triggerid>]['hosts']
+ * @param string $triggers[<triggerid>]['hosts'][]['hostid']
+ * @param string $triggers[<triggerid>]['hosts'][]['name']
+ * @param array  $triggers[<triggerid>]['dependencies']
+ * @param string $triggers[<triggerid>]['dependencies'][]['triggerid']
+ * @param string $pageFile                      the page where the element is displayed
+ * @param int    $viewMode                      table display style: either hosts on top, or host on the left side
+ * @param string $screenId                      the ID of the screen, that contains the trigger overview table
  *
  * @return CTableInfo
  */
@@ -745,8 +746,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 	// Make trigger dependencies.
 	if ($triggers) {
-		$triggers = getDependentTriggers($triggers);
-		$triggers = makeTriggerDependencies($triggers);
+		$dependencies = makeTriggerDependencies($triggers, false);
 	}
 
 	foreach ($triggers as $trigger) {
@@ -776,9 +776,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'flags' => $trigger['flags'],
 				'url' => $trigger['url'],
 				'hosts' => $trigger['hosts'],
-				'items' => $trigger['items'],
-				'dependencies' => $trigger['dependencies'],
-				'dependent_triggers' => $trigger['dependent_triggers']
+				'items' => $trigger['items']
 			];
 			$trcounter[$host['name']][$trigger_name]++;
 		}
@@ -813,8 +811,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				foreach ($host_names as $host_name) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$pageFile,
-						$screenId
+						$dependencies, $pageFile, $screenId
 					);
 				}
 				$triggerTable->addRow($columns);
@@ -847,8 +844,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$pageFile,
-						$screenId
+						$dependencies, $pageFile, $screenId
 					);
 				}
 			}
@@ -866,15 +862,16 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @see getTriggersOverview()
  *
  * @param array  $trigger
- * @param string $pageFile		the page where the element is displayed
+ * @param array  $dependencies  The list of trigger dependencies, prepared by makeTriggerDependencies() function.
+ * @param string $pageFile      The page where the element is displayed.
  * @param string $screenid
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
+function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null) {
 	$ack = null;
 	$css = null;
-	$desc = [];
+	$desc = null;
 	$acknowledge = [];
 
 	// for how long triggers should blink on status change (set by user in administration->general)
@@ -913,38 +910,9 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			}
 		}
 
-		// dependency: triggers on which depends this
-		$triggerId = empty($trigger['triggerid']) ? 0 : $trigger['triggerid'];
-
-		// Trigger dependency DOWN.
-		if ($trigger['dependencies']) {
-			$dependency_table = (new CTableInfo())
-				->setAttribute('style', 'width: 200px;')
-				->addRow(bold(_('Depends on').':'));
-
-			foreach ($trigger['dependencies'] as $dep) {
-				$dependency_table->addRow(' - '.$dep['description']);
-			}
-
-			$desc[] = (new CSpan())
-				->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
-				->setHint($dependency_table, '', false);
-		}
-
-		// Trigger dependency UP.
-		if ($trigger['dependent_triggers']) {
-			$dependency_table = (new CTableInfo())
-				->setAttribute('style', 'width: 200px;')
-				->addRow(bold(_('Dependent').':'));
-
-			foreach ($trigger['dependent_triggers'] as $dep) {
-				$dependency_table->addRow(' - '.$dep['description']);
-			}
-
-			$desc[] = (new CSpan())
-				->addClass(ZBX_STYLE_ICON_DEPEND_UP)
-				->setHint($dependency_table, '', false);
-		}
+		$desc = array_key_exists($trigger['triggerid'], $dependencies)
+			? $dependencies[$trigger['triggerid']]
+			: [];
 	}
 
 	$column = new CCol([$desc, $ack]);
@@ -2362,88 +2330,89 @@ function getTriggerLastProblems(array $triggerids, array $output) {
 }
 
 /**
- * Extends $triggers array by sub-array of dependent triggers.
- *
- * @param array $triggers
- * @param int	$triggers[<triggerid>]['triggerid']
- *
- * @return array
- */
-function getDependentTriggers(array $triggers) {
-	$triggerids = [];
-	foreach ($triggers as &$trigger) {
-		$triggerids[] = $trigger['triggerid'];
-		$trigger['dependent_triggers'] = [];
-	}
-	unset($trigger);
-
-	$db_trigger_dependencies = DBselect(
-		'SELECT triggerid_down,triggerid_up'.
-		' FROM trigger_depends'.
-		' WHERE '.dbConditionInt('triggerid_up', $triggerids)
-	);
-
-	while ($row = DBfetch($db_trigger_dependencies)) {
-		$triggers[$row['triggerid_up']]['dependent_triggers'][] = [
-			'triggerid' => $row['triggerid_down']
-		];
-	}
-
-	return $triggers;
-}
-
-/**
- * Extends 'dependencies' and 'dependent_triggers' sub-array by resolved trigger names.
+ * Returns a list of the trigger dependencies.
  *
  * @param array  $triggers
- * @param int	 $triggers[<triggerid>]['triggerid']
- * @param array	 $triggers[<triggerid>]['dependencies']				(optional)
- * @param array	 $triggers[<triggerid>]['dependent_triggers']		(optional)
+ * @param array  $triggers[<triggerid>]['dependencies']
+ * @param string $triggers[<triggerid>]['dependencies'][]['triggerid']
+ * @param bool   $freeze_on_click
  *
  * @return array
  */
-function makeTriggerDependencies(array $triggers) {
-	$dependent_triggers = [];
-	foreach ($triggers as &$trigger) {
-		if (array_key_exists('dependencies', $trigger)) {
-			foreach ($trigger['dependencies'] as $dependency) {
-				$dependent_triggers[] = $dependency['triggerid'];
-			}
-		}
-		if (array_key_exists('dependent_triggers', $trigger)) {
-			foreach ($trigger['dependent_triggers'] as $dependency) {
-				$dependent_triggers[] = $dependency['triggerid'];
-			}
+function makeTriggerDependencies(array $triggers, $freeze_on_click = true) {
+	$triggerids = [];
+	$triggerids_up = [];
+	$triggerids_down = [];
+
+	// "Depends on" triggers.
+	foreach ($triggers as $triggerid => $trigger) {
+		foreach ($trigger['dependencies'] as $dependency) {
+			$triggerids[$dependency['triggerid']] = true;
+			$triggerids_up[$triggerid][] = $dependency['triggerid'];
 		}
 	}
-	unset($trigger);
 
-	if ($dependent_triggers) {
-		$dependent_triggers = API::Trigger()->get([
-			'output' => ['expression', 'description'],
-			'triggerids' => array_keys(array_flip($dependent_triggers)),
-			'preservekeys' => true
-		]);
+	// "Dependent" triggers.
+	$db_trigger_depends = DBselect(
+		'SELECT triggerid_down,triggerid_up'.
+		' FROM trigger_depends'.
+		' WHERE '.dbConditionInt('triggerid_up', array_keys($triggers))
+	);
 
-		$dependent_triggers = CMacrosResolverHelper::resolveTriggerNames($dependent_triggers);
-
-		foreach ($triggers as &$trigger) {
-			if (array_key_exists('dependencies', $trigger)) {
-				foreach ($trigger['dependencies'] as &$dep) {
-					$dep['description'] = $dependent_triggers[$dep['triggerid']]['description'];
-				}
-				unset($dep);
-			}
-
-			if (array_key_exists('dependent_triggers', $trigger)) {
-				foreach ($trigger['dependent_triggers'] as &$dep) {
-					$dep['description'] = $dependent_triggers[$dep['triggerid']]['description'];
-				}
-				unset($dep);
-			}
-		}
-		unset($trigger);
+	while ($row = DBfetch($db_trigger_depends)) {
+		$triggerids[$row['triggerid_down']] = true;
+		$triggerids_down[$row['triggerid_up']][] = $row['triggerid_down'];
 	}
 
-	return $triggers;
+	$dependencies = [];
+
+	if (!$triggerids) {
+		return $dependencies;
+	}
+
+	$db_triggers = API::Trigger()->get([
+		'output' => ['expression', 'description'],
+		'triggerids' => array_keys($triggerids),
+		'preservekeys' => true
+	]);
+
+	$db_triggers = CMacrosResolverHelper::resolveTriggerNames($db_triggers);
+
+	foreach ($triggerids_up as $triggerid_up => $triggerids) {
+		$table = (new CTableInfo())
+			->setAttribute('style', 'width: 200px;')
+			->setHeader([_('Depends on')]);
+
+		foreach ($triggerids as $triggerid) {
+			$table->addRow(array_key_exists($triggerid, $db_triggers)
+				? $db_triggers[$triggerid]['description']
+				: _('Inaccessible trigger')
+			);
+		}
+
+		$dependencies[$triggerid_up][] = (new CSpan())
+			->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint($table, '', $freeze_on_click);
+	}
+
+	foreach ($triggerids_down as $triggerid_down => $triggerids) {
+		$table = (new CTableInfo())
+			->setAttribute('style', 'width: 200px;')
+			->setHeader([_('Dependent')]);
+
+		foreach ($triggerids as $triggerid) {
+			$table->addRow(array_key_exists($triggerid, $db_triggers)
+				? $db_triggers[$triggerid]['description']
+				: _('Inaccessible trigger')
+			);
+		}
+
+		$dependencies[$triggerid_down][] = (new CSpan())
+			->addClass(ZBX_STYLE_ICON_DEPEND_UP)
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint($table, '', $freeze_on_click);
+	}
+
+	return $dependencies;
 }

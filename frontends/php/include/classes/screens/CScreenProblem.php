@@ -776,8 +776,7 @@ class CScreenProblem extends CScreenBase {
 
 			// Make trigger dependencies.
 			if ($data['triggers']) {
-				$data['triggers'] = getDependentTriggers($data['triggers']);
-				$data['triggers'] = makeTriggerDependencies($data['triggers']);
+				$dependencies = makeTriggerDependencies($data['triggers']);
 			}
 
 			foreach ($data['problems'] as $eventid => $problem) {
@@ -857,41 +856,11 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
-				$description = [];
-				if ($trigger['dependencies']) {
-					$dependencies_table = (new CTable())
-						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-						->addRow(_('Depends on').':');
-
-					foreach ($trigger['dependencies'] as $dependency) {
-						$dependencies_table->addRow(' - '.$dependency['description']);
-					}
-
-					$description[] = (new CSpan())
-						->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
-						->addClass(ZBX_STYLE_CURSOR_POINTER)
-						->setHint($dependencies_table);
-				}
-
-				if ($trigger['dependent_triggers']) {
-					$dependencies_table = (new CTable())
-						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-						->addRow(_('Dependent').':');
-
-					foreach ($trigger['dependent_triggers'] as $dependent_trigger) {
-						$dependencies_table->addRow(' - '.$dependent_trigger['description']);
-					}
-
-					$description[] = (new CSpan())
-						->addClass(ZBX_STYLE_ICON_DEPEND_UP)
-						->addClass(ZBX_STYLE_CURSOR_POINTER)
-						->setHint($dependencies_table);
-				}
-
-				unset($dependencies_table);
-
+				$description = array_key_exists($trigger['triggerid'], $dependencies)
+					? $dependencies[$trigger['triggerid']]
+					: [];
 				$description[] = (new CLinkAction($problem['name']))
-									->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();
