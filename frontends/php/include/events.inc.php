@@ -763,7 +763,7 @@ function orderEventTags($event_tags, $f_tags) {
 		if (array_key_exists($tag['tag'], $f_tags)) {
 			foreach ($f_tags[$tag['tag']] as $f_tag) {
 				if (($f_tag['operator'] == TAG_OPERATOR_LIKE && stripos($tag['value'], $f_tag['value']) !== false)
-						|| ($f_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] == $f_tag['value'])) {
+						|| ($f_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $f_tag['value'])) {
 					$first_tags[] = $tag;
 					unset($event_tags[$i]);
 					break;
