@@ -1698,12 +1698,22 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			if (0 != (protocol_version & ZBX_TCP_COMPRESS))
 			{
 				char	*out;
+				size_t	out_size = reserved;
 
 				out = (char *)zbx_malloc(NULL, reserved + 1);
-				if (FAIL == zbx_uncompress(s->buffer, buf_stat_bytes + buf_dyn_bytes, out, reserved))
+				if (FAIL == zbx_uncompress(s->buffer, buf_stat_bytes + buf_dyn_bytes, out, &out_size))
 				{
 					zbx_free(out);
 					zbx_set_socket_strerror("cannot uncompress data: %s", zbx_compress_strerror());
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
+
+				if (out_size != reserved)
+				{
+					zbx_free(out);
+					zbx_set_socket_strerror("size of uncompressed data is less than expected",
+							zbx_compress_strerror());
 					nbytes = ZBX_PROTO_ERROR;
 					goto out;
 				}

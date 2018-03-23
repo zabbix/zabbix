@@ -107,11 +107,9 @@ int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t size_out)
+int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out)
 {
-	size_t	len = size_out;
-
-	if (Z_OK != (zbx_zlib_errno = uncompress((unsigned char *)out, &len, (unsigned char *)in, size_in)))
+	if (Z_OK != (zbx_zlib_errno = uncompress((unsigned char *)out, size_out, (unsigned char *)in, size_in)))
 		return FAIL;
 
 	return SUCCEED;
