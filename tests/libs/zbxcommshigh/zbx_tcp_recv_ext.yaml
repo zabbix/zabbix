@@ -97,6 +97,41 @@ out:
   return: FAIL
 ---
 # End of header parsing tests
+# Start of version parsing tests
+test case: Version not received
+in:
+  fragments: &fragments
+    - 'ZBXD'
+out:
+  return: FAIL
+---
+test case: Incorrect version 0 in header
+in:
+  fragments: &fragments
+    - 'ZBXD\x00\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
+out:
+  return: FAIL
+---
+test case: Incorrect version in header only compression
+in:
+  fragments: &fragments
+    - 'ZBXD\x02\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
+out:
+  return: FAIL
+---
+test case: Unsupported version in header
+in:
+  fragments: &fragments
+    - 'ZBXD\x04\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
+out:
+  return: FAIL
+test case: Unsupported and supported versions in header
+in:
+  fragments: &fragments
+    - 'ZBXD\xFF\x0A\x00\x00\x00\x00\x00\x00\x00agent.ping'
+out:
+  return: FAIL
+---
 # Start of data length parsing tests
 test case: Header and data length fragmented
 in:
