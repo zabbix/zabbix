@@ -395,7 +395,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($newItem['query_fields']) {
 				$query_fields = [];
 
-				foreach ($newItem['query_fields']['key'] as $index => $key) {
+				foreach ($newItem['query_fields']['name'] as $index => $key) {
 					if (array_key_exists($index, $newItem['query_fields']['value'])) {
 						$query_fields[] = [$key => $newItem['query_fields']['value'][$index]];
 					}
@@ -412,7 +412,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($newItem['headers']) {
 				$headers = [];
 
-				foreach ($newItem['headers']['key'] as $index => $key) {
+				foreach ($newItem['headers']['name'] as $index => $key) {
 					if (array_key_exists($index, $newItem['headers']['value'])) {
 						$headers[$key] = $newItem['headers']['value'][$index];
 					}

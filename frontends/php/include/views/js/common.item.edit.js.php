@@ -502,6 +502,39 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				table.sortable('option', 'disabled', rows < 2);
 			}
 
+			function mergeRows(pairs, name_selector, value_selector) {
+				var row_nodes = table.find('.'+table_row_class),
+					name_selector,
+					parent_nodes;
+
+				$.each(row_nodes, function(i, row_node) {
+					if ($(name_selector, row_node).val() === '' && $(value_selector, row_node).val() === '') {
+						removeRow(row_node);
+					}
+				});
+
+				$.each(pairs, function(i, pair) {
+					if (pair.name.indexOf('[]') != -1) {
+						addRow(pair);
+					}
+					else {
+						name_nodes = $(name_selector, row_nodes).filter(function(index, node) {
+							return $(node).val() === pair.name;
+						});
+
+						if (name_nodes.length) {
+							parent_nodes = name_nodes.closest(row_nodes);
+							row_nodes = row_nodes.not(parent_nodes);
+							name_nodes.first().val(pair.name);
+							$(value_selector, parent_nodes.first()).val(pair.value);
+						}
+						else {
+							addRow(pair);
+						}
+					}
+				});
+			}
+
 			return {
 				addRow: function(values) {
 					return addRow(values);
@@ -509,6 +542,12 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				addRows: function(rows_values) {
 					addRows(rows_values);
 					return table;
+				},
+				removeRow: function(row_node) {
+					removeRow(row_node);
+				},
+				mergeRows: function(pairs, key_selector, value_selector) {
+					mergeRows(pairs, key_selector, value_selector);
 				},
 				clearTable: function() {
 					table.find('.'+table_row_class).remove();
@@ -537,78 +576,29 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		});
 
 		$('[data-action="parse_url"]').click(function() {
-			var url = $(this).siblings('[name="url"]'),
+			var url_node = $(this).siblings('[name="url"]'),
 				table = $('#query_fields_pairs').data('editableTable'),
-				pos = url.val().indexOf('?');
+				url = parseUrlString(url_node.val())
 
-			if (pos != -1) {
-				var host = url.val().substring(0, pos),
-					query = url.val().substring(pos + 1),
-					pairs = {},
-					index,
-					valid = true;
-
-				$.each(query.split('&'), function(i, pair) {
-					if ($.trim(pair)) {
-						pair = pair.split('=', 2);
-						pair.push('');
-
-						try {
-							if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
-								// Non-printable characters in URL.
-								throw null;
-							}
-
-							index = decodeURIComponent(pair[0].replace(/\+/g, ' '));
-							pairs[index] = {
-								'key': index,
-								'value': decodeURIComponent(pair[1].replace(/\+/g, ' '))
-							}
+			if (typeof url === 'object') {
+				table.mergeRows(url.pairs, '[name*="[name]"]', '[name*="[value]"]');
+				url_node.val(url.url);
+			}
+			else {
+				overlayDialogue({
+					'title': <?= CJs::encodeJson(_('Error')); ?>,
+					'content': $('<span>').html(<?=
+						CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+					?>),
+					'buttons': [
+						{
+							title: <?= CJs::encodeJson(_('Ok')); ?>,
+							class: 'btn-alt',
+							focused: true,
+							action: function() {}
 						}
-						catch( e ) {
-							valid = false;
-						}
-					}
+					]
 				});
-
-				if (valid) {
-					$.each(table.getTableRows(), function(index, row_node) {
-						var key = $('[name*="[key]"]', row_node),
-							index = key.val();
-
-						if (index === '') {
-							index = Object.keys(pairs)[0];
-							key.val(index);
-						}
-
-						if (typeof pairs[index] !== 'undefined') {
-							$('[name*="[value]"]', row_node).val(pairs[index].value);
-							delete pairs[index];
-						}
-					});
-
-					$.each(pairs, function(index, row) {
-						table.addRow(row);
-					});
-
-					url.val(host);
-				}
-				else {
-					overlayDialogue({
-						'title': <?= CJs::encodeJson(_('Error')); ?>,
-						'content': $('<span>').html(<?=
-							CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
-						?>),
-						'buttons': [
-							{
-								title: <?= CJs::encodeJson(_('Ok')); ?>,
-								class: 'btn-alt',
-								focused: true,
-								action: function() {}
-							}
-						]
-					});
-				}
 			}
 		});
 

@@ -654,7 +654,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($item['query_fields']) {
 					$query_fields = [];
 
-					foreach ($item['query_fields']['key'] as $index => $key) {
+					foreach ($item['query_fields']['name'] as $index => $key) {
 						if (array_key_exists($index, $item['query_fields']['value'])) {
 							$query_fields[] = [$key => $item['query_fields']['value'][$index]];
 						}
@@ -671,7 +671,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($item['headers']) {
 					$headers = [];
 
-					foreach ($item['headers']['key'] as $index => $key) {
+					foreach ($item['headers']['name'] as $index => $key) {
 						if (array_key_exists($index, $item['headers']['value'])) {
 							$headers[$key] = $item['headers']['value'][$index];
 						}
@@ -880,7 +880,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($posted['query_fields']) {
 					$query_fields = [];
 
-					foreach ($posted['query_fields']['key'] as $index => $key) {
+					foreach ($posted['query_fields']['name'] as $index => $key) {
 						if (array_key_exists($index, $posted['query_fields']['value'])) {
 							$query_fields[] = [$key => $posted['query_fields']['value'][$index]];
 						}
@@ -897,7 +897,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($posted['headers']) {
 					$headers = [];
 
-					foreach ($posted['headers']['key'] as $index => $key) {
+					foreach ($posted['headers']['name'] as $index => $key) {
 						if (array_key_exists($index, $posted['headers']['value'])) {
 							$headers[$key] = $posted['headers']['value'][$index];
 						}
@@ -1155,7 +1155,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 				if ($item['headers']) {
 					$headers = [];
 
-					foreach ($item['headers']['key'] as $index => $key) {
+					foreach ($item['headers']['name'] as $index => $key) {
 						if (array_key_exists($index, $item['headers']['value'])) {
 							$headers[$key] = $item['headers']['value'][$index];
 						}
@@ -1567,7 +1567,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	if ($data['headers']) {
 		$headers = [];
 
-		foreach ($data['headers']['key'] as $index => $key) {
+		foreach ($data['headers']['name'] as $index => $key) {
 			if (array_key_exists($index, $data['headers']['value'])) {
 				$headers[] = [$key => $data['headers']['value'][$index]];
 			}

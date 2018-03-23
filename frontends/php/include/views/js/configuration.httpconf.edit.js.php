@@ -677,84 +677,33 @@
 	 * @param {string}	formid	Id of current form HTML element.
 	 */
 	function parseUrl(formid) {
-		var i,
-			query,
-			index,
-			fields,
-			pair,
-			hasErrors = false,
-			pairs = [],
-			target = jQuery('#url', jQuery('#'+formid)),
-			url = target.val();
+		var target = jQuery('#url', jQuery('#'+formid)),
+			url = parseUrlString(target.val());
 
-		index = url.indexOf('#');
-		if (index !== -1)
-			url = url.substring(0, index);
-
-		index = url.indexOf('?');
-		if (index !== -1) {
-			query = url.substring(index + 1);
-			url = url.substring(0, index);
-
-			fields = query.split('&');
-			for (i = 0; i < fields.length; i++) {
-				if (fields[i].length === 0 || fields[i] === '=')
-					continue;
-
-				pair = {};
-				index = fields[i].indexOf('=');
-				if (index > 0) {
-					pair.name = fields[i].substring(0, index);
-					pair.value = fields[i].substring(index + 1);
-				}
-				else {
-					if (index === 0) {
-						fields[i] = fields[i].substring(1);
+		if (typeof url === 'object') {
+			pairManager.merge(formid, 'query_fields', url.pairs);
+			target.val(url.url);
+		}
+		else {
+			overlayDialogue({
+				'title': <?= CJs::encodeJson(_('Error')); ?>,
+				'content': jQuery('<span>').html(<?=
+					CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+				?>),
+				'buttons': [
+					{
+						title: <?= CJs::encodeJson(_('Ok')); ?>,
+						class: 'btn-alt',
+						focused: true,
+						action: function() {}
 					}
-					pair.name = fields[i];
-					pair.value = '';
-				}
+				]
+			});
 
-				try {
-					if (/%[01]/.match(pair.name) || /%[01]/.match(pair.value) ) {
-						// Non-printable characters in URL.
-						throw null;
-					}
-					pair.name = decodeURIComponent(pair.name.replace(/\+/g, ' '));
-					pair.value = decodeURIComponent(pair.value.replace(/\+/g, ' '));
-				}
-				catch( e ) {
-					// Malformed url.
-					hasErrors = true;
-					break;
-				}
-
-				pairs.push(pair);
-			}
-
-			if (hasErrors === true) {
-				overlayDialogue({
-					'title': <?= CJs::encodeJson(_('Error')); ?>,
-					'content': jQuery('<span>').html(<?=
-						CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
-					?>),
-					'buttons': [
-						{
-							title: <?= CJs::encodeJson(_('Ok')); ?>,
-							class: 'btn-alt',
-							focused: true,
-							action: function() {}
-						}
-					]
-				});
-
-				return false;
-			}
-
-			pairManager.merge(formid, 'query_fields', pairs);
+			return false;
 		}
 
-		target.val(url);
+		return;
 	}
 
 	/**

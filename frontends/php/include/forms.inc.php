@@ -1008,9 +1008,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		foreach (['query_fields', 'headers'] as $property) {
 			$values = [];
 
-			if (is_array($data[$property]) && array_key_exists('key', $data[$property])
+			if (is_array($data[$property]) && array_key_exists('name', $data[$property])
 					&& array_key_exists('value', $data[$property])) {
-				foreach ($data[$property]['key'] as $index => $key) {
+				foreach ($data[$property]['name'] as $index => $key) {
 					if (array_key_exists($index, $data[$property]['value'])) {
 						$values[] = [$key => $data[$property]['value'][$index]];
 					}

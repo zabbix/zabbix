@@ -91,11 +91,11 @@ $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
 	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = ['key' => key($pair), 'value' => reset($pair)];
+		$query_fields_data[] = ['name' => key($pair), 'value' => reset($pair)];
 	}
 }
 elseif (!$data['limited']) {
-	$query_fields_data[] = ['key' => '', 'value' => ''];
+	$query_fields_data[] = ['name' => '', 'value' => ''];
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -120,7 +120,7 @@ $itemFormList->addRow(
 			->setAttribute('type', 'text/x-jquery-tmpl')
 			->addItem(new CRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CTextBox('query_fields[key][#{index}]', '#{key}', $data['limited']))
+				(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
 				(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
@@ -185,11 +185,11 @@ $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
 	foreach ($data['headers'] as $pair) {
-		$headers_data[] = ['key' => key($pair), 'value' => reset($pair)];
+		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
 	}
 }
 elseif (!$data['limited']) {
-	$headers_data[] = ['key' => '', 'value' => ''];
+	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
 $headers->items = [CJs::encodeJson($headers_data)];
