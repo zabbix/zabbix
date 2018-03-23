@@ -923,6 +923,78 @@ function getItemFilterForm(&$items) {
 }
 
 /**
+ * Get item of type ITEM_TYPE_HTTPAGENT fields form data for create or update API calls.
+ *
+ * @return array
+ */
+function getItemHttpAgentFormData() {
+	$item = [
+		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+		'url' => getRequest('url'),
+		'query_fields' => getRequest('query_fields', []),
+		'posts' => getRequest('posts'),
+		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+		'follow_redirects' => (int) getRequest('follow_redirects'),
+		'post_type' => (int) getRequest('post_type'),
+		'http_proxy' => getRequest('http_proxy'),
+		'headers' => getRequest('headers', []),
+		'retrieve_mode' => (int) getRequest('retrieve_mode'),
+		'request_method' => (int) getRequest('request_method'),
+		'output_format' => (int) getRequest('output_format'),
+		'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
+		'ssl_cert_file' => getRequest('ssl_cert_file'),
+		'ssl_key_file' => getRequest('ssl_key_file'),
+		'ssl_key_password' => getRequest('ssl_key_password'),
+		'verify_peer' => (int) getRequest('verify_peer'),
+		'verify_host' => (int) getRequest('verify_host'),
+	];
+
+	$item['authtype'] = getRequest('http_authtype', HTTPTEST_AUTH_NONE);
+	$item['username'] = getRequest('http_username', '');
+	$item['password'] = getRequest('http_password', '');
+
+	if ($item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+		$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+	}
+
+	if ($item['query_fields']) {
+		$query_fields = [];
+
+		foreach ($item['query_fields']['name'] as $index => $key) {
+			if (array_key_exists($index, $item['query_fields']['value'])) {
+				$query_fields[] = [$key => $item['query_fields']['value'][$index]];
+			}
+		}
+
+		// Ignore single row if it is empty.
+		if (count($query_fields) == 1 && $key === '' && $item['query_fields']['value'][$index] === '') {
+			$query_fields = [];
+		}
+
+		$item['query_fields'] = $query_fields;
+	}
+
+	if ($item['headers']) {
+		$headers = [];
+
+		foreach ($item['headers']['name'] as $index => $key) {
+			if (array_key_exists($index, $item['headers']['value'])) {
+				$headers[$key] = $item['headers']['value'][$index];
+			}
+		}
+
+		// Ignore single row if it is empty.
+		if (count($headers) == 1 && $key === '' && $item['headers']['value'][$index] === '') {
+			$headers = [];
+		}
+
+		$item['headers'] = $headers;
+	}
+
+	return $item;
+}
+
+/**
  * Get data for item edit page.
  *
  * @param array	$item							Item, item prototype, LLD rule or LLD item to take the data from.

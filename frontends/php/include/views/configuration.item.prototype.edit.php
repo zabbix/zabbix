@@ -204,11 +204,11 @@ $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
 	foreach ($data['headers'] as $pair) {
-		$headers_data[] = ['key' => key($pair), 'value' => reset($pair)];
+		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
 	}
 }
 elseif (!$readonly) {
-	$headers_data[] = ['key' => '', 'value' => ''];
+	$headers_data[] = ['name' => '', 'value' => ''];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
 $headers->items = [CJs::encodeJson($headers_data)];

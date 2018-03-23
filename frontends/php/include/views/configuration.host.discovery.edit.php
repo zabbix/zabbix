@@ -213,7 +213,7 @@ $itemFormList->addRow(
 			->setAttribute('type', 'text/x-jquery-tmpl')
 			->addItem(new CRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CTextBox('headers[key][#{index}]', '#{key}', $data['limited']))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
 				(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited']))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
