@@ -433,10 +433,11 @@ static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[posts:'%s']", httpitem->posts);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[timeout:'%s' status codes:'%s' follow redirects:%u post type:%u"
-			" http proxy:'%s' retrieve mode:%u request method:%u output format:%u allow traps:%u]",
+			" http proxy:'%s' retrieve mode:%u request method:%u output format:%u allow traps:%u"
+			" trapper_hosts:'%s']",
 			httpitem->timeout, httpitem->status_codes, httpitem->follow_redirects, httpitem->post_type,
 			httpitem->http_proxy, httpitem->retrieve_mode, httpitem->request_method,
-			httpitem->output_format, httpitem->allow_traps);
+			httpitem->output_format, httpitem->allow_traps, httpitem->trapper_hosts);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[username:'%s' password:'%s' authtype:%u]",
 			httpitem->username, httpitem->password, httpitem->authtype);
