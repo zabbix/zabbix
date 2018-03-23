@@ -380,15 +380,15 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
+	if (NULL == header.data)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
+		goto clean;
+	}
+
 	switch (item->retrieve_mode)
 	{
 		case HTTP_RETRIEVE_MODE_CONTENT:
-			if (NULL == header.data)
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
-				goto clean;
-			}
-
 			if (NULL == body.data)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty content"));
@@ -413,12 +413,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case HTTP_RETRIEVE_MODE_HEADERS:
-			if (NULL == header.data)
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
-				goto clean;
-			}
-
 			if (FAIL == zbx_is_utf8(header.data))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
@@ -445,12 +439,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case HTTP_RETRIEVE_MODE_BOTH:
-			if (NULL == header.data)
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty header"));
-				goto clean;
-			}
-
 			if (FAIL == zbx_is_utf8(header.data) || (NULL != body.data && FAIL == zbx_is_utf8(body.data)))
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
