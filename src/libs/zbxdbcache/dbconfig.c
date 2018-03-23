@@ -4849,7 +4849,7 @@ void	DCsync_configuration(unsigned char mode)
 		dc_hostgroups_update_cache();
 
 	update_sec = zbx_time() - sec;
-	zabbix_increase_log_level();
+
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
@@ -5043,7 +5043,7 @@ void	DCsync_configuration(unsigned char mode)
 
 		zbx_mem_dump_stats(config_mem);
 	}
-	zabbix_decrease_log_level();
+
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
