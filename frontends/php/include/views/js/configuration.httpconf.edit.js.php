@@ -702,8 +702,6 @@
 
 			return false;
 		}
-
-		return;
 	}
 
 	/**
