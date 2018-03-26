@@ -39,7 +39,8 @@ $itemFormList = new CFormList('itemFormList');
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[type]', 'type', _('Original')))
 		->setLabel(_('Type'))
-		->setChecked(isset($this->data['visible']['type'])),
+		->setChecked(isset($this->data['visible']['type']))
+		->setAttribute('autofocus', 'autofocus'),
 	new CComboBox('type', $this->data['type'], null, $this->data['itemTypes'])
 );
 
