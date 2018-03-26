@@ -1566,7 +1566,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 	const char	*__function_name = "zbx_tcp_recv_ext";
 
 	ssize_t		nbytes;
-	size_t		allocated, buf_dyn_bytes = 0, buf_stat_bytes = 0, header_bytes = 0, offset = 0;
+	size_t		allocated, buf_dyn_bytes = 0, buf_stat_bytes = 0, offset = 0;
 	zbx_uint32_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
 	int		protocol_version;
@@ -1686,7 +1686,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			}
 
 			expect = ZBX_TCP_EXPECT_SIZE;
-			header_bytes = offset;
 
 			if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 				break;
@@ -1779,7 +1778,7 @@ out:
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
 
-	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes + header_bytes));
+	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes + offset));
 
 #undef ZBX_TCP_EXPECT_HEADER
 #undef ZBX_TCP_EXPECT_LENGTH
