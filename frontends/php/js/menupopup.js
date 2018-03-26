@@ -1316,7 +1316,9 @@ jQuery(function($) {
 				break;
 
 			case 13: // Enter
-				$('>' + link_selector, selected)[0].click();
+				if (typeof selected !== 'undefined') {
+					$('>' + link_selector, selected)[0].click();
+				}
 				break;
 
 			case 9: // Tab
