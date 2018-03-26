@@ -1452,20 +1452,6 @@ if test "x$have_ipcservice" = "xyes"; then
 	fi
 fi
 
-if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
-	dnl Check for libpcre, used by Zabbix for regular expressions
-	LIBPCRE_CHECK_CONFIG([no])
-	if test "x$found_libpcre" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
-	fi
-fi
-
-CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
-LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
-LIBS="$LIBS $LIBPCRE_LIBS"
-
-AC_SUBST(LIBPCRE_CFLAGS)
-
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
 LIBMBEDTLS_CHECK_CONFIG([no])
 if test "x$want_mbedtls" = "xyes"; then
@@ -1602,6 +1588,24 @@ LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
 
 AC_SUBST(ICONV_CFLAGS)
+
+dnl Check for libpcre, used by Zabbix for regular expressions
+if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
+	LIBPCRE_CHECK_CONFIG([no])
+	if test "x$found_libpcre" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
+	fi
+fi
+
+CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+if test "x$ARCH" = "xosx"; then
+	LIBS="$LIBPCRE_LIBS $LIBS"
+else
+	LIBS="$LIBS $LIBPCRE_LIBS"
+fi
+
+AC_SUBST(LIBPCRE_CFLAGS)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)

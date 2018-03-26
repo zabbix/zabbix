@@ -74,7 +74,8 @@ $replaceGroups = (new CDiv(
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[groups]', 'replaceGroups', _('Original')))
 		->setLabel(_('Replace host groups'))
-		->setChecked(isset($data['visible']['groups'])),
+		->setChecked(isset($data['visible']['groups']))
+		->setAttribute('autofocus', 'autofocus'),
 	$replaceGroups
 );
 

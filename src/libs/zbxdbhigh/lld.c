@@ -573,6 +573,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	const char		*sql_start = "update items set ", *sql_continue = ",";
 	lld_filter_t		filter;
 	time_t			now;
+	zbx_item_diff_t		lld_rule_diff = {.itemid = lld_ruleid, .flags = ZBX_FLAGS_ITEM_DIFF_UNSET};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
 
@@ -674,6 +675,9 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);
 		sql_start = sql_continue;
+
+		lld_rule_diff.state = ITEM_STATE_NORMAL;
+		lld_rule_diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
 	}
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
@@ -688,17 +692,25 @@ error:
 		sql_start = sql_continue;
 
 		zbx_free(error_esc);
+
+		lld_rule_diff.error = error;
+		lld_rule_diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 	}
 
 	if (sql_start == sql_continue)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, lld_ruleid);
-
-		DBbegin();
-
 		DBexecute("%s", sql);
+	}
 
-		DBcommit();
+	if (ZBX_FLAGS_ITEM_DIFF_UNSET != lld_rule_diff.flags)
+	{
+		zbx_vector_ptr_t	diffs;
+
+		zbx_vector_ptr_create(&diffs);
+		zbx_vector_ptr_append(&diffs, &lld_rule_diff);
+		DCconfig_items_apply_changes(&diffs);
+		zbx_vector_ptr_destroy(&diffs);
 	}
 clean:
 	DCconfig_unlock_lld_rule(lld_ruleid);
@@ -713,7 +725,6 @@ clean:
 
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
