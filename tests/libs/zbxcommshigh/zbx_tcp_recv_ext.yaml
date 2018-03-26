@@ -132,7 +132,31 @@ in:
 out:
   return: FAIL
 ---
+test case: Received header signature without version
+in:
+  fragments: &fragments
+    - 'ZBXD'
+out:
+  fragments: *fragments
+  return: FAIL
 # Start of data length parsing tests
+---
+test case: Hheader + version received
+in:
+  fragments: &fragments
+    - 'ZBXD\x01'
+out:
+  fragments: *fragments
+  return: FAIL
+---
+test case: Header + version + data size received
+in:
+  fragments: &fragments
+    - 'ZBXD\x01\x00\x00\x00\x00'
+out:
+  fragments: *fragments
+  return: FAIL
+---
 test case: Header and data length fragmented
 in:
   fragments: &fragments
@@ -395,24 +419,30 @@ out:
   return: SUCCEED
   bytes: 23
 ---
-test case: Compressed data with expected less than compressed
-in:
-  fragments: &fragments
-    - 'ZBXD\x03\x12\x00\x00\x00\x00\x00\x00\x00\x78\x9C\x4B\x4C\x4F\xCD\x2B\xD1\x2B\xC8\xCC\x4B\x07\x00\x15\x79\x03\xEC'
-out:
-  return: FAIL
----
-test case: Compressed data with expected more than compressed
-in:
-  fragments: &fragments
-    - 'ZBXD\x03\x12\x00\x00\x00\x00\x00\x00\xFF\x78\x9C\x4B\x4C\x4F\xCD\x2B\xD1\x2B\xC8\xCC\x4B\x07\x00\x15\x79\x03\xEC'
-out:
-  return: FAIL
----
 test case: Corrupted compressed data
 in:
   fragments: &fragments
-    - 'ZBXD\x03\x12\x00\x00\x00\x00\x00\x00\xFF\x78\x9C\x00\x00\x4F\x00\x2B\xD1\x2B\xC8\xCC\x4B\x07\x00\x15\x79\x03\xEC'
+    - 'ZBXD\x03\x12\x00\x00\x00\x0A\x00\x00\x00\x00\x9C\x4B\x4C\x4F\xCD\x2B\xD1\x2B\xC8\xCC\x4B\x07\x00\x15\x79\x03\xEC'
 out:
+  fragments:
+    - 'ZBXD\x03\x12\x00\x00\x00\x0A\x00\x00\x00agent.ping'
+  return: FAIL
+---
+test case: Compressed data with uncompressed size greater than expected
+in:
+  fragments: &fragments
+    - 'ZBXD\x03\x12\x00\x00\x00\x05\x00\x00\x00\x78\x9C\x4B\x4C\x4F\xCD\x2B\xD1\x2B\xC8\xCC\x4B\x07\x00\x15\x79\x03\xEC'
+out:
+  fragments:
+    - 'ZBXD\x03\x12\x00\x00\x00\x0A\x00\x00\x00agent.ping'
+  return: FAIL
+---
+test case: Compressed data with uncompressed size less than expected
+in:
+  fragments: &fragments
+    - 'ZBXD\x03\x12\x00\x00\x00\x35\x00\x00\x00\x78\x9C\x4B\x4C\x4F\xCD\x2B\xD1\x2B\xC8\xCC\x4B\x07\x00\x15\x79\x03\xEC'
+out:
+  fragments:
+    - 'ZBXD\x03\x12\x00\x00\x00\x0A\x00\x00\x00agent.ping'
   return: FAIL
 ...

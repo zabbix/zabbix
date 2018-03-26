@@ -1557,10 +1557,11 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
  ******************************************************************************/
 ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 {
-#define ZBX_TCP_EXPECT_HEADER	1
-#define ZBX_TCP_EXPECT_VERSION	2
-#define ZBX_TCP_EXPECT_LENGTH	3
-#define ZBX_TCP_EXPECT_SIZE	4
+#define ZBX_TCP_EXPECT_HEADER		1
+#define ZBX_TCP_EXPECT_VERSION		2
+#define ZBX_TCP_EXPECT_VERSION_VALIDATE	3
+#define ZBX_TCP_EXPECT_LENGTH		4
+#define ZBX_TCP_EXPECT_SIZE		5
 
 	const char	*__function_name = "zbx_tcp_recv_ext";
 
@@ -1622,6 +1623,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			if (offset + 1 > buf_stat_bytes)
 				continue;
 
+			expect = ZBX_TCP_EXPECT_VERSION_VALIDATE;
 			protocol_version = s->buf_stat[ZBX_TCP_HEADER_LEN];
 
 			if (0 == (protocol_version & ZBX_TCP_PROTOCOL) ||
@@ -1757,6 +1759,12 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 		nbytes = ZBX_PROTO_ERROR;
 	}
 	else if (ZBX_TCP_EXPECT_VERSION == expect)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing protocol version. Message ignored.",
+				s->peer);
+		nbytes = ZBX_PROTO_ERROR;
+	}
+	else if (ZBX_TCP_EXPECT_VERSION_VALIDATE == expect)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is using unsupported protocol version \"%d\"."
 				" Message ignored.", s->peer, protocol_version);
