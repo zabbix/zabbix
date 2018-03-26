@@ -797,8 +797,8 @@ class CHost extends CHostGeneral {
 			);
 		}
 
-		// Property 'compress' is not supported for hosts.
-		if (array_key_exists('compress', $data)) {
+		// Property 'auto_compress' is not supported for hosts.
+		if (array_key_exists('auto_compress', $data)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 		}
 
@@ -1575,8 +1575,8 @@ class CHost extends CHostGeneral {
 				);
 			}
 
-			// Property 'compress' is not supported for hosts.
-			if (array_key_exists('compress', $host)) {
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
@@ -1744,8 +1744,8 @@ class CHost extends CHostGeneral {
 				);
 			}
 
-			// Property 'compress' is not supported for hosts.
-			if (array_key_exists('compress', $host)) {
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 

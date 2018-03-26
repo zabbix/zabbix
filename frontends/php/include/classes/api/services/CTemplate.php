@@ -401,8 +401,8 @@ class CTemplate extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "host" is mandatory.'));
 			}
 
-			// Property 'compress' is not supported for templates.
-			if (array_key_exists('compress', $template)) {
+			// Property 'auto_compress' is not supported for templates.
+			if (array_key_exists('auto_compress', $template)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
@@ -529,8 +529,8 @@ class CTemplate extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 
-			// Property 'compress' is not supported for templates.
-			if (array_key_exists('compress', $template)) {
+			// Property 'auto_compress' is not supported for templates.
+			if (array_key_exists('auto_compress', $template)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
