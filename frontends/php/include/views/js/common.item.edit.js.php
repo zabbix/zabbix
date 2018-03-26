@@ -288,7 +288,7 @@ $ui_rows = [
 		'url_row', 'query_fields_row', 'request_method_row', 'timeout_row', 'post_type_row', 'posts_row', 'headers_row',
 		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'allow_traps_row',
 		'request_method', 'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row',
-		'ssl_key_file_row', 'ssl_cert_file_row', 'ssl_key_password_row', 'row_trapper_hosts', 'trapper_hosts'
+		'ssl_key_file_row', 'ssl_cert_file_row', 'ssl_key_password_row', 'trapper_hosts', 'allow_traps', 'trapper_hosts'
 	]
 ];
 foreach ($ui_rows[ITEM_TYPE_HTTPAGENT] as $row) {
@@ -399,6 +399,12 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
 		<?php } ?>
 
+		if (jQuery('#allow_traps').length) {
+			new CViewSwitcher('allow_traps', 'change', <?= zbx_jsvalue([
+				HTTPCHECK_ALLOW_TRAPS_ON => ['row_trapper_hosts']
+			], true) ?>);
+		}
+
 		jQuery('#type')
 			.change(function() {
 				// update the interface select with each item type change
@@ -406,16 +412,6 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
 
 				setAuthTypeLabel();
-
-				// Show or hide "Allowed hosts" depending on "Enable trapping" checkbox.
-				var allow_traps = jQuery('#allow_traps'),
-					trapper_hosts = jQuery('#row_trapper_hosts');
-
-				trapper_hosts.toggle(allow_traps.is(':checked'));
-
-				allow_traps.on('click', function () {
-					trapper_hosts.toggle($(this).is(':checked'));
-				});
 			})
 			.trigger('change');
 
