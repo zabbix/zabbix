@@ -69,6 +69,12 @@ class CAudit {
 				$table_name = 'applications';
 				break;
 
+			case AUDIT_RESOURCE_CORRELATION:
+				$field_name_resourceid = 'correlationid';
+				$field_name_resourcename = 'name';
+				$table_name = 'correlation';
+				break;
+
 			case AUDIT_RESOURCE_DASHBOARD:
 				$field_name_resourceid = 'dashboardid';
 				$field_name_resourcename = 'name';
