@@ -3919,7 +3919,7 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 	proxy->lastaccess = lastaccess;
 
 	if (0 != (diff.flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
-		DBexecute("update hosts set compress=%d where hostid=" ZBX_FS_UI64, diff.compress, diff.hostid);
+		DBexecute("update hosts set auto_compress=%d where hostid=" ZBX_FS_UI64, diff.compress, diff.hostid);
 
 	zbx_db_flush_proxy_lastaccess();
 }

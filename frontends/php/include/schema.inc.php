@@ -381,7 +381,7 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'compress' => [
+			'auto_compress' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
