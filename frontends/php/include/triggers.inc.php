@@ -682,7 +682,8 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 	$hostids = array_keys($hosts);
 
 	$options = [
-		'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'],
+		'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags',
+			'comments'],
 		'selectHosts' => ['hostid', 'name', 'status'],
 		'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 		'hostids' => $hostids,
@@ -707,6 +708,19 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 	$triggers = API::Trigger()->get($options);
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
+
+	$editable_triggers = API::Trigger()->get([
+		'output' => [],
+		'triggerids' => array_keys($triggers),
+		'editable' => true,
+		'preservekeys' => true
+	]);
+
+	foreach ($triggers as &$trigger) {
+		$trigger['description_disabled']
+			= ($trigger['comments'] === '' && !array_key_exists($trigger['triggerid'], $editable_triggers));
+	}
+	unset($trigger);
 
 	return [$hosts, $triggers];
 }
@@ -776,7 +790,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'flags' => $trigger['flags'],
 				'url' => $trigger['url'],
 				'hosts' => $trigger['hosts'],
-				'items' => $trigger['items']
+				'items' => $trigger['items'],
+				'description_disabled' => $trigger['description_disabled']
 			];
 			$trcounter[$host['name']][$trigger_name]++;
 		}

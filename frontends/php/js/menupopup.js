@@ -668,16 +668,23 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// description
-	items[items.length] = {
-		label: t('Description'),
-		clickCallback: function(event) {
+	var trigger_descr = {
+		label: t('Description')
+	};
+
+	if (typeof options.descriptionDisabled === 'undefined' || !options.descriptionDisabled) {
+		trigger_descr.clickCallback = function(event) {
 			jQuery(this).closest('.action-menu').menuPopup('close', null);
 
-			return PopUp('popup.triggerdesc', {
+			return PopUp('popup.triggerdesc.view', {
 				triggerid: options.triggerid
 			}, null, event.target);
 		}
-	};
+	}
+	else {
+		trigger_descr.disabled = true;
+	}
+	items[items.length] = trigger_descr;
 
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration) {

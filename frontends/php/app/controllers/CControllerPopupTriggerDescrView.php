@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupTriggerDescr extends CController {
+class CControllerPopupTriggerDescrView extends CController {
 	private $trigger;
 
 	protected function init() {
@@ -29,8 +29,7 @@ class CControllerPopupTriggerDescr extends CController {
 	protected function checkInput() {
 		$fields = [
 			'triggerid' =>	'db triggers.triggerid',
-			'comments'	=>	'string',
-			'save'		=>	'in 1'
+			'success'	=>	'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,9 +50,8 @@ class CControllerPopupTriggerDescr extends CController {
 
 	protected function checkPermissions() {
 		$trigger = API::Trigger()->get([
-			'triggerids' => $this->getInput('triggerid'),
 			'output' => API_OUTPUT_EXTEND,
-			'expandDescription' => true
+			'triggerids' => $this->getInput('triggerid')
 		]);
 
 		if (!$trigger) {
@@ -66,22 +64,8 @@ class CControllerPopupTriggerDescr extends CController {
 	}
 
 	protected function doAction() {
-		if ($this->hasInput('save')) {
-			$result = API::Trigger()->update([
-				'triggerid' => $this->trigger['triggerid'],
-				'comments' => $this->getInput('comments')
-			]);
-
-			$result ? info(_('Description updated')) : error(_('Cannot update description'));
-
-			$this->trigger['comments'] = $this->getInput('comments');
-		}
-		else {
-			$result = false;
-		}
-
 		$trigger_editable = API::Trigger()->get([
-			'output' => ['triggerid'],
+			'output' => [],
 			'triggerids' => $this->trigger['triggerid'],
 			'filter' => [
 				'flags' => ZBX_FLAG_DISCOVERY_NORMAL
@@ -89,14 +73,19 @@ class CControllerPopupTriggerDescr extends CController {
 			'editable' => true
 		]);
 
+		if ($this->hasInput('success')) {
+			info(_('Description updated'));
+		}
+
 		$data = [
 			'title' => _('Trigger description'),
 			'trigger' => $this->trigger,
 			'isTriggerEditable' => (boolean) $trigger_editable,
-			'isCommentExist' => ($this->trigger['comments'] !== '')
+			'isCommentExist' => ($this->trigger['comments'] !== ''),
+			'resolved' => CMacrosResolverHelper::resolveTriggerDescription($this->trigger)
 		];
 
-		if (($messages = getMessages($result)) !== null) {
+		if (($messages = getMessages($this->hasInput('success'))) !== null) {
 			$data['messages'] = $messages;
 		}
 

@@ -325,7 +325,7 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['priority', 'url', 'flags', 'expression'],
+						'output' => ['priority', 'url', 'flags', 'expression', 'comments'],
 						'selectHosts' => ['hostid', 'name', 'status'],
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 						'triggerids' => array_keys($triggerids),
@@ -362,6 +362,19 @@ class CScreenProblem extends CScreenBase {
 		while (count($data['problems']) < $config['search_limit'] + 1 && !$end_of_data);
 
 		$data['problems'] = array_slice($data['problems'], 0, $config['search_limit'] + 1, true);
+
+		$editable_triggers = API::Trigger()->get([
+			'output' => [],
+			'triggerids' => array_keys($data['triggers']),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($data['triggers'] as &$trigger) {
+			$trigger['description_disabled']
+				= ($trigger['comments'] === '' && !array_key_exists($trigger['triggerid'], $editable_triggers));
+		}
+		unset($trigger);
 
 		return $data;
 	}
