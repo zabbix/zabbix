@@ -103,35 +103,38 @@ if (!$readonly) {
 $itemFormList->addRow((new CLabel(_('Key'), 'key'))->setAsteriskMark(), $key_controls);
 
 // Append master item select.
-$master_item = [
-	(new CTextBox('master_itemname', $data['master_itemname'], true))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
-	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
-];
-
-if (!$readonly) {
-	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-	$master_item[] = (new CButton('button', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'master_itemname',
-				'dstfrm' => $itemForm->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'only_hostid' => $data['hostid'],
-				'excludeids' => [$data['itemid']],
-				'with_webitems' => 1
-			]).', null, this);'
-		);
-}
-
 $itemFormList->addRow(
 	(new CLabel(_('Master item'), 'master_itemname'))->setAsteriskMark(),
-	$master_item,
+	(new CMultiSelect([
+		'name' => 'master_itemid',
+		'objectName' => 'items',
+		'multiple' => false,
+		'add_post_js' => true,
+		'disabled' => $readonly,
+		'ignored' => [
+			$data['itemid'] => $data['item']
+		],
+		'popup' => [
+			'parameters' => [
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'only_hostid' => $data['hostid'],
+				'with_webitems' => 1
+			]
+		],
+		'data' => ($data['master_itemid'] > 0)
+			? [
+				[
+					'id' => $data['master_itemid'],
+					'name' => $host['name'].NAME_DELIMITER.$data['master_itemname']
+				]
+			]
+			: null
+	]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired(true),
 	'row_master_item'
 );
 

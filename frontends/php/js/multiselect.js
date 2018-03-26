@@ -185,6 +185,7 @@ jQuery(function($) {
 				'Select': 'Select'
 			},
 			data: [],
+			onlyHostid: 0,
 			ignored: {},
 			addNew: false,
 			defaultValue: null,
@@ -303,18 +304,23 @@ jQuery(function($) {
 
 										values.isAjaxLoaded = false;
 
+										var request_data = {
+											search: values.search,
+											limit: getLimit(values, options)
+										}
+
+										if (options.onlyHostid > 0) {
+											request_data.only_hostid = options.onlyHostid;
+										}
+
 										jqxhr = $.ajax({
 											url: options.url + '&curtime=' + new CDate().getTime(),
 											type: 'GET',
 											dataType: 'json',
 											cache: false,
-											data: {
-												search: values.search,
-												limit: getLimit(values, options)
-											},
+											data: request_data,
 											success: function(data) {
 												values.isAjaxLoaded = true;
-
 												loadAvailable(data.result, obj, values, options);
 											}
 										});
@@ -551,6 +557,10 @@ jQuery(function($) {
 			// draw popup link
 			if (options.popup.parameters != null) {
 				var popup_options = options.popup.parameters;
+
+				if (typeof popup_options['only_hostid'] !== 'undefined') {
+					options.onlyHostid = popup_options['only_hostid'];
+				}
 
 				if (options.ignored) {
 					var excludeids = [];

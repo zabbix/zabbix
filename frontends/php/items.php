@@ -1207,7 +1207,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 				'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid'
 			],
-			'selectHosts' => ['status'],
+			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectPreprocessing' => ['type', 'params'],
 			'itemids' => getRequest('itemid')
@@ -1384,16 +1384,19 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 			// set the initial chosen interface to one of the interfaces the items use
 			$items = API::Item()->get([
 				'itemids' => $data['itemids'],
-				'output' => ['itemid', 'type']
+				'output' => ['itemid', 'type', 'name']
 			]);
 			$usedInterfacesTypes = [];
+			$items_names = [];
 			foreach ($items as $item) {
 				$usedInterfacesTypes[$item['type']] = itemTypeInterface($item['type']);
+				$items_names[$item['itemid']] = $item['name'];
 			}
 			$initialItemType = min(array_keys($usedInterfacesTypes));
 			$data['type'] = (getRequest('type') !== null) ? ($data['type']) : $initialItemType;
 			$data['initial_item_type'] = $initialItemType;
 			$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
+			$data['items_names'] = $items_names;
 		}
 	}
 

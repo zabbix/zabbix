@@ -989,7 +989,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$master_item = reset($expanded);
 		$data['type'] = ITEM_TYPE_DEPENDENT;
 		$data['master_itemid'] = $master_item['itemid'];
-		$data['master_itemname'] = $master_item['name_expanded'].NAME_DELIMITER.$master_item['key_'];
+		$data['master_itemname'] = $master_item['name_expanded'];
 		// Do not initialize item data if only master_item array was passed.
 		unset($item['master_item']);
 	}

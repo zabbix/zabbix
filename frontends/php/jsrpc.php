@@ -283,6 +283,7 @@ switch ($data['method']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'key_'],
 					'selectHosts' => ['name'],
+					'hostids' => array_key_exists('only_hostid', $data) ? [$data['only_hostid']] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);

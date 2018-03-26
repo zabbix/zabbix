@@ -29,7 +29,8 @@ class CMultiSelect extends CTag {
 	private $js_event_name = '';
 
 	/**
-	 * @param array $options['objectOptions']  an array of parameters to be added to the request URL
+	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
+	 * @param bool  $options['multiple']       Allows multiple selections.
 	 * @param bool  $options['add_post_js']
 	 *
 	 * @see jQuery.multiSelect()
@@ -67,6 +68,16 @@ class CMultiSelect extends CTag {
 			$params['data'] = zbx_cleanHashes($options['data']);
 		}
 
+		$multiple = array_key_exists('multiple', $options) ? $options['multiple'] : true;
+
+		// for backward compatibility
+		if (array_key_exists('selectedLimit', $options) && $options['selectedLimit'] == 1) {
+			$multiple = false;
+		}
+		elseif (!$multiple) {
+			$options['selectedLimit'] = 1;
+		}
+
 		foreach (['ignored', 'defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles'] as $option) {
 			if (array_key_exists($option, $options)) {
 				$params[$option] = $options[$option];
@@ -76,6 +87,9 @@ class CMultiSelect extends CTag {
 		if (array_key_exists('popup', $options)) {
 			if (array_key_exists('parameters', $options['popup'])) {
 				$params['popup']['parameters'] = $options['popup']['parameters'];
+				if ($multiple) {
+					$params['popup']['parameters']['multiselect'] = '1';
+				}
 			}
 		}
 		if (array_key_exists('callPostEvent', $options) && $options['callPostEvent']) {

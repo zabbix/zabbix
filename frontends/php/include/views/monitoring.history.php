@@ -105,55 +105,46 @@ $action_list->addItem([
 $header['right']->addItem($action_list);
 
 // create filter
-if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
-	if (isset($this->data['iv_string'][$this->data['value_type']])) {
+if ($this->data['action'] == HISTORY_LATEST || $this->data['action'] == HISTORY_VALUES) {
+	if (array_key_exists($this->data['value_type'], $this->data['iv_string'])) {
 		$filterForm = (new CFilter('web.history.filter.state'))
 			->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null)
 			->addVar('action', $this->data['action']);
-		foreach (getRequest('itemids') as $itemId) {
-			$filterForm->addVar('itemids['.$itemId.']', $itemId);
-		}
 
-		$itemListbox = (new CListBox('cmbitemlist[]'))->setAttribute('autofocus', 'autofocus');
-		$itemsData = [];
+		$items_data = [];
 		foreach ($this->data['items'] as $itemid => $item) {
-			if (!isset($this->data['iv_string'][$item['value_type']])) {
+			if (!array_key_exists($item['value_type'], $this->data['iv_string'])) {
 				unset($this->data['items'][$itemid]);
 				continue;
 			}
 
-			$host = reset($item['hosts']);
-			$itemsData[$itemid]['id'] = $itemid;
-			$itemsData[$itemid]['name'] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
-		}
-
-		order_result($itemsData, 'name');
-		foreach ($itemsData as $item) {
-			$itemListbox->addItem($item['id'], $item['name']);
-		}
-
-		$addItemButton = (new CButton('add_log', _('Add')))
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'reference' => 'itemid',
-					'multiselect' => '1',
-					'real_hosts' => '1',
-					'value_types' => [$data['value_type']]
-				]).', null, this);'
-			);
-		$deleteItemButton = null;
-
-		if (count($this->data['items']) > 1) {
-			$deleteItemButton = [
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CButton('remove_log', _('Remove selected'))
+			$items_data[$itemid] = [
+				'id' => $itemid,
+				'name' => $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
 			];
 		}
 
+		CArrayHelper::sort($items_data, ['name']);
+
 		$filterColumn1 = (new CFormList())
-			->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton])
+			->addRow(_('Items list'),
+				(new CMultiSelect([
+					'name' => 'itemids[]',
+					'objectName' => 'items',
+					'multiple' => true,
+					'add_post_js' => true,
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'items',
+							'srcfld1' => 'itemid',
+							'dstfld1' => 'itemids_',
+							'real_hosts' => '1',
+							'value_types' => [$data['value_type']]
+						]
+					],
+					'data' => $items_data,
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
 			->addRow(_('Value'),
 				(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			);

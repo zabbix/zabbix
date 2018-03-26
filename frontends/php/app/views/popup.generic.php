@@ -135,10 +135,9 @@ if ($page_filter->hostsAll) {
 	$table_columns[] = _('Host');
 }
 
-if ($data['multiselect'] && $options['selectLimit'] != 1 && $form !== null) {
+if ($data['multiselect'] && $form !== null) {
 	$ch_box = (new CColHeader(
-		(new CCheckBox('all_records'))
-			->onClick("javascript: checkAll('".$form->getName()."', 'all_records', 'item');")
+		(new CCheckBox('all_records'))->onClick("javascript: checkAll('".$form->getName()."', 'all_records', 'item');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH);
 
 	$table_columns[] = $ch_box;
@@ -427,6 +426,38 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'items':
+		foreach ($data['table_records'] as &$item) {
+			$host = reset($item['hosts']);
+
+			$table->addRow([
+				($options['hostid'] > 0) ? null : $host['name'],
+				$data['multiselect'] ? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid']) : null,
+				(new CLink($item['name_expanded'], 'javascript:void(0);'))
+					->onClick('javascript: addValue('.
+						CJs::encodeJson($options['reference']).', '.
+						CJs::encodeJson($item['itemid']).', '.
+						$options['parentid'].
+					');'.$js_action_onclick),
+				$item['key_'],
+				item_type2str($item['type']),
+				itemValueTypeString($item['value_type']),
+				(new CSpan(itemIndicator($item['status'], $item['state'])))
+					->addClass(itemIndicatorStyle($item['status'], $item['state']))
+			]);
+
+			$item = [
+				'id' => $item['itemid'],
+				'itemid' => $item['itemid'],
+				'name' => $host['name'].NAME_DELIMITER.$item['name_expanded'],
+				'key_' => $item['key_'],
+				'flags' => $item['flags'],
+				'type' => $item['type'],
+				'value_type' => $item['value_type'],
+				'host' => $host['name']
+			];
+		}
+		unset($item);
+		break;
 	case 'item_prototypes':
 		foreach ($data['table_records'] as &$item) {
 			$host = reset($item['hosts']);
@@ -465,9 +496,7 @@ switch ($data['popup_type']) {
 
 			$table->addRow([
 				($options['hostid'] > 0) ? null : $item['hostname'],
-				($data['multiselect'] && $options['selectLimit'] != 1)
-					? new CCheckBox('item['.$checkbox_key.']', $item['itemid'])
-					: null,
+				$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
 				$description,
 				$item['key_'],
 				item_type2str($item['type']),
@@ -632,7 +661,7 @@ if ($data['multiselect'] && $form !== null) {
 	];
 }
 
-$types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'proxies'];
+$types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'proxies', 'items'];
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {
 	$output['script_inline'] .= 'var popup_reference = '.zbx_jsvalue($data['table_records'], true).';';
 }

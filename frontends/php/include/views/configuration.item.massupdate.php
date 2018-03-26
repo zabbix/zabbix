@@ -594,23 +594,25 @@ if ($this->data['displayApplications']) {
 
 // Append master item select.
 $master_item = (new CDiv([
-	(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid')),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('button', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
+	(new CMultiSelect([
+		'name' => 'master_itemid',
+		'objectName' => 'items',
+		'multiple' => false,
+		'add_post_js' => true,
+		'ignored' => array_key_exists('items_names', $data) ? $data['items_names'] : [],
+		'popup' => [
+			'parameters' => [
 				'srctbl' => 'items',
 				'srcfld1' => 'itemid',
-				'srcfld2' => 'master_itemname',
 				'dstfrm' => $itemForm->getName(),
 				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
 				'only_hostid' => $data['hostid'],
-				'excludeids' => $data['itemids']
-			]).', null, this);'
-		)
+				'with_webitems' => 1
+			]
+		]
+	]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired(true)
 ]))->setId('master_item');
 
 $itemFormList->addRow(
