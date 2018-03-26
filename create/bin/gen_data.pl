@@ -177,7 +177,14 @@ sub process_row
 
 	$values = "$values)";
 
-	print "$insert_into $fields values $values$output{'exec_cmd'}";
+	if ($output{'database'} eq 'oracle')
+	{
+		print "$insert_into $fields\nvalues $values$output{'exec_cmd'}";
+	}
+	else
+	{
+		print "$insert_into $fields values $values$output{'exec_cmd'}";
+	}
 }
 
 sub usage
