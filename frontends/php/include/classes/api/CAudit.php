@@ -57,6 +57,12 @@ class CAudit {
 		];
 
 		switch ($resourcetype) {
+			case AUDIT_RESOURCE_ACTION:
+				$field_name_resourceid = 'actionid';
+				$field_name_resourcename = 'name';
+				$table_name = 'actions';
+				break;
+
 			case AUDIT_RESOURCE_APPLICATION:
 				$field_name_resourceid = 'applicationid';
 				$field_name_resourcename = 'name';
