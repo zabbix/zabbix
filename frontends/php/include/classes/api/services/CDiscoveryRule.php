@@ -267,12 +267,12 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
-		$cjson = new CJson();
+		$json = new CJson();
 
 		foreach ($result as &$item) {
 			if (array_key_exists('query_fields', $item)) {
-				$query_fields = ($item['query_fields'] !== '') ? $cjson->decode($item['query_fields'], true) : [];
-				$item['query_fields'] = $cjson->hasError() ? [] : $query_fields;
+				$query_fields = ($item['query_fields'] !== '') ? $json->decode($item['query_fields'], true) : [];
+				$item['query_fields'] = $json->hasError() ? [] : $query_fields;
 			}
 
 			if (array_key_exists('headers', $item)) {
@@ -300,12 +300,12 @@ class CDiscoveryRule extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
-		$cjson = new CJson();
+		$json = new CJson();
 
 		foreach ($items as &$item) {
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item)) {
-					$item['query_fields'] = $item['query_fields'] ? $cjson->encode($item['query_fields']) : '';
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
 				}
 
 				if (array_key_exists('headers', $item)) {
@@ -372,7 +372,8 @@ class CDiscoveryRule extends CItemGeneral {
 				'posts' => ''
 			]
 		];
-		$cjson = new CJson();
+
+		$json = new CJson();
 
 		// set the default values required for updating
 		foreach ($items as &$item) {
@@ -415,7 +416,7 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields'] ? $cjson->encode($item['query_fields']) : '';
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
 				}
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
@@ -634,12 +635,12 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'preservekeys' => true
 		]);
-		$cjson = new CJson();
+		$json = new CJson();
 
 		foreach ($tpl_items as &$item) {
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields'] ? $cjson->encode($item['query_fields']) : '';
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
 				}
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
