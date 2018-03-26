@@ -275,23 +275,36 @@
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
 
-	<target name="mock-tests">
-		<!-- Build Zabbix server and proxy with C mock tests -->
+	<target name="mock-tests" depends="init-conf-options">
+		<!-- Build Zabbix with C mock tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<exec executable="./configure" failonerror="on">
-			<arg line="-q"/>
-			<arg line="--enable-server"/>
-			<arg line="--enable-proxy"/>
-			<arg line="--enable-agent"/>
-			<arg line="--with-mysql"/>
-			<arg line="--with-libxml2"/>
-		</exec>
-		<exec executable="make" failonerror="on">
-			<arg line="-s"/>
-			<arg line="-j5"/>
-			<arg line="tests_build"/>
-		</exec>
-		<exec executable="tests/tests_run.pl" failonerror="on" output="output.xml"></exec>
+		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
+		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
+		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>
+				<exec executable="./configure" failonerror="on">
+				<arg line="-q"/>
+				<arg line="${@{name}}"/>
+				</exec>
+				<trycatch>
+					<try>
+						<exec executable="make" failonerror="on">
+							<arg line="-s"/>
+							<arg line="-j5"/>
+							<arg line="tests_build"/>
+						</exec>
+						<exec executable="tests/tests_run.pl" failonerror="on" output="output.xml"></exec>
+					</try>
+					<finally>
+						<exec executable="make" failonerror="on">
+							<arg line="-s"/>
+							<arg line="-j5"/>
+							<arg line="clean"/>
+						</exec>
+					</finally>
+				</trycatch>
+			</sequential>
+		</for>
 	</target>
 
 	<target name="run-unit-test">
