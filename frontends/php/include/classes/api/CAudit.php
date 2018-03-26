@@ -81,6 +81,12 @@ class CAudit {
 				$table_name = 'dashboard';
 				break;
 
+			case AUDIT_RESOURCE_DISCOVERY_RULE:
+				$field_name_resourceid = 'druleid';
+				$field_name_resourcename = 'name';
+				$table_name = 'drules';
+				break;
+
 			case AUDIT_RESOURCE_ICON_MAP:
 				$field_name_resourceid = 'iconmapid';
 				$field_name_resourcename = 'name';
