@@ -827,9 +827,9 @@ $itemFormList
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		[
-			$readonly ? new CVar('allow_traps', $data['allow_traps']) : null,
-			(new CCheckBox($readonly ? '' : 'allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
-				->setEnabled(!$readonly)
+			$discovered_item ? new CVar('allow_traps', $data['allow_traps']) : null,
+			(new CCheckBox($discovered_item ? '' : 'allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
+				->setEnabled(!$discovered_item)
 				->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON)
 		],
 		'allow_traps_row'

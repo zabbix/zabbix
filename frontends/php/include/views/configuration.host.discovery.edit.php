@@ -562,12 +562,8 @@ $itemFormList->addRow(_('Custom intervals'),
 	)
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
-		[
-			$data['limited'] ? new CVar('allow_traps', $data['allow_traps']) : null,
-			(new CCheckBox($data['limited'] ? '' : 'allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
-				->setEnabled(!$data['limited'])
-				->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON)
-		],
+		(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
+			->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON),
 		'allow_traps_row'
 	)
 	->addRow(_('Allowed hosts'),
