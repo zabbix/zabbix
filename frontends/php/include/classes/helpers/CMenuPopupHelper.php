@@ -234,7 +234,7 @@ class CMenuPopupHelper {
 		];
 
 		if (array_key_exists('description_disabled', $trigger)) {
-			$data['description'] = $trigger['description_disabled'];
+			$data['description'] = !$trigger['description_disabled'];
 		}
 
 		if ($acknowledge !== null) {

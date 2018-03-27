@@ -674,7 +674,7 @@ function getMenuPopupTrigger(options) {
 			label: t('Description')
 		};
 
-		if (!options.description) {
+		if (options.description) {
 			trigger_descr.clickCallback = function(event) {
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
