@@ -225,7 +225,7 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
 		$this->zbxTestTextNotVisibleOnPage('Service: abc');
 		$this->zbxTestTextNotVisibleOnPage('Tag4');
-		$this->zbxTestTextNotVisibleOnPage('Tag5: Tag5');
+		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
 		//Check Show More tags hint button
 		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
 
@@ -237,7 +237,7 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[3]', 'Service: abc');
 		$this->zbxTestTextNotVisibleOnPage('Tag4');
-		$this->zbxTestTextNotVisibleOnPage('Tag5: Tag5');
+		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
 		//Check Show More tags hint button
 		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
 	}
