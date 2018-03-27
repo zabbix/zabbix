@@ -174,7 +174,7 @@ while ($row = DBfetch($result)) {
 }
 
 $data['triggers'] = API::Trigger()->get([
-	'output' => ['triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange', 'comments'],
+	'output' => ['triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'],
 	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 	'selectHosts' => ['hostid', 'status', 'name'],
 	'triggerids' => array_keys($triggersEventCount),
@@ -184,13 +184,6 @@ $data['triggers'] = API::Trigger()->get([
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 
-$editable_triggers = API::Trigger()->get([
-	'output' => [],
-	'triggerids' => array_keys($data['triggers']),
-	'editable' => true,
-	'preservekeys' => true
-]);
-
 $trigger_hostids = [];
 
 foreach ($data['triggers'] as $triggerId => $trigger) {
@@ -198,8 +191,7 @@ foreach ($data['triggers'] as $triggerId => $trigger) {
 	$trigger_hostids[$hostId] = $hostId;
 
 	$data['triggers'][$triggerId]['cnt_event'] = $triggersEventCount[$triggerId];
-	$data['triggers'][$triggerId]['description_disabled']
-		= ($trigger['comments'] === '' && !array_key_exists($trigger['triggerid'], $editable_triggers));
+	$data['triggers'][$triggerId]['description_hidden'] = true;
 }
 
 CArrayHelper::sort($data['triggers'], [

@@ -668,23 +668,25 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// description
-	var trigger_descr = {
-		label: t('Description')
-	};
+	if (typeof options.descriptionHidden === 'undefined' || !options.descriptionHidden) {
+		var trigger_descr = {
+			label: t('Description')
+		};
 
-	if (typeof options.descriptionDisabled === 'undefined' || !options.descriptionDisabled) {
-		trigger_descr.clickCallback = function(event) {
-			jQuery(this).closest('.action-menu').menuPopup('close', null);
+		if (typeof options.descriptionDisabled === 'undefined' || !options.descriptionDisabled) {
+			trigger_descr.clickCallback = function(event) {
+				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
-			return PopUp('popup.triggerdesc.view', {
-				triggerid: options.triggerid
-			}, null, event.target);
+				return PopUp('popup.triggerdesc.view', {
+					triggerid: options.triggerid
+				}, null, event.target);
+			}
 		}
+		else {
+			trigger_descr.disabled = true;
+		}
+		items[items.length] = trigger_descr;
 	}
-	else {
-		trigger_descr.disabled = true;
-	}
-	items[items.length] = trigger_descr;
 
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration) {
