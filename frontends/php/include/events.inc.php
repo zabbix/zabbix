@@ -137,34 +137,6 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	]);
 }
 
-function get_next_event($currentEvent, array $eventList = []) {
-	$nextEvent = false;
-
-	foreach ($eventList as $event) {
-		// check only the events belonging to the same object
-		// find the event with the smallest eventid but greater than the current event id
-		if ($event['object'] == $currentEvent['object'] && bccomp($event['objectid'], $currentEvent['objectid']) == 0
-				&& (bccomp($event['eventid'], $currentEvent['eventid']) === 1
-				&& (!$nextEvent || bccomp($event['eventid'], $nextEvent['eventid']) === -1))) {
-			$nextEvent = $event;
-		}
-	}
-	if ($nextEvent) {
-		return $nextEvent;
-	}
-
-	$sql = 'SELECT e.*'.
-			' FROM events e'.
-			' WHERE e.source='.zbx_dbstr($currentEvent['source']).
-				' AND e.object='.zbx_dbstr($currentEvent['object']).
-				' AND e.objectid='.zbx_dbstr($currentEvent['objectid']).
-				' AND e.clock>='.zbx_dbstr($currentEvent['clock']).
-				' AND ((e.clock='.zbx_dbstr($currentEvent['clock']).' AND e.ns>'.$currentEvent['ns'].')'.
-					' OR e.clock>'.zbx_dbstr($currentEvent['clock']).')'.
-			' ORDER BY e.clock,e.eventid';
-	return DBfetch(DBselect($sql, 1));
-}
-
 /**
  *
  * @param array  $event								An array of event data.
@@ -324,16 +296,9 @@ function make_small_eventlist($startEvent, $backurl) {
 	$actions = makeEventsActions($events, true);
 
 	foreach ($events as $index => $event) {
-		$duration = ($event['r_eventid'] == 0)
-			? zbx_date2age($event['clock'])
-			: zbx_date2age($event['clock'], $event['r_clock']);
-
-		if (bccomp($startEvent['eventid'], $event['eventid']) == 0 && $nextevent = get_next_event($event, $events)) {
-			$duration = zbx_date2age($nextevent['clock'], $clock);
-		}
-		elseif (bccomp($startEvent['eventid'], $event['eventid']) == 0) {
-			$duration = zbx_date2age($clock);
-		}
+		$duration = ($event['r_eventid'] != 0)
+			? zbx_date2age($event['clock'], $event['r_clock'])
+			: zbx_date2age($event['clock']);
 
 		if ($event['r_eventid'] == 0) {
 			$in_closing = false;

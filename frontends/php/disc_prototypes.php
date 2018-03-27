@@ -620,7 +620,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
-	$data['items'] = expandItemNamesWithMasterItems($data['items'], API::ItemPrototype());
+	$data['items'] = expandItemNamesWithMasterItems($data['items'], 'itemprototypes');
 
 	switch ($sortField) {
 		case 'delay':

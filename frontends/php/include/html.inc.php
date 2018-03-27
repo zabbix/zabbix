@@ -524,13 +524,16 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 	$list = (new CList())
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 		->addItem([
-			(new CSpan())->addItem(new CLink(_('All maps'), 'sysmaps.php')),
+			(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
 			'/',
 			(new CSpan())
 				->addClass(ZBX_STYLE_SELECTED)
 				->addItem(
-					new CLink($name, 'zabbix.php?action=map.view&sysmapid='.$sysmapid.'&fullscreen='.$fullscreen.
-						'&severity_min='.$severity_min
+					new CLink($name, (new CUrl('zabbix.php'))
+						->setArgument('action', 'map.view')
+						->setArgument('sysmapid', $sysmapid)
+						->setArgument('severity_min', $severity_min)
+						->setArgument('fullscreen', $fullscreen ? '1' : null)
 					)
 				)
 		]);
@@ -542,8 +545,11 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 
 		foreach ($parent_sysmaps as $parent_sysmap) {
 			$hor_list->addItem(
-				new CLink($parent_sysmap['name'], 'zabbix.php?action=map.view'.
-					'&sysmapid='.$parent_sysmap['sysmapid'].'&fullscreen='.$fullscreen.'&severity_min='.$severity_min
+				new CLink($parent_sysmap['name'], (new CUrl('zabbix.php'))
+					->setArgument('action', 'map.view')
+					->setArgument('sysmapid', $parent_sysmap['sysmapid'])
+					->setArgument('severity_min', $severity_min)
+					->setArgument('fullscreen', $fullscreen ? '1' : null)
 				)
 			);
 		}
@@ -637,7 +643,7 @@ function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($ts_delete),
+			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
 		);
@@ -664,7 +670,7 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($ts_delete),
+			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
 		);
@@ -691,7 +697,7 @@ function getApplicationLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($ts_delete),
+			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
 		);
@@ -718,7 +724,7 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($ts_delete),
+			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
 		);

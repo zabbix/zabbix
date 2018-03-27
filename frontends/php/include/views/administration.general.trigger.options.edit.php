@@ -30,7 +30,9 @@ $widget = (new CWidget())
 
 $triggerDOFormList = (new CFormList())
 	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
-		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED))
+		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+		->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
 		(new CColor('problem_unack_color', $data['problem_unack_color']))
 			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)

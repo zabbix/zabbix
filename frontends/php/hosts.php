@@ -698,13 +698,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			// copy items
-			if (!copyItems($srcHostId, $hostId)) {
+			/*
+			 * First copy web scenarios with web items, so that later regular items can use web item as their master
+			 * item.
+			 */
+			if (!copyHttpTests($srcHostId, $hostId)) {
 				throw new Exception();
 			}
 
-			// copy web scenarios
-			if (!copyHttpTests($srcHostId, $hostId)) {
+			if (!copyItems($srcHostId, $hostId)) {
 				throw new Exception();
 			}
 
