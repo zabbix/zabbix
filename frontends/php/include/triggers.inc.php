@@ -709,7 +709,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
-	$editable_triggers = API::Trigger()->get([
+	$rw_triggers = API::Trigger()->get([
 		'output' => [],
 		'triggerids' => array_keys($triggers),
 		'editable' => true,
@@ -717,8 +717,8 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 	]);
 
 	foreach ($triggers as &$trigger) {
-		$trigger['description_disabled']
-			= ($trigger['comments'] === '' && !array_key_exists($trigger['triggerid'], $editable_triggers));
+		$trigger['description_enabled']
+			= ($trigger['comments'] !== '' || array_key_exists($trigger['triggerid'], $rw_triggers));
 	}
 	unset($trigger);
 
@@ -791,7 +791,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'url' => $trigger['url'],
 				'hosts' => $trigger['hosts'],
 				'items' => $trigger['items'],
-				'description_disabled' => $trigger['description_disabled']
+				'description_enabled' => $trigger['description_enabled']
 			];
 			$trcounter[$host['name']][$trigger_name]++;
 		}

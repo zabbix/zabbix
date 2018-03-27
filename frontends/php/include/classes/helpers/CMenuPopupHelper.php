@@ -233,8 +233,14 @@ class CMenuPopupHelper {
 			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
-		if (array_key_exists('description_disabled', $trigger)) {
-			$data['description'] = !$trigger['description_disabled'];
+		// show_description is TRUE by default. Only FALSE should be specidied.
+		if (array_key_exists('show_description', $trigger) && $trigger['show_description'] === false) {
+			$data['show_description'] = $trigger['show_description'];
+		}
+
+		// description_enabled is TRUE by default. Only FALSE should be specidied.
+		if (array_key_exists('description_enabled', $trigger) && $trigger['description_enabled'] === false) {
+			$data['description_enabled'] = $trigger['description_enabled'];
 		}
 
 		if ($acknowledge !== null) {

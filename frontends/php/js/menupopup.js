@@ -626,7 +626,8 @@ function showDialogForm(form, options, formData, trigger_elmnt) {
  * @param string options['acknowledge']['eventid']	event id
  * @param string options['acknowledge']['backurl']	return url
  * @param object options['configuration']			link to trigger configuration page (optional)
- * @param object options['description']				item opens trigger description window (optional)
+ * @param bool	 options['show_description']		Show Description item in context menu. Default: true.
+ * @param bool	 options['description_enabled']		Show Description item enabled. Default: true.
  * @param string options['url']						trigger url link (optional)
  *
  * @return array
@@ -669,12 +670,12 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// description
-	if (typeof options.description !== 'undefined') {
+	if (typeof options.show_description === 'undefined' || options.show_description !== false) {
 		var trigger_descr = {
 			label: t('Description')
 		};
 
-		if (options.description) {
+		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
 			trigger_descr.clickCallback = function(event) {
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
