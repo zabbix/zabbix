@@ -55,8 +55,8 @@ if ($data['isTriggerEditable']) {
 					'url: "zabbix.php?action=triggerdesc.update",'.
 					'data: {'.
 						'"triggerid": '.$data['trigger']['triggerid'].','.
-						'"comments": jQuery([name=comments], forms).val(),'.
-						'"sid": jQuery([name=sid], forms).val()'.
+						'"comments": jQuery("[name=comments]", forms).val(),'.
+						'"sid": jQuery("[name=sid]", forms).val()'.
 					'},'.
 					'success: function(r) {'.
 						'if (typeof r.errors === "undefined") {'.
