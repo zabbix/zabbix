@@ -125,28 +125,29 @@ foreach ($data['dialogue']['fields'] as $field) {
 		$parameters = [
 			'srctbl' => 'items',
 			'dstfrm' => $form->getName(),
-			'dstfld1' => $field->getName().'_',
 			'srcfld1' => 'itemid',
+			'dstfld1' => $field->getName().($field->isMultiple() ? '_' : ''),
 			'real_hosts' => '1',
-			'with_webitems' => '1',
-			'multiselect' => '1',
-			'selectLimit' => $field->getValuesLimit()
+			'with_webitems' => '1'
 		];
 
+		if ($field->isNumeric()) {
+			$parameters['numeric'] = '1';
+		}
+
 		$field_itemsids = (new CMultiSelect([
-			'name' => $field->getName().'[]',
+			'name' => $field->getName().($field->isMultiple() ? '[]' : ''),
 			'objectName' => 'items',
 			'data' => $data['captions']['ms']['items'][$field->getName()],
-			'selectedLimit' => $field->getValuesLimit(),
-			'popup' => [
-				'parameters' => $parameters
-			],
-			'add_post_js' => false
+			'multiple' => $field->isMultiple(),
+			'popup' => ['parameters' => $parameters]
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
 
-		$form_list->addRow((new CLabel($field->getLabel(), $field->getName().'[]'))->setAsteriskMark($aria_required),
+		$form_list->addRow(
+			(new CLabel($field->getLabel(), $field->getName().($field->isMultiple() ? '_' : '')))
+				->setAsteriskMark($aria_required),
 			$field_itemsids
 		);
 

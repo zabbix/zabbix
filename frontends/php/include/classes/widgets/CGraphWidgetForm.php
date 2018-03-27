@@ -44,7 +44,7 @@ class CGraphWidgetForm extends CWidgetForm {
 			// Item multiselector with single value.
 			$field_item = (new CWidgetFieldItem('itemid', _('Item')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setValuesLimit(1);
+				->setNumeric(true);
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);

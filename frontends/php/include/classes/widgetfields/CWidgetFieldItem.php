@@ -21,7 +21,8 @@
 
 class CWidgetFieldItem extends CWidgetField {
 
-	private $values_limit = 0;
+	private $numeric = false;
+	private $multiple = false;
 
 	/**
 	 * Create widget field for Items selection.
@@ -42,12 +43,44 @@ class CWidgetFieldItem extends CWidgetField {
 		return $this;
 	}
 
-	public function getValuesLimit() {
-		return $this->values_limit;
+	/**
+	 * Field contains numeric type items only.
+	 *
+	 * @return bool
+	 */
+	public function isNumeric() {
+		return $this->numeric;
 	}
 
-	public function setValuesLimit($limit) {
-		$this->values_limit = $limit;
+	/**
+	 * @param bool $numeric
+	 *
+	 * @return CWidgetFieldItem
+	 */
+	public function setNumeric($numeric) {
+		$this->numeric = $numeric;
+
+		return $this;
+	}
+
+	/**
+	 * Is field with multiple items or single.
+	 *
+	 * @return bool
+	 */
+	public function isMultiple() {
+		return $this->multiple;
+	}
+
+	/**
+	 * Set field to multiple items mode.
+	 *
+	 * @param bool $multiple
+	 *
+	 * @return CWidgetFieldItem
+	 */
+	public function setMultiple($multiple) {
+		$this->multiple = $multiple;
 
 		return $this;
 	}
