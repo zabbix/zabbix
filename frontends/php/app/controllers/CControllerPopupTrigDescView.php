@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupTriggerDescrView extends CController {
+class CControllerPopupTrigDescView extends CController {
 	private $trigger;
 
 	protected function init() {

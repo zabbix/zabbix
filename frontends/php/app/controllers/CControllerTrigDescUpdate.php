@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTriggerDescrUpdate extends CController {
+class CControllerTrigDescUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [

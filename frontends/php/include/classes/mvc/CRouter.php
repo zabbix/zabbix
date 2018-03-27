@@ -125,8 +125,8 @@ class CRouter {
 		'popup.services'		=> ['CControllerPopupServices',			'layout.json',			'popup.services'],
 		'popup.testtriggerexpr'	=> ['CControllerPopupTestTriggerExpr',	'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerwizard'	=> ['CControllerPopupTriggerWizard',	'layout.json',			'popup.triggerwizard'],
-		'triggerdesc.update'	=> ['CControllerTriggerDescrUpdate',	'layout.json',			null],
-		'popup.triggerdesc.view'	=> ['CControllerPopupTriggerDescrView',		'layout.json',	'popup.triggerdescr.view']
+		'trigdesc.update'		=> ['CControllerTrigDescUpdate',		'layout.json',			null],
+		'popup.trigdesc.view'	=> ['CControllerPopupTrigDescView',		'layout.json',			'popup.trigdesc.view']
 	];
 
 	public function __construct($action) {

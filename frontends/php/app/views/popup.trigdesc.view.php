@@ -52,7 +52,7 @@ if ($data['isTriggerEditable']) {
 				'e.preventDefault();'.
 				'var forms = jQuery(this);'.
 				'jQuery.ajax({'.
-					'url: "zabbix.php?action=triggerdesc.update",'.
+					'url: "zabbix.php?action=trigdesc.update",'.
 					'data: {'.
 						'"triggerid": '.$data['trigger']['triggerid'].','.
 						'"comments": jQuery("[name=comments]", forms).val(),'.
@@ -61,7 +61,7 @@ if ($data['isTriggerEditable']) {
 					'success: function(r) {'.
 						'if (typeof r.errors === "undefined") {'.
 							'jQuery(forms).append(jQuery("<input>", {type: "hidden", "name": "success"}).val(1));'.
-							'reloadPopup(forms[0], "popup.triggerdesc.view");'.
+							'reloadPopup(forms[0], "popup.trigdesc.view");'.
 						'}'.
 						'else {'.
 							'var dialogue_body = jQuery(forms).closest(".overlay-dialogue-body"),'.

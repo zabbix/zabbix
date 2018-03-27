@@ -679,7 +679,7 @@ function getMenuPopupTrigger(options) {
 			trigger_descr.clickCallback = function(event) {
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
-				return PopUp('popup.triggerdesc.view', {
+				return PopUp('popup.trigdesc.view', {
 					triggerid: options.triggerid
 				}, null, event.target);
 			}
