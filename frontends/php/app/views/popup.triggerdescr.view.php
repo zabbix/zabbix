@@ -21,7 +21,6 @@
 
 $form = (new CForm())
 	->setName('trigger_description')
-	->addVar('action', 'triggerdesc.update')
 	->addVar('triggerid', $data['trigger']['triggerid'])
 	->addVar('comments_unresolved', $data['trigger']['comments'])
 	->addItem(array_key_exists('messages', $data) ? $data['messages'] : null)
@@ -52,18 +51,24 @@ if ($data['isTriggerEditable']) {
 			'jQuery("form[name='.$form->getName().']").submit(function(e) {'.
 				'e.preventDefault();'.
 				'var forms = jQuery(this);'.
-				'jQuery(forms).prevAll(".msg-bad").remove();'.
 				'jQuery.ajax({'.
-					'url: jQuery(forms).attr("action"),'.
-					'data: jQuery(forms).serialize(),'.
+					'url: "zabbix.php?action=triggerdesc.update",'.
+					'data: {'.
+						'"triggerid": '.$data['trigger']['triggerid'].','.
+						'"comments": jQuery([name=comments], forms).val(),'.
+						'"sid": jQuery([name=sid], forms).val()'.
+					'},'.
 					'success: function(r) {'.
 						'if (typeof r.errors === "undefined") {'.
-							'jQuery("[name=action]", forms).remove();'.
 							'jQuery(forms).append(jQuery("<input>", {type: "hidden", "name": "success"}).val(1));'.
 							'reloadPopup(forms[0], "popup.triggerdesc.view");'.
 						'}'.
 						'else {'.
-							'jQuery(r.errors).insertBefore(forms);'.
+							'var dialogue_body = jQuery(forms).closest(".overlay-dialogue-body"),'.
+								'msg = jQuery(".msg-bad,.msg-good", dialogue_body);'.
+							'(msg.length === 0)'.
+								'? jQuery(dialogue_body).prepend(r.errors)'.
+								': jQuery(msg).replaceWith(r.errors);'.
 						'}'.
 					'},'.
 					'dataType: "json",'.

@@ -20,12 +20,11 @@
 
 
 class CControllerTriggerDescrUpdate extends CController {
-	private $trigger;
 
 	protected function checkInput() {
 		$fields = [
-			'triggerid' =>	'db triggers.triggerid',
-			'comments'	=>	'string'
+			'triggerid' => 'db triggers.triggerid',
+			'comments' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -36,33 +35,23 @@ class CControllerTriggerDescrUpdate extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))
-			);
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		$trigger = API::Trigger()->get([
+		return (bool) API::Trigger()->get([
 			'output' => [],
 			'triggerids' => $this->getInput('triggerid'),
 			'editable' => true
 		]);
-
-		if (!$trigger) {
-			return false;
-		}
-
-		$this->trigger = reset($trigger);
-
-		return true;
 	}
 
 	protected function doAction() {
 		$result = API::Trigger()->update([
-			'triggerid' => $this->trigger['triggerid'],
+			'triggerid' => $this->getInput('triggerid'),
 			'comments' => $this->getInput('comments')
 		]);
 
