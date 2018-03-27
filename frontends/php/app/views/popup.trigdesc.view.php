@@ -27,25 +27,27 @@ $form = (new CForm())
 	->addItem(
 		(new CFormList(_('Description')))->addRow(
 			_('Description'),
-			(new CTextArea('comments', $data['resolved'], ['rows' => 25, 'readonly' => $data['isCommentExist']]))
+			(new CTextArea('comments', $data['resolved'],
+					['rows' => 25, 'readonly' => ($data['isTriggerEditable'] ? $data['isCommentExist'] : true)]
+				))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 		));
 
 $script_inline = '';
 
-$buttons = [
-	[
-		'title' => _('Update'),
-		'class' => 'trigger-descr-update-btn',
-		'keepOpen' => true,
-		'isSubmit' => false,
-		'enabled' => !$data['isCommentExist'],
-		'action' => 'jQuery("form[name='.$form->getName().']").trigger("submit");'
-	]
-];
-
 if ($data['isTriggerEditable']) {
+	$buttons = [
+		[
+			'title' => _('Update'),
+			'class' => 'trigger-descr-update-btn',
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'enabled' => !$data['isCommentExist'],
+			'action' => 'jQuery("form[name='.$form->getName().']").trigger("submit");'
+		]
+	];
+
 	$script_inline .=
 		'jQuery(document).ready(function() {'.
 			'jQuery("form[name='.$form->getName().']").submit(function(e) {'.
