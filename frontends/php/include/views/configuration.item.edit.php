@@ -826,9 +826,12 @@ $itemFormList
 	->addRow(_('Show value'), [$valuemapComboBox, SPACE, $link], 'row_valuemap')
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
-		(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
-			->setEnabled(!$readonly)
-			->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON),
+		[
+			$readonly ? new CVar('allow_traps', $data['allow_traps']) : null,
+			(new CCheckBox($readonly ? '' : 'allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
+				->setEnabled(!$readonly)
+				->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON)
+		],
 		'allow_traps_row'
 	)
 	->addRow(_('Allowed hosts'),
