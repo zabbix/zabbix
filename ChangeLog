@@ -3,6 +3,7 @@ Changes for 4.0.0alpha6
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-13509] improved compilation support from source for Solaris and NetBSD (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha5
