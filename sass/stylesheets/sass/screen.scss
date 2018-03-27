@@ -3158,9 +3158,22 @@ $form-icon-btn: (
 .dashbrd-widget-graph-link {
 	display: block;
 
-	&:focus,
-	&:hover {
+	&:link {
 		border: none;
+	}
+
+	&:focus {
+		border: none;
+
+		&:after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 1px;
+			left: 1px;
+			bottom: 0;
+			border: 2px solid rgba($blue, .35);
+		}
 	}
 }
 

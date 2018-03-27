@@ -498,6 +498,14 @@ ul.top-nav-icons {
 	color: darken($dark-yellow, 10%);
 }
 
+.dashbrd-widget-graph-link {
+	&:focus {
+		&:after {
+			border: 2px solid rgba($blue, 1);
+		}
+	}
+}
+
 // SEVERITY STATUSES
 td.log-na-bg {
 	padding-left: 42px !important;
