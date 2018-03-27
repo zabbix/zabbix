@@ -370,6 +370,9 @@ class CScreenProblem extends CScreenBase {
 			$rw_triggers = API::Trigger()->get([
 				'output' => [],
 				'triggerids' => array_keys($data['triggers']),
+				'filter' => [
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				],
 				'editable' => true,
 				'preservekeys' => true
 			]);

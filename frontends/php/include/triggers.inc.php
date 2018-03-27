@@ -713,6 +713,9 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		'output' => [],
 		'triggerids' => array_keys($triggers),
 		'editable' => true,
+		'filter' => [
+			'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+		],
 		'preservekeys' => true
 	]);
 
