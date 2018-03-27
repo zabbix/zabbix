@@ -233,12 +233,8 @@ class CMenuPopupHelper {
 			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
-		if (array_key_exists('description_hidden', $trigger)) {
-			$data['descriptionHidden'] = $trigger['description_hidden'];
-		}
-
 		if (array_key_exists('description_disabled', $trigger)) {
-			$data['descriptionDisabled'] = $trigger['description_disabled'];
+			$data['description'] = $trigger['description_disabled'];
 		}
 
 		if ($acknowledge !== null) {

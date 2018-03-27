@@ -626,6 +626,7 @@ function showDialogForm(form, options, formData, trigger_elmnt) {
  * @param string options['acknowledge']['eventid']	event id
  * @param string options['acknowledge']['backurl']	return url
  * @param object options['configuration']			link to trigger configuration page (optional)
+ * @param object options['description']				item opens trigger description window (optional)
  * @param string options['url']						trigger url link (optional)
  *
  * @return array
@@ -668,12 +669,12 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// description
-	if (typeof options.descriptionHidden === 'undefined' || !options.descriptionHidden) {
+	if (typeof options.description !== 'undefined') {
 		var trigger_descr = {
 			label: t('Description')
 		};
 
-		if (typeof options.descriptionDisabled === 'undefined' || !options.descriptionDisabled) {
+		if (!options.description) {
 			trigger_descr.clickCallback = function(event) {
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
