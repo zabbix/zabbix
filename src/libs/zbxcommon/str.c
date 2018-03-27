@@ -953,16 +953,19 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Function: num_param                                                        *
  *                                                                            *
- * Purpose: calculate count of parameters from parameter list (param)         *
+ * Purpose: find number of parameters in parameter list                       *
  *                                                                            *
  * Parameters:                                                                *
  *      param  - parameter list                                               *
  *                                                                            *
- * Return value: count of parameters                                          *
+ * Return value: number of parameters (starting from 1) or                    *
+ *               0 if syntax error                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
+ *            containing only spaces is handled as having one empty parameter *
+ *            and 1 ir returned.                                              *
  *                                                                            *
  ******************************************************************************/
 int	num_param(const char *p)
@@ -994,8 +997,7 @@ int	num_param(const char *p)
 			{
 				array--;
 
-				/* skip spaces */
-				while (' ' == p[1])
+				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
 					p++;
 
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
@@ -1010,8 +1012,7 @@ int	num_param(const char *p)
 		case 1:
 			if ('"' == *p)
 			{
-				/* skip spaces */
-				while (' ' == p[1])
+				while (' ' == p[1])	/* skip trailing spaces after closing quotes */
 					p++;
 
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
