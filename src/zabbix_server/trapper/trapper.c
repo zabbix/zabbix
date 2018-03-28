@@ -182,7 +182,9 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		goto out;
 	}
 out:
-	zbx_send_response_ext(sock, ret, error, NULL, sock->protocol, CONFIG_TIMEOUT);
+	/* 'history data' request is sent only by pre 3.4 version proxies */
+	/* that did not have compression support                          */
+	zbx_send_response_ext(sock, ret, error, NULL, ZBX_TCP_PROTOCOL, CONFIG_TIMEOUT);
 
 	zbx_free(error);
 
@@ -228,7 +230,7 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	const char	*__function_name = "recv_proxy_heartbeat";
 
 	char			*error = NULL;
-	int			ret;
+	int			ret, flags = ZBX_TCP_PROTOCOL;
 	DC_PROXY		proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -249,8 +251,14 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
+
+	if (0 != proxy.compress)
+		flags |= ZBX_TCP_COMPRESS;
 out:
-	zbx_send_response_ext(sock, ret, error, NULL, sock->protocol, CONFIG_TIMEOUT);
+	if (FAIL == ret && 0 != (sock->protocol & ZBX_TCP_COMPRESS))
+		flags |= ZBX_TCP_COMPRESS;
+
+	zbx_send_response_ext(sock, ret, error, NULL, flags, CONFIG_TIMEOUT);
 
 	zbx_free(error);
 

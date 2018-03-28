@@ -118,7 +118,14 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	zbx_send_proxy_data_response(&proxy, sock, error);
 out:
 	if (FAIL == ret)
-		zbx_send_response_ext(sock, status, error, NULL, sock->protocol, CONFIG_TIMEOUT);
+	{
+		int	flags = ZBX_TCP_PROTOCOL;
+
+		if (0 != (sock->protocol & ZBX_TCP_COMPRESS))
+			flags |= ZBX_TCP_COMPRESS;
+
+		zbx_send_response_ext(sock, status, error, NULL, flags, CONFIG_TIMEOUT);
+	}
 
 	zbx_free(error);
 
