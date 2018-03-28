@@ -856,8 +856,18 @@ td.disaster-bg {
 	content: none;
 }
 
-.notif-body li {
-	padding: 0 0 10px 42px;
+.notif-body {
+	h4 {
+		overflow: visible;
+	}
+
+	p {
+		margin: 0.25em 0 2px 0;
+	}
+
+	li {
+		padding: 0 0 10px 42px;
+	}
 }
 
 .notif-indic {
