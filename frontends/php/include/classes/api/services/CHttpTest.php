@@ -779,7 +779,7 @@ class CHttpTest extends CApiService {
 	private function checkStatusCodes(array $httptests) {
 		$validator = new CStatusCodeRangesValidator([
 			'usermacros' => true,
-			'messageInvalid' => 'Invalid response code "%1$s".'
+			'messageInvalid' => _('Invalid response code "%1$s".')
 		]);
 
 		foreach ($httptests as $httptest) {
