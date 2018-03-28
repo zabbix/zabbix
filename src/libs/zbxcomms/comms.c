@@ -1565,7 +1565,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 	const char	*__function_name = "zbx_tcp_recv_ext";
 
 	ssize_t		nbytes;
-	size_t		allocated, buf_dyn_bytes = 0, buf_stat_bytes = 0, offset = 0;
+	size_t		buf_dyn_bytes = 0, buf_stat_bytes = 0, offset = 0;
 	zbx_uint32_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
 	int		protocol_version;
@@ -1677,8 +1677,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			else
 			{
 				s->buf_type = ZBX_BUF_TYPE_DYN;
-				allocated = expected_len + 1;
-				s->buffer = (char *)zbx_malloc(NULL, allocated);
+				s->buffer = (char *)zbx_malloc(NULL, expected_len + 1);
 				buf_dyn_bytes = buf_stat_bytes - offset;
 				buf_stat_bytes = 0;
 				memcpy(s->buffer, s->buf_stat + offset, buf_dyn_bytes);
