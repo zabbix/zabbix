@@ -3168,11 +3168,12 @@ $form-icon-btn: (
 		&:after {
 			content: "";
 			position: absolute;
-			top: 0;
-			right: 1px;
-			left: 1px;
+			height: 2px;
+			right: 0;
+			left: 0;
 			bottom: 0;
-			border: 2px solid rgba($blue, .35);
+			background-color: rgba($blue, .35);
+			z-index: 1000;
 		}
 	}
 }

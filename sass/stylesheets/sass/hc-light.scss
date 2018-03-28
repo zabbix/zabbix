@@ -501,7 +501,8 @@ ul.top-nav-icons {
 .dashbrd-widget-graph-link {
 	&:focus {
 		&:after {
-			border: 2px solid rgba($blue, 1);
+			height: 3px;
+			background-color: $blue;
 		}
 	}
 }
