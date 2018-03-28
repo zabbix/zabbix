@@ -710,6 +710,38 @@ function makeAcknowledgesTable($acknowledges, $users) {
 }
 
 /**
+ * Place filter tags at the beginning of tags array.
+ *
+ * @param array  $event_tags
+ * @param string $event_tags[]['tag']
+ * @param string $event_tags[]['value']
+ * @param array  $f_tags
+ * @param int    $f_tags[<tag>][]['operator']
+ * @param string $f_tags[<tag>][]['value']
+ *
+ * @return array
+ */
+function orderEventTags(array $event_tags, array $f_tags) {
+	$first_tags = [];
+
+	foreach ($event_tags as $i => $tag) {
+		if (array_key_exists($tag['tag'], $f_tags)) {
+			foreach ($f_tags[$tag['tag']] as $f_tag) {
+				if (($f_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $f_tag['value'])
+						|| ($f_tag['operator'] == TAG_OPERATOR_LIKE
+							&& ($f_tag['value'] === '' || stripos($tag['value'], $f_tag['value']) !== false))) {
+					$first_tags[] = $tag;
+					unset($event_tags[$i]);
+					break;
+				}
+			}
+		}
+	}
+
+	return array_merge($first_tags, $event_tags);
+}
+
+/**
  * Create element with event tags.
  *
  * @param array  $events
@@ -718,11 +750,26 @@ function makeAcknowledgesTable($acknowledges, $users) {
  * @param string $events[]['tags']['tag']
  * @param string $events[]['tags']['value']
  * @param bool   $html
+ * @param int    $list_tags_count
+ * @param array  $filter_tags
+ * @param string $filter_tags[]['tag']
+ * @param int    $filter_tags[]['operator']
+ * @param string $filter_tags[]['value']
  *
- * @return CTableInfo
+ * @return array
  */
-function makeEventsTags($events, $html = true) {
+function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT,
+		array $filter_tags = []) {
 	$tags = [];
+
+	// Convert $filter_tags to a more usable format.
+	$f_tags = [];
+	foreach ($filter_tags as $filter_tag) {
+		$f_tags[$filter_tag['tag']][] = [
+			'operator' => $filter_tag['operator'],
+			'value' => $filter_tag['value']
+		];
+	}
 
 	foreach ($events as $event) {
 		CArrayHelper::sort($event['tags'], ['tag', 'value']);
@@ -730,10 +777,10 @@ function makeEventsTags($events, $html = true) {
 		$tags[$event['eventid']] = [];
 
 		if ($html) {
-			// Show first 3 tags and "..." with hint box if there are more.
+			// Show first n tags and "..." with hint box if there are more.
 
-			$tags_count = count($event['tags']);
-			$tags_shown = array_slice($event['tags'], 0, EVENTS_LIST_TAGS_COUNT);
+			$event_tags = $f_tags ? orderEventTags($event['tags'], $f_tags) : $event['tags'];
+			$tags_shown = array_slice($event_tags, 0, $list_tags_count);
 
 			foreach ($tags_shown as $tag) {
 				$value = $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
@@ -742,7 +789,7 @@ function makeEventsTags($events, $html = true) {
 					->setHint($value);
 			}
 
-			if ($tags_count > count($tags_shown)) {
+			if (count($event['tags']) > count($tags_shown)) {
 				// Display all tags in hint box.
 
 				$hint_content = [];
