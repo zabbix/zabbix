@@ -3163,17 +3163,15 @@ $form-icon-btn: (
 	}
 
 	&:focus {
-		border: none;
 
 		&:after {
 			content: "";
-			position: absolute;
+			background: rgba($blue, .35);
 			height: 2px;
-			right: 0;
+			position: absolute;
 			left: 0;
-			bottom: 0;
-			background-color: rgba($blue, .35);
-			z-index: 1000;
+			right: 0;
+			bottom: -2px;
 		}
 	}
 }

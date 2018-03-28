@@ -499,10 +499,13 @@ ul.top-nav-icons {
 }
 
 .dashbrd-widget-graph-link {
+
 	&:focus {
+
 		&:after {
+			background: $blue;
 			height: 3px;
-			background-color: $blue;
+			bottom: -3px;
 		}
 	}
 }
