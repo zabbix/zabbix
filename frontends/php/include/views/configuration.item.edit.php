@@ -109,7 +109,6 @@ $itemFormList->addRow(
 		'name' => 'master_itemid',
 		'objectName' => 'items',
 		'multiple' => false,
-		'add_post_js' => true,
 		'disabled' => $readonly,
 		'ignored' => [
 			$data['itemid'] => $data['item']

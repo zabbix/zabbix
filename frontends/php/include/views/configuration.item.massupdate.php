@@ -599,7 +599,6 @@ $master_item = (new CDiv([
 		'name' => 'master_itemid',
 		'objectName' => 'items',
 		'multiple' => false,
-		'add_post_js' => true,
 		'ignored' => array_key_exists('items_names', $data) ? $data['items_names'] : [],
 		'popup' => [
 			'parameters' => [

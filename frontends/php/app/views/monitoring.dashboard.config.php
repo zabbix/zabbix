@@ -124,8 +124,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 		$parameters = [
 			'srctbl' => 'items',
-			'dstfrm' => $form->getName(),
 			'srcfld1' => 'itemid',
+			'dstfrm' => $form->getName(),
 			'dstfld1' => $field->getName().($field->isMultiple() ? '_' : ''),
 			'real_hosts' => '1',
 			'with_webitems' => '1'

@@ -426,99 +426,102 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'items':
-		foreach ($data['table_records'] as &$item) {
-			$host = reset($item['hosts']);
-
-			$table->addRow([
-				($options['hostid'] > 0) ? null : $host['name'],
-				$data['multiselect'] ? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid']) : null,
-				(new CLink($item['name_expanded'], 'javascript:void(0);'))
-					->onClick('javascript: addValue('.
-						CJs::encodeJson($options['reference']).', '.
-						CJs::encodeJson($item['itemid']).', '.
-						$options['parentid'].
-					');'.$js_action_onclick),
-				$item['key_'],
-				item_type2str($item['type']),
-				itemValueTypeString($item['value_type']),
-				(new CSpan(itemIndicator($item['status'], $item['state'])))
-					->addClass(itemIndicatorStyle($item['status'], $item['state']))
-			]);
-
-			$item = [
-				'id' => $item['itemid'],
-				'itemid' => $item['itemid'],
-				'name' => $host['name'].NAME_DELIMITER.$item['name_expanded'],
-				'key_' => $item['key_'],
-				'flags' => $item['flags'],
-				'type' => $item['type'],
-				'value_type' => $item['value_type'],
-				'host' => $host['name']
-			];
-		}
-		unset($item);
-		break;
 	case 'item_prototypes':
-		foreach ($data['table_records'] as &$item) {
-			$host = reset($item['hosts']);
-			$item['hostname'] = $host['name'];
+		if ($options['srcfld2'] !== '' && $options['dstfld2'] !== '') {
+			// TODO: this condition must be removed after all item and item_prototype fields changing to multiselect
+			foreach ($data['table_records'] as &$item) {
+				$host = reset($item['hosts']);
+				$item['hostname'] = $host['name'];
 
-			$description = new CLink($item['name_expanded'], 'javascript:void(0);');
-			$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name_expanded'];
-			$item['master_itemname'] = $item['name_expanded'].NAME_DELIMITER.$item['key_'];
+				$description = new CLink($item['name_expanded'], 'javascript:void(0);');
+				$item['name'] = $item['hostname'] . NAME_DELIMITER . $item['name_expanded'];
+				$item['master_itemname'] = $item['name_expanded'] . NAME_DELIMITER . $item['key_'];
 
-			$checkbox_key = is_numeric($item[$options['srcfld1']])
-				? $item[$options['srcfld1']]
-				: zbx_jsValue($item[$options['srcfld1']]);
+				$checkbox_key = is_numeric($item[$options['srcfld1']])
+					? $item[$options['srcfld1']]
+					: zbx_jsValue($item[$options['srcfld1']]);
 
-			if ($data['multiselect']) {
-				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-					zbx_jsvalue($item['itemid']).', '.$options['parentid'].');';
+				if ($data['multiselect']) {
+					$js_action = 'javascript: addValue(' . zbx_jsvalue($options['reference']) . ', ' .
+						zbx_jsvalue($item['itemid']) . ', ' . $options['parentid'] . ');';
+				}
+				else {
+					$values = [];
+					if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
+						$values[$options['dstfld1']] = $item[$options['srcfld1']];
+					}
+					if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
+						$values[$options['dstfld2']] = $item[$options['srcfld2']];
+					}
+					if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
+						$values[$options['dstfld3']] = $item[$options['srcfld3']];
+					}
+
+					$submit_parent = array_key_exists('submit_parent', $options) ? 'true' : 'false';
+					$js_action = 'javascript: addValues(' . zbx_jsvalue($options['dstfrm']) . ', ' .
+						zbx_jsvalue($values) . ', ' . $submit_parent . ');';
+				}
+
+				$description->onClick($js_action . $js_action_onclick);
+
+				$table->addRow([
+					($options['hostid'] > 0) ? null : $item['hostname'],
+					$data['multiselect'] ? new CCheckBox('item[' . $checkbox_key . ']', $item['itemid']) : null,
+					$description,
+					$item['key_'],
+					item_type2str($item['type']),
+					itemValueTypeString($item['value_type']),
+					(new CSpan(itemIndicator($item['status'], $item['state'])))
+						->addClass(itemIndicatorStyle($item['status'], $item['state']))
+				]);
+
+				if ($data['multiselect']) {
+					$item = [
+						'id' => $item['itemid'],
+						'itemid' => $item['itemid'],
+						'name' => $item['name'],
+						'key_' => $item['key_'],
+						'flags' => $item['flags'],
+						'type' => $item['type'],
+						'value_type' => $item['value_type'],
+						'host' => $item['hostname']
+					];
+				}
 			}
-			else {
-				$values = [];
-				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
-					$values[$options['dstfld1']] = $item[$options['srcfld1']];
-				}
-				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
-					$values[$options['dstfld2']] = $item[$options['srcfld2']];
-				}
-				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
-					$values[$options['dstfld3']] = $item[$options['srcfld3']];
-				}
+			unset($item);
+		} else {
+			foreach ($data['table_records'] as &$item) {
+				$host = reset($item['hosts']);
 
-				$submit_parent = array_key_exists('submit_parent', $options) ? 'true' : 'false';
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-					zbx_jsvalue($values).', '.$submit_parent.');';
-			}
+				$table->addRow([
+					($options['hostid'] > 0) ? null : $host['name'],
+					$data['multiselect'] ? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid']) : null,
+					(new CLink($item['name_expanded'], 'javascript:void(0);'))
+						->onClick('javascript: addValue('.
+							CJs::encodeJson($options['reference']).', '.
+							CJs::encodeJson($item['itemid']).', '.
+							$options['parentid'].
+							');'.$js_action_onclick),
+					$item['key_'],
+					item_type2str($item['type']),
+					itemValueTypeString($item['value_type']),
+					(new CSpan(itemIndicator($item['status'], $item['state'])))
+						->addClass(itemIndicatorStyle($item['status'], $item['state']))
+				]);
 
-			$description->onClick($js_action.$js_action_onclick);
-
-			$table->addRow([
-				($options['hostid'] > 0) ? null : $item['hostname'],
-				$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
-				$description,
-				$item['key_'],
-				item_type2str($item['type']),
-				itemValueTypeString($item['value_type']),
-				(new CSpan(itemIndicator($item['status'], $item['state'])))
-					->addClass(itemIndicatorStyle($item['status'], $item['state']))
-			]);
-
-			if ($data['multiselect']) {
 				$item = [
 					'id' => $item['itemid'],
 					'itemid' => $item['itemid'],
-					'name' => $item['name'],
+					'name' => $host['name'].NAME_DELIMITER.$item['name_expanded'],
 					'key_' => $item['key_'],
 					'flags' => $item['flags'],
 					'type' => $item['type'],
 					'value_type' => $item['value_type'],
-					'host' => $item['hostname']
+					'host' => $host['name']
 				];
 			}
+			unset($item);
 		}
-		unset($item);
 		break;
 
 	case 'graphs':

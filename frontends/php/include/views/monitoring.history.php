@@ -132,7 +132,6 @@ if ($this->data['action'] == HISTORY_LATEST || $this->data['action'] == HISTORY_
 					'name' => 'itemids[]',
 					'objectName' => 'items',
 					'multiple' => true,
-					'add_post_js' => true,
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'items',

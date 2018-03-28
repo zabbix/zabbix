@@ -276,7 +276,6 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 			'name' => 'resourceid',
 			'objectName' => 'items',
 			'multiple' => false,
-			'add_post_js' => true,
 			'popup' => [
 				'parameters' => $parameters
 			],
@@ -450,7 +449,6 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 				'name' => 'resourceid',
 				'objectName' => 'items',
 				'multiple' => false,
-				'add_post_js' => true,
 				'popup' => [
 					'parameters' => $parameters
 				],
@@ -769,7 +767,6 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 				'name' => 'resourceid',
 				'objectName' => 'items',
 				'multiple' => false,
-				'add_post_js' => true,
 				'popup' => [
 					'parameters' => $parameters
 				],
