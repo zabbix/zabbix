@@ -25,7 +25,8 @@ $sort_div = (new CSpan())
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
@@ -69,7 +70,7 @@ $today = strtotime('today');
 $last_clock = 0;
 
 if ($data['data']['problems']) {
-	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
+	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
 if ($data['config']['event_ack_enable']) {
 	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
@@ -152,12 +153,11 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	}
 
 	$description = (new CCol([
-		(new CSpan($problem['name']))
+		(new CLinkAction($problem['name']))
 			->setHint(
 				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
 				true
 			)
-			->addClass(ZBX_STYLE_LINK_ACTION)
 	]));
 
 	$description_style = getSeverityStyle($trigger['priority']);

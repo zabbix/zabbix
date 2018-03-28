@@ -96,7 +96,7 @@ if (!$readonly) {
 				'dstfrm' => $itemForm->getName(),
 				'dstfld1' => 'key'
 			]).
-				',{itemtype: jQuery("#type option:selected").val()}));'
+				',{itemtype: jQuery("#type option:selected").val()}), null, this);'
 		);
 }
 
@@ -123,9 +123,9 @@ if (!$readonly) {
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',
 				'only_hostid' => $data['hostid'],
-				'with_webitems' => '0',
-				'excludeids' => [$data['itemid']]
-			]).');'
+				'excludeids' => [$data['itemid']],
+				'with_webitems' => 1
+			]).', null, this);'
 		);
 }
 
@@ -751,6 +751,14 @@ if (!hasRequest('form_refresh')) {
 // Append buttons to form.
 if ($data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
+
+	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
+		$buttons[] = (new CSubmit('check_now', _('Check now')))
+			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
+					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
+					&& $data['host']['status'] == HOST_STATUS_MONITORED
+			);
+	}
 
 	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$buttons[] = new CButtonQMessage(

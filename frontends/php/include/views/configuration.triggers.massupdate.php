@@ -42,7 +42,8 @@ $triggersFormList = (new CFormList('triggersFormList'))
 	->addRow(
 		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
 			->setLabel(_('Severity'))
-			->setChecked(isset($data['visible']['priority'])),
+			->setChecked(isset($data['visible']['priority']))
+			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv(
 			new CSeverity([
 				'name' => 'priority',
@@ -99,7 +100,7 @@ $dependenciesDiv = (new CDiv([
 				'multiselect' => '1',
 				'with_triggers' => '1',
 				'noempty' => '1'
-			]).');'
+			]).', null, this);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]))

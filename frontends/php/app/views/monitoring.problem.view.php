@@ -41,6 +41,7 @@ $options = [
 			'inventory' => $data['filter']['inventory'],
 			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
+			'show_tags' => $data['filter']['show_tags'],
 			'maintenance' => $data['filter']['maintenance'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
 			'details' => $data['filter']['details']
@@ -134,7 +135,7 @@ if ($data['action'] == 'problem.view') {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1',
 						'real_hosts' => '1'
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])
@@ -262,6 +263,14 @@ if ($data['action'] == 'problem.view') {
 	$filter_column2 = (new CFormList())
 		->addRow(_('Host inventory'), $filter_inventory_table)
 		->addRow(_('Tags'), $filter_tags_table)
+		->addRow(_('Show tags'),
+			(new CRadioButtonList('filter_show_tags', (int) $data['filter']['show_tags']))
+				->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
+				->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
+				->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
+				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
+				->setModern(true)
+		)
 		->addRow(_('Show hosts in maintenance'),
 			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1)
 		);
@@ -277,7 +286,7 @@ if ($data['action'] == 'problem.view') {
 
 	$filter = (new CFilter('web.problem.filter.state'))
 		->addVar('action', 'problem.view')
-		->addVar('fullscreen', $data['fullscreen'])
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addVar('page', $data['page'])
 		->addColumn($filter_column1)
 		->addColumn($filter_column2);
@@ -292,7 +301,7 @@ if ($data['action'] == 'problem.view') {
 			(new CForm('get'))
 				->cleanItems()
 				->addVar('action', 'problem.view')
-				->addVar('fullscreen', $data['fullscreen'])
+				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 				->addVar('page', $data['page'])
 				->addItem(
 					(new CList())

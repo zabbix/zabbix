@@ -29,15 +29,17 @@ $widget = (new CWidget())
 		(new CSpan())
 			->addClass(ZBX_STYLE_SELECTED)
 			->addItem(
-				new CLink($data['screen']['name'], 'slides.php?elementid='.$data['screen']['slideshowid'].
-					'&fullscreen='.$data['fullscreen']
+				new CLink($data['screen']['name'], (new CUrl('slides.php'))
+					->setArgument('elementid', $data['screen']['slideshowid'])
+					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 				)
 			)
 	]));
 
 // Create header form.
 $header = (new CForm('get'))
-	->setName('slideHeaderForm');
+	->setName('slideHeaderForm')
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
 
 $controls = (new CList())->addItem(
 	new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
@@ -64,8 +66,6 @@ if ($this->data['screen']) {
 		]
 	));
 }
-
-$header->addVar('fullscreen', $this->data['fullscreen']);
 
 if (isset($this->data['isDynamicItems'])) {
 	$controls->addItem([

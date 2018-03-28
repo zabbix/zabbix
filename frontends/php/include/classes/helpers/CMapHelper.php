@@ -264,9 +264,9 @@ class CMapHelper {
 		}
 
 		foreach ($sysmap['links'] as &$link) {
-			if ($link['permission'] >= PERM_READ) {
-				$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
+			$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
 
+			if ($link['permission'] >= PERM_READ) {
 				if (empty($link['linktriggers'])) {
 					continue;
 				}

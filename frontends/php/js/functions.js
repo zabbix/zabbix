@@ -471,12 +471,27 @@ function stripslashes(str) {
 	});
 }
 
-function overlayDialogueDestroy(dialogueid) {
-	dialogueid = dialogueid || null;
+/**
+ * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
+ *
+ * @param string   dialogueid	Dialogue identifier to identify dialogue.
+ * @param {object} xhr			(optional) XHR request that must be aborted.
+ */
+function overlayDialogueDestroy(dialogueid, xhr) {
+	if (typeof dialogueid !== 'undefined') {
+		if (typeof xhr !== 'undefined') {
+			xhr.abort();
+		}
 
-	jQuery('[data-dialogueid='+dialogueid+']').remove();
-	jQuery('body').css({'overflow': ''});
-	jQuery('body[style=""]').removeAttr('style');
+		jQuery('[data-dialogueid='+dialogueid+']').remove();
+
+		if (!jQuery('[data-dialogueid]').length) {
+			jQuery('body').css({'overflow': ''});
+			jQuery('body[style=""]').removeAttr('style');
+		}
+
+		removeFromOverlaysStack(dialogueid);
+	}
 }
 
 /**
@@ -512,13 +527,17 @@ function getOverlayDialogueId() {
  * @param string   params.dialogueid            (optional) Unique dialogue identifier to reuse existing overlay dialog
  *												or create a new one if value is not set.
  * @param string   params.script_inline         (optional) Custom javascript code to execute when initializing dialog.
+ * @param {object} trigger_elmnt				(optional) UI element which triggered opening of overlay dialogue.
+ * @param {object} xhr							(optional) XHR request used to load content. Used to abort loading.
  *
  * @return {bool}
  */
-function overlayDialogue(params) {
+function overlayDialogue(params, trigger_elmnt, xhr) {
 	var button_focused = null,
 		cancel_action = null,
+		submit_btn = null,
 		overlay_dialogue = null,
+		overlay_bg = null,
 		overlay_dialogue_footer = jQuery('<div>', {
 			class: 'overlay-dialogue-footer'
 		});
@@ -546,7 +565,7 @@ function overlayDialogue(params) {
 			'data-dialogueid': params.dialogueid
 		});
 
-		jQuery('<div>', {
+		overlay_bg = jQuery('<div>', {
 			'id': 'overlay_bg',
 			'class': 'overlay-bg',
 			'data-dialogueid': params.dialogueid
@@ -577,13 +596,20 @@ function overlayDialogue(params) {
 			}
 			var res = obj.action();
 
-			if (res !== false && (!('keepOpen' in obj) || obj.keepOpen === false)) {
-				body_mutation_observer.disconnect();
-				overlayDialogueDestroy(params.dialogueid);
+			if (res !== false) {
+				cancel_action = null;
+
+				if (!('keepOpen' in obj) || obj.keepOpen === false) {
+					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
+				}
 			}
 
 			return false;
 		});
+
+		if (!submit_btn && ('isSubmit' in obj) && obj.isSubmit === true) {
+			submit_btn = button;
+		}
 
 		if ('class' in obj) {
 			button.addClass(obj.class);
@@ -610,14 +636,7 @@ function overlayDialogue(params) {
 				class: 'overlay-close-btn'
 			})
 				.click(function() {
-					body_mutation_observer.disconnect();
-
-					if (cancel_action !== null) {
-						cancel_action();
-					}
-
-					overlayDialogueDestroy(params.dialogueid);
-
+					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
 					return false;
 				})
 		)
@@ -636,19 +655,33 @@ function overlayDialogue(params) {
 					body_mutation_observer.observe(this, {childList: true, subtree: true});
 				})
 		)
-		.append(overlay_dialogue_footer)
-		.on('keydown', function(e) {
-			// ESC
-			if (e.which == 27) {
-				body_mutation_observer.disconnect();
-				if (cancel_action !== null) {
-					cancel_action();
-				}
-				overlayDialogueDestroy(params.dialogueid);
+		.append(overlay_dialogue_footer);
 
-				return false;
+	if (overlay_bg !== null) {
+		jQuery(overlay_bg).on('remove', function(event) {
+			body_mutation_observer.disconnect();
+			if (cancel_action !== null) {
+				cancel_action();
 			}
+
+			setTimeout(function() {
+				overlayDialogueDestroy(params.dialogueid, xhr);
+			});
+
+			return false;
 		});
+	}
+
+	if (submit_btn) {
+		jQuery('.overlay-dialogue-body form', overlay_dialogue).on('submit', function(event) {
+			event.preventDefault();
+			submit_btn.trigger('click');
+		});
+	}
+
+	if (typeof trigger_elmnt !== 'undefined') {
+		addToOverlaysStack(params.dialogueid, trigger_elmnt, 'popup', xhr);
+	}
 
 	if (typeof params.class !== 'undefined') {
 		overlay_dialogue.addClass(params.class);
@@ -662,67 +695,87 @@ function overlayDialogue(params) {
 		}
 	});
 
-	var focusable = jQuery(':focusable', overlay_dialogue);
-
-	if (focusable.length > 0) {
-		var first_focusable = focusable.filter(':first'),
-			last_focusable = focusable.filter(':last');
-
-		first_focusable.on('keydown', function(e) {
-			// TAB and SHIFT
-			if (e.which == 9 && e.shiftKey) {
-				last_focusable.focus();
-
-				return false;
-			}
-		});
-
-		last_focusable.on('keydown', function(e) {
-			// TAB and not SHIFT
-			if (e.which == 9 && !e.shiftKey) {
-				first_focusable.focus();
-
-				return false;
-			}
-		});
-	}
-
 	jQuery('body').css({'overflow': 'hidden'});
 
 	if (button_focused !== null) {
 		button_focused.focus();
 	}
 
-	// Don't focus element in overlay, if the button is already focused.
-	overlayDialogueOnLoad(!button_focused);
+	// Don't focus element in overlay, if button is already focused.
+	overlayDialogueOnLoad(!button_focused, jQuery('.overlay-dialogue[data-dialogueid="'+params.dialogueid+'"]'));
 }
 
 /**
- * Actions to perform, when dialogue is created, as well as, when data in dialogue changed,
- * and this is forced from outside.
+ * Actions to perform, when overlay UI element is created, as well as, when data in overlay was changed.
  *
- * @param {bool} focus  Focus first focusable element in overlay.
+ * @param {bool}	focus		Focus first focusable element in overlay.
+ * @param {object}	overlay		Overlay object.
  */
-function overlayDialogueOnLoad(focus) {
+function overlayDialogueOnLoad(focus, overlay) {
 	if (focus) {
-		jQuery('[autofocus=autofocus]:focusable', jQuery('#overlay_dialogue')).first().focus();
+		if (jQuery('[autofocus=autofocus]:focusable', overlay).length) {
+			jQuery('[autofocus=autofocus]:focusable', overlay).first().focus();
+		}
+		else if (jQuery('.overlay-dialogue-body form :focusable', overlay).length) {
+			jQuery('.overlay-dialogue-body form :focusable', overlay).first().focus();
+		}
+		else {
+			jQuery(':focusable:first', overlay).focus();
+		}
+	}
+
+	var focusable = jQuery(':focusable', overlay);
+
+	if (focusable.length > 1) {
+		var first_focusable = focusable.filter(':first'),
+			last_focusable = focusable.filter(':last');
+
+		first_focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				// TAB and SHIFT
+				if (e.which == 9 && e.shiftKey) {
+					last_focusable.focus();
+					return false;
+				}
+			});
+
+		last_focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				// TAB and not SHIFT
+				if (e.which == 9 && !e.shiftKey) {
+					first_focusable.focus();
+					return false;
+				}
+			});
+	}
+	else {
+		focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				if (e.which == 9) {
+					return false;
+				}
+			});
 	}
 }
 
 /**
  * Execute script.
  *
- * @param string hostid			host id
- * @param string scriptid		script id
- * @param string confirmation	confirmation text
+ * @param string hostid				host id
+ * @param string scriptid			script id
+ * @param string confirmation		confirmation text
+ * @param {object} trigger_elmnt	UI element that was clicked to open overlay dialogue.
  */
-function executeScript(hostid, scriptid, confirmation) {
+function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 	var execute = function() {
 		if (hostid !== null) {
 			PopUp('popup.scriptexec', {
 				hostid: hostid,
 				scriptid: scriptid
-			});
+			}, null, trigger_elmnt);
 		}
 	};
 
@@ -746,7 +799,9 @@ function executeScript(hostid, scriptid, confirmation) {
 					}
 				}
 			]
-		});
+		}, trigger_elmnt);
+
+		return false;
 	}
 	else {
 		execute();

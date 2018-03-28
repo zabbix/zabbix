@@ -39,7 +39,8 @@ $itemFormList = new CFormList('itemFormList');
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[type]', 'type', _('Original')))
 		->setLabel(_('Type'))
-		->setChecked(isset($this->data['visible']['type'])),
+		->setChecked(isset($this->data['visible']['type']))
+		->setAttribute('autofocus', 'autofocus'),
 	new CComboBox('type', $this->data['type'], null, $this->data['itemTypes'])
 );
 
@@ -608,9 +609,8 @@ $master_item = (new CDiv([
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',
 				'only_hostid' => $data['hostid'],
-				'with_webitems' => '0',
 				'excludeids' => $data['itemids']
-			]).');'
+			]).', null, this);'
 		)
 ]))->setId('master_item');
 

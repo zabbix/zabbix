@@ -685,7 +685,7 @@ class CScreenProblem extends CScreenBase {
 
 		$url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'problem.view')
-			->setArgument('fullscreen', $this->data['fullscreen']);
+			->setArgument('fullscreen', $this->data['fullscreen'] ? '1' : null);
 
 		$data = self::getData($this->data['filter'], $this->config);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
@@ -755,14 +755,20 @@ class CScreenProblem extends CScreenBase {
 					_('Duration'),
 					$this->config['event_ack_enable'] ? _('Ack') : null,
 					_('Actions'),
-					_('Tags')
+					$this->data['filter']['show_tags'] ? _('Tags') : null
 				]));
 
 			if ($this->config['event_ack_enable']) {
 				$url->setArgument('uncheck', '1');
 				$acknowledges = makeEventsAcknowledges($data['problems'], $url->getUrl());
 			}
-			$tags = makeEventsTags($data['problems']);
+
+			if ($this->data['filter']['show_tags']) {
+				$tags = makeEventsTags($data['problems'], true, $this->data['filter']['show_tags'],
+					$this->data['filter']['tags']
+				);
+			}
+
 			if ($data['problems']) {
 				$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 			}
@@ -781,6 +787,7 @@ class CScreenProblem extends CScreenBase {
 						->setArgument('triggerid', $problem['objectid'])
 						->setArgument('eventid', $problem['eventid'])
 				));
+
 				if ($problem['r_eventid'] != 0) {
 					$cell_r_clock = ($problem['r_clock'] >= $today)
 						? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
@@ -848,9 +855,8 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$description = [
-					(new CSpan($problem['name']))
+					(new CLinkAction($problem['name']))
 						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
-						->addClass(ZBX_STYLE_LINK_ACTION)
 				];
 
 				if ($this->data['filter']['details'] == 1) {
@@ -904,7 +910,7 @@ class CScreenProblem extends CScreenBase {
 					array_key_exists($eventid, $actions)
 						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 						: '',
-					$tags[$problem['eventid']]
+					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]));
 			}
 

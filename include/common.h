@@ -718,7 +718,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
-/* acknowledgment actions (flags) */
+/* acknowledgement actions (flags) */
 #define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
 #define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
 
@@ -1276,7 +1276,8 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
-int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
+		char *error, int max_error_len);
 
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);
