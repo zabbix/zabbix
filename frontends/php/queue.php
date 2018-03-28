@@ -268,7 +268,7 @@ elseif ($config == QUEUE_DETAILS) {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $itemData['nextcheck']),
 			zbx_date2age($itemData['nextcheck']),
-			(isset($proxies[$hosts[$item['hostid']]['proxy_hostid']]))
+			isset($proxies[$hosts[$item['hostid']]['proxy_hostid']])
 				? $proxies[$hosts[$item['hostid']]['proxy_hostid']]['host'].NAME_DELIMITER.$host['name']
 				: $host['name'],
 			$item['name_expanded']

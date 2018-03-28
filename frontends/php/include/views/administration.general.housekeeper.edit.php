@@ -37,7 +37,9 @@ $houseKeeperTab = (new CFormList())
 	->addRow(new CTag('h4', true, _('Events and alerts')))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
-		(new CCheckBox('hk_events_mode'))->setChecked($data['hk_events_mode'] == 1)
+		(new CCheckBox('hk_events_mode'))
+			->setChecked($data['hk_events_mode'] == 1)
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(
 		(new CLabel(_('Trigger data storage period'), 'hk_events_trigger'))->setAsteriskMark(),

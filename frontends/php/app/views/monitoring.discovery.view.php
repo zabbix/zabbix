@@ -28,7 +28,7 @@ $widget = (new CWidget())
 		(new CForm('get'))
 			->cleanItems()
 			->addVar('action', 'discovery.view')
-			->addVar('fullscreen', $data['fullscreen'])
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
 				->addItem([

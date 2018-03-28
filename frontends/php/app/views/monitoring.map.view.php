@@ -31,7 +31,7 @@ $this->addJsFile('class.svg.map.js');
 			->cleanItems()
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])
-			->addVar('fullscreen', $data['fullscreen'])
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
 				->addItem([

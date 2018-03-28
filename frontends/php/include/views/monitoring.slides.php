@@ -20,7 +20,7 @@
 
 
 $widget = (new CWidget())
-	->setTitle(_('Slide shows'))
+	->setTitle(_('Slide shows!!'))
 	->addItem((new CList())
 	->addClass(ZBX_STYLE_OBJECT_GROUP)
 	->addItem([
@@ -29,8 +29,9 @@ $widget = (new CWidget())
 		(new CSpan())
 			->addClass(ZBX_STYLE_SELECTED)
 			->addItem(
-				new CLink($data['screen']['name'], 'slides.php?elementid='.$data['screen']['slideshowid'].
-					'&fullscreen='.$data['fullscreen']
+				new CLink($data['screen']['name'], (new CUrl('slides.php'))
+					->setArgument('elementid', $data['screen']['slideshowid'])
+					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 				)
 			)
 	]));
@@ -79,7 +80,7 @@ $widget->setControls((new CList([
 	(new CForm('get'))
 		->setAttribute('aria-label', _('Main filter'))
 		->setName('slideHeaderForm')
-		->addVar('fullscreen', $data['fullscreen'])
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem($controls),
 	(new CTag('nav', true, (new CList())
 		->addItem($data['screen']['editable']

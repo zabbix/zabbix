@@ -21,7 +21,7 @@
 $controls = (new CForm('get'))
 	->cleanItems()
 	->setAttribute('aria-label', _('Main filter'))
-	->addVar('fullscreen', $this->data['fullscreen'])
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 	->addVar('page', 1)
 	->addItem((new CList())
 		->addItem([

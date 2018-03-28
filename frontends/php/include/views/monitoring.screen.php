@@ -31,10 +31,10 @@ $widget = (new CWidget())
 			(new CSpan())
 				->addClass(ZBX_STYLE_SELECTED)
 				->addItem(
-					new CLink($data['screen']['name'], 'screens.php?elementid='.$data['screen']['screenid'].
-						'&fullscreen='.$data['fullscreen']
-					)
-				)
+					new CLink($data['screen']['name'], (new CUrl('screens.php'))
+						->setArgument('elementid', $data['screen']['screenid'])
+						->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+				))
 	]))
 	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
@@ -93,7 +93,7 @@ $controls
 $widget->setControls((new CTag('nav', true, (new CList())
 	->addItem((new CForm('get'))
 		->setName('headerForm')
-		->addVar('fullscreen', $data['fullscreen'])
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem($controls)
 	)))
 		->setAttribute('aria-label', _('Content controls'))

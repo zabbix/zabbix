@@ -104,14 +104,14 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
-			->addItem(get_icon('overviewhelp'))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			->addItem($help)
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]));
 
 // filter
-$filter = $this->data['filter'];
+$filter = $data['filter'];
 $filterFormView = new CView('common.filter.trigger', [
 	'overview' => true,
 	'filter' => [
@@ -125,9 +125,9 @@ $filterFormView = new CView('common.filter.trigger', [
 		'application' => $filter['application'],
 		'inventory' => $filter['inventory'],
 		'showMaintenance' => $filter['showMaintenance'],
-		'hostId' => $this->data['hostid'],
-		'groupId' => $this->data['groupid'],
-		'fullScreen' => $this->data['fullscreen']
+		'hostId' => $data['hostid'],
+		'groupId' => $data['groupid'],
+		'fullScreen' => $data['fullscreen']
 	],
 	'config' => $data['config']
 ]);
@@ -139,8 +139,8 @@ $widget->addItem($filterForm);
 if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
-	$dataTable = getTriggersOverview($this->data['hosts'], $this->data['triggers'], $page['file'],
-		$this->data['view_style']
+	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style'], null,
+		$data['fullscreen']
 	);
 }
 else {

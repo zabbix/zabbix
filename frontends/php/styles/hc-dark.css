@@ -164,9 +164,6 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-:-ms-input-placeholder {
-  color: #6d6d6d !important; }
-
 .nav {
   background-color: #e0e0e0; }
 
@@ -794,10 +791,15 @@ output {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
-  .subfilter-enabled a {
+  .subfilter-enabled .link-action {
     color: #fff;
-    text-decoration: none;
-    cursor: default; }
+    text-decoration: none; }
+    .subfilter-enabled .link-action:focus {
+      color: #fff;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.7); }
+    .subfilter-enabled .link-action:hover {
+      color: #fff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7); }
   .subfilter-enabled sup {
     color: white; }
 
@@ -2246,6 +2248,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .action-menu:focus {
+    outline: none; }
   .action-menu li {
     display: block; }
     .action-menu li div {
@@ -2266,11 +2270,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -webkit-transition: background-color 0.2s ease-out;
     -moz-transition: background-color 0.2s ease-out;
     transition: background-color 0.2s ease-out; }
-    .action-menu .action-menu-item:hover {
-      background-color: #454545; }
-    .action-menu .action-menu-item:focus {
-      background-color: #454545; }
-    .action-menu .action-menu-item:active {
+    .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
       background-color: #454545; }
     .action-menu .action-menu-item.selected::before {
       display: block;
@@ -2381,7 +2381,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .btn-back-map-container {
   text-align: left;
   position: absolute;
-  left: -1px; }
+  left: -1px;
+  max-width: 100%; }
   .btn-back-map-container a:focus, .btn-back-map-container a:hover {
     outline: none; }
     .btn-back-map-container a:focus .btn-back-map, .btn-back-map-container a:hover .btn-back-map {
@@ -2390,7 +2391,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content {
         display: inline-block;
         line-height: 24px;
-        padding: 0 6px 0 0; }
+        padding: 0 6px 0 0;
+        flex: auto; }
   .btn-back-map-container .btn-back-map {
     border: #444 solid 1px;
     border-radius: 0 2px 2px 0;
@@ -2398,7 +2400,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     color: white;
     margin-top: 10px;
     padding: 0;
-    display: inline-block;
+    display: flex;
     height: 24px;
     line-height: 24px;
     vertical-align: middle;
@@ -2408,6 +2410,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .btn-back-map-container .btn-back-map .btn-back-map-icon {
       margin-left: 5px;
       display: inline-block;
+      flex: 1 0 auto;
       width: 28px;
       height: 24px;
       vertical-align: middle;
@@ -3331,7 +3334,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -3665,6 +3668,25 @@ svg {
     -ms-animation: fadein .5s;
     -o-animation: fadein .5s;
     animation: fadein .5s; }
+
+::-webkit-input-placeholder {
+  color: #bbb; }
+
+:-ms-input-placeholder {
+  color: #bbb !important; }
+
+::-ms-input-placeholder {
+  color: #bbb; }
+
+::-moz-placeholder {
+  color: #bbb;
+  opacity: 1; }
+
+:-moz-placeholder {
+  color: #bbb; }
+
+:placeholder-shown {
+  color: #bbb; }
 
 /*doc
 ---
@@ -4647,8 +4669,20 @@ Widgets are used as containers to group any related information. Widget consists
 .btn-dashbrd-conf {
   background: url(../img/icon-sprite.svg) no-repeat -354px -619px !important; }
 
+.list-table .subfilter-enabled {
+  background-color: #000;
+  box-shadow: 0 0 0 1px #fff; }
 .list-table thead th {
-  border-color: #3b3b3b !important; }
+  border-color: #3b3b3b; }
+
+.subfilter-enabled .link-action {
+  color: #fff; }
+  .subfilter-enabled .link-action:focus {
+    color: #fff;
+    border-bottom: 3px solid #fff; }
+  .subfilter-enabled .link-action:hover {
+    color: #fff;
+    border-bottom: 1px solid #fff; }
 
 .timeline-axis {
   border-right-color: #b2b2b2 !important; }
@@ -4658,8 +4692,18 @@ Widgets are used as containers to group any related information. Widget consists
 .icon .center {
   background: url(../img/icon-sprite.svg) no-repeat -325px -799px !important; }
 
-.action-menu-item::before {
-  background: url(../img/icon-sprite.svg) no-repeat -317px -835px !important; }
+.action-menu {
+  background-color: #383838;
+  border: 1px solid #666; }
+  .action-menu .action-menu-item-disabled {
+    color: #7d7d7d; }
+  .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
+    background-color: black;
+    color: white; }
+    .action-menu .action-menu-item:hover .arrow-right, .action-menu .action-menu-item:focus .arrow-right, .action-menu .action-menu-item:active .arrow-right, .action-menu .action-menu-item.highlighted .arrow-right {
+      border-left-color: white; }
+  .action-menu .action-menu-item.selected::before {
+    background: url(../img/icon-sprite.svg) no-repeat -317px -835px; }
 
 ul.top-nav-icons input {
   border: 1px solid #666 !important;
@@ -4808,7 +4852,7 @@ ul.top-nav-icons a:focus {
   border-top-color: #000 !important; }
 
 .subfilter-enabled {
-  background-color: #000 !important; }
+  background-color: #000; }
 
 .subfilter-disable-btn {
   background-color: #000 !important; }
