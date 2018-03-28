@@ -102,7 +102,6 @@ class CFilter extends CTag {
 			))
 				->addClass(ZBX_STYLE_FILTER_TRIGGER)
 				->setId('filter-mode');
-			$this->setAttribute('style', 'display: none;');
 		}
 
 		$button->onClick('javascript:
