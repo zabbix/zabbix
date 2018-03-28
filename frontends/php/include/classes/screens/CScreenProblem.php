@@ -170,17 +170,12 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $config
 	 * @param int    $config['search_limit']
 	 * @param int    $config['event_ack_enable']
-	 * @param bool   $get_comments
-	 * @param bool   $select_dependencies             Returns dependencies for selected triggers.
-	 * @param bool   $get_description_state           (optional) Returns property 'description_enabled'. Value TRUE
-	 *                                                indicates that comment is specified or trigger is editable.
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, array $config, $get_comments = false, $select_dependencies = false,
-			$get_description_state = false) {
+	public static function getData(array $filter, array $config) {
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
@@ -328,7 +323,7 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['priority', 'url', 'flags', 'expression'],
+						'output' => ['priority', 'url', 'flags', 'expression', 'comments'],
 						'selectHosts' => ['hostid', 'name', 'status'],
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 						'triggerids' => array_keys($triggerids),
@@ -339,12 +334,6 @@ class CScreenProblem extends CScreenBase {
 
 					if (array_key_exists('details', $filter) && $filter['details'] == 1) {
 						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
-					}
-					if ($get_comments || $get_description_state) {
-						$options['output'][] = 'comments';
-					}
-					if ($select_dependencies) {
-						$options['selectDependencies'] = ['triggerid'];
 					}
 					if (array_key_exists('maintenance', $filter) && $filter['maintenance'] == 0) {
 						$options['maintenance'] = false;
@@ -365,28 +354,6 @@ class CScreenProblem extends CScreenBase {
 		while (count($data['problems']) < $config['search_limit'] + 1 && !$end_of_data);
 
 		$data['problems'] = array_slice($data['problems'], 0, $config['search_limit'] + 1, true);
-
-		if ($get_description_state) {
-			$rw_triggers = API::Trigger()->get([
-				'output' => [],
-				'triggerids' => array_keys($data['triggers']),
-				'filter' => [
-					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
-				],
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			foreach ($data['triggers'] as &$trigger) {
-				$trigger['description_enabled']
-					= ($trigger['comments'] !== '' || array_key_exists($trigger['triggerid'], $rw_triggers));
-
-				if (!$get_comments) {
-					unset($trigger['comments']);
-				}
-			}
-			unset($trigger);
-		}
 
 		return $data;
 	}
@@ -557,13 +524,13 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['show']
 	 * @param array $config
 	 * @param int   $config['event_ack_enable']
-	 * @param bool  $get_comments
+	 * @param bool  $resolve_comments
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter, array $config, $get_comments = false) {
+	public static function makeData(array $data, array $filter, array $config, $resolve_comments = false) {
 		// unset unused triggers
 		$triggerids = [];
 
@@ -597,7 +564,7 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 		$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
-		if ($get_comments) {
+		if ($resolve_comments) {
 			$data['triggers'] = CMacrosResolverHelper::resolveTriggerDescriptions($data['triggers']);
 		}
 
@@ -716,12 +683,42 @@ class CScreenProblem extends CScreenBase {
 			->setArgument('action', 'problem.view')
 			->setArgument('fullscreen', $this->data['fullscreen']);
 
-		$data = self::getData($this->data['filter'], $this->config, false, true, true);
+		$data = self::getData($this->data['filter'], $this->config);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
 
 		$paging = getPagingLine($data['problems'], ZBX_SORT_UP, clone $url);
 
 		$data = self::makeData($data, $this->data['filter'], $this->config);
+
+		if ($data['triggers']) {
+			$triggerids = array_keys($data['triggers']);
+
+			$db_triggers = API::Trigger()->get([
+				'output' => ['triggerid'],
+				'selectDependencies' => ['triggerid'],
+				'triggerids' => $triggerids,
+				'preservekeys' => true
+			]);
+
+			foreach ($data['triggers'] as $triggerid => &$trigger) {
+				$trigger['dependencies'] = array_key_exists($triggerid, $db_triggers)
+					? $db_triggers[$triggerid]['dependencies']
+					: [];
+			}
+			unset($trigger);
+
+			$rw_triggers = API::Trigger()->get([
+				'output' => [],
+				'triggerids' => $triggerids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($data['triggers'] as $triggerid => &$trigger) {
+				$trigger['editable'] = array_key_exists($triggerid, $rw_triggers);
+			}
+			unset($trigger);
+		}
 
 		if ($data['problems']) {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
@@ -881,11 +878,16 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
+				$options = [
+					'description_enabled' => ($trigger['comments'] !== ''
+						|| ($trigger['editable'] && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL))
+				];
+
 				$description = array_key_exists($trigger['triggerid'], $dependencies)
 					? $dependencies[$trigger['triggerid']]
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, null, $options));
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();

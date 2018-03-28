@@ -28,8 +28,8 @@ class CControllerPopupTrigDescView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'triggerid' =>	'db triggers.triggerid',
-			'success'	=>	'in 1'
+			'triggerid' => 'required|db triggers.triggerid',
+			'success' => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,22 +49,22 @@ class CControllerPopupTrigDescView extends CController {
 	}
 
 	protected function checkPermissions() {
-		$trigger = API::Trigger()->get([
-			'output' => API_OUTPUT_EXTEND,
+		$triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'expression', 'comments'],
 			'triggerids' => $this->getInput('triggerid')
 		]);
 
-		if (!$trigger) {
+		if (!$triggers) {
 			return false;
 		}
 
-		$this->trigger = reset($trigger);
+		$this->trigger = $triggers[0];
 
 		return true;
 	}
 
 	protected function doAction() {
-		$trigger_editable = API::Trigger()->get([
+		$rw_triggers = API::Trigger()->get([
 			'output' => [],
 			'triggerids' => $this->trigger['triggerid'],
 			'filter' => [
@@ -80,7 +80,7 @@ class CControllerPopupTrigDescView extends CController {
 		$data = [
 			'title' => _('Trigger description'),
 			'trigger' => $this->trigger,
-			'isTriggerEditable' => (boolean) $trigger_editable,
+			'isTriggerEditable' => (bool) $rw_triggers,
 			'isCommentExist' => ($this->trigger['comments'] !== ''),
 			'resolved' => CMacrosResolverHelper::resolveTriggerDescription($this->trigger)
 		];

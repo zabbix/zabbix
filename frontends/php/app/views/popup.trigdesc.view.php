@@ -28,8 +28,8 @@ $form = (new CForm())
 		(new CFormList(_('Description')))->addRow(
 			_('Description'),
 			(new CTextArea('comments', $data['resolved'],
-					['rows' => 25, 'readonly' => ($data['isTriggerEditable'] ? $data['isCommentExist'] : true)]
-				))
+				['rows' => 25, 'readonly' => ($data['isTriggerEditable'] ? $data['isCommentExist'] : true)]
+			))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 		));

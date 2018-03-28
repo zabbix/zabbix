@@ -191,7 +191,6 @@ foreach ($data['triggers'] as $triggerId => $trigger) {
 	$trigger_hostids[$hostId] = $hostId;
 
 	$data['triggers'][$triggerId]['cnt_event'] = $triggersEventCount[$triggerId];
-	$data['triggers'][$triggerId]['show_description'] = false;
 }
 
 CArrayHelper::sort($data['triggers'], [

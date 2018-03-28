@@ -184,10 +184,13 @@ class CMenuPopupHelper {
 	 * @param string $acknowledge['eventid']			event ID
 	 * @param string $acknowledge['screenid']			screen ID (optional)
 	 * @param string $acknowledge['backurl']			return URL (optional)
+	 * @param array  $options
+	 * @param bool   $options['show_description']       (optional) default: true
+	 * @param bool   $options['description_enabled']    (optional) default: true
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(array $trigger, array $acknowledge = null) {
+	public static function getTrigger(array $trigger, array $acknowledge = null, array $options = []) {
 		$hosts = [];
 		$showEvents = true;
 
@@ -233,14 +236,11 @@ class CMenuPopupHelper {
 			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
-		// show_description is TRUE by default. Only FALSE should be specidied.
-		if (array_key_exists('show_description', $trigger) && $trigger['show_description'] === false) {
-			$data['show_description'] = $trigger['show_description'];
+		if (array_key_exists('show_description', $options) && $options['show_description'] === false) {
+			$data['show_description'] = false;
 		}
-
-		// description_enabled is TRUE by default. Only FALSE should be specidied.
-		if (array_key_exists('description_enabled', $trigger) && $trigger['description_enabled'] === false) {
-			$data['description_enabled'] = $trigger['description_enabled'];
+		else if (array_key_exists('description_enabled', $options) && $options['description_enabled'] === false) {
+			$data['description_enabled'] = false;
 		}
 
 		if ($acknowledge !== null) {

@@ -713,15 +713,11 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		'output' => [],
 		'triggerids' => array_keys($triggers),
 		'editable' => true,
-		'filter' => [
-			'flags' => ZBX_FLAG_DISCOVERY_NORMAL
-		],
 		'preservekeys' => true
 	]);
 
-	foreach ($triggers as &$trigger) {
-		$trigger['description_enabled']
-			= ($trigger['comments'] !== '' || array_key_exists($trigger['triggerid'], $rw_triggers));
+	foreach ($triggers as $triggerid => &$trigger) {
+		$trigger['editable'] = array_key_exists($triggerid, $rw_triggers);
 	}
 	unset($trigger);
 
@@ -794,7 +790,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'url' => $trigger['url'],
 				'hosts' => $trigger['hosts'],
 				'items' => $trigger['items'],
-				'description_enabled' => $trigger['description_enabled']
+				'description_enabled' => ($trigger['comments'] !== ''
+					|| ($trigger['editable'] && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL))
 			];
 			$trcounter[$host['name']][$trigger_name]++;
 		}
@@ -952,7 +949,8 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
+		$options = ['description_enabled' => $trigger['description_enabled']];
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options));
 	}
 
 	return $column;

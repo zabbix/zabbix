@@ -23,8 +23,8 @@ class CControllerTrigDescUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'triggerid' => 'db triggers.triggerid',
-			'comments' => 'string'
+			'triggerid' => 'required|db triggers.triggerid',
+			'comments' => 'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
