@@ -329,7 +329,7 @@ class CScreenHistory extends CScreenBase {
 						}
 					}
 
-					$row[] = (new CCol(new CPre(zbx_nl2br(htmlspecialchars($data['value'])))))->addClass($color);
+					$row[] = (new CCol(new CPre(zbx_nl2br($data['value']))))->addClass($color);
 
 					$history_table->addRow($row);
 				}
@@ -371,7 +371,7 @@ class CScreenHistory extends CScreenBase {
 					$history_table->addRow([
 						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
 							->addClass(ZBX_STYLE_NOWRAP),
-						new CPre(zbx_nl2br(htmlspecialchars($value)))
+						new CPre(zbx_nl2br($value))
 					]);
 				}
 
@@ -455,7 +455,7 @@ class CScreenHistory extends CScreenBase {
 							$value = applyValueMap($value, $item['valuemapid']);
 						}
 
-						$row[] = ($value === '') ? '' : new CPre(htmlspecialchars($value));
+						$row[] = ($value === '') ? '' : new CPre($value);
 					}
 
 					$history_table->addRow($row);
