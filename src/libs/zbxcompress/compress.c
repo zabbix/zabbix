@@ -83,7 +83,7 @@ int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 	*size_out = compressBound(size_in);
 	*out = (char *)zbx_malloc(NULL, *size_out);
 
-	if (Z_OK != (zbx_zlib_errno = compress((unsigned char *)*out, size_out, (unsigned char *)in, size_in)))
+	if (Z_OK != (zbx_zlib_errno = compress((unsigned char *)*out, size_out, (const unsigned char *)in, size_in)))
 	{
 		zbx_free(*out);
 		return FAIL;

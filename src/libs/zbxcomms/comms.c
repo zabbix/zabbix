@@ -743,7 +743,6 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 	size_t		send_bytes, offset, send_len = len, reserved = 0;
 	int		ret = SUCCEED;
 	char		*compressed_data = NULL;
-	const char	*send_data = data;
 	zbx_uint32_t	len32_le;
 
 	if (0 != timeout)
@@ -765,7 +764,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 				goto cleanup;
 			}
 
-			send_data = compressed_data;
+			data = compressed_data;
 			reserved = len;
 		}
 
@@ -783,7 +782,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 		offset += sizeof(len32_le);
 
 		take_bytes = MIN(send_len, ZBX_TLS_MAX_REC_LEN - offset);
-		memcpy(header_buf + offset, send_data, take_bytes);
+		memcpy(header_buf + offset, data, take_bytes);
 
 		send_bytes = offset + take_bytes;
 
@@ -808,7 +807,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 		else
 			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, send_len - (size_t)written);
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, send_data + written, send_bytes)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, data + written, send_bytes)))
 		{
 			ret = FAIL;
 			goto cleanup;
