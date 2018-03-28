@@ -474,11 +474,22 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				}
 			});
 
+			/**
+			 * Enable or disable table rows sorting according to rows count. At least 2 rows should exists to be able
+			 * sort rows using drag and drop.
+			 */
 			function setSortableState() {
 				var allow_sort = table.find('.' + table_row_class).length < 2;
 				table.sortable('option', 'disabled', allow_sort);
 			}
 
+			/**
+			 * Add table row. Returns new added row DOM node.
+			 *
+			 * @param {object}  Object with data for added row.
+			 *
+			 * @return {object}
+			 */
 			function addRow(values) {
 				row_index += 1;
 				values.index = row_index;
@@ -493,12 +504,22 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				return new_row;
 			}
 
+			/**
+			 * Add multiple rows to table.
+			 *
+			 * @param {array} rows_values  Array of objects for every added row.
+			 */
 			function addRows(rows_values) {
 				$.each(rows_values, function(index, values) {
 					addRow(values);
 				});
 			}
 
+			/**
+			 * Remove table row.
+			 *
+			 * @param {object} row_node Table row DOM node to be removed.
+			 */
 			function removeRow(row_node) {
 				row_node.remove();
 				setSortableState();
@@ -514,13 +535,6 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				},
 				removeRow: function(row_node) {
 					removeRow(row_node);
-				},
-				clearTable: function() {
-					table.find('.'+table_row_class).remove();
-					return table;
-				},
-				getTableRows: function() {
-					return table.find('.'+table_row_class);
 				}
 			};
 		};
@@ -572,7 +586,8 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			if ($(this).val() == <?= HTTPCHECK_REQUEST_HEAD ?>) {
 				$(':radio', '#retrieve_mode')
 					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
-					.end().attr('disabled', 'disabled');
+					.end()
+					.attr('disabled', 'disabled');
 			}
 			else {
 				$(':radio', '#retrieve_mode').removeAttr('disabled');
