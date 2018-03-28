@@ -739,7 +739,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 {
 #define ZBX_TLS_MAX_REC_LEN	16384
 
-	ssize_t		bytes_sent = 0, written = 0;
+	ssize_t		bytes_sent, written = 0;
 	size_t		send_bytes, offset, send_len = len, reserved = 0;
 	int		ret = SUCCEED;
 	char		*compressed_data = NULL;
