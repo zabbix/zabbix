@@ -425,7 +425,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				row_template,
 				row_default_values,
 				insert_point,
-				rows = 0,
+				row_index = 0,
 				table_row_class = 'editable_table_row';
 
 			table = $(elm);
@@ -474,16 +474,23 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				}
 			});
 
-			function addRow(values) {
-				rows += 1;
-				values.index = rows;
-				table.sortable('option', 'disabled', rows < 2);
+			function setSortableState() {
+				var allow_sort = table.find('.' + table_row_class).length < 2;
+				table.sortable('option', 'disabled', allow_sort);
+			}
 
-				return $(row_template.evaluate(values))
+			function addRow(values) {
+				row_index += 1;
+				values.index = row_index;
+
+				var new_row = $(row_template.evaluate(values))
 					.addClass(table_row_class)
 					.addClass('sortable')
 					.data('values', values)
 					.insertBefore(insert_point);
+
+				setSortableState();
+				return new_row;
 			}
 
 			function addRows(rows_values) {
@@ -493,42 +500,8 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			}
 
 			function removeRow(row_node) {
-				rows -= 1;
 				row_node.remove();
-				table.sortable('option', 'disabled', rows < 2);
-			}
-
-			function mergeRows(pairs, name_selector, value_selector) {
-				var row_nodes = table.find('.'+table_row_class),
-					name_selector,
-					parent_nodes;
-
-				$.each(row_nodes, function(i, row_node) {
-					if ($(name_selector, row_node).val() === '' && $(value_selector, row_node).val() === '') {
-						removeRow(row_node);
-					}
-				});
-
-				$.each(pairs, function(i, pair) {
-					if (pair.name.indexOf('[]') != -1) {
-						addRow(pair);
-					}
-					else {
-						name_nodes = $(name_selector, row_nodes).filter(function(index, node) {
-							return $(node).val() === pair.name;
-						});
-
-						if (name_nodes.length) {
-							parent_nodes = name_nodes.closest(row_nodes);
-							row_nodes = row_nodes.not(parent_nodes);
-							name_nodes.first().val(pair.name);
-							$(value_selector, parent_nodes.first()).val(pair.value);
-						}
-						else {
-							addRow(pair);
-						}
-					}
-				});
+				setSortableState();
 			}
 
 			return {
@@ -541,9 +514,6 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				},
 				removeRow: function(row_node) {
 					removeRow(row_node);
-				},
-				mergeRows: function(pairs, key_selector, value_selector) {
-					mergeRows(pairs, key_selector, value_selector);
 				},
 				clearTable: function() {
 					table.find('.'+table_row_class).remove();
@@ -577,7 +547,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				url = parseUrlString(url_node.val())
 
 			if (typeof url === 'object') {
-				table.mergeRows(url.pairs, '[name*="[name]"]', '[name*="[value]"]');
+				table.addRows(url.pairs);
 				url_node.val(url.url);
 			}
 			else {
