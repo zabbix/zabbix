@@ -219,7 +219,8 @@ class CControllerDashbrdWidgetConfig extends CController {
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($itemids),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'webitems' => true
 			]);
 
 			$items = CMacrosResolverHelper::resolveItemNames($items);
