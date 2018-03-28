@@ -919,7 +919,7 @@ static void	active_passive_misconfig(zbx_socket_t *sock)
 			" sends requests to it as to proxy in passive mode", sock->peer);
 
 	zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
-	zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+	zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
 	zbx_free(msg);
 }
 
