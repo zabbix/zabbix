@@ -188,12 +188,13 @@ class CFilter extends CTag {
 		}
 
 		$wrapper = (new CDiv([
-				($this->hidden == false) ? $this->getHeader() : null,
-				(new CDiv([$this->items, $this->form]))
+				$this->hidden ? null : $this->getHeader(),
+				(new CDiv($this->form))
 					->addClass($this->attributes['class'])
 					->setId($this->attributes['id'])
+					->addStyle($this->opened ? '' : 'display: none;')
 			]))
-			->setAttribute('aria-label', _('Filter'));
+				->setAttribute('aria-label', _('Filter'));
 
 		return $wrapper->toString($destroy);
 	}
