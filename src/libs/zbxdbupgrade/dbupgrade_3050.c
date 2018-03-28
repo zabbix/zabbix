@@ -518,7 +518,7 @@ static int	DBpatch_3050042(void)
 	return DBadd_foreign_key("task_check_now", 1, &field);
 }
 
-static int	DBpatch_3050043(void)
+static int	DBpatch_3050044(void)
 {
 	int	res;
 
@@ -539,7 +539,7 @@ static int	DBpatch_3050043(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050044(void)
+static int	DBpatch_3050045(void)
 {
 	int	res;
 
@@ -605,7 +605,7 @@ DBPATCH_ADD(3050039, 0, 1)
 DBPATCH_ADD(3050040, 0, 1)
 DBPATCH_ADD(3050041, 0, 1)
 DBPATCH_ADD(3050042, 0, 1)
-DBPATCH_ADD(3050043, 0, 1)
 DBPATCH_ADD(3050044, 0, 1)
+DBPATCH_ADD(3050045, 0, 1)
 
 DBPATCH_END()
