@@ -78,8 +78,6 @@
 #include "ipmi/ipmi_poller.h"
 #endif
 
-#define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_server.conf"
-
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_server";
 const char	syslog_app_name[] = "zabbix_server";
@@ -115,6 +113,15 @@ const char	*help_message[] = {
 	"",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
+	"",
+	"Some configuration parameter default locations:",
+	"  AlertScriptsPath               \"" DEFAULT_ALERT_SCRIPTS_PATH "\"",
+	"  ExternalScripts                \"" DEFAULT_EXTERNAL_SCRIPTS_PATH "\"",
+#ifdef HAVE_LIBCURL
+	"  SSLCertLocation                \"" DEFAULT_SSL_CERT_LOCATION "\"",
+	"  SSLKeyLocation                 \"" DEFAULT_SSL_KEY_LOCATION "\"",
+#endif
+	"  LoadModulePath                 \"" DEFAULT_LOAD_MODULE_PATH "\"",
 	NULL	/* end of text */
 };
 
@@ -421,10 +428,10 @@ static void	zbx_set_defaults(void)
 		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
 
 	if (NULL == CONFIG_ALERT_SCRIPTS_PATH)
-		CONFIG_ALERT_SCRIPTS_PATH = zbx_strdup(CONFIG_ALERT_SCRIPTS_PATH, DATADIR "/zabbix/alertscripts");
+		CONFIG_ALERT_SCRIPTS_PATH = zbx_strdup(CONFIG_ALERT_SCRIPTS_PATH, DEFAULT_ALERT_SCRIPTS_PATH);
 
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
-		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
 
 	if (NULL == CONFIG_TMPDIR)
 		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
@@ -436,13 +443,13 @@ static void	zbx_set_defaults(void)
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 #endif
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
 #ifdef HAVE_LIBCURL
 	if (NULL == CONFIG_SSL_CERT_LOCATION)
-		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DATADIR "/zabbix/ssl/certs");
+		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DEFAULT_SSL_CERT_LOCATION);
 
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
-		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
+		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
 
 	if (NULL == CONFIG_HISTORY_STORAGE_OPTS)
 		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "uint,dbl,str,log,text");
