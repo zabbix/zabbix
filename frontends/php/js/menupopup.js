@@ -1021,14 +1021,7 @@ jQuery(function($) {
 				id = opener.data('menu-popup-id'),
 				menuPopup = $('#' + id),
 				mapContainer = null,
-				target;
-
-			if (IE) {
-				target = opener.closest('svg').length > 0 ? event : event.target;
-			}
-			else {
-				target = (event.originalEvent.detail !== 0 || event.type === 'contextmenu') ? event : event.target;
-			}
+				target = (event.type === 'contextmenu' || event.originalEvent.detail !== 0) ? event : event.target;
 
 			// Close other action menus.
 			$('.action-menu-top').not('#' + id).menuPopup('close');
