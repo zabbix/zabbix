@@ -181,7 +181,7 @@ class CTag extends CObject {
 	 * @return CTag
 	 */
 	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
-		$this->hint = (new CSpan($text))
+		$this->hint = (new CDiv($text))
 			->addClass('hint-box')
 			->setAttribute('style', 'display: none;');
 

@@ -392,14 +392,21 @@ if (!hasRequest('form_refresh')) {
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
-	$itemTab->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')), [
-			new CSubmit('clone', _('Clone')),
-			(new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid'])))
-				->setEnabled(!$data['limited']),
-			new CButtonCancel(url_param('hostid'))
-		]
-	));
+	$buttons = [new CSubmit('clone', _('Clone'))];
+
+	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
+		$buttons[] = (new CSubmit('check_now', _('Check now')))
+			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
+					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
+					&& $data['host']['status'] == HOST_STATUS_MONITORED
+			);
+	}
+
+	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid'])))
+		->setEnabled(!$data['limited']);
+	$buttons[] = new CButtonCancel(url_param('hostid'));
+
+	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$itemTab->setFooter(makeFormFooter(

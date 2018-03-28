@@ -1,5 +1,5 @@
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
   background-color: #333 !important;
   color: #fff !important; }
 
@@ -163,9 +163,6 @@ pre {
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
-
-:-ms-input-placeholder {
-  color: #6d6d6d !important; }
 
 nav, .nav {
   background-color: #000; }
@@ -789,10 +786,15 @@ footer, .footer {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
-  .subfilter-enabled a {
+  .subfilter-enabled .link-action {
     color: #fff;
-    text-decoration: none;
-    cursor: default; }
+    text-decoration: none; }
+    .subfilter-enabled .link-action:focus {
+      color: #fff;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.7); }
+    .subfilter-enabled .link-action:hover {
+      color: #fff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7); }
   .subfilter-enabled sup {
     color: #737373; }
 
@@ -2241,6 +2243,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .action-menu:focus {
+    outline: none; }
   .action-menu li {
     display: block; }
     .action-menu li div {
@@ -2261,11 +2265,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -webkit-transition: background-color 0.2s ease-out;
     -moz-transition: background-color 0.2s ease-out;
     transition: background-color 0.2s ease-out; }
-    .action-menu .action-menu-item:hover {
-      background-color: #f4f4f4; }
-    .action-menu .action-menu-item:focus {
-      background-color: #f4f4f4; }
-    .action-menu .action-menu-item:active {
+    .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
       background-color: #f4f4f4; }
     .action-menu .action-menu-item.selected::before {
       display: block;
@@ -2376,7 +2376,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .btn-back-map-container {
   text-align: left;
   position: absolute;
-  left: -1px; }
+  left: -1px;
+  max-width: 100%; }
   .btn-back-map-container a:focus, .btn-back-map-container a:hover {
     outline: none; }
     .btn-back-map-container a:focus .btn-back-map, .btn-back-map-container a:hover .btn-back-map {
@@ -2385,7 +2386,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content {
         display: inline-block;
         line-height: 24px;
-        padding: 0 6px 0 0; }
+        padding: 0 6px 0 0;
+        flex: auto; }
   .btn-back-map-container .btn-back-map {
     border: #9f9f9f solid 1px;
     border-radius: 0 2px 2px 0;
@@ -2393,7 +2395,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     color: white;
     margin-top: 10px;
     padding: 0;
-    display: inline-block;
+    display: flex;
     height: 24px;
     line-height: 24px;
     vertical-align: middle;
@@ -2403,6 +2405,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .btn-back-map-container .btn-back-map .btn-back-map-icon {
       margin-left: 5px;
       display: inline-block;
+      flex: 1 0 auto;
       width: 28px;
       height: 24px;
       vertical-align: middle;
@@ -2735,11 +2738,11 @@ a.link-action {
       -webkit-border-radius: 2px;
       -moz-border-radius: 2px;
       border-radius: 2px; }
-    .status-container span:first-child:not(:only-child) {
+    .status-container span:first-of-type:not(:only-child) {
       -webkit-border-radius: 2px 0 0 2px;
       -moz-border-radius: 2px 0 0 2px;
       border-radius: 2px 0 0 2px; }
-    .status-container span:last-child:not(:only-child) {
+    .status-container span:last-of-type:not(:only-child) {
       -webkit-border-radius: 0 2px 2px 0;
       -moz-border-radius: 0 2px 2px 0;
       border-radius: 0 2px 2px 0; }
@@ -3326,7 +3329,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -3660,6 +3663,25 @@ svg {
     -ms-animation: fadein .5s;
     -o-animation: fadein .5s;
     animation: fadein .5s; }
+
+::-webkit-input-placeholder {
+  color: #777; }
+
+:-ms-input-placeholder {
+  color: #777 !important; }
+
+::-ms-input-placeholder {
+  color: #777; }
+
+::-moz-placeholder {
+  color: #777;
+  opacity: 1; }
+
+:-moz-placeholder {
+  color: #777; }
+
+:placeholder-shown {
+  color: #777; }
 
 /*doc
 ---
@@ -4615,8 +4637,20 @@ Widgets are used as containers to group any related information. Widget consists
 .btn-dashbrd-conf {
   background: url(../img/icon-sprite.svg) no-repeat -200px -619px !important; }
 
+.list-table .subfilter-enabled {
+  background-color: #fff;
+  box-shadow: 0 0 0 1px #000; }
 .list-table thead th {
-  border-color: #909090 !important; }
+  border-color: #909090; }
+
+.subfilter-enabled .link-action {
+  color: #000; }
+  .subfilter-enabled .link-action:focus {
+    color: #000;
+    border-bottom: 3px solid #000; }
+  .subfilter-enabled .link-action:hover {
+    color: #000;
+    border-bottom: 1px solid #000; }
 
 .timeline-axis {
   border-right-color: #272727 !important; }
@@ -4626,8 +4660,17 @@ Widgets are used as containers to group any related information. Widget consists
 .icon .center {
   background: url(../img/icon-sprite.svg) no-repeat -172px -799px !important; }
 
-.action-menu-item::before {
-  background: url(../img/icon-sprite.svg) no-repeat -164px -835px !important; }
+.action-menu .action-menu-item-disabled {
+  color: #9f9f9f; }
+.action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
+  background-color: black;
+  color: white; }
+  .action-menu .action-menu-item:hover .arrow-right, .action-menu .action-menu-item:focus .arrow-right, .action-menu .action-menu-item:active .arrow-right, .action-menu .action-menu-item.highlighted .arrow-right {
+    border-left-color: white; }
+  .action-menu .action-menu-item:hover.selected::before, .action-menu .action-menu-item:focus.selected::before, .action-menu .action-menu-item:active.selected::before, .action-menu .action-menu-item.highlighted.selected::before {
+    background: url(../img/icon-sprite.svg) no-repeat -317px -835px; }
+.action-menu .action-menu-item.selected::before {
+  background: url(../img/icon-sprite.svg) no-repeat -164px -835px; }
 
 ul.top-nav-icons input {
   border: 1px solid #888 !important;

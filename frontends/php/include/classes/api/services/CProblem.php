@@ -38,7 +38,6 @@ class CProblem extends CApiService {
 	public function get($options = []) {
 		$result = [];
 		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> [$this->fieldId('eventid')],
@@ -98,15 +97,16 @@ class CProblem extends CApiService {
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+
 				// specific triggers
 				if ($options['objectids'] !== null) {
-					$triggers = API::Trigger()->get([
+					$options['objectids'] = array_keys(API::Trigger()->get([
 						'output' => [],
 						'triggerids' => $options['objectids'],
 						'editable' => $options['editable'],
 						'preservekeys' => true
-					]);
-					$options['objectids'] = array_keys($triggers);
+					]));
 				}
 				// all triggers
 				else {
@@ -115,7 +115,7 @@ class CProblem extends CApiService {
 						' FROM functions f,items i,hosts_groups hgg'.
 							' LEFT JOIN rights r'.
 								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+									' AND '.dbConditionInt('r.groupid', $user_groups).
 						' WHERE p.objectid=f.triggerid'.
 							' AND f.itemid=i.itemid'.
 							' AND i.hostid=hgg.hostid'.
@@ -123,7 +123,11 @@ class CProblem extends CApiService {
 						' HAVING MAX(permission)<'.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
 							' OR MIN(permission) IS NULL'.
 							' OR MIN(permission)='.PERM_DENY.
-						')';
+					')';
+				}
+
+				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
+					$sqlParts = self::addTagFilterSqlParts($user_groups, $sqlParts);
 				}
 			}
 			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
@@ -150,18 +154,20 @@ class CProblem extends CApiService {
 				}
 				// all items or lld rules
 				else {
+					$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+
 					$sqlParts['where'][] = 'EXISTS ('.
 						'SELECT NULL'.
 						' FROM items i,hosts_groups hgg'.
 							' JOIN rights r'.
 								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+									' AND '.dbConditionInt('r.groupid', $user_groups).
 						' WHERE p.objectid=i.itemid'.
 							' AND i.hostid=hgg.hostid'.
 						' GROUP BY hgg.hostid'.
 						' HAVING MIN(r.permission)>'.PERM_DENY.
 							' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-						')';
+					')';
 				}
 			}
 		}
@@ -298,7 +304,7 @@ class CProblem extends CApiService {
 					$tag['value'] = ' AND pt.value='.zbx_dbstr($tag['value']);
 				}
 
-				if ($where !== '')  {
+				if ($where !== '') {
 					$where .= ($options['evaltype'] == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
 				}
 
@@ -495,5 +501,87 @@ class CProblem extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Add sql parts related to tag-based permissions.
+	 *
+	 * @param array $usrgrpids
+	 * @param array $sqlParts
+	 *
+	 * @return string
+	 */
+	protected static function addTagFilterSqlParts(array $usrgrpids, array $sqlParts) {
+		$tag_filters = CEvent::getTagFilters($usrgrpids);
+
+		if (!$tag_filters) {
+			return $sqlParts;
+		}
+
+		$sqlParts['from']['f'] = 'functions f';
+		$sqlParts['from']['i'] = 'items i';
+		$sqlParts['from']['hg'] = 'hosts_groups hg';
+		$sqlParts['where']['p-f'] = 'p.objectid=f.triggerid';
+		$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
+		$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
+
+		$tag_conditions = [];
+		$full_access_groupids = [];
+
+		foreach ($tag_filters as $groupid => $filters) {
+			$tags = [];
+			$tag_values = [];
+
+			foreach ($filters as $filter) {
+				if ($filter['tag'] === '') {
+					$full_access_groupids[] = $groupid;
+					continue 2;
+				}
+				elseif ($filter['value'] === '') {
+					$tags[] = $filter['tag'];
+				}
+				else {
+					$tag_values[$filter['tag']][] = $filter['value'];
+				}
+			}
+
+			$conditions = [];
+
+			if ($tags) {
+				$conditions[] = dbConditionString('pt.tag', $tags);
+			}
+			$parenthesis = $tags || count($tag_values) > 1;
+
+			foreach ($tag_values as $tag => $values) {
+				$condition = 'pt.tag='.zbx_dbstr($tag).' AND '.dbConditionString('pt.value', $values);
+				$conditions[] = $parenthesis ? '('.$condition.')' : $condition;
+			}
+
+			$conditions = (count($conditions) > 1) ? '('.implode(' OR ', $conditions).')' : $conditions[0];
+
+			$tag_conditions[] = 'hg.groupid='.zbx_dbstr($groupid).' AND '.$conditions;
+		}
+
+		if ($tag_conditions) {
+			$sqlParts['from']['pt'] = 'problem_tag pt';
+			$sqlParts['where']['p-pt'] = 'p.eventid=pt.eventid';
+
+			if ($full_access_groupids || count($tag_conditions) > 1) {
+				foreach ($tag_conditions as &$tag_condition) {
+					$tag_condition = '('.$tag_condition.')';
+				}
+				unset($tag_condition);
+			}
+		}
+
+		if ($full_access_groupids) {
+			$tag_conditions[] = dbConditionInt('hg.groupid', $full_access_groupids);
+		}
+
+		$sqlParts['where'][] = (count($tag_conditions) > 1)
+			? '('.implode(' OR ', $tag_conditions).')'
+			: $tag_conditions[0];
+
+		return $sqlParts;
 	}
 }

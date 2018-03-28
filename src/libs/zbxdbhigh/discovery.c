@@ -369,6 +369,7 @@ static void	discovery_update_service_status(const DB_DSERVICE *dservice, int sta
 			NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 
 	zbx_process_events(NULL, NULL);
+	zbx_clean_events();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -431,6 +432,7 @@ static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
 			NULL, 0, NULL, 0, NULL);
 
 	zbx_process_events(NULL, NULL);
+	zbx_clean_events();
 }
 
 /******************************************************************************

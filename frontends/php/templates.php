@@ -278,12 +278,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			if (!copyItems($cloneTemplateId, $templateId)) {
+			/*
+			 * First copy web scenarios with web items, so that later regular items can use web item as their master
+			 * item.
+			 */
+			if (!copyHttpTests($cloneTemplateId, $templateId)) {
 				throw new Exception();
 			}
 
-			// copy web scenarios
-			if (!copyHttpTests($cloneTemplateId, $templateId)) {
+			if (!copyItems($cloneTemplateId, $templateId)) {
 				throw new Exception();
 			}
 
