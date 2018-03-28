@@ -895,7 +895,8 @@ td.disaster-bg {
 
 .notif-body {
 	h4 {
-		overflow: visible;
+		padding-bottom: 3px;
+		margin-bottom: -3px;
 	}
 
 	p {
