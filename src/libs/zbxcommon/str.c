@@ -991,11 +991,11 @@ int	num_param(const char *p)
 			else if ('[' == *p)
 			{
 				if (0 == array)
-					array++;
+					array = 1;
 			}
 			else if (']' == *p && 0 != array)
 			{
-				array--;
+				array = 0;
 
 				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
 					p++;
