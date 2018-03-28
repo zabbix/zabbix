@@ -1375,7 +1375,7 @@ done:
 				proxy->last_cfg_error_time = 0;
 			}
 
-			proxy->compress = atoi(row[32 + ZBX_HOST_TLS_OFFSET]);
+			proxy->auto_compress = atoi(row[32 + ZBX_HOST_TLS_OFFSET]);
 			DCstrpool_replace(found, &proxy->proxy_address, row[31 + ZBX_HOST_TLS_OFFSET]);
 
 			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
@@ -8434,7 +8434,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
 	dst_proxy->version = src_proxy->version;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
-	dst_proxy->compress = src_proxy->compress;
+	dst_proxy->auto_compress = src_proxy->auto_compress;
 
 	if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
@@ -11171,8 +11171,8 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
 		{
-			if (proxy->compress != diff->compress)
-				proxy->compress = diff->compress;
+			if (proxy->auto_compress != diff->compress)
+				proxy->auto_compress = diff->compress;
 			else
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS);
 		}

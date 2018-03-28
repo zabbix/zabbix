@@ -3915,7 +3915,7 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 	}
 
 	proxy->version = version;
-	proxy->compress = compress;
+	proxy->auto_compress = compress;
 	proxy->lastaccess = lastaccess;
 
 	if (0 != (diff.flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))

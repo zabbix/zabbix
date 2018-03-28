@@ -169,7 +169,7 @@ static void	DCdump_proxies(ZBX_DC_CONFIG *config)
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " timediff:%d location:%u", proxy->hostid,
 				proxy->timediff, proxy->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", proxy->proxy_address);
-		zabbix_log(LOG_LEVEL_TRACE, "  compres:%d", proxy->compress);
+		zabbix_log(LOG_LEVEL_TRACE, "  compres:%d", proxy->auto_compress);
 
 	}
 

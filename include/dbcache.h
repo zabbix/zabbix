@@ -250,7 +250,7 @@ typedef struct
 	char		*addr;
 	unsigned short	port;
 
-	unsigned char	compress;
+	unsigned char	auto_compress;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
 

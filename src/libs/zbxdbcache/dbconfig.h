@@ -337,7 +337,7 @@ typedef struct
 						/* or 0 if no error */
 	int		version;
 	unsigned char	location;
-	unsigned char	compress;
+	unsigned char	auto_compress;
 
 	const char	*proxy_address;
 }

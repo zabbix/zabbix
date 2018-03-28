@@ -94,7 +94,7 @@ static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const c
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, data);
 
-	if (0 != proxy->compress)
+	if (0 != proxy->auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
 
 	if (FAIL == (ret = zbx_tcp_send_ext(sock, data, strlen(data), flags, 0)))
@@ -185,7 +185,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s)))
 			{
 				if (0 != (s.protocol & ZBX_TCP_COMPRESS))
-						proxy->compress = 1;
+						proxy->auto_compress = 1;
 
 				ret = zbx_send_proxy_data_response(proxy, &s, NULL);
 
@@ -263,7 +263,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 			else
 			{
 				proxy->version = zbx_get_protocol_version(&jp);
-				proxy->compress = (0 != (s.protocol & ZBX_TCP_COMPRESS) ? 1 : 0);
+				proxy->auto_compress = (0 != (s.protocol & ZBX_TCP_COMPRESS) ? 1 : 0);
 				proxy->lastaccess = time(NULL);
 			}
 		}
@@ -873,10 +873,10 @@ static int	process_proxy(void)
 			}
 		}
 error:
-		if (proxy_old.version != proxy.version || proxy_old.compress != proxy.compress ||
+		if (proxy_old.version != proxy.version || proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)
 		{
-			zbx_update_proxy_data(&proxy_old, proxy.version, proxy.lastaccess, proxy.compress);
+			zbx_update_proxy_data(&proxy_old, proxy.version, proxy.lastaccess, proxy.auto_compress);
 		}
 
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);

@@ -252,7 +252,7 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
-	if (0 != proxy.compress)
+	if (0 != proxy.auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
 out:
 	if (FAIL == ret && 0 != (sock->protocol & ZBX_TCP_COMPRESS))

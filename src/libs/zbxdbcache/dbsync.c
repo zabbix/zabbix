@@ -585,7 +585,7 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[31 + ZBX_HOST_TLS_OFFSET], proxy->proxy_address))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[32 + ZBX_HOST_TLS_OFFSET], proxy->compress))
+		if (FAIL == dbsync_compare_uchar(dbrow[32 + ZBX_HOST_TLS_OFFSET], proxy->auto_compress))
 			return FAIL;
 	}
 

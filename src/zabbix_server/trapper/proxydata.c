@@ -53,7 +53,7 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&json, &tasks);
 
-	if (0 != proxy->compress)
+	if (0 != proxy->auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
 
 	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), flags, 0)))
