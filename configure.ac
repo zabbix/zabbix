@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.0alpha5])
+AC_INIT([Zabbix],[4.0.0alpha6])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1647,7 +1647,6 @@ case "x$ARCH" in
 		AC_DEFINE(ZBX_PROCSTAT_COLLECTOR, 1 , [Define to 1 on linux and solaris platforms])
 		;;
 esac
-
 
 dnl *****************************************************************
 dnl *                                                               *
