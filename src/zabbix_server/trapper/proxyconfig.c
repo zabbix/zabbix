@@ -121,7 +121,7 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 
 	process_proxyconfig(&jp_data);
-	zbx_send_response_ext(sock, ret, NULL, ZABBIX_VERSION, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, CONFIG_TIMEOUT);
+	zbx_send_proxy_response(sock, ret, NULL, CONFIG_TIMEOUT);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
