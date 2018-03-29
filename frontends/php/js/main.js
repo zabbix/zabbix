@@ -179,7 +179,7 @@ var MMenu = {
 
 	mouseOver: function(show_label) {
 		clearTimeout(this.timeout_reset);
-		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 10);
+		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
 		PageRefresh.restart();
 	},
 
