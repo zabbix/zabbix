@@ -339,7 +339,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'type', 'authtype', 'allow_traps'],
+			'output' => ['itemid', 'name', 'type', 'authtype', 'allow_traps', 'retrieve_mode'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
@@ -421,6 +421,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+
+				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
+						&& !array_key_exists('retrieve_mode', $item)
+						&& $db_items[$item['itemid']]['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
+					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 				}
 			}
 			else {

@@ -719,7 +719,7 @@ class CItemPrototype extends CItemGeneral {
 		$this->validateDependentItems($items, API::ItemPrototype());
 
 		$db_items = $this->get([
-			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps'],
+			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -799,6 +799,12 @@ class CItemPrototype extends CItemGeneral {
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+
+				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
+						&& !array_key_exists('retrieve_mode', $item)
+						&& $db_items[$item['itemid']]['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
+					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 				}
 			}
 			else {
