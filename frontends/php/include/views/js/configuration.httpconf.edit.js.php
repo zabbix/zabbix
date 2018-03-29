@@ -232,56 +232,6 @@
 			},
 
 			/**
-			 * Merge 'query_fields' values with ones from URL.
-			 *
-			 * @param {string}	formid	Id of current form HTML element.
-			 * @param {string}	type	Type of pairs that should be merged.
-			 * @param {object}	pairs	Object with pair data.
-			 */
-			merge: function (formid, type, pairs) {
-				var	pair,
-					queryFields = [],
-					existingPairs = Object.keys(allPairs);
-
-				if (pairs.length > 0) {
-					this.cleanup(formid, type);
-				}
-
-				for (var p = 0; p < existingPairs.length; p++) {
-					if (typeof allPairs[existingPairs[p]] !== 'undefined'
-							&& allPairs[existingPairs[p]].type === type
-							&& allPairs[existingPairs[p]].formid === formid
-							&& allPairs[existingPairs[p]].name.indexOf('[]') === -1) {
-						queryFields.push(allPairs[existingPairs[p]]);
-					}
-				}
-
-				for (var i = 0; i < pairs.length; i++) {
-					pair = null;
-					for (var p = 0; p < queryFields.length; p++) {
-						if (queryFields[p].name === pairs[i].name) {
-							pair = queryFields[p];
-							break;
-						}
-					}
-
-					if (pair === null) {
-						renderPairRow(formid, createNewPair({
-							formid: formid,
-							type: type,
-							name: pairs[i].name,
-							value: pairs[i].value
-						}));
-					}
-					else {
-						jQuery('#pairs_' + pair.id + '_value').val(pairs[i].value);
-					}
-				}
-
-				refreshContainers();
-			},
-
-			/**
 			 * Removes all new pairs with empty name and value (of given type withing given form).
 			 *
 			 * @param {string}	formid	Id of current form HTML element.
@@ -681,7 +631,13 @@
 			url = parseUrlString(target.val());
 
 		if (typeof url === 'object') {
-			pairManager.merge(formid, 'query_fields', url.pairs);
+			if (url.pairs.length) {
+				pairManager.cleanup(formid, 'query_fields');
+			}
+			jQuery.each(url.pairs, function(i, pair) {
+				pair.type = 'query_fields';
+				pairManager.addNew(formid, pair);
+			})
 			target.val(url.url);
 		}
 		else {

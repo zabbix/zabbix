@@ -535,6 +535,9 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				},
 				removeRow: function(row_node) {
 					removeRow(row_node);
+				},
+				getTableRows: function() {
+					return table.find('.' + table_row_class);
 				}
 			};
 		};
@@ -561,6 +564,15 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				url = parseUrlString(url_node.val())
 
 			if (typeof url === 'object') {
+				table.getTableRows().map(function() {
+					var empty = $(this).find('input[type="text"]').map(function() {
+						return $(this).val() == '' ? this : null;
+					});
+
+					return empty.length == 2 ? this : null;
+				}).map(function() {
+					table.removeRow(this);
+				});
 				table.addRows(url.pairs);
 				url_node.val(url.url);
 			}
