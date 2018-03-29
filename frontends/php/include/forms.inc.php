@@ -923,36 +923,16 @@ function getItemFilterForm(&$items) {
 }
 
 /**
- * Get item of type ITEM_TYPE_HTTPAGENT fields form data for create or update API calls.
+ * Prepare ITEM_TYPE_HTTPAGENT type item data for create or update API calls.
+ * - Converts 'query_fields' from array of keys and array of values to array of hash maps for every field.
+ * - Converts 'headers' from array of keys and array of values to hash map.
+ * - For request method HEAD set retrieve mode to retrieve only headers.
+ *
+ * @param array $item   Array of form fields data for ITEM_TYPE_HTTPAGENT item.
  *
  * @return array
  */
-function getItemHttpAgentFormData() {
-	$item = [
-		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-		'url' => getRequest('url'),
-		'query_fields' => getRequest('query_fields', []),
-		'posts' => getRequest('posts'),
-		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-		'follow_redirects' => (int) getRequest('follow_redirects'),
-		'post_type' => (int) getRequest('post_type'),
-		'http_proxy' => getRequest('http_proxy'),
-		'headers' => getRequest('headers', []),
-		'retrieve_mode' => (int) getRequest('retrieve_mode'),
-		'request_method' => (int) getRequest('request_method'),
-		'output_format' => (int) getRequest('output_format'),
-		'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-		'ssl_cert_file' => getRequest('ssl_cert_file'),
-		'ssl_key_file' => getRequest('ssl_key_file'),
-		'ssl_key_password' => getRequest('ssl_key_password'),
-		'verify_peer' => (int) getRequest('verify_peer'),
-		'verify_host' => (int) getRequest('verify_host'),
-	];
-
-	$item['authtype'] = getRequest('http_authtype', HTTPTEST_AUTH_NONE);
-	$item['username'] = getRequest('http_username', '');
-	$item['password'] = getRequest('http_password', '');
-
+function prepareItemHttpAgentFormData($item) {
 	if ($item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
 		$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 	}

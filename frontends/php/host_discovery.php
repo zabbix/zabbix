@@ -368,7 +368,30 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		];
 
 		if ($newItem['type'] == ITEM_TYPE_HTTPAGENT) {
-			$newItem = array_merge($newItem, getItemHttpAgentFormData());
+			$http_item = [
+				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+				'url' => getRequest('url'),
+				'query_fields' => getRequest('query_fields', []),
+				'posts' => getRequest('posts'),
+				'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+				'follow_redirects' => (int) getRequest('follow_redirects'),
+				'post_type' => (int) getRequest('post_type'),
+				'http_proxy' => getRequest('http_proxy'),
+				'headers' => getRequest('headers', []),
+				'retrieve_mode' => (int) getRequest('retrieve_mode'),
+				'request_method' => (int) getRequest('request_method'),
+				'output_format' => (int) getRequest('output_format'),
+				'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
+				'ssl_cert_file' => getRequest('ssl_cert_file'),
+				'ssl_key_file' => getRequest('ssl_key_file'),
+				'ssl_key_password' => getRequest('ssl_key_password'),
+				'verify_peer' => (int) getRequest('verify_peer'),
+				'verify_host' => (int) getRequest('verify_host'),
+				'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+				'username' => getRequest('http_username', ''),
+				'password' => getRequest('http_password', '')
+			];
+			$newItem = prepareItemHttpAgentFormData($http_item) + $newItem;
 		}
 
 		if ($newItem['type'] == ITEM_TYPE_JMX) {
