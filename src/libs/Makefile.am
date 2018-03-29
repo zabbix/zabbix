@@ -59,11 +59,6 @@ PROXY_SUBDIRS = \
 	zbxself \
 	zbxtasks \
 	zbxhistory
-else
-if ZBXCMOCKA
-AGENT_SUBDIRS = \
-	zbxself
-endif
 endif
 endif
 
