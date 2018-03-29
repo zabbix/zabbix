@@ -776,6 +776,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['description'] !== getRequest('description', '')) {
 					$item['description'] = getRequest('description', '');
 				}
+
+				if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
+					$item = array_merge($item, getItemHttpAgentFormData());
+				}
 			}
 
 			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
@@ -788,10 +792,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
 				$item['master_itemid'] = getRequest('master_itemid');
-			}
-
-			if (getRequest('type') == ITEM_TYPE_HTTPAGENT && !($db_item['flags'] & ZBX_FLAG_DISCOVERY_CREATED)) {
-				$item = array_merge($item, getItemHttpAgentFormData());
 			}
 
 			if ($item) {

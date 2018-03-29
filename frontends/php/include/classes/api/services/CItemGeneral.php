@@ -104,7 +104,7 @@ abstract class CItemGeneral extends CApiService {
 			'retrieve_mode'			=> ['template' => 1],
 			'request_method'		=> ['template' => 1],
 			'output_format'			=> ['template' => 1],
-			'allow_traps'			=> ['template' => 1],
+			'allow_traps'			=> [],
 			'ssl_cert_file'			=> ['template' => 1],
 			'ssl_key_file'			=> ['template' => 1],
 			'ssl_key_password'		=> ['template' => 1],
