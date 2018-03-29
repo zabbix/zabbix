@@ -3187,6 +3187,10 @@ $form-icon-btn: (
 	border-bottom-color: darken($action-border-color, 1%);
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
+	&:focus {
+		outline: none;
+	}
+
 	li {
 		display: block;
 
@@ -3211,15 +3215,10 @@ $form-icon-btn: (
 		@extend %overflow-ellipsis;
 		@include transition(background-color .2s ease-out);
 
-		&:hover {
-			background-color: $action-hover-color;
-		}
-
-		&:focus {
-			background-color: $action-hover-color;
-		}
-
-		&:active {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
 			background-color: $action-hover-color;
 		}
 

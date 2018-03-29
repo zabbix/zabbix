@@ -261,9 +261,33 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu-item {
-	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -317px -835px !important;
+.action-menu {
+	background-color: $form-bg-color;
+	border: 1px solid $form-border-color;
+
+	.action-menu-item-disabled {
+		color: $form-disabled-font-color;
+	}
+
+	.action-menu-item {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
+			background-color: black;
+			color: white;
+
+			.arrow-right {
+				border-left-color: white;
+			}
+		}
+
+		&.selected {
+
+			&::before {
+				background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
+			}
+		}
 	}
 }
 

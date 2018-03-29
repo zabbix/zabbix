@@ -823,12 +823,13 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  * Retrieve overview table object for items.
  *
  * @param array|null $groupids
- * @param string     $application  IDs of applications to filter items by
+ * @param string     $application  IDs of applications to filter items by.
  * @param int        $viewMode
+ * @param bool       $fullscreen   Display mode.
  *
  * @return CTableInfo
  */
-function getItemsDataOverview(array $groupids, $application, $viewMode) {
+function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscreen = false) {
 	// application filter
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
@@ -986,7 +987,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 			foreach ($item_data as $ithosts) {
 				$tableRow = [nbsp($item_name)];
 				foreach ($host_names as $host_name) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
 				}
 				$table->addRow($tableRow);
 			}
@@ -1009,12 +1010,12 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 			$host = $hosts[$hostId];
 
 			$name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true, $fullscreen));
 
 			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
 				foreach ($item_data as $ithosts) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
 				}
 			}
 			$table->addRow($tableRow);
@@ -1024,7 +1025,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	return $table;
 }
 
-function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
+function getItemDataOverviewCells($tableRow, $ithosts, $hostName, $fullscreen = false) {
 	$ack = null;
 	$css = '';
 	$value = UNKNOWN_VALUE;
@@ -1043,7 +1044,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 				if ($ack) {
 					$ack = reset($ack);
 					$ack = ($ack['acknowledged'] == 1)
-						? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
+						? [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
 						: null;
 				}
 			}
@@ -1062,7 +1063,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 
 	if (isset($ithosts[$hostName])) {
 		$column
-			->setMenuPopup(CMenuPopupHelper::getHistory($item))
+			->setMenuPopup(CMenuPopupHelper::getHistory($item, $fullscreen))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->addClass(ZBX_STYLE_NOWRAP);
 	}
