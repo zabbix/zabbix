@@ -1,8 +1,10 @@
 Changes for 4.0.0alpha6
 
 New features:
+..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+....I..... [ZBX-13350] added multiple Zabbix element default paths to output after running ./configure and --help option (dimir, viktors)
 ...G...PS. [ZBX-13509] improved compilation support from source for Solaris and NetBSD (MVekslers)
 
 --------------------------------------------------------------------------------
