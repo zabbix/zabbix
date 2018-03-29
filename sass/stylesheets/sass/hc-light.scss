@@ -938,7 +938,8 @@ td.inactive-bg {
 // GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.1);
-	border: 2px solid rgba($font-color,0.6);
+	border: none;
+	outline: 2px solid rgba($font-color,0.6);
 }
 
 .ui-selectable-helper {

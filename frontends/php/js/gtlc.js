@@ -1851,7 +1851,7 @@ var sbox = Class.create({
 	},
 
 	updateHeightBoxContainer: function(height) {
-		this.areaHeight = height;
+		this.areaHeight = height + 1;
 		this.dom_obj.style.height = this.areaHeight + 'px';
 	},
 
