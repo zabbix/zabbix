@@ -42,7 +42,8 @@ $triggersFormList = (new CFormList('triggersFormList'))
 	->addRow(
 		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
 			->setLabel(_('Severity'))
-			->setChecked(isset($data['visible']['priority'])),
+			->setChecked(isset($data['visible']['priority']))
+			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv(
 			new CSeverity([
 				'name' => 'priority',

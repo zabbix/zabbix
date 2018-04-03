@@ -1,6 +1,22 @@
+Changes for 4.0.0alpha6
+
+New features:
+..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
+
+Bug fixes:
+..F....... [ZBX-13489] fixed wrong tab iteration inside graph widget (ashubin)
+..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
+..F....... [ZBX-13560] fixed acknowledge notifications are visible in popup (agriscenko)
+..F....... [ZBX-13298] fixed missing graph after faulty graph edit form submission (nikita)
+..F....... [ZBX-13487] improved widgets menu icons focus state styles (Andzs)
+....I..... [ZBX-13350] added multiple Zabbix element default paths to output after running ./configure and --help option (dimir, viktors)
+...G...PS. [ZBX-13509] improved compilation support from source for Solaris and NetBSD (MVekslers)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.0alpha5
 
 New features:
+..F....... [ZBXNEXT-4143] implemented submenu autofocus on top-level menu click (nikita)
 ..F....... [ZBXNEXT-4313] implemented keyboard interaction in context menus (miks)
 A.F.I...S. [ZBXNEXT-4426] added option to execute cached passive checks at the current time (Ivo, wiper)
 ........S. [ZBXNEXT-4417] added real time export of events, history and trends in newline delimited JSON format (vso)
@@ -10,6 +26,15 @@ A.F.I...S. [ZBXNEXT-4119] implemented tag based permissions (miks, Oleg, Sasha, 
 ..F....... [ZBXNEXT-4340] added kiosk mode for dashboard (ashubin)
 
 Bug fixes:
+..F....... [ZBX-13542] fixed http steps on template not inheriting hosts application setting (nikita)
+..F....... [ZBX-13618] fixed wrong variables order in translatable error message (nikita)
+..F....... [ZBX-13344] fixed default condition for trigger based actions (agriscenko)
+........S. [ZBX-13613] improved a history syncer when backend elasticsearch is not available (MVekslers)
+.......PS. [ZBX-13510] fixed error of execution "make dbschema" for NetBSD (MVekslers)
+...G...... [ZBX-13544] fixed agent crashes when using regex with 'Log' item for Mac OSX (MVekslers)
+........S. [ZBX-13611] fixed lld rules not always saving their state/error message changes (wiper)
+........S. [ZBX-13571] fixed regression that resulted in slow history data queries on partitioned tables (wiper)
+..F....... [ZBX-13490] fixed autofocus in forms (nikita)
 ........S. [ZBX-13470] improved searching IPMI items by full name (MVekslers)
 ..F....... [ZBX-13566] fixed create dashboard button size in dashboard list (Andzs)
 ..F....... [ZBX-13464] fixed fullscreen attribute included in host context menu links (ashubin)
@@ -191,6 +216,21 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.9rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
+..F....... [ZBX-13560] fixed acknowledge notifications are visible in popup (agriscenko)
+..F....... [ZBX-13298] fixed missing graph after faulty graph edit form submission (nikita)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.8
+
+3.4.8rc1 was released as 3.4.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.4.8rc1
 
 New features:
@@ -200,10 +240,16 @@ A.F....... [ZBX-1357] enabled Hebrew translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, German, Hebrew, Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-13542] fixed http steps on template not inheriting hosts application setting (nikita)
+..F....... [ZBX-13618] fixed wrong variables order in translatable error message (nikita)
+..F....... [ZBX-13344] fixed default condition for trigger based actions (agriscenko)
+........S. [ZBX-13613] improved a history syncer when backend elasticsearch is not available (MVekslers)
+...G...... [ZBX-13544] fixed agent crashes when using regex with 'Log' item for Mac OSX (MVekslers)
+........S. [ZBX-13611] fixed lld rules not always saving their state/error message changes (wiper)
 ........S. [ZBX-13571] fixed regression that resulted in slow history data queries on partitioned tables (wiper)
 A.F....... [ZBX-13424] added possibility to select web items as master items and improved copying of dependent items to destination hosts and templates (Ivo)
-..F....... [ZBX-13573] fixed undefined index message changing Action "Acknowledgment operations" from "Remote command" to "Notify all involved" (agriscenko)
-..F....... [ZBX-13570] fixed undefined index in API call (agriscenko)
+A......... [ZBX-13573] fixed undefined index message changing Action "Acknowledgment operations" from "Remote command" to "Notify all involved" (agriscenko)
+A......... [ZBX-13570] fixed undefined index in API call (agriscenko)
 A......... [ZBX-13331] removed "recovery" property from action.get API method response (nikita)
 ..F....... [ZBX-13309] fixed displaying of Problem/Recovery time (agriscenko, ashubin, Sasha)
 .......PS. [ZBX-13450] fixed server and proxy compilation problem for Solaris 10 (MVekslers)
@@ -1341,12 +1387,25 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.0.16
+
+3.0.16rc1 was released as 3.0.16 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.16rc1
 
 New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), Japanese, Korean, Russian, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-13542] fixed http steps on template not inheriting hosts application setting (nikita)
 ........S. [ZBX-13339] improved deallocation of memory (MVekslers)
 ..F....... [ZBX-13412] fixed JS error and wrong form behaviour when changing item type, type of information, data type (agriscenko)
 ..F....... [ZBX-13257] fixed display of the latest item in Audit log (agriscenko)

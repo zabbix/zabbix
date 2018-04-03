@@ -71,8 +71,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		], $config, true);
 
 		if ($fields['show_tags']) {
-			$data['tags'] = makeEventsTags($data['problems']);
+			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags']);
 		}
+
 		if ($data['problems']) {
 			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
 		}
@@ -85,6 +86,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable'],
+				'problem_unack_style' => $config['problem_unack_style'],
+				'problem_ack_style' => $config['problem_ack_style'],
 				'blink_period' => timeUnitToSeconds($config['blink_period'])
 			],
 			'data' => $data,
