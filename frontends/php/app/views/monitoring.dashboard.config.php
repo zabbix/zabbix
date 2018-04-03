@@ -122,11 +122,13 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldItem) {
 		// multiselect.js must be preloaded in parent view.
 
+		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
+
 		$parameters = [
 			'srctbl' => 'items',
 			'srcfld1' => 'itemid',
 			'dstfrm' => $form->getName(),
-			'dstfld1' => $field->getName().($field->isMultiple() ? '_' : ''),
+			'dstfld1' => zbx_formatDomId($field_name),
 			'real_hosts' => '1',
 			'with_webitems' => '1'
 		];
@@ -136,7 +138,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		}
 
 		$field_itemsids = (new CMultiSelect([
-			'name' => $field->getName().($field->isMultiple() ? '[]' : ''),
+			'name' => $field_name,
 			'objectName' => 'items',
 			'data' => $data['captions']['ms']['items'][$field->getName()],
 			'multiple' => $field->isMultiple(),
@@ -145,9 +147,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
 
-		$form_list->addRow(
-			(new CLabel($field->getLabel(), $field->getName().($field->isMultiple() ? '_' : '')))
-				->setAsteriskMark($aria_required),
+		$form_list->addRow((new CLabel($field->getLabel(), $field_name))->setAsteriskMark($aria_required),
 			$field_itemsids
 		);
 

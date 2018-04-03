@@ -118,13 +118,14 @@ if ($this->data['action'] == HISTORY_LATEST || $this->data['action'] == HISTORY_
 				continue;
 			}
 
-			$items_data[$itemid] = [
+			$items_data[] = [
 				'id' => $itemid,
-				'name' => $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
+				'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER,
+				'name' => $item['name_expanded']
 			];
 		}
 
-		CArrayHelper::sort($items_data, ['name']);
+		CArrayHelper::sort($items_data, ['prefix', 'name']);
 
 		$filterColumn1 = (new CFormList())
 			->addRow(_('Items list'),

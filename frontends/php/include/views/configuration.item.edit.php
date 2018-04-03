@@ -127,13 +127,14 @@ $itemFormList->addRow(
 			? [
 				[
 					'id' => $data['master_itemid'],
-					'name' => $host['name'].NAME_DELIMITER.$data['master_itemname']
+					'prefix' => $host['name'].NAME_DELIMITER,
+					'name' => $data['master_itemname']
 				]
 			]
-			: null
+			: []
 	]))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(true),
+		->setAriaRequired(),
 	'row_master_item'
 );
 
