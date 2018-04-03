@@ -86,7 +86,7 @@ out:
 	return ret;
 }
 
-static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data)
+static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data, size_t size)
 {
 	const char	*__function_name = "send_data_to_proxy";
 
@@ -97,7 +97,7 @@ static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const c
 	if (0 != proxy->auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
 
-	if (FAIL == (ret = zbx_tcp_send_ext(sock, data, strlen(data), flags, 0)))
+	if (FAIL == (ret = zbx_tcp_send_ext(sock, data, size, flags, 0)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
 
@@ -180,7 +180,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 		if (NULL != ts)
 			zbx_timespec(ts);
 
-		if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer)))
+		if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
 		{
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s)))
 			{
@@ -244,7 +244,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen " ZBX_FS_SIZE_T,
 			proxy->host, s.peer, (zbx_fs_size_t)j.buffer_size);
 
-	if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer)))
+	if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
 	{
 		if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 		{
