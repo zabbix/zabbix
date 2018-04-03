@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
 ..F....... [ZBX-13560] fixed acknowledge notifications are visible in popup (agriscenko)
 ..F....... [ZBX-13298] fixed missing graph after faulty graph edit form submission (nikita)
 ..F....... [ZBX-13487] improved widgets menu icons focus state styles (Andzs)
@@ -219,6 +220,7 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
 ..F....... [ZBX-13560] fixed acknowledge notifications are visible in popup (agriscenko)
 ..F....... [ZBX-13298] fixed missing graph after faulty graph edit form submission (nikita)
 
