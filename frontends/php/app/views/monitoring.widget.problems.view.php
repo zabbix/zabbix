@@ -110,6 +110,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+
+	$is_acknowledged = $data['config']['event_ack_enable'] && (bool) $problem['acknowledges'];
+
 	if ($show_recovery_data) {
 		if ($problem['r_eventid'] != 0) {
 			$cell_r_clock = ($problem['r_clock'] >= $today)
@@ -126,9 +129,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$cell_status = new CSpan($value_str);
 
 		// Add colors and blinking to span depending on configuration and trigger parameters.
-		addTriggerValueStyle($cell_status, $value, $value_clock,
-			$data['config']['event_ack_enable'] && (bool) $problem['acknowledges']
-		);
+		addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 	}
 
 	// Info.
@@ -166,7 +167,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$description->addClass($description_style);
 	}
 
-	if (!$show_recovery_data) {
+	if (!$show_recovery_data && $data['config'][$is_acknowledged ? 'problem_ack_style' : 'problem_unack_style']) {
 		// blinking
 		$duration = time() - $problem['clock'];
 
