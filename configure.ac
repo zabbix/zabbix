@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.0alpha5])
+AC_INIT([Zabbix],[4.0.0alpha6])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1610,6 +1610,18 @@ AC_SUBST(LIBPCRE_CFLAGS)
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
 
+SERVER_CONFIG_FILE="${sysconfdir}/zabbix_server.conf"
+PROXY_CONFIG_FILE="${sysconfdir}/zabbix_proxy.conf"
+AGENT_CONFIG_FILE="${sysconfdir}/zabbix_agentd.conf"
+
+EXTERNAL_SCRIPTS_PATH="${datadir}/zabbix/externalscripts"
+ALERT_SCRIPTS_PATH="${datadir}/zabbix/alertscripts"
+
+CURL_SSL_CERT_LOCATION="${datadir}/zabbix/ssl/certs"
+CURL_SSL_KEY_LOCATION="${datadir}/zabbix/ssl/keys"
+
+LOAD_MODULE_PATH="${libdir}/modules"
+
 AC_SUBST(SERVER_LDFLAGS)
 AC_SUBST(SERVER_LIBS)
 
@@ -1624,6 +1636,18 @@ AC_SUBST(ZBXGET_LIBS)
 
 AC_SUBST(SENDER_LDFLAGS)
 AC_SUBST(SENDER_LIBS)
+
+AC_SUBST(SERVER_CONFIG_FILE)
+AC_SUBST(PROXY_CONFIG_FILE)
+AC_SUBST(AGENT_CONFIG_FILE)
+
+AC_SUBST(EXTERNAL_SCRIPTS_PATH)
+AC_SUBST(ALERT_SCRIPTS_PATH)
+
+AC_SUBST(CURL_SSL_CERT_LOCATION)
+AC_SUBST(CURL_SSL_KEY_LOCATION)
+
+AC_SUBST(LOAD_MODULE_PATH)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1647,7 +1671,6 @@ case "x$ARCH" in
 		AC_DEFINE(ZBX_PROCSTAT_COLLECTOR, 1 , [Define to 1 on linux and solaris platforms])
 		;;
 esac
-
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1754,6 +1777,37 @@ AC_OUTPUT([
 	man/Makefile
 	])
 
+dnl The following variables use autoconf variables such as
+dnl ${sysconfdir} and ${datadir} . Which in turn contain
+dnl variables such as ${prefix}. In order to completely
+dnl substitute all variables and output end-value in
+dnl Configuration output below it is required to perform 2
+dnl substitutions.
+
+SERVER_CONFIG_FILE=`eval echo "${SERVER_CONFIG_FILE}"`
+SERVER_CONFIG_FILE=`eval echo "${SERVER_CONFIG_FILE}"`
+
+PROXY_CONFIG_FILE=`eval echo "${PROXY_CONFIG_FILE}"`
+PROXY_CONFIG_FILE=`eval echo "${PROXY_CONFIG_FILE}"`
+
+AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
+AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
+
+EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`
+EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`
+
+ALERT_SCRIPTS_PATH=`eval echo "${ALERT_SCRIPTS_PATH}"`
+ALERT_SCRIPTS_PATH=`eval echo "${ALERT_SCRIPTS_PATH}"`
+
+CURL_SSL_CERT_LOCATION=`eval echo "${CURL_SSL_CERT_LOCATION}"`
+CURL_SSL_CERT_LOCATION=`eval echo "${CURL_SSL_CERT_LOCATION}"`
+
+CURL_SSL_KEY_LOCATION=`eval echo "${CURL_SSL_KEY_LOCATION}"`
+CURL_SSL_KEY_LOCATION=`eval echo "${CURL_SSL_KEY_LOCATION}"`
+
+LOAD_MODULE_PATH=`eval echo "${LOAD_MODULE_PATH}"`
+LOAD_MODULE_PATH=`eval echo "${LOAD_MODULE_PATH}"`
+
 echo "
 
 Configuration:
@@ -1814,15 +1868,25 @@ if test "x$server" != "xno"; then
 
 echo "  Server details:
     With database:         ${have_db}
-    WEB Monitoring:        ${have_web_monitoring}
-    Native Jabber:         ${have_jabber}
+    WEB Monitoring:        ${have_web_monitoring}"
+
+if test "x$have_web_monitoring" = "xcURL"; then
+echo "      SSL certificates:      ${CURL_SSL_CERT_LOCATION}
+      SSL keys:              ${CURL_SSL_KEY_LOCATION}"
+fi
+
+echo "    Native Jabber:         ${have_jabber}
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${SERVER_LDFLAGS} ${LDFLAGS}
-    Libraries:             ${SERVER_LIBS} ${LIBS}"
+    Libraries:             ${SERVER_LIBS} ${LIBS}
+    Config file:           ${SERVER_CONFIG_FILE}
+    External scripts:      ${EXTERNAL_SCRIPTS_PATH}
+    Alert scripts:         ${ALERT_SCRIPTS_PATH}
+    Modules:               ${LOAD_MODULE_PATH}"
 
 fi
 
@@ -1833,14 +1897,23 @@ if test "x$proxy" != "xno"; then
 
 echo "  Proxy details:
     With database:         ${have_db}
-    WEB Monitoring:        ${have_web_monitoring}
-    SNMP:                  ${have_snmp}
+    WEB Monitoring:        ${have_web_monitoring}"
+
+if test "x$have_web_monitoring" = "xcURL"; then
+echo "      SSL certificates:      ${CURL_SSL_CERT_LOCATION}
+      SSL keys:              ${CURL_SSL_KEY_LOCATION}"
+fi
+
+echo "    SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
-    Libraries:             ${PROXY_LIBS} ${LIBS}"
+    Libraries:             ${PROXY_LIBS} ${LIBS}
+    Config file:           ${PROXY_CONFIG_FILE}
+    External scripts:      ${EXTERNAL_SCRIPTS_PATH}
+    Modules:               ${LOAD_MODULE_PATH}"
 
 fi
 
@@ -1852,7 +1925,9 @@ if test "x$agent" != "xno"; then
 echo "  Agent details:
     TLS:                   ${have_tls}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
-    Libraries:             ${AGENT_LIBS} ${LIBS}"
+    Libraries:             ${AGENT_LIBS} ${LIBS}
+    Config file:           ${AGENT_CONFIG_FILE}
+    Modules:               ${LOAD_MODULE_PATH}"
 
 fi
 
