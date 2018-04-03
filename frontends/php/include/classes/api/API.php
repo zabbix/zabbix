@@ -333,6 +333,13 @@ class API {
 	}
 
 	/**
+	 * @return CTask
+	 */
+	public static function Task() {
+		return self::getApi('task');
+	}
+
+	/**
 	 * @return CTemplate
 	 */
 	public static function Template() {

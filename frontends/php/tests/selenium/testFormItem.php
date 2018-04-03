@@ -2032,6 +2032,17 @@ class testFormItem extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'type' => 'Dependent item',
+					'name' => 'Dependent item',
+					'key' => 'item-dependent',
+					'master_item' => 'testFormItem',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
@@ -2160,6 +2171,12 @@ class testFormItem extends CWebTest {
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
 		}
 
+		if (array_key_exists('master_item',$data))	{
+			$this->zbxTestClickWait('button');
+			$this->zbxTestLaunchOverlayDialog('Items');
+			$this->zbxTestClickLinkTextWait($data['master_item']);
+		}
+
 		$itemFlexFlag = true;
 		if (isset($data['flexPeriod'])) {
 
@@ -2282,12 +2299,24 @@ class testFormItem extends CWebTest {
 				case 'SSH agent':
 				case 'TELNET agent':
 				case 'JMX agent':
-			$this->zbxTestAssertElementPresentXpath("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					$this->zbxTestAssertElementPresentXpath("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
 					break;
 				default:
 					$this->zbxTestAssertNotVisibleId('interfaceid');
 			}
 			$this->zbxTestAssertElementPresentXpath("//select[@id='value_type']/option[text()='$value_type']");
+
+			// "Check now" button availability
+			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent',
+					'Zabbix internal', 'Zabbix aggregate', 'External check', 'Database monitor', 'IPMI agent',
+					'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated'])) {
+				$this->zbxTestClick('check_now');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+				$this->zbxTestCheckFatalErrors();
+			}
+			else {
+				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
+			}
 
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");

@@ -189,4 +189,54 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestClickButtonText('Reset');
 	}
+
+	public function testPageProblems_ShowTags() {
+		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestCheckHeader('Problems');
+		$this->zbxTestClickButtonText('Reset');
+
+		// Check Show tags NONE
+		$this->zbxTestInputType('filter_tags_0_tag', 'service');
+		$this->zbxTestClickXpath('//label[@for="filter_show_tags_0"]');
+		$this->zbxTestClickButtonText('Apply');
+		// Check result
+		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
+		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
+		$this->zbxTestAssertElementNotPresentXpath('//thead/tr/th[text()="Tags"]');
+
+		// Check Show tags 1
+		$this->zbxTestClickXpath('//label[@for="filter_show_tags_1"]');
+		$this->zbxTestClickButtonText('Apply');
+		// Check Tags column in result
+		$this->zbxTestAssertVisibleXpath('//thead/tr/th[text()="Tags"]');
+		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
+		$this->zbxTestTextNotVisibleOnPage('Database');
+		$this->zbxTestTextNotVisibleOnPage('Service: abc');
+		$this->zbxTestTextNotVisibleOnPage('Tag4');
+		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+
+		// Check Show tags 2
+		$this->zbxTestClickXpath('//label[@for="filter_show_tags_2"]');
+		$this->zbxTestClickButtonText('Apply');
+		// Check tags in result
+		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
+		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
+		$this->zbxTestTextNotVisibleOnPage('Service: abc');
+		$this->zbxTestTextNotVisibleOnPage('Tag4');
+		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+		// Check Show More tags hint button
+		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
+
+		// Check Show tags 3
+		$this->zbxTestClickXpath('//label[@for="filter_show_tags_3"]');
+		$this->zbxTestClickButtonText('Apply');
+		// Check tags in result
+		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
+		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
+		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[3]', 'Service: abc');
+		$this->zbxTestTextNotVisibleOnPage('Tag4');
+		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+		// Check Show More tags hint button
+		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
+	}
 }

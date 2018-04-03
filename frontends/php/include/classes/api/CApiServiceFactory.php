@@ -62,6 +62,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'screen' => 'CScreen',
 			'screenitem' => 'CScreenItem',
 			'script' => 'CScript',
+			'task' => 'CTask',
 			'template' => 'CTemplate',
 			'templatescreen' => 'CTemplateScreen',
 			'templatescreenitem' => 'CTemplateScreenItem',

@@ -496,6 +496,49 @@ static int	DBpatch_3050040(void)
 	return DBadd_foreign_key("tag_filter", 2, &field);
 }
 
+static int	DBpatch_3050041(void)
+{
+	const ZBX_TABLE table =
+			{"task_check_now", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050042(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_check_now", 1, &field);
+}
+
+static int	DBpatch_3050043(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update widget_field"
+		" set value_int=3"
+		" where name='show_tags'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='problems'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -539,5 +582,8 @@ DBPATCH_ADD(3050037, 0, 1)
 DBPATCH_ADD(3050038, 0, 1)
 DBPATCH_ADD(3050039, 0, 1)
 DBPATCH_ADD(3050040, 0, 1)
+DBPATCH_ADD(3050041, 0, 1)
+DBPATCH_ADD(3050042, 0, 1)
+DBPATCH_ADD(3050043, 0, 1)
 
 DBPATCH_END()

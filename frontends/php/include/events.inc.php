@@ -137,34 +137,6 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	]);
 }
 
-function get_next_event($currentEvent, array $eventList = []) {
-	$nextEvent = false;
-
-	foreach ($eventList as $event) {
-		// check only the events belonging to the same object
-		// find the event with the smallest eventid but greater than the current event id
-		if ($event['object'] == $currentEvent['object'] && bccomp($event['objectid'], $currentEvent['objectid']) == 0
-				&& (bccomp($event['eventid'], $currentEvent['eventid']) === 1
-				&& (!$nextEvent || bccomp($event['eventid'], $nextEvent['eventid']) === -1))) {
-			$nextEvent = $event;
-		}
-	}
-	if ($nextEvent) {
-		return $nextEvent;
-	}
-
-	$sql = 'SELECT e.*'.
-			' FROM events e'.
-			' WHERE e.source='.zbx_dbstr($currentEvent['source']).
-				' AND e.object='.zbx_dbstr($currentEvent['object']).
-				' AND e.objectid='.zbx_dbstr($currentEvent['objectid']).
-				' AND e.clock>='.zbx_dbstr($currentEvent['clock']).
-				' AND ((e.clock='.zbx_dbstr($currentEvent['clock']).' AND e.ns>'.$currentEvent['ns'].')'.
-					' OR e.clock>'.zbx_dbstr($currentEvent['clock']).')'.
-			' ORDER BY e.clock,e.eventid';
-	return DBfetch(DBselect($sql, 1));
-}
-
 /**
  *
  * @param array  $event								An array of event data.
@@ -324,16 +296,9 @@ function make_small_eventlist($startEvent, $backurl) {
 	$actions = makeEventsActions($events, true);
 
 	foreach ($events as $index => $event) {
-		$duration = ($event['r_eventid'] == 0)
-			? zbx_date2age($event['clock'])
-			: zbx_date2age($event['clock'], $event['r_clock']);
-
-		if (bccomp($startEvent['eventid'], $event['eventid']) == 0 && $nextevent = get_next_event($event, $events)) {
-			$duration = zbx_date2age($nextevent['clock'], $clock);
-		}
-		elseif (bccomp($startEvent['eventid'], $event['eventid']) == 0) {
-			$duration = zbx_date2age($clock);
-		}
+		$duration = ($event['r_eventid'] != 0)
+			? zbx_date2age($event['clock'], $event['r_clock'])
+			: zbx_date2age($event['clock']);
 
 		if ($event['r_eventid'] == 0) {
 			$in_closing = false;
@@ -745,6 +710,38 @@ function makeAcknowledgesTable($acknowledges, $users) {
 }
 
 /**
+ * Place filter tags at the beginning of tags array.
+ *
+ * @param array  $event_tags
+ * @param string $event_tags[]['tag']
+ * @param string $event_tags[]['value']
+ * @param array  $f_tags
+ * @param int    $f_tags[<tag>][]['operator']
+ * @param string $f_tags[<tag>][]['value']
+ *
+ * @return array
+ */
+function orderEventTags(array $event_tags, array $f_tags) {
+	$first_tags = [];
+
+	foreach ($event_tags as $i => $tag) {
+		if (array_key_exists($tag['tag'], $f_tags)) {
+			foreach ($f_tags[$tag['tag']] as $f_tag) {
+				if (($f_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $f_tag['value'])
+						|| ($f_tag['operator'] == TAG_OPERATOR_LIKE
+							&& ($f_tag['value'] === '' || stripos($tag['value'], $f_tag['value']) !== false))) {
+					$first_tags[] = $tag;
+					unset($event_tags[$i]);
+					break;
+				}
+			}
+		}
+	}
+
+	return array_merge($first_tags, $event_tags);
+}
+
+/**
  * Create element with event tags.
  *
  * @param array  $events
@@ -753,11 +750,26 @@ function makeAcknowledgesTable($acknowledges, $users) {
  * @param string $events[]['tags']['tag']
  * @param string $events[]['tags']['value']
  * @param bool   $html
+ * @param int    $list_tags_count
+ * @param array  $filter_tags
+ * @param string $filter_tags[]['tag']
+ * @param int    $filter_tags[]['operator']
+ * @param string $filter_tags[]['value']
  *
- * @return CTableInfo
+ * @return array
  */
-function makeEventsTags($events, $html = true) {
+function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT,
+		array $filter_tags = []) {
 	$tags = [];
+
+	// Convert $filter_tags to a more usable format.
+	$f_tags = [];
+	foreach ($filter_tags as $filter_tag) {
+		$f_tags[$filter_tag['tag']][] = [
+			'operator' => $filter_tag['operator'],
+			'value' => $filter_tag['value']
+		];
+	}
 
 	foreach ($events as $event) {
 		CArrayHelper::sort($event['tags'], ['tag', 'value']);
@@ -765,10 +777,10 @@ function makeEventsTags($events, $html = true) {
 		$tags[$event['eventid']] = [];
 
 		if ($html) {
-			// Show first 3 tags and "..." with hint box if there are more.
+			// Show first n tags and "..." with hint box if there are more.
 
-			$tags_count = count($event['tags']);
-			$tags_shown = array_slice($event['tags'], 0, EVENTS_LIST_TAGS_COUNT);
+			$event_tags = $f_tags ? orderEventTags($event['tags'], $f_tags) : $event['tags'];
+			$tags_shown = array_slice($event_tags, 0, $list_tags_count);
 
 			foreach ($tags_shown as $tag) {
 				$value = $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
@@ -777,7 +789,7 @@ function makeEventsTags($events, $html = true) {
 					->setHint($value);
 			}
 
-			if ($tags_count > count($tags_shown)) {
+			if (count($event['tags']) > count($tags_shown)) {
 				// Display all tags in hint box.
 
 				$hint_content = [];
