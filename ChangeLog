@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-13522] fixed duplicate IDs in trigger expression constructor (miks)
 ..F....... [ZBX-13489] fixed wrong tab iteration inside graph widget (ashubin)
 ..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
 ..F....... [ZBX-13560] fixed acknowledge notifications are visible in popup (agriscenko)
