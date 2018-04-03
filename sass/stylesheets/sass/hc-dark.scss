@@ -612,6 +612,18 @@ ul.top-nav-icons {
 	color: lighten($alt-yellow, 10%);
 }
 
+.dashbrd-widget-graph-link {
+
+	&:focus {
+
+		&:after {
+			background: $blue;
+			height: 3px;
+			bottom: -3px;
+		}
+	}
+}
+
 // SEVERITY STATUSES
 td.log-na-bg {
 	padding-left: 42px !important;
@@ -1018,7 +1030,8 @@ td.inactive-bg {
 // GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.2);
-	border: 2px solid rgba($font-color,0.6);
+	border: none;
+	outline: 2px solid rgba($font-color,0.6);
 }
 
 .ui-selectable-helper {

@@ -2228,6 +2228,19 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: inline-block;
     padding: 8px 0 8px 13px; }
 
+.dashbrd-widget-graph-link {
+  display: block; }
+  .dashbrd-widget-graph-link:link {
+    border: none; }
+  .dashbrd-widget-graph-link:focus:after {
+    content: "";
+    background: rgba(255, 255, 255, 0.35);
+    height: 2px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px; }
+
 .action-menu {
   position: absolute;
   z-index: 1000;
@@ -4920,6 +4933,11 @@ ul.top-nav-icons a:focus {
 .suggest-found {
   color: #ffd98c; }
 
+.dashbrd-widget-graph-link:focus:after {
+  background: white;
+  height: 3px;
+  bottom: -3px; }
+
 td.log-na-bg, td.log-info-bg, td.log-warning-bg, td.log-high-bg, td.log-disaster-bg {
   padding-left: 42px !important;
   color: #fff; }
@@ -5209,7 +5227,8 @@ td.inactive-bg {
 
 .graph-selection {
   background-color: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.6); }
+  border: none;
+  outline: 2px solid rgba(255, 255, 255, 0.6); }
 
 .ui-selectable-helper {
   background-color: rgba(255, 255, 255, 0.2);
