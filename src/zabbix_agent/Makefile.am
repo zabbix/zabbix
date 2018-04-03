@@ -44,14 +44,10 @@ zabbix_agentd_LDFLAGS = @AGENT_LDFLAGS@
 
 zabbix_agentd_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DLIBDIR="\"@libdir@\""
-
-AGENTD_CONFIG = zabbix_agentd.conf
-INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG).d
-MODULES_DIR = $(DESTDIR)@libdir@
+	-DDEFAULT_CONFIG_FILE="\"@AGENT_CONFIG_FILE@\"" \
+	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\""
 
 install-data-hook:
-	$(MKDIR_P) "$(INCLUDE_DIR)"
-	$(MKDIR_P) "$(MODULES_DIR)"
-	test -f "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)" || cp "../../conf/$(AGENTD_CONFIG)" "$(DESTDIR)@sysconfdir@"
+	$(MKDIR_P) "@AGENT_CONFIG_FILE@.d"
+	$(MKDIR_P) "@LOAD_MODULE_PATH@"
+	test -f "@AGENT_CONFIG_FILE@" || cp "../../conf/zabbix_agentd.conf" "@AGENT_CONFIG_FILE@"

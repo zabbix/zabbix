@@ -21,7 +21,8 @@
 
 if ($data['only_footer']) {
 	$output = [
-		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
+		'period_string' => $data['period_string']
 	];
 }
 elseif ($data['graph']['unavailable_object']) {
@@ -97,6 +98,10 @@ if ($data['widget']['initial_load'] == 1) {
 		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
 		'script_inline' => $script
 	];
+
+	if (array_key_exists('period_string', $data)) {
+		$output['period_string'] = $data['period_string'];
+	}
 }
 
 if (($messages = getMessages()) !== null) {

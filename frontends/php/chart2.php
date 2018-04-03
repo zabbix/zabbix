@@ -39,7 +39,9 @@ $fields = [
 	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
 	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
-	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'legend' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'widget_view' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -80,6 +82,11 @@ $timeline = calculateTime([
 CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 $graph = new CLineGraphDraw($dbGraph['graphtype']);
+
+if (getRequest('widget_view') === '1') {
+	$graph->draw_header = false;
+	$graph->with_vertical_padding = false;
+}
 
 // array sorting
 CArrayHelper::sort($dbGraph['gitems'], [
@@ -130,7 +137,7 @@ if ($height <= 0) {
 	$height = $dbGraph['height'];
 }
 
-$graph->showLegend($dbGraph['show_legend']);
+$graph->showLegend(getRequest('legend', $dbGraph['show_legend']));
 $graph->showWorkPeriod($dbGraph['show_work_period']);
 $graph->showTriggers($dbGraph['show_triggers']);
 $graph->setWidth($width);
@@ -158,7 +165,12 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 
 if (getRequest('onlyHeight', '0') === '1') {
 	$graph->drawDimensions();
-	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+	$height = $graph->getHeight();
+
+	if (getRequest('widget_view') === '1') {
+		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
+	}
+	header('X-ZBX-SBOX-HEIGHT: '.$height);
 }
 else {
 	$graph->draw();

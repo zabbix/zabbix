@@ -2330,11 +2330,13 @@ class CMap extends CMapElement {
 				}
 				unset($selement);
 
-				$selement_triggers = API::getApiService()->select('sysmap_element_trigger', [
-					'output' => ['selementid', 'triggerid'],
-					'filter' => ['selementid' => array_keys($selements)]
-				]);
-				foreach ($selement_triggers as $selement_trigger) {
+				$selement_triggers = DBselect(
+					'SELECT st.selementid,st.triggerid'.
+					' FROM sysmap_element_trigger st'.
+					' WHERE '.dbConditionInt('st.selementid', array_keys($selements)).
+					' ORDER BY st.selement_triggerid'
+				);
+				while ($selement_trigger = DBfetch($selement_triggers)) {
 					$selements[$selement_trigger['selementid']]['elements'][] = [
 						'triggerid' => $selement_trigger['triggerid']
 					];
@@ -2607,11 +2609,6 @@ class CMap extends CMapElement {
 					unset($link);
 				}
 				else {
-					foreach ($links as &$link) {
-						$link['permission'] = PERM_NONE;
-					}
-					unset($link);
-
 					$db_link_triggers = DBselect(
 						'SELECT slt.linkid,slt.triggerid'.
 						' FROM sysmaps_link_triggers slt'.
@@ -2619,10 +2616,17 @@ class CMap extends CMapElement {
 					);
 
 					$triggerids = [];
+					$has_triggers = [];
 
 					while ($db_link_trigger = DBfetch($db_link_triggers)) {
 						$triggerids[$db_link_trigger['triggerid']][] = $db_link_trigger['linkid'];
+						$has_triggers[$db_link_trigger['linkid']] = true;
 					}
+
+					foreach ($links as &$link) {
+						$link['permission'] = array_key_exists($link['linkid'], $has_triggers) ? PERM_NONE : PERM_READ;
+					}
+					unset($link);
 
 					$db_triggers = $triggerids
 						? API::Trigger()->get([

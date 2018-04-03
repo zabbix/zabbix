@@ -29,7 +29,8 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 		$this->setType(WIDGET_FAVOURITE_GRAPHS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -82,6 +83,7 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'graphs' => $graphs,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

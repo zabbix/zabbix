@@ -563,13 +563,6 @@ class CHistoryManager {
 				' GROUP BY '.$group_by
 			);
 
-			$sql = 'SELECT itemid,'.$sql_select.$sql_select_extra.',MAX(clock) AS clock'.
-				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-					' AND clock>='.zbx_dbstr($time_from).
-					' AND clock<='.zbx_dbstr($time_to).
-				' GROUP BY '.$group_by;
-
 			$data = [];
 			while (($row = DBfetch($result)) !== false) {
 				$data[] = $row;
