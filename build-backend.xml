@@ -276,15 +276,27 @@
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
 
 	<target name="mock-tests">
-		<!-- Build Zabbix server and proxy with C mock tests -->
+		<!-- Build Zabbix with C mock tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<exec executable="./configure" failonerror="on">
 			<arg line="-q"/>
 			<arg line="--enable-server"/>
-			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
+			<arg line="--enable-proxy"/>
+			<arg line="--enable-ipv6"/>
 			<arg line="--with-mysql"/>
+			<arg line="--with-jabber"/>
 			<arg line="--with-libxml2"/>
+			<arg line="--with-unixodbc"/>
+			<arg line="--with-net-snmp"/>
+			<arg line="--with-ssh2"/>
+			<arg line="--with-openipmi"/>
+			<arg line="--with-libevent"/>
+			<arg line="--with-mbedtls"/>
+			<arg line="--with-ldap"/>
+			<arg line="--with-libcurl"/>
+			<arg line="--with-iconv"/>
+			<arg line="--with-libpcre"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
