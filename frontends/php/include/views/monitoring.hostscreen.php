@@ -64,7 +64,7 @@ else {
 			(new CForm('get'))
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
-					->addItem($screenComboBox)
+					->addItem($screen_combobox)
 					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 				)
 			))

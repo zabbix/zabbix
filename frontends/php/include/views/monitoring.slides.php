@@ -20,7 +20,7 @@
 
 
 $widget = (new CWidget())
-	->setTitle(_('Slide shows!!'))
+	->setTitle(_('Slide shows'))
 	->addItem((new CList())
 	->addClass(ZBX_STYLE_OBJECT_GROUP)
 	->addItem([

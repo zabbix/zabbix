@@ -34,9 +34,6 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // header right
-$help = get_icon('overviewhelp');
-$help->setHint($help_hint);
-
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
 	->setControls((new CList([
@@ -68,7 +65,7 @@ $widget = (new CWidget())
 		),
 		(new CTag('nav', true, (new CList())
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-			->addItem($help)
+			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	])));
