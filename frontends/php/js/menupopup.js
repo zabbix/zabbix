@@ -494,6 +494,19 @@ function getMenuPopupRefresh(options) {
 						dataType: 'script',
 						success: function(js) { js }
 					});
+
+					jQuery('a', obj.closest('.action-menu')).each(function() {
+						var link = jQuery(this);
+
+						if (link.data('value') == currentRate) {
+							link.addClass('selected');
+						}
+						else {
+							link.removeClass('selected');
+						}
+					});
+
+					obj.closest('.action-menu').menuPopup('close', null);
 				}
 				else {
 					var url = new Curl('zabbix.php');
@@ -513,27 +526,28 @@ function getMenuPopupRefresh(options) {
 							]
 						},
 						success: function(resp) {
+							jQuery('a', obj.closest('.action-menu')).each(function() {
+								var link = jQuery(this);
+
+								if (link.data('value') == currentRate) {
+									link.addClass('selected');
+								}
+								else {
+									link.removeClass('selected');
+								}
+							});
+
+							obj.closest('.action-menu').menuPopup('close', null);
+
 							jQuery('.dashbrd-grid-widget-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
+							obj.closest('.action-menu').menuPopup('close', null);
 							// TODO: gentle message about failed saving of widget refresh rate
 						}
 					});
 				}
-
-				jQuery('a', obj.closest('.action-menu')).each(function() {
-					var link = jQuery(this);
-
-					if (link.data('value') == currentRate) {
-						link.addClass('selected');
-					}
-					else {
-						link.removeClass('selected');
-					}
-				});
-
-				obj.closest('.action-menu').menuPopup('close', null);
 			}
 		};
 
