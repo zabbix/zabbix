@@ -22,7 +22,7 @@
 class CWidgetFieldItem extends CWidgetField {
 
 	private $numeric = false;
-	private $multiple = false;
+	private $multiple = true;
 
 	/**
 	 * Create widget field for Items selection.

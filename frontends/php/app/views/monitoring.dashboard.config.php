@@ -142,7 +142,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 			'objectName' => 'items',
 			'data' => $data['captions']['ms']['items'][$field->getName()],
 			'multiple' => $field->isMultiple(),
-			'popup' => ['parameters' => $parameters]
+			'popup' => ['parameters' => $parameters],
+			'add_post_js' => false
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
