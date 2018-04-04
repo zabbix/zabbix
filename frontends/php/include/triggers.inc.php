@@ -2396,7 +2396,7 @@ function makeTriggerDependencies(array $triggers, $freeze_on_click = true) {
 
 	foreach ($triggerids_up as $triggerid_up => $triggerids) {
 		$table = (new CTableInfo())
-			->setAttribute('style', 'width: 200px;')
+			->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->setHeader([_('Depends on')]);
 
 		foreach ($triggerids as $triggerid) {
@@ -2414,7 +2414,7 @@ function makeTriggerDependencies(array $triggers, $freeze_on_click = true) {
 
 	foreach ($triggerids_down as $triggerid_down => $triggerids) {
 		$table = (new CTableInfo())
-			->setAttribute('style', 'width: 200px;')
+			->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->setHeader([_('Dependent')]);
 
 		foreach ($triggerids as $triggerid) {
