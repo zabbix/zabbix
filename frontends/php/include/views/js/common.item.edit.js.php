@@ -564,16 +564,19 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				url = parseUrlString(url_node.val())
 
 			if (typeof url === 'object') {
-				table.getTableRows().map(function() {
-					var empty = $(this).find('input[type="text"]').map(function() {
-						return $(this).val() == '' ? this : null;
-					});
+				if (url.pairs.length > 0) {
+					table.getTableRows().map(function() {
+						var empty = $(this).find('input[type="text"]').map(function() {
+							return $(this).val() == '' ? this : null;
+						});
 
-					return empty.length == 2 ? this : null;
-				}).map(function() {
-					table.removeRow(this);
-				});
-				table.addRows(url.pairs);
+						return empty.length == 2 ? this : null;
+					}).map(function() {
+						table.removeRow(this);
+					});
+					table.addRows(url.pairs);
+				}
+
 				url_node.val(url.url);
 			}
 			else {

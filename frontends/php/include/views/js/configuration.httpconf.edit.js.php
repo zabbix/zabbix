@@ -631,13 +631,14 @@
 			url = parseUrlString(target.val());
 
 		if (typeof url === 'object') {
-			if (url.pairs.length) {
+			if (url.pairs.length > 0) {
 				pairManager.cleanup(formid, 'query_fields');
+				jQuery.each(url.pairs, function(i, pair) {
+					pair.type = 'query_fields';
+					pairManager.addNew(formid, pair);
+				})
 			}
-			jQuery.each(url.pairs, function(i, pair) {
-				pair.type = 'query_fields';
-				pairManager.addNew(formid, pair);
-			})
+
 			target.val(url.url);
 		}
 		else {
