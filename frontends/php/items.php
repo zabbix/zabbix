@@ -1121,11 +1121,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 					$item['preprocessing'] = $preprocessing;
 				}
-				foreach ($item as $key => $field) {
-					if ($field === null) {
-						unset($item[$key]);
-					}
-				}
+
+				$item = array_intersect_key($item, $visible);
 
 				$discovered_item = [];
 				if (hasRequest('status')) {
