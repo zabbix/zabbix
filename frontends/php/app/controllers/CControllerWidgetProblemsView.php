@@ -86,6 +86,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable'],
+				'problem_unack_style' => $config['problem_unack_style'],
+				'problem_ack_style' => $config['problem_ack_style'],
 				'blink_period' => timeUnitToSeconds($config['blink_period'])
 			],
 			'data' => $data,

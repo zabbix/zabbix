@@ -2244,15 +2244,15 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -4px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -39px -617px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -39px -580px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -6px -618px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -6px -654px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -6px -689px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -42px -619px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -42px -582px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -6px -546px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -6px -582px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -6px -474px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -6px -510px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -2282,8 +2282,9 @@ $icon-widget-btn: (
 }
 
 %btn-widget {
-	width: 30px;
-	height: 28px;
+	width: 24px;
+	height: 24px;
+	margin: 2px 2px 0 0;
 	@extend %btn-widget-defaults;
 }
 
@@ -2306,7 +2307,6 @@ $icon-widget-btn: (
 	}
 
 	&:focus {
-		@include box-shadow(none);
 		@extend %btn-widget-hover-active;
 	}
 
@@ -3175,6 +3175,27 @@ $form-icon-btn: (
 	}
 }
 
+.dashbrd-widget-graph-link {
+	display: block;
+
+	&:link {
+		border: none;
+	}
+
+	&:focus {
+
+		&:after {
+			content: "";
+			background: rgba($blue, .35);
+			height: 2px;
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: -2px;
+		}
+	}
+}
+
 // Action Menus, Pop-up Menus
 .action-menu {
 	position: absolute;
@@ -3324,7 +3345,7 @@ $form-icon-btn: (
 		& > .overlay-close-btn {
 			position: relative;
 			float: right;
-			top: -12px;
+			top: -13px;
 			right: -8px;
 		}
 	}
@@ -5019,6 +5040,10 @@ svg {
 						border: 0px none;
 						opacity: 0.5;
 						float: left;
+
+						&::-moz-focus-inner {
+							padding: 0;
+						}
 					}
 					.edit-item-btn:hover,
 					.remove-item-btn:hover,
