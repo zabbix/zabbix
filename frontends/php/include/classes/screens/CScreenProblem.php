@@ -798,7 +798,7 @@ class CScreenProblem extends CScreenBase {
 
 			// Make trigger dependencies.
 			if ($data['triggers']) {
-				$dependencies = makeTriggerDependencies($data['triggers']);
+				$dependencies = getTriggerDependencies($data['triggers']);
 			}
 
 			foreach ($data['problems'] as $eventid => $problem) {
@@ -884,7 +884,7 @@ class CScreenProblem extends CScreenBase {
 				];
 
 				$description = array_key_exists($trigger['triggerid'], $dependencies)
-					? $dependencies[$trigger['triggerid']]
+					? makeTriggerDependencies($dependencies[$trigger['triggerid']])
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
 					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, null, $options));

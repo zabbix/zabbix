@@ -759,7 +759,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 	// Make trigger dependencies.
 	if ($triggers) {
-		$dependencies = makeTriggerDependencies($triggers, false);
+		$dependencies = getTriggerDependencies($triggers);
 	}
 
 	foreach ($triggers as $trigger) {
@@ -877,7 +877,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @see getTriggersOverview()
  *
  * @param array  $trigger
- * @param array  $dependencies  The list of trigger dependencies, prepared by makeTriggerDependencies() function.
+ * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
  * @param string $pageFile      The page where the element is displayed.
  * @param string $screenid
  *
@@ -926,7 +926,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 		}
 
 		$desc = array_key_exists($trigger['triggerid'], $dependencies)
-			? $dependencies[$trigger['triggerid']]
+			? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
 			: [];
 	}
 
@@ -2351,11 +2351,10 @@ function getTriggerLastProblems(array $triggerids, array $output) {
  * @param array  $triggers
  * @param array  $triggers[<triggerid>]['dependencies']
  * @param string $triggers[<triggerid>]['dependencies'][]['triggerid']
- * @param bool   $freeze_on_click
  *
  * @return array
  */
-function makeTriggerDependencies(array $triggers, $freeze_on_click = true) {
+function getTriggerDependencies(array $triggers) {
 	$triggerids = [];
 	$triggerids_up = [];
 	$triggerids_down = [];
@@ -2391,44 +2390,59 @@ function makeTriggerDependencies(array $triggers, $freeze_on_click = true) {
 		'triggerids' => array_keys($triggerids),
 		'preservekeys' => true
 	]);
-
 	$db_triggers = CMacrosResolverHelper::resolveTriggerNames($db_triggers);
 
 	foreach ($triggerids_up as $triggerid_up => $triggerids) {
-		$table = (new CTableInfo())
-			->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-			->setHeader([_('Depends on')]);
-
 		foreach ($triggerids as $triggerid) {
-			$table->addRow(array_key_exists($triggerid, $db_triggers)
+			$dependencies[$triggerid_up]['down'][] = array_key_exists($triggerid, $db_triggers)
 				? $db_triggers[$triggerid]['description']
-				: _('Inaccessible trigger')
-			);
+				: _('Inaccessible trigger');
 		}
-
-		$dependencies[$triggerid_up][] = (new CSpan())
-			->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
-			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint($table, '', $freeze_on_click);
 	}
 
 	foreach ($triggerids_down as $triggerid_down => $triggerids) {
-		$table = (new CTableInfo())
-			->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-			->setHeader([_('Dependent')]);
-
 		foreach ($triggerids as $triggerid) {
-			$table->addRow(array_key_exists($triggerid, $db_triggers)
+			$dependencies[$triggerid_down]['up'][] = array_key_exists($triggerid, $db_triggers)
 				? $db_triggers[$triggerid]['description']
-				: _('Inaccessible trigger')
-			);
+				: _('Inaccessible trigger');
 		}
-
-		$dependencies[$triggerid_down][] = (new CSpan())
-			->addClass(ZBX_STYLE_ICON_DEPEND_UP)
-			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint($table, '', $freeze_on_click);
 	}
 
 	return $dependencies;
+}
+
+/**
+ * Returns icons with tooltips for triggers with dependencies.
+ *
+ * @param array  $dependencies
+ * @param array  $dependencies['up']    (optional) The list of "Dependent" triggers.
+ * @param array  $dependencies['down']  (optional) The list of "Depeneds on" triggers.
+ * @param bool   $freeze_on_click
+ *
+ * @return array
+ */
+function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
+	$result = [];
+
+	foreach (['down', 'up'] as $type) {
+		if (array_key_exists($type, $dependencies)) {
+			$header = ($type === 'down') ? _('Depends on') : _('Dependent');
+			$class = ($type === 'down') ? ZBX_STYLE_ICON_DEPEND_DOWN : ZBX_STYLE_ICON_DEPEND_UP;
+
+			$table = (new CTableInfo())
+				->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->setHeader([$header]);
+
+			foreach ($dependencies[$type] as $description) {
+				$table->addRow($description);
+			}
+
+			$result[] = (new CSpan())
+				->addClass($class)
+				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->setHint($table, '', $freeze_on_click);
+		}
+	}
+
+	return $result;
 }
