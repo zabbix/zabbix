@@ -1226,7 +1226,7 @@ int	is_discovery_macro(const char *name);
 int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);
 
-int	parse_key(char **exp);
+int	parse_key(const char **exp);
 
 int	parse_host_key(char *exp, char **host, char **key);
 
