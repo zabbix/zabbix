@@ -185,7 +185,7 @@ jQuery(function($) {
 				'Select': 'Select'
 			},
 			data: [],
-			onlyHostid: 0,
+			only_hostid: 0,
 			ignored: {},
 			addNew: false,
 			defaultValue: null,
@@ -309,8 +309,8 @@ jQuery(function($) {
 											limit: getLimit(values, options)
 										}
 
-										if (options.onlyHostid > 0) {
-											request_data.only_hostid = options.onlyHostid;
+										if (options.only_hostid > 0) {
+											request_data.only_hostid = options.only_hostid;
 										}
 
 										jqxhr = $.ajax({
@@ -559,7 +559,7 @@ jQuery(function($) {
 				var popup_options = options.popup.parameters;
 
 				if (typeof popup_options['only_hostid'] !== 'undefined') {
-					options.onlyHostid = popup_options['only_hostid'];
+					options.only_hostid = popup_options['only_hostid'];
 				}
 
 				if (options.ignored) {

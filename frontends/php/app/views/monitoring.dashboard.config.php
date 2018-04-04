@@ -77,8 +77,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 					'srctbl' => 'host_groups',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => $field->getName().'_',
-					'srcfld1' => 'groupid',
-					'multiselect' => '1'
+					'srcfld1' => 'groupid'
 				]
 			],
 			'add_post_js' => false
@@ -104,8 +103,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 					'srctbl' => 'hosts',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => $field->getName().'_',
-					'srcfld1' => 'hostid',
-					'multiselect' => '1'
+					'srcfld1' => 'hostid'
 				]
 			],
 			'add_post_js' => false
