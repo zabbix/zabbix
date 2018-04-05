@@ -140,9 +140,12 @@ $itemFormList->addRow(
 			->setAttribute('type', 'text/x-jquery-tmpl')
 			->addItem(new CRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
+					->setAttribute('placeholder', _('name'))
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
 				(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
+					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
 					->setEnabled(!$readonly)
@@ -232,9 +235,13 @@ $itemFormList->addRow(
 			->setAttribute('type', 'text/x-jquery-tmpl')
 			->addItem(new CRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
+					->setAttribute('placeholder', _('name'))
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly))
+					->setAttribute('placeholder', _('value'))
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->setEnabled(!$readonly)

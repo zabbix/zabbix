@@ -944,16 +944,12 @@ function prepareItemHttpAgentFormData(array $item) {
 		$query_fields = [];
 
 		foreach ($item['query_fields']['name'] as $index => $key) {
-			if (array_key_exists($index, $item['query_fields']['value'])) {
-				$query_fields[] = [$key => $item['query_fields']['value'][$index]];
+			$value = $item['query_fields']['value'][$index];
+
+			if ($key !== '' || $value !== '') {
+				$query_fields[] = [$key => $value];
 			}
 		}
-
-		// Ignore single row if it is empty.
-		if (count($query_fields) == 1 && $key === '' && $item['query_fields']['value'][$index] === '') {
-			$query_fields = [];
-		}
-
 		$item['query_fields'] = $query_fields;
 	}
 
@@ -961,14 +957,11 @@ function prepareItemHttpAgentFormData(array $item) {
 		$headers = [];
 
 		foreach ($item['headers']['name'] as $index => $key) {
-			if (array_key_exists($index, $item['headers']['value'])) {
-				$headers[$key] = $item['headers']['value'][$index];
-			}
-		}
+			$value = $item['headers']['value'][$index];
 
-		// Ignore single row if it is empty.
-		if (count($headers) == 1 && $key === '' && $item['headers']['value'][$index] === '') {
-			$headers = [];
+			if ($key !== '' || $value !== '') {
+				$headers[$key] = $value;
+			}
 		}
 
 		$item['headers'] = $headers;

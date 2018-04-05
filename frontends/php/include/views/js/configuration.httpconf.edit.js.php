@@ -632,11 +632,11 @@
 
 		if (typeof url === 'object') {
 			if (url.pairs.length > 0) {
-				pairManager.cleanup(formid, 'query_fields');
 				jQuery.each(url.pairs, function(i, pair) {
 					pair.type = 'query_fields';
 					pairManager.addNew(formid, pair);
-				})
+				});
+				pairManager.cleanup(formid, 'query_fields');
 			}
 
 			target.val(url.url);

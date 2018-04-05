@@ -565,6 +565,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 
 			if (typeof url === 'object') {
 				if (url.pairs.length > 0) {
+					table.addRows(url.pairs);
 					table.getTableRows().map(function() {
 						var empty = $(this).find('input[type="text"]').map(function() {
 							return $(this).val() == '' ? this : null;
@@ -574,7 +575,6 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 					}).map(function() {
 						table.removeRow(this);
 					});
-					table.addRows(url.pairs);
 				}
 
 				url_node.val(url.url);
