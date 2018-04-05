@@ -1023,7 +1023,7 @@ jQuery(function($) {
 				mapContainer = null,
 				target = event.target;
 
-			if (event.type == 'contextmenu' || (IE && opener.closest('svg').length > 0)
+			if (event.type === 'contextmenu' || (IE && opener.closest('svg').length > 0)
 					|| event.originalEvent.detail !== 0) {
 				target = event;
 			}
