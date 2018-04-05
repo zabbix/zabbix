@@ -1530,32 +1530,34 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Delete actions.
-	 *
 	 * @param array $actionids
 	 *
 	 * @return array
 	 */
 	public function delete(array $actionids) {
-		if (empty($actionids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $actionids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$delActions = $this->get([
+		$db_actions = $this->get([
+			'output' => ['actionid', 'name'],
 			'actionids' => $actionids,
 			'editable' => true,
-			'output' => ['actionid'],
 			'preservekeys' => true
 		]);
+
 		foreach ($actionids as $actionid) {
-			if (isset($delActions[$actionid])) {
-				continue;
+			if (!array_key_exists($actionid, $db_actions)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		DB::delete('actions', ['actionid' => $actionids]);
-		DB::delete('alerts', ['actionid' => $actionids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, $db_actions);
 
 		return ['actionids' => $actionids];
 	}

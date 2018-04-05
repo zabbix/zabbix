@@ -652,15 +652,6 @@ if (hasRequest('form')) {
 		}
 	}
 
-	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-		$data['action']['filter']['conditions'] = [[
-			'formulaid' => 'A',
-			'conditiontype' => CONDITION_TYPE_MAINTENANCE,
-			'operator' => CONDITION_OPERATOR_NOT_IN,
-			'value' => ''
-		]];
-	}
-
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
 	$data['allowedOperations'] = getAllowedOperations($data['eventsource']);
 

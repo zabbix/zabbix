@@ -608,7 +608,7 @@ void	zbx_preprocessor_unpack_result(zbx_variant_t *value, zbx_item_history_value
 static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size,
 		zbx_ipc_message_t *response)
 {
-	char 			*error;
+	char			*error = NULL;
 	static zbx_ipc_socket_t	socket = {0};
 
 	/* each process has a permanent connection to preprocessing manager */

@@ -62,8 +62,6 @@
 #include "../zabbix_server/ipmi/ipmi_poller.h"
 #endif
 
-#define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_proxy.conf"
-
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
@@ -100,6 +98,14 @@ const char	*help_message[] = {
 	"",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
+	"",
+	"Some configuration parameter default locations:",
+	"  ExternalScripts                \"" DEFAULT_EXTERNAL_SCRIPTS_PATH "\"",
+#ifdef HAVE_LIBCURL
+	"  SSLCertLocation                \"" DEFAULT_SSL_CERT_LOCATION "\"",
+	"  SSLKeyLocation                 \"" DEFAULT_SSL_KEY_LOCATION "\"",
+#endif
+	"  LoadModulePath                 \"" DEFAULT_LOAD_MODULE_PATH "\"",
 	NULL	/* end of text */
 };
 
@@ -428,16 +434,16 @@ static void	zbx_set_defaults(void)
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 #endif
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
 
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
-		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
 #ifdef HAVE_LIBCURL
 	if (NULL == CONFIG_SSL_CERT_LOCATION)
-		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DATADIR "/zabbix/ssl/certs");
+		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DEFAULT_SSL_CERT_LOCATION);
 
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
-		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
+		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
 #endif
 	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
 		CONFIG_HEARTBEAT_FORKS = 0;

@@ -3810,13 +3810,15 @@ static size_t	zbx_no_function(const char *expr)
  *             lpp_len    - [OUT] length of the last parsed parameter         *
  *                                                                            *
  * Return value: SUCCEED -  closing parenthesis was found or other custom     *
- *                          terminator and not quoted                         *
- *               FAIL    -  does not look like a valid                        *
- *                          function parameter list                           *
+ *                          terminator and not quoted and return info about a *
+ *                          last processed parameter.                         *
+ *               FAIL    -  does not look like a valid function parameter     *
+ *                          list and return info about a last processed       *
+ *                          parameter.                                        *
  *                                                                            *
  ******************************************************************************/
 static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r, size_t *lpp_offset,
-			size_t *lpp_len)
+		size_t *lpp_len)
 {
 #define ZBX_FUNC_PARAM_NEXT		0
 #define ZBX_FUNC_PARAM_QUOTED		1
@@ -3825,6 +3827,8 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 
 	const char	*ptr;
 	int		state = ZBX_FUNC_PARAM_NEXT;
+
+	*lpp_offset = 0;
 
 	for (ptr = expr; '\0' != *ptr; ptr++)
 	{
@@ -3902,7 +3906,7 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
  *                                                                            *
  ******************************************************************************/
 static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r, size_t *lpp_offset,
-			size_t *lpp_len)
+		size_t *lpp_len)
 {
 	if (SUCCEED == function_validate_parameters(expr + par_l + 1, ')', par_r, lpp_offset, lpp_len))
 	{
@@ -3956,7 +3960,7 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  ******************************************************************************/
 static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len)
 {
-	size_t	lpp_offset = 0, lpp_len;
+	size_t	lpp_offset, lpp_len;
 
 	/* try to validate function name */
 	if (SUCCEED != function_parse_name(expr, par_l))

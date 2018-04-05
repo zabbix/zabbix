@@ -535,6 +535,7 @@ function getOverlayDialogueId() {
 function overlayDialogue(params, trigger_elmnt, xhr) {
 	var button_focused = null,
 		cancel_action = null,
+		submit_btn = null,
 		overlay_dialogue = null,
 		overlay_bg = null,
 		overlay_dialogue_footer = jQuery('<div>', {
@@ -583,8 +584,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
 		body_mutation_observer = new body_mutation_observer(function(mutation) {
 			center_overlay_dialog();
-		}),
-		submit_btn = null;
+		});
 
 	jQuery.each(params.buttons, function(index, obj) {
 		var button = jQuery('<button>', {
@@ -637,7 +637,6 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			})
 				.click(function() {
 					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
-
 					return false;
 				})
 		)
@@ -702,7 +701,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		button_focused.focus();
 	}
 
-	// Don't focus element in overlay, if the button is already focused.
+	// Don't focus element in overlay, if button is already focused.
 	overlayDialogueOnLoad(!button_focused, jQuery('.overlay-dialogue[data-dialogueid="'+params.dialogueid+'"]'));
 }
 
@@ -737,7 +736,6 @@ function overlayDialogueOnLoad(focus, overlay) {
 				// TAB and SHIFT
 				if (e.which == 9 && e.shiftKey) {
 					last_focusable.focus();
-
 					return false;
 				}
 			});
@@ -748,7 +746,6 @@ function overlayDialogueOnLoad(focus, overlay) {
 				// TAB and not SHIFT
 				if (e.which == 9 && !e.shiftKey) {
 					first_focusable.focus();
-
 					return false;
 				}
 			});
@@ -803,6 +800,8 @@ function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 				}
 			]
 		}, trigger_elmnt);
+
+		return false;
 	}
 	else {
 		execute();
