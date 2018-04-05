@@ -1,6 +1,9 @@
 Changes for 4.0.0alpha6
 
 New features:
+A......... [ZBX-3783] added strict validation for apiinfo.version(), action.delete(), correlation.delete() and drile.delete() methods (Sasha)
+A......... [ZBX-3783] prohibited deleting discovery rules which are used in actions (Sasha)
+A......... [ZBX-3783] added audit for action.delete() and correlation.delete() methods (Sasha)
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
