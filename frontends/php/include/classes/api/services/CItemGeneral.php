@@ -1942,6 +1942,13 @@ abstract class CItemGeneral extends CApiService {
 			];
 		}
 
+		if (array_key_exists('trapper_hosts', $item) && $item['trapper_hosts'] !== ''
+				&& (!array_key_exists('allow_traps', $data) || $data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', _('should be empty'))
+			);
+		}
+
 		// Keep values only for fields with defined validation rules.
 		$data = array_intersect_key($data, $rules);
 
