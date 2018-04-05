@@ -75,6 +75,7 @@ require_once dirname(__FILE__).'/testFormAdministrationUserCreate.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
 require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
+require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHost.php';
@@ -174,6 +175,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormDiscoveryRule');
+		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHost');

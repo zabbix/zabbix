@@ -66,8 +66,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	if (SUCCEED == zbx_is_export_enabled())
 	{
-		zbx_history_export_init("hystory-syncer", process_num);
-		zbx_problems_export_init("hystory-syncer", process_num);
+		zbx_history_export_init("history-syncer", process_num);
+		zbx_problems_export_init("history-syncer", process_num);
 	}
 
 	for (;;)

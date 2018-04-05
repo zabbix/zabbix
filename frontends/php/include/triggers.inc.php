@@ -727,30 +727,32 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *
- * @param array  $hosts                         an array of hosts with host IDs as keys
+ * @param array  $hosts                        An array of hosts with host IDs as keys.
  * @param string $hosts[hostid][name]
  * @param string $hosts[hostid][hostid]
  * @param array  $triggers
- * @param string $triggers[<triggerid>]['triggerid']
- * @param string $triggers[<triggerid>]['description']
- * @param string $triggers[<triggerid>]['expression']
- * @param int    $triggers[<triggerid>]['value']
- * @param int    $triggers[<triggerid>]['lastchange']
- * @param int    $triggers[<triggerid>]['flags']
- * @param array  $triggers[<triggerid>]['url']
- * @param int    $triggers[<triggerid>]['priority']
- * @param array  $triggers[<triggerid>]['hosts']
- * @param string $triggers[<triggerid>]['hosts'][]['hostid']
- * @param string $triggers[<triggerid>]['hosts'][]['name']
+ * @param string $triggers[<triggerid>][triggerid]
+ * @param string $triggers[<triggerid>][description]
+ * @param string $triggers[<triggerid>][expression]
+ * @param int    $triggers[<triggerid>][value]
+ * @param int    $triggers[<triggerid>][lastchange]
+ * @param int    $triggers[<triggerid>][flags]
+ * @param array  $triggers[<triggerid>][url]
+ * @param int    $triggers[<triggerid>][priority]
+ * @param array  $triggers[<triggerid>][hosts]
+ * @param string $triggers[<triggerid>][hosts][][hostid]
+ * @param string $triggers[<triggerid>][hosts][][name]
  * @param array  $triggers[<triggerid>]['dependencies']
  * @param string $triggers[<triggerid>]['dependencies'][]['triggerid']
- * @param string $pageFile                      the page where the element is displayed
- * @param int    $viewMode                      table display style: either hosts on top, or host on the left side
- * @param string $screenId                      the ID of the screen, that contains the trigger overview table
+ * @param string $pageFile                     The page where the element is displayed.
+ * @param int    $viewMode                     Table display style: either hosts on top, or host on the left side.
+ * @param string $screenId                     The ID of the screen, that contains the trigger overview table.
+ * @param bool   $fullscreen                   Display mode.
  *
  * @return CTableInfo
  */
-function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
+function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null,
+		$fullscreen = false) {
 	$data = [];
 	$host_names = [];
 	$trcounter = [];
@@ -826,7 +828,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				foreach ($host_names as $host_name) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId
+						$dependencies, $pageFile, $screenId, $fullscreen
 					);
 				}
 				$triggerTable->addRow($columns);
@@ -852,14 +854,14 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 		foreach ($host_names as $hostId => $host_name) {
 			$name = (new CLinkAction($host_name))
-				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId
+						$dependencies, $pageFile, $screenId, $fullscreen
 					);
 				}
 			}
@@ -880,10 +882,11 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
  * @param string $pageFile      The page where the element is displayed.
  * @param string $screenid
+ * @param bool   $fullscreen    Display mode.
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null) {
+function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null, $fullscreen = false) {
 	$ack = null;
 	$css = null;
 	$desc = null;
@@ -949,7 +952,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$options = ['description_enabled' => $trigger['description_enabled']];
+		$options = ['description_enabled' => $trigger['description_enabled'], 'fullscreen' => $fullscreen];
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options));
 	}
 
@@ -2222,12 +2225,13 @@ function getTriggersHostsList(array $triggers) {
  * @param string $triggers_hosts[<triggerid>][]['maintenanceid']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_status']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
- * @param int    $triggers_hosts[<triggerid>][]['graphs']             the number of graphs
- * @param int    $triggers_hosts[<triggerid>][]['screens']            the number of screens
+ * @param int    $triggers_hosts[<triggerid>][]['graphs']              The number of graphs.
+ * @param int    $triggers_hosts[<triggerid>][]['screens']             The number of screens.
+ * @param bool   $fullscreen				                           Fullscreen mode.
  *
  * @return array
  */
-function makeTriggersHostsList(array $triggers_hosts) {
+function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 	$db_maintenances = [];
 	$scripts_by_hosts = [];
 
@@ -2262,9 +2266,8 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			$scripts_by_host = array_key_exists($host['hostid'], $scripts_by_hosts)
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
-
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true, $fullscreen));
 
 			// add maintenance icon with hint if host is in maintenance
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {

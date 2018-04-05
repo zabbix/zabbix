@@ -107,7 +107,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 					$param_type_element = new CComboBox('paramtype', $data['paramtype'], null, $param_function['M']);
 				}
 				else {
-					$expression_form->addVar('paramtype', PARAM_TYPE_TIME);
+					$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
 					$param_type_element = _('Time');
 				}
 			}
@@ -136,7 +136,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 			$expression_form_list->addRow($param_function['C'],
 				(new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			);
-			$expression_form->addVar('paramtype', PARAM_TYPE_TIME);
+			$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
 		}
 	}
 }

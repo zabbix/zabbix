@@ -24,45 +24,57 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for item history menu popup.
 	 *
-	 * @param array $item				item data
-	 * @param int   $item['itemid']		item id
-	 * @param int   $item['value_type']	item value type
+	 * @param array $item                Item data.
+	 * @param int   $item['itemid']      Item ID.
+	 * @param int   $item['value_type']  Item value type.
+	 * @param bool  $fullscreen          Fullscreen mode.
 	 *
 	 * @return array
 	 */
-	public static function getHistory(array $item) {
-		return [
+	public static function getHistory(array $item, $fullscreen = false) {
+		$data = [
 			'type' => 'history',
 			'itemid' => $item['itemid'],
 			'hasLatestGraphs' => in_array($item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
 		];
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
+		}
+
+		return $data;
 	}
 
 	/**
 	 * Prepare data for host menu popup.
 	 *
-	 * @param array  $host						host data
-	 * @param string $host['hostid']			host id
-	 * @param string $host['status']			host status
-	 * @param array  $host['graphs']			host graphs
-	 * @param array  $host['screens']			host screens
-	 * @param array  $scripts					host scripts (optional)
-	 * @param string $scripts[]['name']			script name
-	 * @param string $scripts[]['scriptid']		script id
-	 * @param string $scripts[]['confirmation']	confirmation text
-	 * @param bool   $hasGoTo					"Go to" block in popup
+	 * @param array  $host                       Host data.
+	 * @param string $host['hostid']             Host ID.
+	 * @param string $host['status']             Host status.
+	 * @param array  $host['graphs']             Host graphs.
+	 * @param array  $host['screens']            Host screens.
+	 * @param array  $scripts                    Host scripts (optional).
+	 * @param string $scripts[]['name']          Script name.
+	 * @param string $scripts[]['scriptid']      Script ID.
+	 * @param string $scripts[]['confirmation']  Confirmation text.
+	 * @param bool   $has_goto                   "Go to" block in popup.
+	 * @param bool   $fullscreen                 Fullscreen mode.
 	 *
 	 * @return array
 	 */
-	public static function getHost(array $host, array $scripts = null, $hasGoTo = true) {
+	public static function getHost(array $host, array $scripts = null, $has_goto = true, $fullscreen = false) {
 		$data = [
 			'type' => 'host',
 			'hostid' => $host['hostid'],
 			'showGraphs' => (bool) $host['graphs'],
 			'showScreens' => (bool) $host['screens'],
 			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
-			'hasGoTo' => $hasGoTo
+			'hasGoTo' => $has_goto
 		];
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
+		}
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
@@ -87,27 +99,34 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for map menu popup.
 	 *
-	 * @param string $hostId					host id
-	 * @param array  $scripts					host scripts (optional)
-	 * @param string $scripts[]['name']			script name
-	 * @param string $scripts[]['scriptid']		script id
-	 * @param string $scripts[]['confirmation']	confirmation text
-	 * @param array  $gotos						goto links (optional)
-	 * @param array  $gotos['graphs']			link to host graphs page with url parameters ("name" => "value") (optional)
-	 * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value") (optional)
-	 * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value") (optional)
-	 * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value") (optional)
-	 * @param array  $gotos['events']			link to events page with url parameters ("name" => "value") (optional)
-	 * @param array  $urls						local and global map urls (optional)
-	 * @param string $urls[]['name']			url name
-	 * @param string $urls[]['url']				url
+	 * @param string $hostId                     Host ID.
+	 * @param array  $scripts                    Host scripts.
+	 * @param string $scripts[]['name']          Script name.
+	 * @param string $scripts[]['scriptid']      Script ID.
+	 * @param string $scripts[]['confirmation']  Confirmation text.
+	 * @param array  $gotos                      Enable goto links.
+	 * @param array  $gotos['graphs']            Link to host graphs page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['screens']           Link to host screen page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['triggerStatus']     Link to trigger status page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['submap']            Link to submap page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['events']            Link to events page with url parameters ("name" => "value") (optional).
+	 * @param array  $urls                       Local and global map links (optional).
+	 * @param string $urls[]['name']             Link name.
+	 * @param string $urls[]['url']              Link url.
+	 * @param bool   $fullscreen                 Fullscreen mode.
 	 *
 	 * @return array
 	 */
-	public static function getMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
+	public static function getMap($hostId, array $scripts = null, array $gotos = null, array $urls = null,
+			$fullscreen = false) {
+
 		$data = [
 			'type' => 'map'
 		];
+
+		if ($fullscreen) {
+			$data['fullscreen'] = true;
+		}
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
@@ -166,27 +185,28 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for trigger menu popup.
 	 *
-	 * @param array  $trigger							trigger data
-	 * @param string $trigger['triggerid']				trigger ID
-	 * @param int    $trigger['flags']					trigger flags (TRIGGER_FLAG_DISCOVERY*)
-	 * @param array  $trigger['hosts']					hosts, used by trigger expression
-	 * @param string $trigger['hosts'][]['hostid']		host ID
-	 * @param string $trigger['hosts'][]['name']		host name
-	 * @param string $trigger['hosts'][]['status']		host status
-	 * @param array  $trigger['items']					trigger items
-	 * @param string $trigger['items'][]['itemid']		item ID
-	 * @param string $trigger['items'][]['hostid']		host ID
-	 * @param string $trigger['items'][]['name']		item name
-	 * @param string $trigger['items'][]['key_']		item key
-	 * @param string $trigger['items'][]['value_type']	type of information of the item
-	 * @param string $trigger['url']					trigger URL
-	 * @param array  $acknowledge						acknowledge link parameters (optional)
-	 * @param string $acknowledge['eventid']			event ID
-	 * @param string $acknowledge['screenid']			screen ID (optional)
-	 * @param string $acknowledge['backurl']			return URL (optional)
+	 * @param array  $trigger                           Trigger data.
+	 * @param string $trigger['triggerid']              Trigger ID.
+	 * @param int    $trigger['flags']                  Trigger flags (TRIGGER_FLAG_DISCOVERY*).
+	 * @param array  $trigger['hosts']                  Hosts, used by trigger expression.
+	 * @param string $trigger['hosts'][]['hostid']      Host ID.
+	 * @param string $trigger['hosts'][]['name']        Host name.
+	 * @param string $trigger['hosts'][]['status']      Host status.
+	 * @param array  $trigger['items']                  Trigger items.
+	 * @param string $trigger['items'][]['itemid']      Item ID.
+	 * @param string $trigger['items'][]['hostid']      Host ID.
+	 * @param string $trigger['items'][]['name']        Item name.
+	 * @param string $trigger['items'][]['key_']        Item key.
+	 * @param string $trigger['items'][]['value_type']  Type of information of the item.
+	 * @param string $trigger['url']                    Trigger URL.
+	 * @param array  $acknowledge                       Acknowledge link parameters (optional).
+	 * @param string $acknowledge['eventid']            Event ID.
+	 * @param string $acknowledge['screenid']           Screen ID (optional).
+	 * @param string $acknowledge['backurl']            Return URL (optional).
 	 * @param array  $options
 	 * @param bool   $options['show_description']       (optional) default: true
 	 * @param bool   $options['description_enabled']    (optional) default: true
+	 * @param bool   $options['fullscreen']             (optional) default: false
 	 *
 	 * @return array
 	 */
@@ -241,6 +261,10 @@ class CMenuPopupHelper {
 		}
 		else if (array_key_exists('description_enabled', $options) && $options['description_enabled'] === false) {
 			$data['description_enabled'] = false;
+		}
+
+		if (array_key_exists('fullscreen', $options) && $options['fullscreen'] === true) {
+			$data['fullscreen'] = true;
 		}
 
 		if ($acknowledge !== null) {
