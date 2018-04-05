@@ -1923,7 +1923,8 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		// Strict validation for 'retrieve_mode' only for create action.
-		if (!$db_item && array_key_exists('request_method', $data) && $data['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+		if (array_key_exists('request_method', $data) && $data['request_method'] == HTTPCHECK_REQUEST_HEAD
+				&& array_key_exists('retrieve_mode', $item)) {
 			$rules['retrieve_mode']['in'] = (string) HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 		}
 

@@ -928,11 +928,14 @@ function getItemFilterForm(&$items) {
  * - Converts 'headers' from array of keys and array of values to hash map.
  * - For request method HEAD set retrieve mode to retrieve only headers.
  *
- * @param array $item   Array of form fields data for ITEM_TYPE_HTTPAGENT item.
+ * @param array $item                       Array of form fields data for ITEM_TYPE_HTTPAGENT item.
+ * @param int   $item['request_method']     Request method type.
+ * @param array $item['query_fields']       Array of 'name' and 'value' arrays for URL query fields.
+ * @param array $item['headers']            Array of 'name' and 'value' arrays for headers.
  *
  * @return array
  */
-function prepareItemHttpAgentFormData($item) {
+function prepareItemHttpAgentFormData(array $item) {
 	if ($item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
 		$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 	}

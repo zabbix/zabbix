@@ -369,6 +369,11 @@ class CItemPrototype extends CItemGeneral {
 				if (array_key_exists('headers', $item)) {
 					$item['headers'] = $this->headersArrayToString($item['headers']);
 				}
+
+				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
+						&& !array_key_exists('retrieve_mode', $item)) {
+					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+				}
 			}
 			else {
 				$item['query_fields'] = '';
