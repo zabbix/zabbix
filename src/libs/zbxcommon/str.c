@@ -801,6 +801,11 @@ int	zbx_check_hostname(const char *hostname, char **error)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
+ * Comments: the pointer is advanced to the first invalid character even if   *
+ *           FAIL is returned (meaning there is a syntax error in item key).  *
+ *           If necessary, the caller must keep a copy of pointer original    *
+ *           value.                                                           *
+ *                                                                            *
  ******************************************************************************/
 int	parse_key(const char **exp)
 {
