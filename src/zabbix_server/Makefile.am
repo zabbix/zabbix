@@ -1,6 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-
 SUBDIRS = \
 	alerter \
 	dbsyncer \
@@ -31,7 +30,7 @@ zabbix_server_SOURCES = \
 	events.c events.h \
 	postinit.c postinit.h \
 	server.c
-	
+
 if ZBXCUNIT
 nodist_zabbix_server_SOURCES = ../libs/zbxcunit/zbxcunit.c ../libs/zbxcunit/zbxcunit.h
 endif
@@ -96,20 +95,17 @@ zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 
 zabbix_server_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DDATADIR="\"@datadir@\"" \
-	-DLIBDIR="\"@libdir@\"" \
-	-I@top_srcdir@/src/libs/zbxdbcache 
-
-SERVER_CONFIG = zabbix_server.conf
-INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d
-EXSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/externalscripts
-ALSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/alertscripts
-MODULES_DIR = $(DESTDIR)@libdir@
+	-DDEFAULT_SSL_CERT_LOCATION="\"@CURL_SSL_CERT_LOCATION@\"" \
+	-DDEFAULT_SSL_KEY_LOCATION="\"@CURL_SSL_KEY_LOCATION@\"" \
+	-DDEFAULT_CONFIG_FILE="\"@SERVER_CONFIG_FILE@\"" \
+	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"@EXTERNAL_SCRIPTS_PATH@\"" \
+	-DDEFAULT_ALERT_SCRIPTS_PATH="\"@ALERT_SCRIPTS_PATH@\"" \
+	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\"" \
+	-I@top_srcdir@/src/libs/zbxdbcache
 
 install-data-hook:
-	$(MKDIR_P) "$(INCLUDE_DIR)"
-	$(MKDIR_P) "$(EXSCRIPTS_DIR)"
-	$(MKDIR_P) "$(ALSCRIPTS_DIR)"
-	$(MKDIR_P) "$(MODULES_DIR)"
-	test -f "$(DESTDIR)@sysconfdir@/$(SERVER_CONFIG)" || cp "../../conf/$(SERVER_CONFIG)" "$(DESTDIR)@sysconfdir@"
+	$(MKDIR_P) "@SERVER_CONFIG_FILE@.d"
+	$(MKDIR_P) "@EXTERNAL_SCRIPTS_PATH@"
+	$(MKDIR_P) "@ALERT_SCRIPTS_PATH@"
+	$(MKDIR_P) "@LOAD_MODULE_PATH@"
+	test -f "@SERVER_CONFIG_FILE@" || cp "../../conf/zabbix_server.conf" "@SERVER_CONFIG_FILE@"

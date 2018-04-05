@@ -105,6 +105,21 @@ class CProblemsWidgetForm extends CWidgetForm {
 		}
 		$this->fields[] = $field_tags;
 
+		// show tags
+		$field_show_tags = (new CWidgetFieldRadioButtonList('show_tags', _('Show tags'), [
+			PROBLEMS_SHOW_TAGS_NONE => _('None'),
+			PROBLEMS_SHOW_TAGS_1 => PROBLEMS_SHOW_TAGS_1,
+			PROBLEMS_SHOW_TAGS_2 => PROBLEMS_SHOW_TAGS_2,
+			PROBLEMS_SHOW_TAGS_3 => PROBLEMS_SHOW_TAGS_3
+		]))
+			->setDefault(PROBLEMS_SHOW_TAGS_NONE)
+			->setModern(true);
+
+		if (array_key_exists('show_tags', $this->data)) {
+			$field_show_tags->setValue($this->data['show_tags']);
+		}
+		$this->fields[] = $field_show_tags;
+
 		// show hosts in maintenance
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))->setDefault(1);
 
@@ -150,13 +165,5 @@ class CProblemsWidgetForm extends CWidgetForm {
 			$field_lines->setValue($this->data['show_lines']);
 		}
 		$this->fields[] = $field_lines;
-
-		// show tags
-		$field_show_tags = new CWidgetFieldCheckBox('show_tags', _('Show tags'));
-
-		if (array_key_exists('show_tags', $this->data)) {
-			$field_show_tags->setValue($this->data['show_tags']);
-		}
-		$this->fields[] = $field_show_tags;
 	}
 }

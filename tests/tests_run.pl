@@ -54,6 +54,8 @@ sub launch($$$)
 		'assertions'	=> 0
 	};
 
+	utf8::encode($test_case->{'name'});
+
 	if (path($test_exec)->is_file)
 	{
 		my $in = Dump($test_data);
