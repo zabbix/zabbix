@@ -359,6 +359,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_LESS_EQUAL		6
 #define CONDITION_OPERATOR_NOT_IN		7
 #define CONDITION_OPERATOR_REGEXP		8
+#define CONDITION_OPERATOR_NOT_REGEXP		9
 
 /* event type action condition values */
 #define EVENT_TYPE_ITEM_NOTSUPPORTED		0
