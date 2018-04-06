@@ -295,13 +295,13 @@ out:
   invalid_part: ']'
   return: 'SUCCEED'
 ---
-test case: invalid key, character [ is allowed in unquoted parameter string but character ] is not
+test case: valid key in the beginning, character [ is allowed in unquoted parameter string
 in:
   key: 'key[a[b]]'
 out:
-  valid_part: 'key[a[b'
-  invalid_part: ']]'
-  return: 'FAIL'
+  valid_part: 'key[a[b]'
+  invalid_part: ']'
+  return: 'SUCCEED'
 ---
 test case: valid key in the beginning, character ] is not allowed in unquoted parameter string, key with multiple different type parameters
 in:
