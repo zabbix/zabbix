@@ -838,8 +838,7 @@ int	parse_key(const char **exp)
 					{
 						array--;
 
-						/* skip spaces */
-						while (' ' == s[1])
+						while (' ' == s[1])	/* skip trailing spaces after closing ']' */
 							s++;
 
 						if (0 == array && ']' == s[1])
@@ -863,8 +862,7 @@ int	parse_key(const char **exp)
 				case 1:
 					if ('"' == *s)
 					{
-						/* skip spaces */
-						while (' ' == s[1])
+						while (' ' == s[1])	/* skip trailing spaces after closing quotes */
 							s++;
 
 						if (0 == array && ']' == s[1])
