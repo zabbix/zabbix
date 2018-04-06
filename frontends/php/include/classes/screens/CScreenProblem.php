@@ -765,10 +765,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($this->data['filter']['show_tags']) {
 				$tags = makeEventsTags($data['problems'], true, $this->data['filter']['show_tags'],
-					(array_key_exists('tags', $this->data['filter'])
-						? $this->data['filter']['tags']
-						: []
-					)
+					array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : []
 				);
 			}
 
@@ -913,7 +910,7 @@ class CScreenProblem extends CScreenBase {
 					array_key_exists($eventid, $actions)
 						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 						: '',
-					isset($tags) ? $tags[$problem['eventid']] : null
+					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]));
 			}
 
