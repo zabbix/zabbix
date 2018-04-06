@@ -188,7 +188,7 @@ class testPageDashboard extends CWebTest {
 
 		$this->zbxTestClickXpathWait("//button[@class='btn-max']");
 		$this->zbxTestCheckHeader('Dashboard');
-		$this->zbxTestAssertElementNotPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertAttribute("//button[@class='btn-kiosk']", 'title', 'Kiosk mode');
 		$this->zbxTestCheckFatalErrors();
 	}
@@ -210,7 +210,7 @@ class testPageDashboard extends CWebTest {
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-min')]");
 		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
-		$this->zbxTestAssertElementPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementPresentXpath("//ul[@class='object-group']");
 		$this->zbxTestCheckFatalErrors();

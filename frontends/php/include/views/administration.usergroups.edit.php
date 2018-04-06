@@ -24,6 +24,7 @@ $widget = (new CWidget())->setTitle(_('User groups'));
 // create form
 $userGroupForm = (new CForm())
 	->setName('userGroupsForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['usrgrpid'] != 0) {

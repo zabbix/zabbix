@@ -23,22 +23,20 @@ if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
 
-$create_button = new CRedirectButton(_('Create dashboard'),
-	(new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('new', '1')
-		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-		->getUrl()
-);
-
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->addItem($create_button)
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create dashboard'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('new', '1')
+					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+					->getUrl()
+			))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-		)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $form = (new CForm())

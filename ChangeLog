@@ -1,14 +1,17 @@
 Changes for 4.0.0alpha6
 
 New features:
+..F....... [ZBXNEXT-4151] added aria roles to provide easier access by keyboard navigation (ashubin, gcalenko, Ivo)
 A......... [ZBX-3783] added strict validation for apiinfo.version(), action.delete(), correlation.delete() and drile.delete() methods (Sasha)
 A......... [ZBX-3783] prohibited deleting discovery rules which are used in actions (Sasha)
 A......... [ZBX-3783] added audit for action.delete() and correlation.delete() methods (Sasha)
+..F....... [ZBXNEXT-4143] implemented submenu autofocus on top-level menu click (nikita)
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
 ..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
 ..F....... [ZBX-13499] fixed checkbox selector in problems table (ashubin, miks)
+........S. [ZBX-13598] fixed crash when Zabbix process cannot connect to preprocessing service (viktors, vso)
 ..F....... [ZBX-13522] fixed duplicate IDs in trigger expression constructor (miks)
 ..F....... [ZBX-13489] fixed wrong tab iteration inside graph widget (ashubin)
 ..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
@@ -22,7 +25,6 @@ Bug fixes:
 Changes for 4.0.0alpha5
 
 New features:
-..F....... [ZBXNEXT-4143] implemented submenu autofocus on top-level menu click (nikita)
 ..F....... [ZBXNEXT-4313] implemented keyboard interaction in context menus (miks)
 A.F.I...S. [ZBXNEXT-4426] added option to execute cached passive checks at the current time (Ivo, wiper)
 ........S. [ZBXNEXT-4417] added real time export of events, history and trends in newline delimited JSON format (vso)
@@ -229,6 +231,7 @@ New features:
 Bug fixes:
 ..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
 ..F....... [ZBX-13499] fixed checkbox selector in problems table (ashubin, miks)
+........S. [ZBX-13598] fixed crash when Zabbix process cannot connect to preprocessing service (viktors, vso)
 ..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
 ..F....... [ZBX-13560] fixed acknowledge notifications are visible in popup (agriscenko)
 ..F....... [ZBX-13298] fixed missing graph after faulty graph edit form submission (nikita)

@@ -231,8 +231,9 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param('groupid'))]));
 
-$hostInventoryWidget->addItem(
-	(new CForm())->addItem($hostInventoriesTab)
+$hostInventoryWidget->addItem((new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addItem($hostInventoriesTab)
 );
 
 return $hostInventoryWidget;

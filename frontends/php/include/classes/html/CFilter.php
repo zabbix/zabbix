@@ -32,7 +32,7 @@ class CFilter extends CTag {
 	private $hidden = false;
 
 	public function __construct($filterid) {
-		parent::__construct('div', true);
+		parent::__construct(null);
 		$this->addClass(ZBX_STYLE_FILTER_CONTAINER);
 		$this->setId('filter-space');
 		$this->filterid = $filterid;
@@ -102,7 +102,6 @@ class CFilter extends CTag {
 			))
 				->addClass(ZBX_STYLE_FILTER_TRIGGER)
 				->setId('filter-mode');
-			$this->setAttribute('style', 'display: none;');
 		}
 
 		$button->onClick('javascript:
@@ -162,17 +161,17 @@ class CFilter extends CTag {
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 			);
-
-		return $buttons;
 	}
 
-	protected function startToString() {
-		$ret = ($this->hidden == false) ? $this->getHeader()->toString() : '';
-		$ret .= parent::startToString();
-		return $ret;
-	}
-
-	protected function endToString() {
+	/**
+	 * Return filter toggle button and filter body with footer wrapped in additinal div element having "role" and
+	 * "aria-label" attributes set.
+	 *
+	 * @param bool $destroy  Should destroy method to be called.
+	 *
+	 * @return string
+	 */
+	public function toString($destroy = true) {
 		$this->form->addItem($this->getTable());
 
 		if ($this->show_buttons) {
@@ -187,9 +186,15 @@ class CFilter extends CTag {
 			$this->form->addItem($this->footer);
 		}
 
-		$ret = $this->form->toString();
+		$wrapper = (new CDiv([
+				$this->hidden ? null : $this->getHeader(),
+				(new CDiv($this->form))
+					->addClass($this->attributes['class'])
+					->setId($this->attributes['id'])
+					->addStyle($this->opened ? '' : 'display: none;')
+			]))
+				->setAttribute('aria-label', _('Filter'));
 
-		$ret .= parent::endToString();
-		return $ret;
+		return $wrapper->toString($destroy);
 	}
 }
