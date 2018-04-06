@@ -263,59 +263,29 @@ out:
   invalid_part: '["d"]'
   return: 'FAIL'
 ---
-# This test case is commented out because support of multi-level arrays is not yet removed from parse_key().
-#test case: invalid key, multi-level arrays are not allowed
-#in:
-#  key: 'key[[[]]]'
-#out:
-#  valid_part: 'key[['
-#  invalid_part: '[]]]'
-#  return: 'FAIL'
-#---
-# The opposite of previous test case. Remove it when support of multi-level arrays is removed from parse_key().
-test case: valid key (until multi-level arrays support is removed)
+test case: invalid key, multi-level arrays are not allowed
 in:
   key: 'key[[[]]]'
 out:
-  valid_part: 'key[[[]]]'
-  invalid_part: ''
-  return: 'SUCCEED'
+  valid_part: 'key[['
+  invalid_part: '[]]]'
+  return: 'FAIL'
 ---
-# This test case is commented out because support of multi-level arrays is not yet removed from parse_key().
-#test case: invalid key, multi-level arrays are not allowed, array consists of multiple different type parameters
-#in:
-#  key: 'key["a",["b",["c","d"],e],"f"]'
-#out:
-#  valid_part: 'key["a",["b",'
-#  invalid_part: '["c","d"],e],"f"]'
-#  return: 'FAIL'
-#---
-# The opposite of previous test case. Remove it when support of multi-level arrays is removed from parse_key().
-test case: valid key (until multi-level arrays support is removed), array consists of multiple different type parameters
+test case: invalid key, multi-level arrays are not allowed, array consists of multiple different type parameters
 in:
   key: 'key["a",["b",["c","d"],e],"f"]'
 out:
-  valid_part: 'key["a",["b",["c","d"],e],"f"]'
-  invalid_part: ''
-  return: 'SUCCEED'
+  valid_part: 'key["a",["b",'
+  invalid_part: '["c","d"],e],"f"]'
+  return: 'FAIL'
 ---
-# This test case is commented out because support of multi-level arrays is not yet removed from parse_key().
-#test case: invalid key, multi-level arrays are not allowed, array consists of single parameter which is another array
-#in:
-#  key: 'key["a","b",[["c","d\",]"]]]'
-#out:
-#  valid_part: 'key["a","b",['
-#  invalid_part: '["c","d\",]"]]]'
-#  return: 'FAIL'
-#---
-# The opposite of previous test case. Remove it when support of multi-level arrays is removed from parse_key().
-test case: valid key (until multi-level arrays support is removed), array consists of single parameter which is another array
+test case: invalid key, multi-level arrays are not allowed, array consists of single parameter which is another array
 in:
   key: 'key["a","b",[["c","d\",]"]]]'
 out:
-  valid_part: 'key["a","b",[["c","d\",]"]]]'
-  invalid_part: ''
-  return: 'SUCCEED'
+  valid_part: 'key["a","b",['
+  invalid_part: '["c","d\",]"]]]'
+  return: 'FAIL'
 ---
 test case: valid key in the beginning, character ] is not allowed in unquoted parameter string
 in:

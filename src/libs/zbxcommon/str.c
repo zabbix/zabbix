@@ -833,10 +833,15 @@ int	parse_key(const char **exp)
 					else if ('"' == *s)
 						state = 1;
 					else if ('[' == *s)
-						array++;
+					{
+						if (0 == array)
+							array = 1;
+						else
+							goto fail;	/* incorrect syntax: muli-level array */
+					}
 					else if (']' == *s && 0 != array)
 					{
-						array--;
+						array = 0;
 
 						while (' ' == s[1])	/* skip trailing spaces after closing ']' */
 							s++;
