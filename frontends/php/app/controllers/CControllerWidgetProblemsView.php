@@ -54,7 +54,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'tags' => $fields['tags'],
 			'maintenance' => $fields['maintenance'],
 			'unacknowledged' => $fields['unacknowledged']
-		], $config, true);
+		], $config);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
 

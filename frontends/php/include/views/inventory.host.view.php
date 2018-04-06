@@ -148,10 +148,6 @@ $overviewFormList->addRow(_('Monitoring'),
 			'latest.php?form=1&select=&show_details=1&filter_set=Filter'.$fullscreen_param.
 			'&hostids[]='.$data['host']['hostid']
 		),
-		new CLink(_('Triggers'),
-			'tr_status.php?filter_set=1&show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
-			'&txt_select=&show_maintenance=1&hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')
-		),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
