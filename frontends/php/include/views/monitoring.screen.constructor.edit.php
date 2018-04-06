@@ -243,7 +243,8 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 		$items = API::Item()->get([
 			'itemids' => $resourceId,
 			'selectHosts' => ['name'],
-			'output' => ['itemid', 'hostid', 'key_', 'name']
+			'output' => ['itemid', 'hostid', 'key_', 'name'],
+			'webitems' => true
 		]);
 
 		if ($items) {
@@ -252,41 +253,38 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 		}
 	}
 
-	$parameters = [
-		'srctbl' => 'items',
-		'srcfld1' => 'itemid',
-		'dstfrm' => $form->getName(),
-		'dstfld1' => 'resourceid',
-		'with_webitems' => '1',
-		'numeric' => '1'
-	];
-
-	if ($this->data['screen']['templateid']) {
-		$parameters['templated_hosts'] = '1';
-		$parameters['only_hostid'] = $data['screen']['templateid'];
-	}
-	else {
-		$parameters['real_hosts'] = '1';
-		$parameters['with_simple_graph_items'] = '1';
-	}
+	$templated = ($data['screen']['templateid'] != 0);
 
 	$screenFormList->addRow(
 		(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'resourceid',
-			'objectName' => 'items',
+			'object_name' => 'items',
 			'multiple' => false,
-			'popup' => [
-				'parameters' => $parameters
-			],
 			'data' => $item
 				? [
 					[
 						'id' => $resourceId,
-						'name' => $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
+						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER,
+						'name' => $item['name_expanded']
 					]
 				]
-				: null,
+				: [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'resourceid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'resourceid',
+					'webitems' => true,
+					'numeric' => true,
+					'templated_hosts' => $templated,
+					'hostid' => $templated ? $data['screen']['templateid'] : 0,
+					'real_hosts' => !$templated,
+					'with_simple_graph_items' => !$templated
+				]
+			]
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(true)
@@ -426,40 +424,36 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		}
 	}
 
-	$parameters = [
-		'srctbl' => 'items',
-		'srcfld1' => 'itemid',
-		'dstfrm' => $form->getName(),
-		'dstfld1' => 'resourceid',
-		'with_webitems' => '1'
-	];
-
-	if ($this->data['screen']['templateid']) {
-		$parameters['templated_hosts'] = '1';
-		$parameters['only_hostid'] = $data['screen']['templateid'];
-	}
-	else {
-		$parameters['real_hosts'] = '1';
-	}
+	$templated = ($data['screen']['templateid'] != 0);
 
 	$screenFormList
 		->addRow(
 			(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
 			(new CMultiSelect([
 				'name' => 'resourceid',
-				'objectName' => 'items',
+				'object_name' => 'items',
 				'multiple' => false,
-				'popup' => [
-					'parameters' => $parameters
-				],
 				'data' => $item
 					? [
 						[
 							'id' => $resourceId,
-							'name' => $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
+							'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER,
+							'name' => $item['name_expanded']
 						]
 					]
-					: null,
+					: [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'resourceid',
+						'templated_hosts' => $templated,
+						'hostid' => $templated ? $data['screen']['templateid'] : 0,
+						'real_hosts' => !$templated,
+						'webitems' => true
+					]
+				],
 			]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(true)
@@ -493,16 +487,23 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 		$screenFormList->addRow(_('Group'),
 			(new CMultiSelect([
 				'name' => 'resourceid',
-				'objectName' => 'hostGroup',
-				'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
-				'defaultValue' => 0,
-				'selectedLimit' => 1,
+				'object_name' => 'hostGroup',
+				'multiple' => false,
+				'default_value' => 0,
+				'data' => $data
+					? [
+						[
+							'id' => $data['groupid'],
+							'name' => $data['name']
+						]
+					]
+					: [],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'host_groups',
+						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'resourceid',
-						'srcfld1' => 'groupid'
+						'dstfld1' => 'resourceid'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -523,16 +524,23 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 		$screenFormList->addRow(_('Host'),
 			(new CMultiSelect([
 				'name' => 'resourceid',
-				'objectName' => 'hosts',
-				'data' => $data ? [['id' => $data['hostid'], 'name' => $data['name']]] : null,
-				'defaultValue' => 0,
-				'selectedLimit' => 1,
+				'object_name' => 'hosts',
+				'multiple' => false,
+				'default_value' => 0,
+				'data' => $data
+					? [
+						[
+							'id' => $data['hostid'],
+							'name' => $data['name']
+						]
+					]
+					: [],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'hosts',
+						'srcfld1' => 'hostid',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'resourceid',
-						'srcfld1' => 'hostid'
+						'dstfld1' => 'resourceid'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -613,15 +621,22 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 	$screenFormList->addRow((new CLabel(_('Group'), 'resourceid'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'resourceid',
-			'objectName' => 'hostGroup',
-			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
-			'selectedLimit' => 1,
+			'object_name' => 'hostGroup',
+			'multiple' => false,
+			'data' => $data
+				? [
+					[
+						'id' => $data['groupid'],
+						'name' => $data['name']
+					]
+				]
+				: [],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
-					'srcfld1' => 'groupid'
+					'dstfld1' => 'resourceid'
 				]
 			]
 		]))
@@ -702,16 +717,23 @@ elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RE
 	$screenFormList->addRow(_('Group'),
 		(new CMultiSelect([
 			'name' => 'resourceid',
-			'objectName' => 'hostGroup',
-			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
-			'defaultValue' => 0,
-			'selectedLimit' => 1,
+			'object_name' => 'hostGroup',
+			'multiple' => false,
+			'default_value' => 0,
+			'data' => $data
+				? [
+					[
+						'id' => $data['groupid'],
+						'name' => $data['name']
+					]
+				]
+				: [],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
-					'srcfld1' => 'groupid'
+					'dstfld1' => 'resourceid'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -745,39 +767,35 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 			}
 		}
 
-		$parameters = [
-			'srctbl' => 'items',
-			'srcfld1' => 'itemid',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'resourceid',
-			'with_webitems' => '1'
-		];
-
-		if ($this->data['screen']['templateid']) {
-			$parameters['templated_hosts'] = '1';
-			$parameters['only_hostid'] = $data['screen']['templateid'];
-		}
-		else {
-			$parameters['real_hosts'] = '1';
-		}
+		$templated = ($data['screen']['templateid'] != 0);
 
 		$screenFormList->addRow(
 			(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
 			(new CMultiSelect([
 				'name' => 'resourceid',
-				'objectName' => 'items',
+				'object_name' => 'items',
 				'multiple' => false,
-				'popup' => [
-					'parameters' => $parameters
-				],
 				'data' => $item
 					? [
 						[
 							'id' => $resourceId,
-							'name' => $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded']
+							'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER,
+							'name' => $item['name_expanded']
 						]
 					]
-					: null,
+					: [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'resourceid',
+						'templated_hosts' => $templated,
+						'hostid' => $templated ? $data['screen']['templateid'] : 0,
+						'real_hosts' => !$templated,
+						'webitems' => true
+					]
+				]
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired(true)

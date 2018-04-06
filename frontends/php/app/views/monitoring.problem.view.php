@@ -92,15 +92,14 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Host groups'),
 			(new CMultiSelect([
 				'name' => 'filter_groupids[]',
-				'objectName' => 'hostGroup',
+				'object_name' => 'hostGroup',
 				'data' => $data['filter']['groups'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'host_groups',
-						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_groupids_',
 						'srcfld1' => 'groupid',
-						'multiselect' => '1'
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_groupids_'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -108,16 +107,15 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Hosts'),
 			(new CMultiSelect([
 				'name' => 'filter_hostids[]',
-				'objectName' => 'hosts',
+				'object_name' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'hosts',
+						'srcfld1' => 'hostid',
 						'dstfrm' => 'zbx_filter',
 						'dstfld1' => 'filter_hostids_',
-						'srcfld1' => 'hostid',
-						'real_hosts' => '1',
-						'multiselect' => '1'
+						'real_hosts' => true
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -142,10 +140,7 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Triggers'),
 			(new CMultiSelect([
 				'name' => 'filter_triggerids[]',
-				'objectName' => 'triggers',
-				'objectOptions' => [
-					'monitored' => true
-				],
+				'object_name' => 'triggers',
 				'data' => $data['filter']['triggers'],
 				'popup' => [
 					'parameters' => [
@@ -153,10 +148,9 @@ if ($data['action'] == 'problem.view') {
 						'srcfld1' => 'triggerid',
 						'dstfrm' => 'zbx_filter',
 						'dstfld1' => 'filter_triggerids_',
-						'monitored_hosts' => '1',
-						'with_monitored_triggers' => '1',
-						'multiselect' => '1',
-						'noempty' => '1'
+						'monitored_hosts' => true,
+						'with_monitored_triggers' => true,
+						'noempty' => true
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

@@ -149,19 +149,15 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'hostGroup',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -170,11 +166,8 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_TEMPLATE:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'templates',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'templates',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -182,9 +175,8 @@ switch ($data['new_condition']['conditiontype']) {
 					'srcfld2' => 'host',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'templated_hosts' => '1',
-					'multiselect' => '1',
-					'writeonly' => '1'
+					'editable' => true,
+					'templated_hosts' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -193,19 +185,15 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'hosts',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'hosts',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'hostid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -214,20 +202,16 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_TRIGGER:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'triggers',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'triggers',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'triggers',
+					'srcfld1' => 'triggerid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'triggerid',
-					'writeonly' => '1',
-					'multiselect' => '1',
-					'noempty' => '1'
+					'editable' => true,
+					'noempty' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -298,9 +282,9 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value]',
-			'objectName' => 'proxies',
-			'selectedLimit' => 1,
-			'defaultValue' => 0,
+			'object_name' => 'proxies',
+			'multiple' => false,
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'proxies',
@@ -1035,17 +1019,15 @@ if (!empty($data['new_operation'])) {
 				(new CLabel(_('Host groups'), 'new_operation[groupids][]'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[groupids][]',
-					'objectName' => 'hostGroup',
-					'objectOptions' => ['editable' => true],
+					'object_name' => 'hostGroup',
 					'data' => $data['new_operation']['groups'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
+							'srcfld1' => 'groupid',
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'new_operation_groupids_',
-							'srcfld1' => 'groupid',
-							'writeonly' => '1',
-							'multiselect' => '1'
+							'editable' => true
 						]
 					]
 				]))
@@ -1060,8 +1042,7 @@ if (!empty($data['new_operation'])) {
 				(new CLabel(_('Templates'), 'new_operation[templateids][]'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[templateids][]',
-					'objectName' => 'templates',
-					'objectOptions' => ['editable' => true],
+					'object_name' => 'templates',
 					'data' => $data['new_operation']['templates'],
 					'popup' => [
 						'parameters' => [
@@ -1070,9 +1051,8 @@ if (!empty($data['new_operation'])) {
 							'srcfld2' => 'host',
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'new_operation_templateids_',
-							'templated_hosts' => '1',
-							'multiselect' => '1',
-							'writeonly' => '1'
+							'editable' => true,
+							'templated_hosts' => true
 						]
 					]
 				]))

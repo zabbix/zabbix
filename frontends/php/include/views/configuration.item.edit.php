@@ -107,21 +107,11 @@ $itemFormList->addRow(
 	(new CLabel(_('Master item'), 'master_itemname'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'master_itemid',
-		'objectName' => 'items',
+		'object_name' => 'items',
 		'multiple' => false,
 		'disabled' => $readonly,
 		'ignored' => [
-			$data['itemid'] => $data['item']
-		],
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'dstfrm' => $itemForm->getName(),
-				'dstfld1' => 'master_itemid',
-				'only_hostid' => $data['hostid'],
-				'with_webitems' => 1
-			]
+			$data['itemid'] => true
 		],
 		'data' => ($data['master_itemid'] > 0)
 			? [
@@ -131,7 +121,17 @@ $itemFormList->addRow(
 					'name' => $data['master_itemname']
 				]
 			]
-			: []
+			: [],
+		'popup' => [
+			'parameters' => [
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'hostid' => $data['hostid'],
+				'webitems' => true
+			]
+		]
 	]))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),

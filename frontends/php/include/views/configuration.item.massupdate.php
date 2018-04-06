@@ -493,35 +493,33 @@ $itemFormList->addRow(
 // append applications to form list
 if ($this->data['displayApplications']) {
 	// replace applications
-	$appToReplace = null;
+	$app_to_replace = null;
 	if (hasRequest('applications')) {
 		$getApps = API::Application()->get([
 			'applicationids' => getRequest('applications'),
 			'output' => ['applicationid', 'name']
 		]);
 		foreach ($getApps as $getApp) {
-			$appToReplace[] = [
+			$app_to_replace[] = [
 				'id' => $getApp['applicationid'],
 				'name' => $getApp['name']
 			];
 		}
 	}
 
-	$replaceApp = (new CDiv(
+	$replace_app = (new CDiv(
 		(new CMultiSelect([
 			'name' => 'applications[]',
-			'objectName' => 'applications',
-			'objectOptions' => ['hostid' => $this->data['hostid']],
-			'data' => $appToReplace,
+			'object_name' => 'applications',
+			'data' => $app_to_replace,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'applications',
+					'srcfld1' => 'applicationid',
 					'dstfrm' => $itemForm->getName(),
 					'dstfld1' => 'applications_',
-					'srcfld1' => 'applicationid',
-					'multiselect' => '1',
-					'noempty' => '1',
-					'hostid' => $this->data['hostid']
+					'hostid' => $data['hostid'],
+					'noempty' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -530,8 +528,8 @@ if ($this->data['displayApplications']) {
 	$itemFormList->addRow(
 		(new CVisibilityBox('visible[applications]', 'replaceApp', _('Original')))
 			->setLabel(_('Replace applications'))
-			->setChecked(isset($this->data['visible']['applications'])),
-		$replaceApp
+			->setChecked(isset($data['visible']['applications'])),
+		$replace_app
 	);
 
 	// add new or existing applications
@@ -567,19 +565,17 @@ if ($this->data['displayApplications']) {
 	$newApp = (new CDiv(
 		(new CMultiSelect([
 			'name' => 'new_applications[]',
-			'objectName' => 'applications',
-			'objectOptions' => ['hostid' => $this->data['hostid']],
+			'object_name' => 'applications',
+			'add_new' => true,
 			'data' => $appToAdd,
-			'addNew' => true,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'applications',
+					'srcfld1' => 'applicationid',
 					'dstfrm' => $itemForm->getName(),
 					'dstfld1' => 'new_applications_',
-					'srcfld1' => 'applicationid',
-					'multiselect' => '1',
-					'noempty' => '1',
-					'hostid' => $this->data['hostid']
+					'hostid' => $data['hostid'],
+					'noempty' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -597,7 +593,7 @@ if ($this->data['displayApplications']) {
 $master_item = (new CDiv([
 	(new CMultiSelect([
 		'name' => 'master_itemid',
-		'objectName' => 'items',
+		'object_name' => 'items',
 		'multiple' => false,
 		'ignored' => array_key_exists('items_names', $data) ? $data['items_names'] : [],
 		'popup' => [
@@ -606,8 +602,8 @@ $master_item = (new CDiv([
 				'srcfld1' => 'itemid',
 				'dstfrm' => $itemForm->getName(),
 				'dstfld1' => 'master_itemid',
-				'only_hostid' => $data['hostid'],
-				'with_webitems' => 1
+				'hostid' => $data['hostid'],
+				'webitems' => true
 			]
 		]
 	]))

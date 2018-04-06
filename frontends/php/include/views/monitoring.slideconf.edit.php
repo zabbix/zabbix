@@ -49,16 +49,16 @@ $slideshow_tab = (new CFormList());
 // Slide show owner multiselect.
 $multiselect_data = [
 	'name' => 'userid',
-	'selectedLimit' => 1,
-	'objectName' => 'users',
+	'object_name' => 'users',
+	'multiple' => false,
 	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'users',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'userid',
 			'srcfld1' => 'userid',
-			'srcfld2' => 'fullname'
+			'srcfld2' => 'fullname',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid'
 		]
 	]
 ];

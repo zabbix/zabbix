@@ -326,7 +326,7 @@ function getItemFilterForm(&$items) {
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
 
 	// row 1
-	$groupFilter = null;
+	$group_filter = null;
 	if (!empty($filter_groupId)) {
 		$getHostInfo = API::HostGroup()->get([
 			'groupids' => $filter_groupId,
@@ -334,7 +334,7 @@ function getItemFilterForm(&$items) {
 		]);
 		$getHostInfo = reset($getHostInfo);
 		if (!empty($getHostInfo)) {
-			$groupFilter[] = [
+			$group_filter[] = [
 				'id' => $getHostInfo['groupid'],
 				'name' => $getHostInfo['name']
 			];
@@ -344,19 +344,16 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Host group'),
 		(new CMultiSelect([
 			'name' => 'filter_groupid',
-			'selectedLimit' => 1,
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'data' => $groupFilter,
+			'object_name' => 'hostGroup',
+			'multiple' => false,
+			'data' => $group_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'filter_groupid',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -382,7 +379,7 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 2
-	$hostFilterData = null;
+	$host_filter_data = null;
 	if (!empty($filter_hostId)) {
 		$getHostInfo = API::Host()->get([
 			'hostids' => $filter_hostId,
@@ -391,7 +388,7 @@ function getItemFilterForm(&$items) {
 		]);
 		$getHostInfo = reset($getHostInfo);
 		if (!empty($getHostInfo)) {
-			$hostFilterData[] = [
+			$host_filter_data[] = [
 				'id' => $getHostInfo['hostid'],
 				'name' => $getHostInfo['name']
 			];
@@ -401,20 +398,17 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Host'),
 		(new CMultiSelect([
 			'name' => 'filter_hostid',
-			'selectedLimit' => 1,
-			'objectName' => 'hosts',
-			'objectOptions' => [
-				'editable' => true,
-				'templated_hosts' => true
-			],
-			'data' => $hostFilterData,
+			'object_name' => 'hosts',
+			'multiple' => false,
+			'data' => $host_filter_data,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_templates',
+					'srcfld1' => 'hostid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'filter_hostid',
-					'srcfld1' => 'hostid',
-					'writeonly' => '1'
+					'editable' => true,
+					'templated_hosts' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)

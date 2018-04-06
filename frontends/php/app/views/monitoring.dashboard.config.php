@@ -68,16 +68,18 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldGroup) {
 		// multiselect.js must be preloaded in parent view.
 
+		$field_name = $field->getName().'[]';
+
 		$field_groupids = (new CMultiSelect([
-			'name' => $field->getName().'[]',
-			'objectName' => 'hostGroup',
+			'name' => $field_name,
+			'object_name' => 'hostGroup',
 			'data' => $data['captions']['ms']['groups'][$field->getName()],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => $field->getName().'_',
-					'srcfld1' => 'groupid'
+					'dstfld1' => zbx_formatDomId($field_name),
 				]
 			],
 			'add_post_js' => false
@@ -94,16 +96,18 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldHost) {
 		// multiselect.js must be preloaded in parent view.
 
+		$field_name = $field->getName().'[]';
+
 		$field_hostids = (new CMultiSelect([
-			'name' => $field->getName().'[]',
-			'objectName' => 'hosts',
+			'name' => $field_name,
+			'object_name' => 'hosts',
 			'data' => $data['captions']['ms']['hosts'][$field->getName()],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => $field->getName().'_',
-					'srcfld1' => 'hostid'
+					'dstfld1' => zbx_formatDomId($field_name)
 				]
 			],
 			'add_post_js' => false
@@ -122,25 +126,22 @@ foreach ($data['dialogue']['fields'] as $field) {
 
 		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
 
-		$parameters = [
-			'srctbl' => 'items',
-			'srcfld1' => 'itemid',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => zbx_formatDomId($field_name),
-			'real_hosts' => '1',
-			'with_webitems' => '1'
-		];
-
-		if ($field->isNumeric()) {
-			$parameters['numeric'] = '1';
-		}
-
 		$field_itemsids = (new CMultiSelect([
 			'name' => $field_name,
-			'objectName' => 'items',
-			'data' => $data['captions']['ms']['items'][$field->getName()],
+			'object_name' => 'items',
 			'multiple' => $field->isMultiple(),
-			'popup' => ['parameters' => $parameters],
+			'data' => $data['captions']['ms']['items'][$field->getName()],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => zbx_formatDomId($field_name),
+					'numeric' => $field->isNumeric(),
+					'real_hosts' => true,
+					'webitems' => true
+				]
+			],
 			'add_post_js' => false
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

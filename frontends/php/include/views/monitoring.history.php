@@ -131,18 +131,17 @@ if ($this->data['action'] == HISTORY_LATEST || $this->data['action'] == HISTORY_
 			->addRow(_('Items list'),
 				(new CMultiSelect([
 					'name' => 'itemids[]',
-					'objectName' => 'items',
-					'multiple' => true,
+					'object_name' => 'items',
+					'data' => $items_data,
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'items',
 							'srcfld1' => 'itemid',
 							'dstfld1' => 'itemids_',
-							'real_hosts' => '1',
+							'real_hosts' => true,
 							'value_types' => [$data['value_type']]
 						]
-					],
-					'data' => $items_data,
+					]
 				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 			->addRow(_('Value'),

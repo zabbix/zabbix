@@ -121,19 +121,15 @@ switch ($data['new_condition']['type']) {
 	case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[groupids][]',
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'hostGroup',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'new_condition_groupids_',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
