@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha6');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050043);
+define('ZABBIX_DB_VERSION',		3050045);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -95,10 +95,6 @@ define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 define('ZBX_ACK_STS_ANY',				1);
 define('ZBX_ACK_STS_WITH_UNACK',		2);
 define('ZBX_ACK_STS_WITH_LAST_UNACK',	3);
-
-define('EVENTS_OPTION_NOEVENT', 1);
-define('EVENTS_OPTION_ALL',		2);
-define('EVENTS_OPTION_NOT_ACK', 3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 

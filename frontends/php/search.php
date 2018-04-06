@@ -126,7 +126,6 @@ $table = (new CTableInfo())
 		_('IP'),
 		_('DNS'),
 		_('Latest data'),
-		_('Triggers'),
 		_('Problems'),
 		_('Graphs'),
 		_('Screens'),
@@ -230,7 +229,6 @@ foreach ($hosts as $hnum => $host) {
 		$hostip,
 		$hostdns,
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&hostids[]='.$hostid),
-		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
@@ -287,7 +285,6 @@ $table = (new CTableInfo())
 	->setHeader([
 		_('Host group'),
 		_('Latest data'),
-		_('Triggers'),
 		_('Problems'),
 		_('Graphs'),
 		_('Web'),
@@ -337,7 +334,6 @@ foreach ($hostGroups as $hnum => $group) {
 	$table->addRow([
 		$hgroup_link,
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$hostgroupid),
-		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
