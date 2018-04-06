@@ -19,19 +19,19 @@
 **/
 
 
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$create_button = new CSubmit('form', _('Create host group'));
-}
-else {
-	$create_button = (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
-		->setEnabled(false);
-}
-
 $widget = (new CWidget())
 	->setTitle(_('Host groups'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())->addItem($create_button))
+	->setControls((new CTag('nav', true, (new CList())
+			->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+				? new CRedirectButton(_('Create host group'), (new CUrl())
+						->setArgument('form', 'create')
+						->getUrl()
+					)
+				: (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
+					->setEnabled(false)
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter('web.groups.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),

@@ -1831,10 +1831,8 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
 	}
 
-	$msg_box = (new CDiv())->addClass($class)
-		->addItem($link_details) // Details link should be in front of title
-		->addItem($title)
-		->addItem($msg_details);
+	// Details link should be in front of title.
+	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))->addClass($class);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())

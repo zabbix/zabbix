@@ -297,21 +297,22 @@ if ($data['action'] == 'problem.view') {
 
 	(new CWidget())
 		->setTitle(_('Problems'))
-		->setControls(
+		->setControls((new CTag('nav', true,
 			(new CForm('get'))
 				->cleanItems()
 				->addVar('action', 'problem.view')
 				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 				->addVar('page', $data['page'])
-				->addItem(
-					(new CList())
-						->addItem(new CRedirectButton(_('Export to CSV'),
-							(new CUrl('zabbix.php'))
-								->setArgument('action', 'problem.view.csv')
-								->setArgument('page',  $data['page'])
-						))
-						->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+				->addItem((new CList())
+					->addItem(new CRedirectButton(_('Export to CSV'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'problem.view.csv')
+							->setArgument('page',  $data['page'])
+					))
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 				)
+			))
+				->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem($filter)
 		->addItem($screen->get())

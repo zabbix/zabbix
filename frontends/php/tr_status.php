@@ -743,24 +743,25 @@ if ($config['event_ack_enable']) {
 
 $triggerWidget = (new CWidget())
 	->setTitle(_('Triggers'))
-	->setControls(
+	->setControls((new CList([
 		(new CForm('get'))
-			->addVar('fullscreen', $_REQUEST['fullscreen'])
-			->addItem(
-				(new CList())
-					->addItem([
-						new CLabel(_('Group'), 'groupid'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$pageFilter->getGroupsCB()
-					])
-					->addItem([
-						new CLabel(_('Host'), 'hostid'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$pageFilter->getHostsCB()
-					])
-					->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
-			)
-	)
+			->setAttribute('aria-label', _('Main filter'))
+			->addVar('fullscreen', getRequest('fullscreen'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$pageFilter->getGroupsCB()
+				])
+				->addItem([
+					new CLabel(_('Host'), 'hostid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$pageFilter->getHostsCB()
+				])
+			),
+		(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])))
+			->setAttribute('aria-label', _('Content controls'))
+	])))
 	->addItem(
 		(new CView('common.filter.trigger', [
 			'overview' => false,

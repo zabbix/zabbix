@@ -22,10 +22,14 @@ $widget = (new CWidget())
 	->setTitle(_('Images'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.images.php')))
+		->setAttribute('aria-label', _('Main filter'))
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.images.php'))
+		)
 	);
 
 $imageForm = (new CForm('post', null, 'multipart/form-data'))
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
 if (isset($this->data['imageid'])) {
 	$imageForm->addVar('imageid', $this->data['imageid']);
