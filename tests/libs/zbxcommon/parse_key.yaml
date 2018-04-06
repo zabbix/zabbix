@@ -235,7 +235,7 @@ test case: invalid key, braces are not allowed in key
 in:
   key: '{}key'
 out:
-  valid_part: ''
+  valid_part: '{}key'	# yes, if the first character of key is invalid, then parse_key() does not advance pointer, so valid and invalid parts are equal.
   invalid_part: '{}key'
   return: 'FAIL'
 ---
