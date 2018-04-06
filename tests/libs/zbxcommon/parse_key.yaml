@@ -191,7 +191,7 @@ out:
   invalid_part: ''
   return: 'FAIL'
 ---
-test case: invalid key, character ] is not allowed in unquoted parameter string
+test case: invalid key, invalid character (double quote) after array-closing bracket
 in:
   key: 'key[[a"]"]'
 out:
@@ -287,7 +287,7 @@ out:
   invalid_part: '["c","d\",]"]]]'
   return: 'FAIL'
 ---
-test case: valid key in the beginning, character ] is not allowed in unquoted parameter string
+test case: valid key in the beginning, followed by character ]
 in:
   key: 'key[a]]'
 out:
@@ -303,7 +303,7 @@ out:
   invalid_part: ']'
   return: 'SUCCEED'
 ---
-test case: valid key in the beginning, character ] is not allowed in unquoted parameter string, key with multiple different type parameters
+test case: valid key in the beginning, followed by comma, key with multiple different type parameters
 in:
   key: 'key["a",b[c,d],e]'
 out:
