@@ -2046,7 +2046,9 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 
 function convert($value) {
 	$value = trim($value);
-	if (!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/', $value, $arr)) {
+
+	if (!preg_match('/(?P<value>[\-+]?([.][0-9]+|[0-9]+[.]?[0-9]*))(?P<mult>['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/',
+			$value, $arr)) {
 		return $value;
 	}
 
