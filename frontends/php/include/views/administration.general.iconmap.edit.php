@@ -23,9 +23,14 @@ include('include/views/js/administration.general.iconmap.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $iconMapTab = new CFormList();
@@ -38,6 +43,7 @@ $name = (new CTextBox('iconmap[name]', $this->data['iconmap']['name']))
 $iconMapTab->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
 
 $iconMapForm = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1);
 if (isset($this->data['iconmapid'])) {
 	$iconMapForm->addVar('iconmapid', $this->data['iconmap']['iconmapid']);

@@ -18,14 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php'))
-			->addItem(new CSubmit('form', _('Create icon map')))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php'))
+				->addItem(new CSubmit('form', _('Create icon map')))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $iconMapTable = (new CTableInfo())

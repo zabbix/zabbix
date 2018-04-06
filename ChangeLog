@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha6
 
 New features:
+..F....... [ZBXNEXT-4151] added aria roles to provide easier access by keyboard navigation (ashubin, gcalenko, Ivo)
 A......... [ZBX-3783] added strict validation for apiinfo.version(), action.delete(), correlation.delete() and drile.delete() methods (Sasha)
 A......... [ZBX-3783] prohibited deleting discovery rules which are used in actions (Sasha)
 A......... [ZBX-3783] added audit for action.delete() and correlation.delete() methods (Sasha)
