@@ -11,7 +11,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 Bug fixes:
 ..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
 ..F....... [ZBX-13499] fixed checkbox selector in problems table (ashubin, miks)
-........S. [ZBX-13598] fixed crush when Zabbix process cannot connect to preprocessing service (viktors, vso)
+........S. [ZBX-13598] fixed crash when Zabbix process cannot connect to preprocessing service (viktors, vso)
 ..F....... [ZBX-13522] fixed duplicate IDs in trigger expression constructor (miks)
 ..F....... [ZBX-13489] fixed wrong tab iteration inside graph widget (ashubin)
 ..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
@@ -231,7 +231,7 @@ New features:
 Bug fixes:
 ..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
 ..F....... [ZBX-13499] fixed checkbox selector in problems table (ashubin, miks)
-........S. [ZBX-13598] fixed crush when Zabbix process cannot connect to preprocessing service (viktors, vso)
+........S. [ZBX-13598] fixed crash when Zabbix process cannot connect to preprocessing service (viktors, vso)
 ..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
 ..F....... [ZBX-13560] fixed acknowledge notifications are visible in popup (agriscenko)
 ..F....... [ZBX-13298] fixed missing graph after faulty graph edit form submission (nikita)
