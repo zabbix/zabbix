@@ -25,7 +25,7 @@
 class CWidgetFormWeb extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_WEB_OVERVIEW);
+		parent::__construct($data, WIDGET_WEB);
 
 		// host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));

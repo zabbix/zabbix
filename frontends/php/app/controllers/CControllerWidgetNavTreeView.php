@@ -28,7 +28,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_NAVIGATION_TREE);
+		$this->setType(WIDGET_NAV_TREE);
 		$this->setValidationRules([
 			'name' => 'string',
 			'uniqueid' => 'required|string',

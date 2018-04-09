@@ -25,7 +25,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_SYSMAP);
+		$this->setType(WIDGET_MAP);
 		$this->setValidationRules([
 			'name' => 'string',
 			'uniqueid' => 'required|string',

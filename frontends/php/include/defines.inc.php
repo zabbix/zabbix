@@ -1186,24 +1186,24 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 
 // dashboard widgets
-define('WIDGET_DISCOVERY_STATUS',		'discovery');
-define('WIDGET_FAVOURITE_GRAPHS',		'favgraphs');
-define('WIDGET_FAVOURITE_MAPS',			'favmaps');
-define('WIDGET_FAVOURITE_SCREENS',		'favscreens');
-define('WIDGET_HOST_STATUS',			'hoststatus');
-define('WIDGET_PROBLEMS',				'problems');
-define('WIDGET_SYSTEM_STATUS',			'syssum');
-define('WIDGET_WEB_OVERVIEW',			'web');
-define('WIDGET_ZABBIX_STATUS',			'stszbx');
-define('WIDGET_GRAPH',					'graph');
-define('WIDGET_CLOCK',					'clock');
-define('WIDGET_SYSMAP',					'map');
-define('WIDGET_NAVIGATION_TREE',		'navtree');
-define('WIDGET_PLAIN_TEXT',				'plaintext');
-define('WIDGET_URL',					'url');
-define('WIDGET_ACTION_LOG',				'actionlog');
-define('WIDGET_DATA_OVERVIEW',			'dataover');
-define('WIDGET_TRIG_OVERVIEW',			'trigover');
+define('WIDGET_ACTION_LOG',		'actionlog');
+define('WIDGET_CLOCK',			'clock');
+define('WIDGET_DATA_OVER',		'dataover');
+define('WIDGET_DISCOVERY',		'discovery');
+define('WIDGET_FAV_GRAPHS',		'favgraphs');
+define('WIDGET_FAV_MAPS',		'favmaps');
+define('WIDGET_FAV_SCREENS',	'favscreens');
+define('WIDGET_GRAPH',			'graph');
+define('WIDGET_HOST_STATUS',	'hoststatus');
+define('WIDGET_MAP',			'map');
+define('WIDGET_NAV_TREE',		'navtree');
+define('WIDGET_PLAIN_TEXT',		'plaintext');
+define('WIDGET_PROBLEMS',		'problems');
+define('WIDGET_SYSTEM_STATUS',	'syssum');
+define('WIDGET_TRIG_OVER',		'trigover');
+define('WIDGET_URL',			'url');
+define('WIDGET_WEB',			'web');
+define('WIDGET_ZABBIX_STATUS',	'stszbx');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
