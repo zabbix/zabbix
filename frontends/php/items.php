@@ -1194,7 +1194,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' &&
 /*
  * Display
  */
-if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'), 'update', 'clone'])) {
+if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'update', 'clone'])) {
 	$master_item_options = [];
 	$has_errors = false;
 

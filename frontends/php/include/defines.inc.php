@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha6');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050043);
+define('ZABBIX_DB_VERSION',		3050045);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -95,10 +95,6 @@ define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 define('ZBX_ACK_STS_ANY',				1);
 define('ZBX_ACK_STS_WITH_UNACK',		2);
 define('ZBX_ACK_STS_WITH_LAST_UNACK',	3);
-
-define('EVENTS_OPTION_NOEVENT', 1);
-define('EVENTS_OPTION_ALL',		2);
-define('EVENTS_OPTION_NOT_ACK', 3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 
@@ -220,6 +216,7 @@ define('AUDIT_RESOURCE_TEMPLATE',		30);
 define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
 define('AUDIT_RESOURCE_ICON_MAP',		32);
 define('AUDIT_RESOURCE_DASHBOARD',		33);
+define('AUDIT_RESOURCE_CORRELATION',	34);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -1306,7 +1303,6 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
-define('ZBX_STYLE_ARTICLE', 'article');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_ARROW_DOWN', 'arrow-down');
 define('ZBX_STYLE_ARROW_LEFT', 'arrow-left');
@@ -1363,6 +1359,7 @@ define('ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER', 'dashbrd-grid-widget-container
 define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DASHBRD_WIDGET_FOOT', 'dashbrd-widget-foot');
 define('ZBX_STYLE_DASHBRD_EDIT', 'dashbrd-edit');
+define('ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK', 'dashbrd-widget-graph-link');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
@@ -1383,7 +1380,6 @@ define('ZBX_STYLE_FILTER_ACTIVE', 'filter-active');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
-define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
@@ -1441,6 +1437,7 @@ define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
 define('ZBX_STYLE_PRELOADER', 'preloader');
+define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');
 define('ZBX_STYLE_PROGRESS_BAR_BG', 'progress-bar-bg');
 define('ZBX_STYLE_PROGRESS_BAR_CONTAINER', 'progress-bar-container');
 define('ZBX_STYLE_PROGRESS_BAR_LABEL', 'progress-bar-label');

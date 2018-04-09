@@ -39,7 +39,7 @@ var chkbxRange = {
 		this.resetOtherPageCookies();
 
 		// initialize checkboxes
-		var chkboxes = jQuery('.list-table input[type=checkbox]:not(:disabled)');
+		var chkboxes = jQuery('.list-table tbody input[type=checkbox]:not(:disabled)');
 		if (chkboxes.length > 0) {
 			for (var i = 0; i < chkboxes.length; i++) {
 				this.implement(chkboxes[i]);
@@ -56,7 +56,7 @@ var chkbxRange = {
 			}
 			// no checkboxes selected from cookies, check browser cache if checkboxes are still checked and update state
 			else {
-				var checkedFromCache = jQuery('.article .list-table tr:not(.header) input[type=checkbox]:checked:not(:disabled)');
+				var checkedFromCache = jQuery('.article .list-table tbody input[type=checkbox]:checked:not(:disabled)');
 				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
 					return this.getObjectIdFromName(checkbox.name);
 				}, this));

@@ -25,6 +25,7 @@ $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
 	->setName('correlation.edit')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['correlationid']) {
