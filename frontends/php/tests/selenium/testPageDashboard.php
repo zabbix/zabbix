@@ -80,7 +80,7 @@ class testPageDashboard extends CWebTest {
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'System status');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'Web monitoring');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//h4", 'Discovery status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'Status of Zabbix');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'System information');
 		}
 	}
 

@@ -47,7 +47,7 @@ class CWidgetConfig {
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_WEB					=> _('Web monitoring'),
-			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix')
+			WIDGET_ZABBIX_STATUS		=> _('System information')
 		];
 	}
 
