@@ -21,12 +21,12 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetStatusView extends CControllerWidget {
+class CControllerWidgetSystemInfoView extends CControllerWidget {
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_ZABBIX_STATUS);
+		$this->setType(WIDGET_SYSTEM_INFO);
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json'

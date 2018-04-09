@@ -575,6 +575,7 @@ static int	DBpatch_3050046(void)
 			"favmap", "favmaps",
 			"favscr", "favscreens",
 			"hoststat", "hoststatus",
+			"stszbx", "systeminfo",
 			"sysmap", "map",
 			"webovr", "web",
 			NULL

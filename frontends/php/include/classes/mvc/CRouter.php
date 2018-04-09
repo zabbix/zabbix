@@ -104,7 +104,7 @@ class CRouter {
 		'widget.graph.view'				=> ['CControllerWidgetGraphView',			'layout.widget',		'monitoring.widget.graph.view'],
 		'widget.hoststatus.view'		=> ['CControllerWidgetHostStatusView',		'layout.widget',		'monitoring.widget.hoststatus.view'],
 		'widget.problems.view'			=> ['CControllerWidgetProblemsView',		'layout.widget',		'monitoring.widget.problems.view'],
-		'widget.stszbx.view'			=> ['CControllerWidgetStatusView',			'layout.widget',		'monitoring.widget.status.view'],
+		'widget.systeminfo.view'		=> ['CControllerWidgetSystemInfoView',		'layout.widget',		'monitoring.widget.systeminfo.view'],
 		'widget.syssum.view'			=> ['CControllerWidgetSystemView',			'layout.widget',		'monitoring.widget.system.view'],
 		'widget.web.view'				=> ['CControllerWidgetWebView',				'layout.widget',		'monitoring.widget.web.view'],
 		'widget.clock.view'				=> ['CControllerWidgetClockView',			'layout.widget',		'monitoring.widget.clock.view'],

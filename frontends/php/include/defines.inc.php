@@ -1195,11 +1195,11 @@ define('WIDGET_MAP',			'map');
 define('WIDGET_NAV_TREE',		'navtree');
 define('WIDGET_PLAIN_TEXT',		'plaintext');
 define('WIDGET_PROBLEMS',		'problems');
+define('WIDGET_SYSTEM_INFO',	'systeminfo');
 define('WIDGET_SYSTEM_STATUS',	'syssum');
 define('WIDGET_TRIG_OVER',		'trigover');
 define('WIDGET_URL',			'url');
 define('WIDGET_WEB',			'web');
-define('WIDGET_ZABBIX_STATUS',	'stszbx');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);

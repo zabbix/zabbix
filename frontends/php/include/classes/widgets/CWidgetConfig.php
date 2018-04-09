@@ -43,11 +43,11 @@ class CWidgetConfig {
 			WIDGET_NAV_TREE				=> _('Map navigation tree'),
 			WIDGET_PLAIN_TEXT			=> _('Plain text'),
 			WIDGET_PROBLEMS				=> _('Problems'),
+			WIDGET_SYSTEM_INFO			=> _('System information'),
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
-			WIDGET_WEB					=> _('Web monitoring'),
-			WIDGET_ZABBIX_STATUS		=> _('System information')
+			WIDGET_WEB					=> _('Web monitoring')
 		];
 	}
 
@@ -73,11 +73,11 @@ class CWidgetConfig {
 			WIDGET_NAV_TREE				=> ['width' => 3, 'height' => 5],
 			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3],
 			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
+			WIDGET_SYSTEM_INFO			=> ['width' => 6, 'height' => 5],
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_TRIG_OVER			=> ['width' => 6, 'height' => 5],
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
-			WIDGET_WEB					=> ['width' => 3, 'height' => 3],
-			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5]
+			WIDGET_WEB					=> ['width' => 3, 'height' => 3]
 		];
 	}
 
@@ -131,7 +131,7 @@ class CWidgetConfig {
 			case WIDGET_FAV_SCREENS:
 			case WIDGET_MAP:
 			case WIDGET_NAV_TREE:
-			case WIDGET_ZABBIX_STATUS:
+			case WIDGET_SYSTEM_INFO:
 				return 15 * SEC_PER_MIN;
 
 			case WIDGET_URL:
