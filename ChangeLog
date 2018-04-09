@@ -1,6 +1,9 @@
 Changes for 4.0.0alpha6
 
 New features:
+..F....... [ZBXNEXT-4413] dropped Monitoring->Triggers view (miks, Sasha)
+..F....... [ZBXNEXT-4413] added the trigger context menu option to view or edit the trigger description (miks, Sasha)
+..F....... [ZBXNEXT-4413] added displaying of the trigger dependencies in Monitoring->Triggers videw (miks, Sasha)
 ..F....... [ZBXNEXT-4151] added aria roles to provide easier access by keyboard navigation (ashubin, gcalenko, Ivo)
 A......... [ZBX-3783] added strict validation for apiinfo.version(), action.delete(), correlation.delete() and drile.delete() methods (Sasha)
 A......... [ZBX-3783] prohibited deleting discovery rules which are used in actions (Sasha)
@@ -9,6 +12,11 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-13642] fixed undefined index in user edit form (agriscenko)
+..F....... [ZBX-13546] fixed context menu positioning in maps (gcalenko, miks)
+..F....... [ZBX-13668] fixed dynamic widget is searching for item key in item prototypes (agriscenko)
+..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
+..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
 ..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
 ..F....... [ZBX-13499] fixed checkbox selector in problems table (ashubin, miks)
 ........S. [ZBX-13598] fixed crash when Zabbix process cannot connect to preprocessing service (viktors, vso)
@@ -229,6 +237,10 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13642] fixed undefined index in user edit form (agriscenko)
+..F....... [ZBX-13668] fixed dynamic widget is searching for item key in item prototypes (agriscenko)
+..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
+..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
 ..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
 ..F....... [ZBX-13499] fixed checkbox selector in problems table (ashubin, miks)
 ........S. [ZBX-13598] fixed crash when Zabbix process cannot connect to preprocessing service (viktors, vso)
@@ -1403,6 +1415,8 @@ Changes for 3.0.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
+..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.16
