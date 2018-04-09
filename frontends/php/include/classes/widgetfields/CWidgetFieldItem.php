@@ -21,8 +21,13 @@
 
 class CWidgetFieldItem extends CWidgetField {
 
-	private $numeric = false;
 	private $multiple = true;
+
+	private $filter_parameters = [
+		'numeric' => false,
+		'real_hosts' => true,
+		'webitems' => true
+	];
 
 	/**
 	 * Create widget field for Items selection.
@@ -39,26 +44,6 @@ class CWidgetFieldItem extends CWidgetField {
 
 	public function setValue($value) {
 		$this->value = (array) $value;
-
-		return $this;
-	}
-
-	/**
-	 * Field contains numeric type items only.
-	 *
-	 * @return bool
-	 */
-	public function isNumeric() {
-		return $this->numeric;
-	}
-
-	/**
-	 * @param bool $numeric
-	 *
-	 * @return CWidgetFieldItem
-	 */
-	public function setNumeric($numeric) {
-		$this->numeric = $numeric;
 
 		return $this;
 	}
@@ -81,6 +66,25 @@ class CWidgetFieldItem extends CWidgetField {
 	 */
 	public function setMultiple($multiple) {
 		$this->multiple = $multiple;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getFilterParameters() {
+		return $this->filter_parameters;
+	}
+
+	/**
+	 * @param string $name
+	 * @param mixed $value
+	 *
+	 * @return CWidgetFieldItem
+	 */
+	public function setFilterParameter($name, $value) {
+		$this->filter_parameters[$name] = $value;
 
 		return $this;
 	}

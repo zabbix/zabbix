@@ -136,11 +136,8 @@ foreach ($data['dialogue']['fields'] as $field) {
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => zbx_formatDomId($field_name),
-					'numeric' => $field->isNumeric(),
-					'real_hosts' => true,
-					'webitems' => true
-				]
+					'dstfld1' => zbx_formatDomId($field_name)
+				] + $field->getFilterParameters()
 			],
 			'add_post_js' => false
 		]))
