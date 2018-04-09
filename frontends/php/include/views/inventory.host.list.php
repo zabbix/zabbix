@@ -21,6 +21,7 @@
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CForm('get'))
+		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
 			->addItem([
 				new CLabel(_('Group'), 'groupid'),
