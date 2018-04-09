@@ -522,6 +522,9 @@ static int	DBpatch_3050043(void)
 {
 	int	res;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	res = DBexecute(
 		"update widget_field"
 		" set value_int=3"
@@ -535,6 +538,33 @@ static int	DBpatch_3050043(void)
 
 	if (ZBX_DB_OK > res)
 		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050044(void)
+{
+	int		i;
+	const char      *types[] = {
+			"actlog", "actionlog",
+			"dscvry", "discovery",
+			"favgrph", "favgraphs",
+			"favmap", "favmaps",
+			"favscr", "favscreens",
+			"hoststat", "hoststatus",
+			"sysmap", "map",
+			"webovr", "web",
+			NULL
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != types[i]; i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update widget set type='%s' where type='%s'", types[i + 1], types[i]))
+			return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -585,5 +615,6 @@ DBPATCH_ADD(3050040, 0, 1)
 DBPATCH_ADD(3050041, 0, 1)
 DBPATCH_ADD(3050042, 0, 1)
 DBPATCH_ADD(3050043, 0, 1)
+DBPATCH_ADD(3050044, 0, 1)
 
 DBPATCH_END()

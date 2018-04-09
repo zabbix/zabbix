@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetSysmapView extends CControllerWidget {
+class CControllerWidgetMapView extends CControllerWidget {
 
 	public function __construct() {
 		parent::__construct();

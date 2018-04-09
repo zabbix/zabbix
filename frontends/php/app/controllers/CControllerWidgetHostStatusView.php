@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetHostsView extends CControllerWidget {
+class CControllerWidgetHostStatusView extends CControllerWidget {
 
 	public function __construct() {
 		parent::__construct();
