@@ -183,7 +183,7 @@ class testPageDashboard extends CWebTest {
 	public function testPageDashboard_FullScreen() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckHeader('Dashboard');
-		$this->zbxTestAssertElementPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
 
 		$this->zbxTestClickXpathWait("//button[@class='btn-max']");
@@ -196,13 +196,13 @@ class testPageDashboard extends CWebTest {
 	public function testPageDashboard_KioskMode() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&fullscreen=1', false);
 		$this->zbxTestCheckHeader('Dashboard');
-		$this->zbxTestAssertElementNotPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementPresentXpath("//ul[@class='object-group']");
 		$this->zbxTestAssertAttribute("//button[@class='btn-kiosk']", 'title', 'Kiosk mode');
 
 		$this->zbxTestClickXpathWait("//button[@class='btn-kiosk']");
-		$this->zbxTestAssertElementNotPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[@class='object-group']");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');

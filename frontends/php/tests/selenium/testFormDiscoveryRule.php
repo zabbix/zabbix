@@ -245,7 +245,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestClickButtonText('Create discovery rule');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -1597,7 +1597,7 @@ class testFormDiscoveryRule extends CWebTest {
 
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestClickButtonText('Create discovery rule');
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
