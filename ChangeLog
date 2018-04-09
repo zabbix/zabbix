@@ -12,6 +12,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-13668] fixed dynamic widget is searching for item key in item prototypes (agriscenko)
 ..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
 ..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
 ..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
@@ -234,6 +235,7 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13668] fixed dynamic widget is searching for item key in item prototypes (agriscenko)
 ..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
 ..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
 ..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
