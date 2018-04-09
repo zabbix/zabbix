@@ -22,7 +22,7 @@
 /**
  * Web widget form.
  */
-class CWebWidgetForm extends CWidgetForm {
+class CWidgetFormWeb extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_WEB_OVERVIEW);

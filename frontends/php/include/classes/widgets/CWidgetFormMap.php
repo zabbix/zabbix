@@ -22,7 +22,7 @@
 /**
  * Map widget form.
  */
-class CSysmapWidgetForm extends CWidgetForm {
+class CWidgetFormMap extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_SYSMAP);

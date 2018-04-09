@@ -22,7 +22,7 @@
 /**
  * Trigger overview widget form.
  */
-class CTrigOverviewWidgetForm extends CWidgetForm {
+class CWidgetFormTrigOver extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_TRIG_OVERVIEW);

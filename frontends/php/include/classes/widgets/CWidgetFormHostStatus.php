@@ -22,7 +22,7 @@
 /**
  * Host status widget form.
  */
-class CHostsWidgetForm extends CWidgetForm {
+class CWidgetFormHostStatus extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_HOST_STATUS);

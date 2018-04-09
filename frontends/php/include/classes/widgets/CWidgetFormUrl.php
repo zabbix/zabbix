@@ -22,7 +22,7 @@
 /**
  * URL widget form.
  */
-class CUrlWidgetForm extends CWidgetForm {
+class CWidgetFormUrl extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_URL);

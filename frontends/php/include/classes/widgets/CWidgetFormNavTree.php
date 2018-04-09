@@ -22,7 +22,7 @@
 /**
  * Navigation widget form.
  */
-class CNavigationWidgetForm extends CWidgetForm {
+class CWidgetFormNavTree extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_NAVIGATION_TREE);

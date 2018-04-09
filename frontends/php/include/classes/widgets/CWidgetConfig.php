@@ -185,43 +185,43 @@ class CWidgetConfig {
 	public static function getForm($type, $data) {
 		switch ($type) {
 			case WIDGET_CLOCK:
-				return new CClockWidgetForm($data);
+				return new CWidgetFormClock($data);
 
 			case WIDGET_NAVIGATION_TREE:
-				return new CNavigationWidgetForm($data);
+				return new CWidgetFormNavTree($data);
 
 			case WIDGET_SYSMAP:
-				return new CSysmapWidgetForm($data);
+				return new CWidgetFormMap($data);
 
 			case WIDGET_URL:
-				return new CUrlWidgetForm($data);
+				return new CWidgetFormUrl($data);
 
 			case WIDGET_ACTION_LOG:
-				return new CActionLogWidgetForm($data);
+				return new CWidgetFormActionLog($data);
 
 			case WIDGET_DATA_OVERVIEW:
-				return new CDataOverviewWidgetForm($data);
+				return new CWidgetFormDataOver($data);
 
 			case WIDGET_TRIG_OVERVIEW:
-				return new CTrigOverviewWidgetForm($data);
+				return new CWidgetFormTrigOver($data);
 
 			case WIDGET_GRAPH:
-				return new CGraphWidgetForm($data);
+				return new CWidgetFormGraph($data);
 
 			case WIDGET_PROBLEMS:
-				return new CProblemsWidgetForm($data);
+				return new CWidgetFormProblems($data);
 
 			case WIDGET_WEB_OVERVIEW:
-				return new CWebWidgetForm($data);
+				return new CWidgetFormWeb($data);
 
 			case WIDGET_SYSTEM_STATUS:
 				return new CSystemWidgetForm($data);
 
 			case WIDGET_HOST_STATUS:
-				return new CHostsWidgetForm($data);
+				return new CWidgetFormHostStatus($data);
 
 			case WIDGET_PLAIN_TEXT:
-				return new CPlainTextWidgetForm($data);
+				return new CWidgetFormPlainText($data);
 
 			default:
 				return new CWidgetForm($data, $type);
