@@ -721,7 +721,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Find and click on button inside 'nav' tag having specific text.
+	 * Find and click on button inside header 'Content controls' area having specific text.
 	 *
 	 * @param string $text  Button text label.
 	 *
@@ -736,7 +736,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Find and click on button inside 'nav' tag having specific class name.
+	 * Find and click on button inside header 'Content controls' area having specific class name.
 	 *
 	 * @param string $class  Button text label.
 	 *
@@ -765,6 +765,56 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 					"//select[@name='{$name}']".
 						"/option[@value='{$value}']"
 		))->click();
+	}
+
+	/**
+	 * Find and click on button inside header 'Content controls' area having specific text.
+	 *
+	 * @param string $text  Button text label.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestContentControlButtonClickTextWait($text) {
+		$xpath = "//div[contains(@class, 'header-title')]".
+					"//nav[@aria-label='Content controls']".
+						"//button[text()='{$text}']";
+
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
+	}
+
+	/**
+	 * Find and click on button inside header 'Content controls' area having specific class name.
+	 *
+	 * @param string $class  Button text label.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestContentControlButtonClickClassWait($class) {
+		$xpath = "//div[contains(@class, 'header-title')]".
+					"//nav[@aria-label='Content controls']".
+						"//button[contains(@class, '{$class}')]";
+
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
+	}
+
+	/**
+	 * Select option for select element inside 'Main filter' area.
+	 *
+	 * @param string $name   Select tag name attribute.
+	 * @param string $value  Option value to select.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestMainFilterDropdownSelectWait($name, $value) {
+		$xpath = "//div[contains(@class, 'header-title')]".
+					"//form[@aria-label='Main filter']".
+						"//select[@name='{$name}']".
+							"/option[@value='{$value}']";
+
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
 	}
 
 	/**
