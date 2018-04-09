@@ -26,32 +26,38 @@ $this->addJsFile('class.svg.map.js');
 
 (new CWidget())
 	->setTitle(_('Maps'))
-	->setControls(
+	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])
 			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-			->addItem(
-				(new CList())
-					->addItem([
-						new CLabel(_('Minimum severity'), 'severity_min'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$data['pageFilter']->getSeveritiesMinCB()
-					])
-					->addItem($data['map']['editable']
-						? (new CButton('edit', _('Edit map')))
-							->onClick('redirect("sysmap.php?sysmapid='.$data['map']['sysmapid'].'")')
-						: null
-					)
-					->addItem(get_icon('favourite', [
-						'fav' => 'web.favorite.sysmapids',
-						'elname' => 'sysmapid',
-						'elid' => $data['map']['sysmapid']
-					]))
-					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Minimum severity'), 'severity_min'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getSeveritiesMinCB()
+				])
+			),
+		(new CTag('nav', true, (new CList())
+			->addItem($data['map']['editable']
+				? new CRedirectButton(_('Edit map'), (new CUrl('sysmap.php'))
+					->setArgument('sysmapid', $data['map']['sysmapid'])
+					->setArgument('fullscreen', $data['fullscreen'])
+					->getUrl()
+				)
+				: null
 			)
-	)
+			->addItem(get_icon('favourite', [
+				'fav' => 'web.favorite.sysmapids',
+				'elname' => 'sysmapid',
+				'elid' => $data['map']['sysmapid']
+			]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	]))
 	->addItem(
 		get_header_sysmap_table($data['map']['sysmapid'], $data['map']['name'], $data['fullscreen'],
 			$data['severity_min']

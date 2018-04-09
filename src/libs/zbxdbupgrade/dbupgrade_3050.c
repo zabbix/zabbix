@@ -539,6 +539,29 @@ static int	DBpatch_3050043(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050044(void)
+{
+	const char	*sql =
+		"delete from profiles"
+		" where idx in ('web.paging.lastpage','web.menu.view.last') and value_str='tr_status.php'"
+			" or idx like 'web.tr_status%'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3050045(void)
+{
+	const char	*sql = "update users set url='zabbix.php?action=problem.view' where url like '%tr_status.php%'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -585,5 +608,7 @@ DBPATCH_ADD(3050040, 0, 1)
 DBPATCH_ADD(3050041, 0, 1)
 DBPATCH_ADD(3050042, 0, 1)
 DBPATCH_ADD(3050043, 0, 1)
+DBPATCH_ADD(3050044, 0, 1)
+DBPATCH_ADD(3050045, 0, 1)
 
 DBPATCH_END()

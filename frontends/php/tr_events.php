@@ -183,7 +183,12 @@ $eventTab = (new CTable())
 
 $eventWidget = (new CWidget())
 	->setTitle(_('Event details'))
-	->setControls((new CList())->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+		))
+		->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem($eventTab)
 	->show();
 

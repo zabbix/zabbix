@@ -546,10 +546,6 @@ class CHistoryManager {
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
 			}
 			else {
-				if (!$item['has_scheduling_intervals'] || $item['delay'] != 0) {
-					$item['delay'] = max($item['delay'], SEC_PER_HOUR);
-				}
-
 				$sql_select = 'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 			}

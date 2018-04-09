@@ -23,7 +23,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, .article, aside, canvas, details, embed, figure, figcaption, footer, .footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, main, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -32,7 +32,7 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline; }
 
-article, .article, aside, details, figcaption, figure, footer, .footer, header, hgroup, menu, nav, .nav, section {
+article, main, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, .nav, section {
   display: block; }
 
 body {
@@ -182,7 +182,7 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-nav, .nav {
+.nav {
   background-color: #454545; }
 
 nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hover, nav a:focus, .nav a:focus, nav a:active, .nav a:active, .ui-tabs-nav li a, .ui-tabs-nav li.ui-state-disabled a {
@@ -399,6 +399,8 @@ ul.top-nav-icons {
     vertical-align: top;
     position: relative;
     padding: 0 0 0 10px; }
+  .header-title ul ul li:first-child {
+    padding-left: 0; }
   .header-title .dashbrd-edit {
     position: relative;
     display: inline-block;
@@ -423,7 +425,7 @@ ul.top-nav-icons {
       .header-title .dashbrd-edit ul li .btn-dashbrd-conf {
         vertical-align: middle; }
 
-article, .article {
+article, main {
   padding: 10px 10px 0 10px; }
 
 .object-group {
@@ -457,13 +459,16 @@ article, .article {
   .hor-list li:last-child {
     margin: 0; }
 
-footer, .footer {
+footer {
   position: absolute;
   bottom: 0;
   width: 100%;
   height: 30px;
   text-align: center;
   color: #737373; }
+
+output {
+  display: block; }
 
 .logo {
   float: left;

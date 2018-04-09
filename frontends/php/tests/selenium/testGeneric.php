@@ -36,7 +36,6 @@ class testGeneric extends CWebTest {
 
 			['zabbix.php?action=web.view',					'Web monitoring'],
 			['latest.php',						'Latest data [refreshed every 30 sec.]'],
-			['tr_status.php',					'Triggers [refreshed every 30 sec.]'],
 
 			['zabbix.php?action=problem.view',	'Problems'],
 
