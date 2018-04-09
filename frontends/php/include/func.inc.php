@@ -2656,3 +2656,68 @@ function calculateTime(array $options = []) {
 		'isNow' => $options['isNow']
 	];
 }
+
+/**
+ * Convert relative date to timestamp. Allow to define precision part using suffix '/', example (now/w).
+ * Supports date as string in format 'Y.m.d H:i:s' and timestamp as integer or string with '@' prefix.
+ * Timestamp is returned as initialized DateTime object. In case of parsing error null will be returned.
+ *
+ * @param string $date      Date in relative format or timestamp.
+ * @param bool   $is_start  If set to true date will be modified to lowest value, example (now/w) will be returned
+ *                          as Monday of this week. When set to false precision will modify date to highest value,
+ *                          same example will return Sunday of this week.
+ *
+ * @return DateTime|null
+ */
+function relativeToTimestamp($date, $is_start) {
+	$time_units = [
+		'/(\d+)s/' => '$1 second',
+		'/(\d+)m/' => '$1 minute',
+		'/(\d+)h/' => '$1 hour',
+		'/(\d+)d/' => '$1 day',
+		'/(\d+)w/' => '$1 week',
+		'/(\d+)M/' => '$1 month',
+		'/(\d+)y/' => '$1 year'
+	];
+	$precision = '';
+
+	if (!ctype_digit($date)) {
+		$date = preg_replace('/[^-+\/0-9a-z]/i', '', $date);
+		// Split relative date in to two parts: Date part and precision (granularity).
+		list($date_chunk, $precision) = explode('/', $date) + ['', ''];
+
+		$date = preg_replace(array_keys($time_units), array_values($time_units), $date_chunk);
+	}
+	else {
+		return (new DateTime())->setTimestamp($date);
+	}
+
+	try {
+		$date = new DateTime($date);
+
+		$modifiers = $is_start
+			? [
+				'm' => $date->format('H:i:00'),
+				'h' => $date->format('H:00:00'),
+				'w' => 'Monday this week 00:00:00',
+				'M' => 'first day of this month 00:00:00',
+				'y' => 'first day of January this year 00:00:00'
+			]
+			: [
+				'm' => $date->format('H:i:59'),
+				'h' => $date->format('H:59:59'),
+				'w' => 'Sunday this week 23:59:59',
+				'M' => 'last day of this month 23:59:59',
+				'y' => 'last day of December this year 23:59:59'
+			];
+
+		if ($precision && array_key_exists($precision, $modifiers)) {
+			$date->modify($modifiers[$precision]);
+		}
+	}
+	catch (Exception $e) {
+		$date = null;
+	}
+
+	return $date;
+}
