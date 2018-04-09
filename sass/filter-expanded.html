@@ -31,147 +31,80 @@
 	<div class="header-title table">
 	<div class="cell"><h1>Dashboard</h1></div><div class="cell"><form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid" class="red"><option>All</option><option>MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM</option><option selected class="red">Zabbix2</option><option>Zabbix3</option></select></li><li><label for="groupid">Group</label>&nbsp;<select id="groupid" class="red"><option>All</option><option>MMMMMMMMMMMM</option><option selected class="red">Zabbix2</option><option>Zabbix3</option></select></li><li><button type="button">Create web scenario</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
 	</div></div>
-		<ul class="object-group"><li><span><a href="">All hosts</a></span>/<span class="selected"><a href="">Zabbix server</a>:</span></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">z</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">z</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><span class="selected"><a href="">Discovery</a></span>/<span><a href="">Discovery</a></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
+		<ul class="object-group"><li><span><a href="">All hosts</a></span>/<span class="selected"><a href="">Zabbix server</a>:</span></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">zbx</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><span class="selected"><a href="">Discovery</a></span>/<span><a href="">Discovery</a></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
 	<div class="filter-btn-container">
-	<button type="button" class="filter-trigger filter-active">Filter<span class="arrow-up"></span></button>
+	<button type="button" class="btn-time-left" title="left"></button>
+	<button type="button" class="btn-time-out" title="zoom out">Zoom out</button>
+	<button type="button" class="btn-time-right" title="right"></button>
+	<button type="button" class="btn-time filter-active">Last 7 days<span class="btn-time-icon"></span></button>
+	<button type="button" class="filter-trigger">Filter<span class="arrow-down"></span></button>
 	</div>
+
 	<form>
+
 	<div class="filter-container">
-	<div class="table filter-forms">
-	<div class="row">
-	<div class="cell">
-	<ul class="table-forms">
-	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right">
-	<div class="multiselect-wrapper">
-	<div class="multiselect" style="width: 160px">
-      <div class="selected">
-        <ul class="multiselect-list disabled">
-          <li data-id=""><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn"></span></span></li><li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn"></span></span></li>
-        </ul>
-      </div>
-      <input type="text" style="" value="" placeholder="Search">
-    </div>
-     <div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
-    </div>
-    </div>
-	</li>
-	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right">
-	<div class="multiselect-wrapper">
-	<div class="multiselect" style="width: 160px">
-      <div class="selected">
-        <ul class="multiselect-list">
-          <li data-id="" class="selected"><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn"></span></span></li><li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn"></span></span></li>
-        </ul>
-      </div>
-      <input type="text" style="" value="" placeholder="Search">
-    </div>
-    <div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
-    </div>
-    </div>
-	</li>
-	<li><div class="table-forms-td-left"><label for="Groups">Host</label></div><div class="table-forms-td-right"><div class="multiselect" style="width: 160px"><div class="available" style="top: 23px"><div class="multiselect-matches">More matches found</div>
-	<ul class="multiselect-suggest"><li class="suggest-hover"><span class="grey"><span class="suggest-found">Za</span>bbix servers</span></li><li><span class="grey"><span class="suggest-found">Za</span>bbix servers</span>df dsfsdf sfsdf sdfsdfsdf</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="grey"><span class="suggest-found">Za</span>bbix servers</span></li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li>Zabbix server</li><li>Zabbix server</li></ul>
+	<div class="time-selection-container">
+	<div class="time-input">
+		<ul class="table-forms">
+			<li><label for="time-from">From:</label></li>
+			<li><input type="text" id="time-from"></li>
+			<li><button class="icon-cal" type="button"></button></li>
+			<li><label for="time-to">To:</label></li>
+			<li><input type="text" id="time-to"></li>
+			<li><button class="icon-cal" type="button"></button></li>
+			<li><button type="button">Apply</button></li>
+		</ul>
 	</div>
-	</div><button type="button" class="btn-grey">Select</button></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Application</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Search"><div class="form-input-margin"></div><button type="button" class="btn-grey">Select</button></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Application</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Search"><div class="form-input-margin"></div><button type="button" class="btn-grey">Select</button></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Name like</label></div><div class="table-forms-td-right"><input type="text" id="Groups"></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Key like</label></div><div class="table-forms-td-right"><input type="text" id="Groups"></div></li>
+	<div class="time-quick-range">
+	<div class="cell">
+	<ul class="time-quick">
+	<li><a href>Last 2 days</a></li>
+	<li class="time-quick-selected">Last 7 days</li>
+	<li><a href>Last 30 days</a></li>
+	<li><a href>Last 3 months</a></li>
+	<li><a href>Last 6 months</a></li>
+	<li><a href>Last 1 year</a></li>
+	<li><a href>Last 2 years</a></li>
+	<li><a href>Last 5 years</a></li>
 	</ul>
 	</div>
 	<div class="cell">
-	<ul class="table-forms">
-	<li><div class="table-forms-td-left"><label for="Groups">Type</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Update interval</label></div><div class="table-forms-td-right"><input type="text" id="Groups"><div class="form-input-margin"></div>sec</div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Update interval</label></div><div class="table-forms-td-right"><input type="text" id="Groups"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button></div></li>
+	<ul class="time-quick">
+	<li><a href>Yesterday</a></li>
+	<li><a href>Day before yesterday</a></li>
+	<li><a href>This day last week</a></li>
+	<li><a href>Previous week</a></li>
+	<li><a href>Previous month</a></li>
+	<li><a href>Previous year</a></li>
 	</ul>
 	</div>
 	<div class="cell">
-	<ul class="table-forms">
-	<li><div class="table-forms-td-left"><label for="Groups">Type of information</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">History</label></div><div class="table-forms-td-right"><input type="text" id="Groups"><div class="form-input-margin"></div>days</div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Trends</label></div><div class="table-forms-td-right"><input type="text" id="Groups"><div class="form-input-margin"></div>days</div></li>
+	<ul class="time-quick">
+	<li><a href>Today</a></li>
+	<li><a href>Today so far</a></li>
+	<li><a href>This week</a></li>
+	<li><a href>This week so far</a></li>
+	<li><a href>This month</a></li>
+	<li><a href>this month so far</a></li>
+	<li><a href>This year</a></li>
+	<li><a href>This year so far</a></li>
 	</ul>
 	</div>
 	<div class="cell">
-	<ul class="table-forms">
-	<li><div class="table-forms-td-left"><label for="Groups">State</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Status</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Triggers</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Template</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
-	<li><div class="table-forms-td-left"><label>Filter by host inventory</label></div><div class="table-forms-td-right"><table><tbody><tr><td><select id="" name=""><option value="software_full">Software (Full details)</option><option value="software_app_a">Software application A</option><option value="software_app_b">Software application B</option></select></td><td><input type="text" id="" name="" style="width: 150px" maxlength="255"></td><td class="nowrap"><button type="button" class="btn-link" id="" name="">Remove</button></td></tr><tr><td colspan="2"><button type="button" id="" name="" class="btn-link">Add</button></td></tr></tbody></table></div></li>
+	<ul class="time-quick">
+	<li><a href>Last 5 minutes</a></li>
+	<li><a href>Last 15 minutes</a></li>
+	<li><a href>Last 30 minutes</a></li>
+	<li><a href>Last 1 hour</a></li>
+	<li><a href>Last 3 hours</a></li>
+	<li><a href>Last 6 hours</a></li>
+	<li><a href>Last 12 hours</a></li>
+	<li><a href>Last 24 hours</a></li>
 	</ul>
 	</div>
 	</div>
-	</div>
-	<div class="filter-forms"><button type="button">Filter</button><button type="button" class="btn-alt">Reset</button></div>
-
-<div id="scrollbar_cntr">
-  <div class="scrollbar" style="width: 1500px">
-    <div class="info" style="width: 1500px">
-      <div class="zoom">
-      Zoom:<span zoom="3600" class="link-action">1h</span><span zoom="7200" class="link-action">2h</span><span href="#" zoom="10800" class="link-action">3h</span><span href="#" zoom="21600" class="link-action">6h</span><span href="#" zoom="43200" class="link-action">12h</span><span zoom="86400" class="link-action">1d</span><span zoom="604800" class="link-action">7d</span><span zoom="1209600" class="link-action">14d</span><span zoom="2592000" class="link-action selected">1m</span><span href="#" zoom="7776000" class="link-action">3m</span><span zoom="63072000" class="link-action">All</span>
-      </div>
-      <div class="timeline"><span data-timestamp="1421532000" class="link-action">2015-01-18 00:00</span>&ndash;<span data-timestamp="1422136800" class="link-action">2015-01-25 00:00</span></div>
-    </div>
-    <div class="sublevel" style="width: 1500px">
-      <button type="button" class="btn-grey"><span class="arrow-left"></span></button>
-      <button type="button" class="btn-grey"><span class="arrow-right"></span></button>
-    </div>
-    <div class="overlevel" style="width: 1444px">
-      <div style="left: 700px; width: 400px" class="bar ui-draggable">
-        <div class="icon">
-          <div class="center"></div>
-        </div>
-      </div>
-      <div style="left: 700px; width: 400px" class="ghost"></div>
-      <div style="left: 700px" class="left_arr ui-draggable"><span class="arrow-left"></span></div>
-      <div style="left: 1088px" class="right_arr ui-draggable"><span class="arrow-right"></span></div>
-    </div>
-    <div style="width: 1500px" class="subline">
-      <div class="nav_links">
-      <span nav="2592000" class="link-action">1m</span><span nav="604800" class="link-action">7d</span><span nav="86400" class="link-action">1d</span><span nav="43200" class="link-action">12h</span><span nav="3600" class="link-action">1h</span>|<span nav="3600" class="link-action">1h</span><span nav="43200" class="link-action">12h</span><span nav="86400" class="link-action">1d</span><span nav="604800" class="link-action">7d</span><span nav="2592000" class="link-action">1m</span>
-      </div>
-      <div class="period"><span class="link-action">Dynamic</span></div>
-      <div class="info_period">1m 17d</div>
-    </div>
-  </div>
 </div>
-
-<table class="list-table">
-     <thead>
-        <tr><th><h4>Subfilter <span class="grey">affects only filtered data</span></h4></th></tr>
-    </thead>
-	<tbody>
-		<tr>
-			<td><h3>Applications</h3><span class="link-action">CPU</span>&nbsp;<sup>13</sup>, <span class="link-action" class="link-action">Filesystem</span>&nbsp;<sup>5</sup>, <span class="link-action">General</span>&nbsp;<sup>5</sup>, <span class="link-action">Memory</span>&nbsp;<sup>5</sup>, <span class="link-action">Network interfaces</span>&nbsp;<sup>4</sup>, <span class="link-action">OS</span>&nbsp;<sup>8</sup>, <span class="link-action">Performance</span>&nbsp;<sup>13</sup>, <span class="link-action">Processes</span>&nbsp;<sup>2</sup>, <span class="link-action">Security</span>&nbsp;<sup>2</sup>, <span class="link-action">Zabbix agent</span>&nbsp;<sup>3</sup>, <span class="link-action">Zabbix server</span>&nbsp;<sup>26</sup></td>
-		</tr>
-		<tr>
-			<td><h3>Types</h3><span class="link-action">Simple check</span>&nbsp;<sup>1</sup>, <span class="link-action">Zabbix agent</span>&nbsp;<sup>41</sup>, <span class="link-action">Zabbix internal</span>&nbsp;<sup>26</sup></td>
-		</tr>
-		<tr>
-			<td><h3>Type of information</h3><span class="link-action">Character</span>&nbsp;<sup>4</sup>, <span class="link-action">Numeric (float)</span>&nbsp;<sup>+38</sup>, <span class="subfilter-enabled"><span class="link-action">Numeric (unsigned)</span>&nbsp;<sup>26</sup></span></td>
-		</tr>
-		<tr>
-			<td><h3>Status</h3><span class="link-action">Disabled</span>&nbsp;<sup>2</sup>, <span class="link-action">Enabled</span>&nbsp;<sup>66</sup></td>
-		</tr>
-		<tr>
-			<td><h3>State</h3><span class="link-action">Normal</span>&nbsp;<sup>63</sup>, Not supported&nbsp;<sup>0</sup></td>
-		</tr>
-		<tr>
-			<td><h3>State</h3><span class="link-action">Not Templated items</span>&nbsp;<sup>9</sup>, <span class="link-action">Templated items</span>&nbsp;<sup>59</sup></td>
-		</tr>
-		<tr>
-			<td><h3>Template</h3><span class="link-action">Whithout triggers</span>&nbsp;<sup>27</sup>, <span class="link-action">With triggers</span>&nbsp;<sup>41</sup></td>
-		</tr>
-		<tr>
-			<td><h3>With triggers</h3><span class="link-action">7</span>&nbsp;<sup>67</sup>, <span class="link-action">90</span>&nbsp;<sup>1</sup></td>
-		</tr>
-		<tr>
-			<td><h3>History</h3><span class="link-action">30</span>&nbsp;<sup>1</sup>, <span class="link-action">60</span>&nbsp;<sup>53</sup>, <span class="link-action">600</span>&nbsp;<sup>4</sup>, <span class="link-action">3600</span>&nbsp;<sup>10</sup></td>
-		</tr>
-	</tbody>
-	</table>
+</div>
 </div>
 	<div class="overflow-table">
 	<table class="list-table">
