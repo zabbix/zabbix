@@ -24,7 +24,6 @@ class CWidgetFieldItem extends CWidgetField {
 	private $multiple = true;
 
 	private $filter_parameters = [
-		'numeric' => false,
 		'real_hosts' => true,
 		'webitems' => true
 	];
