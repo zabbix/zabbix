@@ -723,47 +723,47 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Find and click on button inside 'nav' tag having specific text.
 	 *
-	 * @param string $button_label  Button text label.
+	 * @param string $text  Button text label.
 	 *
 	 * @throws NoSuchElementException
 	 */
-	public function zbxClickNavButtonWithText($button_label) {
+	public function zbxTestContentControlButtonClickText($text) {
 		$this->webDriver->findElement(WebDriverBy::xpath(
 			"//div[contains(@class, 'header-title')]".
 				"//nav[@aria-label='Content controls']".
-					"//button[text()='{$button_label}']"
+					"//button[text()='{$text}']"
 		))->click();
 	}
 
 	/**
 	 * Find and click on button inside 'nav' tag having specific class name.
 	 *
-	 * @param string $button_label  Button text label.
+	 * @param string $class  Button text label.
 	 *
 	 * @throws NoSuchElementException
 	 */
-	public function zbxClickNavButtonWithClassName($class_name) {
+	public function zbxTestContentControlButtonClickClass($class) {
 		$this->webDriver->findElement(WebDriverBy::xpath(
 			"//div[contains(@class, 'header-title')]".
 				"//nav[@aria-label='Content controls']".
-					"//button[contains(@class, '{$class_name}')]"
+					"//button[contains(@class, '{$class}')]"
 		))->click();
 	}
 
 	/**
 	 * Select option for select element inside 'Main filter' area.
 	 *
-	 * @param string $select_name   Select tag name attribute.
-	 * @param string $option_value  Option value to select.
+	 * @param string $name   Select tag name attribute.
+	 * @param string $value  Option value to select.
 	 *
 	 * @throws NoSuchElementException
 	 */
-	public function zbxSelectMainFilterOption($select_name, $option_value) {
+	public function zbxTestMainFilterDropdownSelect($name, $value) {
 		$this->webDriver->findElement(WebDriverBy::xpath(
 			"//div[contains(@class, 'header-title')]".
 				"//form[@aria-label='Main filter']".
-					"//select[@name='{$select_name}']".
-						"/option[@value='{$option_value}']"
+					"//select[@name='{$name}']".
+						"/option[@value='{$value}']"
 		))->click();
 	}
 
