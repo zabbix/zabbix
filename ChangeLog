@@ -12,6 +12,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-13683] fixed multiselect items not being sorted by name (agriscenko)
 ........S. [ZBX-13299] fixed autoregistration, discovery and internal notifications not being sent due to uninitialized severity (vso)
 ....I..... [ZBX-13607] changed ping script to return success also for timeouts (wiper)
 ..F....... [ZBX-12967] fixed Screen Slide Show Refresh interval Multiplier menu is not working (agriscenko)
@@ -241,6 +242,7 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13683] fixed multiselect items not being sorted by name (agriscenko)
 ........S. [ZBX-13299] fixed autoregistration, discovery and internal notifications not being sent due to uninitialized severity (vso)
 ....I..... [ZBX-13607] changed ping script to return success also for timeouts (wiper)
 ..F....... [ZBX-12967] fixed Screen Slide Show Refresh interval Multiplier menu is not working (agriscenko)
