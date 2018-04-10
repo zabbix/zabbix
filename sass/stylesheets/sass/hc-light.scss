@@ -61,6 +61,8 @@ $scrollbar-track-color: #999;
 $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
 
+$input-placeholder-color: #777;
+
 // BUTTONS
 $btn-font-color: #fff;
 $btn-bg-color: #555;
@@ -114,7 +116,7 @@ $ok-unack-fg-color: #009900;
 $ok-ack-fg-color: #009900;
 
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
-	border: 1px solid rgba($ui-bg-color, .2) !important;
+	border-color: rgba($ui-bg-color, .2) !important;
 	background-color: $ui-bg-selected-color !important;
 	color: $ui-bg-color !important;
 }
@@ -159,15 +161,15 @@ $form-icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -163px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -163px -652px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -163px -688px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -198px -617px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -198px -580px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -163px -545px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -163px -581px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -163px -473px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -163px -509px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -165px -618px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -165px -654px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -165px -690px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -201px -619px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -201px -582px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -165px -546px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -165px -582px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -165px -474px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -165px -510px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -193,12 +195,35 @@ $icon-widget-btn: (
 	background: url(../img/icon-sprite.svg) no-repeat -162px -7px !important;
 }
 .btn-dashbrd-conf {
-	background: url(../img/icon-sprite.svg) no-repeat -200px -619px !important;
+	background: url(../img/icon-sprite.svg) no-repeat -201px -619px !important;
 }
 
 .list-table {
+
+	.subfilter-enabled {
+		background-color: $ui-bg-color;
+		box-shadow: 0 0 0 1px $link-hover-color;
+	}
+
 	thead th {
-		border-color: lighten($table-border-color, 3%) !important;
+		border-color: lighten($table-border-color, 3%);
+	}
+}
+
+.subfilter-enabled {
+
+	.link-action {
+		color: $link-hover-color;
+
+		&:focus {
+			color: $link-hover-color;
+			border-bottom: 3px solid $link-hover-color;
+		}
+
+		&:hover {
+			color: $link-hover-color;
+			border-bottom: 1px solid $link-hover-color;
+		}
 	}
 }
 
@@ -216,9 +241,38 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu-item {
-	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -164px -835px !important;
+.action-menu {
+
+	.action-menu-item-disabled {
+		color: $form-disabled-font-color;
+	}
+
+	.action-menu-item {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
+			background-color: black;
+			color: white;
+
+			.arrow-right {
+				border-left-color: white;
+			}
+
+			&.selected {
+
+				&::before {
+					background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
+				}
+			}
+		}
+
+		&.selected {
+
+			&::before {
+				background: url(../img/icon-sprite.svg) no-repeat -164px -835px;
+			}
+		}
 	}
 }
 
@@ -526,6 +580,18 @@ ul.top-nav-icons {
 	color: darken($dark-yellow, 10%);
 }
 
+.dashbrd-widget-graph-link {
+
+	&:focus {
+
+		&:after {
+			background: $blue;
+			height: 3px;
+			bottom: -3px;
+		}
+	}
+}
+
 // SEVERITY STATUSES
 td.log-na-bg {
 	padding-left: 42px !important;
@@ -831,8 +897,19 @@ td.disaster-bg {
 	content: none;
 }
 
-.notif-body li {
-	padding: 0 0 10px 42px;
+.notif-body {
+	h4 {
+		padding-bottom: 3px;
+		margin-bottom: -3px;
+	}
+
+	p {
+		margin: 0.25em 0 2px 0;
+	}
+
+	li {
+		padding: 0 0 10px 42px;
+	}
 }
 
 .notif-indic {
@@ -912,7 +989,8 @@ td.inactive-bg {
 // GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.1);
-	border: 2px solid rgba($font-color,0.6);
+	border: none;
+	outline: 2px solid rgba($font-color,0.6);
 }
 
 .ui-selectable-helper {

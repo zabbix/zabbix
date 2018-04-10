@@ -256,13 +256,17 @@ static void	unlock_log(void)
 #else
 static void	lock_log(void)
 {
+#ifdef ZABBIX_AGENT
 	if (0 == (ZBX_MUTEX_LOGGING_DENIED & get_thread_global_mutex_flag()))
+#endif
 		LOCK_LOG;
 }
 
 static void	unlock_log(void)
 {
+#ifdef ZABBIX_AGENT
 	if (0 == (ZBX_MUTEX_LOGGING_DENIED & get_thread_global_mutex_flag()))
+#endif
 		UNLOCK_LOG;
 }
 #endif

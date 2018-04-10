@@ -25,7 +25,10 @@ $historyWidget = new CWidget();
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($this->data['items'])),
-	'right' => (new CForm('get'))->addVar('itemids', getRequest('itemids'))->addVar('page', 1)
+	'right' => (new CForm('get'))
+		->addVar('itemids', getRequest('itemids'))
+		->addVar('page', 1)
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 ];
 $header_row = [];
 $first_item = reset($this->data['items']);
@@ -72,19 +75,16 @@ elseif (count($this->data['items']) > 1) {
 	unset($actions[HISTORY_LATEST]);
 }
 
-$action_list = new CList();
-$view_type = [
-	new CLabel(_('View as')),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	new CComboBox('action', $this->data['action'], 'submit()', $actions),
-];
+$action_list = (new CList())
+	->addItem([
+		new CLabel(_('View as')),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		new CComboBox('action', $this->data['action'], 'submit()', $actions),
+	]);
 
 if ($data['action'] !== HISTORY_GRAPH && $data['action'] !== HISTORY_BATCH_GRAPH) {
-	$view_type[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-	$view_type[] = new CSubmit('plaintext', _('As plain text'));
+	$action_list->addItem(new CSubmit('plaintext', _('As plain text')));
 }
-
-$action_list->addItem($view_type);
 
 if ($this->data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	$action_list->addItem(get_icon('favourite', [
@@ -105,7 +105,7 @@ $header['right']->addItem($action_list);
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm = (new CFilter('web.history.filter.state'))
-			->addVar('fullscreen', $this->data['fullscreen'])
+			->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null)
 			->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {
 			$filterForm->addVar('itemids['.$itemId.']', $itemId);
@@ -223,8 +223,11 @@ if ($this->data['plaintext']) {
 	$historyWidget->addItem($pre);
 }
 else {
-	$historyWidget->setTitle($header['left'])
-		->setControls($header['right']);
+	$historyWidget
+		->setTitle($header['left'])
+		->setControls((new CTag('nav', true, $header['right']))
+			->setAttribute('aria-label', _('Content controls'))
+	);
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm->addNavigator();
@@ -246,7 +249,7 @@ else {
 				)
 			);
 			$filterForm->removeButtons();
-			$filterForm->addVar('fullscreen', $this->data['fullscreen']);
+			$filterForm->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null);
 			$filterForm->addVar('action', $this->data['action']);
 			$filterForm->addVar('itemids', $this->data['itemids']);
 		}

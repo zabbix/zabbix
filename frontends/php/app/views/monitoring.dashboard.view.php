@@ -33,20 +33,26 @@ else {
 
 	$breadcrumbs = include 'monitoring.dashboard.breadcrumbs.php';
 
-	$item_groupid = null;
-	$item_hostid = null;
+	$main_filter_form = null;
 
 	if ($data['dynamic']['has_dynamic_widgets']) {
-		$item_groupid = [
-			new CLabel(_('Group'), 'groupid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$data['pageFilter']->getGroupsCB()
-		];
-		$item_hostid = [
-			new CLabel(_('Host'), 'hostid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$data['pageFilter']->getHostsCB()
-		];
+		$main_filter_form = (new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addVar('action', 'dashboard.view')
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getGroupsCB()
+				])
+				->addItem([
+					new CLabel(_('Host'), 'hostid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getHostsCB()
+				])
+		);
 	}
 
 	$url_create = (new CUrl('zabbix.php'))
@@ -71,70 +77,84 @@ else {
 	if (!$data['kioskmode']) {
 		$widget
 			->setTitle($data['dashboard']['name'])
-			->setControls((new CForm('get'))
-				->cleanItems()
-				->addVar('action', 'dashboard.view')
-				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-				->addItem((new CList())
-					// $item_groupid and $item_hostid will be hidden, when 'Edit Dashboard' will be clicked.
-					->addItem($item_groupid)
-					->addItem($item_hostid)
-					/*
-					 * 'Edit dashboard' should be first one in list, because it will be visually replaced by last item of
-					 * new list, when clicked.
-					 */
-					->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable']))
-					->addItem((new CButton(SPACE))
-						->addClass(ZBX_STYLE_BTN_ACTION)
-						->setId('dashbrd-actions')
-						->setTitle(_('Actions'))
-						->setMenuPopup([
-							'type' => 'dashboard',
-							'label' => _('Actions'),
-							'items' => [
-								'sharing' => [
-									'label' => _('Sharing'),
-									'form_data' => [
-										'dashboardid' => $data['dashboard']['dashboardid']
+			->setControls((new CList())
+				->setId('dashbrd-control')
+				->addItem($main_filter_form)
+				->addItem((new CTag('nav', true, [
+					(new CList())
+						->addItem((
+							(new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable'])))
+						->addItem((new CButton(SPACE))
+							->addClass(ZBX_STYLE_BTN_ACTION)
+							->setId('dashbrd-actions')
+							->setTitle(_('Actions'))
+							->setMenuPopup([
+								'type' => 'dashboard',
+								'label' => _('Actions'),
+								'items' => [
+									'sharing' => [
+										'label' => _('Sharing'),
+										'form_data' => [
+											'dashboardid' => $data['dashboard']['dashboardid']
+										],
+										'disabled' => !$data['dashboard']['editable']
 									],
-									'disabled' => !$data['dashboard']['editable']
-								],
-								'create' => [
-									'label' => _('Create new'),
-									'url' => $url_create->getUrl()
-								],
-								'clone' => [
-									'label' => _('Clone'),
-									'url' => $url_clone->getUrl()
-								],
-								'delete' => [
-									'label' => _('Delete'),
-									'confirmation' => _('Delete dashboard?'),
-									'url' => 'javascript:void(0)',
-									'redirect' => $data['dashboard']['editable']
-										? $url_delete->getUrl()
-										: null,
-									'disabled' => !$data['dashboard']['editable']
+									'create' => [
+										'label' => _('Create new'),
+										'url' => $url_create->getUrl()
+									],
+									'clone' => [
+										'label' => _('Clone'),
+										'url' => $url_clone->getUrl()
+									],
+									'delete' => [
+										'label' => _('Delete'),
+										'confirmation' => _('Delete dashboard?'),
+										'url' => 'javascript:void(0)',
+										'redirect' => $data['dashboard']['editable']
+											? $url_delete->getUrl()
+											: null,
+										'disabled' => !$data['dashboard']['editable']
+									]
 								]
-							]
-						])
-					)
-					->addItem(get_icon('fullscreen', [
-						'fullscreen' => $data['fullscreen'],
-						'kioskmode' => $data['kioskmode']
-					]))
+							])
+						)
+						->addItem(get_icon('fullscreen', [
+							'fullscreen' => $data['fullscreen'],
+							'kioskmode' => $data['kioskmode']
+						]))
+					]))->setAttribute('aria-label', _('Content controls'))
 				)
-			)
+				->addItem((new CListItem([
+					(new CTag('nav', true, [
+						new CList([
+							(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
+							(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
+								->addClass(ZBX_STYLE_BTN_ALT),
+							(new CButton('dashbrd-save', _('Save changes'))),
+							(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
+							''
+						])
+					]))
+						->setAttribute('role', 'navigation')
+						->setAttribute('aria-label', _('Content controls'))
+						->addClass(ZBX_STYLE_DASHBRD_EDIT)
+					]))
+						->addStyle('display: none')
+		))
 			->addItem((new CList())
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Breadcrumbs'))
 				->addItem($breadcrumbs)
 				->addClass(ZBX_STYLE_OBJECT_GROUP)
 			);
 	}
 	else {
 		$widget->addItem(get_icon('fullscreen', [
-			'fullscreen' => $data['fullscreen'],
-			'kioskmode' => $data['kioskmode']
-		]));
+				'fullscreen' => $data['fullscreen'],
+				'kioskmode' => $data['kioskmode']
+			])->setAttribute('aria-label', _('Content controls'))
+		);
 	}
 
 	$timeline = null;

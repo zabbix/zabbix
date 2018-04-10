@@ -705,8 +705,10 @@ jQuery(function($) {
 					values.isAvailableOpened = false;
 				});
 
-			$.each(values.available, function(i, item) {
-				addAvailable(item, obj, values, options);
+			$.each(data, function (i, item) {
+				if (typeof values.available[item.id] !== 'undefined') {
+					addAvailable(item, obj, values, options);
+				}
 			});
 		}
 

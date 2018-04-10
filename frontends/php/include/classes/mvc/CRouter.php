@@ -63,6 +63,7 @@ class CRouter {
 		'dashbrd.widget.config'	=> ['CControllerDashbrdWidgetConfig',	'layout.json',			'monitoring.dashboard.config'],
 		'dashbrd.widget.check'	=> ['CControllerDashbrdWidgetCheck',	'layout.json',			null],
 		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.json',			null],
+		'dashboard.get'	        => ['CControllerDashboardGet',	        'layout.json',			null],
 		'dashboard.update'	    => ['CControllerDashboardUpdate',	    'layout.json',			null],
 		'dashbrd.widget.rfrate'	=> ['CControllerDashbrdWidgetRfRate',	'layout.json',			null],
 		'discovery.view'		=> ['CControllerDiscoveryView',			'layout.htmlpage',		'monitoring.discovery.view'],
@@ -124,6 +125,8 @@ class CRouter {
 		'popup.services'		=> ['CControllerPopupServices',			'layout.json',			'popup.services'],
 		'popup.testtriggerexpr'	=> ['CControllerPopupTestTriggerExpr',	'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerwizard'	=> ['CControllerPopupTriggerWizard',	'layout.json',			'popup.triggerwizard'],
+		'trigdesc.update'		=> ['CControllerTrigDescUpdate',		'layout.json',			null],
+		'popup.trigdesc.view'	=> ['CControllerPopupTrigDescView',		'layout.json',			'popup.trigdesc.view'],
 		'popup.dashbrd.properties' => ['CControllerPopupDashbrdProperties', 'layout.json',		'popup.dashbrd.properties'],
 		'popup.dashbrd.sharing' => ['CControllerPopupDashbrdSharing', 'layout.json',			'popup.dashbrd.sharing']
 	];

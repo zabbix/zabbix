@@ -28,6 +28,7 @@ if (!empty($this->data['hostid'])) {
 // create form
 $itemForm = (new CForm())
 	->setName('itemForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('group_itemid', $this->data['itemids'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('action', $this->data['action']);
@@ -39,7 +40,8 @@ $itemFormList = new CFormList('itemFormList');
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[type]', 'type', _('Original')))
 		->setLabel(_('Type'))
-		->setChecked(isset($this->data['visible']['type'])),
+		->setChecked(isset($this->data['visible']['type']))
+		->setAttribute('autofocus', 'autofocus'),
 	new CComboBox('type', $this->data['type'], null, $this->data['itemTypes'])
 );
 

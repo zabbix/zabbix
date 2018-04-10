@@ -24,6 +24,7 @@ $widget = (new CWidget())->setTitle(_('User groups'));
 // create form
 $userGroupForm = (new CForm())
 	->setName('userGroupsForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['usrgrpid'] != 0) {
@@ -139,6 +140,7 @@ $new_permissions_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
+			'data' => $data['permission_groups'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -150,7 +152,7 @@ $new_permissions_table = (new CTable())
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
-			(new CRadioButtonList('new_permission', PERM_NONE))
+			(new CRadioButtonList('new_permission', (int) $data['new_permission']))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Deny'), PERM_DENY)
@@ -158,11 +160,7 @@ $new_permissions_table = (new CTable())
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top')
 	])
-	->addRow([[
-		(new CCheckBox('subgroups')),
-		SPACE,
-		_('Include subgroups')
-	]])
+	->addRow([[(new CCheckBox('subgroups'))->setChecked($data['subgroups'] == 1), _('Include subgroups')]])
 	->addRow([
 		(new CSimpleButton(_('Add')))
 			->onClick('javascript: submitFormWithParam("'.$userGroupForm->getName().'", "add_permission", "1");')
@@ -175,10 +173,102 @@ $permissionsFormList->addRow(null,
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
+/*
+ * Tag filter tab
+ */
+$tag_filter_form_list = new CFormList('tagFilterFormList');
+
+$tag_filter_table = (new CTable())
+	->setId('tag_filter_table')
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Host group'), _('Tags'), _('Action')]);
+
+$pre_name = '';
+
+foreach ($data['tag_filters'] as $key => $tag_filter) {
+	$action = (new CSimpleButton(_('Remove')))
+		->onClick('javascript: submitFormWithParam('.
+			'"'.$userGroupForm->getName().'", "remove_tag_filter['.$key.']", "1"'.
+		');')
+		->addClass(ZBX_STYLE_BTN_LINK);
+	if ($pre_name === $tag_filter['name']) {
+		$tag_filter['name'] = '';
+	}
+	else {
+		$pre_name = $tag_filter['name'];
+	}
+
+	if ($tag_filter['tag'] !== '' && $tag_filter['value'] !== '') {
+		$tag_value = $tag_filter['tag'].NAME_DELIMITER.$tag_filter['value'];
+	}
+	elseif ($tag_filter['tag'] !== '') {
+		$tag_value = $tag_filter['tag'];
+	}
+	else {
+		$tag_value = italic(_('All tags'));
+	}
+
+	$tag_filter_table->addRow([$tag_filter['name'], $tag_value, $action]);
+	$userGroupForm->addVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']);
+	$userGroupForm->addVar('tag_filters['.$key.'][tag]', $tag_filter['tag']);
+	$userGroupForm->addVar('tag_filters['.$key.'][value]', $tag_filter['value']);
+}
+
+$tag_filter_form_list->addRow(_('Permissions'),
+	(new CDiv($tag_filter_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
+$new_tag_filter_table = (new CTable())
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'tag_filter_groupids[]',
+			'objectName' => 'hostGroup',
+			'data' => $data['tag_filter_groups'],
+			'styles' => ['margin-top' => '-.3em'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $userGroupForm->getName(),
+					'dstfld1' => 'tag_filter_groupids_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		new CCol(
+			(new CTextBox('tag', $data['tag']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('placeholder', _('tag'))
+		),
+		new CCol(
+			(new CTextBox('value', $data['value']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('placeholder', _('value'))
+		)
+	])
+	->addRow([[
+		(new CCheckBox('tag_filter_subgroups'))->setChecked($data['tag_filter_subgroups'] == 1),
+		_('Include subgroups')
+	]])
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$userGroupForm->getName().'", "add_tag_filter", "1");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
+
+$tag_filter_form_list->addRow(null,
+	(new CDiv($new_tag_filter_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
 // append form lists to tab
 $userGroupTab = (new CTabView())
 	->addTab('userGroupTab', _('User group'), $userGroupFormList)
-	->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
+	->addTab('permissionsTab', _('Permissions'), $permissionsFormList)
+	->addTab('tagFilterTab', _('Tag filter'), $tag_filter_form_list);
 if (!$data['form_refresh']) {
 	$userGroupTab->setSelected(0);
 }

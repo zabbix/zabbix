@@ -131,7 +131,7 @@ $showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTI
  * Display
  */
 $data = [
-	'fullscreen' => $_REQUEST['fullscreen'],
+	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'type' => $type,
 	'view_style' => $viewStyle,
 	'config' => $config
@@ -191,7 +191,7 @@ if ($type == SHOW_TRIGGERS) {
 		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
 		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
 		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null,
-		'maintenance' => !$filter['showMaintenance'] ? false : null,
+		'maintenance' => !$filter['showMaintenance'] ? false : null
 	];
 
 	$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];

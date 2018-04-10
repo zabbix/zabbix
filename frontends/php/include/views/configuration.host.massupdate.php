@@ -26,6 +26,7 @@ $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 // create form
 $hostView = (new CForm())
 	->setName('hostForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'host.massupdate')
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('id', 'hostForm');
@@ -74,7 +75,8 @@ $replaceGroups = (new CDiv(
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[groups]', 'replaceGroups', _('Original')))
 		->setLabel(_('Replace host groups'))
-		->setChecked(isset($data['visible']['groups'])),
+		->setChecked(isset($data['visible']['groups']))
+		->setAttribute('autofocus', 'autofocus'),
 	$replaceGroups
 );
 

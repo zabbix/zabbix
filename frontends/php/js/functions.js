@@ -511,22 +511,22 @@ function getOverlayDialogueId() {
 /**
  * Display modal window.
  *
- * @param {object} params						Modal window params.
- * @param {string} params.title					Modal window title.
- * @param {object} params.content				Window content.
- * @param {object} params.controls				Window controls.
- * @param {array}  params.buttons				Window buttons.
- * @param {string} params.buttons[]['title']	Text on the button.
- * @param {object}|{string} params.buttons[]['action']	Function object or executable string that will be executed on
- *														click.
- * @param {string} params.buttons[]['class']	(optional) Button class.
- * @param {bool}   params.buttons[]['cancel']	(optional) It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']	(optional) Focus this button.
- * @param {bool}   params.buttons[]['enabled']	(optional) Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen']	(optional) Prevent dialogue closing, if button action returned false.
- * @param string   params.dialogueid            (optional) Unique dialogue identifier to reuse existing overlay dialog
- *												or create a new one if value is not set.
- * @param string   params.script_inline         (optional) Custom javascript code to execute when initializing dialog.
+ * @param {object} params                                   Modal window params.
+ * @param {string} params.title                             Modal window title.
+ * @param {object} params.content                           Window content.
+ * @param {object} params.controls                          Window controls.
+ * @param {array}  params.buttons                           Window buttons.
+ * @param {string} params.buttons[]['title']                Text on the button.
+ * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
+ *                                                          on click.
+ * @param {string} params.buttons[]['class']	(optional)  Button class.
+ * @param {bool}   params.buttons[]['cancel']	(optional)  It means what this button has cancel action.
+ * @param {bool}   params.buttons[]['focused']	(optional)  Focus this button.
+ * @param {bool}   params.buttons[]['enabled']	(optional)  Should the button be enabled? Default: true.
+ * @param {bool}   params.buttons[]['keepOpen']	(optional)  Prevent dialogue closing, if button action returned false.
+ * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
+ *                                                          or create a new one if value is not set.
+ * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
  * @param {object} trigger_elmnt				(optional) UI element which triggered opening of overlay dialogue.
  * @param {object} xhr							(optional) XHR request used to load content. Used to abort loading.
  *
@@ -535,7 +535,9 @@ function getOverlayDialogueId() {
 function overlayDialogue(params, trigger_elmnt, xhr) {
 	var button_focused = null,
 		cancel_action = null,
+		submit_btn = null,
 		overlay_dialogue = null,
+		headerid = '',
 		overlay_bg = null,
 		overlay_dialogue_footer = jQuery('<div>', {
 			class: 'overlay-dialogue-footer'
@@ -549,6 +551,8 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		jQuery(overlay_dialogue_footer).append(jQuery('<script>').text(params.script_inline));
 	}
 
+	headerid = 'dashbrd-widget-head-title-'+params.dialogueid;
+
 	if (jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]').length) {
 		overlay_dialogue = jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]');
 
@@ -561,7 +565,10 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		overlay_dialogue = jQuery('<div>', {
 			'id': 'overlay_dialogue',
 			'class': 'overlay-dialogue modal',
-			'data-dialogueid': params.dialogueid
+			'data-dialogueid': params.dialogueid,
+			'role': 'dialog',
+			'aria-modal': 'true',
+			'aria-labeledby': headerid
 		});
 
 		overlay_bg = jQuery('<div>', {
@@ -583,8 +590,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
 		body_mutation_observer = new body_mutation_observer(function(mutation) {
 			center_overlay_dialog();
-		}),
-		submit_btn = null;
+		});
 
 	jQuery.each(params.buttons, function(index, obj) {
 		var button = jQuery('<button>', {
@@ -637,14 +643,13 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			})
 				.click(function() {
 					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
-
 					return false;
 				})
 		)
 		.append(
 			jQuery('<div>', {
 				class: 'dashbrd-widget-head'
-			}).append(jQuery('<h4>').text(params.title))
+			}).append(jQuery('<h4 id="'+headerid+'">').text(params.title))
 		)
 		.append(params.controls ? jQuery('<div>').addClass('overlay-dialogue-controls').html(params.controls) : null)
 		.append(
@@ -655,6 +660,9 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 				.each(function() {
 					body_mutation_observer.observe(this, {childList: true, subtree: true});
 				})
+				.find('form')
+					.attr('aria-labeledby', headerid)
+				.end()
 		)
 		.append(overlay_dialogue_footer);
 
@@ -702,7 +710,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		button_focused.focus();
 	}
 
-	// Don't focus element in overlay, if the button is already focused.
+	// Don't focus element in overlay, if button is already focused.
 	overlayDialogueOnLoad(!button_focused, jQuery('.overlay-dialogue[data-dialogueid="'+params.dialogueid+'"]'));
 }
 
@@ -737,7 +745,6 @@ function overlayDialogueOnLoad(focus, overlay) {
 				// TAB and SHIFT
 				if (e.which == 9 && e.shiftKey) {
 					last_focusable.focus();
-
 					return false;
 				}
 			});
@@ -748,7 +755,6 @@ function overlayDialogueOnLoad(focus, overlay) {
 				// TAB and not SHIFT
 				if (e.which == 9 && !e.shiftKey) {
 					first_focusable.focus();
-
 					return false;
 				}
 			});
@@ -803,6 +809,8 @@ function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 				}
 			]
 		}, trigger_elmnt);
+
+		return false;
 	}
 	else {
 		execute();
