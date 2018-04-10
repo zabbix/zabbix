@@ -62,7 +62,7 @@ class CControllerPopupDashbrdProperties extends CController {
 		elseif ($this->hasInput('dashboardid')) {
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name', 'dashboardid', 'userid'],
-				'dashboardids' => $this->getInput('dashboardid').'111',
+				'dashboardids' => $this->getInput('dashboardid'),
 				'editable' => true,
 				'preservekeys' => true
 			]);
