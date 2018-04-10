@@ -28,7 +28,7 @@ $page['title'] = _('History');
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-if (isset($_REQUEST['plaintext'])) {
+if (hasRequest('plaintext')) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
@@ -37,7 +37,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'itemids' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	null],
+	'itemids' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null],
 	'period' =>			[T_ZBX_INT, O_OPT, null,	null,	null],
 	'stime' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
 	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
@@ -71,37 +71,44 @@ $_REQUEST['action'] = getRequest('action', HISTORY_GRAPH);
 /*
  * Display
  */
-$items = API::Item()->get([
-	'itemids' => getRequest('itemids'),
-	'webitems' => true,
-	'selectHosts' => ['name'],
-	'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid', 'history', 'trends'],
-	'preservekeys' => true
-]);
+$itemids = getRequest('itemids', []);
+$items = [];
+$value_type = '';
 
-foreach (getRequest('itemids') as $itemid) {
-	if (!isset($items[$itemid])) {
-		access_deny();
+if ($itemids) {
+	$items = API::Item()->get([
+		'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid', 'history', 'trends'],
+		'selectHosts' => ['name'],
+		'itemids' => $itemids,
+		'preservekeys' => true,
+		'templated' => false,
+		'webitems' => true
+	]);
+
+	foreach ($itemids as $itemid) {
+		if (!array_key_exists($itemid, $items)) {
+			access_deny();
+		}
 	}
+
+	$items = CMacrosResolverHelper::resolveItemNames($items);
+	$item = reset($items);
+	$value_type = $item['value_type'];
 }
 
-$items = CMacrosResolverHelper::resolveItemNames($items);
-
-$item = reset($items);
-
 $data = [
-	'itemids' => getRequest('itemids'),
+	'itemids' => $itemids,
 	'items' => $items,
-	'value_type' => $item['value_type'],
+	'value_type' => $value_type,
 	'action' => getRequest('action'),
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow'),
-	'plaintext' => isset($_REQUEST['plaintext']),
-	'iv_string' => [ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1],
-	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1],
+	'is_now' => getRequest('isNow'),
+	'plaintext' => hasRequest('plaintext'),
+	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL),
 	'fullscreen' => (bool) getRequest('fullscreen', false),
-	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL)
+	'iv_string' => [ITEM_VALUE_TYPE_LOG => true, ITEM_VALUE_TYPE_TEXT => true],
+	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => true, ITEM_VALUE_TYPE_UINT64 => true]
 ];
 
 // render view

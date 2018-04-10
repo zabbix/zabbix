@@ -24,14 +24,14 @@ require_once dirname(__FILE__).'/js/monitoring.history.js.php';
 $historyWidget = new CWidget();
 
 $header = [
-	'left' => _n('%1$s item', '%1$s items', count($this->data['items'])),
+	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
 		->addVar('itemids', getRequest('itemids'))
 		->addVar('page', 1)
 		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 ];
 $header_row = [];
-$first_item = reset($this->data['items']);
+$first_item = reset($data['items']);
 $host_name = $first_item['hosts'][0]['name'];
 $same_host = true;
 $items_numeric = true;
@@ -41,7 +41,7 @@ foreach ($data['items'] as $item) {
 	$items_numeric = ($items_numeric && array_key_exists($item['value_type'], $data['iv_numeric']));
 }
 
-if (count($data['items']) == 1 || $same_host) {
+if ((count($data['items']) == 1 || $same_host) && $data['itemids']) {
 	$header['left'] = [
 		$host_name,
 		NAME_DELIMITER,
@@ -68,28 +68,30 @@ $actions = [
 	HISTORY_VALUES => _('Values'),
 	HISTORY_LATEST => _('500 latest values')
 ];
+
 if (!$items_numeric) {
 	unset($actions[HISTORY_GRAPH]);
 }
-elseif (count($this->data['items']) > 1) {
+elseif (count($data['items']) > 1) {
 	unset($actions[HISTORY_LATEST]);
 }
 
 $action_list = new CList();
+
 $view_type = [
 	new CLabel(_('View as')),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	new CComboBox('action', $this->data['action'], 'submit()', $actions),
+	(new CComboBox('action', $data['action'], 'submit()', $actions))->setEnabled($data['items']),
 ];
 
 if ($data['action'] !== HISTORY_GRAPH && $data['action'] !== HISTORY_BATCH_GRAPH) {
 	$view_type[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-	$view_type[] = new CSubmit('plaintext', _('As plain text'));
+	$view_type[] = (new CSubmit('plaintext', _('As plain text')))->setEnabled($data['items']);
 }
 
 $action_list->addItem($view_type);
 
-if ($this->data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
+if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	$action_list->addItem(get_icon('favourite', [
 		'fav' => 'web.favorite.graphids',
 		'elid' => $item['itemid'],
@@ -99,163 +101,181 @@ if ($this->data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 
 $action_list->addItem([
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']])
+	get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])
 ]);
 
 $header['right']->addItem($action_list);
 
 // create filter
-if ($this->data['action'] == HISTORY_LATEST || $this->data['action'] == HISTORY_VALUES) {
-	if (array_key_exists($this->data['value_type'], $this->data['iv_string'])) {
+if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
+	if (array_key_exists($data['value_type'], $data['iv_string']) || !$data['itemids']) {
 		$filterForm = (new CFilter('web.history.filter.state'))
-			->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null)
-			->addVar('action', $this->data['action']);
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+			->addVar('action', $data['action']);
 
 		$items_data = [];
-		foreach ($this->data['items'] as $itemid => $item) {
-			if (!array_key_exists($item['value_type'], $this->data['iv_string'])) {
-				unset($this->data['items'][$itemid]);
-				continue;
+		if ($data['items']) {
+			foreach ($data['items'] as $itemid => $item) {
+				if (!array_key_exists($item['value_type'], $data['iv_string'])) {
+					unset($data['items'][$itemid]);
+					continue;
+				}
+
+				$items_data[] = [
+					'id' => $itemid,
+					'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER,
+					'name' => $item['name_expanded']
+				];
+			}
+			CArrayHelper::sort($items_data, ['prefix', 'name']);
+		}
+
+		if ($data['value_type'] == ITEM_VALUE_TYPE_LOG || !$data['itemids']) {
+			$filterColumn1 = (new CFormList())
+				->addRow(_('Items list'),
+					(new CMultiSelect([
+						'name' => 'itemids[]',
+						'object_name' => 'items',
+						'ignored' => $data['items'],
+						'data' => $items_data,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'items',
+								'srcfld1' => 'itemid',
+								'dstfld1' => 'itemids_',
+								'real_hosts' => true,
+								'value_types' => [ITEM_VALUE_TYPE_LOG]
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				)
+				->addRow(_('Value'),
+					(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				);
+
+			$filterTask = getRequest('filter_task', 0);
+
+			$tasks = [new CComboBox('filter_task', $filterTask, 'submit()', [
+				FILTER_TASK_SHOW => _('Show selected'),
+				FILTER_TASK_HIDE => _('Hide selected'),
+				FILTER_TASK_MARK => _('Mark selected'),
+				FILTER_TASK_INVERT_MARK => _('Mark others')
+			])];
+
+			if (str_in_array($filterTask, [FILTER_TASK_MARK, FILTER_TASK_INVERT_MARK])) {
+				$tasks[] = ' ';
+				$tasks[] = new CComboBox('mark_color', getRequest('mark_color', 0), null, [
+					MARK_COLOR_RED => _('as Red'),
+					MARK_COLOR_GREEN => _('as Green'),
+					MARK_COLOR_BLUE => _('as Blue')
+				]);
 			}
 
-			$items_data[] = [
-				'id' => $itemid,
-				'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER,
-				'name' => $item['name_expanded']
-			];
+			$filterColumn1->addRow(_('Selected'), $tasks);
+			$filterForm->addColumn($filterColumn1);
 		}
-
-		CArrayHelper::sort($items_data, ['prefix', 'name']);
-
-		$filterColumn1 = (new CFormList())
-			->addRow(_('Items list'),
-				(new CMultiSelect([
-					'name' => 'itemids[]',
-					'object_name' => 'items',
-					'data' => $items_data,
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'items',
-							'srcfld1' => 'itemid',
-							'dstfld1' => 'itemids_',
-							'real_hosts' => true,
-							'value_types' => [$data['value_type']]
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			)
-			->addRow(_('Value'),
-				(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			);
-
-		$filterTask = getRequest('filter_task', 0);
-
-		$tasks = [new CComboBox('filter_task', $filterTask, 'submit()', [
-			FILTER_TASK_SHOW => _('Show selected'),
-			FILTER_TASK_HIDE => _('Hide selected'),
-			FILTER_TASK_MARK => _('Mark selected'),
-			FILTER_TASK_INVERT_MARK => _('Mark others')
-		])];
-
-		if (str_in_array($filterTask, [FILTER_TASK_MARK, FILTER_TASK_INVERT_MARK])) {
-			$tasks[] = ' ';
-			$tasks[] = new CComboBox('mark_color', getRequest('mark_color', 0), null, [
-				MARK_COLOR_RED => _('as Red'),
-				MARK_COLOR_GREEN => _('as Green'),
-				MARK_COLOR_BLUE => _('as Blue')
-			]);
-		}
-
-		$filterColumn1->addRow(_('Selected'), $tasks);
-		$filterForm->addColumn($filterColumn1);
 	}
 }
 
 // for batch graphs don't remember the time selection in the profiles
-if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
+if ($data['action'] == HISTORY_BATCH_GRAPH) {
 	$profileIdx = null;
 	$profileIdx2 = null;
 	$updateProfile = false;
 }
 else {
 	$profileIdx = 'web.item.graph';
-	$profileIdx2 = reset($this->data['itemids']);
-	$updateProfile = ($this->data['period'] !== null || $this->data['stime'] !== null || $this->data['isNow'] !== null);
+	$profileIdx2 = reset($data['itemids']);
+	$updateProfile = ($data['period'] !== null || $data['stime'] !== null || $data['is_now'] !== null);
 }
 
 // create history screen
-$screen = CScreenBuilder::getScreen([
-	'resourcetype' => SCREEN_RESOURCE_HISTORY,
-	'action' => $this->data['action'],
-	'itemids' => $data['itemids'],
-	'profileIdx' => $profileIdx,
-	'profileIdx2' => $profileIdx2,
-	'updateProfile' => $updateProfile,
-	'period' => $this->data['period'],
-	'stime' => $this->data['stime'],
-	'isNow' => $this->data['isNow'],
-	'filter' => getRequest('filter'),
-	'filter_task' => getRequest('filter_task'),
-	'mark_color' => getRequest('mark_color'),
-	'plaintext' => $this->data['plaintext'],
-	'graphtype' => $this->data['graphtype']
-]);
+if ($data['itemids']) {
+	$screen = CScreenBuilder::getScreen([
+		'resourcetype' => SCREEN_RESOURCE_HISTORY,
+		'action' => $data['action'],
+		'itemids' => $data['itemids'],
+		'profileIdx' => $data['itemids'] ? $profileIdx : null,
+		'profileIdx2' => $data['itemids'] ? $profileIdx2 : null,
+		'updateProfile' => $data['itemids'] ? $updateProfile : false,
+		'period' => $data['period'],
+		'stime' => $data['stime'],
+		'isNow' => $data['is_now'],
+		'filter' => getRequest('filter'),
+		'filter_task' => getRequest('filter_task'),
+		'mark_color' => getRequest('mark_color'),
+		'plaintext' => $data['plaintext'],
+		'graphtype' => $data['graphtype']
+	]);
+}
 
 // append plaintext to widget
-if ($this->data['plaintext']) {
+if ($data['plaintext']) {
 	foreach ($header_row as $text) {
 		$historyWidget->addItem([new CSpan($text), BR()]);
 	}
 
-	$screen = $screen->get();
-
-	$pre = new CPre();
-	foreach ($screen as $text) {
-		$pre->addItem([$text, BR()]);
+	if ($data['itemids']) {
+		$screen = $screen->get();
+		$pre = new CPre();
+		foreach ($screen as $text) {
+			$pre->addItem([$text, BR()]);
+		}
+		$historyWidget->addItem($pre);
 	}
-	$historyWidget->addItem($pre);
 }
 else {
 	$historyWidget->setTitle($header['left'])
 		->setControls($header['right']);
 
-	if (isset($this->data['iv_string'][$this->data['value_type']])) {
+	if (array_key_exists($data['value_type'], $data['iv_string'])) {
 		$filterForm->addNavigator();
 	}
 
-	if (in_array($this->data['action'], [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
+	if (in_array($data['action'], [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
 		if(!isset($filterForm)) {
 			$filterForm = new CFilter('web.history.filter.state');
 		}
 
 		// display the graph type filter for graphs with multiple items
-		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
+		if ($data['action'] == HISTORY_BATCH_GRAPH) {
 			$filterForm->addColumn(
 				(new CFormList())->addRow(_('Graph type'),
-					(new CRadioButtonList('graphtype', (int) $this->data['graphtype']))
+					(new CRadioButtonList('graphtype', (int) $data['graphtype']))
 						->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
 						->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
 						->setModern(true)
 				)
 			);
 			$filterForm->removeButtons();
-			$filterForm->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null);
-			$filterForm->addVar('action', $this->data['action']);
-			$filterForm->addVar('itemids', $this->data['itemids']);
+			$filterForm->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
+			$filterForm->addVar('action', $data['action']);
+			$filterForm->addVar('itemids', $data['itemids']);
 		}
 
 		$filterForm->addNavigator();
 		$historyWidget->addItem($filterForm);
 	}
+	if ($data['itemids']) {
+		$historyWidget->addItem($screen->get());
 
-	$historyWidget->addItem($screen->get());
-
-	if ($data['action'] !== HISTORY_LATEST) {
-		CScreenBuilder::insertScreenStandardJs([
-			'timeline' => $screen->timeline,
-			'profileIdx' => $screen->profileIdx,
-			'profileIdx2' => $screen->profileIdx2
-		]);
+		if ($data['action'] !== HISTORY_LATEST) {
+			CScreenBuilder::insertScreenStandardJs([
+				'timeline' => $screen->timeline,
+				'profileIdx' => $screen->profileIdx,
+				'profileIdx2' => $screen->profileIdx2
+			]);
+		}
+	} else {
+		$historyWidget->addItem(
+			(new CTableInfo())
+				->setHeader([
+					(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
+					(new CColHeader(_('Local time')))->addClass(ZBX_STYLE_CELL_WIDTH),
+					_('Value')
+				])
+				->setNoDataMessage(_('Specify some filter condition to see the values.'))
+		);
 	}
 }
 

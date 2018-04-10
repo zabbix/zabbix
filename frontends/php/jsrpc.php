@@ -288,6 +288,7 @@ switch ($data['method']) {
 					'hostids' => array_key_exists('only_hostid', $data) ? $data['only_hostid'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'monitored' => array_key_exists('monitored', $data) ? $data['monitored'] : null,
+					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,

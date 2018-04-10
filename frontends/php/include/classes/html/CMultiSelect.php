@@ -174,6 +174,10 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['hostid'] = $parameters['hostid'];
 				}
 
+				if (array_key_exists('ignored', $parameters)) {
+					$popup_parameters['excludeids'] = $parameters['ignored'];
+				}
+
 				if (array_key_exists('numeric', $parameters) && $parameters['numeric']) {
 					$popup_parameters['numeric'] = '1';
 					$autocomplete_parameters['filter']['value_type'] = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
