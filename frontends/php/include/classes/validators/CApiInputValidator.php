@@ -926,7 +926,7 @@ class CApiInputValidator {
 	 * Time unit validator like "10", "20s", "30m", "4h", "{$TIME}" etc.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param int    $rule['in']      (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -959,7 +959,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (($flags & API_ALLOW_USER_MACRO) && $data[0] === '{') {
+		if (($flags & (API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO)) && $data[0] === '{') {
 			return true;
 		}
 
