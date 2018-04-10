@@ -66,10 +66,10 @@ ROW   |2 |8       |2     |
 ROW   |4 |7       |1     |
 
 TABLE |scripts
-FIELDS|scriptid|name                   |command                          |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|
-ROW   |1       |Ping                   |/bin/ping -c 3 {HOST.CONN}       |2          |NULL    |NULL   |           |            |0   |2         |
-ROW   |2       |Traceroute             |/usr/bin/traceroute {HOST.CONN}  |2          |NULL    |NULL   |           |            |0   |2         |
-ROW   |3       |Detect operating system|sudo /usr/bin/nmap -O {HOST.CONN}|2          |7       |NULL   |           |            |0   |2         |
+FIELDS|scriptid|name                   |command                                                        |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|
+ROW   |1       |Ping                   |ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac |2          |NULL    |NULL   |           |            |0   |2         |
+ROW   |2       |Traceroute             |/usr/bin/traceroute {HOST.CONN}                                |2          |NULL    |NULL   |           |            |0   |2         |
+ROW   |3       |Detect operating system|sudo /usr/bin/nmap -O {HOST.CONN}                              |2          |7       |NULL   |           |            |0   |2         |
 
 TABLE |actions
 FIELDS|actionid|name                                          |eventsource|evaltype|status|esc_period|def_shortdata                              |def_longdata                                                                                                                                                                                      |r_shortdata                                |r_longdata                                                                                                                                                                                                                    |formula|maintenance_mode|ack_shortdata               |ack_longdata                                                                                                                                                 |

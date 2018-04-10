@@ -12,6 +12,10 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+........S. [ZBX-13299] fixed autoregistration, discovery and internal notifications not being sent due to uninitialized severity (vso)
+....I..... [ZBX-13607] changed ping script to return success also for timeouts (wiper)
+..F....... [ZBX-12967] fixed Screen Slide Show Refresh interval Multiplier menu is not working (agriscenko)
+........S. [ZBX-13696] added maximum record limit to old session removal in housekeeper (wiper)
 ..F....... [ZBX-13642] fixed undefined index in user edit form (agriscenko)
 ..F....... [ZBX-13546] fixed context menu positioning in maps (gcalenko, miks)
 ..F....... [ZBX-13668] fixed dynamic widget is searching for item key in item prototypes (agriscenko)
@@ -237,6 +241,10 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13299] fixed autoregistration, discovery and internal notifications not being sent due to uninitialized severity (vso)
+....I..... [ZBX-13607] changed ping script to return success also for timeouts (wiper)
+..F....... [ZBX-12967] fixed Screen Slide Show Refresh interval Multiplier menu is not working (agriscenko)
+........S. [ZBX-13696] added maximum record limit to old session removal in housekeeper (wiper)
 ..F....... [ZBX-13642] fixed undefined index in user edit form (agriscenko)
 ..F....... [ZBX-13668] fixed dynamic widget is searching for item key in item prototypes (agriscenko)
 ..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
