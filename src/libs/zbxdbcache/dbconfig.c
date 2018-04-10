@@ -11150,7 +11150,6 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &diff->hostid)))
 	{
-
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS))
 		{
 			if (proxy->lastaccess != diff->lastaccess)
