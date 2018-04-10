@@ -229,9 +229,9 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_proxy_heartbeat";
 
-	char			*error = NULL;
-	int			ret, flags = ZBX_TCP_PROTOCOL;
-	DC_PROXY		proxy;
+	char		*error = NULL;
+	int		ret, flags = ZBX_TCP_PROTOCOL;
+	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
