@@ -175,30 +175,6 @@ out:
   invalid_part: ''
   return: 'SUCCEED'
 ---
-test case: invalid key, unmatched opening bracket (1)   # array missing closing bracket after second parameter
-in:
-  key: 'key[["a",]'
-out:
-  valid_part: 'key[["a",]'
-  invalid_part: ''
-  return: 'FAIL'
----
-test case: invalid key, unmatched opening bracket (2)   # array missing closing bracket after second parameter, one of the closing brackets is inside quotes and is a part of the second array parameter
-in:
-  key: 'key[["a","\"b\"]"]'
-out:
-  valid_part: 'key[["a","\"b\"]"]'
-  invalid_part: ''
-  return: 'FAIL'
----
-test case: invalid key, invalid character (double quote) after array-closing bracket
-in:
-  key: 'key[[a"]"]'
-out:
-  valid_part: key[[a"]'
-  invalid_part: '"]'
-  return: 'FAIL'
----
 test case: valid key in the beginning, invalid character for unquoted parameter, multiple parameter key
 in:
   key: 'key["a",["b","c\"]"]]]'
@@ -231,14 +207,6 @@ out:
   invalid_part: '654'
   return: 'SUCCEED'
 ---
-test case: invalid key, braces are not allowed in key
-in:
-  key: '{}key'
-out:
-  valid_part: '{}key'	# yes, if the first character of key is invalid, then parse_key() does not advance pointer, so valid and invalid parts are equal.
-  invalid_part: '{}key'
-  return: 'FAIL'
----
 test case: valid key in the beginning, comma is not allowed in key or parameters should be enclosed in brackets
 in:
   key: 'ssh,21'
@@ -254,6 +222,62 @@ out:
   valid_part: 'key[]'
   invalid_part: '[]'
   return: 'SUCCEED'
+---
+test case: valid key in the beginning, followed by character ]
+in:
+  key: 'key[a]]'
+out:
+  valid_part: 'key[a]'
+  invalid_part: ']'
+  return: 'SUCCEED'
+---
+test case: valid key in the beginning, character [ is allowed in unquoted parameter string
+in:
+  key: 'key[a[b]]'
+out:
+  valid_part: 'key[a[b]'
+  invalid_part: ']'
+  return: 'SUCCEED'
+---
+test case: valid key in the beginning, followed by comma, key with multiple different type parameters
+in:
+  key: 'key["a",b[c,d],e]'
+out:
+  valid_part: 'key["a",b[c,d]'
+  invalid_part: ',e]'
+  return: 'SUCCEED'
+---
+test case: invalid key, unmatched opening bracket (1)   # array missing closing bracket after second parameter
+in:
+  key: 'key[["a",]'
+out:
+  valid_part: 'key[["a",]'
+  invalid_part: ''
+  return: 'FAIL'
+---
+test case: invalid key, unmatched opening bracket (2)   # array missing closing bracket after second parameter, one of the closing brackets is inside quotes and is a part of the second array parameter
+in:
+  key: 'key[["a","\"b\"]"]'
+out:
+  valid_part: 'key[["a","\"b\"]"]'
+  invalid_part: ''
+  return: 'FAIL'
+---
+test case: invalid key, invalid character (double quote) after array-closing bracket
+in:
+  key: 'key[[a"]"]'
+out:
+  valid_part: key[[a"]'
+  invalid_part: '"]'
+  return: 'FAIL'
+---
+test case: invalid key, braces are not allowed in key
+in:
+  key: '{}key'
+out:
+  valid_part: '{}key'	# yes, if the first character of key is invalid, then parse_key() does not advance pointer, so valid and invalid parts are equal.
+  invalid_part: '{}key'
+  return: 'FAIL'
 ---
 test case: invalid key, multiple square bracket pairs containing parameters are not allowed
 in:
@@ -286,30 +310,6 @@ out:
   valid_part: 'key["a","b",['
   invalid_part: '["c","d\",]"]]]'
   return: 'FAIL'
----
-test case: valid key in the beginning, followed by character ]
-in:
-  key: 'key[a]]'
-out:
-  valid_part: 'key[a]'
-  invalid_part: ']'
-  return: 'SUCCEED'
----
-test case: valid key in the beginning, character [ is allowed in unquoted parameter string
-in:
-  key: 'key[a[b]]'
-out:
-  valid_part: 'key[a[b]'
-  invalid_part: ']'
-  return: 'SUCCEED'
----
-test case: valid key in the beginning, followed by comma, key with multiple different type parameters
-in:
-  key: 'key["a",b[c,d],e]'
-out:
-  valid_part: 'key["a",b[c,d]'
-  invalid_part: ',e]'
-  return: 'SUCCEED'
 ---
 test case: invalid key, quoted parameter cannot contain unquoted part
 in:
