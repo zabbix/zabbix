@@ -5,7 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4413] added the trigger context menu option to view or edit the trigger description (miks, Sasha)
 ..F....... [ZBXNEXT-4413] added displaying of the trigger dependencies in Monitoring->Triggers videw (miks, Sasha)
 ..F....... [ZBXNEXT-4151] added aria roles to provide easier access by keyboard navigation (ashubin, gcalenko, Ivo)
-A......... [ZBX-3783] added strict validation for apiinfo.version(), action.delete(), correlation.delete() and drile.delete() methods (Sasha)
+A......... [ZBX-3783] added strict validation for apiinfo.version(), action.delete(), correlation.delete() and drule.delete() methods (Sasha)
 A......... [ZBX-3783] prohibited deleting discovery rules which are used in actions (Sasha)
 A......... [ZBX-3783] added audit for action.delete() and correlation.delete() methods (Sasha)
 ..F....... [ZBXNEXT-4143] implemented submenu autofocus on top-level menu click (nikita)
