@@ -221,19 +221,19 @@ test case: invalid key, character ] is not allowed in unquoted parameter string,
 in:
   key: 'key["a",b[c,d],e]'
 ---
-test case: invalid key, quoted parameter cannot contain unquoter part
+test case: invalid key, quoted parameter cannot contain unquoted part
 in:
   key: 'key["a"b]'
 ---
-test case: invalid key, second parameter of the array cannot contain unquoter part
+test case: invalid key, second parameter of the array cannot contain unquoted part
 in:
   key: 'key["a",["b","]"c]]'
 ---
-test case: invalid key, array type parameter cannot contain quoted parameter with unquoter part
+test case: invalid key, array type parameter cannot contain quoted parameter with unquoted part
 in:
   key: 'key[["]"a]]'
 ---
-test case: invalid key, array type parameter cannot contain quoter part
+test case: invalid key, array type parameter cannot contain quoted part
 in:
   key: 'key[[a]"b"]'
 ...
