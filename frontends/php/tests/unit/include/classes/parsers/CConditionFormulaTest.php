@@ -40,6 +40,11 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 			['A and (B and C)'],
 			['A and(B and C)'],
 			['(A and B)and C'],
+			['(  (   A    and   B   )   )   and    C'],
+			['A and not B'],
+			['not A and not B or C or not D and E'],
+			['(not A and not B) or C or (not D and E)'],
+			['(  (  not A  )  and   (   not B   )   )   or   C   or   (   (   (  not    D    and   E   ) ) )'],
 		];
 	}
 
@@ -70,6 +75,15 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 			['A andB'],
 			['AandB'],
 			['A and BandC'],
+			['A and (not B and A and not)'],
+			['A and (not B and A and not )'],
+			['A and (not B and A and NOT C  )'],
+			['A and (not B and A and not and not C)'],
+			['A and (not B and A and not not C)'],
+			['not (A and B)'],
+			['no A and B'],
+			['notA and B'],
+			['A not and B']
 		];
 	}
 
@@ -102,6 +116,11 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 				['value' => 'A', 'pos' => 0],
 				['value' => 'B', 'pos' => 6],
 				['value' => 'A', 'pos' => 11]
+			]],
+			['A and not B or C', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'B', 'pos' => 10],
+				['value' => 'C', 'pos' => 15]
 			]]
 		];
 	}

@@ -907,14 +907,14 @@ function getConditionFormula(conditions, evalType) {
 		case 1:
 			conditionOperator = 'and';
 			groupOperator = conditionOperator;
-
 			break;
+
 		// or
 		case 2:
 			conditionOperator = 'or';
 			groupOperator = conditionOperator;
-
 			break;
+
 		// and/or
 		default:
 			conditionOperator = 'or';
@@ -922,23 +922,26 @@ function getConditionFormula(conditions, evalType) {
 	}
 
 	var groupedFormulas = [];
+
 	for (var i = 0; i < conditions.length; i++) {
 		if (typeof conditions[i] === 'undefined') {
 			continue;
 		}
 
 		var groupedConditions = [];
-		groupedConditions.push(conditions[i].id);
 
-		// search for other conditions of the same type
+		// operator value "9" - CONDITION_OPERATOR_NOT_REGEXP.
+		groupedConditions.push(((conditions[i].operator == 9) ? 'not ' : '') + conditions[i].id);
+
+		// Search for other conditions of the same type.
 		for (var n = i + 1; n < conditions.length; n++) {
 			if (typeof conditions[n] !== 'undefined' && conditions[i].type == conditions[n].type) {
-				groupedConditions.push(conditions[n].id);
+				groupedConditions.push(((conditions[n].operator == 9) ? 'not ' : '') + conditions[n].id);
 				delete conditions[n];
 			}
 		}
 
-		// join conditions of the same type
+		// Join conditions of the same type.
 		if (groupedConditions.length > 1) {
 			groupedFormulas.push('(' + groupedConditions.join(' ' + conditionOperator + ' ') + ')');
 		}
@@ -949,7 +952,7 @@ function getConditionFormula(conditions, evalType) {
 
 	var formula = groupedFormulas.join(' ' + groupOperator + ' ');
 
-	// strip parentheses if there's only one condition group
+	// Strip parentheses if there's only one condition group.
 	if (groupedFormulas.length == 1) {
 		formula = formula.substr(1, formula.length - 2);
 	}
