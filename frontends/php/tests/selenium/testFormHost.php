@@ -49,7 +49,7 @@ class testFormHost extends CWebTest {
 	public function testFormHost_Create() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickButtonText('Create host');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $this->host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
