@@ -31,6 +31,7 @@ if (!empty($data['hostid'])) {
 // Create form.
 $triggersForm = (new CForm())
 	->setName('triggersForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('expression_constructor', $data['expression_constructor'])

@@ -23,9 +23,14 @@ include('include/views/js/administration.general.trigger.options.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger displaying options'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $triggerDOFormList = (new CFormList())
@@ -88,6 +93,7 @@ $triggerDOFormList = (new CFormList())
 	]);
 
 $severityForm = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(
 		(new CTabView())
 			->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList)

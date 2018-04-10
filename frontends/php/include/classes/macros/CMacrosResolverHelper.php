@@ -260,46 +260,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Get trigger by id and resolve macros in trigger name.
-	 *
-	 * @static
-	 *
-	 * @param int $triggerId
-	 *
-	 * @return string
-	 */
-	public static function resolveTriggerNameById($triggerId) {
-		$macros = self::resolveTriggerNameByIds([$triggerId]);
-		$macros = reset($macros);
-
-		return $macros['description'];
-	}
-
-	/**
-	 * Get triggers by ids and resolve macros in trigger names.
-	 *
-	 * @static
-	 *
-	 * @param array $triggerIds
-	 *
-	 * @return array
-	 */
-	public static function resolveTriggerNameByIds(array $triggerIds) {
-		self::init();
-
-		$triggers = DBfetchArray(DBselect(
-			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
-			' FROM triggers t'.
-			' WHERE '.dbConditionInt('t.triggerid', $triggerIds)
-		));
-
-		return self::$macrosResolver->resolveTriggerNames(zbx_toHash($triggers, 'triggerid'), [
-			'references_only' => false,
-			'events' => false
-		]);
-	}
-
-	/**
 	 * Resolve macros in trigger expression.
 	 *
 	 * @static

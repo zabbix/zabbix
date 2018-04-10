@@ -28,6 +28,7 @@ if (!empty($this->data['hostid'])) {
 // create form
 $itemForm = (new CForm())
 	->setName('itemForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('group_itemid', $this->data['itemids'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('action', $this->data['action']);

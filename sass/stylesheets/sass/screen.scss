@@ -217,8 +217,6 @@ pre {
 
 // Main Navigation
 nav {
-	background-color: $main-subnav-bg-color;
-
 	a {
 
 		&:link {
@@ -245,6 +243,8 @@ nav {
 
 .nav {
 	@extend nav;
+
+	background-color: $main-subnav-bg-color;
 }
 
 %no-border {
@@ -539,6 +539,10 @@ ul.top-nav-icons {
 			position: relative;
 			padding: 0 0 0 10px;
 		}
+
+		ul li:first-child {
+			padding-left: 0;
+		}
 	}
 
 	.dashbrd-edit {
@@ -578,10 +582,6 @@ ul.top-nav-icons {
 // Article
 article {
 	padding: 10px 10px 0 10px;
-}
-
-.article {
-	@extend article;
 }
 
 // Object Group Navigation
@@ -643,8 +643,12 @@ footer {
 	color: $font-alt-color;
 }
 
-.footer {
-	@extend footer;
+main {
+	@extend article;
+}
+
+output {
+	display: block;
 }
 
 .logo {

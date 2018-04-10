@@ -1,12 +1,29 @@
 Changes for 4.0.0alpha6
 
 New features:
+..F....... [ZBXNEXT-4413] dropped Monitoring->Triggers view (miks, Sasha)
+..F....... [ZBXNEXT-4413] added the trigger context menu option to view or edit the trigger description (miks, Sasha)
+..F....... [ZBXNEXT-4413] added displaying of the trigger dependencies in Monitoring->Triggers videw (miks, Sasha)
+..F....... [ZBXNEXT-4151] added aria roles to provide easier access by keyboard navigation (ashubin, gcalenko, Ivo)
 A......... [ZBX-3783] added strict validation for apiinfo.version(), action.delete(), correlation.delete() and drile.delete() methods (Sasha)
 A......... [ZBX-3783] prohibited deleting discovery rules which are used in actions (Sasha)
 A......... [ZBX-3783] added audit for action.delete() and correlation.delete() methods (Sasha)
+..F....... [ZBXNEXT-4143] implemented submenu autofocus on top-level menu click (nikita)
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+........S. [ZBX-13299] fixed autoregistration, discovery and internal notifications not being sent due to uninitialized severity (vso)
+....I..... [ZBX-13607] changed ping script to return success also for timeouts (wiper)
+..F....... [ZBX-12967] fixed Screen Slide Show Refresh interval Multiplier menu is not working (agriscenko)
+........S. [ZBX-13696] added maximum record limit to old session removal in housekeeper (wiper)
+..F....... [ZBX-13642] fixed undefined index in user edit form (agriscenko)
+..F....... [ZBX-13546] fixed context menu positioning in maps (gcalenko, miks)
+..F....... [ZBX-13668] fixed dynamic widget is searching for item key in item prototypes (agriscenko)
+..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
+..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
+..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
+..F....... [ZBX-13499] fixed checkbox selector in problems table (ashubin, miks)
+........S. [ZBX-13598] fixed crash when Zabbix process cannot connect to preprocessing service (viktors, vso)
 ..F....... [ZBX-13522] fixed duplicate IDs in trigger expression constructor (miks)
 ..F....... [ZBX-13489] fixed wrong tab iteration inside graph widget (ashubin)
 ..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
@@ -20,7 +37,6 @@ Bug fixes:
 Changes for 4.0.0alpha5
 
 New features:
-..F....... [ZBXNEXT-4143] implemented submenu autofocus on top-level menu click (nikita)
 ..F....... [ZBXNEXT-4313] implemented keyboard interaction in context menus (miks)
 A.F.I...S. [ZBXNEXT-4426] added option to execute cached passive checks at the current time (Ivo, wiper)
 ........S. [ZBXNEXT-4417] added real time export of events, history and trends in newline delimited JSON format (vso)
@@ -225,6 +241,17 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13299] fixed autoregistration, discovery and internal notifications not being sent due to uninitialized severity (vso)
+....I..... [ZBX-13607] changed ping script to return success also for timeouts (wiper)
+..F....... [ZBX-12967] fixed Screen Slide Show Refresh interval Multiplier menu is not working (agriscenko)
+........S. [ZBX-13696] added maximum record limit to old session removal in housekeeper (wiper)
+..F....... [ZBX-13642] fixed undefined index in user edit form (agriscenko)
+..F....... [ZBX-13668] fixed dynamic widget is searching for item key in item prototypes (agriscenko)
+..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
+..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
+..F....... [ZBX-13517] fixed undefined index in pie charts (Ivo)
+..F....... [ZBX-13499] fixed checkbox selector in problems table (ashubin, miks)
+........S. [ZBX-13598] fixed crash when Zabbix process cannot connect to preprocessing service (viktors, vso)
 ..F....... [ZBX-13625] fixed blinking configuration for problem widget (agriscenko)
 ..F....... [ZBX-13560] fixed acknowledge notifications are visible in popup (agriscenko)
 ..F....... [ZBX-13298] fixed missing graph after faulty graph edit form submission (nikita)
@@ -1396,6 +1423,8 @@ Changes for 3.0.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13500] fixed fractional triggers are misinterpreted without leading 0 (agriscenko)
+..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.16

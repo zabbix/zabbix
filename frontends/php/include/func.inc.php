@@ -1831,10 +1831,8 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
 	}
 
-	$msg_box = (new CDiv())->addClass($class)
-		->addItem($link_details) // Details link should be in front of title
-		->addItem($title)
-		->addItem($msg_details);
+	// Details link should be in front of title.
+	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))->addClass($class);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
@@ -1879,16 +1877,17 @@ function filter_messages(array $messages = []) {
 /**
  * Returns the message box when messages are present; null otherwise
  *
- * @global array $ZBX_MESSAGES
+ * @param  boolean	$good			Parameter passed to makeMessageBox to specify message box style.
+ * @global array	$ZBX_MESSAGES
  *
  * @return CDiv|null
  */
-function getMessages()
+function getMessages($good = false)
 {
 	global $ZBX_MESSAGES;
 
 	$message_box = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES)
-		? makeMessageBox(false, filter_messages($ZBX_MESSAGES))
+		? makeMessageBox($good, filter_messages($ZBX_MESSAGES))
 		: null;
 
 	$ZBX_MESSAGES = [];
