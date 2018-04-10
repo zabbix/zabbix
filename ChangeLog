@@ -12,6 +12,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+....I..... [ZBX-13607] changed ping script to return success also for timeouts (wiper)
 ..F....... [ZBX-12967] fixed Screen Slide Show Refresh interval Multiplier menu is not working (agriscenko)
 ........S. [ZBX-13696] added maximum record limit to old session removal in housekeeper (wiper)
 ..F....... [ZBX-13642] fixed undefined index in user edit form (agriscenko)
@@ -239,6 +240,7 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-13607] changed ping script to return success also for timeouts (wiper)
 ..F....... [ZBX-12967] fixed Screen Slide Show Refresh interval Multiplier menu is not working (agriscenko)
 ........S. [ZBX-13696] added maximum record limit to old session removal in housekeeper (wiper)
 ..F....... [ZBX-13642] fixed undefined index in user edit form (agriscenko)
