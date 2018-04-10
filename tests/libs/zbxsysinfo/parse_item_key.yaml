@@ -157,13 +157,13 @@ test case: invalid key, unmatched opening bracket (1)   # array missing closing 
 in:
   key: 'key[["a",]'
 ---
-test case: invalid key, unmatched opening bracket (2)   # array missing closing bracket after second parameter, one of the closing brackets is inside quotes and is a part of the second array parameter
-in:
-  key: 'key[["a","\"b\"]"]'
----
-test case: invalid key, character ] is not allowed in unquoted parameter string
+test case: invalid key, unmatched opening bracket (2)   # array missing closing bracket, brackets is inside quotes and is a part of the array parameter
 in:
   key: 'key[[a"]"]'
+---
+test case: invalid key, unmatched opening bracket (3)   # array missing closing bracket after second parameter, one of the closing brackets is inside quotes and is a part of the second array parameter
+in:
+  key: 'key[["a","\"b\"]"]'
 ---
 test case: invalid key, illigal character for unquoted parameter, multiple parameter key
 in:
