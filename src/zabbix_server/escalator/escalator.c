@@ -1118,7 +1118,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		now, severity, medias_num = 0, status, res;
+	int		now, severity, priority, medias_num = 0, status, res;
 	char		error[MAX_STRING_LEN], *period = NULL;
 	const char	*perror;
 	zbx_db_insert_t	db_insert;
@@ -1150,6 +1150,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	}
 
 	mediatypeid = 0;
+	priority = EVENT_SOURCE_TRIGGERS == event->source ? event->trigger.priority : TRIGGER_SEVERITY_NOT_CLASSIFIED;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1159,10 +1160,9 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
 				MACRO_TYPE_COMMON, NULL, 0);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "trigger severity:%d, media severity:%d, period:'%s'",
-				(int)event->trigger.priority, severity, period);
+		zabbix_log(LOG_LEVEL_DEBUG, "severity:%d, media severity:%d, period:'%s'", priority, severity, period);
 
-		if (((1 << event->trigger.priority) & severity) == 0)
+		if (((1 << priority) & severity) == 0)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (severity)");
 			continue;
