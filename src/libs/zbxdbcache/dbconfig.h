@@ -338,7 +338,6 @@ typedef struct
 	int		version;
 	unsigned char	location;
 	unsigned char	auto_compress;
-
 	const char	*proxy_address;
 }
 ZBX_DC_PROXY;
