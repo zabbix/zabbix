@@ -244,7 +244,6 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 					break;
 				default:
 					rc = FAIL;
-					break;
 			}
 		}
 
@@ -312,7 +311,6 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 					break;
 				default:
 					ret = FAIL;
-					break;
 			}
 		}
 
@@ -367,7 +365,6 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 					break;
 				default:
 					ret = FAIL;
-					break;
 			}
 		}
 
@@ -431,7 +428,6 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 					break;
 				default:
 					ret = FAIL;
-					break;
 			}
 		}
 
