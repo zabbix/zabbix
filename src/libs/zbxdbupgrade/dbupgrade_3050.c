@@ -688,6 +688,25 @@ static int	DBpatch_3050063(void)
 	return DBadd_field("items", &field);
 }
 
+static int	DBpatch_3050064(void)
+{
+	const ZBX_FIELD	field = {"auto_compress", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_3050065(void)
+{
+	int	ret;
+
+	/* 5 - HOST_STATUS_PROXY_ACTIVE, 6 - HOST_STATUS_PROXY_PASSIVE */
+	ret = DBexecute("update hosts set auto_compress=0 where status=5 or status=6");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(3050)
@@ -754,5 +773,7 @@ DBPATCH_ADD(3050060, 0, 1)
 DBPATCH_ADD(3050061, 0, 1)
 DBPATCH_ADD(3050062, 0, 1)
 DBPATCH_ADD(3050063, 0, 1)
+DBPATCH_ADD(3050064, 0, 1)
+DBPATCH_ADD(3050065, 0, 1)
 
 DBPATCH_END()
