@@ -1234,7 +1234,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output' => ['status'],
+			'output' => ['status', 'name'],
 			'hostids' => getRequest('hostid'),
 			'templated_hosts' => true
 		]);

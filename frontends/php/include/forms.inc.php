@@ -978,10 +978,9 @@ function getItemFormData(array $item = [], array $options = []) {
 	];
 
 	// Dependent item initialization by master_itemid.
-	if (!hasRequest('form_refresh') && array_key_exists('master_item', $item)) {
+	if (array_key_exists('master_item', $item)) {
 		$expanded = CMacrosResolverHelper::resolveItemNames([$item['master_item']]);
 		$master_item = reset($expanded);
-		$data['type'] = ITEM_TYPE_DEPENDENT;
 		$data['master_itemid'] = $master_item['itemid'];
 		$data['master_itemname'] = $master_item['name_expanded'];
 		// Do not initialize item data if only master_item array was passed.
