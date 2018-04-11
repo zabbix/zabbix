@@ -25,6 +25,7 @@ $multiselect = (new CMultiSelect([
 	'name' => 'userid',
 	'selectedLimit' => 1,
 	'objectName' => 'users',
+	'data' => [$data['dashboard']['owner']],
 	'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
 	'popup' => [
 		'parameters' => [
@@ -53,14 +54,9 @@ $form
 		->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
 	);
 
-$js_scripts = [
-	$multiselect->getPostJS(),
-	'jQuery("#userid").multiSelect("addData", '. json_encode($data['dashboard']['owner']).');'
-];
-
 $output = [
 	'header' => _('Dashboard properties'),
-	'script_inline' => implode("\n", $js_scripts),
+	'script_inline' => $multiselect->getPostJS(),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

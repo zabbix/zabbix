@@ -729,7 +729,7 @@ jQuery(function($) {
 	}
 
 	function addSelected(item, obj, values, options) {
-		if (item !== null && typeof values.selected[item.id] === 'undefined') {
+		if (typeof values.selected[item.id] === 'undefined') {
 			removeDefaultValue(obj, options);
 			values.selected[item.id] = item;
 
