@@ -185,7 +185,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s)))
 			{
 				if (0 != (s.protocol & ZBX_TCP_COMPRESS))
-						proxy->auto_compress = 1;
+					proxy->auto_compress = 1;
 
 				ret = zbx_send_proxy_data_response(proxy, &s, NULL);
 
