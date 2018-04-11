@@ -322,6 +322,26 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 	(*str)[*offset] = '\0';
 }
 
+void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
+{
+	if (NULL == *str)
+	{
+		*alloc_len = n + 1;
+		*offset = 0;
+		*str = (char *)zbx_malloc(*str, *alloc_len);
+	}
+	else if (*offset + n >= *alloc_len)
+	{
+		while (*offset + n >= *alloc_len)
+			*alloc_len *= 2;
+		*str = (char *)zbx_realloc(*str, *alloc_len);
+	}
+
+	memcpy(*str + *offset, src, n);
+	*offset += n;
+	(*str)[*offset] = '\0';
+}
+
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src)
 {
 	zbx_strncpy_alloc(str, alloc_len, offset, src, strlen(src));
