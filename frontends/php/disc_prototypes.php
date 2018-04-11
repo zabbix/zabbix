@@ -546,7 +546,8 @@ if (isset($_REQUEST['form'])) {
 		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_prototype_options = [
 				'itemids' => $itemPrototype['master_itemid'],
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_']
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'selectHosts' => ['name']
 			];
 		}
 	}

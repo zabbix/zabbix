@@ -106,7 +106,7 @@ if (!$readonly) {
 			CJs::encodeJson([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',
-				'srcfld2' => 'master_itemname',
+				'srcfld2' => 'name',
 				'dstfrm' => $itemForm->getName(),
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',

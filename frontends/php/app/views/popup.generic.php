@@ -435,7 +435,6 @@ switch ($data['popup_type']) {
 
 				$description = new CLink($item['name_expanded'], 'javascript:void(0);');
 				$item['name'] = $item['hostname'] . NAME_DELIMITER . $item['name_expanded'];
-				$item['master_itemname'] = $item['name_expanded'] . NAME_DELIMITER . $item['key_'];
 
 				$checkbox_key = is_numeric($item[$options['srcfld1']])
 					? $item[$options['srcfld1']]

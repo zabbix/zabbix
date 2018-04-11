@@ -982,7 +982,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$expanded = CMacrosResolverHelper::resolveItemNames([$item['master_item']]);
 		$master_item = reset($expanded);
 		$data['master_itemid'] = $master_item['itemid'];
-		$data['master_itemname'] = $master_item['name_expanded'];
+		$data['master_itemname'] = $master_item['hosts'][0]['name'].NAME_DELIMITER.$master_item['name_expanded'];
 		// Do not initialize item data if only master_item array was passed.
 		unset($item['master_item']);
 	}
