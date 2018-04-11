@@ -130,8 +130,7 @@ int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error)
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS,
-			CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto exit;
@@ -172,8 +171,7 @@ int	put_data_to_server(zbx_socket_t *sock, struct zbx_json *j, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)j->buffer_size);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, j->buffer, strlen(j->buffer), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS,
-			CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_tcp_send_ext(sock, j->buffer, strlen(j->buffer), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto out;
