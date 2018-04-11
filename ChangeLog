@@ -1,7 +1,7 @@
 Changes for 4.0.0alpha6
 
 New features:
-A.F.I..PS. [ZBXNEXT-4448] added ability to push data via trapper to HTTP agent item type (gcalenko, Ivo, vmurzins, wiper)
+A.F.I..PS. [ZBXNEXT-4488] added ability to push data via trapper to HTTP agent item type (gcalenko, Ivo, vmurzins, wiper)
 A.FGI..PS. [ZBXNEXT-4358] added HTTP agent item type for data gathering via HTTP (gcalenko, Ivo, vso)
 ..F....... [ZBXNEXT-4413] dropped Monitoring->Triggers view (miks, Sasha)
 ..F....... [ZBXNEXT-4413] added the trigger context menu option to view or edit the trigger description (miks, Sasha)
