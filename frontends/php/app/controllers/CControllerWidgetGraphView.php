@@ -135,7 +135,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$src_items = API::Item()->get([
 					'output' => ['key_'],
-					'itemids' => $resourceid
+					'itemids' => $resourceid,
+					'webitems' => true
 				]);
 
 				$items = API::Item()->get([
