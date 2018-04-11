@@ -74,7 +74,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 					$('#conditionRow').toggle($(options.row, $(this)).length > 1);
 					updateExpression();
 				})
-				.on('change', '.macro, .operator', function() {
+				.on('change', '.macro', function() {
 					updateExpression();
 				})
 				.ready(function() {
