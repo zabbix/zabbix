@@ -577,6 +577,7 @@ static int	DBpatch_3050046(void)
 			"hoststat", "problemhosts",
 			"stszbx", "systeminfo",
 			"sysmap", "map",
+			"syssum", "problemsbysv",
 			"webovr", "web",
 			NULL
 		};

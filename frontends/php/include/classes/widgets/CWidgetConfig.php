@@ -43,8 +43,8 @@ class CWidgetConfig {
 			WIDGET_PLAIN_TEXT			=> _('Plain text'),
 			WIDGET_PROBLEM_HOSTS		=> _('Problem hosts'),
 			WIDGET_PROBLEMS				=> _('Problems'),
+			WIDGET_PROBLEMS_BY_SV		=> _('Problems by severity'),
 			WIDGET_SYSTEM_INFO			=> _('System information'),
-			WIDGET_SYSTEM_STATUS		=> _('System status'),
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_WEB					=> _('Web monitoring')
@@ -73,8 +73,8 @@ class CWidgetConfig {
 			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3],
 			WIDGET_PROBLEM_HOSTS		=> ['width' => 6, 'height' => 5],
 			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
+			WIDGET_PROBLEMS_BY_SV		=> ['width' => 6, 'height' => 5],
 			WIDGET_SYSTEM_INFO			=> ['width' => 6, 'height' => 5],
-			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 5],
 			WIDGET_TRIG_OVER			=> ['width' => 6, 'height' => 5],
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
 			WIDGET_WEB					=> ['width' => 3, 'height' => 3]
@@ -120,7 +120,7 @@ class CWidgetConfig {
 			case WIDGET_PLAIN_TEXT:
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
-			case WIDGET_SYSTEM_STATUS:
+			case WIDGET_PROBLEMS_BY_SV:
 			case WIDGET_TRIG_OVER:
 			case WIDGET_WEB:
 				return SEC_PER_MIN;
@@ -211,8 +211,8 @@ class CWidgetConfig {
 			case WIDGET_PROBLEMS:
 				return new CWidgetFormProblems($data);
 
-			case WIDGET_SYSTEM_STATUS:
-				return new CSystemWidgetForm($data);
+			case WIDGET_PROBLEMS_BY_SV:
+				return new CWidgetFormProblemsBySv($data);
 
 			case WIDGET_TRIG_OVER:
 				return new CWidgetFormTrigOver($data);

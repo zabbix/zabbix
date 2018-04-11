@@ -77,7 +77,7 @@ class testPageDashboard extends CWebTest {
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Favourite maps');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Problem hosts');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Problems');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'System status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'Problems by severity');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'Web monitoring');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//h4", 'Discovery status');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'System information');
