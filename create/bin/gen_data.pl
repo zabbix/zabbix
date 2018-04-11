@@ -161,14 +161,17 @@ sub process_row
 			if ($output{'database'} eq 'mysql')
 			{
 				$_ =~ s/&eol;/\\r\\n/g;
+				$_ =~ s/&bsn;/\\n/g;
 			}
 			elsif ($output{'database'} eq 'oracle')
 			{
 				$_ =~ s/&eol;/' || chr(13) || chr(10) || '/g;
+				$_ =~ s/&bsn;/' || chr(10) || '/g;
 			}
 			else
 			{
 				$_ =~ s/&eol;/\x0D\x0A/g;
+				$_ =~ s/&bsn;/\x0A/g;
 			}
 
 			$values = "$values$modifier'$_'";
