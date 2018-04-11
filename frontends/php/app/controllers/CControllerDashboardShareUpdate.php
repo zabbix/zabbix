@@ -76,10 +76,18 @@ class CControllerDashboardShareUpdate extends CController {
 
 		$result = (bool) API::Dashboard()->update($dashboard);
 
+		if ($result) {
+			info(_('Dashboard updated'));
+		}
+
 		$response = [
-			'result' => $result,
-			'errors' => (($messages = getMessages()) !== null) ? $messages->toString() : ''
+			'result' => $result
 		];
+
+		if (($messages = getMessages($result)) !== null) {
+			$response[$result ? 'messages' : 'errors'] = $messages->toString();
+		}
+
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($response)]));
 	}
 }

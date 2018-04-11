@@ -87,10 +87,15 @@
 			data: jQuery(form).serialize(),
 			url: jQuery(form).attr('action'),
 			success: function (response) {
-				var errors = [];
+				var errors = [],
+					messages = [];
+
 				if (typeof response === 'object') {
 					if ('errors' in response) {
 						errors = response.errors;
+					}
+					else if ('messages' in response) {
+						messages = response.messages;
 					}
 				}
 
@@ -98,6 +103,11 @@
 					jQuery(errors).insertBefore(jQuery(form));
 				}
 				else {
+					jQuery('main').find('> .msg-bad, > .msg-good').remove();
+
+					if (messages.length) {
+						jQuery('main').prepend(messages);
+					}
 					overlayDialogueDestroy('dashbrdShare');
 				}
 			}
