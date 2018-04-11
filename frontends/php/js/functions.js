@@ -867,22 +867,3 @@ function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 		return json;
 	};
 })(jQuery);
-
-function makeErrorMessageBox(errors, elementId) {
-	var div = jQuery('<div>').addClass('msg-bad').attr('id', elementId);
-	var details = jQuery('<div>').addClass('msg-details'),
-		ul = jQuery('<ul>');
-
-	errors.each(function (error) {
-		// split long messages
-		var msg = '';
-		error.match(/[\s\S]{1,120}/g).each(function (error_part) {
-			msg = msg + jQuery.escapeHtml(error_part) + "\n";
-		});
-		ul.append(jQuery('<li>').append(msg));
-	});
-	details.append(ul);
-	div.append(details);
-
-	return div;
-}
