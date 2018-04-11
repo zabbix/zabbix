@@ -73,6 +73,8 @@ class CControllerPopupDashbrdSharing extends CController {
 	 * Extend dashboard users data.
 	 *
 	 * @param array $users
+	 * @param array $users[]['userid']
+	 * @param array $users[]['permission']
 	 *
 	 * @return array
 	 */
@@ -101,6 +103,8 @@ class CControllerPopupDashbrdSharing extends CController {
 	 * Extend dashboard user groups data.
 	 *
 	 * @param array $usrgrps
+	 * @param array $usrgrps[]['usrgrpid']
+	 * @param array $usrgrps[]['permission']
 	 *
 	 * @return array
 	 */

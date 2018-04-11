@@ -74,7 +74,7 @@
 			userid: form_data['userid'] || 0
 		});
 
-		jQuery('div.article .header-title .cell:first h1').text(form_data['name']);
+		jQuery('#<?= ZBX_STYLE_PAGE_TITLE ?>').text(form_data['name']);
 		jQuery('#dashboard-direct-link').text(form_data['name']);
 
 		overlayDialogueDestroy('dashboard_prop');
@@ -177,6 +177,7 @@
 		}
 
 		<?php if ($this->data['dashboard']['dashboardid'] == 0) { ?>
+		// When creating new dashboard, open it in edit mode, with opened properties popup.
 		showEditMode();
 		dashbrd_config();
 		<?php } ?>
