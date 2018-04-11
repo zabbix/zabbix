@@ -78,7 +78,7 @@ class CControllerDashboardShareUpdate extends CController {
 
 		$response = [
 			'result' => $result,
-			'errors' => getMessages()->toString()
+			'errors' => (($messages = getMessages()) !== null) ? $messages->toString() : ''
 		];
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($response)]));
 	}
