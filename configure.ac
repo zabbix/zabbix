@@ -1,4 +1,3 @@
-
 dnl
 dnl Zabbix
 dnl Copyright (C) 2001-2018 Zabbix SIA
@@ -1419,7 +1418,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
-	
+
 	dnl Check for zlib, used by Zabbix server-proxy communications
 	ZLIB_CHECK_CONFIG([no])
 	if test "x$found_zlib" != "xyes"; then
@@ -1443,7 +1442,6 @@ ZBXGET_LIBS="$ZBXGET_LIBS $ZLIB_LIBS"
 
 SENDER_LDFLAGS="$SENDER_LDFLAGS $ZLIB_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS"
-
 
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 
