@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha6
 
 New features:
+A.F.I..PS. [ZBXNEXT-4411] added compression of server-proxy data exchange (miks, wiper)
 A.F.I..PS. [ZBXNEXT-4488] added ability to push data via trapper to HTTP agent item type (gcalenko, Ivo, vmurzins, wiper)
 A.FGI..PS. [ZBXNEXT-4358] added HTTP agent item type for data gathering via HTTP (gcalenko, Ivo, vso)
 ..F....... [ZBXNEXT-4413] dropped Monitoring->Triggers view (miks, Sasha)

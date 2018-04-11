@@ -262,11 +262,13 @@ typedef struct
 	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
 						/* or 0 if no error */
 	int		version;
+	int		lastaccess;
 	char		addr_orig[INTERFACE_ADDR_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
 
+	unsigned char	auto_compress;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
 
@@ -762,8 +764,10 @@ typedef struct
 zbx_agent_value_t;
 
 void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
-void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess, zbx_vector_uint64_pair_t *proxy_diff);
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
+
+void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff);
+void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess);
 
 typedef struct
 {

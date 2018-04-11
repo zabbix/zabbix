@@ -739,4 +739,24 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	unsigned char	compress;
+	int		version;
+	int		lastaccess;
+
+#define ZBX_FLAGS_PROXY_DIFF_UNSET				0x0000
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			0x0001
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			0x0002
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			0x0004
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION | 	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
+	zbx_uint64_t	flags;
+}
+zbx_proxy_diff_t;
+
 #endif

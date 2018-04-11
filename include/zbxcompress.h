@@ -17,22 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYDATA_H
-#define ZABBIX_PROXYDATA_H
+#ifndef ZABBIX_COMPRESS_H
+#define ZABBIX_COMPRESS_H
 
-#include "comms.h"
-#include "zbxjson.h"
-
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
-
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts);
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts);
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts);
-
-int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info);
-
-int	init_proxy_history_lock(char **error);
-void	free_proxy_history_lock(void);
+int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out);
+int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out);
+const char	*zbx_compress_strerror();
 
 #endif
