@@ -23,6 +23,7 @@ $widget = (new CWidget())->setTitle(_('Host groups'));
 
 $form = (new CForm())
 	->setName('hostgroupForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('groupid', $data['groupid'])
 	->addVar('form', $data['form']);
 

@@ -58,4 +58,4 @@ if ($scripts) {
 $pageHeader->display();
 
 echo '<body lang="'.CWebUser::getLang().'">';
-echo '<div class="'.ZBX_STYLE_MSG_BAD_GLOBAL.'" id="msg-bad-global"></div>';
+echo '<output class="'.ZBX_STYLE_MSG_BAD_GLOBAL.'" id="msg-bad-global"></output>';

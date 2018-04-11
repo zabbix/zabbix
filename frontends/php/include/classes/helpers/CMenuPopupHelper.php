@@ -203,11 +203,14 @@ class CMenuPopupHelper {
 	 * @param string $acknowledge['eventid']            Event ID.
 	 * @param string $acknowledge['screenid']           Screen ID (optional).
 	 * @param string $acknowledge['backurl']            Return URL (optional).
-	 * @param bool   $fullscreen                        Fullscreen mode.
+	 * @param array  $options
+	 * @param bool   $options['show_description']       (optional) default: true
+	 * @param bool   $options['description_enabled']    (optional) default: true
+	 * @param bool   $options['fullscreen']             (optional) default: false
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(array $trigger, array $acknowledge = null, $fullscreen = false) {
+	public static function getTrigger(array $trigger, array $acknowledge = null, array $options = []) {
 		$hosts = [];
 		$showEvents = true;
 
@@ -253,7 +256,14 @@ class CMenuPopupHelper {
 			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
-		if ($fullscreen) {
+		if (array_key_exists('show_description', $options) && $options['show_description'] === false) {
+			$data['show_description'] = false;
+		}
+		else if (array_key_exists('description_enabled', $options) && $options['description_enabled'] === false) {
+			$data['description_enabled'] = false;
+		}
+
+		if (array_key_exists('fullscreen', $options) && $options['fullscreen'] === true) {
 			$data['fullscreen'] = true;
 		}
 

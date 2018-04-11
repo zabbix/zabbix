@@ -125,6 +125,7 @@ else {
 
 	$widget->setControls((new CForm('get'))
 		->cleanItems()
+		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls)
 	);
 

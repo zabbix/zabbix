@@ -28,6 +28,7 @@ $widget = (new CWidget())
 // create form
 $itemForm = (new CForm())
 	->setName('itemForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid']);
 
@@ -68,6 +69,286 @@ $itemFormList->addRow(
 	(new CTextBox('key', $this->data['key'], $this->data['limited']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired()
+);
+
+// ITEM_TYPE_HTTPAGENT URL field.
+$itemFormList->addRow(
+	(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
+	[
+		(new CTextBox('url', $data['url'], $data['limited'], DB::getFieldLength('items', 'url')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('httpcheck_parseurl', _('Parse')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited'])
+			->setAttribute('data-action', 'parse_url')
+	],
+	'url_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Query fields.
+$query_fields_data = [];
+
+if (is_array($data['query_fields']) && $data['query_fields']) {
+	foreach ($data['query_fields'] as $pair) {
+		$query_fields_data[] = ['name' => key($pair), 'value' => reset($pair)];
+	}
+}
+elseif (!$data['limited']) {
+	$query_fields_data[] = ['name' => '', 'value' => ''];
+}
+
+$query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
+$query_fields->items = [CJs::encodeJson($query_fields_data)];
+
+$itemFormList->addRow(
+	new CLabel(_('Query fields'), 'query_fields_pairs'),
+	(new CDiv([
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
+			->setFooter(new CRow(
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setEnabled(!$data['limited'])
+						->setAttribute('data-row-action', 'add_row')
+				))->setColSpan(5)
+			)),
+		(new CTag('script', true))
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->addItem(new CRow([
+				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
+					->setAttribute('placeholder', _('name'))
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				'&rArr;',
+				(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
+					->setAttribute('placeholder', _('value'))
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled(!$data['limited'])
+					->setAttribute('data-row-action', 'remove_row')
+			])),
+		$query_fields
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setId('query_fields_pairs')
+		->setAttribute('data-sortable-pairs-table',  $data['limited'] ? '0' : '1')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
+	'query_fields_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Request type.
+$itemFormList->addRow(
+	new CLabel(_('Request type'), 'request_method'),
+	[
+		$data['limited'] ? new CVar('request_method', $data['request_method']) : null,
+		(new CComboBox($data['limited'] ? '' : 'request_method', $data['request_method'], null, [
+			HTTPCHECK_REQUEST_GET => 'GET',
+			HTTPCHECK_REQUEST_POST => 'POST',
+			HTTPCHECK_REQUEST_PUT => 'PUT',
+			HTTPCHECK_REQUEST_HEAD => 'HEAD'
+		]))->setEnabled(!$data['limited'])
+	],
+	'request_method_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Timeout field.
+$itemFormList->addRow(
+	new CLabel(_('Timeout'), 'timeout'),
+	(new CTextBox('timeout', $data['timeout'], $data['limited']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	'timeout_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Request body type.
+$itemFormList->addRow(
+	new CLabel(_('Request body type'), 'post_type'),
+	(new CRadioButtonList('post_type', (int) $data['post_type']))
+		->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
+		->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
+		->addValue(_('XML data'), ZBX_POSTTYPE_XML)
+		->setEnabled(!$data['limited'])
+		->setModern(true),
+	'post_type_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Request body.
+$itemFormList->addRow(
+	new CLabel(_('Request body'), 'posts'),
+	(new CTextArea('posts', $data['posts'], ['readonly' =>  $data['limited']]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'posts_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Headers fields.
+$headers_data = [];
+
+if (is_array($data['headers']) && $data['headers']) {
+	foreach ($data['headers'] as $pair) {
+		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
+	}
+}
+elseif (!$data['limited']) {
+	$headers_data[] = ['name' => '', 'value' => ''];
+}
+$headers = (new CTag('script', true))->setAttribute('type', 'text/json');
+$headers->items = [CJs::encodeJson($headers_data)];
+
+$itemFormList->addRow(
+	new CLabel(_('Headers'), 'headers_pairs'),
+	(new CDiv([
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
+			->setFooter(new CRow(
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setEnabled(!$data['limited'])
+						->setAttribute('data-row-action', 'add_row')
+				))->setColSpan(5)
+			)),
+		(new CTag('script', true))
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->addItem(new CRow([
+				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
+					->setAttribute('placeholder', _('name'))
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				'&rArr;',
+				(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited']))
+					->setAttribute('placeholder', _('value'))
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled(!$data['limited'])
+					->setAttribute('data-row-action', 'remove_row')
+			])),
+		$headers
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setId('headers_pairs')
+		->setAttribute('data-sortable-pairs-table', $data['limited'] ? '0' : '1')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
+	'headers_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Required status codes.
+$itemFormList->addRow(
+	new CLabel(_('Required status codes'), 'status_codes'),
+	(new CTextBox('status_codes', $data['status_codes'], $data['limited']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'status_codes_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Follow redirects.
+$itemFormList->addRow(
+	new CLabel(_('Follow redirects'), 'follow_redirects'),
+	(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+		->setEnabled(!$data['limited'])
+		->setChecked($data['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON),
+	'follow_redirects_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Retrieve mode.
+$itemFormList->addRow(
+	new CLabel(_('Retrieve mode'), 'retrieve_mode'),
+	(new CRadioButtonList('retrieve_mode', (int) $data['retrieve_mode']))
+		->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+		->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
+		->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
+		->setEnabled(!($data['limited'] || $data['request_method'] == HTTPCHECK_REQUEST_HEAD))
+		->setModern(true),
+	'retrieve_mode_row'
+);
+
+// ITEM_TYPE_HTTPAGENT HTTP proxy.
+$itemFormList->addRow(
+	new CLabel(_('HTTP proxy'), 'http_proxy'),
+	(new CTextBox('http_proxy', $data['http_proxy'], $data['limited'], DB::getFieldLength('items', 'http_proxy')))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
+	'http_proxy_row'
+);
+
+// ITEM_TYPE_HTTPAGENT HTTP authentication.
+$itemFormList->addRow(
+	new CLabel(_('HTTP authentication'), 'http_authtype'),
+	[
+		$data['limited'] ? new CVar('http_authtype', $data['http_authtype']) : null,
+		(new CComboBox($data['limited'] ? '' : 'http_authtype', $data['http_authtype'], null, [
+			HTTPTEST_AUTH_NONE => _('None'),
+			HTTPTEST_AUTH_BASIC => _('Basic'),
+			HTTPTEST_AUTH_NTLM => _('NTLM')
+		]))->setEnabled(!$data['limited'])
+	],
+	'http_authtype_row'
+);
+
+// ITEM_TYPE_HTTPAGENT User name.
+$itemFormList->addRow(
+	(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
+	(new CTextBox('http_username', $data['http_username'], $data['limited'], DB::getFieldLength('items', 'username')))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'http_username_row'
+);
+
+// ITEM_TYPE_HTTPAGENT Password.
+$itemFormList->addRow(
+	(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
+	(new CTextBox('http_password', $data['http_password'], $data['limited'], DB::getFieldLength('items', 'password')))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'http_password_row'
+);
+
+// ITEM_TYPE_HTTPAGENT SSL verify peer.
+$itemFormList->addRow(
+	new CLabel(_('SSL verify peer'), 'verify_peer'),
+	(new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
+		->setEnabled(!$data['limited'])
+		->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON),
+	'verify_peer_row'
+);
+
+// ITEM_TYPE_HTTPAGENT SSL verify host.
+$itemFormList->addRow(
+	new CLabel(_('SSL verify host'), 'verify_host'),
+	(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
+		->setEnabled(!$data['limited'])
+		->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON),
+	'verify_host_row'
+);
+
+// ITEM_TYPE_HTTPAGENT SSL certificate file.
+$itemFormList->addRow(
+	new CLabel(_('SSL certificate file'), 'ssl_cert_file'),
+	(new CTextBox('ssl_cert_file', $data['ssl_cert_file'], $data['limited'],
+		DB::getFieldLength('items', 'ssl_cert_file')
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'ssl_cert_file_row'
+);
+
+// ITEM_TYPE_HTTPAGENT SSL key file.
+$itemFormList->addRow(
+	new CLabel(_('SSL key file'), 'ssl_key_file'),
+	(new CTextBox('ssl_key_file', $data['ssl_key_file'], $data['limited'], DB::getFieldLength('items', 'ssl_key_file')))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'ssl_key_file_row'
+);
+
+// ITEM_TYPE_HTTPAGENT SSL key password.
+$itemFormList->addRow(
+	new CLabel(_('SSL key password'), 'ssl_key_password'),
+	(new CTextBox('ssl_key_password', $data['ssl_key_password'], $data['limited'],
+		DB::getFieldLength('items', 'ssl_key_password')
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'ssl_key_password_row'
 );
 
 // append interfaces to form list
@@ -284,6 +565,12 @@ $itemFormList->addRow(_('Custom intervals'),
 		(new CTextBox('lifetime', $data['lifetime']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
+	)
+	->addRow(
+		new CLabel(_('Enable trapping'), 'allow_traps'),
+		(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
+			->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON),
+		'allow_traps_row'
 	)
 	->addRow(_('Allowed hosts'),
 		(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

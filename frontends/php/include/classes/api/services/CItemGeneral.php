@@ -90,7 +90,26 @@ abstract class CItemGeneral extends CApiService {
 			'inventory_link'		=> [],
 			'lifetime'				=> [],
 			'preprocessing'			=> ['template' => 1],
-			'jmx_endpoint'			=> []
+			'jmx_endpoint'			=> [],
+			'master_itemid'			=> ['template' => 1],
+			'url'					=> ['template' => 1],
+			'timeout'				=> ['template' => 1],
+			'query_fields'			=> ['template' => 1],
+			'posts'					=> ['template' => 1],
+			'status_codes'			=> ['template' => 1],
+			'follow_redirects'		=> ['template' => 1],
+			'post_type'				=> ['template' => 1],
+			'http_proxy'			=> ['template' => 1],
+			'headers'				=> ['template' => 1],
+			'retrieve_mode'			=> ['template' => 1],
+			'request_method'		=> ['template' => 1],
+			'output_format'			=> ['template' => 1],
+			'allow_traps'			=> [],
+			'ssl_cert_file'			=> ['template' => 1],
+			'ssl_key_file'			=> ['template' => 1],
+			'ssl_key_password'		=> ['template' => 1],
+			'verify_peer'			=> ['template' => 1],
+			'verify_host'			=> ['template' => 1]
 		];
 
 		$this->errorMessages = array_merge($this->errorMessages, [
@@ -153,6 +172,21 @@ abstract class CItemGeneral extends CApiService {
 				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
+
+			$discovery_rules = [];
+
+			if ($this instanceof CItemPrototype) {
+				$itemDbFields['ruleid'] = null;
+				$druleids = zbx_objectValues($items, 'ruleid');
+
+				if ($druleids) {
+					$discovery_rules = API::DiscoveryRule()->get([
+						'output' => ['hostid'],
+						'itemids' => $druleids,
+						'preservekeys' => true
+					]);
+				}
+			}
 		}
 
 		// interfaces
@@ -218,6 +252,12 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if ($update) {
+				$type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
+
+				if ($type == ITEM_TYPE_HTTPAGENT) {
+					$this->validateHTTPCheck($fullItem, $dbItems[$item['itemid']]);
+				}
+
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
 
 				$this->checkNoParameters(
@@ -256,6 +296,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 			else {
+				if ($fullItem['type'] == ITEM_TYPE_HTTPAGENT) {
+					$this->validateHTTPCheck($fullItem, []);
+				}
+
 				if (!isset($dbHosts[$item['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
@@ -268,6 +312,13 @@ abstract class CItemGeneral extends CApiService {
 					_('Cannot set "%1$s" for item "%2$s".'),
 					$item['name']
 				);
+
+				if ($this instanceof CItemPrototype && (!array_key_exists($fullItem['ruleid'], $discovery_rules)
+						|| $discovery_rules[$fullItem['ruleid']]['hostid'] != $fullItem['hostid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
 			}
 
 			$host = $dbHosts[$fullItem['hostid']];
@@ -336,7 +387,7 @@ abstract class CItemGeneral extends CApiService {
 				$itemInterfaceType = itemTypeInterface($fullItem['type']);
 
 				if ($itemInterfaceType !== false) {
-					if (!$fullItem['interfaceid']) {
+					if (!array_key_exists('interfaceid', $fullItem) || !$fullItem['interfaceid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
 					}
 					elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
@@ -404,12 +455,12 @@ abstract class CItemGeneral extends CApiService {
 						_('Type of information must be "Numeric (unsigned)" or "Numeric (float)" for aggregate items.'));
 			}
 
-			if ($fullItem['type'] == ITEM_TYPE_TRAPPER && array_key_exists('trapper_hosts', $fullItem)) {
-				if ($fullItem['trapper_hosts'] !== '' && !$ip_range_parser->parse($fullItem['trapper_hosts'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', $ip_range_parser->getError())
-					);
-				}
+			if (($fullItem['type'] == ITEM_TYPE_TRAPPER || $fullItem['type'] == ITEM_TYPE_HTTPAGENT)
+					&& array_key_exists('trapper_hosts', $fullItem) && $fullItem['trapper_hosts'] !== ''
+					&& !$ip_range_parser->parse($fullItem['trapper_hosts'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', $ip_range_parser->getError())
+				);
 			}
 
 			// jmx
@@ -1731,6 +1782,287 @@ abstract class CItemGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _('maximum number of dependency levels reached')
 					));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Converts headers field text to hash with header name as key.
+	 *
+	 * @param string $headers  Headers string, one header per line, line delimiter "\r\n".
+	 *
+	 * @return array
+	 */
+	protected function headersStringToArray($headers) {
+		$result = [];
+
+		foreach (explode("\r\n", $headers) as $header) {
+			$header = explode(': ', $header, 2);
+
+			if (count($header) == 2) {
+				$result[$header[0]] = $header[1];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Converts headers fields hash to string.
+	 *
+	 * @param array $headers  Array of headers where key is header name.
+	 *
+	 * @return string
+	 */
+	protected function headersArrayToString(array $headers) {
+		$result = [];
+
+		foreach ($headers as $k => $v) {
+			$result[] = $k.': '.$v;
+		}
+
+		return implode("\r\n", $result);
+	}
+
+	/**
+	 * Validate item with type ITEM_TYPE_HTTPAGENT.
+	 *
+	 * @param array $item     Array of item fields.
+	 * @param array $db_item  Array of item database fields for update action or empty array for create action.
+	 *
+	 * @throws APIException for invalid data.
+	 */
+	protected function validateHTTPCheck(array $item, array $db_item) {
+		$rules = [
+			'timeout' => [
+				'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
+					? API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+					: API_ALLOW_USER_MACRO,
+				'in' => '1:'.SEC_PER_MIN
+			],
+			'url' => [
+				'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+				'length' => DB::getFieldLength('items', 'url'),
+			],
+			'status_codes' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'status_codes')
+			],
+			'follow_redirects' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
+			],
+			'post_type' => [
+				'type' => API_INT32,
+				'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])
+			],
+			'http_proxy' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')
+			],
+			'headers' => [
+				'type' => API_STRINGS_UTF8
+			],
+			'retrieve_mode' => [
+				'type' => API_INT32,
+				'in' => implode(',', [
+					HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
+					HTTPTEST_STEP_RETRIEVE_MODE_BOTH
+				])
+			],
+			'request_method' => [
+				'type' => API_INT32,
+				'in' => implode(',', [
+					HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD
+				])
+			],
+			'output_format' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])
+			],
+			'allow_traps' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])
+			],
+			'ssl_cert_file' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file'),
+			],
+			'ssl_key_file' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file'),
+			],
+			'ssl_key_password' => [
+				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password'),
+			],
+			'verify_peer' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])
+			],
+			'verify_host' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])
+			],
+			'authtype' => [
+				'type' => API_INT32,
+				'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM])
+			]
+		];
+
+		$data = $item + $db_item;
+
+		if (array_key_exists('authtype', $data)
+				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM)) {
+			$rules += [
+				'username' => [
+					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+					'length' => DB::getFieldLength('items', 'username')
+				],
+				'password' => [
+					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
+					'length' => DB::getFieldLength('items', 'password')
+				]
+			];
+		}
+
+		// Strict validation for 'retrieve_mode' only for create action.
+		if (array_key_exists('request_method', $data) && $data['request_method'] == HTTPCHECK_REQUEST_HEAD
+				&& array_key_exists('retrieve_mode', $item)) {
+			$rules['retrieve_mode']['in'] = (string) HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+		}
+
+		if (array_key_exists('post_type', $data)
+				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
+			$rules['posts'] = [
+				'type' => API_STRING_UTF8,
+				'length' => DB::getFieldLength('items', 'posts')
+			];
+		}
+
+		if (array_key_exists('templateid', $data) && $data['templateid']) {
+			$rules['interfaceid'] = [
+				'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY
+			];
+		}
+
+		if (array_key_exists('trapper_hosts', $item) && $item['trapper_hosts'] !== ''
+				&& (!array_key_exists('allow_traps', $data) || $data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', _('should be empty'))
+			);
+		}
+
+		// Keep values only for fields with defined validation rules.
+		$data = array_intersect_key($data, $rules);
+
+		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, '', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$json = new CJson();
+
+		if (array_key_exists('query_fields', $item)) {
+			if (!is_array($item['query_fields'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', 'query_fields', _('an array is expected'))
+				);
+			}
+
+			foreach ($item['query_fields'] as $v) {
+				if (!is_array($v) || count($v) > 1 || key($v) === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'query_fields', _('nonempty key and value pair expected'))
+					);
+				}
+			}
+
+			$json_string = $json->encode($item['query_fields']);
+
+			if (strlen($json_string) > DB::getFieldLength('items', 'query_fields')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
+					_('cannot convert to JSON, result value too long')
+				));
+			}
+		}
+
+		if (array_key_exists('headers', $item)) {
+			if (!is_array($item['headers'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', 'headers', _('an array is expected'))
+				);
+			}
+
+			foreach ($item['headers'] as $k => $v) {
+				if (trim($k) === '' || !is_string($v) || $v === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'headers', _('nonempty key and value pair expected'))
+					);
+				}
+			}
+		}
+
+		if (array_key_exists('status_codes', $item) && $item['status_codes']) {
+			$validator = new CStatusCodeRangesValidator([
+				'usermacros' => true,
+				'lldmacros' => ($this instanceof CItemPrototype)
+			]);
+
+			if (!$validator->validate($item['status_codes'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $item['status_codes'], 'status_codes')
+				);
+			}
+		}
+
+		if ((array_key_exists('post_type', $item) || array_key_exists('posts', $item))
+				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
+			$posts = array_key_exists('posts', $data) ? $data['posts'] : '';
+			libxml_use_internal_errors(true);
+
+			if ($data['post_type'] == ZBX_POSTTYPE_XML
+					&& simplexml_load_string($posts, null, LIBXML_IMPORT_FLAGS) === false) {
+				$errors = libxml_get_errors();
+				libxml_clear_errors();
+
+				if (!$errors) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.', _('XML is empty')));
+				}
+				else {
+					$error = reset($errors);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.',
+						_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
+						$error->line, $error->column
+					)));
+				}
+			}
+
+			if ($data['post_type'] == ZBX_POSTTYPE_JSON) {
+				if (trim($posts, " \r\n") === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+				}
+
+				$types = [
+					'usermacros' => true,
+					'macros_n' => [
+						'{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}',
+						'{ITEM.KEY}'
+					]
+				];
+
+				if ($this instanceof CItemPrototype) {
+					$types['lldmacros'] = true;
+				}
+
+				$matches = (new CMacrosResolverGeneral)->getMacroPositions($posts, $types);
+
+				$shift = 0;
+
+				foreach ($matches as $pos => $substr) {
+					$posts = substr_replace($posts, '1', $pos + $shift, strlen($substr));
+					$shift = $shift + 1 - strlen($substr);
+				}
+
+				$json->decode($posts);
+
+				if ($json->hasError()) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
 				}
 			}
 		}

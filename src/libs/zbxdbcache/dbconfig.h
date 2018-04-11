@@ -230,6 +230,34 @@ typedef struct
 }
 ZBX_DC_PREPROCITEM;
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	const char	*timeout;
+	const char	*url;
+	const char	*query_fields;
+	const char	*status_codes;
+	const char	*http_proxy;
+	const char	*headers;
+	const char	*username;
+	const char	*ssl_cert_file;
+	const char	*ssl_key_file;
+	const char	*ssl_key_password;
+	const char	*password;
+	const char	*posts;
+	const char	*trapper_hosts;
+	unsigned char	authtype;
+	unsigned char	follow_redirects;
+	unsigned char	post_type;
+	unsigned char	retrieve_mode;
+	unsigned char	request_method;
+	unsigned char	output_format;
+	unsigned char	verify_peer;
+	unsigned char	verify_host;
+	unsigned char	allow_traps;
+}
+ZBX_DC_HTTPITEM;
+
 typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -624,6 +652,7 @@ typedef struct
 	zbx_hashset_t		calcitems;
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;
+	zbx_hashset_t		httpitems;
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;

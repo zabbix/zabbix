@@ -511,22 +511,22 @@ function getOverlayDialogueId() {
 /**
  * Display modal window.
  *
- * @param {object} params						Modal window params.
- * @param {string} params.title					Modal window title.
- * @param {object} params.content				Window content.
- * @param {object} params.controls				Window controls.
- * @param {array}  params.buttons				Window buttons.
- * @param {string} params.buttons[]['title']	Text on the button.
- * @param {object}|{string} params.buttons[]['action']	Function object or executable string that will be executed on
- *														click.
- * @param {string} params.buttons[]['class']	(optional) Button class.
- * @param {bool}   params.buttons[]['cancel']	(optional) It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']	(optional) Focus this button.
- * @param {bool}   params.buttons[]['enabled']	(optional) Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen']	(optional) Prevent dialogue closing, if button action returned false.
- * @param string   params.dialogueid            (optional) Unique dialogue identifier to reuse existing overlay dialog
- *												or create a new one if value is not set.
- * @param string   params.script_inline         (optional) Custom javascript code to execute when initializing dialog.
+ * @param {object} params                                   Modal window params.
+ * @param {string} params.title                             Modal window title.
+ * @param {object} params.content                           Window content.
+ * @param {object} params.controls                          Window controls.
+ * @param {array}  params.buttons                           Window buttons.
+ * @param {string} params.buttons[]['title']                Text on the button.
+ * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
+ *                                                          on click.
+ * @param {string} params.buttons[]['class']	(optional)  Button class.
+ * @param {bool}   params.buttons[]['cancel']	(optional)  It means what this button has cancel action.
+ * @param {bool}   params.buttons[]['focused']	(optional)  Focus this button.
+ * @param {bool}   params.buttons[]['enabled']	(optional)  Should the button be enabled? Default: true.
+ * @param {bool}   params.buttons[]['keepOpen']	(optional)  Prevent dialogue closing, if button action returned false.
+ * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
+ *                                                          or create a new one if value is not set.
+ * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
  * @param {object} trigger_elmnt				(optional) UI element which triggered opening of overlay dialogue.
  * @param {object} xhr							(optional) XHR request used to load content. Used to abort loading.
  *
@@ -537,6 +537,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		cancel_action = null,
 		submit_btn = null,
 		overlay_dialogue = null,
+		headerid = '',
 		overlay_bg = null,
 		overlay_dialogue_footer = jQuery('<div>', {
 			class: 'overlay-dialogue-footer'
@@ -550,6 +551,8 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		jQuery(overlay_dialogue_footer).append(jQuery('<script>').text(params.script_inline));
 	}
 
+	headerid = 'dashbrd-widget-head-title-'+params.dialogueid;
+
 	if (jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]').length) {
 		overlay_dialogue = jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]');
 
@@ -562,7 +565,10 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		overlay_dialogue = jQuery('<div>', {
 			'id': 'overlay_dialogue',
 			'class': 'overlay-dialogue modal',
-			'data-dialogueid': params.dialogueid
+			'data-dialogueid': params.dialogueid,
+			'role': 'dialog',
+			'aria-modal': 'true',
+			'aria-labeledby': headerid
 		});
 
 		overlay_bg = jQuery('<div>', {
@@ -643,7 +649,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		.append(
 			jQuery('<div>', {
 				class: 'dashbrd-widget-head'
-			}).append(jQuery('<h4>').text(params.title))
+			}).append(jQuery('<h4 id="'+headerid+'">').text(params.title))
 		)
 		.append(params.controls ? jQuery('<div>').addClass('overlay-dialogue-controls').html(params.controls) : null)
 		.append(
@@ -654,6 +660,9 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 				.each(function() {
 					body_mutation_observer.observe(this, {childList: true, subtree: true});
 				})
+				.find('form')
+					.attr('aria-labeledby', headerid)
+				.end()
 		)
 		.append(overlay_dialogue_footer);
 
@@ -876,4 +885,59 @@ function makeErrorMessageBox(errors, elementId) {
 	div.append(details);
 
 	return div;
+}
+
+/**
+ * Parse url string to object. Hash starting part of URL will be removed.
+ * Return object where 'url' key contain parsed url, 'pairs' key is array of objects with parsed arguments.
+ * For malformed URL strings will return false.
+ *
+ * @param {string} url    URL string to parse.
+ *
+ * @return {object|bool}
+ */
+function parseUrlString(url) {
+	var url = url.replace(/#.+/, ''),
+		pos = url.indexOf('?'),
+		valid = true,
+		pairs = [],
+		query;
+
+	if (pos != -1) {
+		query = url.substring(pos + 1);
+		url = url.substring(0, pos);
+
+		jQuery.each(query.split('&'), function(i, pair) {
+			if (jQuery.trim(pair)) {
+				pair = pair.replace(/\+/g, ' ').split('=', 2);
+				pair.push('');
+
+				try {
+					if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
+						// Non-printable characters in URL.
+						throw null;
+					}
+
+					pairs.push({
+						'name': decodeURIComponent(pair[0]),
+						'value': decodeURIComponent(pair[1])
+					});
+				}
+				catch( e ) {
+					valid = false;
+					// Break jQuery.each iteration.
+					return false;
+				}
+			}
+		});
+	}
+
+	if (!valid) {
+		return false;
+	}
+
+	return {
+		'url': url,
+		'pairs': pairs
+	};
 }
