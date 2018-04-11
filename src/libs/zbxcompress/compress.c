@@ -135,4 +135,9 @@ int zbx_uncompress(const char *in, size_t size_in, char *out, size_t size_out)
 	return FAIL;
 }
 
+const char	*zbx_compress_strerror()
+{
+	return "";
+}
+
 #endif
