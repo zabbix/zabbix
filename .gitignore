@@ -376,8 +376,8 @@ tests/libs/.deps
 tests/libs/Makefile
 tests/libs/Makefile.in
 tests/libs/zbxalgo/.deps
-tests/libs/zbxalgo/:q!Makefile.in
 tests/libs/zbxalgo/Makefile
+tests/libs/zbxalgo/Makefile.in
 tests/libs/zbxalgo/evaluate
 tests/libs/zbxcommon/.deps
 tests/libs/zbxcommon/Makefile
