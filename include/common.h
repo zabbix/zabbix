@@ -158,7 +158,8 @@ typedef enum
 	ITEM_TYPE_CALCULATED,
 	ITEM_TYPE_JMX,
 	ITEM_TYPE_SNMPTRAP,
-	ITEM_TYPE_DEPENDENT	/* 18 */
+	ITEM_TYPE_DEPENDENT,
+	ITEM_TYPE_HTTPAGENT	/* 19 */
 }
 zbx_item_type_t;
 const char	*zbx_agent_type_string(zbx_item_type_t item_type);
@@ -1066,6 +1067,7 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
+void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
@@ -1297,16 +1299,18 @@ int	zbx_alarm_timed_out(void);
 int	zbx_strcmp_natural(const char *s1, const char *s2);
 
 /* tokens used in expressions */
-#define ZBX_TOKEN_OBJECTID	0x0001
-#define ZBX_TOKEN_MACRO		0x0002
-#define ZBX_TOKEN_LLD_MACRO	0x0004
-#define ZBX_TOKEN_USER_MACRO	0x0008
-#define ZBX_TOKEN_FUNC_MACRO	0x0010
-#define ZBX_TOKEN_SIMPLE_MACRO	0x0020
-#define ZBX_TOKEN_REFERENCE	0x0040
+#define ZBX_TOKEN_OBJECTID	0x00001
+#define ZBX_TOKEN_MACRO		0x00002
+#define ZBX_TOKEN_LLD_MACRO	0x00004
+#define ZBX_TOKEN_USER_MACRO	0x00008
+#define ZBX_TOKEN_FUNC_MACRO	0x00010
+#define ZBX_TOKEN_SIMPLE_MACRO	0x00020
+#define ZBX_TOKEN_REFERENCE	0x00040
 
 /* additional token flags */
-#define ZBX_TOKEN_NUMERIC	0x8000
+#define ZBX_TOKEN_NUMERIC	0x08000
+#define ZBX_TOKEN_JSON		0x10000
+#define ZBX_TOKEN_XML		0x20000
 
 /* location of a substring */
 typedef struct
@@ -1429,6 +1433,8 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 #define ZBX_POSTTYPE_RAW		0
 #define ZBX_POSTTYPE_FORM		1
+#define ZBX_POSTTYPE_JSON		2
+#define ZBX_POSTTYPE_XML		3
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 

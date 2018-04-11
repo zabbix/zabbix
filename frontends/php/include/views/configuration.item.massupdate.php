@@ -99,6 +99,86 @@ $itemFormList->addRow(
 	(new CTextBox('jmx_endpoint', $data['jmx_endpoint']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
+// ITEM_TYPE_HTTPAGENT URL field.
+$itemFormList->addRow(
+	(new CVisibilityBox('visible[url]', 'url', _('Original')))
+		->setLabel(_('URL'))
+		->setChecked(array_key_exists('url', $data['visible'])),
+	(new CTextBox('url', $data['url'], false, DB::getFieldLength('items', 'url')))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
+
+// ITEM_TYPE_HTTPAGENT Request body type.
+$itemFormList->addRow(
+	(new CVisibilityBox('visible[post_type]', 'post_type_container', _('Original')))
+		->setLabel(_('Request body type'))
+		->setChecked(array_key_exists('post_type', $data['visible'])),
+	(new CDiv(
+		(new CRadioButtonList('post_type', (int) $data['post_type']))
+			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
+			->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
+			->addValue(_('XML data'), ZBX_POSTTYPE_XML)
+			->setModern(true)
+	))->setId('post_type_container')
+);
+
+// ITEM_TYPE_HTTPAGENT Request body.
+$itemFormList->addRow(
+	(new CVisibilityBox('visible[posts]', 'posts', _('Original')))
+		->setLabel(_('Request body'))
+		->setChecked(array_key_exists('posts', $data['visible'])),
+	(new CTextArea('posts', $data['posts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
+
+// ITEM_TYPE_HTTPAGENT Headers fields.
+$headers_data = [];
+
+if (is_array($data['headers']) && $data['headers']) {
+	foreach ($data['headers'] as $pair) {
+		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
+	}
+}
+else {
+	$headers_data[] = ['name' => '', 'value' => ''];
+}
+$headers = (new CTag('script', true))->setAttribute('type', 'text/json');
+$headers->items = [CJs::encodeJson($headers_data)];
+
+$itemFormList->addRow(
+	(new CVisibilityBox('visible[headers]', 'headers_pairs', _('Original')))
+		->setLabel(_('Headers'))
+		->setChecked(array_key_exists('headers', $data['visible'])),
+	(new CDiv([
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
+			->setFooter(new CRow(
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setAttribute('data-row-action', 'add_row')
+				))->setColSpan(5)
+			)),
+		(new CTag('script', true))
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->addItem(new CRow([
+				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				'&rArr;',
+				(new CTextBox('headers[value][#{index}]', '#{value}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-row-action', 'remove_row')
+			])),
+		$headers
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setId('headers_pairs')
+		->setAttribute('data-sortable-pairs-table', '1')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
 // append snmp community to form list
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[community]', 'snmp_community', _('Original')))
@@ -475,21 +555,27 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 $valueMapLink = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))
 	->setAttribute('target', '_blank');
 
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
-		->setLabel(_('Show value'))
-		->setChecked(isset($this->data['visible']['valuemapid'])),
-	(new CDiv([$valueMapsComboBox, SPACE, $valueMapLink]))
-		->setId('valuemap')
-);
-
-// append trapper hosts to form list
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))
-		->setLabel(_('Allowed hosts'))
-		->setChecked(isset($this->data['visible']['trapper_hosts'])),
-	(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
+$itemFormList
+	->addRow(
+		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
+			->setLabel(_('Show value'))
+			->setChecked(isset($this->data['visible']['valuemapid'])),
+		(new CDiv([$valueMapsComboBox, SPACE, $valueMapLink]))
+			->setId('valuemap')
+	)
+	->addRow(
+		(new CVisibilityBox('visible[allow_traps]', 'allow_traps', _('Original')))
+			->setLabel(_('Enable trapping'))
+			->setChecked(array_key_exists('allow_traps', $data['visible'])),
+		(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
+			->setChecked($data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON)
+	)
+	->addRow(
+		(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))
+			->setLabel(_('Allowed hosts'))
+			->setChecked(array_key_exists('trapper_hosts', $data['visible'])),
+		(new CTextBox('trapper_hosts', $data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // append applications to form list
 if ($this->data['displayApplications']) {

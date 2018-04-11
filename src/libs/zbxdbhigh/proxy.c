@@ -531,13 +531,14 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 				",hosts r where t.hostid=r.hostid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
-					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				proxy_hostid,
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
-				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL);
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL,
+				ITEM_TYPE_HTTPAGENT);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -3014,8 +3015,23 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 	if (0 != item->host.proxy_hostid)
 		return FAIL;
 
-	if (ITEM_TYPE_TRAPPER != item->type)
-		return FAIL;
+	switch(item->type)
+	{
+		case ITEM_TYPE_HTTPAGENT:
+			if (0 == item->allow_traps)
+			{
+				*error = zbx_dsprintf(*error, "cannot process HTTP agent item \"%s\" trap:"
+						" trapping is not enabled", item->key_orig);
+				return FAIL;
+			}
+			break;
+		case ITEM_TYPE_TRAPPER:
+			break;
+		default:
+			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap:"
+					" item type \"%d\" cannot be used with traps", item->key_orig, item->type);
+			return FAIL;
+	}
 
 	if ('\0' != *item->trapper_hosts)	/* list of allowed hosts not empty */
 	{
@@ -3023,15 +3039,15 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 		int	ret;
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, &allowed_peers,
-				MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL,
+				&allowed_peers, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
 
 		if (FAIL == ret)
 		{
-			*error = zbx_dsprintf(*error,  "cannot process trapper item \"%s\": %s", item->key_orig,
-					zbx_socket_strerror());
+			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap: %s",
+					item->key_orig, zbx_socket_strerror());
 			return FAIL;
 		}
 	}
