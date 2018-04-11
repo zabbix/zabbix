@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupDashbrdSharing extends CController {
+class CControllerDashboardShareEdit extends CController {
 
 	private $dashboard;
 

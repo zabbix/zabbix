@@ -62,9 +62,11 @@ class CRouter {
 		'dashboard.delete'		=> ['CControllerDashboardDelete',		null,					null],
 		'dashbrd.widget.config'	=> ['CControllerDashbrdWidgetConfig',	'layout.json',			'monitoring.dashboard.config'],
 		'dashbrd.widget.check'	=> ['CControllerDashbrdWidgetCheck',	'layout.json',			null],
-		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.json',			null],
+		'dashboard.update'		=> ['CControllerDashboardUpdate',		'layout.json',			null],
 		'dashboard.get'	        => ['CControllerDashboardGet',	        'layout.json',			null],
-		'dashboard.update'	    => ['CControllerDashboardUpdate',	    'layout.json',			null],
+		'dashboard.share.update'	=> ['CControllerDashboardShareUpdate',		'layout.json',	null],
+		'dashboard.properties.edit' => ['CControllerDashboardPropertiesEdit',	'layout.json',	'dashbrd.properties.edit'],
+		'dashboard.share.edit'	=> ['CControllerDashboardShareEdit',	'layout.json',			'dashbrd.sharing.edit'],
 		'dashbrd.widget.rfrate'	=> ['CControllerDashbrdWidgetRfRate',	'layout.json',			null],
 		'discovery.view'		=> ['CControllerDiscoveryView',			'layout.htmlpage',		'monitoring.discovery.view'],
 		'favourite.create'		=> ['CControllerFavouriteCreate',		'layout.javascript',	null],
@@ -126,9 +128,7 @@ class CRouter {
 		'popup.testtriggerexpr'	=> ['CControllerPopupTestTriggerExpr',	'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerwizard'	=> ['CControllerPopupTriggerWizard',	'layout.json',			'popup.triggerwizard'],
 		'trigdesc.update'		=> ['CControllerTrigDescUpdate',		'layout.json',			null],
-		'popup.trigdesc.view'	=> ['CControllerPopupTrigDescView',		'layout.json',			'popup.trigdesc.view'],
-		'popup.dashbrd.properties' => ['CControllerPopupDashbrdProperties', 'layout.json',		'popup.dashbrd.properties'],
-		'popup.dashbrd.sharing' => ['CControllerPopupDashbrdSharing', 'layout.json',			'popup.dashbrd.sharing']
+		'popup.trigdesc.view'	=> ['CControllerPopupTrigDescView',		'layout.json',			'popup.trigdesc.view']
 	];
 
 	public function __construct($action) {

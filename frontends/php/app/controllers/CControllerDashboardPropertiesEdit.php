@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupDashbrdProperties extends CController {
+class CControllerDashboardPropertiesEdit extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();

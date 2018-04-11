@@ -573,7 +573,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 				if (!item.disabled) {
 					item.clickCallback = function () {
 						var options = {'dashboardid': item.form_data.dashboardid};
-						PopUp('popup.dashbrd.sharing', options, 'dashbrdShare', trigger_elmnt);
+						PopUp('dashboard.share.edit', options, 'dashbrdShare', trigger_elmnt);
 
 						jQuery(this).closest('.action-menu').menuPopup('close', null);
 					}

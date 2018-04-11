@@ -19,7 +19,7 @@
 **/
 
 $form = (new CForm('post', (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.update')
+	->setArgument('action', 'dashboard.share.update')
 	->getUrl()
 ))
 	->setName('dashboard_sharing_form')
@@ -74,9 +74,9 @@ if ($data['dashboard']['dashboardid'] != 0) {
 $form
 	->addItem(getMessages())
 	// indicator to help delete all users
-	->addItem(new CInput('hidden', 'users['.CControllerDashboardUpdate::EMPTY_USER.']', '1'))
+	->addItem(new CInput('hidden', 'users['.CControllerDashboardShareUpdate::EMPTY_USER.']', '1'))
 	// indicator to help delete all user groups
-	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardUpdate::EMPTY_GROUP.']', '1'))
+	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardShareUpdate::EMPTY_GROUP.']', '1'))
 	->addItem((new CFormList('sharing_form'))
 		->addRow(_('Type'),
 			(new CRadioButtonList('private', PRIVATE_SHARING))

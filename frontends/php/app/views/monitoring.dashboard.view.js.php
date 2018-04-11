@@ -58,7 +58,7 @@
 			options.new = '1';
 		}
 
-		PopUp('popup.dashbrd.properties', options, 'dashboard_prop', this);
+		PopUp('dashboard.properties.edit', options, 'dashboard_prop', this);
 	};
 
 	function dashbrdApplyProperties() {
