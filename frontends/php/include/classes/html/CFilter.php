@@ -30,6 +30,7 @@ class CFilter extends CTag {
 	private $opened = true;
 	private $show_buttons = true;
 	private $hidden = false;
+	private $timeselector_containerid;
 
 	public function __construct($filterid) {
 		parent::__construct('div', true);
@@ -45,6 +46,8 @@ class CFilter extends CTag {
 
 		// filter is opened by default
 		$this->opened = (CProfile::get($this->filterid, 1) == 1);
+
+		$this->timeselector_containerid = uniqid();
 	}
 
 	public function getName() {
@@ -83,46 +86,52 @@ class CFilter extends CTag {
 		return $this;
 	}
 
+	/**
+	 * Return markup for filter toggler buttons.
+	 *
+	 * @return CDiv
+	 */
 	private function getHeader() {
-		$span = (new CSpan())->setId('filter-arrow');
-
-		if ($this->opened) {
-			$span->addClass(ZBX_STYLE_ARROW_UP);
-			$button = (new CSimpleButton(
-				[_('Filter'), $span]
-			))
-				->addClass(ZBX_STYLE_FILTER_TRIGGER)
-				->addClass(ZBX_STYLE_FILTER_ACTIVE)
-				->setId('filter-mode');
-		}
-		else {
-			$span->addClass(ZBX_STYLE_ARROW_DOWN);
-			$button = (new CSimpleButton(
-				[_('Filter'), $span]
-			))
-				->addClass(ZBX_STYLE_FILTER_TRIGGER)
-				->setId('filter-mode');
-			$this->setAttribute('style', 'display: none;');
+		if (!$this->opened) {
+			$this->setHidden();
 		}
 
-		$button->onClick('javascript:
-			jQuery("#filter-space").toggle();
-			jQuery("#filter-mode").toggleClass("filter-active");
-			jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");
-			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-up") ? 1 : 0, []);
-			if (jQuery(".multiselect").length > 0 && jQuery("#filter-arrow").hasClass("arrow-up")) {
-				jQuery(".multiselect").multiSelect("resize");
-			}
-			if (jQuery("#filter-arrow").hasClass("arrow-up")) {
-				jQuery("#filter-space [autofocus=autofocus]").focus();
-			}'
-		);
+		$timeselector = null;
+		$filter = null;
 
-		$switch = (new CDiv())
-			->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER)
-			->addItem($button);
+		if ($this->navigator) {
+			$timeselector = [
+				(new CSimpleButton())
+					->addClass('btn-time-left')
+					->setAttribute('data-event', 'timeselector.range.decrement'),// Set aria-label attribute
+				(new CSimpleButton(_('Zoom out')))
+					->addClass('btn-time-out')
+					->setAttribute('data-event', 'timeselector.range.zoomout'),// Set aria-label attribute
+				(new CSimpleButton())
+					->addClass('btn-time-right')
+					->setAttribute('data-event', 'timeselector.range.increment'),// Set aria-label attribute
+				(new CSimpleButton([_('Last 7 days'), (new CSpan())->addClass('btn-time-icon')]))
+					->addClass('btn-time')
+					->setAttribute('data-event', 'timeselector.toggle')
+					->setAttribute('data-filter-toggle', '#'.$this->timeselector_containerid)
+					// Add separate profile for timeselector expanded/collapsed state.
+					->setAttribute('data-profile', $this->filterid),// Set aria-label attribute
+			];
+		}
 
-		return $switch;
+		if ($this->columns) {
+			$filter = (new CSimpleButton([_('Filter'), new CSpan()]))
+				->addClass(ZBX_STYLE_FILTER_TRIGGER)
+				->addClass($this->opened ? ZBX_STYLE_FILTER_ACTIVE : '')
+				->addClass('filter-arrow')
+				->setAttribute('data-filter-toggle', '#'.$this->getId())
+				->setAttribute('data-profile', $this->filterid);
+		}
+
+		return (new CDiv([
+			$timeselector,
+			$filter
+		]))->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER);
 	}
 
 	private function getTable() {
@@ -179,15 +188,20 @@ class CFilter extends CTag {
 			$this->form->addItem($this->getButtons());
 		}
 
-		if ($this->navigator) {
-			$this->form->addItem((new CDiv())->setId('scrollbar_cntr'));
-		}
-
 		if ($this->footer !== null) {
 			$this->form->addItem($this->footer);
 		}
 
 		$ret = $this->form->toString();
+
+		if ($this->navigator) {
+			$ret .= (new CForm('get'))
+				->cleanItems()
+				->setId($this->timeselector_containerid)
+				->addItem(
+					(new CDiv())->setId('scrollbar_cntr')
+				);
+		}
 
 		$ret .= parent::endToString();
 		return $ret;

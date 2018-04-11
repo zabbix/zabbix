@@ -471,15 +471,19 @@ ul.top-nav-icons {
 	}
 }
 
+.filter-trigger.filter-arrow.filter-active span,
 .arrow-up {
 	@extend %arrow;
+	border: none;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
 	border-bottom: 6px solid $font-color;
 }
 
+.filter-trigger.filter-arrow span,
 .arrow-down {
 	@extend %arrow;
+	border: none;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
 	border-top: 6px solid $font-color;
@@ -1083,14 +1087,13 @@ footer {
 
 // Filters
 .filter-btn-container {
-	display: inline-flex;
 	position: relative;
-	float: right;
+	text-align: right;
 }
 
 .filter-container {
 	padding: 10px 0;
-	margin: 34px 0 10px 0;
+	margin: -1px 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 
@@ -2209,6 +2212,7 @@ button {
 		border-bottom: none;
 		margin-bottom: -1px;
 
+		& span,
 		.arrow-up {
 			position: absolute;
 			top: 45%;
@@ -2217,6 +2221,7 @@ button {
 		}
 	}
 
+	& span,
 	.arrow-down {
 		position: absolute;
 		top: 45%;
@@ -2271,6 +2276,7 @@ $icon-widget-btn: (
 	margin: 0 0 0 6px;
 	padding-right: 34px;
 	min-width: 94px;
+	vertical-align: bottom;
 	@include border-radius(2px 2px 0 0);
 
 	.btn-time-icon {
@@ -2313,6 +2319,7 @@ $icon-widget-btn: (
 	height: 24px;
 	width: 24px;
 	background: url(../img/icon-sprite.svg) no-repeat -246px -582px;
+	vertical-align: bottom;
 }
 
 .btn-time-right {
@@ -2321,6 +2328,7 @@ $icon-widget-btn: (
 	border: none;
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -83px -623px;
+	vertical-align: bottom;
 
 	&:focus, &:hover {
 		background: url(../img/icon-sprite.svg) no-repeat -395px -623px;
@@ -2334,6 +2342,7 @@ $icon-widget-btn: (
 	border: none;
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -85px -657px;
+	vertical-align: bottom;
 
 	&:focus, &:hover {
 		background: url(../img/icon-sprite.svg) no-repeat -397px -657px;
@@ -2347,6 +2356,7 @@ $icon-widget-btn: (
 	border: none;
 	background: none;
 	color: $font-color;
+	vertical-align: bottom;
 }
 
 .time-quick {
