@@ -34,7 +34,7 @@ static int	zbx_zlib_errno = 0;
  * Purpose: returns last conversion error message                             *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_compress_strerror()
+const char	*zbx_compress_strerror(void)
 {
 	static char	message[ZBX_COMPRESS_STRERROR_LEN];
 
@@ -135,7 +135,7 @@ int zbx_uncompress(const char *in, size_t size_in, char *out, size_t size_out)
 	return FAIL;
 }
 
-const char	*zbx_compress_strerror()
+const char	*zbx_compress_strerror(void)
 {
 	return "";
 }
