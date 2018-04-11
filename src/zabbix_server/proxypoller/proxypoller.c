@@ -695,7 +695,10 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 			goto out;
 
 		if ('\0' == *answer)
+		{
 			proxy->version = ZBX_COMPONENT_VERSION(3, 2);
+			zbx_free(answer);
+		}
 	}
 
 	if (ZBX_COMPONENT_VERSION(3, 2) == proxy->version)
