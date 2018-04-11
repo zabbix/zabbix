@@ -590,33 +590,44 @@ if ($this->data['displayApplications']) {
 }
 
 // Append master item select.
-$master_item = (new CDiv([
-	(new CMultiSelect([
-		'name' => 'master_itemid',
-		'object_name' => 'items',
-		'multiple' => false,
-		'ignored' => array_key_exists('items_names', $data) ? $data['items_names'] : [],
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'dstfrm' => $itemForm->getName(),
-				'dstfld1' => 'master_itemid',
-				'hostid' => $data['hostid'],
-				'webitems' => true
+if ($data['displayMasteritems']) {
+	$master_item = (new CDiv([
+		(new CMultiSelect([
+			'name' => 'master_itemid',
+			'object_name' => 'items',
+			'multiple' => false,
+			'ignored' => $data['itemids'],
+			'data' => ($data['master_itemid'] > 0)
+				? [
+					[
+						'id' => $data['master_itemid'],
+						'prefix' => $data['master_hostname'].NAME_DELIMITER,
+						'name' => $data['master_itemname']
+					]
+				]
+				: [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'dstfrm' => $itemForm->getName(),
+					'dstfld1' => 'master_itemid',
+					'hostid' => $data['hostid'],
+					'webitems' => true
+				]
 			]
-		]
-	]))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(true)
-]))->setId('master_item');
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(true)
+	]))->setId('master_item');
 
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))
-		->setLabel(_('Master item'))
-		->setChecked(isset($data['visible']['master_itemid'])),
-	$master_item
-);
+	$itemFormList->addRow(
+		(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))
+			->setLabel(_('Master item'))
+			->setChecked(array_key_exists('master_itemid', $data['visible'])),
+		$master_item
+	);
+}
 
 // append description to form list
 $itemFormList->addRow(
