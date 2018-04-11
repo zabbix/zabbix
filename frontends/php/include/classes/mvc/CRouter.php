@@ -102,7 +102,7 @@ class CRouter {
 		'widget.favscreens.view'		=> ['CControllerWidgetFavScreensView',		'layout.widget',		'monitoring.widget.favscreens.view'],
 		'widget.discovery.view'			=> ['CControllerWidgetDiscoveryView',		'layout.widget',		'monitoring.widget.discovery.view'],
 		'widget.graph.view'				=> ['CControllerWidgetGraphView',			'layout.widget',		'monitoring.widget.graph.view'],
-		'widget.hoststatus.view'		=> ['CControllerWidgetHostStatusView',		'layout.widget',		'monitoring.widget.hoststatus.view'],
+		'widget.problemhosts.view'		=> ['CControllerWidgetProblemHostsView',	'layout.widget',		'monitoring.widget.problemhosts.view'],
 		'widget.problems.view'			=> ['CControllerWidgetProblemsView',		'layout.widget',		'monitoring.widget.problems.view'],
 		'widget.systeminfo.view'		=> ['CControllerWidgetSystemInfoView',		'layout.widget',		'monitoring.widget.systeminfo.view'],
 		'widget.syssum.view'			=> ['CControllerWidgetSystemView',			'layout.widget',		'monitoring.widget.system.view'],

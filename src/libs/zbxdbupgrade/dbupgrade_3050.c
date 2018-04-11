@@ -574,7 +574,7 @@ static int	DBpatch_3050046(void)
 			"favgrph", "favgraphs",
 			"favmap", "favmaps",
 			"favscr", "favscreens",
-			"hoststat", "hoststatus",
+			"hoststat", "problemhosts",
 			"stszbx", "systeminfo",
 			"sysmap", "map",
 			"webovr", "web",

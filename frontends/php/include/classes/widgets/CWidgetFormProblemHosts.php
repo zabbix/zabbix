@@ -20,12 +20,12 @@
 
 
 /**
- * Host status widget form.
+ * Problem hosts widget form.
  */
-class CWidgetFormHostStatus extends CWidgetForm {
+class CWidgetFormProblemHosts extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_HOST_STATUS);
+		parent::__construct($data, WIDGET_PROBLEM_HOSTS);
 
 		// host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));

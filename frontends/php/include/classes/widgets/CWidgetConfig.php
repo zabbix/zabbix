@@ -38,10 +38,10 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
 			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
 			WIDGET_GRAPH				=> _('Graph'),
-			WIDGET_HOST_STATUS			=> _('Host status'),
 			WIDGET_MAP					=> _('Map'),
 			WIDGET_NAV_TREE				=> _('Map navigation tree'),
 			WIDGET_PLAIN_TEXT			=> _('Plain text'),
+			WIDGET_PROBLEM_HOSTS		=> _('Problem hosts'),
 			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_SYSTEM_INFO			=> _('System information'),
 			WIDGET_SYSTEM_STATUS		=> _('System status'),
@@ -68,10 +68,10 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> ['width' => 2, 'height' => 3],
 			WIDGET_FAV_SCREENS			=> ['width' => 2, 'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
-			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 5],
 			WIDGET_MAP					=> ['width' => 9, 'height' => 5],
 			WIDGET_NAV_TREE				=> ['width' => 3, 'height' => 5],
 			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3],
+			WIDGET_PROBLEM_HOSTS		=> ['width' => 6, 'height' => 5],
 			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
 			WIDGET_SYSTEM_INFO			=> ['width' => 6, 'height' => 5],
 			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 5],
@@ -117,8 +117,8 @@ class CWidgetConfig {
 			case WIDGET_DATA_OVER:
 			case WIDGET_DISCOVERY:
 			case WIDGET_GRAPH:
-			case WIDGET_HOST_STATUS:
 			case WIDGET_PLAIN_TEXT:
+			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
 			case WIDGET_SYSTEM_STATUS:
 			case WIDGET_TRIG_OVER:
@@ -196,9 +196,6 @@ class CWidgetConfig {
 			case WIDGET_GRAPH:
 				return new CWidgetFormGraph($data);
 
-			case WIDGET_HOST_STATUS:
-				return new CWidgetFormHostStatus($data);
-
 			case WIDGET_MAP:
 				return new CWidgetFormMap($data);
 
@@ -207,6 +204,9 @@ class CWidgetConfig {
 
 			case WIDGET_PLAIN_TEXT:
 				return new CWidgetFormPlainText($data);
+
+			case WIDGET_PROBLEM_HOSTS:
+				return new CWidgetFormProblemHosts($data);
 
 			case WIDGET_PROBLEMS:
 				return new CWidgetFormProblems($data);
