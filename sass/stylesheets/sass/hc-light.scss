@@ -1,3 +1,5 @@
+$theme_name: 'hc-light';
+
 // NOTIFICATION & ALERT
 $red: #990000;
 $light-red: #cc0000;
@@ -592,7 +594,43 @@ ul.top-nav-icons {
 	}
 }
 
+// Tables
+.list-table {
+	&.compact-view {
+		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
+			&:before {
+				min-height: 20px;
+			}
+		}
+
+		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
+			&:after {
+				top: 1px;
+				transform: scale(0.8);
+		}
+
+		td {
+			.icon-wzrd-action {
+				background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+			}
+		}
+	}
+}
+
+// Checkbox disabling
+
+.whole-row-checkbox {
+	display: none !important;
+}
+
 // SEVERITY STATUSES
+
+tr.na-bg, tr.na-bg, tr.normal-bg, tr.normal-bg, tr.info-bg, tr.info-bg, tr.warning-bg, tr.warning-bg, tr.average-bg, tr.average-bg, tr.high-bg, tr.high-bg, tr.disaster-bg, tr.disaster-bg {
+	&:before, &:after {
+		display: none !important;
+	}
+}
+
 td.log-na-bg {
 	padding-left: 42px !important;
 	color: $font-color;
