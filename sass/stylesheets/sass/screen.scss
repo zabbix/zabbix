@@ -707,7 +707,7 @@ output {
 					td {
 						color: $font-color;
 					}
-			}
+				}
 
 				@if $theme_name == 'blue' or $theme_name == 'dark' {
 
@@ -4331,7 +4331,20 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
+// Filter Checkboxes
+
+.filter-cb-second-column {
+	display: inline-block;
+	width: 50%;
+	text-align: right;
+}
+
+.cb-second-column-label {
+		padding: 0 10px;
+}
+
 // Event status colors
+
 .problem-unack-fg {
 	color: $problem-unack-fg-color;
 }
