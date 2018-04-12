@@ -35,8 +35,7 @@ $multiselect = (new CMultiSelect([
 			'srcfld1' => 'userid',
 			'srcfld2' => 'fullname'
 		]
-	],
-	'callPostEvent' => true
+	]
 ]))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAriaRequired();
