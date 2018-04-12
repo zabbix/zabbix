@@ -113,6 +113,8 @@
 				var errors = [],
 					messages = [];
 
+				jQuery(form).parent().find('>.msg-good, >.msg-bad').remove();
+
 				if (typeof response === 'object') {
 					if ('errors' in response) {
 						errors = response.errors;
