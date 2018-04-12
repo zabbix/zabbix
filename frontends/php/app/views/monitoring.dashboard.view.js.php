@@ -64,20 +64,43 @@
 	function dashbrdApplyProperties() {
 		var dashboard = jQuery('.dashbrd-grid-widget-container'),
 			form = jQuery('[name=dashboard_form]'),
+			url = new Curl('zabbix.php'),
 			form_data;
 
 		form.trimValues(['#name']);
 		form_data = form.serializeJSON();
+		form_data['dashboardid'] = <?=$this->data['dashboard']['dashboardid'];?>;
+		url.setArgument('action', 'dashboard.properties.check');
 
-		dashboard.dashboardGrid('setDashboardData', {
-			name: form_data['name'],
-			userid: form_data['userid'] || 0
+		jQuery.ajax({
+			data: form_data,
+			url: url.getUrl(),
+			success: function (response) {
+				var errors = [];
+				form.parent().find('>.msg-good, >.msg-bad').remove();
+
+				if (typeof response === 'object') {
+					if ('errors' in response) {
+						errors = response.errors;
+					}
+				}
+
+				if (errors.length) {
+					jQuery(errors).insertBefore(form);
+				}
+				else {
+					dashboard.dashboardGrid('setDashboardData', {
+						name: form_data['name'],
+						userid: form_data['userid']
+					});
+
+					jQuery('#<?= ZBX_STYLE_PAGE_TITLE ?>').text(form_data['name']);
+					jQuery('#dashboard-direct-link').text(form_data['name']);
+
+					overlayDialogueDestroy('dashboard_prop');
+				}
+			}
 		});
-
-		jQuery('#<?= ZBX_STYLE_PAGE_TITLE ?>').text(form_data['name']);
-		jQuery('#dashboard-direct-link').text(form_data['name']);
-
-		overlayDialogueDestroy('dashboard_prop');
 	}
 
 	function dashbrdConfirmSharing() {
@@ -196,7 +219,7 @@
 	function dashboardAddMessages(messages) {
 		var $message_div = jQuery('<div>').attr('id','dashbrd-messages');
 		$message_div.append(messages);
-		jQuery('.article').prepend($message_div);
+		jQuery('main').prepend($message_div);
 	}
 
 	function dashboardRemoveMessages() {
