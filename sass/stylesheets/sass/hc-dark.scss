@@ -628,6 +628,7 @@ ul.top-nav-icons {
 
 // Tables
 .list-table {
+	&.compact-view {
 		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
 			&:before {
 				min-height: 20px;
@@ -638,6 +639,7 @@ ul.top-nav-icons {
 			&:after {
 				top: 1px;
 				transform: scale(0.8);
+			}
 		}
 
 		td {
