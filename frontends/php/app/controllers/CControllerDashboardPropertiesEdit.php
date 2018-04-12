@@ -46,13 +46,7 @@ class CControllerDashboardPropertiesEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->hasInput('dashboardid')
-			? !$this->getInput('dashboardid') || (bool) API::Dashboard()->get([
-				'output' => [],
-				'editable' => true,
-				'dashboardids' => $this->getInput('dashboardid')
-			])
-			: true;
+		return true;
 	}
 
 	protected function doAction() {

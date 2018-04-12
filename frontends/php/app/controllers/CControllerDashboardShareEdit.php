@@ -53,20 +53,27 @@ class CControllerDashboardShareEdit extends CController {
 			'editable' => true
 		]);
 
-		if (!$dashboards) {
-			return false;
-		}
-
-		$this->dashboard = $dashboards[0];
+		$this->dashboard = reset($dashboards);
 
 		return true;
 	}
 
 	protected function doAction() {
-		$this->dashboard['users'] = $this->prepareUsers($this->dashboard['users']);
-		$this->dashboard['userGroups'] = $this->prepareUserGroups($this->dashboard['userGroups']);
+		if ($this->dashboard) {
+			$this->dashboard['users'] = $this->prepareUsers($this->dashboard['users']);
+			$this->dashboard['userGroups'] = $this->prepareUserGroups($this->dashboard['userGroups']);
 
-		$this->setResponse(new CControllerResponseData(['dashboard' => $this->dashboard]));
+			$this->setResponse(new CControllerResponseData(['dashboard' => $this->dashboard]));
+		}
+		else {
+			error(_('No permissions to referred object or it does not exist!'));
+
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => CJs::encodeJson(['errors' => [getMessages()->toString()]])
+				]))->disableView()
+			);
+		}
 	}
 
 	/**
