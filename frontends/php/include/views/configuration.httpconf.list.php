@@ -50,9 +50,11 @@ $widget = (new CWidget())
 					$this->data['pageFilter']->getHostsCB()
 				])
 			),
-		(new CTag('nav', true, getRequest('hostid') != 0
+		(new CTag('nav', true, ($this->data['pageFilter']->groupid > 0 && $this->data['pageFilter']->hostid > 0)
 			? new CRedirectButton(_('Create web scenario'), (new CUrl())
 					->setArgument('form', 'create')
+					->setArgument('groupid', $this->data['pageFilter']->groupid)
+					->setArgument('hostid', $this->data['pageFilter']->hostid)
 					->getUrl()
 				)
 			: (new CButton('form', _('Create web scenario (select host first)')))->setEnabled(false)
