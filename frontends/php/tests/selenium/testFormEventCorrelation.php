@@ -658,7 +658,7 @@ class testFormEventCorrelation extends CWebTest {
 
 		$this->zbxTestInputTypeOverwrite('name', 'New event correlation for update');
 
-		$this->zbxTestClick('remove');
+		$this->zbxTestClickXpathWait('//tr[@id=\'conditions_0\']//button[text()=\'Remove\']');
 		$this->zbxTestDropdownSelectWait('new_condition_type', 'New event tag');
 		$this->zbxTestInputTypeOverwrite('new_condition_tag', 'New update tag');
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
