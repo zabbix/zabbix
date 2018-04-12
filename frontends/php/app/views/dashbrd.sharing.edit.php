@@ -22,8 +22,7 @@ $form = (new CForm('post', (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.share.update')
 	->getUrl()
 ))
-	->setName('dashboard_sharing_form')
-	->setId('dashboard_sharing_form');
+	->setName('dashboard_sharing_form');
 
 $table_user_groups = (new CTable())
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
@@ -101,7 +100,7 @@ $output = [
 	'body' => $form->toString(),
 	'script_inline' => 
 		'jQuery(document).ready(function($) {'.
-			'$("#'.$form->getId().'").fillDashbrdSharingForm('.json_encode($data['dashboard']).');'.
+			'$("[name='.$form->getName().']").fillDashbrdSharingForm('.json_encode($data['dashboard']).');'.
 		'});',
 	'buttons' => [
 		[
