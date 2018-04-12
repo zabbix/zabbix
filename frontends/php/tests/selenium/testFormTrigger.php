@@ -192,7 +192,7 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		}
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
@@ -774,7 +774,7 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 

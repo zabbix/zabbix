@@ -238,7 +238,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
@@ -769,7 +769,7 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($this->discoveryRule);
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 
 		if (isset($data['description'])) {
 			$this->zbxTestInputTypeWait('description', $data['description']);
