@@ -2270,7 +2270,7 @@ class testFormItemPrototype extends CWebTest {
 			$keyName = $data['key'];
 		}
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
 
 		if (isset($data['type'])) {
 			$type = $data['type'];
