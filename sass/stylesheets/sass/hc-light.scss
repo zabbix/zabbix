@@ -595,6 +595,7 @@ ul.top-nav-icons {
 }
 
 // Tables
+
 .list-table {
 	&.compact-view {
 		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
@@ -621,7 +622,7 @@ ul.top-nav-icons {
 // Checkbox disabling
 
 .filter-highlight-row-cb {
-	display: none !important;
+	display: none;
 }
 
 // SEVERITY STATUSES

@@ -684,8 +684,8 @@ output {
 				&:hover {
 					background: $ui-hover-color !important;
 
-						.link-action {
-							color: $font-color;
+					.link-action {
+						color: $font-color;
 
 						&.red {
 							color: $red;
@@ -4333,14 +4333,14 @@ td.inactive-bg {
 
 // Filter Checkboxes
 
-.filter-cb-second-column {
+.table-forms-second-column {
 	display: inline-block;
 	width: 50%;
 	text-align: right;
-}
 
-.cb-second-column-label {
+	.second-column-label {
 		padding: 0 10px;
+	}
 }
 
 // Event status colors

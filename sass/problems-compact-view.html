@@ -5,10 +5,10 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Zabbix | Monitoring - Problems</title>
-		<!-- <link rel="stylesheet" href="stylesheets/screen.css"> -->
+		<link rel="stylesheet" href="stylesheets/screen.css">
 		<!-- <link rel="stylesheet" href="stylesheets/dark-theme.css"> -->
 		<!-- <link rel="stylesheet" href="stylesheets/hc-light.css"> -->
-		<link rel="stylesheet" href="stylesheets/hc-dark.css">
+		<!-- <link rel="stylesheet" href="stylesheets/hc-dark.css"> -->
 		<link rel="icon" href="/favicon.ico">
         <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
@@ -132,9 +132,7 @@
 										<div class="table-forms-td-left"><label>Show</label></div>
 										<div class="table-forms-td-right">
 											<ul id="filter_show" class="radio-segmented">
-												<li><input type="radio" id="filter_show_0" name="filter_show" value="1"><label for="filter_show_0">Recent problems</label></li>
-												<li style="margin-left: -4px;"><input type="radio" id="filter_show_1" name="filter_show" value="3"><label for="filter_show_1">Problems</label></li>
-												<li style="margin-left: -4px;"><input type="radio" id="filter_show_2" name="filter_show" value="2" checked="checked"><label for="filter_show_2">History</label></li>
+												<li><input type="radio" id="filter_show_0" name="filter_show" value="1"><label for="filter_show_0">Recent problems</label></li><li><input type="radio" id="filter_show_1" name="filter_show" value="3"><label for="filter_show_1">Problems</label></li><li><input type="radio" id="filter_show_2" name="filter_show" value="2" checked="checked"><label for="filter_show_2">History</label></li>
 											</ul>
 										</div>
 									</li>
@@ -323,8 +321,7 @@
 													<tr>
 														<td colspan="4">
 															<ul id="filter_evaltype" class="radio-segmented">
-																<li><input type="radio" id="filter_evaltype_0" name="filter_evaltype" value="0" checked="checked"><label for="filter_evaltype_0">AND</label></li>
-																<li style="margin-left: -4px;"><input type="radio" id="filter_evaltype_1" name="filter_evaltype" value="1"><label for="filter_evaltype_1">OR</label></li>
+																<li><input type="radio" id="filter_evaltype_0" name="filter_evaltype" value="0" checked="checked"><label for="filter_evaltype_0">AND</label></li><li><input type="radio" id="filter_evaltype_1" name="filter_evaltype" value="1"><label for="filter_evaltype_1">OR</label></li>
 															</ul>
 														</td>
 													</tr>
@@ -332,8 +329,7 @@
 														<td><input type="text" id="filter_tags_0_tag" name="filter_tags[0][tag]" value="" maxlength="255" placeholder="tag" style="width: 150px;"></td>
 														<td>
 															<ul id="filter_tags_0_operator" class="radio-segmented">
-																<li><input type="radio" id="filter_tags_0_operator_0" name="filter_tags[0][operator]" value="0" checked="checked"><label for="filter_tags_0_operator_0">Like</label></li>
-																<li style="margin-left: -4px;"><input type="radio" id="filter_tags_0_operator_1" name="filter_tags[0][operator]" value="1"><label for="filter_tags_0_operator_1">Equal</label></li>
+																<li><input type="radio" id="filter_tags_0_operator_0" name="filter_tags[0][operator]" value="0" checked="checked"><label for="filter_tags_0_operator_0">Like</label></li><li><input type="radio" id="filter_tags_0_operator_1" name="filter_tags[0][operator]" value="1"><label for="filter_tags_0_operator_1">Equal</label></li>
 															</ul>
 														</td>
 														<td><input type="text" id="filter_tags_0_value" name="filter_tags[0][value]" value="" maxlength="255" placeholder="value" style="width: 150px;"></td>
@@ -350,31 +346,39 @@
 										<div class="table-forms-td-left"><label>Show tags</label></div>
 										<div class="table-forms-td-right">
 											<ul id="filter_show_tags" class="radio-segmented">
-												<li><input type="radio" id="filter_show_tags_3" name="filter_show_tags" value="3"><label for="filter_show_tags_0">None</label></li>
-												<li style="margin-left: -4px;"><input type="radio" id="filter_show_tags_1" name="filter_show_tags" value="1"><label for="filter_show_tags_1">1</label></li>
-												<li style="margin-left: -4px;"><input type="radio" id="filter_show_tags_2" name="filter_show_tags" value="2"><label for="filter_show_tags_2">2</label></li>
-												<li style="margin-left: -4px;"><input type="radio" id="filter_show_tags_3" name="filter_show_tags" value="3" checked="checked"><label for="filter_show_tags_3">3</label></li>
+												<li><input type="radio" id="filter_show_tags_3" name="filter_show_tags" value="3"><label for="filter_show_tags_0">None</label></li><li><input type="radio" id="filter_show_tags_1" name="filter_show_tags" value="1"><label for="filter_show_tags_1">1</label></li><li><input type="radio" id="filter_show_tags_2" name="filter_show_tags" value="2"><label for="filter_show_tags_2">2</label></li><li><input type="radio" id="filter_show_tags_3" name="filter_show_tags" value="3" checked="checked"><label for="filter_show_tags_3">3</label></li>
 											</ul>
 										</div>
 									</li>
 									<li>
 										<div class="table-forms-td-left"><label for="filter_maintenance">Show hosts in maintenance</label></div>
-											<div class="table-forms-td-right"><input type="checkbox" id="filter_maintenance" name="filter_maintenance" value="1" class="checkbox-radio" checked="checked"><label for="filter_maintenance"><span></span></label>
-												<div class="filter-cb-second-column"><label for="filter_compact_view" class="cb-second-column-label">Compact view</label><input type="checkbox" id="filter_compact_view" name="filter_compact_view" value="1" class="checkbox-radio" checked="checked"><label for="filter_compact_view"><span></span></label>
-												</div>
-											</div>
-									</li>
-									<li>
-										<div class="table-forms-td-left"><label for="filter_unacknowledged">Show unacknowledged only</label></div>
-											<div class="table-forms-td-right"><input type="checkbox" id="filter_unacknowledged" name="filter_unacknowledged" value="1" class="checkbox-radio"><label for="filter_unacknowledged"><span></span></label>
-												<div class="filter-cb-second-column"><label for="filter_show_timeline" class="cb-second-column-label">Show timeline</label><input type="checkbox" id="filter_show_timeline" name="filter_show_timeline" value="1" class="checkbox-radio" checked="checked" disabled="disabled"><label for="filter_show_timeline"><span></span></label>
+											<div class="table-forms-td-right"><input type="checkbox" id="filter_maintenance" name="filter_maintenance" value="1" class="checkbox-radio" checked="checked">
+												<label for="filter_maintenance"><span></span></label>
+												<div class="table-forms-second-column">
+													<label for="filter_unacknowledged" class="second-column-label">Show unacknowledged only</label>
+													<input type="checkbox" id="filter_compact_view" name="filter_unacknowledged" value="1" class="checkbox-radio" checked="checked">
+													<label for="filter_unacknowledged"><span></span></label>
 												</div>
 											</div>
 									</li>
 									<li>
 										<div class="table-forms-td-left"><label for="filter_details">Show details</label></div>
-											<div class="table-forms-td-right"><input type="checkbox" id="filter_details" name="filter_details" value="1" class="checkbox-radio" disabled="disabled"><label for="filter_details"><span></span></label>
-												<div class="filter-highlight-row-cb filter-cb-second-column"><label for="filter_highlight_row" class="cb-second-column-label">Highlight whole row</label><input type="checkbox" id="filter_highlight_row" name="filter_highlight_row" value="1" class="checkbox-radio" checked="checked"><label for="filter_highlight_row"><span></span></label>
+											<div class="table-forms-td-right"><input type="checkbox" id="filter_details" name="filter_details" value="1" class="checkbox-radio">
+												<label for="filter_details"><span></span></label>
+												<div class="table-forms-second-column">
+													<label for="filter_compact_view" class="second-column-label">Compact view</label>
+													<input type="checkbox" id="filter_compact_view" name="filter_compact_view" value="1" class="checkbox-radio" checked="checked" disabled="disabled">
+													<label for="filter_compact_view"><span></span></label>
+												</div>
+											</div>
+									<li>
+										<div class="table-forms-td-left"><label for="filter_show_timeline">Show timeline</label></div>
+											<div class="table-forms-td-right"><input type="checkbox" id="filter_show_timeline" name="filter_show_timeline" value="1" class="checkbox-radio" disabled="disabled">
+												<label for="filter_show_timeline"><span></span></label>
+												<div class="filter-highlight-row-cb table-forms-second-column">
+													<label for="filter_highlight_row" class="second-column-label">Highlight whole row</label>
+													<input type="checkbox" id="filter_highlight_row" name="filter_highlight_row" value="1" class="checkbox-radio" checked="checked">
+													<label for="filter_highlight_row"><span></span></label>
 												</div>
 											</div>
 									</li>
