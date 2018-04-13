@@ -31,13 +31,17 @@ if ($data['templateid']) {
 else {
 	$form->addItem((new CList())
 		->addItem(
-			new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+			(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
 				'screens.php' => _('Screens'),
 				'slides.php' => _('Slide shows')
-			])
+			]))->removeId()
 		)
 	);
-	$content_control->addItem((new CButton('form', _('Import')))->onClick('redirect("screen.import.php?rules_preset=screen")'));
+	$content_control->addItem(
+		(new CButton('form', _('Import')))
+			->onClick('redirect("screen.import.php?rules_preset=screen")')
+			->removeId()
+	);
 }
 
 $form->addItem($content_control);
