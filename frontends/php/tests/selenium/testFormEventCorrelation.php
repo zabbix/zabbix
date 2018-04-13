@@ -525,7 +525,7 @@ class testFormEventCorrelation extends CWebTest {
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
 					],
 					'formula'=> '',
-					'error_message' => 'Incorrect custom expression "Test create with empty expression" for correlation "": expression is empty.'
+					'error_message' => 'Incorrect custom expression "" for correlation "Test create with empty expression": expression is empty.'
 				]
 			],
 			[
@@ -561,7 +561,7 @@ class testFormEventCorrelation extends CWebTest {
 						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
 					],
 					'formula'=> 'Wrong formula',
-					'error_message' => 'Incorrect custom expression "Test create with wrong formula" for correlation "Wrong formula": check expression starting from "Wrong formula".'
+					'error_message' => 'Incorrect custom expression "Wrong formula" for correlation "Test create with wrong formula": check expression starting from "Wrong formula".'
 				]
 			],
 		];

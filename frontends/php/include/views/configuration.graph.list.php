@@ -22,39 +22,42 @@
 if (!empty($this->data['parent_discoveryid'])) {
 	$widget = (new CWidget())
 		->setTitle(_('Graph prototypes'))
-		->setControls((new CForm('get'))
-			->cleanItems()
-			->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId())
-			->addItem((new CList())->addItem(new CSubmit('form', _('Create graph prototype'))))
+		->setControls(
+			(new CTag('nav', true,
+				(new CList())->addItem(new CRedirectButton(_('Create graph prototype'),
+					(new CUrl())
+						->setArgument('form', 'create')
+						->getUrl()
+				))
+			))->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	if (!empty($this->data['hostid'])) {
-		$create_button = new CSubmit('form', _('Create graph'));
-	}
-	else {
-		$create_button = (new CSubmit('form', _('Create graph (select host first)')))->setEnabled(false);
-	}
-
 	$widget = (new CWidget())
 		->setTitle(_('Graphs'))
-		->setControls((new CForm('get'))
-			->cleanItems()
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$this->data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Host'), 'hostid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$this->data['pageFilter']->getHostsCB()
-				])
-				->addItem($create_button)
-			)
-		);
+		->setControls(new CList([
+			(new CForm('get'))
+				->cleanItems()
+				->setAttribute('aria-label', _('Main filter'))
+				->addItem((new CList())
+					->addItem([
+						new CLabel(_('Group'), 'groupid'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						$this->data['pageFilter']->getGroupsCB()
+					])
+					->addItem([
+						new CLabel(_('Host'), 'hostid'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						$this->data['pageFilter']->getHostsCB()
+					])
+				),
+			(new CTag('nav', true, ($data['hostid'] == 0)
+				? (new CButton('form', _('Create graph (select host first)')))->setEnabled(false)
+				: new CRedirectButton(_('Create graph'), (new CUrl())->setArgument('form', 'create')->getUrl())
+			))
+				->setAttribute('aria-label', _('Content controls'))
+		]));
 
 	if (!empty($this->data['hostid'])) {
 		$widget->addItem(get_header_host_table('graphs', $this->data['hostid']));

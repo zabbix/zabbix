@@ -211,7 +211,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create graph');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of graphs');

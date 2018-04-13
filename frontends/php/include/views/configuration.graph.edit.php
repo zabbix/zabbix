@@ -35,6 +35,7 @@ else {
 // Create form.
 $graphForm = (new CForm())
 	->setName('graphForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('ymin_itemid', $this->data['ymin_itemid'])
@@ -427,13 +428,9 @@ $graphFormList->addRow(
 );
 
 // Append tabs to form.
-$graphTab = new CTabView();
-if (!$data['form_refresh']) {
-	$graphTab->setSelected(0);
-}
-$graphTab->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'),
-	$graphFormList
-);
+$graphTab = (new CTabView())
+	->setSelected(0)
+	->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'), $graphFormList);
 
 /*
  * Preview tab

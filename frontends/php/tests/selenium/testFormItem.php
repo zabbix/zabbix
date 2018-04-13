@@ -486,7 +486,7 @@ class testFormItem extends CWebTest {
 		}
 
 		$this->zbxTestLogin(
-			'items.php?form='.(isset($itemid) ? 'update' : 'Create+item').
+			'items.php?form='.(isset($itemid) ? 'update' : 'create').
 			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '')
 		);
 
@@ -2121,7 +2121,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$this->zbxTestCheckTitle('Configuration of items');
 
 		if (isset($data['type'])) {
@@ -2360,7 +2360,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//li[30]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText("//input[@id='history']/..", 'Overridden by global housekeeping settings (99d)');
 		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('adm.gui.php');
@@ -2634,7 +2634,7 @@ class testFormItem extends CWebTest {
 		$dbRow = DBfetch($dbResult);
 		$hostid = $dbRow['hostid'];
 
-		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=Create+item');
+		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=create');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 

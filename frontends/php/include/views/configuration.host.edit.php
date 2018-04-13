@@ -32,6 +32,7 @@ if (!hasRequest('form_refresh')) {
 
 $frmHost = (new CForm())
 	->setName('hostsForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])

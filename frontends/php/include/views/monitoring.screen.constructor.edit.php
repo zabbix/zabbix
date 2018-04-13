@@ -26,6 +26,7 @@ if (isset($_REQUEST['screenitemid'])) {
 
 $form = (new CForm('post', $action))
 	->setName('screen_item_form')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('screenid', getRequest('screenid'));
 
 if ($data['screen']['templateid'] != 0) {

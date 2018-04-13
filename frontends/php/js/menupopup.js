@@ -83,7 +83,7 @@ function getMenuPopupHistory(options) {
  * @param string options[]['confirmation']  Confirmation text.
  * @param bool   options['showGraphs']      Link to host graphs page.
  * @param bool   options['showScreens']     Link to host screen page.
- * @param bool   options['showTriggers']    Link to Monitoring->Triggers page.
+ * @param bool   options['showTriggers']    Link to Monitoring->Problems page.
  * @param bool   options['hasGoTo']         "Go to" block in popup.
  * @param bool   options['fullscreen']      Fullscreen mode.
  * @param {object} trigger_elmnt            UI element which triggered opening of overlay dialogue.
@@ -114,9 +114,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 				label: t('Latest data')
 			},
 			latest_data_url = new Curl('latest.php'),
-			// triggers
-			triggers = {
-				label: t('Triggers')
+			// problems
+			problems = {
+				label: t('Problems')
 			},
 			// graphs
 			graphs = {
@@ -143,16 +143,17 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		latest_data.url = latest_data_url.getUrl();
 
 		if (!options.showTriggers) {
-			triggers.disabled = true;
+			problems.disabled = true;
 		}
 		else {
-			var triggers_url = new Curl('tr_status.php');
-
-			triggers_url.setArgument('hostid', options.hostid);
+			var url = new Curl('zabbix.php');
+			url.setArgument('action', 'problem.view');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
 			if (fullscreen) {
-				triggers_url.setArgument('fullscreen', '1');
+				url.setArgument('fullscreen', '1');
 			}
-			triggers.url = triggers_url.getUrl();
+			problems.url = url.getUrl();
 		}
 
 		if (!options.showGraphs) {
@@ -186,7 +187,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			items: [
 				host_inventory,
 				latest_data,
-				triggers,
+				problems,
 				graphs,
 				screens
 			]
@@ -212,7 +213,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
  * @param array  options['gotos']['screens']        Link to host screen page with url parameters ("name" => "value").
  * @param array  options['gotos']['showScreens']    Display "Screens" link enabled or disabled.
  * @param array  options['gotos']['triggerStatus']  Link to trigger status page with url parameters ("name" => "value").
- * @param array  options['gotos']['showTriggers']   Display "Triggers" link enabled or disabled.
+ * @param array  options['gotos']['showTriggers']   Display "Problems" link enabled or disabled.
  * @param array  options['gotos']['submap']         Link to submap page with url parameters ("name" => "value").
  * @param array  options['gotos']['events']         Link to events page with url parameters ("name" => "value").
  * @param array  options['gotos']['showEvents']     Display "Events" link enabled or disabled.
@@ -281,19 +282,20 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			});
 		}
 
-		// trigger status
+		// problems
 		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var triggers = {
-				label: t('Triggers')
+			var problems = {
+				label: t('Problems')
 			};
 
 			if (!options.gotos.showTriggers) {
-				triggers.disabled = true;
+				problems.disabled = true;
 			}
 			else {
-				var url = new Curl('tr_status.php');
+				var url = new Curl('zabbix.php');
+				url.setArgument('action', 'problem.view');
+				url.setArgument('filter_maintenance', '1');
 				url.setArgument('filter_set', '1');
-				url.setArgument('show_maintenance', '1');
 				if (fullscreen) {
 					url.setArgument('fullscreen', '1');
 				}
@@ -304,10 +306,10 @@ function getMenuPopupMap(options, trigger_elmnt) {
 					}
 				});
 
-				triggers.url = url.getUrl();
+				problems.url = url.getUrl();
 			}
 
-			gotos.push(triggers);
+			gotos.push(problems);
 		}
 
 		// graphs
@@ -494,6 +496,19 @@ function getMenuPopupRefresh(options) {
 						dataType: 'script',
 						success: function(js) { js }
 					});
+
+					jQuery('a', obj.closest('.action-menu')).each(function() {
+						var link = jQuery(this);
+
+						if (link.data('value') == currentRate) {
+							link.addClass('selected');
+						}
+						else {
+							link.removeClass('selected');
+						}
+					});
+
+					obj.closest('.action-menu').menuPopup('close', null);
 				}
 				else {
 					var url = new Curl('zabbix.php');
@@ -692,6 +707,8 @@ function showDialogForm(form, options, formData, trigger_elmnt) {
  * @param string options['acknowledge']['eventid']  Event ID
  * @param string options['acknowledge']['backurl']  Return url.
  * @param object options['configuration']           Link to trigger configuration page (optional).
+ * @param bool	 options['show_description']		Show Description item in context menu. Default: true.
+ * @param bool	 options['description_enabled']		Show Description item enabled. Default: true.
  * @param string options['url']                     Trigger url link (optional).
  * @param bool   options['fullscreen']              Fullscreen mode.
  *
@@ -738,6 +755,27 @@ function getMenuPopupTrigger(options) {
 			label: t('Acknowledge'),
 			url: url.getUrl()
 		};
+	}
+
+	// description
+	if (typeof options.show_description === 'undefined' || options.show_description !== false) {
+		var trigger_descr = {
+			label: t('Description')
+		};
+
+		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
+			trigger_descr.clickCallback = function(event) {
+				jQuery(this).closest('.action-menu').menuPopup('close', null);
+
+				return PopUp('popup.trigdesc.view', {
+					triggerid: options.triggerid
+				}, null, event.target);
+			}
+		}
+		else {
+			trigger_descr.disabled = true;
+		}
+		items[items.length] = trigger_descr;
 	}
 
 	// configuration
@@ -1021,13 +1059,11 @@ jQuery(function($) {
 				id = opener.data('menu-popup-id'),
 				menuPopup = $('#' + id),
 				mapContainer = null,
-				target;
+				target = event.target;
 
-			if (IE) {
-				target = opener.closest('svg').length > 0 ? event : event.target;
-			}
-			else {
-				target = event.originalEvent.detail !== 0 ? event : event.target;
+			if (event.type === 'contextmenu' || (IE && opener.closest('svg').length > 0)
+					|| event.originalEvent.detail !== 0) {
+				target = event;
 			}
 
 			// Close other action menus.
@@ -1316,7 +1352,9 @@ jQuery(function($) {
 				break;
 
 			case 13: // Enter
-				$('>' + link_selector, selected)[0].click();
+				if (typeof selected !== 'undefined') {
+					$('>' + link_selector, selected)[0].click();
+				}
 				break;
 
 			case 9: // Tab

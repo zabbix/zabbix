@@ -22,32 +22,29 @@
 $widget = (new CWidget())
 	->setTitle(_('Screens'))
 	->addItem((new CList())
-	->addClass(ZBX_STYLE_OBJECT_GROUP)
-	->addItem([
-		(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
-		'/',
-		(new CSpan())
-			->addClass(ZBX_STYLE_SELECTED)
-			->addItem(
-				new CLink($data['screen']['name'], (new CUrl('screens.php'))
-					->setArgument('elementid', $data['screen']['screenid'])
-					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-				)
-			)
+		->setAttribute('role', 'navigation')
+		->setAttribute('aria-label', _('Breadcrumbs'))
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addItem([
+			(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
+			'/',
+			(new CSpan())
+				->addClass(ZBX_STYLE_SELECTED)
+				->addItem(
+					new CLink($data['screen']['name'], (new CUrl('screens.php'))
+						->setArgument('elementid', $data['screen']['screenid'])
+						->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+				))
 	]))
 	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
-$controls = (new CList())->addItem(
-	(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
-		'screens.php' => _('Screens'),
-		'slides.php' => _('Slide shows')
-	]))->removeId()
+$controls = (new CList())
+	->addItem(
+		(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+			'screens.php' => _('Screens'),
+			'slides.php' => _('Slide shows')
+		]))->removeId()
 );
-
-// Append screens combobox to page header.
-$form = (new CForm())
-	->setName('headerForm')
-	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
 
 if (check_dynamic_items($data['screen']['screenid'], 0)) {
 	$pageFilter = new CPageFilter([
@@ -79,15 +76,13 @@ if (check_dynamic_items($data['screen']['screenid'], 0)) {
 		]);
 }
 
-// page header
 $controls
 	->addItem($data['screen']['editable']
 		? (new CButton('edit', _('Edit screen')))
 			->onClick('redirect("screenedit.php?screenid='.$data['screen']['screenid'].'", "get", "", false, false)')
 		: null
 	)
-	->addItem(get_icon('favourite',
-		[
+	->addItem(get_icon('favourite', [
 			'fav' => 'web.favorite.screenids',
 			'elname' => 'screenid',
 			'elid' => $data['screen']['screenid']
@@ -95,9 +90,14 @@ $controls
 	))
 	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
-$form->addItem($controls);
-
-$widget->setControls($form);
+$widget->setControls((new CTag('nav', true, (new CList())
+	->addItem((new CForm('get'))
+		->setName('headerForm')
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+		->addItem($controls)
+	)))
+		->setAttribute('aria-label', _('Content controls'))
+);
 
 // Append screens to widget.
 $screenBuilder = new CScreenBuilder([

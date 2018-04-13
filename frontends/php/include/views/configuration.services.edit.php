@@ -28,6 +28,7 @@ $widget = (new CWidget())->setTitle(_('Services'));
 // create form
 $servicesForm = (new CForm())
 	->setName('servicesForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('parentid', $this->data['parentid'])
 	->addVar('parentname', $this->data['parentname'])

@@ -64,17 +64,20 @@ if ($zabbixServer->getError()) {
 
 $widget = (new CWidget())
 	->setTitle(_('Queue of items to be updated'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem(
-				(new CComboBox('config', $config, 'submit();', [
-					QUEUE_OVERVIEW => _('Overview'),
-					QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
-					QUEUE_DETAILS => _('Details')
-				]))->removeId()
+	->setControls((new CTag('nav', true, [
+		(new CForm('get'))
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(
+					(new CComboBox('config', $config, 'submit();', [
+						QUEUE_OVERVIEW => _('Overview'),
+						QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
+						QUEUE_DETAILS => _('Details')
+					]))->removeId()
+				)
 			)
-		)
+		]))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $table = new CTableInfo();

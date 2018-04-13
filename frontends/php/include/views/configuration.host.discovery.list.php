@@ -21,10 +21,14 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CVar('hostid', $data['hostid']))->removeId())
-		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(new CRedirectButton(_('Create discovery rule'),
+				(new CUrl())
+					->setArgument('form', 'create')
+					->getUrl()
+			))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 

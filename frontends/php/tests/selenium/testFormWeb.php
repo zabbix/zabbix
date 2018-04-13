@@ -186,7 +186,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create web scenario');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
@@ -1417,7 +1417,7 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create web scenario');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestCheckHeader('Web monitoring');
 
@@ -1581,7 +1581,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestClickLinkTextWait('Triggers');
 
 			foreach ($data['createTriggers'] as $trigger) {
-				$this->zbxTestClickWait('form');
+				$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 				$this->zbxTestInputType('description', $trigger);
 				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
