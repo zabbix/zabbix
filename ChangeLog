@@ -15,6 +15,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+....I..... [ZBX-12756] improved configure script to check iconv library (MVekslers)
 ........S. [ZBX-13667] added notification in zabbix server log about 'error' in elasticsearch json response (MVekslers)
 ..F....... [ZBX-13683] fixed multiselect items not being sorted by name (agriscenko)
 ........S. [ZBX-13299] fixed autoregistration, discovery and internal notifications not being sent due to uninitialized severity (vso)
@@ -246,6 +247,7 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-12756] improved configure script to check iconv library (MVekslers)
 ........S. [ZBX-13667] added notification in zabbix server log about 'error' in elasticsearch json response (MVekslers)
 ..F....... [ZBX-13683] fixed multiselect items not being sorted by name (agriscenko)
 ........S. [ZBX-13299] fixed autoregistration, discovery and internal notifications not being sent due to uninitialized severity (vso)
