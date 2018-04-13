@@ -57,7 +57,7 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestLogin('applications.php');
 		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
 		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
-		$this->zbxTestContentControlButtonClickTextWait('Create application');
+		$this->zbxTestClickLinkTextWait($name);
 
 		// Change application name if new name differs from existing name.
 		if ($new_name !== $name) {
@@ -147,7 +147,7 @@ class testFormApplication extends CWebTest {
 		for ($i = 0; $i < 3; $i++) {
 			$this->updateApplication(self::$application, self::$application.$suffix);
 
-			// Application name is also updated for the other test cases.
+			// Application name is also updated for the other test cases.svn
 			self::$application .= $suffix;
 		}
 	}
