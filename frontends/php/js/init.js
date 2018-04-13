@@ -158,27 +158,4 @@ jQuery(function($) {
 
 	// Initialize hintBox event handlers.
 	hintBox.bindEvents();
-
-	// Initialize filter visibility change event handlers.
-	$('[data-filter-toggle]').click(function(e) {
-		var toggle = $(this),
-			profileid = toggle.data('profile'),
-			container = $(toggle.data('filter-toggle'));
-
-		if (container.length == 0) {
-			return
-		}
-
-		container.toggle();
-		toggle.toggleClass('filter-active');// ZBX_STYLE_FILTER_ACTIVE
-		updateUserProfile(profileid, toggle.hasClass('filter-active') ? 1 : 0, []);
-
-		if (toggle.hasClass('filter-active')) {
-			$('[autofocus=autofocus]', container).focus();
-
-			if (container.find('.multiselect').length > 0) {
-				container.find('.multiselect').multiSelect('resize');
-			}
-		}
-	});
 });

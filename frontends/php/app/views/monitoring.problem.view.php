@@ -275,16 +275,31 @@ if ($data['action'] == 'problem.view') {
 	$filter_column2
 		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
 
-	$filter = (new CFilter('web.problem.filter.state'))
+	// $filter = (new CFilter('web.problem.filter.state'))
+	// 	->addVar('action', 'problem.view')
+	// 	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+	// 	->addVar('page', $data['page'])
+	// 	->addColumn($filter_column1)
+	// 	->addColumn($filter_column2);
+
+	// if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+	// 	$filter->addNavigator();
+	// }
+	$filter = new CFilter(0);
+	$debug = true;
+
+	if ($debug || $data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+		$filter->addTimeSelector('Last 7 days');
+	}
+
+	$filter_column1
 		->addVar('action', 'problem.view')
 		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-		->addVar('page', $data['page'])
-		->addColumn($filter_column1)
-		->addColumn($filter_column2);
+		->addVar('page', $data['page']);
 
-	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		$filter->addNavigator();
-	}
+	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
+
+	$this->addPostJS('jQuery("#'.$filter->getId().'").tabs({disabled: [0], collapsible: true})');
 
 	(new CWidget())
 		->setTitle(_('Problems'))
@@ -311,7 +326,7 @@ if ($data['action'] == 'problem.view') {
 	// activating blinking
 	$this->addPostJS('jqBlink.blink();');
 
-	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+	if (($debug || $data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 		$objData = [
 			'id' => 'timeline_1',
 			'loadSBox' => 0,

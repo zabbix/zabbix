@@ -2658,18 +2658,18 @@ function calculateTime(array $options = []) {
 }
 
 /**
- * Convert relative date to timestamp. Allow to define precision part using suffix '/', example (now/w).
+ * Parse relative date. Allow to define precision part using suffix '/', example (now/w).
  * Supports date as string in format 'Y.m.d H:i:s' and timestamp as integer or string with '@' prefix.
  * Timestamp is returned as initialized DateTime object. In case of parsing error null will be returned.
  *
  * @param string $date      Date in relative format or timestamp.
  * @param bool   $is_start  If set to true date will be modified to lowest value, example (now/w) will be returned
- *                          as Monday of this week. When set to false precision will modify date to highest value,
+ *                          as Monday of this week. When set to false precisiion will modify date to highest value,
  *                          same example will return Sunday of this week.
  *
  * @return DateTime|null
  */
-function relativeToTimestamp($date, $is_start) {
+function parseRelativeDate($date, $is_start) {
 	$time_units = [
 		'/(\d+)s/' => '$1 second',
 		'/(\d+)m/' => '$1 minute',
