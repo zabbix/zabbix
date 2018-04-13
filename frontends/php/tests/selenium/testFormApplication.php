@@ -147,7 +147,7 @@ class testFormApplication extends CWebTest {
 		for ($i = 0; $i < 3; $i++) {
 			$this->updateApplication(self::$application, self::$application.$suffix);
 
-			// Application name is also updated for the other test cases.svn
+			// Application name is also updated for the other test cases
 			self::$application .= $suffix;
 		}
 	}
