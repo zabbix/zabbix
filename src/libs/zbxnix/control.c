@@ -21,7 +21,7 @@
 
 static int	parse_log_level_options(const char *opt, size_t len, int *scope, int *data)
 {
-	int		num = 0;
+	unsigned short	num = 0;
 	const char	*rtc_options;
 
 	rtc_options = opt + len;
@@ -38,6 +38,7 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 	}
 	else if (0 != isdigit(*(++rtc_options)))
 	{
+		/* convert PID */
 		if (FAIL == is_ushort(rtc_options, &num) || 0 == num)
 		{
 			zbx_error("invalid log level control target: invalid or unsupported process identifier");
@@ -86,6 +87,7 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 				return FAIL;
 			}
 
+			/* convert Zabbix process number (e.g. "2" in "poller,2") */
 			if (FAIL == is_ushort(proc_num, &num) || 0 == num)
 			{
 				zbx_error("invalid log level control target: invalid or unsupported process number"
