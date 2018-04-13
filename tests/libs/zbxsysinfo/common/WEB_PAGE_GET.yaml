@@ -1,0 +1,49 @@
+---
+test case: Regular 127.0.0.1
+in:
+  key: "web.page.get[127.0.0.1]"
+out:
+  return: SYSINFO_RET_OK
+  req: "GET / HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n"
+---
+test case: Regular 127.0.0.1,zabbix
+in:
+  key: "web.page.get[127.0.0.1,zabbix]"
+out:
+  return: SYSINFO_RET_OK
+  req: "GET /zabbix HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n"
+---
+test case: Regular 127.0.0.1,zabbix,80
+in:
+  key: "web.page.get[127.0.0.1,zabbix,80]"
+out:
+  return: SYSINFO_RET_OK
+  req: "GET /zabbix HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n"
+---
+test case: Injection 127.0\r\n.0.1
+in:
+  key: "web.page.get[127.0\r\n.0.1]"
+out:
+  return: SYSINFO_RET_FAIL
+  req: "Invalid character in position:5 for host name:127.0\r\n.0.1"
+---
+test case: Injection \r\n127.0\r\n.0.1
+in:
+  key: "web.page.get[\r\n127.0\r\n.0.1]"
+out:
+  return: SYSINFO_RET_FAIL
+  req: "Invalid character in position:0 for host name:\r\n127.0\r\n.0.1"
+---
+test case: Injection 127.0.0.1,zabbi\r\n\r\n\r\nx
+in:
+  key: "web.page.get[127.0.0.1,zabbi\r\n\r\n\r\nx]"
+out:
+  return: SYSINFO_RET_FAIL
+  req: "Invalid character in position:5 for path:zabbi\r\n\r\n\r\nx"
+---
+test case: Injection 127.0.0.1,\r\n\r\n/zabbi\r\n\r\n\r\nx,80
+in:
+  key: "web.page.get[127.0.0.1,\r\n\r\n/zabbi\r\n\r\n\r\nx,80]"
+out:
+  return: SYSINFO_RET_FAIL
+  req: "Invalid character in position:0 for path:\r\n\r\n/zabbi\r\n\r\n\r\nx"
