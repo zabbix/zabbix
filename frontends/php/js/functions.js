@@ -325,7 +325,7 @@ function sprintf(string) {
 		throw Error('Invalid input type. String required, got ' + typeof string);
 	}
 
-	placeHolders = string.match(/%\d\$s/g);
+	placeHolders = string.match(/%\d\$[sd]/g);
 	for (var l = placeHolders.length - 1; l >= 0; l--) {
 		position = placeHolders[l][1];
 		replace = arguments[position];

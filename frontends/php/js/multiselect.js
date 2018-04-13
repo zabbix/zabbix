@@ -209,7 +209,8 @@ jQuery(function($) {
 		};
 
 		return this.each(function() {
-			var obj = $(this);
+			var obj = $(this),
+				aria_live = $('[aria-live]', obj);
 
 			var ms = {
 				options: options,
@@ -280,7 +281,7 @@ jQuery(function($) {
 					var search = input.val();
 
 					// Replace trailing slashes to check if search term contains anything else.
-					if (!empty(search)) {
+					if (search !== '') {
 						if (input.data('lastSearch') != search) {
 							if (!values.isWaiting) {
 								values.isWaiting = true;
@@ -292,12 +293,12 @@ jQuery(function($) {
 									var search = input.val();
 
 									// re-check search after delay
-									if (!empty(search) && input.data('lastSearch') != search) {
+									if (search !== '' && input.data('lastSearch') != search) {
 										values.search = search;
 
 										input.data('lastSearch', values.search);
 
-										if (!empty(jqxhr)) {
+										if (jqxhr != null) {
 											jqxhr.abort();
 										}
 
@@ -335,11 +336,13 @@ jQuery(function($) {
 				.on('keypress keydown', function(e) {
 					switch (e.which) {
 						case KEY.ENTER:
-							if (!empty(input.val())) {
-								var selected = $('.available li.suggest-hover', obj);
+							if (input.val() !== '') {
+								var selected = $('.available li.suggest-hover', obj),
+									name = values.available[selected.data('id')]['name'];
 
-								if (selected.length > 0) {
+								if (selected.length) {
 									select(selected.data('id'), obj, values, options);
+									aria_live.text(sprintf(t('%1$s added'), name));
 								}
 
 								// stop form submit
@@ -350,27 +353,29 @@ jQuery(function($) {
 							break;
 
 						case KEY.BACKSPACE:
-							if (empty(input.val())) {
+							if (input.val() === '') {
 								var selected = $('.selected li.selected', obj);
 
-								if (selected.length > 0) {
-									var prev = selected.prev(),
+								if (selected.length) {
+									var prev = selected.is(':first-child') ? selected.next() : selected.prev(),
 										id = selected.data('id'),
 										item = values.selected[id];
 
-									if (typeof(item.disabled) === 'undefined' || !item.disabled) {
+									if (typeof item.disabled === 'undefined' || !item.disabled) {
+										var aria_text = sprintf(t('%1$s has been removed'),
+											$('.subfilter-enabled > span:first-child', selected).text()
+										);
 										removeSelected(id, obj, values, options);
-									}
 
-									if (prev.length > 0) {
-										prev.addClass('selected');
+										if (prev.length) {
+											var collection = $('.selected li', obj);
+											aria_text += '.'+sprintf(t('%1$s in position %2$d of %3$d selected'),
+												$('.subfilter-enabled > span:first-child', prev.addClass('selected'))
+													.text(), collection.index(prev) + 1, collection.length);
+										}
+
+										aria_live.text(aria_text);
 									}
-									else {
-										$('.selected li:first-child', obj).addClass('selected');
-									}
-								}
-								else if ($('.selected li', obj).length > 0) {
-									$('.selected li:last-child', obj).addClass('selected');
 								}
 
 								cancelEvent(e);
@@ -380,23 +385,28 @@ jQuery(function($) {
 							break;
 
 						case KEY.DELETE:
-							if (empty(input.val())) {
+							if (input.val() === '') {
 								var selected = $('.selected li.selected', obj);
 
-								if (selected.length > 0) {
-									var next = selected.next(),
+								if (selected.length) {
+									var next = selected.is(':last-child') ? selected.prev() : selected.next(),
 										id = selected.data('id'),
 										item = values.selected[id];
 
-									if (typeof(item.disabled) === 'undefined' || !item.disabled) {
+									if (typeof item.disabled === 'undefined' || !item.disabled) {
+										var aria_text = sprintf(t('%1$s has been removed'),
+											$('.subfilter-enabled > span:first-child', selected).text()
+										);
 										removeSelected(id, obj, values, options);
 
-										if (next.length > 0) {
-											next.addClass('selected');
+										if (next.length) {
+											var collection = $('.selected li', obj);
+											aria_text += '.'+sprintf(t('%1$s in position %2$d of %3$d selected'),
+												$('.subfilter-enabled > span:first-child', next.addClass('selected'))
+													.text(), collection.index(next) + 1, collection.length);
 										}
-										else {
-											$('.selected li:last-child', obj).addClass('selected');
-										}
+
+										aria_live.text(aria_text);
 									}
 								}
 
@@ -407,90 +417,70 @@ jQuery(function($) {
 							break;
 
 						case KEY.ARROW_LEFT:
-							if (empty(input.val())) {
-								if ($('.selected li.selected', obj).length > 0) {
-									var prev = $('.selected li.selected', obj).removeClass('selected').prev();
+							if (input.val() === '') {
+								var collection = $('.selected li', obj);
 
-									if (prev.length > 0) {
-										prev.addClass('selected');
-									}
-									else {
-										$('.selected li:first-child', obj).addClass('selected');
-									}
-								}
-								else if ($('.selected li', obj).length > 0) {
-									$('.selected li:last-child', obj).addClass('selected');
+								if (collection.length) {
+									var prev = collection.filter('.selected').removeClass('selected').prev();
+									aria_live.text(
+										$('.subfilter-enabled > span:first-child',
+											(prev.length ? prev : collection.last()).addClass('selected')
+										).text()
+									);
 								}
 							}
 							break;
 
 						case KEY.ARROW_RIGHT:
-							if ($('.selected li.selected', obj).length > 0) {
-								var next = $('.selected li.selected', obj).removeClass('selected').next('li');
+							if (input.val() === '') {
+								var collection = $('.selected li', obj);
 
-								if (next.length > 0) {
-									next.addClass('selected');
-								}
-								else if (getSearchFieldVisibility(obj) == false) {
-									$('.selected li:first-child', obj).addClass('selected');
+								if (collection.length) {
+									var next = collection.filter('.selected').removeClass('selected').next();
+									aria_live.text(
+										$('.subfilter-enabled > span:first-child',
+											(next.length ? next : collection.first()).addClass('selected')
+										).text()
+									);
 								}
 							}
 							break;
 
 						case KEY.ARROW_UP:
-							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj);
-									prev = null;
+							var collection = $('.available:visible li', obj);
+							if (collection.length > 0) {
+								var selected = collection.filter('.suggest-hover').removeClass('suggest-hover'),
+									prev = selected.length ? selected.prev() : collection.last();
 
-								if (selected.length === 0) {
-									// Select last element.
-									prev = $('ul.multiselect-suggest li:last-child', obj);
-								}
-								else {
-									selected.removeClass('suggest-hover');
-									prev = selected.prev();
-								}
-
-								if (prev.length === 0) {
-									// Select search input.
-									$('input[type="text"]', obj).val(values.search);
+								if (selected.is(':first-child')) {
+									input.val(values.search);
 								}
 								else {
 									prev.addClass('suggest-hover');
-									$('input[type="text"]', obj).val(values.available[prev.data('id')]['name']);
+									input.val(values.available[prev.data('id')]['name']);
 								}
 
-								// Position cursor at the end of search input.
+								aria_live.text(input.val());
 								cancelEvent(e);
-
 								scrollAvailable(obj);
 							}
 							break;
 
 						case KEY.ARROW_DOWN:
-							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj),
-									next;
+							var collection = $('.available:visible li', obj);
+							if (collection.length > 0) {
+								var selected = collection.filter('.suggest-hover').removeClass('suggest-hover'),
+									next = selected.length ? selected.next() : collection.first();
 
-								if (selected.length === 0) {
-									// Select first element.
-									next = $('ul.multiselect-suggest li:first-child', obj);
-								}
-								else {
-									selected.removeClass('suggest-hover');
-
-									next = selected.next();
-								}
-
-								if (next.length === 0) {
-									// Select search input.
-									$('input[type="text"]', obj).val(values.search);
+								if (selected.is(':last-child')) {
+									input.val(values.search);
 								}
 								else {
 									next.addClass('suggest-hover');
-									$('input[type="text"]', obj).val(values.available[next.data('id')]['name']);
+									input.val(values.available[next.data('id')]['name']);
 								}
 
+								aria_live.text(input.val());
 								scrollAvailable(obj);
 							}
 							break;
@@ -681,6 +671,7 @@ jQuery(function($) {
 			});
 		}
 
+		var found = 0;
 		// write empty result label
 		if (objectLength(values.available) == 0) {
 			var div = $('<div>', {
@@ -708,8 +699,18 @@ jQuery(function($) {
 			$.each(data, function (i, item) {
 				if (typeof values.available[item.id] !== 'undefined') {
 					addAvailable(item, obj, values, options);
+					found++;
 				}
 			});
+		}
+
+		if (found > 0) {
+			$('[aria-live]', obj).text(sprintf(t('%1$d matches for %2$s found, use down/up arrow keys to select'),
+				found, values.search
+			));
+		}
+		else {
+			$('[aria-live]', obj).text(options.labels['No matches found']);
 		}
 
 		// write more matches found label
