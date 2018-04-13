@@ -837,7 +837,7 @@ jQuery(function($) {
 
 				link.setAttribute('class', 'item-name');
 				link.setAttribute('title', item.name);
-				link.innerHTML = item.name;
+				link.innerText = item.name;
 
 				var li_item = document.createElement('LI');
 
