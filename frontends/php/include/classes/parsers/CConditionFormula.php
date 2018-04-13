@@ -25,7 +25,7 @@ class CConditionFormula {
 	const STATE_AFTER_OPERATOR = 1;
 	const STATE_AFTER_CLOSE_BRACE = 2;
 	const STATE_AFTER_CONSTANT = 3;
-	const STATE_AFTER_KEYWORD = 4;
+	const STATE_AFTER_NOT_OPERATOR = 4;
 
 	/**
 	 * Set to true of the formula is valid.
@@ -61,13 +61,6 @@ class CConditionFormula {
 	 * @var array
 	 */
 	protected $allowedOperators = ['and', 'or'];
-
-	/**
-	 * Array of supported keywords.
-	 *
-	 * @var array
-	 */
-	protected $allowed_keywords = ['not'];
 
 	/**
 	 * Current position on a parsed element.
@@ -115,8 +108,8 @@ class CConditionFormula {
 							if ($this->parseConstant()) {
 								$state = self::STATE_AFTER_CONSTANT;
 							}
-							elseif ($this->parseKeyword()) {
-								$state = self::STATE_AFTER_KEYWORD;
+							elseif ($this->parseNotOperator()) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
 							else {
 								break 3;
@@ -139,8 +132,8 @@ class CConditionFormula {
 							if ($this->parseConstant()) {
 								$state = self::STATE_AFTER_CONSTANT;
 							}
-							elseif ($this->parseKeyword()) {
-								$state = self::STATE_AFTER_KEYWORD;
+							elseif ($this->parseNotOperator()) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
 							else {
 								break 3;
@@ -148,23 +141,30 @@ class CConditionFormula {
 					}
 					break;
 
-				case self::STATE_AFTER_KEYWORD:
-					if (!$afterSpace) {
-						break 2;
-					}
+				case self::STATE_AFTER_NOT_OPERATOR:
+					switch ($this->formula[$this->pos]) {
+						case '(':
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
 
-					if ($this->parseConstant()) {
-						$state = self::STATE_AFTER_CONSTANT;
-					}
-					else {
-						break 2;
+						default:
+							if (!$afterSpace) {
+								break 3;
+							}
+
+							if ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
+							}
+							else {
+								break 3;
+							}
 					}
 					break;
 
 				case self::STATE_AFTER_CLOSE_BRACE:
 					switch ($this->formula[$this->pos]) {
 						case ')':
-							$state = self::STATE_AFTER_CLOSE_BRACE;
 							if ($level == 0) {
 								break 3;
 							}
@@ -174,9 +174,6 @@ class CConditionFormula {
 						default:
 							if ($this->parseOperator()) {
 								$state = self::STATE_AFTER_OPERATOR;
-							}
-							elseif ($this->parseKeyword()) {
-								$state = self::STATE_AFTER_KEYWORD;
 							}
 							else {
 								break 3;
@@ -201,9 +198,6 @@ class CConditionFormula {
 
 							if ($this->parseOperator()) {
 								$state = self::STATE_AFTER_OPERATOR;
-							}
-							elseif ($this->parseKeyword()) {
-								$state = self::STATE_AFTER_KEYWORD;
 							}
 							else {
 								break 3;
@@ -264,28 +258,12 @@ class CConditionFormula {
 	 *
 	 * @return bool
 	 */
-	protected function parseKeyword() {
-		$start = $this->pos;
-
-		while (isset($this->formula[$this->pos])) {
-			if (!$this->isKeywordChar($this->formula[$this->pos])) {
-				if ($this->formula[$this->pos] !== ' ') {
-					return false;
-				}
-				else {
-					break;
-				}
-			}
-
-			$this->pos++;
-		}
-
-		$keyword = substr($this->formula, $start, $this->pos - $start);
-		$this->pos--;
-
-		if (!in_array($keyword, $this->allowed_keywords)) {
+	protected function parseNotOperator() {
+		if (substr($this->formula, $this->pos, 3) !== 'not') {
 			return false;
 		}
+
+		$this->pos += 2;
 
 		return true;
 	}
@@ -309,12 +287,13 @@ class CConditionFormula {
 
 		$operator = substr($this->formula, $start, $this->pos - $start);
 
-		$this->pos--;
-
 		// check if this is a valid operator
 		if (!in_array($operator, $this->allowedOperators)) {
+			$this->pos = $start;
 			return false;
 		}
+
+		$this->pos--;
 
 		return true;
 	}
@@ -338,17 +317,6 @@ class CConditionFormula {
 	 * @return bool
 	 */
 	protected function isOperatorChar($c) {
-		return ($c >= 'a' && $c <= 'z');
-	}
-
-	/**
-	 * Returns true if the given character is a valid keyword character.
-	 *
-	 * @param string $c
-	 *
-	 * @return bool
-	 */
-	protected function isKeywordChar($c) {
 		return ($c >= 'a' && $c <= 'z');
 	}
 }
