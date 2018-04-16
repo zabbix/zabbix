@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())
 	->setTitle(_('Templates'))
 	->addItem(get_header_host_table('', $data['templateid']));
@@ -349,7 +350,7 @@ $linkedTemplateTable = (new CTable())
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['linkedTemplates'] as $template) {
-	$tmplList->addVar('templates[]', $template['templateid']);
+	$tmplList->addItem((new CVar('templates[]', $template['templateid']))->removeId());
 
 	if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 		$template_link = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
