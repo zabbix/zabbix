@@ -18,11 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$form = (new CForm('post', (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.share.update')
-	->getUrl()
-))
-	->setName('dashboard_sharing_form');
+$form = (new CForm('post'))->setName('dashboard_sharing_form');
 
 $table_user_groups = (new CTable())
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])

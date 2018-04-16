@@ -63,13 +63,14 @@
 
 	function dashbrdApplyProperties() {
 		var dashboard = jQuery('.dashbrd-grid-widget-container'),
-			form = jQuery('[name=dashboard_form]'),
+			form = jQuery('[name=dashboard_properties_form]'),
 			url = new Curl('zabbix.php'),
-			form_data;
+			form_data = {};
 
 		form.trimValues(['#name']);
-		form_data = form.serializeJSON();
 		form_data['dashboardid'] = <?=$this->data['dashboard']['dashboardid'];?>;
+		form_data['userid'] = jQuery("[name=userid]", form).val();
+		form_data['name'] = jQuery("[name=name]", form).val();
 		url.setArgument('action', 'dashboard.properties.check');
 
 		jQuery.ajax({
@@ -104,16 +105,19 @@
 	}
 
 	function dashbrdConfirmSharing() {
-		var form = window.document.forms['dashboard_sharing_form'];
+		var form = jQuery('[name=dashboard_sharing_form]'),
+			url = new Curl('zabbix.php');
+
+		url.setArgument('action', 'dashboard.share.update');
 
 		jQuery.ajax({
-			data: jQuery(form).serialize(),
-			url: jQuery(form).attr('action'),
+			data: form.serialize(),
+			url: url.getUrl(),
 			success: function (response) {
 				var errors = [],
 					messages = [];
 
-				jQuery(form).parent().find('>.msg-good, >.msg-bad').remove();
+				form.parent().find('>.msg-good, >.msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -125,7 +129,7 @@
 				}
 
 				if (errors.length) {
-					jQuery(errors).insertBefore(jQuery(form));
+					jQuery(errors).insertBefore(form);
 				}
 				else {
 					jQuery('main').find('> .msg-bad, > .msg-good').remove();
@@ -133,7 +137,7 @@
 					if (messages.length) {
 						jQuery('main').prepend(messages);
 					}
-					overlayDialogueDestroy('dashbrdShare');
+					overlayDialogueDestroy('dashbrd_share');
 				}
 			}
 		});
