@@ -40,7 +40,11 @@ $widget = (new CWidget())
 				->setArgument('form', 'create')
 				->getUrl()
 			))
-			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
+			->addItem(
+				(new CButton('form', _('Import')))
+					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->removeId()
+			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]));

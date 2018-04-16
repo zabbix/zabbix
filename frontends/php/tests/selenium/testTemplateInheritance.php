@@ -416,7 +416,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 
-		$this->zbxTestInputTypeWait('description', 'Test LLD trigger');
+		$this->zbxTestInputTypeByXpath("//input[@name='description']", 'Test LLD trigger');
 		$this->zbxTestInputType('expression', '{Inheritance test template:item-discovery-prototype.last(0)}=0');
 		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
@@ -444,7 +444,8 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestAssertElementText("//a[text()='Test LLD trigger']/parent::td", "$this->templateName: Test LLD trigger");
 		$this->zbxTestClickLinkTextWait('Test LLD trigger');
 
-		$this->zbxTestAssertElementValue('description', 'Test LLD trigger');
+		$getName = $this->zbxTestGetValue("//input[@name='description']");
+		$this->assertEquals($getName, 'Test LLD trigger');
 		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:item-discovery-prototype.last(0)}=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
