@@ -972,7 +972,6 @@ function getConditionFormula(conditions, evalType) {
 	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - rowremove.dynamicRows 	- after removing a row (triggered before tableupdate.dynamicRows)
 	 * - tableupdate.dynamicRows 	- after adding or removing a row
 	 *
 	 * @param options
@@ -1040,7 +1039,6 @@ function getConditionFormula(conditions, evalType) {
 	function removeRow(table, row, options) {
 		row.remove();
 
-		table.trigger('rowremove.dynamicRows', options);
 		table.trigger('tableupdate.dynamicRows', options);
 	}
 }(jQuery));
