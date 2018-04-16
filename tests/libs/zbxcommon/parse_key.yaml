@@ -43,7 +43,7 @@ test case: valid key with leading and trailing spaces around quoted empty string
 in:
   key: 'key[ "" ]'
 out:
-  valid_part: key[ "" ]'
+  valid_part: 'key[ "" ]'
   invalid_part: ''
   return: 'SUCCEED'
 ---
