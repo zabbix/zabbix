@@ -19,21 +19,18 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				->addClass(ZBX_STYLE_UPPERCASE)
 				->addClass('macro')
 				->setAttribute('placeholder', '{#MACRO}')
-				->setAttribute('data-formulaid', '#{formulaId}')
-				->setId('conditions_#{rowNum}_macro'),
+				->setAttribute('data-formulaid', '#{formulaId}'),
 			(new CComboBox('conditions[#{rowNum}][operator]', CONDITION_OPERATOR_REGEXP, null, [
 				CONDITION_OPERATOR_REGEXP => _('matches'),
 				CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
 			]))->addClass('operator'),
 			(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setAttribute('placeholder', _('regular expression'))
-				->setId('conditions_#{rowNum}_value'),
+				->setAttribute('placeholder', _('regular expression')),
 			(new CCol(
 				(new CButton('conditions_#{rowNum}_remove', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
-					->setId('conditions_#{rowNum}_remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('form_row')
