@@ -26,10 +26,6 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 class CControllerPopupTriggerWizard extends CController {
 
-	protected function init() {
-		$this->disableSIDvalidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'description' =>	'string',

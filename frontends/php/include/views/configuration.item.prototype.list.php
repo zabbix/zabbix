@@ -21,15 +21,15 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create item prototype'), (new CUrl())
-				->setArgument('form', 'create')
-				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->getUrl()
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(new CRedirectButton(_('Create item prototype'),
+				(new CUrl())
+					->setArgument('form', 'create')
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->getUrl()
 			))
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 

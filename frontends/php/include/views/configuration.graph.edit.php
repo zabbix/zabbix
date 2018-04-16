@@ -22,10 +22,13 @@
 $widget = new CWidget();
 
 if ($data['parent_discoveryid'] === null) {
-	$widget->setTitle(_('Graphs'))->addItem(get_header_host_table('graphs', $data['hostid']));
+	$widget
+		->setTitle(_('Graphs'))
+		->addItem(get_header_host_table('graphs', $data['hostid']));
 }
 else {
-	$widget->setTitle(_('Graph prototypes'))
+	$widget
+		->setTitle(_('Graph prototypes'))
 		->addItem(get_header_host_table('graphs', $data['hostid'], $data['parent_discoveryid']));
 }
 
@@ -39,7 +42,7 @@ $graphForm = (new CForm())
 	->addVar('ymax_itemid', $this->data['ymax_itemid']);
 
 if ($data['parent_discoveryid'] !== null) {
-	$graphForm->addVar('parent_discoveryid', $data['parent_discoveryid']);
+	$graphForm->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId());
 }
 
 if ($data['graphid'] != 0) {
