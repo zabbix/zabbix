@@ -37,7 +37,7 @@ class CControllerDashboardPropertiesCheck extends CController {
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([
-					'main_block' => CJs::encodeJson(['errors' => [getMessages()->toString()]])
+					'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
 				]))->disableView()
 			);
 		}
