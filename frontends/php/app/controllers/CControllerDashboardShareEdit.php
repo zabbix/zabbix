@@ -63,7 +63,12 @@ class CControllerDashboardShareEdit extends CController {
 			$this->dashboard['users'] = $this->prepareUsers($this->dashboard['users']);
 			$this->dashboard['userGroups'] = $this->prepareUserGroups($this->dashboard['userGroups']);
 
-			$this->setResponse(new CControllerResponseData(['dashboard' => $this->dashboard]));
+			$this->setResponse(new CControllerResponseData([
+				'dashboard' => $this->dashboard,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
+			]));
 		}
 		else {
 			error(_('No permissions to referred object or it does not exist!'));
