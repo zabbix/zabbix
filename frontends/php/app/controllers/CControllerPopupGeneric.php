@@ -991,7 +991,10 @@ class CControllerPopupGeneric extends CController {
 			'multiselect' => $page_options['multiselect'],
 			'table_columns' => $this->popup_properties[$this->source_table]['table_columns'],
 			'table_records' => $records,
-			'allowed_item_types' => $this->allowed_item_types
+			'allowed_item_types' => $this->allowed_item_types,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
 		if ($this->source_table === 'triggers' || $this->source_table === 'trigger_prototypes') {

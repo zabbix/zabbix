@@ -516,6 +516,7 @@ function getOverlayDialogueId() {
  * @param {object} params.content                           Window content.
  * @param {object} params.controls                          Window controls.
  * @param {array}  params.buttons                           Window buttons.
+ * @param {string} params.debug								Debug HTML displayed in modal window.
  * @param {string} params.buttons[]['title']                Text on the button.
  * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
  *                                                          on click.
@@ -664,7 +665,8 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 					.attr('aria-labeledby', headerid)
 				.end()
 		)
-		.append(overlay_dialogue_footer);
+		.append(overlay_dialogue_footer)
+		.append(typeof params.debug !== 'undefined' ? params.debug : null);
 
 	if (overlay_bg !== null) {
 		jQuery(overlay_bg).on('remove', function(event) {

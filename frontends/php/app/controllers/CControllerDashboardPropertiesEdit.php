@@ -83,12 +83,17 @@ class CControllerDashboardPropertiesEdit extends CController {
 
 			// Prepare data for view.
 			$data = [
-				'name' => $this->getInput('name', $dashboard['name']),
-				'dashboardid' => $dashboard['dashboardid'],
-				'owner' => $user
+				'dashboard' => [
+					'name' => $this->getInput('name', $dashboard['name']),
+					'dashboardid' => $dashboard['dashboardid'],
+					'owner' => $user
+				],
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
 			];
 
-			$this->setResponse(new CControllerResponseData(['dashboard' => $data]));
+			$this->setResponse(new CControllerResponseData($data));
 		}
 		else {
 			error(_('No permissions to referred object or it does not exist!'));
