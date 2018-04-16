@@ -46,38 +46,50 @@ class CControllerDashboardShareUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return (bool) API::Dashboard()->get([
+		return true;
+	}
+
+	protected function doAction() {
+		$editable_dashboard = (bool) API::Dashboard()->get([
 			'output' => [],
 			'dashboardids' => $this->getInput('dashboardid'),
 			'editable' => true
 		]);
-	}
 
-	protected function doAction() {
-		$dashboard = ['dashboardid' => $this->getInput('dashboardid')];
+		if ($editable_dashboard) {
+			$dashboard = ['dashboardid' => $this->getInput('dashboardid')];
 
-		if ($this->hasInput('private')) {
-			$dashboard['private'] = $this->getInput('private');
+			if ($this->hasInput('private')) {
+				$dashboard['private'] = $this->getInput('private');
+			}
+			if ($this->hasInput('users')) {
+				$users = $this->getInput('users');
+				/**
+				 * Empty user needed to always POST the 'users' parameter.
+				 * If 'users' parameter is empty array (excluding empty user) then API deletes all users.
+				 */
+				unset($users[self::EMPTY_USER]);
+				$dashboard['users'] = $users;
+			}
+			if ($this->hasInput('userGroups')) {
+				$groups = $this->getInput('userGroups');
+				/**
+				 * Empty user group always needs POST the 'userGroups' parameter.
+				 * If 'userGroups' is empty array (excluding empty group) the API deletes all user groups.
+				 */
+				unset($groups[self::EMPTY_GROUP]);
+				$dashboard['userGroups'] = $groups;
+			}
+
+			$result = (bool) API::Dashboard()->update($dashboard);
+
+			if ($result) {
+				info(_('Dashboard updated'));
+			}
 		}
-		if ($this->hasInput('users')) {
-			$users = $this->getInput('users');
-			// empty user needed to always POST the users param
-			// if users is empty array (excluding empty user) then API delete all users
-			unset($users[self::EMPTY_USER]);
-			$dashboard['users'] = $users;
-		}
-		if ($this->hasInput('userGroups')) {
-			$groups = $this->getInput('userGroups');
-			// empty user group needed to always POST the userGroups param
-			// if userGroups is empty array (excluding empty group) then API delete all userGroups
-			unset($groups[self::EMPTY_GROUP]);
-			$dashboard['userGroups'] = $groups;
-		}
-
-		$result = (bool) API::Dashboard()->update($dashboard);
-
-		if ($result) {
-			info(_('Dashboard updated'));
+		else {
+			error(_('No permissions to referred object or it does not exist!'));
+			$result = false;
 		}
 
 		$response = [
