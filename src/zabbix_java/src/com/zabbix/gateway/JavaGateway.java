@@ -81,7 +81,8 @@ public class JavaGateway
 		}
 		catch (Exception e)
 		{
-			logger.error("caught fatal exception", e);
+			logger.error("caught fatal exception: {}", ZabbixException.getRootCauseMessage(e));
+			logger.debug("error caused by", e);
 		}
 	}
 }
