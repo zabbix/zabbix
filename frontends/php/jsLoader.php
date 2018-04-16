@@ -195,7 +195,11 @@ $tranStrings = [
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
 		'new' => _('new'),
-		'Select' => _('Select')
+		'Select' => _('Select'),
+		'Added, %1$s' => _('Added, %1$s'),
+		'Removed, %1$s' => _('Removed, %1$s'),
+		'Selected, %1$s in position %2$d of %3$d' => _('Selected, %1$s in position %2$d of %3$d'),
+		'%1$d matches for %2$s found, use down/up arrow keys to select' => _('%1$d matches for %2$s found, use down/up arrow keys to select')
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),

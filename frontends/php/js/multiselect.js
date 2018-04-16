@@ -252,16 +252,20 @@ jQuery(function($) {
 
 			// search input
 			if (!options.disabled) {
-				var input = $('<input>', {
-					'class': 'input',
+				var label = $('label[for='+obj.attr('id')+'search]'),
+					input = $('<input>', {
+					id: label.length ? label.attr('for') : null,
+					class: 'input',
 					type: 'text'
 				})
-				.attr('placeholder', options.labels['type here to search'])
+				.attr({
+					'placeholder': options.labels['type here to search'],
+					'aria-label': (label.length ? label.text()+'. ' : '')+options.labels['type here to search']
+				})
 				.on('keyup change', function(e) {
 					if (typeof(e.which) === 'undefined') {
 						return false;
 					}
-
 					switch (e.which) {
 						case KEY.ARROW_DOWN:
 						case KEY.ARROW_LEFT:
@@ -337,12 +341,12 @@ jQuery(function($) {
 					switch (e.which) {
 						case KEY.ENTER:
 							if (input.val() !== '') {
-								var selected = $('.available li.suggest-hover', obj),
-									name = values.available[selected.data('id')]['name'];
+								var selected = $('.available li.suggest-hover', obj);
 
 								if (selected.length) {
 									select(selected.data('id'), obj, values, options);
-									aria_live.text(sprintf(t('%1$s added'), name));
+									aria_live.text(sprintf(t('Added, %1$s'), selected.data('label')));
+									input.focus();
 								}
 
 								// stop form submit
@@ -362,16 +366,14 @@ jQuery(function($) {
 										item = values.selected[id];
 
 									if (typeof item.disabled === 'undefined' || !item.disabled) {
-										var aria_text = sprintf(t('%1$s has been removed'),
-											$('.subfilter-enabled > span:first-child', selected).text()
-										);
+										var aria_text = sprintf(t('Removed, %1$s'), selected.data('label'));
 										removeSelected(id, obj, values, options);
 
 										if (prev.length) {
 											var collection = $('.selected li', obj);
-											aria_text += '.'+sprintf(t('%1$s in position %2$d of %3$d selected'),
-												$('.subfilter-enabled > span:first-child', prev.addClass('selected'))
-													.text(), collection.index(prev) + 1, collection.length);
+											prev.addClass('selected');
+											aria_text += '.'+sprintf(t('Selected, %1$s in position %2$d of %3$d'),
+												prev.data('label'), collection.index(prev) + 1, collection.length);
 										}
 
 										aria_live.text(aria_text);
@@ -394,16 +396,14 @@ jQuery(function($) {
 										item = values.selected[id];
 
 									if (typeof item.disabled === 'undefined' || !item.disabled) {
-										var aria_text = sprintf(t('%1$s has been removed'),
-											$('.subfilter-enabled > span:first-child', selected).text()
-										);
+										var aria_text = sprintf(t('Removed, %1$s'), selected.data('label'));
 										removeSelected(id, obj, values, options);
 
 										if (next.length) {
 											var collection = $('.selected li', obj);
-											aria_text += '.'+sprintf(t('%1$s in position %2$d of %3$d selected'),
-												$('.subfilter-enabled > span:first-child', next.addClass('selected'))
-													.text(), collection.index(next) + 1, collection.length);
+											next.addClass('selected');
+											aria_text += '.'+sprintf(t('Selected, %1$s in position %2$d of %3$d'),
+												next.data('label'), collection.index(next) + 1, collection.length);
 										}
 
 										aria_live.text(aria_text);
@@ -419,14 +419,10 @@ jQuery(function($) {
 						case KEY.ARROW_LEFT:
 							if (input.val() === '') {
 								var collection = $('.selected li', obj);
-
 								if (collection.length) {
 									var prev = collection.filter('.selected').removeClass('selected').prev();
-									aria_live.text(
-										$('.subfilter-enabled > span:first-child',
-											(prev.length ? prev : collection.last()).addClass('selected')
-										).text()
-									);
+									prev = (prev.length ? prev : collection.last()).addClass('selected');
+									aria_live.text(prev.data('label'));
 								}
 							}
 							break;
@@ -434,14 +430,10 @@ jQuery(function($) {
 						case KEY.ARROW_RIGHT:
 							if (input.val() === '') {
 								var collection = $('.selected li', obj);
-
 								if (collection.length) {
 									var next = collection.filter('.selected').removeClass('selected').next();
-									aria_live.text(
-										$('.subfilter-enabled > span:first-child',
-											(next.length ? next : collection.first()).addClass('selected')
-										).text()
-									);
+									next = (next.length ? next : collection.first()).addClass('selected');
+									aria_live.text(next.data('label'));
 								}
 							}
 							break;
@@ -457,10 +449,10 @@ jQuery(function($) {
 								}
 								else {
 									prev.addClass('suggest-hover');
-									input.val(values.available[prev.data('id')]['name']);
+									// input.val(values.available[prev.data('id')]['name']);
 								}
 
-								aria_live.text(input.val());
+								aria_live.text(prev.data('label'));
 								cancelEvent(e);
 								scrollAvailable(obj);
 							}
@@ -477,10 +469,10 @@ jQuery(function($) {
 								}
 								else {
 									next.addClass('suggest-hover');
-									input.val(values.available[next.data('id')]['name']);
+									// input.val(values.available[next.data('id')]['name']);
 								}
 
-								aria_live.text(input.val());
+								aria_live.text(next.data('label'));
 								scrollAvailable(obj);
 							}
 							break;
@@ -687,7 +679,8 @@ jQuery(function($) {
 		else {
 			$('.available', obj)
 				.append($('<ul>', {
-					'class': 'multiselect-suggest'
+					'class': 'multiselect-suggest',
+					'aria-hidden': true
 				}))
 				.mouseenter(function() {
 					values.isAvailableOpened = true;
@@ -757,7 +750,8 @@ jQuery(function($) {
 			}
 
 			var li = $('<li>', {
-				'data-id': item.id
+				'data-id': item.id,
+				'data-label': item.prefix + item.name
 			}).append(
 				$('<span>', {
 					'class': 'subfilter-enabled'
@@ -811,7 +805,8 @@ jQuery(function($) {
 
 	function addAvailable(item, obj, values, options) {
 		var li = $('<li>', {
-			'data-id': item.id
+			'data-id': item.id,
+			'data-label': item.prefix + item.name
 		})
 		.click(function() {
 			select(item.id, obj, values, options);
