@@ -98,7 +98,7 @@ abstract class ItemChecker
 			catch (JSONException e2)
 			{
 				Object[] logInfo = {JSON_TAG_ERROR, e1.getMessage(), ZabbixException.getRootCauseMessage(e2)};
-				logger.warn("cannot add JSON attribute '{}' with message '{}'", logInfo);
+				logger.warn("cannot add JSON attribute '{}' with message '{}': {}", logInfo);
 				logger.debug("error caused by", e2);
 			}
 		}
