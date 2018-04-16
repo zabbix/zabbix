@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha6
 
 New features:
+A....J.... [ZBXNEXT-4458] improved logging of Java gateway, added username/password validation for JMX items (vjaceslavs)
 A.F.I..PS. [ZBXNEXT-4411] added compression of server-proxy data exchange (miks, wiper)
 A.F.I..PS. [ZBXNEXT-4488] added ability to push data via trapper to HTTP agent item type (gcalenko, Ivo, vmurzins, wiper)
 A.FGI..PS. [ZBXNEXT-4358] added HTTP agent item type for data gathering via HTTP (gcalenko, Ivo, vso)
