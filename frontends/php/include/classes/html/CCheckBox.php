@@ -70,6 +70,24 @@ class CCheckBox extends CInput {
 	}
 
 	/**
+	 * Enable or disable the checkbox.
+	 *
+	 * @param bool $checked
+	 *
+	 * @return CCheckBox
+	 */
+	public function setDisabled($disabled) {
+		if ($disabled) {
+			$this->attributes['disabled'] = 'disabled';
+		}
+		else {
+			$this->removeAttribute('disabled');
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Set the label for the checkbox.
 	 *
 	 * @param string $label

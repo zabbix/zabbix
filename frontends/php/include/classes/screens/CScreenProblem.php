@@ -741,7 +741,11 @@ class CScreenProblem extends CScreenBase {
 				$header_check_box = (new CColHeader(
 					(new CCheckBox('all_eventids'))
 						->onClick("checkAll('".$form->getName()."', 'all_eventids', 'eventids');")
-				))->addClass(ZBX_STYLE_CELL_WIDTH);
+				));
+
+				$this->data['filter']['compact_view']
+					? $header_check_box->addStyle('width: 20px;')
+					: $header_check_box->addClass(ZBX_STYLE_CELL_WIDTH);
 			}
 			else {
 				$header_check_box = null;
@@ -754,10 +758,13 @@ class CScreenProblem extends CScreenBase {
 			$show_timeline = ($this->data['sort'] === 'clock');
 
 			$header_clock =
-				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link)
-					->addClass(ZBX_STYLE_CELL_WIDTH);
+				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link);
 
-			if ($show_timeline) {
+			$this->data['filter']['compact_view']
+				? $header_clock->addStyle('width: 115px;')
+				: $header_clock->addClass(ZBX_STYLE_CELL_WIDTH);
+
+			if ($show_timeline && !$this->data['filter']['compact_view'] && $this->data['filter']['show_timeline']) {
 				$header = [
 					$header_clock->addClass(ZBX_STYLE_RIGHT),
 					(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH),
@@ -768,21 +775,44 @@ class CScreenProblem extends CScreenBase {
 				$header = [$header_clock];
 			}
 
-			// create table
-			$table = (new CTableInfo())
-				->setHeader(array_merge($header, [
-					$header_check_box,
-					make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link),
-					(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
-					_('Status'),
-					_('Info'),
-					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
-					make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
-					_('Duration'),
-					$this->config['event_ack_enable'] ? _('Ack') : null,
-					_('Actions'),
-					$this->data['filter']['show_tags'] ? _('Tags') : null
-				]));
+			// Create table.
+			if ($this->data['filter']['compact_view']) {
+				$table = (new CTableInfo())
+					->setHeader(array_merge($header, [
+						$header_check_box,
+						make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link)
+							->addStyle('width: 120px;'),
+						(new CColHeader(_('Recovery time')))->addStyle('width: 115px;'),
+						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
+						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
+						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
+							->addStyle('width: 30%;'),
+						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
+							->addStyle('width: 70%;'),
+						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
+						$this->config['event_ack_enable'] ? (new CColHeader(_('Ack')))->addStyle('width: 36px;') : null,
+						(new CColHeader(_('Actions')))->addStyle('width: 59px;'),
+						$this->data['filter']['show_tags'] ? (new CColHeader(_('Tags')))->addStyle('width: 171px;') : null
+					]))
+					->addClass(ZBX_STYLE_COMPACT_VIEW)
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+			}
+			else {
+				$table = (new CTableInfo())
+					->setHeader(array_merge($header, [
+						$header_check_box,
+						make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link),
+						(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
+						_('Status'),
+						_('Info'),
+						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
+						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
+						_('Duration'),
+						$this->config['event_ack_enable'] ? _('Ack') : null,
+						_('Actions'),
+						$this->data['filter']['show_tags'] ? _('Tags') : null
+					]));
+			}
 
 			if ($this->config['event_ack_enable']) {
 				$url->setArgument('uncheck', '1');
@@ -908,7 +938,7 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
-				if ($show_timeline) {
+				if ($show_timeline && !$this->data['filter']['compact_view'] && $this->data['filter']['show_timeline']) {
 					if ($last_clock != 0) {
 						self::addTimelineBreakpoint($table, $last_clock, $problem['clock'], $this->data['sortorder']);
 					}
@@ -948,7 +978,10 @@ class CScreenProblem extends CScreenBase {
 						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 						: '',
 					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
-				]));
+				]), ($this->data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
+					? getSeverityStyle($trigger['priority'])
+					: null
+				);
 			}
 
 			$footer = null;
