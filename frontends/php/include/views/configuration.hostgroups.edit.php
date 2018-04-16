@@ -23,6 +23,7 @@ $widget = (new CWidget())->setTitle(_('Host groups'));
 
 $form = (new CForm())
 	->setName('hostgroupForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('groupid', $data['groupid'])
 	->addVar('form', $data['form']);
 
@@ -38,7 +39,7 @@ $form_list = (new CFormList('hostgroupFormList'))
 if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$form_list->addRow(null,
 		(new CCheckBox('subgroups'))
-			->setLabel(_('Apply permissions to all subgroups'))
+			->setLabel(_('Apply permissions and tag filters to all subgroups'))
 			->setChecked($data['subgroups'])
 	);
 }

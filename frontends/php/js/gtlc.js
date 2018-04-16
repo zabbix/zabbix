@@ -171,7 +171,7 @@ var timeControl = {
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
 					var graphUrl = new Curl(obj.src);
 					graphUrl.unsetArgument('sid');
-					graphUrl.setArgument('width', obj.objDims.width);
+					graphUrl.setArgument('width', obj.objDims.width - 1);
 
 					obj.src = graphUrl.getUrl();
 				}
@@ -301,19 +301,28 @@ var timeControl = {
 		}
 
 		var widget = widgets[0],
-			url = new Curl('zabbix.php');
+			url = new Curl('zabbix.php'),
+			post_args = {
+				uniqueid: widget['uniqueid'],
+				only_footer: 1
+			};
+
+		if (widget.type === 'graph') {
+			post_args.period = this.timeline.period();
+		}
 
 		url.setArgument('action', 'widget.graph.view');
 		jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
-			data: {
-				uniqueid: widget['uniqueid'],
-				only_footer: 1
-			},
+			data: post_args,
 			dataType: 'json',
 			success: function(resp) {
 				widget['content_footer'].html(resp.footer);
+
+				if ('period_string' in resp) {
+					jQuery('h4 span', widget['content_header']).text(resp.period_string);
+				}
 			}
 		});
 	},
@@ -1853,7 +1862,7 @@ var sbox = Class.create({
 	},
 
 	updateHeightBoxContainer: function(height) {
-		this.areaHeight = height;
+		this.areaHeight = height + 1;
 		this.dom_obj.style.height = this.areaHeight + 'px';
 	},
 

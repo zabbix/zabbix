@@ -42,7 +42,7 @@ for table in `grep TABLE "$schema" | grep $dbflag | awk -F'|' '{print $2}'`; do
 		line=`grep -v ZBX_NODATA "$schema" | grep -A $i "TABLE|$table|" | tail -1 | grep FIELD`
 		[ -z "$line" ] && break
 		field=`echo $line | awk -F'|' '{print $2}'`
-		fields="$fields,replace(replace(replace($field,'|','&pipe;'),'\r\n','&eol;'),'\n','&eol;') as $field"
+		fields="$fields,replace(replace(replace($field,'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;') as $field"
 		# figure out references to itself for correct sort order
 		reftable=`echo $line | cut -f8 -d'|' | sed -e 's/ //'`
 		if [ "$table" = "$reftable" ]; then

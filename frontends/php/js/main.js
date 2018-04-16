@@ -179,7 +179,7 @@ var MMenu = {
 
 	mouseOver: function(show_label) {
 		clearTimeout(this.timeout_reset);
-		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 10);
+		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
 		PageRefresh.restart();
 	},
 
@@ -463,7 +463,7 @@ var hintBox = {
 
 			switch (e.type) {
 				case 'mouseenter' :
-					hintBox.showHint(e, this, jQuery('.hint-box', this).html(), target.data('hintbox-class'), false,
+					hintBox.showHint(e, this, target.next('.hint-box').html(), target.data('hintbox-class'), false,
 						target.data('hintbox-style')
 					);
 					break;
@@ -556,7 +556,7 @@ var hintBox = {
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = jQuery('.hint-box', target).html();
+				hintText = jQuery(target).next('.hint-box').html();
 			}
 
 			target.isStatic = true;

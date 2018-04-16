@@ -22,7 +22,9 @@
 $widget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
-$authenticationForm = (new CForm())->setName('authenticationForm');
+$authenticationForm = (new CForm())
+	->setName('authenticationForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // create form list
 $authenticationFormList = new CFormList('authenticationList');
@@ -30,6 +32,7 @@ $authenticationFormList = new CFormList('authenticationList');
 // append config radio buttons to form list
 $authenticationFormList->addRow(_('Default authentication'),
 	(new CRadioButtonList('config', (int) $this->data['config']['authentication_type']))
+		->setAttribute('autofocus', 'autofocus')
 		->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL, null, 'submit()')
 		->addValue(_('LDAP'), ZBX_AUTH_LDAP, null, 'submit()')
 		->addValue(_('HTTP'), ZBX_AUTH_HTTP, null, 'submit()')

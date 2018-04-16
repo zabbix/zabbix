@@ -23,9 +23,14 @@ require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Macros'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.macros.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.macros.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $table = (new CTable())
@@ -38,6 +43,10 @@ foreach ($data['macros'] as $i => $macro) {
 		->addClass('macro')
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->setAttribute('placeholder', '{$MACRO}');
+
+	if ($i == 0) {
+		$macro_input->setAttribute('autofocus', 'autofocus');
+	}
 
 	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -76,6 +85,7 @@ $tab_view->setFooter(makeFormFooter($saveButton));
 
 $form = (new CForm())
 	->setName('macrosForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($tab_view);
 
 $widget->addItem($form);

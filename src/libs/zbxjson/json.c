@@ -252,6 +252,21 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 	return p;
 }
 
+void	zbx_json_escape(char **string)
+{
+	size_t	size;
+	char	*buffer;
+
+	if (0 == (size = __zbx_json_stringsize(*string, ZBX_JSON_TYPE_UNKNOWN)))
+		return;
+
+	buffer = zbx_malloc(NULL, size + 1);
+	buffer[size] = '\0';
+	__zbx_json_insstring(buffer, *string, ZBX_JSON_TYPE_UNKNOWN);
+	zbx_free(*string);
+	*string = buffer;
+}
+
 static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int object)
 {
 	size_t	len = 2; /* brackets */
@@ -346,6 +361,50 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 	j->status = ZBX_JSON_COMMA;
 }
 
+void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data)
+{
+	size_t	len = 0, len_data;
+	char	*p, *psrc, *pdst;
+
+	assert(j);
+	len_data = strlen(data);
+
+	if (ZBX_JSON_COMMA == j->status)
+		len++; /* , */
+
+	if (NULL != name)
+	{
+		len += __zbx_json_stringsize(name, ZBX_JSON_TYPE_STRING);
+		len += 1; /* : */
+	}
+	len += len_data;
+
+	__zbx_json_realloc(j, j->buffer_size + len + 1/*'\0'*/);
+
+	psrc = j->buffer + j->buffer_offset;
+	pdst = j->buffer + j->buffer_offset + len;
+
+	memmove(pdst, psrc, j->buffer_size - j->buffer_offset + 1/*'\0'*/);
+
+	p = psrc;
+
+	if (ZBX_JSON_COMMA == j->status)
+		*p++ = ',';
+
+	if (NULL != name)
+	{
+		p = __zbx_json_insstring(p, name, ZBX_JSON_TYPE_STRING);
+		*p++ = ':';
+	}
+
+	memcpy(p, data, len_data);
+	p += len_data;
+
+	j->buffer_offset = p - j->buffer;
+	j->buffer_size += len;
+	j->status = ZBX_JSON_COMMA;
+}
+
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value)
 {
 	char	buffer[MAX_ID_LEN];
@@ -359,6 +418,14 @@ void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value)
 	char	buffer[MAX_ID_LEN];
 
 	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_I64, value);
+	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
+}
+
+void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value)
+{
+	char	buffer[MAX_ID_LEN];
+
+	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, value);
 	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
 }
 
@@ -719,7 +786,7 @@ static const char	*zbx_json_copy_value(const char *p, size_t len, char *out, siz
 	return p + len;
 }
 
-static const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, int *is_null)
+const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, int *is_null)
 {
 	size_t	len;
 

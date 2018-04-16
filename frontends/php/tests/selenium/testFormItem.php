@@ -486,7 +486,7 @@ class testFormItem extends CWebTest {
 		}
 
 		$this->zbxTestLogin(
-			'items.php?form='.(isset($itemid) ? 'update' : 'Create+item').
+			'items.php?form='.(isset($itemid) ? 'update' : 'create').
 			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '')
 		);
 
@@ -2032,6 +2032,17 @@ class testFormItem extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'type' => 'Dependent item',
+					'name' => 'Dependent item',
+					'key' => 'item-dependent',
+					'master_item' => 'testFormItem',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
@@ -2110,7 +2121,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$this->zbxTestCheckTitle('Configuration of items');
 
 		if (isset($data['type'])) {
@@ -2158,6 +2169,12 @@ class testFormItem extends CWebTest {
 
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
+		}
+
+		if (array_key_exists('master_item',$data))	{
+			$this->zbxTestClickWait('button');
+			$this->zbxTestLaunchOverlayDialog('Items');
+			$this->zbxTestClickLinkTextWait($data['master_item']);
 		}
 
 		$itemFlexFlag = true;
@@ -2265,7 +2282,7 @@ class testFormItem extends CWebTest {
 			else {
 				$dbName = $name;
 			}
-			$this->zbxTestClickLinkTextWait($dbName);
+			$this->zbxTestClickXpath("//form[@name='items']//a[text()='$dbName']");
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestAssertElementValue('key', $key);
@@ -2282,12 +2299,24 @@ class testFormItem extends CWebTest {
 				case 'SSH agent':
 				case 'TELNET agent':
 				case 'JMX agent':
-			$this->zbxTestAssertElementPresentXpath("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					$this->zbxTestAssertElementPresentXpath("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
 					break;
 				default:
 					$this->zbxTestAssertNotVisibleId('interfaceid');
 			}
 			$this->zbxTestAssertElementPresentXpath("//select[@id='value_type']/option[text()='$value_type']");
+
+			// "Check now" button availability
+			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent',
+					'Zabbix internal', 'Zabbix aggregate', 'External check', 'Database monitor', 'IPMI agent',
+					'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated'])) {
+				$this->zbxTestClick('check_now');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+				$this->zbxTestCheckFatalErrors();
+			}
+			else {
+				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
+			}
 
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
@@ -2331,7 +2360,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//li[30]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText("//input[@id='history']/..", 'Overridden by global housekeeping settings (99d)');
 		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('adm.gui.php');
@@ -2605,7 +2634,7 @@ class testFormItem extends CWebTest {
 		$dbRow = DBfetch($dbResult);
 		$hostid = $dbRow['hostid'];
 
-		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=Create+item');
+		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=create');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 

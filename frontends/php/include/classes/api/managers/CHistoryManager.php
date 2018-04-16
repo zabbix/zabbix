@@ -546,10 +546,6 @@ class CHistoryManager {
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
 			}
 			else {
-				if (!$item['has_scheduling_intervals'] || $item['delay'] != 0) {
-					$item['delay'] = max($item['delay'], SEC_PER_HOUR);
-				}
-
 				$sql_select = 'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 			}
@@ -562,13 +558,6 @@ class CHistoryManager {
 					' AND clock<='.zbx_dbstr($time_to).
 				' GROUP BY '.$group_by
 			);
-
-			$sql = 'SELECT itemid,'.$sql_select.$sql_select_extra.',MAX(clock) AS clock'.
-				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-					' AND clock>='.zbx_dbstr($time_from).
-					' AND clock<='.zbx_dbstr($time_to).
-				' GROUP BY '.$group_by;
 
 			$data = [];
 			while (($row = DBfetch($result)) !== false) {

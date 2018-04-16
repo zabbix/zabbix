@@ -18,43 +18,50 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$controls = (new CList())
-	->addItem([
-		new CLabel(_('Group'), 'groupid'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$this->data['pageFilter']->getGroupsCB()
-	])
-	->addItem([
-		new CLabel(_('Host'), 'hostid'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$this->data['pageFilter']->getHostsCB()
-	])
-	->addItem([
-		new CLabel(_('Graph'), 'graphid'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$this->data['pageFilter']->getGraphsCB()
-	])
-	->addItem([
-		new CLabel(_('View as'), 'action'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CComboBox('action', $data['action'], 'submit()', $data['actions']))->setEnabled((bool) $data['graphid'])
-	]);
+$controls = (new CForm('get'))
+	->cleanItems()
+	->setAttribute('aria-label', _('Main filter'))
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+	->addVar('page', 1)
+	->addItem((new CList())
+		->addItem([
+			new CLabel(_('Group'), 'groupid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$this->data['pageFilter']->getGroupsCB()
+		])
+		->addItem([
+			new CLabel(_('Host'), 'hostid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$this->data['pageFilter']->getHostsCB()
+		])
+		->addItem([
+			new CLabel(_('Graph'), 'graphid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$this->data['pageFilter']->getGraphsCB()
+		])
+		->addItem([
+			new CLabel(_('View as'), 'action'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CComboBox('action', $data['action'], 'submit()', $data['actions']))->setEnabled((bool) $data['graphid'])
+		])
+	);
+
+$content_control = (new CList());
 
 if ($this->data['graphid']) {
-	$controls->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid']]));
-	$controls->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
+	$content_control->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid',
+		'elid' => $this->data['graphid']])
+	);
+	$content_control->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
 }
 
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+$content_control->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+$content_control = (new CTag('nav', true, $content_control))
+	->setAttribute('aria-label', _('Content controls'));
 
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addVar('fullscreen', $this->data['fullscreen'])
-		->addVar('page', 1)
-		->addItem($controls)
-	);
+	->setControls(new CList([$controls, $content_control]));
 
 $filterForm = (new CFilter('web.charts.filter.state'))->addNavigator();
 $chartsWidget->addItem($filterForm);

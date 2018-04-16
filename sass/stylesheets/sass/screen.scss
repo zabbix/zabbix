@@ -215,14 +215,8 @@ pre {
 	word-wrap: break-word;
 }
 
-:-ms-input-placeholder {
-	color: #6d6d6d !important;
-}
-
 // Main Navigation
 nav {
-	background-color: $main-subnav-bg-color;
-
 	a {
 
 		&:link {
@@ -249,6 +243,8 @@ nav {
 
 .nav {
 	@extend nav;
+
+	background-color: $main-subnav-bg-color;
 }
 
 %no-border {
@@ -543,6 +539,10 @@ ul.top-nav-icons {
 			position: relative;
 			padding: 0 0 0 10px;
 		}
+
+		ul li:first-child {
+			padding-left: 0;
+		}
 	}
 
 	.dashbrd-edit {
@@ -582,10 +582,6 @@ ul.top-nav-icons {
 // Article
 article {
 	padding: 10px 10px 0 10px;
-}
-
-.article {
-	@extend article;
 }
 
 // Object Group Navigation
@@ -647,8 +643,12 @@ footer {
 	color: $font-alt-color;
 }
 
-.footer {
-	@extend footer;
+main {
+	@extend article;
+}
+
+output {
+	display: block;
 }
 
 .logo {
@@ -1132,10 +1132,19 @@ footer {
 	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
 
-	a {
+	.link-action {
 		color: $font-selected-color;
 		text-decoration: none;
-		cursor: default;
+
+		&:focus {
+			color: $font-selected-color;
+			border-bottom: 2px solid rgba($font-selected-color, 0.7);
+		}
+
+		&:hover {
+			color: $font-selected-color;
+			border-bottom: 1px solid rgba($font-selected-color, 0.7);
+		}
 	}
 
 	sup {
@@ -1572,6 +1581,10 @@ footer {
 				}
 			}
 		}
+	}
+
+	.table-forms-td-right {
+		position: relative;
 	}
 
 	h4 {
@@ -2216,6 +2229,7 @@ button {
 
 $icon-btn: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
+	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -259px,
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
 	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
@@ -2234,15 +2248,15 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -4px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -39px -617px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -39px -580px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -6px -618px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -6px -654px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -6px -689px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -42px -619px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -42px -582px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -6px -546px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -6px -582px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -6px -474px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -6px -510px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -2257,9 +2271,24 @@ $icon-widget-btn: (
 	@extend %btn-dashbrd;
 }
 
+.btn-dashbrd-normal {
+	position: fixed;
+	right: 45px;
+	top: 5px;
+	z-index: 1010;
+	@include box-shadow(1px 1px 2px $action-shadow-color);
+	@include opacity(1);
+	@include transition(opacity 1s);
+
+	&.hidden {
+		@include opacity(0);
+	}
+}
+
 %btn-widget {
-	width: 30px;
-	height: 28px;
+	width: 24px;
+	height: 24px;
+	margin: 2px 2px 0 0;
 	@extend %btn-widget-defaults;
 }
 
@@ -2282,7 +2311,6 @@ $icon-widget-btn: (
 	}
 
 	&:focus {
-		@include box-shadow(none);
 		@extend %btn-widget-hover-active;
 	}
 
@@ -3151,6 +3179,27 @@ $form-icon-btn: (
 	}
 }
 
+.dashbrd-widget-graph-link {
+	display: block;
+
+	&:link {
+		border: none;
+	}
+
+	&:focus {
+
+		&:after {
+			content: "";
+			background: rgba($blue, .35);
+			height: 2px;
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: -2px;
+		}
+	}
+}
+
 // Action Menus, Pop-up Menus
 .action-menu {
 	position: absolute;
@@ -3162,6 +3211,10 @@ $form-icon-btn: (
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+
+	&:focus {
+		outline: none;
+	}
 
 	li {
 		display: block;
@@ -3187,15 +3240,10 @@ $form-icon-btn: (
 		@extend %overflow-ellipsis;
 		@include transition(background-color .2s ease-out);
 
-		&:hover {
-			background-color: $action-hover-color;
-		}
-
-		&:focus {
-			background-color: $action-hover-color;
-		}
-
-		&:active {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
 			background-color: $action-hover-color;
 		}
 
@@ -3284,6 +3332,7 @@ $form-icon-btn: (
 		.overlay-dialogue-body {
 			overflow: auto;
 			overflow-x: hidden;
+			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
 			margin: 0 0 10px 0;
@@ -3300,7 +3349,7 @@ $form-icon-btn: (
 		& > .overlay-close-btn {
 			position: relative;
 			float: right;
-			top: -12px;
+			top: -13px;
 			right: -8px;
 		}
 	}
@@ -3353,22 +3402,43 @@ $form-icon-btn: (
 
 // Map widget back to parent button.
 .btn-back-map-container {
-
 	text-align: left;
 	position: absolute;
 	left: -1px;
+	max-width: 100%;
+
+	a {
+
+		&:focus,
+		&:hover {
+			outline: none;
+
+			.btn-back-map {
+				background-color: $btn-back-background-hover;
+				border: $btn-border-color solid 1px;
+
+				.btn-back-map-content {
+					display: inline-block;
+					line-height: 24px;
+					padding: 0 6px 0 0;
+					flex: auto;
+					@extend %overflow-ellipsis;
+				}
+			}
+		}
+	}
 
 	.btn-back-map {
-		margin-top: 10px;
-		border-radius: 0px 2px 2px 0px;
+		border: $ui-border-color solid 1px;
+		border-radius: 0 2px 2px 0;
 		background-color: $btn-back-map-background-color;
-		padding: 0px 0px 0px 0px;
-		display: inline-block;
+		color: $btn-back-text-color;
+		margin-top: 10px;
+		padding: 0;
+		display: flex;
 		height: 24px;
 		line-height: 24px;
 		vertical-align: middle;
-		border: $ui-border-color solid 1px;
-		color: $btn-back-text-color;
 		text-decoration: none;
 
 		.btn-back-map-content {
@@ -3378,21 +3448,11 @@ $form-icon-btn: (
 		.btn-back-map-icon {
 			margin-left: 5px;
 			display: inline-block;
+			flex: 1 0 auto;
 			width: 28px;
 			height: 24px;
 			vertical-align: middle;
 			background: url(../img/icon-sprite.svg) no-repeat -85px -691px;
-		}
-
-		&:hover {
-			background-color: $btn-back-background-hover;
-			border: $btn-border-color solid 1px;
-
-			.btn-back-map-content {
-				display: inline-block;
-				line-height: 24px;
-				padding: 0px 6px 0px 0px;
-			}
 		}
 	}
 }
@@ -3737,7 +3797,7 @@ $form-icon-btn: (
 .overlay-descr {
 	max-height: 150px;
 	overflow-y: auto;
-	padding: 0 11px 0 11px;
+	padding: 0;
 	margin: 5px 0;
 	background-color: $ui-bg-color;
 	@extend %webkit-scrollbar;
@@ -3745,7 +3805,8 @@ $form-icon-btn: (
 }
 
 .overlay-descr-url {
-	padding: 3px 11px 7px 11px;
+	padding: 3px 0 7px;
+	@extend %overflow-ellipsis;
 }
 
 %scroll-vert-shadow {
@@ -3948,11 +4009,11 @@ a.link-action {
 			@include border-radius(2px)
 		}
 
-		&:first-child:not(:only-child) {
+		&:first-of-type:not(:only-child) {
 			@include border-radius(2px 0 0 2px);
 		}
 
-		&:last-child:not(:only-child) {
+		&:last-of-type:not(:only-child) {
 			@include border-radius(0 2px 2px 0);
 		}
 	}
@@ -3992,6 +4053,18 @@ a.link-action {
 	@extend %status;
 }
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border: 1px solid rgba($font-color, .2);
+	@extend %status;
+}
+
+.status-disabled-bg {
+	color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border: 1px solid rgba($font-color, .2);
+	@extend %status;
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
@@ -4019,6 +4092,10 @@ a.link-action {
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
+
+	&:not(:last-of-type) {
+		border-right: none;
+	}
 }
 
 .green-bg {
@@ -4030,16 +4107,11 @@ a.link-action {
 }
 
 .na-bg {
-	color: darken($alt-blue-grey,45%);
+	color: darken($alt-blue-grey, 45%);
 
-	a.link-action {
-	color: darken($alt-blue-grey,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .na-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-blue-grey, 45%);
 	}
 }
 
@@ -4076,16 +4148,11 @@ td.normal-bg {
 }
 
 .info-bg {
-	color: darken($alt-dark-blue,45%);
+	color: darken($alt-dark-blue, 45%);
 
-	a.link-action {
-	color: darken($alt-dark-blue,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .info-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-dark-blue, 45%);
 	}
 }
 
@@ -4103,16 +4170,11 @@ td.info-bg {
 }
 
 .average-bg {
-	color: darken($alt-orange,45%);
+	color: darken($alt-orange, 45%);
 
-	a.link-action {
-	color: darken($alt-orange,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .average-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-orange, 45%);
 	}
 }
 
@@ -4125,16 +4187,11 @@ td.average-bg {
 }
 
 .warning-bg {
-	color: darken($alt-yellow,45%);
+	color: darken($alt-yellow, 45%);
 
-	a.link-action {
-	color: darken($alt-yellow,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .warning-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-yellow, 45%);
 	}
 }
 
@@ -4152,16 +4209,11 @@ td.warning-bg {
 }
 
 .high-bg {
-	color: darken($alt-dark-orange,45%);
+	color: darken($alt-dark-orange, 45%);
 
-	a.link-action {
-	color: darken($alt-dark-orange,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .high-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-dark-orange, 45%);
 	}
 }
 
@@ -4179,16 +4231,11 @@ td.high-bg {
 }
 
 .disaster-bg {
-	color: darken($alt-red,45%);
+	color: darken($alt-red, 45%);
 
-	a.link-action {
-	color: darken($alt-red,45%);
-	}
-
-	input[type="radio"] {
-		&:checked + label {
-			@extend .disaster-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-red, 45%);
 	}
 }
 
@@ -5020,6 +5067,10 @@ svg {
 						border: 0px none;
 						opacity: 0.5;
 						float: left;
+
+						&::-moz-focus-inner {
+							padding: 0;
+						}
 					}
 					.edit-item-btn:hover,
 					.remove-item-btn:hover,
@@ -5160,6 +5211,31 @@ svg {
 			animation: fadein .5s;
 		}
 	}
+}
+
+::-webkit-input-placeholder {
+	color: $input-placeholder-color;
+}
+
+:-ms-input-placeholder {
+	color: $input-placeholder-color !important;
+}
+
+::-ms-input-placeholder {
+	color: $input-placeholder-color;
+}
+
+::-moz-placeholder {
+	color: $input-placeholder-color;
+	opacity: 1;
+}
+
+:-moz-placeholder {
+	color: $input-placeholder-color;
+}
+
+:placeholder-shown {
+	color: $input-placeholder-color;
 }
 
 /*doc

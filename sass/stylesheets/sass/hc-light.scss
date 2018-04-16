@@ -61,6 +61,8 @@ $scrollbar-track-color: #999;
 $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
 
+$input-placeholder-color: #777;
+
 // BUTTONS
 $btn-font-color: #fff;
 $btn-bg-color: #555;
@@ -113,6 +115,11 @@ $problem-ack-fg-color: #cc0000;
 $ok-unack-fg-color: #009900;
 $ok-ack-fg-color: #009900;
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border-color: rgba($ui-bg-color, .2) !important;
+	background-color: $ui-bg-selected-color !important;
+	color: $ui-bg-color !important;
+}
 
 // Important! @import string should come after variables
 @import 'screen.scss';
@@ -154,15 +161,15 @@ $form-icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -163px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -163px -652px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -163px -688px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -198px -617px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -198px -580px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -163px -545px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -163px -581px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -163px -473px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -163px -509px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -165px -618px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -165px -654px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -165px -690px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -201px -619px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -201px -582px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -165px -546px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -165px -582px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -165px -474px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -165px -510px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -187,19 +194,36 @@ $icon-widget-btn: (
 .btn-search{
 	background: url(../img/icon-sprite.svg) no-repeat -162px -7px !important;
 }
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -162px -725px !important;
-	}
-}
-
 .btn-dashbrd-conf {
-	background: url(../img/icon-sprite.svg) no-repeat -200px -619px !important;
+	background: url(../img/icon-sprite.svg) no-repeat -201px -619px !important;
 }
 
 .list-table {
+
+	.subfilter-enabled {
+		background-color: $ui-bg-color;
+		box-shadow: 0 0 0 1px $link-hover-color;
+	}
+
 	thead th {
-		border-color: lighten($table-border-color, 3%) !important;
+		border-color: lighten($table-border-color, 3%);
+	}
+}
+
+.subfilter-enabled {
+
+	.link-action {
+		color: $link-hover-color;
+
+		&:focus {
+			color: $link-hover-color;
+			border-bottom: 3px solid $link-hover-color;
+		}
+
+		&:hover {
+			color: $link-hover-color;
+			border-bottom: 1px solid $link-hover-color;
+		}
 	}
 }
 
@@ -217,9 +241,38 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu-item {
-	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -164px -835px !important;
+.action-menu {
+
+	.action-menu-item-disabled {
+		color: $form-disabled-font-color;
+	}
+
+	.action-menu-item {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
+			background-color: black;
+			color: white;
+
+			.arrow-right {
+				border-left-color: white;
+			}
+
+			&.selected {
+
+				&::before {
+					background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
+				}
+			}
+		}
+
+		&.selected {
+
+			&::before {
+				background: url(../img/icon-sprite.svg) no-repeat -164px -835px;
+			}
+		}
 	}
 }
 
@@ -263,13 +316,41 @@ button {
 }
 
 .radio-segmented {
-	input[type="radio"] {
+
+	.average-bg,
+	.disaster-bg,
+	.high-bg,
+	.info-bg,
+	.na-bg,
+	.warning-bg {
+
+		&:before,
+		&:after {
+			display: none;
+		}
+	}
+
+	li {
+
+		input[type="radio"] {
+
+			&:checked:not([disabled]) + label,
 			&:focus + label {
-				border-color: $form-border-focus-color !important;
+				border-color: $form-border-focus-color;
+				color: $white;
+			}
+
+			&:checked + label {
+				background-color: $ui-bg-selected-color;
+			}
+
+			&:checked[disabled] + label {
+				background-color: #d3d3d3 !important;
+			}
+
+			&:focus + label {
 				background-color: #777 !important;
 			}
-		&:checked[disabled] + label {
-			background-color: #d3d3d3 !important;
 		}
 	}
 }
@@ -499,6 +580,18 @@ ul.top-nav-icons {
 	color: darken($dark-yellow, 10%);
 }
 
+.dashbrd-widget-graph-link {
+
+	&:focus {
+
+		&:after {
+			background: $blue;
+			height: 3px;
+			bottom: -3px;
+		}
+	}
+}
+
 // SEVERITY STATUSES
 td.log-na-bg {
 	padding-left: 42px !important;
@@ -549,13 +642,6 @@ content: "";
 
 .na-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .na-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 td.normal-bg {
@@ -640,13 +726,6 @@ td.info-bg {
 	content: none;
 }
 
-.radio-segmented .info-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -681,13 +760,6 @@ td.average-bg {
 
 .average-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .average-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 td.log-warning-bg {
@@ -735,13 +807,6 @@ td.warning-bg {
 	content: none;
 }
 
-.radio-segmented .warning-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
-
 td.log-high-bg {
 	@extend td.log-na-bg;
 }
@@ -785,13 +850,6 @@ td.high-bg {
 
 .high-bg.blink-hidden:after{
 	content: none;
-}
-
-.radio-segmented .high-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
 }
 
 td.log-disaster-bg {
@@ -839,15 +897,19 @@ td.disaster-bg {
 	content: none;
 }
 
-.radio-segmented .disaster-bg {
-	&::before { content: none }
-	&::after { content: none }
-	color: $white !important;
-	background-color: $ui-bg-selected-color !important;
-}
+.notif-body {
+	h4 {
+		padding-bottom: 3px;
+		margin-bottom: -3px;
+	}
 
-.notif-body li {
-	padding: 0 0 10px 42px;
+	p {
+		margin: 0.25em 0 2px 0;
+	}
+
+	li {
+		padding: 0 0 10px 42px;
+	}
 }
 
 .notif-indic {
@@ -924,10 +986,11 @@ td.inactive-bg {
 	}
 }
 
-// GRAPH AND MAP SELECTIONS
+// GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.1);
-	border: 2px solid rgba($font-color,0.6);
+	border: none;
+	outline: 2px solid rgba($font-color,0.6);
 }
 
 .ui-selectable-helper {
@@ -937,4 +1000,18 @@ td.inactive-bg {
 
 .map-element-selected {
 	border: 3px dashed $font-color;
+}
+
+.btn-back-map-container {
+
+	a {
+		border-bottom: none;
+	}
+
+	.btn-back-map {
+
+		.btn-back-map-icon {
+			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+		}
+	}
 }

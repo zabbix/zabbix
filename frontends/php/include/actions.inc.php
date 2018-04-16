@@ -1406,9 +1406,9 @@ function getActionMessages(array $alerts, array $r_alerts) {
 
 			$recipient = $alert['userid']
 				? array_key_exists($alert['userid'], $dbUsers)
-					? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
+					? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
 					: _('Inaccessible user')
-				: $alert['sendto'];
+				: zbx_nl2br($alert['sendto']);
 
 			$info_icons = [];
 			if ($alert['error'] !== ''
@@ -1648,7 +1648,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 			'error'
 		],
 		'eventids' => array_keys($eventids),
-		'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND]],
+		'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND], 'acknowledgeid' => 0],
 		'sortorder' => ['alertid' => ZBX_SORT_DOWN]
 	]);
 

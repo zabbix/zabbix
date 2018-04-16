@@ -86,7 +86,7 @@ class testInheritanceItem extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceItem_SimpleCreate($data) {
-		$this->zbxTestLogin('items.php?form=Create+item&hostid='.$this->templateid);
+		$this->zbxTestLogin('items.php?form=create&hostid='.$this->templateid);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
