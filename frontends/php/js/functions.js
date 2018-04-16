@@ -516,7 +516,7 @@ function getOverlayDialogueId() {
  * @param {object} params.content                           Window content.
  * @param {object} params.controls                          Window controls.
  * @param {array}  params.buttons                           Window buttons.
- * @param {string} params.debug								Debug HTML displayed in modal window.
+ * @param {string} params.debug                             Debug HTML displayed in modal window.
  * @param {string} params.buttons[]['title']                Text on the button.
  * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
  *                                                          on click.
