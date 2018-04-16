@@ -491,50 +491,6 @@ output {
   background-color: #2b2b2b;
   border-collapse: separate;
   border: 1px solid #303030; }
-  .list-table.compact-view tr.na-bg:hover, .list-table.compact-view tr.info-bg:hover, .list-table.compact-view tr.warning-bg:hover, .list-table.compact-view tr.average-bg:hover, .list-table.compact-view tr.high-bg:hover, .list-table.compact-view tr.disaster-bg:hover {
-    background: #383838 !important; }
-    .list-table.compact-view tr.na-bg:hover .link-action, .list-table.compact-view tr.info-bg:hover .link-action, .list-table.compact-view tr.warning-bg:hover .link-action, .list-table.compact-view tr.average-bg:hover .link-action, .list-table.compact-view tr.high-bg:hover .link-action, .list-table.compact-view tr.disaster-bg:hover .link-action {
-      color: #f2f2f2; }
-      .list-table.compact-view tr.na-bg:hover .link-action.red, .list-table.compact-view tr.info-bg:hover .link-action.red, .list-table.compact-view tr.warning-bg:hover .link-action.red, .list-table.compact-view tr.average-bg:hover .link-action.red, .list-table.compact-view tr.high-bg:hover .link-action.red, .list-table.compact-view tr.disaster-bg:hover .link-action.red {
-        color: #e45959; }
-      .list-table.compact-view tr.na-bg:hover .link-action.green, .list-table.compact-view tr.info-bg:hover .link-action.green, .list-table.compact-view tr.warning-bg:hover .link-action.green, .list-table.compact-view tr.average-bg:hover .link-action.green, .list-table.compact-view tr.high-bg:hover .link-action.green, .list-table.compact-view tr.disaster-bg:hover .link-action.green {
-        color: #59db8f; }
-      .list-table.compact-view tr.na-bg:hover .link-action:hover, .list-table.compact-view tr.info-bg:hover .link-action:hover, .list-table.compact-view tr.warning-bg:hover .link-action:hover, .list-table.compact-view tr.average-bg:hover .link-action:hover, .list-table.compact-view tr.high-bg:hover .link-action:hover, .list-table.compact-view tr.disaster-bg:hover .link-action:hover {
-        color: #4796c4; }
-      .list-table.compact-view tr.na-bg:hover .link-action:focus, .list-table.compact-view tr.info-bg:hover .link-action:focus, .list-table.compact-view tr.warning-bg:hover .link-action:focus, .list-table.compact-view tr.average-bg:hover .link-action:focus, .list-table.compact-view tr.high-bg:hover .link-action:focus, .list-table.compact-view tr.disaster-bg:hover .link-action:focus {
-        color: #4796c4; }
-    .list-table.compact-view tr.na-bg:hover td, .list-table.compact-view tr.info-bg:hover td, .list-table.compact-view tr.warning-bg:hover td, .list-table.compact-view tr.average-bg:hover td, .list-table.compact-view tr.high-bg:hover td, .list-table.compact-view tr.disaster-bg:hover td {
-      color: #f2f2f2; }
-  .list-table.compact-view tr.na-bg:not(:hover) td, .list-table.compact-view tr.info-bg:not(:hover) td, .list-table.compact-view tr.warning-bg:not(:hover) td, .list-table.compact-view tr.average-bg:not(:hover) td, .list-table.compact-view tr.high-bg:not(:hover) td, .list-table.compact-view tr.disaster-bg:not(:hover) td {
-    color: #f2f2f2; }
-    .list-table.compact-view tr.na-bg:not(:hover) td sup, .list-table.compact-view tr.na-bg:not(:hover) td a, .list-table.compact-view tr.na-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.na-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.na-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.na-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.info-bg:not(:hover) td sup, .list-table.compact-view tr.info-bg:not(:hover) td a, .list-table.compact-view tr.info-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.info-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.info-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.info-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.warning-bg:not(:hover) td sup, .list-table.compact-view tr.warning-bg:not(:hover) td a, .list-table.compact-view tr.warning-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.warning-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.warning-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.warning-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.average-bg:not(:hover) td sup, .list-table.compact-view tr.average-bg:not(:hover) td a, .list-table.compact-view tr.average-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.average-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.average-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.average-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.high-bg:not(:hover) td sup, .list-table.compact-view tr.high-bg:not(:hover) td a, .list-table.compact-view tr.high-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.high-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.high-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.high-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.disaster-bg:not(:hover) td sup, .list-table.compact-view tr.disaster-bg:not(:hover) td a, .list-table.compact-view tr.disaster-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.disaster-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.disaster-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.disaster-bg:not(:hover) td .ok-ack-fg {
-      color: #f2f2f2; }
-  .list-table.compact-view .link-action {
-    color: #f2f2f2; }
-    .list-table.compact-view .link-action.red {
-      color: #e45959; }
-    .list-table.compact-view .link-action.green {
-      color: #59db8f; }
-    .list-table.compact-view .link-action:hover {
-      color: #4796c4; }
-    .list-table.compact-view .link-action:focus {
-      color: #4796c4; }
-  .list-table.compact-view td {
-    padding: 2px 5px 2px 5px;
-    border-bottom: none;
-    box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1);
-    color: #f2f2f2; }
-    .list-table.compact-view td .tag {
-      max-width: 40px;
-      margin: -2px 3px 0 0;
-      padding: 2px 3px; }
-    .list-table.compact-view td .rel-container {
-      display: inline; }
-    .list-table.compact-view td .icon-wzrd-action {
-      margin: 2px 0 0 2px;
-      height: 12px;
-      min-height: 12px;
-      background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px; }
   .list-table thead th {
     color: #737373;
     height: 100%;
@@ -822,7 +778,7 @@ output {
   border-bottom-color: #2b2b2b !important; }
 
 .filter-btn-container {
-  text-align: right; }
+  text-align: center; }
 
 .filter-container {
   padding: 10px 0;
@@ -2981,14 +2937,6 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   color: #4b0c0c;
   background-color: #e45959; }
 
-.filter-cb-second-column {
-  display: inline-block;
-  width: 50%;
-  text-align: right; }
-
-.cb-second-column-label {
-  padding: 0 10px; }
-
 .problem-unack-fg {
   color: #ff3333; }
 
@@ -4658,17 +4606,6 @@ Widgets are used as containers to group any related information. Widget consists
 .top-subnav a:focus {
   border-bottom: 4px solid #787878 !important;
   outline: none; }
-
-.list-table.compact-view tr:hover td.na-bg, .list-table.compact-view tr:hover td.normal-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg {
-  color: black; }
-.list-table.compact-view tr.na-bg:not(:hover) td, .list-table.compact-view tr.info-bg:not(:hover) td, .list-table.compact-view tr.warning-bg:not(:hover) td, .list-table.compact-view tr.average-bg:not(:hover) td, .list-table.compact-view tr.high-bg:not(:hover) td, .list-table.compact-view tr.disaster-bg:not(:hover) td {
-  color: black;
-  box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
-  .list-table.compact-view tr.na-bg:not(:hover) td sup, .list-table.compact-view tr.na-bg:not(:hover) td a, .list-table.compact-view tr.na-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.na-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.na-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.na-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.info-bg:not(:hover) td sup, .list-table.compact-view tr.info-bg:not(:hover) td a, .list-table.compact-view tr.info-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.info-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.info-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.info-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.warning-bg:not(:hover) td sup, .list-table.compact-view tr.warning-bg:not(:hover) td a, .list-table.compact-view tr.warning-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.warning-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.warning-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.warning-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.average-bg:not(:hover) td sup, .list-table.compact-view tr.average-bg:not(:hover) td a, .list-table.compact-view tr.average-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.average-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.average-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.average-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.high-bg:not(:hover) td sup, .list-table.compact-view tr.high-bg:not(:hover) td a, .list-table.compact-view tr.high-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.high-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.high-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.high-bg:not(:hover) td .ok-ack-fg, .list-table.compact-view tr.disaster-bg:not(:hover) td sup, .list-table.compact-view tr.disaster-bg:not(:hover) td a, .list-table.compact-view tr.disaster-bg:not(:hover) td .problem-unack-fg, .list-table.compact-view tr.disaster-bg:not(:hover) td .problem-ack-fg, .list-table.compact-view tr.disaster-bg:not(:hover) td .ok-unack-fg, .list-table.compact-view tr.disaster-bg:not(:hover) td .ok-ack-fg {
-    color: black; }
-.list-table.compact-view td.na-bg, .list-table.compact-view td.normal-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg {
-  color: black;
-  box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
 
 .btn-back-map-container .btn-back-map .btn-back-map-icon {
   background: url(../img/icon-sprite.svg) no-repeat -85px -725px; }

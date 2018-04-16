@@ -473,46 +473,6 @@ output {
   background-color: #fff;
   border-collapse: separate;
   border: 1px solid #9f9f9f; }
-  .list-table.compact-view tr.na-bg:hover, .list-table.compact-view tr.info-bg:hover, .list-table.compact-view tr.warning-bg:hover, .list-table.compact-view tr.average-bg:hover, .list-table.compact-view tr.high-bg:hover, .list-table.compact-view tr.disaster-bg:hover {
-    background: #f4f4f4 !important; }
-    .list-table.compact-view tr.na-bg:hover .link-action, .list-table.compact-view tr.info-bg:hover .link-action, .list-table.compact-view tr.warning-bg:hover .link-action, .list-table.compact-view tr.average-bg:hover .link-action, .list-table.compact-view tr.high-bg:hover .link-action, .list-table.compact-view tr.disaster-bg:hover .link-action {
-      color: #000; }
-      .list-table.compact-view tr.na-bg:hover .link-action.red, .list-table.compact-view tr.info-bg:hover .link-action.red, .list-table.compact-view tr.warning-bg:hover .link-action.red, .list-table.compact-view tr.average-bg:hover .link-action.red, .list-table.compact-view tr.high-bg:hover .link-action.red, .list-table.compact-view tr.disaster-bg:hover .link-action.red {
-        color: #990000; }
-      .list-table.compact-view tr.na-bg:hover .link-action.green, .list-table.compact-view tr.info-bg:hover .link-action.green, .list-table.compact-view tr.warning-bg:hover .link-action.green, .list-table.compact-view tr.average-bg:hover .link-action.green, .list-table.compact-view tr.high-bg:hover .link-action.green, .list-table.compact-view tr.disaster-bg:hover .link-action.green {
-        color: #009900; }
-      .list-table.compact-view tr.na-bg:hover .link-action:hover, .list-table.compact-view tr.info-bg:hover .link-action:hover, .list-table.compact-view tr.warning-bg:hover .link-action:hover, .list-table.compact-view tr.average-bg:hover .link-action:hover, .list-table.compact-view tr.high-bg:hover .link-action:hover, .list-table.compact-view tr.disaster-bg:hover .link-action:hover {
-        color: #000; }
-      .list-table.compact-view tr.na-bg:hover .link-action:focus, .list-table.compact-view tr.info-bg:hover .link-action:focus, .list-table.compact-view tr.warning-bg:hover .link-action:focus, .list-table.compact-view tr.average-bg:hover .link-action:focus, .list-table.compact-view tr.high-bg:hover .link-action:focus, .list-table.compact-view tr.disaster-bg:hover .link-action:focus {
-        color: #000; }
-    .list-table.compact-view tr.na-bg:hover td, .list-table.compact-view tr.info-bg:hover td, .list-table.compact-view tr.warning-bg:hover td, .list-table.compact-view tr.average-bg:hover td, .list-table.compact-view tr.high-bg:hover td, .list-table.compact-view tr.disaster-bg:hover td {
-      color: #000; }
-  .list-table.compact-view .link-action {
-    color: #000; }
-    .list-table.compact-view .link-action.red {
-      color: #990000; }
-    .list-table.compact-view .link-action.green {
-      color: #009900; }
-    .list-table.compact-view .link-action:hover {
-      color: #000; }
-    .list-table.compact-view .link-action:focus {
-      color: #000; }
-  .list-table.compact-view td {
-    padding: 2px 5px 2px 5px;
-    border-bottom: none;
-    box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
-    color: #000; }
-    .list-table.compact-view td .tag {
-      max-width: 40px;
-      margin: -2px 3px 0 0;
-      padding: 2px 3px; }
-    .list-table.compact-view td .rel-container {
-      display: inline; }
-    .list-table.compact-view td .icon-wzrd-action {
-      margin: 2px 0 0 2px;
-      height: 12px;
-      min-height: 12px;
-      background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px; }
   .list-table thead th {
     color: #333;
     height: 100%;
@@ -800,7 +760,7 @@ output {
   border-bottom-color: #fff !important; }
 
 .filter-btn-container {
-  text-align: right; }
+  text-align: center; }
 
 .filter-container {
   padding: 10px 0;
@@ -2959,14 +2919,6 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   color: #4b0c0c;
   background-color: #e45959; }
 
-.filter-cb-second-column {
-  display: inline-block;
-  width: 50%;
-  text-align: right; }
-
-.cb-second-column-label {
-  padding: 0 10px; }
-
 .problem-unack-fg {
   color: #cc0000; }
 
@@ -4950,20 +4902,6 @@ ul.top-nav-icons a:focus {
   background: #111;
   height: 3px;
   bottom: -3px; }
-
-.list-table.compact-view td.na-bg:before, .list-table.compact-view td.normal-bg:before, .list-table.compact-view td.info-bg:before, .list-table.compact-view td.average-bg:before, .list-table.compact-view td.warning-bg:before, .list-table.compact-view td.high-bg:before, .list-table.compact-view td.disaster-bg:before, .list-table.compact-view td.normal-bg:before, .list-table.compact-view td.info-bg:before, .list-table.compact-view td.warning-bg:before, .list-table.compact-view td.average-bg:before, .list-table.compact-view td.high-bg:before, .list-table.compact-view td.disaster-bg:before {
-  min-height: 20px; }
-.list-table.compact-view td.na-bg:after, .list-table.compact-view td.normal-bg:after, .list-table.compact-view td.info-bg:after, .list-table.compact-view td.average-bg:after, .list-table.compact-view td.warning-bg:after, .list-table.compact-view td.high-bg:after, .list-table.compact-view td.disaster-bg:after, .list-table.compact-view td.normal-bg:after, .list-table.compact-view td.info-bg:after, .list-table.compact-view td.warning-bg:after, .list-table.compact-view td.average-bg:after, .list-table.compact-view td.high-bg:after, .list-table.compact-view td.disaster-bg:after {
-  top: 1px;
-  transform: scale(0.8); }
-.list-table.compact-view td .icon-wzrd-action {
-  background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px; }
-
-.filter-highlight-row-cb {
-  display: none !important; }
-
-tr.na-bg:before, tr.na-bg:after, tr.na-bg:before, tr.na-bg:after, tr.normal-bg:before, tr.normal-bg:after, tr.normal-bg:before, tr.normal-bg:after, tr.info-bg:before, tr.info-bg:after, tr.info-bg:before, tr.info-bg:after, tr.warning-bg:before, tr.warning-bg:after, tr.warning-bg:before, tr.warning-bg:after, tr.average-bg:before, tr.average-bg:after, tr.average-bg:before, tr.average-bg:after, tr.high-bg:before, tr.high-bg:after, tr.high-bg:before, tr.high-bg:after, tr.disaster-bg:before, tr.disaster-bg:after, tr.disaster-bg:before, tr.disaster-bg:after {
-  display: none !important; }
 
 td.log-na-bg, td.log-info-bg, td.log-warning-bg, td.log-high-bg, td.log-disaster-bg {
   padding-left: 42px !important;
