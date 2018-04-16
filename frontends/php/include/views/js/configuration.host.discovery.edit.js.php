@@ -69,12 +69,12 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				.bind('tableupdate.dynamicRows', function(event, options) {
 					$('#conditionRow').toggle($(options.row, $(this)).length > 1);
 
-					if (!($('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>)) {
+					if ($('#evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 						updateExpression();
 					}
 				})
 				.on('change', '.macro', function() {
-					if (!($('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>)) {
+					if ($('#evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 						updateExpression();
 					}
 				})
