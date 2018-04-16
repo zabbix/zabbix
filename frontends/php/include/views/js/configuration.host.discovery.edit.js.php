@@ -72,10 +72,15 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				})
 				.bind('tableupdate.dynamicRows', function(event, options) {
 					$('#conditionRow').toggle($(options.row, $(this)).length > 1);
-					updateExpression();
+
+					if (!($('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>)) {
+						updateExpression();
+					}
 				})
 				.on('change', '.macro', function() {
-					updateExpression();
+					if (!($('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>)) {
+						updateExpression();
+					}
 				})
 				.ready(function() {
 					$('#conditionRow').toggle($('.form_row', $('#conditions')).size() > 1);
