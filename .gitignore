@@ -140,6 +140,9 @@ src/libs/zbxcomms/Makefile.in
 src/libs/zbxcommshigh/.deps
 src/libs/zbxcommshigh/Makefile
 src/libs/zbxcommshigh/Makefile.in
+src/libs/zbxcompress/.deps
+src/libs/zbxcompress/Makefile
+src/libs/zbxcompress/Makefile.in
 src/libs/zbxconf/.deps
 src/libs/zbxconf/Makefile
 src/libs/zbxconf/Makefile.in

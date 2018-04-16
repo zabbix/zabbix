@@ -49,7 +49,7 @@ class testFormHost extends CWebTest {
 	public function testFormHost_Create() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickButtonText('Create host');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $this->host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -65,7 +65,7 @@ class testFormHost extends CWebTest {
 		$host="1234567890123456789012345678901234567890123456789012345678901234";
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -112,7 +112,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -132,7 +132,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
@@ -152,7 +152,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestInputType('visiblename', $hostVisible);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");

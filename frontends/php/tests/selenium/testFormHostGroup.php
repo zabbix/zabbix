@@ -44,7 +44,7 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_CreateEmpty() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
@@ -53,7 +53,7 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_Create() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestInputTypeWait('name', $this->hostGroup);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -65,7 +65,7 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_CreateDuplicate() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestInputTypeWait('name', $this->hostGroup);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
