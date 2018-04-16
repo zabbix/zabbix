@@ -869,3 +869,58 @@ function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 		return json;
 	};
 })(jQuery);
+
+/**
+ * Parse url string to object. Hash starting part of URL will be removed.
+ * Return object where 'url' key contain parsed url, 'pairs' key is array of objects with parsed arguments.
+ * For malformed URL strings will return false.
+ *
+ * @param {string} url    URL string to parse.
+ *
+ * @return {object|bool}
+ */
+function parseUrlString(url) {
+	var url = url.replace(/#.+/, ''),
+		pos = url.indexOf('?'),
+		valid = true,
+		pairs = [],
+		query;
+
+	if (pos != -1) {
+		query = url.substring(pos + 1);
+		url = url.substring(0, pos);
+
+		jQuery.each(query.split('&'), function(i, pair) {
+			if (jQuery.trim(pair)) {
+				pair = pair.replace(/\+/g, ' ').split('=', 2);
+				pair.push('');
+
+				try {
+					if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
+						// Non-printable characters in URL.
+						throw null;
+					}
+
+					pairs.push({
+						'name': decodeURIComponent(pair[0]),
+						'value': decodeURIComponent(pair[1])
+					});
+				}
+				catch( e ) {
+					valid = false;
+					// Break jQuery.each iteration.
+					return false;
+				}
+			}
+		});
+	}
+
+	if (!valid) {
+		return false;
+	}
+
+	return {
+		'url': url,
+		'pairs': pairs
+	};
+}
