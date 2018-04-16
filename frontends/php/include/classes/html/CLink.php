@@ -69,7 +69,7 @@ class CLink extends CTag {
 				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
 			}
 			$confirm_script = ($this->confirm_message !== '')
-				? 'Confirm('.CJs::encodeJson($this->confirm_message).') && '
+				? 'Confirm('.CHtml::encode(CJs::encodeJson($this->confirm_message)).') && '
 				: '';
 			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', 'sid', true)");
 			$this->setAttribute('href', 'javascript:void(0)');
