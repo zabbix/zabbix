@@ -52,8 +52,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 
 					conditions.push({
 						id: macroInput.data('formulaid'),
-						type: macroInput.val(),
-						operator: $('#conditions .operator')[index].value
+						type: macroInput.val()
 					});
 				});
 
