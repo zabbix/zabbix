@@ -565,6 +565,19 @@ ul.top-nav-icons {
 
 		ul {
 			li {
+
+				a {
+
+					&:hover {
+						border-bottom: 1px solid rgba($link-hover-color, 0.5);
+					}
+
+					&:focus {
+						border-bottom: 2px solid rgba($link-hover-color, 0.5);
+					}
+
+				}
+
 				vertical-align: middle;
 
 				&:first-child {
