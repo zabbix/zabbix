@@ -56,6 +56,7 @@ class CControllerDashboardShareUpdate extends CController {
 			'editable' => true
 		]);
 
+		$msg_box_title = null;
 		if ($editable_dashboard) {
 			$dashboard = ['dashboardid' => $this->getInput('dashboardid')];
 
@@ -84,7 +85,7 @@ class CControllerDashboardShareUpdate extends CController {
 			$result = (bool) API::Dashboard()->update($dashboard);
 
 			if ($result) {
-				info(_('Dashboard updated'));
+				$msg_box_title = _('Dashboard updated');
 			}
 		}
 		else {
@@ -96,7 +97,7 @@ class CControllerDashboardShareUpdate extends CController {
 			'result' => $result
 		];
 
-		if (($messages = getMessages($result)) !== null) {
+		if (($messages = getMessages($result, $msg_box_title)) !== null) {
 			$response[$result ? 'messages' : 'errors'] = $messages->toString();
 		}
 
