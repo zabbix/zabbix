@@ -35,13 +35,19 @@ class CFilter extends CDiv {
 	protected $id;
 	protected $headers = [];
 	protected $tabs = [];
+	// jQuery.tabs disabled tabs list.
+	protected $tabs_disabled = [];
+	// jQuery.tabs initialization options.
+	protected $tabs_options = [
+		'collapsible' => true
+	];
 
 	public function __construct($filterid) {
 		parent::__construct();
-		//$this->addClass(ZBX_STYLE_FILTER_CONTAINER);
+
 		$this->setId('filter-space');
+		// TODO: check where id is used, selenium tests?!.
 		$this->filterid = $filterid;
-		$this->columns = [];
 
 		$this->form = (new CForm('get'))
 			->cleanItems()
@@ -57,21 +63,25 @@ class CFilter extends CDiv {
 	}
 
 	public function addColumn($column) {
+		throw new Exception(__FUNCTION__);
 		$this->columns[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
 		return $this;
 	}
 
 	public function setFooter($footer) {
+		throw new Exception(__FUNCTION__);
 		$this->footer = $footer;
 		return $this;
 	}
 
 	public function removeButtons() {
+		throw new Exception(__FUNCTION__);
 		$this->show_buttons = false;
 		return $this;
 	}
 
 	public function addNavigator() {
+		throw new Exception(__FUNCTION__);
 		$this->navigator = true;
 		return $this;
 	}
@@ -82,100 +92,12 @@ class CFilter extends CDiv {
 	}
 
 	public function setHidden() {
+		throw new Exception(__FUNCTION__);
 		$this->hidden = true;
 		$this->addStyle('display: none;');
 
 		return $this;
 	}
-
-	/**
-	 * Return markup for filter toggler buttons.
-	 *
-	 * @return CDiv
-	 */
-	private function getHeader() {
-		if (!$this->opened) {
-			$this->setHidden();
-		}
-
-		$timeselector = null;
-		$filter = null;
-
-		if ($this->navigator) {
-			$timeselector = [
-				(new CSimpleButton())
-					->addClass('btn-time-left')
-					->setAttribute('data-event', 'timeselector.range.decrement'),// Set aria-label attribute
-				(new CSimpleButton(_('Zoom out')))
-					->addClass('btn-time-out')
-					->setAttribute('data-event', 'timeselector.range.zoomout'),// Set aria-label attribute
-				(new CSimpleButton())
-					->addClass('btn-time-right')
-					->setAttribute('data-event', 'timeselector.range.increment'),// Set aria-label attribute
-				(new CSimpleButton([_('Last 7 days'), (new CSpan())->addClass('btn-time-icon')]))
-					->addClass('btn-time')
-					->setAttribute('data-event', 'timeselector.toggle')
-					->setAttribute('data-filter-toggle', '#'.$this->timeselector_containerid)
-					// Add separate profile for timeselector expanded/collapsed state.
-					->setAttribute('data-profile', $this->filterid),// Set aria-label attribute
-			];
-		}
-
-		if ($this->columns) {
-			$filter = (new CSimpleButton([_('Filter'), new CSpan()]))
-				->addClass(ZBX_STYLE_FILTER_TRIGGER)
-				->addClass($this->opened ? ZBX_STYLE_FILTER_ACTIVE : '')
-				->addClass('filter-arrow')
-				->setAttribute('data-filter-toggle', '#'.$this->getId())
-				->setAttribute('data-profile', $this->filterid);
-		}
-
-		return (new CDiv([
-			$timeselector,
-			$filter
-		]))->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER);
-	}
-
-	private function getTable() {
-		if (!$this->columns) {
-			return null;
-		}
-
-		$row = (new CDiv())->addClass(ZBX_STYLE_ROW);
-		foreach ($this->columns as $column) {
-			$row->addItem($column);
-		}
-
-		return (new CDiv())
-			->addClass(ZBX_STYLE_TABLE)
-			->addClass(ZBX_STYLE_FILTER_FORMS)
-			->addItem($row);
-	}
-
-	private function getButtons() {
-		if (!$this->columns) {
-			return null;
-		}
-
-		$url = (new CUrl())
-			->removeArgument('filter_set')
-			->removeArgument('ddreset')
-			->setArgument('filter_rst', 1);
-
-		return (new CDiv())
-			->addClass(ZBX_STYLE_FILTER_FORMS)
-			->addItem(
-				(new CSubmitButton(_('Apply'), 'filter_set', 1))
-					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
-			)
-			->addItem(
-				(new CRedirectButton(_('Reset'), $url->getUrl()))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
-			);
-	}
-
-	// TODO: Methods above should be rewritten/removed.
 
 	/**
 	 * Add tab with filter form.
@@ -215,7 +137,7 @@ class CFilter extends CDiv {
 					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 			);
 
-		return $this->addTab($header, (new CForm('get'))->cleanItems()->addItem($body));
+		return $this->addTab($header, $body);
 	}
 
 	/**
@@ -235,7 +157,7 @@ class CFilter extends CDiv {
 
 	/**
 	 * Add time selector specific tab. Should be called before any tab is added. Adds two tabs:
-	 * - time selector range changes: back, zoom out, forward
+	 * - time selector range changes: back, zoom out, forward.
 	 * - time selector range form with predefined ranges.
 	 *
 	 * @param string $header    Header text. (ex: Last 7 days)
@@ -243,6 +165,8 @@ class CFilter extends CDiv {
 	 * @return CFilter
 	 */
 	public function addTimeSelector($header) {
+		$this->tabs_disabled[] = count($this->tabs);
+
 		$this->addTab([
 			(new CSimpleButton())->addClass('btn-time-left'),
 			(new CSimpleButton(_('Zoom out')))->addClass('btn-time-out'),
@@ -250,12 +174,28 @@ class CFilter extends CDiv {
 		], null);
 
 		$this->addTab((new CSimpleButton([$header, (new CSpan())->addClass('btn-time-icon')]))->addClass('btn-time'),
-			(new CForm('get'))->cleanItems()->addItem((new CDiv())->setId('scrollbar_cntr'))
+			(new CDiv())->setId('scrollbar_cntr')
 		);
 
 		return $this;
 	}
 
+	/**
+	 * Return javascript code for jquery-ui initialization.
+	 *
+	 * @return string
+	 */
+	public function getJS() {
+		return 'jQuery("#'.$this->getId().'").tabs('.
+			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled]), true).
+		')';
+	}
+
+	/**
+	 * Render current CFilter object as HTML string.
+	 *
+	 * @return string
+	 */
 	public function toString($destroy = true) {
 		$headers = (new CList())->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER);
 
@@ -270,14 +210,12 @@ class CFilter extends CDiv {
 			}
 		}
 
-		$this->addItem($headers)
-			->addItem($this->tabs);
+		$this->form->addItem($this->tabs);
 
-		zbx_add_post_js('
-			jQuery("#'.$this->id.'").tabs({
-				collapsible: true
-			});'
-		);
+		$this->addItem($headers)
+			->addItem($this->form);
+
+		zbx_add_post_js($this->getJS());
 
 		return parent::toString($destroy);
 	}

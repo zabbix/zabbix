@@ -2658,6 +2658,69 @@ function calculateTime(array $options = []) {
 }
 
 /**
+ * Convert relative date range string to translated string. Function does not check is passed date range correct.
+ *
+ * @param string $start     Start date of date range.
+ * @param string $end       End date of date range.
+ *
+ * @return string
+ */
+function relativeDateToText($start, $end) {
+	$start = preg_replace('/[^-+\/0-9a-z]/i', '', $start);
+	$end = preg_replace('/[^-+\/0-9a-z]/i', '', $end);
+	$key = $start.':'.$end;
+
+	$ranges = [
+		'now-1d/d:now-1d/d' => 'Yesterday',
+		'now-2d/d:now-2d/d' => 'Day before yesterday',
+		'now-1w/d:now-1w/d' => 'This day last week',
+		'now-1w/w:now-1w/w' => 'Previous week',
+		'now-1M/M:now-1M/M' => 'Previous month',
+		'now-1y/y:now-1y/y' => 'Previous year',
+		'now/d:now/d' => 'Today',
+		'now/d:now' => 'Today so far',
+		'now/w:now/w' => 'This week',
+		'now/w:now' => 'This week so far',
+		'now/M:now/M' => 'This month',
+		'now/M:now' => 'This month so far',
+		'now/y:now/y' => 'This year',
+		'now/y:now' => 'This year so far'
+	];
+
+	if (array_key_exists($key, $ranges)) {
+		return $ranges[$key];
+	}
+
+	if ($end === 'now') {
+		list($count, $mod) = sscanf($start, 'now-%d%s') + ['', ''];
+
+		$ranges = [
+			'm/m' => ['Last %1$d minute', 'Last %1$d minutes'],
+			'h/h' => ['Last %1$d hour', 'Last %1$d hours'],
+			'd/d' => ['Last %1$d day', 'Last %1$d days'],
+			'M/M' => ['Last %1$d month', 'Last %1$d months'],
+			'y/y' => ['Last %1$d year', 'Last %1$d years'],
+		];
+
+		if ($count > 0 && array_key_exists($mod, $ranges)) {
+			return _n($ranges[$mod][0], $ranges[$mod][1], $count);
+		}
+	}
+
+	$range = [
+		parseRelativeDate($start, true), parseRelativeDate($end, false)
+	];
+
+	foreach ($range as &$date) {
+		if ($date !== null) {
+			$date = $date->format('Y.m.d H:i');
+		}
+	}
+
+	return implode(' - ', $range);
+}
+
+/**
  * Parse relative date. Allow to define precision part using suffix '/', example (now/w).
  * Supports date as string in format 'Y.m.d H:i:s' and timestamp as integer or string with '@' prefix.
  * Timestamp is returned as initialized DateTime object. In case of parsing error null will be returned.
@@ -2699,6 +2762,7 @@ function parseRelativeDate($date, $is_start) {
 			? [
 				'm' => $date->format('H:i:00'),
 				'h' => $date->format('H:00:00'),
+				'd' => '00:00:00',
 				'w' => 'Monday this week 00:00:00',
 				'M' => 'first day of this month 00:00:00',
 				'y' => 'first day of January this year 00:00:00'
@@ -2706,6 +2770,7 @@ function parseRelativeDate($date, $is_start) {
 			: [
 				'm' => $date->format('H:i:59'),
 				'h' => $date->format('H:59:59'),
+				'd' => '23:59:59',
 				'w' => 'Sunday this week 23:59:59',
 				'M' => 'last day of this month 23:59:59',
 				'y' => 'last day of December this year 23:59:59'
