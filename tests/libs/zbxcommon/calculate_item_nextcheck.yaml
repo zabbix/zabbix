@@ -261,4 +261,18 @@ out:
     # 2011-12-31 00:00:00 +14:00 instead, there was no 2011-12-30 in Samoa
     - 2011-12-31 02:00:00 +14:00
     - 2012-01-01 02:00:00 +14:00
+---
+test case: Scheduling check around DST change in the Southern Hemisphere
+in:
+  item type: ZABBIX
+  delay: 0;h0,10,14,17,20m30
+  timezone: :America/Sao_Paulo
+  at: 2018-02-17 20:00:00 -02:00
+out:
+  checks:
+    - 2018-02-17 20:30:00 -02:00
+    # 2018-02-18 00:00:00 -02:00 clocks were turned backward 1 hour to
+    # 2018-02-17 23:00:00 -03:00 local standard time instead
+    - 2018-02-18 00:30:00 -03:00
+    - 2018-02-18 10:30:00 -03:00
 ...
