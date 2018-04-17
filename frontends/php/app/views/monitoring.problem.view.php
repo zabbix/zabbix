@@ -279,33 +279,33 @@ if ($data['action'] == 'problem.view') {
 			$data['config']['event_ack_enable']
 				? (new CDiv([
 					(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
-						->addClass(ZBX_STYLE_CB_SECOND_COLUMN_LABEL),
+						->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 					(new CCheckBox('filter_unacknowledged'))
 						->setChecked($data['filter']['unacknowledged'] == 1)
-				]))->addClass(ZBX_STYLE_FILTER_CB_SECOND_COLUMN)
+				]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 				: null
 		])
 		->addRow(_('Compact view'), [
 			(new CCheckBox('filter_compact_view'))->setChecked($data['filter']['compact_view'] == 1),
 			(new CDiv([
-				(new CLabel(_('Show timeline'), 'filter_show_timeline'))->addClass(ZBX_STYLE_CB_SECOND_COLUMN_LABEL),
+				(new CLabel(_('Show timeline'), 'filter_show_timeline'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('filter_show_timeline'))
 					->setChecked($data['filter']['show_timeline'] == 1)
 					->setDisabled($data['filter']['compact_view'] == 1),
-			]))->addClass(ZBX_STYLE_FILTER_CB_SECOND_COLUMN)
+			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		])
 		->addRow(_('Show details'), [
 			(new CCheckBox('filter_details'))
 				->setChecked($data['filter']['details'] == 1)
 				->setDisabled($data['filter']['compact_view'] == 1),
 			(new CDiv([
-				(new CLabel(_('Highlight whole row'), 'filter_highlight_row'))->addClass(ZBX_STYLE_CB_SECOND_COLUMN_LABEL),
+				(new CLabel(_('Highlight whole row'), 'filter_highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('filter_highlight_row'))
 					->setChecked($data['filter']['highlight_row'] == 1)
 					->setDisabled($data['filter']['compact_view'] == 0)
 			]))
 				->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
-				->addClass(ZBX_STYLE_FILTER_CB_SECOND_COLUMN)
+				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		]);
 
 	$filter = (new CFilter('web.problem.filter.state'))

@@ -777,6 +777,24 @@ class CScreenProblem extends CScreenBase {
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
+				switch ($this->data['filter']['show_tags']) {
+					case PROBLEMS_SHOW_TAGS_1:
+						$tags_header = (new CColHeader(_('Tags')))->addStyle('width: 73px;');
+						break;
+
+					case PROBLEMS_SHOW_TAGS_2:
+						$tags_header = (new CColHeader(_('Tags')))->addStyle('width: 122px;');
+						break;
+
+					case PROBLEMS_SHOW_TAGS_3:
+						$tags_header = (new CColHeader(_('Tags')))->addStyle('width: 171px;');
+						break;
+
+					case PROBLEMS_SHOW_TAGS_NONE:
+					default:
+						$tags_header = null;
+				}
+
 				$table = (new CTableInfo())
 					->setHeader(array_merge($header, [
 						$header_check_box,
@@ -792,7 +810,7 @@ class CScreenProblem extends CScreenBase {
 						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
 						$this->config['event_ack_enable'] ? (new CColHeader(_('Ack')))->addStyle('width: 36px;') : null,
 						(new CColHeader(_('Actions')))->addStyle('width: 59px;'),
-						$this->data['filter']['show_tags'] ? (new CColHeader(_('Tags')))->addStyle('width: 171px;') : null
+						$tags_header
 					]))
 					->addClass(ZBX_STYLE_COMPACT_VIEW)
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
