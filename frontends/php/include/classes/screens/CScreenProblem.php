@@ -755,7 +755,8 @@ class CScreenProblem extends CScreenBase {
 				->setArgument('page', $this->data['page'])
 				->getUrl();
 
-			$show_timeline = ($this->data['sort'] === 'clock');
+			$show_timeline = ($this->data['sort'] === 'clock' && !$this->data['filter']['compact_view']
+				&& $this->data['filter']['show_timeline']);
 
 			$header_clock =
 				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link);
@@ -764,7 +765,7 @@ class CScreenProblem extends CScreenBase {
 				? $header_clock->addStyle('width: 115px;')
 				: $header_clock->addClass(ZBX_STYLE_CELL_WIDTH);
 
-			if ($show_timeline && !$this->data['filter']['compact_view'] && $this->data['filter']['show_timeline']) {
+			if ($show_timeline) {
 				$header = [
 					$header_clock->addClass(ZBX_STYLE_RIGHT),
 					(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH),
@@ -777,29 +778,20 @@ class CScreenProblem extends CScreenBase {
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
-				switch ($this->data['filter']['show_tags']) {
-					case PROBLEMS_SHOW_TAGS_1:
-						$tags_header = (new CColHeader(_('Tags')))->addStyle('width: 73px;');
-						break;
-
-					case PROBLEMS_SHOW_TAGS_2:
-						$tags_header = (new CColHeader(_('Tags')))->addStyle('width: 122px;');
-						break;
-
-					case PROBLEMS_SHOW_TAGS_3:
-						$tags_header = (new CColHeader(_('Tags')))->addStyle('width: 171px;');
-						break;
-
-					case PROBLEMS_SHOW_TAGS_NONE:
-					default:
-						$tags_header = null;
+				if ($this->data['filter']['show_tags'] == PROBLEMS_SHOW_TAGS_NONE) {
+					$tags_header = null;
+				}
+				else {
+					$tags_width = 24 + 49 * $this->data['filter']['show_tags'];
+					$tags_header = (new CColHeader(_('Tags')))->addStyle('width: '.$tags_width.'px;');
 				}
 
 				$table = (new CTableInfo())
 					->setHeader(array_merge($header, [
 						$header_check_box,
-						make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 120px;'),
+						make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'],
+							$link
+						)->addStyle('width: 120px;'),
 						(new CColHeader(_('Recovery time')))->addStyle('width: 115px;'),
 						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
 						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
@@ -812,14 +804,16 @@ class CScreenProblem extends CScreenBase {
 						(new CColHeader(_('Actions')))->addStyle('width: 59px;'),
 						$tags_header
 					]))
-					->addClass(ZBX_STYLE_COMPACT_VIEW)
-					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+						->addClass(ZBX_STYLE_COMPACT_VIEW)
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 			}
 			else {
 				$table = (new CTableInfo())
 					->setHeader(array_merge($header, [
 						$header_check_box,
-						make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link),
+						make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'],
+							$link
+						),
 						(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
 						_('Status'),
 						_('Info'),
@@ -956,7 +950,7 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
-				if ($show_timeline && !$this->data['filter']['compact_view'] && $this->data['filter']['show_timeline']) {
+				if ($show_timeline) {
 					if ($last_clock != 0) {
 						self::addTimelineBreakpoint($table, $last_clock, $problem['clock'], $this->data['sortorder']);
 					}
