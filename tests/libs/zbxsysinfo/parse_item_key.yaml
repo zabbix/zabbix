@@ -157,7 +157,7 @@ test case: invalid key, unmatched opening bracket (1)   # array missing closing 
 in:
   key: 'key[["a",]'
 ---
-test case: invalid key, unmatched opening bracket (2)   # array missing closing bracket, brackets is inside quotes and is a part of the array parameter
+test case: invalid key, unmatched opening bracket (2)   # array missing closing bracket, brackets are inside quotes and are a part of the array parameter
 in:
   key: 'key[[a"]"]'
 ---
