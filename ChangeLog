@@ -16,6 +16,9 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+...G...PS. [ZBX-13660] fixed data types passed to is_ushort() for converting PID, port and process number (Andris)
+..F....... [ZBX-12935,ZBX-13539] fixed displaying of floating point values under the "Latest data" page (Sasha)
+...G...PS. [ZBX-13579] fixed unnecessary data getting when agent becomes available in the non-collection data period (Sergejs)
 ..F....... [ZBX-13240] removed duplicating HTML IDs from frontend and fixed SID validation in trigger wizard (Ivo)
 ..F....... [ZBX-13685] fixed maintenance entries displayed in list when filter is applied (agriscenko)
 ....I..... [ZBX-12756] improved configure script to check iconv library (MVekslers)
@@ -250,6 +253,9 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-13660] fixed data types passed to is_ushort() for converting PID, port and process number (Andris)
+..F....... [ZBX-12935,ZBX-13539] fixed displaying of floating point values under the "Latest data" page (Sasha)
+...G...PS. [ZBX-13579] fixed unnecessary data getting when agent becomes available in the non-collection data period (Sergejs)
 ..F....... [ZBX-13685] fixed maintenance entries displayed in list when filter is applied (agriscenko)
 ....I..... [ZBX-12756] improved configure script to check iconv library (MVekslers)
 ........S. [ZBX-13667] added notification in zabbix server log about 'error' in elasticsearch json response (MVekslers)
@@ -1436,6 +1442,8 @@ Changes for 3.0.17rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-13660] fixed data types passed to is_ushort() for converting PID, port and process number (Andris)
+..F....... [ZBX-12935,ZBX-13539] fixed displaying of floating point values under the "Latest data" page (Sasha)
 ..F....... [ZBX-13500] fixed fractional values in triggers being misinterpreted without a leading 0 (agriscenko)
 ..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
 

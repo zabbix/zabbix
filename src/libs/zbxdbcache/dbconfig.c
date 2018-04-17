@@ -314,9 +314,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
 
-	if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (item->nextcheck = DCget_disable_until(item, host)))
-		return;
-
 	if (0 != host->proxy_hostid && NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 		now -= proxy->timediff;
 
