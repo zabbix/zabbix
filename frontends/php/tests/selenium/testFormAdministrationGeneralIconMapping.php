@@ -24,66 +24,43 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
  * @backup icon_map
  */
 
-class testFormIconMapping extends CWebTest {
+class testFormAdministrationGeneralIconMapping extends CWebTest {
 
-	public function testFormIconMapping_CheckLayout() {
-		$this->zbxTestLogin('adm.iconmapping.php');
-		$this->zbxTestClickWait('form');
-		$this->zbxTestCheckHeader('Icon mapping');
-
-		$this->zbxTestAssertElementPresentId('iconmap_name');
-		$this->zbxTestAssertAttribute("//input[@id='iconmap_name']", 'maxlength', 64);
-
-		$this->zbxTestAssertElementPresentId('iconmap_mappings_new0_expression');
-		$this->zbxTestAssertAttribute("//input[@id='iconmap_mappings_new0_expression']", 'maxlength', 64);
-
-		$this->zbxTestDropdownHasOptions('iconmap_mappings_new0_inventory_link', ['Type', 'Type (Full details)', 'Name',
-			'Alias', 'OS', 'OS (Full details)', 'OS (Short)', 'Serial number A', 'Serial number B', 'Tag', 'Asset tag',
-			'MAC address A', 'MAC address B', 'Hardware', 'Hardware (Full details)', 'Software', 'Software (Full details)',
-			'Software application A', 'Software application B', 'Software application C', 'Software application D', 'Software application E',
-			'Contact', 'Location', 'Location latitude', 'Location longitude', 'Notes', 'Chassis', 'Model', 'HW architecture',
-			'Vendor', 'Contract number', 'Installer name', 'Deployment status', 'URL A', 'URL B', 'URL C', 'Host networks',
-			'Host subnet mask', 'Host router', 'OOB IP address', 'OOB subnet mask', 'OOB router', 'Date HW purchased',
-			'Date HW installed', 'Date HW maintenance expires', 'Date HW decommissioned', 'Site address A', 'Site address B',
-			'Site address C', 'Site city', 'Site state / province', 'Site country', 'Site ZIP / postal', 'Site rack location',
-			'Site notes', 'Primary POC name', 'Primary POC email', 'Primary POC phone A', 'Primary POC phone B', 'Primary POC cell',
-			'Primary POC screen name', 'Primary POC notes', 'Secondary POC name', 'Secondary POC email', 'Secondary POC phone A',
-			'Secondary POC phone B', 'Secondary POC cell', 'Secondary POC screen name', 'Secondary POC notes']);
-		$this->zbxTestDropdownHasOptions('iconmap_mappings_new0_iconid', ['Cloud_(24)', 'Cloud_(48)', 'Cloud_(64)',
-			'Cloud_(96)', 'Cloud_(128)', 'Crypto-router_(24)', 'Crypto-router_symbol_(24)', 'IP_PBX_(24)', 'Video_terminal_(24)']);
-		$this->zbxTestDropdownHasOptions('iconmap_default_iconid', ['Cloud_(24)', 'Cloud_(48)', 'Cloud_(64)',
-			'Cloud_(96)', 'Cloud_(128)', 'Crypto-router_(24)', 'Crypto-router_symbol_(24)', 'IP_PBX_(24)', 'Video_terminal_(24)']);
-
-		$this->zbxTestTextPresent(['Name', 'Mappings', 'Default']);
-		$this->zbxTestTextPresent(['Inventory field', 'Expression', 'Icon', 'Action']);
-	}
-
-	public function CreateValidation() {
+	public function create_validation() {
 		return[
+			[
+				[
+					'mappings' => [
+						['expression' => 'Create with empty name']
+					],
+					'error' => 'Invalid parameter "/1/name": cannot be empty.',
+					'NoDbCheck' => true
+				],
+			],
 			[
 				[
 					'name' => ' ',
 					'mappings' => [
-					['expression' => 'Create with empty name']
+						['expression' => 'Create with spaces in name']
 					],
-					'error' => 'Invalid parameter "/1/name": cannot be empty.'
-				]
+					'error' => 'Invalid parameter "/1/name": cannot be empty.',
+				],
 			],
 			[
 				[
 					'name' => 'Icon mapping one for testPage',
 					'mappings' => [
-					['expression' => 'Create with existing name']
+						['expression' => 'Create with existing name']
 					],
 					'error' => 'Icon map "Icon mapping one for testPage" already exists.',
-					'NoDbCheck' => 'true'
+					'NoDbCheck' => true
 				]
 			],
 			[
 				[
 					'name' => 'Icon mapping create with slash',
 					'mappings' => [
-					['expression' => '/']
+						['expression' => '/']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression. '
 				]
@@ -92,7 +69,7 @@ class testFormIconMapping extends CWebTest {
 				[
 					'name' => 'Icon mapping create with backslash',
 					'mappings' => [
-					['expression' => '\\']
+						['expression' => '\\']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
@@ -101,7 +78,7 @@ class testFormIconMapping extends CWebTest {
 				[
 					'name' => 'Icon mapping create with double slash',
 					'mappings' => [
-					['expression' => '//']
+						['expression' => '//']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression. '
 				]
@@ -124,51 +101,59 @@ class testFormIconMapping extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Icon mapping add not existen regular expression',
+					'mappings' => [
+						['expression' => '@regexpnotexist'],
+					],
+					'error' => 'Global regular expression "regexpnotexist" does not exist.'
+				]
+			],
+			[
+				[
+					'name' => 'Icon mapping add not existen global regular expression',
+					'mappings' => [
+						['expression' => '@'],
+					],
+					'error' => 'Global regular expression "" does not exist.'
+				]
+			],
+			[
+				[
 					'name' => 'Icon mapping without expressions',
 					'mappings' => [
 						['expression' => 'first expression', 'remove' => true]
 					],
 					'error' => 'Invalid parameter "/1/mappings": cannot be empty.'
 				]
-			],
+			]
 		];
 	}
 
 	/**
-	 * @dataProvider CreateValidation
+	 * @dataProvider create_validation
+	 *
 	 * Test validate icon mapping creation.
 	 */
-	public function testFormIconMapping_CreateValidation($data) {
+	public function testFormAdministrationGeneralIconMapping_CreateValidation($data) {
 		$this->zbxTestLogin('adm.iconmapping.php?form=create');
+
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeWait('iconmap_name', $data['name']);
 		}
 
-		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_mappings_new0_inventory_link', $data['inventory']);
-		}
-
-		if (array_key_exists('icon', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_mappings_new0_iconid', $data['icon']);
-		}
-
-		if (array_key_exists('default', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_default_iconid', $data['default']);
-		}
-
 		// Input new row for Icon mapping
 		if (array_key_exists('mappings', $data)) {
-			$expressionCount = 0;
+			$expression_count = 0;
 
-			foreach ($data['mappings'] as $mappingRow) {
-				$this->zbxTestInputTypeWait('iconmap_mappings_new'.$expressionCount.'_expression', $mappingRow['expression']);
+			foreach ($data['mappings'] as $mapping_row) {
+				$this->zbxTestInputTypeWait('iconmap_mappings_new'.$expression_count.'_expression', $mapping_row['expression']);
 
-				if (array_key_exists('remove', $mappingRow)) {
-					$this->zbxTestClickXpathWait("//tr[@id='iconmapidRow_new". $expressionCount ."']//button");
+				if (array_key_exists('remove', $mapping_row)) {
+					$this->zbxTestClickXpathWait("//tr[@id='iconmapidRow_new". $expression_count ."']//button");
 				}
 
-				$expressionCount++;
-				if (count($data['mappings']) == $expressionCount) {
+				$expression_count++;
+				if (count($data['mappings']) == $expression_count) {
 					break;
 				}
 				$this->zbxTestClick('addMapping');
@@ -188,7 +173,7 @@ class testFormIconMapping extends CWebTest {
 		}
 	}
 
-	public function Create() {
+	public function create() {
 		return[
 			[
 				[
@@ -269,10 +254,11 @@ class testFormIconMapping extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider Create
+	 * @dataProvider create
+	 *
 	 * Test creation of icon mapping.
 	 */
-	public function testFormIconMapping_Create($data) {
+	public function testFormAdministrationGeneralIconMapping_Create($data) {
 		$this->zbxTestLogin('adm.iconmapping.php?form=create');
 
 		$this->zbxTestInputTypeWait('iconmap_name', $data['name']);
@@ -289,19 +275,19 @@ class testFormIconMapping extends CWebTest {
 			$this->zbxTestDropdownSelect('iconmap_default_iconid', $data['default']);
 		}
 
-		// Input new row for Icon mapping
+		// Input new row for Icon mapping.
 		if (array_key_exists('mappings', $data)) {
-			$expressionCount = 0;
+			$expression_count = 0;
 
-			foreach ($data['mappings'] as $mappingRow) {
-				$this->zbxTestInputTypeWait('iconmap_mappings_new'.$expressionCount.'_expression', $mappingRow['expression']);
+			foreach ($data['mappings'] as $mapping_row) {
+				$this->zbxTestInputTypeWait('iconmap_mappings_new'.$expression_count.'_expression', $mapping_row['expression']);
 
-				if (array_key_exists('remove', $mappingRow)) {
-					$this->zbxTestClickXpathWait("//tr[@id='iconmapidRow_new". $expressionCount ."']//button");
+				if (array_key_exists('remove', $mapping_row)) {
+					$this->zbxTestClickXpathWait("//tr[@id='iconmapidRow_new". $expression_count ."']//button");
 				}
 
-				$expressionCount++;
-				if (count($data['mappings']) == $expressionCount) {
+				$expression_count++;
+				if (count($data['mappings']) == $expression_count) {
 					break;
 				}
 				$this->zbxTestClick('addMapping');
@@ -316,7 +302,7 @@ class testFormIconMapping extends CWebTest {
 		$this->zbxTestCheckHeader('Icon mapping');
 		$this->zbxTestCheckFatalErrors();
 
-		// Check the results in DB
+		// Check the results in DB.
 		if (array_key_exists('dbCheck', $data)) {
 			$expressions = [];
 
@@ -352,14 +338,14 @@ class testFormIconMapping extends CWebTest {
 		}
 	}
 
-
 	/**
 	* Test cancel creation of icon mapping
 	*/
-		public function testFormIconMapping_CancelCreation(){
-		$this->zbxTestLogin('adm.iconmapping.php?form=create');
+	public function testFormAdministrationGeneralIconMapping_CancelCreation(){
 		$cancel_name='Cancel Icon mapping creation';
 		$cancel_expression='Cancel Icon mapping creation';
+
+		$this->zbxTestLogin('adm.iconmapping.php?form=create');
 		$this->zbxTestInputTypeWait('iconmap_name', $cancel_name);
 		$this->zbxTestInputTypeWait('iconmap_mappings_new0_expression', $cancel_expression);
 		$this->zbxTestClick('cancel');
@@ -375,14 +361,14 @@ class testFormIconMapping extends CWebTest {
 	}
 
 	/**
-	 * Test update icon mapping without changes.
+	 * Test update without any modification of icon mapping.
 	 */
-	public function testFormIconMapping_SimpleUpdate(){
-		$sqlIconMap = 'SELECT * FROM icon_map order by iconmapid';
-		$oldIconMap = DBhash($sqlIconMap);
+	public function testFormAdministrationGeneralIconMapping_SimpleUpdate(){
+		$sql_icon_map = 'SELECT * FROM icon_map ORDER BY iconmapid';
+		$old_icon_map = DBhash($sql_icon_map);
 
-		$sqlIconExpression = 'SELECT * FROM icon_mapping order by iconmappingid';
-		$oldIconExpression = DBhash($sqlIconExpression);
+		$sql_expression_hash = 'SELECT * FROM icon_mapping ORDER BY iconmappingid';
+		$old_expression = DBhash($sql_expression_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 
@@ -391,22 +377,20 @@ class testFormIconMapping extends CWebTest {
 			$this->zbxTestClickLinkText($iconmap['name']);
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('update');
-			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestTextPresent('Icon map updated');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated');
 		}
 
-		$newIconMap = DBhash($sqlIconMap);
-		$this->assertEquals($oldIconMap, $newIconMap);
+		$new_icon_map = DBhash($sql_icon_map);
+		$this->assertEquals($old_icon_map, $new_icon_map);
 
-		$newIconExpression = DBhash($sqlIconExpression);
-		$this->assertEquals($oldIconExpression, $newIconExpression);
+		$new_expression = DBhash($sql_expression_hash);
+		$this->assertEquals($old_expression, $new_expression);
 	}
 
-	public function UpdateValidation(){
+	public function update_validation(){
 		return [
 			[
 				[
-					'name' => 'Icon mapping two for testPage',
 					'new_name' => '',
 					'expression' => 'Update with empty name',
 					'error' => 'Invalid parameter "/1/name": cannot be empty.'
@@ -414,52 +398,59 @@ class testFormIconMapping extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Icon mapping two for testPage',
 					'new_name' => 'Icon mapping one for testPage',
 					'expression' => 'Update with existing name',
 					'error' => 'Icon map "Icon mapping one for testPage" already exists.'
 				]
 			],
+			// Expression with slash
 			[
 				[
-// Icon mapping update expression with slash
 					'expression' => '/',
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression. '
+					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
 			],
+			// Expression with backslash
 			[
 				[
-// Icon mapping update with backslash
 					'expression' => '\\',
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
 			],
+			// Expression with double slash
 			[
 				[
-// Icon mapping update with double slash
 					'expression' => '//',
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression. '
+					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
 			],
+			// Empty expression
 			[
 				[
-// Update with empty expression
 					'expression' => '',
 					'error' => 'Invalid parameter "/1/mappings/1/expression": cannot be empty.'
+				]
+			],
+			// Not existen regular expression
+			[
+				[
+					'expression' => '@regexpnotexist',
+					'error' => 'Global regular expression "regexpnotexist" does not exist.'
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider UpdateValidation
+	 * @dataProvider update_validation
+	 *
 	 * Test validate icon mapping updating
 	 */
-	public function testFormIconMapping_ValidateChangeAndUpdate($data) {
+	public function testFormAdministrationGeneralIconMapping_ValidateChangeAndUpdate($data) {
 		$name = 'Icon mapping two for testPage';
-		$sqlIconMap = "SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
+		$sql_hash = "SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
 					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$name."'";
-		$oldIconMap = DBhash($sqlIconMap);
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
@@ -468,12 +459,9 @@ class testFormIconMapping extends CWebTest {
 			$this->zbxTestInputType('iconmap_name', $data['new_name']);
 		}
 
-		if (array_key_exists('expression', $data)) {
-			$this->zbxTestInputType('iconmap_mappings_0_expression', $data['expression']);
-		}
+		$this->zbxTestInputType('iconmap_mappings_0_expression', $data['expression']);
 
 		$this->zbxTestClick('update');
-		$newIconMap = DBhash($sqlIconMap);
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update icon map');
@@ -481,7 +469,7 @@ class testFormIconMapping extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB
-		$this->assertEquals($oldIconMap, $newIconMap);
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function update(){
@@ -524,21 +512,20 @@ class testFormIconMapping extends CWebTest {
 					'dbCheck' => true,
 					'formCheck' => true
 				]
-			],
+			]
 		];
 	}
 
 	/**
 	 * @dataProvider update
+	 *
 	 * Test updating of icon mapping.
 	 */
-	public function testFormIconMapping_ChangeAndUpdate($data) {
+	public function testFormAdministrationGeneralIconMapping_ChangeAndUpdate($data) {
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($data['name'], 'iconmap_name');
 
-		if (array_key_exists('new_name', $data)) {
-			$this->zbxTestInputTypeOverwrite('iconmap_name', $data['new_name']);
-		}
+		$this->zbxTestInputTypeOverwrite('iconmap_name', $data['new_name']);
 
 		if (array_key_exists('expression', $data)) {
 			$this->zbxTestInputTypeOverwrite('iconmap_mappings_0_expression', $data['expression']);
@@ -569,20 +556,14 @@ class testFormIconMapping extends CWebTest {
 					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$data['new_name']."'");
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['name'], $data['new_name']);
-				$dbExpression[] = $row['expression'];
+				$this->assertEquals($row['expression'], $data['expression']);
 			}
 		}
 
 		// Check the results in form
 		if (array_key_exists('formCheck', $data)) {
-			if (array_key_exists('new_name', $data)) {
-				$this->zbxTestClickLinkText($data['new_name'], 'iconmap_name');
-				$this->zbxTestAssertElementValue('iconmap_name', $data['new_name']);
-			}
-			else {
-				$this->zbxTestClickLinkText($data['name'], 'iconmap_name');
-				$this->zbxTestAssertElementValue('iconmap_name', $data['name']);
-			}
+			$this->zbxTestClickLinkText($data['new_name'], 'iconmap_name');
+			$this->zbxTestAssertElementValue('iconmap_name', $data['new_name']);
 
 			$this->zbxTestAssertElementValue('iconmap_mappings_0_expression', $data['expression']);
 			$this->zbxTestDropdownAssertSelected('iconmap[mappings][0][inventory_link]', $data['inventory']);
@@ -592,42 +573,37 @@ class testFormIconMapping extends CWebTest {
 	}
 
 	/**
-	 * Test cancel creation of icon mapping.
+	 * Test cancel update of icon mapping.
 	 */
-	public function testFormIconMapping_CancelUpdating(){
-		$sqlIconMap = 'SELECT * FROM icon_map order by iconmapid';
-		$oldIconMap = DBhash($sqlIconMap);
-
-		$sqlIconExpression = 'SELECT * FROM icon_mapping order by iconmappingid';
-		$oldIconExpression = DBhash($sqlIconExpression);
+	public function testFormAdministrationGeneralIconMapping_CancelUpdating(){
+		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 
-		foreach (DBdata("select name from icon_map", false) as $iconmap) {
+		foreach (DBdata("SELECT name FROM icon_map LIMIT 2", false) as $iconmap) {
 			$iconmap = $iconmap[0];
 			$this->zbxTestClickLinkText($iconmap['name']);
-			$this->zbxTestInputTypeOverwrite('iconmap_name', 'new_name');
-			$this->zbxTestInputTypeOverwrite('iconmap_mappings_0_expression', 'new_expression');
+			$this->zbxTestInputTypeOverwrite('iconmap_name', $iconmap['name'].' (updated)');
 			$this->zbxTestClick('cancel');
 			$this->zbxTestCheckTitle('Configuration of icon mapping');
 			$this->zbxTestCheckHeader('Icon mapping');
 			$this->zbxTestCheckFatalErrors();
-			$this->zbxTestTextNotPresent('new_name');
-			$this->zbxTestTextNotPresent('new_expression');
+			$this->zbxTestTextNotPresent($iconmap['name'].' (updated)');
 		}
 
-		$newIconMap = DBhash($sqlIconMap);
-		$this->assertEquals($oldIconMap, $newIconMap);
+		$new_hash = DBhash($sql_hash);
+		$this->assertEquals($old_hash, $new_hash);
 	}
 
-	public function ValidateCloning(){
+	public function validate_cloning(){
 		return [
 			[
 				[
 					'new_name' => 'Icon mapping one for testPage',
 					'expression' => 'Make Clone with existing name',
 					'error' => 'Icon map "Icon mapping one for testPage" already exists.',
-					'DBexist' => 'true'
+					'DBexist' => true
 				]
 			],
 			[
@@ -644,25 +620,25 @@ class testFormIconMapping extends CWebTest {
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression. '
 				]
 			],
+			// Icon mapping update with backslash.
 			[
 				[
-// Icon mapping update with backslash
 					'new_name' => 'CLONE: Icon mapping one for testPage',
 					'expression' => '\\',
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
 			],
+			// Icon mapping update with double slash.
 			[
 				[
-// Icon mapping update with double slash
 					'new_name' => 'CLONE: Icon mapping one for testPage',
 					'expression' => '//',
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression. '
 				]
 			],
+			// Update with empty expression.
 			[
 				[
-// Update with empty expression
 					'new_name' => 'CLONE: Icon mapping one for testPage',
 					'expression' => '',
 					'error' => 'Invalid parameter "/1/mappings/1/expression": cannot be empty.'
@@ -672,24 +648,22 @@ class testFormIconMapping extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider ValidateCloning
+	 * @dataProvider validate_cloning
+	 *
 	 * Test cloning of icon mapping.
 	 */
-	public function testFormIconMapping_ValidateClone($data) {
-		$this->zbxTestLogin('adm.iconmapping.php');
+	public function testFormAdministrationGeneralIconMapping_ValidateClone($data) {
 		$name='Icon mapping one for testPage';
-		$oldIconMap = DBhash("SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
-					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$name."'");
+		$sql_hash = "SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
+					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$name."'";
+		$old_hash = DBhash($sql_hash);
+
+		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
-		$this->zbxTestClick('clone');
+		$this->zbxTestClickWait('clone');
 
-		if (array_key_exists('new_name', $data)) {
-			$this->zbxTestInputType('iconmap_name', $data['new_name']);
-		}
-
-		if (array_key_exists('expression', $data)) {
-			$this->zbxTestInputType('iconmap_mappings_0_expression', $data['expression']);
-		}
+		$this->zbxTestInputType('iconmap_name', $data['new_name']);
+		$this->zbxTestInputType('iconmap_mappings_0_expression', $data['expression']);
 
 		$this->zbxTestClick('add');
 
@@ -700,12 +674,10 @@ class testFormIconMapping extends CWebTest {
 
 		// Check the results in DB
 		if (!array_key_exists('DBexist', $data)){
-		$this->assertEquals(0, DBcount("SELECT NULL FROM icon_map WHERE name='".$data['new_name']."'"));
+			$this->assertEquals(0, DBcount("SELECT NULL FROM icon_map WHERE name='".$data['new_name']."'"));
 		}
 
-		$newIconMap = DBhash("SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
-					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$name."'");
-		$this->assertEquals($oldIconMap, $newIconMap);
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function cloning(){
@@ -755,15 +727,16 @@ class testFormIconMapping extends CWebTest {
 					'dbCheck' => true,
 					'formCheck' => true
 				]
-			],
+			]
 		];
 	}
 
 	/**
 	 * @dataProvider cloning
+	 *
 	 * Test cloning of icon mapping.
 	 */
-	public function testFormIconMapping_Clone($data) {
+	public function testFormAdministrationGeneralIconMapping_Clone($data) {
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($data['name'], 'iconmap_name');
 		$this->zbxTestClick('clone');
@@ -817,10 +790,11 @@ class testFormIconMapping extends CWebTest {
 	/**
 	 * Test cancel cloning of icon mapping.
 	 */
-	public function testFormIconMapping_CancelCloning(){
-		$this->zbxTestLogin('adm.iconmapping.php');
+	public function testFormAdministrationGeneralIconMapping_CancelCloning(){
 		$name='Icon mapping one for testPage';
 		$new_name='CANCEL CLONING: Icon mapping one for testPage';
+
+		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputTypeOverwrite('iconmap_name', $new_name);
@@ -839,16 +813,17 @@ class testFormIconMapping extends CWebTest {
 	/**
 	 * Test deleting of icon mapping.
 	 */
-	public function testFormIconMapping_Delete() {
-		$this->zbxTestLogin('adm.iconmapping.php');
+	public function testFormAdministrationGeneralIconMapping_Delete() {
 		$name='Icon mapping to check delete functionality';
+
+		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
 		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 
 		// Check the results in frontend.
-		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map deleted');
+		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB.
 		$sql = "SELECT * FROM icon_map WHERE name='$name'";
@@ -856,33 +831,34 @@ class testFormIconMapping extends CWebTest {
 	}
 
 	/**
-	 * Test deleting of icon mapping.
+	 * Test cancel deleting of icon mapping.
 	 */
-	public function testFormIconMapping_CancelDelete() {
-		$this->zbxTestLogin('adm.iconmapping.php');
+	public function testFormAdministrationGeneralIconMapping_CancelDelete() {
 		$name='Icon mapping one for testPage';
+
+		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->dismiss();
 
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
-		$this->zbxTestCheckHeader('Icon mapping');
 		$this->zbxTestCheckFatalErrors();
-		$this->zbxTestTextNotPresent($name);
 
 		// Check the results in DB
 		$this->assertEquals(1, DBcount("SELECT NULL FROM icon_map WHERE name='".$name."'"));
 	}
 
 	/**
-	 * Test deleting of icon mapping.
+	 * Try delete icon mapping used in map.
 	 */
-	public function testFormIconMapping_DeleteUsedIcon() {
-		$this->zbxTestLogin('adm.iconmapping.php');
+	public function testFormAdministrationGeneralIconMapping_DeleteUsedInMap() {
 		$name='used_by_map';
-		$sqlIconMap = "SELECT * FROM icon_map order by iconmapid where name='".$name."'";
-		$oldIconMap = DBhash($sqlIconMap);
+
+		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid where name='.zbx_dbstr($name);
+		$old_hash = DBhash($sql_hash);
+
+		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
 		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
@@ -892,10 +868,8 @@ class testFormIconMapping extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Icon map "'.$name.'" cannot be deleted. Used in map');
 
 		// Check the results in DB.
-		$sql = "SELECT * FROM icon_map WHERE name='$name'";
+		$sql = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name);
 		$this->assertEquals(1, DBcount($sql));
-
-		$newIconMap = DBhash($sqlIconMap);
-		$this->assertEquals($oldIconMap, $newIconMap);
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 }

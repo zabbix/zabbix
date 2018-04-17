@@ -20,18 +20,19 @@
 
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
-class testPageIconMapping extends CWebTest {
-	public function testPageIconMapping_CheckLayout(){
+class testPageAdministrationGeneralIconMapping extends CWebTest {
+
+	public function testPageAdministrationGeneralIconMapping_CheckLayout(){
 		$this->zbxTestLogin('adm.gui.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
 		$strings = [];
 
-		foreach (DBdata('select name,iconmapid from icon_map', false) as $iconname) {
+		foreach (DBdata('SELECT name FROM icon_map', false) as $iconname) {
 			$strings[] = $iconname[0]['name'];
 		}
 
-		foreach (DBdata('SELECT expression,iconmapid FROM icon_mapping', false) as $expression) {
+		foreach (DBdata('SELECT expression FROM icon_mapping', false) as $expression) {
 			$strings[] = $expression[0]['expression'];
 		}
 
