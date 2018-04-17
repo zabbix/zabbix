@@ -125,7 +125,7 @@ out:
   expected_key: 'key["a","b",["c","d\",]"]]'
   return: 'SUCCEED'
 ---
-test case: valid key with multiple quoted parameters and multiple arrays        # arrays contains multiple unquoted and quoted parameters which containing escaping and characters that are not allowed in unquoted parameters
+test case: valid key with multiple quoted parameters and multiple array parameters        # arrays contains multiple unquoted and quoted parameters which containing escaping and characters that are not allowed in unquoted parameters
 in:
   key: 'key["a","b",["c","d\",]"],[e,f]]'
 out:
@@ -171,13 +171,13 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: invalid key, illigal character for unquoted parameter, multiple parameter key
+test case: invalid key, invalid character for unquoted parameter, multiple parameter key
 in:
   key: 'key["a",["b","c\"]"]]]'
 out:
   return: 'FAIL'
 ---
-test case: invalid key, illigal character for unquoted parameter, multiple parameter key
+test case: invalid key, invalid character for unquoted parameter, multiple parameter key
 in:
   key: 'key[a ]]'
 out:
@@ -206,37 +206,36 @@ in:
   key: 'ssh,21'
 out:
   return: 'FAIL'
-#---
-#test case:  invalid key, multiple square bracket pairs are not allowed
-#in:
-#  key: 'key[][]'
-#out:
-#  return: 'FAIL'
-#---
+---
+test case:  invalid key, multiple square bracket pairs are not allowed
+in:
+  key: 'key[][]'
+out:
+  return: 'FAIL'
 ---
 test case: invalid key, multiple square bracket pairs containing parameters are not allowed
 in:
-  key: 'key["a",b,["c","d\",]"]["d"]'
+  key: 'key["a",b,["c","d\",]"]]["d"]'
 out:
   return: 'FAIL'
-#
-#test case: invalid key, multi-level arrays are not allowed
-#in:
-#  key: 'key[[[]]]'
-#out:
-#  return: 'FAIL'
-#---
-#test case: invalid key, multi-level arrays are not allowed, array consists of multiple different type parameters
-#in:
-#  key: 'key["a",["b",["c","d"],e],"f"]'
-#out:
-#  return: 'FAIL'
-#---
-#test case: invalid key, multi-level arrays are not allowed, array consists of single parameter which is another array
-#in:
-#  key: 'key["a","b",[["c","d\",]"]]]'
-#out:
-#  return: 'FAIL'
+---
+test case: invalid key, multi-level arrays are not allowed
+in:
+  key: 'key[[[]]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, multi-level arrays are not allowed, array consists of multiple different type parameters
+in:
+  key: 'key["a",["b",["c","d"],e],"f"]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, multi-level arrays are not allowed, array consists of single parameter which is another array
+in:
+  key: 'key["a","b",[["c","d\",]"]]]'
+out:
+  return: 'FAIL'
 ---
 test case: invalid key, character ] is not allowed in unquoted parameter string
 in:

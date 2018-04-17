@@ -165,7 +165,7 @@ test case: invalid key, unmatched opening bracket (3)   # array missing closing 
 in:
   key: 'key[["a","\"b\"]"]'
 ---
-test case: invalid key, illigal character for unquoted parameter, multiple parameter key
+test case: invalid key, invalid character for unquoted parameter, multiple parameter key
 in:
   key: 'key["a",["b","c\"]"]]]'
 ---
@@ -195,7 +195,7 @@ in:
 ---
 test case: invalid key, multiple square bracket pairs containing parameters are not allowed
 in:
-  key: 'key["a",b,["c","d\",]"]["d"]'
+  key: 'key["a",b,["c","d\",]"]]["d"]'
 ---
 test case: invalid key, multi-level arrays are not allowed
 in:

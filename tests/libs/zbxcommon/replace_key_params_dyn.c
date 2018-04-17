@@ -59,7 +59,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	mh;
 	const char		*key, *expected_key, *tmp;
 	int			expected_result = 123, actual_result;
-	char			function_error[64];
 
 	ZBX_UNUSED(state);
 
@@ -100,10 +99,10 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (expected_result != (actual_result = replace_key_params_dyn((char **)&key, ZBX_KEY_TYPE_ITEM,
-			replace_key_param_cb, NULL, function_error, sizeof(function_error))))
+			replace_key_param_cb, NULL, NULL, 0)))
 	{
-		fail_msg("Got %s instead of %s as a result: %s", zbx_result_string(actual_result),
-				zbx_result_string(expected_result), function_error);
+		fail_msg("Got %s instead of %s as a result.", zbx_result_string(actual_result),
+				zbx_result_string(expected_result));
 	}
 
 	if (SUCCEED == expected_result)

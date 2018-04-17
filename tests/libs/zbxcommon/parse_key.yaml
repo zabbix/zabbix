@@ -223,6 +223,14 @@ out:
   invalid_part: '[]'
   return: 'SUCCEED'
 ---
+test case: valid key in the beginning, multiple square bracket pairs containing parameters are not allowed
+in:
+  key: 'key["a",b,["c","d\",]"]]["d"]'
+out:
+  valid_part: 'key["a",b,["c","d\",]"]]'
+  invalid_part: '["d"]'
+  return: 'SUCCEED'
+---
 test case: valid key in the beginning, followed by character ]
 in:
   key: 'key[a]]'
@@ -277,14 +285,6 @@ in:
 out:
   valid_part: '{}key'	# yes, if the first character of key is invalid, then parse_key() does not advance pointer, so valid and invalid parts are equal.
   invalid_part: '{}key'
-  return: 'FAIL'
----
-test case: invalid key, multiple square bracket pairs containing parameters are not allowed
-in:
-  key: 'key["a",b,["c","d\",]"]["d"]'
-out:
-  valid_part: 'key["a",b,["c","d\",]"]'
-  invalid_part: '["d"]'
   return: 'FAIL'
 ---
 test case: invalid key, multi-level arrays are not allowed

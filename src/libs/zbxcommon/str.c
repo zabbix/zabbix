@@ -1436,7 +1436,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 
 	size_t			i, l = 0;
 	int			level = 0, num = 0, ret = SUCCEED;
-	zbx_parser_state_t	state = ZBX_STATE_END;
+	zbx_parser_state_t	state = ZBX_STATE_NEW;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type)
 	{
@@ -1459,15 +1459,6 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 
 	for (; '\0' != (*data)[i] && FAIL != ret; i++)
 	{
-		if (0 == level)
-		{
-			/* first square bracket + Zapcat compatibility */
-			if (ZBX_STATE_END == state && '[' == (*data)[i])
-				state = ZBX_STATE_NEW;
-			else
-				break;
-		}
-
 		switch (state)
 		{
 			case ZBX_STATE_NEW:	/* a new parameter started */
@@ -1482,6 +1473,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case '[':
+						if (2 == level)
+							goto clean;	/* incorrect syntax: muli-level array */
 						level++;
 						if (1 == level)
 							num++;
