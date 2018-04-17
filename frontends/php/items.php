@@ -1234,7 +1234,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output' => ['status', 'name'],
+			'output' => ['hostid', 'name', 'status'],
 			'hostids' => getRequest('hostid'),
 			'templated_hosts' => true
 		]);
@@ -1401,11 +1401,11 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		}
 	}
 
-	if ($data['master_itemid'] > 0 && $data['displayMasteritems']) {
+	if ($data['master_itemid'] != 0 && $data['displayMasteritems']) {
 		$master_items = API::Item()->get([
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
-			'itemids' => getRequest('master_itemid'),
+			'itemids' => $data['master_itemid'],
 			'hostids' => $data['hostid'],
 			'webitems' => true
 		]);
