@@ -1438,6 +1438,7 @@ Changes for 3.0.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12935,ZBX-13539] fixed displaying of floating point values under the "Latest data" page (Sasha)
 ..F....... [ZBX-13500] fixed fractional values in triggers being misinterpreted without a leading 0 (agriscenko)
 ..F....... [ZBX-13561] fixed incorrectly displayed pie graph when first item has no data (Ivo)
 
