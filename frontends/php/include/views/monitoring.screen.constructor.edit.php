@@ -415,7 +415,8 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		$items = API::Item()->get([
 			'itemids' => $resourceId,
 			'selectHosts' => ['name'],
-			'output' => ['itemid', 'hostid', 'key_', 'name']
+			'output' => ['itemid', 'hostid', 'key_', 'name'],
+			'webitems' => true
 		]);
 
 		if ($items) {
