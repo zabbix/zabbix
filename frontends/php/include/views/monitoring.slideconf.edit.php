@@ -52,6 +52,7 @@ $multiselect_data = [
 	'object_name' => 'users',
 	'multiple' => false,
 	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
+	'data' => [],
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'users',
@@ -65,48 +66,26 @@ $multiselect_data = [
 
 $slideshow_ownerid = $data['slideshow']['userid'];
 
-// If slide show owner does not exist or is not allowed to display.
-if ($slideshow_ownerid === '' || $slideshow_ownerid && array_key_exists($slideshow_ownerid, $data['users'])) {
-	// Slide show owner data.
-	if ($slideshow_ownerid) {
-		$owner_data = [[
+if ($slideshow_ownerid !== '') {
+	$multiselect_data['data'][] = array_key_exists($slideshow_ownerid, $data['users'])
+		? [
 			'id' => $slideshow_ownerid,
 			'name' => getUserFullname($data['users'][$slideshow_ownerid])
-		]];
-	}
-	else {
-		$owner_data = [];
-	}
-
-	$multiselect_data['data'] = $owner_data;
-
-	// Append multiselect to slide show tab.
-	$slideshow_tab->addRow(
-		(new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
-		(new CMultiSelect($multiselect_data))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+		]
+		: [
+			'id' => $slideshow_ownerid,
+			'name' => _('Inaccessible user'),
+			'inmaccessible' => true
+		];
 }
-else {
-	$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-	// Administrators can change slide show owner, but cannot see users from other groups.
-	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-		$slideshow_tab
-			->addRow(_('Owner'), $multiselect_userid)
-			->addRow('', _('Inaccessible user'), 'inaccessible_user');
-	}
-	else {
-		// For regular users and guests, only information message is displayed without multiselect.
-		$slideshow_tab->addRow(_('Owner'), [
-			(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
-			(new CSpan($multiselect_userid))
-				->addStyle('display: none;')
-				->setId('multiselect_userid_wrapper')
-		]);
-	}
-}
+// Append multiselect to slide show tab.
+$slideshow_tab->addRow(
+	(new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
+	(new CMultiSelect($multiselect_data))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 $slideshow_tab
 	->addRow(
