@@ -326,20 +326,12 @@ function getItemFilterForm(&$items) {
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
 
 	// row 1
-	$group_filter = null;
-	if (!empty($filter_groupId)) {
-		$getHostInfo = API::HostGroup()->get([
-			'groupids' => $filter_groupId,
-			'output' => ['name']
-		]);
-		$getHostInfo = reset($getHostInfo);
-		if (!empty($getHostInfo)) {
-			$group_filter[] = [
-				'id' => $getHostInfo['groupid'],
-				'name' => $getHostInfo['name']
-			];
-		}
-	}
+	$group_filter = !empty($filter_groupId)
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter_groupId
+		]), ['groupid' => 'id'])
+		: [];
 
 	$filterColumn1->addRow(_('Host group'),
 		(new CMultiSelect([
@@ -379,28 +371,20 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 2
-	$host_filter_data = null;
-	if (!empty($filter_hostId)) {
-		$getHostInfo = API::Host()->get([
+	$host_filter = !empty($filter_hostId)
+		? CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
 			'hostids' => $filter_hostId,
-			'templated_hosts' => true,
-			'output' => ['name']
-		]);
-		$getHostInfo = reset($getHostInfo);
-		if (!empty($getHostInfo)) {
-			$host_filter_data[] = [
-				'id' => $getHostInfo['hostid'],
-				'name' => $getHostInfo['name']
-			];
-		}
-	}
+			'templated_hosts' => true
+		]), ['hostid' => 'id'])
+		: [];
 
 	$filterColumn1->addRow(_('Host'),
 		(new CMultiSelect([
 			'name' => 'filter_hostid',
 			'object_name' => 'hosts',
 			'multiple' => false,
-			'data' => $host_filter_data,
+			'data' => $host_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_templates',

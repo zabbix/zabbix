@@ -493,19 +493,12 @@ $itemFormList->addRow(
 // append applications to form list
 if ($this->data['displayApplications']) {
 	// replace applications
-	$app_to_replace = null;
-	if (hasRequest('applications')) {
-		$getApps = API::Application()->get([
-			'applicationids' => getRequest('applications'),
-			'output' => ['applicationid', 'name']
-		]);
-		foreach ($getApps as $getApp) {
-			$app_to_replace[] = [
-				'id' => $getApp['applicationid'],
-				'name' => $getApp['name']
-			];
-		}
-	}
+	$app_to_replace = hasRequest('applications')
+		? CArrayHelper::renameObjectsKeys(API::Application()->get([
+			'output' => ['applicationid', 'name'],
+			'applicationids' => getRequest('applications')
+		]), ['applicationid' => 'id'])
+		: [];
 
 	$replace_app = (new CDiv(
 		(new CMultiSelect([
@@ -533,33 +526,29 @@ if ($this->data['displayApplications']) {
 	);
 
 	// add new or existing applications
-	$appToAdd = null;
+	$applications_to_add = [];
 	if (hasRequest('new_applications')) {
+		$applicationids = [];
+
 		foreach (getRequest('new_applications') as $newApplication) {
 			if (is_array($newApplication) && isset($newApplication['new'])) {
-				$appToAdd[] = [
+				$applications_to_add[] = [
 					'id' => $newApplication['new'],
 					'name' => $newApplication['new'].' ('._x('new', 'new element in multiselect').')',
 					'isNew' => true
 				];
 			}
 			else {
-				$appToAddId[] = $newApplication;
+				$applicationids[] = $newApplication;
 			}
 		}
 
-		if (isset($appToAddId)) {
-			$getApps = API::Application()->get([
-				'applicationids' => $appToAddId,
-				'output' => ['applicationid', 'name']
-			]);
-			foreach ($getApps as $getApp) {
-				$appToAdd[] = [
-					'id' => $getApp['applicationid'],
-					'name' => $getApp['name']
-				];
-			}
-		}
+		$applications_to_add = array_merge($applications_to_add, $applicationids
+			? CArrayHelper::renameObjectsKeys(API::Application()->get([
+				'output' => ['applicationid', 'name'],
+				'applicationids' => $applicationids
+			]), ['applicationid' => 'id'])
+			: []);
 	}
 
 	$newApp = (new CDiv(
@@ -567,7 +556,7 @@ if ($this->data['displayApplications']) {
 			'name' => 'new_applications[]',
 			'object_name' => 'applications',
 			'add_new' => true,
-			'data' => $appToAdd,
+			'data' => $applications_to_add,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'applications',
@@ -597,7 +586,7 @@ if ($data['displayMasteritems']) {
 			'object_name' => 'items',
 			'multiple' => false,
 			'ignored' => $data['itemids'],
-			'data' => ($data['master_itemid'] > 0)
+			'data' => ($data['master_itemid'] != 0)
 				? [
 					[
 						'id' => $data['master_itemid'],

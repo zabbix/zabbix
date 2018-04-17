@@ -37,20 +37,13 @@ foreach ($data['hosts'] as $hostid) {
 $hostFormList = new CFormList('hostFormList');
 
 // replace host groups
-$hostgroups_to_replace = null;
-if (isset($_REQUEST['groups'])) {
-	$getHostGroups = API::HostGroup()->get([
-		'groupids' => $_REQUEST['groups'],
+$hostgroups_to_replace = isset($_REQUEST['groups'])
+	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
+		'groupids' => $_REQUEST['groups'],
 		'editable' => true
-	]);
-	foreach ($getHostGroups as $getHostGroup) {
-		$hostgroups_to_replace[] = [
-			'id' => $getHostGroup['groupid'],
-			'name' => $getHostGroup['name']
-		];
-	}
-}
+	]), ['groupid' => 'id'])
+	: [];
 
 $replaceGroups = (new CDiv(
 	(new CMultiSelect([
@@ -78,8 +71,10 @@ $hostFormList->addRow(
 );
 
 // add new or existing host groups
-$hostgroups_to_add = null;
+$hostgroups_to_add = [];
 if (isset($_REQUEST['new_groups'])) {
+	$groupids = [];
+
 	foreach ($_REQUEST['new_groups'] as $newHostGroup) {
 		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
 			$hostgroups_to_add[] = [
@@ -89,22 +84,16 @@ if (isset($_REQUEST['new_groups'])) {
 			];
 		}
 		else {
-			$hostGroupIds[] = $newHostGroup;
+			$groupids[] = $newHostGroup;
 		}
 	}
 
-	if (isset($hostGroupIds)) {
-		$getHostGroups = API::HostGroup()->get([
-			'groupids' => $hostGroupIds,
-			'output' => ['groupid', 'name']
-		]);
-		foreach ($getHostGroups as $getHostGroup) {
-			$hostgroups_to_add[] = [
-				'id' => $getHostGroup['groupid'],
-				'name' => $getHostGroup['name']
-			];
-		}
-	}
+	$hostgroups_to_add = array_merge($hostgroups_to_add, $groupids
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $groupids
+		]), ['groupid' => 'id'])
+		: []);
 }
 
 $hostFormList->addRow(
@@ -134,21 +123,13 @@ $hostFormList->addRow(
 );
 
 // Get list of host groups to remove if unsuccessful submit.
-$host_groups_to_remove = null;
-
-if (getRequest('remove_groups')) {
-	$groups = API::HostGroup()->get([
-		'groupids' => getRequest('remove_groups'),
+$host_groups_to_remove = getRequest('remove_groups')
+	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
+		'groupids' => getRequest('remove_groups'),
 		'editable' => true
-	]);
-	foreach ($groups as $group) {
-		$host_groups_to_remove[] = [
-			'id' => $group['groupid'],
-			'name' => $group['name']
-		];
-	}
-}
+	]), ['groupid' => 'id'])
+	: [];
 
 // Remove host groups control.
 $hostFormList->addRow(
