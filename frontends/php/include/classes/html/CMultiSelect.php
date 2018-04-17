@@ -119,13 +119,21 @@ class CMultiSelect extends CTag {
 	 *
 	 * @return array
 	 */
-	private function mapOptions(array $options = []) {
-		$mapped_options = [];
+	private function mapOptions(array $options) {
+		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'ignored', 'data', 'add_new',
+			'add_post_js', 'call_post_event', 'styles', 'popup'
+		];
 
-		foreach ([
+		foreach ($options as $field => $value) {
+			if (!in_array($field, $valid_fields)) {
+				error('unsupported multiselect option: $options[\''.$field.'\']');
+			}
+		}
+
+		$mapped_options = [];
+		$mappings = [
 			'name' => 'name',
 			'object_name' => 'objectName',
-			'multiple' => 'multiple',
 			'disabled' => 'disabled',
 			'default_value' => 'defaultValue',
 			'ignored' => 'ignored',
@@ -134,7 +142,9 @@ class CMultiSelect extends CTag {
 			'add_post_js' => 'add_post_js',
 			'call_post_event' => 'callPostEvent',
 			'styles' => 'styles'
-			] as $new_field => $old_field) {
+		];
+
+		foreach ($mappings as $new_field => $old_field) {
 			if (array_key_exists($new_field, $options)) {
 				$mapped_options[$old_field] = $options[$new_field];
 			}
@@ -149,17 +159,37 @@ class CMultiSelect extends CTag {
 		$popup_parameters = [];
 
 		if (array_key_exists('popup', $options)) {
+			$valid_fields = ['parameters'];
+
+			foreach ($options['popup'] as $field => $value) {
+				if (!in_array($field, $valid_fields)) {
+					error('unsupported option: $options[\'popup\'][\''.$field.'\']');
+				}
+			}
+
 			if (array_key_exists('parameters', $options['popup'])) {
 				$parameters = $options['popup']['parameters'];
 
-				foreach ([
+				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'templateid', 'real_hosts',
+					'monitored_hosts', 'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid',
+					'webitems', 'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types'];
+
+				foreach ($parameters as $field => $value) {
+					if (!in_array($field, $valid_fields)) {
+						error('unsupported option: $options[\'popup\'][\'parameters\'][\''.$field.'\']');
+					}
+				}
+
+				$mappings = [
 					'srctbl' => 'srctbl',
 					'srcfld1' => 'srcfld1',
 					'srcfld2' => 'srcfld2',
 					'dstfrm' => 'dstfrm',
 					'dstfld1' => 'dstfld1',
 					'templateid' => 'templateid'
-					] as $new_field => $old_field) {
+				];
+
+				foreach ($mappings as $new_field => $old_field) {
 					if (array_key_exists($new_field, $parameters)) {
 						$popup_parameters[$old_field] = $parameters[$new_field];
 					}
