@@ -353,7 +353,7 @@ class CMenuPopupHelper {
 	 * Prepare data for dependent item prototype popup menu.
 	 *
 	 * @param string $itemid                Item id.
-	 * @param string $parent_discoveryid    Prent discovery rule id.
+	 * @param string $parent_discoveryid    Parent discovery rule id.
 	 * @param string $name                  Item name.
 	 */
 	public static function getDependentItemPrototype($itemid, $parent_discoveryid, $name) {
