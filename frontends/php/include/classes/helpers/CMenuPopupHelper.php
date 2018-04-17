@@ -315,11 +315,11 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for dependent item (or item prototype) popup menu.
 	 *
-	 * @param string $page       Page name.
-	 * @param string $itemid     Item id.
-	 * @param string $parent     Name of parent object argument (hostid or parent_discoveryid).
-	 * @param string $parentid   Parent object id (host id for hosts or discoveryid for discovery rules)
-	 * @param string $name       Item name.
+	 * @param string $page        Page name.
+	 * @param string $itemid      Item id.
+	 * @param string $parent      Name of parent object argument (hostid or parent_discoveryid).
+	 * @param string $parentid    Parent object id (host id for hosts or discoveryid for discovery rules)
+	 * @param string $name        Item name.
 	 *
 	 * @return array
 	 */
