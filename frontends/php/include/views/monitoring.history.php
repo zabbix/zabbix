@@ -266,7 +266,8 @@ else {
 				'profileIdx2' => $screen->profileIdx2
 			]);
 		}
-	} else {
+	}
+	else {
 		$historyWidget->addItem(
 			(new CTableInfo())
 				->setHeader([

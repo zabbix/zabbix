@@ -128,8 +128,7 @@ switch ($data['new_condition']['type']) {
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'new_condition_groupids_',
-					'editable' => true
+					'dstfld1' => 'new_condition_groupids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);

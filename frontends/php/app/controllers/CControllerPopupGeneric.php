@@ -500,13 +500,11 @@ class CControllerPopupGeneric extends CController {
 			$options['hosts']['editable'] = true;
 		}
 
-		$host_status = null;
 		$templated = null;
 
 		if ($this->hasInput('monitored_hosts')) {
 			$options['groups']['monitored_hosts'] = true;
 			$options['hosts']['monitored_hosts'] = true;
-			$host_status = 'monitored_hosts';
 		}
 		elseif ($this->hasInput('real_hosts')) {
 			$options['groups']['real_hosts'] = true;
@@ -516,7 +514,6 @@ class CControllerPopupGeneric extends CController {
 			$options['hosts']['templated_hosts'] = true;
 			$options['groups']['templated_hosts'] = true;
 			$templated = 1;
-			$host_status = 'templated_hosts';
 		}
 		else {
 			$options['groups']['with_hosts_and_templates'] = true;
