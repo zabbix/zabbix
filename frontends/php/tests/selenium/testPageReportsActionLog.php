@@ -20,9 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageAdministrationAuditActions extends CWebTest {
+class testPageReportsActionLog extends CWebTest {
 
-	public function testPageAdministrationAuditActions_CheckLayout() {
+	public function testPageReportsActionLog_CheckLayout() {
 
 		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000');
 		$this->zbxTestCheckTitle('Action log');
@@ -46,7 +46,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 	/**
 	* @dataProvider allAuditActions
 	*/
-	public function testPageAdministrationAuditActions_CheckValues($auditactions) {
+	public function testPageReportsActionLog_CheckValues($auditactions) {
 
 		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000&isNow=0');
 		$this->zbxTestCheckTitle('Action log');
