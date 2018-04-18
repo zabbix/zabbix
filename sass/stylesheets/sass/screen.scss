@@ -1180,7 +1180,7 @@ output {
 
 // Filters
 .filter-btn-container {
-	text-align: right;
+	text-align: center;
 }
 
 .filter-container {
@@ -4336,6 +4336,7 @@ td.inactive-bg {
 .table-forms-second-column {
 	display: inline-block;
 	width: 50%;
+	min-width: 200px;
 	text-align: right;
 
 	.second-column-label {

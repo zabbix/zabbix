@@ -782,7 +782,7 @@ class CScreenProblem extends CScreenBase {
 					$tags_header = null;
 				}
 				else {
-					$tags_width = 24 + 49 * $this->data['filter']['show_tags'];
+					$tags_width = 26 + 49 * $this->data['filter']['show_tags'];
 					$tags_header = (new CColHeader(_('Tags')))->addStyle('width: '.$tags_width.'px;');
 				}
 
