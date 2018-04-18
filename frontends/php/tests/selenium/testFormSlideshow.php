@@ -163,6 +163,17 @@ class testFormSlideshow extends CWebTest {
 		// Validate.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Incorrect value for field "Name": cannot be empty.');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Field "Default delay" is not correct: a time unit is expected');
+
+		// Test if slideshow cannot be created with no slides.
+		$this->zbxTestInputTypeWait('name', $data['name']);
+		$this->zbxTestInputTypeWait('delay', $data['delay']);
+
+		// Try to save changes.
+		$submit_btn_selector = WebDriverBy::cssSelector('button[id="add"][type="submit"]');
+		$this->webDriver->findElement($submit_btn_selector)->click();
+
+		// Validate.
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Slide show must contain slides.');
 		$this->zbxTestCheckFatalErrors();
 	}
 
