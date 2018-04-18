@@ -21,12 +21,11 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageReportsTriggerTop extends CWebTest {
-	public function testPageReportsNotifications_CheckLayout(){
+	public function testPageReportsTriggerTop_CheckLayout(){
 		$this->zbxTestLogin('toptriggers.php');
 		$this->zbxTestCheckTitle('100 busiest triggers');
 		$this->zbxTestCheckHeader('100 busiest triggers');
-		$this->zbxTestTextPresent('Host groups','Hosts','Severity','Filter',
-		'From', 'Till');
+		$this->zbxTestTextPresent('Host groups','Hosts','Severity','Filter','From', 'Till');
 //		Click button 'Reset'
 		$this->zbxTestClickXpath('//form[@id=\'id\']/div[2]/button[2]');
 		$this->assertTrue($this->zbxTestCheckboxSelected('severities_0','severities_1',
@@ -39,52 +38,355 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li/div[2]/button');
 //		Check date button for 'Till' field
 		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li[2]/div[2]/button');
-//		Assert elements text
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[7]', 'Yesterday');
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[6]', 'Today');
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[8]', 'Current week');
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[9]', 'Current month');
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[10]', 'Current year');
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[11]', 'Last week');
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[12]', 'Last month');
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[13]', 'Last year');
 		$this->zbxTestAssertElementPresentId('filter-mode');
 	}
 
-	public function testPageReportsNotifications_CheckFilters() {
+	public function testPageReportsTriggerTop_CheckDataFilter() {
 		$this->zbxTestLogin('toptriggers.php');
 //		Click button 'Reset'
 		$this->zbxTestClickXpath('//form[@id=\'id\']/div[2]/button[2]');
-//		Select Host group
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[2]');
-		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->assertTrue(!$this->zbxTestCheckboxSelected('spanid5','spanid7','spanid2','spanid1',
-		'spanid12','spanid13','spanid8','spanid9','spanid10','spanid11','spanid14','spanid6',
-		'spanid4','spanid50003','spanid50001','spanid50002','spanid50000'));
-		$this->zbxTestTextPresent('Discovered hosts','Hypervisors','Linux servers','Templates',
-		'Templates/Applications', 'Templates/Databases','Templates/Modules','Templates/Network Devices',
-		'Templates/Operating Systems', 'Templates/Servers Hardware', 'Templates/Virtualization',
-		'Virtual machines', 'Zabbix servers', 'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers',
-		'ZBX6648 Enabled Triggers', 'ZBX6648 Group No Hosts');
-		$this->zbxTestClick('item_4');
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[27]');
-		$this->zbxTestWaitWindowClose();
-		$this->zbxTestAssertElementText('//div[@id=\'groupids_\']/div/ul/li/span/span', 'Zabbix servers');
-//		Select host
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[3]');
-		$this->zbxTestLaunchOverlayDialog('Hosts');
-		$this->assertTrue(!$this->zbxTestCheckboxSelected('spanid50007','spanid50008','spanid20006','spanid50001',
-		'spanid40001','spanid15001','spanid15003','spanid10053','spanid10084'));
-		$this->zbxTestTextPresent('Host-layout-test-001','Host-map-test-zbx6840', 'Host for trigger description macros',
-		'Host ZBX6663', 'Simple form test host', 'Template inheritance test host',' testPageHistory_CheckLayout',
-		'Visible host for template linkage', 'ЗАББИКС Сервер');
-		$this->zbxTestClick('item_10084');
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[27]');
-		$this->zbxTestWaitWindowClose();
-		$this->zbxTestAssertElementText('//div[@id=\'hostids_\']/div/ul/li/span/span', 'ЗАББИКС Сервер');
+//		Check default values of date filter
+		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
+		$this->zbxTestAssertElementValue('filter_from_month', date('m'));
+		$this->zbxTestAssertElementValue('filter_from_day', date('d'));
+		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_year', date('Y'));
+		$this->zbxTestAssertElementValue('filter_till_month', date('m'));
+		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('+1 day')));
+		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
+//		Check 'Yesterday' button
+		$this->zbxTestClickXpath('(//button[@type=\'button\'])[7]');
+		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 day')));
+		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('-1 day')));
+		$this->zbxTestAssertElementValue('filter_from_day', date('d',strtotime('-1 day')));
+		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('-1 day')));
+		$this->zbxTestAssertElementValue('filter_till_month', date('m',strtotime('-1 day')));
+		$this->zbxTestAssertElementValue('filter_till_day', date('d'));
+		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
+//		Check 'Current week' button
+		$this->zbxTestClickXpath('(//button[@type=\'button\'])[8]');
+		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('monday this week')));
+		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('monday this week')));
+		$this->zbxTestAssertElementValue('filter_from_day', date('d',strtotime('monday this week')));
+		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('monday next week')));
+		$this->zbxTestAssertElementValue('filter_till_month', date('m',strtotime('monday next week')));
+		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('monday next week')));
+		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
+//		Check 'Current month' button
+		$this->zbxTestClickXpath('(//button[@type=\'button\'])[9]');
+		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
+		$this->zbxTestAssertElementValue('filter_from_month', date('m'));
+		$this->zbxTestAssertElementValue('filter_from_day', date('01'));
+		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('+1 month')));
+		$this->zbxTestAssertElementValue('filter_till_month', date('m',strtotime('+1 month')));
+		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
+		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
+//		Check 'Current year' button
+		$this->zbxTestClickXpath('(//button[@type=\'button\'])[10]');
+		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
+		$this->zbxTestAssertElementValue('filter_from_month', date('01'));
+		$this->zbxTestAssertElementValue('filter_from_day', date('01'));
+		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('+1 year')));
+		$this->zbxTestAssertElementValue('filter_till_month', date('01'));
+		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
+		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
+//		Check 'Last week' button
+		$this->zbxTestClickXpath('(//button[@type=\'button\'])[11]');
+		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('monday last week')));
+		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('monday last week')));
+		$this->zbxTestAssertElementValue('filter_from_day', date('d',strtotime('monday last week')));
+		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('monday this week')));
+		$this->zbxTestAssertElementValue('filter_till_month', date('m',strtotime('monday this week')));
+		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('monday this week')));
+		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
+//		Check 'Last month' button
+		$this->zbxTestClickXpath('(//button[@type=\'button\'])[12]');
+		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 month')));
+		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('-1 month')));
+		$this->zbxTestAssertElementValue('filter_from_day', date('01'));
+		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_year', date('Y'));
+		$this->zbxTestAssertElementValue('filter_till_month', date('m'));
+		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
+		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
+//		Check 'Last year' button
+		$this->zbxTestClickXpath('(//button[@type=\'button\'])[13]');
+		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 year')));
+		$this->zbxTestAssertElementValue('filter_from_month', date('01'));
+		$this->zbxTestAssertElementValue('filter_from_day', date('01'));
+		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_year', date('Y'));
+		$this->zbxTestAssertElementValue('filter_till_month', date('01'));
+		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
+		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
+		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
+	}
+
+	public static function filter() {
+		return [
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'item_4',
+				]
+			],
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'spanid4',
+					'filter_from_year'=>'2016',
+					'result'=>
+						[
+							'Test trigger to check tag filter on problem page',
+							'Test trigger with tag'
+						]
+				]
+			],
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'item_4',
+					'filter_from_year'=>'2016',
+					'result'=>
+						[
+							'Test trigger to check tag filter on problem page',
+							'Test trigger with tag'
+						]
+				]
+			],
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'item_4',
+					'host' => 'Host ZBX6663',
+					'host_id' => 'item_50001',
+					'filter_from_year'=>'2016'
+				]
+			],
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'item_4',
+					'host' => 'ЗАББИКС Сервер',
+					'host_id' => 'item_10084',
+					'filter_from_year'=>'2016',
+					'result'=>
+						[
+							'Test trigger to check tag filter on problem page',
+							'Test trigger with tag'
+						]
+				]
+			],
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'item_4',
+					'host' => 'ЗАББИКС Сервер',
+					'host_id' => 'item_10084',
+				]
+			],
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'item_4',
+					'host' => 'ЗАББИКС Сервер',
+					'host_id' => 'item_10084',
+					'filter_from_year'=>'2016',
+					'result'=>
+						[
+							'Test trigger to check tag filter on problem page',
+							'Test trigger with tag'
+						]
+				]
+			],
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'item_4',
+					'filter_from_year'=>'2016',
+					'filter_from_month'=>'01',
+					'filter_from_day'=>'01',
+					'filter_from_hour'=>'15',
+					'filter_from_minute'=>'15',
+					'filter_till_year'=>'2017',
+					'filter_till_month'=>'01',
+					'filter_till_day'=>'01',
+					'filter_till_hour'=>'15',
+					'filter_till_minute'=>'15'
+				]
+			],
+			[
+				[
+					'host_gr_name' => 'Zabbix servers',
+					'host_gr_id' => 'item_4',
+					'host' => 'ЗАББИКС Сервер',
+					'host_id' => 'item_10084',
+					'filter_from_year'=>'2017',
+					'filter_from_month'=>'10',
+					'filter_from_day'=>'22',
+					'filter_from_hour'=>'01',
+					'filter_from_minute'=>'01',
+					'filter_till_year'=>'2017',
+					'filter_till_month'=>'10',
+					'filter_till_day'=>'24',
+					'filter_till_hour'=>'01',
+					'filter_till_minute'=>'01',
+					'result'=>
+						[
+							'Test trigger to check tag filter on problem page',
+							'Test trigger with tag'
+						]
+				]
+			],
+			[
+				[
+					'filter_from_year'=>'2016',
+					'severity'=>'2',
+					'result'=>
+						[
+							'Test trigger to check tag filter on problem page'
+						]
+				]
+			],
+			[
+				[
+					'filter_from_year'=>'2016',
+					'severity'=>'5'
+				]
+			],
+			[
+				[
+					'calendar'=>true,
+				]
+			],
+		];
+}
+
+	/**
+	 * @dataProvider filter
+	 */
+	public function testPageReportsTriggerTop_CheckFilter($data) {
+		$this->zbxTestLogin('toptriggers.php');
+//		Click button 'Reset'
+		$this->zbxTestClickXpath('//form[@id=\'id\']/div[2]/button[2]');
+
+		if (array_key_exists('host_gr_id', $data)) {
+			$this->zbxTestClickXpath('(//button[@type=\'button\'])[2]');
+			$this->zbxTestLaunchOverlayDialog('Host groups');
+			$this->zbxTestClick($data['host_gr_id']);
+
+			if ($this->zbxTestIsElementPresent('(//'.'button[@type=\'button\'])[27]')) {
+				$this->zbxTestClickXpath('(//button[@type=\'button\'])[27]');
+				}
+
+				$this->zbxTestWaitWindowClose();
+			$this->zbxTestAssertElementText('//div[@id=\'groupids_\']/div/ul/li/span/span', $data['host_gr_name']);
+			}
+
+		if (array_key_exists('host_id', $data)) {
+			$this->zbxTestClickXpath('(//button[@type=\'button\'])[3]');
+			$this->zbxTestLaunchOverlayDialog('Hosts');
+			$this->zbxTestClick($data['host_id']);
+
+			if ($this->zbxTestIsElementPresent('(//'.'button[@type=\'button\'])[27]')) {
+				$this->zbxTestClickXpath('(//button[@type=\'button\'])[27]');
+			}
+
+			$this->zbxTestWaitWindowClose();
+			$this->zbxTestAssertElementText('//div[@id=\'hostids_\']/div/ul/li/span/span', $data['host']);
+			}
+
 //		Update date in 'From' field
-		$this->zbxTestInputTypeOverwrite('filter_from_year', '2016');
+		if (array_key_exists('filter_from_year',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_from_year',$data['filter_from_year']);
+		}
+
+		if (array_key_exists('filter_from_month',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_from_month',$data['filter_from_month']);
+		}
+
+		if (array_key_exists('filter_from_day',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_from_day',$data['filter_from_day']);
+		}
+
+		if (array_key_exists('filter_from_hour',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_from_hour',$data['filter_from_hour']);
+		}
+
+		if (array_key_exists('filter_from_minute',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_from_minute',$data['filter_from_minute']);
+		}
+
+		if (array_key_exists('filter_till_year',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_till_year',$data['filter_till_year']);
+		}
+
+		if (array_key_exists('filter_till_month',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_till_month',$data['filter_till_month']);
+		}
+
+		if (array_key_exists('filter_till_day',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_till_day',$data['filter_till_day']);
+		}
+
+		if (array_key_exists('filter_till_hour',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_till_hour',$data['filter_till_hour']);
+		}
+
+		if (array_key_exists('filter_till_minute',$data)){
+			$this->zbxTestInputTypeOverwrite('filter_till_minute',$data['filter_till_minute']);
+		}
+
+		$severity_count=0;
+		if (array_key_exists('severity', $data)) {
+			while ($severity_count <= $data['severity']) {
+				$this->zbxTestCheckboxSelect('severities_'.$severity_count, false);
+				$severity_count++;
+			}
+		}
+
+		if (array_key_exists('calendar_from',$data)){
+			$this->zbxTestClickXpathWait('//form[@id=\'id\']/div/div/div[2]/ul/li/div[2]/button');
+			$this->zbxTestClickXpath('(//button[@value=\'Now\'])[1]');
+			$this->zbxTestClickXpath('(//button[@value=\'Now\'])[2]');
+			$this->zbxTestClickXpathWait('(//button[@type=\'button\'])[20]');
+		}
+
 		$this->zbxTestClickXpath('//button[@name=\'filter_set\']');
-		$this->zbxTestTextPresent('Test trigger to check tag filter on problem page','Test trigger with tag');
+		if (array_key_exists('result',$data)){
+			$result_count = 0;
+
+			foreach ($data['result'] as $result_row){
+				$this->zbxTestTextPresent($result_row);
+
+				$result_count++;
+				if (count($data['result']) == $result_count) {
+					break;
+				}
+				}
+			}
+		else {
+			$this->zbxTestTextPresent('No data found.');
+		}
 	}
 }
