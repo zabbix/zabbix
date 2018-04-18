@@ -256,6 +256,7 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-12805] increased command line limit for proc.num checks on hp-ux systems (Andris, wiper)
+..F....... [ZBX-13728] fixed problem duration on trigger page being calculated incorrectly (agriscenko)
 ...G...PS. [ZBX-13660] fixed data types passed to is_ushort() for converting PID, port and process number (Andris)
 ..F....... [ZBX-12935,ZBX-13539] fixed displaying of floating point values under the "Latest data" page (Sasha)
 ...G...PS. [ZBX-13579] fixed unnecessary data getting when agent becomes available in the non-collection data period (Sergejs)
