@@ -837,7 +837,7 @@ int	parse_key(const char **exp)
 						if (0 == array)
 							array = 1;
 						else
-							goto fail;	/* incorrect syntax: muli-level array */
+							goto fail;	/* incorrect syntax: multi-level array */
 					}
 					else if (']' == *s && 0 != array)
 					{
@@ -1474,7 +1474,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 						break;
 					case '[':
 						if (2 == level)
-							goto clean;	/* incorrect syntax: muli-level array */
+							goto clean;	/* incorrect syntax: multi-level array */
 						level++;
 						if (1 == level)
 							num++;
