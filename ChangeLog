@@ -1449,6 +1449,7 @@ Changes for 3.0.17rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-13742] fixed parsing of the operator "not" in trigger expression (Sasha)
 A.F....... [ZBX-13680] fixed action not being cloned due to existing operation id being submitted (agriscenko)
 ...G...PS. [ZBX-13660] fixed data types passed to is_ushort() for converting PID, port and process number (Andris)
 ..F....... [ZBX-12935,ZBX-13539] fixed displaying of floating point values under the "Latest data" page (Sasha)
