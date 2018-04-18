@@ -125,7 +125,7 @@ out:
   expected_key: 'key["a","b",["c","d\",]"]]'
   return: 'SUCCEED'
 ---
-test case: valid key with multiple quoted parameters and multiple array parameters        # arrays contains multiple unquoted and quoted parameters which containing escaping and characters that are not allowed in unquoted parameters
+test case: valid key with multiple quoted parameters and multiple array parameters        # arrays contain multiple unquoted and quoted parameters which contain escaping and characters that are not allowed in unquoted parameters
 in:
   key: 'key["a","b",["c","d\",]"],[e,f]]'
 out:
