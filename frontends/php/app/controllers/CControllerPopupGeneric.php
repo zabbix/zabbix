@@ -189,7 +189,7 @@ class CControllerPopupGeneric extends CController {
 			'items' => [
 				'title' => _('Items'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'itemid,name,master_itemname',
+				'allowed_src_fields' => 'itemid,name',
 				'form' => [
 					'name' => 'itemform',
 					'id' => 'items'
@@ -252,7 +252,7 @@ class CControllerPopupGeneric extends CController {
 			'item_prototypes' => [
 				'title' => _('Item prototypes'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'itemid,name,flags,master_itemname',
+				'allowed_src_fields' => 'itemid,name,flags',
 				'form' => [
 					'name' => 'itemform',
 					'id' => 'items'
