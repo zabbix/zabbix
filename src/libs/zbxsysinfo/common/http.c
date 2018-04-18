@@ -31,8 +31,8 @@
 static const char URI_PROHIBIT_CHARS[] = {0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xA,0xB,0xC,0xD,0xE,0xF,0x10,0x11,0x12,\
 	0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F};
 
-static int	get_http_page(const char *host, char *path, unsigned short port, char *buffer, size_t max_buffer_len,
-		char **error)
+static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer,
+		size_t max_buffer_len, char **error)
 {
 	int		ret;
 	char		*recv_buffer, *wrong_chr;
@@ -41,21 +41,21 @@ static int	get_http_page(const char *host, char *path, unsigned short port, char
 
 	if (NULL != (wrong_chr = strpbrk(host, URI_PROHIBIT_CHARS)))
 	{
-		*error = zbx_dsprintf(NULL, "Invalid character in position:%u for host name:%s", wrong_chr - host,
-				host);
+		*error = zbx_dsprintf(NULL, "Invalid characters are present after first part of hostname:%.*s",
+				(int)(wrong_chr - host), host);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Invalid characters are present after first part of path:%.*s",
+				(int)(wrong_chr - path), path);
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
-		if (NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
-		{
-			*error = zbx_dsprintf(NULL, "Invalid character in position:%u for path:%s", wrong_chr - path,
-					path);
-			return SYSINFO_RET_FAIL;
-		}
-
 		zbx_snprintf(request, sizeof(request),
 				"GET /%s HTTP/1.1\r\n"
 				"Host: %s\r\n"
