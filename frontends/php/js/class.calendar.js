@@ -664,4 +664,4 @@ calendar.prototype = {
 		line_div.appendChild(this.clndr_done);
 		this.clndr_calendar.appendChild(line_div);
 	}
-}
+};

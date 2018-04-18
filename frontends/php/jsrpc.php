@@ -450,6 +450,97 @@ switch ($data['method']) {
 		}
 		break;
 
+	/**
+	 * Timeselector date modification handlers.
+	 */
+	case 'timeselector.zoomout' :
+	case 'timeselector.decrement' :
+	case 'timeselector.increment' :
+	case 'timeselector.rangechange' :
+		$now_ts = time();
+		$from = array_key_exists('from', $data) ? $data['from'] : '';
+		$to = array_key_exists('to', $data) ? $data['to'] : '';
+		$from_datetime = $from !== '' ? parseRelativeDate($from, true) : null;
+		$to_datetime = $to !== '' ? parseRelativeDate($to, false) : null;
+		$result = [];
+
+		if ($from_datetime instanceof DateTimeImmutable && $to_datetime instanceof DateTimeImmutable
+				&& $from_datetime < $to_datetime
+				&& ($to_datetime->getTimestamp() - $from_datetime->getTimestamp()) >= ZBX_MIN_PERIOD) {
+			$to_ts = $to_datetime->format('U');
+			$from_ts = $from_datetime->format('U');
+
+			$range = $to_ts - $from_ts;
+			// (gch)TODO: ZBX_MAX_PERIOD and it usage should be changed from seconds to year value (2y).
+			$min_date = parseRelativeDate('now-2y', true)->format('U');
+
+			if ($data['method'] === 'timeselector.zoomout' && ($from_ts > $min_date	|| $to_ts < $now_ts)) {
+				$from_ts -= floor($range / 2);
+				$to_ts += floor($range / 2);
+
+				if ($to_ts > $now_ts) {
+					$from_ts -= $to_ts - $now_ts;
+				}
+
+				if ($from_ts < $min_date) {
+					$to_ts += $min_date - $from_ts;
+					$from_ts = $min_date;
+				}
+
+				if ($to_ts > $now_ts) {
+					$to_ts = $now_ts;
+				}
+			}
+			elseif ($data['method'] === 'timeselector.decrement' && $from_ts - $range >= $min_date) {
+				$from_ts -= $range;
+				$to_ts -= $range;
+			}
+			elseif ($data['method'] === 'timeselector.increment' && $to_ts + $range <= $now_ts) {
+				$from_ts += $range;
+				$to_ts += $range;
+			}
+			elseif ($data['method'] === 'timeselector.rangechange') {
+				$result += [
+					'label' => relativeDateToText($from, $to),
+					'from' => $from,
+					'to' => $to
+				];
+			}
+
+			$result += [
+				'label' => relativeDateToText($from_ts, $to_ts),
+				'from' => $from_ts,
+				'from_date' => (new DateTime())->setTimestamp($from_ts)->format(ZBX_DATE_TIME),
+				'to' => $to_ts,
+				'to_date' => (new DateTime())->setTimestamp($to_ts)->format(ZBX_DATE_TIME),
+				'can_zoomout' => $from_ts > $min_date || $to_ts < $now_ts,
+				'can_decrement' => $from_ts - $range >= $min_date,
+				'can_increment' => $to_ts + $range <= $now_ts
+			];
+		}
+		else {
+			$errors = [
+				'from' => !$from_datetime instanceof DateTimeImmutable || $from_datetime > $to_date
+					? _s('Invalid date "%s".', $from)
+					: '',
+				'to' => !$to_datetime instanceof DateTimeImmutable || $to_datetime < $from_datetime
+					? _s('Invalid date "%s".', $to)
+					: ''
+			];
+			$result += [
+				'error' => array_filter($errors)
+			];
+		}
+
+		// Add default values.
+		$result += [
+			'can_zoomout' => false,
+			'can_decrement' => false,
+			'can_increment' => false
+		];
+
+		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }
@@ -466,6 +557,7 @@ if ($requestType == PAGE_TYPE_JSON) {
 elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
 	$json = new CJson();
 
+	header('Content-Type: application/json');
 	echo $json->encode([
 		'jsonrpc' => '2.0',
 		'result' => $result

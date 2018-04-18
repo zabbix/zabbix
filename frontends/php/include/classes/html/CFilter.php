@@ -30,23 +30,36 @@ class CFilter extends CDiv {
 	private $opened = true;
 	private $show_buttons = true;
 	private $hidden = false;
-	private $timeselector_containerid;
 
-	protected $id;
 	protected $headers = [];
 	protected $tabs = [];
 	// jQuery.tabs disabled tabs list.
 	protected $tabs_disabled = [];
 	// jQuery.tabs initialization options.
 	protected $tabs_options = [
-		'collapsible' => true
+		'collapsible' => true,
+		'active' => false
+	];
+	/**
+	 * List of predefined time ranges. Start and end of time range are separated by semicolon.
+	 */
+	protected $time_ranges = [
+		['now-2d/d:now', 'now-7d/d:now', 'now-30d/d:now', 'now-3M/M:now', 'now-6M/M:now', 'now-1y/y:now',
+			'now-2y/y:now'
+		],
+		['now-1d/d:now-1d/d', 'now-2d/d:now-2d/d', 'now-1w/d:now-1w/d', 'now-1w/w:now-1w/w', 'now-1M/M:now-1M/M',
+			'now-1y/y:now-1y/y'
+		],
+		['now/d:now/d', 'now/d:now', 'now/w:now/w', 'now/w:now', 'now/M:now/M', 'now/M:now', 'now/y:now/y', 'now/y:now'],
+		['now-5m/m:now', 'now-15m/m:now', 'now-30m/m:now', 'now-1h/h:now', 'now-3h/h:now', 'now-6h/h:now',
+			'now-12h/h:now', 'now-24h/h:now'
+		]
 	];
 
 	public function __construct($filterid) {
 		parent::__construct();
 
 		$this->setId('filter-space');
-		// TODO: check where id is used, selenium tests?!.
 		$this->filterid = $filterid;
 
 		$this->form = (new CForm('get'))
@@ -54,8 +67,7 @@ class CFilter extends CDiv {
 			->setAttribute('name', $this->name)
 			->setId('id', $this->name);
 
-		// filter is opened by default
-		$this->opened = (CProfile::get($this->filterid, 1) == 1);
+		$this->setActiveTab(CProfile::get($this->filterid, 0));
 	}
 
 	public function getName() {
@@ -63,25 +75,21 @@ class CFilter extends CDiv {
 	}
 
 	public function addColumn($column) {
-		throw new Exception(__FUNCTION__);
 		$this->columns[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
 		return $this;
 	}
 
 	public function setFooter($footer) {
-		throw new Exception(__FUNCTION__);
 		$this->footer = $footer;
 		return $this;
 	}
 
 	public function removeButtons() {
-		throw new Exception(__FUNCTION__);
 		$this->show_buttons = false;
 		return $this;
 	}
 
 	public function addNavigator() {
-		throw new Exception(__FUNCTION__);
 		$this->navigator = true;
 		return $this;
 	}
@@ -92,11 +100,19 @@ class CFilter extends CDiv {
 	}
 
 	public function setHidden() {
-		throw new Exception(__FUNCTION__);
 		$this->hidden = true;
 		$this->addStyle('display: none;');
 
 		return $this;
+	}
+
+	/**
+	 * Set active tab.
+	 *
+	 * @param int $tab  Zero based index of active tab. If set to false all tabs will be collapsed.
+	 */
+	public function setActiveTab($tab) {
+		$this->tabs_options['active'] = $tab;
 	}
 
 	/**
@@ -120,39 +136,26 @@ class CFilter extends CDiv {
 			->addClass(ZBX_STYLE_FILTER_FORMS)
 			->addItem($row);
 
-		$url = (new CUrl())
-			->removeArgument('filter_set')
-			->removeArgument('ddreset')
-			->setArgument('filter_rst', 1);
+		if ($this->show_buttons) {
+			$url = (new CUrl())
+				->removeArgument('filter_set')
+				->removeArgument('ddreset')
+				->setArgument('filter_rst', 1);
 
-		$body[] = (new CDiv())
-			->addClass(ZBX_STYLE_FILTER_FORMS)
-			->addItem(
-				(new CSubmitButton(_('Apply'), 'filter_set', 1))
-					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
-			)
-			->addItem(
-				(new CRedirectButton(_('Reset'), $url->getUrl()))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
-			);
+			$body[] = (new CDiv())
+				->addClass(ZBX_STYLE_FILTER_FORMS)
+				->addItem(
+					(new CSubmitButton(_('Apply'), 'filter_set', 1))
+						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+				)
+				->addItem(
+					(new CRedirectButton(_('Reset'), $url->getUrl()))
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+				);
+		}
 
-		return $this->addTab($header, $body);
-	}
-
-	/**
-	 * Add tab.
-	 *
-	 * @param string $header    Tab header title string.
-	 * @param array  $body      Array of body elements.
-	 *
-	 * @return CFilter
-	 */
-	public function addTab($header, $body) {
-		$this->headers[] = $header;
-		$this->tabs[] = $body;
-
-		return $this;
+		return $this->addTab((new CSimpleButton($header))->addClass(ZBX_STYLE_FILTER_TRIGGER), $body);
 	}
 
 	/**
@@ -165,6 +168,7 @@ class CFilter extends CDiv {
 	 * @return CFilter
 	 */
 	public function addTimeSelector($header) {
+		// Disable time selector range changes tab.
 		$this->tabs_disabled[] = count($this->tabs);
 
 		$this->addTab([
@@ -173,9 +177,64 @@ class CFilter extends CDiv {
 			(new CSimpleButton())->addClass('btn-time-right')
 		], null);
 
-		$this->addTab((new CSimpleButton([$header, (new CSpan())->addClass('btn-time-icon')]))->addClass('btn-time'),
+		$predefined_ranges = [];
+
+		foreach ($this->time_ranges as $column_ranges) {
+			$column = (new CList())->addClass('time-quick');
+
+			foreach ($column_ranges as $range) {
+				list($from, $to) = explode(':', $range);
+				$column->addItem((new CLink(relativeDateToText($from, $to)))
+					->setAttribute('data-from', $from)
+					->setAttribute('data-to', $to)
+				);
+			}
+			$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
+		}
+
+		$this->addTab(
+			(new CSimpleButton($header))->addClass('btn-time'),
+			(new CDiv([
+				(new CDiv(
+					(new CList([
+						new CLabel(_('From:'), 'from'), new CTextBox('from'),
+						(new CButton('from_calendar'))->addClass(ZBX_STYLE_ICON_CAL),
+						new CLabel(_('To:'), 'to'), new CTextBox('to'),
+						(new CButton('to_calendar'))->addClass(ZBX_STYLE_ICON_CAL),
+						(new CButton('apply', _('Apply')))
+					]))->addClass(ZBX_STYLE_TABLE_FORMS)
+				))->addClass('time-input'),
+				(new CDiv($predefined_ranges))->addClass('time-quick-range')
+			]))->addClass('time-selection-container')
+		);
+
+		// (gc)TODO: Old time range selector. Should be removed!
+		$this->addTab(
+			(new CSimpleButton('Time range selector'))->addClass(ZBX_STYLE_FILTER_TRIGGER),
 			(new CDiv())->setId('scrollbar_cntr')
 		);
+
+		return $this;
+	}
+
+	/**
+	 * Add tab.
+	 *
+	 * @param string $header    Tab header title string.
+	 * @param array  $body      Array of body elements.
+	 *
+	 * @return CFilter
+	 */
+	public function addTab($header, $body) {
+		$tabs = count($this->tabs);
+
+		// By default first non timeselect filter type tab will be set as active.
+		if (!in_array($tabs, $this->tabs_disabled) && $this->tabs_options['active'] === false) {
+			$this->setActiveTab($tabs);
+		}
+
+		$this->headers[] = $header;
+		$this->tabs[] = $body;
 
 		return $this;
 	}
@@ -187,7 +246,7 @@ class CFilter extends CDiv {
 	 */
 	public function getJS() {
 		return 'jQuery("#'.$this->getId().'").tabs('.
-			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled]), true).
+			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled])).
 		')';
 	}
 

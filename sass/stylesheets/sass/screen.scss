@@ -471,7 +471,6 @@ ul.top-nav-icons {
 	}
 }
 
-.filter-trigger.filter-arrow.filter-active span,
 .arrow-up {
 	@extend %arrow;
 	border: none;
@@ -480,7 +479,6 @@ ul.top-nav-icons {
 	border-bottom: 6px solid $font-color;
 }
 
-.filter-trigger.filter-arrow span,
 .arrow-down {
 	@extend %arrow;
 	border: none;
@@ -2212,7 +2210,6 @@ button {
 		border-bottom: none;
 		margin-bottom: -1px;
 
-		& span,
 		.arrow-up {
 			position: absolute;
 			top: 45%;
@@ -2221,7 +2218,6 @@ button {
 		}
 	}
 
-	& span,
 	.arrow-down {
 		position: absolute;
 		top: 45%;
@@ -2269,6 +2265,38 @@ $icon-widget-btn: (
 	}
 }
 
+#filter-space {
+	li a.ui-tabs-anchor {
+		padding: 0;
+		margin: 0;
+	}
+	li a.ui-tabs-anchor button {
+		vertical-align: bottom;
+	}
+	li.ui-tabs-active a.ui-tabs-anchor {
+		border: none;
+	}
+	li a.ui-tabs-anchor button.filter-trigger::after {
+		@extend .arrow-down;
+		content: '';
+		margin: 0 0 0 6px;
+		border-top-color: $white;
+	}
+
+	li.ui-tabs-active a.ui-tabs-anchor button {
+		@extend .filter-active;
+	}
+	li.ui-tabs-active a.ui-tabs-anchor button.filter-trigger::after {
+		@extend .arrow-up;
+		content: '';
+		margin: 0 0 0 6px;
+		border-bottom-color: $font-color;
+	}
+}
+.filter-btn-container {
+	margin-bottom: -1px;
+}
+
 // Time selection
 
 .btn-time {
@@ -2279,7 +2307,7 @@ $icon-widget-btn: (
 	vertical-align: bottom;
 	@include border-radius(2px 2px 0 0);
 
-	.btn-time-icon {
+	&::after {
 		content: "";
 		margin: 0 5px 0 5px;
 		position: absolute;
@@ -2289,15 +2317,17 @@ $icon-widget-btn: (
 		width: 24px;
 		background: url(../img/icon-sprite.svg) no-repeat -87px -581px;
 	}
+}
 
-	&.filter-active {
+.ui-tabs-active {
+	.btn-time {
 		color: $font-color;
 		background-color: $ui-bg-color;
 		border: 1px solid $ui-border-color;
 		border-bottom: none;
-		margin-bottom: -1px;
+		//margin-bottom: -1px;
 
-		.btn-time-icon {
+		&::after {
 			content: "";
 			margin: 0 5px 0 5px;
 			position: absolute;
@@ -2308,18 +2338,6 @@ $icon-widget-btn: (
 			background: url(../img/icon-sprite.svg) no-repeat -246px -582px;
 		}
 	}
-}
-
-.btn-time-icon {
-	content: "";
-	margin: 0 5px 0 5px;
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	height: 24px;
-	width: 24px;
-	background: url(../img/icon-sprite.svg) no-repeat -246px -582px;
-	vertical-align: bottom;
 }
 
 .btn-time-right {

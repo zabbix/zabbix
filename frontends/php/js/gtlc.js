@@ -18,6 +18,125 @@
 **/
 
 
+/**
+ * jQuery based publish/subscribe handler.
+ *
+ * - $.subscribe(event_name, callback)
+ * - $.unsubscribe(event_name, callback)
+ * - $.publish(event_name, data_object)
+ *
+ */
+(function($) {
+	var pubsub = $({});
+
+	$.subscribe = function() {
+		pubsub.on.apply(pubsub, arguments);
+	};
+
+	$.unsubscribe = function() {
+		pubsub.off.apply(pubsub, arguments);
+	};
+
+	$.publish = function() {
+		pubsub.trigger.apply(pubsub, arguments);
+	};
+}(jQuery));
+
+// Time range selector.
+jQuery(function ($){
+	var container = $('#filter-space'),
+		xhr = null,
+		endpoint = new Curl('jsrpc.php'),
+		timerange = {from: 'now-3h/h', to:'now'},
+		element = {
+			from: container.find('[name=from]'),
+			to: container.find('[name=to]'),
+			from_clndr: container.find('[name=from_calendar]'),
+			to_clndr: container.find('[name=to_calendar]'),
+			apply: container.find('[name=apply]'),
+			increment: container.find('.btn-time-right'),
+			decrement: container.find('.btn-time-left'),
+			zoomout: container.find('.btn-time-out'),
+			quickranges: container.find('.time-quick a'),
+			label: container.find('.btn-time')
+		};
+
+	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+
+	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout',
+		function (e, data) {
+			endpoint.setArgument('method', [e.type, e.namespace].join('.'));
+
+			if (xhr && xhr.abort) {
+				xhr.abort();
+			}
+
+			xhr = $.post(endpoint.getUrl(), (e.namespace === 'rangechange') ? {from: data.from, to: data.to} : timerange,
+				'json'
+			)
+				.success(function (json) {
+					timerange = json.result;
+					// Update 'from' and 'to' input elements value.
+					element.from.val(timerange[(e.namespace === 'rangechange') ? 'from' : 'from_date']);
+					element.to.val(timerange[(e.namespace === 'rangechange') ? 'to' : 'to_date']);
+					// Update selected time range label.
+					element.label.text(timerange.label);
+					$.publish('timeselector.rangeupdate', timerange);
+				})
+				.always(function () {
+					xhr = null;
+				});
+		}
+	);
+
+	// DOM element event triggerers initialization.
+	container.on('click', function (e) {
+		var event = '',
+			data = {},
+			target = $(e.target);
+
+		if (target.is(element.increment)) {
+			event = 'timeselector.increment';
+		}
+		else if (target.is(element.decrement)) {
+			event = 'timeselector.decrement';
+		}
+		else if (target.is(element.zoomout)) {
+			event = 'timeselector.zoomout';
+		}
+		else if (target.is(element.apply)) {
+			event = 'timeselector.rangechange';
+			data = {
+				from: element.from.val(),
+				to: element.to.val()
+			}
+		}
+		else if (element.quickranges.index(target) != -1) {
+			event = 'timeselector.rangechange';
+			data = target.data();
+		}
+
+		if (event !== '') {
+			$.publish(event, data);
+		}
+	});
+
+	// Calendar toggle visibility handlers initialization.
+	$([element.from_clndr, element.to_clndr]).each(function () {
+		var button = $(this),
+			input = element[button.is(element.from_clndr) ? 'from' : 'to'].get(0);
+
+		button.data('clndr', create_calendar(null, input, null, '', ''))
+			.click(function() {
+				var offset = button.offset();
+
+				button.data('clndr').clndr.clndrshow(parseInt(offset.top + button.outerHeight(), 10),
+					parseInt(offset.left, 10), input);
+			});
+	});
+});
+
+
 // graphs timeline controls (gtlc)
 var timeControl = {
 
@@ -676,9 +795,9 @@ var CScrollBar = Class.create({
 			this.setTabInfo();
 
 			// animate things
-			this.makeBarDragable(this.dom.bar);
-			this.make_left_arr_dragable(this.dom.left_arr);
-			this.make_right_arr_dragable(this.dom.right_arr);
+			// this.makeBarDragable(this.dom.bar);
+			// this.make_left_arr_dragable(this.dom.left_arr);
+			// this.make_right_arr_dragable(this.dom.right_arr);
 			this.disabled = 0;
 		}
 		catch (e) {

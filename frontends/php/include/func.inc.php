@@ -2713,7 +2713,7 @@ function relativeDateToText($start, $end) {
 
 	foreach ($range as &$date) {
 		if ($date !== null) {
-			$date = $date->format('Y.m.d H:i');
+			$date = $date->format(ZBX_DATE_TIME);
 		}
 	}
 
@@ -2730,11 +2730,10 @@ function relativeDateToText($start, $end) {
  *                          as Monday of this week. When set to false precisiion will modify date to highest value,
  *                          same example will return Sunday of this week.
  *
- * @return DateTime|null
+ * @return DateTimeImmutable|null
  */
 function parseRelativeDate($date, $is_start) {
 	$time_units = [
-		'/(\d+)s/' => '$1 second',
 		'/(\d+)m/' => '$1 minute',
 		'/(\d+)h/' => '$1 hour',
 		'/(\d+)d/' => '$1 day',
@@ -2752,11 +2751,11 @@ function parseRelativeDate($date, $is_start) {
 		$date = preg_replace(array_keys($time_units), array_values($time_units), $date_chunk);
 	}
 	else {
-		return (new DateTime())->setTimestamp($date);
+		return (new DateTimeImmutable())->setTimestamp($date);
 	}
 
 	try {
-		$date = new DateTime($date);
+		$date = new DateTimeImmutable($date);
 
 		$modifiers = $is_start
 			? [
@@ -2777,7 +2776,7 @@ function parseRelativeDate($date, $is_start) {
 			];
 
 		if ($precision && array_key_exists($precision, $modifiers)) {
-			$date->modify($modifiers[$precision]);
+			$date = $date->modify($modifiers[$precision]);
 		}
 	}
 	catch (Exception $e) {
