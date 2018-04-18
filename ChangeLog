@@ -17,6 +17,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+A.F....... [ZBX-13742] fixed parsing of the operator "not" in trigger expression (Sasha)
 ...G...... [ZBX-12805] increased command line limit for proc.num checks on hp-ux systems (Andris, wiper)
 ..F....... [ZBX-13749] fixed creation of dependent items from item wizard (vjaceslavs)
 ...G...PS. [ZBX-13660] fixed data types passed to is_ushort() for converting PID, port and process number (Andris)
