@@ -630,6 +630,15 @@ ul.top-nav-icons {
 
 .list-table {
 	&.compact-view {
+
+		.flh-na-bg, .flh-info-bg, .flh-warning-bg, .flh-average-bg, .flh-high-bg, .flh-disaster-bg {
+			background: none;
+
+			&:hover {
+				background-color: $ui-hover-color;
+			}
+		}
+
 		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
 			&:before {
 				min-height: 20px;
@@ -658,12 +667,6 @@ ul.top-nav-icons {
 }
 
 // SEVERITY STATUSES
-
-tr.na-bg, tr.na-bg, tr.normal-bg, tr.normal-bg, tr.info-bg, tr.info-bg, tr.warning-bg, tr.warning-bg, tr.average-bg, tr.average-bg, tr.high-bg, tr.high-bg, tr.disaster-bg, tr.disaster-bg {
-	&:before, &:after {
-		display: none !important;
-	}
-}
 
 td.log-na-bg {
 	padding-left: 42px !important;

@@ -17,7 +17,7 @@
         <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
         <meta name="msapplication-TileImage" content="ms-tile-144x144.png">
         <meta name="msapplication-TileColor" content="#d40000">
-        <style type="text/css">.status-na-bg { background-color: #97AAB3 }.status-info-bg { background-color: #7499FF }.status-warning-bg { background-color: #FFC859 }.status-average-bg { background-color: #FFA059 }.status-high-bg { background-color: #E97659 }.status-disaster-bg { background-color: #E45959 }.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before { background-color: #97AAB3 }.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before { background-color: #7499FF }.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before { background-color: #FFC859 }.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before { background-color: #FFA059 }.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before { background-color: #E97659 }.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before { background-color: #E45959 }
+        <style type="text/css">.status-na-bg { background-color: #97AAB3 }.status-info-bg { background-color: #7499FF }.status-warning-bg { background-color: #FFC859 }.status-average-bg { background-color: #FFA059 }.status-high-bg { background-color: #E97659 }.status-disaster-bg { background-color: #E45959 }.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before, .flh-na-bg { background-color: #97AAB3 }.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before, .flh-info-bg { background-color: #7499FF }.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before, .flh-warning-bg { background-color: #FFC859 }.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before, .flh-average-bg { background-color: #FFA059 }.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before, .flh-high-bg { background-color: #E97659 }.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before, .flh-disaster-bg { background-color: #E45959 }
 
 			.problem-unack-fg {color: #EE0000;}.problem-ack-fg {color: #FF3333;}.ok-unack-fg {color: #00DD00;}.ok-ack-fg {color: #00EE00;}
 		</style>
@@ -407,11 +407,11 @@
 			<th style="width:75px">Duration</th>
 			<th style="width:36px">Ack</th>
 			<th style="width:59px">Actions</th>
-			<th style="width:171px">Tags</th>
+			<th style="width:173px">Tags</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr class="na-bg">
+		<tr class="flh-na-bg">
 			<td class="nowrap right"><a href="#">2017-11-07 15:40:08</a></td>
 			<td><input type="checkbox" id="eventids_91" name="eventids[91]" value="91" class="checkbox-radio"><label for="eventids_91"><span></span></label></td>
 			<td class="na-bg">Not classified</td>
@@ -949,7 +949,7 @@
 			</td>
 			<td></td>
 		</tr>
-		<tr class="warning-bg">
+		<tr class="flh-warning-bg">
 			<td class="nowrap right"><a href="#">2017-11-07 15:40:00</a></td>
 			<td><input type="checkbox" id="eventids_83" name="eventids[83]" value="83" class="checkbox-radio"><label for="eventids_83"><span></span></label></td>
 			<td class="warning-bg">Warning</td>
@@ -1000,7 +1000,7 @@
 			</td>
 			<td></td>
 		</tr>
-		<tr class="info-bg">
+		<tr class="flh-info-bg">
 			<td class="nowrap right"><a href="#">2017-11-07 15:39:59</a></td>
 			<td><input type="checkbox" id="eventids_82" name="eventids[82]" value="82" class="checkbox-radio"><label for="eventids_82"><span></span></label></td>
 			<td class="info-bg">Information</td>
@@ -1051,7 +1051,7 @@
 			</td>
 			<td></td>
 		</tr>
-		<tr class="na-bg">
+		<tr class="flh-na-bg">
 			<td class="nowrap right"><a href="#">2017-11-07 15:39:58</a></td>
 			<td><input type="checkbox" id="eventids_81" name="eventids[81]" value="81" class="checkbox-radio"><label for="eventids_81"><span></span></label></td>
 			<td class="na-bg">Not classified</td>
@@ -1122,7 +1122,7 @@
 			</td>
 			<td></td>
 		</tr>
-		<tr class="average-bg">
+		<tr class="flh-average-bg">
 			<td class="nowrap right"><a href="#">2017-11-07 11:45:00</a></td>
 			<td><input type="checkbox" id="eventids_79" name="eventids[79]" value="79" class="checkbox-radio"><label for="eventids_79"><span></span></label></td>
 			<td class="average-bg">Average</td>
