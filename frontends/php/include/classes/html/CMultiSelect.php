@@ -38,9 +38,9 @@ class CMultiSelect extends CTag {
 		parent::__construct('div', true);
 
 		$this
+			->setId(zbx_formatDomId($options['name']))
 			->addClass('multiselect')
 			->setAttribute('role', 'application')
-			->setId(zbx_formatDomId($options['name']))
 			->addItem((new CDiv())
 				->setAttribute('aria-live', 'assertive')
 				->setAttribute('aria-atomic', 'true')

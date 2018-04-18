@@ -245,49 +245,48 @@ jQuery(function($) {
 			var selected_ul = $('<ul>', {
 				'class': 'multiselect-list'
 			});
+
+			obj.append(selected_div.append(selected_ul));
+
 			if (options.disabled) {
 				selected_ul.addClass('disabled');
 			}
-			obj.append(selected_div.append(selected_ul));
-
-			// search input
-			if (!options.disabled) {
+			else {
 				var label = $('label[for='+obj.attr('id')+'search]'),
 					input = $('<input>', {
-					id: label.length ? label.attr('for') : null,
-					class: 'input',
-					type: 'text'
-				})
-				.attr({
-					'placeholder': options.labels['type here to search'],
-					'aria-label': (label.length ? label.text()+'. ' : '')+options.labels['type here to search']
-				})
-				.on('keyup change', function(e) {
-					if (typeof(e.which) === 'undefined') {
-						return false;
-					}
-					switch (e.which) {
-						case KEY.ARROW_DOWN:
-						case KEY.ARROW_LEFT:
-						case KEY.ARROW_RIGHT:
-						case KEY.ARROW_UP:
+						'id': label.length ? label.attr('for') : null,
+						'class': 'input',
+						'type': 'text',
+						'placeholder': options.labels['type here to search'],
+						'aria-label': (label.length ? label.text()+'. ' : '')+options.labels['type here to search']
+					})
+					.on('keyup change', function(e) {
+
+						if (typeof e.which === 'undefined') {
 							return false;
-						case KEY.ESCAPE:
-							cleanSearchInput(obj);
+						}
+
+						switch (e.which) {
+							case KEY.ARROW_DOWN:
+							case KEY.ARROW_LEFT:
+							case KEY.ARROW_RIGHT:
+							case KEY.ARROW_UP:
+								return false;
+							case KEY.ESCAPE:
+								cleanSearchInput(obj);
+								return false;
+						}
+
+						if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
+							setSearchFieldVisibility(false, obj, options);
 							return false;
-					}
+						}
 
-					if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
-						setSearchFieldVisibility(false, obj, options);
-						return false;
-					}
+						var search = input.val();
 
-					var search = input.val();
-
-					// Replace trailing slashes to check if search term contains anything else.
-					if (search !== '') {
-						if (input.data('lastSearch') != search) {
-							if (!values.isWaiting) {
+						// Replace trailing slashes to check if search term contains anything else.
+						if (search !== '') {
+							if (input.data('lastSearch') != search && !values.isWaiting) {
 								values.isWaiting = true;
 
 								var jqxhr = null;
@@ -326,179 +325,137 @@ jQuery(function($) {
 									}
 								}, 500);
 							}
+							else {
+								if ($('.available', obj).is(':hidden')) {
+									showAvailable(obj, values);
+								}
+							}
 						}
 						else {
-							if ($('.available', obj).is(':hidden')) {
-								showAvailable(obj, values);
-							}
-						}
-					}
-					else {
-						hideAvailable(obj);
-					}
-				})
-				.on('keypress keydown', function(e) {
-					switch (e.which) {
-						case KEY.ENTER:
-							if (input.val() !== '') {
-								var selected = $('.available li.suggest-hover', obj);
-
-								if (selected.length) {
-									select(selected.data('id'), obj, values, options);
-									aria_live.text(sprintf(t('Added, %1$s'), selected.data('label')));
-									input.focus();
-								}
-
-								// stop form submit
-								cancelEvent(e);
-
-								return false;
-							}
-							break;
-
-						case KEY.BACKSPACE:
-							if (input.val() === '') {
-								var selected = $('.selected li.selected', obj);
-
-								if (selected.length) {
-									var prev = selected.is(':first-child') ? selected.next() : selected.prev(),
-										id = selected.data('id'),
-										item = values.selected[id];
-
-									if (typeof item.disabled === 'undefined' || !item.disabled) {
-										var aria_text = sprintf(t('Removed, %1$s'), selected.data('label'));
-										removeSelected(id, obj, values, options);
-
-										if (prev.length) {
-											var collection = $('.selected li', obj);
-											prev.addClass('selected');
-											aria_text += '.'+sprintf(t('Selected, %1$s in position %2$d of %3$d'),
-												prev.data('label'), collection.index(prev) + 1, collection.length);
-										}
-
-										aria_live.text(aria_text);
-									}
-								}
-
-								cancelEvent(e);
-
-								return false;
-							}
-							break;
-
-						case KEY.DELETE:
-							if (input.val() === '') {
-								var selected = $('.selected li.selected', obj);
-
-								if (selected.length) {
-									var next = selected.is(':last-child') ? selected.prev() : selected.next(),
-										id = selected.data('id'),
-										item = values.selected[id];
-
-									if (typeof item.disabled === 'undefined' || !item.disabled) {
-										var aria_text = sprintf(t('Removed, %1$s'), selected.data('label'));
-										removeSelected(id, obj, values, options);
-
-										if (next.length) {
-											var collection = $('.selected li', obj);
-											next.addClass('selected');
-											aria_text += '.'+sprintf(t('Selected, %1$s in position %2$d of %3$d'),
-												next.data('label'), collection.index(next) + 1, collection.length);
-										}
-
-										aria_live.text(aria_text);
-									}
-								}
-
-								cancelEvent(e);
-
-								return false;
-							}
-							break;
-
-						case KEY.ARROW_LEFT:
-							if (input.val() === '') {
-								var collection = $('.selected li', obj);
-								if (collection.length) {
-									var prev = collection.filter('.selected').removeClass('selected').prev();
-									prev = (prev.length ? prev : collection.last()).addClass('selected');
-									aria_live.text(prev.data('label'));
-								}
-							}
-							break;
-
-						case KEY.ARROW_RIGHT:
-							if (input.val() === '') {
-								var collection = $('.selected li', obj);
-								if (collection.length) {
-									var next = collection.filter('.selected').removeClass('selected').next();
-									next = (next.length ? next : collection.first()).addClass('selected');
-									aria_live.text(next.data('label'));
-								}
-							}
-							break;
-
-						case KEY.ARROW_UP:
-							var collection = $('.available:visible li', obj);
-							if (collection.length > 0) {
-								var selected = collection.filter('.suggest-hover').removeClass('suggest-hover'),
-									prev = selected.length ? selected.prev() : collection.last();
-
-								if (selected.is(':first-child')) {
-									input.val(values.search);
-								}
-								else {
-									prev.addClass('suggest-hover');
-									// input.val(values.available[prev.data('id')]['name']);
-								}
-
-								aria_live.text(prev.data('label'));
-								cancelEvent(e);
-								scrollAvailable(obj);
-							}
-							break;
-
-						case KEY.ARROW_DOWN:
-							var collection = $('.available:visible li', obj);
-							if (collection.length > 0) {
-								var selected = collection.filter('.suggest-hover').removeClass('suggest-hover'),
-									next = selected.length ? selected.next() : collection.first();
-
-								if (selected.is(':last-child')) {
-									input.val(values.search);
-								}
-								else {
-									next.addClass('suggest-hover');
-									// input.val(values.available[next.data('id')]['name']);
-								}
-
-								aria_live.text(next.data('label'));
-								scrollAvailable(obj);
-							}
-							break;
-
-						case KEY.TAB:
-						case KEY.ESCAPE:
 							hideAvailable(obj);
-							cleanSearchInput(obj);
-							break;
-					}
-				})
-				.focusin(function() {
-					$(obj).addClass('active');
+						}
+					})
+					.on('keypress keydown', function(e) {
+						switch (e.which) {
+
+							case KEY.TAB:
+							case KEY.ESCAPE:
+								hideAvailable(obj);
+								cleanSearchInput(obj);
+								break;
+
+							case KEY.ENTER:
+								if (input.val() !== '') {
+									var selected = $('.available li.suggest-hover', obj);
+
+									if (selected.length) {
+										select(selected.data('id'), obj, values, options);
+										aria_live.text(sprintf(t('Added, %1$s'), selected.data('label')));
+									}
+
+									return cancelEvent(e);
+								}
+								break;
+
+							case KEY.ARROW_LEFT:
+								if (input.val() === '') {
+									var collection = $('.selected li', obj);
+
+									if (collection.length) {
+										var prev = collection.filter('.selected').removeClass('selected').prev();
+										prev = (prev.length ? prev : collection.last()).addClass('selected');
+										aria_live.text(prev.data('label'));
+									}
+								}
+								break;
+
+							case KEY.ARROW_RIGHT:
+								if (input.val() === '') {
+									var collection = $('.selected li', obj);
+
+									if (collection.length) {
+										var next = collection.filter('.selected').removeClass('selected').next();
+										next = (next.length ? next : collection.first()).addClass('selected');
+										aria_live.text(next.data('label'));
+									}
+								}
+								break;
+
+							case KEY.ARROW_UP:
+							case KEY.ARROW_DOWN:
+								var collection = $('.available:visible li', obj);
+								if (collection.length) {
+									var selected = collection.filter('.suggest-hover').removeClass('suggest-hover'),
+										suggest = (e.which == KEY.ARROW_UP)
+											? !selected.is(':first-child')
+											: !selected.is(':last-child');
+
+									selected = (e.which == KEY.ARROW_UP)
+										? (selected.length ? selected.prev() : collection.last())
+										: (selected.length ? selected.next() : collection.first());
+
+									if (suggest) {
+										selected.addClass('suggest-hover');
+									}
+									aria_live.text(selected.data('label'));
+
+									scrollAvailable(obj);
+									return cancelEvent(e);
+								}
+								break;
+
+							case KEY.BACKSPACE:
+							case KEY.DELETE:
+								if (input.val() === '') {
+									var selected = $('.selected li.selected', obj);
+
+									if (selected.length) {
+										var id = selected.data('id'),
+											item = values.selected[id];
+
+										if (typeof item.disabled === 'undefined' || !item.disabled) {
+											var aria_text = sprintf(t('Removed, %1$s'), selected.data('label'));
+
+											selected = (e.which == KEY.BACKSPACE)
+												? (selected.is(':first-child') ? selected.next() : selected.prev())
+												: (selected.is(':last-child') ? selected.prev() : selected.next());
+
+											if (selected.length) {
+												var collection = $('.selected li', obj);
+												selected.addClass('selected');
+												aria_text += ',' + sprintf(t('Selected, %1$s in position %2$d of %3$d'),
+													selected.data('label'), collection.index(selected) + 1,
+													collection.length
+												);
+											}
+
+											removeSelected(id, obj, values, options);
+											aria_live.text(aria_text);
+										}
+									}
+
+									return cancelEvent(e);
+								}
+								break;
+						}
+					})
+				.on('focusin', function() {
+					obj.addClass('active');
 
 					if (getSearchFieldVisibility(obj) == false) {
 						$('.selected li:first-child', obj).addClass('selected');
 					}
 				})
-				.focusout(function() {
-					$(obj).removeClass('active').find('li.selected').removeClass('selected');
+				.on('focusout', function() {
+					obj.removeClass('active').find('li.selected').removeClass('selected');
 					cleanSearchInput(obj);
 				});
+
 				if (obj.attr('aria-required')) {
 					input.attr('aria-required', obj.attr('aria-required'));
 					obj.removeAttr('aria-required');
 				}
+
 				obj.append(input);
 			}
 
@@ -663,7 +620,9 @@ jQuery(function($) {
 			});
 		}
 
-		var found = 0;
+		var found = 0,
+			preselected = '';
+
 		// write empty result label
 		if (objectLength(values.available) == 0) {
 			var div = $('<div>', {
@@ -691,6 +650,9 @@ jQuery(function($) {
 
 			$.each(data, function (i, item) {
 				if (typeof values.available[item.id] !== 'undefined') {
+					if (found == 0) {
+						preselected = item.prefix+item.name;
+					}
 					addAvailable(item, obj, values, options);
 					found++;
 				}
@@ -698,8 +660,8 @@ jQuery(function($) {
 		}
 
 		if (found > 0) {
-			$('[aria-live]', obj).text(sprintf(t('%1$d matches for %2$s found, use down/up arrow keys to select'),
-				found, values.search
+			$('[aria-live]', obj).text(sprintf(t('%1$d matches for %2$s found, %3$s, preselected, use down,up arrow keys and enter to select'),
+				found, values.search, preselected
 			));
 		}
 		else {

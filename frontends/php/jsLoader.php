@@ -196,10 +196,10 @@ $tranStrings = [
 		'type here to search' => _('type here to search'),
 		'new' => _('new'),
 		'Select' => _('Select'),
-		'Added, %1$s' => _('Added, %1$s'),
-		'Removed, %1$s' => _('Removed, %1$s'),
-		'Selected, %1$s in position %2$d of %3$d' => _('Selected, %1$s in position %2$d of %3$d'),
-		'%1$d matches for %2$s found, use down/up arrow keys to select' => _('%1$d matches for %2$s found, use down/up arrow keys to select')
+		'Added, %1$s' => pgettext(ZBX_CONTEXT_SCREEN_READER, 'Added, %1$s'),
+		'Removed, %1$s' => pgettext(ZBX_CONTEXT_SCREEN_READER, 'Removed, %1$s'),
+		'Selected, %1$s in position %2$d of %3$d' => pgettext(ZBX_CONTEXT_SCREEN_READER, 'Selected, %1$s in position %2$d of %3$d'),
+		'%1$d matches for %2$s found, %3$s, preselected, use down,up arrow keys and enter to select' => pgettext(ZBX_CONTEXT_SCREEN_READER, '%1$d matches for %2$s found, %3$s, preselected, use down,up arrow keys and enter to select')
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
