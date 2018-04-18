@@ -256,6 +256,8 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-13535] fixed trigger recovery expression for 'High error rate' trigger (vitaly)
+.........T [ZBX-13278] fixed trigger expression for 'Link down' trigger (vitaly)
 ...G...... [ZBX-12805] increased command line limit for proc.num checks on hp-ux systems (Andris, wiper)
 ..F....... [ZBX-13728] fixed problem duration on trigger page being calculated incorrectly (agriscenko)
 ...G...PS. [ZBX-13660] fixed data types passed to is_ushort() for converting PID, port and process number (Andris)
