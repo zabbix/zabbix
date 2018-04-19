@@ -1000,6 +1000,8 @@ int	num_param(const char *p)
 			{
 				if (0 == array)
 					array = 1;
+				else
+					return 0;	/* incorrect syntax: multi-level array */
 			}
 			else if (']' == *p && 0 != array)
 			{
