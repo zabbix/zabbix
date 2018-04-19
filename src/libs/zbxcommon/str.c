@@ -1505,6 +1505,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case ']':
+						if (0 == level)
+							goto clean;	/* incorrect syntax: redundant ']' */
 						level--;
 						break;
 					default:
