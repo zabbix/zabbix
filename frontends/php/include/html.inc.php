@@ -984,19 +984,6 @@ function getTriggerSeverityCss($config)
 {
 	$css = '';
 
-	$severity_statuses = [
-		ZBX_STYLE_STATUS_NA_BG => $config['severity_color_0'],
-		ZBX_STYLE_STATUS_INFO_BG => $config['severity_color_1'],
-		ZBX_STYLE_STATUS_WARNING_BG => $config['severity_color_2'],
-		ZBX_STYLE_STATUS_AVERAGE_BG => $config['severity_color_3'],
-		ZBX_STYLE_STATUS_HIGH_BG => $config['severity_color_4'],
-		ZBX_STYLE_STATUS_DISASTER_BG => $config['severity_color_5']
-	];
-
-	foreach ($severity_statuses as $class => $color) {
-		$css .= '.'.$class.' { background-color: #'.$color.' }'."\n";
-	}
-
 	$severities = [
 		ZBX_STYLE_NA_BG => $config['severity_color_0'],
 		ZBX_STYLE_INFO_BG => $config['severity_color_1'],
@@ -1007,7 +994,8 @@ function getTriggerSeverityCss($config)
 	];
 
 	foreach ($severities as $class => $color) {
-		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before { background-color: #'.$color.' }'."\n";
+		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before, .flh-'.$class.
+			', .status-'.$class.' { background-color: #'.$color.' }'."\n";
 	}
 
 	return $css;

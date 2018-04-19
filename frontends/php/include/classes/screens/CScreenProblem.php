@@ -991,7 +991,7 @@ class CScreenProblem extends CScreenBase {
 						: '',
 					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]), ($this->data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
-					? getSeverityStyle($trigger['priority'])
+					? getSeverityFlhStyle($trigger['priority'])
 					: null
 				);
 			}
