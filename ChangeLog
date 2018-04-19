@@ -17,6 +17,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+.......PS. [ZBX-13481] fixed incorrect parsing of BITS data type in SNMP response (vso)
 .......PS. [ZBX-13744] fixed potential shared memory leak when item is removed (Sergejs)
 A.F....... [ZBX-13742] fixed parsing of the operator "not" in trigger expression (Sasha)
 .........T [ZBX-13535] fixed trigger recovery expression for 'High error rate' trigger (vitaly)
@@ -260,6 +261,7 @@ Changes for 3.4.9rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-13481] fixed incorrect parsing of BITS data type in SNMP response (vso)
 .......PS. [ZBX-13744] fixed potential shared memory leak when item is removed (Sergejs)
 A.F....... [ZBX-13742] fixed parsing of the operator "not" in trigger expression (Sasha)
 .........T [ZBX-13535] fixed trigger recovery expression for 'High error rate' trigger (vitaly)
@@ -1455,6 +1457,7 @@ Changes for 3.0.17rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-13481] fixed incorrect parsing of BITS data type in SNMP response (vso)
 A.F....... [ZBX-13742] fixed parsing of the operator "not" in trigger expression (Sasha)
 A.F....... [ZBX-13680] fixed action not being cloned due to existing operation id being submitted (agriscenko)
 ...G...PS. [ZBX-13660] fixed data types passed to is_ushort() for converting PID, port and process number (Andris)
