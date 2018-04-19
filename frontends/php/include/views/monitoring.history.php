@@ -136,7 +136,6 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 					(new CMultiSelect([
 						'name' => 'itemids[]',
 						'object_name' => 'items',
-						'ignored' => $data['items'],
 						'data' => $items_data,
 						'popup' => [
 							'parameters' => [
