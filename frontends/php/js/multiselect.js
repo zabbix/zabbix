@@ -562,14 +562,6 @@ jQuery(function($) {
 					options.only_hostid = popup_options['only_hostid'];
 				}
 
-				if (options.ignored) {
-					var excludeids = [];
-					$.each(options.ignored, function(i, value) {
-						excludeids.push(i);
-					});
-					popup_options['excludeids'] = excludeids;
-				}
-
 				var popupButton = $('<button>', {
 					type: 'button',
 					'class': 'btn-grey',

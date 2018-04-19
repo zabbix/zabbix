@@ -167,6 +167,10 @@ class CMultiSelect extends CTag {
 				}
 			}
 
+			if (array_key_exists('ignored', $options)) {
+				$popup_parameters['excludeids'] = $options['ignored'];
+			}
+
 			if (array_key_exists('parameters', $options['popup'])) {
 				$parameters = $options['popup']['parameters'];
 
@@ -202,10 +206,6 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
 					$popup_parameters['only_hostid'] = $parameters['hostid'];
 					$autocomplete_parameters['hostid'] = $parameters['hostid'];
-				}
-
-				if (array_key_exists('ignored', $parameters)) {
-					$popup_parameters['excludeids'] = $parameters['ignored'];
 				}
 
 				if (array_key_exists('numeric', $parameters) && $parameters['numeric']) {
