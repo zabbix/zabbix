@@ -11,16 +11,16 @@
       <template>
          <template>Template Net HP Comware HH3C SNMPv2</template>
          <name>Template Net HP Comware HH3C SNMPv2</name>
-         <description>Template Net HP Comware (HH3C) version: 0.14
-Overview: http://certifiedgeek.weebly.com/blog/hp-comware-snmp-mib-for-cpu-memory-and-temperature
-http://www.h3c.com.hk/products___solutions/technology/system_management/configuration_example/200912/656451_57_0.htm
-
-MIBs used:
-HH3C-ENTITY-EXT-MIB
-ENTITY-MIB
-Known Issues:
-description : No temperature sensors. All entities of them return 0 for HH3C-ENTITY-EXT-MIB::hh3cEntityExtTemperature
-version : 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010-2016 Hewlett Packard Enterprise Development LP
+         <description>Template Net HP Comware (HH3C) version: 0.14&#13;
+Overview: http://certifiedgeek.weebly.com/blog/hp-comware-snmp-mib-for-cpu-memory-and-temperature&#13;
+http://www.h3c.com.hk/products___solutions/technology/system_management/configuration_example/200912/656451_57_0.htm&#13;
+&#13;
+MIBs used:&#13;
+HH3C-ENTITY-EXT-MIB&#13;
+ENTITY-MIB&#13;
+Known Issues:&#13;
+description : No temperature sensors. All entities of them return 0 for HH3C-ENTITY-EXT-MIB::hh3cEntityExtTemperature&#13;
+version : 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010-2016 Hewlett Packard Enterprise Development LP&#13;
 device : HP 1910-48</description>
          <groups>
             <group>
@@ -124,9 +124,9 @@ device : HP 1910-48</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HH3C-ENTITY-EXT-MIB
-The CPU usage for this entity. Generally, the CPU usage
-will calculate the overall CPU usage on the entity, and it
+                     <description>MIB: HH3C-ENTITY-EXT-MIB&#13;
+The CPU usage for this entity. Generally, the CPU usage&#13;
+will calculate the overall CPU usage on the entity, and it&#13;
 is not sensible with the number of CPU on the entity</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -169,8 +169,8 @@ is not sensible with the number of CPU on the entity</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HH3C-ENTITY-EXT-MIB
-The memory usage for the entity. This object indicates what
+                     <description>MIB: HH3C-ENTITY-EXT-MIB&#13;
+The memory usage for the entity. This object indicates what&#13;
 percent of memory are used.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -371,7 +371,7 @@ percent of memory are used.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HH3C-ENTITY-EXT-MIB
+                     <description>MIB: HH3C-ENTITY-EXT-MIB&#13;
 The temperature for the {#SNMPVALUE}.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -398,7 +398,7 @@ The temperature for the {#SNMPVALUE}.</description>
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -421,7 +421,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -516,8 +516,8 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HH3C-ENTITY-EXT-MIB
-Indicate the error state of this entity object.
+                     <description>MIB: HH3C-ENTITY-EXT-MIB&#13;
+Indicate the error state of this entity object.&#13;
 fanError(41) means that the fan stops working.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -546,7 +546,7 @@ fanError(41) means that the fan stops working.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -625,9 +625,9 @@ Please check the fan unit</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HH3C-ENTITY-EXT-MIB
-Indicate the error state of this entity object.
-psuError(51) means that the Power Supply Unit is in the state of fault.
+                     <description>MIB: HH3C-ENTITY-EXT-MIB&#13;
+Indicate the error state of this entity object.&#13;
+psuError(51) means that the Power Supply Unit is in the state of fault.&#13;
 rpsError(61) means the Redundant Power Supply is in the state of fault.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -656,7 +656,7 @@ rpsError(61) means the Redundant Power Supply is in the state of fault.</descrip
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -930,7 +930,7 @@ Please check the power supply unit for errors</description>
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
@@ -947,7 +947,7 @@ Device serial number has changed. Ack to close</description>
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Firmware version has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>

@@ -11,8 +11,8 @@
       <template>
          <template>Template Net Intel_Qlogic Infiniband SNMPv2</template>
          <name>Template Net Intel_Qlogic Infiniband SNMPv2</name>
-         <description>Template Net Intel_Qlogic Infiniband version: 0.14
-MIBs used:
+         <description>Template Net Intel_Qlogic Infiniband version: 0.14&#13;
+MIBs used:&#13;
 ICS-CHASSIS-MIB</description>
          <groups>
             <group>
@@ -198,7 +198,7 @@ ICS-CHASSIS-MIB</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
 The current value read from the sensor.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -241,7 +241,7 @@ The current value read from the sensor.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
 The operational status of the sensor.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -272,7 +272,7 @@ or
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -299,7 +299,7 @@ or
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -395,7 +395,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
 The serial number of the FRU.  If not available, this value is a zero-length string.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -422,7 +422,7 @@ The serial number of the FRU.  If not available, this value is a zero-length str
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
@@ -494,15 +494,15 @@ Device serial number has changed. Ack to close</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
-Actual status of the power supply:
-(1) unknown: status not known.
-(2) disabled: power supply is disabled.
-(3) failed - power supply is unable to supply power due to failure.
-(4) warning - power supply is supplying power, but an output or sensor is bad or warning.
-(5) standby - power supply believed usable,but not supplying power.
-(6) engaged - power supply is supplying power.
-(7) redundant - power supply is supplying power, but not needed.
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
+Actual status of the power supply:&#13;
+(1) unknown: status not known.&#13;
+(2) disabled: power supply is disabled.&#13;
+(3) failed - power supply is unable to supply power due to failure.&#13;
+(4) warning - power supply is supplying power, but an output or sensor is bad or warning.&#13;
+(5) standby - power supply believed usable,but not supplying power.&#13;
+(6) engaged - power supply is supplying power.&#13;
+(7) redundant - power supply is supplying power, but not needed.&#13;
 (8) notPresent - power supply is supplying power is not present.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -531,7 +531,7 @@ Actual status of the power supply:
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -548,7 +548,7 @@ Please check the power supply unit for errors</description>
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -626,7 +626,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
 The operational status of the fan unit.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -655,7 +655,7 @@ The operational status of the fan unit.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -734,7 +734,7 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
