@@ -3561,6 +3561,11 @@ $form-icon-btn: (
 	button:last-child {
 		float: right;
 	}
+
+	button:hover {
+		background-color: $action-hover-color;
+		cursor: pointer;
+	}
 }
 
 .calendar-month {
