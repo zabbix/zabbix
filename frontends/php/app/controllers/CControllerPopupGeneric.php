@@ -502,6 +502,11 @@ class CControllerPopupGeneric extends CController {
 
 		$templated = null;
 
+		if ($this->source_table == 'hosts') {
+			$options['groups']['real_hosts'] = true;
+			$templated = 0;
+		}
+
 		if ($this->hasInput('monitored_hosts')) {
 			$options['groups']['monitored_hosts'] = true;
 			$options['hosts']['monitored_hosts'] = true;

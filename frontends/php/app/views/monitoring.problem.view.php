@@ -114,8 +114,7 @@ if ($data['action'] == 'problem.view') {
 						'srctbl' => 'hosts',
 						'srcfld1' => 'hostid',
 						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_hostids_',
-						'real_hosts' => true
+						'dstfld1' => 'filter_hostids_'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

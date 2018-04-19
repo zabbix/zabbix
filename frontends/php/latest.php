@@ -354,8 +354,7 @@ $filterColumn1 = (new CFormList())
 					'srctbl' => 'hosts',
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'hostids_',
-					'real_hosts' => true
+					'dstfld1' => 'hostids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
