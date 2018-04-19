@@ -28,12 +28,10 @@
 #include "memalloc.h"
 #include "zbxserver.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
-#include "dbcache.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
