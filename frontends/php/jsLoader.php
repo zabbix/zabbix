@@ -122,7 +122,7 @@ $tranStrings = [
 	],
 	'class.calendar.js' => [
 		'S_Calendar' => _('Calendar'),
-		'S_calendar_helptext' => _('Press Tab keyboard button to switch between calendar year, month, day, hour and minute sections. Press the arrow keys to select date, month and year. By pressing Space bar you can select date. Press Enter to confirm selected date or Escape to close calendar.'),
+		'S_calendar_helptext' => _('Press Tab keyboard button to switch between calendar year, month, and day sections. Press the arrow keys to select date, month and year. By pressing Space bar you can select date. Press Enter to confirm selected date or Escape to close calendar.'),
 		'S_JANUARY' => _('January'),
 		'S_FEBRUARY' => _('February'),
 		'S_MARCH' => _('March'),
