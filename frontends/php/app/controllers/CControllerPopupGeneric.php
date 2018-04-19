@@ -705,6 +705,10 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
+				if (array_key_exists('normal_only', $page_options)) {
+					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+				}
+
 				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
 				}

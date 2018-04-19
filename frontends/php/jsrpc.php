@@ -237,11 +237,11 @@ switch ($data['method']) {
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$hostGroups = API::HostGroup()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : false,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['groupid', 'name'],
-					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
-					'filter' => isset($data['filter']) ? $data['filter'] : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
 				]);
 
 				if ($hostGroups) {
