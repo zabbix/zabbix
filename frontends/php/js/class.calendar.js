@@ -795,6 +795,7 @@ calendar.prototype = {
 		this.clndr_year_wrap.appendChild(this.clndr_year);
 		this.clndr_year_wrap.setAttribute('aria-live', 'assertive');
 		this.clndr_year_wrap.setAttribute('id', 'current-year'+this.id);
+		this.clndr_year_wrap.setAttribute('aria-atomic', 'true');
 		this.clndr_year_div.appendChild(this.clndr_year_wrap);
 		this.clndr_year_div.setAttribute('aria-labelledby', this.clndr_year_wrap.id);
 
