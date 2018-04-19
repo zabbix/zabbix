@@ -56,60 +56,46 @@
 			}
 		},
 
-		refresh: function(id, isSelfRefresh) {
-			var screen = this.screens[id], ajaxParams;
-
-			switch (screen.resourcetype) {
-				case 17:
-					// SCREEN_RESOURCE_HISTORY
-					ajaxParams = ['mode', 'pageFile', 'page'];
-					break;
-
-				case 21:
-					// SCREEN_RESOURCE_HTTPTEST_DETAILS
-					ajaxParams = ['mode', 'resourcetype', 'profileIdx2'];
-					break;
-
-				case 22:
-					// SCREEN_RESOURCE_DISCOVERY
-					ajaxParams = ['mode', 'resourcetype', 'data'];
-					break;
-
-				case 23:
-					// SCREEN_RESOURCE_HTTPTEST
-					ajaxParams = ['mode', 'groupid', 'hostid', 'resourcetype', 'data', 'page'];
-					break;
-
-				case 24:
-					// SCREEN_RESOURCE_PROBLEM
-					ajaxParams = ['mode', 'resourcetype', 'data', 'page'];
-					break;
-
-				default:
-					ajaxParams = ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
-						'updateProfile', 'screenitemid'
-					];
-			}
+		refresh: function(id, is_self_refresh) {
+			var screen = this.screens[id];
 
 			if (empty(screen.id)) {
 				return;
 			}
 
-			if (empty(isSelfRefresh)) {
-				isSelfRefresh = false;
-			}
+			/**
+			 * 17   SCREEN_RESOURCE_HISTORY
+			 * 21   SCREEN_RESOURCE_HTTPTEST_DETAILS
+			 * 22   SCREEN_RESOURCE_DISCOVERY
+			 * 23   SCREEN_RESOURCE_HTTPTEST
+			 * 24   SCREEN_RESOURCE_PROBLEM
+			 */
+			var type_params = {
+					'17': ['mode', 'resourcetype', 'pageFile', 'page'],
+					'21': ['mode', 'resourcetype', 'profileIdx2'],
+					'22': ['mode', 'resourcetype', 'data'],
+					'23': ['mode', 'groupid', 'hostid', 'resourcetype', 'data', 'page'],
+					'24': ['mode', 'resourcetype', 'data', 'page'],
+					'default': ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
+						'updateProfile', 'screenitemid'
+					]
+				},
+				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default';
+				ajax_url = new Curl('jsrpc.php'),
+				refresh = (!empty(is_self_refresh) || empty(timeControl.timeline) || timeControl.timeline.isNow()),
+				self = this;
+
+			ajax_url.setArgument('type', 9); // PAGE_TYPE_TEXT
+			ajax_url.setArgument('method', 'screen.get');
+			// TODO: remove, do not use timestamp passing to server and back to ensure newest content will be shown.
+			ajax_url.setArgument('timestamp', screen.timestampActual);
+
+			$.each(type_params[params_index], function (i, name) {
+				ajax_url.setArgument(name, empty(screen[name]) ? null : screen[name]);
+			});
 
 			// set actual timestamp
 			screen.timestampActual = new CDate().getTime();
-
-			var ajaxUrl = new Curl('jsrpc.php');
-			ajaxUrl.setArgument('type', 9); // PAGE_TYPE_TEXT
-			ajaxUrl.setArgument('method', 'screen.get');
-			ajaxUrl.setArgument('timestamp', screen.timestampActual);
-
-			for (var i = 0; i < ajaxParams.length; i++) {
-				ajaxUrl.setArgument(ajaxParams[i], empty(screen[ajaxParams[i]]) ? null : screen[ajaxParams[i]]);
-			}
 
 			// timeline params
 			// SCREEN_RESOURCE_HTTPTEST_DETAILS, SCREEN_RESOURCE_DISCOVERY, SCREEN_RESOURCE_HTTPTEST
@@ -117,115 +103,106 @@
 				if (!empty(timeControl.timeline)) {
 					timeControl.timeline.refreshEndtime();
 				}
-				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : this.getCalculatedPeriod(screen));
-				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
-				if (typeof screen.timeline.isNow !== 'undefined') {
-					ajaxUrl.setArgument('isNow', + screen.timeline.isNow);
-				}
+
+				ajax_url.setArgument('from', screen.timeline.from);
+				ajax_url.setArgument('to', screen.timeline.to);
 			}
 
-			// SCREEN_RESOURCE_GRAPH or SCREEN_RESOURCE_SIMPLE_GRAPH
-			if (screen.resourcetype == 0 || screen.resourcetype == 1) {
-				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
-					this.refreshImg(id, function() {
-						$('#flickerfreescreen_' + id + ' a').each(function() {
-							var obj = $(this),
-								url = new Curl(obj.attr('href'));
+			switch (screen.resourcetype) {
+				// SCREEN_RESOURCE_GRAPH
+				case 0:
+					// falls through
 
-							url.setArgument('period', empty(screen.timeline.period)
-								? null
-								: window.flickerfreeScreen.getCalculatedPeriod(screen)
-							);
-							url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
-							if (typeof screen.timeline.isNow !== 'undefined') {
-								url.setArgument('isNow', + screen.timeline.isNow);
-							}
-							obj.attr('href', url.getUrl());
+				// SCREEN_RESOURCE_SIMPLE_GRAPH
+				case 1:
+					if (refresh) {
+						self.refreshImg(id, function() {
+							$('a', '#flickerfreescreen_' + id).each(function() {
+								var obj = $(this),
+									url = self.setTimerangeArguments(new Curl(obj.attr('href')));
+
+								obj.attr('href', url.getUrl());
+							});
 						});
-					});
-				}
-			}
-
-			// SCREEN_RESOURCE_MAP
-			else if (screen.resourcetype == 2) {
-				this.refreshMap(id);
-			}
-
-			// SCREEN_RESOURCE_CHART
-			else if (screen.resourcetype == 18) {
-				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
-					this.refreshImg(id);
-				}
-			}
-
-			// SCREEN_RESOURCE_HISTORY
-			else if (screen.resourcetype == 17) {
-				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
-					if (screen.data.action == 'showgraph') {
-						this.refreshImg(id);
 					}
-					else {
-						ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
+					break;
 
-						if ('itemids' in screen.data) {
-							for (var i = 0; i < screen.data.itemids.length; i++) {
-								ajaxUrl.setArgument(
-									'itemids[' + screen.data.itemids[i] + ']',
-									empty(screen.data.itemids[i]) ? null : screen.data.itemids[i]
-								);
-							}
+				// SCREEN_RESOURCE_MAP
+				case 2:
+					self.refreshMap(id);
+					break;
+
+				// SCREEN_RESOURCE_PLAIN_TEXT
+				case 3:
+					if (refresh) {
+						self.refreshHtml(id, ajax_url);
+					}
+					break;
+
+				// SCREEN_RESOURCE_CLOCK
+				case 7:
+					// don't refresh anything
+					break;
+
+				// SCREEN_RESOURCE_SCREEN
+				case 8:
+					self.refreshProfile(id, ajax_url);
+					break;
+
+				// SCREEN_RESOURCE_HISTORY
+				case 17:
+					if (refresh) {
+						if (screen.data.action == 'showgraph') {
+							self.refreshImg(id);
 						}
 						else {
-							ajaxUrl.setArgument('graphid', screen.data.graphid);
-						}
-
-						jQuery.each({
-							'filter': screen.data.filter,
-							'filter_task': screen.data.filterTask,
-							'mark_color': screen.data.markColor,
-							'page': screen.data.page,
-							'action': screen.data.action
-						}, function (ajax_key, value) {
-							if (!empty(value)) {
-								ajaxUrl.setArgument(ajax_key, value);
+							if ('itemids' in screen.data) {
+								$.each(screen.data.itemids, function (i, value) {
+									if (!empty(value)) {
+										ajax_url.setArgument('itemids[' + value + ']', value);
+									}
+								});
 							}
-						});
+							else {
+								ajax_url.setArgument('graphid', screen.data.graphid);
+							}
 
-						this.refreshHtml(id, ajaxUrl);
+							$.each({
+								'filter': screen.data.filter,
+								'filter_task': screen.data.filterTask,
+								'mark_color': screen.data.markColor,
+								'page': screen.data.page,
+								'action': screen.data.action
+							}, function (ajax_key, value) {
+								if (!empty(value)) {
+									ajax_url.setArgument(ajax_key, value);
+								}
+							});
+
+							self.refreshHtml(id, ajax_url);
+						}
 					}
-				}
-			}
+					break;
 
-			// SCREEN_RESOURCE_CLOCK
-			else if (screen.resourcetype == 7) {
-				// don't refresh anything
-			}
+				// SCREEN_RESOURCE_CHART
+				case 18:
+					if (refresh) {
+						self.refreshImg(id);
+					}
+					break;
 
-			// SCREEN_RESOURCE_SCREEN
-			else if (screen.resourcetype == 8) {
-				this.refreshProfile(id, ajaxUrl);
-			}
+				// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+				case 19:
+					// falls through
 
-			// SCREEN_RESOURCE_LLD_GRAPH
-			else if (screen.resourcetype == 20) {
-				this.refreshProfile(id, ajaxUrl);
-			}
+				// SCREEN_RESOURCE_LLD_GRAPH
+				case 20:
+					self.refreshProfile(id, ajax_url);
+					break;
 
-			// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-			else if (screen.resourcetype == 19) {
-				this.refreshProfile(id, ajaxUrl);
-			}
-
-			// SCREEN_RESOURCE_PLAIN_TEXT
-			else if (screen.resourcetype == 3) {
-				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
-					this.refreshHtml(id, ajaxUrl);
-				}
-			}
-
-			// others
-			else {
-				this.refreshHtml(id, ajaxUrl);
+				default:
+					self.refreshHtml(id, ajax_url);
+					break;
 			}
 
 			// set next refresh execution time
@@ -245,14 +222,13 @@
 			}
 		},
 
-		refreshAll: function(period, stime, isNow) {
+		refreshAll: function(from, to) {
 			for (var id in this.screens) {
 				var screen = this.screens[id];
 
 				if (!empty(screen.id) && typeof screen.timeline !== 'undefined') {
-					screen.timeline.period = period;
-					screen.timeline.stime = stime;
-					screen.timeline.isNow = isNow;
+					screen.timeline.from = from;
+					screen.timeline.to = to;
 
 					// restart refresh execution starting from Now
 					clearTimeout(screen.timeoutHandler);
@@ -262,7 +238,8 @@
 		},
 
 		refreshHtml: function(id, ajaxUrl) {
-			var screen = this.screens[id];
+			var screen = this.screens[id],
+				request_start = new CDate().getTime();
 
 			if (screen.isRefreshing) {
 				this.calculateReRefresh(id);
@@ -270,7 +247,6 @@
 			else {
 				screen.isRefreshing = true;
 				screen.timestampResponsiveness = new CDate().getTime();
-
 				window.flickerfreeScreenShadow.start(id);
 
 				var ajaxRequest = $.ajax({
@@ -279,31 +255,14 @@
 					data: {},
 					dataType: 'html',
 					success: function(html) {
-						// Get timestamp and error message from HTML.
-						var htmlTimestamp = null,
-							msg_bad = null;
-
-						$(html).each(function() {
-							var obj = $(this);
-
-							if (obj.hasClass('msg-bad')) {
-								msg_bad = obj;
-							}
-							else if (obj.prop('nodeName') === 'DIV') {
-								htmlTimestamp = obj.data('timestamp');
-							}
-						});
+						var html = $(html);
 
 						$('.article .msg-bad').remove();
+						html.find('.msg-bad').insertBefore('.article > :first-child');
 
-						// set message
-						if (msg_bad) {
-							$(msg_bad).insertBefore('.article > :first-child');
-							html = $(html).not('.msg-bad');
-						}
-
-						// set html
-						if ($('#flickerfreescreen_' + id).data('timestamp') < htmlTimestamp) {
+						// Replace existing markup with server response.
+						if (request_start > screen.timestamp) {
+							screen.timestamp = request_start;
 							$('#flickerfreescreen_' + id).replaceWith(html);
 
 							screen.isRefreshing = false;
@@ -368,7 +327,8 @@
 		},
 
 		refreshImg: function(id, successAction) {
-			var screen = this.screens[id];
+			var screen = this.screens[id],
+				request_start = new CDate().getTime();
 
 			if (screen.isRefreshing) {
 				this.calculateReRefresh(id);
@@ -380,38 +340,25 @@
 
 				window.flickerfreeScreenShadow.start(id);
 
-				$('#flickerfreescreen_' + id + ' img').each(function() {
+				$('img', '#flickerfreescreen_' + id).each(function() {
 					var domImg = $(this),
 						url = new Curl(domImg.attr('src')),
 						on_dashboard = timeControl.objectList[id].onDashboard;
 
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
-					if (typeof screen.updateProfile === 'undefined') {
-						url.setArgument('updateProfile', + screen.updateProfile);
-					}
-					url.setArgument('period', empty(screen.timeline.period)
-						? null
-						: window.flickerfreeScreen.getCalculatedPeriod(screen)
-					);
-					url.setArgument('stime', window.flickerfreeScreen.getCalculatedSTime(screen));
-					if (typeof screen.timeline.isNow !== 'undefined') {
-						url.setArgument('isNow', + screen.timeline.isNow);
-					}
 					url.setArgument('curtime', new CDate().getTime());
+					url.setArgument('from', screen.timeline.from);
+					url.setArgument('to', screen.timeline.to);
+
+					if (typeof screen.updateProfile === 'undefined') {
+						url.setArgument('updateProfile', 0);
+					}
 
 					// Create temp image in buffer.
-					var img = $('<img>', {
-							'class': domImg.attr('class'),
-							'data-timestamp': new CDate().getTime(),
-							id: domImg.attr('id') + '_tmp',
-							name: domImg.attr('name'),
-							border: domImg.attr('border'),
-							usemap: domImg.attr('usemap'),
-							alt: domImg.attr('alt'),
-							css: {
-								position: 'relative',
-								zIndex: 2
-							}
+					var	sbox_height = 0,
+						img = domImg.clone().css({
+							position: 'relative',
+							zIndex: 2
 						})
 						.error(function() {
 							screen.error++;
@@ -424,26 +371,20 @@
 
 							screen.isRefreshing = false;
 
-							// Re-refresh image.
-							var bufferImg = $(this);
-
-							if (bufferImg.data('timestamp') > screen.timestamp) {
-								screen.timestamp = bufferImg.data('timestamp');
-
-								// Set id.
-								bufferImg.attr('id', bufferImg.attr('id').substring(0, bufferImg.attr('id').indexOf('_tmp')));
+							if (request_start > screen.timestamp) {
+								screen.timestamp = request_start;
 
 								// Set opacity state.
 								if (window.flickerfreeScreenShadow.isShadowed(id)) {
-									bufferImg.fadeTo(0, 0.6);
+									img.fadeTo(0, 0.6);
 								}
 
-								if (!empty(bufferImg.data('height'))) {
-									timeControl.changeSBoxHeight(id, bufferImg.data('height'));
+								if (sbox_height > 0) {
+									timeControl.changeSBoxHeight(id, sbox_height);
 								}
 
 								// Set loaded image from buffer to dom.
-								domImg.replaceWith(bufferImg);
+								domImg.replaceWith(img);
 
 								// Callback function on success.
 								if (!empty(successAction)) {
@@ -471,17 +412,12 @@
 					if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(url.getPath()) > -1
 							&& url.getArgument('outer') === '1') {
 						// Getting height of graph inside image. Only for line graphs on dashboard.
-						var heightUrl = new Curl(url.getUrl());
-						heightUrl.setArgument('onlyHeight', '1');
-
-						$.ajax({
-							url: heightUrl.getUrl(),
-							success: function(response, status, xhr) {
+						$.get(url.getUrl(), {'onlyHeight': 1}, 'json')
+							.success(function(response, status, xhr) {
 								// 'src' should be added only here to trigger load event after new height is received.
-								img.data('height', +xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'));
+								sbox_height = xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT');
 								img.attr('src', url.getUrl());
-							}
-						});
+							});
 					}
 					else {
 						img.attr('src', url.getUrl());
@@ -538,29 +474,6 @@
 			else {
 				screen.isReRefreshRequire = true;
 			}
-		},
-
-		isRefreshAllowed: function(screen) {
-			return empty(timeControl.timeline) ? true : timeControl.timeline.isNow();
-		},
-
-		getCalculatedSTime: function(screen) {
-			if (timeControl.timeline && timeControl.timeline.is_selectall_period) {
-				return timeControl.timeline.usertime();
-			}
-
-			return screen.timeline.stime;
-		},
-
-		/**
-		 * Return period in seconds for requesting data. Automatically calculates period when 'All' period is selected.
-		 *
-		 * @property {Object} screen screen object
-		 *
-		 * @return {int}
-		 */
-		getCalculatedPeriod: function (screen) {
-			return !empty(timeControl.timeline) ? timeControl.timeline.period() : screen.timeline.period;
 		},
 
 		cleanAll: function() {
