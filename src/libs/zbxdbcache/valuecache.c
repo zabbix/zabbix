@@ -2124,10 +2124,12 @@ static void	vch_item_get_values_by_time_and_count(zbx_vc_item_t *item, zbx_vecto
 	/* fill the values vector with item history values until the start timestamp is reached */
 	while (0 < zbx_timespec_compare(&chunk->slots[chunk->last_value].timestamp, &start))
 	{
-		while (index >= chunk->first_value && values->values_num < count &&
-				0 < zbx_timespec_compare(&chunk->slots[index].timestamp, &start))
+		while (index >= chunk->first_value && 0 < zbx_timespec_compare(&chunk->slots[index].timestamp, &start))
 		{
 			vc_history_record_vector_append(values, item->value_type, &chunk->slots[index--]);
+
+			if (values->values_num == count)
+				goto out;
 		}
 
 		if (NULL == (chunk = chunk->prev))
