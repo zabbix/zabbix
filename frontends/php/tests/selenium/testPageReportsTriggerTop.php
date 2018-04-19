@@ -26,26 +26,26 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestCheckTitle('100 busiest triggers');
 		$this->zbxTestCheckHeader('100 busiest triggers');
 		$this->zbxTestTextPresent('Host groups','Hosts','Severity','Filter','From', 'Till');
-//		Click button 'Reset'
+// Click button 'Reset'
 		$this->zbxTestClickXpath('//form[@id=\'id\']/div[2]/button[2]');
 		$this->assertTrue($this->zbxTestCheckboxSelected('severities_0','severities_1',
 		'severities_2','severities_3','severities_4','severities_5'));
-//		Check Host groups "Select" button
+// Check Host groups "Select" button
 		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[3]', 'Select');
-//		Check Hosts "Select" button
+// Check Hosts "Select" button
 		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[2]', 'Select');
-//		Check date button for 'From' field
+// Check date button for 'From' field
 		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li/div[2]/button');
-//		Check date button for 'Till' field
+// Check date button for 'Till' field
 		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li[2]/div[2]/button');
 		$this->zbxTestAssertElementPresentId('filter-mode');
 	}
 
 	public function testPageReportsTriggerTop_CheckDataFilter() {
 		$this->zbxTestLogin('toptriggers.php');
-//		Click button 'Reset'
+// Click button 'Reset'
 		$this->zbxTestClickXpath('//form[@id=\'id\']/div[2]/button[2]');
-//		Check default values of date filter
+// Check default values of date filter
 		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
 		$this->zbxTestAssertElementValue('filter_from_month', date('m'));
 		$this->zbxTestAssertElementValue('filter_from_day', date('d'));
@@ -56,7 +56,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('+1 day')));
 		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
 		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-//		Check 'Yesterday' button
+// Check 'Yesterday' button
 		$this->zbxTestClickXpath('(//button[@type=\'button\'])[7]');
 		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 day')));
 		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('-1 day')));
@@ -68,7 +68,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementValue('filter_till_day', date('d'));
 		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
 		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-//		Check 'Current week' button
+// Check 'Current week' button
 		$this->zbxTestClickXpath('(//button[@type=\'button\'])[8]');
 		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('monday this week')));
 		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('monday this week')));
@@ -80,7 +80,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('monday next week')));
 		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
 		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-//		Check 'Current month' button
+// Check 'Current month' button
 		$this->zbxTestClickXpath('(//button[@type=\'button\'])[9]');
 		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
 		$this->zbxTestAssertElementValue('filter_from_month', date('m'));
@@ -92,7 +92,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
 		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
 		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-//		Check 'Current year' button
+// Check 'Current year' button
 		$this->zbxTestClickXpath('(//button[@type=\'button\'])[10]');
 		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
 		$this->zbxTestAssertElementValue('filter_from_month', date('01'));
@@ -104,7 +104,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
 		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
 		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-//		Check 'Last week' button
+// Check 'Last week' button
 		$this->zbxTestClickXpath('(//button[@type=\'button\'])[11]');
 		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('monday last week')));
 		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('monday last week')));
@@ -116,7 +116,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('monday this week')));
 		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
 		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-//		Check 'Last month' button
+// Check 'Last month' button
 		$this->zbxTestClickXpath('(//button[@type=\'button\'])[12]');
 		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 month')));
 		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('-1 month')));
@@ -128,7 +128,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
 		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
 		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-//		Check 'Last year' button
+// Check 'Last year' button
 		$this->zbxTestClickXpath('(//button[@type=\'button\'])[13]');
 		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 year')));
 		$this->zbxTestAssertElementValue('filter_from_month', date('01'));
@@ -287,7 +287,7 @@ class testPageReportsTriggerTop extends CWebTest {
 	 */
 	public function testPageReportsTriggerTop_CheckFilter($data) {
 		$this->zbxTestLogin('toptriggers.php');
-//		Click button 'Reset'
+// Click button 'Reset'
 		$this->zbxTestClickXpath('//form[@id=\'id\']/div[2]/button[2]');
 
 		if (array_key_exists('host_gr_id', $data)) {
@@ -316,7 +316,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestAssertElementText('//div[@id=\'hostids_\']/div/ul/li/span/span', $data['host']);
 			}
 
-//		Update date in 'From' field
+// Update date in 'From' field
 		if (array_key_exists('filter_from_year',$data)){
 			$this->zbxTestInputTypeOverwrite('filter_from_year',$data['filter_from_year']);
 		}
@@ -374,19 +374,10 @@ class testPageReportsTriggerTop extends CWebTest {
 
 		$this->zbxTestClickXpath('//button[@name=\'filter_set\']');
 		if (array_key_exists('result',$data)){
-			$result_count = 0;
-
-			foreach ($data['result'] as $result_row){
-				$this->zbxTestTextPresent($result_row);
-
-				$result_count++;
-				if (count($data['result']) == $result_count) {
-					break;
-				}
-				}
+			$this->zbxTestTextPresent($data['result']);
 			}
 		else {
 			$this->zbxTestTextPresent('No data found.');
-		}
+			}
 	}
 }
