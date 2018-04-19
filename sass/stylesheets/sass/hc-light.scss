@@ -621,6 +621,9 @@ ul.top-nav-icons {
 		}
 
 		td {
+
+			box-shadow: inset 0 -1px 0 0 $table-border-color;
+
 			.icon-wzrd-action {
 				background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
 			}
