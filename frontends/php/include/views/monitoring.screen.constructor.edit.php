@@ -274,7 +274,6 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 				'parameters' => [
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
-					'srcfld2' => 'resourceid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
 					'webitems' => true,
