@@ -45,7 +45,8 @@ class CGraphWidgetForm extends CWidgetForm {
 			$field_item = (new CWidgetFieldItem('itemid', _('Item')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
-				->setFilterParameter('numeric', true);
+				->setFilterParameter('numeric', true)
+				->setFilterParameter('with_simple_graph_items', true);
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);
