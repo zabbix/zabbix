@@ -5295,6 +5295,8 @@ svg {
 	color: $input-placeholder-color;
 }
 
+@if $theme_name == 'dev' {
+
 /*doc
 ---
 //title: About
@@ -6187,3 +6189,4 @@ Widgets are used as containers to group any related information. Widget consists
 </div>
 ```
 */
+}
