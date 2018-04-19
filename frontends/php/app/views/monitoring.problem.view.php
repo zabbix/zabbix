@@ -291,18 +291,18 @@ if ($data['action'] == 'problem.view') {
 				(new CLabel(_('Show timeline'), 'filter_show_timeline'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('filter_show_timeline'))
 					->setChecked($data['filter']['show_timeline'] == 1)
-					->setDisabled($data['filter']['compact_view'] == 1),
+					->setEnabled($data['filter']['compact_view'] == 0),
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		])
 		->addRow(_('Show details'), [
 			(new CCheckBox('filter_details'))
 				->setChecked($data['filter']['details'] == 1)
-				->setDisabled($data['filter']['compact_view'] == 1),
+				->setEnabled($data['filter']['compact_view'] == 0),
 			(new CDiv([
 				(new CLabel(_('Highlight whole row'), 'filter_highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('filter_highlight_row'))
 					->setChecked($data['filter']['highlight_row'] == 1)
-					->setDisabled($data['filter']['compact_view'] == 0)
+					->setEnabled($data['filter']['compact_view'] == 1)
 			]))
 				->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
 				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)

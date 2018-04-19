@@ -50,7 +50,7 @@
 
 		$('#filter_show').trigger('change');
 
-		$('#filter_compact_view').click(function() {
+		$('#filter_compact_view').change(function() {
 			if ($(this).is(':checked')) {
 				$('#filter_show_timeline, #filter_details').attr('disabled', true);
 				$('#filter_highlight_row').removeAttr('disabled');
@@ -61,14 +61,23 @@
 			}
 		});
 
-		$('table.compact-view a.link-action').mouseover(function() {
+		$('table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>').each(function() {
 			var anchor = $(this),
 				anchor_width = anchor.width(),
 				cell_width = anchor.parent('td').width();
 
-			if (!anchor.attr('title') && anchor_width > cell_width) {
-				anchor.attr({title: anchor.text()});
-			}
+			anchor.hover(
+				function() {
+					if (anchor_width > cell_width) {
+						anchor.attr({title: anchor.text()});
+					}
+				},
+				function() {
+					if (anchor.is('[title]')) {
+						anchor.removeAttr('title');
+					}
+				}
+			);
 		});
 	});
 </script>
