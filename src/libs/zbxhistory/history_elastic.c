@@ -269,46 +269,46 @@ static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
 	if (SUCCEED != zbx_json_open(page->data, &jp) || SUCCEED != zbx_json_brackets_open(jp.start, &jp_values))
 		return FAIL;
 
-	if (NULL == (errors = zbx_json_pair_by_name(&jp_values, "errors")))
+	if (NULL == (errors = zbx_json_pair_by_name(&jp_values, "errors")) || 0 != strncmp("true", errors, 4))
 		return FAIL;
 
-	if (0 == strncmp("true", errors, 4))
+	if (SUCCEED == zbx_json_brackets_by_name(&jp, "items", &jp_items))
 	{
-		if (SUCCEED == zbx_json_brackets_by_name(&jp, "items", &jp_items))
+		while (NULL != (p = zbx_json_next(&jp_items, p)))
 		{
-			while (NULL != (p = zbx_json_next(&jp_items, p)))
+			if (SUCCEED == zbx_json_brackets_open(p, &jp_item) &&
+					SUCCEED == zbx_json_brackets_by_name(&jp_item, "index", &jp_index) &&
+					SUCCEED == zbx_json_brackets_by_name(&jp_index, "error", &jp_error))
 			{
-				if (SUCCEED == zbx_json_brackets_open(p, &jp_item) &&
-						SUCCEED == zbx_json_brackets_by_name(&jp_item, "index", &jp_index) &&
-						SUCCEED == zbx_json_brackets_by_name(&jp_index, "error", &jp_error))
-				{
-					rc_js |= zbx_json_value_by_name_dyn(&jp_error, "type", &type, &type_alloc);
-					rc_js |= zbx_json_value_by_name_dyn(&jp_error, "reason", &reason,
-							&reason_alloc);
-				}
-				else
-					continue;
-
-				rc_js |= zbx_json_value_by_name_dyn(&jp_index, "status", &status, &status_alloc);
-				rc_js |= zbx_json_value_by_name_dyn(&jp_index, "_index", &index, &index_alloc);
-				break;
+				if (SUCCEED != zbx_json_value_by_name_dyn(&jp_error, "type", &type, &type_alloc))
+					rc_js = FAIL;
+				if (SUCCEED != zbx_json_value_by_name_dyn(&jp_error, "reason", &reason, &reason_alloc))
+					rc_js = FAIL;
 			}
+			else
+				continue;
+
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_index, "status", &status, &status_alloc))
+				rc_js = FAIL;
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_index, "_index", &index, &index_alloc))
+				rc_js = FAIL;
+
+			break;
 		}
-
-		*err = zbx_dsprintf(NULL,"index:%s status:%s type:%s reason:%s%s", ZBX_NULL2EMPTY_STR(index),
-				ZBX_NULL2EMPTY_STR(status), ZBX_NULL2EMPTY_STR(type), ZBX_NULL2EMPTY_STR(reason),
-				SUCCEED != rc_js ? " / elasticsearch version is not fully compatible with zabbix "
-				"server" : "");
-
-		zbx_free(status);
-		zbx_free(type);
-		zbx_free(reason);
-		zbx_free(index);
-
-		return SUCCEED;
 	}
+	else
+		rc_js = FAIL;
 
-	return FAIL;
+	*err = zbx_dsprintf(NULL,"index:%s status:%s type:%s reason:%s%s", ZBX_NULL2EMPTY_STR(index),
+			ZBX_NULL2EMPTY_STR(status), ZBX_NULL2EMPTY_STR(type), ZBX_NULL2EMPTY_STR(reason),
+			FAIL == rc_js ? " / elasticsearch version is not fully compatible with zabbix server" : "");
+
+	zbx_free(status);
+	zbx_free(type);
+	zbx_free(reason);
+	zbx_free(index);
+
+	return SUCCEED;
 }
 
 /******************************************************************************************************************
