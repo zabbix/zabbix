@@ -175,8 +175,7 @@ switch ($data['new_condition']['conditiontype']) {
 					'srcfld2' => 'host',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'editable' => true,
-					'templated_hosts' => true
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -1051,8 +1050,7 @@ if (!empty($data['new_operation'])) {
 							'srcfld2' => 'host',
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'new_operation_templateids_',
-							'editable' => true,
-							'templated_hosts' => true
+							'editable' => true
 						]
 					]
 				]))

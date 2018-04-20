@@ -399,7 +399,6 @@ $newTemplateTable = (new CTable())
 					'srcfld2' => 'host',
 					'dstfrm' => $frmHost->getName(),
 					'dstfld1' => 'add_templates_',
-					'templated_hosts' => true,
 					'templateid' => $data['templateid']
 				]
 			]

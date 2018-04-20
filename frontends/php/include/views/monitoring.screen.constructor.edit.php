@@ -253,8 +253,6 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 		}
 	}
 
-	$templated = ($data['screen']['templateid'] != 0);
-
 	$screenFormList->addRow(
 		(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
 		(new CMultiSelect([
@@ -278,10 +276,9 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'webitems' => true,
 					'numeric' => true,
-					'templated_hosts' => $templated,
-					'hostid' => $templated ? $data['screen']['templateid'] : 0,
-					'real_hosts' => !$templated,
-					'with_simple_graph_items' => !$templated
+					'hostid' => $data['screen']['templateid'],
+					'real_hosts' => ($data['screen']['templateid'] != 0),
+					'with_simple_graph_items' => ($data['screen']['templateid'] != 0)
 				]
 			]
 		]))
@@ -424,8 +421,6 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		}
 	}
 
-	$templated = ($data['screen']['templateid'] != 0);
-
 	$screenFormList
 		->addRow(
 			(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
@@ -448,9 +443,8 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 						'srcfld1' => 'itemid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
-						'templated_hosts' => $templated,
-						'hostid' => $templated ? $data['screen']['templateid'] : 0,
-						'real_hosts' => !$templated,
+						'hostid' => $data['screen']['templateid'],
+						'real_hosts' => ($data['screen']['templateid'] != 0),
 						'webitems' => true
 					]
 				],
@@ -767,8 +761,6 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 			}
 		}
 
-		$templated = ($data['screen']['templateid'] != 0);
-
 		$screenFormList->addRow(
 			(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
 			(new CMultiSelect([
@@ -790,9 +782,8 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'srcfld1' => 'itemid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
-						'templated_hosts' => $templated,
-						'hostid' => $templated ? $data['screen']['templateid'] : 0,
-						'real_hosts' => !$templated,
+						'hostid' => $data['screen']['templateid'],
+						'real_hosts' => ($data['screen']['templateid'] != 0),
 						'webitems' => true
 					]
 				]

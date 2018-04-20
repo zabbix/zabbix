@@ -312,8 +312,7 @@ else {
 						'srcfld1' => 'hostid',
 						'srcfld2' => 'host',
 						'dstfrm' => $frmHost->getName(),
-						'dstfld1' => 'add_templates_',
-						'templated_hosts' => true
+						'dstfld1' => 'add_templates_'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

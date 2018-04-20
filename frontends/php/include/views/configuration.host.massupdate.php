@@ -201,8 +201,7 @@ $newTemplateTable = (new CTable())
 					'srcfld1' => 'hostid',
 					'srcfld2' => 'host',
 					'dstfrm' => $hostView->getName(),
-					'dstfld1' => 'templates_',
-					'templated_hosts' => true
+					'dstfld1' => 'templates_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
