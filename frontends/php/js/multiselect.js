@@ -309,10 +309,6 @@ jQuery(function($) {
 											limit: getLimit(values, options)
 										}
 
-										if (options.only_hostid > 0) {
-											request_data.only_hostid = options.only_hostid;
-										}
-
 										jqxhr = $.ajax({
 											url: options.url + '&curtime=' + new CDate().getTime(),
 											type: 'GET',

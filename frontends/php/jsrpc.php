@@ -284,7 +284,7 @@ switch ($data['method']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'key_'],
 					'selectHosts' => ['name'],
-					'hostids' => array_key_exists('only_hostid', $data) ? $data['only_hostid'] : null,
+					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
