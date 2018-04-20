@@ -20,12 +20,12 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetSysmapView extends CControllerWidget {
+class CControllerWidgetMapView extends CControllerWidget {
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_SYSMAP);
+		$this->setType(WIDGET_MAP);
 		$this->setValidationRules([
 			'name' => 'string',
 			'uniqueid' => 'required|string',

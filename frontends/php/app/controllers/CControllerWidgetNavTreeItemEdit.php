@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetNavigationtreeItemEditDialog extends CController {
+class CControllerWidgetNavTreeItemEdit extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();

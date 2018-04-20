@@ -51,7 +51,7 @@ class testGeneric extends CWebTest {
 			['hostinventories.php',			'Host inventory'],
 
 			// reports
-			['zabbix.php?action=report.status',					'Status of Zabbix'],
+			['zabbix.php?action=report.status',					'System information'],
 			['report2.php',										'Availability report'],
 			['toptriggers.php',									'100 busiest triggers'],
 			['toptriggers.php?severities[0]=0&filter_set=Filter',	'100 busiest triggers'],

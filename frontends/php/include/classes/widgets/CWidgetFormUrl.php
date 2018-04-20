@@ -19,26 +19,29 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+/**
+ * URL widget form.
+ */
+class CWidgetFormUrl extends CWidgetForm {
 
-class CControllerWidgetStatusView extends CControllerWidget {
+	public function __construct($data) {
+		parent::__construct($data, WIDGET_URL);
 
-	public function __construct() {
-		parent::__construct();
+		// URL field
+		$field_url = (new CWidgetFieldUrl('url', _('URL')))
+			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
-		$this->setType(WIDGET_ZABBIX_STATUS);
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'json'
-		]);
-	}
+		if (array_key_exists('url', $this->data)) {
+			$field_url->setValue($this->data['url']);
+		}
+		$this->fields[] = $field_url;
 
-	protected function doAction() {
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		]));
+		// dynamic item
+		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
+
+		if (array_key_exists('dynamic', $this->data)) {
+			$field_dynamic->setValue($this->data['dynamic']);
+		}
+		$this->fields[] = $field_dynamic;
 	}
 }
