@@ -728,6 +728,7 @@ static int	DBpatch_3050066(void)
 			"favmap", "favmaps",
 			"favscr", "favscreens",
 			"hoststat", "problemhosts",
+			"navigationtree", "navtree",
 			"stszbx", "systeminfo",
 			"sysmap", "map",
 			"syssum", "problemsbysv",
