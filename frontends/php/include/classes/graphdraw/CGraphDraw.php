@@ -72,6 +72,7 @@ abstract class CGraphDraw {
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
 		$this->graphtheme = getUserGraphTheme();
+		$this->shiftY = 0;
 	}
 
 	/**

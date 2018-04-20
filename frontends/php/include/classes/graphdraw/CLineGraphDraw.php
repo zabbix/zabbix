@@ -2690,8 +2690,6 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->selectTriggers();
 		$this->calcDimentions();
 
-		$this->initColors();
-
 		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
 				&& @imagecreatetruecolor(1, 1)
 		) {
@@ -2700,6 +2698,8 @@ class CLineGraphDraw extends CGraphDraw {
 		else {
 			$this->im = imagecreate(1, 1);
 		}
+
+		$this->initColors();
 
 		imageOut($this->im);
 	}
