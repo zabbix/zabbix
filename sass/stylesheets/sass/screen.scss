@@ -682,14 +682,27 @@ output {
 		tr {
 			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
 
-				@if $theme_name == 'blue' or $theme_name == 'dark' {
+				@if $theme_name == 'blue' {
 
-					&:not(:hover) {
+					&:not(.row-selected):not(:hover) {
 						td {
 							color: $font-color;
 
 							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
 								color: $font-color;
+							}
+						}
+					}
+				}
+
+				@if $theme_name == 'dark' {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							color: black;
+
+							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
+								color: black;
 							}
 						}
 					}

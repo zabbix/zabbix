@@ -600,16 +600,15 @@ ul.top-nav-icons {
 	&.compact-view {
 
 		.flh-na-bg, .flh-info-bg, .flh-warning-bg, .flh-average-bg, .flh-high-bg, .flh-disaster-bg {
-			background: none;
-
-			&:hover {
-				background-color: $ui-hover-color;
+			&:not(.row-selected):not(:hover) {
+				background: none;
 			}
 		}
 
 		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
 			&:before {
 				min-height: 20px;
+				box-shadow: inset 0 -1px 0 0 $table-border-color;
 			}
 		}
 
