@@ -262,7 +262,6 @@ switch ($data['method']) {
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['hostid', 'name'],
 					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
-					'monitored_hosts' => array_key_exists('monitored', $data) ? $data['monitored'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);
@@ -286,8 +285,6 @@ switch ($data['method']) {
 					'output' => ['itemid', 'hostid', 'name', 'key_'],
 					'selectHosts' => ['name'],
 					'hostids' => array_key_exists('only_hostid', $data) ? $data['only_hostid'] : null,
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
-					'monitored' => array_key_exists('monitored', $data) ? $data['monitored'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
@@ -338,7 +335,6 @@ switch ($data['method']) {
 
 			case 'proxies':
 				$proxies = API::Proxy()->get([
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['proxyid', 'host'],
 					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
 					'limit' => $config['search_limit']
@@ -432,7 +428,6 @@ switch ($data['method']) {
 
 			case 'users':
 				$users = API::User()->get([
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['userid', 'alias', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
 						? [
