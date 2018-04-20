@@ -617,6 +617,9 @@ calendar.prototype = {
 			this.syncCDT();
 			this.setCDate();
 		}
+
+		this.hl_month = this.month;
+		this.hl_year = this.year;
 	},
 
 	monthdown: function() {
@@ -636,6 +639,9 @@ calendar.prototype = {
 			this.syncCDT();
 			this.setCDate();
 		}
+
+		this.hl_month = this.month;
+		this.hl_year = this.year;
 	},
 
 	yearup: function() {
@@ -645,6 +651,7 @@ calendar.prototype = {
 		this.year++;
 		this.syncCDT();
 		this.setCDate();
+		this.hl_year = this.year;
 	},
 
 	yeardown: function() {
@@ -654,6 +661,7 @@ calendar.prototype = {
 		this.year--;
 		this.syncCDT();
 		this.setCDate();
+		this.hl_year = this.year;
 	},
 
 	syncBSDateBySDT: function() {
