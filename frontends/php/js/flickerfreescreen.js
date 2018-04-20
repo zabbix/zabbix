@@ -294,11 +294,11 @@
 							}
 						});
 
-						$('.article .msg-bad').remove();
+						$('main > .msg-bad').remove();
 
 						// set message
 						if (msg_bad) {
-							$(msg_bad).insertBefore('.article > :first-child');
+							$(msg_bad).insertBefore('main > :first-child');
 							html = $(html).not('.msg-bad');
 						}
 
