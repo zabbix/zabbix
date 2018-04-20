@@ -160,7 +160,8 @@ calendar.prototype = {
 
 		jQuery(document)
 			.off('click', this.calendarDocumentClickHandler)
-			.off('keydown', this.calendarKeyDownHandler);
+			.off('keydown', this.calendarKeyDownHandler)
+			.off('keyup', this.calendarKeyUpHandler);
 
 		removeFromOverlaysStack(this.id.toString());
 	},
@@ -197,6 +198,7 @@ calendar.prototype = {
 
 			jQuery(document)
 				.on('keydown', {calendar: this}, this.calendarKeyDownHandler)
+				.on('keyup', {calendar: this}, this.calendarKeyUpHandler)
 				.on('click', this.calendarDocumentClickHandler);
 
 			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
@@ -212,6 +214,35 @@ calendar.prototype = {
 				cal.clndr.clndrhide();
 			}
 		});
+	},
+
+	/**
+	 * This function is workaround for Firefox bug.
+	 *
+	 * When triggering keydown event on [space] button, event is called for both, the actual element as well as calendar
+	 * icon elemnet, so the calendar is first closed (by handeler of actually focused element) and immediately opened
+	 * again (by calendar icon element's handler).
+	 *
+	 * Workaround works as follow - it separates [enter] and [space] button in 2 handlers with similar functionality
+	 * (since pressing [space] and [enter] does the same thing in calendar). Keyup handles the [space] click event,
+	 * while other keyboard events are handled by keydown event.
+	 */
+	calendarKeyUpHandler: function(event) {
+		var cal = event.data.calendar;
+
+		if (event.which == 32) { // SPACE
+			// Enter has special meaning for each Calendar section.
+			var active_section = cal.sections[cal.active_section];
+			if (active_section === '.calendar-year' ||  active_section === '.calendar-month') {
+				cal.active_section++;
+				cal.focusSection();
+			}
+			else if (active_section === '.calendar-date') {
+				cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
+			}
+
+			return false; // Prevent page scrolling when pressing Space.
+		}
 	},
 
 	calendarKeyDownHandler: function(event) {
@@ -334,7 +365,6 @@ calendar.prototype = {
 				break;
 
 			case 13: // Enter
-			case 32: // Space
 				// Enter has special meaning for each Calendar section.
 				var active_section = cal.sections[cal.active_section];
 				if (active_section === '.calendar-year' ||  active_section === '.calendar-month') {
@@ -345,7 +375,7 @@ calendar.prototype = {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 				}
 
-				return false; // Prevent page scrolling when pressing Space.
+				return false;
 				break;
 		}
 	},
