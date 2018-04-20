@@ -61,23 +61,17 @@
 			}
 		});
 
-		$('table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>').each(function() {
-			var anchor = $(this),
-				anchor_width = anchor.width(),
-				cell_width = anchor.parent('td').width();
-
-			anchor.hover(
-				function() {
-					if (anchor_width > cell_width) {
-						anchor.attr({title: anchor.text()});
-					}
-				},
-				function() {
-					if (anchor.is('[title]')) {
-						anchor.removeAttr('title');
-					}
+		$(document).on({
+			mouseenter: function() {
+				if ($(this).width() > $(this).parent('td').width()) {
+					$(this).attr({title: $(this).text()});
 				}
-			);
-		});
+			},
+			mouseleave: function() {
+				if ($(this).is('[title]')) {
+					$(this).removeAttr('title');
+				}
+			}
+		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
 	});
 </script>
