@@ -3513,6 +3513,10 @@ $form-icon-btn: (
 				&.selected {
 					background-color: $ui-bg-selected-color;
 					color: $white;
+
+					&:hover {
+						background-color: darken($ui-bg-selected-color, 4%);
+					}
 				}
 
 				&:hover {
