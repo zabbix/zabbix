@@ -22,12 +22,12 @@
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
-class CControllerWidgetSystemView extends CControllerWidget {
+class CControllerWidgetProblemsBySvView extends CControllerWidget {
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_SYSTEM_STATUS);
+		$this->setType(WIDGET_PROBLEMS_BY_SV);
 		$this->setValidationRules([
 			'name' => 'string',
 			'fullscreen' => 'in 0,1',

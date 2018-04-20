@@ -1,6 +1,9 @@
 Changes for 4.0.0alpha6
 
 New features:
+..F....... [ZBXNEXT-4516] renamed dashboard widget and screen element "System status" to "Problems by severity" (Sasha)
+..F....... [ZBXNEXT-4516] renamed dashboard widget and screen element "Host status" to "Problem hosts" (Sasha)
+..F....... [ZBXNEXT-4516] renamed dashboard widget, screen element and report "Status of Zabbix" to "System information" (Sasha)
 ....IJ.... [ZBX-13376] moved functionality to enable JMX interface in Java gateway to settings.sh and ensured setting TCP timeout (dimir)
 A....J.... [ZBXNEXT-4458] improved logging of Java gateway, added username/password validation for JMX items (vjaceslavs)
 A.F.I..PS. [ZBXNEXT-4411] added compression of server-proxy data exchange (miks, wiper)
