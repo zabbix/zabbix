@@ -199,7 +199,7 @@ function getFontComboBox($name) {
 									'dstfld1' => 'sysmapid',
 									'dstfld2' => 'elementNameMap'
 								]).
-									',{excludeids: [#{sysmapid}]}), null, this);'
+									',{excludeids: {#{sysmapid}: true}}), null, this);'
 							)
 					], 'mapSelectRow')
 					->addRow(_('Application'), [

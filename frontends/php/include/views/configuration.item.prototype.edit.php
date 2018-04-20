@@ -111,7 +111,9 @@ if (!$readonly) {
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',
 				'parent_discoveryid' => $data['parent_discoveryid'],
-				'excludeids' => [$data['itemid']]
+				'excludeids' => [
+					$data['itemid'] => true
+				]
 			]).', null, this);'
 		);
 }

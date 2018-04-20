@@ -436,7 +436,6 @@ class CControllerPopupGeneric extends CController {
 	}
 
 	protected function doAction() {
-		$excludeids = zbx_toHash($this->getInput('excludeids', []));
 		$records = [];
 
 		$value_types = null;
@@ -572,7 +571,7 @@ class CControllerPopupGeneric extends CController {
 			'dstfrm' => $this->getInput('dstfrm', ''),
 			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
-			'excludeids' => $excludeids,
+			'excludeids' => $this->getInput('excludeids', []),
 			'multiselect' => $this->getInput('multiselect', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
@@ -822,9 +821,9 @@ class CControllerPopupGeneric extends CController {
 					$records = API::Item()->get($options);
 				}
 
-				if ($excludeids) {
+				if ($page_options['excludeids']) {
 					foreach ($records as $item) {
-						if (array_key_exists($item['itemid'], $excludeids)) {
+						if (array_key_exists($item['itemid'], $page_options['excludeids'])) {
 							unset($records[$item['itemid']]);
 						}
 					}
