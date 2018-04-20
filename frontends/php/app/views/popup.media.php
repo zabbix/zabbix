@@ -76,6 +76,7 @@ $media_form = (new CFormList(_('Media')))
 	);
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('media_form')
 	->addVar('action', 'popup.media')
 	->addVar('add', '1')
