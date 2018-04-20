@@ -520,7 +520,7 @@ switch ($data['method']) {
 		}
 		else {
 			$errors = [
-				'from' => !$from_datetime instanceof DateTimeImmutable || $from_datetime > $to_date
+				'from' => !$from_datetime instanceof DateTimeImmutable || $from_datetime > $to_datetime
 					? _s('Invalid date "%s".', $from)
 					: '',
 				'to' => !$to_datetime instanceof DateTimeImmutable || $to_datetime < $from_datetime

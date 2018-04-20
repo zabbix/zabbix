@@ -119,7 +119,10 @@
 						self.refreshImg(id, function() {
 							$('a', '#flickerfreescreen_' + id).each(function() {
 								var obj = $(this),
-									url = self.setTimerangeArguments(new Curl(obj.attr('href')));
+									url = new Curl(obj.attr('href'));
+
+								url.setArgument('from', screen.timeline.from);
+								url.setArgument('to', screen.timeline.to);
 
 								obj.attr('href', url.getUrl());
 							});
@@ -409,21 +412,39 @@
 							}
 						});
 
-					if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(url.getPath()) > -1
-							&& url.getArgument('outer') === '1') {
-						// Getting height of graph inside image. Only for line graphs on dashboard.
-						$.get(url.getUrl(), {'onlyHeight': 1}, 'json')
-							.success(function(response, status, xhr) {
-								// 'src' should be added only here to trigger load event after new height is received.
-								sbox_height = xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT');
-								img.attr('src', url.getUrl());
-							});
-					}
-					else {
+					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+						// 'src' should be added only here to trigger load event after new height is received.
+						sbox_height = height;
+						img.attr('src', url.getUrl());
+					});
+
+					if (async === null) {
 						img.attr('src', url.getUrl());
 					}
 				});
 			}
+		},
+
+		/**
+		 * Getting shadow box height of graph image, asynchronious. Only for line graphs on dashboard.
+		 * Will return xhr request for line graphs.
+		 *
+		 * @param {Curl}     url  Curl object for image request.
+		 *                        Endpoint should support returning height via HTTP header.
+		 * @param {function} cb   Callable, will be called with value of shadow box height.
+		 *
+		 * @return {object|null}
+		 */
+		getImageSboxHeight: function (url, cb) {
+			if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(url.getPath()) > -1
+					&& url.getArgument('outer') === '1') {
+				return $.get(url.getUrl(), {'onlyHeight': 1}, 'json')
+					.success(function(response, status, xhr) {
+						cb(xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'))
+					});
+			}
+
+			return null;
 		},
 
 		refreshProfile: function(id, ajaxUrl) {

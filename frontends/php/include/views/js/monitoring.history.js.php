@@ -45,16 +45,14 @@
 			var form = $(this).parents('form');
 			form.append($('<input>', {
 				type: 'hidden',
-				name: 'period',
-				value: timeControl.timeline.period()
-			}));
-			if (!timeControl.timeline.isNow()) {
-				form.append($('<input>', {
+				name: 'from',
+				value: timeControl.timeline.from
+			}))
+				.append($('<input>', {
 					type: 'hidden',
-					name: 'stime',
-					value: timeControl.timeline.usertime() - timeControl.timeline.period()
+					name: 'to',
+					value: timeControl.timeline.to
 				}));
-			}
 			form.submit();
 		})
 	});

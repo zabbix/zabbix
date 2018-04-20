@@ -140,7 +140,7 @@ else {
 
 	$timeline = null;
 	if ($data['show_timeline']) {
-		$timeline = (new CFilter('web.dashbrd.filter.state'))->addNavigator();
+		$timeline = (new CFilter('web.dashbrd.filter.state'))->addTimeSelector();
 
 		if ($data['kioskmode']) {
 			$timeline->setHidden();

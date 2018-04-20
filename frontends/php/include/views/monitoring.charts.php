@@ -56,7 +56,7 @@ $chartsWidget = (new CWidget())
 		->addItem($controls)
 	);
 
-$filterForm = (new CFilter('web.charts.filter.state'))->addNavigator();
+$filterForm = (new CFilter('web.charts.filter.state'))->addTimeSelector('Test');
 $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {
