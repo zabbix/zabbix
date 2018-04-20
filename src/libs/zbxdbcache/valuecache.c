@@ -1961,8 +1961,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 
 	start = ts->sec - seconds;
 
-	/* check if the requested period is in the cached range                            */
-	/* (the first interval endpoint is excluded, thats why we have to check start + 1) */
+	/* check if the requested period is in the cached range */
 	if (0 != item->db_cached_from && start >= item->db_cached_from)
 		return SUCCEED;
 
