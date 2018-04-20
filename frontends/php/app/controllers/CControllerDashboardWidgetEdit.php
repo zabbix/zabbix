@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerDashbrdWidgetConfig extends CController {
+class CControllerDashboardWidgetEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [

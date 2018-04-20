@@ -49,7 +49,7 @@ class testFormHost extends CWebTest {
 	public function testFormHost_Create() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickButtonText('Create host');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $this->host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -65,7 +65,7 @@ class testFormHost extends CWebTest {
 		$host="1234567890123456789012345678901234567890123456789012345678901234";
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -112,7 +112,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -132,7 +132,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
@@ -152,7 +152,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestInputType('visiblename', $hostVisible);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -305,7 +305,7 @@ class testFormHost extends CWebTest {
 
 		// this should be a separate test
 		// should check that items, triggers, graphs and applications are not linked to the template anymore
-		$this->zbxTestHrefClickWait('items.php?filter_set=1&hostid='.$hostid);
+		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&hostid=".$hostid."')]", 'filter_application');
 		$this->zbxTestTextNotPresent($template.':');
 		// using "host navigation bar" at the top of entity list
 		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
@@ -364,7 +364,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
-		$this->zbxTestHrefClickWait('items.php?filter_set=1&hostid='.$hostid);
+		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&hostid=".$hostid."')]", 'filter_application');
 		$this->zbxTestTextNotPresent($template.':');
 
 		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);

@@ -391,67 +391,6 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 
 /******************************************************************************
  *                                                                            *
- * Function: db_update_proxies_lastaccess                                     *
- *                                                                            *
- * Purpose: updates proxy last access timestamp in database                   *
- *                                                                            *
- * Parameter: proxy_diff - [IN] last access updates for proxies               *
- *                                                                            *
- ******************************************************************************/
-static void	db_update_proxies_lastaccess(const zbx_vector_uint64_pair_t *proxy_diff)
-{
-	char	*sql;
-	size_t	sql_alloc = 256, sql_offset = 0;
-	int	i;
-
-	sql = (char *)zbx_malloc(NULL, sql_alloc);
-
-	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < proxy_diff->values_num; i++)
-	{
-		zbx_uint64_pair_t	pair = proxy_diff->values[i];
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts"
-				" set lastaccess=%d"
-				" where hostid=" ZBX_FS_UI64 ";\n",
-				pair.second, pair.first);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
-	DBcommit();
-
-	zbx_free(sql);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: update_proxy_lastaccess                                          *
- *                                                                            *
- ******************************************************************************/
-void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access)
-{
-	zbx_vector_uint64_pair_t	proxy_diff;
-
-	zbx_vector_uint64_pair_create(&proxy_diff);
-
-	zbx_dc_update_proxy_lastaccess(hostid, last_access, &proxy_diff);
-
-	if (0 != proxy_diff.values_num)
-		db_update_proxies_lastaccess(&proxy_diff);
-
-	zbx_vector_uint64_pair_destroy(&proxy_diff);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_proxyconfig_table                                            *
  *                                                                            *
  * Purpose: prepare proxy configuration data                                  *
@@ -531,13 +470,14 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 				",hosts r where t.hostid=r.hostid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
-					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				proxy_hostid,
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
-				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL);
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL,
+				ITEM_TYPE_HTTPAGENT);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -3014,8 +2954,23 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 	if (0 != item->host.proxy_hostid)
 		return FAIL;
 
-	if (ITEM_TYPE_TRAPPER != item->type)
-		return FAIL;
+	switch(item->type)
+	{
+		case ITEM_TYPE_HTTPAGENT:
+			if (0 == item->allow_traps)
+			{
+				*error = zbx_dsprintf(*error, "cannot process HTTP agent item \"%s\" trap:"
+						" trapping is not enabled", item->key_orig);
+				return FAIL;
+			}
+			break;
+		case ITEM_TYPE_TRAPPER:
+			break;
+		default:
+			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap:"
+					" item type \"%d\" cannot be used with traps", item->key_orig, item->type);
+			return FAIL;
+	}
 
 	if ('\0' != *item->trapper_hosts)	/* list of allowed hosts not empty */
 	{
@@ -3023,15 +2978,15 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 		int	ret;
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, &allowed_peers,
-				MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL,
+				&allowed_peers, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
 
 		if (FAIL == ret)
 		{
-			*error = zbx_dsprintf(*error,  "cannot process trapper item \"%s\": %s", item->key_orig,
-					zbx_socket_strerror());
+			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap: %s",
+					item->key_orig, zbx_socket_strerror());
 			return FAIL;
 		}
 	}
@@ -3254,7 +3209,8 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 	DB_DHOST		dhost;
 	zbx_uint64_t		last_druleid = 0, dcheckid;
 	struct zbx_json_parse	jp_row;
-	int			port, status, ret = SUCCEED;
+	int			status, ret = SUCCEED;
+	unsigned short		port;
 	const char		*p = NULL;
 	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
 				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
@@ -3349,7 +3305,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
-				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%d value:'%s'",
+				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%hu value:'%s'",
 				__function_name, drule.druleid, dcheckid, drule.unique_dcheckid, zbx_date2str(itemtime),
 				zbx_time2str(itemtime), ip, dns, port, value);
 
@@ -3638,20 +3594,19 @@ int	proxy_get_history_count(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_proxy_update_version                                         *
+ * Function: zbx_get_protocol_version                                         *
  *                                                                            *
- * Purpose: updates proxy version based on the received version field         *
+ * Purpose: extracts protocol version from json data                          *
  *                                                                            *
  * Parameters:                                                                *
  *     jp      - [IN] JSON with the proxy version                             *
- *     version - [OUT] proxy version                                          *
  *                                                                            *
- * Return value:                                                              *
+ * Return value: The protocol version.                                        *
  *     SUCCEED - proxy version was successfully extracted                     *
  *     FAIL    - otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxy_update_version(DC_PROXY *proxy, struct zbx_json_parse *jp)
+int	zbx_get_protocol_version(struct zbx_json_parse *jp)
 {
 	char	value[MAX_STRING_LEN], *pminor, *ptr;
 	int	version;
@@ -3670,21 +3625,9 @@ int	zbx_proxy_update_version(DC_PROXY *proxy, struct zbx_json_parse *jp)
 	else
 		version = ZBX_COMPONENT_VERSION(3, 2);
 
-	if (proxy->version != version)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" version updated from %d.%d to %d.%d", proxy->host,
-				ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
-				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
-				ZBX_COMPONENT_VERSION_MAJOR(version),
-				ZBX_COMPONENT_VERSION_MINOR(version));
+	return version;
 
-		zbx_dc_update_proxy_version(proxy->hostid, version);
-		proxy->version = version;
-	}
-
-	return SUCCEED;
 }
-
 /******************************************************************************
  *                                                                            *
  * Function: process_proxy_history_data_33                                    *
@@ -3898,4 +3841,102 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_flush_proxy_lastaccess                                    *
+ *                                                                            *
+ * Purpose: flushes lastaccess changes for proxies every                      *
+ *          ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY seconds                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_flush_proxy_lastaccess()
+{
+	zbx_vector_uint64_pair_t	lastaccess;
+
+	zbx_vector_uint64_pair_create(&lastaccess);
+
+	zbx_dc_get_proxy_lastaccess(&lastaccess);
+
+	if (0 != lastaccess.values_num)
+	{
+		char	*sql;
+		size_t	sql_alloc = 256, sql_offset = 0;
+		int	i;
+
+		sql = (char *)zbx_malloc(NULL, sql_alloc);
+
+		DBbegin();
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		for (i = 0; i < lastaccess.values_num; i++)
+		{
+			zbx_uint64_pair_t	*pair = &lastaccess.values[i];
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts"
+					" set lastaccess=%d"
+					" where hostid=" ZBX_FS_UI64 ";\n",
+					pair->second, pair->first);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+			DBexecute("%s", sql);
+
+		DBcommit();
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_pair_destroy(&lastaccess);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_proxy_data                                            *
+ *                                                                            *
+ * Purpose: updates proxy runtime properties in cache and database.           *
+ *                                                                            *
+ * Parameters: proxy      - [IN/OUT] the proxy                                *
+ *             version    - [IN] the proxy version                            *
+ *             lastaccess - [IN] the last proxy access time                   *
+ *             compress   - [IN] 1 if proxy is using data compression,        *
+ *                               0 otherwise                                  *
+ *                                                                            *
+ * Comments: The proxy parameter properties are also updated.                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress)
+{
+	zbx_proxy_diff_t	diff;
+
+	diff.hostid = proxy->hostid;
+	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE;
+	diff.version = version;
+	diff.lastaccess = lastaccess;
+	diff.compress = compress;
+
+	zbx_dc_update_proxy(&diff);
+
+	if (0 != (diff.flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION) && 0 != proxy->version)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %d.%d to %d.%d", proxy->host,
+				ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
+				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
+				ZBX_COMPONENT_VERSION_MAJOR(diff.version),
+				ZBX_COMPONENT_VERSION_MINOR(diff.version));
+	}
+
+	proxy->version = version;
+	proxy->auto_compress = compress;
+	proxy->lastaccess = lastaccess;
+
+	if (0 != (diff.flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
+		DBexecute("update hosts set auto_compress=%d where hostid=" ZBX_FS_UI64, diff.compress, diff.hostid);
+
+	zbx_db_flush_proxy_lastaccess();
 }

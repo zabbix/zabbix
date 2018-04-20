@@ -62,16 +62,20 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == expected_result)
 	{
+		zbx_uint32_t	num;
+
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("func_pos", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
 		{
 			fail_msg("Cannot get expected 'func_pos' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint64(tmp, &func_pos_exp))
+		else if(SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("func_pos parameter \"%s\" is not numeric.", tmp);
 		}
+
+		func_pos_exp = num;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("par_l", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
@@ -79,10 +83,12 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Cannot get expected 'par_l' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint64(tmp, &par_l_exp))
+		else if(SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("par_l parameter \"%s\" is not numeric.", tmp);
 		}
+
+		par_l_exp = num;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("par_r", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
@@ -90,10 +96,12 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Cannot get expected 'par_r' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint64(tmp, &par_r_exp))
+		else if(SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("par_r parameter \"%s\" is not numeric.", tmp);
 		}
+
+		par_r_exp = num;
 	}
 
 	if (FAIL == expected_result && (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("error", &param_handle)) ||

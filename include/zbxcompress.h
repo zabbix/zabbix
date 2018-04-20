@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -18,27 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_COMPRESS_H
+#define ZABBIX_COMPRESS_H
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out);
+int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out);
+const char	*zbx_compress_strerror(void);
 
-class CControllerWidgetStatusView extends CControllerWidget {
-
-	public function __construct() {
-		parent::__construct();
-
-		$this->setType(WIDGET_ZABBIX_STATUS);
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'json'
-		]);
-	}
-
-	protected function doAction() {
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		]));
-	}
-}
+#endif

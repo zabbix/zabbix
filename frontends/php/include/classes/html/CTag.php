@@ -274,6 +274,17 @@ class CTag extends CObject {
 	}
 
 	/**
+	 * Remove ID attribute from tag.
+	 *
+	 * @return CTag
+	 */
+	public function removeId() {
+		$this->removeAttribute('id');
+
+		return $this;
+	}
+
+	/**
 	 * Sanitizes a string according to the given strategy before outputting it to the browser.
 	 *
 	 * @param string	$value

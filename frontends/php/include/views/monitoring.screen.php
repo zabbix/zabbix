@@ -40,10 +40,10 @@ $widget = (new CWidget())
 
 $controls = (new CList())
 	->addItem(
-		new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+		(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
 			'screens.php' => _('Screens'),
 			'slides.php' => _('Slide shows')
-		])
+		]))->removeId()
 );
 
 if (check_dynamic_items($data['screen']['screenid'], 0)) {

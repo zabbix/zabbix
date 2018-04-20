@@ -27,11 +27,12 @@ $output = [
 $options = $data['options'];
 
 $http_popup_form = (new CForm())
+	->cleanItems()
 	->setId('http_step')
 	->addVar('dstfrm', $options['dstfrm'])
 	->addVar('stepid', $options['stepid'])
 	->addVar('list_name', $options['list_name'])
-	->addVar('templated', $options['templated'])
+	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
 	->addVar('action', 'popup.httpstep')
@@ -39,10 +40,11 @@ $http_popup_form = (new CForm())
 
 $http_popup_form_list = (new CFormList())
 	->addRow(
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CLabel(_('Name'), 'step_name'))->setAsteriskMark(),
 		(new CTextBox('name', $options['name'], (bool) $options['templated'], 64))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('step_name')
 	)
 	->addRow(
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),

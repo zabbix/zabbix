@@ -22,13 +22,14 @@
 if (!empty($this->data['parent_discoveryid'])) {
 	$widget = (new CWidget())
 		->setTitle(_('Graph prototypes'))
-		->setControls((new CTag('nav', true,
-			(new CList())
-				->addItem(new CRedirectButton(_('Create graph prototype'), (new CUrl())->setArgument('form', 'create')
-					->getUrl()
+		->setControls(
+			(new CTag('nav', true,
+				(new CList())->addItem(new CRedirectButton(_('Create graph prototype'),
+					(new CUrl())
+						->setArgument('form', 'create')
+						->getUrl()
 				))
-			))
-				->setAttribute('aria-label', _('Content controls'))
+			))->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }

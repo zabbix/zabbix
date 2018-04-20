@@ -496,23 +496,32 @@ function getMenuPopupRefresh(options) {
 						dataType: 'script',
 						success: function(js) { js }
 					});
+
+					jQuery('a', obj.closest('.action-menu')).each(function() {
+						var link = jQuery(this);
+
+						if (link.data('value') == currentRate) {
+							link.addClass('selected');
+						}
+						else {
+							link.removeClass('selected');
+						}
+					});
+
+					obj.closest('.action-menu').menuPopup('close', null);
 				}
 				else {
 					var url = new Curl('zabbix.php');
 
-					url.setArgument('action', 'dashbrd.widget.rfrate')
+					url.setArgument('action', 'dashboard.widget.rfrate')
 
 					jQuery.ajax({
 						url: url.getUrl(),
 						method: 'POST',
 						dataType: 'json',
 						data: {
-							widgets: [
-								{
-									'widgetid': options.widgetName,
-									'rf_rate': currentRate
-								}
-							]
+							'widgetid': options.widgetName,
+							'rf_rate': currentRate
 						},
 						success: function(resp) {
 							jQuery('a', obj.closest('.action-menu')).each(function() {
