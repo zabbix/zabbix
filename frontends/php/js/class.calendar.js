@@ -623,7 +623,6 @@ calendar.prototype = {
 		this.syncSDT();
 		this.syncBSDateBySDT();
 		this.syncCDT();
-		this.setCDate();
 		this.setDone();
 	},
 
