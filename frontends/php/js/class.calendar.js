@@ -334,6 +334,7 @@ calendar.prototype = {
 				break;
 
 			case 13: // Enter
+			case 32: // Space
 				// Enter has special meaning for each Calendar section.
 				var active_section = cal.sections[cal.active_section];
 				if (active_section === '.calendar-year' ||  active_section === '.calendar-month') {
@@ -344,11 +345,7 @@ calendar.prototype = {
 					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
 				}
 
-				return false;
-				break;
-
-			case 32: // Space
-				return false; // Prevent page scrolling.
+				return false; // Prevent page scrolling when pressing Space.
 				break;
 		}
 	},
