@@ -1031,7 +1031,7 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 
 	zbx_history_record_vector_create(&values);
 
-	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, 0, arg1, ts))
+	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, 0, arg1, &ts_end))
 	{
 		if (arg1 <= values.values_num)
 		{
