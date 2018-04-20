@@ -19,31 +19,22 @@
 **/
 
 
-/**
- * Action log widget form.
- */
-class CActionLogWidgetForm extends CWidgetForm {
+class CWidgetFormPlainText extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_ACTION_LOG);
+		parent::__construct($data, WIDGET_PLAIN_TEXT);
 
-		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
-			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
-			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
-			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type').' ('._('descending').')',
-			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type').' ('._('ascending').')',
-			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status').' ('._('descending').')',
-			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status').' ('._('ascending').')',
-			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient').' ('._('descending').')',
-			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient').' ('._('ascending').')'
-		]))
-			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
+		// item field
+		$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
+			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
-		if (array_key_exists('sort_triggers', $this->data)) {
-			$field_sort->setValue($this->data['sort_triggers']);
+		if (array_key_exists('itemid', $this->data)) {
+			$field_item->setValue($this->data['itemid']);
 		}
-		$this->fields[] = $field_sort;
 
+		$this->fields[] = $field_item;
+
+		// Number of records to display.
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
 		))
@@ -53,6 +44,25 @@ class CActionLogWidgetForm extends CWidgetForm {
 		if (array_key_exists('show_lines', $this->data)) {
 			$field_lines->setValue($this->data['show_lines']);
 		}
+
 		$this->fields[] = $field_lines;
+
+		// Show text as HTML.
+		$field_text_as_html = (new CWidgetFieldCheckBox('style', _('Show text as HTML')))->setDefault(0);
+
+		if (array_key_exists('style', $this->data)) {
+			$field_text_as_html->setValue($this->data['style']);
+		}
+
+		$this->fields[] = $field_text_as_html;
+
+		// dynamic item
+		$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(0);
+
+		if (array_key_exists('dynamic', $this->data)) {
+			$dynamic_item->setValue($this->data['dynamic']);
+		}
+
+		$this->fields[] = $dynamic_item;
 	}
 }

@@ -33,14 +33,14 @@ $form = null;
 $options = $data['options'];
 $page_filter = $data['page_filter'];
 
-// Construct table header
-$header_form = new CForm();
+// Construct table header.
+$header_form = (new CForm())->cleanItems();
 foreach ($options as $option_key => $option_value) {
 	if ($option_value === true) {
-		$header_form->addVar($option_key, 1);
+		$header_form->addItem((new CVar($option_key, 1))->removeId());
 	}
 	elseif ($option_value) {
-		$header_form->addVar($option_key, $option_value);
+		$header_form->addItem((new CVar($option_key, $option_value))->removeId());
 	}
 }
 
@@ -56,6 +56,7 @@ if (array_key_exists('only_hostid', $options)) {
 				->addItem($host['hostid'], $host['name'])
 				->setEnabled(false)
 				->setTitle(_('You can not switch hosts for current selection.'))
+				->removeId()
 		];
 	}
 }
@@ -125,6 +126,7 @@ if ($controls) {
 // Create form.
 if ($data['form']) {
 	$form = (new CForm())
+		->cleanItems()
 		->setName($data['form']['name'])
 		->setId($data['form']['id']);
 }

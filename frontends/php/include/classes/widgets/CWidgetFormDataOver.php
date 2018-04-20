@@ -22,10 +22,10 @@
 /**
  * Data overview widget form.
  */
-class CDataOverviewWidgetForm extends CWidgetForm {
+class CWidgetFormDataOver extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_DATA_OVERVIEW);
+		parent::__construct($data, WIDGET_DATA_OVER);
 
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
