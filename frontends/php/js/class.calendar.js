@@ -675,7 +675,6 @@ calendar.prototype = {
 			return ;
 		}
 		this.year++;
-		this.validate();
 		this.syncCDT();
 		this.setCDate();
 		this.hl_year = this.year;
@@ -686,24 +685,9 @@ calendar.prototype = {
 			return ;
 		}
 		this.year--;
-		this.validate();
 		this.syncCDT();
 		this.setCDate();
 		this.hl_year = this.year;
-	},
-
-	validate: function() {
-		var valid = new Date(this.year, this.month, this.day);
-
-		if (valid.getMonth() != this.month) {
-			this.month = valid.getMonth();
-			this.hl_month = this.month;
-			this.setCDate();
-		}
-		if (valid.getDate() != this.day) {
-			this.day = valid.getDate();
-			this.hl_day = this.day;
-		}
 	},
 
 	syncBSDateBySDT: function() {
@@ -725,6 +709,12 @@ calendar.prototype = {
 	setCDate: function() {
 		this.clndr_month.textContent = this.monthname[this.month];
 		this.clndr_year.textContent = this.year;
+
+		// Switching month to one in which selected date does not exist, the first date is selected.
+		if (new Date(this.year, this.month + 1, 0).getDate() < this.hl_day) {
+			this.hl_day = 1;
+		}
+
 		this.createDaysTab();
 	},
 
