@@ -190,11 +190,19 @@ jQuery(function ($){
 		var offset = target.offset(),
 			left = offset.left + data.sbox_left,
 			right = offset.left + target.width() - data.sbox_right,
-			x = Math.min(Math.max(left, e.pageX), right)
+			x = Math.min(Math.max(left, e.pageX), right),
+			// TODO: should be taken from object data! 12px shift from top objDims.shiftYtop
+			margin_top = 12;
+
+		offset.top += 12;
+		if ((e.pageY < offset.top) || e.pageY > offset.top + parseInt(data.sbox_height, 10)) {
+			return;
+		}
+
 		selection = {
 			dom: $('<div class="graph-selection"/>').css({
 				position: 'absolute',
-				top: offset.top + 12,// 12px shift from top objDims.shiftYtop
+				top: offset.top,
 				left: x,
 				height: data.sbox_height + 'px',
 				width: '1px'
