@@ -130,7 +130,8 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 			CArrayHelper::sort($items_data, ['prefix', 'name']);
 		}
 
-		if ($data['value_type'] == ITEM_VALUE_TYPE_LOG || !$data['itemids']) {
+		if ($data['value_type'] == ITEM_VALUE_TYPE_LOG || $data['value_type'] == ITEM_VALUE_TYPE_TEXT
+				|| !$data['itemids']) {
 			$filterColumn1 = (new CFormList())
 				->addRow(_('Items list'),
 					(new CMultiSelect([
@@ -143,7 +144,7 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 								'srcfld1' => 'itemid',
 								'dstfld1' => 'itemids_',
 								'real_hosts' => true,
-								'value_types' => [ITEM_VALUE_TYPE_LOG]
+								'value_types' => [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -194,9 +195,9 @@ if ($data['itemids']) {
 		'resourcetype' => SCREEN_RESOURCE_HISTORY,
 		'action' => $data['action'],
 		'itemids' => $data['itemids'],
-		'profileIdx' => $data['itemids'] ? $profileIdx : null,
-		'profileIdx2' => $data['itemids'] ? $profileIdx2 : null,
-		'updateProfile' => $data['itemids'] ? $updateProfile : false,
+		'profileIdx' => $profileIdx,
+		'profileIdx2' => $profileIdx2,
+		'updateProfile' => $updateProfile,
 		'period' => $data['period'],
 		'stime' => $data['stime'],
 		'isNow' => $data['is_now'],
