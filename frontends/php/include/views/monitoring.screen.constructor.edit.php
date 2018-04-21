@@ -277,8 +277,8 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'webitems' => true,
 					'numeric' => true,
 					'hostid' => $data['screen']['templateid'],
-					'real_hosts' => ($data['screen']['templateid'] != 0),
-					'with_simple_graph_items' => ($data['screen']['templateid'] != 0)
+					'real_hosts' => ($data['screen']['templateid'] == 0),
+					'with_simple_graph_items' => ($data['screen']['templateid'] == 0)
 				]
 			]
 		]))
@@ -444,7 +444,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
 						'hostid' => $data['screen']['templateid'],
-						'real_hosts' => ($data['screen']['templateid'] != 0),
+						'real_hosts' => ($data['screen']['templateid'] == 0),
 						'webitems' => true
 					]
 				],
@@ -783,7 +783,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
 						'hostid' => $data['screen']['templateid'],
-						'real_hosts' => ($data['screen']['templateid'] != 0),
+						'real_hosts' => ($data['screen']['templateid'] == 0),
 						'webitems' => true
 					]
 				]
