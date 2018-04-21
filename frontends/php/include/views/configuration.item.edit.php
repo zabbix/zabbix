@@ -110,9 +110,11 @@ $itemFormList->addRow(
 		'object_name' => 'items',
 		'multiple' => false,
 		'disabled' => $readonly,
-		'ignored' => [
-			$data['itemid'] => $data['name']
-		],
+		'ignored' => $data['itemid']
+			? [
+				$data['itemid'] => $data['name']
+			]
+			: [],
 		'data' => ($data['master_itemid'] > 0)
 			? [
 				[

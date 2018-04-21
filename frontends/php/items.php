@@ -1227,7 +1227,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_item_options = [
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'itemids' => $item['master_itemid'],
+				'itemids' => getRequest('master_itemid', $item['master_itemid']),
 				'webitems' => true
 			];
 		}
