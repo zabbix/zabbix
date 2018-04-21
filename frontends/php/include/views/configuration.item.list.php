@@ -23,18 +23,18 @@ require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Items'))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(($data['hostid'] != 0)
-				? new CRedirectButton(_('Create item'), (new CUrl())
-						->setArgument('form', 'create')
-						->setArgument('hostid', $data['hostid'])
-						->getUrl()
-					)
-				: (new CButton('form', _('Create item (select host first)')))->setEnabled(false)
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				($data['hostid'] != 0)
+					? new CRedirectButton(_('Create item'), (new CUrl())
+							->setArgument('form', 'create')
+							->setArgument('hostid', $data['hostid'])
+							->getUrl()
+						)
+					: (new CButton('form', _('Create item (select host first)')))->setEnabled(false)
 			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 if (!empty($this->data['hostid'])) {

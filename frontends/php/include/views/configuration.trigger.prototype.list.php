@@ -21,14 +21,14 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create trigger prototype'), (new CUrl())
-				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('form', 'create')
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(new CRedirectButton(_('Create trigger prototype'),
+				(new CUrl())
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('form', 'create')
 			))
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
@@ -169,10 +169,10 @@ $triggersForm->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'triggerprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Enable selected trigger prototypes?')
+				'confirm' => _('Create triggers from selected prototypes as enabled?')
 			],
 			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Disable selected trigger prototypes?')
+				'confirm' => _('Create triggers from selected prototypes as disabled?')
 			],
 			'triggerprototype.massupdateform' => ['name' => _('Mass update')],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),

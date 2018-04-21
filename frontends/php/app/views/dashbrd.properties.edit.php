@@ -19,7 +19,9 @@
 **/
 
 
-$form = (new CForm())->setName('dashboard_properties_form');
+$form = (new CForm())
+	->cleanItems()
+	->setName('dashboard_properties_form');
 
 $multiselect = (new CMultiSelect([
 	'name' => 'userid',

@@ -522,18 +522,14 @@ class testFormAction extends CWebTest {
 		if ($eventsource == 'Triggers' && array_key_exists('evaltype', $data)) {
 			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name like TEST1');
 			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name like TEST2');
-			$this->zbxTestAssertElementPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
-				' removeCondition(0);"]');
-			$this->zbxTestAssertElementPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
-				' removeCondition(1);"]');
+			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
+			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
 		else {
 			$this->zbxTestTextNotVisibleOnPage(['A', 'B']);
 			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]/td[2]');
-			$this->zbxTestAssertElementNotPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
-				' removeCondition(0);"]');
-			$this->zbxTestAssertElementNotPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
-				' removeCondition(1);"]');
+			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
+			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
 
 		if (isset($data['new_condition_conditiontype'])) {
@@ -946,7 +942,7 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['new_operation_operationtype'])) {
 			$new_operation_operationtype = $data['new_operation_operationtype'];
-			$this->zbxTestClickXpathWait("//ul[@id='operationlist']//button[text()='New' and contains(@onclick,'new_operation')]");
+			$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[text()='New' and contains(@onclick,'new_operation')]");
 			switch ($eventsource) {
 				case 'Triggers':
 				case 'Discovery':
@@ -1263,11 +1259,11 @@ class testFormAction extends CWebTest {
 			]);
 
 			if ($add_opcondition == null) {
-				$this->zbxTestAssertVisibleXpath("//ul[@id='operationlist']//button[text()='New' and contains(@onclick,'new_opcondition')]");
+				$this->zbxTestAssertVisibleXpath("//div[@id='operationTab']//button[text()='New' and contains(@onclick,'new_opcondition')]");
 			}
 			else {
 				$this->zbxTestTextPresent ('Operation condition');
-				$this->zbxTestAssertVisibleXpath("//ul[@id='operationlist']//button[text()='Cancel' and contains(@onclick,'cancel_new_opcondition')]");
+				$this->zbxTestAssertVisibleXpath("//div[@id='operationTab']//button[text()='Cancel' and contains(@onclick,'cancel_new_opcondition')]");
 
 				$this->zbxTestAssertVisibleXpath('//select[@id=\'new_opcondition_conditiontype\']');
 				$this->zbxTestDropdownAssertSelected('new_opcondition[conditiontype]', 'Event acknowledged');
@@ -1289,8 +1285,8 @@ class testFormAction extends CWebTest {
 			}
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'new_opcondition')]");
-			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'cancel_new_opcondition')]");
+			$this->zbxTestAssertElementNotPresentXpath("//div[@id='operationTab']//button[contains(@onclick,'new_opcondition')]");
+			$this->zbxTestAssertElementNotPresentXpath("//div[@id='operationTab']//button[contains(@onclick,'cancel_new_opcondition')]");
 
 			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_conditiontype\']');
 			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_operator\']');
@@ -1517,12 +1513,12 @@ class testFormAction extends CWebTest {
 		}
 
 		if ($new_operation_operationtype != null) {
-			$this->zbxTestAssertVisibleXpath("//ul[@id='operationlist']//button[text()='Add' and contains(@onclick,'add_operation')]");
-			$this->zbxTestAssertVisibleXpath("//ul[@id='operationlist']//button[text()='Cancel' and contains(@onclick,'cancel_new_operation')]");
+			$this->zbxTestAssertVisibleXpath("//div[@id='operationTab']//button[text()='Add' and contains(@onclick,'add_operation')]");
+			$this->zbxTestAssertVisibleXpath("//div[@id='operationTab']//button[text()='Cancel' and contains(@onclick,'cancel_new_operation')]");
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'add_operation')]");
-			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'cancel_new_operation')]");
+			$this->zbxTestAssertElementNotPresentXpath("//div[@id='operationTab']//button[contains(@onclick,'add_operation')]");
+			$this->zbxTestAssertElementNotPresentXpath("//div[@id='operationTab']//button[contains(@onclick,'cancel_new_operation')]");
 		}
 
 		if (array_key_exists('recovery_msg', $data)) {

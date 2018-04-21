@@ -247,7 +247,7 @@ class testUrlUserPermissions extends CWebTest {
 			// Reports
 			[[
 				'url' => 'zabbix.php?action=report.status',
-				'title' =>	'Status of Zabbix',
+				'title' =>	'System information',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
