@@ -487,8 +487,8 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 	{
 		zbx_timespec_t	start = {ts->sec - seconds, ts->ns};
 
-		while (0 >= zbx_timespec_compare(&values->values[values->values_num - 1].timestamp, &start) &&
-				0 < values->values_num)
+		while (0 < values->values_num &&
+				0 >= zbx_timespec_compare(&values->values[values->values_num - 1].timestamp, &start))
 		{
 			zbx_history_record_clear(&values->values[--values->values_num], value_type);
 		}
@@ -2192,7 +2192,7 @@ out:
 static int	vch_item_get_values(zbx_vc_item_t *item, zbx_vector_history_record_t *values, int seconds,
 		int count, const zbx_timespec_t *ts)
 {
-	int	ret, records_read, hits, misses;
+	int	ret, records_read, hits, misses, range;
 
 	zbx_vector_history_record_clear(values);
 
@@ -2208,26 +2208,16 @@ static int	vch_item_get_values(zbx_vc_item_t *item, zbx_vector_history_record_t 
 		if (records_read > values->values_num)
 			records_read = values->values_num;
 	}
-	else if (0 == seconds)
-	{
-		if (FAIL == (ret = vch_item_cache_values_by_time_and_count(item, ts->sec, count, ts)))
-			goto out;
-
-		records_read = ret;
-
-		vch_item_get_values_by_time_and_count(item, values, ts->sec, count, ts);
-
-		if (records_read > values->values_num)
-			records_read = values->values_num;
-	}
 	else
 	{
-		if (FAIL == (ret = vch_item_cache_values_by_time_and_count(item, seconds, count, ts)))
+		range = (0 == seconds ? ts->sec : seconds);
+
+		if (FAIL == (ret = vch_item_cache_values_by_time_and_count(item, range, count, ts)))
 			goto out;
 
 		records_read = ret;
 
-		vch_item_get_values_by_time_and_count(item, values, seconds, count, ts);
+		vch_item_get_values_by_time_and_count(item, values, range, count, ts);
 
 		if (records_read > values->values_num)
 			records_read = values->values_num;

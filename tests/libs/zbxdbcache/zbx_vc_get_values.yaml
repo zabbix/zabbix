@@ -4014,4 +4014,41 @@ out:
     mode: ZBX_VC_MODE_NORMAL
     hits: 3
     misses: 0
+---
+# TC47
+# Test empty requests in low memory mode */ 
+test case: Get number of uncached item values from interval when cache working in low memory mode
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:06.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:07.700000000 +00:00
+    - &row58
+      value: value 5.7
+      ts: 2017-01-10 10:00:08.800000000 +00:00
+  test:
+    cache mode: ZBX_VC_MODE_LOWMEM
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 1
+    count: 0
+    end: 2017-01-10 10:00:05.200000000 +00:00
+out:
+  values: []
+  cache:
+    items:
+    - itemid: 1
+    mode: ZBX_VC_MODE_LOWMEM
+    hits: 0
+    misses: 0
 ...
