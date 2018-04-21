@@ -25,25 +25,25 @@ in:
   key: "web.page.get[127.0\r\n.0.1]"
 out:
   return: SYSINFO_RET_FAIL
-  req: "Invalid characters are present after first part of hostname: 127.0"
+  req: "Incorrect hostname expression. Check hostname part after: 127.0."
 ---
 test case: Injection \r\n127.0\r\n.0.1
 in:
   key: "web.page.get[\r\n127.0\r\n.0.1]"
 out:
   return: SYSINFO_RET_FAIL
-  req: "Invalid characters are present after first part of hostname: "
+  req: "Incorrect hostname expression. Check hostname part after: ."
 ---
 test case: Injection 127.0.0.1,zabbi\r\n\r\n\r\nx
 in:
   key: "web.page.get[127.0.0.1,zabbi\r\n\r\n\r\nx]"
 out:
   return: SYSINFO_RET_FAIL
-  req: "Invalid characters are present after first part of path: zabbi"
+  req: "Incorrect path expression. Check path part after: zabbi."
 ---
 test case: Injection 127.0.0.1,\r\n\r\n/zabbi\r\n\r\n\r\nx,80
 in:
   key: "web.page.get[127.0.0.1,\r\n\r\n/zabbi\r\n\r\n\r\nx,80]"
 out:
   return: SYSINFO_RET_FAIL
-  req: "Invalid characters are present after first part of path: "
+  req: "Incorrect path expression. Check path part after: ."
