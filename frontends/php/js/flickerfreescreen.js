@@ -416,6 +416,7 @@
 						// 'src' should be added only here to trigger load event after new height is received.
 						sbox_height = height;
 						img.attr('src', url.getUrl());
+						img.data('sbox_height', sbox_height);
 					});
 
 					if (async === null) {
