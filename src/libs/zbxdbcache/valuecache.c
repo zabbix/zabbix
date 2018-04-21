@@ -1951,8 +1951,8 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, const
  *           and updates cache from database if necessary.                    *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seconds, int count, const
-		zbx_timespec_t *ts)
+static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seconds, int count,
+		const zbx_timespec_t *ts)
 {
 	int	ret = SUCCEED, cached_records = 0, start;
 
