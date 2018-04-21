@@ -35,7 +35,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 		size_t max_buffer_len, char **error)
 {
 	int		ret;
-	char		*recv_buffer, *wrong_chr;
+	char		*wrong_chr;
 	char		request[MAX_STRING_LEN];
 	zbx_socket_t	s;
 
