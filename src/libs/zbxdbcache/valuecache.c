@@ -1869,8 +1869,8 @@ out:
  ******************************************************************************/
 static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, const zbx_timespec_t *ts)
 {
-	int		ret = SUCCEED, update_seconds = 0, start;
-	int		update_end;
+	int	ret = SUCCEED, update_seconds = 0, start;
+	int	update_end;
 
 	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
 		return SUCCEED;
