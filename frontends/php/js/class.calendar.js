@@ -260,39 +260,30 @@ calendar.prototype = {
 			case 40: // arrow down
 				switch (cal.sections[cal.active_section]) {
 					case '.calendar-date':
-						var change = true;
 						if (cal.hl_month === null || cal.hl_day === null || cal.hl_year === null) {
 							cal.hl_year = cal.year;
 							cal.hl_month = cal.month;
 							cal.hl_day = cal.day;
 						}
-						else if (cal.hl_year != cal.year || cal.hl_month != cal.month) {
-							change = false;
-							cal.hl_day = 1;
-							cal.hl_year = cal.year;
-							cal.hl_month = cal.month;
-						}
 
 						hl_date = new Date(cal.hl_year, cal.hl_month, cal.hl_day, 0, 0, 0, 0);
 
-						if (change) {
-							switch (event.which) {
-								case 37: // arrow left
-									hl_date.setDate(hl_date.getDate() - 1);
-									break;
+						switch (event.which) {
+							case 37: // arrow left
+								hl_date.setDate(hl_date.getDate() - 1);
+								break;
 
-								case 38: // arrow up
-									hl_date.setDate(hl_date.getDate() - 7);
-									break;
+							case 38: // arrow up
+								hl_date.setDate(hl_date.getDate() - 7);
+								break;
 
-								case 39: // arrow right
-									hl_date.setDate(hl_date.getDate() + 1);
-									break;
+							case 39: // arrow right
+								hl_date.setDate(hl_date.getDate() + 1);
+								break;
 
-								case 40: // arrow down
-									hl_date.setDate(hl_date.getDate() + 7);
-									break;
-							}
+							case 40: // arrow down
+								hl_date.setDate(hl_date.getDate() + 7);
+								break;
 						}
 
 						cal.hl_year = hl_date.getFullYear();
@@ -392,7 +383,14 @@ calendar.prototype = {
 			this.hl_month = this.hl_month || this.month;
 			this.hl_day = this.hl_day || this.day;
 
-			if (this.hl_year != this.year || this.hl_month != this.month) {
+			/**
+			 * Switching between months and years, date picker will highlight previously selected date. If
+			 * selected date is in different year or month, the first date of displayed year is highleghted.
+			 * Same happens also if the number of dates in selected month is smaller than selected date in different
+			 * month.
+			 */
+			if (this.hl_year != this.year || this.hl_month != this.month
+					|| new Date(this.year, this.month + 1, 0).getDate() < this.hl_day) {
 				this.hl_day = 1;
 			}
 
@@ -709,12 +707,6 @@ calendar.prototype = {
 	setCDate: function() {
 		this.clndr_month.textContent = this.monthname[this.month];
 		this.clndr_year.textContent = this.year;
-
-		// Switching month to one in which selected date does not exist, the first date is selected.
-		if (new Date(this.year, this.month + 1, 0).getDate() < this.hl_day) {
-			this.hl_day = 1;
-		}
-
 		this.createDaysTab();
 	},
 
