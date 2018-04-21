@@ -22,10 +22,10 @@
 /**
  * Map widget form.
  */
-class CSysmapWidgetForm extends CWidgetForm {
+class CWidgetFormMap extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_SYSMAP);
+		parent::__construct($data, WIDGET_MAP);
 
 		// widget reference field
 		$field_reference = (new CWidgetFieldReference());
@@ -50,7 +50,7 @@ class CSysmapWidgetForm extends CWidgetForm {
 		// select filter widget field
 		if ($field_source_type->getValue() === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			$field_filter_widget = (new CWidgetFieldWidgetListComboBox('filter_widget_reference', _('Filter'),
-				'type', 'navigationtree'
+				'type', 'navtree'
 			))
 				->setDefault('')
 				->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);

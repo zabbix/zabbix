@@ -60,7 +60,7 @@ class testPageTriggerPrototypes extends CWebTest {
 				'Severity',
 				'Name',
 				'Expression',
-				'Status'
+				'Create enabled'
 			]
 		);
 		$this->zbxTestTextNotPresent('Info');

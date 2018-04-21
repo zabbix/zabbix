@@ -473,6 +473,13 @@ abstract class CItemGeneral extends CApiService {
 						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('cannot be empty'))
 					);
 				}
+
+				if (($fullItem['username'] === '') !== ($fullItem['password'] === '')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'username',
+								_('both username and password should be either present or empty'))
+					);
+				}
 			}
 			else {
 				if (array_key_exists('jmx_endpoint', $item) && $item['jmx_endpoint'] !== '') {
