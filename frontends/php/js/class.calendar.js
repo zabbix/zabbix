@@ -185,7 +185,7 @@ calendar.prototype = {
 				this.syncBSDateBySDT();
 				this.setCDate();
 			}
-			if ('undefined' != typeof(top) && 'undefined' != typeof(left)) {
+			if (typeof(top) != 'undefined' && typeof(left) != 'undefined') {
 				var cw = jQuery(this.clndr_calendar).outerWidth();
 				if (document.body.clientWidth < +left + cw) {
 					left = document.body.clientWidth - cw;
@@ -230,7 +230,7 @@ calendar.prototype = {
 	calendarKeyUpHandler: function(event) {
 		var cal = event.data.calendar;
 
-		if (event.which == 32) { // SPACE
+		if (event.which == 32) { // Space
 			// Enter has special meaning for each Calendar section.
 			var active_section = cal.sections[cal.active_section];
 			if (active_section === '.calendar-year' ||  active_section === '.calendar-month') {
@@ -774,7 +774,6 @@ calendar.prototype = {
 		Element.extend(this.clndr_calendar);
 		this.clndr_calendar.className = 'overlay-dialogue calendar';
 		this.clndr_calendar.setAttribute('aria-label', locale['S_Calendar']);
-		this.clndr_calendar.setAttribute('aria-describedby', 'calendar-description');
 		this.clndr_calendar.setAttribute('role', 'application');
 		this.clndr_calendar.setAttribute('tabindex', '0');
 		this.clndr_calendar.hide();
@@ -789,12 +788,6 @@ calendar.prototype = {
 		else {
 			$(parentNodeid).appendChild(this.clndr_calendar);
 		}
-
-		var infobox = document.createElement('div');
-		infobox.setAttribute('id', 'calendar-description');
-		infobox.innerHTML = locale['S_calendar_helptext'];
-		infobox.style.display = 'none';
-		this.clndr_calendar.appendChild(infobox);
 
 		/*
 		 * Calendar header
