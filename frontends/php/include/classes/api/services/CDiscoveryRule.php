@@ -1113,7 +1113,7 @@ class CDiscoveryRule extends CItemGeneral {
 					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
 				]),
 				'operator' => new CLimitedSetValidator([
-					'values' => [CONDITION_OPERATOR_REGEXP],
+					'values' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP],
 					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
 				])
 			],

@@ -360,6 +360,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_LESS_EQUAL		6
 #define CONDITION_OPERATOR_NOT_IN		7
 #define CONDITION_OPERATOR_REGEXP		8
+#define CONDITION_OPERATOR_NOT_REGEXP		9
 
 /* event type action condition values */
 #define EVENT_TYPE_ITEM_NOTSUPPORTED		0
@@ -1215,6 +1216,9 @@ int	MAIN_ZABBIX_ENTRY(int flags);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
+
+zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data);
+zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data);
 
 int	zbx_check_hostname(const char *hostname, char **error);
 

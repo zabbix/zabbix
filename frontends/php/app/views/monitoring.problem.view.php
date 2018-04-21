@@ -285,9 +285,9 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
 
 	$filter = (new CFilter('web.problem.filter.state'))
-		->addVar('action', 'problem.view')
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-		->addVar('page', $data['page'])
+		->addFormItem((new CVar('action', 'problem.view'))->removeId())
+		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
+		->addFormItem((new CVar('page', $data['page']))->removeId())
 		->addColumn($filter_column1)
 		->addColumn($filter_column2);
 

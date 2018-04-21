@@ -4,5 +4,6 @@ SUBDIRS = \
 	zbxjson \
 	zbxsysinfo \
 	zbxcommshigh \
-	zbxcommon	
+	zbxcommon \
+	zbxalgo
 

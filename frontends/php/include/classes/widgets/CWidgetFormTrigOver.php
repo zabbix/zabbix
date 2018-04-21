@@ -22,10 +22,10 @@
 /**
  * Trigger overview widget form.
  */
-class CTrigOverviewWidgetForm extends CWidgetForm {
+class CWidgetFormTrigOver extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_TRIG_OVERVIEW);
+		parent::__construct($data, WIDGET_TRIG_OVER);
 
 		// show
 		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [

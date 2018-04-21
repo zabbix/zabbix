@@ -238,7 +238,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
@@ -270,9 +270,9 @@ class testFormTriggerPrototype extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Name');
-		$this->zbxTestAssertVisibleId('description');
-		$this->zbxTestAssertAttribute("//input[@id='description']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='description']", 'size', 20);
+		$this->zbxTestAssertVisibleXpath("//input[@name='description']");
+		$this->zbxTestAssertAttribute("//input[@name='description']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@name='description']", 'size', 20);
 
 		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(['Expression', 'Expression constructor']);
@@ -282,17 +282,16 @@ class testFormTriggerPrototype extends CWebTest {
 				$this->zbxTestAssertAttribute("//textarea[@id='expression']", 'readonly');
 			}
 
-			$this->zbxTestAssertVisibleId('insert');
-			$this->zbxTestAssertElementText("//button[@id='insert']", 'Add');
+			$this->zbxTestAssertVisibleXpath("//button[@name='insert']");
+			$this->zbxTestAssertElementText("//button[@name='insert']", 'Add');
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertAttribute("//button[@id='insert']", 'disabled');
+				$this->zbxTestAssertAttribute("//button[@name='insert']", 'disabled');
 			}
 
 			$this->zbxTestAssertElementNotPresentXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression')]");
 			$this->zbxTestAssertElementNotPresentId('insert_macro');
-			$this->zbxTestAssertElementNotPresentId('exp_list');
-			}
-			else {
+		}
+		else {
 			$this->zbxTestTextPresent('Expression');
 			$this->zbxTestAssertVisibleId('expr_temp');
 			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'rows', 7);
@@ -307,10 +306,10 @@ class testFormTriggerPrototype extends CWebTest {
 				$this->zbxTestAssertElementNotPresentXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression')]");
 			}
 
-			$this->zbxTestAssertVisibleId('insert');
-			$this->zbxTestAssertElementText("//button[@id='insert']", 'Edit');
+			$this->zbxTestAssertVisibleXpath("//button[@name='insert']");
+			$this->zbxTestAssertElementText("//button[@name='insert']", 'Edit');
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertElementPresentXpath("//button[@id='insert'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//button[@name='insert'][@disabled]");
 			}
 
 			$this->zbxTestAssertVisibleId('insert_macro');
@@ -325,7 +324,6 @@ class testFormTriggerPrototype extends CWebTest {
 			else {
 				$this->zbxTestTextPresent(['Expression', 'Info', 'Close expression constructor']);
 			}
-			$this->zbxTestAssertVisibleId('exp_list');
 			$this->zbxTestTextPresent('Close expression constructor');
 		}
 
@@ -769,10 +767,10 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($this->discoveryRule);
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 
 		if (isset($data['description'])) {
-			$this->zbxTestInputTypeWait('description', $data['description']);
+			$this->zbxTestInputTypeByXpath("//input[@name='description']", $data['description']);
 			$description = $data['description'];
 		}
 
@@ -839,7 +837,7 @@ class testFormTriggerPrototype extends CWebTest {
 					}
 				}
 				else {
-					$this->zbxTestAssertElementPresentId('test_expression');
+					$this->zbxTestAssertElementPresentXpath("//button[@name='test_expression']");
 
 					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'and_expression') and text()='And']");
 					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'or_expression') and text()='Or']");
@@ -850,10 +848,10 @@ class testFormTriggerPrototype extends CWebTest {
 						}
 					}
 					if (isset($constructor['elementError'])) {
-						$this->zbxTestAssertElementPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
+						$this->zbxTestAssertElementPresentXpath('//span[@class="icon-info status-red"]');
 					}
 					else {
-						$this->zbxTestAssertElementNotPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
+						$this->zbxTestAssertElementNotPresentXpath('//span[@class="icon-info status-red"]');
 					}
 
 					if (isset($constructor['text'])) {
@@ -896,8 +894,9 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestClickLinkTextWait('Trigger prototypes');
 
 			$this->zbxTestClickLinkTextWait($description);
-			$this->zbxTestAssertElementValue('description', $description);
 			$this->zbxTestAssertElementValue('expression', $expression);
+			$getName = $this->zbxTestGetValue("//input[@name='description']");
+			$this->assertEquals($getName, $description);
 		}
 
 		if (isset($data['dbCheck'])) {
