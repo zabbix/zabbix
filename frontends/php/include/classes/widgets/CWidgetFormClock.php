@@ -22,7 +22,7 @@
 /**
  * Clock widget form.
  */
-class CClockWidgetForm extends CWidgetForm {
+class CWidgetFormClock extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_CLOCK);

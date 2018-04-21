@@ -527,8 +527,8 @@ For a sub-layer which has no concept of bandwidth, this object should be zero.</
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
                      <name>Interface {#IFDESCR}: Link down</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -562,7 +562,7 @@ Interface is down</description>
                         <dependency>
                            <name>Interface {#IFDESCR}: Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                           <recovery_expression/>
+                           <recovery_expression>{Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
@@ -571,22 +571,23 @@ Interface is down</description>
                      <expression>{Template Module Interfaces Simple SNMPv2:net.if.in.errors[ifInErrors.{#SNMPINDEX}].avg(5m)}&gt;{$IF_ERRORS_WARN:"{#IFNAME}"}
 or {Template Module Interfaces Simple SNMPv2:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].avg(5m)}&gt;{$IF_ERRORS_WARN:"{#IFNAME}"}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Module Interfaces Simple SNMPv2:net.if.in.errors[ifInErrors.{#SNMPINDEX}].avg(5m)}&lt;{$IF_ERRORS_WARN:"{#IFNAME}"}-2
-and {Template Module Interfaces Simple SNMPv2:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].avg(5m)}&lt;{$IF_ERRORS_WARN:"{#IFNAME}"}-2</recovery_expression>
+                     <recovery_expression>{Template Module Interfaces Simple SNMPv2:net.if.in.errors[ifInErrors.{#SNMPINDEX}].avg(5m)}&lt;{$IF_ERRORS_WARN:"{#IFNAME}"}*0.8
+and {Template Module Interfaces Simple SNMPv2:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].avg(5m)}&lt;{$IF_ERRORS_WARN:"{#IFNAME}"}*0.8</recovery_expression>
                      <name>Interface {#IFDESCR}: High error rate</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}.
+Recovers when below 80% of {$IF_ERRORS_WARN:"{#IFNAME}"} threshold</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFDESCR}: Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                           <recovery_expression/>
+                           <recovery_expression>{Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
@@ -621,7 +622,7 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                         <dependency>
                            <name>Interface {#IFDESCR}: Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                           <recovery_expression/>
+                           <recovery_expression>{Template Module Interfaces Simple SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>

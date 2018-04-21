@@ -22,10 +22,10 @@
 /**
  * Navigation widget form.
  */
-class CNavigationWidgetForm extends CWidgetForm {
+class CWidgetFormNavTree extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_NAVIGATION_TREE);
+		parent::__construct($data, WIDGET_NAV_TREE);
 
 		// Widget reference field.
 		$field_reference = new CWidgetFieldReference();

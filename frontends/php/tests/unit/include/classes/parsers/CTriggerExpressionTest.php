@@ -133,6 +133,10 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			['-not 1', null, false],
 			['- not1', null, false],
 			['-not1', null, false],
+			['1 not 1', null, false],
+			['(1) not 1', null, false],
+			['1not1', null, false],
+			['(1)not1', null, false],
 
 			// operator cases
 			['Not 1', null, false],

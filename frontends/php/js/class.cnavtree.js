@@ -615,7 +615,7 @@ jQuery(function($) {
 					ajax_data['map_id'] = getNextId($obj);
 				}
 
-				url.setArgument('action', 'widget.navigationtree.edititemdialog');
+				url.setArgument('action', 'widget.navtree.item.edit');
 
 				jQuery.ajax({
 					url: url.getUrl(),
@@ -643,7 +643,7 @@ jQuery(function($) {
 												mapid: id
 											};
 
-										url.setArgument('action', 'widget.navigationtree.edititem');
+										url.setArgument('action', 'widget.navtree.item.update');
 
 										jQuery.ajax({
 											url: url.getUrl(),

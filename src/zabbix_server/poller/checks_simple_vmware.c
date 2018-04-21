@@ -219,8 +219,6 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
-
-
 	if (SUCCEED == is_uint64((char *)perfvalue->second, &value))
 	{
 		value *= coeff;
