@@ -152,7 +152,7 @@ jQuery(function($) {
 	 * @param string options['data'][prefix]		(optional)
 	 * @param bool   options['data'][inaccessible]	(optional)
 	 * @param bool   options['data'][disabled]		(optional)
-	 * @param array  options['ignored']				preload ignored {id: name} (optional)
+	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
@@ -186,7 +186,7 @@ jQuery(function($) {
 			},
 			data: [],
 			only_hostid: 0,
-			ignored: {},
+			excludeids: [],
 			addNew: false,
 			defaultValue: null,
 			disabled: false,
@@ -222,8 +222,7 @@ jQuery(function($) {
 					isMoreMatchesFound: false,
 					isAvailableOpened: false,
 					selected: {},
-					available: {},
-					ignored: empty(options.ignored) ? {} : options.ignored
+					available: {}
 				}
 			};
 
@@ -303,7 +302,6 @@ jQuery(function($) {
 										}
 
 										values.isAjaxLoaded = false;
-
 										var request_data = {
 											search: values.search,
 											limit: getLimit(values, options)
@@ -669,7 +667,7 @@ jQuery(function($) {
 				if (options.limit != 0 && objectLength(values.available) < options.limit) {
 					if (typeof values.available[item.id] === 'undefined'
 							&& typeof values.selected[item.id] === 'undefined'
-							&& typeof values.ignored[item.id] === 'undefined') {
+							&& options.excludeids.indexOf(item.id) === -1) {
 						values.available[item.id] = item;
 					}
 				}
@@ -1012,26 +1010,8 @@ jQuery(function($) {
 
 	function getLimit(values, options) {
 		return (options.limit != 0)
-			? options.limit + countMatches(values.selected, values.search) + countMatches(values.ignored, values.search) + 1
+			? options.limit + objectLength(values.selected) + options.excludeids.length + 1
 			: null;
-	}
-
-	function countMatches(data, search) {
-		var count = 0;
-
-		if (empty(data)) {
-			return count;
-		}
-
-		for (var id in data) {
-			var name = (typeof(data[id]) == 'object') ? data[id].name : data[id];
-
-			if (name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
-				count++;
-			}
-		}
-
-		return count;
 	}
 
 	function objectLength(obj) {

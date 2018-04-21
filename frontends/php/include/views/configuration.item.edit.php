@@ -110,11 +110,6 @@ $itemFormList->addRow(
 		'object_name' => 'items',
 		'multiple' => false,
 		'disabled' => $readonly,
-		'ignored' => $data['itemid']
-			? [
-				$data['itemid'] => $data['name']
-			]
-			: [],
 		'data' => ($data['master_itemid'] > 0)
 			? [
 				[
@@ -131,6 +126,7 @@ $itemFormList->addRow(
 				'dstfrm' => $itemForm->getName(),
 				'dstfld1' => 'master_itemid',
 				'hostid' => $data['hostid'],
+				'excludeids' => $data['itemid'] != 0 ? [$data['itemid']] : [],
 				'webitems' => true
 			]
 		]

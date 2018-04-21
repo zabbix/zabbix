@@ -585,7 +585,6 @@ if ($data['displayMasteritems']) {
 			'name' => 'master_itemid',
 			'object_name' => 'items',
 			'multiple' => false,
-			'ignored' => $data['itemids'],
 			'data' => ($data['master_itemid'] != 0)
 				? [
 					[
@@ -602,6 +601,7 @@ if ($data['displayMasteritems']) {
 					'dstfrm' => $itemForm->getName(),
 					'dstfld1' => 'master_itemid',
 					'hostid' => $data['hostid'],
+					'excludeids' => $data['itemids'],
 					'webitems' => true
 				]
 			]

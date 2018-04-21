@@ -162,7 +162,7 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
 				: null;
 
-			if (array_key_exists($item['id'], $options['excludeids'])) {
+			if (array_key_exists('_disabled', $item)) {
 				if ($data['multiselect']) {
 					$check_box->setChecked(1);
 					$check_box->setEnabled(false);
@@ -227,31 +227,22 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$item['usrgrpid'].']', $item['usrgrpid'])
 				: null;
 
-			if (array_key_exists($item['usrgrpid'], $options['excludeids'])) {
-				if ($data['multiselect']) {
-					$check_box->setChecked(1);
-					$check_box->setEnabled(false);
-				}
-				$name = $item['name'];
+			if ($data['multiselect']) {
+				$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
+						zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');';
 			}
 			else {
-				if ($data['multiselect']) {
-					$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
-							zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');';
-				}
-				else {
-					$values = [
-						$options['dstfld1'] => $item[$options['srcfld1']],
-						$options['dstfld2'] => $item[$options['srcfld2']]
-					];
-					$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-							zbx_jsvalue($values).', '.$options['parentid'].');';
-				}
-
-				$name = (new CLink($item['name'], 'javascript: void(0);'))
-							->setId('spanid'.$item['usrgrpid'])
-							->onClick($js_action.$js_action_onclick);
+				$values = [
+					$options['dstfld1'] => $item[$options['srcfld1']],
+					$options['dstfld2'] => $item[$options['srcfld2']]
+				];
+				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
+						zbx_jsvalue($values).', '.$options['parentid'].');';
 			}
+
+			$name = (new CLink($item['name'], 'javascript: void(0);'))
+						->setId('spanid'.$item['usrgrpid'])
+						->onClick($js_action.$js_action_onclick);
 
 			$table->addRow([$check_box, $name]);
 
@@ -334,31 +325,22 @@ switch ($data['popup_type']) {
 				$check_box = new CCheckBox('item['.$sysmap['sysmapid'].']', $sysmap['sysmapid']);
 			}
 
-			if (array_key_exists($sysmap['sysmapid'], $options['excludeids'])) {
-				if ($data['multiselect']) {
-					$check_box->setChecked(1);
-					$check_box->setEnabled(false);
-				}
-				$name = $sysmap['name'];
+			if ($data['multiselect']) {
+				$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
+						zbx_jsvalue($sysmap['sysmapid']).', '.$options['parentid'].');';
 			}
 			else {
-				if ($data['multiselect']) {
-					$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
-							zbx_jsvalue($sysmap['sysmapid']).', '.$options['parentid'].');';
-				}
-				else {
-					$values = [
-						$options['dstfld1'] => $sysmap[$options['srcfld1']],
-						$options['dstfld2'] => $sysmap[$options['srcfld2']]
-					];
-					$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-							zbx_jsvalue($values).');';
-				}
-
-				$name = (new CLink($sysmap['name'], 'javascript:void(0);'))
-							->setId('spanid'.$sysmap['sysmapid'])
-							->onClick($js_action.$js_action_onclick);
+				$values = [
+					$options['dstfld1'] => $sysmap[$options['srcfld1']],
+					$options['dstfld2'] => $sysmap[$options['srcfld2']]
+				];
+				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
+						zbx_jsvalue($values).');';
 			}
+
+			$name = (new CLink($sysmap['name'], 'javascript:void(0);'))
+						->setId('spanid'.$sysmap['sysmapid'])
+						->onClick($js_action.$js_action_onclick);
 
 			$table->addRow([$data['multiselect'] ? $check_box : null, $name]);
 		}

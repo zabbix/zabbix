@@ -72,7 +72,7 @@ class CMultiSelect extends CTag {
 			$params['data'] = zbx_cleanHashes($options['data']);
 		}
 
-		foreach (['ignored', 'defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles'] as $option) {
+		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles'] as $option) {
 			if (array_key_exists($option, $options)) {
 				$params[$option] = $options[$option];
 			}
@@ -81,6 +81,18 @@ class CMultiSelect extends CTag {
 		if (array_key_exists('popup', $options)) {
 			if (array_key_exists('parameters', $options['popup'])) {
 				$params['popup']['parameters'] = $options['popup']['parameters'];
+
+				$excludeids = array_key_exists('excludeids', $options['popup']['parameters'])
+					? $options['popup']['parameters']['excludeids']
+					: [];
+
+				$excludeids = array_merge($excludeids, array_key_exists('disableids', $options['popup']['parameters'])
+					? $options['popup']['parameters']['disableids']
+					: []);
+
+				if ($excludeids) {
+					$params['excludeids'] = $excludeids;
+				}
 			}
 		}
 		if (array_key_exists('callPostEvent', $options) && $options['callPostEvent']) {
@@ -120,7 +132,7 @@ class CMultiSelect extends CTag {
 	 * @return array
 	 */
 	private function mapOptions(array $options) {
-		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'ignored', 'data', 'add_new',
+		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
 			'add_post_js', 'call_post_event', 'styles', 'popup'
 		];
 
@@ -136,7 +148,6 @@ class CMultiSelect extends CTag {
 			'object_name' => 'objectName',
 			'disabled' => 'disabled',
 			'default_value' => 'defaultValue',
-			'ignored' => 'ignored',
 			'data' => 'data',
 			'add_new' => 'addNew',
 			'add_post_js' => 'add_post_js',
@@ -167,16 +178,13 @@ class CMultiSelect extends CTag {
 				}
 			}
 
-			if (array_key_exists('ignored', $options)) {
-				$popup_parameters['excludeids'] = $options['ignored'];
-			}
-
 			if (array_key_exists('parameters', $options['popup'])) {
 				$parameters = $options['popup']['parameters'];
 
-				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'templateid', 'real_hosts',
-					'monitored_hosts', 'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid',
-					'webitems', 'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types'];
+				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
+					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'webitems',
+					'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types', 'excludeids',
+					'disableids'];
 
 				foreach ($parameters as $field => $value) {
 					if (!in_array($field, $valid_fields)) {
@@ -189,8 +197,7 @@ class CMultiSelect extends CTag {
 					'srcfld1' => 'srcfld1',
 					'srcfld2' => 'srcfld2',
 					'dstfrm' => 'dstfrm',
-					'dstfld1' => 'dstfld1',
-					'templateid' => 'templateid'
+					'dstfld1' => 'dstfld1'
 				];
 
 				foreach ($mappings as $new_field => $old_field) {
@@ -262,6 +269,14 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('with_monitored_triggers', $parameters) && $parameters['with_monitored_triggers']) {
 					$popup_parameters['with_monitored_triggers'] = '1';
 					$autocomplete_parameters['monitored'] = true;
+				}
+
+				if (array_key_exists('excludeids', $parameters) && $parameters['excludeids']) {
+					$popup_parameters['excludeids'] = $parameters['excludeids'];
+				}
+
+				if (array_key_exists('disableids', $parameters) && $parameters['disableids']) {
+					$popup_parameters['disableids'] = $parameters['disableids'];
 				}
 			}
 		}

@@ -344,6 +344,7 @@ class CControllerPopupGeneric extends CController {
 			'multiselect' =>				'in 1',
 			'submit' =>						'string',
 			'excludeids' =>					'array',
+			'disableids' =>					'array',
 			'only_hostid' =>				'db hosts.hostid',
 			'monitored_hosts' =>			'in 1',
 			'templated_hosts' =>			'in 1',
@@ -362,8 +363,7 @@ class CControllerPopupGeneric extends CController {
 			'reference' =>					'string',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
-			'submit_parent' =>				'in 1',
-			'templateid' =>					'db hosts.hostid'
+			'submit_parent' =>				'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -577,11 +577,13 @@ class CControllerPopupGeneric extends CController {
 			'dstfrm' => $this->getInput('dstfrm', ''),
 			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
-			'excludeids' => $this->getInput('excludeids', []),
 			'multiselect' => $this->getInput('multiselect', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
+
+		$excludeids = $this->getInput('excludeids', []);
+		$disableids = $this->getInput('disableids', []);
 
 		$page_options['parentid'] = $page_options['dstfld1'] !== '' ? zbx_jsvalue($page_options['dstfld1']) : 'null';
 
@@ -611,7 +613,7 @@ class CControllerPopupGeneric extends CController {
 			}
 		}
 
-		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'templateid', 'value_types'];
+		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'value_types'];
 		foreach ($option_fields_value as $field) {
 			if ($this->hasInput($field)) {
 				$page_options[$field] = $this->getInput($field);
@@ -660,12 +662,6 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::Template()->get($options);
-
-				// Do not show itself.
-				if (array_key_exists('templateid', $page_options)
-						&& array_key_exists($page_options['templateid'], $records)) {
-					unset($records[$page_options['templateid']]);
-				}
 
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['templateid' => 'id']);
@@ -827,14 +823,6 @@ class CControllerPopupGeneric extends CController {
 					$records = API::Item()->get($options);
 				}
 
-				if ($page_options['excludeids']) {
-					foreach ($records as $item) {
-						if (array_key_exists($item['itemid'], $page_options['excludeids'])) {
-							unset($records[$item['itemid']]);
-						}
-					}
-				}
-
 				$records = CMacrosResolverHelper::resolveItemNames($records);
 				CArrayHelper::sort($records, ['name_expanded']);
 				break;
@@ -902,6 +890,7 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::Map()->get($options);
+
 				CArrayHelper::sort($records, ['name']);
 				break;
 
@@ -989,6 +978,18 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Script()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				break;
+		}
+
+		foreach ($excludeids as $excludeid) {
+			if (array_key_exists($excludeid, $records)) {
+				unset($records[$excludeid]);
+			}
+		}
+
+		foreach ($disableids as $disableid) {
+			if (array_key_exists($disableid, $records)) {
+				$records[$disableid]['_disabled'] = true;
+			}
 		}
 
 		$data = [

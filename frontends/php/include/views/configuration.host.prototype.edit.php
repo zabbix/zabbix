@@ -261,7 +261,7 @@ if ($hostPrototype['templateid']) {
 	);
 }
 else {
-	$ignore_templates = [];
+	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
@@ -290,7 +290,7 @@ else {
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 
-		$ignore_templates[$template['templateid']] = $template['name'];
+		$disableids[] = $template['templateid'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
@@ -305,14 +305,14 @@ else {
 			(new CMultiSelect([
 				'name' => 'add_templates[]',
 				'object_name' => 'templates',
-				'ignored' => $ignore_templates,
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'templates',
 						'srcfld1' => 'hostid',
 						'srcfld2' => 'host',
 						'dstfrm' => $frmHost->getName(),
-						'dstfld1' => 'add_templates_'
+						'dstfld1' => 'add_templates_',
+						'disableids' => $disableids
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

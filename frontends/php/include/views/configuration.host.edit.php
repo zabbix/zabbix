@@ -538,7 +538,7 @@ $tmplList = new CFormList();
 
 // templates for normal hosts
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$ignored_templates = [];
+	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
@@ -576,7 +576,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			))->addClass(ZBX_STYLE_NOWRAP)
 		], null, 'conditions_'.$template['templateid']);
 
-		$ignored_templates[$template['templateid']] = $template['name'];
+		$disableids[] = $template['templateid'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
@@ -591,14 +591,14 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			(new CMultiSelect([
 				'name' => 'add_templates[]',
 				'object_name' => 'templates',
-				'ignored' => $ignored_templates,
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'templates',
 						'srcfld1' => 'hostid',
 						'srcfld2' => 'host',
 						'dstfrm' => $frmHost->getName(),
-						'dstfld1' => 'add_templates_'
+						'dstfld1' => 'add_templates_',
+						'disableids' => $disableids
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

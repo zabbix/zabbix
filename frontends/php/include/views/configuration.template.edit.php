@@ -335,11 +335,7 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // TEMPLATES{
 $tmplList = new CFormList();
 
-$ignored_templates = [];
-
-if ($data['templateid'] != 0) {
-	$ignored_templates[$data['templateid']] = $data['dbTemplate']['host'];
-}
+$disableids = [];
 
 $linkedTemplateTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
@@ -376,7 +372,7 @@ foreach ($data['linkedTemplates'] as $template) {
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], null, 'conditions_'.$template['templateid']);
 
-	$ignored_templates[$template['templateid']] = $template['name'];
+	$disableids[] = $template['templateid'];
 }
 
 $tmplList->addRow(_('Linked templates'),
@@ -391,7 +387,6 @@ $newTemplateTable = (new CTable())
 		(new CMultiSelect([
 			'name' => 'add_templates[]',
 			'object_name' => 'templates',
-			'ignored' => $ignored_templates,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -399,7 +394,8 @@ $newTemplateTable = (new CTable())
 					'srcfld2' => 'host',
 					'dstfrm' => $frmHost->getName(),
 					'dstfld1' => 'add_templates_',
-					'templateid' => $data['templateid']
+					'excludeids' => $data['templateid'] != 0 ? [$data['templateid']] : [],
+					'disableids' => $disableids
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
