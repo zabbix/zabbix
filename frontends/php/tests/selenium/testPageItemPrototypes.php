@@ -55,7 +55,7 @@ class testPageItemPrototypes extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent(
-			['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Applications', 'Status']
+			['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Applications', 'Create enabled']
 		);
 		$this->zbxTestTextNotPresent('Info');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
