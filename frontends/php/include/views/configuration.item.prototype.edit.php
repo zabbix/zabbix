@@ -91,8 +91,11 @@ if (!$readonly) {
 
 $itemFormList->addRow((new CLabel(_('Key'), 'key'))->setAsteriskMark(), $key_controls);
 
+$master_itemname = ($data['master_itemid'] != 0) ? $data['hostname'].NAME_DELIMITER.$data['master_itemname'] : '';
+
 // Append master item select.
-$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))
+$master_item = [
+	(new CTextBox('master_itemname', $master_itemname, true))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
