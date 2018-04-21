@@ -48,11 +48,11 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Icon mapping one for testPage',
+					'name' => 'Icon mapping one',
 					'mappings' => [
 						['expression' => 'Create with existing name']
 					],
-					'error' => 'Icon map "Icon mapping one for testPage" already exists.',
+					'error' => 'Icon map "Icon mapping one" already exists.',
 					'NoDbCheck' => true
 				]
 			],
@@ -398,9 +398,9 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 			],
 			[
 				[
-					'new_name' => 'Icon mapping one for testPage',
+					'new_name' => 'Icon mapping one',
 					'expression' => 'Update with existing name',
-					'error' => 'Icon map "Icon mapping one for testPage" already exists.'
+					'error' => 'Icon map "Icon mapping one" already exists.'
 				]
 			],
 			// Expression with slash
@@ -447,7 +447,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 * Test validate icon mapping updating
 	 */
 	public function testFormAdministrationGeneralIconMapping_ValidateChangeAndUpdate($data) {
-		$name = 'Icon mapping two for testPage';
+		$name = 'Icon mapping two';
 		$sql_hash = "SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
 					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$name."'";
 		$old_hash = DBhash($sql_hash);
@@ -503,7 +503,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Icon mapping two for testPage',
+					'name' => 'Icon mapping two',
 					'new_name' => 'Икона карты обновленна утф-8',
 					'expression' => 'Выражение обновленно утф-8',
 					'inventory' => 'Name',
@@ -600,9 +600,9 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		return [
 			[
 				[
-					'new_name' => 'Icon mapping one for testPage',
+					'new_name' => 'Icon mapping one',
 					'expression' => 'Make Clone with existing name',
-					'error' => 'Icon map "Icon mapping one for testPage" already exists.',
+					'error' => 'Icon map "Icon mapping one" already exists.',
 					'DBexist' => true
 				]
 			],
@@ -623,7 +623,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 			// Icon mapping update with backslash.
 			[
 				[
-					'new_name' => 'CLONE: Icon mapping one for testPage',
+					'new_name' => 'CLONE: Icon mapping one',
 					'expression' => '\\',
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
@@ -631,7 +631,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 			// Icon mapping update with double slash.
 			[
 				[
-					'new_name' => 'CLONE: Icon mapping one for testPage',
+					'new_name' => 'CLONE: Icon mapping one',
 					'expression' => '//',
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression. '
 				]
@@ -639,7 +639,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 			// Update with empty expression.
 			[
 				[
-					'new_name' => 'CLONE: Icon mapping one for testPage',
+					'new_name' => 'CLONE: Icon mapping one',
 					'expression' => '',
 					'error' => 'Invalid parameter "/1/mappings/1/expression": cannot be empty.'
 				]
@@ -653,7 +653,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 * Test cloning of icon mapping.
 	 */
 	public function testFormAdministrationGeneralIconMapping_ValidateClone($data) {
-		$name='Icon mapping one for testPage';
+		$name='Icon mapping one';
 		$sql_hash = "SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
 					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$name."'";
 		$old_hash = DBhash($sql_hash);
@@ -684,47 +684,48 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		return [
 			[
 				[
-					'name' => 'Икона карты обновленна утф-8',
+					'name' => 'Icon mapping to check clone functionality',
 					'new_name' => 'CLONE: Икона карты обновленна утф-8',
-					'dbCheck' => true,
+					'dbCheck' => '4'
 				]
 			],
 			[
 				[
-					'name' => 'Icon mapping one for testPage',
+					'name' => 'Icon mapping to check clone functionality',
 					'new_name' => 'Clone Icon mapping with expression update',
 					'expression' => '!@#$%^&*()123updated',
-					'dbCheck' => true,
+					'dbCheck' => '4'
 				]
 			],
 			[
 				[
-					'name' => 'Icon mapping testForm create',
+					'name' => 'Icon mapping to check clone functionality',
 					'new_name' => 'CLONE: Icon mapping testForm create',
 					'expression' => 'Test expression updated',
 					'inventory' => 'Serial number B',
 					'icon' => 'Firewall_(96)',
 					'default' => 'Crypto-router_(96)',
-					'dbCheck' => true,
+					'dbCheck' => '4',
 					'formCheck' => true
 				]
 			],
 			[
 				[
-					'name' => 'Icon mapping testForm create default inventory and icons',
+					'name' => 'Icon mapping to check clone functionality',
 					'new_name' => 'LongNameqwertyuioplkjhg0123456789mqwertyuioplkjhgfdsazxcvbnmqwer',
 					'expression' => 'Update with long name',
+					'dbCheck' => '4'
 				]
 			],
 			[
 				[
-					'name' => 'Icon mapping one for testPage',
+					'name' => 'Icon mapping to check clone functionality',
 					'new_name' => 'Икона карты кирилица утф-8',
 					'expression' => 'Выражение обновленно кирилица утф-8',
 					'inventory' => 'Name',
 					'icon' => 'House_(48)',
 					'default' => 'Hub_(24)',
-					'dbCheck' => true,
+					'dbCheck' => '4',
 					'formCheck' => true
 				]
 			]
@@ -770,12 +771,10 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		// Check the results in DB.
 		if (array_key_exists('dbCheck', $data)) {
-			$result = DBselect("SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
-					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$data['new_name']."'");
-			while ($row = DBfetch($result)) {
-				$this->assertEquals($row['name'], $data['new_name']);
-			}
+			$this->assertEquals($data['dbCheck'], DBcount("SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping "
+					. "ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '".$data['new_name']."'"));
 		}
+
 		// Check the results in form
 		if (array_key_exists('formCheck', $data)) {
 			$this->zbxTestDoubleClickLinkText($data['new_name'], 'iconmap_name');
@@ -791,8 +790,8 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 * Test cancel cloning of icon mapping.
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelCloning(){
-		$name='Icon mapping one for testPage';
-		$new_name='CANCEL CLONING: Icon mapping one for testPage';
+		$name='Icon mapping one';
+		$new_name='CANCEL CLONING: Icon mapping one';
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
@@ -834,7 +833,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 * Test cancel deleting of icon mapping.
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelDelete() {
-		$name='Icon mapping one for testPage';
+		$name='Icon mapping one';
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
