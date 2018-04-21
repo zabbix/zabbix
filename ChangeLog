@@ -20,6 +20,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-13737] fixed invalid confirmation message when mass enabling and disabling trigger, item and host prototypes (Ivo)
 ........S. [ZBX-13766] fixed comparison of two large float numbers in expressions (Sergejs)
 .......PS. [ZBX-13481] fixed incorrect parsing of BITS data type in SNMP response (vso)
 .......PS. [ZBX-13744] fixed potential shared memory leak when item is removed (Sergejs)
