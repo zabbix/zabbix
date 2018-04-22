@@ -1466,6 +1466,7 @@ Changes for 3.0.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12425] fixed selection of web items in the "Plain text" screen element (Sasha)
 ...G...... [ZBX-13781] fixed CRLF injection in Zabbix Agentd (MVekslers)
 ........S. [ZBX-13766] fixed comparison of two large float numbers in expressions (Sergejs)
 .......PS. [ZBX-13481] fixed incorrect parsing of BITS data type in SNMP response (vso)
