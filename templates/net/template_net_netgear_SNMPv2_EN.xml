@@ -466,8 +466,8 @@ The state of temperature sensor</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
-or
+                     <expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+or&#13;
 {Template Net Netgear Fastpath SNMPv2:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
                      <recovery_expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -484,8 +484,8 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>#{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}
-or
+                           <expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
 {Template Net Netgear Fastpath SNMPv2:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
                            <recovery_expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
@@ -493,8 +493,8 @@ or
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}
-or
+                     <expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
 {Template Net Netgear Fastpath SNMPv2:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
                      <recovery_expression>{Template Net Netgear Fastpath SNMPv2:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>

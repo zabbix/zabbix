@@ -978,8 +978,8 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <dependencies>
             <dependency>
                <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-               <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}
-or
+               <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
 {Template Net Extreme EXOS SNMPv2:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
                <recovery_expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
             </dependency>
@@ -987,8 +987,8 @@ or
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}
-or
+         <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
 {Template Net Extreme EXOS SNMPv2:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
          <recovery_mode>1</recovery_mode>
          <recovery_expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
