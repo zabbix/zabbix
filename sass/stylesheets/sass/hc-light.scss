@@ -377,34 +377,6 @@ a.link-action {
 	}
 }
 
-.header-title {
-	.dashbrd-edit {
-		ul {
-			li {
-
-				a {
-
-					&:link {
-						border-bottom: 1px solid rgba($link-hover-color, 0.5);
-					}
-
-					&:visited {
-						border-bottom: 1px solid $link-hover-color;
-					}
-
-					&:hover {
-						border-bottom: 1px solid $link-hover-color;
-					}
-
-					&:focus {
-						border-bottom: 3px solid $link-hover-color;
-					}
-				}
-			}
-		}
-	}
-}
-
 .link-action {
 	&:hover {
 		color: $link-hover-color;
@@ -459,14 +431,16 @@ a.link-action {
 }
 
 .top-subnav a {
+
 	&.selected {
 		font-weight: bold;
-		border-bottom: 4px solid #fff !important;
+		border-bottom: 4px solid #fff;
 	}
+
 	&:focus {
 		color: $link-main-subnav-active-color;
 		padding: 8px 0 4px 0;
-		border-bottom: 4px solid rgba($ui-hover-color, .8) !important;
+		border-bottom: 4px solid rgba($ui-hover-color, .8);
 		outline: none;
 	}
 }

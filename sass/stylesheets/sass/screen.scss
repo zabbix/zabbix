@@ -215,48 +215,23 @@ pre {
 	word-wrap: break-word;
 }
 
-// Main Navigation
-nav {
-	a {
-
-		&:link {
-			@extend %no-border;
-		}
-
-		&:visited {
-			@extend %no-border;
-		}
-
-		&:hover {
-			@extend %no-border;
-		}
-
-		&:focus {
-			@extend %no-border;
-		}
-
-		&:active {
-			@extend %no-border;
-		}
-	}
-}
-
-.nav {
-	@extend nav;
-
-	background-color: $main-subnav-bg-color;
-}
-
-%no-border {
-	border: none;
-}
-
 .top-nav-container {
+	background-color: $main-nav-bg-color;
 	height: 45px;
 	line-height: 45px;
-	padding: 0 10px 0 10px;
+	padding: 0 10px;
 	position: relative;
-	background-color: $main-nav-bg-color;
+}
+
+.top-nav a,
+.top-subnav a,
+.header-logo {
+	&:active,
+	&:hover,
+	&:link,
+	&:visited {
+		border: none;
+	}
 }
 
 .top-nav {
@@ -415,11 +390,11 @@ ul.top-nav-icons {
 }
 
 .top-subnav-container {
+	background-color: $main-subnav-bg-color;
 	height: 30px;
 	line-height: 30px;
-	background-color: $main-subnav-bg-color;
-	position: relative;
 	padding: 0 10px;
+	position: relative;
 }
 
 .top-subnav {
@@ -453,21 +428,20 @@ ul.top-nav-icons {
 		color: $link-main-subnav-hover-color;
 	}
 
-	&:focus {
-		color: $link-main-subnav-active-color;
-		padding: 8px 0 4px 0;
-		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
-		outline: none;
-	}
-
 	&:active {
 		color: $link-main-subnav-active-color;
 	}
 
+	&:focus,
 	&.selected {
+		border-bottom: 4px solid rgba($ui-hover-color, .5);
 		color: $link-main-subnav-active-color;
-		padding: 8px 0 4px 0;
-		border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
+		outline: none;
+		padding-bottom: 4px;
+	}
+
+	&.selected {
+		border-color: lighten($main-subnav-bg-color, 50%);
 	}
 }
 
@@ -565,19 +539,6 @@ ul.top-nav-icons {
 
 		ul {
 			li {
-
-				a {
-
-					&:hover {
-						border-bottom: 1px solid rgba($link-hover-color, 0.5);
-					}
-
-					&:focus {
-						border-bottom: 2px solid rgba($link-hover-color, 0.5);
-					}
-
-				}
-
 				vertical-align: middle;
 
 				&:first-child {
@@ -678,7 +639,7 @@ output {
 	margin: 10px 10px 0 0;
 
 	&:focus {
-	@include box-shadow(0 0 0 2px rgba($blue, .35));
+		@include box-shadow(0 0 0 2px rgba($blue, .35));
 	}
 }
 
@@ -2430,7 +2391,7 @@ button[disabled] {
 		display: inline-block;
 
 		a {
-			@extend %no-border;
+			border: none;
 			padding: 8px 10px;
 			@include transition(background-color .2s ease-out);
 
@@ -2469,7 +2430,7 @@ button[disabled] {
 				cursor: default;
 				color: $btn-disabled-font-color;
 				background-color: $transparent;
-				@extend %no-border;
+				border: none;
 			}
 		}
 	}
