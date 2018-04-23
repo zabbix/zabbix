@@ -28,6 +28,8 @@
 #define ZBX_MOCK_FORMAT_NS		".%09d"
 #define ZBX_MOCK_FORMAT_TZ		" %c%02d:%02d"
 
+#define ZBX_MOCK_TZ_MAX		7
+
 #define ZBX_MOCK_TIME_DATE	0x0001
 #define ZBX_MOCK_TIME_TIME	0x0002
 #define ZBX_MOCK_TIME_NS	0x0004
@@ -202,8 +204,6 @@ static zbx_mock_error_t	ts_get_ns(const char *text, int *ns, const char **pnext)
 	while (0 <= pad--)
 		*ns *= 10;
 
-
-
 	return ZBX_MOCK_SUCCESS;
 }
 
@@ -305,6 +305,38 @@ static zbx_mock_error_t	zbx_time_to_localtime(time_t timestamp, struct tm *local
 
 	return ZBX_MOCK_SUCCESS;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tz_format                                                    *
+ *                                                                            *
+ * Purpose: formats timezone to +hh:mm format                                 *
+ *                                                                            *
+ * Parameters: buffer - [OUT] the output buffer                               *
+ *             size   - [IN] the output buffer size                           *
+ *             tz_sec - [IN] the timezone offset in seconds                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_tz_format(char *buffer, size_t size, int tz_sec)
+{
+	int	tz_hour, tz_min;
+	char	tz_sign;
+
+	if (0 > tz_sec)
+	{
+		tz_sec = -tz_sec;
+		tz_sign = '-';
+	}
+	else
+		tz_sign = '+';
+
+	tz_hour = tz_sec / 60;
+	tz_min = tz_hour % 60;
+	tz_hour /= 60;
+
+	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_TZ, tz_sign, tz_hour, tz_min);
+}
+
 
 typedef enum
 {
@@ -491,8 +523,8 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size)
 {
 	struct tm		tm;
-	int			tz_hour, tz_min, tz_sec;
-	char			tz_sign;
+	int			tz_sec;
+	char			tz_buf[ZBX_MOCK_TZ_MAX];
 	zbx_mock_error_t	err;
 
 	/* max timestamp length minus nanosecond component */
@@ -502,21 +534,11 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size
 	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_localtime(timestamp, &tm, &tz_sec)))
 		return err;
 
-	if (0 > tz_sec)
-	{
-		tz_sec = -tz_sec;
-		tz_sign = '-';
-	}
-	else
-		tz_sign = '+';
+	zbx_tz_format(tz_buf, sizeof(tz_buf), tz_sec);
 
-	tz_hour = tz_sec / 60;
-	tz_min = tz_hour % 60;
-	tz_hour /= 60;
-
-	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_TZ,
+	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME "%s",
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-			tm.tm_hour, tm.tm_min, tm.tm_sec, tz_sign, tz_hour, tz_min);
+			tm.tm_hour, tm.tm_min, tm.tm_sec, tz_buf);
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -543,8 +565,8 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size
 zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer, size_t size)
 {
 	struct tm		tm;
-	int			tz_hour, tz_min, tz_sec;
-	char			tz_sign;
+	int			tz_sec;
+	char			tz_buf[ZBX_MOCK_TZ_MAX + 1];
 	zbx_mock_error_t	err;
 
 	if (size < ZBX_MOCK_TIMESTAMP_MAX_LEN)
@@ -553,21 +575,11 @@ zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer,
 	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_localtime(ts->sec, &tm, &tz_sec)))
 		return err;
 
-	if (0 > tz_sec)
-	{
-		tz_sec = -tz_sec;
-		tz_sign = '-';
-	}
-	else
-		tz_sign = '+';
+	zbx_tz_format(tz_buf, sizeof(tz_buf), tz_sec);
 
-	tz_hour = tz_sec / 60;
-	tz_min = tz_hour % 60;
-	tz_hour /= 60;
-
-	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_NS ZBX_MOCK_FORMAT_TZ,
+	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_NS "%s",
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-			tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns, tz_sign, tz_hour, tz_min);
+			tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns, tz_buf);
 
 	return ZBX_MOCK_SUCCESS;
 }
