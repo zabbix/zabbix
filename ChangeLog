@@ -268,8 +268,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 3.4.9rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-12821] fixed multiple javascript memory leaks (miks)
 ........S. [ZBX-13755] fixed proxy lastaccess update on 32-bit Zabbix server (vso)
