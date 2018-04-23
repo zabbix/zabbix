@@ -266,6 +266,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
+		zbx_free(buffer);
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
 	}
