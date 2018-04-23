@@ -748,6 +748,46 @@ static int	DBpatch_3050066(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050067(void)
+{
+	const ZBX_FIELD	field = {"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("events", &field);
+}
+
+static int	DBpatch_3050068(void)
+{
+	const ZBX_FIELD	field = {"acknowledged", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3050069(void)
+{
+	const ZBX_FIELD	field = {"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3050070(void)
+{
+	const ZBX_FIELD	field = {"old_severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_3050071(void)
+{
+	const ZBX_FIELD	field = {"new_severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_3050072(void)
+{
+	return DBdrop_field("config", "event_ack_enable");
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -817,5 +857,11 @@ DBPATCH_ADD(3050063, 0, 1)
 DBPATCH_ADD(3050064, 0, 1)
 DBPATCH_ADD(3050065, 0, 1)
 DBPATCH_ADD(3050066, 0, 1)
+DBPATCH_ADD(3050067, 0, 1)
+DBPATCH_ADD(3050068, 0, 1)
+DBPATCH_ADD(3050069, 0, 1)
+DBPATCH_ADD(3050070, 0, 1)
+DBPATCH_ADD(3050071, 0, 1)
+DBPATCH_ADD(3050072, 0, 1)
 
 DBPATCH_END()

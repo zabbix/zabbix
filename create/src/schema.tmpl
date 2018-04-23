@@ -546,7 +546,6 @@ FIELD		|configid	|t_id		|	|NOT NULL	|0
 FIELD		|refresh_unsupported|t_varchar(32)|'10m'	|NOT NULL	|ZBX_PROXY
 FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
-FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|event_expire	|t_varchar(32)	|'1w'	|NOT NULL	|ZBX_NODATA
 FIELD		|event_show_max	|t_integer	|'100'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
@@ -1074,6 +1073,7 @@ FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|source,object,objectid,clock
 INDEX		|2		|source,object,clock
 
@@ -1100,6 +1100,8 @@ FIELD		|eventid	|t_id		|	|NOT NULL	|0			|2|events
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|message	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|old_severity	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|new_severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|userid
 INDEX		|2		|eventid
 INDEX		|3		|clock
@@ -1405,6 +1407,8 @@ FIELD		|r_ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
 FIELD		|userid		|t_id		|	|NULL		|0			|-|users
 FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|source,object,objectid
 INDEX		|2		|r_clock
 INDEX		|3		|r_eventid
@@ -1622,4 +1626,4 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050066	|3050066
+ROW		|3050072	|3050072
