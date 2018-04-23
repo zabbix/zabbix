@@ -663,9 +663,8 @@ if (isset($_REQUEST['form'])) {
 
 		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_prototypes = API::ItemPrototype()->get([
-				'itemids' => getRequest('master_itemid', $itemPrototype['master_itemid']),
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'selectHosts' => ['name']
+				'itemids' => getRequest('master_itemid', $itemPrototype['master_itemid'])
 			]);
 
 			if ($master_prototypes) {
@@ -673,27 +672,18 @@ if (isset($_REQUEST['form'])) {
 			}
 		}
 	}
-	elseif (getRequest('master_itemid') && getRequest('parent_discoveryid')) {
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['hostid'],
-			'itemids' => getRequest('parent_discoveryid'),
-			'editable' => true
+	elseif (getRequest('master_itemid')) {
+		$master_prototypes = API::ItemPrototype()->get([
+			'itemids' => getRequest('master_itemid'),
+			'output' => ['itemid', 'type', 'hostid', 'name', 'key_']
 		]);
 
-		if ($discovery_rule) {
-			$master_prototypes = API::ItemPrototype()->get([
-				'itemids' => getRequest('master_itemid'),
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'filter' => ['hostid' => $discovery_rule[0]['hostid']]
-			]);
-
-			if ($master_prototypes) {
-				$itemPrototype['master_item'] = reset($master_prototypes);
-			}
-			else {
-				show_messages(false, '', _('No permissions to referred object or it does not exist!'));
-				$has_errors = true;
-			}
+		if ($master_prototypes) {
+			$itemPrototype['master_item'] = reset($master_prototypes);
+		}
+		else {
+			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
+			$has_errors = true;
 		}
 	}
 
