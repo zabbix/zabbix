@@ -218,7 +218,7 @@ out:
       - *row4
       - *row5
       status:
-      active_range: 550
+      active_range: 551
       values_total: 2
       db_cached_from: 2017-01-10 10:00:50.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -279,7 +279,7 @@ out:
       - *row4
       - *row5
       status:
-      active_range: 600
+      active_range: 601
       values_total: 5
       db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -379,7 +379,7 @@ out:
       - *row55
       - *row57
       status:
-      active_range: 599
+      active_range: 600
       values_total: 15
       db_cached_from: 2017-01-10 10:00:01.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -479,7 +479,7 @@ out:
           - *row55
           - *row57
         status:
-        active_range: 599
+        active_range: 600
         values_total: 15
         db_cached_from: 2017-01-10 10:00:01.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -582,7 +582,7 @@ out:
         - *row55
         - *row57
       status:
-      active_range: 599
+      active_range: 600
       values_total: 15
       db_cached_from: 2017-01-10 10:00:01.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -682,7 +682,7 @@ out:
       - *row55
       - *row57
       status:
-      active_range: 609
+      active_range: 610
       values_total: 15
       db_cached_from: 2017-01-10 09:59:51.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -782,7 +782,7 @@ out:
       - *row55
       - *row57
       status:
-      active_range: 609
+      active_range: 610
       values_total: 15
       db_cached_from: 2017-01-10 09:59:51.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -1493,7 +1493,7 @@ out:
       - *row55
       - *row57
       status: 
-      active_range: 596
+      active_range: 597
       values_total: 6
       db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -1584,7 +1584,7 @@ out:
       - *row55
       - *row57
       status: 
-      active_range: 596
+      active_range: 597
       values_total: 6
       db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -1675,7 +1675,7 @@ out:
       - *row55
       - *row57
       status: 
-      active_range: 596
+      active_range: 597
       values_total: 6
       db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -2119,7 +2119,7 @@ out:
       value type: ITEM_VALUE_TYPE_STR
       data: []
       status: 
-      active_range: 600
+      active_range: 601
       values_total: 0
       db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -2746,7 +2746,7 @@ out:
       - *row55
       - *row57
       status: 
-      active_range: 598
+      active_range: 599
       values_total: 12
       db_cached_from: 2017-01-10 10:00:02.000000000 +00:00
     mode: ZBX_VC_MODE_LOWMEM
@@ -2984,7 +2984,7 @@ out:
       - *row55
       - *row57
       status:
-      active_range: 600
+      active_range: 601
       values_total: 15
       db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     - itemid: 2
@@ -3124,7 +3124,7 @@ out:
       - *row55
       - *row57
       status:
-      active_range: 1200
+      active_range: 1201
       values_total: 15
       db_cached_from: 2017-01-11 10:00:00.000000000 +00:00
     - itemid: 2
@@ -3222,7 +3222,7 @@ out:
           - *row55
           - *row57
         status:
-        active_range: 1199
+        active_range: 1200
         values_total: 15
         db_cached_from: 2017-01-10 09:50:01.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -3325,7 +3325,7 @@ out:
           - *row55
           - *row57
         status:
-        active_range: 100
+        active_range: 101
         values_total: 15
         db_cached_from: 2017-01-10 09:50:01.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -3494,7 +3494,7 @@ out:
           - *row55
           - *row57
         status:
-        active_range: 597
+        active_range: 598
         values_total: 9
         db_cached_from: 2017-01-10 10:00:03.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
@@ -4008,7 +4008,7 @@ out:
           - *row55
           - *row57
         status:
-        active_range: 597
+        active_range: 598
         values_total: 9
         db_cached_from: 2017-01-10 10:00:03.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL

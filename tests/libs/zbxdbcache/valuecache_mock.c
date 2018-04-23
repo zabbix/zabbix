@@ -566,6 +566,12 @@ int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start
 	zbx_history_record_t	*rec, rec_local;
 	int			i;
 
+	if (0 > start)
+		fail_msg("invalid parameters passed to zbx_history_get_values function (start < 0)");
+
+	if (start >= end)
+		fail_msg("invalid parameters passed to zbx_history_get_values function (start >= end)");
+
 	if (NULL == (item = zbx_hashset_search(&vc_ds.items, &itemid)))
 		return SUCCEED;
 

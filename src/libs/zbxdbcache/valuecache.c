@@ -1984,7 +1984,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 	if (cached_records < count)
 	{
 		zbx_vector_history_record_t	records;
-		int				update_end;
+		int				update_end, range;
 
 		/* get the end timestamp to which (including) the values should be cached */
 		if (NULL != item->head)
@@ -2006,8 +2006,10 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 		else
 			seconds -= ts->sec - update_end;
 
+		range = (seconds == update_end ? seconds : seconds + 1);
+
 		if (SUCCEED == ret && SUCCEED == (ret = vc_db_read_values_by_time_and_count(item->itemid,
-				item->value_type, &records, seconds + 1, count - cached_records, update_end, ts)))
+				item->value_type, &records, range, count - cached_records, update_end, ts)))
 		{
 			zbx_vector_history_record_sort(&records,
 					(zbx_compare_func_t)zbx_history_record_compare_asc_func);
@@ -2065,7 +2067,8 @@ static void	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_
 	if (0 != item->active_range || ZBX_ITEM_STATUS_CACHED_ALL != item->status)
 	{
 		now = time(NULL);
-		vch_item_update_range(item, seconds + now - ts->sec, now);
+		/* add another second to include nanosecond shifts */
+		vch_item_update_range(item, seconds + now - ts->sec + 1, now);
 	}
 
 	if (FAIL == vch_item_get_last_value(item, ts, &chunk, &index))
@@ -2148,7 +2151,8 @@ out:
 			item->status = ZBX_ITEM_STATUS_CACHED_ALL;
 			return;
 		}
-		/* not enough data in the requested period, set the range equal to the period */
+		/* not enough data in the requested period, set the range equal to the period plus */
+		/* one second to include nanosecond shifts                                         */
 		range_timestamp = ts->sec - seconds;
 	}
 	else
