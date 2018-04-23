@@ -403,12 +403,12 @@ var jqBlink = {
 			// changing visibility state
 			jQuery.each(objects, function() {
 				if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
-					jQuery(this).toggleClass(jQuery(this).data('toggleClass'));
+					jQuery(this)[jqBlink.shown ? 'removeClass' : 'addClass'](jQuery(this).data('toggleClass'));
 				}
 				else {
 					jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
 				}
-			})
+			});
 
 			// reversing the value of indicator attribute
 			this.shown = !this.shown;
