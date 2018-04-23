@@ -374,7 +374,7 @@ test case: 'Valid expression "(1-(2=2))or(1/1000000)"'
 in:
   expression: '(1-(2=2))or(1/1000000)'
 out:
-  value: 1
+  value: 0
   return: 'SUCCEED'
 ---
 test case: 'Valid expression "(1-(2=2))or(1/2000000)"'
@@ -492,6 +492,97 @@ out:
 test case: 'Valid expression "-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-1)))))))))))))))))))))))))))))))"'
 in:
   expression: '-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-1)))))))))))))))))))))))))))))))' # 32 levels
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "17179869184 > 17179869184"'
+in:
+  expression: '17179869184 > 17179869184'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "17179869184 < 17179869184"'
+in:
+  expression: '17179869184 < 17179869184'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "17179869184 = 17179869184"'
+in:
+  expression: '17179869184 = 17179869184'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "1 > 1 or 1 < 1 or 1 = 1"'
+in:
+  expression: '1 > 1 or 1 < 1 or 1 = 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "0 > 0 or 0 < 0 or 0 = 0"'
+in:
+  expression: '0 > 0 or 0 < 0 or 0 = 0'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "17179869184 > 17179869184 or 17179869184 < 17179869184 or 17179869184 = 17179869184"'
+in:
+  expression: '17179869184 > 17179869184 or 17179869184 < 17179869184 or 17179869184 = 17179869184'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "17179869184.000001 > 17179869184 or 17179869184.000001 < 17179869184 or 17179869184.000001 = 17179869184"'
+in:
+  expression: '17179869184 > 17179869184.000001 or 17179869184 < 17179869184.000001 or 17179869184.000001 = 17179869184'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "17179869184 > 17179869184.000001 or 17179869184 < 17179869184.000001 or 17179869184 = 17179869184.000001"'
+in:
+  expression: '17179869184 > 17179869184.000001 or 17179869184 < 17179869184.000001 or 17179869184 = 17179869184.000001'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "17179869184.000001 > 17179869184"'
+in:
+  expression: '17179869184.000001 > 17179869184'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "17179869184.000001 = 17179869184"'
+in:
+  expression: '17179869184.000001 = 17179869184'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "17179869184.000001 < 17179869184"'
+in:
+  expression: '17179869184.000001 < 17179869184'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "17179869184.000001 <= 17179869184"'
+in:
+  expression: '17179869184.000001 <= 17179869184'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression "17179869184.000001 >= 17179869184"'
+in:
+  expression: '17179869184.000001 >= 17179869184'
 out:
   value: 1
   return: 'SUCCEED'

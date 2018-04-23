@@ -411,6 +411,7 @@ tests/libs/zbxsysinfo/common/.deps
 tests/libs/zbxsysinfo/common/Makefile
 tests/libs/zbxsysinfo/common/Makefile.in
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME
+tests/libs/zbxsysinfo/common/WEB_PAGE_GET
 tests/libs/zbxsysinfo/linux/.deps
 tests/libs/zbxsysinfo/linux/KERNEL_MAXFILES
 tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC

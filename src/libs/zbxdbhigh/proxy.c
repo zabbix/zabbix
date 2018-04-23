@@ -3877,7 +3877,7 @@ void	zbx_db_flush_proxy_lastaccess()
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts"
 					" set lastaccess=%d"
 					" where hostid=" ZBX_FS_UI64 ";\n",
-					pair->second, pair->first);
+					(int)pair->second, pair->first);
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
