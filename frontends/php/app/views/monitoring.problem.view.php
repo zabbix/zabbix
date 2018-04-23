@@ -278,9 +278,9 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
 
 	$filter = (new CFilter('web.problem.filter.state'))
-		->addVar('action', 'problem.view')
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-		->addVar('page', $data['page'])
+		->addFormItem((new CVar('action', 'problem.view'))->removeId())
+		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
+		->addFormItem((new CVar('page', $data['page']))->removeId())
 		->addColumn($filter_column1)
 		->addColumn($filter_column2);
 
@@ -290,21 +290,22 @@ if ($data['action'] == 'problem.view') {
 
 	(new CWidget())
 		->setTitle(_('Problems'))
-		->setControls(
+		->setControls((new CTag('nav', true,
 			(new CForm('get'))
 				->cleanItems()
 				->addVar('action', 'problem.view')
 				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 				->addVar('page', $data['page'])
-				->addItem(
-					(new CList())
-						->addItem(new CRedirectButton(_('Export to CSV'),
-							(new CUrl('zabbix.php'))
-								->setArgument('action', 'problem.view.csv')
-								->setArgument('page',  $data['page'])
-						))
-						->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+				->addItem((new CList())
+					->addItem(new CRedirectButton(_('Export to CSV'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'problem.view.csv')
+							->setArgument('page',  $data['page'])
+					))
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 				)
+			))
+				->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem($filter)
 		->addItem($screen->get())

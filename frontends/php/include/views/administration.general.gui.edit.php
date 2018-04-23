@@ -23,9 +23,14 @@ require_once dirname(__FILE__).'/js/administration.general.gui.php';
 
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.gui.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.gui.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $guiTab = (new CFormList())
@@ -76,6 +81,7 @@ $guiView = (new CTabView())
 	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
 $guiForm = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($guiView);
 
 $widget->addItem($guiForm);

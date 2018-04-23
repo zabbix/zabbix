@@ -25,9 +25,11 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Scripts'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'))
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter('web.scripts.filter.state'))
 		->addVar('action', 'script.list')

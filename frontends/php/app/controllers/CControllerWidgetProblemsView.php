@@ -54,7 +54,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'tags' => $fields['tags'],
 			'maintenance' => $fields['maintenance'],
 			'unacknowledged' => $fields['unacknowledged']
-		], $config, true);
+		], $config);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
 
@@ -86,6 +86,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable'],
+				'problem_unack_style' => $config['problem_unack_style'],
+				'problem_ack_style' => $config['problem_ack_style'],
 				'blink_period' => timeUnitToSeconds($config['blink_period'])
 			],
 			'data' => $data,

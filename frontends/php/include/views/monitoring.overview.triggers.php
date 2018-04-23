@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 zbx_add_post_js('jqBlink.blink();');
 
 // hint table
@@ -70,44 +71,45 @@ if ($blink_period > 0) {
 }
 
 // header right
-$help = get_icon('overviewhelp');
-$help->setHint($help_hint);
-
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$data['pageFilter']->getGroupsCB()
-			])
-			->addItem([
-				new CLabel(_('Type'), 'type'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('type', $data['type'], 'submit()', [
-					SHOW_TRIGGERS => _('Triggers'),
-					SHOW_DATA => _('Data')
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
 				])
-			])
-			->addItem([
-				new CLabel(_('Hosts location'), 'view_style'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('view_style', $data['view_style'], 'submit()', [
-					STYLE_TOP => _('Top'),
-					STYLE_LEFT => _('Left')
+				->addItem([
+					new CLabel(_('Type'), 'type'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('type', $this->data['type'], 'submit()', [
+						SHOW_TRIGGERS => _('Triggers'),
+						SHOW_DATA => _('Data')
+					])
 				])
-			])
+				->addItem([
+					new CLabel(_('Hosts location'), 'view_style'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+						STYLE_TOP => _('Top'),
+						STYLE_LEFT => _('Left')
+					])
+				])
+			),
+		(new CTag('nav', true, (new CList())
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-			->addItem($help)
-		)
-	);
+			->addItem(get_icon('overviewhelp')->setHint($help_hint))
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	]));
 
 // filter
 $filter = $data['filter'];
 $filterFormView = new CView('common.filter.trigger', [
-	'overview' => true,
 	'filter' => [
 		'filterid' => 'web.overview.filter.state',
 		'showTriggers' => $filter['showTriggers'],

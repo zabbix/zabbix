@@ -22,7 +22,9 @@
 $widget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
-$authenticationForm = (new CForm())->setName('authenticationForm');
+$authenticationForm = (new CForm())
+	->setName('authenticationForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // create form list
 $authenticationFormList = new CFormList('authenticationList');
@@ -35,6 +37,7 @@ $authenticationFormList->addRow(_('Default authentication'),
 		->addValue(_('LDAP'), ZBX_AUTH_LDAP, null, 'submit()')
 		->addValue(_('HTTP'), ZBX_AUTH_HTTP, null, 'submit()')
 		->setModern(true)
+		->removeId()
 );
 
 // append LDAP fields to form list

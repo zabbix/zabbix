@@ -901,6 +901,54 @@ function getItemFilterForm(&$items) {
 }
 
 /**
+ * Prepare ITEM_TYPE_HTTPAGENT type item data for create or update API calls.
+ * - Converts 'query_fields' from array of keys and array of values to array of hash maps for every field.
+ * - Converts 'headers' from array of keys and array of values to hash map.
+ * - For request method HEAD set retrieve mode to retrieve only headers.
+ *
+ * @param array $item                       Array of form fields data for ITEM_TYPE_HTTPAGENT item.
+ * @param int   $item['request_method']     Request method type.
+ * @param array $item['query_fields']       Array of 'name' and 'value' arrays for URL query fields.
+ * @param array $item['headers']            Array of 'name' and 'value' arrays for headers.
+ *
+ * @return array
+ */
+function prepareItemHttpAgentFormData(array $item) {
+	if ($item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+		$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+	}
+
+	if ($item['query_fields']) {
+		$query_fields = [];
+
+		foreach ($item['query_fields']['name'] as $index => $key) {
+			$value = $item['query_fields']['value'][$index];
+
+			if ($key !== '' || $value !== '') {
+				$query_fields[] = [$key => $value];
+			}
+		}
+		$item['query_fields'] = $query_fields;
+	}
+
+	if ($item['headers']) {
+		$headers = [];
+
+		foreach ($item['headers']['name'] as $index => $key) {
+			$value = $item['headers']['value'][$index];
+
+			if ($key !== '' || $value !== '') {
+				$headers[$key] = $value;
+			}
+		}
+
+		$item['headers'] = $headers;
+	}
+
+	return $item;
+}
+
+/**
  * Get data for item edit page.
  *
  * @param array	$item							Item, item prototype, LLD rule or LLD item to take the data from.
@@ -958,8 +1006,49 @@ function getItemFormData(array $item = [], array $options = []) {
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
 		'templates' => [],
-		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT)
+		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT),
+		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+		'url' => getRequest('url'),
+		'query_fields' => getRequest('query_fields', []),
+		'posts' => getRequest('posts'),
+		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+		'follow_redirects' => (int) getRequest('follow_redirects'),
+		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+		'http_proxy' => getRequest('http_proxy'),
+		'headers' => getRequest('headers', []),
+		'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
+		'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
+		'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+		'allow_traps' => getRequest('allow_traps', DB::getDefault('items', 'allow_traps')),
+		'ssl_cert_file' => getRequest('ssl_cert_file'),
+		'ssl_key_file' => getRequest('ssl_key_file'),
+		'ssl_key_password' => getRequest('ssl_key_password'),
+		'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
+		'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
+		'http_authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+		'http_username' => getRequest('http_username', ''),
+		'http_password' => getRequest('http_password', '')
 	];
+
+	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
+		foreach (['query_fields', 'headers'] as $property) {
+			$values = [];
+
+			if (is_array($data[$property]) && array_key_exists('name', $data[$property])
+					&& array_key_exists('value', $data[$property])) {
+				foreach ($data[$property]['name'] as $index => $key) {
+					if (array_key_exists($index, $data[$property]['value'])) {
+						$values[] = [$key => $data[$property]['value'][$index]];
+					}
+				}
+			}
+			$data[$property] = $values;
+		}
+	}
+	else {
+		$data['headers'] = [];
+		$data['query_fields'] = [];
+	}
 
 	// Dependent item initialization by master_itemid.
 	if (array_key_exists('master_item', $item)) {
@@ -1149,9 +1238,42 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['jmx_endpoint'] = $data['item']['jmx_endpoint'];
 		$data['new_application'] = getRequest('new_application', '');
+		// ITEM_TYPE_HTTPAGENT
+		$data['timeout'] = $data['item']['timeout'];
+		$data['url'] = $data['item']['url'];
+		$data['query_fields'] = $data['item']['query_fields'];
+		$data['posts'] = $data['item']['posts'];
+		$data['status_codes'] = $data['item']['status_codes'];
+		$data['follow_redirects'] = $data['item']['follow_redirects'];
+		$data['post_type'] = $data['item']['post_type'];
+		$data['http_proxy'] = $data['item']['http_proxy'];
+		$data['headers'] = $data['item']['headers'];
+		$data['retrieve_mode'] = $data['item']['retrieve_mode'];
+		$data['request_method'] = $data['item']['request_method'];
+		$data['allow_traps'] = $data['item']['allow_traps'];
+		$data['ssl_cert_file'] = $data['item']['ssl_cert_file'];
+		$data['ssl_key_file'] = $data['item']['ssl_key_file'];
+		$data['ssl_key_password'] = $data['item']['ssl_key_password'];
+		$data['verify_peer'] = $data['item']['verify_peer'];
+		$data['verify_host'] = $data['item']['verify_host'];
+		$data['http_authtype'] = $data['item']['authtype'];
+		$data['http_username'] = $data['item']['username'];
+		$data['http_password'] = $data['item']['password'];
+
+		if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
+			// Convert hash to array where every item is hash for single key value pair as it is used by view.
+			$headers = [];
+
+			foreach ($data['headers'] as $key => $value) {
+				$headers[] = [$key => $value];
+			}
+
+			$data['headers'] = $headers;
+		}
 
 		if (!$data['is_discovery_rule']) {
 			$data['preprocessing'] = $data['item']['preprocessing'];
+			$data['output_format'] = $data['item']['output_format'];
 		}
 
 		if ($data['parent_discoveryid'] != 0) {

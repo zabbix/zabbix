@@ -5,7 +5,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, .article, aside, canvas, details, embed, figure, figcaption, footer, .footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, main, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -14,7 +14,7 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline; }
 
-article, .article, aside, details, figcaption, figure, footer, .footer, header, hgroup, menu, nav, .nav, section {
+article, main, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, .nav, section {
   display: block; }
 
 body {
@@ -164,7 +164,7 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-nav, .nav {
+.nav {
   background-color: #000; }
 
 nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hover, nav a:focus, .nav a:focus, nav a:active, .nav a:active, .ui-tabs-nav li a, .ui-tabs-nav li.ui-state-disabled a {
@@ -381,6 +381,8 @@ ul.top-nav-icons {
     vertical-align: top;
     position: relative;
     padding: 0 0 0 10px; }
+  .header-title ul ul li:first-child {
+    padding-left: 0; }
   .header-title .dashbrd-edit {
     position: relative;
     display: inline-block;
@@ -405,7 +407,7 @@ ul.top-nav-icons {
       .header-title .dashbrd-edit ul li .btn-dashbrd-conf {
         vertical-align: middle; }
 
-article, .article {
+article, main {
   padding: 10px 10px 0 10px; }
 
 .object-group {
@@ -439,13 +441,16 @@ article, .article {
   .hor-list li:last-child {
     margin: 0; }
 
-footer, .footer {
+footer {
   position: absolute;
   bottom: 0;
   width: 100%;
   height: 30px;
   text-align: center;
   color: #333; }
+
+output {
+  display: block; }
 
 .logo {
   float: left;
@@ -1543,31 +1548,31 @@ button {
   background: #555 url(../img/icon-sprite.svg) no-repeat -7px -439px; }
 
 .btn-widget-action {
-  background: url(../img/icon-sprite.svg) no-repeat -4px -616px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -618px; }
 
 .btn-widget-collapse {
-  background: url(../img/icon-sprite.svg) no-repeat -5px -652px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -654px; }
 
 .btn-widget-expand {
-  background: url(../img/icon-sprite.svg) no-repeat -5px -688px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -689px; }
 
 .btn-widget-edit {
-  background: url(../img/icon-sprite.svg) no-repeat -39px -617px; }
+  background: url(../img/icon-sprite.svg) no-repeat -42px -619px; }
 
 .btn-widget-delete {
-  background: url(../img/icon-sprite.svg) no-repeat -39px -580px; }
+  background: url(../img/icon-sprite.svg) no-repeat -42px -582px; }
 
 .btn-alarm-on {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -545px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -546px; }
 
 .btn-alarm-off {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -581px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -582px; }
 
 .btn-sound-on {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -473px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -474px; }
 
 .btn-sound-off {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -509px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -510px; }
 
 .btn-dashbrd-conf {
   background: url(../img/icon-sprite.svg) no-repeat -42px -619px; }
@@ -1590,8 +1595,9 @@ button {
     filter: alpha(opacity=0); }
 
 .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off {
-  width: 30px;
-  height: 28px; }
+  width: 24px;
+  height: 24px;
+  margin: 2px 2px 0 0; }
 
 .btn-dashbrd-conf {
   width: 24px;
@@ -1607,10 +1613,6 @@ button {
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
-  .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-widget-delete:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-dashbrd-conf:focus {
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none; }
 
 .btn-conf, .btn-kiosk, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
@@ -2231,6 +2233,19 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: inline-block;
     padding: 8px 0 8px 13px; }
 
+.dashbrd-widget-graph-link {
+  display: block; }
+  .dashbrd-widget-graph-link:link {
+    border: none; }
+  .dashbrd-widget-graph-link:focus:after {
+    content: "";
+    background: rgba(17, 17, 17, 0.35);
+    height: 2px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px; }
+
 .action-menu {
   position: absolute;
   z-index: 1000;
@@ -2351,7 +2366,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
-      top: -12px;
+      top: -13px;
       right: -8px; }
   .overlay-dialogue.modal-popup {
     max-width: 1024px;
@@ -3587,6 +3602,11 @@ svg {
         border: 0px none;
         opacity: 0.5;
         float: left; }
+        .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn::-moz-focus-inner,
+        .navtree .tree .tree-item > .tree-row > .tools .remove-item-btn::-moz-focus-inner,
+        .navtree .tree .tree-item > .tree-row > .tools .import-items-btn::-moz-focus-inner,
+        .navtree .tree .tree-item > .tree-row > .tools .add-child-btn::-moz-focus-inner {
+          padding: 0; }
       .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn:hover,
       .navtree .tree .tree-item > .tree-row > .tools .remove-item-btn:hover,
       .navtree .tree .tree-item > .tree-row > .tools .import-items-btn:hover,
@@ -4593,31 +4613,31 @@ Widgets are used as containers to group any related information. Widget consists
   margin-top: -16px; }
 
 .btn-widget-action {
-  background: url(../img/icon-sprite.svg) no-repeat -163px -616px; }
+  background: url(../img/icon-sprite.svg) no-repeat -165px -618px; }
 
 .btn-widget-collapse {
-  background: url(../img/icon-sprite.svg) no-repeat -163px -652px; }
+  background: url(../img/icon-sprite.svg) no-repeat -165px -654px; }
 
 .btn-widget-expand {
-  background: url(../img/icon-sprite.svg) no-repeat -163px -688px; }
+  background: url(../img/icon-sprite.svg) no-repeat -165px -690px; }
 
 .btn-widget-edit {
-  background: url(../img/icon-sprite.svg) no-repeat -198px -617px; }
+  background: url(../img/icon-sprite.svg) no-repeat -201px -619px; }
 
 .btn-widget-delete {
-  background: url(../img/icon-sprite.svg) no-repeat -198px -580px; }
+  background: url(../img/icon-sprite.svg) no-repeat -201px -582px; }
 
 .btn-alarm-on {
-  background: url(../img/icon-sprite.svg) no-repeat -163px -545px; }
+  background: url(../img/icon-sprite.svg) no-repeat -165px -546px; }
 
 .btn-alarm-off {
-  background: url(../img/icon-sprite.svg) no-repeat -163px -581px; }
+  background: url(../img/icon-sprite.svg) no-repeat -165px -582px; }
 
 .btn-sound-on {
-  background: url(../img/icon-sprite.svg) no-repeat -163px -473px; }
+  background: url(../img/icon-sprite.svg) no-repeat -165px -474px; }
 
 .btn-sound-off {
-  background: url(../img/icon-sprite.svg) no-repeat -163px -509px; }
+  background: url(../img/icon-sprite.svg) no-repeat -165px -510px; }
 
 .top-nav-help {
   background: url(../img/icon-sprite.svg) no-repeat -162px -32px !important; }
@@ -4635,7 +4655,7 @@ Widgets are used as containers to group any related information. Widget consists
   background: url(../img/icon-sprite.svg) no-repeat -162px -7px !important; }
 
 .btn-dashbrd-conf {
-  background: url(../img/icon-sprite.svg) no-repeat -200px -619px !important; }
+  background: url(../img/icon-sprite.svg) no-repeat -201px -619px !important; }
 
 .list-table .subfilter-enabled {
   background-color: #fff;
@@ -4878,6 +4898,11 @@ ul.top-nav-icons a:focus {
 .suggest-found {
   color: #b77102; }
 
+.dashbrd-widget-graph-link:focus:after {
+  background: #111;
+  height: 3px;
+  bottom: -3px; }
+
 td.log-na-bg, td.log-info-bg, td.log-warning-bg, td.log-high-bg, td.log-disaster-bg {
   padding-left: 42px !important;
   color: #000; }
@@ -5099,6 +5124,11 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .disaster-bg.blink-hidden:after {
   content: none; }
 
+.notif-body h4 {
+  padding-bottom: 3px;
+  margin-bottom: -3px; }
+.notif-body p {
+  margin: 0.25em 0 2px 0; }
 .notif-body li {
   padding: 0 0 10px 42px; }
 
@@ -5157,7 +5187,8 @@ td.inactive-bg {
 
 .graph-selection {
   background-color: rgba(0, 0, 0, 0.1);
-  border: 2px solid rgba(0, 0, 0, 0.6); }
+  border: none;
+  outline: 2px solid rgba(0, 0, 0, 0.6); }
 
 .ui-selectable-helper {
   background-color: rgba(0, 0, 0, 0.1);

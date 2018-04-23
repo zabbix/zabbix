@@ -48,7 +48,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'zabbix.php',
 					'action' => 'problem.view',
-					'active_if' => ['problem.view'],
+					'active_if' => ['problem.view', 'acknowledge.edit'],
 					'label' => _('Problems'),
 					'sub_pages' => ['tr_events.php']
 				],
@@ -67,12 +67,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'latest.php',
 					'label' => _('Latest data'),
 					'sub_pages' => ['history.php', 'chart.php']
-				],
-				[
-					'url' => 'tr_status.php',
-					'active_if' => ['acknowledge.edit'],
-					'label' => _('Triggers'),
-					'sub_pages' => ['tr_comments.php', 'chart4.php']
 				],
 				[
 					'url' => 'charts.php',
@@ -148,12 +142,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'zabbix.php',
 					'action' => 'report.status',
 					'active_if' => ['report.status'],
-					'label' => _('Status of Zabbix'),
+					'label' => _('System information'),
 					'user_type' => USER_TYPE_SUPER_ADMIN
 				],
 				[
 					'url' => 'report2.php',
-					'label' => _('Availability report')
+					'label' => _('Availability report'),
+					'sub_pages' => ['chart4.php']
 				],
 				[
 					'url' => 'toptriggers.php',

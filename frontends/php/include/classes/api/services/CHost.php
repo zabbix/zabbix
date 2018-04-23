@@ -797,6 +797,11 @@ class CHost extends CHostGeneral {
 			);
 		}
 
+		// Property 'auto_compress' is not supported for hosts.
+		if (array_key_exists('auto_compress', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+		}
+
 		/*
 		 * Update hosts properties
 		 */
@@ -1570,6 +1575,11 @@ class CHost extends CHostGeneral {
 				);
 			}
 
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
+
 			// Validate "host" field.
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1732,6 +1742,11 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Wrong fields for host "%1$s".', array_key_exists('host', $host) ? $host['host'] : '')
 				);
+			}
+
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
 			// Validate host permissions.

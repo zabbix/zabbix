@@ -25,6 +25,7 @@ $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
 	->setName('correlation.edit')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['correlationid']) {
@@ -74,7 +75,8 @@ if ($data['correlation']['filter']['conditions']) {
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('javascript: removeCondition('.$i.');')
-						->addClass(ZBX_STYLE_BTN_LINK),
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->removeId(),
 					new CVar('conditions['.$i.']', $condition)
 				]))->addClass(ZBX_STYLE_NOWRAP)
 			],
@@ -199,7 +201,7 @@ $correlation_tab
 	);
 
 // Operations tab.
-$operation_tab = new CFormList('operationlist');
+$operation_tab = new CFormList();
 
 $operations_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
@@ -217,7 +219,8 @@ if ($data['correlation']['operations']) {
 			(new CCol([
 				(new CButton('remove', _('Remove')))
 					->onClick('javascript: removeOperation('.$operationid.');')
-					->addClass(ZBX_STYLE_BTN_LINK),
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId(),
 				new CVar('operations['.$operationid.']', $operation)
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		], null, 'operations_'.$operationid);

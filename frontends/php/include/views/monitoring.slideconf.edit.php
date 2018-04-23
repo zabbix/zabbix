@@ -32,6 +32,7 @@ if (!$data['form_refresh']) {
 // create form
 $form = (new CForm())
 	->setName('slideForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('slides', $data['slides_without_delay'])
 	->addVar('current_user_userid', $data['current_user_userid'])

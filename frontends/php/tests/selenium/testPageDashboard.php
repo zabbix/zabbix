@@ -75,12 +75,12 @@ class testPageDashboard extends CWebTest {
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'Favourite graphs');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Favourite screens');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Favourite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Host status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Problem hosts');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Problems');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'System status');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'Problems by severity');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'Web monitoring');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//h4", 'Discovery status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'Status of Zabbix');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'System information');
 		}
 	}
 
@@ -183,12 +183,12 @@ class testPageDashboard extends CWebTest {
 	public function testPageDashboard_FullScreen() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckHeader('Dashboard');
-		$this->zbxTestAssertElementPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
 
 		$this->zbxTestClickXpathWait("//button[@class='btn-max']");
 		$this->zbxTestCheckHeader('Dashboard');
-		$this->zbxTestAssertElementNotPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertAttribute("//button[@class='btn-kiosk']", 'title', 'Kiosk mode');
 		$this->zbxTestCheckFatalErrors();
 	}
@@ -196,13 +196,13 @@ class testPageDashboard extends CWebTest {
 	public function testPageDashboard_KioskMode() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&fullscreen=1', false);
 		$this->zbxTestCheckHeader('Dashboard');
-		$this->zbxTestAssertElementNotPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementPresentXpath("//ul[@class='object-group']");
 		$this->zbxTestAssertAttribute("//button[@class='btn-kiosk']", 'title', 'Kiosk mode');
 
 		$this->zbxTestClickXpathWait("//button[@class='btn-kiosk']");
-		$this->zbxTestAssertElementNotPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[@class='object-group']");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
@@ -210,7 +210,7 @@ class testPageDashboard extends CWebTest {
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-min')]");
 		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
-		$this->zbxTestAssertElementPresentXpath("//header[@role='banner']");
+		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementPresentXpath("//ul[@class='object-group']");
 		$this->zbxTestCheckFatalErrors();

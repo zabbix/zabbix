@@ -203,11 +203,14 @@ class CMenuPopupHelper {
 	 * @param string $acknowledge['eventid']            Event ID.
 	 * @param string $acknowledge['screenid']           Screen ID (optional).
 	 * @param string $acknowledge['backurl']            Return URL (optional).
-	 * @param bool   $fullscreen                        Fullscreen mode.
+	 * @param array  $options
+	 * @param bool   $options['show_description']       (optional) default: true
+	 * @param bool   $options['description_enabled']    (optional) default: true
+	 * @param bool   $options['fullscreen']             (optional) default: false
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(array $trigger, array $acknowledge = null, $fullscreen = false) {
+	public static function getTrigger(array $trigger, array $acknowledge = null, array $options = []) {
 		$hosts = [];
 		$showEvents = true;
 
@@ -253,7 +256,14 @@ class CMenuPopupHelper {
 			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
-		if ($fullscreen) {
+		if (array_key_exists('show_description', $options) && $options['show_description'] === false) {
+			$data['show_description'] = false;
+		}
+		else if (array_key_exists('description_enabled', $options) && $options['description_enabled'] === false) {
+			$data['description_enabled'] = false;
+		}
+
+		if (array_key_exists('fullscreen', $options) && $options['fullscreen'] === true) {
 			$data['fullscreen'] = true;
 		}
 
@@ -303,16 +313,20 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for dependent item popup menu.
+	 * Prepare data for dependent item (or item prototype) popup menu.
 	 *
-	 * @param string $itemid    Item id.
-	 * @param string $hostid    Host id.
-	 * @param string $name      Item name.
+	 * @param string $page        Page name.
+	 * @param string $itemid      Item id.
+	 * @param string $parent      Name of parent object argument (hostid or parent_discoveryid).
+	 * @param string $parentid    Parent object id (host id for hosts or discoveryid for discovery rules)
+	 * @param string $name        Item name.
+	 *
+	 * @return array
 	 */
-	public static function getDependentItem($itemid, $hostid, $name) {
-		$url = (new CUrl('items.php'))
-					->setArgument('form', _('Create item'))->setArgument('type', ITEM_TYPE_DEPENDENT)
-					->setArgument('hostid', $hostid)->setArgument('master_itemid', $itemid)
+	protected static function getDependent($page, $itemid, $parent, $parentid, $name) {
+		$url = (new CUrl($page))
+					->setArgument('form', 'create')->setArgument('type', ITEM_TYPE_DEPENDENT)
+					->setArgument($parent, $parentid)->setArgument('master_itemid', $itemid)
 					->getUrl();
 
 		return [
@@ -325,24 +339,24 @@ class CMenuPopupHelper {
 	}
 
 	/**
+	 * Prepare data for dependent item popup menu.
+	 *
+	 * @param string $itemid    Item id.
+	 * @param string $hostid    Host id.
+	 * @param string $name      Item name.
+	 */
+	public static function getDependentItem($itemid, $hostid, $name) {
+		return self::getDependent('items.php', $itemid, 'hostid', $hostid, $name);
+	}
+
+	/**
 	 * Prepare data for dependent item prototype popup menu.
 	 *
 	 * @param string $itemid                Item id.
-	 * @param string $parent_discoveryid    Prent discovery rule id.
+	 * @param string $parent_discoveryid    Parent discovery rule id.
 	 * @param string $name                  Item name.
 	 */
 	public static function getDependentItemPrototype($itemid, $parent_discoveryid, $name) {
-		$url = (new CUrl('disc_prototypes.php'))
-					->setArgument('form', _('Create item'))->setArgument('type', ITEM_TYPE_DEPENDENT)
-					->setArgument('parent_discoveryid', $parent_discoveryid)->setArgument('master_itemid', $itemid)
-					->getUrl();
-
-		return [
-			'type' => 'dependent_items',
-			'itemid' => $itemid,
-			'item_name' => $name,
-			'add_label' => _('Create dependent item'),
-			'add_url' => $url
-		];
+		return self::getDependent('disc_prototypes.php', $itemid, 'parent_discoveryid', $parent_discoveryid, $name);
 	}
 }

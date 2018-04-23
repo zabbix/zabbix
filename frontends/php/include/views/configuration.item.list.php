@@ -21,19 +21,20 @@
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-if (empty($this->data['hostid'])) {
-	$create_button = (new CSubmit('form', _('Create item (select host first)')))->setEnabled(false);
-}
-else {
-	$create_button = new CSubmit('form', _('Create item'));
-}
-
 $widget = (new CWidget())
 	->setTitle(_('Items'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addVar('hostid', $this->data['hostid'])
-		->addItem((new CList())->addItem($create_button))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				($data['hostid'] != 0)
+					? new CRedirectButton(_('Create item'), (new CUrl())
+							->setArgument('form', 'create')
+							->setArgument('hostid', $data['hostid'])
+							->getUrl()
+						)
+					: (new CButton('form', _('Create item (select host first)')))->setEnabled(false)
+			)
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 if (!empty($this->data['hostid'])) {

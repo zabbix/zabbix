@@ -1,0 +1,639 @@
+---
+test case: 'Valid expression "1"'
+in:
+  expression: '1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-1"'
+in:
+  expression: '-1'
+out:
+  value: -1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "- 1"'
+in:
+  expression: '- 1'
+out:
+  value: -1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression " - 1K "'
+in:
+  expression: ' - 1K '
+out:
+  value: -1024
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not -1"'
+in:
+  expression: 'not -1'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not 1"'
+in:
+  expression: 'not 1'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not 0"'
+in:
+  expression: 'not 0'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1.5 * 4"'
+in:
+  expression: '1.5 * 4'
+out:
+  value: 6
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1024K/4M"'
+in:
+  expression: '1024K/4M'
+out:
+  value: 0.25
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1+2'
+in:
+  expression: '1+2'
+out:
+  value: 3
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1-2"'
+in:
+  expression: '1-2'
+out:
+  value: -1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1<2"' 
+in:
+  expression: '1<2'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1<1"'
+in:
+  expression: '1<1'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "2<1"'
+in:
+  expression: '2<1'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1<=2"'
+in:
+  expression: '1<=2'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "2<=2"'
+in:
+  expression: '2<=2'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "3<=2"'
+in:
+  expression: '3<=2'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "2>=1"'
+in:
+  expression: '2>=1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "2>=2"'
+in:
+  expression: '2>=2'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1>=2"'
+in:
+  expression: '1>=2'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "2>1"'
+in:
+  expression: '2>1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1>1"'
+in:
+  expression: '1>1'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1>2"'
+in:
+  expression: '1>2'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1=1"'
+in:
+  expression: '1=1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1=2"'
+in:
+  expression: '1=2'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1<>1"'
+in:
+  expression: '1<>1'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1<>2"'
+in:
+  expression: '1<>2'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1 and 1"'
+in:
+  expression: '1 and 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "0 and 1"'
+in:
+  expression: '0 and 1'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1 and 0"'
+in:
+  expression: '1 and 0'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "0 and 0"'
+in:
+  expression: '0 and 0'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1 or 1"'
+in:
+  expression: '1 or 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "0 or 1"'
+in:
+  expression: '0 or 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1 or 0"'
+in:
+  expression: '1 or 0'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "0 or 0"'
+in:
+  expression: '0 or 0'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not 1 or 1"'
+in:
+  expression: 'not 1 or 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not 0 and 0"'
+in:
+  expression: 'not 0 and 0'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-1-2-3-4"'
+in:
+  expression: '-1-2-3-4'
+out:
+  value: -10
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-1-(2-3-4)"'
+in:
+  expression: '-1-(2-3-4)'
+out:
+  value: 4
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-1-(2-(3-4))"'
+in:
+  expression: '-1-(2-(3-4))'
+out:
+  value: -4
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-1/2/3/4"'
+in:
+  expression: '-1/2/3/4'
+out:
+  value: -0.0416666666667
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-1/(2/3/4)"'
+in:
+  expression: '-1/(2/3/4)'
+out:
+  value: -6
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1/(2/(3/4))"'
+in:
+  expression: '-1/(2/(3/4))'
+out:
+  value: -0.375
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "5 + 10 / 3 * (not 0 + (1 or 0) + (1K and 1M))"'
+in:
+  expression: '5 + 10 / 3 * (not 0 + (1 or 0) + (1K and 1M))'
+out:
+  value: 15
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "3 * not 1 + (5 = 2 + 3) / 1000000000G + (1/10/100/1000 <> 1/1000000)"'
+in:
+  expression: '3 * not 1 + (5 = 2 + 3) / 1000000000G + (1/10/100/1000 <> 1/1000000)'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "2 * 3 * 5 * 7 = 300 + 4 * -30 - -20 + 10"'
+in:
+  expression: '2 * 3 * 5 * 7 = 300 + 4 * -30 - -20 + 10'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-5 + 10 * -6 - 700 / (49 * (1 / (2 + 5))) = -165"'
+in:
+  expression: '-5 + 10 * -6 - 700 / (49 * (1 / (2 + 5))) = -165'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1<2=2<1"'
+in:
+  expression: '1<2=2<1'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1<2<>2<1"'
+in:
+  expression: '1<2<>2<1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "0<>1<2<>0"'
+in:
+  expression: '0<>1<2<>0'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "0<1<=1>=1>0"'
+in:
+  expression: '0<1<=1>=1>0'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1/0.2"'
+in:
+  expression: '1/0.2'
+out:
+  value: 5
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "(1-(2=2))or(1/100000)"'
+in:
+  expression: '(1-(2=2))or(1/100000)'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "(1-(2=2))or(1/1000000)"'
+in:
+  expression: '(1-(2=2))or(1/1000000)'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "(1-(2=2))or(1/2000000)"'
+in:
+  expression: '(1-(2=2))or(1/2000000)'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "1K-1 < 2 * 512 and not(0000000000000000000000000000000000000000000000000000000000000000000000000)"'
+in:
+  expression: '1K-1 < 2 * 512 and not(0000000000000000000000000000000000000000000000000000000000000000000000000)'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "2.5K = 256 * 10 and (not(1)or(1))"'
+in:
+  expression: '2.5K = 256 * 10 and (not(1)or(1))'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not(not(not(not(not(not 1)))))"'
+in:
+  expression: 'not(not(not(not(not(not 1)))))'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-(-(-(-(-(-2.G)))))"'
+in:
+  expression: '-(-(-(-(-(-2.G)))))'
+out:
+  value: 2147483648 # 2*GIBIBYTE
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-(-(-(-(-(-.1T)))))"'
+in:
+  expression: '-(-(-(-(-(-.1T)))))'
+out:
+  value: 109951162777.6 # 0.1*TEBIBYTE
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not 0 <> not 1"'
+in:
+  expression: 'not 0 <> not 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not 0K >= not 1"'
+in:
+  expression: 'not 0K >= not 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not 00.M > not 1"'
+in:
+  expression: 'not 00.M > not 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "not .000G > not 1"'
+in:
+  expression: 'not .000G > not 1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case:  'Valid expression " 1 + 2 * 3 = 7 and ( - 1 or - 2 ) and not 0 "'
+in:
+  expression: ' 1 + 2 * 3 = 7 and ( - 1 or - 2 ) and not 0 '
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "(1+((2)*(3))=(7)and(-(1)or(-(2)))and(not(0)))"'
+in:
+  expression: '(1+((2)*(3))=(7)and(-(1)or(-(2)))and(not(0)))'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "\t1\t+\t2\t*\t3\t=\t7\tand\t(\t-\t1\tor\t-\t2\t)\tand\tnot\t0\t"'
+in:
+  expression: "\t1\t+\t2\t*\t3\t=\t7\tand\t(\t-\t1\tor\t-\t2\t)\tand\tnot\t0\t"
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "\r1\r+\r2\r*\r3\r=\r7\rand\r(\r-\r1\ror\r-\r2\r)\rand\rnot\r0\r"'
+in:
+  expression: "\r1\r+\r2\r*\r3\r=\r7\rand\r(\r-\r1\ror\r-\r2\r)\rand\rnot\r0\r"
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "\n1\n+\n2\n*\n3\n=\n7\nand\n(\n-\n1\nor\n-\n2\n)\nand\nnot\n0\n"'
+in:
+  expression: "\n1\n+\n2\n*\n3\n=\n7\nand\n(\n-\n1\nor\n-\n2\n)\nand\nnot\n0\n"
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "(((((((((((((((((((((((((((((((1)))))))))))))))))))))))))))))))"'
+in:
+  expression: '(((((((((((((((((((((((((((((((1)))))))))))))))))))))))))))))))' # 32 levels
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Valid expression "-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-1)))))))))))))))))))))))))))))))"'
+in:
+  expression: '-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-1)))))))))))))))))))))))))))))))' # 32 levels
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'Invalid expression ""'
+in:
+  expression: ''
+out:
+  error: 'Cannot evaluate expression: unexpected end of expression.'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "+1"'
+in:
+  expression: '+1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "+1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "--1"'
+in:
+  expression: '--1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "-1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "not1"'
+in:
+  expression: 'not1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "not1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1not"'
+in:
+  expression: '1not'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "1not".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "not-1"'
+in:
+  expression: 'not-1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "not-1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "-not 1"'
+in:
+  expression: '-not 1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "not 1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "- not(1)"'
+in:
+  expression: '- not(1)'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "not(1)".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "not not 1"'
+in:
+  expression: 'not not 1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "not 1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1and 1"'
+in:
+  expression: '1and 1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "1and 1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1or 1"'
+in:
+  expression: '1or 1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "1or 1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1 or1"'
+in:
+  expression: '1 or1'
+out:
+  error: 'Cannot evaluate expression: unexpected token at "or1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1..2"'
+in:
+  expression: '1..2'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "1..2".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1.K2"'
+in:
+  expression: '1.K2'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "1.K2".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1.2Kand 1"'
+in:
+  expression: '1.2Kand 1'
+out:
+  error: 'Cannot evaluate expression: expected numeric token at "1.2Kand 1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1 andnot 1"'
+in:
+  expression: '1 andnot 1'
+out:
+  error: 'Cannot evaluate expression: unexpected token at "andnot 1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1 andor 1"'
+in:
+  expression: '1 andor 1'
+out:
+  error: 'Cannot evaluate expression: unexpected token at "andor 1".'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "1/(5-10/2)"'
+in:
+  expression: '1/(5-10/2)'
+out:
+  error: 'Cannot evaluate expression: division by zero.'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "((((((((((((((((((((((((((((((((1))))))))))))))))))))))))))))))))"'
+in:
+  expression: '((((((((((((((((((((((((((((((((1))))))))))))))))))))))))))))))))' # 33 levels
+out:
+  error: 'Cannot evaluate expression: nesting level is too deep.'
+  return: 'FAIL'
+---
+test case: 'Invalid expression "-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-1))))))))))))))))))))))))))))))))"'
+in:
+  expression: '-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-1))))))))))))))))))))))))))))))))' # 33 levels
+out:
+  error: 'Cannot evaluate expression: nesting level is too deep.'
+  return: 'FAIL'
+...
+

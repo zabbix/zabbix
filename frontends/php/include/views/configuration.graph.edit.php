@@ -22,23 +22,27 @@
 $widget = new CWidget();
 
 if ($data['parent_discoveryid'] === null) {
-	$widget->setTitle(_('Graphs'))->addItem(get_header_host_table('graphs', $data['hostid']));
+	$widget
+		->setTitle(_('Graphs'))
+		->addItem(get_header_host_table('graphs', $data['hostid']));
 }
 else {
-	$widget->setTitle(_('Graph prototypes'))
+	$widget
+		->setTitle(_('Graph prototypes'))
 		->addItem(get_header_host_table('graphs', $data['hostid'], $data['parent_discoveryid']));
 }
 
 // Create form.
 $graphForm = (new CForm())
 	->setName('graphForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('ymin_itemid', $this->data['ymin_itemid'])
 	->addVar('ymax_itemid', $this->data['ymax_itemid']);
 
 if ($data['parent_discoveryid'] !== null) {
-	$graphForm->addVar('parent_discoveryid', $data['parent_discoveryid']);
+	$graphForm->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId());
 }
 
 if ($data['graphid'] != 0) {
@@ -424,13 +428,9 @@ $graphFormList->addRow(
 );
 
 // Append tabs to form.
-$graphTab = new CTabView();
-if (!$data['form_refresh']) {
-	$graphTab->setSelected(0);
-}
-$graphTab->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'),
-	$graphFormList
-);
+$graphTab = (new CTabView())
+	->setSelected(0)
+	->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'), $graphFormList);
 
 /*
  * Preview tab

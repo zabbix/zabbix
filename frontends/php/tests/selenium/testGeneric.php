@@ -36,7 +36,6 @@ class testGeneric extends CWebTest {
 
 			['zabbix.php?action=web.view',					'Web monitoring'],
 			['latest.php',						'Latest data [refreshed every 30 sec.]'],
-			['tr_status.php',					'Triggers [refreshed every 30 sec.]'],
 
 			['zabbix.php?action=problem.view',	'Problems'],
 
@@ -52,7 +51,7 @@ class testGeneric extends CWebTest {
 			['hostinventories.php',			'Host inventory'],
 
 			// reports
-			['zabbix.php?action=report.status',					'Status of Zabbix'],
+			['zabbix.php?action=report.status',					'System information'],
 			['report2.php',										'Availability report'],
 			['toptriggers.php',									'100 busiest triggers'],
 			['toptriggers.php?severities[0]=0&filter_set=Filter',	'100 busiest triggers'],

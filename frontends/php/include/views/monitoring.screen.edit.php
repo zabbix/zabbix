@@ -36,6 +36,7 @@ if ($data['screen']['templateid']) {
 // create form
 $form = (new CForm())
 	->setName('screenForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['screen']['templateid'] != 0) {

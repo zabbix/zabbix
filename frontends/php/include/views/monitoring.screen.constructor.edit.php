@@ -26,6 +26,7 @@ if (isset($_REQUEST['screenitemid'])) {
 
 $form = (new CForm('post', $action))
 	->setName('screen_item_form')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('screenid', getRequest('screenid'));
 
 if ($data['screen']['templateid'] != 0) {
@@ -407,11 +408,11 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	$item = false;
 
-	if ($resourceId > 0) {
+	if ($resourceId != 0) {
 		$items = API::Item()->get([
-			'itemids' => $resourceId,
-			'selectHosts' => ['name'],
 			'output' => ['itemid', 'hostid', 'key_', 'name'],
+			'selectHosts' => ['name'],
+			'itemids' => $resourceId,
 			'webitems' => true
 		]);
 
@@ -457,7 +458,11 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		)
-		->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
+		->addRow(_('Show text as HTML'),
+			(new CCheckBox('style'))
+				->setChecked($style == 1)
+				->removeId()
+		);
 }
 
 /*

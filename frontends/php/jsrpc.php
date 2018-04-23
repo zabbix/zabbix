@@ -120,7 +120,11 @@ switch ($data['method']) {
 						$sound = $msgsettings['sounds.'.$trigger['priority']];
 					}
 
-					$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
+					$url_problems = (new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_hostids[]', $host['hostid'])
+						->setArgument('filter_set', '1')
+						->getUrl();
 					$url_events = (new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
 						->setArgument('filter_triggerids[]', $event['objectid'])
@@ -136,7 +140,7 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'severity_style' => getSeverityStyle($trigger['priority'], $event['value'] == TRIGGER_VALUE_TRUE),
-						'title' => $title.' [url='.$url_tr_status.']'.CHtml::encode($host['name']).'[/url]',
+						'title' => $title.' [url='.$url_problems.']'.CHtml::encode($host['name']).'[/url]',
 						'body' => [
 							'[url='.$url_events.']'.CHtml::encode($trigger['description']).'[/url]',
 							'[url='.$url_tr_events.']'.
