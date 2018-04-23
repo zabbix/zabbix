@@ -969,7 +969,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'description' => getRequest('description', ''),
 		'key' => getRequest('key', ''),
 		'master_itemid' => getRequest('master_itemid', 0),
-		'master_itemname' => getRequest('master_itemname', ''),
 		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),

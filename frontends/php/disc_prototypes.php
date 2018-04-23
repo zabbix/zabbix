@@ -46,7 +46,6 @@ $fields = [
 	],
 	'master_itemid' =>				[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({type}) && {type}=='.ITEM_TYPE_DEPENDENT, _('Master item')],
-	'master_itemname' =>			[T_ZBX_STR, O_OPT, null,	null,			null],
 	'delay' =>						[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO | P_ALLOW_LLD_MACRO, null,
 		'(isset({add}) || isset({update}))'.
 			' && (isset({type}) && ({type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.')'.
@@ -635,7 +634,6 @@ elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelet
 if (isset($_REQUEST['form'])) {
 	$itemPrototype = [];
 	$has_errors = false;
-	$master_prototype_options = [];
 
 	if (hasRequest('itemid')) {
 		$itemPrototype = API::ItemPrototype()->get([
@@ -663,12 +661,16 @@ if (isset($_REQUEST['form'])) {
 			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
-			$master_prototype_options = [
-				'itemids' => $itemPrototype['master_itemid'],
+		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
+			$master_prototypes = API::ItemPrototype()->get([
+				'itemids' => getRequest('master_itemid', $itemPrototype['master_itemid']),
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
 				'selectHosts' => ['name']
-			];
+			]);
+
+			if ($master_prototypes) {
+				$itemPrototype['master_item'] = reset($master_prototypes);
+			}
 		}
 	}
 	elseif (getRequest('master_itemid') && getRequest('parent_discoveryid')) {
@@ -679,23 +681,19 @@ if (isset($_REQUEST['form'])) {
 		]);
 
 		if ($discovery_rule) {
-			$master_prototype_options = [
+			$master_prototypes = API::ItemPrototype()->get([
 				'itemids' => getRequest('master_itemid'),
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
 				'filter' => ['hostid' => $discovery_rule[0]['hostid']]
-			];
-		}
-	}
+			]);
 
-	if ($master_prototype_options) {
-		$master_prototypes = API::ItemPrototype()->get($master_prototype_options);
-
-		if ($master_prototypes) {
-			$itemPrototype['master_item'] = reset($master_prototypes);
-		}
-		else {
-			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
-			$has_errors = true;
+			if ($master_prototypes) {
+				$itemPrototype['master_item'] = reset($master_prototypes);
+			}
+			else {
+				show_messages(false, '', _('No permissions to referred object or it does not exist!'));
+				$has_errors = true;
+			}
 		}
 	}
 
