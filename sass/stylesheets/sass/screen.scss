@@ -690,6 +690,19 @@ output {
 
 							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
 								color: $font-color;
+								border-bottom-color: rgba($font-color, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+							}
+
+							.tag {
+								background-color: rgba($font-color, 0.5);
+							}
+
+							button:focus {
+								box-shadow: 0 0 0 2px rgba($font-color, 0.5);
 							}
 						}
 					}
@@ -703,6 +716,15 @@ output {
 
 							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
 								color: black;
+								border-bottom-color: rgba(black, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+							}
+
+							button:focus {
+								box-shadow: 0 0 0 2px rgba(black, 0.5);
 							}
 						}
 					}
@@ -4905,6 +4927,10 @@ tr.cursor-move {
 
 	.icon-info {
 		margin-right: 10px;
+
+		&:only-of-type {
+			margin-right: 0;
+		}
 
 		&:last-child {
 			margin-right: 0;
