@@ -372,10 +372,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_MYSQL)
-#ifdef my_bool	/* my_bool type is removed in MySQL 8.0 */
-	my_bool		mysql_reconnect = 1;
-#else
+#if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
+#else
+	my_bool		mysql_reconnect = 1;
 #endif
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
