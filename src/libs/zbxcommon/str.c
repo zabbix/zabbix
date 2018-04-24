@@ -1621,52 +1621,6 @@ void	remove_param(char *param, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_num2hex                                                      *
- *                                                                            *
- * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
- *                                                                            *
- * Parameters:                                                                *
- *      c - number 0-15                                                       *
- *                                                                            *
- * Return value:                                                              *
- *      '0'-'f'                                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-char	zbx_num2hex(u_char c)
-{
-	if (c >= 10)
-		return c + 0x57; /* a-f */
-	else
-		return c + 0x30; /* 0-9 */
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_hex2num                                                      *
- *                                                                            *
- * Purpose: convert hexit c ('0'-'9''a'-'f') to number (0-15)                 *
- *                                                                            *
- * Parameters:                                                                *
- *      c - char ('0'-'9''a'-'f')                                             *
- *                                                                            *
- * Return value:                                                              *
- *      0-15                                                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-u_char	zbx_hex2num(char c)
-{
-	if (c >= 'a')
-		return c - 0x57; /* a-f */
-	else
-		return c - 0x30; /* 0-9 */
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: str_in_list                                                      *
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *

@@ -191,6 +191,30 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 	return len;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_num2hex                                                      *
+ *                                                                            *
+ * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      c - number 0-15                                                       *
+ *                                                                            *
+ * Return value:                                                              *
+ *      '0'-'f'                                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+static char	zbx_num2hex(u_char c)
+{
+	if (c >= 10)
+		return c + 0x57; /* a-f */
+	else
+		return c + 0x30; /* 0-9 */
+}
+
 static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t type)
 {
 	const char	*sptr;
@@ -652,6 +676,29 @@ static const char	*zbx_json_decodenull(const char *p)
 		return p + 4;
 
 	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hex2num                                                      *
+ *                                                                            *
+ * Purpose: convert hexit c ('0'-'9''a'-'f') to number (0-15)                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      c - char ('0'-'9''a'-'f')                                             *
+ *                                                                            *
+ * Return value:                                                              *
+ *      0-15                                                                  *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+static u_char	zbx_hex2num(char c)
+{
+	if (c >= 'a')
+		return c - 0x57; /* a-f */
+	else
+		return c - 0x30; /* 0-9 */
 }
 
 /******************************************************************************
