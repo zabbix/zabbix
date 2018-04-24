@@ -158,6 +158,11 @@ calendar.prototype = {
 		this.clndr_calendar.hide();
 		this.visible = 0;
 
+		// Unset higlighted date.
+		this.hl_month = null;
+		this.hl_year = null;
+		this.hl_day = null;
+
 		jQuery(document)
 			.off('click', this.calendarDocumentClickHandler)
 			.off('keydown', this.calendarKeyDownHandler)
