@@ -432,16 +432,17 @@ ul.top-nav-icons {
 		color: $link-main-subnav-active-color;
 	}
 
-	&:focus,
-	&.selected {
-		border-bottom: 4px solid rgba($ui-hover-color, .5);
+	&:focus {
+		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
 		color: $link-main-subnav-active-color;
 		outline: none;
 		padding-bottom: 4px;
 	}
 
 	&.selected {
-		border-color: lighten($main-subnav-bg-color, 50%);
+		border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
+		color: $link-main-subnav-active-color;
+		padding-bottom: 4px;
 	}
 }
 
