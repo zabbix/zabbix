@@ -666,7 +666,7 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.name"
-			" from groups g,hosts_groups hg,items i,functions f"
+			" from hstgrp g,hosts_groups hg,items i,functions f"
 			" where g.groupid=hg.groupid"
 				" and hg.hostid=i.hostid"
 				" and i.itemid=f.itemid"

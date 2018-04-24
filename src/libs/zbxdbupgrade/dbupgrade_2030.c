@@ -592,7 +592,7 @@ static int	DBpatch_2030048(void)
 
 static int	DBpatch_2030049(void)
 {
-	return dm_rename_slave_data("groups", "groupid", "name", 64);
+	return dm_rename_slave_data(ZBX_SQL_QUOTE("groups"), "groupid", "name", 64);
 }
 
 static int	DBpatch_2030050(void)

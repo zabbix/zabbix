@@ -251,6 +251,16 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "\n)" ZBX_DB_TABLE_OPTIONS);
 }
 
+static void	DBrename_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const char *new_name)
+{
+#ifdef HAVE_IBM_DB2
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename table %s to %s", table_name, new_name);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s rename to %s", table_name, new_name);
+#endif
+}
+
 static void	DBdrop_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop table %s", table_name);
@@ -425,6 +435,22 @@ int	DBcreate_table(const ZBX_TABLE *table)
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	DBrename_table(const char *table_name, const char *new_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
+
+	DBrename_table_sql(&sql, &sql_alloc, &sql_offset, table_name, new_name);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(new_name);
 
 	zbx_free(sql);
 
