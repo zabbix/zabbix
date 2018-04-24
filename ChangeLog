@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha6
 
 New features:
+..F....... [ZBXNEXT-4415] added new mode "Compact view" to the Problems page with ability to toggle highlighting whole row; added option to toggle timeline (agriscenko, Andzs)
 A.F.....S. [ZBXNEXT-2788] added support "NOT" keyword in custom expression fields (Ivo, Sergejs)
 ..F....... [ZBXNEXT-4516] renamed dashboard widget and screen element "System status" to "Problems by severity" (Sasha)
 ..F....... [ZBXNEXT-4516] renamed dashboard widget and screen element "Host status" to "Problem hosts" (Sasha)
