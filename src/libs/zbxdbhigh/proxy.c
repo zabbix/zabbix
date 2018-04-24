@@ -3209,7 +3209,8 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 	DB_DHOST		dhost;
 	zbx_uint64_t		last_druleid = 0, dcheckid;
 	struct zbx_json_parse	jp_row;
-	int			port, status, ret = SUCCEED;
+	int			status, ret = SUCCEED;
+	unsigned short		port;
 	const char		*p = NULL;
 	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
 				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
@@ -3304,7 +3305,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
-				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%d value:'%s'",
+				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%hu value:'%s'",
 				__function_name, drule.druleid, dcheckid, drule.unique_dcheckid, zbx_date2str(itemtime),
 				zbx_time2str(itemtime), ip, dns, port, value);
 
@@ -3876,7 +3877,7 @@ void	zbx_db_flush_proxy_lastaccess()
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts"
 					" set lastaccess=%d"
 					" where hostid=" ZBX_FS_UI64 ";\n",
-					pair->second, pair->first);
+					(int)pair->second, pair->first);
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}

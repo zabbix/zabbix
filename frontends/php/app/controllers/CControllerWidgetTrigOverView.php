@@ -26,7 +26,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_TRIG_OVERVIEW);
+		$this->setType(WIDGET_TRIG_OVER);
 		$this->setValidationRules([
 			'name' => 'string',
 			'fullscreen' => 'in 0,1',

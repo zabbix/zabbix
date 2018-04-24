@@ -28,7 +28,7 @@
 static zbx_vector_ptr_t		handle_pool;		/* a place to store handles provided to mock data user */
 static zbx_vector_str_t		string_pool;		/* a place to store strings provided to mock data user */
 static yaml_document_t		test_case;		/* parsed YAML document with test case data */
-static const yaml_node_t	*root;                  /* the root document node */
+static const yaml_node_t	*root;			/* the root document node */
 static const yaml_node_t	*in = NULL;		/* pointer to "in" section of test case document */
 static const yaml_node_t	*out = NULL;		/* pointer to "out" section of test case document */
 static const yaml_node_t	*db_data = NULL;	/* pointer to "db data" section of test case document */

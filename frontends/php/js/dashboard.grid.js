@@ -576,7 +576,7 @@
 		delete fields['type'];
 		delete fields['name'];
 
-		url.setArgument('action', 'dashbrd.widget.check');
+		url.setArgument('action', 'dashboard.widget.check');
 
 		if (Object.keys(fields).length != 0) {
 			ajax_data['fields'] = JSON.stringify(fields);
@@ -1282,7 +1282,7 @@
 				// Disable saving, while form is beeing updated.
 				$('.dialogue-widget-save', footer).prop('disabled', true);
 
-				url.setArgument('action', 'dashbrd.widget.config');
+				url.setArgument('action', 'dashboard.widget.edit');
 
 				if (form.length) {
 					// Take values from form.

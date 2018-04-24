@@ -22,7 +22,7 @@
 /**
  * Problems widget form.
  */
-class CProblemsWidgetForm extends CWidgetForm {
+class CWidgetFormProblems extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_PROBLEMS);

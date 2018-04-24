@@ -142,7 +142,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'zabbix.php',
 					'action' => 'report.status',
 					'active_if' => ['report.status'],
-					'label' => _('Status of Zabbix'),
+					'label' => _('System information'),
 					'user_type' => USER_TYPE_SUPER_ADMIN
 				],
 				[

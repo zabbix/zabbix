@@ -1396,7 +1396,7 @@ static int	check_action_conditions(zbx_action_eval_t *action)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, action->actionid);
 
-	if (action->evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
+	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		expression = zbx_strdup(expression, action->formula);
 
 	for (i = 0; i < action->conditions.values_num; i++)
@@ -1463,7 +1463,7 @@ static int	check_action_conditions(zbx_action_eval_t *action)
 		}
 	}
 
-	if (action->evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
+	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 	{
 		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);

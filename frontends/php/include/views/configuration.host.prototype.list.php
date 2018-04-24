@@ -157,10 +157,10 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Enable selected host prototypes?')
+				'confirm' => _('Create hosts from selected prototypes as enabled?')
 			],
 			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Disable selected host prototypes?')
+				'confirm' => _('Create hosts from selected prototypes as disabled?')
 			],
 			'hostprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected host prototypes?')
