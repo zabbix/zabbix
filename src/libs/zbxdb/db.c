@@ -372,7 +372,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_MYSQL)
+#ifdef my_bool
 	my_bool		mysql_reconnect = 1;
+#else
+	int		mysql_reconnect = 1;
+#endif
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;

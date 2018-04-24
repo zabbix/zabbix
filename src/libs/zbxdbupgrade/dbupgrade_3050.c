@@ -491,7 +491,7 @@ static int	DBpatch_3050039(void)
 
 static int	DBpatch_3050040(void)
 {
-	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"groupid", NULL, ZBX_SQL_QUOTE("groups"), "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("tag_filter", 2, &field);
 }
