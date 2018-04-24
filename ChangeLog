@@ -22,6 +22,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+........S. [ZBX-13694] disable check now for items with scheduler configuration errors (wiper)
 ...G...PS. [ZBX-9882] removed Zapcat-style and multi-level array type support in item key parameters (Andris, viktors)
 ..F....... [ZBX-12821] fixed multiple javascript memory leaks (miks)
 ........S. [ZBX-13755] fixed proxy lastaccess update on 32-bit Zabbix server (vso)

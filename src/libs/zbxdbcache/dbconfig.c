@@ -11261,6 +11261,13 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 			proxy_hostid = 0;
 		}
+		else if (0 == dc_item->schedulable)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for item \"%s\" on host \"%s\""
+					": item configuration error", dc_item->key, dc_host->host);
+
+			proxy_hostid = 0;
+		}
 		else if (0 == (proxy_hostid = dc_host->proxy_hostid))
 			dc_requeue_item_at(dc_item, dc_host, nextcheck);
 
