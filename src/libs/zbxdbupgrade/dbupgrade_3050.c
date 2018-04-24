@@ -788,6 +788,110 @@ static int	DBpatch_3050072(void)
 	return DBdrop_field("config", "event_ack_enable");
 }
 
+static int	DBpatch_3050073(void)
+{
+	int	ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update problem set acknowledged="
+			"(select acknowledged from events where events.eventid=problem.eventid)");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050074(void)
+{
+	int	ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update events set severity="
+			"(select priority from triggers where triggerid=objectid) where source=0 and object=0");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050075(void)
+{
+	int	ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update problem set severity="
+			"(select priority from triggers where triggerid=objectid) where source=0 and object=0");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050076(void)
+{
+	int		ret = SUCCEED, action;
+	zbx_uint64_t	ackid, eventid;
+	zbx_hashset_t	eventids;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql;
+	size_t		sql_alloc = 4096, sql_offset = 0;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+	zbx_hashset_create(&eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select acknowledgeid,eventid,action from acknowledges order by clock");
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(ackid, row[0]);
+		ZBX_STR2UINT64(eventid, row[1]);
+		action = atoi(row[2]);
+
+		/* 0x04 - ZBX_ACKNOWLEDGE_ACTION_COMMENT */
+		action |= 0x04;
+
+		if (NULL == zbx_hashset_search(&eventids, &eventid))
+		{
+			zbx_hashset_insert(&eventids, &eventid, sizeof(eventid));
+			/* 0x02 - ZBX_ACKNOWLEDGE_ACTION_ACKNOWLEDGE */
+			action |= 0x02;
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update acknowledges set action=%d where acknowledgeid=" ZBX_FS_UI64 ";\n",
+				action, ackid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	zbx_hashset_destroy(&eventids);
+	zbx_free(sql);
+
+	return ret;
+}
+
+
 #endif
 
 DBPATCH_START(3050)
@@ -863,5 +967,9 @@ DBPATCH_ADD(3050069, 0, 1)
 DBPATCH_ADD(3050070, 0, 1)
 DBPATCH_ADD(3050071, 0, 1)
 DBPATCH_ADD(3050072, 0, 1)
+DBPATCH_ADD(3050073, 0, 1)
+DBPATCH_ADD(3050074, 0, 1)
+DBPATCH_ADD(3050075, 0, 1)
+DBPATCH_ADD(3050076, 0, 1)
 
 DBPATCH_END()
