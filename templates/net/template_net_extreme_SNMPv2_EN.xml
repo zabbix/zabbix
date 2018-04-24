@@ -11,10 +11,10 @@
       <template>
          <template>Template Net Extreme EXOS SNMPv2</template>
          <name>Template Net Extreme EXOS SNMPv2</name>
-         <description>Template Extreme EXOS version: 0.14
-MIBs used:
-EXTREME-SOFTWARE-MONITOR-MIB
-EXTREME-SYSTEM-MIB
+         <description>Template Extreme EXOS version: 0.14&#13;
+MIBs used:&#13;
+EXTREME-SOFTWARE-MONITOR-MIB&#13;
+EXTREME-SYSTEM-MIB&#13;
 ENTITY-MIB</description>
          <groups>
             <group>
@@ -70,7 +70,7 @@ ENTITY-MIB</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
+               <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB&#13;
 Total CPU utlization (percentage) as of last sampling.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -112,8 +112,8 @@ Total CPU utlization (percentage) as of last sampling.</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: EXTREME-SYSTEM-MIB
-Temperature readings of testpoint: Device
+               <description>MIB: EXTREME-SYSTEM-MIB&#13;
+Temperature readings of testpoint: Device&#13;
 Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -155,7 +155,7 @@ Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-supp
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: EXTREME-SYSTEM-MIB
+               <description>MIB: EXTREME-SYSTEM-MIB&#13;
 Temperature status of testpoint: Device</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -363,9 +363,9 @@ Temperature status of testpoint: Device</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: EXTREME-SYSTEM-MIB
-The software revision of the primary image stored in this device.
-This string will have a zero length if the revision is unknown, invalid or not present.
+               <description>MIB: EXTREME-SYSTEM-MIB&#13;
+The software revision of the primary image stored in this device.&#13;
+This string will have a zero length if the revision is unknown, invalid or not present.&#13;
 This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.</description>
                <inventory_link>5</inventory_link>
                <applications>
@@ -441,7 +441,7 @@ This will also be reported in RMON2 probeSoftwareRev if this is the software ima
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
+                     <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB&#13;
 Total amount of free memory in Kbytes in the system.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -489,7 +489,7 @@ Total amount of free memory in Kbytes in the system.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB
+                     <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB&#13;
 Total amount of DRAM in Kbytes in the system.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -667,7 +667,7 @@ Total amount of DRAM in Kbytes in the system.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EXTREME-SYSTEM-MIB
+                     <description>MIB: EXTREME-SYSTEM-MIB&#13;
 Status of the power supply {#SNMPVALUE}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -696,7 +696,7 @@ Status of the power supply {#SNMPVALUE}</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -768,7 +768,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EXTREME-SYSTEM-MIB
+                     <description>MIB: EXTREME-SYSTEM-MIB&#13;
 Operational status of a cooling fan.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -813,7 +813,7 @@ Operational status of a cooling fan.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EXTREME-SYSTEM-MIB
+                     <description>MIB: EXTREME-SYSTEM-MIB&#13;
 The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -840,7 +840,7 @@ The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -971,15 +971,15 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies>
             <dependency>
                <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-               <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}
-or
+               <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
 {Template Net Extreme EXOS SNMPv2:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
                <recovery_expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
             </dependency>
@@ -987,8 +987,8 @@ or
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}
-or
+         <expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
 {Template Net Extreme EXOS SNMPv2:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
          <recovery_mode>1</recovery_mode>
          <recovery_expression>{Template Net Extreme EXOS SNMPv2:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
@@ -998,7 +998,7 @@ or
          <url/>
          <status>0</status>
          <priority>4</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
          <type>0</type>
          <manual_close>0</manual_close>
@@ -1031,7 +1031,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
@@ -1048,7 +1048,7 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
