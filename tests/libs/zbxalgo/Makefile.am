@@ -1,23 +1,14 @@
 if SERVER
-SERVER_tests = \
-	zbx_function_find \
-	parse_key \
-	replace_key_params_dyn
+SERVER_tests = evaluate 
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
 
 if SERVER
 COMMON_SRC_FILES = \
-	../../../src/zabbix_server/actions.c \
-	../../../src/zabbix_server/events.c \
-	../../../src/zabbix_server/operations.c \
 	../../zbxmocktest.h
 
 COMMON_LIB_FILES = \
-	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
-	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
-	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
 	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
@@ -72,50 +63,25 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 
-zbx_function_find_SOURCES = \
-	zbx_function_find.c \
+evaluate_SOURCES = \
+	evaluate.c \
+	../../../src/zabbix_server/actions.c \
+	../../../src/zabbix_server/events.c \
+	../../../src/zabbix_server/operations.c \
 	$(COMMON_SRC_FILES)
 
-zbx_function_find_LDADD = \
-	$(COMMON_LIB_FILES) \
-	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a 
+evaluate_LDADD = \
+	$(COMMON_LIB_FILES)
 
-zbx_function_find_LDADD += @SERVER_LIBS@ 
+evaluate_LDADD += @SERVER_LIBS@ 
 
-zbx_function_find_LDFLAGS = @SERVER_LDFLAGS@
+evaluate_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_function_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-parse_key_SOURCES = \
-	parse_key.c \
-	$(COMMON_SRC_FILES)
-
-parse_key_LDADD = \
-	$(COMMON_LIB_FILES) \
-	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a 
-
-parse_key_LDADD += @SERVER_LIBS@ 
-
-parse_key_LDFLAGS = @SERVER_LDFLAGS@
-
-parse_key_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-replace_key_params_dyn_SOURCES = \
-	replace_key_params_dyn.c \
-	$(COMMON_SRC_FILES)
-
-replace_key_params_dyn_LDADD = \
-	$(COMMON_LIB_FILES) \
-	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a 
-
-replace_key_params_dyn_LDADD += @SERVER_LIBS@ 
-
-replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@
-
-replace_key_params_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
+evaluate_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
