@@ -389,6 +389,12 @@ ul.top-nav-icons {
 		-webkit-transform-style: preserve-3d;
 	}
 
+	.top-nav-support {
+		background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
+		width: auto;
+		padding: 0 6px 0 17px;
+	}
+
 	form {
 		position: relative;
 	}
@@ -401,6 +407,13 @@ ul.top-nav-icons {
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
+
+		@media (max-width: 1050px) {
+			width: 130px;
+		}
+
+		transition: width 0.5s;
+		-webkit-transition: width 0.5s;
 
 		&:focus {
 			background-color: $form-bg-color;
