@@ -21,6 +21,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+...G...PS. [ZBX-9882] removed Zapcat-style and multi-level array type support in item key parameters (Andris, viktors)
 ..F....... [ZBX-12821] fixed multiple javascript memory leaks (miks)
 ........S. [ZBX-13755] fixed proxy lastaccess update on 32-bit Zabbix server (vso)
 ..F....... [ZBX-12425] fixed selection of web items in the "Plain text" screen element (Sasha)
@@ -267,8 +268,6 @@ Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 3.4.9rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-12821] fixed multiple javascript memory leaks (miks)
@@ -1468,8 +1467,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-12425] fixed selection of web items in the "Plain text" screen element (Sasha)
