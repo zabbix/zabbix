@@ -682,10 +682,10 @@ static const char	*zbx_json_decodenull(const char *p)
  *                                                                            *
  * Function: zbx_hex2num                                                      *
  *                                                                            *
- * Purpose: convert hexit c ('0'-'9''a'-'f') to number (0-15)                 *
+ * Purpose: convert hexit c ('0'-'9''a'-'f''A'-'F') to number (0-15)          *
  *                                                                            *
  * Parameters:                                                                *
- *      c - char ('0'-'9''a'-'f')                                             *
+ *      c - char ('0'-'9''a'-'f''A'-'F')                                      *
  *                                                                            *
  * Return value:                                                              *
  *      0-15                                                                  *
@@ -697,6 +697,8 @@ static u_char	zbx_hex2num(char c)
 {
 	if (c >= 'a')
 		return c - 0x57; /* a-f */
+	else if (c >= 'A')
+		return c - 0x37; /* A-F */
 	else
 		return c - 0x30; /* 0-9 */
 }
