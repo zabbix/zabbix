@@ -374,7 +374,7 @@ calendar.prototype = {
 				return false;
 				break;
 
-			default:
+			case 32: // Prevent page scrolling when pressing Space.
 				return false;
 		}
 	},
