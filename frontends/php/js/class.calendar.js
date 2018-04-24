@@ -373,6 +373,9 @@ calendar.prototype = {
 
 				return false;
 				break;
+
+			default:
+				return false;
 		}
 	},
 
