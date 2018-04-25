@@ -288,6 +288,12 @@ jQuery(function ($){
 	}
 });
 
+/**
+ * flickerfreeScreen refresh on timeselector change.
+ */
+jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
+	window.flickerfreeScreen.refreshAll(data.from, data.to);
+});
 
 // graphs timeline controls (gtlc)
 var timeControl = {
@@ -388,7 +394,6 @@ var timeControl = {
 			img = jQuery('<img/>').attr('id', id).appendTo(('#'+obj.containerid));
 
 			var xhr = flickerfreeScreen.getImageSboxHeight(new Curl(obj.src), function (height) {
-				img.attr('src', obj.src);
 				img.data('zbx_sbox', {
 					height: parseInt(height, 10),
 					left: obj.objDims.shiftXleft,
@@ -396,7 +401,7 @@ var timeControl = {
 					top: obj.objDims.shiftYtop,
 					period: obj.timeline.period,
 					timestamp: obj.timeline.from_ts
-				});
+				}).attr('src', obj.src);
 			});
 
 			if (xhr === null) {
@@ -433,9 +438,7 @@ var timeControl = {
 					top: obj.objDims.shiftYtop,
 					period: obj.timeline.period,
 					timestamp: obj.timeline.from_ts
-				});
-				img.data('sbox_height', height)
-					.attr('src', url.getUrl());
+				}).attr('src', url.getUrl());
 			});
 
 		if (async === null) {
@@ -517,18 +520,6 @@ var timeControl = {
 	},
 
 	objectUpdate: function() {
-		// TODO: remove
-		// secure browser from fast user operations
-		// if (isNaN(usertime) || isNaN(period)) {
-		// 	for (var id in this.objectList) {
-		// 		if (isset(id, ZBX_SBOX)) {
-		// 			ZBX_SBOX[id].clearParams();
-		// 		}
-		// 	}
-
-		// 	return;
-		// }
-
 		if (this.refreshPage) {
 			var url = new Curl(location.href);
 			url.setArgument('from', this.timeline.from);
@@ -552,8 +543,6 @@ var timeControl = {
 			});
 
 			jQuery.publish('timeselector.rangechange', {from: this.timeline.from, to: this.timeline.to});
-
-			flickerfreeScreen.refreshAll(this.timeline.from, this.timeline.to);
 		}
 	},
 
@@ -572,7 +561,7 @@ var timeControl = {
 			location.href = url.getUrl();
 		}
 		else {
-			flickerfreeScreen.refreshAll(this.timeline.from, this.timeline.to);
+			jQuery.publish('timeselector.rangechange', {from: this.timeline.from, to: this.timeline.to});
 		}
 	}
 };

@@ -29,7 +29,7 @@ class CControllerTimelineUpdate extends CController {
 			'idx' =>		'required|string',
 			'idx2' =>		'required|id',
 			'from' =>		'string|not_empty',
-			'to' =>			'string||not_empty'
+			'to' =>			'string|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);

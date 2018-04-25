@@ -399,7 +399,6 @@
 
 					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 						// 'src' should be added only here to trigger load event after new height is received.
-						img.attr('src', url.getUrl());
 						img.data('zbx_sbox', {
 							height: parseInt(height, 10),
 							left: 0,
@@ -407,7 +406,7 @@
 							top: 0,
 							period: screen.timeline.period,
 							timestamp: screen.timeline.from_ts
-						});
+						}).attr('src', url.getUrl());
 					});
 
 					if (async === null) {

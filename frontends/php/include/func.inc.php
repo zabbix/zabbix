@@ -2546,9 +2546,9 @@ function makeUpdateIntervalFilter($field_name, $values) {
  * @param array		$options
  * @param string	$options['profileIdx']      Profile idx identificator.
  * @param int		$options['profileIdx2']     Profile idx2 identificator.
- * @param boolean	$options['updateProfile']   Shouuld the profile to be updated.
- * @param int		$options['from']            Interval from date, can be in relative format.
- * @param string	$options['to']              Interval to date, can be in relative format.
+ * @param boolean	$options['updateProfile']   Update profile or not.
+ * @param int		$options['from']            Interval start date, can be in relative format.
+ * @param string	$options['to']              Interval end date, can be in relative format.
  *
  * @return array
  */
