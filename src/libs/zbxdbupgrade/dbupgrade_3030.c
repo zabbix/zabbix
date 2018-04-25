@@ -2003,7 +2003,7 @@ static int	DBpatch_3030168(void)
 
 static int	DBpatch_3030169(void)
 {
-	const ZBX_FIELD	field = {"value_groupid", NULL, ZBX_SQL_QUOTE("groups"), "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"value_groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 2, &field);
 }

@@ -1411,7 +1411,7 @@ static int	DBpatch_3010059(void)
 
 static int	DBpatch_3010060(void)
 {
-	const ZBX_FIELD	field = {"groupid", NULL, ZBX_SQL_QUOTE("groups"), "groupid", 0, 0, 0, 0};
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("corr_condition_group", 2, &field);
 }
@@ -1589,7 +1589,7 @@ static int	DBpatch_3010077(void)
 {
 	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type(ZBX_SQL_QUOTE("groups"), &field, NULL);
+	return DBmodify_field_type("groups", &field, NULL);
 }
 
 static int	DBpatch_3010078(void)

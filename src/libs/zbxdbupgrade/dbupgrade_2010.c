@@ -1409,7 +1409,7 @@ static int	DBpatch_2010168(void)
 
 static int	DBpatch_2010169(void)
 {
-	const ZBX_FIELD	field = {"groupid", NULL, ZBX_SQL_QUOTE("groups"), "groupid", 0, 0, 0, 0};
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("group_prototype", 2, &field);
 }
@@ -1446,7 +1446,7 @@ static int	DBpatch_2010172(void)
 
 static int	DBpatch_2010173(void)
 {
-	const ZBX_FIELD	field = {"groupid", NULL, ZBX_SQL_QUOTE("groups"), "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_discovery", 1, &field);
 }
@@ -1462,7 +1462,7 @@ static int	DBpatch_2010175(void)
 {
 	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	return DBadd_field(ZBX_SQL_QUOTE("groups"), &field);
+	return DBadd_field("groups", &field);
 }
 
 static int	DBpatch_2010176(void)

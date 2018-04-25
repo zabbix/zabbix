@@ -491,7 +491,7 @@ static int	DBpatch_3050039(void)
 
 static int	DBpatch_3050040(void)
 {
-	const ZBX_FIELD	field = {"groupid", NULL, ZBX_SQL_QUOTE("groups"), "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("tag_filter", 2, &field);
 }
@@ -862,7 +862,7 @@ static int	DBpatch_3050078(void)
 
 static int	DBpatch_3050079(void)
 {
-	return DBrename_table(ZBX_SQL_QUOTE("groups"), "hstgrp");
+	return DBrename_table("groups", "hstgrp");
 }
 
 static int	DBpatch_3050080(void)
@@ -1028,7 +1028,7 @@ static int	DBpatch_3050095(void)
 {
 	const ZBX_FIELD	field = {"name", "", NULL, NULL, 12, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBrename_field("functions", ZBX_SQL_QUOTE("function"), &field);
+	return DBrename_field("functions", "function", &field);
 }
 
 static int	DBpatch_3050096(void)
