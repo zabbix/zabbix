@@ -693,7 +693,7 @@ static const char	*zbx_json_decodenull(const char *p)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static u_char	zbx_hex2num(char c)
+static unsigned char	zbx_hex2num(char c)
 {
 	if (c >= 'a')
 		return c - 0x57; /* a-f */
