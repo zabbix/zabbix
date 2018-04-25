@@ -102,13 +102,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestTextPresent(['Trigger displaying options', 'blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged RESOLVED events', 'Acknowledged RESOLVED events', 'Display OK triggers for', 'On status change triggers blink for']);
 
 		// hash calculation for not-changed DB fields
-		$sqlHash = 'SELECT configid, refresh_unsupported, work_period, alert_usrgrpid, event_ack_enable, event_expire,'.
-		'event_show_max, authentication_type, ldap_host, ldap_port, ldap_base_dn, ldap_bind_dn, ldap_bind_password, ldap_search_attribute,'.
-		'dropdown_first_entry, dropdown_first_remember, discovery_groupid, max_in_table, search_limit, severity_color_0, severity_color_1,'.
-		'severity_color_2, severity_color_3, severity_color_4, severity_color_5, severity_name_0, severity_name_1, severity_name_2,'.
-		'severity_name_3, severity_name_4, severity_name_5, snmptrap_logging FROM config ORDER BY configid';
-
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT '.DB::getTableFields('config', ['problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('custom_color');
 
@@ -148,8 +143,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$sql = "SELECT blink_period FROM config WHERE blink_period='120'";
 		$this->assertEquals(1, DBcount($sql));
 
-		$newHash = DBhash($sqlHash);
-		$this->assertEquals($oldHash, $newHash);
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public static function ok_period() {
@@ -338,13 +332,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
 
 		// hash calculation for the DB fields that should be changed in this report
-		$sqlHash = 'SELECT configid, refresh_unsupported, work_period, alert_usrgrpid, event_ack_enable,'.
-		'event_expire, event_show_max, authentication_type, ldap_host, ldap_port, ldap_base_dn, ldap_bind_dn, ldap_bind_password,'.
-		'ldap_search_attribute, dropdown_first_entry, dropdown_first_remember, discovery_groupid, max_in_table, search_limit, severity_color_0,'.
-		'severity_color_1, severity_color_2, severity_color_3, severity_color_4, severity_color_5, severity_name_0, severity_name_1,'.
-		'severity_name_2, severity_name_3, severity_name_4, severity_name_5, snmptrap_logging FROM config ORDER BY configid';
-
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT '.DB::getTableFields('config', ['problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestClick('resetDefaults');
 		$this->zbxTestClickXpath("//div[@id='overlay_dialogue']//button[text()='Reset defaults']");
@@ -366,7 +355,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 
 		// hash calculation for the DB fields that should be changed in this report
-		$newHash=DBhash($sqlHash);
-		$this->assertEquals($oldHash, $newHash);
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 }
