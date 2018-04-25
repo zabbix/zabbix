@@ -433,14 +433,16 @@ a.link-action {
 }
 
 .top-subnav a {
+
 	&.selected {
 		font-weight: bold;
-		border-bottom: 4px solid #fff !important;
+		border-bottom: 4px solid #fff;
 	}
+
 	&:focus {
 		color: $link-main-subnav-active-color;
 		padding: 8px 0 4px 0;
-		border-bottom: 4px solid rgba($ui-hover-color, .8) !important;
+		border-bottom: 4px solid rgba($ui-hover-color, .8);
 		outline: none;
 	}
 }
