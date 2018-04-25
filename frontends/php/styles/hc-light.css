@@ -5,7 +5,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, main, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, main, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -14,7 +14,7 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline; }
 
-article, main, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, .nav, section {
+article, main, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
   display: block; }
 
 body {
@@ -164,18 +164,23 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-.nav {
-  background-color: #000; }
-
-nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hover, nav a:focus, .nav a:focus, nav a:active, .nav a:active, .ui-tabs-nav li a, .ui-tabs-nav li.ui-state-disabled a {
-  border: none; }
-
 .top-nav-container {
+  background-color: #fff;
   height: 45px;
   line-height: 45px;
-  padding: 0 10px 0 10px;
-  position: relative;
-  background-color: #fff; }
+  padding: 0 10px;
+  position: relative; }
+
+.top-nav a:active, .top-nav a:hover, .top-nav a:link, .top-nav a:visited,
+.top-subnav a:active,
+.top-subnav a:hover,
+.top-subnav a:link,
+.top-subnav a:visited,
+.header-logo:active,
+.header-logo:hover,
+.header-logo:link,
+.header-logo:visited {
+  border: none; }
 
 .top-nav {
   font-size: 1.167em;
@@ -289,11 +294,11 @@ ul.top-nav-icons {
       filter: alpha(opacity=100); }
 
 .top-subnav-container {
+  background-color: #000;
   height: 30px;
   line-height: 30px;
-  background-color: #000;
-  position: relative;
-  padding: 0 10px; }
+  padding: 0 10px;
+  position: relative; }
 
 .top-subnav {
   background-color: #000;
@@ -316,17 +321,17 @@ ul.top-nav-icons {
     color: rgba(255, 255, 255, 0.8); }
   .top-subnav a:hover {
     color: white; }
-  .top-subnav a:focus {
-    color: white;
-    padding: 8px 0 4px 0;
-    border-bottom: 4px solid rgba(244, 244, 244, 0.5) !important;
-    outline: none; }
   .top-subnav a:active {
     color: white; }
-  .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+  .top-subnav a:focus {
+    border-bottom: 4px solid rgba(244, 244, 244, 0.5) !important;
     color: white;
-    padding: 8px 0 4px 0;
-    border-bottom: 4px solid gray; }
+    outline: none;
+    padding-bottom: 4px; }
+  .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+    border-bottom: 4px solid gray;
+    color: white;
+    padding-bottom: 4px; }
 
 .arrow-up {
   border-left: 4px solid transparent;
@@ -1704,6 +1709,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .ui-tabs-nav li {
     display: inline-block; }
     .ui-tabs-nav li a {
+      border: none;
       padding: 8px 10px;
       -webkit-transition: background-color 0.2s ease-out;
       -moz-transition: background-color 0.2s ease-out;
@@ -1726,7 +1732,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .ui-tabs-nav li.ui-state-disabled a {
       cursor: default;
       color: #999;
-      background-color: transparent; }
+      background-color: transparent;
+      border: none; }
 
 .icon-maint {
   margin: 0 18px 0 0; }
@@ -3950,11 +3957,11 @@ a.link-action {
 
 .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
   font-weight: bold;
-  border-bottom: 4px solid #fff !important; }
+  border-bottom: 4px solid #fff; }
 .top-subnav a:focus {
   color: white;
   padding: 8px 0 4px 0;
-  border-bottom: 4px solid rgba(244, 244, 244, 0.8) !important;
+  border-bottom: 4px solid rgba(244, 244, 244, 0.8);
   outline: none; }
 
 ul.top-nav-icons a:focus {
