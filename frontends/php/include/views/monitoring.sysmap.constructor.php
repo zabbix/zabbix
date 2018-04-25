@@ -25,7 +25,7 @@ include dirname(__FILE__).'/js/monitoring.sysmaps.js.php';
 $menu = (new CList())
 	->addClass(ZBX_STYLE_OBJECT_GROUP)
 	->addItem([
-		_('Icon').':'.SPACE,
+		_('Map element').NAME_DELIMITER,
 		(new CButton('selementAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
 		SPACE.'/'.SPACE,
 		(new CButton('selementRemove', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
