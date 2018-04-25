@@ -113,7 +113,9 @@ $tranStrings = [
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
-		'Add a new widget' => _('Add a new widget')
+		'Add a new widget' => _('Add a new widget'),
+		'Adjust widget refresh interval' => pgettext(ZBX_CONTEXT_SCREEN_READER, 'Adjust widget refresh interval'),
+		'%1$s, selected' => pgettext(ZBX_CONTEXT_SCREEN_READER, '%1$s, selected')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),

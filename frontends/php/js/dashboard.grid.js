@@ -45,7 +45,11 @@
 						'widgetName': widget['widgetid'],
 						'currentRate': widget['rf_rate'],
 						'multiplier': false
-					})
+					}),
+					'attr': {
+						'aria-label': t('Adjust widget refresh interval'),
+						'aria-haspopup': true
+					}
 				}))
 			)
 		);
