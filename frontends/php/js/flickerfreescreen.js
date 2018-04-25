@@ -82,7 +82,7 @@
 				},
 				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default';
 				ajax_url = new Curl('jsrpc.php'),
-				refresh = (!empty(is_self_refresh) || empty(timeControl.timeline) || timeControl.timeline.isNow()),
+				refresh = (!empty(is_self_refresh) || !empty(screen.timeline.refreshable)),
 				self = this;
 
 			ajax_url.setArgument('type', 9); // PAGE_TYPE_TEXT
@@ -100,10 +100,6 @@
 			// timeline params
 			// SCREEN_RESOURCE_HTTPTEST_DETAILS, SCREEN_RESOURCE_DISCOVERY, SCREEN_RESOURCE_HTTPTEST
 			if (jQuery.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
-				if (!empty(timeControl.timeline)) {
-					timeControl.timeline.refreshEndtime();
-				}
-
 				ajax_url.setArgument('from', screen.timeline.from);
 				ajax_url.setArgument('to', screen.timeline.to);
 			}
@@ -349,7 +345,6 @@
 						on_dashboard = timeControl.objectList[id].onDashboard;
 
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
-					url.setArgument('curtime', new CDate().getTime());
 					url.setArgument('from', screen.timeline.from);
 					url.setArgument('to', screen.timeline.to);
 
@@ -358,8 +353,7 @@
 					}
 
 					// Create temp image in buffer.
-					var	sbox_height = 0,
-						img = domImg.clone().css({
+					var	img = domImg.clone().css({
 							position: 'relative',
 							zIndex: 2
 						})
@@ -382,21 +376,12 @@
 									img.fadeTo(0, 0.6);
 								}
 
-								if (sbox_height > 0) {
-									timeControl.changeSBoxHeight(id, sbox_height);
-								}
-
 								// Set loaded image from buffer to dom.
 								domImg.replaceWith(img);
 
 								// Callback function on success.
 								if (!empty(successAction)) {
 									successAction();
-								}
-
-								// Rebuild timeControl sbox listeners.
-								if (!empty(ZBX_SBOX[id])) {
-									ZBX_SBOX[id].addListeners();
 								}
 
 								window.flickerfreeScreenShadow.end(id);
@@ -414,9 +399,15 @@
 
 					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 						// 'src' should be added only here to trigger load event after new height is received.
-						sbox_height = height;
 						img.attr('src', url.getUrl());
-						img.data('sbox_height', sbox_height);
+						img.data('zbx_sbox', {
+							height: parseInt(height, 10),
+							left: 0,
+							right: 0,
+							top: 0,
+							period: screen.timeline.period,
+							timestamp: screen.timeline.from_ts
+						});
 					});
 
 					if (async === null) {
@@ -508,7 +499,6 @@
 			}
 
 			this.screens = [];
-			ZBX_SBOX = {};
 
 			for (var id in timeControl.objectList) {
 				if (id !== 'scrollbar' && timeControl.objectList.hasOwnProperty(id)) {

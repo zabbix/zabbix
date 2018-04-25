@@ -38,9 +38,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'groupid' =>			'db groups.groupid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
-			'period' =>				'int32',
-			'stime' =>				'time',
-			'isNow' =>				'in 0,1'
+			'from' =>				'string|not_empty',
+			'to' =>					'string|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -123,17 +122,13 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'profileIdx' => $options['profileIdx'],
 				'profileIdx2' => $options['profileIdx2'],
 				'updateProfile' => true,
-				'period' => $this->hasInput('period') ? $this->getInput('period') : null,
-				'stime' => $this->hasInput('stime') ? $this->getInput('stime') : null,
-				'isNow' => $this->hasInput('isNow') ? $this->getInput('isNow') : null
+				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+				'to' => $this->hasInput('to') ? $this->getInput('to') : null
 			]);
 
 			$data['timeControlData'] = [
-				'loadScroll' => 1,
 				'mainObject' => 1,
 				'onDashboard' => 1,
-				'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1, $options['profileIdx2']),
-				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
 				'profile' => [
 					'idx' => $options['profileIdx'],
 					'idx2' => $options['profileIdx2']

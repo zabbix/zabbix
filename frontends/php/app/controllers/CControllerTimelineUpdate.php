@@ -28,9 +28,8 @@ class CControllerTimelineUpdate extends CController {
 		$fields = [
 			'idx' =>		'required|string',
 			'idx2' =>		'required|id',
-			'stime' =>		'string',
-			'period' =>		'int32',
-			'isNow' =>		'int32|in 0,1'
+			'from' =>		'string|not_empty',
+			'to' =>			'string||not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -69,9 +68,8 @@ class CControllerTimelineUpdate extends CController {
 			'profileIdx' => $this->getInput('idx'),
 			'profileIdx2' => $this->getInput('idx2'),
 			'updateProfile' => true,
-			'period' => $this->getInput('period'),
-			'stime' => $this->getInput('stime'),
-			'isNow' => $this->getInput('isNow')
+			'from' => $this->getInput('from'),
+			'to' => $this->getInput('to')
 		]);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => '']));

@@ -56,7 +56,8 @@ $chartsWidget = (new CWidget())
 		->addItem($controls)
 	);
 
-$filterForm = (new CFilter('web.charts.filter.state'))->addTimeSelector('Test');
+$interval = relativeDateToText($data['from'], $data['to']);
+$filterForm = (new CFilter('web.charts.filter.state'))->addTimeSelector($interval);
 $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {
@@ -70,9 +71,8 @@ if (!empty($this->data['graphid'])) {
 			'profileIdx' => 'web.graphs',
 			'profileIdx2' => $data['graphid'],
 			'updateProfile' => false,
-			'period' => $data['period'],
-			'stime' => $data['stime'],
-			'isNow' => $data['isNow']
+			'from' => $data['from'],
+			'to' => $data['to']
 		]);
 	}
 	else {

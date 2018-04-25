@@ -2541,119 +2541,76 @@ function makeUpdateIntervalFilter($field_name, $values) {
 }
 
 /**
- * Calculate timeline data
+ * Calculate timeline data.
  *
  * @param array		$options
- * @param string	$options['profileIdx']
- * @param int		$options['profileIdx2']
- * @param boolean	$options['updateProfile']
- * @param int		$options['period']
- * @param string	$options['stime']
- * @param int		$options['isNow']
+ * @param string	$options['profileIdx']      Profile idx identificator.
+ * @param int		$options['profileIdx2']     Profile idx2 identificator.
+ * @param boolean	$options['updateProfile']   Shouuld the profile to be updated.
+ * @param int		$options['from']            Interval from date, can be in relative format.
+ * @param string	$options['to']              Interval to date, can be in relative format.
  *
  * @return array
  */
 function calculateTime(array $options = []) {
-	$defOptions = [
+	$time = time();
+	$options = array_filter($options) + [
 		'updateProfile' => false,
 		'profileIdx' => null,
 		'profileIdx2' => 0,
-		'period' => null,
-		'stime' => null,
-		'isNow' => null
+		'from' => null,
+		'to' => null
 	];
-	$options = zbx_array_merge($defOptions, $options);
+	$idx = $options['profileIdx'];
+	$from = $options['from'];
+	$to = $options['to'];
 
-	if ($options['profileIdx'] === '') {
-		$options['profileIdx'] = $defOptions['profileIdx'];
-	}
-	if ($options['profileIdx2'] === null || $options['profileIdx2'] === '') {
-		$options['profileIdx2'] = $defOptions['profileIdx2'];
-	}
-	if ($options['stime'] === '') {
-		$options['stime'] = $defOptions['stime'];
-	}
-
-	if ($options['profileIdx'] === null) {
-		$options['updateProfile'] = false;
-	}
-
-	// period
-	if ($options['period'] === null) {
-		$options['period'] = ($options['profileIdx'] !== null)
-			? CProfile::get($options['profileIdx'].'.period', ZBX_PERIOD_DEFAULT, $options['profileIdx2'])
-			: ZBX_PERIOD_DEFAULT;
-	}
-	else {
-		if ($options['period'] < ZBX_MIN_PERIOD) {
-			error(_n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.',
-				(int) ZBX_MIN_PERIOD / SEC_PER_MIN
-			));
-			$options['period'] = ZBX_MIN_PERIOD;
+	if ($idx !== null) {
+		if ($from === null) {
+			$from = CProfile::get($idx.'.from', ZBX_PERIOD_DEFAULT, $options['profileIdx2']);
 		}
-		elseif ($options['period'] > ZBX_MAX_PERIOD) {
-			error(_n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.',
-				(int) ZBX_MAX_PERIOD / SEC_PER_DAY
-			));
-			$options['period'] = ZBX_MAX_PERIOD;
+
+		if ($to === null) {
+			$to = CProfile::get($idx.'.to', 'now', $options['profileIdx2']);
+		}
+
+		if ($options['updateProfile']) {
+			CProfile::update($idx.'.from', $from, PROFILE_TYPE_STR, $options['profileIdx2']);
+			CProfile::update($idx.'.to', $to, PROFILE_TYPE_STR, $options['profileIdx2']);
 		}
 	}
 
-	$time = time();
-	$usertime = null;
+	$from_ts = parseRelativeDate($from, true);
+	$from_ts = $from_ts !== null
+		? $from_ts->getTimestamp()
+		: parseRelativeDate(ZBX_PERIOD_DEFAULT, true)->getTimestamp();
+	$to_ts = parseRelativeDate($to, false);
+	$to_ts = $to_ts !== null
+		? $to_ts->getTimestamp()
+		: parseRelativeDate('now', true)->getTimestamp();
+	$period = $to_ts - $from_ts;
 
-	// isNow
-	if ($options['isNow'] === null) {
-		$options['isNow'] = ($options['stime'] !== null)
-			? 0
-			: ($options['profileIdx'] !== null)
-				? CProfile::get($options['profileIdx'].'.isnow', 1, $options['profileIdx2'])
-				: 1;
+	if ($period < ZBX_MIN_PERIOD) {
+		error(_n('Minimum time period to display is %1$s minute.',
+			'Minimum time period to display is %1$s minutes.',
+			(int) ZBX_MIN_PERIOD / SEC_PER_MIN
+		));
+		$from = $to_ts - ZBX_MIN_PERIOD;
 	}
-
-	// stime
-	if ($options['isNow'] == 1) {
-		$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
-		$usertime = date(TIMESTAMP_FORMAT, $time);
-	}
-	else {
-		if ($options['stime'] === null) {
-			$options['stime'] = CProfile::get($options['profileIdx'].'.stime', null, $options['profileIdx2']);
-
-			if ($options['stime'] === null) {
-				$options['isNow'] = 1;
-				$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
-			}
-		}
-
-		$stimeUnix = zbxDateToTime($options['stime']);
-
-		if (zbxAddSecondsToUnixtime($options['period'], $stimeUnix) >= $time) {
-			$options['isNow'] = 1;
-			$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
-			$usertime = date(TIMESTAMP_FORMAT, $time);
-		}
-		else {
-			$usertime = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime($options['period'], $stimeUnix));
-		}
-	}
-
-	if ($options['updateProfile']) {
-		CProfile::update($options['profileIdx'].'.period', $options['period'], PROFILE_TYPE_INT,
-			$options['profileIdx2']
-		);
-		CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
-		CProfile::update($options['profileIdx'].'.isnow', $options['isNow'], PROFILE_TYPE_INT, $options['profileIdx2']);
+	elseif ($period > ZBX_MAX_PERIOD) {
+		error(_n('Maximum time period to display is %1$s day.',
+			'Maximum time period to display is %1$s days.',
+			(int) ZBX_MAX_PERIOD / SEC_PER_DAY
+		));
+		$from = $to_ts - ZBX_MAX_PERIOD;
 	}
 
 	return [
-		'period' => $options['period'],
-		'stime' => date(TIMESTAMP_FORMAT, zbxDateToTime($options['stime'])),
-		'starttime' => date(TIMESTAMP_FORMAT, $time - ZBX_MAX_PERIOD),
-		'usertime' => $usertime,
-		'isNow' => $options['isNow']
+		'period' => $period,
+		'refreshable' => $from_ts <= $time && $time <= $to_ts,
+		'from_ts' => $from_ts,
+		'from' => $from,
+		'to' => $to
 	];
 }
 
@@ -2692,14 +2649,14 @@ function relativeDateToText($start, $end) {
 	}
 
 	if ($end === 'now') {
-		list($count, $mod) = sscanf($start, 'now-%d%s') + ['', ''];
+		list($count, $mod) = sscanf($start, 'now-%d%1s') + ['', ''];
 
 		$ranges = [
-			'm/m' => ['Last %1$d minute', 'Last %1$d minutes'],
-			'h/h' => ['Last %1$d hour', 'Last %1$d hours'],
-			'd/d' => ['Last %1$d day', 'Last %1$d days'],
-			'M/M' => ['Last %1$d month', 'Last %1$d months'],
-			'y/y' => ['Last %1$d year', 'Last %1$d years'],
+			'm' => ['Last %1$d minute', 'Last %1$d minutes'],
+			'h' => ['Last %1$d hour', 'Last %1$d hours'],
+			'd' => ['Last %1$d day', 'Last %1$d days'],
+			'M' => ['Last %1$d month', 'Last %1$d months'],
+			'y' => ['Last %1$d year', 'Last %1$d years'],
 		];
 
 		if ($count > 0 && array_key_exists($mod, $ranges)) {

@@ -323,11 +323,8 @@ if ($data['action'] == 'problem.view') {
 			'id' => 'timeline_1',
 			'loadSBox' => 0,
 			'loadImage' => 0,
-			'loadScroll' => 1,
 			'dynamic' => 0,
 			'mainObject' => 1,
-			'periodFixed' => CProfile::get('web.problem.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
 			'profile' => [
 				'idx' => 'web.problem.timeline',
 				'idx2' => 0,

@@ -73,9 +73,8 @@ $timeline = calculateTime([
 	'profileIdx' => getRequest('profileIdx', 'web.screens'),
 	'profileIdx2' => getRequest('profileIdx2'),
 	'updateProfile' => (getRequest('updateProfile', '0') === '1'),
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow')
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
 ]);
 
 CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
@@ -122,9 +121,21 @@ foreach ($dbGraph['hosts'] as $gItemHost) {
 	}
 }
 
+$from = parseRelativeDate($timeline['from'], true);
+if ($from === null) {
+	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
+}
+$from = $from->getTimestamp();
+
+$to = parseRelativeDate($timeline['to'], false);
+if ($to === null) {
+	$to = parseRelativeDate('now', false);
+}
+$to = $to->getTimestamp();
+
 $graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
-$graph->setPeriod($timeline['period']);
-$graph->setSTime($timeline['stime']);
+$graph->setPeriod($to - $from);
+$graph->setSTime($from);
 
 $width = getRequest('width', 0);
 if ($width <= 0) {

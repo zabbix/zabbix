@@ -208,12 +208,6 @@ class CFilter extends CDiv {
 			]))->addClass('time-selection-container')
 		);
 
-		// (gc)TODO: Old time range selector. Should be removed!
-		$this->addTab(
-			(new CSimpleButton('Time range selector'))->addClass(ZBX_STYLE_FILTER_TRIGGER),
-			(new CDiv())->setId('scrollbar_cntr')
-		);
-
 		return $this;
 	}
 

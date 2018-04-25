@@ -171,7 +171,10 @@ jQuery(function ($){
 	}
 
 	// Time selection box for graphs.
-	var selection = null;
+	var selection = null,
+		anchor = null,
+		noclick_area = null;
+
 	$(document).on('mousedown', 'img', selectionHandleDragStart);
 
 	/**
@@ -180,44 +183,65 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandleDragStart(e) {
+		if (e.which !== 1) {
+			return;
+		}
+
 		var target = $(e.target),
 			data = target.data();
 
-		if (typeof data.sbox_height === 'undefined') {
+		if (typeof data.zbx_sbox === 'undefined') {
 			return;
 		}
+
+		/**
+		 * @prop {object}  data
+		 * @prop {integer} data.height      Height of selection box.
+		 * @prop {integer} data.left        Left margin of selection box.
+		 * @prop {integer} data.right       Right margin of selection box.
+		 * @prop {integer} data.top         Top margin of selection box.
+		 * @prop {integer} data.period      Period length in seconds of selection box.
+		 * @prop {integer} data.timestamp   Timestamp for start time of selection box.
+		 */
+		data = data.zbx_sbox;
 
 		var offset = target.offset(),
-			left = offset.left + data.sbox_left,
-			right = offset.left + target.width() - data.sbox_right,
-			x = Math.min(Math.max(left, e.pageX), right),
-			// TODO: should be taken from object data! 12px shift from top objDims.shiftYtop
-			margin_top = 12;
+			left = offset.left + data.left,
+			right = offset.left + target.width() - data.right,
+			x = Math.min(Math.max(left, e.pageX), right);
 
-		offset.top += 12;
-		if ((e.pageY < offset.top) || e.pageY > offset.top + parseInt(data.sbox_height, 10)) {
+		offset.top += data.top;
+		if ((e.pageY < offset.top) || e.pageY > offset.top + data.height) {
 			return;
 		}
+
+		noclick_area = $('<div/>').css({
+			position: 'absolute',
+			top: target.offset().top,
+			left: target.offset().left,
+			height: target.outerHeight() + 'px',
+			width: target.outerWidth() + 'px'
+		}).appendTo(document.body);
 
 		selection = {
 			dom: $('<div class="graph-selection"/>').css({
 				position: 'absolute',
 				top: offset.top,
 				left: x,
-				height: data.sbox_height + 'px',
+				height: data.height + 'px',
 				width: '1px'
 			}).appendTo(document.body),
 			min: left,
 			max: right,
 			x: x,
-			// TODO: above should be initialized when sbox is added to timeline or refreshed.
-			seconds_per_px: 28,
-			from_ts: 0
+			seconds_per_px: parseInt(data.period/(right - left)),
+			from_ts: data.timestamp
 		}
 
 		$(document)
 			.on('mouseup', selectionHandlerDragEnd)
 			.on('mousemove', selectionHandlerDrag);
+
 		return false;
 	}
 
@@ -240,6 +264,9 @@ jQuery(function ($){
 		$(document)
 			.off('mouseup', selectionHandlerDragEnd)
 			.off('mousemove', selectionHandlerDrag);
+
+		noclick_area.remove();
+		noclick_area = null;
 	}
 
 	/**
@@ -267,7 +294,6 @@ var timeControl = {
 
 	// data
 	objectList: {},
-	timeline: null,
 
 	// options
 	refreshPage: true,
@@ -277,95 +303,41 @@ var timeControl = {
 	addObject: function(id, time, objData) {
 		if (typeof this.objectList[id] === 'undefined'
 				|| (typeof(objData['reloadOnAdd']) !== 'undefined' && objData['reloadOnAdd'] === 1)) {
-			this.objectList[id] = {
+			this.objectList[id] = jQuery.extend({
 				id: id,
 				containerid: null,
 				refresh: false,
 				processed: 0,
-				time: {},
+				timeline: time,
 				objDims: {},
 				src: location.href,
 				dynamic: 1,
-				// TODO: remove
 				loadSBox: 0,
 				loadImage: 0,
-				loadScroll: 0,
 				mainObject: 0, // object on changing will reflect on all others
 				onDashboard: 0, // object is on dashboard
 				profile: { // if values are not null, will save timeline and fixedperiod state here, on change
 					idx: null,
 					idx2: null
 				}
-			};
+			}, objData);
 
-			for (var key in this.objectList[id]) {
-				if (isset(key, objData)) {
-					this.objectList[id][key] = objData[key];
-				}
+			if (this.objectList[id].loadSBox) {
+				var timecontrol = this,
+					obj = this.objectList[id];
+				jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
+					obj.timeline.from = data.from;
+					obj.timeline.to = data.to;
+					timecontrol.refreshImage(obj);
+				});
 			}
-
-			this.objectList[id].time = time;
 		}
 	},
 
 	processObjects: function() {
-		// create timeline and scrollbar
-		for (var id in this.objectList) {
-			if (!empty(this.objectList[id]) && !this.objectList[id].processed && this.objectList[id].loadScroll) {
-				var obj = this.objectList[id];
-
-				obj.processed = 1;
-
-				// timeline
-				var nowDate = new CDate(),
-					now = parseInt(nowDate.getTime() / 1000);
-
-				if (!isset('period', obj.time)) {
-					obj.time.period = 3600;
-				}
-				if (!isset('endtime', obj.time)) {
-					obj.time.endtime = now;
-				}
-				if (!isset('isNow', obj.time)) {
-					obj.time.isNow = false;
-				}
-
-				obj.time.starttime = (!isset('starttime', obj.time) || is_null(obj.time['starttime']))
-					? obj.time.endtime - 3 * ((obj.time.period < 86400) ? 86400 : obj.time.period)
-					: nowDate.setZBXDate(obj.time.starttime) / 1000;
-
-				obj.time.usertime = (!isset('usertime', obj.time) || obj.time.isNow)
-					? obj.time.endtime
-					: nowDate.setZBXDate(obj.time.usertime) / 1000;
-
-				// this.timeline = new CTimeLine(
-				// 	parseInt(obj.time.period),
-				// 	parseInt(obj.time.starttime),
-				// 	parseInt(obj.time.usertime),
-				// 	parseInt(obj.time.endtime),
-				// 	obj.sliderMaximumTimePeriod,
-				// 	obj.time.isNow
-				// );
-
-				// scrollbar
-				var width = get_bodywidth() - 100;
-
-				if (!is_number(width)) {
-					width = 900;
-				}
-				else if (width < 600) {
-					width = 600;
-				}
-
-				// this.scrollbar = new CScrollBar(width, obj.periodFixed, obj.sliderMaximumTimePeriod, obj.profile);
-				// this.scrollbar.onchange = this.objectUpdate.bind(this);
-			}
-		}
-
-
 		// load objects
 		for (var id in this.objectList) {
-			if (!empty(this.objectList[id]) && !this.objectList[id].processed && !this.objectList[id].loadScroll) {
+			if (!empty(this.objectList[id]) && !this.objectList[id].processed) {
 				var obj = this.objectList[id];
 
 				obj.processed = 1;
@@ -396,31 +368,35 @@ var timeControl = {
 				// image
 				if (obj.loadImage) {
 					if (!obj.refresh) {
-						this.addImage(id, false);
+						this.addImage(id);
 					}
 				}
 
 				// refresh
-				if (obj.refresh) {
-					this.refreshImage(id);
+				if (obj.timeline.refreshable) {
+					this.refreshImage(obj);
 				}
 			}
 		}
 	},
 
-	addImage: function(id, rebuildListeners) {
+	addImage: function(id) {
 		var obj = this.objectList[id],
 			img = jQuery('#' + id);
 
 		if (img.length == 0) {
 			img = jQuery('<img/>').attr('id', id).appendTo(('#'+obj.containerid));
 
-			img.data('sbox_left', obj.objDims.shiftXleft);
-			img.data('sbox_right', obj.objDims.shiftXright);
-
 			var xhr = flickerfreeScreen.getImageSboxHeight(new Curl(obj.src), function (height) {
 				img.attr('src', obj.src);
-				img.data('sbox_height', height);
+				img.data('zbx_sbox', {
+					height: parseInt(height, 10),
+					left: obj.objDims.shiftXleft,
+					right: obj.objDims.shiftXright,
+					top: obj.objDims.shiftYtop,
+					period: obj.timeline.period,
+					timestamp: obj.timeline.from_ts
+				});
 			});
 
 			if (xhr === null) {
@@ -428,43 +404,49 @@ var timeControl = {
 			}
 		}
 
-		img.data('from', obj.time.from);
-		img.data('to', obj.time.to);
+		img.data('from', obj.timeline.from);
+		img.data('to', obj.timeline.to);
 	},
 
-	refreshImage: function(id) {
+	refreshImage: function(obj) {
 		// image
-		var url = new Curl(obj.src);
-		url.setArgument('from', obj.time.from);
-		url.setArgument('to', obj.time.to);
+		var id = obj.id,
+			url = new Curl(obj.src);
+		url.setArgument('from', obj.timeline.from);
+		url.setArgument('to', obj.timeline.to);
 
-		var img = jQuery('<img />', {id: id + '_tmp'})
-			.on('load', function() {
-				var imgId = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+		var img = jQuery('#' + id).clone()
+				.on('load', function() {
+					jQuery(this).unbind('load');
+					jQuery('#' + id).replaceWith(jQuery(this));
 
-				jQuery(this).unbind('load');
-				jQuery('#' + imgId).replaceWith(jQuery(this));
-				jQuery(this).attr('id', imgId);
-
-				// Update dashboard widget footer.
-				if (obj.onDashboard) {
-					timeControl.updateDashboardFooter(id);
-				}
-			}),
-			xhr = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+					// Update dashboard widget footer.
+					if (obj.onDashboard) {
+						timeControl.updateDashboardFooter(id);
+					}
+				}),
+			async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+				img.data('zbx_sbox', {
+					height: parseInt(height, 10),
+					left: obj.objDims.shiftXleft,
+					right: obj.objDims.shiftXright,
+					top: obj.objDims.shiftYtop,
+					period: obj.timeline.period,
+					timestamp: obj.timeline.from_ts
+				});
 				img.data('sbox_height', height)
 					.attr('src', url.getUrl());
 			});
 
-		if (xhr === null) {
+		if (async === null) {
 			img.attr('src', url.getUrl());
 		}
 
 		// link
 		var graphUrl = new Curl(jQuery('#' + obj.containerid).attr('href'));
 		graphUrl.setArgument('width', obj.objDims.width);
-		graphUrl.setArgument('from', obj.time.from);
-		graphUrl.setArgument('to', obj.time.to);
+		graphUrl.setArgument('from', obj.timeline.from);
+		graphUrl.setArgument('to', obj.timeline.to);
 
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
 	},
@@ -483,6 +465,7 @@ var timeControl = {
 		}
 
 		var widget = widgets[0],
+			obj = this.objectList[id],
 			url = new Curl('zabbix.php'),
 			post_args = {
 				uniqueid: widget['uniqueid'],
@@ -490,7 +473,8 @@ var timeControl = {
 			};
 
 		if (widget.type === 'graph') {
-			post_args.period = this.timeline.period();
+			post_args.from = obj.timeline.from;
+			post_args.to = obj.timeline.from;
 		}
 
 		url.setArgument('action', 'widget.graph.view');
@@ -527,24 +511,13 @@ var timeControl = {
 
 	refreshTime: function() {
 		if (this.timeRefreshInterval > 0) {
-			// timeline
-			if (this.timeline.isNow()) {
-				this.timeline.setNow();
-			}
-			else {
-				this.timeline.refreshEndtime();
-			}
-
 			// plan next time update
 			this.timeRefreshTimeoutHandler = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
 		}
 	},
 
 	objectUpdate: function() {
-		// var usertime = this.timeline.usertime(),
-		// 	period = this.timeline.period(),
-		// 	isNow = (this.timeline.now() || this.timeline.isNow());
-
+		// TODO: remove
 		// secure browser from fast user operations
 		// if (isNaN(usertime) || isNaN(period)) {
 		// 	for (var id in this.objectList) {
@@ -555,9 +528,6 @@ var timeControl = {
 
 		// 	return;
 		// }
-
-		var date = new CDate((usertime - period) * 1000),
-			stime = date.getZBXDate();
 
 		if (this.refreshPage) {
 			var url = new Curl(location.href);
@@ -574,8 +544,8 @@ var timeControl = {
 
 			sendAjaxData(url.getUrl(), {
 				data: {
-					idx: '', // this.scrollbar.profile.idx,
-					idx2: '', // this.scrollbar.profile.idx2,
+					idx: this.profile.idx,
+					idx2: this.profile.idx2,
 					from: this.timeline.from,
 					to: this.timeline.to
 				}

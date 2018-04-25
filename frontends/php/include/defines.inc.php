@@ -35,7 +35,7 @@ define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar cont
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
-define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
+define('ZBX_PERIOD_DEFAULT',	'now-1h'); // 1 hour
 define('ZBX_DATE_TIME',			'Y-m-d H:i:s');// Time selector date and time presentation format.
 
 // the maximum period to display history data for the latest data and item overview pages in seconds

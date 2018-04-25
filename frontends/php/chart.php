@@ -30,9 +30,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'type' =>           [T_ZBX_INT, O_OPT, null,	IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
 	'itemids' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
-	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
-	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'from' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'to' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -87,14 +86,25 @@ $timeline = calculateTime([
 	'profileIdx' => getRequest('profileIdx', 'web.screens'),
 	'profileIdx2' => getRequest('profileIdx2'),
 	'updateProfile' => (getRequest('updateProfile', '0') === '1'),
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow')
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
 ]);
 
+$from = parseRelativeDate($timeline['from'], true);
+if ($from === null) {
+	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
+}
+$from = $from->getTimestamp();
+
+$to = parseRelativeDate($timeline['to'], false);
+if ($to === null) {
+	$to = parseRelativeDate('now', false);
+}
+$to = $to->getTimestamp();
+
 $graph = new CLineGraphDraw(getRequest('type'));
-$graph->setPeriod($timeline['period']);
-$graph->setSTime($timeline['stime']);
+$graph->setPeriod($to - $from);
+$graph->setSTime($from);
 $graph->showLegend(getRequest('legend', 1));
 
 // change how the graph will be displayed if more than one item is selected

@@ -40,9 +40,8 @@ $fields = [
 	'groupid' =>	[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
 	'hostid' =>		[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
 	'graphid' =>	[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
-	'period' =>		[T_ZBX_INT, O_OPT, P_SYS, null,		null],
-	'stime' =>		[T_ZBX_STR, O_OPT, P_SYS, null,		null],
-	'isNow' =>		[T_ZBX_INT, O_OPT, null,  IN('0,1'),	null],
+	'from' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'to' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null],
 	'action' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'"'), null]
 ];
@@ -81,15 +80,13 @@ if (hasRequest('period') || hasRequest('stime') || hasRequest('isNow')) {
 		'profileIdx' => 'web.graphs',
 		'profileIdx2' => $pageFilter->graphid,
 		'updateProfile' => true,
-		'period' => getRequest('period'),
-		'stime' => getRequest('stime'),
-		'isNow' => getRequest('isNow')
+		'from' => getRequest('from'),
+		'to' => getRequest('to')
 	]);
 
 	$curl = (new CUrl())
-		->removeArgument('period')
-		->removeArgument('stime')
-		->removeArgument('isNow');
+		->removeArgument('from')
+		->removeArgument('to');
 
 	ob_end_clean();
 
@@ -119,9 +116,8 @@ $data = [
 		HISTORY_GRAPH => _('Graph'),
 		HISTORY_VALUES => _('Values')
 	],
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow')
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
 ];
 
 // render view
