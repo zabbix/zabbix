@@ -235,3 +235,7 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 
 -- interfaces
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99004,10084,1,2,1,'127.0.0.1','','161');
+
+-- autoregistration action
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata, formula, maintenance_mode, ack_shortdata, ack_longdata) VALUES (91,'Auto registration action',2,0,0,'1h','Auto registration: {HOST.HOST}','Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}','','','',1,'','');
+
