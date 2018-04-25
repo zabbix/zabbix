@@ -52,8 +52,8 @@ function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
 function dateSelectorOnClick(event, elmnt, name) {
 	var pos = getPosition(elmnt);
 	// This way calendar will never overlap with selector.
-	pos.top += elmnt.offsetHeight + 5;
-	pos.left += elmnt.offsetWidth + 5;
+	pos.top += elmnt.offsetHeight;
+	pos.left += elmnt.offsetWidth;
 
 	getCalendarByID(name).clndr.clndrshow(pos.top, pos.left, elmnt);
 
