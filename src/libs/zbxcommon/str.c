@@ -866,13 +866,12 @@ int	parse_key(const char **exp)
 						while (' ' == s[1])	/* skip trailing spaces after closing ']' */
 							s++;
 
-						if (0 == array && ']' == s[1])
+						if (']' == s[1])
 						{
 							s++;
 							goto succeed;
 						}
-
-						if (',' != s[1] && !(0 != array && ']' == s[1]))
+						else if (',' != s[1])
 						{
 							s++;
 							goto fail;	/* incorrect syntax */
