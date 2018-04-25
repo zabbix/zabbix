@@ -351,6 +351,7 @@ src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
+tests/libs/zbxcommon/replace_key_params_dyn.yaml -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png

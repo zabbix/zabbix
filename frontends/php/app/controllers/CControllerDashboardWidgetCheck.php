@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerDashbrdWidgetCheck extends CController {
+class CControllerDashboardWidgetCheck extends CController {
 
 	public function __construct() {
 		parent::__construct();

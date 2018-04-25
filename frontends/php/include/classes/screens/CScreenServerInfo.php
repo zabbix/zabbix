@@ -35,7 +35,7 @@ class CScreenServerInfo extends CScreenBase {
 
 		return $this->getOutput(
 			(new CUiWidget(uniqid(), [make_status_of_zbx(), $footer]))
-				->setHeader(_('Status of Zabbix'))
+				->setHeader(_('System information'))
 		);
 	}
 }

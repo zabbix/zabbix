@@ -26,7 +26,7 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_FAVOURITE_MAPS);
+		$this->setType(WIDGET_FAV_MAPS);
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',
@@ -59,7 +59,7 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 		CArrayHelper::sort($maps, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAVOURITE_MAPS]),
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAV_MAPS]),
 			'maps' => $maps,
 			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [

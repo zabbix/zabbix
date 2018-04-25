@@ -821,10 +821,15 @@ int	zbx_check_hostname(const char *hostname, char **error)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
+ * Comments: the pointer is advanced to the first invalid character even if   *
+ *           FAIL is returned (meaning there is a syntax error in item key).  *
+ *           If necessary, the caller must keep a copy of pointer original    *
+ *           value.                                                           *
+ *                                                                            *
  ******************************************************************************/
-int	parse_key(char **exp)
+int	parse_key(const char **exp)
 {
-	char	*s;
+	const char	*s;
 
 	for (s = *exp; SUCCEED == is_key_char(*s); s++)
 		;
@@ -845,18 +850,20 @@ int	parse_key(char **exp)
 				case 0:
 					if (',' == *s)
 						;
-					else if (']' == *s && '[' == s[1] && 0 == array)	/* Zapcat */
-						s++;
 					else if ('"' == *s)
 						state = 1;
 					else if ('[' == *s)
-						array++;
+					{
+						if (0 == array)
+							array = 1;
+						else
+							goto fail;	/* incorrect syntax: multi-level array */
+					}
 					else if (']' == *s && 0 != array)
 					{
-						array--;
+						array = 0;
 
-						/* skip spaces */
-						while (' ' == s[1])
+						while (' ' == s[1])	/* skip trailing spaces after closing ']' */
 							s++;
 
 						if (0 == array && ']' == s[1])
@@ -880,15 +887,8 @@ int	parse_key(char **exp)
 				case 1:
 					if ('"' == *s)
 					{
-						/* skip spaces */
-						while (' ' == s[1])
+						while (' ' == s[1])	/* skip trailing spaces after closing quotes */
 							s++;
-
-						if (0 == array && ']' == s[1] && '[' == s[2])	/* Zapcat */
-						{
-							state = 0;
-							break;
-						}
 
 						if (0 == array && ']' == s[1])
 						{
@@ -909,12 +909,7 @@ int	parse_key(char **exp)
 					break;
 				/* unquoted */
 				case 2:
-					if (0 == array && ']' == *s && '[' == s[1])	/* Zapcat */
-					{
-						s--;
-						state = 0;
-					}
-					else if (',' == *s || (']' == *s && 0 != array))
+					if (',' == *s || (']' == *s && 0 != array))
 					{
 						s--;
 						state = 0;
@@ -986,16 +981,19 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Function: num_param                                                        *
  *                                                                            *
- * Purpose: calculate count of parameters from parameter list (param)         *
+ * Purpose: find number of parameters in parameter list                       *
  *                                                                            *
  * Parameters:                                                                *
  *      param  - parameter list                                               *
  *                                                                            *
- * Return value: count of parameters                                          *
+ * Return value: number of parameters (starting from 1) or                    *
+ *               0 if syntax error                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
+ *            containing only spaces is handled as having one empty parameter *
+ *            and 1 ir returned.                                              *
  *                                                                            *
  ******************************************************************************/
 int	num_param(const char *p)
@@ -1019,18 +1017,24 @@ int	num_param(const char *p)
 			else if ('"' == *p)
 				state = 1;
 			else if ('[' == *p)
-				array++;
+			{
+				if (0 == array)
+					array = 1;
+				else
+					return 0;	/* incorrect syntax: multi-level array */
+			}
 			else if (']' == *p && 0 != array)
 			{
-				array--;
+				array = 0;
 
-				/* skip spaces */
-				while (' ' == p[1])
+				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
 					p++;
 
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 0;	/* incorrect syntax */
 			}
+			else if (']' == *p && 0 == array)
+				return 0;		/* incorrect syntax */
 			else if (' ' != *p)
 				state = 2;
 			break;
@@ -1038,8 +1042,7 @@ int	num_param(const char *p)
 		case 1:
 			if ('"' == *p)
 			{
-				/* skip spaces */
-				while (' ' == p[1])
+				while (' ' == p[1])	/* skip trailing spaces after closing quotes */
 					p++;
 
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
@@ -1057,6 +1060,8 @@ int	num_param(const char *p)
 				p--;
 				state = 0;
 			}
+			else if (']' == *p && 0 == array)
+				return 0;		/* incorrect syntax */
 			break;
 		}
 	}
@@ -1453,7 +1458,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 
 	size_t			i, l = 0;
 	int			level = 0, num = 0, ret = SUCCEED;
-	zbx_parser_state_t	state = ZBX_STATE_END;
+	zbx_parser_state_t	state = ZBX_STATE_NEW;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type)
 	{
@@ -1476,15 +1481,6 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 
 	for (; '\0' != (*data)[i] && FAIL != ret; i++)
 	{
-		if (0 == level)
-		{
-			/* first square bracket + Zapcat compatibility */
-			if (ZBX_STATE_END == state && '[' == (*data)[i])
-				state = ZBX_STATE_NEW;
-			else
-				break;
-		}
-
 		switch (state)
 		{
 			case ZBX_STATE_NEW:	/* a new parameter started */
@@ -1499,6 +1495,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case '[':
+						if (2 == level)
+							goto clean;	/* incorrect syntax: multi-level array */
 						level++;
 						if (1 == level)
 							num++;
@@ -1529,6 +1527,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case ']':
+						if (0 == level)
+							goto clean;	/* incorrect syntax: redundant ']' */
 						level--;
 						break;
 					default:
@@ -4421,12 +4421,10 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 {
 	size_t				offset;
 	zbx_token_simple_macro_t	*data;
-	const char			*ptr;
+	const char			*ptr = key;
 	zbx_strloc_t			key_loc, func_loc, func_param;
 
-	ptr = key;
-
-	if (SUCCEED != parse_key((char **)&ptr))
+	if (SUCCEED != parse_key(&ptr))
 	{
 		zbx_token_t	key_token;
 
