@@ -887,37 +887,30 @@ calendar.prototype = {
 		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_MONDAY_SHORT_BIG']));
-		td.setAttribute('tabindex', '-1');
 
 		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_TUESDAY_SHORT_BIG']));
-		td.setAttribute('tabindex', '-1');
 
 		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_WEDNESDAY_SHORT_BIG']));
-		td.setAttribute('tabindex', '-1');
 
 		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_THURSDAY_SHORT_BIG']));
-		td.setAttribute('tabindex', '-1');
 
 		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_FRIDAY_SHORT_BIG']));
-		td.setAttribute('tabindex', '-1');
 
 		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_SATURDAY_SHORT_BIG']));
-		td.setAttribute('tabindex', '-1');
 
 		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_SUNDAY_SHORT_BIG']));
-		td.setAttribute('tabindex', '-1');
 
 		/*
 		 * Days calendar
