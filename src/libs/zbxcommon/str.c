@@ -1026,7 +1026,7 @@ int	num_param(const char *p)
 				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
 					p++;
 
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+				if (',' != p[1] && '\0' != p[1] && ']' != p[1])
 					return 0;	/* incorrect syntax */
 			}
 			else if (']' == *p && 0 == array)
