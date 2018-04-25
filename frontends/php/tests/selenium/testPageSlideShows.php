@@ -89,9 +89,9 @@ class testPageSlideShows extends CWebTest {
 	}
 
 	/**
-	* @dataProvider allSlideShows
-	*/
-	public function testPageSlideShows_MassDelete($slideshow) {
+	 * @dataProvider allSlideShows
+	 */
+	public function testPageSlideShows_DeleteSelected($slideshow) {
 		$slideshowid = $slideshow['slideshowid'];
 		$name = $slideshow['name'];
 
@@ -99,7 +99,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestCheckboxSelect('shows_'.$slideshowid);
 		$this->zbxTestClickButton('slideshow.massdelete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestTextPresent('Slide show deleted');
@@ -115,4 +115,20 @@ class testPageSlideShows extends CWebTest {
 		DBrestore_tables('slideshows');
 	}
 
+	/**
+	 * @backup-once slideshows
+	 */
+	public function testPageSlideShows_MassDeleteAll() {
+		$this->zbxTestLogin('slideconf.php');
+		$this->zbxTestCheckTitle('Configuration of slide shows');
+		$this->zbxTestCheckboxSelect('all_shows');
+		$this->zbxTestClickButton('slideshow.massdelete');
+		$this->zbxTestAcceptAlert();
+
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show deleted');
+		$this->zbxTestCheckFatalErrors();
+
+		$this->assertEquals(0, DBcount('SELECT NULL FROM slideshows'));
+		$this->assertEquals(0, DBcount('SELECT NULL FROM slides'));
+	}
 }
