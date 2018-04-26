@@ -159,6 +159,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
 				true
 			)
+			->setAttribute('aria-label', _x('%1$s, Severity, %2$s', ZBX_CONTEXT_SCREEN_READER,
+				$problem['name'], getSeverityName($trigger['priority'], $data['config'])
+			))
 	]));
 
 	$description_style = getSeverityStyle($trigger['priority']);
@@ -172,9 +175,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$duration = time() - $problem['clock'];
 
 		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
-			$description->addClass('blink');
-			$description->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration);
-			$description->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
+			$description
+				->addClass('blink')
+				->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration)
+				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 	}
 
