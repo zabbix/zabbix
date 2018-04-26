@@ -86,12 +86,14 @@ jQuery(function ($){
 			event = 'timeselector.rangechange';
 			data = {
 				from: element.from.val(),
-				to: element.to.val()
+				to: element.to.val(),
+				collapse: true
 			}
 		}
 		else if (element.quickranges.index(target) != -1) {
 			event = 'timeselector.rangechange';
 			data = target.data();
+			data.collapse = true;
 		}
 
 		if (event !== '') {
@@ -115,12 +117,30 @@ jQuery(function ($){
 	 * @param {object} data Server response on 'timeselector.rangechange' request.
 	 */
 	function updateTimeselectorUI(data) {
-		element.from.val(data[(data.event === 'rangechange') ? 'from' : 'from_date']);
-		element.to.val(data[(data.event === 'rangechange') ? 'to' : 'to_date']);
+		var is_timestamp = /^\d+$/;
+
+		if (is_timestamp.test(data['from'])) {
+			element.from.val(data['from_date']);
+		}
+		else {
+			element.from.val(data['from']);
+		}
+
+		if (is_timestamp.test(data['to'])) {
+			element.to.val(data['to_date']);
+		}
+		else {
+			element.to.val(data['to']);
+		}
+
 		element.label.text(data.label);
 		element.decrement.attr('disabled', !data.can_decrement);
 		element.zoomout.attr('disabled', !data.can_zoomout);
 		element.increment.attr('disabled', !data.can_increment);
+
+		if (data.collapse) {
+			element.label.closest('.ui-tabs-collapsible').tabs('option', 'active', false);
+		}
 	}
 
 	/**

@@ -452,6 +452,15 @@ switch ($data['method']) {
 
 	/**
 	 * Timeselector date modification handlers.
+	 *
+	 * 'from'		    Start time in supplied format.
+	 * 'to'             End time in supplied format.
+	 * 'from_date'      Start time in ZBX_DATE_TIME date format.
+	 * 'to_date'        End time in ZBX_DATE_TIME format.
+	 * 'label'          Selected time interval label, relative date range or absolute date in format ZBX_DATE_TIME.
+	 * 'can_zoomout'    Is allowed to zoom out supplied date range.
+	 * 'can_decrement'  Is allowed to decrement supplied date range.
+	 * 'can_increment'  Is allowed to increment supplied date range.
 	 */
 	case 'timeselector.zoomout' :
 	case 'timeselector.decrement' :
@@ -467,12 +476,12 @@ switch ($data['method']) {
 		if ($from_datetime instanceof DateTimeImmutable && $to_datetime instanceof DateTimeImmutable
 				&& $from_datetime < $to_datetime
 				&& ($to_datetime->getTimestamp() - $from_datetime->getTimestamp()) >= ZBX_MIN_PERIOD) {
-			$to_ts = $to_datetime->format('U');
-			$from_ts = $from_datetime->format('U');
+			$to_ts = $to_datetime->getTimestamp();
+			$from_ts = $from_datetime->getTimestamp();
 
 			$range = $to_ts - $from_ts;
 			// (gch)TODO: ZBX_MAX_PERIOD and it usage should be changed from seconds to year value (2y).
-			$min_date = parseRelativeDate('now-2y', true)->format('U');
+			$min_date = parseRelativeDate('now-2y', true)->getTimestamp();
 
 			if ($data['method'] === 'timeselector.zoomout' && ($from_ts > $min_date	|| $to_ts < $now_ts)) {
 				$from_ts -= floor($range / 2);

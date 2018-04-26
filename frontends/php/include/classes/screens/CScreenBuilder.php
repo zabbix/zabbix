@@ -98,7 +98,7 @@ class CScreenBuilder {
 	 * @param int		$options['mode']
 	 * @param int		$options['timestamp']
 	 * @param int		$options['hostid']
-	 * @param int		$options['from']			Start time of selected time period. Can be in relative date format.
+	 * @param int		$options['from']            Start time of selected time period. Can be in relative date format.
 	 * @param int		$options['to']              End time of selected time period. Can be in relative date format.
 	 * @param string	$options['profileIdx']      Profile idx value.
 	 * @param int		$options['profileIdx2']     Profile idx2 value.
