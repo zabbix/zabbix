@@ -59,6 +59,7 @@ jQuery(function ($){
 			quickranges: container.find('.time-quick a'),
 			label: container.find('.btn-time')
 		},
+		ui_disabled = false,
 		timerange = {from: element.from.val(), to: element.to.val()};
 
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
@@ -73,7 +74,11 @@ jQuery(function ($){
 			data = {},
 			target = $(e.target);
 
-		if (target.is(element.increment)) {
+		if (ui_disabled) {
+			e.preventDefault();
+			return false;
+		}
+		else if (target.is(element.increment)) {
 			event = 'timeselector.increment';
 		}
 		else if (target.is(element.decrement)) {
@@ -119,36 +124,49 @@ jQuery(function ($){
 	function updateTimeselectorUI(data) {
 		var is_timestamp = /^\d+$/;
 
-		if (is_timestamp.test(data['from'])) {
-			element.from.val(data['from_date']);
-		}
-		else {
-			element.from.val(data['from']);
-		}
-
-		if (is_timestamp.test(data['to'])) {
-			element.to.val(data['to_date']);
-		}
-		else {
-			element.to.val(data['to']);
-		}
-
+		element.from.val(is_timestamp.test(data['from']) ? data['from_date'] : data['from']);
+		element.to.val(is_timestamp.test(data['to']) ? data['to_date'] : data['to']);
 		element.label.text(data.label);
-		element.decrement.attr('disabled', !data.can_decrement);
-		element.zoomout.attr('disabled', !data.can_zoomout);
-		element.increment.attr('disabled', !data.can_increment);
+
+		$([element.from[0], element.to[0], element.apply[0], element.decrement[0], element.zoomout[0],
+			element.increment[0]
+		]).attr('disabled', false);
+
+		element.from_clndr.data('clndr').clndr.clndrhide();
+		element.to_clndr.data('clndr').clndr.clndrhide();
 
 		if (data.collapse) {
 			element.label.closest('.ui-tabs-collapsible').tabs('option', 'active', false);
 		}
+
+		element.apply.closest('.ui-tabs-panel').removeClass('in-progress');
+		ui_disabled = false;
+	}
+
+	/**
+	 * Disable time selector UI.
+	 */
+	function disableTimeselectorUI() {
+		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
+		$([element.from[0], element.to[0], element.apply[0], element.decrement[0], element.zoomout[0],
+			element.increment[0]
+		]).attr('disabled', true);
+		element.from_clndr.data('clndr').clndr.clndrhide();
+		element.to_clndr.data('clndr').clndr.clndrhide();
+		ui_disabled = true;
 	}
 
 	/**
 	 * Show or hide associated to button calendar picker.
 	 */
-	function toggleCalendarPickerHandler() {
+	function toggleCalendarPickerHandler(e) {
 		var button = $(this,)
 			offset = button.offset();
+
+		if (ui_disabled) {
+			e.preventDefault();
+			return false;
+		}
 
 		button.data('clndr').clndr.clndrshow(parseInt(offset.top + button.outerHeight(), 10), parseInt(offset.left, 10),
 			button.data('input')
@@ -176,6 +194,8 @@ jQuery(function ($){
 			// xhr.abort();
 			return;
 		}
+
+		disableTimeselectorUI();
 
 		xhr = $.post(endpoint.getUrl(), (e.namespace === 'rangechange') ? {from: data.from, to: data.to} : timerange,
 			'json'
@@ -276,8 +296,8 @@ jQuery(function ($){
 			to = from + selection.dom.width() * selection.seconds_per_px;
 
 		$.publish('timeselector.rangechange', {
-			from: from,
-			to: to
+			from: Math.round(from),
+			to: Math.round(to)
 		});
 
 		selection.dom.remove();
