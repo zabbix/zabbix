@@ -457,6 +457,8 @@ switch ($data['method']) {
 	 * 'to'             End time in supplied format.
 	 * 'from_date'      Start time in ZBX_DATE_TIME date format.
 	 * 'to_date'        End time in ZBX_DATE_TIME format.
+	 * 'from_ts'        Start time as timestamp.
+	 * 'to_ts'          End time as timestamp.
 	 * 'label'          Selected time interval label, relative date range or absolute date in format ZBX_DATE_TIME.
 	 * 'can_zoomout'    Is allowed to zoom out supplied date range.
 	 * 'can_decrement'  Is allowed to decrement supplied date range.
@@ -518,9 +520,11 @@ switch ($data['method']) {
 
 			$result += [
 				'label' => relativeDateToText($from_ts, $to_ts),
-				'from' => $from_ts,
+				'from' => $from,
+				'from_ts' => $from_ts,
 				'from_date' => (new DateTime())->setTimestamp($from_ts)->format(ZBX_DATE_TIME),
-				'to' => $to_ts,
+				'to' => $to,
+				'to_ts' => $to_ts,
 				'to_date' => (new DateTime())->setTimestamp($to_ts)->format(ZBX_DATE_TIME),
 				'can_zoomout' => $from_ts > $min_date || $to_ts < $now_ts,
 				'can_decrement' => $from_ts - $range >= $min_date,

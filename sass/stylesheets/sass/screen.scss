@@ -2395,7 +2395,8 @@ $icon-widget-btn: (
 				@include transition(background-color .2s ease-out);
 			}
 
-			&:focus {
+			&:focus,
+			&.selected {
 				color: white;
 				border-bottom: 0;
 				background: #0274b8;

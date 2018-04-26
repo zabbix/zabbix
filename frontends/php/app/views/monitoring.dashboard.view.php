@@ -140,8 +140,8 @@ else {
 
 	$timeline = null;
 	if ($data['show_timeline']) {
-		$interval = relativeDateToText($data['timeline']['from'], $data['timeline']['to']);
-		$timeline = (new CFilter('web.dashbrd.filter.state'))->addTimeSelector($interval);
+		$timeline = (new CFilter('web.dashbrd.filter.state'))
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 
 		if ($data['kioskmode']) {
 			$timeline->setHidden();

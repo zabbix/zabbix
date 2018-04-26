@@ -280,7 +280,7 @@ if ($data['action'] == 'problem.view') {
 		->addVar('page', $data['page']);
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		$filter->addTimeSelector(relativeDateToText($data['from'], $data['to']));
+		$filter->addTimeSelector($data['from'], $data['to']);
 	}
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);

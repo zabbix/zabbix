@@ -167,9 +167,10 @@ class CFilter extends CDiv {
 	 *
 	 * @return CFilter
 	 */
-	public function addTimeSelector($header) {
+	public function addTimeSelector($from, $to) {
 		// Disable time selector range changes tab.
 		$this->tabs_disabled[] = count($this->tabs);
+		$header = relativeDateToText($from, $to);
 
 		$this->addTab([
 			(new CSimpleButton())->addClass('btn-time-left'),
@@ -183,10 +184,11 @@ class CFilter extends CDiv {
 			$column = (new CList())->addClass('time-quick');
 
 			foreach ($column_ranges as $range) {
-				list($from, $to) = explode(':', $range);
-				$column->addItem((new CLink(relativeDateToText($from, $to)))
-					->setAttribute('data-from', $from)
-					->setAttribute('data-to', $to)
+				list($range_from, $range_to) = explode(':', $range);
+				$column->addItem((new CLink(relativeDateToText($range_from, $range_to)))
+					->setAttribute('data-from', $range_from)
+					->setAttribute('data-to', $range_to)
+					->addClass(($from == $range_from && $to == $range_to) ? ZBX_STYLE_SELECTED : null)
 				);
 			}
 			$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
@@ -197,9 +199,9 @@ class CFilter extends CDiv {
 			(new CDiv([
 				(new CDiv(
 					(new CList([
-						new CLabel(_('From:'), 'from'), new CTextBox('from'),
+						new CLabel(_('From:'), 'from'), new CTextBox('from', $from),
 						(new CButton('from_calendar'))->addClass(ZBX_STYLE_ICON_CAL),
-						new CLabel(_('To:'), 'to'), new CTextBox('to'),
+						new CLabel(_('To:'), 'to'), new CTextBox('to', $to),
 						(new CButton('to_calendar'))->addClass(ZBX_STYLE_ICON_CAL),
 						(new CButton('apply', _('Apply')))
 					]))->addClass(ZBX_STYLE_TABLE_FORMS)

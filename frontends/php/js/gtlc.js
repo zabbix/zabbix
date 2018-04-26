@@ -260,7 +260,7 @@ jQuery(function ($){
 			left: 0,
 			height: target.outerHeight() + 'px',
 			width: target.outerWidth() + 'px'
-		}).insertAfter(target),
+		}).insertAfter(target);
 
 		selection = {
 			dom: $('<div class="graph-selection"/>').css({
@@ -269,7 +269,7 @@ jQuery(function ($){
 				left: xpos,
 				height: data.height + 'px',
 				width: '1px'
-			}).insertAfter(target),
+			}).insertAfter(noclick_area),
 			min: left,
 			max: right,
 			base_x: xpos,
@@ -293,11 +293,6 @@ jQuery(function ($){
 		var from = selection.from_ts + (selection.dom.offset().left - selection.min) * selection.seconds_per_px,
 			to = from + selection.dom.width() * selection.seconds_per_px;
 
-		$.publish('timeselector.rangechange', {
-			from: Math.round(from),
-			to: Math.round(to)
-		});
-
 		selection.dom.remove();
 		selection = null;
 		$(document)
@@ -306,6 +301,11 @@ jQuery(function ($){
 
 		noclick_area.remove();
 		noclick_area = null;
+
+		$.publish('timeselector.rangechange', {
+			from: Math.round(from),
+			to: Math.round(to)
+		});
 	}
 
 	/**
@@ -460,7 +460,7 @@ var timeControl = {
 		var img = jQuery('#' + id).clone()
 				.on('load', function() {
 					jQuery(this).unbind('load');
-					jQuery('#' + id).replaceWith(jQuery(this));
+					jQuery('#' + id).attr('src', jQuery(this).attr('src'));
 
 					// Update dashboard widget footer.
 					if (obj.onDashboard) {
@@ -514,7 +514,7 @@ var timeControl = {
 
 		if (widget.type === 'graph') {
 			post_args.from = obj.timeline.from;
-			post_args.to = obj.timeline.from;
+			post_args.to = obj.timeline.to;
 		}
 
 		url.setArgument('action', 'widget.graph.view');

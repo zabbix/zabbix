@@ -56,8 +56,7 @@ $chartsWidget = (new CWidget())
 		->addItem($controls)
 	);
 
-$interval = relativeDateToText($data['from'], $data['to']);
-$filterForm = (new CFilter('web.charts.filter.state'))->addTimeSelector($interval);
+$filterForm = (new CFilter('web.charts.filter.state'))->addTimeSelector($data['from'], $data['to']);
 $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {

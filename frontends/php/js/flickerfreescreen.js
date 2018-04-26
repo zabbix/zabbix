@@ -376,8 +376,7 @@
 									img.fadeTo(0, 0.6);
 								}
 
-								// Set loaded image from buffer to dom.
-								domImg.replaceWith(img);
+								domImg.attr('src', img.attr('src'));
 
 								// Callback function on success.
 								if (!empty(successAction)) {
@@ -399,14 +398,12 @@
 
 					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 						// 'src' should be added only here to trigger load event after new height is received.
-						img.data('zbx_sbox', {
+						var zbx_sbox = domImg.data('zbx_sbox');
+						img.data('zbx_sbox', $.extend(zbx_sbox, {
 							height: parseInt(height, 10),
-							left: 0,
-							right: 0,
-							top: 0,
 							period: screen.timeline.period,
 							timestamp: screen.timeline.from_ts
-						}).attr('src', url.getUrl());
+						})).attr('src', url.getUrl());
 					});
 
 					if (async === null) {
