@@ -22,6 +22,24 @@
 class CTestDbHelper {
 
 	/**
+	 * Returns comma-delimited list of the fields.
+	 *
+	 * @param string $table_name
+	 * @param array  $exlude_fields
+	 */
+	public static function getTableFields($table_name, array $exlude_fields = []) {
+		$fields = [];
+
+		foreach (DB::getSchema($table_name)['fields'] as $field_name) {
+			if (!in_array($field_name, $exlude_fields, true)) {
+				$fields[] = $field_name;
+			}
+		}
+
+		return implode(', ', $fields);
+	}
+
+	/**
 	 * Add host groups to user group with these rights.
 	 *
 	 * @param string $usergroup_name

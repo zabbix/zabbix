@@ -26,7 +26,7 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 class testFormAdministrationGeneralGUI extends CWebTest {
 
 	public static function allValues() {
-		return DBdata('SELECT default_theme,dropdown_first_entry,dropdown_first_remember,search_limit,max_in_table,event_ack_enable,event_expire,event_show_max,server_check_interval FROM config ORDER BY configid');
+		return DBdata('SELECT default_theme,dropdown_first_entry,dropdown_first_remember,search_limit,max_in_table,event_ack_enable,server_check_interval FROM config ORDER BY configid');
 	}
 
 	/**
@@ -38,19 +38,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestTextPresent(
-				[
-					'Default theme',
-					'Dropdown first entry',
-					'remember selected',
-					'Limit for search and filter results',
-					'Max count of elements to show inside table cell',
-					'Enable event acknowledgement',
-					'Show events not older than',
-					'Max count of events per trigger to show',
-					'Show warning if Zabbix server is down'
-					]
-				);
+		$this->zbxTestTextPresent([
+			'Default theme',
+			'Dropdown first entry',
+			'remember selected',
+			'Limit for search and filter results',
+			'Max count of elements to show inside table cell',
+			'Enable event acknowledgement',
+			'Show warning if Zabbix server is down'
+		]);
 
 		$this->zbxTestDropdownHasOptions('default_theme', ['Blue', 'Dark']);
 		$this->zbxTestDropdownHasOptions('dropdown_first_entry', ['All', 'None']);
@@ -59,10 +55,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestAssertAttribute('//input[@id="search_limit"]', 'maxlength', '6');
 		$this->zbxTestAssertElementPresentId('max_in_table');
 		$this->zbxTestAssertAttribute('//input[@id="max_in_table"]','maxlength', '5');
-		$this->zbxTestAssertElementPresentId('event_expire');
-		$this->zbxTestAssertAttribute('//input[@id="event_expire"]', 'maxlength', '255');
-		$this->zbxTestAssertElementPresentId('event_show_max');
-		$this->zbxTestAssertAttribute('//input[@id="event_show_max"]', 'maxlength', '255');
 
 		$this->zbxTestAssertElementPresentId('dropdown_first_remember');
 		$this->zbxTestAssertElementPresentId('event_ack_enable');
@@ -96,15 +88,13 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestAssertElementValue('search_limit', $allValues['search_limit']);
 		$this->zbxTestAssertElementValue('max_in_table', $allValues['max_in_table']);
-		$this->zbxTestAssertElementValue('event_expire', $allValues['event_expire']);
-		$this->zbxTestAssertElementValue('event_show_max', $allValues['event_show_max']);
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeTheme() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT '.DB::getTableFields('config', ['default_theme']).' FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestDropdownSelect('default_theme', 'Dark');
 		$this->zbxTestAssertElementValue('default_theme', 'dark-theme');
@@ -120,14 +110,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('blue-theme');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Blue" theme can not be selected as default theme: it does not exist in the DB');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstEntry() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestDropdownSelect('dropdown_first_entry', 'None');
 		$this->zbxTestClickWait('update');
@@ -142,14 +132,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT dropdown_first_entry FROM config WHERE dropdown_first_entry=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value "All" can not be selected as "dropdown first entry" value');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstRemember() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT '.DB::getTableFields('config', ['dropdown_first_remember']).' FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('dropdown_first_remember');
 		$this->zbxTestClickWait('update');
@@ -167,13 +157,13 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=1';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeSearchLimit() {
 		$this->zbxTestLogin('adm.gui.php');
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT '.DB::getTableFields('config', ['search_limit']).' FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestInputType('search_limit', '1000');
 		$this->zbxTestClickWait('update');
@@ -225,12 +215,12 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "-1" for "Limit for search and filter results" field: must be between 1 and 999999.']);
 		$this->zbxTestTextNotPresent('Configuration updated');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeMaxInTable() {
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT '.DB::getTableFields('config', ['max_in_table']).' FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestLogin('adm.gui.php');
 		$this->zbxTestInputTypeOverwrite('max_in_table', '1000');
@@ -282,13 +272,13 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		]);
 		$this->zbxTestTextNotPresent('Configuration updated');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function testFormAdministrationGeneralGUI_EventAckEnable() {
 		$this->zbxTestLogin('adm.gui.php');
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT '.DB::getTableFields('config', ['event_ack_enable']).' FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('event_ack_enable');
 		$this->zbxTestClickWait('update');
@@ -312,107 +302,13 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT event_ack_enable FROM config WHERE event_ack_enable=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_ack_enable"');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
-	}
-
-	public function testFormAdministrationGeneralGUI_EventExpire() {
-		// 86400-788400000
-
-		$this->zbxTestLogin('adm.gui.php');
-
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
-
-		$this->zbxTestInputType('event_expire', '788400000');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
-		$this->zbxTestTextPresent(['GUI', 'Show events not older than']);
-
-		$sql = "SELECT event_expire FROM config WHERE event_expire='788400000'";
-		$this->assertEquals(1, DBcount($sql));
-
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_expire', '86400');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestTextPresent('Show events not older than');
-
-		$sql = "select event_expire from config where event_expire='86400'";
-		$this->assertEquals(1, DBcount($sql));
-
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_expire', '788400001');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
-		$this->zbxTestTextPresent('Invalid event expiry time: must be between "86400" and "788400000"');
-		$this->zbxTestTextNotPresent('Configuration updated');
-		$this->zbxTestTextPresent(['GUI', 'Show events not older than']);
-
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_expire', '86399');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
-		$this->zbxTestTextPresent('Invalid event expiry time: must be between "86400" and "788400000"');
-		$this->zbxTestTextNotPresent('Configuration updated');
-		$this->zbxTestTextPresent(['GUI', 'Show events not older than']);
-
-		$this->assertEquals($oldHash, DBhash($sqlHash));
-	}
-
-	public function testFormAdministrationGeneralGUI_EventShowMax() {
-		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxTestInputType('event_show_max', '99999');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Max count of events per trigger to show']);
-
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
-
-		$sql = 'SELECT event_show_max FROM config WHERE event_show_max=99999';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_show_max"');
-
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_show_max', '1');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Max count of events per trigger to show']);
-
-		$sql = 'SELECT event_show_max FROM config WHERE event_show_max=1';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_show_max"');
-
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_show_max', '100000');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "100000" for "Max count of events per trigger to show" field: must be between 1 and 99999.']);
-		$this->zbxTestTextNotPresent('Configuration updated');
-		$this->zbxTestTextPresent(['GUI', 'Max count of events per trigger to show']);
-
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('event_show_max', '0');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "0" for "Max count of events per trigger to show" field: must be between 1 and 99999.']);
-		$this->zbxTestTextNotPresent('Configuration updated');
-		$this->zbxTestTextPresent(['GUI', 'Max count of events per trigger to show']);
-
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function testFormAdministrationGeneralGUI_EventCheckInterval() {
 		$this->zbxTestLogin('adm.gui.php');
-		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sqlHash);
+		$sql_hash = 'SELECT '.DB::getTableFields('config', ['server_check_interval']).' FROM config ORDER BY configid';
+		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('server_check_interval');
 		$this->zbxTestClickWait('update');
@@ -436,6 +332,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT server_check_interval FROM config WHERE server_check_interval=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "server_check_interval"');
 
-		$this->assertEquals($oldHash, DBhash($sqlHash));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 }
