@@ -23,8 +23,10 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageAdministrationAuditActions extends CWebTest {
 
 	public function testPageAdministrationAuditActions_CheckLayout() {
-
-		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000');
+		// from: 2012-02-20 09:00:00
+		// to: 2014-02-19 09:00:00
+		// dates can be in relative format, example: now-1y/y, now-1w, now
+		$this->zbxTestLogin('auditacts.php?stime=1329721200&period=1392793200');
 		$this->zbxTestCheckTitle('Action log');
 		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');
@@ -47,8 +49,9 @@ class testPageAdministrationAuditActions extends CWebTest {
 	* @dataProvider allAuditActions
 	*/
 	public function testPageAdministrationAuditActions_CheckValues($auditactions) {
-
-		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000&isNow=0');
+		// from: 2012-02-20 09:00:00
+		// to: 2014-02-19 09:00:00
+		$this->zbxTestLogin('auditacts.php?from=1329721200&to=1392793200');
 		$this->zbxTestCheckTitle('Action log');
 		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');

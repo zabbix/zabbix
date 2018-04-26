@@ -153,7 +153,8 @@ jQuery(function ($){
 
 		// TODO: ignore events and block ui if there is request in progress state. Do not silently abort it.
 		if (xhr && xhr.abort) {
-			xhr.abort();
+			// xhr.abort();
+			return;
 		}
 
 		xhr = $.post(endpoint.getUrl(), (e.namespace === 'rangechange') ? {from: data.from, to: data.to} : timerange,
@@ -329,12 +330,10 @@ var timeControl = {
 			}, objData);
 
 			if (this.objectList[id].loadSBox) {
-				var timecontrol = this,
-					obj = this.objectList[id];
 				jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
-					obj.timeline.from = data.from;
-					obj.timeline.to = data.to;
-					timecontrol.refreshImage(obj);
+					timeControl.objectList[id].timeline.from = data.from;
+					timeControl.objectList[id].timeline.to = data.to;
+					timeControl.objectUpdate.bind(this);
 				});
 			}
 		}
@@ -528,8 +527,7 @@ var timeControl = {
 
 			location.href = url.getUrl();
 		}
-		else {
-			// TODO: This should be done as event!!!
+		else if (this.profile) {
 			var url = new Curl('zabbix.php');
 			url.setArgument('action', 'timeline.update');
 
@@ -541,8 +539,6 @@ var timeControl = {
 					to: this.timeline.to
 				}
 			});
-
-			jQuery.publish('timeselector.rangechange', {from: this.timeline.from, to: this.timeline.to});
 		}
 	},
 

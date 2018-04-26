@@ -40,9 +40,8 @@ $fields = [
 	'tr_hostid' =>	[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
 	'screenid' =>	[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null],
 	'step' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(0, 65535), null],
-	'period' =>		[T_ZBX_INT, O_OPT, P_SYS, null,		null],
-	'stime' =>		[T_ZBX_STR, O_OPT, P_SYS, null,		null],
-	'isNow' =>		[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null],
+	'from' =>		[T_ZBX_STR, O_OPT, P_SYS, null,		null],
+	'to' =>			[T_ZBX_STR, O_OPT, P_SYS, null,		null],
 	'reset' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"reset"'), null],
 	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null]
 ];
@@ -60,9 +59,8 @@ $data = [
 	'hostid' => getRequest('hostid', 0),
 	'fullscreen' => getRequest('fullscreen', 0),
 	'screenid' => getRequest('screenid', CProfile::get('web.hostscreen.screenid', null)),
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow')
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
 ];
 CProfile::update('web.hostscreen.screenid', $data['screenid'], PROFILE_TYPE_ID);
 

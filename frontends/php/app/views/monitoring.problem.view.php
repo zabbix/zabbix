@@ -59,9 +59,8 @@ switch ($data['filter']['show']) {
 		$options['profileIdx'] = $data['profileIdx'];
 		$options['profileIdx2'] = $data['profileIdx2'];
 		$options['updateProfile'] = $data['updateProfile'];
-		$options['period'] = $data['period'];
-		$options['stime'] = $data['stime'];
-		$options['isNow'] = $data['isNow'];
+		$options['from'] = $data['from'];
+		$options['to'] = $data['to'];
 		break;
 }
 
@@ -281,12 +280,7 @@ if ($data['action'] == 'problem.view') {
 		->addVar('page', $data['page']);
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		// (gc) TODO: remove starting this line!
-		$start = zbxDateToTime($screen->timeline['stime']);
-		$end = $options['isNow'] ? 'now' : $start + $screen->timeline['period'];
-		//sdi($screen->timeline);
-		// (gc) TODO: remove till this line!
-		$filter->addTimeSelector(relativeDateToText($start, $end));
+		$filter->addTimeSelector(relativeDateToText($data['from'], $data['to']));
 	}
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);

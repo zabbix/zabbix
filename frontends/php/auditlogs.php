@@ -38,9 +38,8 @@ $fields = [
 	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'alias' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'period' =>			[T_ZBX_INT, O_OPT, null,	null,	null],
-	'stime' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
-	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'from' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
+	'to' =>				[T_ZBX_STR, O_OPT, null,	null,	null]
 ];
 check_fields($fields);
 
@@ -79,10 +78,9 @@ $data = [
 	'timeline' => calculateTime([
 		'profileIdx' => 'web.auditlogs.timeline',
 		'profileIdx2' => 0,
-		'updateProfile' => (hasRequest('period') || hasRequest('stime') || hasRequest('isNow')),
-		'period' => getRequest('period'),
-		'stime' => getRequest('stime'),
-		'isNow' => getRequest('isNow')
+		'updateProfile' => (hasRequest('from') && hasRequest('to')),
+		'from' => getRequest('from'),
+		'to' => getRequest('to')
 	])
 ];
 
@@ -99,8 +97,16 @@ if ($data['action'] > -1) {
 if ($data['resourcetype'] > -1) {
 	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
 }
-$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr(zbxDateToTime($data['timeline']['stime']));
-$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr(zbxDateToTime($data['timeline']['usertime']));
+
+$from = parseRelativeDate($data['from']);
+$to = parseRelativeDate($data['to']);
+if ($from === null || $to === null) {
+	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
+	$to = parseRelativeDate('now', false);
+}
+
+$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr($from->getTimestamp());
+$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr($to->getTimestamp());
 
 $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
 		' FROM auditlog a,users u'.
@@ -153,20 +159,21 @@ if (!empty($data['actions'])) {
 // get paging
 $data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlogs.php'));
 
+// TODO: test/remove.
 // get timeline
-unset($sqlWhere['from'], $sqlWhere['till']);
+// unset($sqlWhere['from'], $sqlWhere['till']);
 
-$sql = 'SELECT MIN(a.clock) AS clock'.
-		' FROM auditlog a,users u'.
-		' WHERE a.userid=u.userid'.
-			implode('', $sqlWhere);
-$first_audit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
-$min_start_time = ($first_audit) ? $first_audit['clock'] - 1 : null;
+// $sql = 'SELECT MIN(a.clock) AS clock'.
+// 		' FROM auditlog a,users u'.
+// 		' WHERE a.userid=u.userid'.
+// 			implode('', $sqlWhere);
+// $first_audit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
+// $min_start_time = ($first_audit) ? $first_audit['clock'] - 1 : null;
 
-// Show shorter timeline.
-if ($min_start_time !== null && $min_start_time > 0) {
-	$data['timeline']['starttime'] = date(TIMESTAMP_FORMAT, $min_start_time);
-}
+// // Show shorter timeline.
+// if ($min_start_time !== null && $min_start_time > 0) {
+// 	$data['timeline']['from'] = $min_start_time;
+// }
 
 // render view
 $auditView = new CView('administration.auditlogs.list', $data);

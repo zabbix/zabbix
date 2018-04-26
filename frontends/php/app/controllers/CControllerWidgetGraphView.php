@@ -36,16 +36,23 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'content_width' => 'int32',
 			'content_height' => 'int32',
 			'only_footer' => 'in 1',
-			'fullscreen' => 'in 0,1'
+			'fullscreen' => 'in 0,1',
+			'from' => 'string',
+			'to' => 'string'
 		]);
 	}
 
 	protected function doAction() {
 		if ($this->getInput('only_footer', 0)) {
+			$from = $this->getInput('from');
+			$to = $this->getInput('to');
+			$from = $this->hasInput('from') ? parseRelativeDate($this->getInput('from'), true) : null;
+			$to = $this->hasInput('to') ? parseRelativeDate($this->getInput('to'), false) : null;
+
 			$this->setResponse(new CControllerResponseData([
 				'only_footer' => true,
-				'period_string' => $this->hasInput('period')
-					? ' ('.zbx_date2age(0, $this->getInput('period', 0)).')'
+				'period_string' => ($from !== null && $to !== null)
+					? ' ('.convertUnitsS($to->getTimestamp() - $from->getTimestamp()).')'
 					: '',
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
@@ -383,7 +390,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 		if ($response['name'] === '') {
 			$response['name'] = $header_label;
-			$response['period_string'] = ' ('.zbx_date2age(0, $timeline['to'] - $timeline['from']).')';
+			$response['period_string'] = array_key_exists('period', $timeline)
+				? ' ('.convertUnitsS($timeline['period']).')'
+				: '';
 		}
 
 		$this->setResponse(new CControllerResponseData($response));

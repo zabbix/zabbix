@@ -33,9 +33,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'period' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'stime' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'isNow' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'from' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'to' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'reset' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'httptestid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
 	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null]
@@ -104,10 +103,9 @@ $graph_in = new CScreenBase([
 	'dataId' => 'graph_in',
 	'profileIdx' => $profileIdx,
 	'profileIdx2' => $profileIdx2,
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow'),
-	'updateProfile' => (hasRequest('period') || hasRequest('stime') || hasRequest('isNow'))
+	'from' => getRequest('from'),
+	'to' => getRequest('to'),
+	'updateProfile' => (hasRequest('from') && hasRequest('to'))
 ]);
 
 $items = DBfetchArray(DBselect(
@@ -126,9 +124,8 @@ $url = (new CUrl('chart3.php'))
 	->setArgument('http_item_type', HTTPSTEP_ITEM_TYPE_IN)
 	->setArgument('httptestid', $httptest['httptestid'])
 	->setArgument('graphtype', GRAPH_TYPE_STACKED)
-	->setArgument('period', $graph_in->timeline['period'])
-	->setArgument('stime', $graph_in->timeline['stime'])
-	->setArgument('isNow', $graph_in->timeline['isNow'])
+	->setArgument('from', $graph_in->timeline['from'])
+	->setArgument('to', $graph_in->timeline['to'])
 	->setArgument('profileIdx', $graph_in->profileIdx)
 	->setArgument('profileIdx2', $graph_in->profileIdx2)
 	->getUrl();
@@ -144,9 +141,7 @@ $time_control_data = [
 	'src' => $url,
 	'objDims' => $graph_dims,
 	'loadSBox' => 1,
-	'loadImage' => 1,
-	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
-	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+	'loadImage' => 1
 ];
 zbx_add_post_js('timeControl.addObject("graph_in", '.zbx_jsvalue($graph_in->timeline).', '.
 	zbx_jsvalue($time_control_data).');'
@@ -162,10 +157,9 @@ $graph_time = new CScreenBase([
 	'dataId' => 'graph_time',
 	'profileIdx' => $profileIdx,
 	'profileIdx2' => $profileIdx2,
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow'),
-	'updateProfile' => (hasRequest('period') || hasRequest('stime') || hasRequest('isNow'))
+	'from' => getRequest('from'),
+	'to' => getRequest('to'),
+	'updateProfile' => (hasRequest('from') || hasRequest('to'))
 ]);
 
 $url = (new CUrl('chart3.php'))
@@ -174,9 +168,8 @@ $url = (new CUrl('chart3.php'))
 	->setArgument('http_item_type', HTTPSTEP_ITEM_TYPE_TIME)
 	->setArgument('httptestid', $httptest['httptestid'])
 	->setArgument('graphtype', GRAPH_TYPE_STACKED)
-	->setArgument('period', $graph_time->timeline['period'])
-	->setArgument('stime', $graph_time->timeline['stime'])
-	->setArgument('isNow', $graph_time->timeline['isNow'])
+	->setArgument('from', $graph_time->timeline['from'])
+	->setArgument('to', $graph_time->timeline['to'])
 	->setArgument('profileIdx', $graph_time->profileIdx)
 	->setArgument('profileIdx2', $graph_time->profileIdx2)
 	->getUrl();
@@ -192,9 +185,7 @@ $time_control_data = [
 	'src' => $url,
 	'objDims' => $graph_dims,
 	'loadSBox' => 1,
-	'loadImage' => 1,
-	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
-	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+	'loadImage' => 1
 ];
 zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($graph_in->timeline).', '.
 	zbx_jsvalue($time_control_data).');'

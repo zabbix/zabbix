@@ -75,7 +75,7 @@ $pageFilter = new CPageFilter([
 	'graphid' => getRequest('graphid')
 ]);
 
-if (hasRequest('period') || hasRequest('stime') || hasRequest('isNow')) {
+if (hasRequest('from') && hasRequest('to')) {
 	calculateTime([
 		'profileIdx' => 'web.graphs',
 		'profileIdx2' => $pageFilter->graphid,

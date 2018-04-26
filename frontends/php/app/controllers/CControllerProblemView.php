@@ -57,9 +57,8 @@ class CControllerProblemView extends CController {
 			'filter_maintenance' =>		'in 1',
 			'filter_unacknowledged' =>	'in 1',
 			'filter_details' =>			'in 1',
-			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
-			'stime' =>					'time',
-			'isNow' =>					'in 0,1'
+			'from' =>					'string',
+			'to' =>						'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -289,10 +288,9 @@ class CControllerProblemView extends CController {
 		if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 			$data['profileIdx'] = 'web.problem.timeline';
 			$data['profileIdx2'] = 0;
-			$data['period'] = $this->hasInput('period') ? $this->getInput('period') : null;
-			$data['stime'] = $this->hasInput('stime') ? $this->getInput('stime') : null;
-			$data['isNow'] = $this->hasInput('isNow') ? $this->getInput('isNow') : null;
-			$data['updateProfile'] = ($data['period'] !== null || $data['stime'] !== null || $data['isNow'] !== null);
+			$data['from'] = $this->hasInput('from') ? $this->getInput('from') : null;
+			$data['to'] = $this->hasInput('to') ? $this->getInput('to') : null;
+			$data['updateProfile'] = ($data['from'] !== null && $data['to'] !== null);
 		}
 
 		$response = new CControllerResponseData($data);

@@ -190,7 +190,7 @@ if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
 else {
 	$profileIdx = 'web.item.graph';
 	$profileIdx2 = reset($this->data['itemids']);
-	$updateProfile = ($this->data['period'] !== null || $this->data['stime'] !== null || $this->data['isNow'] !== null);
+	$updateProfile = ($this->data['from'] !== null && $this->data['to'] !== null);
 }
 
 // create history screen
@@ -201,9 +201,8 @@ $screen = CScreenBuilder::getScreen([
 	'profileIdx' => $profileIdx,
 	'profileIdx2' => $profileIdx2,
 	'updateProfile' => $updateProfile,
-	'period' => $this->data['period'],
-	'stime' => $this->data['stime'],
-	'isNow' => $this->data['isNow'],
+	'from' => $this->data['from'],
+	'to' => $this->data['to'],
 	'filter' => getRequest('filter'),
 	'filter_task' => getRequest('filter_task'),
 	'mark_color' => getRequest('mark_color'),

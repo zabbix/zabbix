@@ -107,10 +107,9 @@ $screenBuilder = new CScreenBuilder([
 	'profileIdx2' => $data['screen']['screenid'],
 	'groupid' => getRequest('groupid'),
 	'hostid' => getRequest('hostid'),
-	'period' => $data['period'],
-	'stime' => $data['stime'],
-	'isNow' => $data['isNow'],
-	'updateProfile' => ($data['period'] !== null || $data['stime'] !== null || $data['isNow'] !== null)
+	'from' => $data['from'],
+	'to' => $data['to'],
+	'updateProfile' => ($data['from'] !== null && $data['to'] !== null)
 ]);
 $widget->addItem(
 	(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)

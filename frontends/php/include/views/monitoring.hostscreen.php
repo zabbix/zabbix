@@ -71,9 +71,8 @@ else {
 		'screen' => $data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'hostid' => $data['hostid'],
-		'period' => $data['period'],
-		'stime' => $data['stime'],
-		'isNow' => $data['isNow'],
+		'from' => $data['from'],
+		'to' => $data['to'],
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $data['screen']['screenid']
 	]);

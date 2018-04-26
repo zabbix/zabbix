@@ -98,11 +98,11 @@ class CScreenBuilder {
 	 * @param int		$options['mode']
 	 * @param int		$options['timestamp']
 	 * @param int		$options['hostid']
-	 * @param int		$options['period']
-	 * @param int		$options['stime']
-	 * @param string	$options['profileIdx']
-	 * @param int		$options['profileIdx2']
-	 * @param boolean	$options['updateProfile']
+	 * @param int		$options['from']			Start time of selected time period. Can be in relative date format.
+	 * @param int		$options['to']              End time of selected time period. Can be in relative date format.
+	 * @param string	$options['profileIdx']      Profile idx value.
+	 * @param int		$options['profileIdx2']     Profile idx2 value.
+	 * @param boolean	$options['updateProfile']   Should the profile updated with 'from' and 'to' values.
 	 * @param array		$options['screen']
 	 */
 	public function __construct(array $options = []) {

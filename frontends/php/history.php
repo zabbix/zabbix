@@ -38,9 +38,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'itemids' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	null],
-	'period' =>			[T_ZBX_INT, O_OPT, null,	null,	null],
-	'stime' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
-	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'from' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
+	'to' =>				[T_ZBX_STR, O_OPT, null,	null,	null],
 	'filter_task' =>	[T_ZBX_STR, O_OPT, null,	IN(FILTER_TASK_SHOW.','.FILTER_TASK_HIDE.','.FILTER_TASK_MARK.','.FILTER_TASK_INVERT_MARK), null],
 	'filter' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
 	'mark_color' =>		[T_ZBX_STR, O_OPT, null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null],
@@ -94,9 +93,8 @@ $data = [
 	'items' => $items,
 	'value_type' => $item['value_type'],
 	'action' => getRequest('action'),
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow'),
+	'from' => getRequest('from'),
+	'to' => getRequest('to'),
 	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => [ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1],
 	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1],

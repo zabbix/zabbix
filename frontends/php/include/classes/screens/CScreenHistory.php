@@ -545,9 +545,8 @@ class CScreenHistory extends CScreenBase {
 	 */
 	protected function getGraphUrl(array $itemIds) {
 		$url = new CUrl('chart.php');
-		$url->setArgument('period', $this->timeline['period']);
-		$url->setArgument('stime', $this->timeline['stime']);
-		$url->setArgument('isNow', $this->timeline['isNow']);
+		$url->setArgument('from', $this->timeline['from']);
+		$url->setArgument('to', $this->timeline['to']);
 		$url->setArgument('itemids', $itemIds);
 		$url->setArgument('type', $this->graphType);
 

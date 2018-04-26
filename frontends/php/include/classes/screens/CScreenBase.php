@@ -345,9 +345,8 @@ class CScreenBase {
 				'profileIdx' => $this->profileIdx,
 				'profileIdx2' => $this->profileIdx2,
 				'updateProfile' => $this->updateProfile,
-				'period' => array_key_exists('period', $options) ? $options['period'] : null,
-				'stime' => array_key_exists('stime', $options) ? $options['stime'] : null,
-				'isNow' => array_key_exists('isNow', $options) ? $options['isNow'] : null
+				'from' => array_key_exists('from', $options) ? $options['from'] : null,
+				'to' => array_key_exists('to', $options) ? $options['to'] : null,
 			]);
 		}
 

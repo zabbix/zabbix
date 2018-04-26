@@ -37,9 +37,8 @@ $fields = [
 	'filter_rst' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'filter_set' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'alias' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'period' =>		[T_ZBX_INT, O_OPT, null,	null,	null],
-	'stime' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
-	'isNow' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'from' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
+	'to' =>			[T_ZBX_STR, O_OPT, null,	null,	null]
 ];
 check_fields($fields);
 
@@ -71,10 +70,9 @@ $data = [
 	'timeline' => calculateTime([
 		'profileIdx' => 'web.auditacts.timeline',
 		'profileIdx2' => 0,
-		'updateProfile' => (hasRequest('period') || hasRequest('stime') || hasRequest('isNow')),
-		'period' => getRequest('period'),
-		'stime' => getRequest('stime'),
-		'isNow' => getRequest('isNow')
+		'updateProfile' => (hasRequest('from') && hasRequest('to')),
+		'from' => getRequest('from'),
+		'to' => getRequest('to')
 	])
 ];
 
@@ -105,8 +103,8 @@ if (!$data['alias'] || $data['users']) {
 			],
 			'selectMediatypes' => ['mediatypeid', 'description', 'maxattempts'],
 			'userids' => $userid,
-			'time_from' => zbxDateToTime($data['timeline']['stime']),
-			'time_till' => zbxDateToTime($data['timeline']['usertime']),
+			'time_from' => parseRelativeDate($data['timeline']['from'])->getTimestamp(),
+			'time_till' => parseRelativeDate($data['timeline']['to'])->getTimestamp(),
 			'eventsource' => $eventSource['source'],
 			'eventobject' => $eventSource['object'],
 			'sortfield' => 'alertid',
@@ -134,19 +132,20 @@ if (!$data['alias'] || $data['users']) {
 	}
 }
 
+// TODO: test/remove
 // get first alert clock
-$first_alert = null;
-if ($userid) {
-	$first_alert = DBfetch(DBselect(
-		'SELECT MIN(a.clock) AS clock'.
-		' FROM alerts a'.
-		' WHERE a.userid='.zbx_dbstr($userid)
-	));
-}
-elseif ($data['alias'] === '') {
-	$first_alert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'));
-}
-$min_start_time = ($first_alert) ? $first_alert['clock'] - 1 : null;
+// $first_alert = null;
+// if ($userid) {
+// 	$first_alert = DBfetch(DBselect(
+// 		'SELECT MIN(a.clock) AS clock'.
+// 		' FROM alerts a'.
+// 		' WHERE a.userid='.zbx_dbstr($userid)
+// 	));
+// }
+// elseif ($data['alias'] === '') {
+// 	$first_alert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'));
+// }
+// $min_start_time = ($first_alert) ? $first_alert['clock'] - 1 : null;
 
 // get actions names
 if ($data['alerts']) {
@@ -157,10 +156,11 @@ if ($data['alerts']) {
 	]);
 }
 
+// TODO: test/remove
 // Show shorter timeline.
-if ($min_start_time !== null && $min_start_time > 0) {
-	$data['timeline']['starttime'] = date(TIMESTAMP_FORMAT, $min_start_time);
-}
+// if ($min_start_time !== null && $min_start_time > 0) {
+// 	$data['timeline']['from'] = $min_start_time;
+// }
 
 // render view
 $auditView = new CView('administration.auditacts.list', $data);
