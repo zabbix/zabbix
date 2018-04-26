@@ -93,7 +93,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	public function testFormAdministrationGeneralGUI_ChangeTheme() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$sql_hash = 'SELECT '.DB::getTableFields('config', ['default_theme']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['default_theme']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestDropdownSelect('default_theme', 'Dark');
@@ -138,7 +138,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstRemember() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$sql_hash = 'SELECT '.DB::getTableFields('config', ['dropdown_first_remember']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['dropdown_first_remember']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('dropdown_first_remember');
@@ -162,7 +162,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 	public function testFormAdministrationGeneralGUI_ChangeSearchLimit() {
 		$this->zbxTestLogin('adm.gui.php');
-		$sql_hash = 'SELECT '.DB::getTableFields('config', ['search_limit']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['search_limit']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestInputType('search_limit', '1000');
@@ -219,7 +219,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeMaxInTable() {
-		$sql_hash = 'SELECT '.DB::getTableFields('config', ['max_in_table']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['max_in_table']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestLogin('adm.gui.php');
@@ -277,7 +277,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 	public function testFormAdministrationGeneralGUI_EventAckEnable() {
 		$this->zbxTestLogin('adm.gui.php');
-		$sql_hash = 'SELECT '.DB::getTableFields('config', ['event_ack_enable']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['event_ack_enable']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('event_ack_enable');
@@ -307,7 +307,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 	public function testFormAdministrationGeneralGUI_EventCheckInterval() {
 		$this->zbxTestLogin('adm.gui.php');
-		$sql_hash = 'SELECT '.DB::getTableFields('config', ['server_check_interval']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['server_check_interval']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('server_check_interval');

@@ -102,7 +102,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestTextPresent(['Trigger displaying options', 'blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged RESOLVED events', 'Acknowledged RESOLVED events', 'Display OK triggers for', 'On status change triggers blink for']);
 
 		// hash calculation for not-changed DB fields
-		$sql_hash = 'SELECT '.DB::getTableFields('config', ['problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('custom_color');
@@ -332,7 +332,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
 
 		// hash calculation for the DB fields that should be changed in this report
-		$sql_hash = 'SELECT '.DB::getTableFields('config', ['problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestClick('resetDefaults');
