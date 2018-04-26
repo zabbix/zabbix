@@ -869,10 +869,9 @@ int	parse_key(const char **exp)
 
 						if (']' == *s)
 							goto succeed;
-						else if (',' != *s)
+
+						if (',' != *s)
 							goto fail;	/* incorrect syntax */
-						else
-							break;
 					}
 					else if (']' == *s && 0 == array)
 						goto succeed;
