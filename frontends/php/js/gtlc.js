@@ -189,9 +189,7 @@ jQuery(function ($){
 	function timeselectorEventHandler(e, data) {
 		endpoint.setArgument('method', [e.type, e.namespace].join('.'));
 
-		// TODO: ignore events and block ui if there is request in progress state. Do not silently abort it.
 		if (xhr && xhr.abort) {
-			// xhr.abort();
 			return;
 		}
 
@@ -247,9 +245,9 @@ jQuery(function ($){
 		data = data.zbx_sbox;
 
 		var offset = target.offset(),
-			left = offset.left + data.left,
-			right = offset.left + target.width() - data.right,
-			x = Math.min(Math.max(left, e.pageX), right);
+			left = offset.left - 10 + data.left,
+			right = offset.left - 10 + target.width() - data.right,
+			xpos = Math.min(Math.max(left, e.pageX), right);
 
 		offset.top += data.top;
 		if ((e.pageY < offset.top) || e.pageY > offset.top + data.height) {
@@ -258,23 +256,23 @@ jQuery(function ($){
 
 		noclick_area = $('<div/>').css({
 			position: 'absolute',
-			top: target.offset().top,
-			left: target.offset().left,
+			top: 0,
+			left: 0,
 			height: target.outerHeight() + 'px',
 			width: target.outerWidth() + 'px'
-		}).appendTo(document.body);
+		}).insertAfter(target),
 
 		selection = {
 			dom: $('<div class="graph-selection"/>').css({
 				position: 'absolute',
-				top: offset.top,
-				left: x,
+				top: data.top,
+				left: xpos,
 				height: data.height + 'px',
 				width: '1px'
-			}).appendTo(document.body),
+			}).insertAfter(target),
 			min: left,
 			max: right,
-			x: x,
+			base_x: xpos,
 			seconds_per_px: parseInt(data.period/(right - left)),
 			from_ts: data.timestamp
 		}
@@ -317,13 +315,13 @@ jQuery(function ($){
 	 */
 	function selectionHandlerDrag(e) {
 		var x = Math.min(Math.max(selection.min, e.pageX), selection.max),
-			width = Math.abs(x - selection.x),
+			width = Math.abs(x - selection.base_x),
 			seconds = Math.round(width * selection.seconds_per_px),
 			label = formatTimestamp(seconds, false, true)
 				+ (seconds < 60 ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
 
 		selection.dom.css({
-			left: Math.min(selection.x, x),
+			left: Math.min(selection.base_x, x),
 			width: width + 'px'
 		}).text(label);
 	}
