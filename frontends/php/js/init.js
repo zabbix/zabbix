@@ -22,6 +22,15 @@ jQuery(function($) {
 
 	if ($('#search').length) {
 		createSuggest('search');
+
+		$('#search').keyup(function() {
+			if (this.value.trim().length > 0) {
+				$(this).siblings('button').removeAttr('disabled');
+			}
+			else {
+				$(this).siblings('button').attr('disabled', true);
+			}
+		});
 	}
 
 	if (IE) {
