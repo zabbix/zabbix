@@ -2275,7 +2275,7 @@ button {
 	&[disabled] {
 		background-color: $transparent;
 
-		&:hover, &:active, &:focus {
+		&:hover {
 			background-color: $transparent;
 			@include opacity(0.75);
 		}
