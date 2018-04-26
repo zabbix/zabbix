@@ -512,9 +512,7 @@ switch ($data['method']) {
 			}
 			elseif ($data['method'] === 'timeselector.rangechange') {
 				$result += [
-					'label' => relativeDateToText($from, $to),
-					'from' => $from,
-					'to' => $to
+					'label' => relativeDateToText($from, $to)
 				];
 			}
 
