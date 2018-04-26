@@ -270,6 +270,12 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.9rc2
+
+Bug fixes:
+...G...... [ZBX-13781] fixed possible crash due to uninitialised error string in Zabbix Agentd (MVekslers)
+
+--------------------------------------------------------------------------------
 Changes for 3.4.9rc1
 
 Bug fixes:
@@ -1467,6 +1473,12 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.17rc2
+
+Bug fixes:
+...G...... [ZBX-13781] fixed possible crash due to uninitialised error string in Zabbix Agentd (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17rc1
