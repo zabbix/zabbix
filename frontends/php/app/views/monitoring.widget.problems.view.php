@@ -227,7 +227,11 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 $output = [
 	'header' => $data['name'],
 	'body' => $table->toString(),
-	'footer' => (new CList([$data['info'], _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'footer' => (new CList([
+		(new CDiv($data['info']))->setAttribute('aria-label',
+			_x('%1$s widget', ZBX_CONTEXT_SCREEN_READER, $data['name']).', '.$data['info']
+		),
+		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];
 
 if (($messages = getMessages()) !== null) {
