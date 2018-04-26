@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
 	->setName('correlation.edit')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['correlationid']) {
@@ -32,9 +33,11 @@ if ($data['correlationid']) {
 }
 
 $correlation_tab = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['correlation']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -72,7 +75,8 @@ if ($data['correlation']['filter']['conditions']) {
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('javascript: removeCondition('.$i.');')
-						->addClass(ZBX_STYLE_BTN_LINK),
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->removeId(),
 					new CVar('conditions['.$i.']', $condition)
 				]))->addClass(ZBX_STYLE_NOWRAP)
 			],
@@ -98,10 +102,12 @@ $correlation_tab
 			->setId('formula')
 			->setAttribute('placeholder', 'A or (B and C) &hellip;')
 	])
-	->addRow(_('Conditions'),
+	->addRow(
+		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
 		(new CDiv($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setAriaRequired()
 	);
 
 $condition2 = null;
@@ -123,8 +129,14 @@ switch ($data['new_condition']['type']) {
 			],
 			'defaultValue' => 0,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=new_condition_groupids_'.
-					'&srcfld1=groupid&writeonly=1&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'new_condition_groupids_',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
@@ -194,9 +206,12 @@ $correlation_tab
 	);
 
 // Operations tab.
-$operation_tab = new CFormList('operationlist');
+$operation_tab = new CFormList();
 
-$operations_table = (new CTable())->setAttribute('style', 'width: 100%;')->setHeader([_('Details'), _('Action')]);
+$operations_table = (new CTable())
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Details'), _('Action')])
+	->setId('operations_table');
 
 if ($data['correlation']['operations']) {
 	foreach ($data['correlation']['operations'] as $operationid => $operation) {
@@ -209,7 +224,8 @@ if ($data['correlation']['operations']) {
 			(new CCol([
 				(new CButton('remove', _('Remove')))
 					->onClick('javascript: removeOperation('.$operationid.');')
-					->addClass(ZBX_STYLE_BTN_LINK),
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId(),
 				new CVar('operations['.$operationid.']', $operation)
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		], null, 'operations_'.$operationid);
@@ -217,7 +233,8 @@ if ($data['correlation']['operations']) {
 }
 
 $operation_tab
-	->addRow(_('Operations'),
+	->addRow(
+		(new CLabel(_('Operations'), $operations_table->getId()))->setAsteriskMark(),
 		(new CDiv([$operations_table]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

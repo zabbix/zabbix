@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,7 +113,8 @@ $link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
 	->addClass(ZBX_STYLE_LINK_ALT);
 $sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_LINKS);
 
-(new CTag('body', true, [(new CDiv([$ZBX_SETUP_WIZARD, $sub_footer]))->addClass(ZBX_STYLE_ARTICLE), makePageFooter()]))
+(new CTag('body', true, [(new CTag('main', true, [$ZBX_SETUP_WIZARD, $sub_footer])), makePageFooter()]))
+	->setAttribute('lang', CWebUser::getLang())
 	->show();
 ?>
 </html>

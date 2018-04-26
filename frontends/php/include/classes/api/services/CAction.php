@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class CAction extends CApiService {
 	 * @param array $options['actionids']
 	 * @param array $options['applicationids']
 	 * @param array $options['status']
-	 * @param array $options['editable']
+	 * @param bool  $options['editable']
 	 * @param array $options['extendoutput']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
@@ -49,8 +49,6 @@ class CAction extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userId = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['actions' => 'a.actionid'],
@@ -70,7 +68,7 @@ class CAction extends CApiService {
 			'userids'						=> null,
 			'scriptids'						=> null,
 			'nopermissions'					=> null,
-			'editable'						=> null,
+			'editable'						=> false,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -93,11 +91,10 @@ class CAction extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// conditions are checked here by sql, operations after, by api queries
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userId);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			// condition hostgroup
 			$sqlParts['where'][] = 'NOT EXISTS ('.
@@ -192,7 +189,7 @@ class CAction extends CApiService {
 
 			$sqlParts['from']['opmessage'] = 'opmessage om';
 			$sqlParts['from']['operations_media'] = 'operations omed';
-			$sqlParts['where'][] = dbConditionInt('om.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionId('om.mediatypeid', $options['mediatypeids']);
 			$sqlParts['where']['aomed'] = 'a.actionid=omed.actionid';
 			$sqlParts['where']['oom'] = 'omed.operationid=om.operationid';
 		}
@@ -268,7 +265,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// check hosts, templates
 			$hosts = [];
 			$hostIds = [];
@@ -850,7 +847,14 @@ class CAction extends CApiService {
 					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$db_opmessage = $db_ack_operations[$ack_operation['operationid']]['opmessage'];
+							$db_opmessage = array_key_exists('opmessage', $db_ack_operations[$ack_operation['operationid']])
+								? $db_ack_operations[$ack_operation['operationid']]['opmessage']
+								: [
+									'default_msg'	=> 0,
+									'mediatypeid'	=> 0,
+									'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+									'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+								];
 							$default_msg = array_key_exists('default_msg', $opmessage)
 								? $opmessage['default_msg']
 								: $db_opmessage['default_msg'];
@@ -1526,32 +1530,34 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Delete actions.
-	 *
 	 * @param array $actionids
 	 *
 	 * @return array
 	 */
 	public function delete(array $actionids) {
-		if (empty($actionids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $actionids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$delActions = $this->get([
+		$db_actions = $this->get([
+			'output' => ['actionid', 'name'],
 			'actionids' => $actionids,
 			'editable' => true,
-			'output' => ['actionid'],
 			'preservekeys' => true
 		]);
+
 		foreach ($actionids as $actionid) {
-			if (isset($delActions[$actionid])) {
-				continue;
+			if (!array_key_exists($actionid, $db_actions)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		DB::delete('actions', ['actionid' => $actionids]);
-		DB::delete('alerts', ['actionid' => $actionids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, $db_actions);
 
 		return ['actionids' => $actionids];
 	}
@@ -2043,7 +2049,7 @@ class CAction extends CApiService {
 
 			foreach ($ack_operations as $ack_operation) {
 				$actionid = $ack_operation['actionid'];
-				unset($ack_operation['actionid']);
+				unset($ack_operation['actionid'], $ack_operation['recovery']);
 				$result[$actionid]['acknowledgeOperations'][] = $ack_operation;
 			}
 		}
@@ -2079,6 +2085,8 @@ class CAction extends CApiService {
 			$opinventory = [];
 
 			foreach ($operations as $operationid => $operation) {
+				unset($operations[$operationid]['recovery']);
+
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$opmessage[] = $operationid;
@@ -2297,6 +2305,8 @@ class CAction extends CApiService {
 			$op_recovery_message = [];
 
 			foreach ($recovery_operations as $recovery_operationid => $recovery_operation) {
+				unset($recovery_operations[$recovery_operationid]['recovery']);
+
 				switch ($recovery_operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$opmessage[] = $recovery_operationid;
@@ -2572,9 +2582,10 @@ class CAction extends CApiService {
 			}
 		}
 
-		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'actionid' ,'operationtype'],
+		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'operationtype'],
 			$ack_options
 		);
+
 		return $ack_operations;
 	}
 
@@ -3156,8 +3167,7 @@ class CAction extends CApiService {
 		if ($mediatypeids) {
 			$count = API::MediaType()->get([
 				'countOutput' => true,
-				'mediatypeids' => array_keys($mediatypeids),
-				'editable' => true
+				'mediatypeids' => array_keys($mediatypeids)
 			]);
 
 			if ($count != count($mediatypeids)) {

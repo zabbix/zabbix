@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,16 +21,15 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+/**
+ * @backup httptest
+ */
 class testInheritanceWeb extends CWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
-
-	public function testInheritanceWeb_backup() {
-		DBsave_tables('httptest');
-	}
 
 	public static function update() {
 		return DBdata(
@@ -105,12 +104,12 @@ class testInheritanceWeb extends CWebTest {
 
 		$this->zbxTestClick('tab_stepTab');
 		foreach ($data['addStep'] as $step) {
-			$this->zbxTestLaunchPopup('add_step');
-			$this->zbxTestInputTypeWait('name', $step['name']);
-			$this->zbxTestInputType('url', $step['url']);
-			$this->zbxTestClick('add');
+			$this->zbxTestClick('add_step');
+			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step['name']);
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $step['url']);
+			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 			$this->zbxTestTextNotPresent('Page received incorrect data');
-			$this->zbxTestWaitWindowClose();
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name_0'));
 			$this->zbxTestTextPresent($step['name']);
 		}
@@ -129,9 +128,5 @@ class testInheritanceWeb extends CWebTest {
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
-	}
-
-	public function testInheritanceWeb_restore() {
-		DBrestore_tables('httptest');
 	}
 }

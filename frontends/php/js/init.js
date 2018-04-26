@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2017 Zabbix SIA
+ ** Copyright (C) 2001-2018 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -52,9 +52,18 @@ jQuery(function($) {
 	/**
 	 * Build menu popup for given elements.
 	 */
-	$(document).on('click', '[data-menu-popup]', function(event) {
+	$(document).on('keydown click', '[data-menu-popup]', function(event) {
 		var obj = $(this),
 			data = obj.data('menu-popup');
+
+		if (event.type === 'keydown') {
+			if (event.which != 13) {
+				return;
+			}
+
+			event.preventDefault();
+			event.target = this;
+		}
 
 		switch (data.type) {
 			case 'history':
@@ -62,11 +71,11 @@ jQuery(function($) {
 				break;
 
 			case 'host':
-				data = getMenuPopupHost(data);
+				data = getMenuPopupHost(data, obj);
 				break;
 
 			case 'map':
-				data = getMenuPopupMap(data);
+				data = getMenuPopupMap(data, obj);
 				break;
 
 			case 'refresh':
@@ -78,7 +87,7 @@ jQuery(function($) {
 				break;
 
 			case 'triggerLog':
-				data = getMenuPopupTriggerLog(data);
+				data = getMenuPopupTriggerLog(data, obj);
 				break;
 
 			case 'triggerMacro':
@@ -120,7 +129,7 @@ jQuery(function($) {
 						'name': data.values[i].name
 					};
 
-					if (typeof(data.values[i].prefix) !== 'undefined') {
+					if (typeof data.values[i].prefix !== 'undefined') {
 						item.prefix = data.values[i].prefix;
 					}
 
@@ -145,5 +154,8 @@ jQuery(function($) {
 		if (typeof confirmation === 'undefined' || (typeof confirmation !== 'undefined' && confirm(confirmation))) {
 			window.location = button.data('url');
 		}
-	})
+	});
+
+	// Initialize hintBox event handlers.
+	hintBox.bindEvents();
 });

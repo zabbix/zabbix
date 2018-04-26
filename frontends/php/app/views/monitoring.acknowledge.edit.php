@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,10 @@
 $this->includeJSfile('app/views/monitoring.acknowledge.edit.js.php');
 
 $form_list = (new CFormList())
-	->addRow(_('Message'),
+	->addRow(
+		(new CLabel(_('Message'), 'message'))->setAsteriskMark(),
 		(new CTextArea('message'))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setMaxLength(255)
 			->setAttribute('autofocus', 'autofocus')
@@ -90,6 +92,7 @@ $footer_buttons = makeFormFooter(
 	->addItem(
 		(new CForm())
 			->setId('acknowledge_form')
+			->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 			->addVar('eventids', $data['eventids'])
 			->addVar('backurl', $data['backurl'])
 			->addItem(

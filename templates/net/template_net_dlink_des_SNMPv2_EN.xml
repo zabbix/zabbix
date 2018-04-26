@@ -11,15 +11,15 @@
       <template>
          <template>Template Net D-Link DES_DGS Switch SNMPv2</template>
          <name>Template Net D-Link DES_DGS Switch SNMPv2</name>
-         <description>Template D-Link DES_DGS Switch version: 0.13
-MIBs used:
-DLINK-AGENT-MIB
-EQUIPMENT-MIB
-SNMPv2-MIB
-ENTITY-MIB
-Known Issues:
-description : D-Link reports missing PSU as fail(4)
-version : Firmware: 	1.73R008,hardware revision:	B1
+         <description>Template D-Link DES_DGS Switch version: 0.14&#13;
+MIBs used:&#13;
+DLINK-AGENT-MIB&#13;
+EQUIPMENT-MIB&#13;
+SNMPv2-MIB&#13;
+ENTITY-MIB&#13;
+Known Issues:&#13;
+description : D-Link reports missing PSU as fail(4)&#13;
+version : Firmware: 	1.73R008,hardware revision:	B1&#13;
 device : DGS-3420-26SC Gigabit Ethernet Switch</description>
          <groups>
             <group>
@@ -75,7 +75,7 @@ device : DGS-3420-26SC Gigabit Ethernet Switch</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: DLINK-AGENT-MIB
+               <description>MIB: DLINK-AGENT-MIB&#13;
 The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very busy).</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -117,9 +117,9 @@ The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very 
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
-A textual description of the entity.  This value should
-include the full name and version identification of the system's hardware type, software operating-system, and
+               <description>MIB: SNMPv2-MIB&#13;
+A textual description of the entity.  This value should&#13;
+include the full name and version identification of the system's hardware type, software operating-system, and&#13;
 networking software.</description>
                <inventory_link>29</inventory_link>
                <applications>
@@ -161,7 +161,7 @@ networking software.</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: DLINK-AGENT-MIB
+               <description>MIB: DLINK-AGENT-MIB&#13;
 A text string containing the serial number of this device.</description>
                <inventory_link>8</inventory_link>
                <applications>
@@ -319,7 +319,7 @@ A text string containing the serial number of this device.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: DLINK-AGENT-MIB
+                     <description>MIB: DLINK-AGENT-MIB&#13;
 The percentage of used DRAM memory of the total DRAM memory available.The value will be between 0%(idle) and 100%(very busy)</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -434,7 +434,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -450,7 +450,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EQUIPMENT-MIB
+                     <description>MIB: EQUIPMENT-MIB&#13;
 The shelf current temperature.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -477,7 +477,7 @@ The shelf current temperature.</description>
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -500,7 +500,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -578,7 +578,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -596,13 +596,13 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EQUIPMENT-MIB
-Indicates the current power status.
-lowVoltage : The voltage of the power unit is too low.
-overCurrent: The current of the power unit is too high.
-working    : The power unit is working normally.
-fail       : The power unit has failed.
-connect    : The power unit is connected but not powered on.
+                     <description>MIB: EQUIPMENT-MIB&#13;
+Indicates the current power status.&#13;
+lowVoltage : The voltage of the power unit is too low.&#13;
+overCurrent: The current of the power unit is too high.&#13;
+working    : The power unit is working normally.&#13;
+fail       : The power unit has failed.&#13;
+connect    : The power unit is connected but not powered on.&#13;
 disconnect : The power unit is not connected.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -622,7 +622,7 @@ disconnect : The power unit is not connected.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.psu.status[swPowerStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.psu.status[swPowerStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Power supply is in critical state</name>
@@ -631,7 +631,7 @@ disconnect : The power unit is not connected.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -693,7 +693,7 @@ Please check the power supply unit for errors</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -711,11 +711,11 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EQUIPMENT-MIB
-Indicates the current fan status.
-speed-0     : If the fan function is normal and the fan does not spin            due to the temperature not  reaching the threshold,              the status of the fan is speed 0.
-speed-low   : Fan spin using the lowest speed.
-speed-middle: Fan spin using the middle speed.
+                     <description>MIB: EQUIPMENT-MIB&#13;
+Indicates the current fan status.&#13;
+speed-0     : If the fan function is normal and the fan does not spin            due to the temperature not  reaching the threshold,              the status of the fan is speed 0.&#13;
+speed-low   : Fan spin using the lowest speed.&#13;
+speed-middle: Fan spin using the middle speed.&#13;
 speed-high  : Fan spin using the highest speed.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -735,7 +735,7 @@ speed-high  : Fan spin using the highest speed.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.fan.status[swFanStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net D-Link DES_DGS Switch SNMPv2:sensor.fan.status[swFanStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Fan is in critical state</name>
@@ -744,7 +744,7 @@ speed-high  : Fan spin using the highest speed.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -871,7 +871,7 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
@@ -888,7 +888,7 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>

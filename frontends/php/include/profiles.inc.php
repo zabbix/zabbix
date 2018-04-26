@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ function update_config($config) {
 			'min' => SEC_PER_DAY,
 			'max' => 25 * SEC_PER_YEAR,
 			'allow_zero' => false,
-			'message' => _('Invalid IT services data storage period: %1$s.')
+			'message' => _('Invalid data storage period for services: %1$s.')
 		],
 		'hk_audit' => [
 			'min' => SEC_PER_DAY,

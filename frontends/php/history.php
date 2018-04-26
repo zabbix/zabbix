@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ $data = [
 	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => [ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1],
 	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1],
-	'fullscreen' => $_REQUEST['fullscreen'],
+	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL)
 ];
 

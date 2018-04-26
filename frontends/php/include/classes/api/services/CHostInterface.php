@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,23 +31,21 @@ class CHostInterface extends CApiService {
 	/**
 	 * Get interface data.
 	 *
-	 * @param array   $options
-	 * @param array   $options['hostids']		Interface IDs
-	 * @param boolean $options['editable']		only with read-write permission. Ignored for SuperAdmins
-	 * @param boolean $options['selectHosts']	select Interface hosts
-	 * @param boolean $options['selectItems']	select Items
-	 * @param int     $options['count']			count Interfaces, returned column name is rowscount
-	 * @param string  $options['pattern']		search hosts by pattern in Interface name
-	 * @param int     $options['limit']			limit selection
-	 * @param string  $options['sortfield']		field to sort by
-	 * @param string  $options['sortorder']		sort order
+	 * @param array  $options
+	 * @param array  $options['hostids']		Interface IDs
+	 * @param bool   $options['editable']		only with read-write permission. Ignored for SuperAdmins
+	 * @param bool   $options['selectHosts']	select Interface hosts
+	 * @param bool   $options['selectItems']	select Items
+	 * @param int    $options['count']			count Interfaces, returned column name is rowscount
+	 * @param string $options['pattern']		search hosts by pattern in Interface name
+	 * @param int    $options['limit']			limit selection
+	 * @param string $options['sortfield']		field to sort by
+	 * @param string $options['sortorder']		sort order
 	 *
 	 * @return array|boolean Interface data as array or false if error
 	 */
 	public function get(array $options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userId = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['interface' => 'hi.interfaceid'],
@@ -64,7 +62,7 @@ class CHostInterface extends CApiService {
 			'interfaceids'				=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -88,10 +86,9 @@ class CHostInterface extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userId);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.

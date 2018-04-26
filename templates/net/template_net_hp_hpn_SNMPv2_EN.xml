@@ -11,13 +11,13 @@
       <template>
          <template>Template Net HP Enterprise Switch SNMPv2</template>
          <name>Template Net HP Enterprise Switch SNMPv2</name>
-         <description>Template Net HP Enterprise Switch version: 0.13
-MIBs used:
-STATISTICS-MIB
-NETSWITCH-MIB
-ENTITY-SENSORS-MIB
-HP-ICF-CHASSIS
-ENTITY-MIB
+         <description>Template Net HP Enterprise Switch version: 0.14&#13;
+MIBs used:&#13;
+STATISTICS-MIB&#13;
+NETSWITCH-MIB&#13;
+ENTITY-SENSORS-MIB&#13;
+HP-ICF-CHASSIS&#13;
+ENTITY-MIB&#13;
 SEMI-MIB</description>
          <groups>
             <group>
@@ -73,8 +73,8 @@ SEMI-MIB</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: STATISTICS-MIB
-The CPU utilization in percent(%).
+               <description>MIB: STATISTICS-MIB&#13;
+The CPU utilization in percent(%).&#13;
 Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c02597344&amp;sp4ts.oid=51079</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -157,11 +157,11 @@ Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c0259
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: NETSWITCH-MIB
-Contains the operating code version number (also known as software or firmware).
-For example, a software version such as A.08.01 is described as follows:
-A    the function set available in your router
-08   the common release number
+               <description>MIB: NETSWITCH-MIB&#13;
+Contains the operating code version number (also known as software or firmware).&#13;
+For example, a software version such as A.08.01 is described as follows:&#13;
+A    the function set available in your router&#13;
+08   the common release number&#13;
 01   updates to the current common release</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -236,7 +236,7 @@ A    the function set available in your router
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -252,9 +252,9 @@ A    the function set available in your router
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-SENSORS-MIB
-The most recent measurement obtained by the agent for this sensor.
-To correctly interpret the value of this object, the associated entPhySensorType,
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
+The most recent measurement obtained by the agent for this sensor.&#13;
+To correctly interpret the value of this object, the associated entPhySensorType,&#13;
 entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -281,7 +281,7 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -304,7 +304,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -392,7 +392,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: NETSWITCH-MIB
+                     <description>MIB: NETSWITCH-MIB&#13;
 The number of currently allocated bytes.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -435,7 +435,7 @@ The number of currently allocated bytes.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: NETSWITCH-MIB
+                     <description>MIB: NETSWITCH-MIB&#13;
 The number of available (unallocated) bytes.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -604,7 +604,7 @@ The number of available (unallocated) bytes.</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -622,7 +622,7 @@ The number of available (unallocated) bytes.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HP-ICF-CHASSIS
+                     <description>MIB: HP-ICF-CHASSIS&#13;
 Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -642,7 +642,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS:"bad"}</expression>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_DESCR}: Fan is in critical state</name>
@@ -651,11 +651,34 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#ENT_DESCR}: Fan is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#ENT_DESCR}: Fan is in critical state</name>
+                           <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -719,7 +742,7 @@ Please check the fan unit</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -737,7 +760,7 @@ Please check the fan unit</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HP-ICF-CHASSIS
+                     <description>MIB: HP-ICF-CHASSIS&#13;
 Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -757,7 +780,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS:"bad"}</expression>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_DESCR}: Power supply is in critical state</name>
@@ -766,11 +789,34 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#ENT_DESCR}: Power supply is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#ENT_DESCR}: Power supply is in critical state</name>
+                           <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -852,7 +898,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HP-ICF-CHASSIS
+                     <description>MIB: HP-ICF-CHASSIS&#13;
 Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -1013,8 +1059,16 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                <value>2</value>
             </macro>
             <macro>
+               <macro>{$FAN_WARN_STATUS:"warning"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
                <macro>{$PSU_CRIT_STATUS:"bad"}</macro>
                <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_WARN_STATUS:"warning"}</macro>
+               <value>3</value>
             </macro>
             <macro>
                <macro>{$TEMP_WARN_STATUS}</macro>
@@ -1128,7 +1182,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
@@ -1145,7 +1199,7 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>

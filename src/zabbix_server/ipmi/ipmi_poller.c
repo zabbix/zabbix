@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "ipmi_manager.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
+#include "ipmi_poller.h"
 
 #define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
 
@@ -168,8 +169,8 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	char			*error = NULL;
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;
-	int			polled_num;
-	double			time_stat, time_idle, time_now, time_read;
+	int			polled_num = 0;
+	double			time_stat, time_idle = 0, time_now, time_read, time_file = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -197,10 +198,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 	ipmi_poller_register(&ipmi_socket);
 
-	/* initialize statistics */
 	time_stat = zbx_time();
-	time_idle = 0;
-	polled_num = 0;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -221,8 +219,6 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 			polled_num = 0;
 		}
 
-		zbx_handle_log();
-
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&ipmi_socket, &message))
@@ -232,6 +228,16 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+		/* handle /etc/resolv.conf update and log rotate less often than once a second */
+		if (1.0 < time_now - time_file)
+		{
+			time_file = time_now;
+			zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+			zbx_update_resolver_conf();
+#endif
+		}
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;

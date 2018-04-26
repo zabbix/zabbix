@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,14 +20,13 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup sysmaps
+ */
 class testFormSysmap extends CWebTest {
 
 	public $mapName = 'Test map 1';
 	public $edit_map_name = 'Local network';
-
-	public function testFormSysmap_backup() {
-		DBsave_tables('sysmaps');
-	}
 
 	public function testFormSysmap_Layout() {
 		$this->zbxTestLogin('sysmaps.php?form=Create+map');
@@ -153,16 +152,6 @@ class testFormSysmap extends CWebTest {
 					]
 				]
 			],
-						[
-				[
-					'expected' => TEST_BAD,
-					'name' => '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789',
-					'error_msg' => 'Cannot add network map',
-					'errors' => [
-						'Value "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" is too long for field "name" - 160 characters. Allowed length is 128 characters.',
-					]
-				]
-			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -225,6 +214,29 @@ class testFormSysmap extends CWebTest {
 				]
 			]
 		];
+	}
+
+	public function maxlengthDataProvider() {
+		return [
+			[
+				[
+					'field' => 'name',
+					'maxlength' => 128
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider maxlengthDataProvider
+	 */
+	public function testFormFieldMaxLengthStripped($data) {
+		$maxlength = $data['maxlength'];
+		$test_value = str_repeat('0123456789', ceil($maxlength/10) + 10);
+
+		$this->zbxTestLogin('sysmaps.php?form=Create+map');
+		$this->zbxTestInputTypeWait($data['field'], $test_value);
+		$this->zbxTestAssertElementValue($data['field'], substr($test_value, 0, $maxlength));
 	}
 
 	/**
@@ -358,12 +370,8 @@ class testFormSysmap extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickXpathWait("//a[text()='".$mapName."']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map deleted');
 		$this->assertEquals(0, DBcount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
-	}
-
-	public function testFormSysmap_restore() {
-		DBrestore_tables('sysmaps');
 	}
 }

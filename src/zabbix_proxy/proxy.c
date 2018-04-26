@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
 #include "../zabbix_server/pinger/pinger.h"
 #include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/trapper/trapper.h"
+#include "../zabbix_server/trapper/proxydata.h"
 #include "../zabbix_server/snmptrapper/snmptrapper.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
@@ -60,8 +61,6 @@
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "../zabbix_server/ipmi/ipmi_poller.h"
 #endif
-
-#define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_proxy.conf"
 
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
@@ -99,6 +98,14 @@ const char	*help_message[] = {
 	"",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
+	"",
+	"Some configuration parameter default locations:",
+	"  ExternalScripts                \"" DEFAULT_EXTERNAL_SCRIPTS_PATH "\"",
+#ifdef HAVE_LIBCURL
+	"  SSLCertLocation                \"" DEFAULT_SSL_CERT_LOCATION "\"",
+	"  SSLKeyLocation                 \"" DEFAULT_SSL_KEY_LOCATION "\"",
+#endif
+	"  LoadModulePath                 \"" DEFAULT_LOAD_MODULE_PATH "\"",
 	NULL	/* end of text */
 };
 
@@ -185,6 +192,7 @@ zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -201,6 +209,7 @@ char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
+char	*CONFIG_EXPORT_DIR		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -249,6 +258,9 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
+
+char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
+char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -422,16 +434,16 @@ static void	zbx_set_defaults(void)
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 #endif
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
 
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
-		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
 #ifdef HAVE_LIBCURL
 	if (NULL == CONFIG_SSL_CERT_LOCATION)
-		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DATADIR "/zabbix/ssl/certs");
+		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DEFAULT_SSL_CERT_LOCATION);
 
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
-		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
+		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
 #endif
 	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
 		CONFIG_HEARTBEAT_FORKS = 0;
@@ -489,10 +501,16 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
+	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE && FAIL == is_supported_ip(CONFIG_SERVER) &&
+			FAIL == zbx_validate_hostname(CONFIG_SERVER))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter is not defined."
-				" This parameter is mandatory for active proxies.");
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Server\" configuration parameter: '%s'", CONFIG_SERVER);
+		err = 1;
+	}
+	else if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
+		zbx_free(ch_error);
 		err = 1;
 	}
 
@@ -560,7 +578,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"ProxyMode",			&CONFIG_PROXYMODE,			TYPE_INT,
 			PARM_OPT,	ZBX_PROXYMODE_ACTIVE,	ZBX_PROXYMODE_PASSIVE},
 		{"Server",			&CONFIG_SERVER,				TYPE_STRING,
-			PARM_OPT,	0,			0},
+			PARM_MAND,	0,			0},
 		{"ServerPort",			&CONFIG_SERVER_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
@@ -947,6 +965,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (SUCCEED != init_proxy_history_lock(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize lock for passive proxy history: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != init_configuration_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
@@ -1005,7 +1030,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_SELFMON_FORKS
 			+ CONFIG_VMWARE_FORKS + CONFIG_IPMIMANAGER_FORKS + CONFIG_TASKMANAGER_FORKS;
 
-	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
+	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
@@ -1166,6 +1191,7 @@ void	zbx_on_exit(void)
 		zbx_vmware_destroy();
 
 	free_selfmon_collector();
+	free_proxy_history_lock();
 
 	zbx_unload_modules();
 

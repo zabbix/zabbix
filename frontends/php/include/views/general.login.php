@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ $guest = (CWebUser::$data['userid'] > 0)
 
 global $ZBX_SERVER_NAME;
 
-(new CDiv([
+(new CTag('main', true, [
 	(isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '')
 		? (new CDiv($ZBX_SERVER_NAME))->addClass(ZBX_STYLE_SERVER_NAME)
 		: null,
@@ -44,6 +44,7 @@ global $ZBX_SERVER_NAME;
 		(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),
 		(new CForm())
 			->cleanItems()
+			->setAttribute('aria-label', _('Sign in'))
 			->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
 			->addItem(
 				(new CList())
@@ -63,7 +64,7 @@ global $ZBX_SERVER_NAME;
 			)
 	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
 	(new CDiv([
-		(new CLink(_('Help'), 'http://www.zabbix.com/documentation/3.4/'))
+		(new CLink(_('Help'), 'http://www.zabbix.com/documentation/4.0/'))
 			->setTarget('_blank')
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT),
@@ -73,9 +74,7 @@ global $ZBX_SERVER_NAME;
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT)
 	]))->addClass(ZBX_STYLE_SIGNIN_LINKS)
-]))
-	->addClass(ZBX_STYLE_ARTICLE)
-	->show();
+]))->show();
 
 makePageFooter(false)->show();
 ?>

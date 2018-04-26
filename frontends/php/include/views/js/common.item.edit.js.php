@@ -128,7 +128,7 @@
 						case '<?= ZBX_PREPROC_MULTIPLIER ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', '<?= _('number') ?>');
+								.attr('placeholder', <?= CJs::encodeJson(_('number')) ?>);
 							$(inputs[1]).hide();
 							break;
 
@@ -137,7 +137,7 @@
 						case '<?= ZBX_PREPROC_TRIM ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', '<?= _('list of characters') ?>');
+								.attr('placeholder', <?= CJs::encodeJson(_('list of characters')) ?>);
 							$(inputs[1]).hide();
 							break;
 
@@ -145,14 +145,14 @@
 						case '<?= ZBX_PREPROC_JSONPATH ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', '<?= _('path') ?>');
+								.attr('placeholder', <?= CJs::encodeJson(_('path')) ?>);
 							$(inputs[1]).hide();
 							break;
 
 						case '<?= ZBX_PREPROC_REGSUB ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', '<?= _('pattern') ?>');
+								.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>);
 							$(inputs[1]).show();
 							break;
 
@@ -217,6 +217,8 @@ if (!empty($this->data['interfaces'])) {
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'interfaceid');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPTRAP, 'interface_row');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPTRAP, 'interfaceid');
+	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_HTTPAGENT, 'interface_row');
+	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_HTTPAGENT, 'interfaceid');
 }
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_username');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'username');
@@ -281,6 +283,18 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_CALCULATED, 'row_para
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'trapper_hosts');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DEPENDENT, 'row_master_item');
+$ui_rows = [
+	ITEM_TYPE_HTTPAGENT => [
+		'url_row', 'query_fields_row', 'request_method_row', 'timeout_row', 'post_type_row', 'posts_row', 'headers_row',
+		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'allow_traps_row',
+		'request_method', 'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row',
+		'ssl_key_file_row', 'ssl_cert_file_row', 'ssl_key_password_row', 'trapper_hosts', 'allow_traps'
+	]
+];
+foreach ($ui_rows[ITEM_TYPE_HTTPAGENT] as $row) {
+	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_HTTPAGENT, $row);
+}
+
 foreach ($this->data['types'] as $type => $label) {
 	switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
@@ -349,6 +363,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'p
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
+
 ?>
 <script type="text/javascript">
 	function setAuthTypeLabel() {
@@ -371,11 +386,24 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			var typeSwitcher = new CViewSwitcher('type', 'change',
 				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>,
 				<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
-		<?php }
+		<?php } ?>
+		if (jQuery('#http_authtype').length) {
+			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue([
+				HTTPTEST_AUTH_BASIC => ['http_username_row', 'http_password_row'],
+				HTTPTEST_AUTH_NTLM => ['http_username_row', 'http_password_row']
+			], true) ?>);
+		}
+		<?php
 		if (!empty($this->data['securityLevelVisibility'])) { ?>
 			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
 				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
 		<?php } ?>
+
+		if (jQuery('#allow_traps').length) {
+			new CViewSwitcher('allow_traps', 'change', <?= zbx_jsvalue([
+				HTTPCHECK_ALLOW_TRAPS_ON => ['row_trapper_hosts']
+			], true) ?>);
+		}
 
 		jQuery('#type')
 			.change(function() {
@@ -389,6 +417,196 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 
 		jQuery('#authtype').bind('change', function() {
 			setAuthTypeLabel();
+		});
+
+		var $ = jQuery,
+			editableTable = function (elm, tmpl, tmpl_defaults) {
+			var table,
+				row_template,
+				row_default_values,
+				insert_point,
+				row_index = 0,
+				table_row_class = 'editable_table_row';
+
+			table = $(elm);
+			insert_point = table.find('tbody tr[data-insert-point]');
+			row_template = new Template($(tmpl).html());
+			row_default_values = tmpl_defaults;
+
+			table.sortable({
+				disabled: true,
+				items: 'tbody tr.sortable',
+				axis: 'y',
+				containment: 'parent',
+				cursor: 'move',
+				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				helper: function(e, ui) {
+					ui.children('td').each(function() {
+						$(this).width($(this).width());
+					});
+
+					return ui;
+				},
+				start: function(e, ui) {
+					// Fix placeholder not to change height while object is being dragged.
+					$(ui.placeholder).height($(ui.helper).height());
+				}
+			});
+
+			table.on('click', '[data-row-action]', function (e) {
+				e.preventDefault();
+
+				switch ($(e.currentTarget).data('row-action')) {
+					case 'remove_row' :
+						removeRow($(e.currentTarget).closest('.' + table_row_class));
+						break;
+
+					case 'add_row' :
+						var row_data = $(e.currentTarget).data('values'),
+							new_row = addRow(row_data || {});
+
+						if (!row_data) {
+							new_row.find('[type="text"]').val('');
+						}
+						break;
+				}
+			});
+
+			/**
+			 * Enable or disable table rows sorting according to rows count. At least 2 rows should exists to be able
+			 * sort rows using drag and drop.
+			 */
+			function setSortableState() {
+				var allow_sort = table.find('.' + table_row_class).length < 2;
+				table.sortable('option', 'disabled', allow_sort);
+			}
+
+			/**
+			 * Add table row. Returns new added row DOM node.
+			 *
+			 * @param {object}  Object with data for added row.
+			 *
+			 * @return {object}
+			 */
+			function addRow(values) {
+				row_index += 1;
+				values.index = row_index;
+
+				var new_row = $(row_template.evaluate(values))
+					.addClass(table_row_class)
+					.addClass('sortable')
+					.data('values', values)
+					.insertBefore(insert_point);
+
+				setSortableState();
+				return new_row;
+			}
+
+			/**
+			 * Add multiple rows to table.
+			 *
+			 * @param {array} rows_values  Array of objects for every added row.
+			 */
+			function addRows(rows_values) {
+				$.each(rows_values, function(index, values) {
+					addRow(values);
+				});
+			}
+
+			/**
+			 * Remove table row.
+			 *
+			 * @param {object} row_node Table row DOM node to be removed.
+			 */
+			function removeRow(row_node) {
+				row_node.remove();
+				setSortableState();
+			}
+
+			return {
+				addRow: function(values) {
+					return addRow(values);
+				},
+				addRows: function(rows_values) {
+					addRows(rows_values);
+					return table;
+				},
+				removeRow: function(row_node) {
+					removeRow(row_node);
+				},
+				getTableRows: function() {
+					return table.find('.' + table_row_class);
+				}
+			};
+		};
+
+		$('[data-sortable-pairs-table]').each(function() {
+			var t = $(this),
+				table = t.find('table'),
+				data = JSON.parse(t.find('[type="text/json"]').text()),
+				template = t.find('[type="text/x-jquery-tmpl"]'),
+				container = new editableTable(table, template);
+
+			container.addRows(data);
+
+			if (t.data('sortable-pairs-table') != 1) {
+				table.sortable('option', 'disabled', true);
+			}
+
+			t.data('editableTable', container);
+		});
+
+		$('[data-action="parse_url"]').click(function() {
+			var url_node = $(this).siblings('[name="url"]'),
+				table = $('#query_fields_pairs').data('editableTable'),
+				url = parseUrlString(url_node.val())
+
+			if (typeof url === 'object') {
+				if (url.pairs.length > 0) {
+					table.addRows(url.pairs);
+					table.getTableRows().map(function() {
+						var empty = $(this).find('input[type="text"]').map(function() {
+							return $(this).val() == '' ? this : null;
+						});
+
+						return empty.length == 2 ? this : null;
+					}).map(function() {
+						table.removeRow(this);
+					});
+				}
+
+				url_node.val(url.url);
+			}
+			else {
+				overlayDialogue({
+					'title': <?= CJs::encodeJson(_('Error')); ?>,
+					'content': $('<span>').html(<?=
+						CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+					?>),
+					'buttons': [
+						{
+							title: <?= CJs::encodeJson(_('Ok')); ?>,
+							class: 'btn-alt',
+							focused: true,
+							action: function() {}
+						}
+					]
+				});
+			}
+		});
+
+		$('#request_method').change(function() {
+			if ($(this).val() == <?= HTTPCHECK_REQUEST_HEAD ?>) {
+				$(':radio', '#retrieve_mode')
+					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
+					.end()
+					.attr('disabled', 'disabled');
+			}
+			else {
+				$(':radio', '#retrieve_mode').removeAttr('disabled');
+			}
 		});
 	});
 </script>

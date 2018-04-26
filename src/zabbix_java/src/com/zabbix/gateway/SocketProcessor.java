@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,19 +70,22 @@ class SocketProcessor implements Runnable
 		}
 		catch (Exception e1)
 		{
-			logger.warn("error processing request", e1);
+			String error = ZabbixException.getRootCauseMessage(e1);
+			logger.warn("error processing request: {}", error);
+			logger.debug("error caused by", e1);
 
 			try
 			{
 				JSONObject response = new JSONObject();
 				response.put(ItemChecker.JSON_TAG_RESPONSE, ItemChecker.JSON_RESPONSE_FAILED);
-				response.put(ItemChecker.JSON_TAG_ERROR, e1.getMessage());
+				response.put(ItemChecker.JSON_TAG_ERROR, error);
 
 				speaker.sendResponse(response.toString());
 			}
 			catch (Exception e2)
 			{
-				logger.warn("error sending failure notification", e2);
+				logger.warn("error sending failure notification: {}", ZabbixException.getRootCauseMessage(e1));
+				logger.debug("error caused by", e2);
 			}
 		}
 		finally

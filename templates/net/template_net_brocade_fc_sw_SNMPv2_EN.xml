@@ -11,14 +11,15 @@
       <template>
          <template>Template Net Brocade FC SNMPv2</template>
          <name>Template Net Brocade FC SNMPv2</name>
-         <description>Template Net Brocade FC version: 0.13
-MIBs used:
-SW-MIB
-ENTITY-MIB
-Known Issues:
-description : no IF-MIB::ifAlias is available
-version : v6.3.1c and v7.0.0c
-device : SW5480</description>
+         <description>Template Net Brocade FC version: 0.14&#13;
+Overview: https://community.brocade.com/dtscp75322/attachments/dtscp75322/fibre/25235/1/FOS_MIB_Reference_v740.pdf&#13;
+&#13;
+MIBs used:&#13;
+SW-MIB&#13;
+Known Issues:&#13;
+description : no IF-MIB::ifAlias is available&#13;
+version : v6.3.1c, v7.0.0c,  v7.4.1c&#13;
+device : all</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -76,7 +77,7 @@ device : SW5480</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SW-MIB
+               <description>MIB: SW-MIB&#13;
 System's CPU usage.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -118,7 +119,7 @@ System's CPU usage.</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SW-MIB
+               <description>MIB: SW-MIB&#13;
 Memory utilization in %</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -160,11 +161,11 @@ Memory utilization in %</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SW-MIB
-The current operational status of the switch.The states are as follow:
-online(1) means the switch is accessible by an external  Fibre Channel port
-offline(2) means the switch is not accessible
-testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port
+               <description>MIB: SW-MIB&#13;
+The current operational status of the switch.The states are as follow:&#13;
+online(1) means the switch is accessible by an external  Fibre Channel port&#13;
+offline(2) means the switch is not accessible&#13;
+testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port&#13;
 faulty(4) means the switch is not operational.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -265,94 +266,6 @@ faulty(4) means the switch is not operational.</description>
          </items>
          <discovery_rules>
             <discovery_rule>
-               <name>Entity Discovery</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5]</snmp_oid>
-               <key>entity.discovery</key>
-               <delay>3600</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions>
-                     <condition>
-                        <macro>{#ENT_CLASS}</macro>
-                        <value>3</value>
-                        <!-- 3 - chassis-->
-                        <operator>8</operator>
-                        <formulaid>A</formulaid>
-                     </condition>
-                  </conditions>
-               </filter>
-               <lifetime>30d</lifetime>
-               <description/>
-               <item_prototypes>
-                  <item_prototype>
-                     <name>Hardware model name</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}</snmp_oid>
-                     <key>system.hw.model[entPhysicalDescr.{#SNMPINDEX}]</key>
-                     <delay>3600</delay>
-                     <history>14d</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>1</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: ENTITY-MIB</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Inventory</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-               </item_prototypes>
-               <trigger_prototypes/>
-               <graph_prototypes/>
-               <host_prototypes/>
-               <jmx_endpoint/>
-            </discovery_rule>
-            <discovery_rule>
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
@@ -404,7 +317,7 @@ faulty(4) means the switch is not operational.</description>
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -420,7 +333,7 @@ faulty(4) means the switch is not operational.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: SW-MIB
+                     <description>MIB: SW-MIB&#13;
 Temperature readings of testpoint: {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -463,7 +376,7 @@ Temperature readings of testpoint: {#SENSOR_INFO}</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: SW-MIB
+                     <description>MIB: SW-MIB&#13;
 Temperature status of testpoint: {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -483,8 +396,8 @@ Temperature status of testpoint: {#SENSOR_INFO}</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade FC SNMPv2:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
-or
+                     <expression>{Template Net Brocade FC SNMPv2:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+or&#13;
 {Template Net Brocade FC SNMPv2:sensor.temp.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
                      <recovery_expression>{Template Net Brocade FC SNMPv2:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -494,7 +407,7 @@ or
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -517,7 +430,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -595,7 +508,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -632,7 +545,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade FC SNMPv2:sensor.psu.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Brocade FC SNMPv2:sensor.psu.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SENSOR_INFO}: Power supply is in critical state</name>
@@ -641,11 +554,34 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net Brocade FC SNMPv2:sensor.psu.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SENSOR_INFO}: Power supply is not in normal state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_INFO}: Power supply is in critical state</name>
+                           <expression>{Template Net Brocade FC SNMPv2:sensor.psu.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -703,7 +639,7 @@ Please check the power supply unit for errors</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -765,11 +701,11 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: SW-MIB
-
-		      The current value (reading) of the sensor.
-		      The value, -2147483648, represents an unknown quantity.
-			  The fan value will be in RPM(revolution per minute)</description>
+                     <description>MIB: SW-MIB&#13;
+&#13;
+The current value (reading) of the sensor.&#13;
+The value, -2147483648, represents an unknown quantity.&#13;
+The fan value will be in RPM(revolution per minute)</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -786,7 +722,7 @@ Please check the power supply unit for errors</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade FC SNMPv2:sensor.fan.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Brocade FC SNMPv2:sensor.fan.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SENSOR_INFO}: Fan is in critical state</name>
@@ -795,11 +731,34 @@ Please check the power supply unit for errors</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net Brocade FC SNMPv2:sensor.fan.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SENSOR_INFO}: Fan is not in normal state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_INFO}: Fan is in critical state</name>
+                           <expression>{Template Net Brocade FC SNMPv2:sensor.fan.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -991,7 +950,7 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>4</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the device for errors</description>
          <type>0</type>
          <manual_close>0</manual_close>
@@ -1008,7 +967,7 @@ Please check the device for errors</description>
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the device for warnings</description>
          <type>0</type>
          <manual_close>0</manual_close>
@@ -1031,7 +990,7 @@ Please check the device for warnings</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
@@ -1048,7 +1007,7 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>

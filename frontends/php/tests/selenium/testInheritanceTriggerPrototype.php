@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup triggers
  */
 class testInheritanceTriggerPrototype extends CWebTest {
 
@@ -33,10 +35,6 @@ class testInheritanceTriggerPrototype extends CWebTest {
 
 	private $discoveryRuleId = 15011;	// 'testInheritanceDiscoveryRule'
 	private $discoveryRule = 'testInheritanceDiscoveryRule';
-
-	public function testInheritanceTriggerPrototype_backup() {
-		DBsave_tables('triggers');
-	}
 
 	// Returns update data
 	public static function update() {
@@ -103,7 +101,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 
 		$this->zbxTestLogin('trigger_prototypes.php?form=Create+trigger+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->zbxTestInputType('description', $data['description']);
+		$this->zbxTestInputTypeByXpath("//input[@name='description']", $data['description']);
 		$this->zbxTestInputType('expression', $data['expression']);
 
 		$this->zbxTestClickWait('add');
@@ -122,12 +120,5 @@ class testInheritanceTriggerPrototype extends CWebTest {
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testInheritanceTriggerPrototype_restore() {
-		DBrestore_tables('triggers');
 	}
 }

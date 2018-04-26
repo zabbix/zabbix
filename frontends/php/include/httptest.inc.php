@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,30 +74,30 @@ function httptest_status2style($status) {
 /**
  * Delete web scenario item and web scenario step item history and trends by given web scenario IDs.
  *
- * @param array $httpTestIds
+ * @param array $http_testids
  *
  * @return bool
  */
-function deleteHistoryByHttpTestIds(array $httpTestIds) {
-	$itemIds = [];
+function deleteHistoryByHttpTestIds(array $http_testids) {
+	$itemids = [];
 
-	$dbItems = DBselect(
+	$db_items = DBselect(
 		'SELECT hti.itemid'.
 		' FROM httptestitem hti'.
-		' WHERE '.dbConditionInt('httptestid', $httpTestIds).
+		' WHERE '.dbConditionInt('httptestid', $http_testids).
 		' UNION ALL '.
 		'SELECT hsi.itemid'.
 		' FROM httpstep hs,httpstepitem hsi'.
 		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND '.dbConditionInt('httptestid', $httpTestIds)
+			' AND '.dbConditionInt('httptestid', $http_testids)
 	);
 
-	while ($dbItem = DBfetch($dbItems)) {
-		$itemIds[] = $dbItem['itemid'];
+	while ($db_item = DBfetch($db_items)) {
+		$itemids[] = $db_item['itemid'];
 	}
 
-	if ($itemIds) {
-		return deleteHistoryByItemIds($itemIds);
+	if ($itemids) {
+		return Manager::History()->deleteHistory($itemids);
 	}
 
 	return true;

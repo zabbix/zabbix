@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,10 +76,11 @@ class CConfigFile {
 			);
 		}
 
-		if (!array_key_exists($DB['TYPE'], CFrontendSetup::getSupportedDatabases())) {
-			self::exception(
-				'DB type "'.$DB['TYPE'].'" is not supported by current setup. Possible values '.
-				implode(', ', array_keys(CFrontendSetup::getSupportedDatabases())).'.'
+		$php_supported_db = array_keys(CFrontendSetup::getSupportedDatabases());
+
+		if (!in_array($DB['TYPE'], $php_supported_db)) {
+			self::exception('DB type "'.$DB['TYPE'].'" is not supported by current setup.'.
+				($php_supported_db ? ' Possible values '.implode(', ', $php_supported_db).'.' : '')
 			);
 		}
 

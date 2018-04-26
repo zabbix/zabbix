@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class CAlert extends CApiService {
 	 * @param array $options['alertids']
 	 * @param array $options['applicationids']
 	 * @param array $options['status']
-	 * @param array $options['editable']
+	 * @param bool  $options['editable']
 	 * @param array $options['extendoutput']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
@@ -49,8 +49,6 @@ class CAlert extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['alerts' => 'a.alertid'],
@@ -88,7 +86,7 @@ class CAlert extends CApiService {
 			'selectHosts'				=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
-			'editable'					=> null,
+			'editable'					=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -98,7 +96,7 @@ class CAlert extends CApiService {
 		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -109,7 +107,7 @@ class CAlert extends CApiService {
 					' FROM events e,functions f,items i,hosts_groups hgg'.
 					' JOIN rights r'.
 						' ON r.id=hgg.groupid'.
-						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
 					' WHERE a.eventid=e.eventid'.
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
@@ -129,7 +127,7 @@ class CAlert extends CApiService {
 					' FROM events e,items i,hosts_groups hgg'.
 					' JOIN rights r'.
 						' ON r.id=hgg.groupid'.
-						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
 					' WHERE a.eventid=e.eventid'.
 						' AND e.objectid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
@@ -162,6 +160,17 @@ class CAlert extends CApiService {
 					' AND e.source='.zbx_dbstr($options['eventsource']).
 					' AND e.object='.zbx_dbstr($options['eventobject']).
 			')';
+		}
+
+		// Allow user to get alerts sent only by users with same user group.
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			// Filter by userid only if userid IS NOT NULL.
+			$sqlParts['where'][] = '(a.userid IS NULL OR EXISTS ('.
+				'SELECT NULL'.
+				' FROM users_groups ug'.
+				' WHERE ug.userid=a.userid'.
+					' AND '.dbConditionInt('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
+			'))';
 		}
 
 		// groupids
@@ -267,14 +276,14 @@ class CAlert extends CApiService {
 			if (!is_null($options['time_from']) || !is_null($options['time_till'])) {
 				$field = '(a.userid+0)';
 			}
-			$sqlParts['where'][] = dbConditionInt($field, $options['userids']);
+			$sqlParts['where'][] = dbConditionId($field, $options['userids']);
 		}
 
 		// mediatypeids
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
 
-			$sqlParts['where'][] = dbConditionInt('a.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionId('a.mediatypeid', $options['mediatypeids']);
 		}
 
 		// filter

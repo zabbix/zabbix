@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #define DEVICE_DIR	"/proc/sys/dev/sensors"
 #else
 #define DEVICE_DIR	"/sys/class/hwmon"
-static char	*locations[] = {"", "/device", NULL};
+static const char	*locations[] = {"", "/device", NULL};
 #endif
 
 #define ATTR_MAX	128
@@ -92,8 +92,9 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
  *********************************************************************************/
 static const char	*sysfs_read_attr(const char *device, char **attribute)
 {
-	char	path[MAX_STRING_LEN], buf[ATTR_MAX], *p, **location;
-	FILE	*f;
+	const char	**location;
+	char		path[MAX_STRING_LEN], buf[ATTR_MAX], *p;
+	FILE		*f;
 
 	for (location = locations; NULL != *location; location++)
 	{

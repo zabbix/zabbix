@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,6 @@ $availableJScripts = [
 	'class.cookie.js' => '',
 	'class.cscreen.js' => '',
 	'class.csuggest.js' => '',
-	'class.cswitcher.js' => '',
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
 	'class.rpc.js' => '',
@@ -87,7 +86,6 @@ $availableJScripts = [
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
-	'tr_logform.js' => 'pages/',
 ];
 
 $tranStrings = [
@@ -114,15 +112,13 @@ $tranStrings = [
 		'Delete' => _('Delete'),
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
+		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'Add a new widget' => _('Add a new widget')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation')
-	],
-	'tr_logform.js' => [
-		'S_REMOVE' => _('Remove')
 	],
 	'class.calendar.js' => [
 		'S_JANUARY' => _('January'),
@@ -209,6 +205,7 @@ $tranStrings = [
 		'Create trigger' => _('Create trigger'),
 		'Dashboard sharing' => _('Dashboard sharing'),
 		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
+		'Description' => _('Description'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Edit trigger' => _('Edit trigger'),
 		'Insert expression' => _('Insert expression'),
@@ -226,13 +223,12 @@ $tranStrings = [
 		'Last month graph' => _('Last month graph'),
 		'Last week graph' => _('Last week graph'),
 		'Problems' => _('Problems'),
-		'Refresh time' => _('Refresh time'),
-		'Refresh time multiplier' => _('Refresh time multiplier'),
+		'Refresh interval' => _('Refresh interval'),
+		'Refresh interval multiplier' => _('Refresh interval multiplier'),
 		'Scripts' => _('Scripts'),
 		'Something went wrong. Please try again later!' => _('Something went wrong. Please try again later!'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
-		'Triggers' => _('Triggers'),
 		'Update' => _('Update'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
@@ -306,11 +302,18 @@ foreach ($files as $file) {
 	}
 }
 
-$jsLength = strlen($js);
-$etag = md5($jsLength);
-if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
+$etag = md5($js);
+/**
+ * strpos function allow to check ETag value to fix cases when web server compression is used:
+ * - For case when apache server appends "-gzip" suffix to ETag.
+ *   https://bz.apache.org/bugzilla/show_bug.cgi?id=39727
+ *   https://bz.apache.org/bugzilla/show_bug.cgi?id=45023
+ * - For case when nginx v1.7.3+ server mark ETag as weak adding "W/" prefix
+ *   http://nginx.org/en/CHANGES
+ */
+if (array_key_exists('HTTP_IF_NONE_MATCH', $_SERVER) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $etag) !== false) {
 	header('HTTP/1.1 304 Not Modified');
-	header('ETag: '.$etag);
+	header('ETag: "'.$etag.'"');
 	exit;
 }
 
@@ -328,10 +331,10 @@ if (in_array('prototype.js', $files)) {
 		'};';
 }
 
-header('Content-type: text/javascript; charset=UTF-8');
+header('Content-Type: application/javascript; charset=UTF-8');
 // breaks if "zlib.output_compression = On"
 // header('Content-length: '.$jsLength);
 header('Cache-Control: public, must-revalidate');
-header('ETag: '.$etag);
+header('ETag: "'.$etag.'"');
 
 echo $js;

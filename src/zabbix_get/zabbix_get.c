@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -212,7 +212,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	zbx_socket_t	s;
 	int		ret;
 	ssize_t		bytes_received = -1;
-	char		*tls_arg1, *tls_arg2, *request;
+	char		*tls_arg1, *tls_arg2;
 
 	switch (configured_tls_connect_mode)
 	{
@@ -238,11 +238,9 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT,
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
-		request = zbx_dsprintf(NULL, "%s\n", key);
-
-		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
+		if (SUCCEED == (ret = zbx_tcp_send(&s, key)))
 		{
-			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, 0)))
 			{
 				if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED) && sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
 				{
@@ -262,8 +260,6 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 				ret = FAIL;
 			}
 		}
-
-		zbx_free(request);
 
 		zbx_tcp_close(&s);
 

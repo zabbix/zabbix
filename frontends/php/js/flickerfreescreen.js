@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2017 Zabbix SIA
+ ** Copyright (C) 2001-2018 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,8 @@
 			// SCREEN_RESOURCE_MAP
 			if (screen.resourcetype == 2) {
 				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
+				$(screen.data.container).attr({'aria-label': screen.data.options.aria_label, 'tabindex': 0})
+					.find('svg').attr('aria-hidden', 'true');
 			}
 
 			// init refresh plan
@@ -58,6 +60,11 @@
 			var screen = this.screens[id], ajaxParams;
 
 			switch (screen.resourcetype) {
+				case 17:
+					// SCREEN_RESOURCE_HISTORY
+					ajaxParams = ['mode', 'pageFile', 'page'];
+					break;
+
 				case 21:
 					// SCREEN_RESOURCE_HTTPTEST_DETAILS
 					ajaxParams = ['mode', 'resourcetype', 'profileIdx2'];
@@ -160,18 +167,29 @@
 					else {
 						ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
 
-						for (var i = 0; i < screen.data.itemids.length; i++) {
-							ajaxUrl.setArgument(
-								'itemids[' + screen.data.itemids[i] + ']',
-								empty(screen.data.itemids[i]) ? null : screen.data.itemids[i]
-							);
+						if ('itemids' in screen.data) {
+							for (var i = 0; i < screen.data.itemids.length; i++) {
+								ajaxUrl.setArgument(
+									'itemids[' + screen.data.itemids[i] + ']',
+									empty(screen.data.itemids[i]) ? null : screen.data.itemids[i]
+								);
+							}
+						}
+						else {
+							ajaxUrl.setArgument('graphid', screen.data.graphid);
 						}
 
-						ajaxUrl.setArgument('action', empty(screen.data.action) ? null : screen.data.action);
-						ajaxUrl.setArgument('filter', empty(screen.data.filter) ? null : screen.data.filter);
-						ajaxUrl.setArgument('filter_task', empty(screen.data.filterTask)
-							? null : screen.data.filterTask);
-						ajaxUrl.setArgument('mark_color', empty(screen.data.markColor) ? null : screen.data.markColor);
+						jQuery.each({
+							'filter': screen.data.filter,
+							'filter_task': screen.data.filterTask,
+							'mark_color': screen.data.markColor,
+							'page': screen.data.page,
+							'action': screen.data.action
+						}, function (ajax_key, value) {
+							if (!empty(value)) {
+								ajaxUrl.setArgument(ajax_key, value);
+							}
+						});
 
 						this.refreshHtml(id, ajaxUrl);
 					}
@@ -258,6 +276,7 @@
 				var ajaxRequest = $.ajax({
 					url: ajaxUrl.getUrl(),
 					type: 'post',
+					cache: false,
 					data: {},
 					dataType: 'html',
 					success: function(html) {
@@ -276,7 +295,7 @@
 							}
 						});
 
-						$('.msg-bad').remove();
+						$('.article .msg-bad').remove();
 
 						// set message
 						if (msg_bad) {
@@ -316,7 +335,7 @@
 		},
 
 		refreshMap: function(id) {
-			var screen = this.screens[id];
+			var screen = this.screens[id], self = this;
 
 			if (screen.isRefreshing) {
 				this.calculateReRefresh(id);
@@ -339,8 +358,10 @@
 					window.flickerfreeScreen.calculateReRefresh(id);
 				})
 				.done(function(data) {
+					data.show_timestamp = screen.data.options.show_timestamp;
 					screen.isRefreshing = false;
 					screen.data.update(data);
+					$(screen.data.container).attr('aria-label', data.aria_label);
 					screen.timestamp = screen.timestampActual;
 					window.flickerfreeScreenShadow.end(id);
 				});

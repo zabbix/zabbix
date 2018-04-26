@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $options['triggerids']
 	 * @param array $options['applicationids']
 	 * @param array $options['status']
-	 * @param array $options['editable']
+	 * @param bool  $options['editable']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
 	 * @param array $options['limit']
@@ -48,8 +48,6 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	public function get(array $options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['triggers' => 't.triggerid'],
@@ -78,7 +76,7 @@ class CTrigger extends CTriggerGeneral {
 			'withLastEventUnacknowledged'	=> null,
 			'skipDependent'					=> null,
 			'nopermissions'					=> null,
-			'editable'						=> null,
+			'editable'						=> false,
 			// timing
 			'lastChangeSince'				=> null,
 			'lastChangeTill'				=> null,
@@ -106,6 +104,7 @@ class CTrigger extends CTriggerGeneral {
 			'selectDiscoveryRule'			=> null,
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
+			'selectTriggerDiscovery'		=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -117,10 +116,9 @@ class CTrigger extends CTriggerGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
@@ -1209,6 +1207,10 @@ class CTrigger extends CTriggerGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		if (!$result) {
+			return $result;
+		}
+
 		$triggerids = array_keys($result);
 
 		// adding trigger dependencies
@@ -1334,6 +1336,34 @@ class CTrigger extends CTriggerGeneral {
 				// find max 'ns' for each trigger and that will be the 'lastEvent'
 				$maxNs = max(array_keys($events));
 				$result[$triggerId]['lastEvent'] = $events[$maxNs];
+			}
+		}
+
+		// adding trigger discovery
+		if ($options['selectTriggerDiscovery'] !== null && $options['selectTriggerDiscovery'] !== API_OUTPUT_COUNT) {
+			foreach ($result as &$trigger) {
+				$trigger['triggerDiscovery'] = [];
+			}
+			unset($trigger);
+
+			$sql_select = ['triggerid'];
+			foreach (['parent_triggerid'] as $field) {
+				if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
+					$sql_select[] = $field;
+				}
+			}
+
+			$trigger_discoveries = DBselect(
+				'SELECT '.implode(',', $sql_select).
+				' FROM trigger_discovery'.
+				' WHERE '.dbConditionInt('triggerid', $triggerids)
+			);
+
+			while ($trigger_discovery = DBfetch($trigger_discoveries)) {
+				$triggerid = $trigger_discovery['triggerid'];
+				unset($trigger_discovery['triggerid']);
+
+				$result[$triggerid]['triggerDiscovery'] = $trigger_discovery;
 			}
 		}
 

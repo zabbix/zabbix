@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,8 +37,6 @@ class CHostGroup extends CApiService {
 	 */
 	public function get($params) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['groups' => 'g.groupid'],
@@ -68,7 +66,7 @@ class CHostGroup extends CApiService {
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
 			'with_applications'			=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -94,10 +92,9 @@ class CHostGroup extends CApiService {
 		$options = zbx_array_merge($defOptions, $params);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
@@ -401,6 +398,62 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
+	 * Inherit tag filters from parent host groups.
+	 *
+	 * @param array  $groups
+	 * @param string $groups[]['groupid']
+	 * @param string $groups[]['name']
+	 *
+	 * @return array
+	 */
+	private function inheritTagFilters(array $groups) {
+		$parent_names = [];
+
+		foreach ($groups as $group) {
+			if (($pos = strrpos($group['name'], '/')) === false) {
+				continue;
+			}
+
+			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+		}
+
+		if ($parent_names) {
+			$db_parent_groups = DB::select('groups', [
+				'output' => ['groupid', 'name'],
+				'filter' => ['name' => array_keys($parent_names)]
+			]);
+
+			$parent_groupids = [];
+
+			foreach ($db_parent_groups as $db_parent_group) {
+				$parent_groupids[$db_parent_group['groupid']] = $parent_names[$db_parent_group['name']];
+			}
+
+			if ($parent_groupids) {
+				$db_tag_filters = DB::select('tag_filter', [
+					'output' => ['usrgrpid', 'groupid', 'tag', 'value'],
+					'filter' => ['groupid' => array_keys($parent_groupids)]
+				]);
+
+				$tag_filters = [];
+
+				foreach ($db_tag_filters as $db_tag_filter) {
+					foreach ($parent_groupids[$db_tag_filter['groupid']] as $groupid) {
+						$tag_filters[] = [
+							'usrgrpid' => $db_tag_filter['usrgrpid'],
+							'groupid' => $groupid,
+							'tag' => $db_tag_filter['tag'],
+							'value' => $db_tag_filter['value']
+						];
+					}
+				}
+
+				DB::insertBatch('tag_filter', $tag_filters);
+			}
+		}
+	}
+
+	/**
 	 * @param array  $groups
 	 *
 	 * @return array
@@ -416,6 +469,7 @@ class CHostGroup extends CApiService {
 		unset($group);
 
 		$this->inheritRights($groups);
+		$this->inheritTagFilters($groups);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groups);
 

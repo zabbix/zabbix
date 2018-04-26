@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+/**
+ * @backup httptest
+ */
 class testFormWeb extends CWebTest {
 
 	/**
@@ -43,10 +46,6 @@ class testFormWeb extends CWebTest {
 	 * @var int
 	 */
 	protected $hostid = 40001;
-
-	public function testFormWeb_backup() {
-		DBsave_tables('httptest');
-	}
 
 	// Returns layout data
 	public static function layout() {
@@ -187,7 +186,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create web scenario');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
@@ -1418,7 +1417,7 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create web scenario');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestCheckHeader('Web monitoring');
 
@@ -1506,16 +1505,16 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 			foreach($data['add_step'] as $item) {
 				$this->zbxTestClickWait('add_step');
-				$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
-				$this->zbxTestCheckFatalErrors();
-				$step = $item['step']." step";
-				$this->zbxTestInputTypeWait('name',$step);
-				$url = $step." url";
-				$this->zbxTestInputTypeWait('url', $url);
-				$this->zbxTestClick('add');
-				$this->zbxTestWaitWindowClose();
+				$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+				$step = $item['step'].' step';
+				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step, false);
+				$url = $step.' url';
+				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $url);
+				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
+				$this->zbxTestWaitForPageToLoad();
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 
-				if(isset($item['remove'])) {
+				if (isset($item['remove'])) {
 					$this->zbxTestClickWait('remove_0');
 				}
 			}
@@ -1582,7 +1581,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestClickLinkTextWait('Triggers');
 
 			foreach ($data['createTriggers'] as $trigger) {
-				$this->zbxTestClickWait('form');
+				$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 				$this->zbxTestInputType('description', $trigger);
 				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
@@ -1599,16 +1598,12 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestCheckboxSelect("group_httptestid_$httptestid");
 			$this->zbxTestClickButton('httptest.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario deleted');
 			$this->assertEquals(0, DBcount("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".
 				"step.httptestid = test.httptestid ".
 				"WHERE test.name = '".$name."' AND step.name = '".$step."'"));
 		}
-	}
-
-	public function testFormWeb_restore() {
-		DBrestore_tables('httptest');
 	}
 }

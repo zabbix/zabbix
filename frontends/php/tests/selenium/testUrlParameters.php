@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -635,62 +635,6 @@ class testUrlParameters extends CWebTest {
 					[
 						'url' => 'latest.php',
 						'text_present' => 'Latest data'
-					]
-				]
-			],
-			[
-				'title' => 'Triggers [refreshed every 30 sec.]',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'tr_status.php?groupid=4&hostid=10084',
-						'text_present' => 'Triggers'
-					],
-					[
-						'url' => 'tr_status.php?groupid=9999999&hostid=10084',
-						'text_not_present' => 'Triggers',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'tr_status.php?groupid=4&hostid=9999999',
-						'text_not_present' => 'Triggers',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'tr_status.php?groupid=abc&hostid=abc',
-						'text_not_present' => 'Triggers',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.',
-							'Field "hostid" is not integer.'
-						]
-					],
-					[
-						'url' => 'tr_status.php?groupid=&hostid=',
-						'text_not_present' => 'Triggers',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.',
-							'Field "hostid" is not integer.'
-						]
-					],
-					[
-						'url' => 'tr_status.php?groupid=-1&hostid=-1',
-						'text_not_present' => 'Triggers',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "groupid" field.',
-							'Incorrect value "-1" for "hostid" field.'
-						]
-					],
-					[
-						'url' => 'tr_status.php',
-						'text_present' => 'Triggers'
 					]
 				]
 			],

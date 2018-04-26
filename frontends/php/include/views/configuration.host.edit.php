@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,10 +32,11 @@ if (!hasRequest('form_refresh')) {
 
 $frmHost = (new CForm())
 	->setName('hostsForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])
-	->addVar('tls_connect', $data['tls_connect'])
+	->addItem((new CVar('tls_connect', $data['tls_connect']))->removeId())
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('id', 'hostForm');
 
@@ -44,9 +45,6 @@ if ($data['hostid'] != 0) {
 }
 if ($data['clone_hostid'] != 0) {
 	$frmHost->addVar('clone_hostid', $data['clone_hostid']);
-}
-if ($data['groupid'] != 0) {
-	$frmHost->addVar('groupid', $data['groupid']);
 }
 
 $hostList = new CFormList('hostlist');
@@ -60,58 +58,40 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 }
 
-$hostList->addRow(_('Host name'),
-	(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
-);
-
-$hostList->addRow(_('Visible name'),
-	(new CTextBox('visiblename', $data['visiblename'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
-
-if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	// groups for normal hosts
-	$groupsTB = new CTweenBox($frmHost, 'groups', $data['groups'], 10);
-
-	foreach ($data['groupsAll'] as $group) {
-		if (in_array($group['groupid'], $data['groups'])) {
-			$groupsTB->addItem($group['groupid'], $group['name'], null,
-				array_key_exists($group['groupid'], $data['groupsAllowed'])
-			);
-		}
-		elseif (array_key_exists($group['groupid'], $data['groupsAllowed'])) {
-			$groupsTB->addItem($group['groupid'], $group['name']);
-		}
-	}
-
-	$hostList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
-
-	$new_group = (new CTextBox('newgroup', $data['newgroup']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-	$new_group_label = _('New group');
-	if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-		$new_group_label .= ' '._('(Only super admins can create groups)');
-		$new_group->setReadonly(true);
-	}
-	$hostList->addRow(new CLabel($new_group_label, 'newgroup'),
-		(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+$hostList
+	->addRow(
+		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
+		(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Visible name'),
+		(new CTextBox('visiblename', $data['visiblename'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow((new CLabel(_('Groups'), 'groups[]'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'groups[]',
+			'objectName' => 'hostGroup',
+			'disabled' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
+			'objectOptions' => ['editable' => true],
+			'data' => $data['groups_ms'],
+			'addNew' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $frmHost->getName(),
+					'dstfld1' => 'groups_',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				]
+			]
+		]))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
-}
-else {
-	// groups for discovered hosts
-	$groupBox = new CListBox(null, null, 10);
-	$groupBox->setEnabled(false);
-	foreach ($data['groupsAll'] as $group) {
-		if (in_array($group['groupid'], $data['groups'])) {
-			$groupBox->addItem($group['groupid'], $group['name'], null,
-				array_key_exists($group['groupid'], $data['groupsAllowed'])
-			);
-		}
-	}
-	$hostList->addRow(_('Groups'), $groupBox);
-	$hostList->addVar('groups', $data['groups']);
-}
 
 // interfaces for normal hosts
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
@@ -119,6 +99,9 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
 		: 'hostInterfacesManager.addNew("agent");');
 
+	$hostList->addRow('',
+		(new CLabel(_('At least one interface must exist.')))->setAsteriskMark()
+	);
 	// Zabbix agent interfaces
 	$ifTab = (new CTable())
 		->setId('agentInterfaces')
@@ -613,8 +596,15 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 				'objectName' => 'templates',
 				'ignored' => $ignoredTemplates,
 				'popup' => [
-					'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-						'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'templates',
+						'srcfld1' => 'hostid',
+						'srcfld2' => 'host',
+						'dstfrm' => $frmHost->getName(),
+						'dstfld1' => 'add_templates_',
+						'templated_hosts' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		])
@@ -743,7 +733,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
 		$link = (new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']))
-			->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
+			->setTitle(_s('This field is automatically populated by item "%s".', $name));
 
 		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
@@ -792,13 +782,17 @@ $encryption_form_list = (new CFormList('encryption'))
 				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			)
 	)
-	->addRow(_('PSK identity'),
+	->addRow(
+		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('PSK'),
+	->addRow(
+		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))

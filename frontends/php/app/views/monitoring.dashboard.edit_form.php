@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ $this->addJsFile('multiselect.js');
 $this->includeJSfile('app/views/monitoring.dashboard.edit_form.js.php');
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('dashboard_form')
 	->setAttribute('style', 'display: none;');
 
@@ -32,18 +33,26 @@ $multiselect = (new CMultiSelect([
 	'objectName' => 'users',
 	'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
 	'popup' => [
-		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+		'parameters' => [
+			'srctbl' => 'users',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid',
+			'srcfld1' => 'userid',
+			'srcfld2' => 'fullname'
+		]
 	],
 	'callPostEvent' => true
 ]))
 	->setAttribute('data-default-owner', CJs::encodeJson($data['dashboard']['owner']))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAriaRequired();
 
 $form->addItem((new CFormList())
-	->addRow(_('Owner'), $multiselect)
-	->addRow(_('Name'),
+	->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect)
+	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
 );

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,11 +50,11 @@ class CControllerFavouriteDelete extends CController {
 		];
 
 		$widgetids = [
-			'graphid' => WIDGET_FAVOURITE_GRAPHS,
-			'itemid' => WIDGET_FAVOURITE_GRAPHS,
-			'screenid' => WIDGET_FAVOURITE_SCREENS,
-			'slideshowid' => WIDGET_FAVOURITE_SCREENS,
-			'sysmapid' => WIDGET_FAVOURITE_MAPS
+			'graphid' => WIDGET_FAV_GRAPHS,
+			'itemid' => WIDGET_FAV_GRAPHS,
+			'screenid' => WIDGET_FAV_SCREENS,
+			'slideshowid' => WIDGET_FAV_SCREENS,
+			'sysmapid' => WIDGET_FAV_MAPS
 		];
 
 		$object = $this->getInput('object');

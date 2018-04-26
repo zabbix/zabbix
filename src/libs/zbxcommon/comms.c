@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 
 	if (SUCCEED == xml_get_data_dyn(xml, "host", &data_b64))
 	{
-		str_base64_decode(data_b64, host, host_len - 1, &i);
+		str_base64_decode(data_b64, host, (int)host_len - 1, &i);
 		host[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
@@ -50,7 +50,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 
 	if (SUCCEED == xml_get_data_dyn(xml, "key", &data_b64))
 	{
-		str_base64_decode(data_b64, key, key_len - 1, &i);
+		str_base64_decode(data_b64, key, (int)key_len - 1, &i);
 		key[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
@@ -62,7 +62,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 
 	if (SUCCEED == xml_get_data_dyn(xml, "data", &data_b64))
 	{
-		str_base64_decode(data_b64, data, data_len - 1, &i);
+		str_base64_decode(data_b64, data, (int)data_len - 1, &i);
 		data[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
@@ -74,7 +74,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 
 	if (SUCCEED == xml_get_data_dyn(xml, "lastlogsize", &data_b64))
 	{
-		str_base64_decode(data_b64, lastlogsize, lastlogsize_len - 1, &i);
+		str_base64_decode(data_b64, lastlogsize, (int)lastlogsize_len - 1, &i);
 		lastlogsize[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
@@ -83,7 +83,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 
 	if (SUCCEED == xml_get_data_dyn(xml, "timestamp", &data_b64))
 	{
-		str_base64_decode(data_b64, timestamp, timestamp_len - 1, &i);
+		str_base64_decode(data_b64, timestamp, (int)timestamp_len - 1, &i);
 		timestamp[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
@@ -92,7 +92,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 
 	if (SUCCEED == xml_get_data_dyn(xml, "source", &data_b64))
 	{
-		str_base64_decode(data_b64, source, source_len - 1, &i);
+		str_base64_decode(data_b64, source, (int)source_len - 1, &i);
 		source[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
@@ -101,7 +101,7 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 
 	if (SUCCEED == xml_get_data_dyn(xml, "severity", &data_b64))
 	{
-		str_base64_decode(data_b64, severity, severity_len - 1, &i);
+		str_base64_decode(data_b64, severity, (int)severity_len - 1, &i);
 		severity[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
@@ -180,3 +180,58 @@ zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 
 	return data;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_htole_uint32                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 32 bit                                   *
+ *          from host byte order                                              *
+ *          to little-endian byte order format                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 32 bit in little-endian byte order format   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data)
+{
+	unsigned char	buf[4];
+
+	buf[0] = (unsigned char)data;	data >>= 8;
+	buf[1] = (unsigned char)data;	data >>= 8;
+	buf[2] = (unsigned char)data;	data >>= 8;
+	buf[3] = (unsigned char)data;	data >>= 8;
+
+	memcpy(&data, buf, sizeof(buf));
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_letoh_uint32                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 32 bit                                   *
+ *          from little-endian byte order format                              *
+ *          to host byte order                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 32 bit in host byte order                   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data)
+{
+	unsigned char	buf[4];
+
+	memcpy(buf, &data, sizeof(buf));
+
+	data = (zbx_uint32_t)buf[3];	data <<= 8;
+	data |= (zbx_uint32_t)buf[2];	data <<= 8;
+	data |= (zbx_uint32_t)buf[1];	data <<= 8;
+	data |= (zbx_uint32_t)buf[0];
+
+	return data;
+}
+

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,12 +72,15 @@ $details_screen = CScreenBuilder::getScreen([
 
 (new CWidget())
 	->setTitle(_('Details of web scenario').': '.$http_test_name)
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
-			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
+				->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($details_screen->get())
 	->show();
@@ -118,7 +121,7 @@ $items = DBfetchArray(DBselect(
 		' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
 ));
 
-$graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($items));
+$graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, Manager::History()->getMinClock($items));
 
 $url = (new CUrl('chart3.php'))
 	->setArgument('height', 150)

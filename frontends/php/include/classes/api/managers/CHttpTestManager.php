@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -380,23 +380,32 @@ class CHttpTestManager {
 				if (isset($hostHttpTest['byTemplateId'][$httpTestId])) {
 					$exHttpTest = $hostHttpTest['byTemplateId'][$httpTestId];
 
-					// need to check templateid here too in case we update linked http test to name that already exists on linked host
+					/*
+					 * 'templateid' needs to be checked here too in case we update linked httptest to name
+					 * that already exists on a linked host.
+					 */
 					if (isset($httpTest['name']) && isset($hostHttpTest['byName'][$httpTest['name']])
 							&& !idcmp($exHttpTest['templateid'], $hostHttpTest['byName'][$httpTest['name']]['templateid'])) {
 						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
-						throw new Exception(_s('Web scenario "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name']));
+						throw new Exception(
+							_s('Web scenario "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name'])
+						);
 					}
 				}
 				// update by name
-				else if (isset($hostHttpTest['byName'][$httpTest['name']])) {
+				elseif (isset($hostHttpTest['byName'][$httpTest['name']])) {
 					$exHttpTest = $hostHttpTest['byName'][$httpTest['name']];
-					if ($exHttpTest['templateid'] > 0 || !$this->compareHttpSteps($httpTest, $exHttpTest)) {
-						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
-						throw new Exception(_s('Web scenario "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name']));
-					}
 
-					$this->createLinkageBetweenHttpTests($httpTestId, $exHttpTest['httptestid']);
-					continue;
+					if (bccomp($exHttpTest['templateid'], $httpTestId) == 0 || !$this->compareHttpSteps($httpTest, $exHttpTest)) {
+						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
+						throw new Exception(
+							_s('Web scenario "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name'])
+						);
+					}
+					elseif ($this->compareHttpProperties($httpTest, $exHttpTest)) {
+						$this->createLinkageBetweenHttpTests($httpTestId, $exHttpTest['httptestid']);
+						continue;
+					}
 				}
 
 				$newHttpTest = $httpTest;
@@ -424,6 +433,22 @@ class CHttpTestManager {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Compare properties for http tests.
+	 *
+	 * @param array $http_test			Current http test properties.
+	 * @param array $ex_http_test		Existing http test properties to compare with.
+	 *
+	 * @return bool
+	 */
+	protected function compareHttpProperties(array $http_test, array $ex_http_test) {
+		return ($http_test['http_proxy'] === $ex_http_test['http_proxy']
+				&& $http_test['agent'] === $ex_http_test['agent']
+				&& $http_test['retries'] == $ex_http_test['retries']
+				&& $http_test['delay'] === $ex_http_test['delay']
+				&& bccomp($http_test['applicationid'], $ex_http_test['applicationid']) == 0);
 	}
 
 	/**
@@ -530,7 +555,8 @@ class CHttpTestManager {
 		}
 
 		$dbCursor = DBselect(
-			'SELECT ht.httptestid,ht.name,ht.hostid,ht.templateid'.
+			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.agent,ht.hostid,ht.templateid,ht.http_proxy,'.
+				'ht.retries'.
 			' FROM httptest ht'.
 			' WHERE '.dbConditionInt('ht.hostid', $hostIds)
 		);
@@ -578,34 +604,47 @@ class CHttpTestManager {
 	/**
 	 * Save http tests. If http test has httptestid it gets updated otherwise a new one is created.
 	 *
-	 * @param array $httpTests
+	 * @param array $http_tests
 	 *
 	 * @return array
 	 */
-	protected function save(array $httpTests) {
-		$httpTestsCreate = [];
-		$httpTestsUpdate = [];
+	protected function save(array $http_tests) {
+		$http_tests_to_create = [];
+		$http_tests_to_update = [];
 
-		foreach ($httpTests as $httpTest) {
-			if (isset($httpTest['httptestid'])) {
-				$httpTestsUpdate[] = $httpTest;
+		foreach ($http_tests as $num => $http_test) {
+			if (array_key_exists('httptestid', $http_test)) {
+				$http_tests_to_update[] = $http_test;
 			}
 			else {
-				$httpTestsCreate[] = $httpTest;
+				$http_tests_to_create[] = $http_test;
+			}
+
+			/*
+			 * Unset $http_tests and (later) put it back with actual httptestid as a key right after creating/updateing
+			 * it. This is done in such a way because $http_tests array holds items with incremental keys which are not
+			 * a real httptestids.
+			 */
+			unset($http_tests[$num]);
+		}
+
+		if ($http_tests_to_create) {
+			$new_http_tests = $this->create($http_tests_to_create);
+
+			foreach ($new_http_tests as $new_http_test) {
+				$http_tests[$new_http_test['httptestid']] = $new_http_test;
 			}
 		}
 
-		if (!empty($httpTestsCreate)) {
-			$newHttpTests = $this->create($httpTestsCreate);
-			foreach ($newHttpTests as $num => $newHttpTest) {
-				$httpTests[$num]['httptestid'] = $newHttpTest['httptestid'];
+		if ($http_tests_to_update) {
+			$updated_http_tests = $this->update($http_tests_to_update);
+
+			foreach ($updated_http_tests as $updated_http_test) {
+				$http_tests[$updated_http_test['httptestid']] = $updated_http_test;
 			}
 		}
-		if (!empty($httpTestsUpdate)) {
-			$this->update($httpTestsUpdate);
-		}
 
-		return $httpTests;
+		return $http_tests;
 	}
 
 	/**
@@ -1245,7 +1284,7 @@ class CHttpTestManager {
 				' AND '.dbConditionInt('hti.httptestid', $httpTestIds)
 		));
 
-		$history = Manager::History()->getLast($httpItems, 1, ZBX_HISTORY_PERIOD);
+		$history = Manager::History()->getLastValues($httpItems, 1, ZBX_HISTORY_PERIOD);
 
 		$data = [];
 

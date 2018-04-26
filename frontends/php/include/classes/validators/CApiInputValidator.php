@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -926,7 +926,7 @@ class CApiInputValidator {
 	 * Time unit validator like "10", "20s", "30m", "4h", "{$TIME}" etc.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param int    $rule['in']      (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -949,14 +949,17 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => ($flags & API_ALLOW_USER_MACRO)]);
+		$simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
+		]);
 
 		if ($simple_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
 			return false;
 		}
 
-		if (($flags & API_ALLOW_USER_MACRO) && $data[0] === '{') {
+		if (($flags & (API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO)) && $data[0] === '{') {
 			return true;
 		}
 
@@ -1155,6 +1158,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1162,6 +1166,8 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateUrl($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
 		if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
 			return false;
 		}
@@ -1171,7 +1177,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data !== '' && CHtmlUrlValidator::validate($data) === false) {
+		if ($data !== '' && CHtmlUrlValidator::validate($data, ($flags & API_ALLOW_USER_MACRO)) === false) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptible URL'));
 			return false;
 		}

@@ -48,9 +48,21 @@
 		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Standard input field"></div>
 		</li>
 		<li>
-		<div class="table-forms-td-left"><label>Groups</label></div><div class="table-forms-td-right">
-		<table><tbody><tr>
-		<td><label for="InGroups">In groups</label></td><td>&nbsp;</td><td><label for="OtherGroups">Other groups</label></td></tr><tr><td><select id="InGroups" size="10" multiple><option>Zabbix servers</option><option>Zabbix servers</option></select></td><td class="center"><button type="button" class="btn-grey"><span class="arrow-left"></span></button><br><button type="button" class="btn-grey"><span class="arrow-right"></span></button></td><td><select id="OtherGroups" size="10" multiple><option>Discovered hosts</option><option>Linux servers</option><option>Templates</option></select></td></tr></tbody></table></div>
+		<div class="table-forms-td-left"><label>Groups</label></div>
+		  <div class="table-forms-td-right">
+            <div class="multiselect-wrapper">
+              <div class="multiselect" style="width: 160px">
+                <div class="selected">
+                  <ul class="multiselect-list">
+                    <li class="disabled" data-id=""><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn"></span></span></li>
+                    <li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn"></span></span></li>
+                  </ul>
+                </div>
+                <input type="text" style="" value="" placeholder="Search">
+              </div>
+              <div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
+            </div>
+          </div>
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label for="Groups">New group</label></div><div class="table-forms-td-right"><span class="form-new-group"><input type="text" id="Groups"></span></div>

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,9 +101,6 @@ static int	variant_to_dbl(zbx_variant_t *value)
 
 	value_dbl = atof(buffer);
 
-	if (FAIL == zbx_validate_value_dbl(value_dbl))
-		return FAIL;
-
 	zbx_variant_clear(value);
 	zbx_variant_set_dbl(value, value_dbl);
 
@@ -190,7 +187,6 @@ int	zbx_variant_convert(zbx_variant_t *value, int type)
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 {
 	zbx_uint64_t	value_ui64;
-	double		value_dbl;
 	char		buffer[MAX_STRING_LEN];
 
 	zbx_strlcpy(buffer, text, sizeof(buffer));
@@ -205,9 +201,9 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 		return SUCCEED;
 	}
 
-	if (SUCCEED == is_double(buffer) && SUCCEED == zbx_validate_value_dbl(value_dbl = atof(buffer)))
+	if (SUCCEED == is_double(buffer))
 	{
-		zbx_variant_set_dbl(value, value_dbl);
+		zbx_variant_set_dbl(value, atof(buffer));
 		return SUCCEED;
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,10 +55,16 @@ class CPageHeader {
 	protected $js = [];
 
 	/**
+	* @var {string} sid
+	*/
+	protected $sid;
+
+	/**
 	 * @param string $title
 	 */
 	public function __construct($title = '') {
 		$this->title = CHtml::encode($title);
+		$this->sid = substr(get_cookie('zbx_sessionid'), 16, 16);
 	}
 
 	/**
@@ -130,6 +136,7 @@ class CPageHeader {
 		<link rel="apple-touch-icon-precomposed" sizes="152x152" href="img/apple-touch-icon-152x152-precomposed.png">
 		<link rel="apple-touch-icon-precomposed" sizes="180x180" href="img/apple-touch-icon-180x180-precomposed.png">
 		<link rel="icon" sizes="192x192" href="img/touch-icon-192x192.png">
+		<meta name="csrf-token" content="$this->sid"/>
 		<meta name="msapplication-TileImage" content="img/ms-tile-144x144.png">
 		<meta name="msapplication-TileColor" content="#d40000">
 		<meta name="msapplication-config" content="none"/>

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "common.h"
 #include "threads.h"
 #include "log.h"
+#include "zbxexec.h"
 
 /* the size of temporary buffer used to read from output stream */
 #define PIPE_BUFFER_SIZE	4096
@@ -280,6 +281,7 @@ exit:
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *             timeout       - [IN] execution timeout                         *
+ *             flag          - [IN] indicates if exit code must be checked    *
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
  *               timeout occurred or FAIL otherwise                           *
@@ -287,7 +289,8 @@ exit:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout)
+int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
+		unsigned char flag)
 {
 	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
 	int			ret = FAIL;
@@ -311,7 +314,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (NULL != output)
 		zbx_free(*output);
 
-	buffer = zbx_malloc(buffer, buf_size);
+	buffer = (char *)zbx_malloc(buffer, buf_size);
 	*buffer = '\0';
 
 #ifdef _WINDOWS
@@ -403,7 +406,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 
 			ret = FAIL;
 		}
-		else if (0 != code)
+		else if (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != code)
 		{
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
@@ -469,7 +472,7 @@ close:
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 		}
-		else if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
+		else if (0 == WIFEXITED(status) || (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != WEXITSTATUS(status)))
 		{
 			if ('\0' == *buffer)
 			{

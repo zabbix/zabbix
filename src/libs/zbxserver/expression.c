@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,11 @@
 #include "zbxalgo.h"
 #include "valuecache.h"
 #include "macrofunc.h"
+#ifdef HAVE_LIBXML2
+#	include <libxml/parser.h>
+#	include <libxml/tree.h>
+#	include <libxml/xpath.h>
+#endif
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -267,7 +272,7 @@ static void	DCexpand_trigger_expression(char **expression)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
-	tmp = zbx_malloc(tmp, tmp_alloc);
+	tmp = (char *)zbx_malloc(tmp, tmp_alloc);
 
 	for (l = 0; '\0' != (*expression)[l]; l++)
 	{
@@ -312,8 +317,7 @@ static void	DCexpand_trigger_expression(char **expression)
 
 			if (SUCCEED == errcode[0])
 			{
-				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1,
-						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1);
 
 				if (SUCCEED == errcode[1])
 				{
@@ -569,10 +573,10 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_
 		goto out;
 	}
 
-	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	*replace_to = (char *)zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct h.name"
@@ -655,10 +659,10 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64
 		}
 	}
 
-	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	*replace_to = (char *)zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.name"
@@ -773,6 +777,50 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_substitute_item_name_macros                                  *
+ *                                                                            *
+ * Purpose: substitute key macros and use it to substitute item name macros if*
+ *          item name is specified                                            *
+ *                                                                            *
+ * Parameters: dc_item    - [IN] item information used in substitution        *
+ *             name       - [IN] optional item name to substitute             *
+ *             replace_to - [OUT] expanded item name or key if name is absent *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to)
+{
+	int	ret;
+	char	*key;
+
+	if (INTERFACE_TYPE_UNKNOWN == dc_item->interface.type)
+		ret = DCconfig_get_interface(&dc_item->interface, dc_item->host.hostid, 0);
+	else
+		ret = SUCCEED;
+
+	if (ret == FAIL)
+		return FAIL;
+
+	key = zbx_strdup(NULL, dc_item->key_orig);
+	substitute_key_macros(&key, NULL, dc_item, NULL, MACRO_TYPE_ITEM_KEY,
+			NULL, 0);
+
+	if (NULL != name)
+	{
+		*replace_to = zbx_strdup(*replace_to, name);
+		item_description(replace_to, key, dc_item->host.hostid);
+		zbx_free(key);
+	}
+	else	/* ZBX_REQUEST_ITEM_KEY */
+	{
+		zbx_free(*replace_to);
+		*replace_to = key;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_item_value                                                 *
  *                                                                            *
  * Purpose: retrieve a particular value associated with the item              *
@@ -787,7 +835,6 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DC_ITEM		dc_item;
-	char		*key;
 	zbx_uint64_t	proxy_hostid;
 	int		ret = FAIL, errcode;
 
@@ -825,38 +872,20 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
-			case ZBX_REQUEST_ITEM_KEY:
-				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1,
-						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
-				{
-					if (INTERFACE_TYPE_UNKNOWN == dc_item.interface.type)
-						ret = DCconfig_get_interface(&dc_item.interface, dc_item.host.hostid, 0);
-					else
-						ret = SUCCEED;
+					ret = zbx_substitute_item_name_macros(&dc_item, row[3], replace_to);
 
-					if (SUCCEED == ret)
-					{
-						key = zbx_strdup(NULL, dc_item.key_orig);
-						substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY,
-								NULL, 0);
+				DCconfig_clean_items(&dc_item, &errcode, 1);
+				break;
+			case ZBX_REQUEST_ITEM_KEY:
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
-						if (ZBX_REQUEST_ITEM_NAME == request)
-						{
-							*replace_to = zbx_strdup(*replace_to, row[3]);
-							item_description(replace_to, key, dc_item.host.hostid);
-							zbx_free(key);
-						}
-						else	/* ZBX_REQUEST_ITEM_KEY */
-						{
-							zbx_free(*replace_to);
-							*replace_to = key;
-						}
-					}
+				if (SUCCEED == errcode)
+					ret = zbx_substitute_item_name_macros(&dc_item, NULL, replace_to);
 
-					DCconfig_clean_items(&dc_item, &errcode, 1);
-				}
+				DCconfig_clean_items(&dc_item, &errcode, 1);
 				break;
 			case ZBX_REQUEST_ITEM_NAME_ORIG:
 				*replace_to = zbx_strdup(*replace_to, row[3]);
@@ -936,8 +965,12 @@ static int	DBget_trigger_value(const char *expression, char **replace_to, int N_
  * Purpose: retrieve number of events (acknowledged or unacknowledged) for a  *
  *          trigger (in an OK or PROBLEM state) which generated an event      *
  *                                                                            *
- * Parameters: triggerid - trigger identifier from database                   *
- *             replace_to - pointer to result buffer                          *
+ * Parameters: triggerid    - [IN] trigger identifier from database           *
+ *             replace_to   - [IN/OUT] pointer to result buffer               *
+ *             problem_only - [IN] selected trigger status:                   *
+ *                             0 - TRIGGER_VALUE_PROBLEM and TRIGGER_VALUE_OK *
+ *                             1 - TRIGGER_VALUE_PROBLEM                      *
+ *             acknowledged - [IN] acknowledged event or not                  *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1196,7 +1229,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
@@ -1332,7 +1365,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
-			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)
@@ -1394,7 +1427,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
-			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)
@@ -1419,7 +1452,8 @@ out:
  * Purpose: retrieve escalation history                                       *
  *                                                                            *
  ******************************************************************************/
-static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event, char **replace_to)
+static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+			char **replace_to, const zbx_uint64_t *recipient_userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1430,7 +1464,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 	time_t		now;
 	zbx_uint64_t	userid;
 
-	buf = zbx_malloc(buf, buf_alloc);
+	buf = (char *)zbx_malloc(buf, buf_alloc);
 
 	zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
 			zbx_date2str(event->clock), zbx_time2str(event->clock),
@@ -1448,11 +1482,14 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int	user_permit;
+
 		now = atoi(row[0]);
 		type = (unsigned char)atoi(row[1]);
 		status = (unsigned char)atoi(row[2]);
 		esc_step = atoi(row[6]);
 		ZBX_DBROW2UINT64(userid, row[7]);
+		user_permit = zbx_check_user_permissions(&userid, recipient_userid);
 
 		if (0 != esc_step)
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%d. ", esc_step);
@@ -1473,14 +1510,35 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 		}
 		else
 		{
+			const char	*description, *send_to, *user_name;
+
+			description = (SUCCEED == DBis_null(row[3]) ? "" : row[3]);
+
+			if (SUCCEED == user_permit)
+			{
+				send_to = row[4];
+				user_name = zbx_user_string(userid);
+			}
+			else
+			{
+				send_to = "\"Inaccessible recipient details\"";
+				user_name = "Inaccessible user";
+			}
+
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s %s \"%s\"",
-					SUCCEED == DBis_null(row[3]) ? "" : row[3],	/* media type description */
-					row[4],						/* send to */
-					zbx_user_string(userid));			/* alert user */
+					description,	/* media type description */
+					send_to,	/* historical recipient */
+					user_name);	/* alert user full name */
 		}
 
 		if (ALERT_STATUS_FAILED == status)
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s", row[5]);	/* alert error */
+		{
+			/* alert error can be generated by SMTP Relay or other media and contain sensitive details */
+			if (SUCCEED == user_permit)
+				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s", row[5]);
+			else
+				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " \"Inaccessible error message\"");
+		}
 
 		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
 	}
@@ -1530,7 +1588,7 @@ static void	acknowledge_expand_action_names(char **str, size_t *str_alloc, size_
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
+static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1546,7 +1604,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 		return;
 	}
 
-	buf = zbx_malloc(buf, buf_alloc);
+	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
 	result = DBselect("select clock,userid,message,action"
@@ -1556,15 +1614,22 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		const char	*user_name;
+
 		now = atoi(row[0]);
 		ZBX_STR2UINT64(userid, row[1]);
 		action = atoi(row[3]);
+
+		if (SUCCEED == zbx_check_user_permissions(&userid, recipient_userid))
+			user_name = zbx_user_string(userid);
+		else
+			user_name = "Inaccessible user";
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n",
 				zbx_date2str(now),
 				zbx_time2str(now),
-				zbx_user_string(userid));
+				user_name);
 
 		if (ZBX_ACKNOWLEDGE_ACTION_NONE != action)
 		{
@@ -1575,7 +1640,6 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n\n", row[2]);
 	}
-
 	DBfree_result(result);
 
 	if (0 != buf_offset)
@@ -1643,6 +1707,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_STATUS		MVAR_EVENT "STATUS}"
 #define MVAR_EVENT_TIME			MVAR_EVENT "TIME}"
 #define MVAR_EVENT_VALUE		MVAR_EVENT "VALUE}"
+#define MVAR_EVENT_NAME		MVAR_EVENT "NAME}"
 #define MVAR_EVENT_TAGS			MVAR_EVENT "TAGS}"
 #define MVAR_EVENT_RECOVERY		MVAR_EVENT "RECOVERY."		/* a prefix for all recovery event macros */
 #define MVAR_EVENT_RECOVERY_DATE	MVAR_EVENT_RECOVERY "DATE}"
@@ -1872,92 +1937,92 @@ static const char	*mod_macros[] = {MVAR_ITEM_VALUE, MVAR_ITEM_LASTVALUE, NULL};
 typedef struct
 {
 	const char	*macro;
-	const char	*field_name;
+	int		idx;
 } inventory_field_t;
 
 static inventory_field_t	inventory_fields[] =
 {
-	{MVAR_INVENTORY_TYPE, "type"},
-	{MVAR_PROFILE_DEVICETYPE, "type"},	/* deprecated */
-	{MVAR_INVENTORY_TYPE_FULL, "type_full"},
-	{MVAR_INVENTORY_NAME, "name"},
-	{MVAR_PROFILE_NAME, "name"},	/* deprecated */
-	{MVAR_INVENTORY_ALIAS, "alias"},
-	{MVAR_INVENTORY_OS, "os"},
-	{MVAR_PROFILE_OS, "os"},	/* deprecated */
-	{MVAR_INVENTORY_OS_FULL, "os_full"},
-	{MVAR_INVENTORY_OS_SHORT, "os_short"},
-	{MVAR_INVENTORY_SERIALNO_A, "serialno_a"},
-	{MVAR_PROFILE_SERIALNO, "serialno_a"},	/* deprecated */
-	{MVAR_INVENTORY_SERIALNO_B, "serialno_b"},
-	{MVAR_INVENTORY_TAG, "tag"},
-	{MVAR_PROFILE_TAG, "tag"},	/* deprecated */
-	{MVAR_INVENTORY_ASSET_TAG, "asset_tag"},
-	{MVAR_INVENTORY_MACADDRESS_A, "macaddress_a"},
-	{MVAR_PROFILE_MACADDRESS, "macaddress_a"},	/* deprecated */
-	{MVAR_INVENTORY_MACADDRESS_B, "macaddress_b"},
-	{MVAR_INVENTORY_HARDWARE, "hardware"},
-	{MVAR_PROFILE_HARDWARE, "hardware"},	/* deprecated */
-	{MVAR_INVENTORY_HARDWARE_FULL, "hardware_full"},
-	{MVAR_INVENTORY_SOFTWARE, "software"},
-	{MVAR_PROFILE_SOFTWARE, "software"},	/* deprecated */
-	{MVAR_INVENTORY_SOFTWARE_FULL, "software_full"},
-	{MVAR_INVENTORY_SOFTWARE_APP_A, "software_app_a"},
-	{MVAR_INVENTORY_SOFTWARE_APP_B, "software_app_b"},
-	{MVAR_INVENTORY_SOFTWARE_APP_C, "software_app_c"},
-	{MVAR_INVENTORY_SOFTWARE_APP_D, "software_app_d"},
-	{MVAR_INVENTORY_SOFTWARE_APP_E, "software_app_e"},
-	{MVAR_INVENTORY_CONTACT, "contact"},
-	{MVAR_PROFILE_CONTACT, "contact"},	/* deprecated */
-	{MVAR_INVENTORY_LOCATION, "location"},
-	{MVAR_PROFILE_LOCATION, "location"},	/* deprecated */
-	{MVAR_INVENTORY_LOCATION_LAT, "location_lat"},
-	{MVAR_INVENTORY_LOCATION_LON, "location_lon"},
-	{MVAR_INVENTORY_NOTES, "notes"},
-	{MVAR_PROFILE_NOTES, "notes"},	/* deprecated */
-	{MVAR_INVENTORY_CHASSIS, "chassis"},
-	{MVAR_INVENTORY_MODEL, "model"},
-	{MVAR_INVENTORY_HW_ARCH, "hw_arch"},
-	{MVAR_INVENTORY_VENDOR, "vendor"},
-	{MVAR_INVENTORY_CONTRACT_NUMBER, "contract_number"},
-	{MVAR_INVENTORY_INSTALLER_NAME, "installer_name"},
-	{MVAR_INVENTORY_DEPLOYMENT_STATUS, "deployment_status"},
-	{MVAR_INVENTORY_URL_A, "url_a"},
-	{MVAR_INVENTORY_URL_B, "url_b"},
-	{MVAR_INVENTORY_URL_C, "url_c"},
-	{MVAR_INVENTORY_HOST_NETWORKS, "host_networks"},
-	{MVAR_INVENTORY_HOST_NETMASK, "host_netmask"},
-	{MVAR_INVENTORY_HOST_ROUTER, "host_router"},
-	{MVAR_INVENTORY_OOB_IP, "oob_ip"},
-	{MVAR_INVENTORY_OOB_NETMASK, "oob_netmask"},
-	{MVAR_INVENTORY_OOB_ROUTER, "oob_router"},
-	{MVAR_INVENTORY_HW_DATE_PURCHASE, "date_hw_purchase"},
-	{MVAR_INVENTORY_HW_DATE_INSTALL, "date_hw_install"},
-	{MVAR_INVENTORY_HW_DATE_EXPIRY, "date_hw_expiry"},
-	{MVAR_INVENTORY_HW_DATE_DECOMM, "date_hw_decomm"},
-	{MVAR_INVENTORY_SITE_ADDRESS_A, "site_address_a"},
-	{MVAR_INVENTORY_SITE_ADDRESS_B, "site_address_b"},
-	{MVAR_INVENTORY_SITE_ADDRESS_C, "site_address_c"},
-	{MVAR_INVENTORY_SITE_CITY, "site_city"},
-	{MVAR_INVENTORY_SITE_STATE, "site_state"},
-	{MVAR_INVENTORY_SITE_COUNTRY, "site_country"},
-	{MVAR_INVENTORY_SITE_ZIP, "site_zip"},
-	{MVAR_INVENTORY_SITE_RACK, "site_rack"},
-	{MVAR_INVENTORY_SITE_NOTES, "site_notes"},
-	{MVAR_INVENTORY_POC_PRIMARY_NAME, "poc_1_name"},
-	{MVAR_INVENTORY_POC_PRIMARY_EMAIL, "poc_1_email"},
-	{MVAR_INVENTORY_POC_PRIMARY_PHONE_A, "poc_1_phone_a"},
-	{MVAR_INVENTORY_POC_PRIMARY_PHONE_B, "poc_1_phone_b"},
-	{MVAR_INVENTORY_POC_PRIMARY_CELL, "poc_1_cell"},
-	{MVAR_INVENTORY_POC_PRIMARY_SCREEN, "poc_1_screen"},
-	{MVAR_INVENTORY_POC_PRIMARY_NOTES, "poc_1_notes"},
-	{MVAR_INVENTORY_POC_SECONDARY_NAME, "poc_2_name"},
-	{MVAR_INVENTORY_POC_SECONDARY_EMAIL, "poc_2_email"},
-	{MVAR_INVENTORY_POC_SECONDARY_PHONE_A, "poc_2_phone_a"},
-	{MVAR_INVENTORY_POC_SECONDARY_PHONE_B, "poc_2_phone_b"},
-	{MVAR_INVENTORY_POC_SECONDARY_CELL, "poc_2_cell"},
-	{MVAR_INVENTORY_POC_SECONDARY_SCREEN, "poc_2_screen"},
-	{MVAR_INVENTORY_POC_SECONDARY_NOTES, "poc_2_notes"},
+	{MVAR_INVENTORY_TYPE, 0},
+	{MVAR_PROFILE_DEVICETYPE, 0},	/* deprecated */
+	{MVAR_INVENTORY_TYPE_FULL, 1},
+	{MVAR_INVENTORY_NAME, 2},
+	{MVAR_PROFILE_NAME, 2},	/* deprecated */
+	{MVAR_INVENTORY_ALIAS, 3},
+	{MVAR_INVENTORY_OS, 4},
+	{MVAR_PROFILE_OS, 4},	/* deprecated */
+	{MVAR_INVENTORY_OS_FULL, 5},
+	{MVAR_INVENTORY_OS_SHORT, 6},
+	{MVAR_INVENTORY_SERIALNO_A, 7},
+	{MVAR_PROFILE_SERIALNO, 7},	/* deprecated */
+	{MVAR_INVENTORY_SERIALNO_B, 8},
+	{MVAR_INVENTORY_TAG, 9},
+	{MVAR_PROFILE_TAG, 9},	/* deprecated */
+	{MVAR_INVENTORY_ASSET_TAG, 10},
+	{MVAR_INVENTORY_MACADDRESS_A, 11},
+	{MVAR_PROFILE_MACADDRESS, 11},	/* deprecated */
+	{MVAR_INVENTORY_MACADDRESS_B, 12},
+	{MVAR_INVENTORY_HARDWARE, 13},
+	{MVAR_PROFILE_HARDWARE, 13},	/* deprecated */
+	{MVAR_INVENTORY_HARDWARE_FULL, 14},
+	{MVAR_INVENTORY_SOFTWARE, 15},
+	{MVAR_PROFILE_SOFTWARE, 15},	/* deprecated */
+	{MVAR_INVENTORY_SOFTWARE_FULL, 16},
+	{MVAR_INVENTORY_SOFTWARE_APP_A, 17},
+	{MVAR_INVENTORY_SOFTWARE_APP_B, 18},
+	{MVAR_INVENTORY_SOFTWARE_APP_C, 19},
+	{MVAR_INVENTORY_SOFTWARE_APP_D, 20},
+	{MVAR_INVENTORY_SOFTWARE_APP_E, 21},
+	{MVAR_INVENTORY_CONTACT, 22},
+	{MVAR_PROFILE_CONTACT, 22},	/* deprecated */
+	{MVAR_INVENTORY_LOCATION, 23},
+	{MVAR_PROFILE_LOCATION, 23},	/* deprecated */
+	{MVAR_INVENTORY_LOCATION_LAT, 24},
+	{MVAR_INVENTORY_LOCATION_LON, 25},
+	{MVAR_INVENTORY_NOTES, 26},
+	{MVAR_PROFILE_NOTES, 26},	/* deprecated */
+	{MVAR_INVENTORY_CHASSIS, 27},
+	{MVAR_INVENTORY_MODEL, 28},
+	{MVAR_INVENTORY_HW_ARCH, 29},
+	{MVAR_INVENTORY_VENDOR, 30},
+	{MVAR_INVENTORY_CONTRACT_NUMBER, 31},
+	{MVAR_INVENTORY_INSTALLER_NAME, 32},
+	{MVAR_INVENTORY_DEPLOYMENT_STATUS, 33},
+	{MVAR_INVENTORY_URL_A, 34},
+	{MVAR_INVENTORY_URL_B, 35},
+	{MVAR_INVENTORY_URL_C, 36},
+	{MVAR_INVENTORY_HOST_NETWORKS, 37},
+	{MVAR_INVENTORY_HOST_NETMASK, 38},
+	{MVAR_INVENTORY_HOST_ROUTER, 39},
+	{MVAR_INVENTORY_OOB_IP, 40},
+	{MVAR_INVENTORY_OOB_NETMASK, 41},
+	{MVAR_INVENTORY_OOB_ROUTER, 42},
+	{MVAR_INVENTORY_HW_DATE_PURCHASE, 43},
+	{MVAR_INVENTORY_HW_DATE_INSTALL, 44},
+	{MVAR_INVENTORY_HW_DATE_EXPIRY, 45},
+	{MVAR_INVENTORY_HW_DATE_DECOMM, 46},
+	{MVAR_INVENTORY_SITE_ADDRESS_A, 47},
+	{MVAR_INVENTORY_SITE_ADDRESS_B, 48},
+	{MVAR_INVENTORY_SITE_ADDRESS_C, 49},
+	{MVAR_INVENTORY_SITE_CITY, 50},
+	{MVAR_INVENTORY_SITE_STATE, 51},
+	{MVAR_INVENTORY_SITE_COUNTRY, 52},
+	{MVAR_INVENTORY_SITE_ZIP, 53},
+	{MVAR_INVENTORY_SITE_RACK, 54},
+	{MVAR_INVENTORY_SITE_NOTES, 55},
+	{MVAR_INVENTORY_POC_PRIMARY_NAME, 56},
+	{MVAR_INVENTORY_POC_PRIMARY_EMAIL, 57},
+	{MVAR_INVENTORY_POC_PRIMARY_PHONE_A, 58},
+	{MVAR_INVENTORY_POC_PRIMARY_PHONE_B, 59},
+	{MVAR_INVENTORY_POC_PRIMARY_CELL, 60},
+	{MVAR_INVENTORY_POC_PRIMARY_SCREEN, 61},
+	{MVAR_INVENTORY_POC_PRIMARY_NOTES, 62},
+	{MVAR_INVENTORY_POC_SECONDARY_NAME, 63},
+	{MVAR_INVENTORY_POC_SECONDARY_EMAIL, 64},
+	{MVAR_INVENTORY_POC_SECONDARY_PHONE_A, 65},
+	{MVAR_INVENTORY_POC_SECONDARY_PHONE_B, 66},
+	{MVAR_INVENTORY_POC_SECONDARY_CELL, 67},
+	{MVAR_INVENTORY_POC_SECONDARY_SCREEN, 68},
+	{MVAR_INVENTORY_POC_SECONDARY_NOTES, 69},
 	{NULL}
 };
 
@@ -1999,44 +2064,6 @@ static int	get_action_value(const char *macro, zbx_uint64_t actionid, char **rep
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_host_inventory_value                                       *
- *                                                                            *
- * Purpose: request host inventory value by itemid and field name             *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_host_inventory_value(zbx_uint64_t itemid, char **replace_to, const char *field_name)
-{
-	const char	*__function_name = "DBget_host_inventory_value";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result = DBselect(
-			"select hi.%s"
-			" from host_inventory hi,items i"
-			" where hi.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64, field_name, itemid);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		ret = SUCCEED;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_host_inventory                                               *
  *                                                                            *
  * Purpose: request host inventory value by macro and trigger                 *
@@ -2055,16 +2082,15 @@ static int	get_host_inventory(const char *macro, const char *expression, char **
 		if (0 == strcmp(macro, inventory_fields[i].macro))
 		{
 			zbx_uint64_t	itemid;
-			int		ret = FAIL;
 
-			if (SUCCEED == get_N_itemid(expression, N_functionid, &itemid))
-				ret = DBget_host_inventory_value(itemid, replace_to, inventory_fields[i].field_name);
+			if (SUCCEED != get_N_itemid(expression, N_functionid, &itemid))
+				return FAIL;
 
-			return ret;
+			return DCget_host_inventory_value_by_itemid(itemid, replace_to, inventory_fields[i].idx);
 		}
 	}
 
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************
@@ -2084,10 +2110,10 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 	for (i = 0; NULL != inventory_fields[i].macro; i++)
 	{
 		if (0 == strcmp(macro, inventory_fields[i].macro))
-			return DBget_host_inventory_value(itemid, replace_to, inventory_fields[i].field_name);
+			return DCget_host_inventory_value_by_itemid(itemid, replace_to, inventory_fields[i].idx);
 	}
 
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************
@@ -2226,7 +2252,8 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
  * Purpose: request event value by macro                                      *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_value(const char *macro, const DB_EVENT *event, char **replace_to)
+static void	get_event_value(const char *macro, const DB_EVENT *event, char **replace_to,
+			const zbx_uint64_t *recipient_userid)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_AGE))
 	{
@@ -2248,7 +2275,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	{
 		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY))
 		{
-			get_event_ack_history(event, replace_to);
+			get_event_ack_history(event, replace_to, recipient_userid);
 		}
 		else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
 		{
@@ -2447,7 +2474,7 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 		DC_ITEM	item;
 		int	errcode;
 
-		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 		if (SUCCEED == errcode)
 			zbx_vector_uint64_append(hostids, item.host.hostid);
@@ -2518,7 +2545,7 @@ static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_al
 		if (NULL != replace_to_alloc)
 			*replace_to_alloc = replace_to_len + 3;
 
-		buffer = zbx_malloc(NULL, replace_to_len + 3);
+		buffer = (char *)zbx_malloc(NULL, replace_to_len + 3);
 
 		memcpy(buffer + 1, *replace_to, replace_to_len);
 
@@ -2541,7 +2568,7 @@ static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_al
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, DC_ITEM *dc_item,
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
 	const char		*__function_name = "substitute_simple_macros";
@@ -2684,7 +2711,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(*actionid, event, r_event, &replace_to);
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
@@ -2695,9 +2722,13 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					get_current_event_value(m, c_event, &replace_to);
 				}
+				else if (0 == strcmp(m, MVAR_EVENT_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->name);
+				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to, userid);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
@@ -2940,7 +2971,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_USER_FULLNAME))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-						replace_to = zbx_strdup(replace_to, zbx_user_string(ack->userid));
+					{
+						const char	*user_name;
+
+						if (SUCCEED == zbx_check_user_permissions(&ack->userid, userid))
+							user_name = zbx_user_string(ack->userid);
+						else
+							user_name = "Inaccessible user";
+
+						replace_to = zbx_strdup(replace_to, user_name);
+					}
 				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
@@ -2962,7 +3002,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(*actionid, event, r_event, &replace_to);
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
@@ -2973,9 +3013,13 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					get_current_event_value(m, c_event, &replace_to);
 				}
+				else if (0 == strcmp(m, MVAR_EVENT_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->name);
+				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to, userid);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
@@ -3145,7 +3189,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to, userid);
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 				{
@@ -3269,7 +3313,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to, userid);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_METADATA))
 				{
@@ -3346,7 +3390,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(*actionid, event, r_event, &replace_to);
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
@@ -3357,9 +3401,13 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					get_current_event_value(m, c_event, &replace_to);
 				}
+				else if (0 == strcmp(m, MVAR_EVENT_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->name);
+				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to, userid);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
@@ -3459,7 +3507,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(*actionid, event, r_event, &replace_to);
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
@@ -3472,7 +3520,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to, userid);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
@@ -3609,15 +3657,15 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
-				{
-					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
-							raw_value);
-				}
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				{
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
 				}
 			}
 		}
@@ -3856,6 +3904,50 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					replace_to = zbx_strdup(replace_to, interface.addr);
 			}
 		}
+		else if (0 == indexed_macro && (0 != (macro_type & (MACRO_TYPE_HTTP_RAW | MACRO_TYPE_HTTP_JSON |
+				MACRO_TYPE_HTTP_XML))))
+		{
+			if (ZBX_TOKEN_USER_MACRO == token.type)
+			{
+				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+				pos = token.token.r;
+			}
+			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			{
+				replace_to = zbx_strdup(replace_to, dc_host->host);
+			}
+			else if (0 == strcmp(m, MVAR_HOST_NAME))
+			{
+				replace_to = zbx_strdup(replace_to, dc_host->name);
+			}
+			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+					replace_to = zbx_strdup(replace_to, interface.ip_orig);
+			}
+			else if	(0 == strcmp(m, MVAR_HOST_DNS))
+			{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+					replace_to = zbx_strdup(replace_to, interface.dns_orig);
+			}
+			else if (0 == strcmp(m, MVAR_HOST_CONN))
+			{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+					replace_to = zbx_strdup(replace_to, interface.addr);
+			}
+			else if (0 == strcmp(m, MVAR_ITEM_ID))
+			{
+				replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, dc_item->itemid);
+			}
+			else if (0 == strcmp(m, MVAR_ITEM_KEY))
+			{
+				replace_to = zbx_strdup(replace_to, dc_item->key);
+			}
+			else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
+			{
+				replace_to = zbx_strdup(replace_to, dc_item->key_orig);
+			}
+		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_ALERT))
 		{
 			if (0 == strcmp(m, MVAR_ALERT_SENDTO))
@@ -3981,7 +4073,24 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
 				}
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+				{
+					ret = get_host_inventory(m, event->trigger.expression, &replace_to,
+							N_functionid);
+				}
 			}
+		}
+
+		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
+			zbx_json_escape(&replace_to);
+
+		if (0 != (macro_type & MACRO_TYPE_HTTP_XML) && NULL != replace_to)
+		{
+			char	*replace_to_esc;
+
+			replace_to_esc = xml_escape_dyn(replace_to);
+			zbx_free(replace_to);
+			replace_to = replace_to_esc;
 		}
 
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
@@ -4192,7 +4301,7 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 
 		if (SUCCEED == extract_expression_functionids(&funcids, tr->expression))
 		{
-			tr_func_pos = zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
+			tr_func_pos = (zbx_trigger_func_position_t *)zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
 			tr_func_pos->trigger = tr;
 			tr_func_pos->start_index = functionids->values_num;
 			tr_func_pos->count = funcids.values_num;
@@ -4241,8 +4350,8 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 
 	zbx_link_triggers_with_functions(&triggers_func_pos, &functionids, trigger_order);
 
-	functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
+	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 
 	DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes, functionids.values_num);
 
@@ -4357,8 +4466,8 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 	func_local.value = NULL;
 	func_local.error = NULL;
 
-	functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
+	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
 
 	DCconfig_get_functions_by_functionids(functions, functionids->values, errcodes, functionids->values_num);
 
@@ -4384,9 +4493,9 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 		func_local.function = functions[i].function;
 		func_local.parameter = functions[i].parameter;
 
-		if (NULL == (func = zbx_hashset_search(funcs, &func_local)))
+		if (NULL == (func = (zbx_func_t *)zbx_hashset_search(funcs, &func_local)))
 		{
-			func = zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
+			func = (zbx_func_t *)zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
 			func->function = zbx_strdup(NULL, func_local.function);
 			func->parameter = zbx_strdup(NULL, func_local.parameter);
 		}
@@ -4422,20 +4531,19 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 	zbx_vector_uint64_reserve(&itemids, funcs->num_data);
 
 	zbx_hashset_iter_reset(funcs, &iter);
-	while (NULL != (func = zbx_hashset_iter_next(&iter)))
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 		zbx_vector_uint64_append(&itemids, func->itemid);
 
 	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
+	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
-			ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	zbx_hashset_iter_reset(funcs, &iter);
-	while (NULL != (func = zbx_hashset_iter_next(&iter)))
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
 		int	ret_unknown = 0;	/* flag raised if current function evaluates to ZBX_UNKNOWN */
 		char	*unknown_msg;
@@ -4473,8 +4581,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 		/*     evaluated to regular numbers even for NOTSUPPORTED items. */
 		/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].db_state &&
-				FAIL == evaluatable_for_notsupported(func->function))
+		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == evaluatable_for_notsupported(func->function))
 		{
 			/* compose and store 'unknown' message for future use */
 			unknown_msg = zbx_dsprintf(NULL,
@@ -4564,7 +4671,7 @@ static int	substitute_expression_functions_results(zbx_hashset_t *ifuncs, char *
 		*br++ = '}';
 		bl = br;
 
-		if (NULL == (ifunc = zbx_hashset_search(ifuncs, &functionid)))
+		if (NULL == (ifunc = (zbx_ifunc_t *)zbx_hashset_search(ifuncs, &functionid)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot obtain function"
 					" and item for functionid: " ZBX_FS_UI64, functionid);
@@ -4612,7 +4719,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d tr_num:%d",
 			__function_name, ifuncs->num_data, triggers->values_num);
 
-	out = zbx_malloc(out, out_alloc);
+	out = (char *)zbx_malloc(out, out_alloc);
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -4851,7 +4958,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, const str
 		goto out;
 	}
 
-	replace_to = zbx_malloc(NULL, replace_to_alloc);
+	replace_to = (char *)zbx_malloc(NULL, replace_to_alloc);
 
 	lld_start = token->data.simple_macro.key.l;
 	lld_end = token->data.simple_macro.func_param.r - 1;
@@ -4941,6 +5048,18 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 			zbx_snprintf(error, error_len, "macro \"%s\" value is not numeric", *data + token->token.l);
 			ret = FAIL;
 		}
+	}
+	else if (0 != (flags & ZBX_TOKEN_JSON))
+	{
+		zbx_json_escape(&replace_to);
+	}
+	else if (0 != (flags & ZBX_TOKEN_XML))
+	{
+		char	*replace_to_esc;
+
+		replace_to_esc = xml_escape_dyn(replace_to);
+		zbx_free(replace_to);
+		replace_to = replace_to_esc;
 	}
 
 	(*data)[token->token.r + 1] = c;
@@ -5337,3 +5456,171 @@ out:
 
 	return ret;
 }
+
+#ifdef HAVE_LIBXML2
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_in_xml_elements                                *
+ *                                                                            *
+ * Comments: auxiliary function for substitute_macros_xml()                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+		xmlNode *node)
+{
+	xmlChar	*value;
+	xmlAttr	*attr;
+	char	*value_tmp;
+
+	for (;NULL != node; node = node->next)
+	{
+		switch (node->type)
+		{
+			case XML_TEXT_NODE:
+				if (NULL == (value = xmlNodeGetContent(node)))
+					break;
+
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+
+				if (NULL != item)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+							NULL, &value_tmp, MACRO_TYPE_HTTP_XML, NULL, 0);
+				}
+				else
+					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
+
+				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+
+				zbx_free(value_tmp);
+				xmlFree(value);
+				break;
+			case XML_CDATA_SECTION_NODE:
+				if (NULL == (value = xmlNodeGetContent(node)))
+					break;
+
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+
+				if (NULL != item)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+							NULL, &value_tmp, MACRO_TYPE_HTTP_RAW, NULL, 0);
+				}
+				else
+					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+
+				zbx_free(value_tmp);
+				xmlFree(value);
+				break;
+			case XML_ELEMENT_NODE:
+				for (attr = node->properties; NULL != attr; attr = attr->next)
+				{
+					if (NULL == attr->name || NULL == (value = xmlGetProp(node, attr->name)))
+						continue;
+
+					value_tmp = zbx_strdup(NULL, (const char *)value);
+
+					if (NULL != item)
+					{
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host,
+								item, NULL, NULL, &value_tmp, MACRO_TYPE_HTTP_XML,
+								NULL, 0);
+					}
+					else
+						substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
+
+					xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
+
+					zbx_free(value_tmp);
+					xmlFree(value);
+				}
+				break;
+			default:
+				break;
+		}
+
+		substitute_macros_in_xml_elements(item, jp_row, node->children);
+	}
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_xml                                            *
+ *                                                                            *
+ * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
+ *          a node or in CDATA section, validate XML                          *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] pointer to a buffer that contains XML        *
+ *             item   - [IN] item for simple macro substitution               *
+ *             jp_row - [IN] discovery data for LLD macro substitution        *
+ *             error  - [OUT] reason for XML parsing failure                  *
+ *             maxerrlen - [IN] the size of error buffer                      *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL if XML validation has failed                 *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
+		int maxerrlen)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(jp_row);
+	zbx_snprintf(error, maxerrlen, "Support for XML was not compiled in");
+	return FAIL;
+#else
+	const char	*__function_name = "substitute_macros_xml";
+	xmlDoc		*doc;
+	xmlErrorPtr	pErr;
+	xmlNode		*root_element;
+	xmlChar		*mem;
+	int		size, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == (doc = xmlReadMemory(*data, strlen(*data), "noname.xml", NULL, 0)))
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+			zbx_snprintf(error, maxerrlen, "Cannot parse XML value: %s", pErr->message);
+		else
+			zbx_snprintf(error, maxerrlen, "Cannot parse XML value");
+
+		goto exit;
+	}
+
+	if (NULL == (root_element = xmlDocGetRootElement(doc)))
+	{
+		zbx_snprintf(error, maxerrlen, "Cannot parse XML root");
+		goto clean;
+	}
+
+	substitute_macros_in_xml_elements(item, jp_row, root_element);
+	xmlDocDumpMemory(doc, &mem, &size);
+
+	if (NULL == mem)
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+			zbx_snprintf(error, maxerrlen, "Cannot save XML: %s", pErr->message);
+		else
+			zbx_snprintf(error, maxerrlen, "Cannot save XML");
+
+		goto clean;
+	}
+
+	zbx_free(*data);
+	*data = zbx_malloc(NULL, size + 1);
+	memcpy(*data, (const char *)mem, size + 1);
+	xmlFree(mem);
+	ret = SUCCEED;
+clean:
+	xmlFreeDoc(doc);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+#endif
+}
+

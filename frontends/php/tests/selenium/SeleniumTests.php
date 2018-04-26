@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
-require_once dirname(__FILE__).'/testPageStatusOfTriggers.php';
 require_once dirname(__FILE__).'/testPageProblems.php';
 require_once dirname(__FILE__).'/testPageScreens.php';
 require_once dirname(__FILE__).'/testPageActions.php';
@@ -47,7 +46,6 @@ require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
-require_once dirname(__FILE__).'/testPagePopup.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -74,8 +72,10 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralInstallation.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserCreate.php';
+require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
 require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
+require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHost.php';
@@ -83,6 +83,7 @@ require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
+require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
@@ -91,6 +92,8 @@ require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormUserProfile.php';
 require_once dirname(__FILE__).'/testFormWeb.php';
+require_once dirname(__FILE__).'/testFormWebStep.php';
+require_once dirname(__FILE__).'/testFormApplication.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
@@ -101,6 +104,7 @@ require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
+require_once dirname(__FILE__).'/testTagBasedPermissions.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 require_once dirname(__FILE__).'/testTriggerDependencies.php';
 require_once dirname(__FILE__).'/testTriggerExpressions.php';
@@ -140,7 +144,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageOverview');
-		$suite->addTestSuite('testPagePopup');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
@@ -149,7 +152,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageScreens');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageSlideShows');
-		$suite->addTestSuite('testPageStatusOfTriggers');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
@@ -170,8 +172,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserCreate');
+		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormDiscoveryRule');
+		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHost');
@@ -179,6 +183,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormLogin');
+		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormSysmap');
@@ -187,16 +192,19 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormWeb');
+		$suite->addTestSuite('testFormWebStep');
+		$suite->addTestSuite('testFormApplication');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItem');
 		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testInheritanceGraph');
+		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testInheritanceWeb');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
-		$suite->addTestSuite('testInheritanceGraphPrototype');
+		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testTemplateInheritance');
 		$suite->addTestSuite('testTriggerDependencies');
 		$suite->addTestSuite('testTriggerExpressions');

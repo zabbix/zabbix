@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp, char **error
 
 	return SYSINFO_RET_FAIL;
 #else
-	*error = zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
+	*error = zbx_strdup(NULL, "Agent was compiled without support for Perfstat API.");
 	return SYSINFO_RET_FAIL;
 #endif
 }

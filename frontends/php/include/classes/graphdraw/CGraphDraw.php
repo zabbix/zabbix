@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,28 @@
 
 
 abstract class CGraphDraw {
+
+	/**
+	 * Default top padding including header label height and vertical padding.
+	 */
+	const DEFAULT_HEADER_PADDING_TOP = 36;
+	/**
+	 * Default font size for header label text.
+	 */
+	const DEFAULT_HEADER_LABEL_FONT_SIZE = 11;
+	/**
+	 * Default value for top and bottom padding.
+	 */
+	const DEFAULT_TOP_BOTTOM_PADDING = 12;
+
+	/**
+	 * Header label visibility.
+	 */
+	public $draw_header = true;
+	/**
+	 * Use top and bottom padding for graph image.
+	 */
+	public $with_vertical_padding = true;
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		$this->stime = null;
@@ -46,11 +68,28 @@ abstract class CGraphDraw {
 		$this->shiftXleft = 100;
 		$this->shiftXright = 50;
 		$this->shiftXCaption = 0;
-		$this->shiftY = 36;
 		$this->num = 0;
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
 		$this->graphtheme = getUserGraphTheme();
+	}
+
+	/**
+	 * Recalculate $this->shiftY property for graph according header label visibility settings and visibility of graph
+	 * top and bottom padding settings.
+	 */
+	protected function calculateTopPadding() {
+		$shift = static::DEFAULT_HEADER_PADDING_TOP;
+
+		if (!$this->draw_header) {
+			$shift -= static::DEFAULT_HEADER_LABEL_FONT_SIZE;
+		}
+
+		if (!$this->with_vertical_padding) {
+			$shift -= static::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+
+		$this->shiftY = $shift;
 	}
 
 	public function initColors() {
@@ -176,6 +215,10 @@ abstract class CGraphDraw {
 	}
 
 	public function drawHeader() {
+		if (!$this->draw_header) {
+			return;
+		}
+
 		if (!isset($this->header)) {
 			$str = $this->items[0]['hostname'].NAME_DELIMITER.$this->items[0]['name'];
 		}
@@ -190,7 +233,7 @@ abstract class CGraphDraw {
 
 		// calculate largest font size that can fit graph header
 		// TODO: font size must be dynamic in other parts of the graph as well, like legend, timeline, etc
-		for ($fontsize = 11; $fontsize > 7; $fontsize--) {
+		for ($fontsize = static::DEFAULT_HEADER_LABEL_FONT_SIZE; $fontsize > 7; $fontsize--) {
 			$dims = imageTextSize($fontsize, 0, $str);
 			$x = $this->fullSizeX / 2 - ($dims['width'] / 2);
 
@@ -202,21 +245,17 @@ abstract class CGraphDraw {
 				break;
 			}
 		}
+		$y_baseline = 24;
 
-		imageText($this->im, $fontsize, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
+		if (!$this->with_vertical_padding) {
+			$y_baseline -= static::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+
+		imageText($this->im, $fontsize, 0, $x, $y_baseline, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 
 	public function setHeader($header) {
 		$this->header = $header;
-	}
-
-	public function drawLogo() {
-		imagestringup($this->im, 1,
-			$this->fullSizeX - 10,
-			$this->fullSizeY - 50,
-			ZABBIX_HOMEPAGE,
-			$this->getColor('Gray')
-		);
 	}
 
 	public function getColor($color, $alfa = 50) {

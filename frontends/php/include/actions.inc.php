@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -828,7 +828,8 @@ function getActionOperationDescriptions(array $actions, $type) {
  *
  * @param array  $operations								Array of action operations or recovery operations.
  * @param string $operation['operationtype']				Action operation type.
- *															Possible values: OPERATION_TYPE_MESSAGE and OPERATION_TYPE_COMMAND
+ *															Possible values: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
+ *															OPERATION_TYPE_ACK_MESSAGE and OPERATION_TYPE_RECOVERY_MESSAGE
  * @param string $operation['opcommand']['type']			Action operation command type.
  *															Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
  *															ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
@@ -1405,9 +1406,9 @@ function getActionMessages(array $alerts, array $r_alerts) {
 
 			$recipient = $alert['userid']
 				? array_key_exists($alert['userid'], $dbUsers)
-					? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
+					? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
 					: _('Inaccessible user')
-				: $alert['sendto'];
+				: zbx_nl2br($alert['sendto']);
 
 			$info_icons = [];
 			if ($alert['error'] !== ''
@@ -1642,14 +1643,14 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 		}
 	}
 
-	$result = DBselect(
-		'SELECT a.eventid,a.p_eventid,a.mediatypeid,a.userid,a.esc_step,a.clock,a.status,a.alerttype,a.error'.
-		' FROM alerts a'.
-		' WHERE '.dbConditionInt('a.eventid', array_keys($eventids)).
-			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-			' AND a.acknowledgeid IS NULL'.
-		' ORDER BY a.alertid DESC'
-	);
+	$db_alerts = API::Alert()->get([
+		'output' => ['eventid', 'p_eventid', 'mediatypeid', 'userid', 'esc_step', 'clock', 'status', 'alerttype',
+			'error'
+		],
+		'eventids' => array_keys($eventids),
+		'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND], 'acknowledgeid' => 0],
+		'sortorder' => ['alertid' => ZBX_SORT_DOWN]
+	]);
 
 	$alerts = [];
 	$userids = [];
@@ -1657,30 +1658,30 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 	$mediatypeids = [];
 	$mediatypes = [];
 
-	while ($row = DBfetch($result)) {
+	foreach ($db_alerts as $db_alert) {
 		$alert = [
-			'esc_step' => $row['esc_step'],
-			'clock' => $row['clock'],
-			'status' => $row['status'],
-			'alerttype' => $row['alerttype'],
-			'error' => $row['error'],
-			'p_eventid' => $row['p_eventid']
+			'esc_step' => $db_alert['esc_step'],
+			'clock' => $db_alert['clock'],
+			'status' => $db_alert['status'],
+			'alerttype' => $db_alert['alerttype'],
+			'error' => $db_alert['error'],
+			'p_eventid' => $db_alert['p_eventid']
 		];
 
 		if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
-			$alert['mediatypeid'] = $row['mediatypeid'];
-			$alert['userid'] = $row['userid'];
+			$alert['mediatypeid'] = $db_alert['mediatypeid'];
+			$alert['userid'] = $db_alert['userid'];
 
 			if ($alert['mediatypeid'] != 0) {
-				$mediatypeids[$row['mediatypeid']] = true;
+				$mediatypeids[$db_alert['mediatypeid']] = true;
 			}
 
 			if ($alert['userid'] != 0) {
-				$userids[$row['userid']] = true;
+				$userids[$db_alert['userid']] = true;
 			}
 		}
 
-		$alerts[$row['eventid']][$row['p_eventid']][] = $alert;
+		$alerts[$db_alert['eventid']][$db_alert['p_eventid']][] = $alert;
 	}
 
 	if ($mediatypeids) {
@@ -1723,21 +1724,22 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:
-					$status_str = $html ? (new CSpan(_('Done')))->addClass(ZBX_STYLE_GREEN) : _('Done');
+					$status_str = $html ? (new CLinkAction(_('Done')))->addClass(ZBX_STYLE_GREEN) : _('Done');
 					break;
 
 				case ALERT_STATUS_NOT_SENT:
-					$status_str = $html ? (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW) : _('In progress');
+					$status_str = $html
+						? (new CLinkAction(_('In progress')))->addClass(ZBX_STYLE_YELLOW)
+						: _('In progress');
 					break;
 
 				default:
-					$status_str = $html ? (new CSpan(_('Failures')))->addClass(ZBX_STYLE_RED) : _('Failures');
+					$status_str = $html ? (new CLinkAction(_('Failures')))->addClass(ZBX_STYLE_RED) : _('Failures');
 			}
 
 			if ($html) {
 				$problems[$index] = [
 					$status_str
-						->addClass(ZBX_STYLE_LINK_ACTION)
 						->setHint(
 							makeActionHints($event_alerts, $r_event_alerts, $mediatypes, $users, $display_recovery_alerts)
 						),

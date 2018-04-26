@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "zbxicmpping.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "preproc.h"
 
 #include "pinger.h"
 
@@ -64,7 +65,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	if (SUCCEED != errcode)
 		goto clean;
@@ -78,7 +79,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	if (NOTSUPPORTED == ping_result)
 	{
 		item.state = ITEM_STATE_NOTSUPPORTED;
-		zbx_preprocess_item_value(item.itemid, item.flags, NULL, ts, item.state, error);
+		zbx_preprocess_item_value(item.itemid, item.value_type, item.flags, NULL, ts, item.state, error);
 	}
 	else
 	{
@@ -90,12 +91,12 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 			SET_DBL_RESULT(&value, *value_dbl);
 
 		item.state = ITEM_STATE_NORMAL;
-		zbx_preprocess_item_value(item.itemid, item.flags, &value, ts, item.state, NULL);
+		zbx_preprocess_item_value(item.itemid, item.value_type, item.flags, &value, ts, item.state, NULL);
 
 		free_result(&value);
 	}
 clean:
-	DCrequeue_items(&item.itemid, &item.state, &ts->sec, NULL, NULL, &errcode, 1);
+	DCrequeue_items(&item.itemid, &item.state, &ts->sec, &errcode, 1);
 
 	DCconfig_clean_items(&item, &errcode, 1);
 
@@ -158,7 +159,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 			if (0 == host->cnt)
 			{
 				process_value(item->itemid, NULL, NULL, ts, NOTSUPPORTED,
-						"Cannot send ICMP ping packets to this host.");
+						(char *)"Cannot send ICMP ping packets to this host.");
 				continue;
 			}
 
@@ -371,7 +372,7 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
 	{
 		*items_alloc += 4;
 		sz = *items_alloc * sizeof(icmpitem_t);
-		*items = zbx_realloc(*items, sz);
+		*items = (icmpitem_t *)zbx_realloc(*items, sz);
 	}
 
 	memmove(&(*items)[index + 1], &(*items)[index], sizeof(icmpitem_t) * (*items_count - index));
@@ -444,9 +445,10 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 			zbx_timespec(&ts);
 
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(items[i].itemid, items[i].flags, NULL, &ts, items[i].state, error);
+			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags, NULL, &ts,
+					items[i].state, error);
 
-			DCrequeue_items(&items[i].itemid, &items[i].state, &ts.sec, NULL, NULL, &errcode, 1);
+			DCrequeue_items(&items[i].itemid, &items[i].state, &ts.sec, &errcode, 1);
 		}
 
 		zbx_free(items[i].key);
@@ -491,7 +493,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 	{
 		*hosts_alloc += 4;
 		sz = *hosts_alloc * sizeof(ZBX_FPING_HOST);
-		*hosts = zbx_realloc(*hosts, sz);
+		*hosts = (ZBX_FPING_HOST *)zbx_realloc(*hosts, sz);
 	}
 
 	h = &(*hosts)[*hosts_count - 1];
@@ -529,7 +531,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == hosts)
-		hosts = zbx_malloc(hosts, sizeof(ZBX_FPING_HOST) * hosts_alloc);
+		hosts = (ZBX_FPING_HOST *)zbx_malloc(hosts, sizeof(ZBX_FPING_HOST) * hosts_alloc);
 
 	for (i = 0; i < items_count; i++)
 	{
@@ -586,7 +588,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	if (NULL == items)
-		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
+		items = (icmpitem_t *)zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
 
 	for (;;)
 	{
@@ -609,5 +611,9 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 				get_process_type_string(process_type), process_num, itc, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,40 +29,38 @@ class CHost extends CHostGeneral {
 	/**
 	 * Get host data.
 	 *
-	 * @param array         $options
-	 * @param array         $options['groupids']                 HostGroup IDs
-	 * @param array         $options['hostids']                  Host IDs
-	 * @param boolean       $options['monitored_hosts']          only monitored Hosts
-	 * @param boolean       $options['templated_hosts']          include templates in result
-	 * @param boolean       $options['with_items']               only with items
-	 * @param boolean       $options['with_monitored_items']     only with monitored items
-	 * @param boolean       $options['with_triggers']            only with triggers
-	 * @param boolean       $options['with_monitored_triggers']  only with monitored triggers
-	 * @param boolean       $options['with_httptests']           only with http tests
-	 * @param boolean       $options['with_monitored_httptests'] only with monitored http tests
-	 * @param boolean       $options['with_graphs']              only with graphs
-	 * @param boolean       $options['editable']                 only with read-write permission. Ignored for SuperAdmins
-	 * @param boolean       $options['selectGroups']             select HostGroups
-	 * @param boolean       $options['selectItems']              select Items
-	 * @param boolean       $options['selectTriggers']           select Triggers
-	 * @param boolean       $options['selectGraphs']             select Graphs
-	 * @param boolean       $options['selectApplications']       select Applications
-	 * @param boolean       $options['selectMacros']             select Macros
-	 * @param boolean|array $options['selectInventory']          select Inventory
-	 * @param boolean       $options['withInventory']            select only hosts with inventory
-	 * @param int           $options['count']                    count Hosts, returned column name is rowscount
-	 * @param string        $options['pattern']                  search hosts by pattern in Host name
-	 * @param string        $options['extendPattern']            search hosts by pattern in Host name, ip and DNS
-	 * @param int           $options['limit']                    limit selection
-	 * @param string        $options['sortfield']                field to sort by
-	 * @param string        $options['sortorder']                sort order
+	 * @param array      $options
+	 * @param array      $options['groupids']                  HostGroup IDs
+	 * @param array      $options['hostids']                   Host IDs
+	 * @param bool       $options['monitored_hosts']           only monitored Hosts
+	 * @param bool       $options['templated_hosts']           include templates in result
+	 * @param bool       $options['with_items']                only with items
+	 * @param bool       $options['with_monitored_items']      only with monitored items
+	 * @param bool       $options['with_triggers']             only with triggers
+	 * @param bool       $options['with_monitored_triggers']   only with monitored triggers
+	 * @param bool       $options['with_httptests']            only with http tests
+	 * @param bool       $options['with_monitored_httptests']  only with monitored http tests
+	 * @param bool       $options['with_graphs']               only with graphs
+	 * @param bool       $options['editable']                  only with read-write permission. Ignored for SuperAdmins
+	 * @param bool       $options['selectGroups']              select HostGroups
+	 * @param bool       $options['selectItems']               select Items
+	 * @param bool       $options['selectTriggers']            select Triggers
+	 * @param bool       $options['selectGraphs']              select Graphs
+	 * @param bool       $options['selectApplications']        select Applications
+	 * @param bool       $options['selectMacros']              select Macros
+	 * @param bool|array $options['selectInventory']           select Inventory
+	 * @param bool       $options['withInventory']             select only hosts with inventory
+	 * @param int        $options['count']                     count Hosts, returned column name is rowscount
+	 * @param string     $options['pattern']                   search hosts by pattern in Host name
+	 * @param string     $options['extendPattern']             search hosts by pattern in Host name, ip and DNS
+	 * @param int        $options['limit']                     limit selection
+	 * @param string     $options['sortfield']                 field to sort by
+	 * @param string     $options['sortorder']                 sort order
 	 *
 	 * @return array|boolean Host data as array or false if error
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['hosts' => 'h.hostid'],
@@ -99,7 +97,7 @@ class CHost extends CHostGeneral {
 			'with_graphs'				=> null,
 			'with_applications'			=> null,
 			'withInventory'				=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -136,10 +134,9 @@ class CHost extends CHostGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
@@ -177,7 +174,7 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
 
-			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionId('h.proxy_hostid', $options['proxyids']);
 		}
 
 		// templateids
@@ -798,6 +795,11 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Host "%1$s" cannot be without host group.', $host['host'])
 			);
+		}
+
+		// Property 'auto_compress' is not supported for hosts.
+		if (array_key_exists('auto_compress', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 		}
 
 		/*
@@ -1573,6 +1575,11 @@ class CHost extends CHostGeneral {
 				);
 			}
 
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
+
 			// Validate "host" field.
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1735,6 +1742,11 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Wrong fields for host "%1$s".', array_key_exists('host', $host) ? $host['host'] : '')
 				);
+			}
+
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
 			// Validate host permissions.

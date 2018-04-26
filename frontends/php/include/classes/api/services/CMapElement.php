@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ abstract class CMapElement extends CApiService {
 
 			if (array_key_exists('urls', $selement)) {
 				foreach ($selement['urls'] as $url_data) {
-					if (!CHtmlUrlValidator::validate($url_data['url'])) {
+					if (!CHtmlUrlValidator::validate($url_data['url'], false)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 					}
 				}
@@ -198,17 +198,6 @@ abstract class CMapElement extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('No icon for map element "%s".', array_key_exists('label', $selement) ? $selement['label'] : '')
 				);
-			}
-
-			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-				$label = array_key_exists('label', $selement) ? $selement['label'] : '';
-				foreach ($selement['elements'] as $element) {
-					if ($this->checkCircleSelementsLink($selement['sysmapid'], $element['sysmapid'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Circular link cannot be created for map element "%s".', $label)
-						);
-					}
-				}
 			}
 
 			if ($create) {
@@ -357,27 +346,6 @@ abstract class CMapElement extends CApiService {
 		}
 
 		return true;
-	}
-
-	public function checkCircleSelementsLink($sysmapId, $elementId) {
-		if (bccomp($sysmapId, $elementId) == 0) {
-			return true;
-		}
-
-		$dbElements = DBselect(
-			'SELECT se.elementid,se.elementtype'.
-			' FROM sysmaps_elements se'.
-			' WHERE se.sysmapid='.zbx_dbstr($elementId).
-				' AND se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP
-		);
-		while ($element = DBfetch($dbElements)) {
-			// get data from sysmap_element_trigger if type trigger
-			if ($this->checkCircleSelementsLink($sysmapId, $element['elementid'])) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -485,49 +485,35 @@ elseif (hasRequest('edit_ack_operationid')) {
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.massenable', 'action.massdisable']) && hasRequest('g_actionid')) {
-	$result = true;
-	$enable = (getRequest('action') == 'action.massenable');
-	$status = $enable ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
-	$statusName = $enable ? 'enabled' : 'disabled';
-	$actionIds = [];
-	$updated = 0;
+	$status = (getRequest('action') == 'action.massenable') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
+	$actionids = (array) getRequest('g_actionid', []);
+	$actions_count = count($actionids);
+	$actions = [];
 
-	DBstart();
+	foreach ($actionids as $actionid) {
+		$actions[] = ['actionid' => $actionid, 'status' => $status];
+	}
 
-	$dbActions = DBselect(
-		'SELECT a.actionid'.
-		' FROM actions a'.
-		' WHERE '.dbConditionInt('a.actionid', getRequest('g_actionid'))
-	);
-	while ($row = DBfetch($dbActions)) {
-		$result &= DBexecute(
-			'UPDATE actions'.
-			' SET status='.zbx_dbstr($status).
-			' WHERE actionid='.zbx_dbstr($row['actionid'])
+	$response = API::Action()->update($actions);
+
+	if ($response && array_key_exists('actionids', $response)) {
+		$message = $status == ACTION_STATUS_ENABLED
+			? _n('Action enabled', 'Actions enabled', $actions_count)
+			: _n('Action disabled', 'Actions disabled', $actions_count);
+
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $response['actionids']).'] '.
+			($status == ACTION_STATUS_ENABLED ? 'enabled' : 'disabled')
 		);
-		if ($result) {
-			$actionIds[] = $row['actionid'];
-		}
-		$updated++;
-	}
-
-	if ($result) {
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
-	}
-
-	$messageSuccess = $enable
-		? _n('Action enabled', 'Actions enabled', $updated)
-		: _n('Action disabled', 'Actions disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable action', 'Cannot enable actions', $updated)
-		: _n('Cannot disable action', 'Cannot disable actions', $updated);
-
-	$result = DBend($result);
-
-	if ($result) {
+		show_messages(true, $message);
 		uncheckTableRows();
 	}
-	show_messages($result, $messageSuccess, $messageFailed);
+	else {
+		$message = $status == ACTION_STATUS_ENABLED
+			? _n('Cannot enable action', 'Cannot enable actions', $actions_count)
+			: _n('Cannot disable action', 'Cannot disable actions', $actions_count);
+
+		show_messages(false, null, $message);
+	}
 }
 elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && hasRequest('g_actionid')) {
 	$result = API::Action()->delete(getRequest('g_actionid'));
@@ -664,15 +650,6 @@ if (hasRequest('form')) {
 				$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
 			}
 		}
-	}
-
-	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-		$data['action']['filter']['conditions'] = [[
-			'formulaid' => 'A',
-			'conditiontype' => CONDITION_TYPE_MAINTENANCE,
-			'operator' => CONDITION_OPERATOR_NOT_IN,
-			'value' => ''
-		]];
 	}
 
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,12 +28,30 @@
 #include "http.h"
 
 #define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
+static const char URI_PROHIBIT_CHARS[] = {0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xA,0xB,0xC,0xD,0xE,0xF,0x10,0x11,0x12,\
+	0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F};
 
-static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, size_t max_buffer_len)
+static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer,
+		size_t max_buffer_len, char **error)
 {
 	int		ret;
+	char		*wrong_chr;
 	char		request[MAX_STRING_LEN];
 	zbx_socket_t	s;
+
+	if (NULL != (wrong_chr = strpbrk(host, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Incorrect hostname expression. Check hostname part after: %.*s.",
+				(int)(wrong_chr - host), host);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Incorrect path expression. Check path part after: %.*s.",
+				(int)(wrong_chr - path), path);
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
@@ -47,7 +65,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
-			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
+			if (SUCCEED == (ret = zbx_tcp_recv_raw(&s)))
 			{
 				if (NULL != buffer)
 					zbx_strlcpy(buffer, s.buffer, max_buffer_len);
@@ -68,7 +86,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*hostname, *path_str, *port_str, buffer[MAX_BUFFER_LEN], path[MAX_STRING_LEN];
+	char		*hostname, *path_str, *port_str, buffer[MAX_BUFFER_LEN], path[MAX_STRING_LEN], *error;
 	unsigned short	port_number;
 
 	if (3 < request->nparam)
@@ -100,20 +118,23 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, sizeof(buffer)))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, sizeof(buffer), &error))
 	{
 		zbx_rtrim(buffer, "\r\n");
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 	else
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
 
 int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*hostname, path[MAX_STRING_LEN], *port_str, *path_str;
+	char		*hostname, path[MAX_STRING_LEN], *port_str, *path_str, *error;
 	double		start_time;
 	unsigned short	port_number;
 
@@ -148,10 +169,16 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, NULL, 0))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, NULL, 0, &error))
+	{
 		SET_DBL_RESULT(result, zbx_time() - start_time);
+
+	}
 	else
-		SET_DBL_RESULT(result, 0.0);
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -159,7 +186,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
-			*buffer = NULL, *ptr = NULL, *str, *newline;
+			*buffer = NULL, *ptr = NULL, *str, *newline, *error;
 	int		length;
 	const char	*output;
 	unsigned short	port_number;
@@ -214,9 +241,9 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == output || '\0' == *output)
 		output = "\\0";
 
-	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
+	buffer = (char *)zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE, &error))
 	{
 		for (str = buffer; ;)
 		{
@@ -236,6 +263,12 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 				break;
 		}
+	}
+	else
+	{
+		zbx_free(buffer);
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL != ptr)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,24 +59,21 @@ class testPageDiscovery extends CWebTest {
 	}
 
 	/**
-	* @dataProvider allRules
-	*/
+	 * @dataProvider allRules
+	 * @backup drules
+	 */
 	public function testPageDiscovery_MassDelete($drule) {
-		DBsave_tables('drules');
-
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
 		$this->zbxTestClickButton('drule.massdelete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
 
 		$this->assertEquals(0, DBcount('SELECT * FROM drules WHERE druleid='.$drule['druleid']));
 		$this->assertEquals(0, DBcount('SELECT * FROM dchecks WHERE druleid='.$drule['druleid']));
-
-		DBrestore_tables('drules');
 	}
 
 	public function testPageDiscovery_MassDisableAll() {
@@ -86,7 +83,7 @@ class testPageDiscovery extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
 		$this->zbxTestClickButton('drule.massdisable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules disabled');
@@ -104,7 +101,7 @@ class testPageDiscovery extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
 		$this->zbxTestClickButton('drule.massdisable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule disabled');
@@ -124,7 +121,7 @@ class testPageDiscovery extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
 		$this->zbxTestClickButton('drule.massenable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules enabled');
@@ -142,7 +139,7 @@ class testPageDiscovery extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
 		$this->zbxTestClickButton('drule.massenable');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule enabled');
@@ -154,5 +151,4 @@ class testPageDiscovery extends CWebTest {
 				' AND status='.DRULE_STATUS_ACTIVE
 		));
 	}
-
 }

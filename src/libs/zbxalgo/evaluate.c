@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -436,13 +436,13 @@ static double	evaluate_term4(int *unknown_idx)
 		else
 		{
 			if ('<' == op)
-				result = (result <= operand - ZBX_DOUBLE_EPSILON);
+				result = (result < operand - ZBX_DOUBLE_EPSILON);
 			else if ('l' == op)
-				result = (result < operand + ZBX_DOUBLE_EPSILON);
+				result = (result <= operand + ZBX_DOUBLE_EPSILON);
 			else if ('g' == op)
-				result = (result > operand - ZBX_DOUBLE_EPSILON);
+				result = (result >= operand - ZBX_DOUBLE_EPSILON);
 			else
-				result = (result >= operand + ZBX_DOUBLE_EPSILON);
+				result = (result > operand + ZBX_DOUBLE_EPSILON);
 		}
 	}
 

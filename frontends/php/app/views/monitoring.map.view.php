@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,32 +26,38 @@ $this->addJsFile('class.svg.map.js');
 
 (new CWidget())
 	->setTitle(_('Maps'))
-	->setControls(
+	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])
-			->addVar('fullscreen', $data['fullscreen'])
-			->addItem(
-				(new CList())
-					->addItem([
-						new CLabel(_('Minimum severity'), 'severity_min'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$data['pageFilter']->getSeveritiesMinCB()
-					])
-					->addItem($data['map']['editable']
-						? (new CButton('edit', _('Edit map')))
-							->onClick('redirect("sysmap.php?sysmapid='.$data['map']['sysmapid'].'")')
-						: null
-					)
-					->addItem(get_icon('favourite', [
-						'fav' => 'web.favorite.sysmapids',
-						'elname' => 'sysmapid',
-						'elid' => $data['map']['sysmapid']
-					]))
-					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Minimum severity'), 'severity_min'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getSeveritiesMinCB()
+				])
+			),
+		(new CTag('nav', true, (new CList())
+			->addItem($data['map']['editable']
+				? new CRedirectButton(_('Edit map'), (new CUrl('sysmap.php'))
+					->setArgument('sysmapid', $data['map']['sysmapid'])
+					->setArgument('fullscreen', $data['fullscreen'])
+					->getUrl()
+				)
+				: null
 			)
-	)
+			->addItem(get_icon('favourite', [
+				'fav' => 'web.favorite.sysmapids',
+				'elname' => 'sysmapid',
+				'elid' => $data['map']['sysmapid']
+			]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	]))
 	->addItem(
 		get_header_sysmap_table($data['map']['sysmapid'], $data['map']['name'], $data['fullscreen'],
 			$data['severity_min']
@@ -60,6 +66,7 @@ $this->addJsFile('class.svg.map.js');
 	->addItem(
 		(new CDiv())
 			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+			->addStyle('padding: 0;')
 			->addItem(
 				CScreenBuilder::getScreen([
 					'resourcetype' => SCREEN_RESOURCE_MAP,

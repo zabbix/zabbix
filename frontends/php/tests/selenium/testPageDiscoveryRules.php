@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,21 +74,31 @@ class testPageDiscoveryRules extends CWebTest {
 			);
 			$this->zbxTestTextNotPresent('Info');
 		}
+
+		$this->zbxTestAssertElementText("//button[@value='discoveryrule.masscheck_now'][@disabled]", 'Check now');
+
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Delete');
 		$this->zbxTestTextPresent('0 selected');
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
+	 * @dataProvider data
 	 */
-	public function testPageDiscoveryRules_Setup() {
-		DBsave_tables('triggers');
+	public function testPageDiscoveryRules_CheckNowAll($data) {
+		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
+		$this->zbxTestCheckHeader('Discovery rules');
+
+		$this->zbxTestClick('all_items');
+		$this->zbxTestClickButtonText('Check now');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
-	* @dataProvider data
-	*/
+	 * @dataProvider data
+	 * @backup-once triggers
+	 */
 	public function testPageDiscoveryRules_SimpleDelete($data) {
 		$itemid = $data['itemid'];
 
@@ -97,7 +107,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestCheckboxSelect('g_hostdruleid_'.$itemid);
 		$this->zbxTestClickButton('discoveryrule.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
@@ -105,20 +115,6 @@ class testPageDiscoveryRules extends CWebTest {
 
 		$sql = "SELECT null FROM items WHERE itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageDiscoveryRules_Teardown() {
-		DBrestore_tables('triggers');
-	}
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testPageDiscoveryRules_SetupMass() {
-		DBsave_tables('triggers');
 	}
 
 	// Returns all discovery rules
@@ -133,14 +129,15 @@ class testPageDiscoveryRules extends CWebTest {
 
 
 	/**
-	* @dataProvider rule
-	*/
+	 * @dataProvider rule
+	 * @backup-once triggers
+	 */
 	public function testPageDiscoveryRules_MassDelete($rule) {
 		$hostids = DBdata(
 			'SELECT hostid'.
 			' FROM items'.
 			' WHERE hostid='.$rule['hostid'].
-				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE
+				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE, false
 		);
 		$hostids = zbx_objectValues($hostids, 'hostids');
 
@@ -149,7 +146,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('discoveryrule.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
@@ -157,12 +154,5 @@ class testPageDiscoveryRules extends CWebTest {
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('hostids', $hostids);
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageDiscoveryRules_TeardownMass() {
-		DBrestore_tables('triggers');
 	}
 }

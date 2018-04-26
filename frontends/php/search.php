@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,7 +126,6 @@ $table = (new CTableInfo())
 		_('IP'),
 		_('DNS'),
 		_('Latest data'),
-		_('Triggers'),
 		_('Problems'),
 		_('Graphs'),
 		_('Screens'),
@@ -137,7 +136,8 @@ $table = (new CTableInfo())
 		_('Graphs'),
 		_('Discovery'),
 		_('Web')
-	]);
+	])
+	->removeId();
 
 foreach ($hosts as $hnum => $host) {
 	$hostid = $host['hostid'];
@@ -230,7 +230,6 @@ foreach ($hosts as $hnum => $host) {
 		$hostip,
 		$hostdns,
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&hostids[]='.$hostid),
-		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
@@ -287,7 +286,6 @@ $table = (new CTableInfo())
 	->setHeader([
 		_('Host group'),
 		_('Latest data'),
-		_('Triggers'),
 		_('Problems'),
 		_('Graphs'),
 		_('Web'),
@@ -337,7 +335,6 @@ foreach ($hostGroups as $hnum => $group) {
 	$table->addRow([
 		$hgroup_link,
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$hostgroupid),
-		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')

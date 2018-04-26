@@ -11,10 +11,10 @@
       <template>
          <template>Template Net Juniper SNMPv2</template>
          <name>Template Net Juniper SNMPv2</name>
-         <description>Template Net Juniper version: 0.13
-MIBs used:
-JUNIPER-MIB
-JUNIPER-ALARM-MIB
+         <description>Template Net Juniper version: 0.14&#13;
+MIBs used:&#13;
+JUNIPER-MIB&#13;
+JUNIPER-ALARM-MIB&#13;
 SNMPv2-MIB</description>
          <groups>
             <group>
@@ -73,15 +73,15 @@ SNMPv2-MIB</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: JUNIPER-ALARM-MIB
-The red alarm indication on the craft interface panel.
-The red alarm is on when there is some system
-failure or power supply failure or the system
-is experiencing a hardware malfunction or some
-threshold is being exceeded.
-
-This red alarm state could be turned off by the
-ACO/LT (Alarm Cut Off / Lamp Test) button on the
+               <description>MIB: JUNIPER-ALARM-MIB&#13;
+The red alarm indication on the craft interface panel.&#13;
+The red alarm is on when there is some system&#13;
+failure or power supply failure or the system&#13;
+is experiencing a hardware malfunction or some&#13;
+threshold is being exceeded.&#13;
+&#13;
+This red alarm state could be turned off by the&#13;
+ACO/LT (Alarm Cut Off / Lamp Test) button on the&#13;
 front panel module.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -125,7 +125,7 @@ front panel module.</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: JUNIPER-MIB
+               <description>MIB: JUNIPER-MIB&#13;
 The serial number of this subject, blank if unknown or unavailable.</description>
                <inventory_link>8</inventory_link>
                <applications>
@@ -167,7 +167,7 @@ The serial number of this subject, blank if unknown or unavailable.</description
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: JUNIPER-MIB
+               <description>MIB: JUNIPER-MIB&#13;
 The name, model, or detailed description of the box,indicating which product the box is about, for example 'M40'.</description>
                <inventory_link>29</inventory_link>
                <applications>
@@ -268,7 +268,7 @@ The name, model, or detailed description of the box,indicating which product the
                   </conditions>
                </filter>
                <lifetime>30d</lifetime>
-               <description>Scanning JUNIPER-MIB::jnxOperatingTable for CPU and Memory 
+               <description>Scanning JUNIPER-MIB::jnxOperatingTable for CPU and Memory&#13;
 http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
                <item_prototypes>
                   <item_prototype>
@@ -299,8 +299,8 @@ http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=sear
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: JUNIPER-MIB
-The CPU Load Average over the last 5 minutes Here it will be shown as percentage valueZero if unavailable or inapplicable.
+                     <description>MIB: JUNIPER-MIB&#13;
+The CPU Load Average over the last 5 minutes Here it will be shown as percentage valueZero if unavailable or inapplicable.&#13;
 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -343,8 +343,8 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: JUNIPER-MIB
-The buffer pool utilization in percentage of this subject.  Zero if unavailable or inapplicable.
+                     <description>MIB: JUNIPER-MIB&#13;
+The buffer pool utilization in percentage of this subject.  Zero if unavailable or inapplicable.&#13;
 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -500,7 +500,7 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                   </conditions>
                </filter>
                <lifetime>30d</lifetime>
-               <description>Scanning JUNIPER-MIB::jnxOperatingTable for Temperature 
+               <description>Scanning JUNIPER-MIB::jnxOperatingTable for Temperature&#13;
 http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
                <item_prototypes>
                   <item_prototype>
@@ -515,7 +515,7 @@ http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=sear
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -531,7 +531,7 @@ http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=sear
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: JUNIPER-MIB
+                     <description>MIB: JUNIPER-MIB&#13;
 The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -558,7 +558,7 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -581,7 +581,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -651,7 +651,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -688,7 +688,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Juniper SNMPv2:sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: Fan is in critical state</name>
@@ -697,7 +697,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -751,7 +751,7 @@ Please check the fan unit</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -769,8 +769,8 @@ Please check the fan unit</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: JUNIPER-MIB
-If they are using DC power supplies there is a a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.
+                     <description>MIB: JUNIPER-MIB&#13;
+If they are using DC power supplies there is a a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.&#13;
 This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK-MX104/m-p/289644#M14122</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -790,7 +790,7 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Juniper SNMPv2:sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: Power supply is in critical state</name>
@@ -799,7 +799,7 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -889,7 +889,7 @@ Please check the power supply unit for errors</description>
          <url/>
          <status>0</status>
          <priority>4</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the device for errors</description>
          <type>0</type>
          <manual_close>0</manual_close>
@@ -906,7 +906,7 @@ Please check the device for errors</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>

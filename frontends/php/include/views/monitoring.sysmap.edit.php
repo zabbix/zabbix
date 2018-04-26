@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,13 @@ $multiselect_data = [
 	'objectName' => 'users',
 	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 	'popup' => [
-		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+		'parameters' => [
+			'srctbl' => 'users',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid',
+			'srcfld1' => 'userid',
+			'srcfld2' => 'fullname'
+		]
 	]
 ];
 
@@ -74,16 +80,21 @@ if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users
 	$multiselect_data['data'] = $owner_data;
 
 	// Append multiselect to map tab.
-	$map_tab->addRow(_('Owner'),
-		(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+	$multiselect_userid = (new CMultiSelect($multiselect_data))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired();
+
+	$map_tab->addRow((new CLabel(_('Owner'), $multiselect_userid->getId()))->setAsteriskMark(), $multiselect_userid);
 }
 else {
-	$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	$multiselect_userid = (new CMultiSelect($multiselect_data))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired();
 
 	// Administrators can change map owner, but cannot see users from other groups.
 	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-		$map_tab->addRow(_('Owner'), $multiselect_userid)
+		$map_tab
+			->addRow((new CLabel(_('Owner'), $multiselect_userid->getId()))->setAsteriskMark(), $multiselect_userid)
 			->addRow('', _('Inaccessible user'), 'inaccessible_user');
 	}
 	else {
@@ -97,18 +108,22 @@ else {
 	}
 }
 
-$map_tab->addRow(_('Name'),
+$map_tab->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['sysmap']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'name'))
 	)
-	->addRow(_('Width'),
+	->addRow((new CLabel(_('Width'), 'width'))->setAsteriskMark(),
 		(new CNumericBox('width', $data['sysmap']['width'], 5))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Height'),
+	->addRow((new CLabel(_('Height'), 'height'))->setAsteriskMark(),
 		(new CNumericBox('height', $data['sysmap']['height'], 5))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	);
 
 // Append background image to form list.
@@ -297,8 +312,14 @@ $user_group_shares_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 $add_user_group_btn = ([(new CButton(null, _('Add')))
-	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
-		'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'
+	->onClick('return PopUp("popup.generic",'.
+		CJs::encodeJson([
+			'srctbl' => 'usrgrp',
+			'srcfld1' => 'usrgrpid',
+			'srcfld2' => 'name',
+			'dstfrm' => $form->getName(),
+			'multiselect' => '1'
+		]).', null, this);'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -327,8 +348,14 @@ $user_shares_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 $add_user_btn = ([(new CButton(null, _('Add')))
-	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
-		'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'
+	->onClick('return PopUp("popup.generic",'.
+		CJs::encodeJson([
+			'srctbl' => 'users',
+			'srcfld1' => 'userid',
+			'srcfld2' => 'fullname',
+			'dstfrm' => $form->getName(),
+			'multiselect' => '1'
+		]).', null, this);'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 

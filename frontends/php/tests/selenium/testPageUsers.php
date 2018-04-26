@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,25 +134,27 @@ class testPageUsers extends CWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
-	public function testPageUsers_backup() {
-		DBsave_tables('users');
-	}
-
+	/**
+	 * @backup users
+	 */
 	public function testPageUsers_MassDelete() {
 		$result=DBselect("SELECT userid,alias FROM users");
+
+		$this->zbxTestLogin('users.php');
+		$this->zbxTestCheckTitle('Configuration of users');
+		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
 		while ($user = DBfetch($result)) {
 			$id = $user['userid'];
 			$alias = $user['alias'];
 
-			$this->zbxTestLogin('users.php');
-			$this->zbxTestCheckTitle('Configuration of users');
-			$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
+			$this->zbxTestClickButtonText('Reset');
+			$this->zbxTestWaitForPageToLoad();
 
 			$this->zbxTestCheckboxSelect('group_userid_' . $id);
 			$this->zbxTestClickButton('user.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 			$this->zbxTestCheckTitle('Configuration of users');
 			if ($alias === 'guest' || $alias === 'Admin') {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' ,'Cannot delete user');
@@ -172,9 +174,5 @@ class testPageUsers extends CWebTest {
 				$this->assertEquals(0, DBcount("select * from media where userid=$id"));
 			}
 		}
-	}
-
-	public function testPageUsers_restore() {
-		DBrestore_tables('users');
 	}
 }

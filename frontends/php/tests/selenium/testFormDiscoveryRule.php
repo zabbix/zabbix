@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+/**
+ * @backup items
+ */
 class testFormDiscoveryRule extends CWebTest {
 
 	/**
@@ -50,14 +53,6 @@ class testFormDiscoveryRule extends CWebTest {
 	 * @var string
 	 */
 	protected $keyInheritance = 'discovery-rule-inheritance1';
-
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormDiscoveryRule_Setup() {
-		DBsave_tables('items');
-	}
 
 	// Returns layout data
 	public static function layout() {
@@ -250,7 +245,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -357,7 +352,7 @@ class testFormDiscoveryRule extends CWebTest {
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType), false
 					);
 					$dbInterfaces = reset($dbInterfaces);
 					if ($dbInterfaces != null) {
@@ -1362,7 +1357,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'discovery-simple-check',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1371,7 +1367,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'discovery-snmpv1-agent',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1390,7 +1387,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'discovery-snmpv3-agent',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1423,7 +1421,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
 					'key' => 'discovery-zabbix-internal',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1443,7 +1442,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'discovery-external-check',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1478,6 +1478,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'username' => 'zabbix',
 					'params_es' => 'executed script',
 					'dbCheck' => true,
+					'formCheck' => true,
 					'remove' => true
 				]
 			],
@@ -1596,7 +1597,7 @@ class testFormDiscoveryRule extends CWebTest {
 
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
@@ -1736,6 +1737,18 @@ class testFormDiscoveryRule extends CWebTest {
 					$this->zbxTestAssertNotVisibleId('interfaceid');
 			}
 
+			// "Check now" button availability
+			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent',
+					'Zabbix internal', 'External check', 'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent',
+					'JMX agent'])) {
+				$this->zbxTestClick('check_now');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+				$this->zbxTestCheckFatalErrors();
+			}
+			else {
+				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
+			}
+
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
@@ -1763,18 +1776,11 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
 			$this->zbxTestClickButton('discoveryrule.massdelete');
 
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
 			$this->assertEquals(0, DBcount($sql), 'Discovery rule has not been deleted from DB.');
 		}
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormDiscoveryRule_Teardown() {
-		DBrestore_tables('items');
 	}
 }

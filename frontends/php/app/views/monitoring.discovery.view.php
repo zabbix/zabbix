@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,20 +24,22 @@ $this->addJsFile('flickerfreescreen.js');
 
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
-	->setControls(
+	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->addVar('action', 'discovery.view')
-			->addVar('fullscreen', $data['fullscreen'])
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
 				->addItem([
 					new CLabel(_('Discovery rule'), 'druleid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$data['pageFilter']->getDiscoveryCB()
 				])
-				->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-			)
-	);
+			),
+		(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
+			->setAttribute('aria-label', _('Content controls'))
+	]));
 
 $discovery_table = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_DISCOVERY,

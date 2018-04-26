@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,8 +48,6 @@ class CScript extends CApiService {
 	 */
 	public function get(array $options) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['scripts' => 's.scriptid'],
@@ -64,7 +62,7 @@ class CScript extends CApiService {
 			'hostids'				=> null,
 			'scriptids'				=> null,
 			'usrgrpids'				=> null,
-			'editable'				=> null,
+			'editable'				=> false,
 			'nopermissions'			=> null,
 			// filter
 			'filter'				=> null,
@@ -86,12 +84,12 @@ class CScript extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + permission check
-		if ($userType != USER_TYPE_SUPER_ADMIN) {
-			if (!is_null($options['editable'])) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if ($options['editable']) {
 				return $result;
 			}
 
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = '(s.usrgrpid IS NULL OR '.dbConditionInt('s.usrgrpid', $userGroups).')';
 			$sqlParts['where'][] = '(s.groupid IS NULL OR EXISTS ('.
@@ -711,7 +709,7 @@ class CScript extends CApiService {
 				$result[$scriptId]['groups'] = API::HostGroup()->get([
 					'output' => $options['selectGroups'],
 					'groupids' => $script['groupid'] ? $script['groupid'] : null,
-					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
+					'editable' => ($script['host_access'] == PERM_READ_WRITE)
 				]);
 			}
 		}
@@ -729,7 +727,7 @@ class CScript extends CApiService {
 						'output' => $options['selectHosts'],
 						'groupids' => $script['groupid'] ? $script['groupid'] : null,
 						'hostids' => $options['hostids'] ? $options['hostids'] : null,
-						'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
+						'editable' => ($script['host_access'] == PERM_READ_WRITE)
 					]);
 
 					$processedGroups[$script['groupid'].'_'.$script['host_access']] = $scriptId;

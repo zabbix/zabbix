@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ if (!empty($data['hostid'])) {
 // create form
 $triggersForm = (new CForm())
 	->setName('triggersForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('hostid', $data['hostid'])
 	->addVar('action', $data['action']);
 
@@ -42,7 +43,8 @@ $triggersFormList = (new CFormList('triggersFormList'))
 	->addRow(
 		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
 			->setLabel(_('Severity'))
-			->setChecked(isset($data['visible']['priority'])),
+			->setChecked(isset($data['visible']['priority']))
+			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv(
 			new CSeverity([
 				'name' => 'priority',
@@ -79,6 +81,7 @@ foreach ($data['dependencies'] as $dependency) {
 				(new CButton('remove', _('Remove')))
 					->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('dependency_'.$dependency['triggerid'])
 	);
@@ -87,9 +90,20 @@ foreach ($data['dependencies'] as $dependency) {
 $dependenciesDiv = (new CDiv([
 	$dependenciesTable,
 	(new CButton('btn1', _('Add')))
-		->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'&with_triggers=1&noempty=1");')
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'triggers',
+				'srcfld1' => 'triggerid',
+				'dstfrm' => 'massupdate',
+				'dstfld1' => 'new_dependency',
+				'dstact' => 'add_dependency',
+				'reference' => 'deptrigger',
+				'objname' => 'triggers',
+				'multiselect' => '1',
+				'with_triggers' => '1',
+				'noempty' => '1'
+			]).', null, this);'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

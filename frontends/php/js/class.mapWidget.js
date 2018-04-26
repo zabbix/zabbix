@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', uniqueid);
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget[0], 'current_sysmapid',
 				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0});
-			jQuery('.action-menu').fadeOut(100);
+			jQuery('.action-menu').menuPopup('close', null);
 		}
 	}
 }
@@ -147,6 +147,7 @@ jQuery(function($) {
 						var $this = $(this);
 
 						options['map_options']['canvas']['useViewBox'] = !IE;
+						options['map_options']['show_timestamp'] = false;
 						widget_data['map_instance'] = new SVGMap(options['map_options']);
 						widget_data['is_refreshing'] = false;
 						$this.data('widgetData', widget_data);

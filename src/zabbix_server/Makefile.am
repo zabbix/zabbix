@@ -1,6 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-
 SUBDIRS = \
 	alerter \
 	dbsyncer \
@@ -19,6 +18,7 @@ SUBDIRS = \
 	vmware \
 	taskmanager \
 	ipmi \
+	odbc \
 	scripts \
 	preprocessor
 
@@ -28,8 +28,9 @@ zabbix_server_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
+	postinit.c postinit.h \
 	server.c
-	
+
 if ZBXCUNIT
 nodist_zabbix_server_SOURCES = ../libs/zbxcunit/zbxcunit.c ../libs/zbxcunit/zbxcunit.h
 endif
@@ -51,7 +52,7 @@ zabbix_server_LDADD = \
 	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
-	ipmi/libipmi.a \
+	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -60,6 +61,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
@@ -81,7 +83,12 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a
+	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a 
+
+if HAVE_IPMI
+zabbix_server_LDADD += ipmi/libipmi.a
+endif
 
 zabbix_server_LDADD += @SERVER_LIBS@ $(CUNIT_LDADD)
 
@@ -89,20 +96,17 @@ zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 
 zabbix_server_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DDATADIR="\"@datadir@\"" \
-	-DLIBDIR="\"@libdir@\"" \
-	-I@top_srcdir@/src/libs/zbxdbcache 
-
-SERVER_CONFIG = zabbix_server.conf
-INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d
-EXSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/externalscripts
-ALSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/alertscripts
-MODULES_DIR = $(DESTDIR)@libdir@
+	-DDEFAULT_SSL_CERT_LOCATION="\"@CURL_SSL_CERT_LOCATION@\"" \
+	-DDEFAULT_SSL_KEY_LOCATION="\"@CURL_SSL_KEY_LOCATION@\"" \
+	-DDEFAULT_CONFIG_FILE="\"@SERVER_CONFIG_FILE@\"" \
+	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"@EXTERNAL_SCRIPTS_PATH@\"" \
+	-DDEFAULT_ALERT_SCRIPTS_PATH="\"@ALERT_SCRIPTS_PATH@\"" \
+	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\"" \
+	-I@top_srcdir@/src/libs/zbxdbcache
 
 install-data-hook:
-	$(MKDIR_P) "$(INCLUDE_DIR)"
-	$(MKDIR_P) "$(EXSCRIPTS_DIR)"
-	$(MKDIR_P) "$(ALSCRIPTS_DIR)"
-	$(MKDIR_P) "$(MODULES_DIR)"
-	test -f "$(DESTDIR)@sysconfdir@/$(SERVER_CONFIG)" || cp "../../conf/$(SERVER_CONFIG)" "$(DESTDIR)@sysconfdir@"
+	$(MKDIR_P) "@SERVER_CONFIG_FILE@.d"
+	$(MKDIR_P) "@EXTERNAL_SCRIPTS_PATH@"
+	$(MKDIR_P) "@ALERT_SCRIPTS_PATH@"
+	$(MKDIR_P) "@LOAD_MODULE_PATH@"
+	test -f "@SERVER_CONFIG_FILE@" || cp "../../conf/zabbix_server.conf" "@SERVER_CONFIG_FILE@"

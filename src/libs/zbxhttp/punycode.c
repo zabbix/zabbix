@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,14 +241,14 @@ static int	punycode_encode_part(zbx_uint32_t *codepoints, zbx_uint32_t count, ch
  * Return value: SUCCEED if encoding was successful. FAIL on error.           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_http_punycode_encode(const char *text, char **output)
+static int	zbx_http_punycode_encode(const char *text, char **output)
 {
 	int		ret = FAIL;
 	size_t		offset = 0, size = 0;
 	zbx_uint32_t	n, tmp, count = 0, *codepoints;
 
 	zbx_free(*output);
-	codepoints = zbx_malloc(NULL, strlen(text) * sizeof(zbx_uint32_t));
+	codepoints = (zbx_uint32_t *)zbx_malloc(NULL, strlen(text) * sizeof(zbx_uint32_t));
 
 	while ('\0' != *text)
 	{
@@ -304,3 +304,62 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_http_punycode_encode_url                                     *
+ *                                                                            *
+ * Purpose: encodes unicode domain name in URL into punycode                  *
+ *                                                                            *
+ * Parameters: url - [IN/OUT] URL to encode                                   *
+ *                                                                            *
+ * Return value: SUCCEED if encoding was successful. FAIL on error.           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_http_punycode_encode_url(char **url)
+{
+	char	*domain, *ptr, ascii = 1, delimiter, *iri = NULL;
+	size_t	url_alloc, url_len;
+
+	if (NULL == (domain = strchr(*url, '@')))
+	{
+		if (NULL == (domain = strstr(*url, "://")))
+			domain = *url;
+		else
+			domain += ZBX_CONST_STRLEN("://");
+	}
+	else
+		domain++;
+
+	ptr = domain;
+
+	while ('\0' != *ptr && ':' != *ptr && '/' != *ptr)
+	{
+		if (0 != ((*ptr) & 0x80))
+			ascii = 0;
+		ptr++;
+	}
+
+	if (1 == ascii)
+		return SUCCEED;
+
+	if ('\0' != (delimiter = *ptr))
+		*ptr = '\0';
+
+	if (FAIL == zbx_http_punycode_encode(domain, &iri))
+	{
+		*ptr = delimiter;
+		return FAIL;
+	}
+
+	*ptr = delimiter;
+
+	url_alloc = url_len = strlen(*url) + 1;
+
+	zbx_replace_mem_dyn(url, &url_alloc, &url_len, domain - *url, ptr - domain, iri, strlen(iri));
+
+	zbx_free(iri);
+
+	return SUCCEED;
+}
+

@@ -30,7 +30,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 [
 	AC_ARG_WITH([libpcre],[
 If you want to specify libpcre installation directories:
-AC_HELP_STRING([--with-libpcre=@<:@DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
+AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
 		[
 			LIBPCRE_CFLAGS="-I$withval/include"
 			LIBPCRE_LDFLAGS="-L$withval/lib"
@@ -39,11 +39,21 @@ AC_HELP_STRING([--with-libpcre=@<:@DIR@:>@], [use libpcre from given base instal
 	)
 
 	AC_ARG_WITH([libpcre-include],
-		AC_HELP_STRING([--with-libpcre-include=@<:@DIR@:>@],
+		AC_HELP_STRING([--with-libpcre-include@<:@=DIR@:>@],
 			[use libpcre include headers from given path.]
 		),
 		[
 			LIBPCRE_CFLAGS="-I$withval"
+			_libpcre_dir_set="yes"
+		]
+	)
+
+	AC_ARG_WITH([libpcre-lib],
+		AC_HELP_STRING([--with-libpcre-lib@<:@=DIR@:>@],
+			[use libpcre libraries from given path.]
+		),
+		[
+			LIBPCRE_LDFLAGS="-L$withval"
 			_libpcre_dir_set="yes"
 		]
 	)
@@ -65,6 +75,16 @@ AC_HELP_STRING([--with-libpcre=@<:@DIR@:>@], [use libpcre from given base instal
 	elif test -f /usr/pkg/include/pcreposix.h; then
 		LIBPCRE_CFLAGS="-I/usr/pkg/include"
 		LIBPCRE_LDFLAGS="-L/usr/pkg/lib"
+		LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS -Wl,-R/usr/pkg/lib"
+		found_libpcre="yes"
+	elif test -f /opt/csw/include/pcreposix.h; then
+		LIBPCRE_CFLAGS="-I/opt/csw/include"
+		LIBPCRE_LDFLAGS="-L/opt/csw/lib"
+		if $(echo "$CFLAGS"|grep -q -- "-m64") ; then
+			LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS/64 -Wl,-R/opt/csw/lib/64"
+		else
+			LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS -Wl,-R/opt/csw/lib"
+		fi
 		found_libpcre="yes"
 	else
 		found_libpcre="no"

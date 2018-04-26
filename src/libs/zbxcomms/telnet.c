@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -427,12 +427,12 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 	/* `command' with multiple lines may contain CR+LF from the browser;	*/
 	/* it should be converted to plain LF to remove echo later on properly	*/
 	offset_lf = strlen(command);
-	command_lf = zbx_malloc(command_lf, offset_lf + 1);
+	command_lf = (char *)zbx_malloc(command_lf, offset_lf + 1);
 	zbx_strlcpy(command_lf, command, offset_lf + 1);
 	convert_telnet_to_unix_eol(command_lf, &offset_lf);
 
 	/* telnet protocol requires that end-of-line is transferred as CR+LF	*/
-	command_crlf = zbx_malloc(command_crlf, offset_lf * 2 + 1);
+	command_crlf = (char *)zbx_malloc(command_crlf, offset_lf * 2 + 1);
 	convert_unix_to_telnet_eol(command_lf, offset_lf, command_crlf, &offset_crlf);
 
 	telnet_socket_write(socket_fd, command_crlf, offset_crlf);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,22 +23,20 @@ if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
 
-$create_button = new CRedirectButton(_('Create dashboard'),
-	(new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('new', '1')
-		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-		->getUrl()
-);
-
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem($create_button)
-		->addItem((new CList())
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create dashboard'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('new', '1')
+					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+					->getUrl()
+			))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-		)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $form = (new CForm())

@@ -1,3 +1,5 @@
+$theme_name: 'dark';
+
 // NOTIFICATION & ALERT
 $red: #e45959;
 $light-red: #503434;
@@ -31,6 +33,10 @@ $ui-bg-color: #2b2b2b;
 $ui-bg-selected-color: #4f4f4f;
 $ui-hover-color: #383838;
 $ui-border-color: #303030;
+$ui-placeholder-background-color: darken($ui-hover-color, 15%);
+$ui-highlighted-parent-background-color: darken($ui-hover-color, 10%);
+$ui-sortable-helper-background-color: $ui-bg-color;
+$ui-sortable-helper-border-color: $ui-border-color;
 
 $action-hover-color: #454545;
 $action-border-color: #383838;
@@ -99,6 +105,16 @@ $clock-hand-color: #f2f2f2;
 $clock-hand-sec-color: #69808d;
 $clock-lines-color: #4f4f4f;
 
+// STATUSES
+$problem-unack-fg-color: #ff3333;
+$problem-ack-fg-color: #ff3333;
+$ok-unack-fg-color: #00ff00;
+$ok-ack-fg-color: #00ff00;
+
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border-color: rgba($ui-bg-color, .2) !important;
+}
+
 .top-nav-help {
 	background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important;
 }
@@ -111,20 +127,8 @@ $clock-lines-color: #4f4f4f;
 .top-nav-zbbshare {
 	background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important;
 }
-.btn-search{
+.btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
-}
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
-	}
-}
-
-.list-table {
-
-	thead th {
-		border-color: lighten($table-border-color, 3%) !important;
-	}
 }
 
 .timeline-axis {
@@ -135,5 +139,60 @@ $clock-lines-color: #4f4f4f;
 	}
 }
 
+
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+.list-table {
+
+	thead th {
+		border-color: lighten($table-border-color, 3%);
+	}
+}
+
+.top-subnav a {
+	&:focus {
+		border-bottom: 4px solid lighten($main-nav-bg-color, 30%) !important;
+		outline: none;
+	}
+}
+
+// Tables
+
+.list-table {
+	&.compact-view {
+		tr {
+			&:hover {
+				td {
+					&.na-bg, &.info-bg, &.warning-bg, &.average-bg, &.high-bg, &.disaster-bg {
+						color: black;
+					}
+				}
+			}
+
+			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
+				td {
+					box-shadow: inset 0 -1px 0 0 rgba(black, 0.1);
+				}
+			}
+		}
+
+		td {
+			&.na-bg, &.info-bg, &.warning-bg, &.average-bg, &.high-bg, &.disaster-bg {
+				color: black;
+				box-shadow: inset 0 -1px 0 0 rgba(black, 0.1);
+			}
+		}
+	}
+}
+
+// GRAPH AND MAP
+.btn-back-map-container {
+
+	.btn-back-map {
+
+		.btn-back-map-icon {
+			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+		}
+	}
+}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,11 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Proxies'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit')))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit'))
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter('web.proxies.filter.state'))
 		->addVar('action', 'proxy.list')
@@ -58,6 +60,7 @@ $proxyTable = (new CTableInfo())
 		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),
 		_('Mode'),
 		_('Encryption'),
+		_('Compression'),
 		_('Last seen (age)'),
 		_('Host count'),
 		_('Item count'),
@@ -133,7 +136,10 @@ foreach ($data['proxies'] as $proxy) {
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? $out_encryption : $in_encryption,
-		$proxy['lastaccess'] == 0
+		($proxy['auto_compress'] == HOST_COMPRESSION_ON)
+			? (new CSpan(_('On')))->addClass(ZBX_STYLE_STATUS_GREEN)
+			: (new CSpan(_('Off')))->addClass(ZBX_STYLE_STATUS_GREY),
+		($proxy['lastaccess'] == 0)
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
 		array_key_exists('host_count', $proxy) ? $proxy['host_count'] : '',

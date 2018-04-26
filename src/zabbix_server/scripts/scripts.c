@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -459,7 +459,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
 					ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT);
+							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED);
 					break;
 				default:
 					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option \"%d\".",
@@ -527,8 +527,12 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 			script->authtype, script->username, script->password, script->publickey, script->privatekey,
 			taskid, host->hostid, alertid);
 
+	DBbegin();
+
 	if (FAIL == zbx_tm_save_task(task))
 		taskid = 0;
+
+	DBcommit();
 
 	zbx_tm_task_free(task);
 

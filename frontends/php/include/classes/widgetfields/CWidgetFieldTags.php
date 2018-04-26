@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,8 +32,9 @@ class CWidgetFieldTags extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'tag' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
+			'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'operator'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL])],
+			'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
 		]]);
 		$this->setDefault([]);
 	}
@@ -65,6 +66,11 @@ class CWidgetFieldTags extends CWidgetField {
 				'type' => $this->save_type,
 				'name' => $this->name.'.tag.'.$index,
 				'value' => $val['tag']
+			];
+			$widget_fields[] = [
+				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+				'name' => $this->name.'.operator.'.$index,
+				'value' => $val['operator']
 			];
 			$widget_fields[] = [
 				'type' => $this->save_type,

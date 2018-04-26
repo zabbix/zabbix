@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,52 +29,6 @@
 #endif
 #include "comms.h"
 
-char	*CONFIG_HOSTS_ALLOWED		= NULL;
-char	*CONFIG_HOSTNAME		= NULL;
-char	*CONFIG_HOSTNAME_ITEM		= NULL;
-char	*CONFIG_HOST_METADATA		= NULL;
-char	*CONFIG_HOST_METADATA_ITEM	= NULL;
-
-int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
-int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
-int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
-int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
-int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
-char	*CONFIG_LISTEN_IP		= NULL;
-char	*CONFIG_SOURCE_IP		= NULL;
-int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
-
-int	CONFIG_BUFFER_SIZE		= 100;
-int	CONFIG_BUFFER_SEND		= 5;
-
-int	CONFIG_MAX_LINES_PER_SECOND	= 20;
-
-char	*CONFIG_LOAD_MODULE_PATH	= NULL;
-
-char	**CONFIG_ALIASES		= NULL;
-char	**CONFIG_LOAD_MODULE		= NULL;
-char	**CONFIG_USER_PARAMETERS	= NULL;
-#if defined(_WINDOWS)
-char	**CONFIG_PERF_COUNTERS		= NULL;
-#endif
-
-char	*CONFIG_USER			= NULL;
-
-/* TLS parameters */
-unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
-unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
-
-char	*CONFIG_TLS_CONNECT		= NULL;
-char	*CONFIG_TLS_ACCEPT		= NULL;
-char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CRL_FILE		= NULL;
-char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
-char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
-char	*CONFIG_TLS_CERT_FILE		= NULL;
-char	*CONFIG_TLS_KEY_FILE		= NULL;
-char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
-char	*CONFIG_TLS_PSK_FILE		= NULL;
-
 /******************************************************************************
  *                                                                            *
  * Function: load_aliases                                                     *
@@ -88,11 +42,12 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
  ******************************************************************************/
 void	load_aliases(char **lines)
 {
-	char	**pline, *r, *c;
+	char	**pline;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
-		r = *pline;
+		char		*c;
+		const char	*r = *pline;
 
 		if (SUCCEED != parse_key(&r) || ':' != *r)
 		{
@@ -101,7 +56,7 @@ void	load_aliases(char **lines)
 			exit(EXIT_FAILURE);
 		}
 
-		c = r++;
+		c = (char *)r++;
 
 		if (SUCCEED != parse_key(&r) || '\0' != *r)
 		{
@@ -240,7 +195,7 @@ pc_fail:
 #endif	/* _WINDOWS */
 
 #ifdef _AIX
-void	tl_version()
+void	tl_version(void)
 {
 #ifdef _AIXVERSION_610
 #	define ZBX_AIX_TL	"6100 and above"

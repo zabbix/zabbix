@@ -1,21 +1,28 @@
 <script type="text/x-jquery-tmpl" id="screenRowTPL">
-<tr class="sortable" id="slides_#{rowId}">
-	<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-		<input id="slides_#{rowId}_screenid" name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
-		<input id="slides_#{rowId}_slideid" name="slides[#{rowId}][slideid]" type="hidden" value="" />
-	</td>
-	<td>
-		<span class="rowNum" id="current_slide_#{rowId}">#{rowNum}</span>
-	</td>
-	<td>#{name}</td>
-	<td>
-		<input type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?= CHtml::encode(_('default')); ?>" value="" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right; width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px">
-	</td>
-	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="remove_#{rowId}" remove_slide="#{rowId}" onclick="removeSlide(this);"><?= _('Remove') ?></button>
-	</td>
-</tr>
+<?= (new CRow([
+	(new CCol([
+		(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+		new CInput('hidden', 'slides[#{rowId}][screenid]', '#{screenid}'),
+		new CInput('hidden', 'slides[#{rowId}][slideid]')
+	]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+	(new CSpan('#{rowNum}:'))
+		->addClass('rowNum')
+		->setId('current_slide_#{rowId}'),
+	'#{name}',
+	(new CTextBox('slides[#{rowId}][delay]'))
+		->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		->setAttribute('placeholder', _('default')),
+	(new CCol(
+		(new CButton('remove_#{rowId}', _('Remove')))
+			->onClick('javascript: removeSlide(this);')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->setAttribute('remove_slide', '#{rowId}')
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->addClass('sortable')
+	->setId('slides_#{rowId}')
+	->toString()
+?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="user_group_row_tpl">

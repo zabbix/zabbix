@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'dynamic_hostid' => 'db hosts.hostid',
 			'content_width' => 'int32',
 			'content_height' => 'int32',
-			'only_footer' => 'in 1'
+			'only_footer' => 'in 1',
+			'period' => 'int32',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -43,6 +45,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		if ($this->getInput('only_footer', 0)) {
 			$this->setResponse(new CControllerResponseData([
 				'only_footer' => true,
+				'period_string' => $this->hasInput('period')
+					? ' ('.zbx_date2age(0, $this->getInput('period', 0)).')'
+					: '',
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]
@@ -50,6 +55,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 			return;
 		}
+
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
 
 		$fields = $this->getForm()->getFieldsData();
 
@@ -67,6 +74,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$profileIdx = 'web.dashbrd';
 		$profileIdx2 = $dashboardid;
 		$unavailable_object = false;
+		$header_label = '';
 
 		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $fields['graphid']) {
 			$resource_type = SCREEN_RESOURCE_GRAPH;
@@ -86,6 +94,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$resource_type = null;
 			$graph_dims = getGraphDims();
 		}
+		$graph_dims['shiftYtop'] = CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
 
 		// Prepare timeline details
 		$timeline = calculateTime([
@@ -124,8 +133,25 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				$new_itemid = get_same_item_for_host($resourceid, $dynamic_hostid);
-				$resourceid = !empty($new_itemid) ? $new_itemid : null;
+				$src_items = API::Item()->get([
+					'output' => ['key_'],
+					'itemids' => $resourceid,
+					'webitems' => true
+				]);
+
+				$items = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'selectHosts' => ['name'],
+					'hostids' => $dynamic_hostid,
+					'filter' => [
+						'key_' => $src_items[0]['key_'],
+						'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+					],
+					'webitems' => true
+				]);
+
+				$item = reset($items);
+				$resourceid = $items ? $item['itemid'] : null;
 
 				if ($resourceid === null) {
 					$unavailable_object = true;
@@ -182,6 +208,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 							$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
 						}
 					}
+
+					$graph['hosts'] = $hosts;
 				}
 
 				if ($graph) {
@@ -206,12 +234,14 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$unavailable_object = true;
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				$item = API::Item()->get([
+				$items = API::Item()->get([
+					'output' => ['name', 'key_', 'delay', 'hostid'],
+					'selectHosts' => ['name'],
 					'itemids' => $resourceid,
 					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
-					'output' => null
+					'webitems' => true
 				]);
-				$item = reset($item);
+				$item = reset($items);
 
 				if (!$item) {
 					$unavailable_object = true;
@@ -221,7 +251,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				// get graph, used below
 				$graph = API::Graph()->get([
 					'graphids' => $resourceid,
-					'output' => API_OUTPUT_EXTEND
+					'output' => API_OUTPUT_EXTEND,
+					'selectHosts' => ['name']
 				]);
 				$graph = reset($graph);
 
@@ -243,6 +274,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					$graph_src->setArgument('itemids[]', $resourceid);
 					$graph_src->setArgument('width', $width);
 					$graph_src->setArgument('height', $height);
+					$graph_src->setArgument('legend', $fields['show_legend']);
 				}
 				else {
 					$graph_src = new CUrl('chart3.php');
@@ -251,9 +283,13 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$graph_src->setArgument('period', $timeline['period']);
 				$graph_src->setArgument('stime', $timeline['stime']);
 				$graph_src->setArgument('isNow', $timeline['isNow']);
+
+				$item = CMacrosResolverHelper::resolveItemNames([$item])[0];
+				$header_label = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';
+				$header_label = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
 
 				if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
 					$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
@@ -303,7 +339,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 				$graph_src->setArgument('width', $width);
 				$graph_src->setArgument('height', $height);
-				$graph_src->setArgument('legend', $graph['show_legend']);
+				$graph_src->setArgument('legend', ($fields['show_legend'] == 1 && $graph['show_legend'] == 1) ? 1 : 0);
 				$graph_src->setArgument('period', $timeline['period']);
 				$graph_src->setArgument('stime', $timeline['stime']);
 				$graph_src->setArgument('isNow', $timeline['isNow']);
@@ -321,17 +357,31 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$graph_src->setArgument('outer', '1');
 			}
 
+			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
+
+			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+				$item_graph_url = (new CUrl('charts.php'))->setArgument('graphid', $resourceid);
+			}
+			else {
+				$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+			}
+			$item_graph_url
+				->setArgument('period', $timeline['period'])
+				->setArgument('stime', $timeline['stime'])
+				->setArgument('isNow', $timeline['isNow'])
+				->setArgument('fullscreen', $fullscreen ? '1' : null);
 		}
 
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+		$response = [
+			'name' => $this->getInput('name', ''),
 			'graph' => [
 				'dataid' => $dataid,
 				'containerid' => $containerid,
 				'timestamp' => time(),
 				'unavailable_object' => $unavailable_object
 			],
+			'item_graph_url' => $unavailable_object ? '' : $item_graph_url,
 			'widget' => [
 				'uniqueid' => $uniqueid,
 				'initial_load' => (int) $this->getInput('initial_load', 0),
@@ -344,6 +394,13 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
-		]));
+		];
+
+		if ($response['name'] === '') {
+			$response['name'] = $header_label;
+			$response['period_string'] = ' ('.zbx_date2age(0, $timeline['period']).')';
+		}
+
+		$this->setResponse(new CControllerResponseData($response));
 	}
 }

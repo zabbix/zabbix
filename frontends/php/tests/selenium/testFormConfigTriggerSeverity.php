@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup config
+ */
 class testFormConfigTriggerSeverity extends CWebTest {
 	// Data provider
 	public static function providerTriggerSeverity() {
@@ -107,7 +110,6 @@ class testFormConfigTriggerSeverity extends CWebTest {
 		return $data;
 	}
 
-
 	public function testFormTriggerSeverity_Layout() {
 		$this->zbxTestLogin('adm.triggerseverities.php');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
@@ -140,10 +142,6 @@ class testFormConfigTriggerSeverity extends CWebTest {
 		$this->zbxTestAssertNotVisibleXpath('//div[@class="color-picker"]');
 		$this->zbxTestClick('lbl_severity_color_0');
 		$this->zbxTestAssertVisibleXpath('//div[@class="color-picker"]');
-	}
-
-	public function testFormTriggerSeverity_backup() {
-		DBsave_tables('config');
 	}
 
 	/**
@@ -179,9 +177,4 @@ class testFormConfigTriggerSeverity extends CWebTest {
 		}
 
 	}
-
-	public function testFormTriggerSeverity_restore() {
-		DBrestore_tables('config');
-	}
-
 }

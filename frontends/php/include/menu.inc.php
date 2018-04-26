@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'zabbix.php',
 					'action' => 'problem.view',
-					'active_if' => ['problem.view'],
+					'active_if' => ['problem.view', 'acknowledge.edit'],
 					'label' => _('Problems'),
 					'sub_pages' => ['tr_events.php']
 				],
@@ -67,12 +67,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'latest.php',
 					'label' => _('Latest data'),
 					'sub_pages' => ['history.php', 'chart.php']
-				],
-				[
-					'url' => 'tr_status.php',
-					'active_if' => ['acknowledge.edit'],
-					'label' => _('Triggers'),
-					'sub_pages' => ['tr_comments.php', 'chart4.php', 'scripts_exec.php']
 				],
 				[
 					'url' => 'charts.php',
@@ -148,12 +142,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'zabbix.php',
 					'action' => 'report.status',
 					'active_if' => ['report.status'],
-					'label' => _('Status of Zabbix'),
+					'label' => _('System information'),
 					'user_type' => USER_TYPE_SUPER_ADMIN
 				],
 				[
 					'url' => 'report2.php',
-					'label' => _('Availability report')
+					'label' => _('Availability report'),
+					'sub_pages' => ['chart4.php']
 				],
 				[
 					'url' => 'toptriggers.php',
@@ -173,9 +168,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'report4.php',
 					'label' => _('Notifications'),
 					'user_type' => USER_TYPE_ZABBIX_ADMIN
-				],
-				[
-					'url' => 'popup.php'
 				]
 			]
 		],
@@ -207,15 +199,11 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 						'triggers.php',
 						'graphs.php',
 						'applications.php',
-						'tr_logform.php',
-						'tr_testexpr.php',
-						'popup_trexpr.php',
 						'host_discovery.php',
 						'disc_prototypes.php',
 						'trigger_prototypes.php',
 						'host_prototypes.php',
-						'httpconf.php',
-						'popup_httpstep.php'
+						'httpconf.php'
 					]
 				],
 				[
@@ -278,10 +266,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'users.php',
-					'label' => _('Users'),
-					'sub_pages' => [
-						'popup_usrgrp.php'
-					]
+					'label' => _('Users')
 				],
 				[
 					'url' => 'zabbix.php',
@@ -308,7 +293,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'pages' => [
 				[
 					'url' => 'index.php',
-					'sub_pages' => ['profile.php', 'popup_media.php']
+					'sub_pages' => ['profile.php']
 				]
 			]
 		]
@@ -415,11 +400,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		}
 		$mmenu_entry = (new CListItem(
 			(new CLink($menu['label']))
+				->onClick('javascript: MMenu.mouseOver(\''.$label.'\');')
+				->onKeyup('javascript: MMenu.keyUp(\''.$label.'\', event);')
 				->setAttribute('tabindex', 0)
 		))
 			->addClass($menu_class)
 			->setId($label);
-		$mmenu_entry->onClick('javascript: MMenu.mouseOver(\''.$label.'\');');
+
 		array_push($main_menu, $mmenu_entry);
 	}
 

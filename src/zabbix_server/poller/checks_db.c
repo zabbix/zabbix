@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,195 +19,10 @@
 
 #include "checks_db.h"
 
-#include "zbxjson.h"
-#include "log.h"
-
 #ifdef HAVE_UNIXODBC
 
-#include "zbxodbc.h"
-
-static int	get_result_columns(ZBX_ODBC_DBH *dbh, char **buffer)
-{
-	int		ret = SUCCEED, i, j;
-	char		str[MAX_STRING_LEN];
-	SQLRETURN	rc;
-	SQLSMALLINT	len;
-
-	for (i = 0; i < dbh->col_num; i++)
-	{
-		rc = SQLColAttribute(dbh->hstmt, i + 1, SQL_DESC_LABEL, str, sizeof(str), &len, NULL);
-
-		if (SQL_SUCCESS != rc || sizeof(str) <= (size_t)len || '\0' == *str)
-		{
-			for (j = 0; j < i; j++)
-				zbx_free(buffer[j]);
-
-			ret = FAIL;
-			break;
-		}
-
-		buffer[i] = zbx_strdup(NULL, str);
-	}
-
-	return ret;
-}
-
-static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	const char	*__function_name = "db_odbc_discovery";
-
-	int		ret = NOTSUPPORTED, i, j;
-	ZBX_ODBC_DBH	dbh;
-	ZBX_ODBC_ROW	row;
-	char		**columns, *p, macro[MAX_STRING_LEN];
-	struct zbx_json	json;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, item->params);
-
-	if (2 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	if (SUCCEED != odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
-		goto out;
-	}
-
-	if (NULL != odbc_DBselect(&dbh, item->params))
-	{
-		columns = zbx_malloc(NULL, sizeof(char *) * dbh.col_num);
-
-		if (SUCCEED == get_result_columns(&dbh, columns))
-		{
-			for (i = 0; i < dbh.col_num; i++)
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() column[%d]:'%s'", __function_name, i + 1, columns[i]);
-
-			for (i = 0; i < dbh.col_num; i++)
-			{
-				for (p = columns[i]; '\0' != *p; p++)
-				{
-					if (0 != isalpha((unsigned char)*p))
-						*p = toupper((unsigned char)*p);
-
-					if (SUCCEED != is_macro_char(*p))
-					{
-						SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-								"Cannot convert column #%d name to macro.", i + 1));
-						goto clean;
-					}
-				}
-
-				for (j = 0; j < i; j++)
-				{
-					if (0 == strcmp(columns[i], columns[j]))
-					{
-						SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-								"Duplicate macro name: {#%s}.", columns[i]));
-						goto clean;
-					}
-				}
-			}
-
-			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
-
-			while (NULL != (row = odbc_DBfetch(&dbh)))
-			{
-				zbx_json_addobject(&json, NULL);
-
-				for (i = 0; i < dbh.col_num; i++)
-				{
-					zbx_snprintf(macro, MAX_STRING_LEN, "{#%s}", columns[i]);
-					zbx_json_addstring(&json, macro, row[i], ZBX_JSON_TYPE_STRING);
-				}
-
-				zbx_json_close(&json);
-			}
-
-			zbx_json_close(&json);
-
-			SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
-
-			zbx_json_free(&json);
-
-			ret = SUCCEED;
-clean:
-			for (i = 0; i < dbh.col_num; i++)
-				zbx_free(columns[i]);
-		}
-		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain column names."));
-
-		zbx_free(columns);
-	}
-	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
-
-	odbc_DBclose(&dbh);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	const char	*__function_name = "db_odbc_select";
-
-	int		ret = NOTSUPPORTED;
-	ZBX_ODBC_DBH	dbh;
-	ZBX_ODBC_ROW	row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, item->params);
-
-	if (2 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	if (SUCCEED != odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
-		goto out;
-	}
-
-	if (NULL != odbc_DBselect(&dbh, item->params))
-	{
-		if (NULL != (row = odbc_DBfetch(&dbh)))
-		{
-			if (NULL == row[0])
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL value."));
-			}
-			else
-			{
-				set_result_type(result, ITEM_VALUE_TYPE_TEXT, row[0]);
-				ret = SUCCEED;
-			}
-		}
-		else
-		{
-			const char	*last_error = get_last_odbc_strerror();
-
-			if ('\0' != *last_error)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
-			else
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty result."));
-		}
-	}
-	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
-
-	odbc_DBclose(&dbh);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
+#include "log.h"
+#include "../odbc/odbc.h"
 
 /******************************************************************************
  *                                                                            *
@@ -215,7 +30,8 @@ out:
  *                                                                            *
  * Purpose: retrieve data from database                                       *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item   - [IN] item we are interested in                        *
+ *             result - [OUT] check result                                    *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
@@ -225,27 +41,77 @@ out:
  ******************************************************************************/
 int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 {
-	const char	*__function_name = "get_value_db";
+	const char		*__function_name = "get_value_db";
 
-	AGENT_REQUEST	request;
-	int		ret = NOTSUPPORTED;
+	AGENT_REQUEST		request;
+	const char		*dsn;
+	zbx_odbc_data_source_t	*data_source;
+	zbx_odbc_query_result_t	*query_result;
+	char			*error = NULL;
+	int			(*query_result_to_text)(zbx_odbc_query_result_t *query_result, char **text, char **error),
+				ret = NOTSUPPORTED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s'", __function_name, item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' query:'%s'", __function_name, item->key_orig, item->params);
 
 	init_request(&request);
 
-	if (SUCCEED == parse_item_key(item->key, &request))
+	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		if (0 == strcmp(request.key, "db.odbc.select"))
-			ret = db_odbc_select(item, &request, result);
-		else if (0 == strcmp(request.key, "db.odbc.discovery"))
-			ret = db_odbc_discovery(item, &request, result);
-		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
+		goto out;
+	}
+
+	if (0 == strcmp(request.key, "db.odbc.select"))
+	{
+		query_result_to_text = zbx_odbc_query_result_to_string;
+	}
+	else if (0 == strcmp(request.key, "db.odbc.discovery"))
+	{
+		query_result_to_text = zbx_odbc_query_result_to_lld_json;
 	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
+		goto out;
+	}
 
+	if (2 != request.nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	/* request.params[0] is ignored and is only needed to distinguish queries of same DSN */
+
+	dsn = request.params[1];
+
+	if (NULL == dsn || '\0' == *dsn)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	if (NULL != (data_source = zbx_odbc_connect(dsn, item->username, item->password, CONFIG_TIMEOUT, &error)))
+	{
+		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, &error)))
+		{
+			char	*text = NULL;
+
+			if (SUCCEED == query_result_to_text(query_result, &text, &error))
+			{
+				SET_TEXT_RESULT(result, text);
+				ret = SUCCEED;
+			}
+
+			zbx_odbc_query_result_free(query_result);
+		}
+
+		zbx_odbc_data_source_free(data_source);
+	}
+
+	if (SUCCEED != ret)
+		SET_MSG_RESULT(result, error);
+out:
 	free_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

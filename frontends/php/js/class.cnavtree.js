@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -260,7 +260,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				levels_moved = Math.floor(Math.abs(parent_item.offset().left - this.positionAbs.left) / o.indent_size);
 			}
 
-			$('.highliglted-parent').removeClass('highliglted-parent');
+			$('.highlighted-parent').removeClass('highlighted-parent');
 
 			if (direction_moved === 'right' && levels_moved) {
 				var drop_to = prev_item,
@@ -270,7 +270,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 
 				this.changing_parent = setTimeout(function() {
 					$(drop_to)
-						.addClass('highliglted-parent opened')
+						.addClass('highlighted-parent opened')
 						.removeClass('closed');
 
 					if (prev_offset_top && (prev_offset_top <= prev_item.offset().top)) {
@@ -297,7 +297,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 					levels_moved--;
 				}
 
-				$(drop_to).addClass('highliglted-parent');
+				$(drop_to).addClass('highlighted-parent');
 
 				this.changing_parent = setTimeout(function() {
 					if (one_before && one_before.length) {
@@ -316,7 +316,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				this._isAllowed(prev_item, level, level + child_levels);
 			}
 			else {
-				$(this.placeholder.parent().closest('.tree-item')).addClass('highliglted-parent');
+				$(this.placeholder.parent().closest('.tree-item')).addClass('highlighted-parent');
 				this._isAllowed(prev_item, level, level + child_levels);
 			}
 
@@ -341,7 +341,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				return;
 			}
 
-			$('.highliglted-parent').removeClass('highliglted-parent');
+			$('.highlighted-parent').removeClass('highlighted-parent');
 			this.placeholder.removeClass('sortable-error');
 
 			if (this.changing_parent) {
@@ -595,8 +595,9 @@ jQuery(function($) {
 			 * @param {numeric} id - widget field ID or 0 when creating new item.
 			 * @param {numeric} parent - ID of parent item under which new item is created.
 			 * @param {numeric} depth - a depth of parent item under which new item is created.
+			 * @param {object}  trigger_elmnt - UI element clicked to open dialog.
 			 */
-			var itemEditDialog = function($obj, id, parent, depth) {
+			var itemEditDialog = function($obj, id, parent, depth, trigger_elmnt) {
 				var url = new Curl('zabbix.php'),
 					item_edit = !!id,
 					ajax_data = {
@@ -614,7 +615,7 @@ jQuery(function($) {
 					ajax_data['map_id'] = getNextId($obj);
 				}
 
-				url.setArgument('action', 'widget.navigationtree.edititemdialog');
+				url.setArgument('action', 'widget.navtree.item.edit');
 
 				jQuery.ajax({
 					url: url.getUrl(),
@@ -638,10 +639,11 @@ jQuery(function($) {
 												add_submaps: $('[name="add_submaps"]', form).is(':checked') ? 1 : 0,
 												map_name: $('[name="map.name.' + id + '"]', form).val(),
 												map_mapid: +$('[name="linked_map_id"]', form).val(),
+												depth: depth || 1,
 												mapid: id
 											};
 
-										url.setArgument('action', 'widget.navigationtree.edititem');
+										url.setArgument('action', 'widget.navtree.item.update');
 
 										jQuery.ajax({
 											url: url.getUrl(),
@@ -706,8 +708,8 @@ jQuery(function($) {
 																				parent: +itemid
 																			};
 
-																		root.appendChild(createTreeItem($obj, new_item, 1,
-																			true, true
+																		root.appendChild(createTreeItem($obj, new_item,
+																			1, true, true
 																		));
 																		add_child_levels($obj, +submapid,
 																			submap_itemid
@@ -724,7 +726,7 @@ jQuery(function($) {
 															.removeClass('closed');
 													}
 
-													overlayDialogueDestroy();
+													overlayDialogueDestroy('navtreeitem');
 													setTreeHandlers($obj);
 												}
 											}
@@ -738,8 +740,9 @@ jQuery(function($) {
 									'class': 'btn-alt',
 									'action': function() {}
 								}
-							]
-						});
+							],
+							'dialogueid': 'navtreeitem'
+						}, trigger_elmnt);
 					}
 				});
 			};
@@ -834,7 +837,7 @@ jQuery(function($) {
 
 				link.setAttribute('class', 'item-name');
 				link.setAttribute('title', item.name);
-				link.innerHTML = item.name;
+				link.innerText = item.name;
 
 				var li_item = document.createElement('LI');
 
@@ -894,7 +897,7 @@ jQuery(function($) {
 						}
 
 						if (widget_data.max_depth > +depth) {
-							itemEditDialog($obj, 0, parentId, +depth);
+							itemEditDialog($obj, 0, parentId, +depth + 1, event.target);
 						}
 					});
 					tools.appendChild(btn1);
@@ -905,14 +908,8 @@ jQuery(function($) {
 					btn2.setAttribute('data-id', item.id);
 					btn2.setAttribute('class', 'import-items-btn');
 					btn2.setAttribute('title', t('Add multiple maps'));
-					btn2.addEventListener('click', function() {
-						var url = new Curl('popup.php'),
-							id = $(this).data('id');
-
-						url.setArgument('srctbl', 'sysmaps');
-						url.setArgument('srcfld1', 'sysmapid');
-						url.setArgument('srcfld2', 'name');
-						url.setArgument('multiselect', '1');
+					btn2.addEventListener('click', function(event) {
+						var id = $(this).data('id');
 
 						if (typeof addPopupValues === 'function') {
 							old_addPopupValues = addPopupValues;
@@ -946,8 +943,13 @@ jQuery(function($) {
 							}
 						};
 
-						return PopUp(url.getUrl());
-					});
+						return PopUp('popup.generic', {
+							srctbl: 'sysmaps',
+							srcfld1: 'sysmapid',
+							srcfld2: 'name',
+							multiselect: '1'
+						}, null, event.target);
+						});
 					tools.appendChild(btn2);
 
 					if (editable) {
@@ -957,12 +959,12 @@ jQuery(function($) {
 						btn3.setAttribute('data-id', item.id);
 						btn3.setAttribute('class', 'edit-item-btn');
 						btn3.setAttribute('title', t('Edit'));
-						btn3.addEventListener('click', function() {
+						btn3.addEventListener('click', function(event) {
 							var id = $(this).data('id'),
 								parent = +$('input[name="map.parent.' + id + '"]', $obj).val(),
 								depth = +$(this).closest('[data-depth]').attr('data-depth');
 
-							itemEditDialog($obj, id, parent, depth);
+							itemEditDialog($obj, id, parent, depth, event.target);
 						});
 						tools.appendChild(btn3);
 
@@ -1004,6 +1006,7 @@ jQuery(function($) {
 					arrow.appendChild(arrow_btn);
 					arrow_btn.addEventListener('click', function(event) {
 						var widget_data = getWidgetData($obj),
+							widget_options = $obj.data('widgetData'),
 							branch = $(this).closest('[data-id]'),
 							button = $(this),
 							closed_state = '1';
@@ -1029,6 +1032,19 @@ jQuery(function($) {
 								'web.dashbrd.navtree-' + branch.data('id') + '.toggle',
 								closed_state, [widget_data['widgetid']]
 							);
+
+							var index = widget_options['navtree_items_opened'].indexOf(branch.data('id').toString());
+							if (index > -1) {
+								if (closed_state === '1') {
+									widget_options['navtree_items_opened'].splice(index, 1);
+								}
+								else {
+									widget_options['navtree_items_opened'].push(branch.data('id').toString());
+								}
+							}
+							else if (closed_state === '0' && index == -1) {
+								widget_options['navtree_items_opened'].push(branch.data('id').toString());
+							}
 						}
 					});
 				}
@@ -1340,8 +1356,7 @@ jQuery(function($) {
 				 * linked widgets, but avoid real data sharing.
 				 */
 				if (item_id && $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
-						send_data ? 'selected_mapid' : '', {mapid: $(selected_item).data('mapid')})
-				) {
+						send_data ? 'selected_mapid' : '', {mapid: $(selected_item).data('mapid')})) {
 					$('.selected', $obj).removeClass('selected');
 
 					while ($(step_in_path).length) {

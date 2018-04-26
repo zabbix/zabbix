@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -472,7 +472,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 								zbx_strdup(*((char **)cfg[i].variable), value);
 						break;
 					case TYPE_MULTISTRING:
-						zbx_strarr_add(cfg[i].variable, value);
+						zbx_strarr_add((char ***)cfg[i].variable, value);
 						break;
 					case TYPE_UINT64:
 						if (FAIL == str2uint64(value, "KMGT", &var))
@@ -520,7 +520,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	return SUCCEED;
 cannot_open:
-	if (0 != optional)
+	if (ZBX_CFG_FILE_REQUIRED != optional)
 		return SUCCEED;
 	zbx_error("cannot open config file \"%s\": %s", cfg_file, zbx_strerror(errno));
 	goto error;

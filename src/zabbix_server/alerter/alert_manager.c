@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -894,6 +894,58 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 	return *alerter;
 }
 
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_DATABASE_TYPE "IBM DB2"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_DATABASE_TYPE "MySQL"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_DATABASE_TYPE "Oracle"
+#elif defined(HAVE_POSTGRESQL)
+#	define ZBX_DATABASE_TYPE "PostgreSQL"
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: am_create_db_alert_message                                       *
+ *                                                                            *
+ * Purpose: get and format error message from database when it is unavailable *
+ *                                                                            *
+ * Return value: full database error message is allocated                     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*am_create_db_alert_message(void)
+{
+	const char	*error;
+	char		*alert_message = NULL;
+	size_t		alert_message_alloc = 0, alert_message_offset = 0;
+
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s database \"%s\"",
+			ZBX_DATABASE_TYPE, CONFIG_DBNAME);
+
+	if ('\0' != *CONFIG_DBHOST)
+	{
+		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " on \"%s",
+				CONFIG_DBHOST);
+
+		if (0 != CONFIG_DBPORT)
+		{
+			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d\"",
+					CONFIG_DBPORT);
+		}
+		else
+			zbx_chrcpy_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, '\"');
+	}
+
+	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " is not available");
+
+	if (NULL != (error = zbx_db_last_strerr()) && '\0' != *error)
+		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ": %s", error);
+
+	return alert_message;
+}
+
+#undef ZBX_DATABASE_TYPE
+
 /******************************************************************************
  *                                                                            *
  * Function: am_queue_watchdog_alerts                                         *
@@ -914,7 +966,8 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 	zbx_am_alertpool_t	*alertpool;
 	zbx_am_alert_t		*alert;
 	zbx_hashset_iter_t	iter;
-	const char		*message = "Zabbix database is down.";
+	const char		*alert_subject = "Zabbix database is not available.";
+	char			*alert_message;
 
 	if ((now = time(NULL)) < lastsent + ZBX_WATCHDOG_ALERT_FREQUENCY)
 		return;
@@ -928,7 +981,11 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 			continue;
 
 		mediatype->refcount++;
-		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, message, message, 0, 0, 0);
+
+		alert_message = am_create_db_alert_message();
+
+		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject, alert_message, 0,
+				0, 0);
 
 		alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
 		alertpool->refcount++;
@@ -936,6 +993,8 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 		am_push_alert(alertpool, alert);
 		am_push_alertpool(mediatype, alertpool);
 		am_push_mediatype(manager, mediatype);
+
+		zbx_free(alert_message);
 	}
 
 	lastsent = now;
@@ -1022,6 +1081,48 @@ static void	am_destroy(zbx_am_t *manager)
 
 /******************************************************************************
  *                                                                            *
+ * Function: am_db_update_alert                                               *
+ *                                                                            *
+ * Purpose: update alert status in local cache to be flushed after reading    *
+ *          new alerts from database                                          *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *             alertid - [IN] the alert identifier                            *
+ *             status  - [IN] the alert status                                *
+ *             retries - [IN] the number of attempted sending retries         *
+ *             error   - [IN] the error message                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int status, int retries, char *error)
+{
+	const char		*__function_name = "am_db_update_alert";
+
+	zbx_am_alertstatus_t	*update;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alertid:" ZBX_FS_UI64 " status:%d retries:%d error:%s", __function_name,
+			alertid, status, retries, error);
+
+	/* alerts with 0 alertid are runtime alerts generated by alert manager when database is down */
+	if (0 != alertid)
+	{
+		if (NULL == (update = (zbx_am_alertstatus_t *)zbx_hashset_search(&manager->alertupdates, &alertid)))
+		{
+			zbx_am_alertstatus_t	update_local = {.alertid = alertid};
+
+			update = (zbx_am_alertstatus_t *)zbx_hashset_insert(&manager->alertupdates, &update_local,
+					sizeof(update_local));
+		}
+
+		update->retries = retries;
+		update->status = status;
+		ZBX_UPDATE_STR(update->error, error);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: am_db_get_alerts                                                 *
  *                                                                            *
  * Purpose: reads the new alerts from database                                *
@@ -1036,7 +1137,7 @@ static void	am_destroy(zbx_am_t *manager)
  *               FAIL    - database connection error                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_db_get_alerts(zbx_vector_ptr_t *alerts, int now)
+static int	am_db_get_alerts(zbx_am_t *manager, zbx_vector_ptr_t *alerts, int now)
 {
 	const char		*__function_name = "am_db_get_alerts";
 
@@ -1082,6 +1183,14 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts, int now)
 		ZBX_STR2UINT64(mediatypeid, row[1]);
 		status = atoi(row[5]);
 		attempts = atoi(row[6]);
+
+		if (SUCCEED == DBis_null(row[7]))
+		{
+			am_db_update_alert(manager, alertid, ALERT_STATUS_FAILED, 0,
+					(char *)"Related event was removed.");
+			continue;
+		}
+
 		source = atoi(row[7]);
 		object = atoi(row[8]);
 		ZBX_STR2UINT64(objectid, row[9]);
@@ -1250,7 +1359,7 @@ static int	am_db_queue_alerts(zbx_am_t *manager, int now)
 
 	zbx_vector_ptr_create(&alerts);
 
-	if (FAIL == (ret = am_db_get_alerts(&alerts, now)))
+	if (FAIL == (ret = am_db_get_alerts(manager, &alerts, now)))
 		goto out;
 
 	/* update media types for new and queued alerts */
@@ -1307,48 +1416,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: am_db_update_alert                                               *
- *                                                                            *
- * Purpose: update alert status in local cache to be flushed after reading    *
- *          new alerts from database                                          *
- *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             alertid - [IN] the alert identifier                            *
- *             status  - [IN] the alert status                                *
- *             retries - [IN] the number of attempted sending retries         *
- *             error   - [IN] the error message                               *
- *                                                                            *
- ******************************************************************************/
-static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int status, int retries, char *error)
-{
-	const char		*__function_name = "am_db_update_alert";
-
-	zbx_am_alertstatus_t	*update;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alertid:" ZBX_FS_UI64 " status:%d retries:%d error:%s", __function_name,
-			alertid, status, retries, error);
-
-	/* alerts with 0 alertid are runtime alerts generated by alert manager when database is down */
-	if (0 != alertid)
-	{
-		if (NULL == (update = (zbx_am_alertstatus_t *)zbx_hashset_search(&manager->alertupdates, &alertid)))
-		{
-			zbx_am_alertstatus_t	update_local = {.alertid = alertid};
-
-			update = (zbx_am_alertstatus_t *)zbx_hashset_insert(&manager->alertupdates, &update_local,
-					sizeof(update_local));
-		}
-
-		update->retries = retries;
-		update->status = status;
-		ZBX_UPDATE_STR(update->error, error);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1503,7 +1570,7 @@ static int	am_db_sync_watchdog(zbx_am_t *manager)
 		if (NULL == (media = (zbx_am_media_t *)zbx_hashset_search(&manager->watchdog, &mediaid)))
 		{
 			media_local.mediaid = mediaid;
-			media = zbx_hashset_insert(&manager->watchdog, &media_local, sizeof(media_local));
+			media = (zbx_am_media_t *)zbx_hashset_insert(&manager->watchdog, &media_local, sizeof(media_local));
 			media->sendto = NULL;
 
 			zbx_vector_ptr_append(&media_new, media);
@@ -1592,7 +1659,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
 
-	*cmd = zbx_malloc(NULL, cmd_alloc);
+	*cmd = (char *)zbx_malloc(NULL, cmd_alloc);
 
 	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
 
@@ -1707,7 +1774,7 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			zbx_free(cmd);
 			break;
 		default:
-			am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, "unsupported media type");
+			am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, (char *)"unsupported media type");
 			zabbix_log(LOG_LEVEL_ERR, "cannot process alertid:" ZBX_FS_UI64 ": unsupported media type: %d",
 					alert->alertid, mediatype->type);
 			am_remove_alert(manager, alert);
@@ -1851,8 +1918,9 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	zbx_am_alerter_t	*alerter;
-	int			ret, sent_num, failed_num, now, time_db, time_watchdog, freq_watchdog, time_connect;
-	double			time_stat, time_idle, time_now;
+	int			ret, sent_num = 0, failed_num = 0, now, time_db = 0, time_watchdog = 0, freq_watchdog;
+	int			time_connect;
+	double			time_stat, time_idle = 0, time_now, time_file = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -1876,13 +1944,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
-	time_now = time_stat;
-	time_connect = time_now;
-	time_idle = 0;
-	sent_num = 0;
-	failed_num = 0;
-	time_db = 0;
-	time_watchdog = 0;
+	time_connect = time_stat;
 
 	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = CONFIG_CONFSYNCER_FREQUENCY))
 		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
@@ -1900,6 +1962,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		{
 			if (ZBX_DB_DOWN == (manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE)))
 			{
+				am_queue_watchdog_alerts(&manager);
+
 				zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds",
 						ZBX_DB_WAIT_DOWN);
 			}
@@ -1927,8 +1991,6 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			failed_num = 0;
 		}
 
-		zbx_handle_log();
-
 		if (ZBX_DB_OK == manager.dbstatus && now - time_db >= ZBX_AM_DB_POLL_DELAY)
 		{
 			if (SUCCEED == (ret = am_db_flush_alert_updates(&manager)))
@@ -1948,14 +2010,11 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			time_watchdog = now;
 		}
 
-		if (ZBX_DB_DOWN == manager.dbstatus)
-			am_queue_watchdog_alerts(&manager);
-
 		now = time(NULL);
 
 		while (SUCCEED == am_check_queue(&manager, now))
 		{
-			if (NULL == (alerter = zbx_queue_ptr_pop(&manager.free_alerters)))
+			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
 			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager)))
@@ -1965,6 +2024,16 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&alerter_service, 1, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+		/* handle /etc/resolv.conf update and log rotate less often than once a second */
+		if (1.0 < time_now - time_file)
+		{
+			time_file = time_now;
+			zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+			zbx_update_resolver_conf();
+#endif
+		}
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += zbx_time() - time_now;

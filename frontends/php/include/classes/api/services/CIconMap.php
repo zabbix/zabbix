@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class CIconMap extends CApiService {
 	 * @param array $options
 	 * @param array $options['iconmapids']
 	 * @param array $options['sysmapids']
-	 * @param array $options['editable']
+	 * @param bool  $options['editable']
 	 * @param array $options['count']
 	 * @param array $options['limit']
 	 * @param array $options['order']
@@ -58,7 +58,7 @@ class CIconMap extends CApiService {
 			'iconmapids'				=> null,
 			'sysmapids'					=> null,
 			'nopermissions'				=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -259,6 +259,22 @@ class CScreenBase {
 					'page'				=> true
 				];
 				break;
+
+			case SCREEN_RESOURCE_HISTORY:
+				$this->required_parameters += [
+					'isTemplatedScreen'	=> true,
+					'screenid'			=> true,
+					'action'			=> true,
+					'groupid'			=> false,
+					'hostid'			=> false,
+					'pageFile'			=> true,
+					'profileIdx'		=> true,
+					'profileIdx2'		=> true,
+					'updateProfile'		=> true,
+					'timeline'			=> true,
+					'page'				=> true
+				];
+			break;
 
 			default:
 				$this->required_parameters += [

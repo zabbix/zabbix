@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,8 +43,6 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
@@ -64,7 +62,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'inherited'					=> null,
 			'templated'					=> null,
 			'monitored'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -92,10 +90,9 @@ class CDiscoveryRule extends CItemGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
@@ -145,7 +142,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
+			$sqlParts['where']['interfaceid'] = dbConditionId('i.interfaceid', $options['interfaceids']);
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.interfaceid';
@@ -269,6 +266,23 @@ class CDiscoveryRule extends CItemGeneral {
 			unset($rule);
 		}
 
+		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
+		$json = new CJson();
+
+		foreach ($result as &$item) {
+			if (array_key_exists('query_fields', $item)) {
+				$query_fields = ($item['query_fields'] !== '') ? $json->decode($item['query_fields'], true) : [];
+				$item['query_fields'] = $json->hasError() ? [] : $query_fields;
+			}
+
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = $this->headersStringToArray($item['headers']);
+			}
+
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
+		}
+
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
@@ -286,6 +300,33 @@ class CDiscoveryRule extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
+		$json = new CJson();
+
+		foreach ($items as &$item) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('query_fields', $item)) {
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+				}
+
+				if (array_key_exists('headers', $item)) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+
+				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
+						&& !array_key_exists('retrieve_mode', $item)) {
+					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
+		}
+		unset($item);
+
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -302,17 +343,47 @@ class CDiscoveryRule extends CItemGeneral {
 	public function update($items) {
 		$items = zbx_toArray($items);
 
-		$dbItems = $this->get([
-			'output' => ['itemid', 'name'],
+		$db_items = $this->get([
+			'output' => ['itemid', 'name', 'type', 'authtype', 'allow_traps', 'retrieve_mode'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
 		]);
 
-		$this->checkInput($items, true, $dbItems);
+		$this->checkInput($items, true, $db_items);
+
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+
+		$defaults = DB::getDefaults('items');
+		$clean = [
+			ITEM_TYPE_HTTPAGENT => [
+				'url' => '',
+				'query_fields' => '',
+				'timeout' => $defaults['timeout'],
+				'status_codes' => $defaults['status_codes'],
+				'follow_redirects' => $defaults['follow_redirects'],
+				'request_method' => $defaults['request_method'],
+				'allow_traps' => $defaults['allow_traps'],
+				'post_type' => $defaults['post_type'],
+				'http_proxy' => '',
+				'headers' => '',
+				'retrieve_mode' => $defaults['retrieve_mode'],
+				'output_format' => $defaults['output_format'],
+				'ssl_key_password' => '',
+				'verify_peer' => $defaults['verify_peer'],
+				'verify_host' => $defaults['verify_host'],
+				'ssl_cert_file' => '',
+				'ssl_key_file' => '',
+				'posts' => ''
+			]
+		];
+
+		$json = new CJson();
 
 		// set the default values required for updating
 		foreach ($items as &$item) {
+			$type_change = (array_key_exists('type', $item) && $item['type'] != $db_items[$item['itemid']]['type']);
+
 			if (isset($item['filter'])) {
 				foreach ($item['filter']['conditions'] as &$condition) {
 					$condition += [
@@ -321,6 +392,55 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 				unset($condition);
 			}
+
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
+				$item = array_merge($item, $clean[ITEM_TYPE_HTTPAGENT]);
+
+				if ($item['type'] != ITEM_TYPE_SSH) {
+					$item['authtype'] = $defaults['authtype'];
+					$item['username'] = '';
+					$item['password'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_TRAPPER) {
+					$item['trapper_hosts'] = '';
+				}
+			}
+
+			if ($db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
+				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
+				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
+						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
+					$item['username'] = '';
+					$item['password'] = '';
+				}
+
+				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF
+						&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
+					$item['trapper_hosts'] = '';
+				}
+
+				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+				}
+
+				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+
+				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
+						&& !array_key_exists('retrieve_mode', $item)
+						&& $db_items[$item['itemid']]['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
+					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
 		}
 		unset($item);
 
@@ -350,8 +470,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $ruleids,
 			'editable' => true,
-			'preservekeys' => true,
-			'selectHosts' => ['name']
+			'preservekeys' => true
 		]);
 
 		// TODO: remove $nopermissions hack
@@ -382,8 +501,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $childTuleids,
 			'nopermissions' => true,
-			'preservekeys' => true,
-			'selectHosts' => ['name']
+			'preservekeys' => true
 		]);
 
 		$delRules = array_merge($delRules, $delRulesChildren);
@@ -429,12 +547,6 @@ class CDiscoveryRule extends CItemGeneral {
 			];
 		}
 		DB::insertBatch('housekeeper', $insert);
-
-		// TODO: remove info from API
-		foreach ($delRules as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 
 		return ['ruleids' => $ruleids];
 	}
@@ -521,21 +633,42 @@ class CDiscoveryRule extends CItemGeneral {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$selectFields = [];
-		foreach ($this->fieldRules as $key => $rules) {
-			if (!isset($rules['system']) && !isset($rules['host'])) {
-				$selectFields[] = $key;
+		$output = [];
+		foreach ($this->fieldRules as $field_name => $rules) {
+			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
+				$output[] = $field_name;
 			}
 		}
 
-		$items = $this->get([
+		$tpl_items = $this->get([
+			'output' => $output,
 			'hostids' => $data['templateids'],
-			'preservekeys' => true,
-			'output' => $selectFields,
-			'selectFilter' => ['formula', 'evaltype', 'conditions']
+			'selectFilter' => ['formula', 'evaltype', 'conditions'],
+			'preservekeys' => true
 		]);
+		$json = new CJson();
 
-		$this->inherit($items, $data['hostids']);
+		foreach ($tpl_items as &$item) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+				}
+
+				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
+		}
+		unset($item);
+
+		$this->inherit($tpl_items, $data['hostids']);
 
 		return true;
 	}
@@ -778,32 +911,12 @@ class CDiscoveryRule extends CItemGeneral {
 				$this->updateFormula($item['itemid'], $item['filter']['formula'], $itemConditions[$item['itemid']]);
 			}
 		}
-
-		// TODO: REMOVE info
-		$itemHosts = $this->get([
-			'itemids' => zbx_objectValues($items, 'itemid'),
-			'output' => ['key_', 'name'],
-			'selectHosts' => ['name'],
-			'nopermissions' => true
-		]);
-		foreach ($itemHosts as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Created: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
-		}
 	}
 
 	protected function updateReal($items) {
 		$items = zbx_toArray($items);
 
 		$ruleIds = zbx_objectValues($items, 'itemid');
-		$exRules = $this->get([
-			'itemids' => $ruleIds,
-			'output' => ['key_', 'name'],
-			'selectHosts' => ['name'],
-			'selectFilter' => ['evaltype'],
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
 
 		$data = [];
 		foreach ($items as $item) {
@@ -867,12 +980,6 @@ class CDiscoveryRule extends CItemGeneral {
 			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				$this->updateFormula($item['itemid'], $item['filter']['formula'], $ruleConditions[$item['itemid']]);
 			}
-		}
-
-		// TODO: REMOVE info
-		foreach ($exRules as $item) {
-			$host = reset($item['hosts']);
-			info(_s('Updated: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -1006,7 +1113,7 @@ class CDiscoveryRule extends CItemGeneral {
 					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
 				]),
 				'operator' => new CLimitedSetValidator([
-					'values' => [CONDITION_OPERATOR_REGEXP],
+					'values' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP],
 					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
 				])
 			],
@@ -1039,34 +1146,54 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	protected function inherit(array $items, array $hostids = null) {
-		if (empty($items)) {
-			return true;
+		if (!$items) {
+			return;
 		}
 
-		// prepare the child items
-		$newItems = $this->prepareInheritedItems($items, $hostids);
-		if (!$newItems) {
-			return true;
+		// Prepare the child discovery rules.
+		$new_items = $this->prepareInheritedItems($items, $hostids);
+		if (!$new_items) {
+			return;
 		}
 
-		$insertItems = [];
-		$updateItems = [];
-		foreach ($newItems as $newItem) {
-			if (isset($newItem['itemid'])) {
-				$updateItems[] = $newItem;
+		$ins_items = [];
+		$upd_items = [];
+		foreach ($new_items as $new_item) {
+			if (array_key_exists('itemid', $new_item)) {
+				$upd_items[] = $new_item;
 			}
 			else {
-				$newItem['flags'] = ZBX_FLAG_DISCOVERY_RULE;
-				$insertItems[] = $newItem;
+				$ins_items[] = $new_item;
 			}
 		}
 
-		// save the new items
-		$this->createReal($insertItems);
-		$this->updateReal($updateItems);
+		// Save the new items.
+		$this->createReal($ins_items);
+		$this->updateReal($upd_items);
 
-		// propagate the inheritance to the children
-		return $this->inherit(array_merge($updateItems, $insertItems));
+		$new_items = array_merge($upd_items, $ins_items);
+
+		// Inheriting items from the templates.
+		$tpl_items = DBselect(
+			'SELECT i.itemid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+		);
+
+		$tpl_itemids = [];
+		while ($tpl_item = DBfetch($tpl_items)) {
+			$tpl_itemids[$tpl_item['itemid']] = true;
+		}
+
+		foreach ($new_items as $index => $new_item) {
+			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
+				unset($new_items[$index]);
+			}
+		}
+
+		$this->inherit($new_items);
 	}
 
 	/**
@@ -1089,7 +1216,10 @@ class CDiscoveryRule extends CItemGeneral {
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'url',
+				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'preservekeys' => true
@@ -1120,7 +1250,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
-			$interface = self::findInterfaceForItem($dstDiscovery, $dstHost['interfaces']);
+			$interface = self::findInterfaceForItem($dstDiscovery['type'], $dstHost['interfaces']);
 			if ($interface) {
 				$dstDiscovery['interfaceid'] = $interface['interfaceid'];
 			}
@@ -1188,7 +1318,9 @@ class CDiscoveryRule extends CItemGeneral {
 				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor',
 				'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description',
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid',
-				'templateid', 'type'
+				'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects',
+				'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
@@ -1254,7 +1386,7 @@ class CDiscoveryRule extends CItemGeneral {
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 					// find a matching interface
-					$interface = self::findInterfaceForItem($prototype, $dstHost['interfaces']);
+					$interface = self::findInterfaceForItem($prototype['type'], $dstHost['interfaces']);
 					if ($interface) {
 						$prototype['interfaceid'] = $interface['interfaceid'];
 					}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 
 $page['title'] = _('Configuration of users');
 $page['file'] = 'users.php';
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -47,10 +48,8 @@ $fields = [
 	'password2' =>			[T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && isset({form}) && {form} != "update" && isset({change_password})'],
 	'user_type' =>			[T_ZBX_INT, O_OPT, null,	IN('1,2,3'),'isset({add}) || isset({update})'],
 	'user_groups' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null],
-	'user_groups_to_del' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'user_medias' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null],
 	'user_medias_to_del' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_groups' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'new_media' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'enable_media' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'disable_media' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
@@ -68,10 +67,7 @@ $fields = [
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'delete_selected' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'del_user_group' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'del_user_media' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'del_group_user' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'change_password' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	// form
@@ -137,14 +133,7 @@ if (hasRequest('action')) {
  */
 $config = select_config();
 
-if (isset($_REQUEST['new_groups'])) {
-	$_REQUEST['new_groups'] = getRequest('new_groups', []);
-	$_REQUEST['user_groups'] = getRequest('user_groups', []);
-	$_REQUEST['user_groups'] += $_REQUEST['new_groups'];
-
-	unset($_REQUEST['new_groups']);
-}
-elseif (isset($_REQUEST['new_media'])) {
+if (isset($_REQUEST['new_media'])) {
 	$_REQUEST['user_medias'] = getRequest('user_medias', []);
 
 	array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);
@@ -273,13 +262,6 @@ elseif (isset($_REQUEST['del_user_media'])) {
 	foreach (getRequest('user_medias_to_del', []) as $mediaId) {
 		if (isset($_REQUEST['user_medias'][$mediaId])) {
 			unset($_REQUEST['user_medias'][$mediaId]);
-		}
-	}
-}
-elseif (isset($_REQUEST['del_user_group'])) {
-	foreach (getRequest('user_groups_to_del', []) as $groupId) {
-		if (isset($_REQUEST['user_groups'][$groupId])) {
-			unset($_REQUEST['user_groups'][$groupId]);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,52 +137,24 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	]);
 }
 
-function get_next_event($currentEvent, array $eventList = []) {
-	$nextEvent = false;
-
-	foreach ($eventList as $event) {
-		// check only the events belonging to the same object
-		// find the event with the smallest eventid but greater than the current event id
-		if ($event['object'] == $currentEvent['object'] && bccomp($event['objectid'], $currentEvent['objectid']) == 0
-				&& (bccomp($event['eventid'], $currentEvent['eventid']) === 1
-				&& (!$nextEvent || bccomp($event['eventid'], $nextEvent['eventid']) === -1))) {
-			$nextEvent = $event;
-		}
-	}
-	if ($nextEvent) {
-		return $nextEvent;
-	}
-
-	$sql = 'SELECT e.*'.
-			' FROM events e'.
-			' WHERE e.source='.zbx_dbstr($currentEvent['source']).
-				' AND e.object='.zbx_dbstr($currentEvent['object']).
-				' AND e.objectid='.zbx_dbstr($currentEvent['objectid']).
-				' AND e.clock>='.zbx_dbstr($currentEvent['clock']).
-				' AND ((e.clock='.zbx_dbstr($currentEvent['clock']).' AND e.ns>'.$currentEvent['ns'].')'.
-					' OR e.clock>'.zbx_dbstr($currentEvent['clock']).')'.
-			' ORDER BY e.clock,e.eventid';
-	return DBfetch(DBselect($sql, 1));
-}
-
 /**
  *
  * @param array  $event								An array of event data.
  * @param string $event['eventid']					Event ID.
  * @param string $event['correlationid']			OK Event correlation ID.
  * @param string $event['userid]					User ID who gerenerated the OK event.
- * @param array  $trigger							An array of trigger data.
+ * @param string $event['name']						Event name.
  * @param string $backurl							A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
  */
-function make_event_details($event, $trigger, $backurl) {
+function make_event_details($event, $backurl) {
 	$config = select_config();
 
 	$table = (new CTableInfo())
 		->addRow([
 			_('Event'),
-			CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))
+			$event['name']
 		])
 		->addRow([
 			_('Time'),
@@ -324,16 +296,9 @@ function make_small_eventlist($startEvent, $backurl) {
 	$actions = makeEventsActions($events, true);
 
 	foreach ($events as $index => $event) {
-		$duration = ($event['r_eventid'] == 0)
-			? zbx_date2age($event['clock'])
-			: zbx_date2age($event['clock'], $event['r_clock']);
-
-		if (bccomp($startEvent['eventid'], $event['eventid']) == 0 && $nextevent = get_next_event($event, $events)) {
-			$duration = zbx_date2age($nextevent['clock'], $clock);
-		}
-		elseif (bccomp($startEvent['eventid'], $event['eventid']) == 0) {
-			$duration = zbx_date2age($clock);
-		}
+		$duration = ($event['r_eventid'] != 0)
+			? zbx_date2age($event['clock'], $event['r_clock'])
+			: zbx_date2age($event['clock']);
 
 		if ($event['r_eventid'] == 0) {
 			$in_closing = false;
@@ -404,11 +369,11 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $backurl							URL to return to.
  * @param array  $config
  * @param int    $config['event_ack_enable']
- * @param int    $fullscreen
+ * @param bool   $fullscreen
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, $fullscreen = 0) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, $fullscreen = false) {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -422,9 +387,14 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 	}
 
 	if ($trigger['url'] !== '') {
+		$trigger_url = CHtmlUrlValidator::validate($trigger['url'])
+			? $trigger['url']
+			: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'], false, false)).
+				'\');';
+
 		$div->addItem(
 			(new CDiv())
-				->addItem(new CLink($trigger['url'], $trigger['url']))
+				->addItem(new CLink($trigger['url'], $trigger_url))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addStyle('max-width: 500px')
 		);
@@ -508,10 +478,8 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 
 		$url_details = (new CUrl('tr_events.php'))
 			->setArgument('triggerid', '')
-			->setArgument('eventid', '');
-		if ($fullscreen == 1) {
-			$url_details->setArgument('fullscreen', $fullscreen);
-		}
+			->setArgument('eventid', '')
+			->setArgument('fullscreen', $fullscreen ? '1' : null);
 
 		foreach ($problems as $problem) {
 			if (array_key_exists($problem['r_eventid'], $r_events)) {
@@ -742,6 +710,38 @@ function makeAcknowledgesTable($acknowledges, $users) {
 }
 
 /**
+ * Place filter tags at the beginning of tags array.
+ *
+ * @param array  $event_tags
+ * @param string $event_tags[]['tag']
+ * @param string $event_tags[]['value']
+ * @param array  $f_tags
+ * @param int    $f_tags[<tag>][]['operator']
+ * @param string $f_tags[<tag>][]['value']
+ *
+ * @return array
+ */
+function orderEventTags(array $event_tags, array $f_tags) {
+	$first_tags = [];
+
+	foreach ($event_tags as $i => $tag) {
+		if (array_key_exists($tag['tag'], $f_tags)) {
+			foreach ($f_tags[$tag['tag']] as $f_tag) {
+				if (($f_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $f_tag['value'])
+						|| ($f_tag['operator'] == TAG_OPERATOR_LIKE
+							&& ($f_tag['value'] === '' || stripos($tag['value'], $f_tag['value']) !== false))) {
+					$first_tags[] = $tag;
+					unset($event_tags[$i]);
+					break;
+				}
+			}
+		}
+	}
+
+	return array_merge($first_tags, $event_tags);
+}
+
+/**
  * Create element with event tags.
  *
  * @param array  $events
@@ -750,11 +750,26 @@ function makeAcknowledgesTable($acknowledges, $users) {
  * @param string $events[]['tags']['tag']
  * @param string $events[]['tags']['value']
  * @param bool   $html
+ * @param int    $list_tags_count
+ * @param array  $filter_tags
+ * @param string $filter_tags[]['tag']
+ * @param int    $filter_tags[]['operator']
+ * @param string $filter_tags[]['value']
  *
- * @return CTableInfo
+ * @return array
  */
-function makeEventsTags($events, $html = true) {
+function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT,
+		array $filter_tags = []) {
 	$tags = [];
+
+	// Convert $filter_tags to a more usable format.
+	$f_tags = [];
+	foreach ($filter_tags as $filter_tag) {
+		$f_tags[$filter_tag['tag']][] = [
+			'operator' => $filter_tag['operator'],
+			'value' => $filter_tag['value']
+		];
+	}
 
 	foreach ($events as $event) {
 		CArrayHelper::sort($event['tags'], ['tag', 'value']);
@@ -762,10 +777,10 @@ function makeEventsTags($events, $html = true) {
 		$tags[$event['eventid']] = [];
 
 		if ($html) {
-			// Show first 3 tags and "..." with hint box if there are more.
+			// Show first n tags and "..." with hint box if there are more.
 
-			$tags_count = count($event['tags']);
-			$tags_shown = array_slice($event['tags'], 0, EVENTS_LIST_TAGS_COUNT);
+			$event_tags = $f_tags ? orderEventTags($event['tags'], $f_tags) : $event['tags'];
+			$tags_shown = array_slice($event_tags, 0, $list_tags_count);
 
 			foreach ($tags_shown as $tag) {
 				$value = $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
@@ -774,7 +789,7 @@ function makeEventsTags($events, $html = true) {
 					->setHint($value);
 			}
 
-			if ($tags_count > count($tags_shown)) {
+			if (count($event['tags']) > count($tags_shown)) {
 				// Display all tags in hint box.
 
 				$hint_content = [];
@@ -812,10 +827,10 @@ function getLastEvents($options) {
 	}
 
 	$triggerOptions = [
+		'output' => ['triggerid', 'priority'],
 		'filter' => [],
 		'skipDependent' => 1,
 		'selectHosts' => ['hostid', 'name'],
-		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['triggerLimit']
@@ -867,10 +882,7 @@ function getLastEvents($options) {
 		$events[$enum]['host'] = reset($events[$enum]['trigger']['hosts']);
 		$sortClock[$enum] = $event['clock'];
 		$sortEvent[$enum] = $event['eventid'];
-
-		//expanding description for the state where event was
-		$merged_event = array_merge($event, $triggers[$event['objectid']]);
-		$events[$enum]['trigger']['description'] = CMacrosResolverHelper::resolveEventDescription($merged_event);
+		$events[$enum]['trigger']['description'] = $event['name'];
 	}
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
 

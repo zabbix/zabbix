@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,6 +129,10 @@ if (isset($_REQUEST['favobj'])) {
 
 			foreach ($sources as $source) {
 				if (is_array($source) && (array_key_exists('label', $source) || array_key_exists('text', $source))) {
+					if (array_key_exists('inherited_label', $source) && $source['inherited_label'] !== null) {
+						$source['label'] = $source['inherited_label'];
+					}
+
 					if (array_key_exists('elementtype', $source) && array_key_exists('elements', $source)
 							&& is_array($source['elements']) && CMapHelper::checkSelementPermissions([$source])) {
 
@@ -161,7 +165,9 @@ if (PAGE_TYPE_HTML != $page['type']) {
 if (isset($_REQUEST['sysmapid'])) {
 	$sysmap = API::Map()->get([
 		'output' => ['sysmapid', 'name', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
-			'iconmapid', 'backgroundid', 'label_location'
+			'iconmapid', 'backgroundid', 'label_location', 'label_type', 'label_format', 'label_type_host',
+			'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
+			'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image'
 		],
 		'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
 			'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
@@ -210,8 +216,18 @@ $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selemen
 $data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'sysmap_shapeid');
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 
+$data['sysmap'] = CMapHelper::setElementInheritedLabels($data['sysmap']);
 foreach ($data['sysmap']['selements'] as &$selement) {
+	if ($selement['inherited_label'] !== null) {
+		$label = $selement['label'];
+		$selement['label'] = $selement['inherited_label'];
+	}
+
 	$selement['expanded'] = CMacrosResolverHelper::resolveMapLabelMacrosAll($selement);
+
+	if ($selement['inherited_label'] !== null) {
+		$selement['label'] = $label;
+	}
 }
 unset($selement);
 

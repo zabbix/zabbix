@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,8 +43,6 @@ class CTemplateScreen extends CScreen {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['screens' => 's.screenid,s.templateid'],
@@ -60,7 +58,7 @@ class CTemplateScreen extends CScreen {
 			'screenitemids'				=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'noInheritance'				=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -82,12 +80,12 @@ class CTemplateScreen extends CScreen {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (!is_null($options['editable']) || (is_null($options['hostids']) && is_null($options['templateids']))) {
+		if ($options['editable'] || (is_null($options['hostids']) && is_null($options['templateids']))) {
 			$options['noInheritance'] = 1;
 		}
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// TODO: think how we could combine templateids && hostids options
 			if (!is_null($options['templateids'])) {
 				unset($options['hostids']);
@@ -112,8 +110,7 @@ class CTemplateScreen extends CScreen {
 			else {
 				// TODO: get screen
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-				$userGroups = getUserGroupsByUserId($userid);
+				$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 				$sqlParts['where'][] = 'EXISTS ('.
 						'SELECT NULL'.

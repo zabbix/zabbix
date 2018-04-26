@@ -11,16 +11,16 @@
       <template>
          <template>Template OS Windows SNMPv2</template>
          <name>Template OS Windows SNMPv2</name>
-         <description>Template OS Windows version: 0.13
-Known Issues:
-description : Doesn't support In/Out 64 bit counters even thoug1h IfxTable is present:
-Currently, Windows gets it’s interface status from MIB-2. Since these 64bit SNMP counters (ifHCInOctets, ifHCOutOctets, etc.) are defined as an extension to IF-MIB, Microsoft has not implemented it.
-https://social.technet.microsoft.com/Forums/windowsserver/en-US/07b62ff0-94f6-40ca-a99d-d129c1b33d70/windows-2008-r2-snmp-64bit-counters-support?forum=winservergen
-version : Win2008, Win2012R2
-device : description : Doesn't support ifXTable at all
-version : WindowsXP
-device : description : EtherLike MIB is not supported
-version : *
+         <description>Template OS Windows version: 0.14&#13;
+Known Issues:&#13;
+description : Doesn't support In/Out 64 bit counters even thoug1h IfxTable is present:&#13;
+Currently, Windows gets it’s interface status from MIB-2. Since these 64bit SNMP counters (ifHCInOctets, ifHCOutOctets, etc.) are defined as an extension to IF-MIB, Microsoft has not implemented it.&#13;
+https://social.technet.microsoft.com/Forums/windowsserver/en-US/07b62ff0-94f6-40ca-a99d-d129c1b33d70/windows-2008-r2-snmp-64bit-counters-support?forum=winservergen&#13;
+version : Win2008, Win2012R2&#13;
+device : description : Doesn't support ifXTable at all&#13;
+version : WindowsXP&#13;
+device : description : EtherLike MIB is not supported&#13;
+version : *&#13;
 device : *</description>
          <groups>
             <group>

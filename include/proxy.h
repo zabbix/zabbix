@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,11 +58,13 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **error);
 int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts, char **error);
 
-void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_timespec_t *ts);
+void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, const zbx_timespec_t *ts);
 
 int	proxy_get_history_count(void);
 
-int	zbx_proxy_update_version(DC_PROXY *proxy, struct zbx_json_parse *jp);
+int	zbx_get_protocol_version(struct zbx_json_parse *jp);
+void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress);
+void	zbx_db_flush_proxy_lastaccess();
 
 int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);

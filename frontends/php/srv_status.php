@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,14 +96,14 @@ else {
 
 	// fetch services
 	$services = API::Service()->get([
-		'output' => ['name', 'serviceid', 'showsla', 'goodsla', 'algorithm'],
+		'output' => ['name', 'serviceid', 'showsla', 'goodsla', 'algorithm', 'sortorder'],
 		'selectParent' => ['serviceid'],
 		'selectDependencies' => ['servicedownid', 'soft', 'linkid'],
 		'selectTrigger' => ['description', 'triggerid', 'expression'],
-		'preservekeys' => true,
-		'sortfield' => 'sortorder',
-		'sortorder' => ZBX_SORT_UP
+		'preservekeys' => true
 	]);
+
+	sortServices($services);
 
 	// expand trigger descriptions
 	$triggers = zbx_objectValues(
@@ -157,18 +157,21 @@ else {
 
 		$srv_wdgt = (new CWidget())
 			->setTitle(_('Services'))
-			->setControls((new CForm('get'))
-				->cleanItems()
-				->addVar('fullscreen', $_REQUEST['fullscreen'])
-				->addItem((new CList())
-					->addItem([
-						new CLabel(_('Period'), 'period'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$period_combo
-					])
-					->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
-				)
-			)
+			->setControls(new CList([
+				(new CForm('get'))
+					->cleanItems()
+					->addVar('fullscreen', getRequest('fullscreen'))
+					->setAttribute('aria-label', _('Main filter'))
+					->addItem((new CList())
+						->addItem([
+							new CLabel(_('Period'), 'period'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							$period_combo
+						])
+					),
+				(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])))
+					->setAttribute('aria-label', _('Content controls'))
+			]))
 			->addItem(BR())
 			->addItem($tree->getHTML())
 			->show();

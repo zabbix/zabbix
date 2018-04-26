@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -851,24 +851,6 @@ class DB {
 	}
 
 	/**
-	 * Check if $type is numeric field type.
-	 *
-	 * @param int $type
-	 *
-	 * @return bool
-	 */
-	public static function isNumericFieldType($type) {
-		switch ($type) {
-			case self::FIELD_TYPE_ID:
-			case self::FIELD_TYPE_INT:
-			case self::FIELD_TYPE_UINT:
-				return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * @param string $table_name
 	 * @param array  $options
 	 * @param string $table_alias
@@ -1045,10 +1027,21 @@ class DB {
 			}
 
 			$field_schema = $table_schema['fields'][$pk];
+			$field_name = self::fieldId($pk, $table_alias);
 
-			$sql_parts['where'][] = self::isNumericFieldType($field_schema['type'])
-				? dbConditionInt(self::fieldId($pk, $table_alias), $options[$pk_option], false, true, false)
-				: dbConditionString(self::fieldId($pk, $table_alias), $options[$pk_option]);
+			switch ($field_schema['type']) {
+				case self::FIELD_TYPE_ID:
+					$sql_parts['where'][] = dbConditionId($field_name, $options[$pk_option], false, true, false);
+					break;
+
+				case self::FIELD_TYPE_INT:
+				case self::FIELD_TYPE_UINT:
+					$sql_parts['where'][] = dbConditionInt($field_name, $options[$pk_option], false, true, false);
+					break;
+
+				default:
+					$sql_parts['where'][] = dbConditionString($field_name, $options[$pk_option]);
+			}
 		}
 
 		// filters
@@ -1096,9 +1089,19 @@ class DB {
 				$value = [$value];
 			}
 
-			$filter[] = self::isNumericFieldType($field_schema['type'])
-				? dbConditionInt(self::fieldId($field_name, $table_alias), $value, false, true, false)
-				: dbConditionString(self::fieldId($field_name, $table_alias), $value);
+			switch ($field_schema['type']) {
+				case self::FIELD_TYPE_ID:
+					$filter[] = dbConditionId(self::fieldId($field_name, $table_alias), $value, false, true, false);
+					break;
+
+				case self::FIELD_TYPE_INT:
+				case self::FIELD_TYPE_UINT:
+					$filter[] = dbConditionInt(self::fieldId($field_name, $table_alias), $value, false, true, false);
+					break;
+
+				default:
+					$filter[] = dbConditionString(self::fieldId($field_name, $table_alias), $value);
+			}
 		}
 
 		if ($filter) {

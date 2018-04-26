@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class CScreenEvents extends CScreenBase {
 		]);
 
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'description', 'expression', 'priority'],
+			'output' => ['priority'],
 			'selectHosts' => ['hostid', 'name'],
 			'skipDependent' => true,
 			'monitored' => true,
@@ -45,7 +45,7 @@ class CScreenEvents extends CScreenBase {
 		]);
 
 		$options = [
-			'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns'],
+			'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
@@ -74,9 +74,6 @@ class CScreenEvents extends CScreenBase {
 			$events[$key]['host'] = reset($events[$key]['trigger']['hosts']);
 			$sort_clock[$key] = $event['clock'];
 			$sort_event[$key] = $event['eventid'];
-
-			$merged_event = array_merge($event, $triggers[$event['objectid']]);
-			$events[$key]['trigger']['description'] = CMacrosResolverHelper::resolveEventDescription($merged_event);
 		}
 		array_multisort($sort_clock, SORT_DESC, $sort_event, SORT_DESC, $events);
 
@@ -147,7 +144,7 @@ class CScreenEvents extends CScreenBase {
 				($event['r_eventid'] == 0) ? '' : zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['r_clock']),
 				$host['name'],
 				new CLink(
-					$trigger['description'],
+					$event['name'],
 					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 				),
 				$statusSpan,

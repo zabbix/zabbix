@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/js/common.filter.trigger.js.php';
 
-$overview = $this->data['overview'];
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
 $filterForm = (new CFilter($filter['filterid']))
-	->addVar('fullscreen', $filter['fullScreen'])
+	->addVar('fullscreen', $filter['fullScreen'] ? '1' : null)
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);
 
@@ -48,20 +48,6 @@ if ($config['event_ack_enable']) {
 			ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
 		])
 	);
-}
-
-// events
-if (!$overview) {
-	$config['event_expire'] = convertUnitsS(timeUnitToSeconds($config['event_expire']));
-
-	$eventsComboBox = new CComboBox('show_events', $filter['showEvents'], null, [
-		EVENTS_OPTION_NOEVENT => _('Hide all'),
-		EVENTS_OPTION_ALL => _s('Show all (%1$s)', $config['event_expire'])
-	]);
-	if ($config['event_ack_enable']) {
-		$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK, _s('Show unacknowledged (%1$s)', $config['event_expire']));
-	}
-	$column1->addRow(_('Events'), $eventsComboBox);
 }
 
 // min severity
@@ -95,9 +81,6 @@ $column1->addRow(_('Name'),
 	(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 
-$application_name_url =
-	'popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1&dstfrm=zbx_filter';
-
 // application
 $column2 = (new CFormList())
 	->addRow(_('Application'), [
@@ -105,7 +88,16 @@ $column2 = (new CFormList())
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("'.$application_name_url.'");')
+			->onClick('return PopUp("popup.generic",'.
+				CJs::encodeJson([
+					'srctbl' => 'applications',
+					'srcfld1' => 'name',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'application',
+					'real_hosts' => '1',
+					'with_applications' => '1'
+				]).', null, this);'
+			)
 	]);
 
 // inventory filter
@@ -149,11 +141,6 @@ $column2->addRow(_('Host inventory'), $inventoryFilterTable);
 $column2->addRow(_('Show hosts in maintenance'),
 	(new CCheckBox('show_maintenance'))->setChecked($filter['showMaintenance'] == 1)
 );
-
-// show details
-if (!$overview) {
-	$column2->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
-}
 
 $filterForm->addColumn($column1);
 $filterForm->addColumn($column2);

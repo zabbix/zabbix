@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,9 @@ function SVGMap(options) {
 	this.imageUrl = 'imgstore.php?iconid=';
 	this.imageCache = new ImageCache();
 	this.canvas = new SVGCanvas(options.canvas, true);
+	if (typeof this.options.show_timestamp === 'undefined') {
+		this.options.show_timestamp = true;
+	}
 
 	// Extra group for font styles.
 	container = this.canvas.add('g', {
@@ -45,7 +48,7 @@ function SVGMap(options) {
 		'font-size': '10px'
 	});
 
-	layers = container.add([
+	var layers_to_add = [
 		//  Background.
 		{
 			type: 'g',
@@ -93,39 +96,33 @@ function SVGMap(options) {
 			attributes: {
 				class: 'map-elements'
 			}
-		},
-		// Marks (timestamp and homepage).
-		{
+		}
+	];
+
+	// Marks (timestamp and homepage).
+	if (options.show_timestamp) {
+		layers_to_add.push({
 			type: 'g',
 			attributes: {
 				class: 'map-marks',
-				fill: 'rgba(150,150,150,0.75)',
+				fill: 'rgba(150, 150, 150, 0.75)',
 				'font-size': '8px',
 				'shape-rendering': 'crispEdges'
 			},
-
 			content: [
 				{
 					type: 'text',
 					attributes: {
 						class: 'map-timestamp',
-						x: options.canvas.width - 107,
+						x: options.canvas.width - 80,
 						y: options.canvas.height - 6
 					}
-				},
-				{
-					type: 'text',
-					attributes: {
-						class: 'map-homepage',
-						x: options.canvas.width,
-						y: options.canvas.height - 50,
-						transform: 'rotate(270 ' + (options.canvas.width) + ', ' + (options.canvas.height - 50) + ')'
-					},
-					content: options.homepage
 				}
 			]
-		}
-	]);
+		});
+	}
+
+	layers = container.add(layers_to_add);
 
 	['background', 'grid', 'shapes', 'highlights', 'links', 'elements', 'marks'].forEach(function (attribute, index) {
 		this.layers[attribute] = layers[index];
@@ -143,17 +140,15 @@ function SVGMap(options) {
 		this.render(this.options.container);
 	}
 
-	['timestamp', 'homepage'].forEach(function (attribute) {
-		var elements = this.canvas.getElementsByAttributes({class: 'map-' + attribute});
-
-		if (elements.length === 1) {
-			this[attribute] = elements[0];
+	if (options.show_timestamp) {
+		var elements = this.canvas.getElementsByAttributes({class: 'map-timestamp'});
+		if (elements.length == 0) {
+			throw 'timestamp element is missing';
 		}
 		else {
-			throw attribute + " element is missing";
+			this['timestamp'] = elements[0];
 		}
-	}, this);
-
+	}
 	this.update(this.options);
 }
 
@@ -465,16 +460,12 @@ SVGMap.prototype.update = function (options, incremental) {
 			this.container.style.height = options.canvas.height + 'px';
 		}
 
-		this.timestamp.update({
-			x: options.canvas.width - 107,
-			y: options.canvas.height - 6
-		});
-
-		this.homepage.update({
-			x: options.canvas.width,
-			y: options.canvas.height - 50,
-			transform: 'rotate(270 ' + (options.canvas.width) + ', ' + (options.canvas.height - 50) + ')'
-		});
+		if (options.show_timestamp) {
+			this.timestamp.update({
+				x: options.canvas.width,
+				y: options.canvas.height - 6
+			});
+		}
 	}
 
 	// Images are preloaded before update.
@@ -489,13 +480,8 @@ SVGMap.prototype.update = function (options, incremental) {
 	}, this);
 
 	// Timestamp (date on map) is updated.
-	if (typeof options.timestamp !== 'undefined') {
+	if (options.show_timestamp && typeof options.timestamp !== 'undefined') {
 		this.timestamp.element.textContent = options.timestamp;
-	}
-
-	// Homepage is updated.
-	if (typeof options.homepage !== 'undefined') {
-		this.homepage.element.textContent = options.homepage;
 	}
 };
 
@@ -767,7 +753,7 @@ SVGMapElement.prototype.updateLabel = function() {
 			'anchor': anchor,
 			background: {
 				fill: '#' + this.map.options.theme.backgroundcolor,
-				opacity: 0.5
+				opacity: 0.7
 			}
 		}, this.options.label);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "listener.h"
-#include "zbxself.h"
 
 #include "comms.h"
 #include "cfg.h"
@@ -76,7 +75,7 @@ static void	process_listener(zbx_socket_t *s)
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED ": %s]", *value);
 
 				if (NULL == buffer)
-					buffer = zbx_malloc(buffer, buffer_alloc);
+					buffer = (char *)zbx_malloc(buffer, buffer_alloc);
 
 				zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 						ZBX_NOTSUPPORTED, ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED));
@@ -151,7 +150,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		}
 
 		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
-			continue;
+			goto next;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (NULL != msg)
@@ -168,6 +167,12 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 		if (ZBX_IS_RUNNING())
 			zbx_sleep(1);
+next:
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#else
+		;
+#endif
 	}
 
 #ifdef _WINDOWS

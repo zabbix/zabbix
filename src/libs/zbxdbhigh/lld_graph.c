@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		graph = zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
+		graph = (zbx_lld_graph_t *)zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
 
 		ZBX_STR2UINT64(graph->graphid, row[0]);
 		graph->name = zbx_strdup(NULL, row[1]);
@@ -270,7 +270,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 
 	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type"
@@ -285,7 +285,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		gitem = zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
+		gitem = (zbx_lld_gitem_t *)zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
 
 		ZBX_STR2UINT64(gitem->gitemid, row[0]);
 		ZBX_STR2UINT64(graphid, row[1]);
@@ -381,7 +381,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 
 		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		sql = zbx_malloc(sql, sql_alloc);
+		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid,flags"
@@ -395,7 +395,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			item = zbx_malloc(NULL, sizeof(zbx_lld_item_t));
+			item = (zbx_lld_item_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_t));
 
 			ZBX_STR2UINT64(item->itemid, row[0]);
 			ZBX_STR2UCHAR(item->flags, row[1]);
@@ -532,7 +532,7 @@ static int	lld_gitems_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_
 
 		if (i == gitems->values_num)
 		{
-			gitem = zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
+			gitem = (zbx_lld_gitem_t *)zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
 
 			gitem->gitemid = 0;
 			gitem->itemid = itemid;
@@ -668,7 +668,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 	}
 	else
 	{
-		graph = zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
+		graph = (zbx_lld_graph_t *)zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
 
 		graph->graphid = 0;
 
@@ -849,7 +849,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 		char		*sql = NULL;
 		size_t		sql_alloc = 256, sql_offset = 0;
 
-		sql = zbx_malloc(sql, sql_alloc);
+		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select g.name"
@@ -1013,7 +1013,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
-		sql = zbx_malloc(sql, sql_alloc);
+		sql = (char *)zbx_malloc(sql, sql_alloc);
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 

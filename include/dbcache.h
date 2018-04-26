@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,9 @@
 #define MAX_PINGER_ITEMS	128
 
 #define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
+
+#define ZBX_TRIGGER_DEPENDENCY_FAIL		1
+#define ZBX_TRIGGER_DEPENDENCY_UNRESOLVED	2
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
@@ -136,13 +139,6 @@ DC_HOST;
 
 typedef struct
 {
-	unsigned char	type;
-	char		params[ITEM_PREPROC_PARAMS_LEN * 4 + 1];
-}
-zbx_item_preproc_t;
-
-typedef struct
-{
 	DC_HOST			host;
 	DC_INTERFACE		interface;
 	zbx_uint64_t		itemid;
@@ -151,7 +147,6 @@ typedef struct
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		state;
-	unsigned char		db_state;
 	unsigned char		snmpv3_securitylevel;
 	unsigned char		authtype;
 	unsigned char		flags;
@@ -161,14 +156,21 @@ typedef struct
 	unsigned char		status;
 	unsigned char		history;
 	unsigned char		trends;
+	unsigned char		follow_redirects;
+	unsigned char		post_type;
+	unsigned char		retrieve_mode;
+	unsigned char		request_method;
+	unsigned char		output_format;
+	unsigned char		verify_peer;
+	unsigned char		verify_host;
+	unsigned char		allow_traps;
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char			*units;
 	char			*delay;
+	int			history_sec;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
-	int			preproc_ops_num;
-	int			dep_itemids_num;
 	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
 	char			snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
@@ -184,10 +186,17 @@ typedef struct
 	char			password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 	char			snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 	char			jmx_endpoint_orig[ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
-	char			*db_error;
-
-	zbx_item_preproc_t	*preproc_ops;
-	zbx_uint64_t		*dep_itemids;
+	char			timeout_orig[ITEM_TIMEOUT_LEN_MAX], *timeout;
+	char			url_orig[ITEM_URL_LEN_MAX], *url;
+	char			query_fields_orig[ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
+	char			*posts;
+	char			status_codes_orig[ITEM_STATUS_CODES_LEN_MAX], *status_codes;
+	char			http_proxy_orig[ITEM_HTTP_PROXY_LEN_MAX], *http_proxy;
+	char			*headers;
+	char			ssl_cert_file_orig[ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
+	char			ssl_key_file_orig[ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
+	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
+	char			*error;
 }
 DC_ITEM;
 
@@ -246,16 +255,20 @@ DC_TRIGGER;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	char            host[HOST_HOST_LEN_MAX];
+	char		host[HOST_HOST_LEN_MAX];
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
 	int		proxy_tasks_nextcheck;
+	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
+						/* or 0 if no error */
 	int		version;
+	int		lastaccess;
 	char		addr_orig[INTERFACE_ADDR_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
 
+	unsigned char	auto_compress;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
 
@@ -265,6 +278,7 @@ typedef struct
 	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
+	char		proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
 }
 DC_PROXY;
 
@@ -341,6 +355,15 @@ zbx_config_t;
 
 typedef struct
 {
+	zbx_uint64_t	hostid;
+	unsigned char	idx;
+	const char	*field_name;
+	char		*value;
+}
+zbx_inventory_value_t;
+
+typedef struct
+{
 	char	*tag;
 }
 zbx_corr_condition_tag_t;
@@ -414,6 +437,34 @@ typedef struct
 }
 zbx_correlation_rules_t;
 
+/* value_avg_t structure is used for item average value trend calculations. */
+/*                                                                          */
+/* For double values the average value is calculated on the fly with the    */
+/* following formula: avg = (dbl * count + value) / (count + 1) and stored  */
+/* into dbl member.                                                         */
+/* For uint64 values the item values are summed into ui64 member and the    */
+/* average value is calculated before flushing trends to database:          */
+/* avg = ui64 / count                                                       */
+typedef union
+{
+	double		dbl;
+	zbx_uint128_t	ui64;
+}
+value_avg_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	history_value_t	value_min;
+	value_avg_t	value_avg;
+	history_value_t	value_max;
+	int		clock;
+	int		num;
+	int		disable_from;
+	unsigned char	value_type;
+}
+ZBX_DC_TREND;
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -422,6 +473,20 @@ typedef struct
 	unsigned char		value_type;
 }
 zbx_item_history_value_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	history_value_t	value;
+	zbx_uint64_t	lastlogsize;
+	zbx_timespec_t	ts;
+	int		mtime;
+	unsigned char	value_type;
+	unsigned char	flags;		/* see ZBX_DC_FLAG_* */
+	unsigned char	state;
+	int		ttl;		/* time-to-live of the history value */
+}
+ZBX_DC_HISTORY;
 
 /* item queue data */
 typedef struct
@@ -454,11 +519,32 @@ typedef enum
 }
 zbx_counter_type_t;
 
+typedef struct
+{
+	unsigned char	type;
+	char		*params;
+}
+zbx_preproc_op_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	unsigned char		type;
+	unsigned char		value_type;
+
+	int			dep_itemids_num;
+	int			preproc_ops_num;
+
+	zbx_uint64_t		*dep_itemids;
+	zbx_preproc_op_t	*preproc_ops;
+}
+zbx_preproc_item_t;
+
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
-void	dc_add_history(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result, const zbx_timespec_t *ts,
-		unsigned char state, const char *error);
+void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
+		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history(void);
 int	DCsync_history(int sync_type, int *sync_num);
 int	init_database_cache(char **error);
@@ -485,11 +571,6 @@ void	free_database_cache(void);
 #define ZBX_STATS_HISTORY_INDEX_PFREE	18
 void	*DCget_stats(int request);
 
-/* flags for DCconfig_get_items_by_itemids() function to specify the data needed */
-#define ZBX_FLAG_ITEM_FIELDS_DEFAULT		__UINT64_C(0x0000)
-#define ZBX_FLAG_ITEM_FIELDS_PREPROC		__UINT64_C(0x0001)
-#define ZBX_FLAG_ITEM_FIELDS_DEPENDENT		__UINT64_C(0x0002)
-
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 /* initial sync, get all data */
@@ -507,10 +588,8 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
-void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
-		zbx_uint64_t flags);
+void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp);
-void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
@@ -543,10 +622,9 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 #define ZBX_HK_TRENDS_MIN	SEC_PER_DAY
 
 void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
-		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num);
+		const int *errcodes, size_t num);
 void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
-		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num,
-		unsigned char poller_type, int *nextcheck);
+		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
@@ -554,8 +632,13 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
 void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
+void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff);
+
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
+
+void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
+int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2
@@ -563,13 +646,14 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 #define ZBX_CONFSTATS_BUFFER_PFREE	4
 void	*DCconfig_get_stats(int request);
 
+int	DCconfig_get_last_sync_time(void);
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
 int	DCconfig_get_proxypoller_nextcheck(void);
 
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
-void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
+void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err);
 void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff);
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 
@@ -609,6 +693,7 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
+void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
 
 /* global configuration support */
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
@@ -622,6 +707,7 @@ void	DCupdate_hosts_availability(void);
 
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions, unsigned char opflags);
 void	zbx_action_eval_free(zbx_action_eval_t *action);
+void	zbx_db_condition_clean(DB_CONDITION *condition);
 void	zbx_conditions_eval_clean(zbx_hashset_t *uniq_conditions);
 
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
@@ -677,14 +763,22 @@ typedef struct
 }
 zbx_agent_value_t;
 
-void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
-void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess);
+void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
 
-/* item preprocessing support */
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result,
-		zbx_timespec_t *ts, unsigned char state, char *error);
-void	zbx_preprocessor_flush();
-zbx_uint64_t	zbx_preprocessor_get_queue_size();
+void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff);
+void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess);
+
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	unsigned char		status;
+	zbx_vector_uint64_t	masterids;
+}
+zbx_trigger_dep_t;
+
+void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
+
+void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_uint64_t *proxy_hostids);
 
 #endif

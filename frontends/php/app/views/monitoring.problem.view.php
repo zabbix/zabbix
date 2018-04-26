@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,13 +36,18 @@ $options = [
 			'hostids' => $data['filter']['hostids'],
 			'application' => $data['filter']['application'],
 			'triggerids' => $data['filter']['triggerids'],
-			'problem' => $data['filter']['problem'],
+			'name' => $data['filter']['name'],
 			'severity' => $data['filter']['severity'],
 			'inventory' => $data['filter']['inventory'],
+			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
+			'show_tags' => $data['filter']['show_tags'],
 			'maintenance' => $data['filter']['maintenance'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
-			'details' => $data['filter']['details']
+			'compact_view' => $data['filter']['compact_view'],
+			'show_timeline' => $data['filter']['show_timeline'],
+			'details' => $data['filter']['details'],
+			'highlight_row' => $data['filter']['highlight_row']
 		]
 	]
 ];
@@ -93,8 +98,13 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hostGroup',
 				'data' => $data['filter']['groups'],
 				'popup' => [
-					'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=filter_groupids_'.
-						'&srcfld1=groupid&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'host_groups',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_groupids_',
+						'srcfld1' => 'groupid',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -104,8 +114,14 @@ if ($data['action'] == 'problem.view') {
 				'objectName' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
-					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=filter_hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1'
+					'parameters' => [
+						'srctbl' => 'hosts',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_hostids_',
+						'srcfld1' => 'hostid',
+						'real_hosts' => '1',
+						'multiselect' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
@@ -114,16 +130,15 @@ if ($data['action'] == 'problem.view') {
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
-				->onClick('return PopUp("'.
-					(new CUrl('popup.php'))
-						->setArgument('srctbl', 'applications')
-						->setArgument('srcfld1', 'name')
-						->setArgument('dstfrm', 'zbx_filter')
-						->setArgument('dstfld1', 'filter_application')
-						->setArgument('with_applications', '1')
-						->setArgument('real_hosts', '1')
-						->getUrl().
-					'");'
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_application',
+						'with_applications' => '1',
+						'real_hosts' => '1'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])
@@ -136,13 +151,21 @@ if ($data['action'] == 'problem.view') {
 				],
 				'data' => $data['filter']['triggers'],
 				'popup' => [
-					'parameters' => 'srctbl=triggers&srcfld1=triggerid&dstfrm=zbx_filter&dstfld1=filter_triggerids_'.
-						'&monitored_hosts=1&with_monitored_triggers=1&multiselect=1&noempty=1'
+					'parameters' => [
+						'srctbl' => 'triggers',
+						'srcfld1' => 'triggerid',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_triggerids_',
+						'monitored_hosts' => '1',
+						'with_monitored_triggers' => '1',
+						'multiselect' => '1',
+						'noempty' => '1'
+					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Problem'),
-			(new CTextBox('filter_problem', $data['filter']['problem']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Minimum trigger severity'),
 			new CComboBox('filter_severity', $data['filter']['severity'], null, $data['filter']['severities'])
@@ -196,17 +219,31 @@ if ($data['action'] == 'problem.view') {
 
 	$filter_tags = $data['filter']['tags'];
 	if (!$filter_tags) {
-		$filter_tags = [['tag' => '', 'value' => '']];
+		$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 	}
 
 	$filter_tags_table = new CTable();
 	$filter_tags_table->setId('filter-tags');
+
+	$filter_tags_table->addRow(
+		(new CCol(
+			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
+				->addValue(_('AND'), TAG_EVAL_TYPE_AND)
+				->addValue(_('OR'), TAG_EVAL_TYPE_OR)
+				->setModern(true)
+		))->setColSpan(4)
+	);
+
 	$i = 0;
 	foreach ($filter_tags as $tag) {
 		$filter_tags_table->addRow([
 			(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
+				->addValue(_('Like'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
 			(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
@@ -229,23 +266,52 @@ if ($data['action'] == 'problem.view') {
 	$filter_column2 = (new CFormList())
 		->addRow(_('Host inventory'), $filter_inventory_table)
 		->addRow(_('Tags'), $filter_tags_table)
-		->addRow(_('Show hosts in maintenance'),
-			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1)
-		);
-
-	if ($data['config']['event_ack_enable']) {
-		$filter_column2->addRow(_('Show unacknowledged only'),
-			(new CCheckBox('filter_unacknowledged'))->setChecked($data['filter']['unacknowledged'] == 1)
-		);
-	}
-
-	$filter_column2
-		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
+		->addRow(_('Show tags'),
+			(new CRadioButtonList('filter_show_tags', (int) $data['filter']['show_tags']))
+				->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
+				->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
+				->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
+				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
+				->setModern(true)
+		)
+		->addRow(_('Show hosts in maintenance'), [
+			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1),
+			$data['config']['event_ack_enable']
+				? (new CDiv([
+					(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
+						->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+					(new CCheckBox('filter_unacknowledged'))
+						->setChecked($data['filter']['unacknowledged'] == 1)
+				]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+				: null
+		])
+		->addRow(_('Compact view'), [
+			(new CCheckBox('filter_compact_view'))->setChecked($data['filter']['compact_view'] == 1),
+			(new CDiv([
+				(new CLabel(_('Show timeline'), 'filter_show_timeline'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+				(new CCheckBox('filter_show_timeline'))
+					->setChecked($data['filter']['show_timeline'] == 1)
+					->setEnabled($data['filter']['compact_view'] == 0),
+			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+		])
+		->addRow(_('Show details'), [
+			(new CCheckBox('filter_details'))
+				->setChecked($data['filter']['details'] == 1)
+				->setEnabled($data['filter']['compact_view'] == 0),
+			(new CDiv([
+				(new CLabel(_('Highlight whole row'), 'filter_highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+				(new CCheckBox('filter_highlight_row'))
+					->setChecked($data['filter']['highlight_row'] == 1)
+					->setEnabled($data['filter']['compact_view'] == 1)
+			]))
+				->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
+				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+		]);
 
 	$filter = (new CFilter('web.problem.filter.state'))
-		->addVar('action', 'problem.view')
-		->addVar('fullscreen', $data['fullscreen'])
-		->addVar('page', $data['page'])
+		->addFormItem((new CVar('action', 'problem.view'))->removeId())
+		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
+		->addFormItem((new CVar('page', $data['page']))->removeId())
 		->addColumn($filter_column1)
 		->addColumn($filter_column2);
 
@@ -255,21 +321,22 @@ if ($data['action'] == 'problem.view') {
 
 	(new CWidget())
 		->setTitle(_('Problems'))
-		->setControls(
+		->setControls((new CTag('nav', true,
 			(new CForm('get'))
 				->cleanItems()
 				->addVar('action', 'problem.view')
-				->addVar('fullscreen', $data['fullscreen'])
+				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 				->addVar('page', $data['page'])
-				->addItem(
-					(new CList())
-						->addItem(new CRedirectButton(_('Export to CSV'),
-							(new CUrl('zabbix.php'))
-								->setArgument('action', 'problem.view.csv')
-								->setArgument('page',  $data['page'])
-						))
-						->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+				->addItem((new CList())
+					->addItem(new CRedirectButton(_('Export to CSV'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'problem.view.csv')
+							->setArgument('page',  $data['page'])
+					))
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 				)
+			))
+				->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem($filter)
 		->addItem($screen->get())

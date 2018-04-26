@@ -8,5 +8,5 @@ libipmi_a_SOURCES = \
 	ipmi_poller.c ipmi_poller.h \
 	ipmi_manager.c ipmi_manager.h \
 	ipmi.c ipmi.h
-	
-	
+
+libipmi_a_CFLAGS = @OPENIPMI_CFLAGS@

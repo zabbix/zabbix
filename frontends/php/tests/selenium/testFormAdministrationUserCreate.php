@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,24 +21,22 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup users
+ */
 class testFormAdministrationUserCreate extends CWebTest {
-
-	public function testFormAdministrationUserCreate_backup() {
-		DBsave_tables('users');
-	}
 
 	public function testFormAdministrationUserCreate_CreateUser() {
 		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
-		$this->zbxTestClick('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create user');
 		$this->zbxTestInputType('alias', 'User alias');
 		$this->zbxTestInputType('name', 'User name');
 		$this->zbxTestInputType('surname', 'User surname');
-		$this->zbxTestClick('add_group');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
-		$this->zbxTestCheckboxSelect('new_groups_7');
-		$this->zbxTestClick('select');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestClickButtonMultiselect('user_groups_');
+		$this->zbxTestLaunchOverlayDialog('User groups');
+		$this->zbxTestCheckboxSelect('item_7');
+		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 		$this->zbxTestInputTypeWait('password1', '123');
 		$this->zbxTestInputType('password2', '123');
 		$this->zbxTestClick('add');
@@ -46,9 +44,5 @@ class testFormAdministrationUserCreate extends CWebTest {
 
 		$sql = 'SELECT * FROM users WHERE alias=\'User alias\'';
 		$this->assertEquals(1, DBcount($sql), 'User with such alias has not been added');
-	}
-
-	public function testFormAdministrationUserCreate_restore() {
-		DBrestore_tables('users');
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,15 +20,14 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup regexps
+ */
 class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	private $regexp = 'test_regexp1';
 	private $regexp2 = 'test_regexp2';
 	private $cloned_regexp = 'test_regexp1_clone';
-
-	public function testFormAdministrationGeneralRegexp_backup() {
-		DBsave_tables('regexps');
-	}
 
 	public function testFormAdministrationGeneralRegexp_Layout() {
 		$this->zbxTestLogin('adm.gui.php');
@@ -95,7 +94,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive', false);
 		}
 
-		$this->zbxTestClick('tab_test');
+		$this->zbxTestTabSwitchById('tab_test', 'Test');
 		$this->zbxTestInputTypeWait('test_string', $test_string);
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('Regular expression added');
@@ -134,7 +133,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 
-		$this->zbxTestClickWait('tab_test');
+		$this->zbxTestTabSwitchById('tab_test', 'Test');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='green']"));
 		$this->zbxTestTextPresent('TRUE');
 	}
@@ -143,7 +142,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestClickWait('tab_test');
+		$this->zbxTestTabSwitchById('tab_test', 'Test');
 
 		$this->zbxTestInputType('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');
@@ -182,7 +181,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->regexp2);
 
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
@@ -201,7 +200,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_regexps');
 		$this->zbxTestClickButton('regexp.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestTextPresent('Regular expressions deleted');
 
@@ -210,9 +209,5 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		$sql = 'SELECT * FROM expressions';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
-	}
-
-	public function testFormAdministrationGeneralRegexp_restore() {
-		DBrestore_tables('regexps');
 	}
 }

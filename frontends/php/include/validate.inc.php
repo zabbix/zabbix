@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -311,6 +311,10 @@ function check_field(&$fields, &$field, $checks) {
 		}
 	}
 
+	if ($flags & P_CRLF) {
+		$_REQUEST[$field] = CRLFtoLF($_REQUEST[$field]);
+	}
+
 	if (!($flags & P_NO_TRIM)) {
 		check_trim($_REQUEST[$field]);
 	}
@@ -363,7 +367,7 @@ function invalid_url($msg = null) {
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
-function check_fields(&$fields, $show_messages = true) {
+function check_fields(&$fields, $show_messages = true, $add_messages_to_message_stack = false) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = [
 		'sid' =>			[T_ZBX_STR, O_OPT, P_SYS, HEX(),		null],
@@ -394,6 +398,9 @@ function check_fields(&$fields, $show_messages = true) {
 
 	if ($show_messages && $err != ZBX_VALID_OK) {
 		show_messages(($err == ZBX_VALID_OK), null, _('Page received incorrect data'));
+	}
+	elseif ($add_messages_to_message_stack && $err != ZBX_VALID_OK) {
+		error(_('Page received incorrect data'));
 	}
 
 	return ($err == ZBX_VALID_OK);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -329,53 +329,75 @@ static int	DBpatch_3030029(void)
  * Comments: This procedure fills in field 'p_eventid' for all recovery       *
  *           actions. 'p_eventid' value is defined as per last problematic    *
  *           event, that was closed by correct recovery event.                *
- *           This is done because the relation beetwen ecovery alerts and     *
+ *           This is done because the relation between recovery alerts and    *
  *           this method is most successful for updating zabbix 3.0 to latest *
  *           versions.                                                        *
  *                                                                            *
  ******************************************************************************/
 static int	DBpatch_3030030(void)
 {
-	int			ret = FAIL;
-	DB_ROW			row;
-	DB_RESULT		result;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		prev_eventid = 0, curr_eventid;
+	int		ret = SUCCEED, upd_num;
+	DB_ROW		row;
+	DB_RESULT	result;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset;
+	zbx_uint64_t	last_r_eventid = 0, r_eventid;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	result = DBselect("select eventid, r_eventid"
-			" from event_recovery"
-			" order by r_eventid, eventid desc");
-
-	while (NULL != (row = DBfetch(result)))
+	do
 	{
-		ZBX_STR2UINT64(curr_eventid, row[1]);
-		if (prev_eventid == curr_eventid)
-			continue;
+		upd_num = 0;
 
+		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update alerts set p_eventid=%s where eventid=%s;\n",
-				row[0], row[1]);
+					"select e.eventid, e.r_eventid"
+					" from event_recovery e"
+						" join alerts a"
+							" on a.eventid=e.r_eventid");
+		if (0 < last_r_eventid)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where e.r_eventid<" ZBX_FS_UI64,
+					last_r_eventid);
+		}
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.r_eventid desc, e.eventid desc");
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
+		if (NULL == (result = DBselectN(sql, 10000)))
+		{
+			ret = FAIL;
+			break;
+		}
 
-		prev_eventid = curr_eventid;
-	}
+		sql_offset = 0;
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(r_eventid, row[1]);
+			if (last_r_eventid == r_eventid)
+				continue;
 
-	if (16 < sql_offset)
-	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			goto out;
-	}
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update alerts set p_eventid=%s where eventid=%s;\n",
+					row[0], row[1]);
 
-	ret = SUCCEED;
+			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				goto out;
+
+			last_r_eventid = r_eventid;
+			upd_num++;
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)
+		{
+			if (ZBX_DB_OK > DBexecute("%s", sql))
+				ret = FAIL;
+		}
 out:
-	DBfree_result(result);
+		DBfree_result(result);
+	}
+	while (0 < upd_num && SUCCEED == ret);
+
 	zbx_free(sql);
 
 	return ret;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,11 +30,15 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fullscreen' => 'in 0,1',
+			'kioskmode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
 
 	protected function doAction() {
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
+
 		$fields = $this->getForm()->getFieldsData();
 
 		$config = select_config();
@@ -44,12 +48,13 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'groupids' => getSubGroups($fields['groupids']),
 			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
 			'hostids' => $fields['hostids'],
-			'problem' => $fields['problem'],
+			'name' => $fields['problem'],
 			'severities' => $fields['severities'],
+			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
 			'maintenance' => $fields['maintenance'],
 			'unacknowledged' => $fields['unacknowledged']
-		], $config, true);
+		], $config);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
 
@@ -66,8 +71,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		], $config, true);
 
 		if ($fields['show_tags']) {
-			$data['tags'] = makeEventsTags($data['problems']);
+			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags']);
 		}
+
 		if ($data['problems']) {
 			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
 		}
@@ -80,13 +86,16 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable'],
+				'problem_unack_style' => $config['problem_unack_style'],
+				'problem_ack_style' => $config['problem_ack_style'],
 				'blink_period' => timeUnitToSeconds($config['blink_period'])
 			],
 			'data' => $data,
 			'info' => $info,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'fullscreen' => $this->getInput('fullscreen', 0),
+			'fullscreen' => $fullscreen,
+			'kioskmode' => $kioskmode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -125,10 +134,10 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				return ['host', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_NAME_ASC:
-				return ['problem', ZBX_SORT_UP];
+				return ['name', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_NAME_DESC:
-				return ['problem', ZBX_SORT_DOWN];
+				return ['name', ZBX_SORT_DOWN];
 		}
 	}
 }

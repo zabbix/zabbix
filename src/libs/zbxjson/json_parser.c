@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ static int	json_parse_string(const char *start, char **error)
 		ptr++;
 	}
 
-	return ptr - start + 1;
+	return (int)(ptr - start) + 1;
 }
 
 /******************************************************************************
@@ -178,7 +178,7 @@ static int	json_parse_array(const char *start, char **error)
 			return json_error("invalid array format, expected closing character ']'", ptr, error);
 	}
 
-	return ptr - start + 1;
+	return (int)(ptr - start) + 1;
 }
 
 /******************************************************************************
@@ -253,7 +253,7 @@ static int	json_parse_number(const char *start, char **error)
 		}
 	}
 
-	return ptr - start;
+	return (int)(ptr - start);
 }
 
 /******************************************************************************
@@ -288,7 +288,7 @@ static int	json_parse_literal(const char *start, const char *text, char **error)
 		text++;
 	}
 
-	return ptr - start;
+	return (int)(ptr - start);
 }
 
 /******************************************************************************
@@ -360,7 +360,7 @@ int	json_parse_value(const char *start, char **error)
 			return json_error("invalid JSON object value starting character", ptr, error);
 	}
 
-	return ptr - start + len;
+	return (int)(ptr - start) + len;
 }
 
 /******************************************************************************
@@ -429,7 +429,7 @@ static int	json_parse_object(const char *start, char **error)
 			return json_error("invalid object format, expected closing character '}'", ptr, error);
 	}
 
-	return ptr - start + 1;
+	return (int)(ptr - start) + 1;
 }
 
 /******************************************************************************

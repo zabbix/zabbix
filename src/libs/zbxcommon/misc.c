@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #endif
 
 	if (NULL == last_ts)
-		last_ts = zbx_calloc(last_ts, 1, sizeof(zbx_timespec_t));
+		last_ts = (zbx_timespec_t *)zbx_calloc(last_ts, 1, sizeof(zbx_timespec_t));
 
 #ifdef _WINDOWS
 	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
@@ -433,7 +433,7 @@ int	zbx_day_in_month(int year, int mon)
  * Author: Eugene Grigorjev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
+void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -472,7 +472,7 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -512,7 +512,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -532,7 +532,7 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 	exit(EXIT_FAILURE);
 }
 
-char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
+char	*zbx_strdup2(const char *filename, int line, char *old, const char *str)
 {
 	int	retry;
 	char	*ptr = NULL;
@@ -874,7 +874,7 @@ int	zbx_check_time_period(const char *period, time_t time, int *res)
 	tm = localtime(&time);
 
 	next = strchr(period, ';');
-	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : next - period)))
+	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : (int)(next - period))))
 	{
 		if (SUCCEED == check_time_period(tp, tm))
 			res_total = SUCCEED;	/* no short-circuits, validate all periods before return */
@@ -936,7 +936,7 @@ static int	flexible_interval_parse(zbx_flexible_interval_t *interval, const char
 	for (ptr = text; 0 < len && '\0' != *ptr && '/' != *ptr; len--, ptr++)
 		;
 
-	if (SUCCEED != is_time_suffix(text, &interval->delay, ptr - text))
+	if (SUCCEED != is_time_suffix(text, &interval->delay, (int)(ptr - text)))
 		return FAIL;
 
 	if (0 >= len-- || '/' != *ptr++)
@@ -1106,7 +1106,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 			return FAIL;
 	}
 
-	filter_new = zbx_malloc(NULL, sizeof(zbx_scheduler_filter_t));
+	filter_new = (zbx_scheduler_filter_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_filter_t));
 	filter_new->start = start;
 	filter_new->end = end;
 	filter_new->step = step;
@@ -1626,7 +1626,7 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
 static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t now)
 {
 	struct tm	tm_start, tm;
-	int		nextcheck = 0, current_nextcheck;
+	time_t		nextcheck = 0, current_nextcheck;
 
 	tm_start = *(localtime(&now));
 	tm_start.tm_isdst = -1;
@@ -1677,7 +1677,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 	int				ret;
 
 	if (SUCCEED != (ret = is_time_suffix(interval_str, simple_interval,
-			(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str))))
+			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str))))
 	{
 		interval_type = "update";
 		goto out;
@@ -1695,10 +1695,10 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 		{
 			zbx_flexible_interval_t	*new_interval;
 
-			new_interval = zbx_malloc(NULL, sizeof(zbx_flexible_interval_t));
+			new_interval = (zbx_flexible_interval_t *)zbx_malloc(NULL, sizeof(zbx_flexible_interval_t));
 
 			if (SUCCEED != (ret = flexible_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : delim - interval_str))))
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)))))
 			{
 				zbx_free(new_interval);
 				interval_type = "flexible";
@@ -1712,11 +1712,11 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 		{
 			zbx_scheduler_interval_t	*new_interval;
 
-			new_interval = zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
+			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
 			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
 
 			if (SUCCEED != (ret = scheduler_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : delim - interval_str))))
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)))))
 			{
 				zbx_free(new_interval);
 				interval_type = "scheduling";
@@ -1733,7 +1733,8 @@ out:
 		if (NULL != error)
 		{
 			*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
-					(NULL == delim ? (int)strlen(interval_str) : delim - interval_str), interval_str);
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
+					interval_str);
 		}
 
 		flexible_interval_free(flexible);
@@ -1741,7 +1742,7 @@ out:
 	}
 	else if (NULL != custom_intervals)
 	{
-		*custom_intervals = zbx_malloc(NULL, sizeof(zbx_custom_interval_t));
+		*custom_intervals = (zbx_custom_interval_t *)zbx_malloc(NULL, sizeof(zbx_custom_interval_t));
 		(*custom_intervals)->flexible = flexible;
 		(*custom_intervals)->scheduling = scheduling;
 	}
@@ -1805,7 +1806,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 	}
 	else
 	{
-		int	current_delay = 0, try = 0;
+		int	current_delay = 0, attempt = 0;
 		time_t	next_interval, t, tmax, scheduled_check = 0;
 
 		/* first try to parse out and calculate scheduled intervals */
@@ -1832,7 +1833,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 				nextcheck = current_delay * (int)(t / (time_t)current_delay) +
 						(int)(seed % (zbx_uint64_t)current_delay);
 
-				if (0 == try)
+				if (0 == attempt)
 				{
 					while (nextcheck <= t)
 						nextcheck += current_delay;
@@ -1856,14 +1857,14 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 			{
 				/* 'nextcheck' is beyond the current interval */
 				t = next_interval;
-				try++;
+				attempt++;
 			}
 			else
 				break;	/* nextcheck is within the current interval */
 		}
 
 		if (0 != scheduled_check && scheduled_check < nextcheck)
-			nextcheck = scheduled_check;
+			nextcheck = (int)scheduled_check;
 	}
 
 	return nextcheck;
@@ -2234,7 +2235,7 @@ int	int_in_list(char *list, int value)
 
 int	zbx_double_compare(double a, double b)
 {
-	return fabs(a - b) < ZBX_DOUBLE_EPSILON ? SUCCEED : FAIL;
+	return fabs(a - b) <= ZBX_DOUBLE_EPSILON ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2856,7 +2857,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 		}
 
 		*alloc += alloc_step;
-		*values = zbx_realloc(*values, *alloc * sizeof(zbx_uint64_t));
+		*values = (zbx_uint64_t *)zbx_realloc(*values, *alloc * sizeof(zbx_uint64_t));
 	}
 
 	memmove(&(*values)[index + 1], &(*values)[index], sizeof(zbx_uint64_t) * (*num - index));
@@ -3215,6 +3216,7 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
+		case ITEM_TYPE_HTTPAGENT:
 			return INTERFACE_TYPE_ANY;
 		default:
 			return INTERFACE_TYPE_UNKNOWN;

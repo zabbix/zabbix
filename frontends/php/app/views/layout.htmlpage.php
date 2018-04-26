@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,37 @@ function local_generateHeader($data) {
 	global $page;
 
 	header('Content-Type: text/html; charset=UTF-8');
+	header('X-Content-Type-Options: nosniff');
+	header('X-XSS-Protection: 1; mode=block');
+
+	if (X_FRAME_OPTIONS !== null) {
+		if (strcasecmp(X_FRAME_OPTIONS, 'SAMEORIGIN') == 0 || strcasecmp(X_FRAME_OPTIONS, 'DENY') == 0) {
+			$x_frame_options = X_FRAME_OPTIONS;
+		}
+		else {
+			$x_frame_options = 'SAMEORIGIN';
+			$allowed_urls = explode(',', X_FRAME_OPTIONS);
+			$url_to_check = array_key_exists('HTTP_REFERER', $_SERVER)
+				? parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST)
+				: null;
+
+			if ($url_to_check) {
+				foreach ($allowed_urls as $allowed_url) {
+					if (strcasecmp(trim($allowed_url), $url_to_check) == 0) {
+						$x_frame_options = 'ALLOW-FROM '.$allowed_url;
+						break;
+					}
+				}
+			}
+		}
+
+		header('X-Frame-Options: '.$x_frame_options);
+	}
+
+	if ((array_key_exists('https', $_SERVER) && ($_SERVER['https'] == 1 || $_SERVER['https'] === 'on'))
+			|| (array_key_exists('SERVER_PORT', $_SERVER) && $_SERVER['SERVER_PORT'] == 443)) {
+		header('strict-transport-security: max-age=31557600');
+	}
 
 	// construct menu
 	$main_menu = [];
@@ -67,7 +98,7 @@ function local_generateHeader($data) {
 		echo $pageMenu->getOutput();
 	}
 
-	echo '<div class="'.ZBX_STYLE_ARTICLE.'">';
+	echo '<main>';
 
 	// should be replaced with addPostJS() at some point
 	zbx_add_post_js('initMessages({});');
@@ -100,7 +131,7 @@ function local_generateFooter($fullscreen) {
 			'debug_mode' => CWebUser::$data['debug_mode']
 		]
 	]);
-	echo $pageFooter->getOutput();
+	echo '</main>'.$pageFooter->getOutput();
 }
 
 function local_showMessage() {
@@ -128,9 +159,7 @@ local_showMessage();
 echo $data['javascript']['pre'];
 echo $data['main_block'];
 echo $data['javascript']['post'];
-
 local_generateFooter($data['fullscreen']);
-
 show_messages();
 
 echo '</body></html>';

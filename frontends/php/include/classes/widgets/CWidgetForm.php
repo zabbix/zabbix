@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,10 +30,34 @@ class CWidgetForm {
 	 */
 	protected $data;
 
-	public function __construct($data) {
+	public function __construct($data, $type) {
 		$this->data = CJs::decodeJson($data);
 
 		$this->fields = [];
+
+		// Refresh interval field.
+		$default_rf_rate = '';
+
+		foreach (CWidgetConfig::getRfRates() as $rf_rate => $label) {
+			if ($rf_rate == CWidgetConfig::getDefaultRfRate($type)) {
+				$default_rf_rate = $label;
+				break;
+			}
+		}
+
+		$rf_rates = [
+			-1 => _('Default').' ('.$default_rf_rate.')'
+		];
+		$rf_rates += CWidgetConfig::getRfRates();
+
+		$rf_rate_field = (new CWidgetFieldComboBox('rf_rate', _('Refresh interval'), $rf_rates))
+			->setDefault(-1);
+
+		if (array_key_exists('rf_rate', $this->data)) {
+			$rf_rate_field->setValue($this->data['rf_rate']);
+		}
+
+		$this->fields[] = $rf_rate_field;
 	}
 
 	/**

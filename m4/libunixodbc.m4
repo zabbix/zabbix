@@ -60,7 +60,7 @@ AC_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
 		AC_CHECK_LIB(odbc, SQLAllocHandle, ,[unixodbc_error="unixODBC library not found"])
 
 		if test "x$unixodbc_error" = "x"; then
-			AC_DEFINE(HAVE_UNIXODBC,1,[Define to 1 if unixUNIXODBC Driver Manager should be used.])
+			AC_DEFINE(HAVE_UNIXODBC,1,[Define to 1 if unixODBC Driver Manager should be used.])
 		fi
 
 		CFLAGS="${_save_unixodbc_cflags}"

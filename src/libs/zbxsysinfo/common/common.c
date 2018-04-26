@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,6 +64,7 @@ ZBX_METRIC	parameters_common[] =
 	{"vfs.file.cksum",	CF_HAVEPARAMS,	VFS_FILE_CKSUM,		VFS_TEST_FILE},
 
 	{"vfs.dir.size",	CF_HAVEPARAMS,	VFS_DIR_SIZE,		VFS_TEST_DIR},
+	{"vfs.dir.count",	CF_HAVEPARAMS,	VFS_DIR_COUNT,		VFS_TEST_DIR},
 
 	{"net.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"},
 	{"net.dns.record",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"},
@@ -113,9 +114,8 @@ int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
-	init_result(result);
-
-	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT,
+			ZBX_EXIT_CODE_CHECKS_DISABLED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		goto out;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
+CWebUser::disableSessionCookie();
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -73,7 +76,16 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 			]);
 		}
 
-		$request = getRequest('request');
+		$request = getRequest('request', '');
+
+		if ($request) {
+			preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(?<request>\?.*)?$/i', $request, $test_request);
+
+			$request = (array_key_exists('filename', $test_request) && file_exists('./'.$test_request['filename']))
+				? $test_request['filename'].(array_key_exists('request', $test_request) ? $test_request['request'] : '')
+				: '';
+		}
+
 		if (!zbx_empty($request)) {
 			$url = $request;
 		}

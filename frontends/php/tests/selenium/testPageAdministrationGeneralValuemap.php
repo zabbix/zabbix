@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,33 +22,27 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAdministrationGeneralValuemap extends CWebTest {
 
-	public static function allValuemaps() {
-		return DBdata('select * from valuemaps');
-	}
-
-	/**
-	* @dataProvider allValuemaps
-	*/
-	public function testPageAdministrationGeneralValuemap_CheckLayout($valuemap) {
+	public function testPageAdministrationGeneralValuemap_CheckLayout() {
 		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestTextPresent(['Name', 'Value map']);
 		$this->zbxTestAssertElementPresentId('form');
-		$this->zbxTestTextPresent($valuemap['name']);
 
-		// checking that in the "Value map" column are correct values
-		$sqlMappings = 'SELECT value,newvalue FROM mappings WHERE valuemapid='.$valuemap['valuemapid'];
-		$result = DBselect($sqlMappings);
-		while ($row = DBfetch($result)) {
-			$this->zbxTestTextPresent($row['value'].' ⇒ '.$row['newvalue']);
+		$strings = [];
+
+		foreach (DBdata('select name,valuemapid from valuemaps', false) as $valuemap) {
+			$strings[] = $valuemap[0]['name'];
 		}
+
+		foreach (DBdata('SELECT value,newvalue FROM mappings', false) as $mapping) {
+			$strings[] = $mapping[0]['value'].' ⇒ '.$mapping[0]['newvalue'];
+		}
+
+		$this->zbxTestTextPresent($strings);
 	}
 
-	/**
-	* @dataProvider allValuemaps
-	*/
-	public function testPageAdministrationGeneralValuemap_SimpleUpdate($valuemap) {
+	public function testPageAdministrationGeneralValuemap_SimpleUpdate() {
 		$sqlValuemaps = 'select * from valuemaps order by valuemapid';
 		$oldHashValuemap = DBhash($sqlValuemaps);
 
@@ -56,9 +50,16 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 		$oldHashMappings = DBhash($sqlMappings);
 
 		$this->zbxTestLogin('adm.valuemapping.php');
-		$this->zbxTestClickLinkText($valuemap['name']);
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Value map updated');
+
+		// There is no need to check simple update of every valuemap.
+		foreach (DBdata('select name from valuemaps limit 10', false) as $valuemap) {
+			$valuemap = $valuemap[0];
+			$this->zbxTestClickLinkText($valuemap['name']);
+			$this->zbxTestWaitForPageToLoad();
+			$this->zbxTestClickWait('update');
+			$this->zbxTestWaitForPageToLoad();
+			$this->zbxTestTextPresent('Value map updated');
+		}
 
 		$newHashValuemap = DBhash($sqlValuemaps);
 		$this->assertEquals($oldHashValuemap, $newHashValuemap);

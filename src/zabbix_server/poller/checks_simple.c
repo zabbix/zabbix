@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
 	}
 

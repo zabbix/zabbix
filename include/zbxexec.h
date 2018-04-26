@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,11 @@
 #ifndef ZABBIX_ZBXEXEC_H
 #define ZABBIX_ZBXEXEC_H
 
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout);
+#define ZBX_EXIT_CODE_CHECKS_DISABLED	0
+#define ZBX_EXIT_CODE_CHECKS_ENABLED	1
+
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout,
+		unsigned char flag);
 int	zbx_execute_nowait(const char *command);
 
 #endif

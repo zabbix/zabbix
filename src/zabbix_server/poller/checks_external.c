@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	int		i, ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key);
 
 	init_request(&request);
 
@@ -59,7 +59,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	cmd = zbx_malloc(cmd, cmd_alloc);
+	cmd = (char *)zbx_malloc(cmd, cmd_alloc);
 	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_EXTERNALSCRIPTS, get_rkey(&request));
 
 	if (-1 == access(cmd, X_OK))
@@ -75,12 +75,12 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 		param = get_rparam(&request, i);
 
-		param_esc = zbx_dyn_escape_string(param, "\"\\");
-		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\"", param_esc);
+		param_esc = zbx_dyn_escape_shell_single_quote(param);
+		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
 		zbx_free(param_esc);
 	}
 
-	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT, ZBX_EXIT_CODE_CHECKS_DISABLED))
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 

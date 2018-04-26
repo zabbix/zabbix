@@ -99,12 +99,13 @@ static const char	*ipc_get_path(void)
  * Purpose: makes socket path from the service name                           *
  *                                                                            *
  * Parameters: service_name - [IN] the service name                           *
+ *             error        - [OUT] the error message                         *
  *                                                                            *
  * Return value: The created path or NULL if the path exceeds unix domain     *
  *               socket path maximum length                                   *
  *                                                                            *
  ******************************************************************************/
-static const char	*ipc_make_path(const char *service_name)
+static const char	*ipc_make_path(const char *service_name, char **error)
 {
 	const char	*prefix;
 	size_t		path_len, offset, prefix_len;
@@ -135,6 +136,9 @@ static const char	*ipc_make_path(const char *service_name)
 	if (ZBX_IPC_PATH_MAX < ipc_path_root_len + path_len + 1 + ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX) +
 			ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + prefix_len)
 	{
+		*error = zbx_dsprintf(*error,
+				"Socket path \"%s%s%s%s%s\" exceeds maximum length of unix domain socket path.",
+				ipc_path, ZBX_IPC_SOCKET_PREFIX, prefix, service_name, ZBX_IPC_SOCKET_SUFFIX);
 		return NULL;
 	}
 
@@ -316,7 +320,9 @@ static int	ipc_socket_write_message(zbx_ipc_socket_t *csocket, zbx_uint32_t code
 
 	if (ZBX_IPC_SOCKET_BUFFER_SIZE - ZBX_IPC_HEADER_SIZE >= size)
 	{
-		memcpy(buffer + 2, data, size);
+		if (0 != size)
+			memcpy(buffer + 2, data, size);
+
 		return ipc_write_data(csocket->fd, (unsigned char *)buffer, size + ZBX_IPC_HEADER_SIZE, tx_size);
 	}
 
@@ -375,7 +381,7 @@ static int	ipc_read_buffer(zbx_uint32_t *header, unsigned char **data, zbx_uint3
 			return SUCCEED;
 		}
 
-		*data = zbx_malloc(NULL, data_size);
+		*data = (unsigned char *)zbx_malloc(NULL, data_size);
 		data_offset = 0;
 	}
 	else
@@ -450,9 +456,7 @@ static int	ipc_socket_read_message(zbx_ipc_socket_t *csocket, zbx_uint32_t *head
 		*rx_bytes += read_size;
 
 		if (SUCCEED == ret)
-		{
 			goto out;
-		}
 	}
 
 	/* not enough data in socket buffer, try to read more until message is completed or no data to read */
@@ -536,13 +540,13 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 
 	zbx_ipc_socket_close(&client->csocket);
 
-	while (NULL != (message = zbx_queue_ptr_pop(&client->rx_queue)))
+	while (NULL != (message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&client->rx_queue)))
 		zbx_ipc_message_free(message);
 
 	zbx_queue_ptr_destroy(&client->rx_queue);
 	zbx_free(client->rx_data);
 
-	while (NULL != (message = zbx_queue_ptr_pop(&client->tx_queue)))
+	while (NULL != (message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&client->tx_queue)))
 		zbx_ipc_message_free(message);
 
 	zbx_queue_ptr_destroy(&client->tx_queue);
@@ -592,7 +596,7 @@ static void	ipc_client_pop_tx_message(zbx_ipc_client_t *client)
 	zbx_free(client->tx_data);
 	client->tx_bytes = 0;
 
-	if (NULL == (message = zbx_queue_ptr_pop(&client->tx_queue)))
+	if (NULL == (message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&client->tx_queue)))
 		return;
 
 	client->tx_bytes = ZBX_IPC_HEADER_SIZE + message->size;
@@ -875,23 +879,27 @@ static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
  * Parameters: service - [IN] the IPC service                                 *
  *                                                                            *
  ******************************************************************************/
-static int	ipc_service_accept(zbx_ipc_service_t *service)
+static void	ipc_service_accept(zbx_ipc_service_t *service)
 {
 	const char	*__function_name = "ipc_service_accept";
-	int		fd, ret = FAIL;
+	int		fd;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (fd = accept(service->fd, NULL, NULL)))
-		goto out;
+	while (-1 == (fd = accept(service->fd, NULL, NULL)))
+	{
+		if (EINTR != errno)
+		{
+			/* If there is unaccepted connection libevent will call registered callback function over and */
+			/* over again. It is better to exit straight away and cause all other processes to stop. */
+			zabbix_log(LOG_LEVEL_CRIT, "cannot accept incoming IPC connection: %s", zbx_strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+	}
 
 	ipc_service_add_client(service, fd);
 
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -918,7 +926,7 @@ static zbx_ipc_message_t	*ipc_message_create(zbx_uint32_t code, const unsigned c
 
 	if (0 != size)
 	{
-		message->data = zbx_malloc(NULL, size);
+		message->data = (unsigned char *)zbx_malloc(NULL, size);
 		memcpy(message->data, data, size);
 	}
 	else
@@ -1067,11 +1075,8 @@ int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (socket_path = ipc_make_path(service_name)))
-	{
-		*error = zbx_dsprintf(*error, "Invalid service name \"%s\".", service_name);
+	if (NULL == (socket_path = ipc_make_path(service_name, error)))
 		goto out;
-	}
 
 	if (-1 == (csocket->fd = socket(AF_UNIX, SOCK_STREAM, 0)))
 	{
@@ -1287,7 +1292,7 @@ void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
 	if (ZBX_IPC_DATA_DUMP_SIZE < data_num)
 		data_num = ZBX_IPC_DATA_DUMP_SIZE;
 
-	*data = zbx_malloc(*data, data_alloc);
+	*data = (char *)zbx_malloc(*data, data_alloc);
 	zbx_snprintf_alloc(data, &data_alloc, &data_offset, "code:%u size:%u data:", message->code, message->size);
 
 	for (i = 0; i < data_num; i++)
@@ -1315,7 +1320,7 @@ void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src)
 {
 	dst->code = src->code;
 	dst->size = src->size;
-	dst->data = zbx_malloc(NULL, src->size);
+	dst->data = (unsigned char *)zbx_malloc(NULL, src->size);
 	memcpy(dst->data, src->data, src->size);
 }
 
@@ -1430,11 +1435,8 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 
 	mode = umask(077);
 
-	if (NULL == (socket_path = ipc_make_path(service_name)))
-	{
-		*error = zbx_dsprintf(*error, "Invalid service name \"%s\".", service_name);
+	if (NULL == (socket_path = ipc_make_path(service_name, error)))
 		goto out;
-	}
 
 	if (0 == access(socket_path, F_OK))
 	{
@@ -1514,7 +1516,7 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 	close(service->fd);
 
 	for (i = 0; i < service->clients.values_num; i++)
-		ipc_client_free(service->clients.values[i]);
+		ipc_client_free((zbx_ipc_client_t *)service->clients.values[i]);
 
 	zbx_free(service->path);
 
@@ -1577,7 +1579,7 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client
 
 	if (NULL != (*client = ipc_service_pop_client(service)))
 	{
-		if (NULL != (*message = zbx_queue_ptr_pop(&(*client)->rx_queue)))
+		if (NULL != (*message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&(*client)->rx_queue)))
 		{
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 			{
@@ -1629,7 +1631,7 @@ int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsig
 	zbx_ipc_message_t	*message;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() client:" ZBX_FS_UI64, __function_name, client, client->id);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clientid:" ZBX_FS_UI64, __function_name, client->id);
 
 	if (0 != client->tx_bytes)
 	{
@@ -1646,7 +1648,7 @@ int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsig
 	{
 		client->tx_header[ZBX_IPC_MESSAGE_CODE] = code;
 		client->tx_header[ZBX_IPC_MESSAGE_SIZE] = size;
-		client->tx_data = zbx_malloc(NULL, size);
+		client->tx_data = (unsigned char *)zbx_malloc(NULL, size);
 		memcpy(client->tx_data, data, size);
 		client->tx_bytes = ZBX_IPC_HEADER_SIZE + size - tx_size;
 		event_add(client->tx_event, NULL);

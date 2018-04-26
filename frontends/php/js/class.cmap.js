@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -245,6 +245,13 @@ ZABBIX.apps.map = (function($) {
 			});
 		};
 
+		CMap.LABEL_TYPE_LABEL	= 0; // MAP_LABEL_TYPE_LABEL
+		CMap.LABEL_TYPE_IP		= 1; // MAP_LABEL_TYPE_IP
+		CMap.LABEL_TYPE_NAME	= 2; // MAP_LABEL_TYPE_NAME
+		CMap.LABEL_TYPE_STATUS	= 3; // MAP_LABEL_TYPE_STATUS
+		CMap.LABEL_TYPE_NOTHING	= 4; // MAP_LABEL_TYPE_NOTHING
+		CMap.LABEL_TYPE_CUSTOM	= 5; // MAP_LABEL_TYPE_CUSTOM
+
 		CMap.prototype = {
 			copypaste_buffer: [],
 			buffered_expand: false,
@@ -289,7 +296,7 @@ ZABBIX.apps.map = (function($) {
 				var url = new Curl(location.href);
 
 				if (source !== null) {
-					if ((/\{.+\}/.test(source.data.label) || /\{.+\}/.test(source.data.text))) {
+					if (/\{.+\}/.test(source.getLabel(false))) {
 						this.expand_sources.push(source);
 					}
 					else {
@@ -352,13 +359,11 @@ ZABBIX.apps.map = (function($) {
 				Object.keys(this.selements).forEach(function(key) {
 					var element = {};
 
-					['selementid', 'x', 'y', 'label', 'label_location'].forEach(function (name) {
+					['selementid', 'x', 'y', 'label_location'].forEach(function (name) {
 						element[name] = this.selements[key].data[name];
 					}, this);
 
-					if (this.data.expand_macros === '1' && typeof(this.selements[key].expanded) === 'string') {
-						element['label'] = this.selements[key].expanded;
-					}
+					element['label'] = this.selements[key].getLabel();
 
 					// host group elements
 					if (this.selements[key].data.elementtype == '3' && this.selements[key].data.elementsubtype == '1') {
@@ -378,14 +383,11 @@ ZABBIX.apps.map = (function($) {
 
 				Object.keys(this.links).forEach(function(key) {
 					var link = {};
-					['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label'].forEach(function (name) {
+					['linkid', 'selementid1', 'selementid2', 'drawtype', 'color'].forEach(function (name) {
 						link[name] = this.links[key].data[name];
 					}, this);
 
-					if (this.data.expand_macros === '1' && typeof(this.links[key].expanded) === 'string') {
-						link['label'] = this.links[key].expanded;
-					}
-
+					link['label'] = this.links[key].getLabel();
 					links.push(link);
 				}, this);
 
@@ -395,15 +397,11 @@ ZABBIX.apps.map = (function($) {
 						shape[name] = this.shapes[key].data[name];
 					}, this);
 
-					if (this.data.expand_macros === '1') {
-						if (typeof(this.shapes[key].expanded) === 'string') {
-							shape['text'] = this.shapes[key].expanded;
-						}
+					shape['text'] = this.shapes[key].getLabel();
 
+					if (this.data.expand_macros === '1' && typeof(shape['text']) === 'string' && shape['text'] !== '') {
 						// Additional macro that is supported in shapes is {MAP.NAME}
-						if (typeof(shape['text']) === 'string' && shape['text'] !== '') {
-							shape['text'] = shape['text'].replace(/\{MAP\.NAME\}/g, this.data.name);
-						}
+						shape['text'] = shape['text'].replace(/\{MAP\.NAME\}/g, this.data.name);
 					}
 
 					shapes.push(shape);
@@ -771,23 +769,26 @@ ZABBIX.apps.map = (function($) {
 					switch (obj.val()) {
 						// host
 						case '0':
-							jQuery('#elementNameHost').multiSelect('clean');
+							$('#elementNameHost').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
 							break;
 
 						// triggers
 						case '2':
-							jQuery('#elementNameTriggers').multiSelect('clean');
+							$('#elementNameTriggers').multiSelect('clean');
 							$('#triggerContainer tbody').html('');
 							break;
 
 						// host group
 						case '3':
-							jQuery('#elementNameHostGroup').multiSelect('clean');
+							$('#elementNameHostGroup').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
 							break;
 
 						// others types
 						default:
 							$('input[name=elementName]').val('');
+							$('#triggerContainer tbody').html('');
 					}
 				});
 
@@ -867,13 +868,22 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// application selection pop up
-				$('#application-select').click(function() {
-					var data = $('#elementNameHost').multiSelect('getData');
+				$('#application-select').click(function(event) {
+					var data = $('#elementNameHost').multiSelect('getData'),
+						popup_options = {
+							srctbl: 'applications',
+							srcfld1: 'name',
+							dstfrm: 'selementForm',
+							dstfld1: 'application',
+							real_hosts: '1',
+							with_applications: '1'
+						};
 
-					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
-						+ '&with_applications=1&dstfrm=selementForm'
-						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : '')
-					);
+					if (data.length > 0 && $('#elementType').val() == '4') {
+						popup_options['hostid'] = data[0].id;
+					}
+
+					PopUp('popup.generic', popup_options, null, event.target);
 				});
 
 				// mass update form
@@ -1190,6 +1200,7 @@ ZABBIX.apps.map = (function($) {
 					if (element) {
 						data.x = parseInt(data.x, 10) + delta_x;
 						data.y = parseInt(data.y, 10) + delta_y;
+						element.expanded = element_data.expanded;
 
 						if (type === 'shapes' && data.type == SVGMapShape.TYPE_LINE) {
 							// Additional shift for line shape.
@@ -1332,7 +1343,7 @@ ZABBIX.apps.map = (function($) {
 
 				// Clean trigger selement.
 				if ($('#elementType').val() == 2) {
-					jQuery('#elementNameTriggers').multiSelect('clean');
+					$('#elementNameTriggers').multiSelect('clean');
 					$('#triggerContainer tbody').html('');
 				}
 			},
@@ -1619,6 +1630,27 @@ ZABBIX.apps.map = (function($) {
 
 		Link.prototype = {
 			/**
+			 * Return label based on map constructor configuration.
+			 *
+			 * @param {boolean} return label with expanded macros.
+			 *
+			 * @returns {string}
+			 */
+			getLabel: function (expand) {
+				var label = this.data.label;
+
+				if (typeof(expand) === 'undefined') {
+					expand = true;
+				}
+
+				if (expand && typeof(this.expanded) === 'string' && this.sysmap.data.expand_macros === '1') {
+					label = this.expanded;
+				}
+
+				return label;
+			},
+
+			/**
 			 * Updades values in property data.
 			 *
 			 * @param {object} data
@@ -1793,6 +1825,27 @@ ZABBIX.apps.map = (function($) {
 				else {
 					sysmap.updateImage();
 				}
+			},
+
+			/**
+			 * Return label based on map constructor configuration.
+			 *
+			 * @param {boolean} return label with expanded macros.
+			 *
+			 * @returns {string}
+			 */
+			getLabel: function (expand) {
+				var label = this.data.text;
+
+				if (typeof(expand) === 'undefined') {
+					expand = true;
+				}
+
+				if (expand && typeof(this.expanded) === 'string' && this.sysmap.data.expand_macros === '1') {
+					label = this.expanded;
+				}
+
+				return label;
 			},
 
 			/**
@@ -2180,7 +2233,8 @@ ZABBIX.apps.map = (function($) {
 					urls: {},
 					elementName: this.sysmap.defaultIconName, // first image name
 					use_iconmap: '1',
-					application: ''
+					application: '',
+					inherited_label: null
 				};
 			}
 			else {
@@ -2190,6 +2244,7 @@ ZABBIX.apps.map = (function($) {
 			}
 
 			this.data = selementData;
+			this.updateLabel();
 			this.id = this.data.selementid;
 			this.expanded = this.data.expanded;
 			delete this.data.expanded;
@@ -2215,6 +2270,12 @@ ZABBIX.apps.map = (function($) {
 			});
 		}
 
+		Selement.TYPE_HOST			= 0; // SYSMAP_ELEMENT_TYPE_HOST
+		Selement.TYPE_MAP			= 1; // SYSMAP_ELEMENT_TYPE_MAP
+		Selement.TYPE_TRIGGER		= 2; // SYSMAP_ELEMENT_TYPE_TRIGGER
+		Selement.TYPE_HOST_GROUP	= 3; // SYSMAP_ELEMENT_TYPE_HOST_GROUP
+		Selement.TYPE_IMAGE			= 4; // SYSMAP_ELEMENT_TYPE_IMAGE
+
 		Selement.prototype = {
 			/**
 			 * Returns element data.
@@ -2230,6 +2291,102 @@ ZABBIX.apps.map = (function($) {
 			 * Allows resizing of element
 			 */
 			makeResizable: Shape.prototype.makeResizable,
+
+			/**
+			 * Update label data inherited from map configuration.
+			 */
+			updateLabel: function () {
+				if (this.sysmap.data.label_format != 0) {
+					switch (parseInt(this.data.elementtype, 10)) {
+						case Selement.TYPE_HOST_GROUP:
+							this.data.label_type = this.sysmap.data.label_type_hostgroup;
+							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+								this.data.inherited_label = this.sysmap.data.label_string_hostgroup;
+							}
+							break;
+
+						case Selement.TYPE_HOST:
+							this.data.label_type = this.sysmap.data.label_type_host;
+							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+								this.data.inherited_label = this.sysmap.data.label_string_host;
+							}
+							break;
+
+						case Selement.TYPE_TRIGGER:
+							this.data.label_type = this.sysmap.data.label_type_trigger;
+							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+								this.data.inherited_label = this.sysmap.data.label_string_trigger;
+							}
+							break;
+
+						case Selement.TYPE_MAP:
+							this.data.label_type = this.sysmap.data.label_type_map;
+							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+								this.data.inherited_label = this.sysmap.data.label_string_map;
+							}
+							break;
+
+						case Selement.TYPE_IMAGE:
+							this.data.label_type = this.sysmap.data.label_type_image;
+							if (this.data.label_type == CMap.LABEL_TYPE_CUSTOM) {
+								this.data.inherited_label = this.sysmap.data.label_string_image;
+							}
+							break;
+					}
+				}
+				else {
+					this.data.label_type = this.sysmap.data.label_type;
+					this.data.inherited_label = null;
+				}
+
+				if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
+					if (this.data.elementtype != Selement.TYPE_IMAGE) {
+						this.data.inherited_label = this.data.elements[0].elementName;
+					}
+					else {
+						this.data.inherited_label = locale['S_IMAGE'];
+					}
+				}
+
+				if (this.data.label_type != CMap.LABEL_TYPE_CUSTOM && this.data.label_type != CMap.LABEL_TYPE_LABEL
+						&& this.data.label_type != CMap.LABEL_TYPE_IP) {
+					this.data.expanded = null;
+				}
+				else if (this.data.label_type == CMap.LABEL_TYPE_IP && this.data.elementtype == Selement.TYPE_HOST) {
+					this.data.inherited_label = '{HOST.IP}';
+				}
+			},
+
+			/**
+			 * Return label based on map constructor configuration.
+			 *
+			 * @param {boolean} return label with expanded macros.
+			 *
+			 * @returns {string} or null
+			 */
+			getLabel: function (expand) {
+				var label = this.data.label;
+
+				if (typeof(expand) === 'undefined') {
+					expand = true;
+				}
+
+				if (this.data.label_type != CMap.LABEL_TYPE_NOTHING && this.data.label_type != CMap.LABEL_TYPE_STATUS) {
+					if (expand && typeof(this.expanded) === 'string' && (this.sysmap.data.expand_macros === '1'
+							|| (this.data.label_type == CMap.LABEL_TYPE_IP
+							&& this.data.elementtype == Selement.TYPE_HOST))) {
+						label = this.expanded;
+					}
+					else if (typeof this.data.inherited_label === 'string') {
+						label = this.data.inherited_label;
+					}
+				}
+				else {
+					label = null;
+				}
+
+				return label;
+			},
 
 			/**
 			 * Updates element fields.
@@ -2323,6 +2480,7 @@ ZABBIX.apps.map = (function($) {
 					this.data.elementName = this.data.elements[0].elementName;
 				}
 
+				this.updateLabel();
 				this.updateIcon();
 				this.align(false);
 				this.trigger('afterMove', this);
@@ -2575,8 +2733,12 @@ ZABBIX.apps.map = (function($) {
 					editable: true
 				},
 				popup: {
-					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
-						'&srcfld1=hostid'
+					parameters: {
+						srctbl: 'hosts',
+						srcfld1: 'hostid',
+						dstfrm: 'selementForm',
+						dstfld1: 'elementNameHost'
+					}
 				}
 			});
 
@@ -2590,8 +2752,16 @@ ZABBIX.apps.map = (function($) {
 					real_hosts: true
 				},
 				popup: {
-					parameters: 'dstfrm=selementForm&dstfld1=elementNameTriggers&srctbl=triggers' +
-						'&srcfld1=triggerid&with_triggers=1&real_hosts=1&multiselect=1'
+					parameters: {
+						srctbl: 'triggers',
+						srcfld1: 'triggerid',
+						dstfrm: 'selementForm',
+						dstfld1: 'elementNameTriggers',
+						with_triggers: '1',
+						real_hosts: '1',
+						multiselect: '1',
+						noempty: '1'
+					}
 				}
 			});
 
@@ -2605,8 +2775,12 @@ ZABBIX.apps.map = (function($) {
 					editable: true
 				},
 				popup: {
-					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
-						'&srcfld1=groupid'
+					parameters: {
+						srctbl: 'host_groups',
+						srcfld1: 'groupid',
+						dstfrm: 'selementForm',
+						dstfld1: 'elementNameHostGroup'
+					}
 				}
 			});
 
@@ -2858,7 +3032,9 @@ ZABBIX.apps.map = (function($) {
 							data.elements[i] = {
 								triggerid: $(this).val(),
 								elementName: $('input[name^="element_name[' + $(this).val() + ']"]').val(),
-								priority: $('input[name^="element_priority[' + $(this).val() + ']"]').val()
+								priority: $('input[name^="element_priority[' + $(this).val() + ']"]').val(),
+								elementExpressionTrigger: $('input[name^="element_expression[' + $(this).val()
+									+ ']"]').val()
 							};
 							i++;
 						});
@@ -3744,7 +3920,9 @@ ZABBIX.apps.map = (function($) {
 				}
 			}
 
-			sysmap.updateImage();
+			if (sysmap.buffered_expand === false) {
+				sysmap.updateImage();
+			}
 		});
 
 		return sysmap;

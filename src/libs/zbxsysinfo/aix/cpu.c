@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,9 @@
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
-	char			*tmp;
-	perfstat_cpu_total_t	ps_cpu_total;
+	char				*tmp;
+	perfstat_partition_config_t	part_cfg;
+	int				rc;
 
 	if (1 < request->nparam)
 	{
@@ -43,13 +44,15 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
+	rc = perfstat_partition_config(NULL, &part_cfg, sizeof(perfstat_partition_config_t), 1);
+
+	if (1 != rc)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_UI64_RESULT(result, ps_cpu_total.ncpus);
+	SET_UI64_RESULT(result, part_cfg.lcpus);
 
 	return SYSINFO_RET_OK;
 #else

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,32 +20,20 @@
 #ifndef ZABBIX_EVENTS_H
 #define ZABBIX_EVENTS_H
 
-#define ZBX_EVENTS_SKIP_CORRELATION	0
-#define ZBX_EVENTS_PROCESS_CORRELATION	1
-
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);
-int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value);
+		unsigned char trigger_value, const char *error);
 
-int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *ts, zbx_uint64_t userid, zbx_uint64_t correlationid, zbx_uint64_t c_eventid,
-		const char *trigger_description, const char *trigger_expression,
-		const char *trigger_recovery_expression, unsigned char trigger_priority, unsigned char trigger_type,
-		const zbx_vector_ptr_t *trigger_tags, unsigned char trigger_correlation_mode,
-		const char *trigger_correlation_tag, unsigned char trigger_value);
+int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid);
 
-int	process_events(void);
-int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock, int mode);
-int	flush_correlated_events(void);
-
-void	get_db_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
-		zbx_vector_uint64_t *r_eventids);
-void	get_db_events_info(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
-void	free_db_event(DB_EVENT *event);
+int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+void	zbx_clean_events(void);
+void	zbx_export_events(void);
+int	zbx_flush_correlated_events(void);
 
 #endif

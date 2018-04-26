@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@ $sort_div = (new CSpan())
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
@@ -55,7 +56,7 @@ $table = (new CTableInfo())
 		_('Info'),
 		($data['sortfield'] === 'host') ? [_('Host'), $sort_div] : _('Host'),
 		[
-			($data['sortfield'] === 'problem') ? [_('Problem'), $sort_div] : _('Problem'),
+			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
 			' &bullet; ',
 			($data['sortfield'] === 'priority') ? [_('Severity'), $sort_div] : _('Severity')
 		],
@@ -69,7 +70,7 @@ $today = strtotime('today');
 $last_clock = 0;
 
 if ($data['data']['problems']) {
-	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
+	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
 if ($data['config']['event_ack_enable']) {
 	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
@@ -109,6 +110,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+
+	$is_acknowledged = $data['config']['event_ack_enable'] && (bool) $problem['acknowledges'];
+
 	if ($show_recovery_data) {
 		if ($problem['r_eventid'] != 0) {
 			$cell_r_clock = ($problem['r_clock'] >= $today)
@@ -125,9 +129,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$cell_status = new CSpan($value_str);
 
 		// Add colors and blinking to span depending on configuration and trigger parameters.
-		addTriggerValueStyle($cell_status, $value, $value_clock,
-			$data['config']['event_ack_enable'] && (bool) $problem['acknowledges']
-		);
+		addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 	}
 
 	// Info.
@@ -135,9 +137,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	if ($problem['r_eventid'] != 0) {
 		if ($problem['correlationid'] != 0) {
 			$info_icons[] = makeInformationIcon(
-				array_key_exists($problem['correlationid'], $data['correlations'])
+				array_key_exists($problem['correlationid'], $data['data']['correlations'])
 					? _s('Resolved by correlation rule "%1$s".',
-						$data['correlations'][$problem['correlationid']]['name']
+						$data['data']['correlations'][$problem['correlationid']]['name']
 					)
 					: _('Resolved by correlation rule.')
 			);
@@ -151,27 +153,28 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	$description_style = getSeverityStyle($trigger['priority'], $value == TRIGGER_VALUE_TRUE);
 	$description = (new CCol([
-		(new CSpan(CMacrosResolverHelper::resolveEventDescription(
-			$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-		)))
+		(new CLinkAction($problem['name']))
 			->setHint(
 				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
 				true
 			)
-			->addClass(ZBX_STYLE_LINK_ACTION)
-	]))
-		->addClass($description_style);
+	]));
 
-	if (!$show_recovery_data) {
+	$description_style = getSeverityStyle($trigger['priority']);
+
+	if ($value == TRIGGER_VALUE_TRUE) {
+		$description->addClass($description_style);
+	}
+
+	if (!$show_recovery_data && $data['config'][$is_acknowledged ? 'problem_ack_style' : 'problem_unack_style']) {
 		// blinking
 		$duration = time() - $problem['clock'];
 
 		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
 			$description->addClass('blink');
 			$description->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration);
-			$description->setAttribute('data-toggle-class', $description_style);
+			$description->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,21 +83,30 @@ class CConfigurationExport {
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
 				'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid'
+				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
+				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
+				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
+				'verify_host', 'allow_traps'
 			],
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'filter', 'lifetime', 'jmx_endpoint'
+				'filter', 'lifetime', 'jmx_endpoint', 'timeout', 'url', 'query_fields', 'posts', 'status_codes',
+				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
+				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
+				'allow_traps'
 			],
 			'item_prototype' => ['hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
 				'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid'
+				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
+				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
+				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
+				'verify_host', 'allow_traps'
 			]
 		];
 	}

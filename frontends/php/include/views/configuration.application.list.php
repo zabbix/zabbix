@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,31 +19,35 @@
 **/
 
 
-if ($this->data['hostid'] == 0) {
-	$create_button = (new CSubmit('form', _('Create application (select host first)')))->setEnabled(false);
-}
-else {
-	$create_button = new CSubmit('form', _('Create application'));
-}
-
 $widget = (new CWidget())
 	->setTitle(_('Applications'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-			->addItem([
-				new CLabel(_('Host'), 'hostid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getHostsCB()
-			])
-			->addItem($create_button)
-		)
-	)
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
+				])
+				->addItem([
+					new CLabel(_('Host'), 'hostid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getHostsCB()
+				])
+			),
+		(new CTag('nav', true, ($data['hostid'] == 0)
+			? (new CButton('form', _('Create application (select host first)')))->setEnabled(false)
+			: new CRedirectButton(_('Create application'), (new CUrl())
+					->setArgument('form', 'create')
+					->setArgument('groupid', $this->data['pageFilter']->groupid)
+					->setArgument('hostid', $this->data['pageFilter']->hostid)
+					->getUrl()
+				)
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	]))
 	->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form

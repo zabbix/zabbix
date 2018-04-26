@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup trigger_depends
+ */
 class testTriggerDependencies extends CWebTest {
-
-	public function testTriggerDependenciesFromHost_backup() {
-		DBsave_tables('trigger_depends');
-	}
 
 	/**
 	* @dataProvider testTriggerDependenciesFromHost_SimpleTestProvider
@@ -36,12 +35,12 @@ class testTriggerDependencies extends CWebTest {
 
 		$this->zbxTestClickLinkTextWait('{HOST.NAME} has just been restarted');
 		$this->zbxTestClickWait('tab_dependenciesTab');
-		$this->zbxTestClickWait('bnt1');
-		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('hostid'));
+
+		$this->zbxTestClick('bnt1');
+		$this->zbxTestLaunchOverlayDialog('Triggers');
+
 		$this->zbxTestDropdownSelectWait('hostid', 'Template OS FreeBSD');
 		$this->zbxTestClickLinkTextWait('/etc/passwd has been changed on Template OS FreeBSD');
-		$this->zbxTestWaitWindowClose();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
 		$this->zbxTestTextPresent('Template OS FreeBSD: /etc/passwd has been changed on {HOST.NAME}');
 		$this->zbxTestClickWait('update');
@@ -53,9 +52,5 @@ class testTriggerDependencies extends CWebTest {
 			['10001', 'Cannot add dependency from a host to a template.'],
 			['10081', 'Trigger updated']
 		];
-	}
-
-	public function testTriggerDependenciesFromHost_restore() {
-		DBrestore_tables('trigger_depends');
 	}
 }

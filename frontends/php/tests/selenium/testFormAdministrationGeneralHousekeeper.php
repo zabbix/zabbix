@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -325,7 +325,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_services_mode' => true,
 					'hk_services' => 0,
 					'errors' => [
-						'Invalid IT services data storage period: must be between "86400" and "788400000"',
+						'Invalid data storage period for services: must be between "86400" and "788400000"',
 					]
 				]
 			],

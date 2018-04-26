@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,14 +44,16 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 	{
 		if (0 == strcasecmp(encoding, "UNICODE") || 0 == strcasecmp(encoding, "UNICODELITTLE") ||
 				0 == strcasecmp(encoding, "UTF-16") || 0 == strcasecmp(encoding, "UTF-16LE") ||
-				0 == strcasecmp(encoding, "UTF16") || 0 == strcasecmp(encoding, "UTF16LE"))
+				0 == strcasecmp(encoding, "UTF16") || 0 == strcasecmp(encoding, "UTF16LE") ||
+				0 == strcasecmp(encoding, "UCS-2") || 0 == strcasecmp(encoding, "UCS-2LE"))
 		{
 			*cr = "\r\0";
 			*lf = "\n\0";
 			*szbyte = 2;
 		}
 		else if (0 == strcasecmp(encoding, "UNICODEBIG") || 0 == strcasecmp(encoding, "UNICODEFFFE") ||
-				0 == strcasecmp(encoding, "UTF-16BE") || 0 == strcasecmp(encoding, "UTF16BE"))
+				0 == strcasecmp(encoding, "UTF-16BE") || 0 == strcasecmp(encoding, "UTF16BE") ||
+				0 == strcasecmp(encoding, "UCS-2BE"))
 		{
 			*cr = "\0\r";
 			*lf = "\0\n";
@@ -83,17 +85,8 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
  *             buf      - [IN] buffer to read into                            *
  *             count    - [IN] buffer size in bytes                           *
  *             encoding - [IN] pointer to a text string describing encoding.  *
- *                        The following encodings are recognized:             *
- *                          "UNICODE"                                         *
- *                          "UNICODEBIG"                                      *
- *                          "UNICODEFFFE"                                     *
- *                          "UNICODELITTLE"                                   *
- *                          "UTF-16"   "UTF16"                                *
- *                          "UTF-16BE" "UTF16BE"                              *
- *                          "UTF-16LE" "UTF16LE"                              *
- *                          "UTF-32"   "UTF32"                                *
- *                          "UTF-32BE" "UTF32BE"                              *
- *                          "UTF-32LE" "UTF32LE".                             *
+ *                        See function find_cr_lf_szbyte() for supported      *
+ *                        encodings.                                          *
  *                        "" (empty string) means a single-byte character set.*
  *                                                                            *
  * Return value: On success, the number of bytes read is returned (0 (zero)   *
@@ -106,20 +99,19 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
  ******************************************************************************/
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 {
-	size_t		i, szbyte;
+	size_t		i, szbyte, nbytes;
 	const char	*cr, *lf;
-	int		nbytes;
 	zbx_offset_t	offset;
 
 	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		return -1;
 
-	if (0 >= (nbytes = (int)read(fd, buf, count)))
-		return nbytes;
+	if (0 >= (nbytes = read(fd, buf, (unsigned int)count)))
+		return (int)nbytes;
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
-	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
+	for (i = 0; i <= nbytes - szbyte; i += szbyte)
 	{
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 		{
@@ -130,7 +122,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		{
 			/* CR+LF (Windows) ? */
-			if (i < (size_t)nbytes - szbyte && 0 == memcmp(&buf[i + szbyte], lf, szbyte))
+			if (i < nbytes - szbyte && 0 == memcmp(&buf[i + szbyte], lf, szbyte))
 				i += szbyte;
 
 			i += szbyte;

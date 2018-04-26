@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,10 @@ $dbTrigger = reset($dbTriggers);
 /*
  * Display
  */
-$startTime = microtime(true);
+$debug_mode = CWebUser::getDebugMode();
+if ($debug_mode) {
+	$start_time = microtime(true);
+}
 
 $sizeX = 900;
 $sizeY = 300;
@@ -164,12 +167,12 @@ imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 54, $shiftX + 5, $sizeY 
 imagerectangle($im, $shiftX, $sizeY + $shiftYup + 54, $shiftX + 5, $sizeY + $shiftYup + 59, $black);
 imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 60, $black, _('Problems').' (%)');
 
-imagestringup($im, 1, imagesx($im) - 10, imagesy($im) - 50, ZABBIX_HOMEPAGE, $gray);
-
-$str = sprintf('%0.2f', microtime(true) - $startTime);
-$str = _s('Generated in %s sec', $str);
-$strSize = imageTextSize(6, 0, $str);
-imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gray, $str);
+if ($debug_mode) {
+	$str = sprintf('%0.2f', microtime(true) - $start_time);
+	$str = _s('Generated in %s sec', $str);
+	$str_size = imageTextSize(6, 0, $str);
+	imageText($im, 6, 0, imagesx($im) - $str_size['width'] - 5, imagesy($im) - 5, $gray, $str);
+}
 
 imageOut($im);
 imagedestroy($im);

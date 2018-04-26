@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,13 +77,14 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	const char		*key;
 	const char		*port;
-	const char		*db_error;
+	const char		*error;
 	const char		*delay;
 	ZBX_DC_TRIGGER		**triggers;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
 	int			data_expected_from;
+	int			history_sec;
 	unsigned char		history;
 	unsigned char		type;
 	unsigned char		value_type;
@@ -94,12 +95,9 @@ typedef struct
 	unsigned char		location;
 	unsigned char		flags;
 	unsigned char		status;
-	unsigned char		unreachable;
+	unsigned char		queue_priority;
 	unsigned char		schedulable;
 	unsigned char		update_triggers;
-
-	zbx_vector_ptr_t	preproc_ops;
-	zbx_vector_uint64_t	dep_itemids;
 }
 ZBX_DC_ITEM;
 
@@ -218,6 +216,48 @@ typedef struct
 }
 ZBX_DC_CALCITEM;
 
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_vector_uint64_t	dep_itemids;
+}
+ZBX_DC_MASTERITEM;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_vector_ptr_t	preproc_ops;
+}
+ZBX_DC_PREPROCITEM;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	const char	*timeout;
+	const char	*url;
+	const char	*query_fields;
+	const char	*status_codes;
+	const char	*http_proxy;
+	const char	*headers;
+	const char	*username;
+	const char	*ssl_cert_file;
+	const char	*ssl_key_file;
+	const char	*ssl_key_password;
+	const char	*password;
+	const char	*posts;
+	const char	*trapper_hosts;
+	unsigned char	authtype;
+	unsigned char	follow_redirects;
+	unsigned char	post_type;
+	unsigned char	retrieve_mode;
+	unsigned char	request_method;
+	unsigned char	output_format;
+	unsigned char	verify_peer;
+	unsigned char	verify_host;
+	unsigned char	allow_traps;
+}
+ZBX_DC_HTTPITEM;
+
 typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -298,6 +338,7 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	unsigned char	inventory_mode;
+	const char	*values[HOST_INVENTORY_FIELD_COUNT];
 }
 ZBX_DC_HOST_INVENTORY;
 
@@ -320,8 +361,12 @@ typedef struct
 	int		nextcheck;
 	int		timediff;
 	int		lastaccess;
+	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
+						/* or 0 if no error */
 	int		version;
 	unsigned char	location;
+	unsigned char	auto_compress;
+	const char	*proxy_address;
 }
 ZBX_DC_PROXY;
 
@@ -581,13 +626,15 @@ typedef struct
 	unsigned char	type;
 	const char	*params;
 }
-zbx_dc_item_preproc_t;
+zbx_dc_preproc_op_t;
 
 typedef struct
 {
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
+	int			proxy_lastaccess_ts;
 	int			sync_ts;
+	int			item_sync_ts;
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
@@ -603,6 +650,9 @@ typedef struct
 	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
+	zbx_hashset_t		masteritems;
+	zbx_hashset_t		preprocitems;
+	zbx_hashset_t		httpitems;
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
@@ -612,6 +662,7 @@ typedef struct
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		host_inventories;
+	zbx_hashset_t		host_inventories_auto;	/* for caching of automatically populated host inventories */
 	zbx_hashset_t		ipmihosts;
 	zbx_hashset_t		htmpls;
 	zbx_hashset_t		gmacros;
@@ -632,7 +683,7 @@ typedef struct
 	zbx_hashset_t		corr_operations;
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
-	zbx_hashset_t		item_preproc;
+	zbx_hashset_t		preprocops;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -642,6 +693,7 @@ typedef struct
 	zbx_vector_uint64_t	locked_lld_ruleids;	/* for keeping track of lld rules being processed */
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
+	zbx_hashset_t		strpool;
 }
 ZBX_DC_CONFIG;
 

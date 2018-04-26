@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,8 +45,6 @@ class CProxy extends CApiService {
 	public function get($options = []) {
 		$result = [];
 
-		$userType = self::$userData['type'];
-
 		$sqlParts = [
 			'select'	=> ['hostid' => 'h.hostid'],
 			'from'		=> ['hosts' => 'hosts h'],
@@ -57,7 +55,7 @@ class CProxy extends CApiService {
 
 		$defOptions = [
 			'proxyids'					=> null,
-			'editable'					=> null,
+			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -79,7 +77,7 @@ class CProxy extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			if ($permission == PERM_READ_WRITE) {
 				return [];
@@ -309,6 +307,11 @@ class CProxy extends CApiService {
 			if ($status == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)) {
 				$proxy['interface']['main'] = INTERFACE_PRIMARY;
 			}
+
+			// Clean proxy address field.
+			if ($status == HOST_STATUS_PROXY_PASSIVE && !array_key_exists('proxy_address', $proxy)) {
+				$proxy['proxy_address'] = '';
+			}
 		}
 		unset($proxy);
 
@@ -372,79 +375,37 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Delete proxy.
-	 *
-	 * @param array	$proxyIds
+	 * @param array	$proxyids
 	 *
 	 * @return array
 	 */
-	public function delete(array $proxyIds) {
-		$this->validateDelete($proxyIds);
+	public function delete(array $proxyids) {
+		$this->validateDelete($proxyids, $db_proxies);
 
-		$dbProxies = DBselect(
-			'SELECT h.hostid,h.host'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.hostid', $proxyIds)
-		);
-		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
+		DB::delete('interface', ['hostid' => $proxyids]);
+		DB::delete('hosts', ['hostid' => $proxyids]);
 
-		$actionIds = [];
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, $db_proxies);
 
-		// get conditions
-		$dbActions = DBselect(
-			'SELECT DISTINCT c.actionid'.
-			' FROM conditions c'.
-			' WHERE c.conditiontype='.CONDITION_TYPE_PROXY.
-				' AND '.dbConditionString('c.value', $proxyIds)
-		);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionIds[$dbAction['actionid']] = $dbAction['actionid'];
-		}
-
-		if ($actionIds) {
-			DB::update('actions', [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionIds]
-			]);
-		}
-
-		// delete action conditions
-		DB::delete('conditions', [
-			'conditiontype' => CONDITION_TYPE_PROXY,
-			'value' => $proxyIds
-		]);
-
-		// delete interface
-		DB::delete('interface', ['hostid' => $proxyIds]);
-
-		// delete host
-		DB::delete('hosts', ['hostid' => $proxyIds]);
-
-		// TODO: remove info from API
-		foreach ($dbProxies as $proxy) {
-			info(_s('Deleted: Proxy "%1$s".', $proxy['host']));
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].'] ['.$proxy['hostid'].']');
-		}
-
-		return ['proxyids' => $proxyIds];
+		return ['proxyids' => $proxyids];
 	}
 
 	/**
-	 * Check if proxies can be deleted.
-	 *  - only super admin can delete proxy
-	 *  - cannot delete proxy if it is used to monitor host
-	 *  - cannot delete proxy if it is used in discovery rule
-	 *
 	 * @param array $proxyids
+	 * @param array $db_proxies
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $proxyids) {
-		if (empty($proxyids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	private function validateDelete(array &$proxyids, array &$db_proxies = null) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $proxyids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_proxies = $this->get([
-			'output' => [],
+			'output' => ['proxyid', 'host'],
 			'proxyids' => $proxyids,
+			'editable' => true,
 			'preservekeys' => true
 		]);
 
@@ -456,47 +417,71 @@ class CProxy extends CApiService {
 			}
 		}
 
-		$this->checkUsedInDiscoveryRule($proxyids);
-		$this->checkUsedForMonitoring($proxyids);
+		$this->checkUsedInDiscovery($db_proxies);
+		$this->checkUsedInHosts($db_proxies);
+		$this->checkUsedInActions($db_proxies);
 	}
 
 	/**
-	 * Check if proxy is used in discovery rule.
+	 * Check if proxy is used in network discovery rule.
 	 *
-	 * @param array $proxyIds
+	 * @param array  $proxies
+	 * @param string $proxies[<proxyid>]['host']
 	 */
-	protected function checkUsedInDiscoveryRule(array $proxyIds) {
-		$dRule = DBfetch(DBselect(
-			'SELECT dr.druleid,dr.name,dr.proxy_hostid'.
-			' FROM drules dr'.
-			' WHERE '.dbConditionInt('dr.proxy_hostid', $proxyIds),
-			1
-		));
-		if ($dRule) {
-			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($dRule['proxy_hostid'])));
+	private function checkUsedInDiscovery(array $proxies) {
+		$db_drules = DB::select('drules', [
+			'output' => ['proxy_hostid', 'name'],
+			'filter' => ['proxy_hostid' => array_keys($proxies)],
+			'limit' => 1
+		]);
 
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Proxy "%1$s" is used by discovery rule "%2$s".', $proxy['host'], $dRule['name']));
+		if ($db_drules) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%1$s" is used by discovery rule "%2$s".',
+				$proxies[$db_drules[0]['proxy_hostid']]['host'], $db_drules[0]['name']
+			));
 		}
 	}
 
 	/**
 	 * Check if proxy is used to monitor hosts.
 	 *
-	 * @param array $proxyIds
+	 * @param array  $proxies
+	 * @param string $proxies[<proxyid>]['host']
 	 */
-	protected function checkUsedForMonitoring(array $proxyIds) {
-		$host = DBfetch(DBselect(
-			'SELECT h.name,h.proxy_hostid'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.proxy_hostid', $proxyIds),
+	protected function checkUsedInHosts(array $proxies) {
+		$db_hosts = DB::select('hosts', [
+			'output' => ['proxy_hostid', 'name'],
+			'filter' => ['proxy_hostid' => array_keys($proxies)],
+			'limit' => 1
+		]);
+
+		if ($db_hosts) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" is monitored with proxy "%2$s".',
+				$db_hosts[0]['name'], $proxies[$db_hosts[0]['proxy_hostid']]['host']
+			));
+		}
+	}
+
+	/**
+	 * Check if proxy is used in actions.
+	 *
+	 * @param array  $proxies
+	 * @param string $proxies[<proxyid>]['host']
+	 */
+	private function checkUsedInActions(array $proxies) {
+		$db_actions = DBfetchArray(DBselect(
+			'SELECT a.name,c.value AS proxy_hostid'.
+			' FROM actions a,conditions c'.
+			' WHERE a.actionid=c.actionid'.
+				' AND c.conditiontype='.CONDITION_TYPE_PROXY.
+				' AND '.dbConditionString('c.value', array_keys($proxies)),
 			1
 		));
-		if ($host) {
-			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($host['proxy_hostid'])));
 
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Host "%1$s" is monitored with proxy "%2$s".', $host['name'], $proxy['host']));
+		if ($db_actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%1$s" is used by action "%2$s".',
+				$proxies[$db_actions[0]['proxy_hostid']]['host'], $db_actions[0]['name']
+			));
 		}
 	}
 
@@ -623,12 +608,14 @@ class CProxy extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $proxies) {
-		$proxy_db_fields = ['host' => null];
+		$proxy_db_fields = ['host' => null, 'status' => null];
 		$names = [];
+
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
 
 		foreach ($proxies as $proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%1$s".', $proxy['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
@@ -653,10 +640,7 @@ class CProxy extends CApiService {
 		$hostids = [];
 
 		foreach ($proxies as $proxy) {
-			if (!array_key_exists('status', $proxy)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No status for proxy.'));
-			}
-			elseif ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
+			if ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value used for proxy status "%1$s".', $proxy['status'])
 				);
@@ -669,8 +653,33 @@ class CProxy extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
 			}
 
+			if (array_key_exists('proxy_address', $proxy)) {
+				switch ($proxy['status']) {
+					case HOST_STATUS_PROXY_PASSIVE:
+						if ($proxy['proxy_address'] !== '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'proxy_address', _('should be empty')
+							));
+						}
+						break;
+
+					case HOST_STATUS_PROXY_ACTIVE:
+						if ($proxy['proxy_address'] !== '' && !$ip_range_parser->parse($proxy['proxy_address'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'proxy_address', $ip_range_parser->getError()
+							));
+						}
+						break;
+				}
+			}
+
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
 				$hostids = array_merge($hostids, zbx_objectValues($proxy['hosts'], 'hostid'));
+			}
+
+			// Propery 'auto_compress' is read-only.
+			if (array_key_exists('auto_compress', $proxy)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
 
@@ -709,9 +718,11 @@ class CProxy extends CApiService {
 		$proxy_db_fields = ['proxyid' => null];
 		$names = [];
 
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+
 		foreach ($proxies as $proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%1$s".', $proxy['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
 			if (!array_key_exists($proxy['proxyid'], $db_proxies)) {
@@ -729,6 +740,11 @@ class CProxy extends CApiService {
 				if ($proxy['host'] !== $db_proxies[$proxy['proxyid']]['host']) {
 					$names[$proxy['host']] = true;
 				}
+			}
+
+			// Propery 'auto_compress' is read-only.
+			if (array_key_exists('auto_compress', $proxy)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
 
@@ -758,6 +774,26 @@ class CProxy extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value used for proxy status "%1$s".', $proxy['status'])
 				);
+			}
+
+			if (array_key_exists('proxy_address', $proxy)) {
+				switch (array_key_exists('status', $proxy) ? $proxy['status'] : $db_proxy['status']) {
+					case HOST_STATUS_PROXY_PASSIVE:
+						if ($proxy['proxy_address'] !== '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'proxy_address', _('should be empty')
+							));
+						}
+						break;
+
+					case HOST_STATUS_PROXY_ACTIVE:
+						if ($proxy['proxy_address'] !== '' && !$ip_range_parser->parse($proxy['proxy_address'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'proxy_address', $ip_range_parser->getError()
+							));
+						}
+						break;
+				}
 			}
 
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {

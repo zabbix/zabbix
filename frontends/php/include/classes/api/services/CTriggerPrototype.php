@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,16 +31,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Get trigger prototypes from database.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/get
-	 *
 	 * @param array $options
 	 *
 	 * @return array|int
 	 */
 	public function get(array $options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userId = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['triggers' => 't.triggerid'],
@@ -66,7 +62,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'active' 						=> null,
 			'maintenance'					=> null,
 			'nopermissions'					=> null,
-			'editable'						=> null,
+			'editable'						=> false,
 			// filter
 			'group'							=> null,
 			'host'							=> null,
@@ -98,10 +94,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + permission check
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userId);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
@@ -427,8 +422,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Create new trigger prototypes.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/create
-	 *
 	 * @param array $trigger_prototypes
 	 *
 	 * @return array
@@ -463,8 +456,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Update existing trigger prototypes.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/update
-	 *
 	 * @param array $trigger_prototypes
 	 *
 	 * @return array
@@ -498,8 +489,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 	/**
 	 * Delete existing trigger prototypes.
-	 *
-	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/delete
 	 *
 	 * @param array $triggerPrototypeIds
 	 * @param bool  $nopermissions

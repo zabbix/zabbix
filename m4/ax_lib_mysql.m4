@@ -78,73 +78,57 @@ AC_DEFUN([AX_LIB_MYSQL],
 
     if test "$want_mysql" = "yes"; then
 
-        AC_PATH_PROG([MYSQL_CONFIG], [mysql_config], [])
+        AC_PATH_PROGS(MYSQL_CONFIG, mysql_config mariadb_config)
 
         if test -x "$MYSQL_CONFIG"; then
-
             MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
-
             _full_libmysql_libs="`$MYSQL_CONFIG --libs`"
+
+             _save_mysql_ldflags="${LDFLAGS}"
+            _save_mysql_cflags="${CFLAGS}"
+            LDFLAGS="${LDFLAGS} ${_full_libmysql_libs}"
+            CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
             for i in $_full_libmysql_libs; do
                 case $i in
-                    -lmysqlclient)
-                        _client_lib_name="mysqlclient"
-                ;;
-                    -lperconaserverclient)
-                        _client_lib_name="perconaserverclient"
+                    -lmysqlclient|-lperconaserverclient|-lmariadbclient|-lmariadb)
 
-                ;;
-                    -lmariadbclient)
-                        _client_lib_name="mariadbclient"
+                        _lib_name="`echo "$i" | cut -b3-`"
+                        AC_CHECK_LIB($_lib_name, main, [
+                        	MYSQL_LIBS="-l${_lib_name} ${MYSQL_LIBS}"
+                        	],[
+                        	AC_MSG_ERROR([Not found $_lib_name library])
+                        	])
                 ;;
                     -L*)
+
                         MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"
+                ;;
+                    -R*)
+
+                        MYSQL_LDFLAGS="${MYSQL_LDFLAGS} -Wl,$i"
+                ;;
+                    -l*)
+
+                        _lib_name="`echo "$i" | cut -b3-`"
+                        AC_CHECK_LIB($_lib_name, main, [
+                        	MYSQL_LIBS="${MYSQL_LIBS} ${i}"
+                        	],[
+                        	AC_MSG_ERROR([Not found $i library])
+                        	])
                 ;;
                 esac
             done
-
-            if test "x$enable_static" = "xyes"; then
-               for i in $_full_libmysql_libs; do
-                   case $i in
-           	      -lmysqlclient|-lperconaserverclient|-lmariadbclient)
-           	    ;;
-                      -l*)
-				_lib_name="`echo "$i" | cut -b3-`"
-				AC_CHECK_LIB($_lib_name, main, [
-						MYSQL_LIBS="$MYSQL_LIBS $i"
-					],[
-						AC_MSG_ERROR([Not found $_lib_name library])
-					])
-                   ;;
-                   esac
-               done
-            fi
-
-		_save_mysql_libs="${LIBS}"
-		_save_mysql_ldflags="${LDFLAGS}"
-		_save_mysql_cflags="${CFLAGS}"
-		LIBS="${LIBS} ${MYSQL_LIBS}"
-		LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
-		CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
-
-		AC_CHECK_LIB($_client_lib_name, main, [
-			MYSQL_LIBS="-l${_client_lib_name} ${MYSQL_LIBS}"
-			],[
-			AC_MSG_ERROR([Not found mysqlclient library])
-			])
-
-		LIBS="${_save_mysql_libs}"
-		LDFLAGS="${_save_mysql_ldflags}"
-		CFLAGS="${_save_mysql_cflags}"
-		unset _save_mysql_libs
-		unset _save_mysql_ldflags
-		unset _save_mysql_cflags
-
-		MYSQL_VERSION=`$MYSQL_CONFIG --version`
-
-		AC_DEFINE([HAVE_MYSQL], [1],
-			[Define to 1 if MySQL libraries are available])
+    
+            LDFLAGS="${_save_mysql_ldflags}"
+            CFLAGS="${_save_mysql_cflags}"
+            unset _save_mysql_ldflags
+            unset _save_mysql_cflags
+    
+            MYSQL_VERSION=`$MYSQL_CONFIG --version`
+    
+            AC_DEFINE([HAVE_MYSQL], [1],
+                [Define to 1 if MySQL libraries are available])
 
             found_mysql="yes"
         else

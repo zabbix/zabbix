@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup globalmacro
+ */
 class testFormAdministrationGeneralMacro extends CWebTest {
 	private $macroSize = 20;
 	private $macroMaxLength = 255;
@@ -81,7 +84,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private function saveGlobalMacros($confirmation = false) {
 		$this->zbxTestClick('update');
 		if ($confirmation) {
-			$this->webDriver->switchTo()->alert()->accept();
+			$this->zbxTestAcceptAlert();
 		}
 			$this->zbxTestCheckHeader('Macros');
 			$this->zbxTestTextPresent('Macros');
@@ -122,10 +125,6 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 			['{$$MACRO}'],
 			['{$MACRO$}']
 		];
-	}
-
-	public function testFormAdministrationGeneralMacros_backup() {
-		DBsave_tables('globalmacro');
 	}
 
 	public function testFormAdministrationGeneralMacros_CheckLayout() {
@@ -568,9 +567,5 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->checkGlobalMacrosOrder();
 
 		$this->verifyHash();
-	}
-
-	public function testFormAdministrationGeneralMacros_restore() {
-		DBrestore_tables('globalmacro');
 	}
 }

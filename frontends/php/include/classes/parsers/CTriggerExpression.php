@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -343,16 +343,6 @@ class CTriggerExpression {
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 								break;
 							}
-
-							if (!$afterSpace) {
-								break 3;
-							}
-
-							if ($this->parseUsing($this->notOperatorParser,
-									CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR)) {
-
-								$state = self::STATE_AFTER_NOT_OPERATOR;
-							}
 							else {
 								break 3;
 							}
@@ -383,12 +373,7 @@ class CTriggerExpression {
 								break 3;
 							}
 
-							if ($this->parseUsing($this->notOperatorParser,
-									CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR)) {
-
-								$state = self::STATE_AFTER_NOT_OPERATOR;
-							}
-							elseif ($this->parseUsing($this->logicalOperatorParser,
+							if ($this->parseUsing($this->logicalOperatorParser,
 									CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR)) {
 
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;

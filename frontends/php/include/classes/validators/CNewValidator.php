@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,13 +34,6 @@ class CNewValidator {
 	 */
 	private $validationRuleParser;
 
-	/**
-	 * Validation errors.
-	 *
-	 * @var array
-	 */
-	private $error;
-
 	public function __construct(array $input, array $rules) {
 		$this->input = $input;
 		$this->rules = $rules;
@@ -69,6 +62,8 @@ class CNewValidator {
 		}
 
 		$fatal = array_key_exists('fatal', $rules);
+
+		$flags = array_key_exists('flags', $rules) ? $rules['flags'] : 0x00;
 
 		foreach ($rules as $rule => $params) {
 			switch ($rule) {
@@ -103,7 +98,7 @@ class CNewValidator {
 					break;
 
 				/*
-				 * 'in' => array(<values)
+				 * 'in' => array(<values>)
 				 */
 				case 'in':
 					if (array_key_exists($field, $this->input)) {
@@ -177,9 +172,8 @@ class CNewValidator {
 				 */
 				case 'array_db':
 					if (array_key_exists($field, $this->input)) {
-						if (!is_array($this->input[$field])
-								|| !$this->is_array_db($this->input[$field], $params['table'], $params['field'])) {
-
+						if (!$this->is_array_db($this->input[$field], $params['table'], $params['field'], $flags)
+								|| !is_array($this->input[$field])) {
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
 								// TODO: stringify($this->input[$field]) ???
@@ -229,8 +223,7 @@ class CNewValidator {
 				 */
 				case 'db':
 					if (array_key_exists($field, $this->input)) {
-						if (!$this->is_db($this->input[$field], $params['table'], $params['field'])) {
-
+						if (!$this->is_db($this->input[$field], $params['table'], $params['field'], $flags)) {
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
 								// TODO: stringify($this->input[$field]) ???
@@ -274,6 +267,12 @@ class CNewValidator {
 					}
 					break;
 
+				/*
+				 * 'flags' => <value1> | <value2> | ... | <valueN>
+				 */
+				case 'flags':
+					break;
+
 				default:
 					// the message can be not translated because it is an internal error
 					$this->addError($fatal, 'Invalid validation rule "'.$rule.'".');
@@ -311,7 +310,18 @@ class CNewValidator {
 		return (bccomp($value, '0') >= 0 && bccomp($value, '18446744073709551615') <= 0);
 	}
 
-	private function check_db_value($field_schema, $value) {
+	/**
+	 * Validate value against DB schema.
+	 *
+	 * @param array  $field_schema            Array of DB schema.
+	 * @param string $field_schema['type']    Type of DB field.
+	 * @param string $field_schema['length']  Length of DB field.
+	 * @param string $value                   [IN/OUT] IN - input value, OUT - changed value according to flags.
+	 * @param int    $flags                   Validation flags.
+	 *
+	 * @return bool
+	 */
+	private function check_db_value($field_schema, &$value, $flags) {
 		switch ($field_schema['type']) {
 			case DB::FIELD_TYPE_ID:
 				return $this->is_id($value);
@@ -320,9 +330,17 @@ class CNewValidator {
 				return $this->is_int32($value);
 
 			case DB::FIELD_TYPE_CHAR:
+				if ($flags & P_CRLF) {
+					$value = CRLFtoLF($value);
+				}
+
 				return (mb_strlen($value) <= $field_schema['length']);
 
 			case DB::FIELD_TYPE_TEXT:
+				if ($flags & P_CRLF) {
+					$value = CRLFtoLF($value);
+				}
+
 				// TODO: check length
 				return true;
 
@@ -341,22 +359,43 @@ class CNewValidator {
 		return true;
 	}
 
-	private function is_array_db(array $values, $table, $field) {
+	/**
+	 * Validate array of string values against DB schema.
+	 *
+	 * @param array $values  [IN/OUT] IN - input values, OUT - changed values according to flags.
+	 * @param string $table  DB table name.
+	 * @param string $field  DB field name.
+	 * @param int $flags     Validation flags.
+	 *
+	 * @return bool
+	 */
+	private function is_array_db(array &$values, $table, $field, $flags) {
 		$table_schema = DB::getSchema($table);
 
-		foreach ($values as $value) {
-			if (!is_string($value) || !$this->check_db_value($table_schema['fields'][$field], $value)) {
+		foreach ($values as &$value) {
+			if (!is_string($value) || !$this->check_db_value($table_schema['fields'][$field], $value, $flags)) {
 				return false;
 			}
 		}
+		unset($value);
 
 		return true;
 	}
 
-	private function is_db($value, $table, $field) {
+	/**
+	 * Validate a string value against DB schema.
+	 *
+	 * @param string $value  [IN/OUT] IN - input value, OUT - changed value according to flags.
+	 * @param string $table  DB table name.
+	 * @param string $field  DB field name.
+	 * @param int $flags     Validation flags.
+	 *
+	 * @return bool
+	 */
+	private function is_db(&$value, $table, $field, $flags) {
 		$table_schema = DB::getSchema($table);
 
-		return (is_string($value) && $this->check_db_value($table_schema['fields'][$field], $value));
+		return (is_string($value) && $this->check_db_value($table_schema['fields'][$field], $value, $flags));
 	}
 
 	private function isLeapYear($year) {

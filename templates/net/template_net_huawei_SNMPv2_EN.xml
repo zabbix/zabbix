@@ -11,12 +11,12 @@
       <template>
          <template>Template Net Huawei VRP SNMPv2</template>
          <name>Template Net Huawei VRP SNMPv2</name>
-         <description>Template Net Huawei VRP version: 0.13
-Overview: Reference: https://www.slideshare.net/Huanetwork/huawei-s5700-naming-conventions-and-port-numbering-conventions
-Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
-
-MIBs used:
-HUAWEI-ENTITY-EXTENT-MIB
+         <description>Template Net Huawei VRP version: 0.14&#13;
+Overview: Reference: https://www.slideshare.net/Huanetwork/huawei-s5700-naming-conventions-and-port-numbering-conventions&#13;
+Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234&#13;
+&#13;
+MIBs used:&#13;
+HUAWEI-ENTITY-EXTENT-MIB&#13;
 ENTITY-MIB</description>
          <groups>
             <group>
@@ -110,8 +110,8 @@ ENTITY-MIB</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HUAWEI-ENTITY-EXTENT-MIB
-The CPU usage for this entity. Generally, the CPU usage will calculate the overall CPU usage on the entity, and itis not sensible with the number of CPU on the entity.
+                     <description>MIB: HUAWEI-ENTITY-EXTENT-MIB&#13;
+The CPU usage for this entity. Generally, the CPU usage will calculate the overall CPU usage on the entity, and itis not sensible with the number of CPU on the entity.&#13;
 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -154,8 +154,8 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HUAWEI-ENTITY-EXTENT-MIB
-The memory usage for the entity. This object indicates what percent of memory are used.
+                     <description>MIB: HUAWEI-ENTITY-EXTENT-MIB&#13;
+The memory usage for the entity. This object indicates what percent of memory are used.&#13;
 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -182,7 +182,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -198,7 +198,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HUAWEI-ENTITY-EXTENT-MIB
+                     <description>MIB: HUAWEI-ENTITY-EXTENT-MIB&#13;
 The temperature for the {#SNMPVALUE}.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -383,7 +383,7 @@ The temperature for the {#SNMPVALUE}.</description>
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -406,7 +406,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -439,7 +439,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
@@ -646,7 +646,7 @@ Device serial number has changed. Ack to close</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -683,7 +683,7 @@ Device serial number has changed. Ack to close</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Huawei VRP SNMPv2:sensor.fan.status[hwEntityFanState.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Huawei VRP SNMPv2:sensor.fan.status[hwEntityFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: Fan is in critical state</name>
@@ -692,7 +692,7 @@ Device serial number has changed. Ack to close</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>

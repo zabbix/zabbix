@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,5 +42,6 @@ typedef struct
 } zbx_file_descriptor_t;
 
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_DIR_H */

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
 
-	hv = zbx_hashset_search(hvs, &hv_local);
+	hv = (zbx_vmware_hv_t *)zbx_hashset_search(hvs, &hv_local);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, hv);
 
@@ -78,7 +78,7 @@ static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
 
-	if (NULL != (vmi = zbx_hashset_search(&service->data->vms_index, &vmi_local)))
+	if (NULL != (vmi = (zbx_vmware_vm_index_t *)zbx_hashset_search(&service->data->vms_index, &vmi_local)))
 		hv = vmi->hv;
 	else
 		hv = NULL;
@@ -98,7 +98,7 @@ static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
 
-	if (NULL != (vmi = zbx_hashset_search(&service->data->vms_index, &vmi_local)))
+	if (NULL != (vmi = (zbx_vmware_vm_index_t *)zbx_hashset_search(&service->data->vms_index, &vmi_local)))
 		vm = vmi->vm;
 	else
 		vm = NULL;
@@ -202,7 +202,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	{
 		perfvalue = (zbx_ptr_pair_t *)&perfcounter->values.values[i];
 
-		if (0 == strcmp(perfvalue->first, instance))
+		if (0 == strcmp((char *)perfvalue->first, instance))
 			break;
 	}
 
@@ -213,15 +213,13 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	}
 
 	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it */
-	if (0 == strcmp(perfvalue->second, "-1"))
+	if (0 == strcmp((char *)perfvalue->second, "-1"))
 	{
 		ret = SYSINFO_RET_OK;
 		goto out;
 	}
 
-
-
-	if (SUCCEED == is_uint64(perfvalue->second, &value))
+	if (SUCCEED == is_uint64((char *)perfvalue->second, &value))
 	{
 		value *= coeff;
 
@@ -587,109 +585,42 @@ out:
 	return ret;
 }
 
-static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const DC_ITEM *item,
-		AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key, const DC_ITEM *item,
+		zbx_vector_ptr_t *add_results)
 {
-	const char		*__function_name = "vmware_get_events";
+	const char	*__function_name = "vmware_get_events";
 
-	zbx_vector_str_t	keys;
-	zbx_vector_uint64_t	ids;
-	zbx_uint64_t		key;
-	char			*value, xpath[MAX_STRING_LEN];
-	int			i, ret = SYSINFO_RET_FAIL;
+	int		i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:" ZBX_FS_UI64, __function_name, lastlogsize);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __function_name, eventlog_last_key);
 
-	zbx_vector_str_create(&keys);
-
-	if (SUCCEED != zbx_xml_read_values(events, ZBX_XPATH_LN2("Event", "key"), &keys))
+	/* events were retrieved in reverse chronological order */
+	for (i = events->values_num - 1; i >= 0; i--)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No event key found."));
-		zbx_vector_str_destroy(&keys);
-		goto out;
-	}
+		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
+		AGENT_RESULT			*add_result = NULL;
 
-	zbx_vector_uint64_create(&ids);
-
-	for (i = 0; i < keys.values_num; i++)
-	{
-		if (SUCCEED != is_uint64(keys.values[i], &key))
+		if (event->key <= eventlog_last_key)
 			continue;
 
-		if (key <= lastlogsize)
-			continue;
+		add_result = (AGENT_RESULT *)zbx_malloc(add_result, sizeof(AGENT_RESULT));
+		init_result(add_result);
 
-		zbx_vector_uint64_append(&ids, key);
-	}
-
-	if (0 != ids.values_num)
-	{
-		zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		for (i = 0; i < ids.values_num; i++)
+		if (SUCCEED == set_result_type(add_result, item->value_type, event->message))
 		{
-			AGENT_RESULT	*add_result;
+			set_result_meta(add_result, event->key, 0);
 
-			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
-					ZBX_XPATH_LN("fullFormattedMessage"), ids.values[i]);
-
-			if (NULL == (value = zbx_xml_read_value(events, xpath)))
-				continue;
-
-			zbx_replace_invalid_utf8(value);
-
-			add_result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
-
-			init_result(add_result);
-
-			if (SUCCEED == (ret = set_result_type(add_result, item->value_type, value)))
+			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
-				set_result_meta(add_result, ids.values[i], 0);
-
-				if (ITEM_VALUE_TYPE_LOG == item->value_type)
-				{
-					char	*timestamp;
-
-					add_result->log->logeventid = ids.values[i];
-
-					zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key")
-							"[.='" ZBX_FS_UI64 "']/.." ZBX_XPATH_LN("createdTime"),
-							ids.values[i]);
-
-					if (NULL != (timestamp = zbx_xml_read_value(events, xpath)))
-					{
-						int	year, mon, mday, hour, min, sec, t;
-
-						/* 2013-06-04T14:19:23.406298Z */
-						if (6 == sscanf(timestamp, "%d-%d-%dT%d:%d:%d.%*s",
-								&year, &mon, &mday, &hour, &min, &sec))
-						{
-							if (FAIL != zbx_utc_time(year, mon, mday, hour, min, sec, &t))
-								add_result->log->timestamp = t;
-						}
-
-						zbx_free(timestamp);
-					}
-				}
+				add_result->log->logeventid = event->key;
+				add_result->log->timestamp = event->timestamp;
 			}
-
-			zbx_free(value);
 
 			zbx_vector_ptr_append(add_results, add_result);
 		}
 	}
 
-	zbx_vector_uint64_destroy(&ids);
-
-	zbx_vector_str_clear_ext(&keys, zbx_ptr_free);
-	zbx_vector_str_destroy(&keys);
-
-	ret = SYSINFO_RET_OK;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __function_name, zbx_sysinfo_ret_string(ret),
-			add_results->values_num);
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __function_name, add_results->values_num);
 }
 
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
@@ -716,7 +647,24 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_get_events(service->data->events, request->lastlogsize, item, result, add_results);
+	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog_last_key)
+	{
+		service->eventlog_last_key = request->lastlogsize;
+	}
+	else if (request->lastlogsize < service->eventlog_last_key)
+	{
+		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */
+		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet */
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too old events requested."));
+		goto unlock;
+	}
+	else if (0 < service->data->events.values_num)
+	{
+		vmware_get_events(&service->data->events, request->lastlogsize, item, add_results);
+		service->eventlog_last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+	}
+
+	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -905,7 +853,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
 
 	zbx_hashset_iter_reset(&service->data->hvs, &iter);
-	while (NULL != (hv = zbx_hashset_iter_next(&iter)))
+	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vmware_cluster_t	*cluster = NULL;
 
@@ -1494,7 +1442,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 	for (i = 0; i < hv->datastores.values_num; i++)
 	{
-		zbx_vmware_datastore_t	*datastore = hv->datastores.values[i];
+		zbx_vmware_datastore_t	*datastore = (zbx_vmware_datastore_t *)hv->datastores.values[i];
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
@@ -1558,7 +1506,7 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 
 	for (i = 0; i < hv->datastores.values_num; i++)
 	{
-		zbx_vmware_datastore_t	*datastore = hv->datastores.values[i];
+		zbx_vmware_datastore_t	*datastore = (zbx_vmware_datastore_t *)hv->datastores.values[i];
 
 		if (0 == strcmp(name, datastore->name))
 		{
@@ -1625,7 +1573,7 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 
 	for (i = 0; i < hv->datastores.values_num; i++)
 	{
-		zbx_vmware_datastore_t	*datastore = hv->datastores.values[i];
+		zbx_vmware_datastore_t	*datastore = (zbx_vmware_datastore_t *)hv->datastores.values[i];
 
 		if (0 == strcmp(name, datastore->name))
 		{
@@ -1706,7 +1654,7 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 
 	for (i = 0; i < hv->datastores.values_num; i++)
 	{
-		datastore = hv->datastores.values[i];
+		datastore = (zbx_vmware_datastore_t *)hv->datastores.values[i];
 		if (0 == strcmp(name, datastore->name))
 			break;
 	}
@@ -1777,7 +1725,8 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 {
 	const char		*__function_name = "check_vcenter_hv_perfcounter";
 
-	char			*url, *uuid, *path, *instance;
+	char			*url, *uuid, *path;
+	const char 		*instance;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_uint64_t		counterid;
@@ -2041,7 +1990,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
 
 	zbx_hashset_iter_reset(&service->data->hvs, &iter);
-	while (NULL != (hv = zbx_hashset_iter_next(&iter)))
+	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vmware_cluster_t	*cluster = NULL;
 
@@ -2931,7 +2880,8 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 {
 	const char		*__function_name = "check_vcenter_vm_perfcounter";
 
-	char			*url, *uuid, *path, *instance;
+	char			*url, *uuid, *path;
+	const char 		*instance;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
 	zbx_uint64_t		counterid;

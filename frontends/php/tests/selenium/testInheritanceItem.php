@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup items
  */
 class testInheritanceItem extends CWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
@@ -30,10 +32,6 @@ class testInheritanceItem extends CWebTest {
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
-
-	public function testInheritanceItem_backup() {
-		DBsave_tables('items');
-	}
 
 	// returns list of items from a template
 	public static function update() {
@@ -88,7 +86,7 @@ class testInheritanceItem extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceItem_SimpleCreate($data) {
-		$this->zbxTestLogin('items.php?form=Create+item&hostid='.$this->templateid);
+		$this->zbxTestLogin('items.php?form=create&hostid='.$this->templateid);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -141,9 +139,5 @@ class testInheritanceItem extends CWebTest {
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
-	}
-
-	public function testInheritanceItem_restore() {
-		DBrestore_tables('items');
 	}
 }

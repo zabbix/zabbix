@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,10 +78,7 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	zbx_strncpy_alloc(cmd, &cmd_alloc, &cmd_offset, command, pl - command);
 
 	if ('\0' == *pl)	/* no parameters specified */
-	{
-		zbx_strncpy_alloc(param, &param_alloc, &param_offset, "", 0);
 		return ZBX_COMMAND_WITHOUT_PARAMS;
-	}
 
 	if ('[' != *pl)		/* unsupported character */
 		return ZBX_COMMAND_ERROR;
@@ -123,7 +120,7 @@ int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 	commands[i].function = metric->function;
 	commands[i].test_param = (NULL == metric->test_param ? NULL : zbx_strdup(NULL, metric->test_param));
 
-	commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
+	commands = (ZBX_METRIC *)zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
 	memset(&commands[i + 1], 0, sizeof(ZBX_METRIC));
 
 	return SUCCEED;
@@ -163,12 +160,12 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 	return ret;
 }
 
-void	init_metrics()
+void	init_metrics(void)
 {
 	int	i;
 	char	error[MAX_STRING_LEN];
 
-	commands = zbx_malloc(commands, sizeof(ZBX_METRIC));
+	commands = (ZBX_METRIC *)zbx_malloc(commands, sizeof(ZBX_METRIC));
 	commands[0].key = NULL;
 
 #ifdef WITH_AGENT_METRICS
@@ -224,7 +221,7 @@ void	init_metrics()
 #endif
 }
 
-void	free_metrics()
+void	free_metrics(void)
 {
 	if (NULL != commands)
 	{
@@ -341,7 +338,7 @@ void	free_request(AGENT_REQUEST *request)
 static void	add_request_param(AGENT_REQUEST *request, char *pvalue)
 {
 	request->nparam++;
-	request->params = zbx_realloc(request->params, request->nparam * sizeof(char *));
+	request->params = (char **)zbx_realloc(request->params, request->nparam * sizeof(char *));
 	request->params[request->nparam - 1] = pvalue;
 }
 
@@ -366,7 +363,7 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 		case ZBX_COMMAND_WITH_PARAMS:
 			if (0 == (request->nparam = num_param(params)))
 				goto out;	/* key is badly formatted */
-			request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
+			request->params = (char **)zbx_malloc(request->params, request->nparam * sizeof(char *));
 			for (i = 0; i < request->nparam; i++)
 				request->params[i] = get_param_dyn(params, i + 1);
 			break;
@@ -374,7 +371,8 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 			goto out;	/* key is badly formatted */
 	}
 
-	request->key = zbx_strdup(NULL, key);
+	request->key = key;
+	key = NULL;
 
 	ret = SUCCEED;
 out:
@@ -386,15 +384,11 @@ out:
 
 void	test_parameter(const char *key)
 {
-#define	ZBX_COL_WIDTH	45
+#define ZBX_KEY_COLUMN_WIDTH	45
 
 	AGENT_RESULT	result;
-	int		n;
 
-	n = printf("%s", key);
-
-	if (0 < n && ZBX_COL_WIDTH > n)
-		printf("%-*s", ZBX_COL_WIDTH - n, " ");
+	printf("%-*s", ZBX_KEY_COLUMN_WIDTH, key);
 
 	init_result(&result);
 
@@ -428,9 +422,11 @@ void	test_parameter(const char *key)
 	printf("\n");
 
 	fflush(stdout);
+
+#undef ZBX_KEY_COLUMN_WIDTH
 }
 
-void	test_parameters()
+void	test_parameters(void)
 {
 	int	i;
 	char	*key = NULL;
@@ -474,7 +470,7 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 		if (NULL == strchr(param, *c))
 			continue;
 
-		buf = zbx_malloc(buf, buf_alloc);
+		buf = (char *)zbx_malloc(buf, buf_alloc);
 
 		for (c = suppressed_chars; '\0' != *c; c++)
 		{
@@ -567,7 +563,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	ZBX_METRIC	*command = NULL;
 	AGENT_REQUEST	request;
 
-	init_result(result);
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key((0 == (flags & PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
@@ -654,7 +649,7 @@ notsupported:
 
 static void	add_log_result(AGENT_RESULT *result, const char *value)
 {
-	result->log = zbx_malloc(result->log, sizeof(zbx_log_t));
+	result->log = (zbx_log_t *)zbx_malloc(result->log, sizeof(zbx_log_t));
 
 	zbx_log_init(result->log);
 
@@ -877,7 +872,7 @@ static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
 
 	if (0 != ISSET_VALUE(result))
 	{
-		result->log = zbx_malloc(result->log, sizeof(zbx_log_t));
+		result->log = (zbx_log_t *)zbx_malloc(result->log, sizeof(zbx_log_t));
 
 		zbx_log_init(result->log);
 
@@ -1014,7 +1009,7 @@ int	quote_key_param(char **param, int forced)
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 
-	*param = zbx_realloc(*param, sz_dst);
+	*param = (char *)zbx_realloc(*param, sz_dst);
 
 	(*param)[--sz_dst] = '\0';
 	(*param)[--sz_dst] = '"';
@@ -1123,7 +1118,7 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		while (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
 			*data_alloc *= 1.5;
 
-		*data = zbx_realloc(*data, *data_alloc);
+		*data = (char *)zbx_realloc(*data, *data_alloc);
 	}
 
 	memcpy(*data + *data_offset, &agent_ret, sizeof(int));
@@ -1263,7 +1258,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		goto out;
 	}
 
-	data = zbx_malloc(NULL, data_alloc);
+	data = (char *)zbx_malloc(NULL, data_alloc);
 
 	if (0 == pid)
 	{
@@ -1313,7 +1308,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 			while ((int)(data_alloc - data_offset) < n + 1)
 				data_alloc *= 1.5;
 
-			data = zbx_realloc(data, data_alloc);
+			data = (char *)zbx_realloc(data, data_alloc);
 		}
 
 		memcpy(data + data_offset, buffer, n);
@@ -1330,13 +1325,15 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	{
 		if (0 == WIFEXITED(status))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated unexpectedly."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Data gathering process terminated unexpectedly with"
+					" error %d.", status));
 			kill(pid, SIGKILL);
 			ret = SYSINFO_RET_FAIL;
 		}
 		else if (EXIT_SUCCESS != WEXITSTATUS(status))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated with error."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Data gathering process terminated with error %d.",
+					status));
 			ret = SYSINFO_RET_FAIL;
 		}
 		else
@@ -1351,11 +1348,19 @@ out:
 }
 #else
 
+ZBX_THREAD_LOCAL static zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
+
+zbx_uint32_t get_thread_global_mutex_flag()
+{
+	return mutex_flag;
+}
+
 typedef struct
 {
 	zbx_metric_func_t	func;
 	AGENT_REQUEST		*request;
 	AGENT_RESULT		*result;
+	zbx_uint32_t		mutex_flag; /* in regular case should always be = ZBX_MUTEX_ALL_ALLOW */
 	int			agent_ret;
 }
 zbx_metric_thread_args_t;
@@ -1363,6 +1368,7 @@ zbx_metric_thread_args_t;
 ZBX_THREAD_ENTRY(agent_metric_thread, data)
 {
 	zbx_metric_thread_args_t	*args = (zbx_metric_thread_args_t *)((zbx_thread_args_t *)data)->args;
+	mutex_flag = args->mutex_flag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "executing in data thread for key:'%s'", args->request->key);
 
@@ -1396,7 +1402,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	ZBX_THREAD_HANDLE		thread;
 	zbx_thread_args_t		args;
-	zbx_metric_thread_args_t	metric_args = {metric_func, request, result};
+	zbx_metric_thread_args_t	metric_args = {metric_func, request, result, ZBX_MUTEX_THREAD_DENIED |
+							ZBX_MUTEX_LOGGING_DENIED};
 	DWORD				rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);

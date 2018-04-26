@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
+ *
+ * @backup graphs
  */
 class testInheritanceGraphPrototype extends CWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
@@ -32,10 +34,6 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 	private $discoveryRuleId = 15011;	// 'testInheritanceDiscoveryRule'
 	private $discoveryRule = 'testInheritanceDiscoveryRule';
-
-	public function testInheritanceGraphPrototype_backup() {
-		DBsave_tables('graphs');
-	}
 
 	public static function update() {
 		return DBdata(
@@ -110,10 +108,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {
-				$this->zbxTestClickWait('add_protoitem');
-				$this->zbxTestSwitchToNewWindow();
+				$this->zbxTestClick('add_protoitem');
+				$this->zbxTestLaunchOverlayDialog('Item prototypes');
 				$this->zbxTestClickLinkTextWait($item['itemName']);
-				$this->zbxTestWaitWindowClose();
 				$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 			}
 		}
@@ -137,9 +134,5 @@ class testInheritanceGraphPrototype extends CWebTest {
 				break;
 		}
 
-	}
-
-	public function testInheritanceGraphPrototype_restore() {
-		DBrestore_tables('graphs');
 	}
 }

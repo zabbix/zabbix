@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,7 +175,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 	{NULL}
 };
 
-int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset = 0;
 	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
@@ -217,11 +217,15 @@ int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT) &&
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
+				ZBX_EXIT_CODE_CHECKS_DISABLED) &&
 				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT))
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
+					ZBX_EXIT_CODE_CHECKS_DISABLED))
+			{
 				continue;
+			}
 
 			ret = SYSINFO_RET_OK;
 

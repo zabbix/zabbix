@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,13 +23,19 @@ require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.regexps.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.regexps.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $form = (new CForm())
 	->setId('zabbixRegExpForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('regexpid', $data['regexpid']);
 
@@ -61,7 +67,8 @@ foreach ($data['expressions'] as $i => $expression) {
 			expression_type2str()
 		))->onChange('onChangeExpressionType(this, '.$i.')'),
 		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAriaRequired(),
 		$exp_delimiter,
 		(new CCheckBox('expressions['.$i.'][case_sensitive]', '1'))->setChecked($expression['case_sensitive'] == 1)
 	];
@@ -91,14 +98,18 @@ $exprTable->setFooter(
 );
 
 $exprTab = (new CFormList('exprTab'))
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAriaRequired()
 	)
-	->addRow(_('Expressions'), (new CDiv($exprTable))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	->addRow(
+		(new CLabel(_('Expressions'), 'tbl_expr'))->setAsteriskMark(),
+		(new CDiv($exprTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
 /*

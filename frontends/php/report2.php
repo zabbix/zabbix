@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -160,10 +160,12 @@ if ($triggerData) {
 	$triggerData['hostid'] = $host['hostid'];
 	$triggerData['hostname'] = $host['name'];
 
-	$reportWidget->setControls(
+	$reportWidget->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))
 			->addItem($triggerData['description'])
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 	$table = (new CTableInfo())
@@ -174,17 +176,18 @@ if ($triggerData) {
 		->show();
 }
 elseif (isset($_REQUEST['filter_hostid'])) {
-	$headerForm = (new CForm('get'))->addItem((new CList())
-		->addItem([
-			new CLabel(_('Mode'), 'mode'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			new CComboBox('mode', $availabilityReportMode, 'submit()', [
-				AVAILABILITY_REPORT_BY_HOST => _('By host'),
-				AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
+	$reportWidget->setControls((new CForm('get'))
+		->setAttribute('aria-label', _('Main filter'))
+		->addItem((new CList())
+			->addItem([
+				new CLabel(_('Mode'), 'mode'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				new CComboBox('mode', $availabilityReportMode, 'submit()', [
+					AVAILABILITY_REPORT_BY_HOST => _('By host'),
+					AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
+				])
 			])
-		])
-	);
-	$reportWidget->setControls($headerForm);
+	));
 
 	$triggerOptions = [
 		'output' => ['triggerid', 'description', 'expression', 'value'],
@@ -200,7 +203,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	 * Filter
 	 */
 	$filterForm = (new CFilter('web.avail_report.filter.state'))
-		->addVar('config', $availabilityReportMode)
+		->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
 		->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']))
 		->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
 
@@ -420,7 +423,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	 */
 	$triggerTable = (new CTableInfo())
 		->setHeader([
-			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
+			_('Host'),
 			_('Name'),
 			_('Problems'),
 			_('Ok'),
@@ -429,17 +432,12 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	$triggers = API::Trigger()->get($triggerOptions);
 
-	if (getRequest('filter_hostid') == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-		foreach ($triggers as &$trigger) {
-			$trigger['host_name'] = $trigger['hosts'][0]['name'];
-		}
-		unset($trigger);
+	foreach ($triggers as &$trigger) {
+		$trigger['host_name'] = $trigger['hosts'][0]['name'];
+	}
+	unset($trigger);
 
-		CArrayHelper::sort($triggers, ['host_name', 'description']);
-	}
-	else {
-		CArrayHelper::sort($triggers, ['description']);
-	}
+	CArrayHelper::sort($triggers, ['host_name', 'description']);
 
 	$paging = getPagingLine($triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
@@ -449,8 +447,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		);
 
 		$triggerTable->addRow([
-			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
-				? $trigger['host_name'] : null,
+			$trigger['host_name'],
 			new CLink($trigger['description'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')

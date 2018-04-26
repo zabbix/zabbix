@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				break;
 
 			case WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH:
-				// falls through
 			case WIDGET_FIELD_SELECT_RES_ITEM:
 				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 				$this->srctbl = 'items';
@@ -75,30 +74,36 @@ class CWidgetFieldSelectResource extends CWidgetField {
 		return $this->resource_type;
 	}
 
-	public function getPopupUrl() {
-		$url = (new CUrl('popup.php'))
-			->setArgument('srctbl', $this->srctbl)
-			->setArgument('srcfld1', $this->srcfld1)
-			->setArgument('srcfld2', $this->srcfld2)
-			->setArgument('dstfld1', $this->dstfld1)
-			->setArgument('dstfld2', $this->dstfld2);
+	public function getPopupOptions($dstfrm) {
+		$popup_options = [
+			'srctbl' => $this->srctbl,
+			'srcfld1' => $this->srcfld1,
+			'srcfld2' => $this->srcfld2,
+			'dstfld1' => $this->dstfld1,
+			'dstfld2' => $this->dstfld2,
+			'dstfrm' => $dstfrm
+		];
 
 		switch ($this->getResourceType()) {
 			case WIDGET_FIELD_SELECT_RES_ITEM:
-				$url->setArgument('real_hosts', '1');
+				$popup_options['real_hosts'] = '1';
+				$popup_options['with_webitems'] = '1';
 				break;
 
 			case WIDGET_FIELD_SELECT_RES_GRAPH:
-				$url->setArgument('real_hosts', '1');
-				$url->setArgument('with_graphs', '1');
+				$popup_options['real_hosts'] = '1';
+				$popup_options['with_graphs'] = '1';
 				break;
 
 			case WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH:
-				$url->setArgument('numeric', '1');
+				$popup_options['numeric'] = '1';
+				$popup_options['real_hosts'] = '1';
+				$popup_options['with_simple_graph_items'] = '1';
+				$popup_options['with_webitems'] = '1';
 				break;
 		}
 
-		return $url->getUrl();
+		return $popup_options;
 	}
 
 	public function validate($strict = false) {

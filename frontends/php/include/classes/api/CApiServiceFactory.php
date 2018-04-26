@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'screen' => 'CScreen',
 			'screenitem' => 'CScreenItem',
 			'script' => 'CScript',
+			'task' => 'CTask',
 			'template' => 'CTemplate',
 			'templatescreen' => 'CTemplateScreen',
 			'templatescreenitem' => 'CTemplateScreenItem',
@@ -71,7 +72,6 @@ class CApiServiceFactory extends CRegistryFactory {
 			'user' => 'CUser',
 			'usergroup' => 'CUserGroup',
 			'usermacro' => 'CUserMacro',
-			'usermedia' => 'CUserMedia',
 			'valuemap' => 'CValueMap'
 		], $objects));
 	}

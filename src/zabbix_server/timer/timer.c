@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "export.h"
 
 #include "timer.h"
 
@@ -79,21 +80,27 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		zbx_process_triggers(&trigger_order, &trigger_diff);
 
-		if (0 != (events_num = process_trigger_events(&trigger_diff, &triggerids,
-				ZBX_EVENTS_PROCESS_CORRELATION)))
+		if (0 != (events_num = zbx_process_events(&trigger_diff, &triggerids)))
 		{
 			*events_count += events_num;
 
 			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_save_trigger_changes(&trigger_diff);
+			zbx_db_save_trigger_changes(&trigger_diff);
 		}
 
 		DBcommit();
+
+		DBupdate_itservices(&trigger_diff);
 
 		DCconfig_unlock_triggers(&triggerids);
 		zbx_vector_uint64_clear(&triggerids);
 
 		DCfree_triggers(&trigger_order);
+
+		if (SUCCEED == zbx_is_export_enabled())
+			zbx_export_events();
+
+		zbx_clean_events();
 	}
 
 	zbx_vector_uint64_destroy(&triggerids);
@@ -180,7 +187,7 @@ static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm,
 	if (*hm_alloc == *hm_count)
 	{
 		*hm_alloc += 4;
-		*hm = zbx_realloc(*hm, *hm_alloc * sizeof(zbx_host_maintenance_t));
+		*hm = (zbx_host_maintenance_t *)zbx_realloc(*hm, *hm_alloc * sizeof(zbx_host_maintenance_t));
 	}
 
 	memmove(&(*hm)[hm_index + 1], &(*hm)[hm_index], sizeof(zbx_host_maintenance_t) * (*hm_count - hm_index));
@@ -325,7 +332,7 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	DBbegin();
 
@@ -452,7 +459,7 @@ static int	process_maintenance(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == hm)
-		hm = zbx_malloc(hm, sizeof(zbx_host_maintenance_t) * hm_alloc);
+		hm = (zbx_host_maintenance_t *)zbx_malloc(hm, sizeof(zbx_host_maintenance_t) * hm_alloc);
 
 	now = time(NULL);
 	tm = localtime(&now);
@@ -647,15 +654,22 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	if (SUCCEED == zbx_is_export_enabled())
+		zbx_problems_export_init("timer", process_num);
+
 	for (;;)
 	{
 		now = time(NULL);
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
 
-		/* flush correlated event queue and set minimal sleep time if queue is not empty */
-		if (0 != flush_correlated_events() && 1 < sleeptime)
-			sleeptime = 1;
+		/* try flushing correlated event queue */
+		if (0 != zbx_flush_correlated_events())
+		{
+			/* force minimal sleep period if there are still some events left in queue */
+			if (1 < sleeptime)
+				sleeptime = 1;
+		}
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
@@ -744,7 +758,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		/* only the "timer #1" process evaluates the maintenance periods */
 		if (1 != process_num)
-			continue;
+			goto next;
 
 		/* we process maintenance at every 00 sec */
 		/* process time functions can take long time */
@@ -760,6 +774,12 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			hm_count += process_maintenance();
 			total_sec_maint += zbx_time() - sec_maint;
 		}
+next:
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#else
+		;
+#endif
 	}
 
 #undef STAT_INTERVAL

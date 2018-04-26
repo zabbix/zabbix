@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,9 +100,6 @@ $filter = [
 	'hostids' => CProfile::getArray('web.latest.filter.hostids')
 ];
 
-// we'll need to hide the host column if only one host is selected
-$singleHostSelected = (count($filter['hostids']) == 1);
-
 $sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
 $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
@@ -123,13 +120,18 @@ if ($filter['groupids'] !== null) {
 		'preservekeys' => true
 	]);
 
-	foreach ($filterGroups as $group) {
-		$multiSelectHostGroupData[] = [
-			'id' => $group['groupid'],
-			'name' => $group['name']
-		];
+	if ($filterGroups) {
+		foreach ($filterGroups as $group) {
+			$multiSelectHostGroupData[] = [
+				'id' => $group['groupid'],
+				'name' => $group['name']
+			];
 
-		$child_groups[] = $group['name'].'/';
+			$child_groups[] = $group['name'].'/';
+		}
+	}
+	else {
+		$filter['groupids'] = [];
 	}
 }
 
@@ -171,10 +173,8 @@ if ($hosts) {
 	}
 	unset($host);
 
-	if (!$singleHostSelected) {
-		$sortFields = ($sortField === 'host') ? [['field' => 'name', 'order' => $sortOrder]] : ['name'];
-		CArrayHelper::sort($hosts, $sortFields);
-	}
+	$sortFields = ($sortField === 'host') ? [['field' => 'name', 'order' => $sortOrder]] : ['name'];
+	CArrayHelper::sort($hosts, $sortFields);
 
 	$hostIds = array_keys($hosts);
 
@@ -236,7 +236,7 @@ if ($items) {
 
 	if ($items) {
 		// get history
-		$history = Manager::History()->getLast($items, 2, ZBX_HISTORY_PERIOD);
+		$history = Manager::History()->getLastValues($items, 2, ZBX_HISTORY_PERIOD);
 
 		// filter items without history
 		if (!$filter['showWithoutData']) {
@@ -282,22 +282,20 @@ if ($items) {
 			CArrayHelper::sort($applications, $sortFields);
 		}
 
-		if (!$singleHostSelected) {
-			// get host scripts
-			$hostScripts = API::Script()->getScriptsByHosts($hostIds);
+		// get host scripts
+		$hostScripts = API::Script()->getScriptsByHosts($hostIds);
 
-			// get templates screen count
-			$screens = API::TemplateScreen()->get([
-				'hostids' => $hostIds,
-				'countOutput' => true,
-				'groupCount' => true
-			]);
-			$screens = zbx_toHash($screens, 'hostid');
-			foreach ($hosts as &$host) {
-				$host['screens'] = isset($screens[$host['hostid']]);
-			}
-			unset($host);
+		// get templates screen count
+		$screens = API::TemplateScreen()->get([
+			'hostids' => $hostIds,
+			'countOutput' => true,
+			'groupCount' => true
+		]);
+		$screens = zbx_toHash($screens, 'hostid');
+		foreach ($hosts as &$host) {
+			$host['screens'] = isset($screens[$host['hostid']]);
 		}
+		unset($host);
 	}
 }
 
@@ -322,8 +320,10 @@ if ($filter['hostids']) {
  */
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
-	->setControls((new CList())
+	->setControls((new CTag('nav', true, (new CList())
 		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+	))
+		->setAttribute('aria-label', _('Content controls'))
 	);
 
 // Filter
@@ -337,8 +337,13 @@ $filterColumn1 = (new CFormList())
 			'objectName' => 'hostGroup',
 			'data' => $multiSelectHostGroupData,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
-					'&srcfld1=groupid&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'groupids_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
@@ -348,8 +353,14 @@ $filterColumn1 = (new CFormList())
 			'objectName' => 'hosts',
 			'data' => $multiSelectHostData,
 			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
-					'&real_hosts=1&multiselect=1'
+				'parameters' => [
+					'srctbl' => 'hosts',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'hostids_',
+					'srcfld1' => 'hostid',
+					'real_hosts' => '1',
+					'multiselect' => '1'
+				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
@@ -358,8 +369,15 @@ $filterColumn1 = (new CFormList())
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
-				'&with_applications=1&dstfrm=zbx_filter");'
+			->onClick('return PopUp("popup.generic",'.
+				CJs::encodeJson([
+					'srctbl' => 'applications',
+					'srcfld1' => 'name',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'application',
+					'real_hosts' => '1',
+					'with_applications' => '1'
+				]).', null, this);'
 			)
 	]);
 
@@ -401,11 +419,8 @@ if ($filter['showDetails']) {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		$singleHostSelected
-			? null
-			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 13%'),
-		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder)
-			->addStyle('width: '.($singleHostSelected ? 34 : 21).'%'),
+		make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 13%'),
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder)->addStyle('width: 21%'),
 		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
 		(new CColHeader(_('History')))->addStyle('width: 5%'),
 		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
@@ -421,11 +436,8 @@ else {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		$singleHostSelected
-			? null
-			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 17%'),
-		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder)
-			->addStyle('width: '.($singleHostSelected ? 57 : 40).'%'),
+		make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 17%'),
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder)->addStyle('width: 40%'),
 		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
@@ -433,7 +445,6 @@ else {
 	]);
 }
 
-$hostColumn = $singleHostSelected ? null : '';
 $tab_rows = [];
 
 $config = select_config();
@@ -572,7 +583,7 @@ foreach ($items as $key => $item) {
 		$row = new CRow([
 			'',
 			$checkbox,
-			$hostColumn,
+			'',
 			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
 			(new CCol($item['delay']))->addClass($state_css),
 			(new CCol($item['history']))->addClass($state_css),
@@ -589,7 +600,7 @@ foreach ($items as $key => $item) {
 		$row = new CRow([
 			'',
 			$checkbox,
-			$hostColumn,
+			'',
 			(new CCol($item['name_expanded']))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),
@@ -622,15 +633,10 @@ foreach ($applications as $appid => $dbApp) {
 
 	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$hostName = null;
-
-	if (!$singleHostSelected) {
-		$hostName = (new CSpan($host['name']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
-		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
-			$hostName->addClass(ZBX_STYLE_RED);
-		}
+	$hostName = (new CLinkAction($host['name']))
+		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+		$hostName->addClass(ZBX_STYLE_RED);
 	}
 
 	// add toggle row
@@ -732,7 +738,7 @@ foreach ($items as $item) {
 		$row = new CRow([
 			'',
 			$checkbox,
-			$hostColumn,
+			'',
 			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
 			(new CCol($item['delay']))->addClass($state_css),
 			(new CCol($item['history']))->addClass($state_css),
@@ -749,7 +755,7 @@ foreach ($items as $item) {
 		$row = new CRow([
 			'',
 			$checkbox,
-			$hostColumn,
+			'',
 			(new CCol($item['name_expanded']))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),
@@ -772,15 +778,10 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$hostName = null;
-
-	if (!$singleHostSelected) {
-		$hostName = (new CSpan($host['name']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
-		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
-			$hostName->addClass(ZBX_STYLE_RED);
-		}
+	$hostName = (new CLinkAction($host['name']))
+		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+		$hostName->addClass(ZBX_STYLE_RED);
 	}
 
 	// add toggle row

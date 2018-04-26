@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup hosts
+ */
 class testFormHost extends CWebTest {
 	public $host = 'Test host 001';
 	public $host_tmp = 'Test host 001A';
@@ -29,10 +32,6 @@ class testFormHost extends CWebTest {
 	public $host_fullcloned = 'Test host 001 full cloned';
 	public $host_fullcloned_visible = 'Test host 001 full cloned (visible)';
 	public $host_for_template = 'Visible host for template linkage';
-
-	public function testFormHost_backup() {
-		DBsave_tables('hosts');
-	}
 
 	public function testFormHost_Layout() {
 		$this->zbxTestLogin('hosts.php?form=1');
@@ -50,7 +49,7 @@ class testFormHost extends CWebTest {
 	public function testFormHost_Create() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $this->host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -66,7 +65,7 @@ class testFormHost extends CWebTest {
 		$host="1234567890123456789012345678901234567890123456789012345678901234";
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -113,14 +112,14 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host');
-		$this->zbxTestTextPresent('Host "'.$host.'" cannot be without host group.');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+		$this->zbxTestTextPresent('Field "groups" is mandatory.');
 
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}
@@ -133,7 +132,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
@@ -153,7 +152,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
 		$this->zbxTestInputType('visiblename', $hostVisible);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -186,7 +185,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_cloned_visible);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
@@ -215,7 +214,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_fullcloned_visible);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
@@ -244,7 +243,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_tmp);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
@@ -262,11 +261,9 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
-		$this->zbxTestClickButtonText('Select');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickButtonMultiselect('add_templates_');
+		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux');
-		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
@@ -308,7 +305,7 @@ class testFormHost extends CWebTest {
 
 		// this should be a separate test
 		// should check that items, triggers, graphs and applications are not linked to the template anymore
-		$this->zbxTestHrefClickWait('items.php?filter_set=1&hostid='.$hostid);
+		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&hostid=".$hostid."')]", 'filter_application');
 		$this->zbxTestTextNotPresent($template.':');
 		// using "host navigation bar" at the top of entity list
 		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
@@ -325,11 +322,9 @@ class testFormHost extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
-		$this->zbxTestClickButtonText('Select');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickButtonMultiselect('add_templates_');
+		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux');
-		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
@@ -369,7 +364,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
-		$this->zbxTestHrefClickWait('items.php?filter_set=1&hostid='.$hostid);
+		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&hostid=".$hostid."')]", 'filter_application');
 		$this->zbxTestTextNotPresent($template.':');
 
 		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
@@ -378,9 +373,5 @@ class testFormHost extends CWebTest {
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('applications.php?hostid='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
-	}
-
-	public function testFormHost_restore() {
-		DBrestore_tables('hosts');
 	}
 }

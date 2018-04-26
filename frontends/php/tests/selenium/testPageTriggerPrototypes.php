@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ class testPageTriggerPrototypes extends CWebTest {
 	/**
 	* @dataProvider data
 	*/
-
 	public function testPageTriggerPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
@@ -61,24 +60,18 @@ class testPageTriggerPrototypes extends CWebTest {
 				'Severity',
 				'Name',
 				'Expression',
-				'Status'
+				'Create enabled'
 			]
 		);
 		$this->zbxTestTextNotPresent('Info');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent(['Enable', 'Disable', 'Mass update', 'Delete']);
+		$this->zbxTestTextPresent(['Create disabled', 'Mass update', 'Delete']);
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
+	 * @dataProvider data
+	 * @backup-once triggers
 	 */
-	public function testPageTriggerPrototypes_Setup() {
-		DBsave_tables('triggers');
-	}
-
-	/**
-	* @dataProvider data
-	*/
 	public function testPageTriggerPrototypes_SimpleDelete($data) {
 		$triggerid = $data['triggerid'];
 
@@ -88,7 +81,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
 		$this->zbxTestClickButton('triggerprototype.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
@@ -97,20 +90,6 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageTriggerPrototypes_Teardown() {
-		DBrestore_tables('triggers');
-	}
-
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testPageTriggerPrototypes_SetupMass() {
-		DBsave_tables('triggers');
 	}
 
 	// Returns all discovery rules
@@ -128,11 +107,16 @@ class testPageTriggerPrototypes extends CWebTest {
 	}
 
 	/**
-	* @dataProvider rule
-	*/
+	 * @dataProvider rule
+	 * @backup-once triggers
+	 */
 	public function testPageTriggerPrototypes_MassDelete($rule) {
 		$druleid = $rule['parent_itemid'];
-		$triggerids = DBdata('select i.itemid from item_discovery id, items i where parent_itemid='.$druleid.' and i.itemid = id.itemid');
+		$triggerids = DBdata(
+				'SELECT i.itemid'.
+				' FROM item_discovery id, items i'.
+				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid', false
+		);
 		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid);
@@ -140,7 +124,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_triggers');
 		$this->zbxTestClickButton('triggerprototype.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
@@ -148,12 +132,5 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerids', $triggerids);
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testPageTriggerPrototypes_TeardownMass() {
-		DBrestore_tables('triggers');
 	}
 }

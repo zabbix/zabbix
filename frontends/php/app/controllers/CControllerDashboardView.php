@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	protected function checkInput() {
 		$fields = [
 			'fullscreen' =>			'in 0,1',
+			'kioskmode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'source_dashboardid' =>	'db dashboard.dashboardid',
 			'groupid' =>			'db groups.groupid',
@@ -52,10 +53,39 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function checkPermissions() {
-		return  !($this->getUserType() < USER_TYPE_ZABBIX_USER);
+		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+			return false;
+		}
+
+		if ($this->hasInput('groupid') && $this->getInput('groupid') != 0) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => [$this->getInput('groupid')]
+			]);
+
+			if (!$groups) {
+				return false;
+			}
+		}
+
+		if ($this->hasInput('hostid') && $this->getInput('hostid') != 0) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => [$this->getInput('hostid')]
+			]);
+
+			if (!$hosts) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
+
 		list($this->dashboard, $error) = $this->getDashboard();
 
 		if ($error !== null) {
@@ -66,7 +96,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		elseif ($this->dashboard === null) {
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
-				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null);
+				->setArgument('fullscreen', $fullscreen ? '1' : null);
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;
@@ -77,7 +107,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 			$data = [
 				'dashboard' => $dashboard,
-				'fullscreen' => $this->getInput('fullscreen', '0'),
+				'fullscreen' => $fullscreen,
+				'kioskmode' => $kioskmode,
 				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
 				'show_timeline' => self::showTimeline($this->dashboard['widgets']),
@@ -364,8 +395,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return array
 	 */
-	private function getNewDashboard()
-	{
+	private function getNewDashboard() {
 		return [
 			'dashboardid' => 0,
 			'name' => _('New dashboard'),
@@ -382,8 +412,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return array
 	 */
-	private function getOwnerData($userid)
-	{
+	private function getOwnerData($userid) {
 		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
 
 		$users = API::User()->get([
@@ -407,33 +436,42 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	private static function getWidgets($widgets) {
 		$grid_widgets = [];
 
-		foreach ($widgets as $widget) {
-			if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
-				continue;
+		if ($widgets) {
+			CArrayHelper::sort($widgets, ['y', 'x']);
+
+			foreach ($widgets as $widget) {
+				if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
+					continue;
+				}
+
+				$widgetid = $widget['widgetid'];
+				$fields = self::convertWidgetFields($widget['fields']);
+
+				$rf_rate = (array_key_exists('rf_rate', $fields))
+					? ($fields['rf_rate'] == -1)
+						? CWidgetConfig::getDefaultRfRate($widget['type'])
+						: $fields['rf_rate']
+					: CWidgetConfig::getDefaultRfRate($widget['type']);
+
+				$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($fields));
+				if ($widget_form->validate()) {
+					$fields = $widget_form->getFieldsData();
+				}
+
+				$grid_widgets[] = [
+					'widgetid' => $widgetid,
+					'type' => $widget['type'],
+					'header' => $widget['name'],
+					'pos' => [
+						'x' => (int) $widget['x'],
+						'y' => (int) $widget['y'],
+						'width' => (int) $widget['width'],
+						'height' => (int) $widget['height']
+					],
+					'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $rf_rate, $widgetid),
+					'fields' => $fields
+				];
 			}
-
-			$widgetid = $widget['widgetid'];
-			$default_rf_rate = CWidgetConfig::getDefaultRfRate($widget['type']);
-
-			$widget_fields = self::convertWidgetFields($widget['fields']);
-			$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($widget_fields));
-			if ($widget_form->validate()) {
-				$widget_fields = $widget_form->getFieldsData();
-			}
-
-			$grid_widgets[$widgetid] = [
-				'widgetid' => $widgetid,
-				'type' => $widget['type'],
-				'header' => $widget['name'],
-				'pos' => [
-					'x' => (int) $widget['x'],
-					'y' => (int) $widget['y'],
-					'width' => (int) $widget['width'],
-					'height' => (int) $widget['height']
-				],
-				'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $default_rf_rate, $widgetid),
-				'fields' => $widget_fields
-			];
 		}
 
 		return $grid_widgets;

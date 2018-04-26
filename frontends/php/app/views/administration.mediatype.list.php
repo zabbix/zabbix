@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,11 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Media types'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit')))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter('web.media_types.filter.state'))
 		->addVar('action', 'mediatype.list')

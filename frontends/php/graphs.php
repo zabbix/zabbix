@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -390,9 +390,6 @@ $pageFilter = new CPageFilter([
 ]);
 
 if (empty($_REQUEST['parent_discoveryid'])) {
-	if ($pageFilter->groupid > 0) {
-		$groupId = $pageFilter->groupids;
-	}
 	if ($pageFilter->hostid > 0) {
 		$hostId = $pageFilter->hostid;
 	}
@@ -400,7 +397,7 @@ if (empty($_REQUEST['parent_discoveryid'])) {
 
 if (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('group_graphid')) {
 	// render view
-	$data = getCopyElementsFormData('group_graphid');
+	$data = getCopyElementsFormData('group_graphid', _('Graphs'));
 	$data['action'] = 'graph.masscopyto';
 	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();
@@ -414,6 +411,7 @@ elseif (isset($_REQUEST['form'])) {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'group_gid' => getRequest('group_gid', []),
 		'hostid' => $hostId,
+		'groupid' => $groupId,
 		'normal_only' => getRequest('normal_only')
 	];
 
@@ -605,11 +603,25 @@ elseif (isset($_REQUEST['form'])) {
 
 		$i = $next;
 	}
-	asort_by_key($data['items'], 'sortorder');
+	CArrayHelper::sort($data['items'], ['sortorder']);
 	$data['items'] = array_values($data['items']);
 
 	// is template
 	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
+
+	// Read groupid for selected host or template if groupid filter is set to 'All' (is equal 0).
+
+	if ($data['hostid'] && !$data['groupid']) {
+		$db_hostgroup = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'hostids' => $data['hostid'],
+			'templateids' => $data['hostid']
+		]);
+
+		if ($db_hostgroup) {
+			$data['groupid'] = $db_hostgroup[0]['groupid'];
+		}
+	}
 
 	// render view
 	$graphView = new CView('configuration.graph.edit', $data);

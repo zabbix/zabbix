@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ class CUser extends CApiService {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
-			'editable'					=> null,
+			'editable'					=> false,
 			'selectUsrgrps'				=> null,
 			'selectMedias'				=> null,
 			'selectMediatypes'			=> null,
@@ -280,7 +280,7 @@ class CUser extends CApiService {
 			]],
 			'user_medias' =>	['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-				'sendto' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media', 'sendto')],
+				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
@@ -299,7 +299,8 @@ class CUser extends CApiService {
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
 		$this->checkUserGroups($users);
-		$this->checkMediaTypes($users);
+		$db_mediatypes = $this->checkMediaTypes($users);
+		$this->validateMediaRecipients($users, $db_mediatypes);
 	}
 
 	/**
@@ -380,7 +381,7 @@ class CUser extends CApiService {
 			]],
 			'user_medias' =>	['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-				'sendto' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media', 'sendto')],
+				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
@@ -441,7 +442,8 @@ class CUser extends CApiService {
 			$this->checkDuplicates($aliases);
 		}
 		$this->checkUserGroups($users);
-		$this->checkMediaTypes($users);
+		$db_mediatypes = $this->checkMediaTypes($users);
+		$this->validateMediaRecipients($users, $db_mediatypes);
 		$this->checkHimself($users);
 	}
 
@@ -507,10 +509,12 @@ class CUser extends CApiService {
 	/**
 	 * Check for valid media types.
 	 *
-	 * @param array $users
-	 * @param array $users[]['user_medias']  (optional)
+	 * @param array $users                               Array of users.
+	 * @param array $users[]['user_medias']  (optional)  Array of user medias.
 	 *
-	 * @throws APIException  if user media type is not exists.
+	 * @throws APIException if user media type does not exist.
+	 *
+	 * @return array                                     Returns valid media types.
 	 */
 	private function checkMediaTypes(array $users) {
 		$mediatypeids = [];
@@ -524,13 +528,13 @@ class CUser extends CApiService {
 		}
 
 		if (!$mediatypeids) {
-			return;
+			return [];
 		}
 
 		$mediatypeids = array_keys($mediatypeids);
 
 		$db_mediatypes = DB::select('media_type', [
-			'output' => [],
+			'output' => ['mediatypeid', 'type'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
@@ -540,6 +544,89 @@ class CUser extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Media type with ID "%1$s" is not available.', $mediatypeid)
 				);
+			}
+		}
+
+		return $db_mediatypes;
+	}
+
+	/**
+	 * Check if the passed 'sendto' value is a valid input according to the mediatype. Currently validates
+	 * only e-mail media types.
+	 *
+	 * @param array         $users                                    Array of users.
+	 * @param string        $users[]['user_medias'][]['mediatypeid']  Media type ID.
+	 * @param array|string  $users[]['user_medias'][]['sendto']       Address where to send the alert.
+	 * @param array         $db_mediatypes                            List of available media types.
+	 *
+	 * @throws APIException if e-mail is not valid or exeeds maximum DB field length.
+	 */
+	private function validateMediaRecipients(array $users, array $db_mediatypes) {
+		if ($db_mediatypes) {
+			$email_mediatypes = [];
+
+			foreach ($db_mediatypes as $db_mediatype) {
+				if ($db_mediatype['type'] == MEDIA_TYPE_EMAIL) {
+					$email_mediatypes[$db_mediatype['mediatypeid']] = true;
+				}
+			}
+
+			$max_length = DB::getFieldLength('media', 'sendto');
+			$email_validator = new CEmailValidator();
+
+			foreach ($users as $user) {
+				if (array_key_exists('user_medias', $user)) {
+					foreach ($user['user_medias'] as $media) {
+						/*
+						 * For non-email media types only one value allowed. Since value is normalized, need to validate
+						 * if array contains only one item. If there are more than one string, error message is
+						 * displayed, indicating that passed value is not a string.
+						 */
+						if (!array_key_exists($media['mediatypeid'], $email_mediatypes)
+								&& count($media['sendto']) > 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('a character string is expected'))
+							);
+						}
+
+						/*
+						 * If input value is an array with empty string, ApiInputValidator identifies it as valid since
+						 * values are normalized. That's why value must be revalidated.
+						 */
+						foreach ($media['sendto'] as $sendto) {
+							if ($sendto === '') {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('cannot be empty'))
+								);
+							}
+						}
+
+						/*
+						 * If media type is email, validate each given string against email pattern.
+						 * Additionally, total lenght of emails must be checked, because all media type emails are
+						 * separated by newline and stored as a string in single database field. Newline characters
+						 * consumes extra space, so additional validation must be made.
+						 */
+						if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
+							foreach ($media['sendto'] as $sendto) {
+								if (!$email_validator->validate($sendto)) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Invalid email address for media type with ID "%1$s".',
+											$media['mediatypeid']
+										)
+									);
+								}
+								elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
+											$media['mediatypeid']
+										)
+									);
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -702,6 +789,7 @@ class CUser extends CApiService {
 				$medias[$user['userid']] = [];
 
 				foreach ($user['user_medias'] as $media) {
+					$media['sendto'] = implode("\n", $media['sendto']);
 					$medias[$user['userid']][] = $media;
 				}
 			}
@@ -773,17 +861,6 @@ class CUser extends CApiService {
 		if ($del_mediaids) {
 			DB::delete('media', ['mediaid' => $del_mediaids]);
 		}
-	}
-
-	/**
-	 * @deprecated	As of version 3.4, use update() method instead.
-	 */
-	public function updateProfile($user) {
-		$this->deprecated('user.updateprofile method is deprecated.');
-
-		$user['userid'] = self::$userData['userid'];
-
-		return $this->update([$user]);
 	}
 
 	/**
@@ -915,355 +992,6 @@ class CUser extends CApiService {
 					$db_dashboards[0]['name']
 				)
 			);
-		}
-	}
-
-	/**
-	 * Add user media.
-	 *
-	 * @deprecated	As of version 3.4, use update() method instead.
-	 *
-	 * @param array  $data['users']
-	 * @param string $data['users']['userid']
-	 * @param array  $data['medias']
-	 * @param string $data['medias']['mediatypeid']
-	 * @param string $data['medias']['address']
-	 * @param int    $data['medias']['severity']
-	 * @param int    $data['medias']['active']
-	 * @param string $data['medias']['period']
-	 *
-	 * @return array
-	 */
-	public function addMedia(array $data) {
-		$this->deprecated('user.addmedia method is deprecated.');
-
-		$this->validateAddMedia($data);
-		$mediaIds = $this->addMediaReal($data);
-
-		return ['mediaids' => $mediaIds];
-	}
-
-	/**
-	 * Validate add user media.
-	 *
-	 * @throws APIException if the input is invalid
-	 *
-	 * @param array  $data['users']
-	 * @param string $data['users']['userid']
-	 * @param array  $data['medias']
-	 * @param string $data['medias']['mediatypeid']
-	 * @param string $data['medias']['address']
-	 * @param int    $data['medias']['severity']
-	 * @param int    $data['medias']['active']
-	 * @param string $data['medias']['period']
-	 */
-	protected function validateAddMedia(array $data) {
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user media.'));
-		}
-
-		if (!isset($data['users']) || !isset($data['medias'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-		}
-
-		$users = zbx_toArray($data['users']);
-		$media = zbx_toArray($data['medias']);
-
-		$this->checkPermissions(zbx_objectValues($users, 'userid'));
-
-		$mediaDBfields = [
-			'period' => null,
-			'mediatypeid' => null,
-			'sendto' => null,
-			'active' => null,
-			'severity' => null
-		];
-
-		foreach ($media as $mediaItem) {
-			if (!check_db_fields($mediaDBfields, $mediaItem)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-			}
-		}
-
-		$time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
-
-		foreach ($media as $media_item) {
-			if ($time_periods_parser->parse($media_item['period']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid time period.'));
-			}
-		}
-	}
-
-	/**
-	 * Create user media.
-	 *
-	 * @throws APIException if user media insert is fail.
-	 *
-	 * @param array  $data['users']
-	 * @param string $data['users']['userid']
-	 * @param array  $data['medias']
-	 * @param string $data['medias']['mediatypeid']
-	 * @param string $data['medias']['address']
-	 * @param int    $data['medias']['severity']
-	 * @param int    $data['medias']['active']
-	 * @param string $data['medias']['period']
-	 *
-	 * @return array
-	 */
-	protected function addMediaReal(array $data) {
-		$users = zbx_toArray($data['users']);
-		$media = zbx_toArray($data['medias']);
-
-		$mediaIds = [];
-
-		foreach ($users as $user) {
-			foreach ($media as $mediaItem) {
-				$mediaId = get_dbid('media', 'mediaid');
-
-				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-						' VALUES ('.zbx_dbstr($mediaId).','.zbx_dbstr($user['userid']).','.zbx_dbstr($mediaItem['mediatypeid']).','.
-									zbx_dbstr($mediaItem['sendto']).','.zbx_dbstr($mediaItem['active']).','.zbx_dbstr($mediaItem['severity']).','.
-									zbx_dbstr($mediaItem['period']).')';
-
-				if (!DBexecute($sql)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot insert user media.'));
-				}
-
-				$mediaIds[] = $mediaId;
-			}
-		}
-
-		return $mediaIds;
-	}
-
-	/**
-	 * Update user media.
-	 *
-	 * @throws APIException if user media update is fail.
-	 *
-	 * @deprecated	As of version 3.4, use update() method instead.
-	 *
-	 * @param array  $data['users']
-	 * @param string $data['users']['userid']
-	 * @param array  $data['medias']
-	 * @param string $data['medias']['mediatypeid']
-	 * @param string $data['medias']['address']
-	 * @param int    $data['medias']['severity']
-	 * @param int    $data['medias']['active']
-	 * @param string $data['medias']['period']
-	 *
-	 * @return array
-	 */
-	public function updateMedia(array $data) {
-		$this->deprecated('user.updatemedia method is deprecated.');
-
-		$this->validateUpdateMedia($data);
-
-		$users = zbx_toArray($data['users']);
-		$media = zbx_toArray($data['medias']);
-
-		$userIds = array_keys(array_flip((zbx_objectValues($users, 'userid'))));
-
-		$dbMedia = API::UserMedia()->get([
-			'output' => ['mediaid'],
-			'userids' => $userIds,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		$mediaToCreate = $mediaToUpdate = $mediaToDelete = [];
-
-		foreach ($media as $mediaItem) {
-			if (isset($mediaItem['mediaid'])) {
-				$mediaToUpdate[$mediaItem['mediaid']] = $mediaItem;
-			}
-			else {
-				$mediaToCreate[] = $mediaItem;
-			}
-		}
-
-		foreach ($dbMedia as $dbMediaItem) {
-			if (!isset($mediaToUpdate[$dbMediaItem['mediaid']])) {
-				$mediaToDelete[$dbMediaItem['mediaid']] = $dbMediaItem['mediaid'];
-			}
-		}
-
-		// create
-		if ($mediaToCreate) {
-			$this->addMediaReal([
-				'users' => $users,
-				'medias' => $mediaToCreate
-			]);
-		}
-
-		// update
-		if ($mediaToUpdate) {
-			foreach ($mediaToUpdate as $media) {
-				$result = DBexecute(
-					'UPDATE media'.
-					' SET mediatypeid='.zbx_dbstr($media['mediatypeid']).','.
-						' sendto='.zbx_dbstr($media['sendto']).','.
-						' active='.zbx_dbstr($media['active']).','.
-						' severity='.zbx_dbstr($media['severity']).','.
-						' period='.zbx_dbstr($media['period']).
-					' WHERE mediaid='.zbx_dbstr($media['mediaid'])
-				);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update user media.'));
-				}
-			}
-		}
-
-		// delete
-		if ($mediaToDelete) {
-			$this->deleteMediaReal($mediaToDelete);
-		}
-
-		return ['userids' => $userIds];
-	}
-
-	/**
-	 * Validate update user media.
-	 *
-	 * @throws APIException if the input is invalid
-	 *
-	 * @param array  $data['users']
-	 * @param string $data['users']['userid']
-	 * @param array  $data['medias']
-	 * @param string $data['medias']['mediatypeid']
-	 * @param string $data['medias']['address']
-	 * @param int    $data['medias']['severity']
-	 * @param int    $data['medias']['active']
-	 * @param string $data['medias']['period']
-	 */
-	protected function validateUpdateMedia(array $data) {
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user media.'));
-		}
-
-		if (!isset($data['users']) || !isset($data['medias'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-		}
-
-		$users = zbx_toArray($data['users']);
-		$media = zbx_toArray($data['medias']);
-
-		$this->checkPermissions(zbx_objectValues($users, 'userid'));
-
-		// validate media permissions
-		$mediaIds = [];
-
-		foreach ($media as $mediaItem) {
-			if (isset($mediaItem['mediaid'])) {
-				$mediaIds[$mediaItem['mediaid']] = $mediaItem['mediaid'];
-			}
-		}
-
-		if ($mediaIds) {
-			$dbUserMediaCount = API::UserMedia()->get([
-				'countOutput' => true,
-				'mediaids' => $mediaIds,
-				'editable' => true
-			]);
-
-			if ($dbUserMediaCount != count($mediaIds)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
-
-		// validate media parameters
-		$mediaDBfields = [
-			'period' => null,
-			'mediatypeid' => null,
-			'sendto' => null,
-			'active' => null,
-			'severity' => null
-		];
-
-		$time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
-
-		foreach ($media as $media_item) {
-			if (!check_db_fields($mediaDBfields, $mediaItem)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-			}
-
-			if ($time_periods_parser->parse($media_item['period']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid time period.'));
-			}
-		}
-	}
-
-	/**
-	 * Checks if the given users are editable.
-	 *
-	 * @param array $userids	user ids to check
-	 *
-	 * @throws APIException		if the user has no permissions to edit users or a user does not exist
-	 */
-	protected function checkPermissions(array $userids) {
-		$userids = array_unique($userids);
-
-		$count = $this->get([
-			'countOutput' => true,
-			'userids' => $userids,
-			'editable' => true
-		]);
-
-		if ($count != count($userids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-	}
-
-	/**
-	 * Delete user media.
-	 *
-	 * @deprecated	As of version 3.4, use update() method instead.
-	 *
-	 * @param array $mediaIds
-	 *
-	 * @return array
-	 */
-	public function deleteMedia($mediaIds) {
-		$this->deprecated('user.deletemedia method is deprecated.');
-
-		$mediaIds = zbx_toArray($mediaIds);
-
-		$this->validateDeleteMedia($mediaIds);
-		$this->deleteMediaReal($mediaIds);
-
-		return ['mediaids' => $mediaIds];
-	}
-
-	/**
-	 * Validate delete user media.
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateDeleteMedia(array $mediaIds) {
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
-		}
-
-		$dbUserMediaCount = API::UserMedia()->get([
-			'countOutput' => true,
-			'mediaids' => $mediaIds,
-			'editable' => true
-		]);
-
-		if (count($mediaIds) != $dbUserMediaCount) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
-	}
-
-	/**
-	 * Delete user media.
-	 *
-	 * @throws APIException if delete is fail
-	 */
-	protected function deleteMediaReal($mediaIds) {
-		if (!DBexecute('DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaIds))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user media.'));
 		}
 	}
 
@@ -1611,14 +1339,36 @@ class CUser extends CApiService {
 		// adding medias
 		if ($options['selectMedias'] !== null && $options['selectMedias'] != API_OUTPUT_COUNT) {
 			$db_medias = API::getApiService()->select('media', [
-				'output' => $this->outputExtend($options['selectMedias'], ['userid', 'mediaid']),
+				'output' => $this->outputExtend($options['selectMedias'], ['userid', 'mediaid', 'mediatypeid']),
 				'filter' => ['userid' => $userIds],
 				'preservekeys' => true
 			]);
 
+			// 'sendto' parameter in media types with 'type' == MEDIA_TYPE_EMAIL are returned as array.
+			if (($options['selectMedias'] === API_OUTPUT_EXTEND || in_array('sendto', $options['selectMedias']))
+					&& $db_medias) {
+				$db_email_medias = DB::select('media_type', [
+					'output' => [],
+					'filter' => [
+						'mediatypeid' => zbx_objectValues($db_medias, 'mediatypeid'),
+						'type' => MEDIA_TYPE_EMAIL
+					],
+					'preservekeys' => true
+				]);
+
+				foreach ($db_medias as &$db_media) {
+					if (array_key_exists($db_media['mediatypeid'], $db_email_medias)) {
+						$db_media['sendto'] = explode("\n", $db_media['sendto']);
+					}
+				}
+				unset($db_media);
+			}
+
 			$relationMap = $this->createRelationMap($db_medias, 'userid', 'mediaid');
 
-			$db_medias = $this->unsetExtraFields($db_medias, ['userid', 'mediaid'], $options['selectMedias']);
+			$db_medias = $this->unsetExtraFields($db_medias, ['userid', 'mediaid', 'mediatypeid'],
+				$options['selectMedias']
+			);
 			$result = $relationMap->mapMany($result, $db_medias, 'medias');
 		}
 

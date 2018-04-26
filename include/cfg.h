@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 #define	ZBX_CFG_STRICT		1
 
 #define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
+#define ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY	5
 
 extern char	*CONFIG_FILE;
 extern char	*CONFIG_LOG_TYPE_STR;
@@ -48,7 +49,7 @@ extern int	CONFIG_TIMEOUT;
 
 struct cfg_line
 {
-	char		*parameter;
+	const char	*parameter;
 	void		*variable;
 	int		type;
 	int		mandatory;

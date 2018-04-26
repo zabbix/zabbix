@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,7 +82,8 @@ class CMapHelper {
 					'font_size' => 11,
 					'font_color' => 'FF0000',
 					'text' => _('No permissions to referred object or it does not exist!')
-				]]
+				]],
+				'aria_label' => ''
 			];
 		}
 		else {
@@ -110,8 +111,8 @@ class CMapHelper {
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
-			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS),
-			'homepage' => ZABBIX_HOMEPAGE
+			'aria_label' => $map['aria_label'],
+			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
 		];
 	}
 
@@ -129,50 +130,65 @@ class CMapHelper {
 			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
 		];
 
-		if ($sysmap['selements']) {
-			foreach ($sysmap['selements'] as &$selement) {
-				// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
-				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['permission'] < PERM_READ
-						&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
-					$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
-				}
+		foreach ($sysmap['selements'] as &$selement) {
+			// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['permission'] < PERM_READ
+					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+				$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
 			}
-			unset($selement);
 		}
+		unset($selement);
 
 		$areas = populateFromMapAreas($sysmap, $theme);
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
+		// Adding element names and removing inaccessible triggers from readable elements.
 		add_elementNames($sysmap['selements']);
 
-		foreach ($sysmap['selements'] as $id => $element) {
+		foreach ($sysmap['selements'] as $id => &$element) {
+			if ($element['permission'] < PERM_READ) {
+				continue;
+			}
+
 			switch ($element['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
 					$map_info[$id]['name'] = _('Image');
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					// Skip inaccessible elements.
-					$selements_accessible = array_filter($element['elements'], function($elmn) {
-						return array_key_exists('elementName', $elmn);
-					});
-					if (($selements_accessible = reset($selements_accessible)) !== false) {
-						$map_info[$id]['name'] = $selements_accessible['elementName'];
-					} else {
-						$map_info[$id]['name'] = '';
+					// Move the trigger with problem and highiest priority to the beginning of the trigger list.
+					if (array_key_exists('triggerid', $map_info[$id])) {
+						$trigger_pos = 0;
+
+						foreach ($element['elements'] as $i => $trigger) {
+							if ($trigger['triggerid'] == $map_info[$id]['triggerid']) {
+								$trigger_pos = $i;
+								break;
+							}
+						}
+
+						if ($trigger_pos > 0) {
+							$trigger = $element['elements'][$trigger_pos];
+							unset($element['elements'][$trigger_pos]);
+							array_unshift($element['elements'], $trigger);
+						}
 					}
-					break;
+					// break; is not missing here
 
 				default:
 					$map_info[$id]['name'] = $element['elements'][0]['elementName'];
-					break;
 			}
 		}
+		unset($element);
 
-		$labels = getMapLabels($sysmap, $map_info, true);
+		$labels = getMapLabels($sysmap, $map_info);
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
 		$linktrigger_info = getMapLinktriggerInfo($sysmap, $options);
+
+		$problems_total = 0;
+		$status_problems = [];
+		$status_other = [];
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			$icon = null;
@@ -185,6 +201,32 @@ class CMapHelper {
 
 			$element['icon'] = $icon;
 			if ($element['permission'] >= PERM_READ) {
+				$label = str_replace(['.', ','], ' ', CMacrosResolverHelper::resolveMapLabelMacrosAll($element));
+
+				if ($map_info[$id]['problems_total'] > 0) {
+					$problems_total += $map_info[$id]['problems_total'];
+					$problem_desc = str_replace(['.', ','], ' ', $map_info[$id]['aria_label']);
+					$status_problems[] = sprintf('%1$s, %2$s, %3$s, %4$s. ',
+						sysmap_element_types($element['elementtype']), _('Status problem'), $label, $problem_desc
+					);
+				}
+				else {
+					$element_status = _('Status ok');
+
+					if (array_key_exists('info', $map_info[$id])
+							&& array_key_exists('maintenance', $map_info[$id]['info'])) {
+						$element_status = _('Status maintenance');
+					}
+					elseif (array_key_exists('info', $map_info[$id])
+							&& array_key_exists('status', $map_info[$id]['info'])) {
+						$element_status = _('Status disabled');
+					}
+
+					$status_other[] = sprintf('%1$s, %2$s, %3$s. ', sysmap_element_types($element['elementtype']),
+						$element_status, $label
+					);
+				}
+
 				$element['highlight'] = $highlights[$id];
 				$element['actions'] = $actions[$id];
 				$element['label'] = $labels[$id];
@@ -201,6 +243,14 @@ class CMapHelper {
 		}
 		unset($element);
 
+		$sysmap['aria_label'] = str_replace(['.', ','], ' ', $sysmap['name']).', '.
+			_n('%1$s of %2$s element in problem state', '%1$s of %2$s elements in problem state',
+				count($status_problems), count($sysmap['selements'])).
+			', '.
+			_n('%1$s problem in total', '%1$s problems in total', $problems_total).
+			'. '.
+			implode('', array_merge($status_problems, $status_other));
+
 		foreach ($sysmap['shapes'] as &$shape) {
 			if (array_key_exists('text', $shape)) {
 				$shape['text'] = CMacrosResolverHelper::resolveMapLabelMacros($shape['text']);
@@ -214,9 +264,9 @@ class CMapHelper {
 		}
 
 		foreach ($sysmap['links'] as &$link) {
-			if ($link['permission'] >= PERM_READ) {
-				$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
+			$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
 
+			if ($link['permission'] >= PERM_READ) {
 				if (empty($link['linktriggers'])) {
 					continue;
 				}
@@ -440,5 +490,69 @@ class CMapHelper {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Set labels inherited from map configuration data.
+	 *
+	 * @param array $map
+	 *
+	 * @return array map with inherited labels set for elements.
+	 */
+	public static function setElementInheritedLabels(array $map) {
+		foreach ($map['selements'] as &$selement) {
+			$selement['inherited_label'] = null;
+			$selement['label_type'] = $map['label_type'];
+
+			if ($map['label_format'] != SYSMAP_LABEL_ADVANCED_OFF) {
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+						$selement['label_type'] = $map['label_type_hostgroup'];
+						if ($map['label_type_hostgroup'] == MAP_LABEL_TYPE_CUSTOM) {
+							$selement['inherited_label'] = $map['label_string_hostgroup'];
+						}
+						break;
+
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						$selement['label_type'] = $map['label_type_host'];
+						if ($map['label_type_host'] == MAP_LABEL_TYPE_CUSTOM) {
+							$selement['inherited_label'] = $map['label_string_host'];
+						}
+						break;
+
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$selement['label_type'] = $map['label_type_trigger'];
+						if ($map['label_type_trigger'] == MAP_LABEL_TYPE_CUSTOM) {
+							$selement['inherited_label'] = $map['label_string_trigger'];
+						}
+						break;
+
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$selement['label_type'] = $map['label_type_map'];
+						if ($map['label_type_map'] == MAP_LABEL_TYPE_CUSTOM) {
+							$selement['inherited_label'] = $map['label_string_map'];
+						}
+						break;
+
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+						$selement['label_type'] = $map['label_type_image'];
+						if ($map['label_type_image'] == MAP_LABEL_TYPE_CUSTOM) {
+							$selement['inherited_label'] = $map['label_string_image'];
+						}
+						break;
+				}
+			}
+
+			if ($selement['label_type'] == MAP_LABEL_TYPE_NOTHING) {
+				$selement['inherited_label'] = '';
+			}
+			elseif ($selement['label_type'] == MAP_LABEL_TYPE_IP
+					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
+				$selement['inherited_label'] = '{HOST.IP}';
+			}
+		}
+		unset($selement);
+
+		return $map;
 	}
 }

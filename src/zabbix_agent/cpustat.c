@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,10 +122,11 @@ static int	refresh_kstat(ZBX_CPUS_STAT_DATA *pcpus)
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char			*__function_name = "init_cpu_collector";
+	char				*error = NULL;
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
 	wchar_t				cpu[8];
-	char				counterPath[PDH_MAX_COUNTER_PATH], *error = NULL;
+	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -174,9 +175,10 @@ clean:
 	}
 
 #else	/* not _WINDOWS */
-	if (SUCCEED != zbx_mutex_create(&cpustats_lock, ZBX_MUTEX_CPUSTATS, NULL))	/* FIXME later */
+	if (SUCCEED != zbx_mutex_create(&cpustats_lock, ZBX_MUTEX_CPUSTATS, &error))
 	{
-		zbx_error("unable to create mutex for cpu collector");
+		zbx_error("unable to create mutex for cpu collector: %s", error);
+		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
@@ -363,7 +365,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		goto exit;
 	}
 
-	cpu_status = zbx_malloc(cpu_status, sizeof(unsigned char) * (pcpus->count + 1));
+	cpu_status = (unsigned char *)zbx_malloc(cpu_status, sizeof(unsigned char) * (pcpus->count + 1));
 
 	for (idx = 0; idx <= pcpus->count; idx++)
 		cpu_status[idx] = SYSINFO_RET_FAIL;
@@ -394,6 +396,10 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 				&counter[ZBX_CPU_STATE_IOWAIT], &counter[ZBX_CPU_STATE_INTERRUPT],
 				&counter[ZBX_CPU_STATE_SOFTIRQ], &counter[ZBX_CPU_STATE_STEAL],
 				&counter[ZBX_CPU_STATE_GCPU], &counter[ZBX_CPU_STATE_GNICE]);
+
+		/* Linux includes guest times in user and nice times */
+		counter[ZBX_CPU_STATE_USER] -= counter[ZBX_CPU_STATE_GCPU];
+		counter[ZBX_CPU_STATE_NICE] -= counter[ZBX_CPU_STATE_GNICE];
 
 		update_cpu_counters(&pcpus->cpu[idx], counter);
 		cpu_status[idx] = SYSINFO_RET_OK;

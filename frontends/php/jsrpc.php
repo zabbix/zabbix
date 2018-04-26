@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,7 +120,11 @@ switch ($data['method']) {
 						$sound = $msgsettings['sounds.'.$trigger['priority']];
 					}
 
-					$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
+					$url_problems = (new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_hostids[]', $host['hostid'])
+						->setArgument('filter_set', '1')
+						->getUrl();
 					$url_events = (new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
 						->setArgument('filter_triggerids[]', $event['objectid'])
@@ -136,7 +140,7 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'severity_style' => getSeverityStyle($trigger['priority'], $event['value'] == TRIGGER_VALUE_TRUE),
-						'title' => $title.' [url='.$url_tr_status.']'.CHtml::encode($host['name']).'[/url]',
+						'title' => $title.' [url='.$url_problems.']'.CHtml::encode($host['name']).'[/url]',
 						'body' => [
 							'[url='.$url_events.']'.CHtml::encode($trigger['description']).'[/url]',
 							'[url='.$url_tr_events.']'.
@@ -204,7 +208,7 @@ switch ($data['method']) {
 		$result = [];
 
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'priority'],
+			'output' => ['triggerid', 'expression', 'priority'],
 			'triggerids' => $data['triggerids'],
 			'limit' => $config['search_limit']
 		]);
@@ -215,7 +219,7 @@ switch ($data['method']) {
 			]);
 
 			foreach ($triggers as $trigger) {
-				$trigger['color'] = getSeverityColor($trigger['priority']);
+				$trigger['class_name'] = getSeverityStyle($trigger['priority']);
 				$result[] = $trigger;
 			}
 		}
@@ -237,7 +241,7 @@ switch ($data['method']) {
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$hostGroups = API::HostGroup()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['groupid', 'name'],
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
 					'filter' => isset($data['filter']) ? $data['filter'] : null,
@@ -253,18 +257,13 @@ switch ($data['method']) {
 						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
 					}
 
-					foreach ($hostGroups as $hostGroup) {
-						$result[] = [
-							'id' => $hostGroup['groupid'],
-							'name' => $hostGroup['name']
-						];
-					}
+					$result = CArrayHelper::renameObjectsKeys($hostGroups, ['groupid' => 'id']);
 				}
 				break;
 
 			case 'hosts':
 				$hosts = API::Host()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['hostid', 'name'],
 					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
@@ -280,18 +279,13 @@ switch ($data['method']) {
 						$hosts = array_slice($hosts, 0, $data['limit']);
 					}
 
-					foreach ($hosts as $host) {
-						$result[] = [
-							'id' => $host['hostid'],
-							'name' => $host['name']
-						];
-					}
+					$result = CArrayHelper::renameObjectsKeys($hosts, ['hostid' => 'id']);
 				}
 				break;
 
 			case 'templates':
 				$templates = API::Template()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['templateid', 'name'],
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
@@ -306,12 +300,26 @@ switch ($data['method']) {
 						$templates = array_slice($templates, 0, $data['limit']);
 					}
 
-					foreach ($templates as $template) {
-						$result[] = [
-							'id' => $template['templateid'],
-							'name' => $template['name']
-						];
+					$result = CArrayHelper::renameObjectsKeys($templates, ['templateid' => 'id']);
+				}
+				break;
+
+			case 'proxies':
+				$proxies = API::Proxy()->get([
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
+					'output' => ['proxyid', 'host'],
+					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($proxies) {
+					CArrayHelper::sort($proxies, ['host']);
+
+					if (isset($data['limit'])) {
+						$proxies = array_slice($proxies, 0, $data['limit']);
 					}
+
+					$result = CArrayHelper::renameObjectsKeys($proxies, ['proxyid' => 'id', 'host' => 'name']);
 				}
 				break;
 
@@ -332,12 +340,7 @@ switch ($data['method']) {
 						$applications = array_slice($applications, 0, $data['limit']);
 					}
 
-					foreach ($applications as $application) {
-						$result[] = [
-							'id' => $application['applicationid'],
-							'name' => $application['name']
-						];
-					}
+					$result = CArrayHelper::renameObjectsKeys($applications, ['applicationid' => 'id']);
 				}
 				break;
 
@@ -350,7 +353,7 @@ switch ($data['method']) {
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid', 'description'],
 					'selectHosts' => $host_fields,
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'monitored' => isset($data['monitored']) ? $data['monitored'] : null,
 					'search' => isset($data['search']) ? ['description' => $data['search']] : null,
 					'limit' => $config['search_limit']
@@ -397,7 +400,7 @@ switch ($data['method']) {
 
 			case 'users':
 				$users = API::User()->get([
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : null,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['userid', 'alias', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
 						? [
@@ -427,6 +430,27 @@ switch ($data['method']) {
 					}
 				}
 				break;
+
+			case 'usersGroups':
+				$groups = API::UserGroup()->get([
+					'output' => ['usrgrpid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($groups) {
+					CArrayHelper::sort($groups, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$groups = array_slice($groups, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($groups, ['usrgrpid' => 'id']);
+				}
+				break;
+
 		}
 		break;
 

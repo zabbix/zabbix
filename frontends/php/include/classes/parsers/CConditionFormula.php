@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ class CConditionFormula {
 	const STATE_AFTER_OPERATOR = 1;
 	const STATE_AFTER_CLOSE_BRACE = 2;
 	const STATE_AFTER_CONSTANT = 3;
+	const STATE_AFTER_NOT_OPERATOR = 4;
 
 	/**
 	 * Set to true of the formula is valid.
@@ -102,9 +103,13 @@ class CConditionFormula {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
+
 						default:
 							if ($this->parseConstant()) {
 								$state = self::STATE_AFTER_CONSTANT;
+							}
+							elseif ($this->parseNotOperator()) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
 							else {
 								break 3;
@@ -118,6 +123,31 @@ class CConditionFormula {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
+
+						default:
+							if (!$afterSpace) {
+								break 3;
+							}
+
+							if ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
+							}
+							elseif ($this->parseNotOperator()) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
+							}
+							else {
+								break 3;
+							}
+					}
+					break;
+
+				case self::STATE_AFTER_NOT_OPERATOR:
+					switch ($this->formula[$this->pos]) {
+						case '(':
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+
 						default:
 							if (!$afterSpace) {
 								break 3;
@@ -135,12 +165,12 @@ class CConditionFormula {
 				case self::STATE_AFTER_CLOSE_BRACE:
 					switch ($this->formula[$this->pos]) {
 						case ')':
-							$state = self::STATE_AFTER_CLOSE_BRACE;
 							if ($level == 0) {
 								break 3;
 							}
 							$level--;
 							break;
+
 						default:
 							if ($this->parseOperator()) {
 								$state = self::STATE_AFTER_OPERATOR;
@@ -160,6 +190,7 @@ class CConditionFormula {
 							}
 							$level--;
 							break;
+
 						default:
 							if (!$afterSpace) {
 								break 3;
@@ -223,6 +254,21 @@ class CConditionFormula {
 	}
 
 	/**
+	 * Parses a keyword and advances the position to its last character.
+	 *
+	 * @return bool
+	 */
+	protected function parseNotOperator() {
+		if (substr($this->formula, $this->pos, 3) !== 'not') {
+			return false;
+		}
+
+		$this->pos += 2;
+
+		return true;
+	}
+
+	/**
 	 * Parses an operator and advances the position to its last character.
 	 *
 	 * @return bool
@@ -241,12 +287,13 @@ class CConditionFormula {
 
 		$operator = substr($this->formula, $start, $this->pos - $start);
 
-		$this->pos--;
-
 		// check if this is a valid operator
 		if (!in_array($operator, $this->allowedOperators)) {
+			$this->pos = $start;
 			return false;
 		}
+
+		$this->pos--;
 
 		return true;
 	}

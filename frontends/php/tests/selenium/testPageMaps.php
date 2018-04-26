@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,10 +71,10 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkText($name);
 
-		$this->zbxTestClickWait('edit');
+		$this->zbxTestContentControlButtonClickTextWait('Edit map');
 		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('sysmap_update');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestTextPresent($name);
@@ -120,13 +120,10 @@ class testPageMaps extends CWebTest {
 		$this->assertEquals($oldHashLinkTriggers, DBhash($sqlLinkTriggers));
 	}
 
-	public function testPageMaps_backup() {
-		DBsave_tables('sysmaps');
-	}
-
 	/**
-	* @dataProvider allMaps
-	*/
+	 * @dataProvider allMaps
+	 * @backup sysmaps
+	 */
 	public function testPageMaps_MassDelete($map) {
 		$sysmapid = $map['sysmapid'];
 
@@ -135,7 +132,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckboxSelect('maps_'.$sysmapid);
 		$this->zbxTestClickButton('map.massdelete');
 
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map deleted');
 		$this->zbxTestCheckFatalErrors();
@@ -150,10 +147,6 @@ class testPageMaps extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 		$sql = "select * from screens_items where resourcetype=".SCREEN_RESOURCE_MAP." and resourceid=$sysmapid;";
 		$this->assertEquals(0, DBcount($sql));
-	}
-
-	public function testPageMaps_restore() {
-		DBrestore_tables('sysmaps');
 	}
 
 	public function testPageMaps_CreateCancel() {

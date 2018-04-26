@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class CScreenServerInfo extends CScreenBase {
 
 		return $this->getOutput(
 			(new CUiWidget(uniqid(), [make_status_of_zbx(), $footer]))
-				->setHeader(_('Status of Zabbix'))
+				->setHeader(_('System information'))
 		);
 	}
 }

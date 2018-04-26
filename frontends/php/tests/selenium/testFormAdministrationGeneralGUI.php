@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@
 
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
+/**
+ * @backup config
+ */
 class testFormAdministrationGeneralGUI extends CWebTest {
-
-	public function testFormAdministrationGeneralGUI_backup() {
-		DBsave_tables('config');
-	}
 
 	public static function allValues() {
 		return DBdata('SELECT default_theme,dropdown_first_entry,dropdown_first_remember,search_limit,max_in_table,event_ack_enable,event_expire,event_show_max,server_check_interval FROM config ORDER BY configid');
@@ -438,9 +437,5 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "server_check_interval"');
 
 		$this->assertEquals($oldHash, DBhash($sqlHash));
-	}
-
-	public function testFormAdministrationGeneralGUI_restore() {
-		DBrestore_tables('config');
 	}
 }

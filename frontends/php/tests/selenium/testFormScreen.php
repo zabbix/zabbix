@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup screens
+ */
 class testFormScreen extends CWebTest {
 	public $testscreen = 'Test screen (clock)';
 	public $new_screen_name = 'Changed screen name';
@@ -27,10 +30,6 @@ class testFormScreen extends CWebTest {
 	public $cloned_screen = 'Cloned screen';
 	public $testscreen_history = 'Test screen (history of actions)';
 	public $testscreen_ = 'Test screen (simple graph)';
-
-	public function testFormScreen_backup() {
-		DBsave_tables('screens');
-	}
 
 	public static function create() {
 		return [
@@ -124,7 +123,7 @@ class testFormScreen extends CWebTest {
 	 */
 	public function testFormScreen_Create($data) {
 		$this->zbxTestLogin('screenconf.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestClickButton('Create screen');
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 
@@ -139,10 +138,9 @@ class testFormScreen extends CWebTest {
 		$vsize = $this->zbxTestGetValue("//input[@id='vsize']");
 
 		if (isset($data['owner'])) {
-			$this->zbxTestClickXpathWait("//button[text()='Select']");
-			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+			$this->zbxTestClickButtonMultiselect('userid');
+			$this->zbxTestLaunchOverlayDialog('Users');
 			$this->zbxTestClickLinkTextWait($data['owner']);
-			$this->webDriver->switchTo()->window('');
 		}
 
 		if (isset($data['remove_owner'])) {
@@ -218,7 +216,7 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickXpathWait("//a[text()='$this->testscreen_history']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen deleted');
 		$this->assertEquals(0, DBcount("SELECT screenid FROM screens WHERE name='$this->testscreen_history'"));
 	}
@@ -242,9 +240,4 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Change');
 		$this->assertFalse($this->zbxTestCheckboxSelected('dynamic'));
 	}
-
-	public function testFormScreen_restore() {
-		DBrestore_tables('screens');
-	}
-
 }

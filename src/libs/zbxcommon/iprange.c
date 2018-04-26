@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,8 +134,9 @@ static void	iprange_apply_mask(zbx_iprange_t *iprange, int bits)
  ******************************************************************************/
 static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 {
-	int		index, len, bits = -1;
+	int		index, bits = -1;
 	const char	*ptr = address, *dash, *end;
+	size_t		len;
 
 	iprange->type = ZBX_IPRANGE_V4;
 
@@ -227,8 +228,9 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
  ******************************************************************************/
 static int	iprangev6_parse(zbx_iprange_t *iprange, const char *address)
 {
-	int		index, len, fill = -1, bits = -1, target;
+	int		index, fill = -1, bits = -1, target;
 	const char	*ptr = address, *dash, *end;
+	size_t		len;
 
 	iprange->type = ZBX_IPRANGE_V6;
 

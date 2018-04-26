@@ -3,7 +3,7 @@ $red: #e33734 !default;
 $light-red: #ed9898 !default;
 $lighter-red: #fccacf !default;
 
-$orange: #f24f1d;
+$orange: #f24f1d !default;
 $alt-dark-orange: #e97659;
 
 $dark-yellow: #e99003 !default;
@@ -46,6 +46,10 @@ $ui-bg-color: #fff !default;
 $ui-bg-selected-color: #768d99 !default;
 $ui-hover-color: #e8f5ff !default;
 $ui-border-color: #dfe4e7 !default;
+$ui-placeholder-background-color: $body-bg-color !default;
+$ui-highlighted-parent-background-color: lighten($body-bg-color, 4%) !default;
+$ui-sortable-helper-background-color: $ui-bg-color !default;
+$ui-sortable-helper-border-color: $ui-border-color !default;
 
 $action-hover-color: #e8f5ff !default;
 $action-border-color: #ccd5d9 !default;
@@ -61,6 +65,7 @@ $form-font-color: #1f2c33 !default;
 $form-bg-color: #fff !default;
 $form-border-color: #acbbc2 !default;
 $form-border-focus-color: #02659f !default;
+$form-label-asterisk-color: $red;
 
 $form-disabled-font-color: #acbbc2 !default;
 $form-disabled-bg-color: #ebebeb !default;
@@ -68,6 +73,9 @@ $form-disabled-border-color: #ccd5d9 !default;
 
 $scrollbar-track-color: #ebebeb !default;
 $scrollbar-thumb-color: #ccd5d9 !default;
+$scrollbar-thumb-color-darken: 5% !default;
+
+$input-placeholder-color: #9d9d9d !default;
 
 
 // BUTTONS
@@ -115,3 +123,9 @@ $clock-face-color: #ebebeb!default;
 $clock-hand-color: #1f2c33 !default;
 $clock-hand-sec-color: #0275b8 !default;
 $clock-lines-color: #acbbc2 !default;
+
+// STATUSES
+$problem-unack-fg-color: #cc0000 !default;
+$problem-ack-fg-color: #cc0000 !default;
+$ok-unack-fg-color: #009900 !default;
+$ok-ack-fg-color: #009900 !default;

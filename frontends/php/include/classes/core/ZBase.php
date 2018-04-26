@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -259,6 +259,8 @@ class ZBase {
 		return [
 			'blue-theme' => _('Blue'),
 			'dark-theme' => _('Dark'),
+			'hc-light' => _('High-contrast light'),
+			'hc-dark' => _('High-contrast dark')
 		];
 	}
 

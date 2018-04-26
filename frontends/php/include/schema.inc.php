@@ -375,6 +375,18 @@ return [
 				'length' => 512,
 				'default' => '',
 			],
+			'proxy_address' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'auto_compress' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
 		],
 	],
 	'groups' => [
@@ -1240,7 +1252,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'port' => [
@@ -1547,6 +1559,112 @@ return [
 				'length' => 20,
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
+			],
+			'timeout' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '3s',
+			],
+			'url' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			],
+			'query_fields' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			],
+			'posts' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
+			'status_codes' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '200',
+			],
+			'follow_redirects' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'post_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'http_proxy' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'headers' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
+			'retrieve_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'request_method' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'output_format' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'ssl_cert_file' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'ssl_key_file' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'ssl_key_password' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			],
+			'verify_peer' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'verify_host' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'allow_traps' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -2535,25 +2653,25 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'DC0000',
+				'default' => 'CC0000',
 			],
 			'problem_ack_color' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'DC0000',
+				'default' => 'CC0000',
 			],
 			'ok_unack_color' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => '00AA00',
+				'default' => '009900',
 			],
 			'ok_ack_color' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => '00AA00',
+				'default' => '009900',
 			],
 			'problem_unack_style' => [
 				'null' => false,
@@ -2698,6 +2816,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '-1',
+			],
+			'custom_color' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -3134,6 +3258,12 @@ return [
 				'length' => 6,
 				'default' => '',
 			],
+			'colorpalette' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
 		],
 	],
 	'globalmacro' => [
@@ -3313,7 +3443,7 @@ return [
 			'sendto' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
+				'length' => 1024,
 				'default' => '',
 			],
 			'active' => [
@@ -4331,7 +4461,7 @@ return [
 			'sendto' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
+				'length' => 1024,
 				'default' => '',
 			],
 			'subject' => [
@@ -4700,7 +4830,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 		],
@@ -4754,6 +4884,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
 			],
 		],
 	],
@@ -5046,7 +5182,7 @@ return [
 			'listen_dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'host_metadata' => [
@@ -5092,7 +5228,7 @@ return [
 			'listen_dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'host_metadata' => [
@@ -5199,7 +5335,7 @@ return [
 			'dns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 		],
@@ -6312,6 +6448,12 @@ return [
 				'ref_table' => 'users',
 				'ref_field' => 'userid',
 			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			],
 		],
 	],
 	'problem_tag' => [
@@ -6328,6 +6470,42 @@ return [
 				'length' => 20,
 				'ref_table' => 'problem',
 				'ref_field' => 'eventid',
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'tag_filter' => [
+		'key' => 'tag_filterid',
+		'fields' => [
+			'tag_filterid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid',
+			],
+			'groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'groups',
+				'ref_field' => 'groupid',
 			],
 			'tag' => [
 				'null' => false,
@@ -7212,6 +7390,25 @@ return [
 				'length' => 20,
 				'ref_table' => 'sysmaps',
 				'ref_field' => 'sysmapid',
+			],
+		],
+	],
+	'task_check_now' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
 			],
 		],
 	],

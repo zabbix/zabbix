@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@
 		<meta name="msapplication-config" content="none"/>
 		<link rel="stylesheet" type="text/css" href="styles/<?= ZBX_DEFAULT_THEME ?>.css" />
 	</head>
-	<body>
-		<div class="<?= ZBX_STYLE_ARTICLE ?>">
+	<body lang="en">
+		<main>
 			<div class="<?= ZBX_STYLE_BROWSER_WARNING_CONTAINER ?>">
 				<h2 class="<?= ZBX_STYLE_RED ?>">You are using an outdated browser.</h2>
 				<p>Zabbix frontend is built on advanced, modern technologies and does not support old browsers. It is highly recommended that you choose and install a modern browser. It is free of charge and only takes a couple of minutes.</p>
@@ -69,9 +69,9 @@
 					<a href="index.php" onClick="javascript: document.cookie='browserwarning_ignore=yes';">Continue despite this warning</a>
 				</div>
 			</div>
-		</div>
-		<div class="<?= ZBX_STYLE_FOOTER ?>">
+		</main>
+		<footer role="contentinfo">
 			&copy; <?= ZABBIX_COPYRIGHT_FROM ?>&ndash;<?= ZABBIX_COPYRIGHT_TO ?>, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
-		</div>
+		</footer>
 	</body>
 </html>

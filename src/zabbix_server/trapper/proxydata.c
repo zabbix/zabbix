@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,12 +25,19 @@
 #include "proxydata.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxtasks.h"
+#include "mutexs.h"
 
-int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info)
+extern unsigned char	program_type;
+static ZBX_MUTEX	proxy_lock = ZBX_MUTEX_NULL;
+
+#define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(&proxy_lock)
+#define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(&proxy_lock)
+
+int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info)
 {
 	struct zbx_json		json;
 	zbx_vector_ptr_t	tasks;
-	int			ret;
+	int			ret, flags = ZBX_TCP_PROTOCOL;
 
 	zbx_vector_ptr_create(&tasks);
 
@@ -46,13 +53,16 @@ int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&json, &tasks);
 
-	if (SUCCEED == (ret = zbx_tcp_send_raw(sock, json.buffer)))
+	if (0 != proxy->auto_compress)
+		flags |= ZBX_TCP_COMPRESS;
+
+	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), flags, 0)))
 	{
 		if (0 != tasks.values_num)
 			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_INPROGRESS);
 	}
 
-	zbx_json_clean(&json);
+	zbx_json_free(&json);
 
 	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 	zbx_vector_ptr_destroy(&tasks);
@@ -90,12 +100,13 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	if (SUCCEED != (status = zbx_proxy_check_permissions(&proxy, sock, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
-				proxy.host, sock->peer, error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
+				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
 		goto out;
 	}
 
-	zbx_proxy_update_version(&proxy, jp);
+	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
 	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
 	{
@@ -104,10 +115,17 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	zbx_send_proxy_data_respose(&proxy, sock, error);
+	zbx_send_proxy_data_response(&proxy, sock, error);
 out:
 	if (FAIL == ret)
-		zbx_send_response(sock, status, error, CONFIG_TIMEOUT);
+	{
+		int	flags = ZBX_TCP_PROTOCOL;
+
+		if (0 != (sock->protocol & ZBX_TCP_COMPRESS))
+			flags |= ZBX_TCP_COMPRESS;
+
+		zbx_send_response_ext(sock, status, error, NULL, flags, CONFIG_TIMEOUT);
+	}
 
 	zbx_free(error);
 
@@ -127,7 +145,7 @@ out:
  ******************************************************************************/
 static int	send_data_to_server(zbx_socket_t *sock, const char *data, char **error)
 {
-	if (SUCCEED != zbx_tcp_send_to(sock, data, CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_tcp_send_ext(sock, data, strlen(data), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, CONFIG_TIMEOUT))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		return FAIL;
@@ -168,6 +186,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 		goto out;
 	}
 
+	LOCK_PROXY_HISTORY;
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	get_host_availability_data(&j, &availability_ts);
@@ -233,6 +252,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_vector_ptr_destroy(&tasks);
 
 	zbx_json_free(&j);
+	UNLOCK_PROXY_HISTORY;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -310,5 +330,19 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_json_free(&j);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+int	init_proxy_history_lock(char **error)
+{
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+		return zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, error);
+
+	return SUCCEED;
+}
+
+void	free_proxy_history_lock(void)
+{
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+		zbx_mutex_destroy(&proxy_lock);
 }
 

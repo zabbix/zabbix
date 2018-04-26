@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed)
 		len -= 12;
 	}
 
-	c = c + len;
+	c = c + (zbx_hash_t)len;
 
 	switch (len)
 	{
@@ -119,7 +119,7 @@ zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed)
 	const zbx_hash_t	m = 0x5bd1e995u;
 	const zbx_hash_t	r = 24;
 
-	hash = seed ^ len;
+	hash = seed ^ (zbx_hash_t)len;
 
 	while (len >= 4)
 	{

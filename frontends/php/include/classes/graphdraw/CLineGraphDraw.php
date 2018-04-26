@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,12 +188,12 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->to_time = $this->stime + $this->period; // + timeZone offset
 
 		$p = $this->to_time - $this->from_time; // graph size in time
-		$z = $p - $this->from_time % $p; // graphsize - mod(from_time,p) for Oracle...
 		$x = $this->sizeX; // graph size in px
 
 		$this->itemsHost = null;
 
 		$config = select_config();
+		$items = [];
 
 		for ($i = 0; $i < $this->num; $i++) {
 			$item = $this->items[$i];
@@ -213,10 +213,6 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			$type = $item['calc_type'];
-			$from_time = $this->from_time;
-			$to_time = $this->to_time;
-			$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)'; // required for 'group by' support of Oracle
-
 			$to_resolve = [];
 
 			// Override item history setting with housekeeping settings, if they are enabled in config.
@@ -261,29 +257,21 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
-			if ($item['trends'] == 0 || ($item['history'] > time() - ($this->from_time + $this->period / 2)
-						&& $this->period / $this->sizeX <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)) {
-				$this->dataFrom = 'history';
+			$item['source'] = ($item['trends'] == 0 || ($item['history'] > time() - ($this->from_time + $this->period / 2)
+					&& $this->period / $this->sizeX <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
+					? 'history' : 'trends';
 
-				$sql_select = 'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';
-				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
-			}
-			else {
-				$this->dataFrom = 'trends';
+			$items[] = $item;
+		}
 
-				if (!$item['has_scheduling_intervals'] || $item['delay'] != 0) {
-					$item['delay'] = max($item['delay'], SEC_PER_HOUR);
-				}
+		$results = Manager::History()->getGraphAggregation($items, $this->from_time, $this->to_time, $x);
 
-				$sql_select = 'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
-				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
-			}
-
-			if (!isset($this->data[$item['itemid']])) {
+		foreach ($items as $item) {
+			if (!array_key_exists($item['itemid'], $this->data)) {
 				$this->data[$item['itemid']] = [];
 			}
 
-			if (!isset($this->data[$item['itemid']][$type])) {
+			if (!array_key_exists($type, $this->data[$item['itemid']])) {
 				$this->data[$item['itemid']][$type] = [];
 			}
 
@@ -295,40 +283,41 @@ class CLineGraphDraw extends CGraphDraw {
 			$curr_data['avg'] = null;
 			$curr_data['clock'] = null;
 
-			$result = DBselect(
-				'SELECT itemid,'.$calc_field.' AS i,'.$sql_select.',MAX(clock) AS clock'.
-				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-					' AND clock>='.zbx_dbstr($from_time).
-					' AND clock<='.zbx_dbstr($to_time).
-				' GROUP BY itemid,'.$calc_field
-			);
-			while ($row = DBfetch($result)) {
-				$idx = $row['i'] - 1;
-				if ($idx < 0) {
-					continue;
+			if (array_key_exists($item['itemid'], $results)) {
+				$result = $results[$item['itemid']];
+				$this->dataFrom = $result['source'];
+
+				foreach ($result['data'] as $row) {
+					$idx = $row['i'] - 1;
+					if ($idx < 0) {
+						continue;
+					}
+
+					/* --------------------------------------------------
+						We are taking graph on 1px more than we need,
+						and here we are skiping first px, because of MOD (in SELECT),
+						it combines prelast point (it would be last point if not that 1px in begining)
+						and first point, but we still losing prelast point :(
+						but now we've got the first point.
+					--------------------------------------------------*/
+					$curr_data['count'][$idx] = $row['count'];
+					$curr_data['min'][$idx] = $row['min'];
+					$curr_data['max'][$idx] = $row['max'];
+					$curr_data['avg'][$idx] = $row['avg'];
+					$curr_data['clock'][$idx] = $row['clock'];
+					$curr_data['shift_min'][$idx] = 0;
+					$curr_data['shift_max'][$idx] = 0;
+					$curr_data['shift_avg'][$idx] = 0;
 				}
 
-				/* --------------------------------------------------
-					We are taking graph on 1px more than we need,
-					and here we are skiping first px, because of MOD (in SELECT),
-					it combines prelast point (it would be last point if not that 1px in begining)
-					and first point, but we still losing prelast point :(
-					but now we've got the first point.
-				--------------------------------------------------*/
-				$curr_data['count'][$idx] = $row['count'];
-				$curr_data['min'][$idx] = $row['min'];
-				$curr_data['max'][$idx] = $row['max'];
-				$curr_data['avg'][$idx] = $row['avg'];
-				$curr_data['clock'][$idx] = $row['clock'];
-				$curr_data['shift_min'][$idx] = 0;
-				$curr_data['shift_max'][$idx] = 0;
-				$curr_data['shift_avg'][$idx] = 0;
+				unset($result);
+			}
+			else {
+				$this->dataFrom = $item['source'];
 			}
 
 			$loc_min = is_array($curr_data['min']) ? min($curr_data['min']) : null;
 			$this->setGraphOrientation($loc_min, $item['yaxisside']);
-			unset($row);
 
 			$curr_data['avg_orig'] = is_array($curr_data['avg']) ? zbx_avg($curr_data['avg']) : null;
 
@@ -398,6 +387,9 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 		}
+
+		unset($items);
+		unset($results);
 
 		// calculate shift for stacked graphs
 		if ($this->type == GRAPH_TYPE_STACKED) {
@@ -474,7 +466,9 @@ class CLineGraphDraw extends CGraphDraw {
 
 				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($trigger);
 
-				if (!preg_match('/^\{([0-9]+)\}\s*?([\<\>\=]{1})\s*?([\-0-9\.]+)([TGMKsmhdw]?)$/', $trigger['expression'], $arr)) {
+				if (!preg_match(
+					'/^\{([0-9]+)\}\s*?([<>=]|[<>][=])\s*?([\-0-9\.]+)(['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)$/',
+						$trigger['expression'], $arr)) {
 					continue;
 				}
 
@@ -561,7 +555,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymin_itemid);
-			$history = Manager::History()->getLast([$item]);
+			$history = Manager::History()->getLastValues([$item]);
 			if (isset($history[$item['itemid']])) {
 				return $history[$item['itemid']][0]['value'];
 			}
@@ -635,7 +629,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymax_itemid);
-			$history = Manager::History()->getLast([$item]);
+			$history = Manager::History()->getLastValues([$item]);
 			if (isset($history[$item['itemid']])) {
 				return $history[$item['itemid']][0]['value'];
 			}
@@ -1996,7 +1990,7 @@ class CLineGraphDraw extends CGraphDraw {
 			return true;
 		}
 
-		$leftXShift = 20;
+		$leftXShift = 15;
 		$units = [GRAPH_YAXIS_SIDE_LEFT => 0, GRAPH_YAXIS_SIDE_RIGHT => 0];
 
 		// draw item legend
@@ -2558,11 +2552,19 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$x_offsets = $this->shiftXleft + $this->shiftXright + 1;
 		$y_offsets = $this->shiftY + self::legendOffsetY;
+
+		if (!$this->with_vertical_padding) {
+			$y_offsets -= $this->m_showTriggers
+				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
+				: static::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;
 
 		if ($this->drawLegend) {
-			$h_legend_items = 14 * ($this->num + 1) + 8;
+			// Reserve N+1 item rows, last row is used as padding for legend.
+			$h_legend_items = 14 * $this->num + 14;
 			$h_legend_triggers = 14 * count($this->triggers);
 			$h_legend_percentile = 0;
 
@@ -2582,7 +2584,7 @@ class CLineGraphDraw extends CGraphDraw {
 					$this->sizeY -= $h_legend_items;
 					$this->drawItemsLegend = true;
 
-					if ($this->sizeY - $h_legend_triggers - $h_legend_percentile >= ZBX_GRAPH_LEGEND_HEIGHT) {
+					if ($this->sizeY - $h_legend_triggers - $h_legend_percentile >= self::GRAPH_HEIGHT_MIN) {
 						$this->sizeY -= $h_legend_triggers + $h_legend_percentile;
 						$this->drawExLegend = true;
 					}
@@ -2705,9 +2707,13 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	public function draw() {
-		$start_time = microtime(true);
+		$debug_mode = CWebUser::getDebugMode();
+		if ($debug_mode) {
+			$start_time = microtime(true);
+		}
 
 		set_image_header();
+		$this->calculateTopPadding();
 
 		// $this->sizeX is required for selectData() method
 		$this->expandItems();
@@ -2842,12 +2848,12 @@ class CLineGraphDraw extends CGraphDraw {
 			$this->drawLegend();
 		}
 
-		$this->drawLogo();
-
-		$str = sprintf('%0.2f', microtime(true) - $start_time);
-		$str = _s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str);
-		$strSize = imageTextSize(6, 0, $str);
-		imageText($this->im, 6, 0, $this->fullSizeX - $strSize['width'] - 5, $this->fullSizeY - 5, $this->getColor('Gray'), $str);
+		if ($debug_mode) {
+			$str = sprintf('%0.2f', microtime(true) - $start_time);
+			imageText($this->im, 6, 90, $this->fullSizeX - 2, $this->fullSizeY - 5, $this->getColor('Gray'),
+				_s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str)
+			);
+		}
 
 		unset($this->items, $this->data);
 

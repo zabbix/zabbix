@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ class testFormMap extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkTextWait($map_name);
-		$this->zbxTestClickWait('edit');
+		$this->zbxTestContentControlButtonClickTextWait('Edit map');
 
 		// checking if appropriate value for grid size is selected
 		$this->assertTrue($this->zbxTestGetValue("//select[@id='gridsize']//option[@selected]") == $db_map['grid_size']);
@@ -120,7 +120,7 @@ class testFormMap extends CWebTest {
 		);
 
 		$this->zbxTestClickLinkTextWait($map_name);
-		$this->zbxTestClickWait('edit');
+		$this->zbxTestContentControlButtonClickTextWait('Edit map');
 
 		// checking if all options remain as they were set
 		$this->assertTrue(

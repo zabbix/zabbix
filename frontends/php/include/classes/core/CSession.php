@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ class CSession {
 			$path = substr($path, 0, strrpos($path, '/') + 1);
 
 			ob_start();
-			session_set_cookie_params(0, $path, null, HTTPS);
+			session_set_cookie_params(0, $path, null, HTTPS, true);
 
 			if (!session_start()) {
 				throw new Exception('Cannot start session.');
@@ -133,7 +133,13 @@ class CSession {
 	 * Open session for writing
 	 */
 	private static function open() {
-		session_start();
+		static $options = [];
+
+		session_start($options);
+
+		if (!$options) {
+			$options = ['use_cookies' => 0];
+		}
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 
 
 class CPieGraphDraw extends CGraphDraw {
+
+	const DEFAULT_HEADER_PADDING_TOP = 30;
 
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
@@ -158,10 +160,11 @@ class CPieGraphDraw extends CGraphDraw {
 			}
 		}
 		if ($lastValueItems) {
-			$history = Manager::History()->getLast($lastValueItems);
+			$history = Manager::History()->getLastValues($lastValueItems);
 		}
 
 		$config = select_config();
+		$items = [];
 
 		for ($i = 0; $i < $this->num; $i++) {
 			$item = get_item_by_itemid($this->items[$i]['itemid']);
@@ -213,40 +216,38 @@ class CPieGraphDraw extends CGraphDraw {
 				}
 			}
 
-			if ($item['trends'] == 0 || ($item['history'] * SEC_PER_DAY > time() - ($from_time + $this->period / 2))) {
-				$this->dataFrom = 'history';
-
-				$sql_select = 'AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';
-				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
-			}
-			else {
-				$this->dataFrom = 'trends';
-
-				$sql_select = 'AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
-				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
-			}
-
 			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
 				? $history[$item['itemid']][0]['value'] : null;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 
-			$result = DBselect(
-				'SELECT itemid,'.$sql_select.',MAX(clock) AS clock'.
-				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
-					' AND clock>='.zbx_dbstr($from_time).
-					' AND clock<='.zbx_dbstr($to_time).
-				' GROUP BY itemid'
-			);
-			while ($row = DBfetch($result)) {
-				$this->data[$this->items[$i]['itemid']][$type]['min'] = $row['min'];
-				$this->data[$this->items[$i]['itemid']][$type]['max'] = $row['max'];
-				$this->data[$this->items[$i]['itemid']][$type]['avg'] = $row['avg'];
-				$this->data[$this->items[$i]['itemid']][$type]['clock'] = $row['clock'];
+			$item['source'] = ($item['trends'] == 0 || ($item['history'] > time() - ($from_time + $this->period / 2)))
+				? 'history'
+				: 'trends';
+			$items[] = $item;
+		}
+
+		$results = Manager::History()->getGraphAggregation($items, $from_time, $to_time);
+		$i = 0;
+
+		foreach ($items as $item) {
+			if (array_key_exists($item['itemid'], $results)) {
+				$result = $results[$item['itemid']];
+				$this->dataFrom = $result['source'];
+				$type = $this->items[$i]['calc_type'];
+
+				foreach ($result['data'] as $row) {
+					$this->data[$item['itemid']][$type]['min'] = $row['min'];
+					$this->data[$item['itemid']][$type]['max'] = $row['max'];
+					$this->data[$item['itemid']][$type]['avg'] = $row['avg'];
+					$this->data[$item['itemid']][$type]['clock'] = $row['clock'];
+				}
+				unset($result);
 			}
-			unset($row);
+			else {
+				$this->dataFrom = $item['source'];
+			}
 
 			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
@@ -263,9 +264,9 @@ class CPieGraphDraw extends CGraphDraw {
 					$fncName = 'avg';
 			}
 
-			$item_value = empty($this->data[$this->items[$i]['itemid']][$type][$fncName])
+			$item_value = empty($this->data[$item['itemid']][$type][$fncName])
 				? 0
-				: abs($this->data[$this->items[$i]['itemid']][$type][$fncName]);
+				: abs($this->data[$item['itemid']][$type][$fncName]);
 
 			if ($type == GRAPH_ITEM_SUM) {
 				$this->background = $i;
@@ -276,9 +277,10 @@ class CPieGraphDraw extends CGraphDraw {
 
 			$convertedUnit = strlen(convert_units([
 				'value' => $item_value,
-				'units' => $this->items[$i]['units']
+				'units' => $item['units']
 			]));
 			$strvaluelength = max($strvaluelength, $convertedUnit);
+			$i++;
 		}
 
 		if (isset($graph_sum)) {
@@ -308,6 +310,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 		// display items
 		$i = 0;
+		$top_padding = $this->with_vertical_padding ? 10 : -(static::DEFAULT_TOP_BOTTOM_PADDING / 2);
 
 		foreach ($this->items as $item) {
 			$color = $this->getColor($item['color'], 0);
@@ -401,9 +404,9 @@ class CPieGraphDraw extends CGraphDraw {
 			imagefilledrectangle(
 				$this->im,
 				$shiftX - 10,
-				$this->shiftY + 10 + 14 * $i,
+				$this->shiftY + $top_padding + 14 * $i,
 				$shiftX,
-				$this->shiftY + 10 + 10 + 14 * $i,
+				$this->shiftY + $top_padding + 10 + 14 * $i,
 				$color
 			);
 
@@ -411,9 +414,9 @@ class CPieGraphDraw extends CGraphDraw {
 			imagerectangle(
 				$this->im,
 				$shiftX - 10,
-				$this->shiftY + 10 + 14 * $i,
+				$this->shiftY + $top_padding + 14 * $i,
 				$shiftX,
-				$this->shiftY + 10 + 10 + 14 * $i,
+				$this->shiftY + $top_padding + 10 + 14 * $i,
 				$this->GetColor('Black No Alpha')
 			);
 
@@ -423,7 +426,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$fontSize,
 				0,
 				$shiftX + 5,
-				$this->shiftY + 10 + 14 * $i + 10,
+				$this->shiftY + $top_padding + 14 * $i + 10,
 				$this->getColor($this->graphtheme['textcolor'], 0),
 				$strValue
 			);
@@ -464,19 +467,21 @@ class CPieGraphDraw extends CGraphDraw {
 		if ($this->type == GRAPH_TYPE_EXPLODED) {
 			list($sizeX, $sizeY) = $this->calcExplodedRadius($sizeX, $sizeY, count($values));
 		}
-		else {
-			$sizeX = (int) $sizeX * 0.95;
-			$sizeY = (int) $sizeY * 0.95;
-		}
 
 		$xc = $x = (int) $this->sizeX / 2 + $this->shiftXleft;
 		$yc = $y = (int) $this->sizeY / 2 + $this->shiftY;
 
 		$anglestart = 0;
 		$angleend = 0;
+
 		foreach ($values as $item => $value) {
+			if ($value == 0) {
+				continue;
+			}
+
 			$angleend += (int) (360 * $value / $sum) + 1;
 			$angleend = ($angleend > 360) ? 360 : $angleend;
+
 			if (($angleend - $anglestart) < 1) {
 				continue;
 			}
@@ -550,9 +555,15 @@ class CPieGraphDraw extends CGraphDraw {
 		// bottom angle line
 		$anglestart = 0;
 		$angleend = 0;
+
 		foreach ($values as $item => $value) {
+			if ($value == 0) {
+				continue;
+			}
+
 			$angleend += (int) (360 * $value / $sum) + 1;
 			$angleend = ($angleend > 360) ? 360 : $angleend;
+
 			if (($angleend - $anglestart) < 1) {
 				continue;
 			}
@@ -560,6 +571,7 @@ class CPieGraphDraw extends CGraphDraw {
 			if ($this->type == GRAPH_TYPE_3D_EXPLODED) {
 				list($x, $y) = $this->calcExplodedCenter($anglestart, $angleend, $xc, $yc, count($values));
 			}
+
 			imagefilledarc(
 				$this->im,
 				$x,
@@ -589,7 +601,12 @@ class CPieGraphDraw extends CGraphDraw {
 		for ($i = $this->graphheight3d; $i > 0; $i--) {
 			$anglestart = 0;
 			$angleend = 0;
+
 			foreach ($values as $item => $value) {
+				if ($value == 0) {
+					continue;
+				}
+
 				$angleend += (int) (360 * $value / $sum) + 1;
 				$angleend = ($angleend > 360) ? 360 : $angleend;
 
@@ -621,9 +638,15 @@ class CPieGraphDraw extends CGraphDraw {
 
 		$anglestart = 0;
 		$angleend = 0;
+
 		foreach ($values as $item => $value) {
+			if ($value == 0) {
+				continue;
+			}
+
 			$angleend += (int) (360 * $value / $sum) + 1;
 			$angleend = ($angleend > 360) ? 360 : $angleend;
+
 			if (($angleend - $anglestart) < 1) {
 				continue;
 			}
@@ -659,12 +682,15 @@ class CPieGraphDraw extends CGraphDraw {
 	}
 
 	public function draw() {
-		$start_time = microtime(true);
+		$debug_mode = CWebUser::getDebugMode();
+		if ($debug_mode) {
+			$start_time = microtime(true);
+		}
 		set_image_header();
+		$this->calculateTopPadding();
 
 		$this->selectData();
 
-		$this->shiftY = 30;
 		$this->shiftYLegend = 20;
 		$this->shiftXleft = 10;
 		$this->shiftXright = 0;
@@ -677,15 +703,31 @@ class CPieGraphDraw extends CGraphDraw {
 
 		if ($this->drawLegend == 1) {
 			$this->sizeX -= $this->shiftXleft + $this->shiftXright + $this->shiftlegendright;
-			$this->sizeY -= $this->shiftY + $this->shiftYLegend + 12 * $this->num + 8;
+			$this->sizeY -= $this->shiftY + $this->shiftYLegend + 14 * $this->num + 8;
 		}
-		else {
+		elseif ($this->with_vertical_padding) {
 			$this->sizeX -= $this->shiftXleft * 2;
 			$this->sizeY -= $this->shiftY * 2;
 		}
 
+		if (!$this->with_vertical_padding) {
+			if ($this->drawLegend == 1) {
+				// Increase size of graph by sum of: 8px legend font size and 5px legend item bottom shift.
+				$this->sizeY += 13;
+			}
+			else {
+				// Remove y shift if only graph is rendered (no labels, header, vertical paddings).
+				$this->shiftY = 0;
+			}
+		}
+
 		$this->sizeX = min($this->sizeX, $this->sizeY);
 		$this->sizeY = min($this->sizeX, $this->sizeY);
+
+		if ($this->sizeX + $this->shiftXleft > $this->fullSizeX) {
+			$this->sizeX = $this->fullSizeX - $this->shiftXleft - $this->shiftXleft;
+			$this->sizeY = min($this->sizeX, $this->sizeY);
+		}
 
 		$this->calc3dheight($this->sizeY);
 
@@ -747,23 +789,22 @@ class CPieGraphDraw extends CGraphDraw {
 				$this->drawElementPie($values);
 		}
 
-		$this->drawLogo();
 		if ($this->drawLegend == 1) {
 			$this->drawLegend();
 		}
 
-		$str = sprintf('%0.2f', microtime(true) - $start_time);
-		$str = _s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str);
-		$strSize = imageTextSize(6, 0, $str);
-		imageText(
-			$this->im,
-			6,
-			0,
-			$this->fullSizeX - $strSize['width'] - 5,
-			$this->fullSizeY - 5,
-			$this->getColor('Gray'),
-			$str
-		);
+		if ($debug_mode) {
+			$str = sprintf('%0.2f', microtime(true) - $start_time);
+			imageText(
+				$this->im,
+				6,
+				90,
+				$this->fullSizeX - 2,
+				$this->fullSizeY - 5,
+				$this->getColor('Gray'),
+				_s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str)
+			);
+		}
 
 		unset($this->items, $this->data);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -418,17 +418,20 @@ class CApiService {
 	 * @return string			The resulting SQL query
 	 */
 	protected function createSelectQueryFromParts(array $sqlParts) {
-		// build query
-		$sqlSelect = implode(',', array_unique($sqlParts['select']));
-		$sqlFrom = implode(',', array_unique($sqlParts['from']));
-
 		$sql_left_join = '';
 		if (array_key_exists('left_join', $sqlParts)) {
 			foreach ($sqlParts['left_join'] as $join) {
 				$sql_left_join .= ' LEFT JOIN '.$join['from'].' ON '.$join['on'];
 			}
+
+			// Moving a left table to the end.
+			$left_table = $sqlParts['from'][$sqlParts['left_table']];
+			unset($sqlParts['from'][$sqlParts['left_table']]);
+			$sqlParts['from'][$sqlParts['left_table']] = $left_table;
 		}
 
+		$sqlSelect = implode(',', array_unique($sqlParts['select']));
+		$sqlFrom = implode(',', array_unique($sqlParts['from']));
 		$sqlWhere = empty($sqlParts['where']) ? '' : ' WHERE '.implode(' AND ', array_unique($sqlParts['where']));
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
@@ -874,9 +877,19 @@ class CApiService {
 			zbx_value2array($value);
 
 			$fieldName = $this->fieldId($field, $tableShort);
-			$filter[$field] = DB::isNumericFieldType($tableSchema['fields'][$field]['type'])
-				? dbConditionInt($fieldName, $value)
-				: dbConditionString($fieldName, $value);
+			switch ($tableSchema['fields'][$field]['type']) {
+				case DB::FIELD_TYPE_ID:
+					$filter[$field] = dbConditionId($fieldName, $value);
+					break;
+
+				case DB::FIELD_TYPE_INT:
+				case DB::FIELD_TYPE_UINT:
+					$filter[$field] = dbConditionInt($fieldName, $value);
+					break;
+
+				default:
+					$filter[$field] = dbConditionString($fieldName, $value);
+			}
 		}
 
 		if ($filter) {

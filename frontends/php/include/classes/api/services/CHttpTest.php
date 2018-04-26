@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,8 +37,6 @@ class CHttpTest extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['httptests' => 'ht.httptestid'],
@@ -55,7 +53,7 @@ class CHttpTest extends CApiService {
 			'hostids'        => null,
 			'groupids'       => null,
 			'templateids'    => null,
-			'editable'       => null,
+			'editable'       => false,
 			'inherited'      => null,
 			'templated'      => null,
 			'monitored'      => null,
@@ -82,10 +80,9 @@ class CHttpTest extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
@@ -147,7 +144,7 @@ class CHttpTest extends CApiService {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts['where'][] = dbConditionInt('ht.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionId('ht.applicationid', $options['applicationids']);
 		}
 
 		// inherited
@@ -771,16 +768,19 @@ class CHttpTest extends CApiService {
 
 	/**
 	 * Validate http response code range.
-	 * Range can be empty string, can be set as user macro or be numeric and contain ',' and '-'.
+	 * Range can be empty string or list of comma separated numeric strings or user macroses.
 	 *
-	 * Examples: '100-199, 301, 404, 500-550' or '{$USER_MACRO123}'
+	 * Examples: '100-199, 301, 404, 500-550, {$MACRO}-200, {$MACRO}-{$MACRO}'
 	 *
 	 * @param array $httptests
 	 *
 	 * @throws APIException if the status code range is invalid.
 	 */
 	private function checkStatusCodes(array $httptests) {
-		$user_macro_parser = new CUserMacroParser();
+		$validator = new CStatusCodeRangesValidator([
+			'usermacros' => true,
+			'messageInvalid' => _('Invalid response code "%1$s".')
+		]);
 
 		foreach ($httptests as $httptest) {
 			if (!array_key_exists('steps', $httptest)) {
@@ -788,29 +788,12 @@ class CHttpTest extends CApiService {
 			}
 
 			foreach ($httptest['steps'] as $httpstep) {
-				if (!array_key_exists('status_codes', $httpstep)) {
+				if (!array_key_exists('status_codes', $httpstep) || $httpstep['status_codes'] === '') {
 					continue;
 				}
 
-				$status_codes = $httpstep['status_codes'];
-
-				if ($status_codes === '' || $user_macro_parser->parse($status_codes) == CParser::PARSE_SUCCESS) {
-					continue;
-				}
-
-				foreach (explode(',', $status_codes) as $range) {
-					$range = explode('-', $range);
-					if (count($range) > 2) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $status_codes));
-					}
-
-					foreach ($range as $value) {
-						if (!is_numeric($value)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid response code "%1$s".', $status_codes)
-							);
-						}
-					}
+				if (!$validator->validate($httpstep['status_codes'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $validator->getError());
 				}
 			}
 		}

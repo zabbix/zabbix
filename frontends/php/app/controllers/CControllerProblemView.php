@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class CControllerProblemView extends CController {
 
 		$fields = [
 			'action' =>					'string',
-			'sort' =>					'in clock,host,priority,problem',
+			'sort' =>					'in clock,host,priority,name',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>				'in 1',
 			'fullscreen' =>				'in 0,1',
@@ -47,15 +47,20 @@ class CControllerProblemView extends CController {
 			'filter_hostids' =>			'array_id',
 			'filter_application' =>		'string',
 			'filter_triggerids' =>		'array_id',
-			'filter_problem' =>			'string',
+			'filter_name' =>			'string',
 			'filter_severity' =>		'in '.implode(',', $severities),
 			'filter_age_state' =>		'in 1',
 			'filter_age' =>				'int32',
 			'filter_inventory' =>		'array',
+			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>			'array',
+			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
 			'filter_maintenance' =>		'in 1',
 			'filter_unacknowledged' =>	'in 1',
+			'filter_compact_view' =>	'in 1',
+			'filter_show_timeline' =>	'in 1',
 			'filter_details' =>			'in 1',
+			'filter_highlight_row' =>	'in 1',
 			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
 			'stime' =>					'time',
 			'isNow' =>					'in 0,1'
@@ -76,9 +81,10 @@ class CControllerProblemView extends CController {
 
 		if ($ret && $this->hasInput('filter_tags')) {
 			foreach ($this->getInput('filter_tags') as $filter_tag) {
-				if (count($filter_tag) != 2
+				if (count($filter_tag) != 3
 						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
-						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])) {
+						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
+						|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
 					$ret = false;
 					break;
 				}
@@ -118,7 +124,7 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.triggerids', $this->getInput('filter_triggerids', []),
 				PROFILE_TYPE_ID
 			);
-			CProfile::update('web.problem.filter.problem', $this->getInput('filter_problem', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.problem.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.problem.filter.severity',
 				$this->getInput('filter_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED), PROFILE_TYPE_INT
 			);
@@ -137,7 +143,11 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.inventory.field', $filter_inventory['fields'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.problem.filter.inventory.value', $filter_inventory['values'], PROFILE_TYPE_STR);
 
-			$filter_tags = ['tags' => [], 'values' => []];
+			CProfile::update('web.problem.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND),
+				PROFILE_TYPE_INT
+			);
+
+			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
 			foreach ($this->getInput('filter_tags', []) as $filter_tag) {
 				if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
 					continue;
@@ -145,16 +155,31 @@ class CControllerProblemView extends CController {
 
 				$filter_tags['tags'][] = $filter_tag['tag'];
 				$filter_tags['values'][] = $filter_tag['value'];
+				$filter_tags['operators'][] = $filter_tag['operator'];
 			}
 			CProfile::updateArray('web.problem.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.problem.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.problem.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+
+			CProfile::update('web.problem.filter.show_tags', $this->getInput('filter_show_tags', PROBLEMS_SHOW_TAGS_3),
+				PROFILE_TYPE_INT
+			);
 			CProfile::update('web.problem.filter.maintenance', $this->getInput('filter_maintenance', 0),
 				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.unacknowledged', $this->getInput('filter_unacknowledged', 0),
 				PROFILE_TYPE_INT
 			);
+			CProfile::update('web.problem.filter.compact_view', $this->getInput('filter_compact_view', 0),
+				PROFILE_TYPE_INT
+			);
+			CProfile::update('web.problem.filter.show_timeline', $this->getInput('filter_show_timeline', 0),
+				PROFILE_TYPE_INT
+			);
 			CProfile::update('web.problem.filter.details', $this->getInput('filter_details', 0), PROFILE_TYPE_INT);
+			CProfile::update('web.problem.filter.highlight_row', $this->getInput('filter_highlight_row', 0),
+				PROFILE_TYPE_INT
+			);
 		}
 		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.problem.filter.show');
@@ -162,17 +187,23 @@ class CControllerProblemView extends CController {
 			CProfile::deleteIdx('web.problem.filter.hostids');
 			CProfile::delete('web.problem.filter.application');
 			CProfile::deleteIdx('web.problem.filter.triggerids');
-			CProfile::delete('web.problem.filter.problem');
+			CProfile::delete('web.problem.filter.name');
 			CProfile::delete('web.problem.filter.severity');
 			CProfile::delete('web.problem.filter.age_state');
 			CProfile::delete('web.problem.filter.age');
 			CProfile::deleteIdx('web.problem.filter.inventory.field');
 			CProfile::deleteIdx('web.problem.filter.inventory.value');
+			CProfile::delete('web.problem.filter.evaltype');
 			CProfile::deleteIdx('web.problem.filter.tags.tag');
 			CProfile::deleteIdx('web.problem.filter.tags.value');
+			CProfile::deleteIdx('web.problem.filter.tags.operator');
+			CProfile::delete('web.problem.filter.show_tags');
 			CProfile::delete('web.problem.filter.maintenance');
 			CProfile::delete('web.problem.filter.unacknowledged');
+			CProfile::delete('web.problem.filter.compact_view');
+			CProfile::delete('web.problem.filter.show_timeline');
 			CProfile::delete('web.problem.filter.details');
+			CProfile::delete('web.problem.filter.highlight_row');
 		}
 
 		$config = select_config();
@@ -228,7 +259,8 @@ class CControllerProblemView extends CController {
 		foreach (CProfile::getArray('web.problem.filter.tags.tag', []) as $i => $tag) {
 			$filter_tags[] = [
 				'tag' => $tag,
-				'value' => CProfile::get('web.problem.filter.tags.value', null, $i)
+				'value' => CProfile::get('web.problem.filter.tags.value', null, $i),
+				'operator' => CProfile::get('web.problem.filter.tags.operator', null, $i)
 			];
 		}
 
@@ -256,17 +288,22 @@ class CControllerProblemView extends CController {
 				'application' => CProfile::get('web.problem.filter.application', ''),
 				'triggerids' => $filter_triggerids,
 				'triggers' => $filter_triggers,
-				'problem' => CProfile::get('web.problem.filter.problem', ''),
+				'name' => CProfile::get('web.problem.filter.name', ''),
 				'severity' => CProfile::get('web.problem.filter.severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 				'severities' => $severities,
 				'age_state' => CProfile::get('web.problem.filter.age_state', 0),
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
 				'inventory' => $filter_inventory,
+				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND),
 				'tags' => $filter_tags,
+				'show_tags' => CProfile::get('web.problem.filter.show_tags', PROBLEMS_SHOW_TAGS_3),
 				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),
 				'unacknowledged' => CProfile::get('web.problem.filter.unacknowledged', 0),
-				'details' => CProfile::get('web.problem.filter.details', 0)
+				'compact_view' => CProfile::get('web.problem.filter.compact_view', 0),
+				'show_timeline' => CProfile::get('web.problem.filter.show_timeline', 1),
+				'details' => CProfile::get('web.problem.filter.details', 0),
+				'highlight_row' => CProfile::get('web.problem.filter.highlight_row', 0)
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable']
@@ -284,7 +321,7 @@ class CControllerProblemView extends CController {
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));
-		if ($data['action'] == 'problem.view.csv') {
+		if ($data['action'] === 'problem.view.csv') {
 			$response->setFileName('zbx_problems_export.csv');
 		}
 

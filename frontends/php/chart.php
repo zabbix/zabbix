@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,9 @@ $fields = [
 	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
 	'outer' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
-	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'legend' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'widget_view' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -93,6 +95,7 @@ $timeline = calculateTime([
 $graph = new CLineGraphDraw(getRequest('type'));
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
+$graph->showLegend(getRequest('legend', 1));
 
 // change how the graph will be displayed if more than one item is selected
 if (getRequest('batch')) {
@@ -118,6 +121,11 @@ if (hasRequest('outer')) {
 	$graph->setOuter(getRequest('outer'));
 }
 
+if (getRequest('widget_view') === '1') {
+	$graph->draw_header = false;
+	$graph->with_vertical_padding = false;
+}
+
 foreach ($items as $item) {
 	$graph->addItem($item + [
 		'color' => rgb2hex(get_next_color(1)),
@@ -136,7 +144,12 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 
 if (getRequest('onlyHeight', '0') === '1') {
 	$graph->drawDimensions();
-	header('X-ZBX-SBOX-HEIGHT: '.$graph->getHeight());
+	$height = $graph->getHeight();
+
+	if (getRequest('widget_view') === '1') {
+		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
+	}
+	header('X-ZBX-SBOX-HEIGHT: '.$height);
 }
 else {
 	$graph->draw();

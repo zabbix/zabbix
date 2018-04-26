@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,6 +68,20 @@ class CVar {
 		foreach ($this->var_container as $item) {
 			$res .= $item->toString();
 		}
+
 		return $res;
+	}
+
+	/**
+	 * Remove ID attribute from tag.
+	 *
+	 * @return CVar
+	 */
+	public function removeId() {
+		foreach ($this->var_container as $item) {
+			$item->removeAttribute('id');
+		}
+
+		return $this;
 	}
 }

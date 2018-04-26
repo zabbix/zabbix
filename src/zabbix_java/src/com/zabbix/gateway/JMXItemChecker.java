@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package com.zabbix.gateway;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashSet;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
@@ -63,7 +64,7 @@ class JMXItemChecker extends ItemChecker
 			password = request.optString(JSON_TAG_PASSWORD, null);
 
 			if (null != username && null == password || null == username && null != password)
-				throw new IllegalArgumentException("invalid username and password nullness combination");
+				throw new IllegalArgumentException("Both JMX endpoint username and password should be either present or empty");
 		}
 		catch (Exception e)
 		{
@@ -156,7 +157,7 @@ class JMXItemChecker extends ItemChecker
 
 			JSONArray counters = new JSONArray();
 			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
-			
+
 			int mode = DISCOVERY_MODE_ATTRIBUTES;
 			if (0 != argumentCount)
 			{
@@ -249,8 +250,9 @@ class JMXItemChecker extends ItemChecker
 			}
 			catch (Exception e)
 			{
-				Object[] logInfo = {name, attrInfo.getName(), e};
-				logger.trace("processing '{},{}' failed", logInfo);
+				Object[] logInfo = {name, attrInfo.getName(), ZabbixException.getRootCauseMessage(e)};
+				logger.warn("attribute processing '{},{}' failed: {}", logInfo);
+				logger.debug("error caused by", e);
 			}
 		}
 	}
@@ -259,19 +261,35 @@ class JMXItemChecker extends ItemChecker
 	{
 		try
 		{
+			HashSet<String> properties = new HashSet<String>();
 			JSONObject counter = new JSONObject();
 
+			// Default properties are added.
 			counter.put("{#JMXOBJ}", name);
 			counter.put("{#JMXDOMAIN}", name.getDomain());
+			properties.add("OBJ");
+			properties.add("DOMAIN");
 
 			for (Map.Entry<String, String> property : name.getKeyPropertyList().entrySet())
-				counter.put("{#JMX" + property.getKey().toUpperCase() + "}" , property.getValue());
+			{
+				String key = property.getKey().toUpperCase();
+
+				// Property key should only contain valid characters and should not be already added to attribute list.
+				if (key.matches("^[A-Z0-9_\\.]+$") && !properties.contains(key))
+				{
+					counter.put("{#JMX" + key + "}" , property.getValue());
+					properties.add(key);
+				}
+				else
+					logger.trace("bean '{}' property '{}' was ignored", name, property.getKey());
+			}
 
 			counters.put(counter);
 		}
 		catch (Exception e)
 		{
-			logger.trace("bean processing '{}' failed", name);
+			logger.warn("bean processing '{}' failed: {}", name, ZabbixException.getRootCauseMessage(e));
+			logger.debug("error caused by", e);
 		}
 	}
 

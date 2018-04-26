@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -255,10 +255,7 @@ var colorPalette = (function() {
 	'use strict';
 
 	var current_color = 0,
-		palette = [
-			'1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
-			'BB2A02', '5A2B57', '89ABF8', '7EC25C', '274482', '2B5429', '8048B4', 'FD5434', '790E1F', '87AC4D', 'E89DF4'
-		];
+		palette = [];
 
 	return {
 		incrementNextColor: function() {
@@ -278,53 +275,19 @@ var colorPalette = (function() {
 			this.incrementNextColor();
 
 			return color;
+		},
+
+		/**
+		 * Set theme specific color palette.
+		 *
+		 * @param array colors  Array of hexadecimal color codes.
+		 */
+		setThemeColors: function(colors) {
+			palette = colors;
+			current_color = 0;
 		}
 	}
 }());
-
-/**
- * Used for php ctweenbox object.
- * Moves item from 'from' select to 'to' select and adds or removes hidden fields to 'formname' for posting data.
- * Moving perserves alphabetical order.
- *
- * @formname string	form name where hidden fields will be added
- * @objname string	unique name for hidden field naming
- * @from string		from select id
- * @to string		to select id
- * @action string	action to perform with hidden field
- *
- * @return true
- */
-function moveListBoxSelectedItem(objname, from, to, action) {
-	to = jQuery('#' + to);
-
-	jQuery('#' + from).find('option:selected').each(function(i, fromel) {
-		var notApp = true;
-		to.find('option').each(function(j, toel) {
-			if (toel.innerHTML.toLowerCase() > fromel.innerHTML.toLowerCase()) {
-				jQuery(toel).before(fromel);
-				notApp = false;
-				return false;
-			}
-		});
-		if (notApp) {
-			to.append(fromel);
-		}
-		fromel = jQuery(fromel);
-		if (action.toLowerCase() == 'add') {
-			jQuery(this)
-				.closest('form')
-				.append("<input name='" + objname + '[' + fromel.val() + ']' + "' id='" + objname + '_' + fromel.val()
-					+ "' value='" + fromel.val() + "' type='hidden'>"
-				);
-		}
-		else if (action.toLowerCase() == 'rmv') {
-			jQuery('#' + objname + '_' + fromel.val()).remove();
-		}
-	});
-
-	return true;
-}
 
 /**
  * Returns the number of properties of an object.
@@ -508,40 +471,125 @@ function stripslashes(str) {
 	});
 }
 
-function overlayDialogueDestroy() {
-	jQuery('#overlay_bg, #overlay_dialogue').remove();
-	jQuery('body').css({'overflow': ''});
-	jQuery('body[style=""]').removeAttr('style');
+/**
+ * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
+ *
+ * @param string   dialogueid	Dialogue identifier to identify dialogue.
+ * @param {object} xhr			(optional) XHR request that must be aborted.
+ */
+function overlayDialogueDestroy(dialogueid, xhr) {
+	if (typeof dialogueid !== 'undefined') {
+		if (typeof xhr !== 'undefined') {
+			xhr.abort();
+		}
+
+		jQuery('[data-dialogueid='+dialogueid+']').remove();
+
+		if (!jQuery('[data-dialogueid]').length) {
+			jQuery('body').css({'overflow': ''});
+			jQuery('body[style=""]').removeAttr('style');
+		}
+
+		removeFromOverlaysStack(dialogueid);
+	}
+}
+
+/**
+ * Get unused overlay dialog id.
+ *
+ * @return {string}
+ */
+function getOverlayDialogueId() {
+	var dialogueid = Math.random().toString(36).substring(7);
+	while (jQuery('[data-dialogueid="' + dialogueid + '"]').length) {
+		dialogueid = Math.random().toString(36).substring(7);
+	}
+
+	return dialogueid;
 }
 
 /**
  * Display modal window.
  *
- * @param {object} params                        Modal window params.
- * @param {string} params.title                  Modal window title.
- * @param {object} params.content                Window content.
- * @param {array}  params.buttons                Window buttons.
- * @param {string} params.buttons[]['title']     Text on the button.
- * @param {object} params.buttons[]['action']    Function object that will be called on click.
- * @param {string} params.buttons[]['class']     (optional) Button class.
- * @param {bool}   params.buttons[]['cancel']    (optional) It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']   (optional) Focus this button.
- * @param {bool}   params.buttons[]['enabled']   (optional) Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen']  (optional) Prevent dialogue closing, if button action returned false.
+ * @param {object} params                                   Modal window params.
+ * @param {string} params.title                             Modal window title.
+ * @param {object} params.content                           Window content.
+ * @param {object} params.controls                          Window controls.
+ * @param {array}  params.buttons                           Window buttons.
+ * @param {string} params.buttons[]['title']                Text on the button.
+ * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
+ *                                                          on click.
+ * @param {string} params.buttons[]['class']	(optional)  Button class.
+ * @param {bool}   params.buttons[]['cancel']	(optional)  It means what this button has cancel action.
+ * @param {bool}   params.buttons[]['focused']	(optional)  Focus this button.
+ * @param {bool}   params.buttons[]['enabled']	(optional)  Should the button be enabled? Default: true.
+ * @param {bool}   params.buttons[]['keepOpen']	(optional)  Prevent dialogue closing, if button action returned false.
+ * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
+ *                                                          or create a new one if value is not set.
+ * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
+ * @param {object} trigger_elmnt				(optional) UI element which triggered opening of overlay dialogue.
+ * @param {object} xhr							(optional) XHR request used to load content. Used to abort loading.
  *
  * @return {bool}
  */
-function overlayDialogue(params) {
-	jQuery('<div>', {
-		id: 'overlay_bg',
-		class: 'overlay-bg'
-	})
-		.appendTo('body');
-
+function overlayDialogue(params, trigger_elmnt, xhr) {
 	var button_focused = null,
 		cancel_action = null,
+		submit_btn = null,
+		overlay_dialogue = null,
+		headerid = '',
+		overlay_bg = null,
 		overlay_dialogue_footer = jQuery('<div>', {
 			class: 'overlay-dialogue-footer'
+		});
+
+	if (typeof params.dialogueid === 'undefined') {
+		params.dialogueid = getOverlayDialogueId();
+	}
+
+	if (typeof params.script_inline !== 'undefined') {
+		jQuery(overlay_dialogue_footer).append(jQuery('<script>').text(params.script_inline));
+	}
+
+	headerid = 'dashbrd-widget-head-title-'+params.dialogueid;
+
+	if (jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]').length) {
+		overlay_dialogue = jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]');
+
+		jQuery(overlay_dialogue)
+			.attr('class', 'overlay-dialogue modal')
+			.unbind('keydown')
+			.empty();
+	}
+	else {
+		overlay_dialogue = jQuery('<div>', {
+			'id': 'overlay_dialogue',
+			'class': 'overlay-dialogue modal',
+			'data-dialogueid': params.dialogueid,
+			'role': 'dialog',
+			'aria-modal': 'true',
+			'aria-labeledby': headerid
+		});
+
+		overlay_bg = jQuery('<div>', {
+			'id': 'overlay_bg',
+			'class': 'overlay-bg',
+			'data-dialogueid': params.dialogueid
+		})
+			.appendTo('body');
+
+		jQuery(overlay_dialogue).appendTo('body');
+	}
+
+	var center_overlay_dialog = function() {
+			overlay_dialogue.css({
+				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).outerWidth()) / 2) + 'px',
+				'top': Math.round((jQuery(window).height() - jQuery(overlay_dialogue).outerHeight()) / 2) + 'px'
+			});
+		},
+		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
+		body_mutation_observer = new body_mutation_observer(function(mutation) {
+			center_overlay_dialog();
 		});
 
 	jQuery.each(params.buttons, function(index, obj) {
@@ -549,14 +597,25 @@ function overlayDialogue(params) {
 			type: 'button',
 			text: obj.title
 		}).click(function() {
+			if (typeof obj.action === 'string') {
+				obj.action = new Function(obj.action);
+			}
 			var res = obj.action();
 
-			if (res !== false && (!('keepOpen' in obj) || obj.keepOpen === false)) {
-				overlayDialogueDestroy();
+			if (res !== false) {
+				cancel_action = null;
+
+				if (!('keepOpen' in obj) || obj.keepOpen === false) {
+					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
+				}
 			}
 
 			return false;
 		});
+
+		if (!submit_btn && ('isSubmit' in obj) && obj.isSubmit === true) {
+			submit_btn = button;
+		}
 
 		if ('class' in obj) {
 			button.addClass(obj.class);
@@ -577,71 +636,73 @@ function overlayDialogue(params) {
 		overlay_dialogue_footer.append(button);
 	});
 
-	var overlay_dialogue = jQuery('<div>', {
-		id: 'overlay_dialogue',
-		class: 'overlay-dialogue modal'
-	})
+	jQuery(overlay_dialogue)
 		.append(
 			jQuery('<button>', {
 				class: 'overlay-close-btn'
 			})
 				.click(function() {
-					if (cancel_action !== null) {
-						cancel_action();
-					}
-					overlayDialogueDestroy();
-
+					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
 					return false;
 				})
 		)
 		.append(
 			jQuery('<div>', {
 				class: 'dashbrd-widget-head'
-			}).append(jQuery('<h4>').text(params.title))
+			}).append(jQuery('<h4 id="'+headerid+'">').text(params.title))
 		)
+		.append(params.controls ? jQuery('<div>').addClass('overlay-dialogue-controls').html(params.controls) : null)
 		.append(
 			jQuery('<div>', {
 				class: 'overlay-dialogue-body',
-			}).append(params.content)
+			})
+				.append(params.content)
+				.each(function() {
+					body_mutation_observer.observe(this, {childList: true, subtree: true});
+				})
+				.find('form')
+					.attr('aria-labeledby', headerid)
+				.end()
 		)
-		.append(overlay_dialogue_footer)
-		.on('keydown', function(e) {
-			// ESC
-			if (e.which == 27) {
-				if (cancel_action !== null) {
-					cancel_action();
-				}
-				overlayDialogueDestroy();
+		.append(overlay_dialogue_footer);
 
-				return false;
+	if (overlay_bg !== null) {
+		jQuery(overlay_bg).on('remove', function(event) {
+			body_mutation_observer.disconnect();
+			if (cancel_action !== null) {
+				cancel_action();
 			}
-		})
-		.appendTo('body');
 
-	var focusable = jQuery(':focusable', overlay_dialogue);
+			setTimeout(function() {
+				overlayDialogueDestroy(params.dialogueid, xhr);
+			});
 
-	if (focusable.length > 0) {
-		var first_focusable = focusable.filter(':first'),
-			last_focusable = focusable.filter(':last');
-
-		first_focusable.on('keydown', function(e) {
-			// TAB and SHIFT
-			if (e.keyCode == 9 && e.shiftKey) {
-				last_focusable.focus();
-
-				return false;
-			}
-		});
-
-		last_focusable.on('keydown', function(e) {
-			// TAB and not SHIFT
-			if (e.keyCode == 9 && !e.shiftKey) {
-				first_focusable.focus();
-
-				return false;
-			}
+			return false;
 		});
 	}
+
+	if (submit_btn) {
+		jQuery('.overlay-dialogue-body form', overlay_dialogue).on('submit', function(event) {
+			event.preventDefault();
+			submit_btn.trigger('click');
+		});
+	}
+
+	if (typeof trigger_elmnt !== 'undefined') {
+		addToOverlaysStack(params.dialogueid, trigger_elmnt, 'popup', xhr);
+	}
+
+	if (typeof params.class !== 'undefined') {
+		overlay_dialogue.addClass(params.class);
+	}
+
+	center_overlay_dialog();
+
+	jQuery(window).resize(function() {
+		if (jQuery('#overlay_dialogue').length) {
+			center_overlay_dialog();
+		}
+	});
 
 	jQuery('body').css({'overflow': 'hidden'});
 
@@ -649,35 +710,81 @@ function overlayDialogue(params) {
 		button_focused.focus();
 	}
 
-	// Don't focus element in overlay, if the button is already focused.
-	overlayDialogueOnLoad(!button_focused);
+	// Don't focus element in overlay, if button is already focused.
+	overlayDialogueOnLoad(!button_focused, jQuery('.overlay-dialogue[data-dialogueid="'+params.dialogueid+'"]'));
 }
 
 /**
- * Actions to perform, when dialogue is created, as well as, when data in dialogue changed,
- * and this is forced from outside.
+ * Actions to perform, when overlay UI element is created, as well as, when data in overlay was changed.
  *
- * @param {bool} focus  Focus first focusable element in overlay.
+ * @param {bool}	focus		Focus first focusable element in overlay.
+ * @param {object}	overlay		Overlay object.
  */
-function overlayDialogueOnLoad(focus) {
+function overlayDialogueOnLoad(focus, overlay) {
 	if (focus) {
-		jQuery('[autofocus=autofocus]:focusable', jQuery('#overlay_dialogue')).first().focus();
+		if (jQuery('[autofocus=autofocus]:focusable', overlay).length) {
+			jQuery('[autofocus=autofocus]:focusable', overlay).first().focus();
+		}
+		else if (jQuery('.overlay-dialogue-body form :focusable', overlay).length) {
+			jQuery('.overlay-dialogue-body form :focusable', overlay).first().focus();
+		}
+		else {
+			jQuery(':focusable:first', overlay).focus();
+		}
+	}
+
+	var focusable = jQuery(':focusable', overlay);
+
+	if (focusable.length > 1) {
+		var first_focusable = focusable.filter(':first'),
+			last_focusable = focusable.filter(':last');
+
+		first_focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				// TAB and SHIFT
+				if (e.which == 9 && e.shiftKey) {
+					last_focusable.focus();
+					return false;
+				}
+			});
+
+		last_focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				// TAB and not SHIFT
+				if (e.which == 9 && !e.shiftKey) {
+					first_focusable.focus();
+					return false;
+				}
+			});
+	}
+	else {
+		focusable
+			.off('keydown')
+			.on('keydown', function(e) {
+				if (e.which == 9) {
+					return false;
+				}
+			});
 	}
 }
 
 /**
  * Execute script.
  *
- * @param string hostid			host id
- * @param string scriptid		script id
- * @param string confirmation	confirmation text
+ * @param string hostid				host id
+ * @param string scriptid			script id
+ * @param string confirmation		confirmation text
+ * @param {object} trigger_elmnt	UI element that was clicked to open overlay dialogue.
  */
-function executeScript(hostid, scriptid, confirmation) {
+function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 	var execute = function() {
 		if (hostid !== null) {
-			openWinCentered('scripts_exec.php?hostid=' + hostid + '&scriptid=' + scriptid, 'Tools', 950, 470,
-				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
-			);
+			PopUp('popup.scriptexec', {
+				hostid: hostid,
+				scriptid: scriptid
+			}, null, trigger_elmnt);
 		}
 	};
 
@@ -701,7 +808,9 @@ function executeScript(hostid, scriptid, confirmation) {
 					}
 				}
 			]
-		});
+		}, trigger_elmnt);
+
+		return false;
 	}
 	else {
 		execute();
@@ -776,4 +885,59 @@ function makeErrorMessageBox(errors, elementId) {
 	div.append(details);
 
 	return div;
+}
+
+/**
+ * Parse url string to object. Hash starting part of URL will be removed.
+ * Return object where 'url' key contain parsed url, 'pairs' key is array of objects with parsed arguments.
+ * For malformed URL strings will return false.
+ *
+ * @param {string} url    URL string to parse.
+ *
+ * @return {object|bool}
+ */
+function parseUrlString(url) {
+	var url = url.replace(/#.+/, ''),
+		pos = url.indexOf('?'),
+		valid = true,
+		pairs = [],
+		query;
+
+	if (pos != -1) {
+		query = url.substring(pos + 1);
+		url = url.substring(0, pos);
+
+		jQuery.each(query.split('&'), function(i, pair) {
+			if (jQuery.trim(pair)) {
+				pair = pair.replace(/\+/g, ' ').split('=', 2);
+				pair.push('');
+
+				try {
+					if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
+						// Non-printable characters in URL.
+						throw null;
+					}
+
+					pairs.push({
+						'name': decodeURIComponent(pair[0]),
+						'value': decodeURIComponent(pair[1])
+					});
+				}
+				catch( e ) {
+					valid = false;
+					// Break jQuery.each iteration.
+					return false;
+				}
+			}
+		});
+	}
+
+	if (!valid) {
+		return false;
+	}
+
+	return {
+		'url': url,
+		'pairs': pairs
+	};
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@ static void	print_backtrace(CONTEXT *pctx)
 	if (0 != GetModuleFileNameEx(hProcess, NULL, szProcessName, ARRSIZE(szProcessName)))
 	{
 		char	*ptr;
-		int	path_alloc = 0, path_offset = 0;
+		size_t	path_alloc = 0, path_offset = 0;
 
 		process_name = zbx_unicode_to_utf8(szProcessName);
 

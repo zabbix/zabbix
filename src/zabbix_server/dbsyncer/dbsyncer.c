@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 #include "dbcache.h"
 #include "dbsyncer.h"
+#include "export.h"
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
@@ -62,6 +63,12 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (SUCCEED == zbx_is_export_enabled())
+	{
+		zbx_history_export_init("history-syncer", process_num);
+		zbx_problems_export_init("history-syncer", process_num);
+	}
 
 	for (;;)
 	{
@@ -101,6 +108,10 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 
 #undef STAT_INTERVAL

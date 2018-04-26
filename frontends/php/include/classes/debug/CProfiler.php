@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,13 @@ class CProfiler {
 	protected $slowSqlQueryTime = 0.01;
 
 	/**
+	 * Determines time for single Elasticsearch query to be considered slow.
+	 *
+	 * @var float
+	 */
+	protected $slowElasticQueryTime = 0.01;
+
+	/**
 	 * Contains all api requests info.
 	 *
 	 * @var array
@@ -43,11 +50,25 @@ class CProfiler {
 	protected $sqlQueryLog = [];
 
 	/**
+	 * Contains Elasticsearch queries info.
+	 *
+	 * @var array
+	 */
+	protected $elasticQueryLog = [];
+
+	/**
 	 * Total time of all performed sql queries.
 	 *
 	 * @var float
 	 */
 	protected $sqlTotalTime = 0.0;
+
+	/**
+	 * Total time of all performed Elasticsearch queries.
+	 *
+	 * @var float
+	 */
+	protected $elasticTotalTime = 0.0;
 
 	/**
 	 * Timestamp of profiling start.
@@ -128,6 +149,11 @@ class CProfiler {
 		$debug[] = _s('Total SQL time: %1$s', $this->sqlTotalTime);
 		$debug[] = BR();
 
+		if ($this->elasticQueryLog) {
+			$debug[] = _s('Total Elasticsearch time: %1$s', $this->elasticTotalTime);
+			$debug[] = BR();
+		}
+
 		if (isset($DB) && isset($DB['SELECT_COUNT'])) {
 			$debug[] = _s('SQL count: %1$s (selects: %2$s | executes: %3$s)',
 				count($this->sqlQueryLog), $DB['SELECT_COUNT'], $DB['EXECUTE_COUNT']);
@@ -178,6 +204,31 @@ class CProfiler {
 			$debug[] = $sql;
 
 			$debug[] = $this->formatCallStack($query[2]);
+			$debug[] = BR();
+			$debug[] = BR();
+		}
+
+		$debug[] = BR();
+
+		foreach ($this->elasticQueryLog as $query) {
+			$time = $query[0];
+
+			$record = [
+				'Elasticsearch ('.$time.'): ',
+				$query[1].' ',
+				(new CSpan($query[2]))->addClass(ZBX_STYLE_BLUE),
+				BR(),
+				'Request: ',
+				(new CSpan($query[3]))->addClass(ZBX_STYLE_GREEN),
+				BR()
+			];
+
+			if ($time > $this->slowElasticQueryTime) {
+				$sql = bold($record);
+			}
+			$debug[] = $record;
+
+			$debug[] = $this->formatCallStack($query[4]);
 			$debug[] = BR();
 			$debug[] = BR();
 		}
@@ -253,6 +304,32 @@ class CProfiler {
 			$result,
 			$file,
 			$line
+		];
+	}
+
+	/**
+	 * Store Elasticsearch query data.
+	 *
+	 * @param float  $time
+	 * @param string $method
+	 * @param string $endpoint
+	 * @param string $query
+	 */
+	public function profileElasticsearch($time, $method, $endpoint, $query) {
+		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
+				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
+			return;
+		}
+
+		$time = round($time, 6);
+
+		$this->elasticTotalTime += $time;
+		$this->elasticQueryLog[] = [
+			$time,
+			$method,
+			$endpoint,
+			$query,
+			array_slice(debug_backtrace(), 1)
 		];
 	}
 

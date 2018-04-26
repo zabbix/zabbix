@@ -11,8 +11,8 @@
       <template>
          <template>Template Net Intel_Qlogic Infiniband SNMPv2</template>
          <name>Template Net Intel_Qlogic Infiniband SNMPv2</name>
-         <description>Template Net Intel_Qlogic Infiniband version: 0.13
-MIBs used:
+         <description>Template Net Intel_Qlogic Infiniband version: 0.14&#13;
+MIBs used:&#13;
 ICS-CHASSIS-MIB</description>
          <groups>
             <group>
@@ -182,7 +182,7 @@ ICS-CHASSIS-MIB</description>
                      <status>0</status>
                      <value_type>0</value_type>
                      <allowed_hosts/>
-                     <units>°С</units>
+                     <units>°C</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -198,7 +198,7 @@ ICS-CHASSIS-MIB</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
 The current value read from the sensor.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -241,7 +241,7 @@ The current value read from the sensor.</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
 The operational status of the sensor.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -261,8 +261,8 @@ The operational status of the sensor.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
-or
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+or&#13;
 {Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
                      <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -272,15 +272,15 @@ or
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}
-or
+                           <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
 {Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
                            <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
@@ -288,8 +288,8 @@ or
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}
-or
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
 {Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
                      <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
@@ -299,7 +299,7 @@ or
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -395,7 +395,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
 The serial number of the FRU.  If not available, this value is a zero-length string.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -422,7 +422,7 @@ The serial number of the FRU.  If not available, this value is a zero-length str
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
@@ -476,7 +476,7 @@ Device serial number has changed. Ack to close</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -494,15 +494,15 @@ Device serial number has changed. Ack to close</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
-Actual status of the power supply:
-(1) unknown: status not known.
-(2) disabled: power supply is disabled.
-(3) failed - power supply is unable to supply power due to failure.
-(4) warning - power supply is supplying power, but an output or sensor is bad or warning.
-(5) standby - power supply believed usable,but not supplying power.
-(6) engaged - power supply is supplying power.
-(7) redundant - power supply is supplying power, but not needed.
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
+Actual status of the power supply:&#13;
+(1) unknown: status not known.&#13;
+(2) disabled: power supply is disabled.&#13;
+(3) failed - power supply is unable to supply power due to failure.&#13;
+(4) warning - power supply is supplying power, but an output or sensor is bad or warning.&#13;
+(5) standby - power supply believed usable,but not supplying power.&#13;
+(6) engaged - power supply is supplying power.&#13;
+(7) redundant - power supply is supplying power, but not needed.&#13;
 (8) notPresent - power supply is supplying power is not present.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -522,7 +522,7 @@ Actual status of the power supply:
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].last(0)}={$PSU_CRIT_STATUS}</expression>
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: Power supply is in critical state</name>
@@ -531,11 +531,34 @@ Actual status of the power supply:
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SNMPVALUE}: Power supply is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SNMPVALUE}: Power supply is in critical state</name>
+                           <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -585,7 +608,7 @@ Please check the power supply unit for errors</description>
                      <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
-                     <value_type>1</value_type>
+                     <value_type>3</value_type>
                      <allowed_hosts/>
                      <units/>
                      <snmpv3_contextname/>
@@ -603,7 +626,7 @@ Please check the power supply unit for errors</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ICS-CHASSIS-MIB
+                     <description>MIB: ICS-CHASSIS-MIB&#13;
 The operational status of the fan unit.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -623,7 +646,7 @@ The operational status of the fan unit.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.fan.status[icsChassisFanOperStatus.{#SNMPINDEX}].last(0)}={$FAN_CRIT_STATUS}</expression>
+                     <expression>{Template Net Intel_Qlogic Infiniband SNMPv2:sensor.fan.status[icsChassisFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#SNMPVALUE}: Fan is in critical state</name>
@@ -632,7 +655,7 @@ The operational status of the fan unit.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -660,16 +683,12 @@ Please check the fan unit</description>
                <value>3</value>
             </macro>
             <macro>
+               <macro>{$PSU_WARN_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
                <macro>{$FAN_CRIT_STATUS}</macro>
                <value>3</value>
-            </macro>
-            <macro>
-               <macro>{$PSU_OK_STATUS}</macro>
-               <value>1</value>
-            </macro>
-            <macro>
-               <macro>{$FAN_OK_STATUS}</macro>
-               <value>1</value>
             </macro>
             <macro>
                <macro>{$TEMP_CRIT}</macro>
@@ -715,7 +734,7 @@ Please check the fan unit</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>

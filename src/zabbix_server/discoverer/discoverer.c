@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -164,6 +164,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 	if (SUCCEED == ret)
 	{
+		char	**pvalue;
+
 		zbx_alarm_on(CONFIG_TIMEOUT);
 
 		switch (dcheck->type)
@@ -224,8 +226,11 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, &result) && NULL != GET_STR_RESULT(&result))
-						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
+					if (SUCCEED == get_value_agent(&item, &result) &&
+							NULL != (pvalue = GET_TEXT_RESULT(&result)))
+					{
+						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
+					}
 					else
 						ret = FAIL;
 				}
@@ -267,8 +272,11 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 								NULL, 0);
 					}
 
-					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))
-						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
+					if (SUCCEED == get_value_snmp(&item, &result) &&
+							NULL != (pvalue = GET_TEXT_RESULT(&result)))
+					{
+						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
+					}
 					else
 						ret = FAIL;
 
@@ -336,7 +344,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	value = zbx_malloc(value, value_alloc);
+	value = (char *)zbx_malloc(value, value_alloc);
 
 	for (start = dcheck->ports; '\0' != *start;)
 	{
@@ -863,6 +871,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
+#endif
 	}
 
 #undef STAT_INTERVAL

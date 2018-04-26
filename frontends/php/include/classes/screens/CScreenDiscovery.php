@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,9 @@ class CScreenDiscovery extends CScreenBase {
 		];
 
 		foreach ($services as $name => $foo) {
-			$header[] = (new CColHeader($name))->addClass('vertical_rotation');
+			$header[] = (new CColHeader($name))
+				->addClass('vertical_rotation')
+				->setTitle($name);
 		}
 
 		// create table
@@ -179,7 +181,7 @@ class CScreenDiscovery extends CScreenBase {
 							'type' => $htype,
 							'class' => $hclass,
 							'host' => $hostName,
-							'time' => $htime,
+							'time' => $htime
 						];
 					}
 
@@ -188,7 +190,7 @@ class CScreenDiscovery extends CScreenBase {
 						$time = 'lastdown';
 					}
 					else {
-						$class = ZBX_STYLE_ACTIVE_BG;
+						$class = null;
 						$time = 'lastup';
 					}
 
@@ -235,33 +237,10 @@ class CScreenDiscovery extends CScreenBase {
 				];
 
 				foreach ($services as $name => $foo) {
-					$class = null;
-					$time = SPACE;
-					$hint = (new CDiv(SPACE))->addClass($class);
-
-					$hint_table = null;
-					if (array_key_exists($name, $h_data['services'])) {
-						$class = $h_data['services'][$name]['class'];
-						$time = $h_data['services'][$name]['time'];
-
-						$hint_table = (new CTableInfo())->setAttribute('style', 'width: auto;');
-
-						if ($class == ZBX_STYLE_ACTIVE_BG) {
-							$hint_table->setHeader(_('Uptime'));
-						}
-						else {
-							$hint_table->setHeader(_('Downtime'));
-						}
-
-						$hint_table->addRow(
-							(new CCol(zbx_date2age($h_data['services'][$name]['time'])))->addClass($class)
-						);
-					}
-					$column = (new CCol($hint))->addClass($class);
-					if (!is_null($hint_table)) {
-						$column->setHint($hint_table);
-					}
-					$row[] = $column;
+					$row[] = array_key_exists($name, $h_data['services'])
+						? (new CCol(zbx_date2age($h_data['services'][$name]['time'])))
+							->addClass($h_data['services'][$name]['class'])
+						: '';
 				}
 				$table->addRow($row);
 			}

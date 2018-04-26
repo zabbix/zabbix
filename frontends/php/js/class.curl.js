@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,9 +37,13 @@ Curl.prototype = {
 	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
 	 *
 	 * @param url
+	 * @param add_sid	boolean	Add SID to given URL. Default: true.
 	 */
-	initialize: function(url) {
+	initialize: function(url, add_sid) {
 		url = url || location.href;
+		if (typeof add_sid === 'undefined') {
+			add_sid = true;
+		}
 
 		this.url = url;
 		this.args = {};
@@ -122,7 +126,9 @@ Curl.prototype = {
 			this.formatArguments();
 		}
 
-		this.addSID();
+		if (add_sid) {
+			this.addSID();
+		}
 	},
 
 	addSID: function() {
@@ -133,10 +139,7 @@ Curl.prototype = {
 			sid = location.href.substr(possition + 4, 16);
 		}
 		else {
-			sid = cookie.read('zbx_sessionid');
-			if (!is_null(sid)) {
-				sid = sid.substr(16, 16);
-			}
+			sid = jQuery('meta[name="csrf-token"]').attr('content');
 		}
 
 		if ((/[\da-z]{16}/i).test(sid)) {

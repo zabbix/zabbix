@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class CScreenSystemStatus extends CScreenBase {
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
 		return $this->getOutput(
-			(new CUiWidget('hat_syssum', [$table, $footer]))->setHeader(_('System status'))
+			(new CUiWidget('hat_syssum', [$table, $footer]))->setHeader(_('Problems by severity'))
 		);
 	}
 }
