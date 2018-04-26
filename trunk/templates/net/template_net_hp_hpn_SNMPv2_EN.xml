@@ -1,0 +1,1237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>3.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Network Devices</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Net HP Enterprise Switch SNMPv2</template>
+         <name>Template Net HP Enterprise Switch SNMPv2</name>
+         <description>Template Net HP Enterprise Switch version: 0.14&#13;
+MIBs used:&#13;
+STATISTICS-MIB&#13;
+NETSWITCH-MIB&#13;
+ENTITY-SENSORS-MIB&#13;
+HP-ICF-CHASSIS&#13;
+ENTITY-MIB&#13;
+SEMI-MIB</description>
+         <groups>
+            <group>
+               <name>Templates/Network Devices</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>CPU</name>
+            </application>
+            <application>
+               <name>Memory</name>
+            </application>
+            <application>
+               <name>Temperature</name>
+            </application>
+            <application>
+               <name>Fans</name>
+            </application>
+            <application>
+               <name>Power Supply</name>
+            </application>
+            <application>
+               <name>Inventory</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>CPU utilization</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0</snmp_oid>
+               <key>system.cpu.util[hpSwitchCpuStat.0]</key>
+               <delay>180</delay>
+               <history>30d</history>
+               <trends>365d</trends>
+               <status>0</status>
+               <value_type>0</value_type>
+               <allowed_hosts/>
+               <units>%</units>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: STATISTICS-MIB&#13;
+The CPU utilization in percent(%).&#13;
+Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c02597344&amp;sp4ts.oid=51079</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>CPU</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Hardware serial number</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.11.2.36.1.1.2.9.0</snmp_oid>
+               <key>system.hw.serialnumber</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: SEMI-MIB</description>
+               <inventory_link>8</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Firmware version</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.11.2.14.11.5.1.1.3.0</snmp_oid>
+               <key>system.hw.firmware</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: NETSWITCH-MIB&#13;
+Contains the operating code version number (also known as software or firmware).&#13;
+For example, a software version such as A.08.01 is described as follows:&#13;
+A    the function set available in your router&#13;
+08   the common release number&#13;
+01   updates to the current common release</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Temperature Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3]</snmp_oid>
+               <key>temp.precision0.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>8</value>
+                        <!-- celsius -->
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SENSOR_PRECISION}</macro>
+                        <value>0</value>
+                        <!-- limit only to precision 0 (like 10) -->
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SENSOR_INFO}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
+The most recent measurement obtained by the agent for this sensor.&#13;
+To correctly interpret the value of this object, the associated entPhySensorType,&#13;
+entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Memory Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.1]</snmp_oid>
+               <key>memory.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Discovery of NETSWITCH-MIB::hpLocalMemTable, A table that contains information on all the local memory for each slot.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>#{#SNMPVALUE}: Used memory</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: NETSWITCH-MIB&#13;
+The number of currently allocated bytes.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Memory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>#{#SNMPVALUE}: Available memory</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>vm.memory.free[hpLocalMemFreeBytes.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: NETSWITCH-MIB&#13;
+The number of available (unallocated) bytes.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Memory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>#{#SNMPVALUE}: Memory utilization</name>
+                     <type>15</type>
+                     <snmp_community/>
+                     <snmp_oid/>
+                     <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>%</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params>(last(vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}])/(last(vm.memory.free[hpLocalMemFreeBytes.{#SNMPINDEX}])+last(vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}])))*100</params>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>Memory utilization in %</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Memory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:vm.memory.pused[vm.memory.pused.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#SNMPVALUE}: High memory utilization</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>#{#SNMPVALUE}: Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Net HP Enterprise Switch SNMPv2</host>
+                              <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>FAN Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]</snmp_oid>
+               <key>fan.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>.+8.3.2$</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
+                     <condition>
+                        <macro>{#ENT_STATUS}</macro>
+                        <value>(1|2|3|4)</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.2 - fans and are present</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ENT_DESCR}: Fan status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: HP-ICF-CHASSIS&#13;
+Actual status indicated by the sensor: {#ENT_DESCR}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>HP-ICF-CHASSIS::hpicfSensorStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#ENT_DESCR}: Fan is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#ENT_DESCR}: Fan is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#ENT_DESCR}: Fan is in critical state</name>
+                           <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>PSU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]</snmp_oid>
+               <key>psu.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>.+8.3.1$</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
+                     <condition>
+                        <macro>{#ENT_STATUS}</macro>
+                        <value>(1|2|3|4)</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.1 - power supplies and are present</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ENT_DESCR}: Power supply status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: HP-ICF-CHASSIS&#13;
+Actual status indicated by the sensor: {#ENT_DESCR}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Power Supply</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>HP-ICF-CHASSIS::hpicfSensorStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#ENT_DESCR}: Power supply is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#ENT_DESCR}: Power supply is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#ENT_DESCR}: Power supply is in critical state</name>
+                           <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temp Status Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]</snmp_oid>
+               <key>temp.status.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>.+8.3.3$</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
+                     <condition>
+                        <macro>{#ENT_STATUS}</macro>
+                        <value>(1|2|3|4)</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.3 - over temp status and are present</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ENT_DESCR}: Temperature status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.status[hpicfSensorStatus.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: HP-ICF-CHASSIS&#13;
+Actual status indicated by the sensor: {#ENT_DESCR}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>HP-ICF-CHASSIS::hpicfSensorStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes/>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Entity Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]</snmp_oid>
+               <key>entity.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>3</value>
+                        <!-- 3 - chassis  -->
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description/>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ENT_NAME}: Hardware model name</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.model[entPhysicalDescr.{#SNMPINDEX}]</key>
+                     <delay>3600</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: ENTITY-MIB</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Inventory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#ENT_NAME}: Hardware version(revision)</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.version[entPhysicalHardwareRev.{#SNMPINDEX}]</key>
+                     <delay>3600</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: ENTITY-MIB</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Inventory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes/>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"bad"}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_WARN_STATUS:"warning"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_CRIT_STATUS:"bad"}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_WARN_STATUS:"warning"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_STATUS}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$CPU_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$STORAGE_UTIL_CRIT}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$STORAGE_UTIL_WARN}</macro>
+               <value>80</value>
+            </macro>
+         </macros>
+         <templates>
+            <template>
+               <name>Template Module Interfaces SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+         </templates>
+         <screens/>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>CPU utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Net HP Enterprise Switch SNMPv2</host>
+                  <key>system.cpu.util[hpSwitchCpuStat.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <triggers>
+      <trigger>
+         <expression>{Template Net HP Enterprise Switch SNMPv2:system.cpu.util[hpSwitchCpuStat.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>High CPU utilization</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>3</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Net HP Enterprise Switch SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net HP Enterprise Switch SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <recovery_mode>2</recovery_mode>
+         <recovery_expression/>
+         <name>Device has been replaced (new serial number received)</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>1</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Device serial number has changed. Ack to close</description>
+         <type>0</type>
+         <manual_close>1</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Net HP Enterprise Switch SNMPv2:system.hw.firmware.diff()}=1 and {Template Net HP Enterprise Switch SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <recovery_mode>2</recovery_mode>
+         <recovery_expression/>
+         <name>Firmware has changed</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>1</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Firmware version has changed. Ack to close</description>
+         <type>0</type>
+         <manual_close>1</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+   </triggers>
+   <value_maps>
+      <value_map>
+         <name>HP-ICF-CHASSIS::hpicfSensorStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>bad</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>warning</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>good</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>notPresent</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

@@ -1,0 +1,1738 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>3.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Modules</name>
+      </group>
+      <group>
+         <name>Templates/Network Devices</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</template>
+         <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
+         <description>Template Cisco CISCO-MEMORY-POOL-MIB version: 0.14&#13;
+MIBs used:&#13;
+CISCO-MEMORY-POOL-MIB</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Memory</name>
+            </application>
+         </applications>
+         <items/>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Memory Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.48.1.1.1.2]</snmp_oid>
+               <key>memory.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.&#13;
+http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SNMPVALUE}: Used memory</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CISCO-MEMORY-POOL-MIB&#13;
+Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.&#13;
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Memory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SNMPVALUE}: Available memory</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CISCO-MEMORY-POOL-MIB&#13;
+Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool&#13;
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Memory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SNMPVALUE}: Memory utilization</name>
+                     <type>15</type>
+                     <snmp_community/>
+                     <snmp_oid/>
+                     <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>%</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params>(last(vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])/(last(vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}])+last(vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])))*100</params>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>Memory utilization in %</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Memory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2:vm.memory.pused[vm.memory.pused.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SNMPVALUE}: High memory utilization</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#SNMPVALUE}: Memory utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</host>
+                              <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros/>
+         <templates/>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</template>
+         <name>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</name>
+         <description>Template Cisco CISCO-PROCESS-MIB version: 0.14&#13;
+MIBs used:&#13;
+CISCO-PROCESS-MIB</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>CPU</name>
+            </application>
+         </applications>
+         <items/>
+         <discovery_rules>
+            <discovery_rule>
+               <name>CPU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.5]</snmp_oid>
+               <key>cpu.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable ,&#13;
+indexed with cpmCPUTotalIndex .&#13;
+This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,&#13;
+like different CPU chips, group of CPUs, or CPUs in different modules/cards.&#13;
+In case of a single CPU, cpmCPUTotalTable has only one entry.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>#{#SNMPINDEX}: CPU utilization</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>%</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CISCO-PROCESS-MIB&#13;
+The cpmCPUTotal5minRev MIB object provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev . These MIB objects are not accurate because they look at CPU at one minute and five second intervals, respectively. These MIBs enable you to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500s, can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.&#13;
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>CPU</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-PROCESS-MIB SNMPv2:system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#SNMPINDEX}: High CPU utilization</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>#{#SNMPINDEX}: CPU utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</host>
+                              <key>system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros/>
+         <templates/>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</template>
+         <name>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
+         <description>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 version: 0.14&#13;
+MIBs used:&#13;
+CISCO-PROCESS-MIB</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>CPU</name>
+            </application>
+         </applications>
+         <items/>
+         <discovery_rules>
+            <discovery_rule>
+               <name>CPU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.5]</snmp_oid>
+               <key>cpu.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable ,&#13;
+indexed with cpmCPUTotalIndex .&#13;
+This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,&#13;
+like different CPU chips, group of CPUs, or CPUs in different modules/cards.&#13;
+In case of a single CPU, cpmCPUTotalTable has only one entry.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SNMPVALUE}: CPU utilization</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.9.9.109.1.1.1.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>%</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CISCO-PROCESS-MIB&#13;
+The overall CPU busy percentage in the last 5 minute&#13;
+period. This object deprecates the avgBusy5 object from&#13;
+the OLD-CISCO-SYSTEM-MIB. This object is deprecated&#13;
+by cpmCPUTotal5minRev which has the changed range&#13;
+of value (0..100)&#13;
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>CPU</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2:system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SNMPVALUE}: High CPU utilization</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#SNMPVALUE}: CPU utilization</name>
+                     <width>900</width>
+                     <height>200</height>
+                     <yaxismin>0</yaxismin>
+                     <yaxismax>100</yaxismax>
+                     <show_work_period>1</show_work_period>
+                     <show_triggers>1</show_triggers>
+                     <type>0</type>
+                     <show_legend>1</show_legend>
+                     <show_3d>0</show_3d>
+                     <percent_left>0.0000</percent_left>
+                     <percent_right>0.0000</percent_right>
+                     <ymin_type_1>1</ymin_type_1>
+                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_item_1>0</ymin_item_1>
+                     <ymax_item_1>0</ymax_item_1>
+                     <graph_items>
+                        <graph_item>
+                           <sortorder>0</sortorder>
+                           <drawtype>5</drawtype>
+                           <color>1A7C11</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>2</calc_fnc>
+                           <type>0</type>
+                           <item>
+                              <host>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</host>
+                              <key>system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros/>
+         <templates/>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</template>
+         <name>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</name>
+         <description>Template Cisco OLD-CISCO-CPU-MIB version: 0.14&#13;
+MIBs used:&#13;
+OLD-CISCO-CPU-MIB</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>CPU</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>CPU utilization</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.9.2.1.58</snmp_oid>
+               <key>system.cpu.util[avgBusy5]</key>
+               <delay>180</delay>
+               <history>30d</history>
+               <trends>365d</trends>
+               <status>0</status>
+               <value_type>0</value_type>
+               <allowed_hosts/>
+               <units>%</units>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: OLD-CISCO-CPU-MIB&#13;
+5 minute exponentially-decayed moving average of the CPU busy percentage.&#13;
+Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>CPU</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+         </items>
+         <discovery_rules/>
+         <httptests/>
+         <macros/>
+         <templates/>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Module Cisco Inventory SNMPv2</template>
+         <name>Template Module Cisco Inventory SNMPv2</name>
+         <description>Template Cisco Inventory version: 0.14&#13;
+MIBs used:&#13;
+ENTITY-MIB&#13;
+SNMPv2-MIB</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Inventory</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Hardware model name</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.13.1</snmp_oid>
+               <key>system.hw.model</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: ENTITY-MIB</description>
+               <inventory_link>29</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Hardware serial number</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.11.1</snmp_oid>
+               <key>system.hw.serialnumber</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: ENTITY-MIB</description>
+               <inventory_link>8</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Operating system</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
+               <key>system.sw.os</key>
+               <delay>3600</delay>
+               <history>14d</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: SNMPv2-MIB</description>
+               <inventory_link>5</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing>
+                  <step>
+                     <type>5</type>
+                     <params>Version (.+), RELEASE
+\1</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Entity Serial Numbers Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_SN},1.3.6.1.2.1.47.1.1.1.1.11]</snmp_oid>
+               <key>entity_sn.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>1</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#ENT_SN}</macro>
+                        <value>.+</value>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ENT_CLASS}</macro>
+                        <value>[^3]</value>
+                        <!-- all other than chassis (chassis is not from LLD) -->
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description/>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ENT_NAME}: Hardware serial number</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]</key>
+                     <delay>3600</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: ENTITY-MIB</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Inventory</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco Inventory SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Module Cisco Inventory SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <recovery_mode>2</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#ENT_NAME}: Device has been replaced (new serial number received)</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Device serial number has changed. Ack to close</description>
+                     <type>0</type>
+                     <manual_close>1</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros/>
+         <templates/>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</template>
+         <name>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</name>
+         <description>Template Cisco CISCO-ENVMON-MIB version: 0.14&#13;
+MIBs used:&#13;
+CISCO-ENVMON-MIB</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Temperature</name>
+            </application>
+            <application>
+               <name>Power Supply</name>
+            </application>
+            <application>
+               <name>Fans</name>
+            </application>
+         </applications>
+         <items/>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Temperature Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.13.1.3.1.2]</snmp_oid>
+               <key>temperature.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status&#13;
+maintained by the environmental monitor.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SNMPVALUE}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CISCO-ENVMON-MIB&#13;
+The current measurement of the test point being instrumented.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SNMPVALUE}: Temperature status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CISCO-ENVMON-MIB&#13;
+The current state of the test point being instrumented.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CISCO-ENVMON-MIB::CiscoEnvMonState</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+or&#13;
+{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <name>{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
+{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+or&#13;
+{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+                           <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+or&#13;
+{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+or&#13;
+{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <name>{#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>PSU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.5.1.2]</snmp_oid>
+               <key>psu.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>The table of power supply status maintained by the environmental monitor card.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SENSOR_INFO}: Power supply status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.9.9.13.1.5.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CISCO-ENVMON-MIB</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Power Supply</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CISCO-ENVMON-MIB::CiscoEnvMonState</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"shutdown"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SENSOR_INFO}: Power supply is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"notFunctioning"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SENSOR_INFO}: Power supply is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_INFO}: Power supply is in critical state</name>
+                           <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"shutdown"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>FAN Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.4.1.2]</snmp_oid>
+               <key>fan.discovery</key>
+               <delay>3600</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>The table of fan status maintained by the environmental monitor.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SENSOR_INFO}: Fan status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.9.9.13.1.4.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}]</key>
+                     <delay>180</delay>
+                     <history>14d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CISCO-ENVMON-MIB</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CISCO-ENVMON-MIB::CiscoEnvMonState</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"shutdown"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SENSOR_INFO}: Fan is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"notFunctioning"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#SENSOR_INFO}: Fan is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_INFO}: Fan is in critical state</name>
+                           <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMPv2:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"shutdown"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$TEMP_CRIT:"CPU"}</macro>
+               <value>75</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN:"CPU"}</macro>
+               <value>70</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN_STATUS}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_DISASTER_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_CRIT_STATUS:"critical"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_CRIT_STATUS:"shutdown"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_WARN_STATUS:"warning"}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_WARN_STATUS:"notFunctioning"}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"critical"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"shutdown"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_WARN_STATUS:"warning"}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_WARN_STATUS:"notFunctioning"}</macro>
+               <value>6</value>
+            </macro>
+         </macros>
+         <templates/>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Net Cisco IOS SNMPv2</template>
+         <name>Template Net Cisco IOS SNMPv2</name>
+         <description>Template Cisco IOS Software releases 12.2(3.5) or later version: 0.14&#13;
+Known Issues:&#13;
+description : no if(in|out)(Errors|Discards) are available for vlan ifType&#13;
+version : IOS for example: 	12.1(22)EA11, 15.4(3)M2&#13;
+device : C2911, C7600</description>
+         <groups>
+            <group>
+               <name>Templates/Network Devices</name>
+            </group>
+         </groups>
+         <applications/>
+         <items/>
+         <discovery_rules/>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$CPU_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$STORAGE_UTIL_CRIT}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$STORAGE_UTIL_WARN}</macro>
+               <value>80</value>
+            </macro>
+         </macros>
+         <templates>
+            <template>
+               <name>Template Module Cisco Inventory SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Interfaces SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+         </templates>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMPv2</template>
+         <name>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
+         <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.14</description>
+         <groups>
+            <group>
+               <name>Templates/Network Devices</name>
+            </group>
+         </groups>
+         <applications/>
+         <items/>
+         <discovery_rules/>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$CPU_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$STORAGE_UTIL_CRIT}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$STORAGE_UTIL_WARN}</macro>
+               <value>80</value>
+            </macro>
+         </macros>
+         <templates>
+            <template>
+               <name>Template Module Cisco Inventory SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Interfaces SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+         </templates>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Net Cisco IOS prior to 12.0_3_T SNMPv2</template>
+         <name>Template Net Cisco IOS prior to 12.0_3_T SNMPv2</name>
+         <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.14</description>
+         <groups>
+            <group>
+               <name>Templates/Network Devices</name>
+            </group>
+         </groups>
+         <applications/>
+         <items/>
+         <discovery_rules/>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$CPU_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$STORAGE_UTIL_CRIT}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$STORAGE_UTIL_WARN}</macro>
+               <value>80</value>
+            </macro>
+         </macros>
+         <templates>
+            <template>
+               <name>Template Module Cisco Inventory SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco CISCO-ENVMON-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+         </templates>
+         <screens/>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>CPU utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</host>
+                  <key>system.cpu.util[avgBusy5]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <triggers>
+      <trigger>
+         <expression>{Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2:system.cpu.util[avgBusy5].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>High CPU utilization</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>3</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Module Cisco Inventory SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Module Cisco Inventory SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <recovery_mode>2</recovery_mode>
+         <recovery_expression/>
+         <name>Device has been replaced (new serial number received)</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>1</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Device serial number has changed. Ack to close</description>
+         <type>0</type>
+         <manual_close>1</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+   </triggers>
+   <value_maps>
+      <value_map>
+         <name>CISCO-ENVMON-MIB::CiscoEnvMonState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>warning</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>critical</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>shutdown</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>notPresent</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>notFunctioning</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

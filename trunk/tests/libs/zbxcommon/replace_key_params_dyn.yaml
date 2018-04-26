@@ -1,0 +1,281 @@
+---
+test case: valid key with no parameters
+in:
+  key: 'key'
+out:
+  expected_key: 'key'
+  return: 'SUCCEED'
+---
+test case: valid key with empty brackets
+in:
+  key: 'key[]'
+out:
+  expected_key: 'key[]'
+  return: 'SUCCEED'
+---
+test case: valid key with quoted empty string in brackets
+in:
+  key: 'key[""]'
+out:
+  expected_key: 'key[""]'
+  return: 'SUCCEED'
+---
+test case: valid key with space in brackets
+in:
+  key: 'key[ ]'
+out:
+  expected_key: 'key[ ]'
+  return: 'SUCCEED'
+---
+test case: valid key with leading space before quoted empty string in brackets
+in:
+  key: 'key[ ""]'
+out:
+  expected_key: 'key[ ""]'
+  return: 'SUCCEED'
+---
+test case: valid key with leading and trailing spaces around quoted empty string in brackets
+in:
+  key: 'key[ "" ]'
+out:
+  expected_key: 'key[ "" ]'
+  return: 'SUCCEED'
+---
+test case: valid key with 'a' in brackets
+in:
+  key: 'key[a]'
+out:
+  expected_key: 'key[a]'
+  return: 'SUCCEED'
+---
+test case: valid key with leading space before 'a' in brackets
+in:
+  key: 'key[ a]'
+out:
+  expected_key: 'key[ a]'
+  return: 'SUCCEED'
+---
+test case: valid key with leading and trailing spaces around 'a' in brackets
+in:
+  key: 'key[ a ]'
+out:
+  expected_key: 'key[ a ]'
+  return: 'SUCCEED'
+---
+test case: valid key with quoted 'a' in brackets
+in:
+  key: 'key["a"]'
+out:
+  expected_key: 'key["a"]'
+  return: 'SUCCEED'
+---
+test case: valid key with quoted 'a' followed by comma in brackets
+in:
+  key: 'key["a",]'
+out:
+  expected_key: 'key["a",]'
+  return: 'SUCCEED'
+---
+test case: valid key with unquoted 'a' followed by comma in brackets
+in:
+  key: 'key[a,]'
+out:
+  expected_key: 'key[a,]'
+  return: 'SUCCEED'
+---
+test case: valid key with multiple unquoted parameters in brackets
+in:
+  key: 'key[a,b,c]'
+out:
+  expected_key: 'key[a,b,c]'
+  return: 'SUCCEED'
+---
+test case: valid key with multiple quoted parameters in brackets
+in:
+  key: 'key["a","b","c"]'
+out:
+  expected_key: 'key["a","b","c"]'
+  return: 'SUCCEED'
+---
+test case: valid key with first unquoted parameter and second array parameter containing two unquoted parameters
+in:
+  key: 'key[a,[b,c]]'
+out:
+  expected_key: 'key[a,[b,c]]'
+  return: 'SUCCEED'
+---
+test case: valid key with first unquoted parameter and second array parameter containing unquoted and empty parameter
+in:
+  key: 'key[a,[b,]]'
+out:
+  expected_key: 'key[a,[b,]]'
+  return: 'SUCCEED'
+---
+test case: valid key with two unquoted parameters where second parameter contains opening square bracket
+in:
+  key: 'key[a,b[c]'
+out:
+  expected_key: 'key[a,b[c]'
+  return: 'SUCCEED'
+---
+test case: valid key with multiple quoted parameters and array  # array contains multiple quoted parameters which containing escaping and characters that are not allowed in unquoted parameters
+in:
+  key: 'key["a","b",["c","d\",]"]]'
+out:
+  expected_key: 'key["a","b",["c","d\",]"]]'
+  return: 'SUCCEED'
+---
+test case: valid key with multiple quoted parameters and multiple array parameters        # arrays contain multiple unquoted and quoted parameters which contain escaping and characters that are not allowed in unquoted parameters
+in:
+  key: 'key["a","b",["c","d\",]"],[e,f]]'
+out:
+  expected_key: 'key["a","b",["c","d\",]"],[e,f]]'
+  return: 'SUCCEED'
+---
+test case: valid key, single parameter with unquoted string containing double quote characters
+in:
+  key: 'key[a"b"]'
+out:
+  expected_key: 'key[a"b"]'
+  return: 'SUCCEED'
+---
+test case: valid key, multiple different type parameters where one is unquoted string containing double quote characters
+in:
+  key: 'key["a",b"c",d]'
+out:
+  expected_key: 'key["a",b"c",d]'
+  return: 'SUCCEED'
+---
+test case: valid key with many quoted/unquoted parameters with/without trailing/leading spaces also featuring escaping
+in:
+  key: 'key["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]'
+out:
+  expected_key: 'key["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]'
+  return: 'SUCCEED'
+---
+test case: invalid key, unmatched opening bracket (1)   # array missing closing bracket after second parameter
+in:
+  key: 'key[["a",]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, unmatched opening bracket (2)   # array missing closing bracket, brackets is inside quotes and is a part of the array parameter
+in:
+  key: 'key[[a"]"]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, unmatched opening bracket (3)   # array missing closing bracket after second parameter, one of the closing brackets is inside quotes and is a part of the second array parameter
+in:
+  key: 'key[["a","\"b\"]"]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, invalid character for unquoted parameter, multiple parameter key
+in:
+  key: 'key["a",["b","c\"]"]]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, invalid character for unquoted parameter, multiple parameter key
+in:
+  key: 'key[a ]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, unmatched closing bracket, parameter followed by trailing space
+in:
+  key: 'key[ a]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, part of parameters list not enclosed in brackets
+in:
+  key: 'key[ГУГЛ]654'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, braces are not allowed in key
+in:
+  key: '{}key'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, comma is not allowed in key or parameters should be enclosed in brackets
+in:
+  key: 'ssh,21'
+out:
+  return: 'FAIL'
+---
+test case:  invalid key, multiple square bracket pairs are not allowed
+in:
+  key: 'key[][]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, multiple square bracket pairs containing parameters are not allowed
+in:
+  key: 'key["a",b,["c","d\",]"]]["d"]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, multi-level arrays are not allowed
+in:
+  key: 'key[[[]]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, multi-level arrays are not allowed, array consists of multiple different type parameters
+in:
+  key: 'key["a",["b",["c","d"],e],"f"]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, multi-level arrays are not allowed, array consists of single parameter which is another array
+in:
+  key: 'key["a","b",[["c","d\",]"]]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, character ] is not allowed in unquoted parameter string
+in:
+  key: 'key[a]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, character [ is allowed in unquoted parameter string but character ] is not
+in:
+  key: 'key[a[b]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, character ] is not allowed in unquoted parameter string, key with multiple different type parameters
+in:
+  key: 'key["a",b[c,d],e]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, quoted parameter cannot contain unquoted part
+in:
+  key: 'key["a"b]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, second parameter of the array cannot contain unquoted part
+in:
+  key: 'key["a",["b","]"c]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, array type parameter cannot contain quoted parameter with unquoted part
+in:
+  key: 'key[["]"a]]'
+out:
+  return: 'FAIL'
+---
+test case: invalid key, array type parameter cannot contain quoted part
+in:
+  key: 'key[[a]"b"]'
+out:
+  return: 'FAIL'
+...
