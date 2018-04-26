@@ -121,4 +121,68 @@ in:
 out:
   result: succeed
   value: 3
+---
+test case: ZBX-13782, escaped Unicode character which translates into 1 byte UTF-8
+in:
+  json: '{"DeviceLog": "IPv6-Pr\u00e4fix"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "IPv6-Präfix"
+---
+test case: ZBX-13782, escaped Unicode character which translates into 2 byte UTF-8
+in:
+  json: '{"DeviceLog": "IPv6-Pr\u00D1fix"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "IPv6-PrÑfix"
+---
+test case: ZBX-13782, escaped Unicode character which translates into 2 byte UTF-8
+in:
+  json: '{"DeviceLog": "IPv6-Pr\u042Ffix"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "IPv6-PrЯfix"
+---
+test case: ZBX-13782, escaped Unicode character which translates into 3 byte UTF-8
+in:
+  json: '{"DeviceLog": "IPv6-Pr\u0800fix"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "IPv6-Prࠀfix"
+---
+test case: ZBX-13782, escaped Unicode character which translates into 3 byte UTF-8
+in:
+  json: '{"DeviceLog": "IPv6-Pr\u10c0fix"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "IPv6-PrჀfix"
+---
+test case: ZBX-13782, escaped Unicode character which translates into 3 byte UTF-8
+in:
+  json: '{"DeviceLog": "IPv6-Pr\u10c0fix"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "IPv6-PrჀfix"
+---
+test case: ZBX-13782, single escaped Unicode character which translates into 3 byte UTF-8
+in:
+  json: '{"DeviceLog": "\u20E0"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "⃠"
+---
+test case: ZBX-13782, escaped Unicode character which translates into 3 byte UTF-8
+in:
+  json: '{"DeviceLog": "-\u20E0-"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "-⃠-"
 ...
