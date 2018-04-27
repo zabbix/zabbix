@@ -30,9 +30,6 @@ $hostInventoryWidget = (new CWidget())
 		)
 	);
 
-// filter
-$filterForm = new CFilter('web.hostinventories.filter.state');
-
 $filterColumn = new CFormList();
 
 // getting inventory fields to make a drop down
@@ -57,8 +54,12 @@ $filterColumn->addRow(
 		]
 );
 
-$filterForm->addColumn($filterColumn);
-$hostInventoryWidget->addItem($filterForm);
+// filter
+$hostInventoryWidget->addItem(
+	(new CFilter())
+		->setProfile('web.hostinventories.filter', 0)
+		->addFilterTab(_('Filter'), [$filterColumn])
+);
 
 $table = (new CTableInfo())
 	->setHeader([

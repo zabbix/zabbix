@@ -199,11 +199,6 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Filter
 	 */
-	$filterForm = (new CFilter('web.avail_report.filter.state'))
-		->addVar('config', $availabilityReportMode)
-		->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']))
-		->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
-
 	$filterColumn1 = new CFormList();
 	$filterColumn2 = new CFormList();
 
@@ -410,10 +405,14 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince'], 'filter_timetill'));
 	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill'], 'filter_timesince'));
 
-	$filterForm->addColumn($filterColumn1);
-	$filterForm->addColumn($filterColumn2);
-
-	$reportWidget->addItem($filterForm);
+	$reportWidget->addItem(
+		(new CFilter())
+			->setProfile('web.avail_report.filter', 0)
+			->addVar('config', $availabilityReportMode)
+			->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']))
+			->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']))
+			->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2])
+	);
 
 	/*
 	 * Triggers
