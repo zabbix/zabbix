@@ -22,6 +22,7 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-13750] fixed hover and focus style for edit dashboard cancel button, improved top nav css coding style (Andzs, ashubin)
 ........S. [ZBX-13694] disable check now for items with scheduler configuration errors (wiper)
 ...G...PS. [ZBX-9882] removed Zapcat-style and multi-level array type support in item key parameters (Andris, viktors)
 ..F....... [ZBX-12821] fixed multiple javascript memory leaks (miks)
@@ -267,6 +268,12 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.9rc2
+
+Bug fixes:
+...G...... [ZBX-13781] fixed possible crash in the function "web.page.get" of Zabbix Agentd (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.9rc1
@@ -1466,6 +1473,12 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.17rc2
+
+Bug fixes:
+...G...... [ZBX-13781] fixed possible crash in the function "web.page.get" of Zabbix Agentd (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17rc1
