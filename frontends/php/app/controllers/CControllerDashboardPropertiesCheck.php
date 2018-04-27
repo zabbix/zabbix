@@ -66,10 +66,8 @@ class CControllerDashboardPropertiesCheck extends CController {
 		if ($dashboard === false) {
 			error(_('No permissions to referred object or it does not exist!'));
 		}
-		else {
-			if (!$this->hasInput('userid') || $this->getInput('userid') == 0) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'userid', _('cannot be empty')));
-			}
+		elseif ($this->getInput('userid') == 0) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'userid', _('cannot be empty')));
 		}
 
 		$output = [];
