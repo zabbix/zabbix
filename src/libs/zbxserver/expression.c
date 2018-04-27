@@ -1558,25 +1558,6 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 
 /******************************************************************************
  *                                                                            *
- * Function: acknowledge_expand_action_names                                  *
- *                                                                            *
- * Purpose: expand acknowledge action flags into user readable list           *
- *                                                                            *
- * Parameters: str        - [IN/OUT]                                          *
- *             str_alloc  - [IN/OUT]                                          *
- *             str_offset - [IN/OUT]                                          *
- *             action       [IN] the acknowledge action flags                 *
- *                               (see ZBX_ACKNOWLEDGE_ACTION_* defines)       *
- *                                                                            *
- ******************************************************************************/
-static void	acknowledge_expand_action_names(char **str, size_t *str_alloc, size_t *str_offset, int action)
-{
-	if (0 != (action & ZBX_PROBLEM_UPDATE_CLOSE))
-		zbx_strcpy_alloc(str, str_alloc, str_offset, "Close problem");
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_event_ack_history                                            *
  *                                                                            *
  * Purpose: retrieve event acknowledges history                               *
@@ -1607,7 +1588,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
-	result = DBselect("select clock,userid,message,action"
+	result = DBselect("select clock,userid,message,action,old_severity,new_severity"
 			" from acknowledges"
 			" where eventid=" ZBX_FS_UI64 " order by clock",
 			event->eventid);
@@ -1631,11 +1612,53 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 				zbx_time2str(now),
 				user_name);
 
-		if (ZBX_PROBLEM_UPDATE_CLOSE == action)
+		if (0 != (action & (ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SEVERITY |
+				ZBX_PROBLEM_UPDATE_CLOSE)))
 		{
-			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "Action: ");
-			acknowledge_expand_action_names(&buf, &buf_alloc, &buf_offset, action);
-			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
+			size_t	offset;
+
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "Actions:");
+
+			offset = buf_offset;
+
+			if (0 != (action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
+				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " acknowledged");
+
+			if (0 != (action & ZBX_PROBLEM_UPDATE_SEVERITY))
+			{
+				zbx_config_t	cfg;
+				const char	*from = "unknown", *to = "unknown";
+				int		old_severity, new_severity;
+
+				old_severity = atoi(row[4]);
+				new_severity = atoi(row[5]);
+
+				zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
+
+				if (TRIGGER_SEVERITY_COUNT > old_severity)
+					from = cfg.severity_name[old_severity];
+
+				if (TRIGGER_SEVERITY_COUNT > new_severity)
+					to = cfg.severity_name[new_severity];
+
+				if (offset != buf_offset)
+					zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
+
+				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " severity changed from %s to %s",
+						from, to);
+
+				zbx_config_clean(&cfg);
+			}
+
+			if (0 != (action & ZBX_PROBLEM_UPDATE_CLOSE))
+			{
+				if (offset != buf_offset)
+					zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
+
+				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " closed");
+			}
+
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, ".\n");
 		}
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n\n", row[2]);
