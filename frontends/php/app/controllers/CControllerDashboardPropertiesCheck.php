@@ -27,9 +27,9 @@ class CControllerDashboardPropertiesCheck extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>		'db dashboard.dashboardid',
+			'dashboardid' =>		'required|db dashboard.dashboardid',
 			'name'		  =>		'string|not_empty',
-			'userid'	  =>		'db users.userid'
+			'userid'	  =>		'required|db users.userid'
 		];
 
 		$ret = $this->validateInput($fields);
