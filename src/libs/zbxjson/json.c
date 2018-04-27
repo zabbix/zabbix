@@ -207,12 +207,12 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static char	zbx_num2hex(u_char c)
+static char	zbx_num2hex(unsigned char c)
 {
 	if (c >= 10)
-		return c + 0x57; /* a-f */
+		return (char)(c + 0x57); /* a-f */
 	else
-		return c + 0x30; /* 0-9 */
+		return (char)(c + 0x30); /* 0-9 */
 }
 
 static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t type)
