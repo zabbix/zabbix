@@ -21,7 +21,6 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 
-#include "log.h"
 #include "comms.h"
 #include "cfg.h"
 
@@ -78,7 +77,6 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 	if (FAIL == ret)
 	{
 		*error = zbx_dsprintf(NULL, "HTTP get error: %s", zbx_socket_strerror());
-		zabbix_log(LOG_LEVEL_DEBUG, "%s", *error);
 		return SYSINFO_RET_FAIL;
 	}
 
