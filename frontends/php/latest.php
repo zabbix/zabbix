@@ -325,7 +325,8 @@ $widget = (new CWidget())
 	);
 
 // Filter
-$filterForm = (new CFilter('web.latest.filter.state'))
+$filterForm = (new CFilter())
+	->setProfile('web.latest.filter', 0)
 	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = (new CFormList())
@@ -386,9 +387,7 @@ $filterColumn2 = (new CFormList())
 	)
 	->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
 
-$filterForm
-	->addColumn($filterColumn1)
-	->addColumn($filterColumn2);
+$filterForm->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2]);
 
 $widget->addItem($filterForm);
 // End of Filter

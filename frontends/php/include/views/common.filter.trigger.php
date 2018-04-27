@@ -25,7 +25,8 @@ $overview = $this->data['overview'];
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = (new CFilter($filter['filterid']))
+$filterForm = (new CFilter())
+	->setProfile($filter['filterid'], 0)
 	->addVar('fullscreen', $filter['fullScreen'] ? '1' : null)
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);
@@ -162,7 +163,6 @@ if (!$overview) {
 	$column2->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
 }
 
-$filterForm->addColumn($column1);
-$filterForm->addColumn($column2);
+$filterForm->addFilterTab(_('Filter'), [$column1, $column2]);
 
 return $filterForm;

@@ -98,15 +98,8 @@ if ($data['resourcetype'] > -1) {
 	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
 }
 
-$from = parseRelativeDate($data['from']);
-$to = parseRelativeDate($data['to']);
-if ($from === null || $to === null) {
-	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
-	$to = parseRelativeDate('now', false);
-}
-
-$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr($from->getTimestamp());
-$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr($to->getTimestamp());
+$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr($data['timeline']['from_ts']);
+$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr($data['timeline']['to_ts']);
 
 $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
 		' FROM auditlog a,users u'.

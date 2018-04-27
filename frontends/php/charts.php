@@ -77,7 +77,7 @@ $pageFilter = new CPageFilter([
 
 if (hasRequest('from') && hasRequest('to')) {
 	calculateTime([
-		'profileIdx' => 'web.graphs',
+		'profileIdx' => 'web.graphs.filter',
 		'profileIdx2' => $pageFilter->graphid,
 		'updateProfile' => true,
 		'from' => getRequest('from'),
@@ -116,8 +116,10 @@ $data = [
 		HISTORY_GRAPH => _('Graph'),
 		HISTORY_VALUES => _('Values')
 	],
-	'from' => getRequest('from'),
-	'to' => getRequest('to')
+	'timeline' => calculateTime([
+		'profileIdx' => 'web.graphs.filter',
+		'profileIdx2' => $pageFilter->graphid
+	])
 ];
 
 // render view

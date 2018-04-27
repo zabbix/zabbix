@@ -60,8 +60,8 @@ jQuery(function ($){
 			label: container.find('.btn-time')
 		},
 		request_data = {
-			idx: container.data()['profileIdx']||'',
-			idx2: container.data()['profileIdx2']||0,
+			idx: container.length ? container.data()['profileIdx'] : '',
+			idx2: container.length ? container.data()['profileIdx2'] : 0,
 			from: element.from.val(),
 			to: element.to.val()
 		},

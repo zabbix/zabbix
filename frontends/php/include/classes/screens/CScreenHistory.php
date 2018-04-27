@@ -142,8 +142,6 @@ class CScreenHistory extends CScreenBase {
 		}
 
 		$items = CMacrosResolverHelper::resolveItemNames($items);
-
-		$stime = zbxDateToTime($this->timeline['stime']);
 		$firstItem = reset($items);
 
 		$iv_string = [
@@ -171,8 +169,8 @@ class CScreenHistory extends CScreenBase {
 
 				// Interval start value is non-inclusive, hence the + 1 second.
 				$options += [
-					'time_from' => $stime + 1,
-					'time_till' => $stime + $this->timeline['period'],
+					'time_from' => $this->timeline['from_ts'] + 1,
+					'time_till' => $this->timeline['to_ts'],
 					'limit' => $config['search_limit']
 				];
 			}

@@ -765,7 +765,7 @@ $triggerWidget = (new CWidget())
 		(new CView('common.filter.trigger', [
 			'overview' => false,
 			'filter' => [
-				'filterid' => 'web.tr_status.filter.state',
+				'filterid' => 'web.tr_status.filter',
 				'showTriggers' => $showTriggers,
 				'ackStatus' => $ackStatus,
 				'showEvents' => $showEvents,

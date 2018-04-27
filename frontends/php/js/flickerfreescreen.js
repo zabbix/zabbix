@@ -262,10 +262,9 @@
 						// Replace existing markup with server response.
 						if (request_start > screen.timestamp) {
 							screen.timestamp = request_start;
-							$('#flickerfreescreen_' + id).replaceWith(html);
-
 							screen.isRefreshing = false;
-							screen.timestamp = htmlTimestamp;
+
+							$('#flickerfreescreen_' + id).replaceWith(html);
 
 							window.flickerfreeScreenShadow.isShadowed(id, false);
 							window.flickerfreeScreenShadow.fadeSpeed(id, 0);

@@ -56,7 +56,9 @@ $chartsWidget = (new CWidget())
 		->addItem($controls)
 	);
 
-$filterForm = (new CFilter('web.charts.filter.state'))->addTimeSelector($data['from'], $data['to']);
+$filterForm = (new CFilter())
+	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {
@@ -67,19 +69,19 @@ if (!empty($this->data['graphid'])) {
 			'resourcetype' => SCREEN_RESOURCE_HISTORY,
 			'action' => HISTORY_VALUES,
 			'graphid' => $data['graphid'],
-			'profileIdx' => 'web.graphs',
-			'profileIdx2' => $data['graphid'],
+			'profileIdx' => $data['timeline']['profileIdx'],
+			'profileIdx2' => $data['timeline']['profileIdx2'],
 			'updateProfile' => false,
-			'from' => $data['from'],
-			'to' => $data['to']
+			'from' => $data['timeline']['from'],
+			'to' => $data['timeline']['to']
 		]);
 	}
 	else {
 		$screen = CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_CHART,
 			'graphid' => $this->data['graphid'],
-			'profileIdx' => 'web.graphs',
-			'profileIdx2' => $this->data['graphid']
+			'profileIdx' => $data['timeline']['profileIdx'],
+			'profileIdx2' => $data['timeline']['profileIdx2']
 		]);
 	}
 

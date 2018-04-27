@@ -35,7 +35,10 @@ $widget = (new CWidget())
 				)
 			)
 	]))
-	->addItem((new CFilter('web.screens.filter.state'))->addTimeSelector($data['from'], $data['to']));
+	->addItem((new CFilter())
+		->setProfile('web.screens.filter', 0)
+		->addTimeSelector($data['from'], $data['to'])
+	);
 
 $controls = (new CList())->addItem(
 	new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [

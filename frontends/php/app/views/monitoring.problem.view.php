@@ -274,7 +274,8 @@ if ($data['action'] == 'problem.view') {
 	$filter_column2
 		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
 
-	$filter = (new CFilter('web.problem.filter.state'))
+	$filter = (new CFilter())
+		->setProfile('web.problem.filter', 0)
 		->addVar('action', 'problem.view')
 		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addVar('page', $data['page']);

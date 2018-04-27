@@ -54,8 +54,8 @@ class CFilter extends CDiv {
 			'now-1y/y:now-1y/y'
 		],
 		['now/d:now/d', 'now/d:now', 'now/w:now/w', 'now/w:now', 'now/M:now/M', 'now/M:now', 'now/y:now/y', 'now/y:now'],
-		['now-5m/m:now', 'now-15m/m:now', 'now-30m/m:now', 'now-1h/h:now', 'now-3h/h:now', 'now-6h/h:now',
-			'now-12h/h:now', 'now-24h/h:now'
+		['now-5m:now', 'now-15m:now', 'now-30m:now', 'now-1h:now', 'now-3h:now', 'now-6h:now', 'now-12h:now',
+			'now-24h:now'
 		]
 	];
 
@@ -115,7 +115,10 @@ class CFilter extends CDiv {
 	 * @return CFilter
 	 */
 	public function setProfile($idx, $idx2) {
-		$this->setActiveTab(CProfile::get($this->idx.'.expanded', $idx2));
+		$this->idx = $idx;
+		$this->idx2 = $idx2;
+
+		$this->setActiveTab(CProfile::get($idx.'.active', 1, $idx2));
 		$this->setAttribute('data-profile-idx', $idx);
 		$this->setAttribute('data-profile-idx2', $idx2);
 
@@ -125,12 +128,12 @@ class CFilter extends CDiv {
 	/**
 	 * Set active tab.
 	 *
-	 * @param int $tab  Zero based index of active tab. If set to false all tabs will be collapsed.
+	 * @param int $tab  1 based index of active tab. If set to 0 all tabs will be collapsed.
 	 *
 	 * @return CFilter
 	 */
 	public function setActiveTab($tab) {
-		$this->tabs_options['active'] = $tab;
+		$this->tabs_options['active'] = $tab > 0 ? $tab - 1 : false;
 
 		return $this;
 	}
@@ -211,6 +214,7 @@ class CFilter extends CDiv {
 					->addClass(($from == $range_from && $to == $range_to) ? ZBX_STYLE_SELECTED : null)
 				);
 			}
+
 			$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
 		}
 
@@ -263,7 +267,10 @@ class CFilter extends CDiv {
 	public function getJS() {
 		return 'jQuery("#'.$this->getId().'").tabs('.
 			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled])).
-		')';
+		').on("tabsactivate", function(e, ui) {
+			var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0;
+			updateUserProfile("'.$this->idx.'.active", active, []);
+		})';
 	}
 
 	/**

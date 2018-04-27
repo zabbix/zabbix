@@ -124,9 +124,7 @@ class CScreenGraph extends CScreenBase {
 			'containerid' => $containerId,
 			'objDims' => $graphDims,
 			'loadSBox' => 0,
-			'loadImage' => 1,
-			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+			'loadImage' => 1
 		];
 
 		$isDefault = false;
