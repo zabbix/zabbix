@@ -451,6 +451,9 @@ typedef struct
 	zbx_uint64_t	userid;
 	char		*message;
 	int		clock;
+	int		action;
+	int		old_severity;
+	int		new_severity;
 }
 DB_ACKNOWLEDGE;
 

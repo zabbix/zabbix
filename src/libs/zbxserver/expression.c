@@ -387,6 +387,63 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_problem_update_actions                                       *
+ *                                                                            *
+ * Purpose: get comma delimited list of problem update actions                *
+ *                                                                            *
+ * Parameters: ack - [IN] the acknowledge (problem update) data               *
+ *             out - [OUT] the output buffer                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, char **out)
+{
+	char	*buf = NULL;
+	size_t	buf_alloc = 0, buf_offset = 0;
+
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "acknowledged");
+
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_SEVERITY))
+	{
+		zbx_config_t	cfg;
+		const char	*from = "unknown", *to = "unknown";
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
+
+		if (TRIGGER_SEVERITY_COUNT > ack->old_severity)
+			from = cfg.severity_name[ack->old_severity];
+
+		if (TRIGGER_SEVERITY_COUNT > ack->new_severity)
+			to = cfg.severity_name[ack->new_severity];
+
+		if (0 != buf_offset)
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, ", ");
+
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "severity changed from %s to %s",
+				from, to);
+
+		zbx_config_clean(&cfg);
+	}
+
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_CLOSE))
+	{
+		if (0 != buf_offset)
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, ", ");
+
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "closed");
+	}
+
+	if (0 != buf_offset)
+	{
+		zbx_free(*out);
+		*out = buf;
+	}
+	else
+		*out = zbx_strdup(*out, "");
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: item_description                                                 *
  *                                                                            *
  * Purpose: substitute key parameters and user macros in                      *
@@ -1604,11 +1661,9 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	DB_ACKNOWLEDGE	ack;
 	char		*buf = NULL;
 	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
-	time_t		now;
-	zbx_uint64_t	userid;
-	int		action;
 
 	if (0 == event->acknowledged)
 	{
@@ -1618,7 +1673,6 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
-
 	result = DBselect("select clock,userid,message,action,old_severity,new_severity"
 			" from acknowledges"
 			" where eventid=" ZBX_FS_UI64 " order by clock",
@@ -1628,71 +1682,36 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 	{
 		const char	*user_name;
 
-		now = atoi(row[0]);
-		ZBX_STR2UINT64(userid, row[1]);
-		action = atoi(row[3]);
+		ack.clock = atoi(row[0]);
+		ZBX_STR2UINT64(ack.userid, row[1]);
+		ack.message = row[2];
+		ack.acknowledgeid = 0;
+		ack.action = atoi(row[3]);
+		ack.old_severity = atoi(row[4]);
+		ack.new_severity = atoi(row[5]);
 
-		if (SUCCEED == zbx_check_user_permissions(&userid, recipient_userid))
-			user_name = zbx_user_string(userid);
+		if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
+			user_name = zbx_user_string(ack.userid);
 		else
 			user_name = "Inaccessible user";
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n",
-				zbx_date2str(now),
-				zbx_time2str(now),
+				zbx_date2str(ack.clock),
+				zbx_time2str(ack.clock),
 				user_name);
 
-		if (0 != (action & (ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SEVERITY |
+		if (0 != (ack.action & (ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SEVERITY |
 				ZBX_PROBLEM_UPDATE_CLOSE)))
 		{
-			size_t	offset;
+			char	*actions = NULL;
 
-			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "Actions:");
-
-			offset = buf_offset;
-
-			if (0 != (action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
-				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " acknowledged");
-
-			if (0 != (action & ZBX_PROBLEM_UPDATE_SEVERITY))
-			{
-				zbx_config_t	cfg;
-				const char	*from = "unknown", *to = "unknown";
-				int		old_severity, new_severity;
-
-				old_severity = atoi(row[4]);
-				new_severity = atoi(row[5]);
-
-				zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
-
-				if (TRIGGER_SEVERITY_COUNT > old_severity)
-					from = cfg.severity_name[old_severity];
-
-				if (TRIGGER_SEVERITY_COUNT > new_severity)
-					to = cfg.severity_name[new_severity];
-
-				if (offset != buf_offset)
-					zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
-
-				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " severity changed from %s to %s",
-						from, to);
-
-				zbx_config_clean(&cfg);
-			}
-
-			if (0 != (action & ZBX_PROBLEM_UPDATE_CLOSE))
-			{
-				if (offset != buf_offset)
-					zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
-
-				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " closed");
-			}
-
-			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, ".\n");
+			get_problem_update_actions(&ack, &actions);
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
+			zbx_free(actions);
 		}
 
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n\n", row[2]);
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n\n", ack.message);
 	}
 	DBfree_result(result);
 
@@ -1772,11 +1791,12 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
 #define MVAR_EVENT_RECOVERY_TIME	MVAR_EVENT_RECOVERY "TIME}"
 #define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"	/* deprecated */
-#define MVAR_EVENT_UPDATE		MVAR_EVENT "UPDATE}"
-#define MVAR_EVENT_UPDATE_DATE		MVAR_EVENT "UPDATE.DATE}"
-#define MVAR_EVENT_UPDATE_HISTORY	MVAR_EVENT "UPDATE.HISTORY}"
-#define MVAR_EVENT_UPDATE_MESSAGE	MVAR_EVENT "UPDATE.MESSAGE}"
-#define MVAR_EVENT_UPDATE_TIME		MVAR_EVENT "UPDATE.TIME}"
+#define MVAR_EVENT_UPDATE		MVAR_EVENT "UPDATE."
+#define MVAR_EVENT_UPDATE_ACTION	MVAR_EVENT_UPDATE "ACTION}"
+#define MVAR_EVENT_UPDATE_DATE		MVAR_EVENT_UPDATE "DATE}"
+#define MVAR_EVENT_UPDATE_HISTORY	MVAR_EVENT_UPDATE "HISTORY}"
+#define MVAR_EVENT_UPDATE_MESSAGE	MVAR_EVENT_UPDATE "MESSAGE}"
+#define MVAR_EVENT_UPDATE_TIME		MVAR_EVENT_UPDATE "TIME}"
 
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
@@ -2779,6 +2799,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
 						replace_to = zbx_strdup(replace_to, zbx_date2str(ack->clock));
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_ACTION))
+				{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+						get_problem_update_actions(ack, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{

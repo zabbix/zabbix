@@ -2090,7 +2090,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 	memset(&ack, 0, sizeof(ack));
 
 	result = DBselect(
-			"select message,userid,clock from acknowledges"
+			"select message,userid,clock,action,old_severity,new_severity from acknowledges"
 			" where acknowledgeid=" ZBX_FS_UI64,
 			escalation->acknowledgeid);
 
@@ -2100,6 +2100,9 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 		ZBX_STR2UINT64(ack.userid, row[1]);
 		ack.clock = atoi(row[2]);
 		ack.acknowledgeid = escalation->acknowledgeid;
+		ack.action = atoi(row[3]);
+		ack.old_severity = atoi(row[4]);
+		ack.new_severity = atoi(row[5]);
 
 		escalation_execute_acknowledge_operations(event, r_event, action, &ack);
 	}
