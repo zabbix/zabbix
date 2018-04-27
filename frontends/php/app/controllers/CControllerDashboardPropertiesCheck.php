@@ -28,8 +28,8 @@ class CControllerDashboardPropertiesCheck extends CController {
 	protected function checkInput() {
 		$fields = [
 			'dashboardid' =>		'required|db dashboard.dashboardid',
-			'name'		  =>		'string|not_empty',
-			'userid'	  =>		'required|db users.userid'
+			'userid'	  =>		'required|db users.userid',
+			'name'		  =>		'string|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -50,6 +50,7 @@ class CControllerDashboardPropertiesCheck extends CController {
 	}
 
 	protected function doAction() {
+		// Dashboard with ID 0 is considered as newly created dashboard.
 		if ($this->getInput('dashboardid') != 0) {
 			$dashboards = API::Dashboard()->get([
 				'output' => [],
@@ -57,17 +58,20 @@ class CControllerDashboardPropertiesCheck extends CController {
 				'editable' => true
 			]);
 
-			$dashboard = reset($dashboards);
-		}
-		else {
-			$dashboard = true;
+			if (!$dashboards) {
+				error(_('No permissions to referred object or it does not exist!'));
+			}
 		}
 
-		if ($dashboard === false) {
-			error(_('No permissions to referred object or it does not exist!'));
-		}
-		elseif ($this->getInput('userid') == 0) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'userid', _('cannot be empty')));
+		if (!hasErrorMesssages()) {
+			$users = API::User()->get([
+				'output' => [],
+				'userids' => $this->getInput('userid')
+			]);
+
+			if (!$users) {
+				error(_s('User with ID "%1$s" is not available.', $this->getInput('userid')));
+			}
 		}
 
 		$output = [];
