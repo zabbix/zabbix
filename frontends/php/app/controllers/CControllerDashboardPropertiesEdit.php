@@ -51,7 +51,7 @@ class CControllerDashboardPropertiesEdit extends CController {
 
 	protected function doAction() {
 		if ($this->hasInput('new')) {
-			$dashboard = (new CControllerDashboardView())->getNewDashboard();
+			$dashboard = CControllerDashboardView::getNewDashboard();
 		}
 		elseif ($this->hasInput('dashboardid')) {
 			$dashboards = API::Dashboard()->get([
@@ -72,10 +72,10 @@ class CControllerDashboardPropertiesEdit extends CController {
 				$user = null;
 			}
 			elseif ($this->hasInput('userid')) {
-				$user = (new CControllerDashboardView())->getOwnerData($this->getInput('userid'));
+				$user = CControllerDashboardView::getOwnerData($this->getInput('userid'));
 			}
 			elseif (array_key_exists('userid', $dashboard)) {
-				$user = (new CControllerDashboardView())->getOwnerData($dashboard['userid']);
+				$user = CControllerDashboardView::getOwnerData($dashboard['userid']);
 			}
 			elseif (array_key_exists('owner', $dashboard)) {
 				$user = $dashboard['owner'];
