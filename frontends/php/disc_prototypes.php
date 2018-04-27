@@ -665,8 +665,15 @@ if (isset($_REQUEST['form'])) {
 
 		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_prototype_options = [
-				'itemids' => $itemPrototype['master_itemid'],
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_']
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'itemids' => [$itemPrototype['master_itemid']]
+			];
+
+			$master_item_options = [
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'itemids' => [$itemPrototype['master_itemid']],
+				'hostids' => [$itemPrototype['hostid']],
+				'webitems' => true
 			];
 		}
 	}
@@ -679,15 +686,23 @@ if (isset($_REQUEST['form'])) {
 
 		if ($discovery_rule) {
 			$master_prototype_options = [
-				'itemids' => getRequest('master_itemid'),
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'itemids' => [getRequest('master_itemid')],
 				'filter' => ['hostid' => $discovery_rule[0]['hostid']]
+			];
+
+			$master_item_options = [
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'itemids' => [getRequest('master_itemid')],
+				'filter' => ['hostid' => $discovery_rule[0]['hostid']],
+				'webitems' => true
 			];
 		}
 	}
 
 	if ($master_prototype_options) {
-		$master_prototypes = API::ItemPrototype()->get($master_prototype_options);
+		$master_prototypes = API::Item()->get($master_item_options)
+			+ API::ItemPrototype()->get($master_prototype_options);
 
 		if ($master_prototypes) {
 			$itemPrototype['master_item'] = reset($master_prototypes);

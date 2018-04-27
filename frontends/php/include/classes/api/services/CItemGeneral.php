@@ -197,6 +197,12 @@ abstract class CItemGeneral extends CApiService {
 			'preservekeys' => true
 		]);
 
+		foreach ($items as $item) {
+			if (!check_db_fields($itemDbFields, $item)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+		}
+
 		if ($update) {
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
 				'allowed' => ['itemid', 'status'],
@@ -246,10 +252,6 @@ abstract class CItemGeneral extends CApiService {
 			$item = $this->clearValues($item);
 
 			$fullItem = $items[$inum];
-
-			if (!check_db_fields($itemDbFields, $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
 
 			if ($update) {
 				$type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
@@ -661,7 +663,7 @@ abstract class CItemGeneral extends CApiService {
 
 				if ($item['hostid'] == $template['templateid']
 						|| ($item['type'] == ITEM_TYPE_DEPENDENT
-						&& array_key_exists($item['master_itemid'], $host_items))) {
+							&& array_key_exists($item['master_itemid'], $host_items))) {
 					$item_index = array_key_exists('itemid', $item) ? $item['itemid'] : $item['key_'];
 					$host_items[$item_index] = $item;
 				}
@@ -1474,32 +1476,51 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Validate items with type ITEM_TYPE_DEPENDENT for create or update operation.
 	 *
-	 * @param array                $items          Array of items.
-	 * @param CItem|CItemPrototype $data_provider  Item data provider.
+	 * @param array   $items   Array of items.
+	 * @param string  $method  Create or update method.
 	 *
 	 * @throws APIException for invalid data.
 	 */
-	protected function validateDependentItems($items, $data_provider) {
+	protected function validateDependentItems(array $items, $method) {
 		$items_cache = zbx_toHash($items, 'itemid');
 		$root_items = [];
 		$items_added = [];
 		$items_moved = [];
 		$items_created = [];
 		$db_items = [];
-
 		$processed_items = [];
 		$unresolved_master_itemids = [];
 		$has_unresolved_masters = false;
 
 		if ($items_cache) {
-			$db_items = $data_provider->get([
+			$options = [
 				'output' => ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
 				'itemids' => array_keys($items_cache),
 				'preservekeys' => true
-			]);
+			];
+
+			$db_items = API::Item()->get($options);
+
+			if ($this instanceof CItemPrototype) {
+				if ($method === 'CItemPrototype::update') {
+					$options += ['selectDiscoveryRule' => ['itemid']];
+				}
+
+				$db_item_prototypes = API::ItemPrototype()->get($options);
+
+				// Populate 'ruleid' field.
+				if ($method === 'CItemPrototype::update') {
+					foreach ($db_item_prototypes as &$db_item_prototype) {
+						$db_item_prototype['ruleid'] = $db_item_prototype['discoveryRule']['itemid'];
+					}
+					unset($db_item_prototype);
+				}
+
+				$db_items += $db_item_prototypes;
+			}
 
 			foreach ($db_items as $db_itemid => $db_item) {
-				$items_cache[$db_itemid] = $items_cache[$db_itemid] + $db_item;
+				$items_cache[$db_itemid] += $db_item;
 			}
 		}
 
@@ -1510,11 +1531,18 @@ abstract class CItemGeneral extends CApiService {
 					'itemids' => array_keys($unresolved_master_itemids)
 				];
 
-				if ($data_provider instanceof CItem) {
-					$options['webitems'] = true;
-				}
+				$db_masters = API::Item()->get($options + ['webitems' => true]);
 
-				$db_masters = $data_provider->get($options);
+				if ($this instanceof CItemPrototype) {
+					$db_master_prototypes = API::ItemPrototype()->get($options + ['selectDiscoveryRule' => ['itemid']]);
+
+					foreach ($db_master_prototypes as &$db_master_prototype) {
+						$db_master_prototype['ruleid'] = $db_master_prototype['discoveryRule']['itemid'];
+					}
+					unset($db_master_prototype);
+
+					$db_masters += $db_master_prototypes;
+				}
 
 				foreach ($db_masters as $db_master) {
 					$items_cache[$db_master['itemid']] = $db_master;
@@ -1538,7 +1566,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if (array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $items_cache)) {
-					$item = $item + $items_cache[$item['itemid']];
+					$item += $items_cache[$item['itemid']];
 				}
 
 				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
@@ -1549,6 +1577,10 @@ abstract class CItemGeneral extends CApiService {
 				$item_masters = [];
 				$master_item = $item;
 				$hostid = $master_item['hostid'];
+
+				if ($this instanceof CItemPrototype) {
+					$ruleid = $master_item['ruleid'];
+				}
 
 				if (array_key_exists('itemid', $item)) {
 					$item_masters[$item['itemid']] = true;
@@ -1585,6 +1617,13 @@ abstract class CItemGeneral extends CApiService {
 					if ($hostid != $master_item['hostid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'master_itemid', _('hostid of dependent item and master item should match')
+						));
+					}
+
+					if ($this instanceof CItemPrototype && array_key_exists('discoveryRule', $master_item)
+							&& $ruleid != $master_item['discoveryRule']['itemid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'master_itemid', _('ruleid of dependent item and master item should match')
 						));
 					}
 
@@ -1651,11 +1690,17 @@ abstract class CItemGeneral extends CApiService {
 						&& array_key_exists($dependency_level, $items_added[$root_itemid])) {
 					$find_itemids += $items_added[$root_itemid][$dependency_level];
 				}
-				$find_itemids = $data_provider->get([
+
+				$options = [
 					'output' => ['itemid'],
 					'filter' => ['master_itemid' => array_keys($find_itemids)],
 					'preservekeys' => true
-				]);
+				];
+				$find_itemids = API::Item()->get($options);
+
+				if ($this instanceof CItemPrototype) {
+					$find_itemids += API::ItemPrototype()->get($options);
+				}
 
 				$find_itemids = array_diff_key($find_itemids, $counted_masters);
 				$items_count = $items_count + count($find_itemids);
@@ -1733,23 +1778,24 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate merge of template dependent items and every host dependent items, host dependent item will be overwritten
-	 * by template dependent items.
+	 * Validate merge of template dependent items and every host dependent items, host dependent item will be
+	 * overwritten by template dependent items.
 	 * Return false if intersection of host dependent items and template dependent items create dependent items
 	 * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
 	 *
-	 * @param array $items
+	 * @param array $db_items
 	 * @param array $hostids
 	 *
 	 * @throws APIException if intersection of template items and host items creates dependent items tree with
 	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS or master item recursion.
 	 */
-	protected function validateDependentItemsIntersection($db_items, $hostids, $errorService = null) {
+	protected function validateDependentItemsIntersection(array $db_items, array $hostids, $errorService = null) {
 		$hosts_items = [];
 		$tmpl_items = [];
 
 		foreach ($db_items as $db_item) {
-			$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT)
+			$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT
+					&& array_key_exists($db_item['master_itemid'], $db_items))
 				? $db_items[$db_item['master_itemid']]['key_']
 				: '';
 

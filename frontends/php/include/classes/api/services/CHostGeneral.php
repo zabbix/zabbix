@@ -95,7 +95,9 @@ abstract class CHostGeneral extends CHostBase {
 		if (!empty($data['templates_link'])) {
 			$this->checkHostPermissions($allHostIds);
 
-			$this->validateDependentItemsLinkage($allHostIds, zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'));
+			$this->validateDependentItemsLinkage($allHostIds,
+				zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid')
+			);
 
 			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
 		}
@@ -991,13 +993,13 @@ abstract class CHostGeneral extends CHostBase {
 	 * Return false if intersection of host dependent items and template dependent items create dependent items
 	 * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
 	 *
-	 * @param array $items
+	 * @param array $db_items
 	 * @param array $hostids
 	 *
 	 * @throws APIException if intersection of template items and host items creates dependent items tree with
 	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS or master item recursion.
 	 */
-	protected function validateDependentItemsIntersection($db_items, $hostids, $errorService = null) {
+	protected function validateDependentItemsIntersection(array $db_items, array $hostids, $errorService = null) {
 		$hosts_items = [];
 		$tmpl_items = [];
 

@@ -392,6 +392,22 @@ if (!$readonly) {
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
 			CJs::encodeJson([
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'master_itemname',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'dstfld2' => 'master_itemname',
+				'only_hostid' => $data['hostid'],
+				'excludeids' => [$data['itemid']],
+				'with_webitems' => 1
+			]).', null, this);'
+		);
+	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$master_item[] = (new CButton('button', _('Select prototype')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',
 				'srcfld2' => 'master_itemname',

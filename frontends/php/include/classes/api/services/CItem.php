@@ -427,7 +427,7 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->validateDependentItems($items, API::Item());
+		$this->validateDependentItems($items, __METHOD__);
 
 		$json = new CJson();
 
@@ -554,7 +554,7 @@ class CItem extends CItemGeneral {
 
 		parent::checkInput($items, true);
 		self::validateInventoryLinks($items, true);
-		$this->validateDependentItems($items, API::Item());
+		$this->validateDependentItems($items, __METHOD__);
 
 		$db_items = $this->get([
 			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],

@@ -69,9 +69,11 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
-			'?form=update&parent_discoveryid='.$data['parent_discoveryid'].'&itemid='.$item['master_item']['itemid']
-		))
+		$link = ($item['master_item']['source'] === 'itemprototypes')
+			? '?form=update&parent_discoveryid='.$data['parent_discoveryid'].'&itemid='.$item['master_item']['itemid']
+			: 'items.php?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid'];
+
+		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']), $link))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_TEAL);
 		$description[] = NAME_DELIMITER;
