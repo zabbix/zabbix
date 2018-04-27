@@ -23,20 +23,23 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 
 	public static function allValues() {
-		return DBdata('SELECT problem_unack_color, problem_unack_style, problem_ack_color, problem_ack_style, ok_unack_color, ok_unack_style,'.
-					'ok_ack_color, ok_ack_style, ok_period, blink_period FROM config ORDER BY configid');
+		return DBdata(
+			'SELECT custom_color,problem_unack_color,problem_unack_style,problem_ack_color,problem_ack_style,'.
+				'ok_unack_color,ok_unack_style,ok_ack_color,ok_ack_style,ok_period,blink_period'.
+			' FROM config'
+		);
 	}
 
 	/**
-	* @dataProvider allValues
-	*/
+	 * @dataProvider allValues
+	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_Layout($allValues) {
-
 		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 		$this->zbxTestCheckHeader('Trigger displaying options');
 		$this->zbxTestTextPresent(
 			[
 				'Trigger displaying options',
+				'Use custom event status colors',
 				'blinking',
 				'Unacknowledged PROBLEM events',
 				'Acknowledged PROBLEM events',
@@ -47,13 +50,18 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 			]
 		);
 
-		$sql = 'SELECT problem_unack_color, problem_unack_style, problem_ack_color, problem_ack_style, ok_unack_color, ok_unack_style,'.
-		'ok_ack_color, ok_ack_style, ok_period, blink_period FROM config ORDER BY configid';
+		$this->assertEquals($this->zbxTestCheckboxSelected('custom_color'), (bool) $allValues['custom_color']);
 
 		$this->zbxTestAssertElementValue('problem_unack_color', $allValues['problem_unack_color']);
 		$this->zbxTestAssertElementValue('problem_ack_color', $allValues['problem_ack_color']);
 		$this->zbxTestAssertElementValue('ok_unack_color', $allValues['ok_unack_color']);
 		$this->zbxTestAssertElementValue('ok_ack_color', $allValues['ok_ack_color']);
+
+		$this->assertEquals($this->zbxTestCheckboxSelected('problem_unack_style'), (bool) $allValues['problem_unack_style']);
+		$this->assertEquals($this->zbxTestCheckboxSelected('problem_ack_style'), (bool) $allValues['problem_ack_style']);
+		$this->assertEquals($this->zbxTestCheckboxSelected('ok_unack_style'), (bool) $allValues['ok_unack_style']);
+		$this->assertEquals($this->zbxTestCheckboxSelected('ok_ack_style'), (bool) $allValues['ok_ack_style']);
+
 		$this->zbxTestAssertElementValue('ok_period', $allValues['ok_period']);
 		$this->zbxTestAssertElementValue('blink_period', $allValues['blink_period']);
 
@@ -61,36 +69,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath("//input[@id='problem_ack_color'][@disabled]");
 		$this->zbxTestAssertElementPresentXpath("//input[@id='ok_unack_color'][@disabled]");
 		$this->zbxTestAssertElementPresentXpath("//input[@id='ok_ack_color'][@disabled]");
-
-		if ($allValues['problem_unack_style']==1) {
-			$this->assertTrue($this->zbxTestCheckboxSelected('problem_unack_style'));
-		}
-
-		if ($allValues['problem_unack_style']==0) {
-			$this->assertFalse($this->zbxTestCheckboxSelected('problem_unack_style'));
-		}
-
-		if ($allValues['problem_ack_style']==1) {
-			$this->assertTrue($this->zbxTestCheckboxSelected('problem_ack_style'));
-		}
-
-		if ($allValues['problem_ack_style']==0) {
-			$this->assertFalse($this->zbxTestCheckboxSelected('problem_ack_style'));
-		}
-
-		if ($allValues['ok_unack_style']==1) {
-			$this->assertTrue($this->zbxTestCheckboxSelected('ok_unack_style'));
-		}
-		if ($allValues['ok_unack_style']==0) {
-			$this->assertFalse($this->zbxTestCheckboxSelected('ok_unack_style'));
-		}
-
-		if ($allValues['ok_ack_style']==1) {
-			$this->assertTrue($this->zbxTestCheckboxSelected('ok_ack_style'));
-		}
-		if ($allValues['ok_ack_style']==0) {
-			$this->assertFalse($this->zbxTestCheckboxSelected('ok_ack_style'));
-		}
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_UpdateTrigDisplOptions() {
@@ -204,24 +182,24 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 	 * @dataProvider ok_period
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_OKPeriod($data) {
-	$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 
 		$this->zbxTestInputTypeOverwrite('ok_period', $data['period']);
 		$this->zbxTestClickWait('update');
 
+		$this->zbxTestCheckHeader('Trigger displaying options');
+
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good' , 'Configuration updated');
-				$this->zbxTestCheckHeader('Trigger displaying options');
-				$this->zbxTestCheckFatalErrors();
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
 				break;
+
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update configuration');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
 				$this->zbxTestTextPresent($data['error_msg']);
-				$this->zbxTestCheckHeader('Trigger displaying options');
-				$this->zbxTestCheckFatalErrors();
 				break;
 		}
+		$this->zbxTestCheckFatalErrors();
 	}
 
 	public static function blink_period() {
@@ -293,24 +271,24 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 	 * @dataProvider blink_period
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_BlinkPeriod($data) {
-	$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 
 		$this->zbxTestInputTypeOverwrite('blink_period', $data['period']);
 		$this->zbxTestClickWait('update');
 
+		$this->zbxTestCheckHeader('Trigger displaying options');
+
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good' , 'Configuration updated');
-				$this->zbxTestCheckHeader('Trigger displaying options');
-				$this->zbxTestCheckFatalErrors();
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
 				break;
+
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update configuration');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
 				$this->zbxTestTextPresent($data['error_msg']);
-				$this->zbxTestCheckHeader('Trigger displaying options');
-				$this->zbxTestCheckFatalErrors();
 				break;
 		}
+		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetTrigDisplOptions() {
