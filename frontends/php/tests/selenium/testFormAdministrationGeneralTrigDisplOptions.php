@@ -94,7 +94,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_UpdateTrigDisplOptions() {
-
 		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestCheckHeader('Trigger displaying options');
@@ -102,46 +101,36 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestTextPresent(['Trigger displaying options', 'blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged RESOLVED events', 'Acknowledged RESOLVED events', 'Display OK triggers for', 'On status change triggers blink for']);
 
 		// hash calculation for not-changed DB fields
-		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['custom_color', 'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestCheckboxSelect('custom_color');
-
-		$this->zbxTestInputType('problem_unack_color', 'BB0000');
-		$this->zbxTestInputType('problem_ack_color', 'BB0000');
-		$this->zbxTestInputType('ok_unack_color', '66FF66');
-		$this->zbxTestInputType('ok_ack_color', '66FF66');
+		$this->zbxTestInputType('problem_unack_color', 'AAAAAA');
+		$this->zbxTestInputType('problem_ack_color', 'BBBBBB');
+		$this->zbxTestInputType('ok_unack_color', 'CCCCCC');
+		$this->zbxTestInputType('ok_ack_color', 'DDDDDD');
 		$this->zbxTestCheckboxSelect('problem_unack_style', false);
 		$this->zbxTestCheckboxSelect('problem_ack_style', false);
 		$this->zbxTestCheckboxSelect('ok_unack_style', false);
 		$this->zbxTestCheckboxSelect('ok_ack_style', false);
-		$this->zbxTestInputType('ok_period', '120');
-		$this->zbxTestInputType('blink_period', '120');
+		$this->zbxTestInputType('ok_period', '1h');
+		$this->zbxTestInputType('blink_period', '5m');
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
 
 		// checking values in the DB
-		$sql = 'SELECT problem_unack_color FROM config WHERE problem_unack_color='.zbx_dbstr('BB0000');
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT problem_ack_color FROM config WHERE problem_ack_color='.zbx_dbstr('BB0000');
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT ok_unack_color FROM config WHERE ok_unack_color='.zbx_dbstr('66FF66');
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT ok_ack_color FROM config WHERE ok_unack_color='.zbx_dbstr('66FF66');
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT problem_unack_style FROM config WHERE problem_unack_style=0 AND problem_unack_color='.zbx_dbstr('BB0000');
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT problem_ack_style FROM config WHERE problem_ack_style=0 AND problem_ack_color='.zbx_dbstr('BB0000');
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT ok_unack_style FROM config WHERE ok_unack_style=0 AND ok_unack_color='.zbx_dbstr('66FF66');
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT ok_ack_style FROM config WHERE ok_ack_style=0 AND ok_ack_color='.zbx_dbstr('66FF66');
-		$this->assertEquals(1, DBcount($sql));
-		$sql = "SELECT ok_period FROM config WHERE ok_period='120'";
-		$this->assertEquals(1, DBcount($sql));
-		$sql = "SELECT blink_period FROM config WHERE blink_period='120'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, DBcount('SELECT custom_color FROM config WHERE custom_color=1'));
+		$this->assertEquals(1, DBcount("SELECT problem_unack_color FROM config WHERE problem_unack_color='AAAAAA'"));
+		$this->assertEquals(1, DBcount("SELECT problem_ack_color FROM config WHERE problem_ack_color='BBBBBB'"));
+		$this->assertEquals(1, DBcount("SELECT ok_unack_color FROM config WHERE ok_unack_color='CCCCCC'"));
+		$this->assertEquals(1, DBcount("SELECT ok_ack_color FROM config WHERE ok_ack_color='DDDDDD'"));
+		$this->assertEquals(1, DBcount('SELECT problem_unack_style FROM config WHERE problem_unack_style=0'));
+		$this->assertEquals(1, DBcount('SELECT problem_ack_style FROM config WHERE problem_ack_style=0'));
+		$this->assertEquals(1, DBcount('SELECT ok_unack_style FROM config WHERE ok_unack_style=0'));
+		$this->assertEquals(1, DBcount('SELECT ok_ack_style FROM config WHERE ok_ack_style=0'));
+		$this->assertEquals(1, DBcount("SELECT ok_period FROM config WHERE ok_period='1h'"));
+		$this->assertEquals(1, DBcount("SELECT blink_period FROM config WHERE blink_period='5m'"));
 
 		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
@@ -325,14 +314,13 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetTrigDisplOptions() {
-
 		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestCheckHeader('Trigger displaying options');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
 
 		// hash calculation for the DB fields that should be changed in this report
-		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['custom_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestClick('resetDefaults');
@@ -340,19 +328,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
 
-		$sql = 'SELECT problem_unack_style FROM config WHERE problem_unack_style=1';
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT problem_ack_style FROM config WHERE problem_ack_style=1';
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT ok_unack_style FROM config WHERE ok_unack_style=1';
-		$this->assertEquals(1, DBcount($sql));
-		$sql = 'SELECT ok_ack_style FROM config WHERE ok_ack_style=1';
-		$this->assertEquals(1, DBcount($sql));
-
-		$sql = "SELECT ok_period FROM config WHERE ok_period='30m'";
-		$this->assertEquals(1, DBcount($sql));
-		$sql = "SELECT blink_period FROM config WHERE blink_period='30m'";
-		$this->assertEquals(1, DBcount($sql));
+		// checking values in the DB
+		$this->assertEquals(1, DBcount('SELECT custom_color FROM config WHERE custom_color=0'));
+		$this->assertEquals(1, DBcount('SELECT problem_unack_style FROM config WHERE problem_unack_style=1'));
+		$this->assertEquals(1, DBcount('SELECT problem_ack_style FROM config WHERE problem_ack_style=1'));
+		$this->assertEquals(1, DBcount('SELECT ok_unack_style FROM config WHERE ok_unack_style=1'));
+		$this->assertEquals(1, DBcount('SELECT ok_ack_style FROM config WHERE ok_ack_style=1'));
+		$this->assertEquals(1, DBcount("SELECT ok_period FROM config WHERE ok_period='30m'"));
+		$this->assertEquals(1, DBcount("SELECT blink_period FROM config WHERE blink_period='30m'"));
 
 		// hash calculation for the DB fields that should be changed in this report
 		$this->assertEquals($old_hash, DBhash($sql_hash));
