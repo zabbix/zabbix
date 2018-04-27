@@ -2397,7 +2397,7 @@ void	zbx_vc_reset(void)
 		while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 		{
 			vch_item_free_cache(item);
-			zbx_hashset_remove_direct(&vc_cache->items, &iter);
+			zbx_hashset_iter_remove(&iter);
 		}
 
 		vc_cache->hits = 0;
