@@ -28,15 +28,15 @@ class CTestDbHelper {
 	 * @param array  $exlude_fields
 	 */
 	public static function getTableFields($table_name, array $exlude_fields = []) {
-		$fields = [];
+		$field_names = [];
 
-		foreach (DB::getSchema($table_name)['fields'] as $field_name) {
+		foreach (DB::getSchema($table_name)['fields'] as $field_name => $field) {
 			if (!in_array($field_name, $exlude_fields, true)) {
-				$fields[] = $field_name;
+				$field_names[] = $field_name;
 			}
 		}
 
-		return implode(', ', $fields);
+		return implode(', ', $field_names);
 	}
 
 	/**
