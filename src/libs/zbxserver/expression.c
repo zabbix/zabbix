@@ -1571,7 +1571,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
  ******************************************************************************/
 static void	acknowledge_expand_action_names(char **str, size_t *str_alloc, size_t *str_offset, int action)
 {
-	if (0 != (action & ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM))
+	if (0 != (action & ZBX_PROBLEM_UPDATE_CLOSE))
 		zbx_strcpy_alloc(str, str_alloc, str_offset, "Close problem");
 }
 
@@ -1631,7 +1631,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 				zbx_time2str(now),
 				user_name);
 
-		if (ZBX_ACKNOWLEDGE_ACTION_NONE != action)
+		if (ZBX_PROBLEM_UPDATE_CLOSE == action)
 		{
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "Action: ");
 			acknowledge_expand_action_names(&buf, &buf_alloc, &buf_offset, action);

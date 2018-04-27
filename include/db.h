@@ -309,6 +309,7 @@ typedef struct
 	int			value;
 	int			acknowledged;
 	int			ns;
+	int			severity;
 
 	zbx_vector_ptr_t	tags;
 
