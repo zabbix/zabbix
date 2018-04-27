@@ -669,9 +669,10 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 #elif defined(HAVE_POSTGRESQL)
 		return DBexecute(
 				"delete from %s"
-				" where ctid = any(array(select ctid from %s"
+				" where %s and ctid = any(array(select ctid from %s"
 					" where %s limit %d))",
 				tablename,
+				filter,
 				tablename,
 				filter,
 				limit);
@@ -689,7 +690,7 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_problem_cleanup                                              *
+ * Function: hk_problem_cleanup                                               *
  *                                                                            *
  * Purpose: perform problem table cleanup                                     *
  *                                                                            *
@@ -867,7 +868,12 @@ static int	housekeeping_sessions(int now)
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.sessions_mode)
 	{
-		rc = DBexecute("delete from sessions where lastaccess<%d", now - cfg.hk.sessions);
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "lastaccess<%d", now - cfg.hk.sessions);
+		rc = DBdelete_from_table("sessions", sql, CONFIG_MAX_HOUSEKEEPER_DELETE);
+		zbx_free(sql);
 
 		if (ZBX_DB_OK <= rc)
 			deleted = rc;

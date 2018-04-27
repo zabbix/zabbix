@@ -4,7 +4,9 @@ SUBDIRS = \
 	zbxdbhigh \
 	zbxhistory \
 	zbxjson \
-	zbxsysinfo 
-	
+	zbxsysinfo \
+	zbxcommshigh \
+	zbxcommon \
+	zbxalgo
 	
 

@@ -28,7 +28,7 @@
 static zbx_vector_ptr_t		handle_pool;		/* a place to store handles provided to mock data user */
 static zbx_vector_str_t		string_pool;		/* a place to store strings provided to mock data user */
 static yaml_document_t		test_case;		/* parsed YAML document with test case data */
-static const yaml_node_t	*root;                  /* the root document node */
+static const yaml_node_t	*root;			/* the root document node */
 static const yaml_node_t	*in = NULL;		/* pointer to "in" section of test case document */
 static const yaml_node_t	*out = NULL;		/* pointer to "out" section of test case document */
 static const yaml_node_t	*db_data = NULL;	/* pointer to "db data" section of test case document */
@@ -302,6 +302,10 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Internal error, please report to maintainers.";
 		case ZBX_MOCK_INVALID_YAML_PATH:
 			return "Invalid YAML path syntax.";
+		case ZBX_MOCK_NOT_A_BINARY:
+			return "Provided handle is not a binary string.";
+		case ZBX_MOCK_NOT_AN_UINT64:
+			return "Provided handle is not an unsigned 64 bit integer handle.";
 		default:
 			return "Unknown error.";
 	}
@@ -465,6 +469,49 @@ zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value)
 	return ZBX_MOCK_SUCCESS;
 }
 
+zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, size_t *length)
+{
+	const zbx_mock_pool_handle_t	*handle;
+	char				*tmp, *dst;
+	const char			*src;
+	size_t				i;
+
+	if (0 > binary || binary >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[binary];
+
+	if (YAML_SCALAR_NODE != handle->node->type)
+		return ZBX_MOCK_NOT_A_BINARY;
+
+	src = (char*)handle->node->data.scalar.value;
+	dst = tmp = zbx_malloc(NULL, handle->node->data.scalar.length);
+
+	for (i = 0; i < handle->node->data.scalar.length; i++)
+	{
+		if ('\\' == src[i])
+		{
+			if (i + 3 >= handle->node->data.scalar.length || 'x' != src[i + 1] ||
+					SUCCEED != is_hex_n_range(&src[i + 2], 2, dst, sizeof(char), 0, 0xff))
+			{
+				zbx_free(tmp);
+				return ZBX_MOCK_NOT_A_BINARY;
+			}
+
+			dst++;
+			i += 3;
+		}
+		else
+			*dst++ = src[i];
+	}
+
+	zbx_vector_str_append(&string_pool, tmp);
+	*value = tmp;
+	*length = dst - tmp;
+
+	return ZBX_MOCK_SUCCESS;
+}
+
 static zbx_mock_error_t	zbx_yaml_path_next(const char **pnext, const char **key, int *key_len, int *index)
 {
 	const char	*next = *pnext;
@@ -612,4 +659,25 @@ static zbx_mock_error_t	zbx_mock_parameter_rec(const yaml_node_t *node, const ch
 zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter)
 {
 	return zbx_mock_parameter_rec(root, path, parameter);
+}
+
+zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value)
+{
+	const zbx_mock_pool_handle_t	*handle;
+
+	if (0 > object || object >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[object];
+
+	if (YAML_SCALAR_NODE != handle->node->type || ZBX_MAX_UINT64_LEN < handle->node->data.scalar.length)
+		return ZBX_MOCK_NOT_AN_UINT64;
+
+	if (SUCCEED != is_uint64_n((const char *)handle->node->data.scalar.value, handle->node->data.scalar.length,
+			value))
+	{
+		return ZBX_MOCK_NOT_AN_UINT64;
+	}
+
+	return ZBX_MOCK_SUCCESS;
 }

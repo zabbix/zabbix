@@ -26,6 +26,7 @@ if (isset($_REQUEST['screenitemid'])) {
 
 $form = (new CForm('post', $action))
 	->setName('screen_item_form')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('screenid', getRequest('screenid'));
 
 if ($data['screen']['templateid'] != 0) {
@@ -131,7 +132,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
 					'only_hostid' => $data['screen']['templateid']
-				]).');'
+				]).', null, this);'
 			);
 	}
 	else {
@@ -147,7 +148,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 					'dstfld2' => 'caption',
 					'real_hosts' => '1',
 					'with_graphs' => '1'
-				]).');'
+				]).', null, this);'
 			);
 	}
 
@@ -197,7 +198,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
 					'only_hostid' => $data['screen']['templateid']
-				]).');'
+				]).', null, this);'
 			);
 	}
 	else {
@@ -212,7 +213,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'real_hosts' => '1'
-				]).');'
+				]).', null, this);'
 			);
 	}
 
@@ -269,8 +270,9 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
 					'only_hostid' => $data['screen']['templateid'],
+					'with_webitems' => '1',
 					'numeric' => '1'
-				]).');'
+				]).', null, this);'
 			);
 	}
 	else {
@@ -286,8 +288,9 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'dstfld2' => 'caption',
 					'real_hosts' => '1',
 					'with_simple_graph_items' => '1',
+					'with_webitems' => '1',
 					'numeric' => '1'
-				]).');'
+				]).', null, this);'
 			);
 	}
 
@@ -338,7 +341,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 					'templated_hosts' => '1',
 					'only_hostid' => $data['screen']['templateid'],
 					'numeric' => '1'
-				]).');'
+				]).', null, this);'
 			);
 	}
 	else {
@@ -356,7 +359,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 					'with_discovery_rule' => '1',
 					'items' => '1',
 					'numeric' => '1'
-				]).');'
+				]).', null, this);'
 			);
 	}
 
@@ -410,7 +413,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption'
-				]).');'
+				]).', null, this);'
 			)
 	]);
 }
@@ -423,9 +426,10 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	$id = 0;
 
 	$items = API::Item()->get([
-		'itemids' => $resourceId,
+		'output' => ['itemid', 'hostid', 'key_', 'name'],
 		'selectHosts' => ['name'],
-		'output' => ['itemid', 'hostid', 'key_', 'name']
+		'itemids' => $resourceId,
+		'webitems' => true
 	]);
 
 	if ($items) {
@@ -451,8 +455,9 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'templated_hosts' => '1',
+					'with_webitems' => '1',
 					'only_hostid' => $data['screen']['templateid']
-				]).');'
+				]).', null, this);'
 			);
 	}
 	else {
@@ -466,8 +471,9 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
+					'with_webitems' => '1',
 					'real_hosts' => '1'
-				]).');'
+				]).', null, this);'
 			);
 	}
 
@@ -484,7 +490,11 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		)
-		->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
+		->addRow(_('Show text as HTML'),
+			(new CCheckBox('style'))
+				->setChecked($style == 1)
+				->removeId()
+		);
 }
 elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS])) {
 	// Screen item: Triggers
@@ -690,7 +700,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 					'dstfld1' => 'resourceid',
 					'dstfld2' => 'caption',
 					'screenid' => getRequest('screenid')
-				]).');'
+				]).', null, this);'
 			)
 	]);
 }
@@ -773,8 +783,9 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'dstfld1' => 'resourceid',
 						'dstfld2' => 'caption',
 						'templated_hosts' => '1',
+						'with_webitems' => '1',
 						'only_hostid' => $data['screen']['templateid']
-					]).');'
+					]).', null, this);'
 				);
 		}
 		else {
@@ -788,8 +799,9 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
 						'dstfld2' => 'caption',
+						'with_webitems' => '1',
 						'real_hosts' => '1'
-					]).');'
+					]).', null, this);'
 				);
 		}
 		$screenFormList->addRow((new CLabel(_('Item'), 'caption'))->setAsteriskMark(), [

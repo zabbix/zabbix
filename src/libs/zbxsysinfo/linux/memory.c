@@ -67,34 +67,6 @@ static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
-{
-	FILE		*f;
-	zbx_uint64_t	value;
-	int		res;
-
-	if (NULL == (f = fopen("/proc/meminfo", "r")))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/meminfo: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (FAIL == (res = byte_value_from_proc_file(f, "Cached:", NULL, &value)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of Cached from /proc/meminfo."));
-		goto close;
-	}
-
-	if (NOTSUPPORTED == res)
-		value = 0;
-close:
-	zbx_fclose(f);
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
 static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
@@ -242,10 +214,35 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 #endif
 }
 
+static int	VM_MEMORY_PROC_MEMINFO(const char *meminfo_entry, AGENT_RESULT *result)
+{
+	FILE		*f;
+	zbx_uint64_t	value;
+	int		ret = SYSINFO_RET_FAIL;
+
+	if (NULL == (f = fopen("/proc/meminfo", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/meminfo: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SUCCEED == byte_value_from_proc_file(f, meminfo_entry, NULL, &value))
+	{
+		SET_UI64_RESULT(result, value);
+		ret = SYSINFO_RET_OK;
+	}
+	else
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain value from /proc/meminfo."));
+
+	zbx_fclose(f);
+
+	return ret;
+}
+
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (1 < request->nparam)
 	{
@@ -261,8 +258,6 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VM_MEMORY_FREE(result);
 	else if (0 == strcmp(mode, "buffers"))
 		ret = VM_MEMORY_BUFFERS(result);
-	else if (0 == strcmp(mode, "cached"))
-		ret = VM_MEMORY_CACHED(result);
 	else if (0 == strcmp(mode, "used"))
 		ret = VM_MEMORY_USED(result);
 	else if (0 == strcmp(mode, "pused"))
@@ -273,6 +268,16 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VM_MEMORY_PAVAILABLE(result);
 	else if (0 == strcmp(mode, "shared"))
 		ret = VM_MEMORY_SHARED(result);
+	else if (0 == strcmp(mode, "cached"))
+		ret = VM_MEMORY_PROC_MEMINFO("Cached:", result);
+	else if (0 == strcmp(mode, "active"))
+		ret = VM_MEMORY_PROC_MEMINFO("Active:", result);
+	else if (0 == strcmp(mode, "anon"))
+		ret = VM_MEMORY_PROC_MEMINFO("AnonPages:", result);
+	else if (0 == strcmp(mode, "inactive"))
+		ret = VM_MEMORY_PROC_MEMINFO("Inactive:", result);
+	else if (0 == strcmp(mode, "slab"))
+		ret = VM_MEMORY_PROC_MEMINFO("Slab:", result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));

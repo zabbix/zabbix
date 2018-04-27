@@ -91,18 +91,22 @@ $output = [
 	'body' => (new CDiv([
 		$data['message'],
 		(new CForm())
+			->cleanItems()
 			->setId('expression_testing_from')
-			->addVar('expression', $data['expression'])
-			->addVar('test_expression', 1)
-			->addItem(
-				(new CTabView())->addTab('test_tab', null, $form_list)
-			)
+			->addItem((new CVar('expression', $data['expression']))->removeId())
+			->addItem((new CVar('test_expression', 1))->removeId())
+			->addItem([
+				$form_list,
+				(new CInput('submit', 'submit'))->addStyle('display: none;')
+			])
 		]))->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),
 			'enabled' => $allowed_testing,
 			'class' => '',
+			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return reloadPopup(document.forms["expression_testing_from"], "popup.testtriggerexpr");'
 		]
 	]

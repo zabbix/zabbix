@@ -21,6 +21,10 @@
 #include "log.h"
 #include "mutexs.h"
 
+#ifdef _WINDOWS
+#	include "sysinfo.h"
+#endif
+
 #ifndef _WINDOWS
 #	if !HAVE_SEMUN
 		union semun
@@ -125,6 +129,14 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 		return;
 
 #ifdef _WINDOWS
+#ifdef ZABBIX_AGENT
+	if (0 != (ZBX_MUTEX_THREAD_DENIED & get_thread_global_mutex_flag()))
+	{
+		zbx_error("[file:'%s',line:%d] lock failed: ZBX_MUTEX_THREAD_DENIED is set for thread with id = %d",
+				filename, line, zbx_get_thread_id());
+		exit(EXIT_FAILURE);
+	}
+#endif
 	dwWaitResult = WaitForSingleObject(*mutex, INFINITE);
 
 	switch (dwWaitResult)

@@ -37,7 +37,6 @@ var CMessageList = Class.create({
 	lastupdate:			0,		// lastupdate timestamp
 	msgcounter:			0,		// how many messages have been added
 	pipeLength:			15,		// how many messages to show
-	messages:			{},		// received messages
 	messageList:		{},		// list of received messages
 	messagePipe:		[],		// messageid pipe line
 	messageLast:		{},		// last message's sourceid by caption
@@ -56,7 +55,6 @@ var CMessageList = Class.create({
 	initialize: function(messagesListId, args) {
 		this.messageListId = messagesListId;
 		this.dom = {};
-		this.messages = {};
 		this.messageList = {};
 		this.messageLast = {};
 		this.updateSettings();
@@ -148,7 +146,11 @@ var CMessageList = Class.create({
 			'messageid': this.messageList[this.msgcounter].messageid
 		};
 
-		jQuery(this.dom.container).fadeTo('fast', 0.9);
+		var trigger_element = document.activeElement;
+		jQuery(this.dom.container).fadeTo('fast', 0.9, function() {
+			addToOverlaysStack('zbx_messages', trigger_element, 'message');
+			overlayDialogueOnLoad(true, this);
+		});
 
 		return this.messageList[this.msgcounter];
 	},
@@ -207,8 +209,8 @@ var CMessageList = Class.create({
 			return true;
 		}
 
-		for (var i = 0; i < this.messages.length; i++) {
-			var message = this.messages[i];
+		for (var i in this.messageList) {
+			var message = this.messageList[i];
 
 			if (message.type != 1 && message.type != 3) {
 				continue;
@@ -302,24 +304,16 @@ var CMessageList = Class.create({
 
 		new RPC.Call(rpcRequest);
 
-		jQuery(this.dom.container).slideUp(this.effectTimeout);
+		jQuery(this.dom.container).hide();
 
-		var count = 0;
-		var effect = false;
 		for (var messageid in this.messageList) {
-			if (empty(this.messageList[messageid])) {
-				continue;
+			if (!empty(this.messageList[messageid])) {
+				this.closeMessage(messageid, false);
 			}
-			if (!effect) {
-				this.closeMessage(this, messageid, effect);
-			}
-			else {
-				setTimeout(this.closeMessage.bind(this, messageid, effect), count * this.effectTimeout * 0.5);
-			}
-			count++;
 		}
 
 		this.stopSound();
+		removeFromOverlaysStack('zbx_messages');
 	},
 
 	timeoutMessages: function() {
@@ -365,7 +359,6 @@ var CMessageList = Class.create({
 				this.addMessage(messages[i]);
 			}
 
-			this.messages = messages;
 			this.playSound();
 		}
 
@@ -467,6 +460,7 @@ var CMessage = Class.create({
 	},
 
 	close: function() {
+		delete(this.list[this.messageid]);
 		$(this.dom.listItem).remove();
 		this.dom = {};
 	},

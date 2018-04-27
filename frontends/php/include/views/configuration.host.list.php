@@ -19,37 +19,89 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.host.list.js.php';
+
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$data['pageFilter']->getGroupsCB()
-			])
-			->addItem(new CSubmit('form', _('Create host')))
-			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
-		)
-	);
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getGroupsCB()
+				])
+			),
+		(new CTag('nav', true, (new CList())
+			->addItem(new CRedirectButton(_('Create host'), (new CUrl())
+				->removeArgument('hostid')
+				->setArgument('form', 'create')
+				->getUrl()
+			))
+			->addItem(
+				(new CButton('form', _('Import')))
+					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->removeId()
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	]));
 
 // filter
 $filter = (new CFilter('web.hosts.filter.state'))
-	->addColumn((new CFormList())->addRow(_('Name'),
-		(new CTextBox('filter_host', $data['filter']['host']))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
-	))
-	->addColumn((new CFormList())->addRow(_('DNS'),
-		(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	))
-	->addColumn((new CFormList())->addRow(_('IP'),
-		(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	))
-	->addColumn((new CFormList())->addRow(_('Port'),
-		(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	));
+	->addColumn(
+		(new CFormList())
+			->addRow(
+				_('Name'),
+				(new CTextBox('filter_host', $data['filter']['host']))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+			->addRow(
+				_('Monitored by'),
+				(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))
+					->addValue(_('Any'), ZBX_MONITORED_BY_ANY)
+					->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
+					->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
+					->setModern(true)
+			)
+			->addRow(
+				_('Proxy'),
+				(new CMultiSelect([
+					'name' => 'filter_proxyids[]',
+					'objectName' => 'proxies',
+					'data' => $data['proxies_ms'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'proxies',
+							'srcfld1' => 'proxyid',
+							'srcfld2' => 'host',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_proxyids_',
+							'multiselect' => '1'
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'filter_proxyids_row'
+			)
+	)
+	->addColumn(
+		(new CFormList())
+			->addRow(
+				_('DNS'),
+				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(
+				_('IP'),
+				(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(
+				_('Port'),
+				(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+	);
 
 $widget->addItem($filter);
 

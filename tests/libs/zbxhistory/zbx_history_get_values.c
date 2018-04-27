@@ -80,6 +80,10 @@ int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_
 	return SUCCEED;
 }
 
+void	__wrap_zbx_clean_events(void)
+{
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_vcmock_history_dump                                          *

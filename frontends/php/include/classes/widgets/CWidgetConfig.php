@@ -30,24 +30,24 @@ class CWidgetConfig {
 	 */
 	public static function getKnownWidgetTypes() {
 		return [
-			WIDGET_SYSTEM_STATUS		=> _('System status'),
-			WIDGET_ZABBIX_STATUS		=> _('Status of Zabbix'),
-			WIDGET_PROBLEMS				=> _('Problems'),
-			WIDGET_WEB_OVERVIEW			=> _('Web monitoring'),
-			WIDGET_DISCOVERY_STATUS		=> _('Discovery status'),
-			WIDGET_GRAPH				=> _('Graph'),
-			WIDGET_HOST_STATUS			=> _('Host status'),
-			WIDGET_FAVOURITE_GRAPHS		=> _('Favourite graphs'),
-			WIDGET_FAVOURITE_MAPS		=> _('Favourite maps'),
-			WIDGET_FAVOURITE_SCREENS	=> _('Favourite screens'),
-			WIDGET_CLOCK				=> _('Clock'),
-			WIDGET_SYSMAP				=> _('Map'),
-			WIDGET_NAVIGATION_TREE		=> _('Map navigation tree'),
-			WIDGET_URL					=> _('URL'),
 			WIDGET_ACTION_LOG			=> _('Action log'),
-			WIDGET_DATA_OVERVIEW		=> _('Data overview'),
-			WIDGET_TRIG_OVERVIEW		=> _('Trigger overview'),
-			WIDGET_PLAIN_TEXT			=> _('Plain text')
+			WIDGET_CLOCK				=> _('Clock'),
+			WIDGET_DATA_OVER			=> _('Data overview'),
+			WIDGET_DISCOVERY			=> _('Discovery status'),
+			WIDGET_FAV_GRAPHS			=> _('Favourite graphs'),
+			WIDGET_FAV_MAPS				=> _('Favourite maps'),
+			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
+			WIDGET_GRAPH				=> _('Graph'),
+			WIDGET_MAP					=> _('Map'),
+			WIDGET_NAV_TREE				=> _('Map navigation tree'),
+			WIDGET_PLAIN_TEXT			=> _('Plain text'),
+			WIDGET_PROBLEM_HOSTS		=> _('Problem hosts'),
+			WIDGET_PROBLEMS				=> _('Problems'),
+			WIDGET_PROBLEMS_BY_SV		=> _('Problems by severity'),
+			WIDGET_SYSTEM_INFO			=> _('System information'),
+			WIDGET_TRIG_OVER			=> _('Trigger overview'),
+			WIDGET_URL					=> _('URL'),
+			WIDGET_WEB					=> _('Web monitoring')
 		];
 	}
 
@@ -60,24 +60,24 @@ class CWidgetConfig {
 	 */
 	private static function getDefaultDimensions() {
 		return [
-			WIDGET_SYSTEM_STATUS		=> ['width' => 6, 'height' => 5],
-			WIDGET_ZABBIX_STATUS		=> ['width' => 6, 'height' => 5],
-			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
-			WIDGET_WEB_OVERVIEW			=> ['width' => 3, 'height' => 3],
-			WIDGET_DISCOVERY_STATUS		=> ['width' => 3, 'height' => 3],
-			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
-			WIDGET_HOST_STATUS			=> ['width' => 6, 'height' => 5],
-			WIDGET_FAVOURITE_GRAPHS		=> ['width' => 2, 'height' => 3],
-			WIDGET_FAVOURITE_MAPS		=> ['width' => 2, 'height' => 3],
-			WIDGET_FAVOURITE_SCREENS	=> ['width' => 2, 'height' => 3],
-			WIDGET_CLOCK				=> ['width' => 2, 'height' => 3],
-			WIDGET_SYSMAP				=> ['width' => 9, 'height' => 5],
-			WIDGET_NAVIGATION_TREE		=> ['width' => 3, 'height' => 5],
-			WIDGET_URL					=> ['width' => 6, 'height' => 5],
 			WIDGET_ACTION_LOG			=> ['width' => 6, 'height' => 5],
-			WIDGET_DATA_OVERVIEW		=> ['width' => 6, 'height' => 5],
-			WIDGET_TRIG_OVERVIEW		=> ['width' => 6, 'height' => 5],
-			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3]
+			WIDGET_CLOCK				=> ['width' => 2, 'height' => 3],
+			WIDGET_DATA_OVER			=> ['width' => 6, 'height' => 5],
+			WIDGET_DISCOVERY			=> ['width' => 3, 'height' => 3],
+			WIDGET_FAV_GRAPHS			=> ['width' => 2, 'height' => 3],
+			WIDGET_FAV_MAPS				=> ['width' => 2, 'height' => 3],
+			WIDGET_FAV_SCREENS			=> ['width' => 2, 'height' => 3],
+			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
+			WIDGET_MAP					=> ['width' => 9, 'height' => 5],
+			WIDGET_NAV_TREE				=> ['width' => 3, 'height' => 5],
+			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3],
+			WIDGET_PROBLEM_HOSTS		=> ['width' => 6, 'height' => 5],
+			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
+			WIDGET_PROBLEMS_BY_SV		=> ['width' => 6, 'height' => 5],
+			WIDGET_SYSTEM_INFO			=> ['width' => 6, 'height' => 5],
+			WIDGET_TRIG_OVER			=> ['width' => 6, 'height' => 5],
+			WIDGET_URL					=> ['width' => 6, 'height' => 5],
+			WIDGET_WEB					=> ['width' => 3, 'height' => 3]
 		];
 	}
 
@@ -113,25 +113,25 @@ class CWidgetConfig {
 	 */
 	public static function getDefaultRfRate($type) {
 		switch ($type) {
-			case WIDGET_SYSTEM_STATUS:
-			case WIDGET_PROBLEMS:
-			case WIDGET_WEB_OVERVIEW:
-			case WIDGET_DISCOVERY_STATUS:
-			case WIDGET_GRAPH:
-			case WIDGET_HOST_STATUS:
 			case WIDGET_ACTION_LOG:
-			case WIDGET_DATA_OVERVIEW:
-			case WIDGET_TRIG_OVERVIEW:
+			case WIDGET_DATA_OVER:
+			case WIDGET_DISCOVERY:
+			case WIDGET_GRAPH:
 			case WIDGET_PLAIN_TEXT:
+			case WIDGET_PROBLEM_HOSTS:
+			case WIDGET_PROBLEMS:
+			case WIDGET_PROBLEMS_BY_SV:
+			case WIDGET_TRIG_OVER:
+			case WIDGET_WEB:
 				return SEC_PER_MIN;
 
-			case WIDGET_ZABBIX_STATUS:
-			case WIDGET_FAVOURITE_GRAPHS:
-			case WIDGET_FAVOURITE_MAPS:
-			case WIDGET_FAVOURITE_SCREENS:
-			case WIDGET_NAVIGATION_TREE:
 			case WIDGET_CLOCK:
-			case WIDGET_SYSMAP:
+			case WIDGET_FAV_GRAPHS:
+			case WIDGET_FAV_MAPS:
+			case WIDGET_FAV_SCREENS:
+			case WIDGET_MAP:
+			case WIDGET_NAV_TREE:
+			case WIDGET_SYSTEM_INFO:
 				return 15 * SEC_PER_MIN;
 
 			case WIDGET_URL:
@@ -184,44 +184,44 @@ class CWidgetConfig {
 	 */
 	public static function getForm($type, $data) {
 		switch ($type) {
-			case WIDGET_CLOCK:
-				return new CClockWidgetForm($data);
-
-			case WIDGET_NAVIGATION_TREE:
-				return new CNavigationWidgetForm($data);
-
-			case WIDGET_SYSMAP:
-				return new CSysmapWidgetForm($data);
-
-			case WIDGET_URL:
-				return new CUrlWidgetForm($data);
-
 			case WIDGET_ACTION_LOG:
-				return new CActionLogWidgetForm($data);
+				return new CWidgetFormActionLog($data);
 
-			case WIDGET_DATA_OVERVIEW:
-				return new CDataOverviewWidgetForm($data);
+			case WIDGET_CLOCK:
+				return new CWidgetFormClock($data);
 
-			case WIDGET_TRIG_OVERVIEW:
-				return new CTrigOverviewWidgetForm($data);
+			case WIDGET_DATA_OVER:
+				return new CWidgetFormDataOver($data);
 
 			case WIDGET_GRAPH:
-				return new CGraphWidgetForm($data);
+				return new CWidgetFormGraph($data);
 
-			case WIDGET_PROBLEMS:
-				return new CProblemsWidgetForm($data);
+			case WIDGET_MAP:
+				return new CWidgetFormMap($data);
 
-			case WIDGET_WEB_OVERVIEW:
-				return new CWebWidgetForm($data);
-
-			case WIDGET_SYSTEM_STATUS:
-				return new CSystemWidgetForm($data);
-
-			case WIDGET_HOST_STATUS:
-				return new CHostsWidgetForm($data);
+			case WIDGET_NAV_TREE:
+				return new CWidgetFormNavTree($data);
 
 			case WIDGET_PLAIN_TEXT:
-				return new CPlainTextWidgetForm($data);
+				return new CWidgetFormPlainText($data);
+
+			case WIDGET_PROBLEM_HOSTS:
+				return new CWidgetFormProblemHosts($data);
+
+			case WIDGET_PROBLEMS:
+				return new CWidgetFormProblems($data);
+
+			case WIDGET_PROBLEMS_BY_SV:
+				return new CWidgetFormProblemsBySv($data);
+
+			case WIDGET_TRIG_OVER:
+				return new CWidgetFormTrigOver($data);
+
+			case WIDGET_URL:
+				return new CWidgetFormUrl($data);
+
+			case WIDGET_WEB:
+				return new CWidgetFormWeb($data);
 
 			default:
 				return new CWidgetForm($data, $type);

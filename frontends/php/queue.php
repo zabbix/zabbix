@@ -64,15 +64,20 @@ if ($zabbixServer->getError()) {
 
 $widget = (new CWidget())
 	->setTitle(_('Queue of items to be updated'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem((new CComboBox('config', $config, 'submit();', [
-				QUEUE_OVERVIEW => _('Overview'),
-				QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
-				QUEUE_DETAILS => _('Details')
-			])))
-		)
+	->setControls((new CTag('nav', true, [
+		(new CForm('get'))
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(
+					(new CComboBox('config', $config, 'submit();', [
+						QUEUE_OVERVIEW => _('Overview'),
+						QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
+						QUEUE_DETAILS => _('Details')
+					]))->removeId()
+				)
+			)
+		]))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $table = new CTableInfo();
@@ -267,7 +272,7 @@ elseif ($config == QUEUE_DETAILS) {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $itemData['nextcheck']),
 			zbx_date2age($itemData['nextcheck']),
-			(isset($proxies[$hosts[$item['hostid']]['proxy_hostid']]))
+			isset($proxies[$hosts[$item['hostid']]['proxy_hostid']])
 				? $proxies[$hosts[$item['hostid']]['proxy_hostid']]['host'].NAME_DELIMITER.$host['name']
 				: $host['name'],
 			$item['name_expanded']

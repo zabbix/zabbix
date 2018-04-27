@@ -26,6 +26,7 @@ $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 // create form
 $hostView = (new CForm())
 	->setName('hostForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'host.massupdate')
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('id', 'hostForm');
@@ -74,7 +75,8 @@ $replaceGroups = (new CDiv(
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[groups]', 'replaceGroups', _('Original')))
 		->setLabel(_('Replace host groups'))
-		->setChecked(isset($data['visible']['groups'])),
+		->setChecked(isset($data['visible']['groups']))
+		->setAttribute('autofocus', 'autofocus'),
 	$replaceGroups
 );
 
@@ -158,6 +160,48 @@ else {
 		))->setId('newGroups')
 	);
 }
+
+// Get list of host groups to remove if unsuccessful submit.
+$host_groups_to_remove = null;
+
+if (getRequest('remove_groups')) {
+	$groups = API::HostGroup()->get([
+		'groupids' => getRequest('remove_groups'),
+		'output' => ['groupid', 'name'],
+		'editable' => true
+	]);
+	foreach ($groups as $group) {
+		$host_groups_to_remove[] = [
+			'id' => $group['groupid'],
+			'name' => $group['name']
+		];
+	}
+}
+
+// Remove host groups control.
+$hostFormList->addRow(
+	(new CVisibilityBox('visible[remove_groups]', 'remove_groups', _('Original')))
+		->setLabel(_('Remove host groups'))
+		->setChecked(array_key_exists('remove_groups', $data['visible'])),
+	(new CDiv(
+		(new CMultiSelect([
+			'name' => 'remove_groups[]',
+			'objectName' => 'hostGroup',
+			'objectOptions' => ['editable' => true],
+			'data' => $host_groups_to_remove,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'dstfrm' => $hostView->getName(),
+					'dstfld1' => 'remove_groups_',
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))->setId('remove_groups')
+);
 
 // append description to form list
 $hostFormList->addRow(

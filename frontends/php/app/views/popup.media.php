@@ -55,7 +55,7 @@ $media_form = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $options['mediatypeid'], null, $data['db_mediatypes']))
 	->addRow(
 		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
-		(new CTextBox('sendto', $options['sendto'], false, 100))
+		(new CTextBox('sendto', $options['sendto'], false, 1024))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'mediatype_send_to'
@@ -76,6 +76,7 @@ $media_form = (new CFormList(_('Media')))
 	);
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('media_form')
 	->addVar('action', 'popup.media')
 	->addVar('add', '1')
@@ -83,8 +84,9 @@ $form = (new CForm())
 	->addVar('type', $options['type'])
 	->addVar('dstfrm', $options['dstfrm'])
 	->setId('media_form')
-	->addItem((new CTabView())->addTab('mediaTab', _('Media'), $media_form))
-	->addItem(
+	->addItem([
+		$media_form,
+		(new CInput('submit', 'submit'))->addStyle('display: none;'),
 		(new CTag('script'))
 			->addItem((new CRow([
 				(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
@@ -99,7 +101,7 @@ $form = (new CForm())
 				->addClass('form_row'))
 				->setAttribute('type', 'text/x-jquery-tmpl')
 				->setAttribute('id', 'email_send_to_table_row')
-);
+	]);
 
 $output = [
 	'header' => $data['title'],
@@ -110,6 +112,7 @@ $output = [
 			'title' => ($options['media'] !== -1) ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
+			'isSubmit' => true,
 			'action' => 'return validateMedia("'.$form->getName().'");'
 		]
 	]

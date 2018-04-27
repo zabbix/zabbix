@@ -106,7 +106,7 @@ class testInheritanceWeb extends CWebTest {
 		foreach ($data['addStep'] as $step) {
 			$this->zbxTestClick('add_step');
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $step['name']);
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step['name']);
 			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $step['url']);
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 			$this->zbxTestTextNotPresent('Page received incorrect data');

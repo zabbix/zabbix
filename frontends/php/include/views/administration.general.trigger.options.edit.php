@@ -23,35 +23,56 @@ include('include/views/js/administration.general.trigger.options.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger displaying options'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $triggerDOFormList = (new CFormList())
+	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
+		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+		->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
-		(new CColor('problem_unack_color', $data['problem_unack_color']))->setAriaRequired(),
+		(new CColor('problem_unack_color', $data['problem_unack_color']))
+			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
+			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_unack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['problem_unack_style'] == 1)
 	])
 	->addRow((new CLabel(_('Acknowledged PROBLEM events'), 'problem_ack_color'))->setAsteriskMark(), [
-		(new CColor('problem_ack_color', $data['problem_ack_color']))->setAriaRequired(),
+		(new CColor('problem_ack_color', $data['problem_ack_color']))
+			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
+			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('problem_ack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['problem_ack_style'] == 1)
 	])
-	->addRow((new CLabel(_('Unacknowledged OK events'), 'ok_unack_color'))->setAsteriskMark(), [
-		(new CColor('ok_unack_color', $data['ok_unack_color']))->setAriaRequired(),
+	->addRow((new CLabel(_('Unacknowledged RESOLVED events'), 'ok_unack_color'))->setAsteriskMark(), [
+		(new CColor('ok_unack_color', $data['ok_unack_color']))
+			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
+			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_unack_style'))
 			->setLabel(_('blinking'))
 			->setChecked($data['ok_unack_style'] == 1)
 	])
-	->addRow((new CLabel(_('Acknowledged OK events'), 'ok_ack_color'))->setAsteriskMark(), [
-		(new CColor('ok_ack_color', $data['ok_ack_color']))->setAriaRequired(),
+	->addRow((new CLabel(_('Acknowledged RESOLVED events'), 'ok_ack_color'))->setAsteriskMark(), [
+		(new CColor('ok_ack_color', $data['ok_ack_color']))
+			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+			->addClass(($data['custom_color'] == EVENT_CUSTOM_COLOR_DISABLED) ? ZBX_STYLE_DISABLED : null)
+			->setAriaRequired(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CCheckBox('ok_ack_style'))
 			->setLabel(_('blinking'))
@@ -72,6 +93,7 @@ $triggerDOFormList = (new CFormList())
 	]);
 
 $severityForm = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(
 		(new CTabView())
 			->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList)

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ use warnings;
 use YAML::XS qw(LoadFile Dump);
 use Path::Tiny qw(path);
 use IPC::Run3 qw(run3);
-use Time::HiRes qw(clock);
+use Time::HiRes qw(time);
 use File::Basename qw(dirname);
 
 use constant TEST_SUITE_ATTRIBUTES	=> ('name', 'tests', 'skipped', 'errors', 'failures', 'time');
@@ -22,9 +22,9 @@ sub escape_xml_entity($)
 {
 	my $entity = shift;
 
+	$entity =~ s/&/&amp;/g;
 	$entity =~ s/</&lt;/g;
 	$entity =~ s/>/&gt;/g;
-	$entity =~ s/&/&amp;/g;
 
 	return $entity;
 }
@@ -45,7 +45,7 @@ sub launch($$$)
 	my $test_exec = shift;
 	my $test_data = shift;
 
-	my $start = clock();
+	my $start = time();
 
 	$test_suite->{'tests'}++;
 
@@ -53,6 +53,8 @@ sub launch($$$)
 		'name'		=> $test_data->{'test case'} // "N/A",
 		'assertions'	=> 0
 	};
+
+	utf8::encode($test_case->{'name'});
 
 	if (path($test_exec)->is_file)
 	{
@@ -82,7 +84,7 @@ sub launch($$$)
 		$test_suite->{'skipped'}++;
 	}
 
-	my $end = clock();
+	my $end = time();
 
 	$test_suite->{'time'} += $test_case->{'time'} = $end - $start;
 

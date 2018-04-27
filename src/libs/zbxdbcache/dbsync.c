@@ -497,6 +497,7 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 	signed char	ipmi_authtype;
 	unsigned char	ipmi_privilege;
 	ZBX_DC_IPMIHOST	*ipmihost;
+	ZBX_DC_PROXY	*proxy;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], host->proxy_hostid))
 	{
@@ -542,11 +543,6 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	if (FAIL == dbsync_compare_str(dbrow[35], host->proxy_address))
-		return FAIL;
-#else
-	if (FAIL == dbsync_compare_str(dbrow[31], host->proxy_address))
-		return FAIL;
 #endif
 	if (FAIL == dbsync_compare_uchar(dbrow[29], host->tls_connect))
 		return FAIL;
@@ -583,6 +579,16 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 	else if (NULL != zbx_hashset_search(&dbsync_env.cache->ipmihosts, &host->hostid))
 		return FAIL;
 
+	/* proxies */
+	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&dbsync_env.cache->proxies, &host->hostid)))
+	{
+		if (FAIL == dbsync_compare_str(dbrow[31 + ZBX_HOST_TLS_OFFSET], proxy->proxy_address))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[32 + ZBX_HOST_TLS_OFFSET], proxy->auto_compress))
+			return FAIL;
+	}
+
 	return SUCCEED;
 }
 
@@ -616,7 +622,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
 				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept"
-				",tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address"
+				",tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -627,7 +633,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 36, NULL);
+	dbsync_prepare(sync, 37, NULL);
 #else
 	if (NULL == (result = DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
@@ -636,7 +642,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
 				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept,"
-				"proxy_address"
+				"proxy_address,auto_compress"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -647,7 +653,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 32, NULL);
+	dbsync_prepare(sync, 33, NULL);
 #endif
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
@@ -1269,6 +1275,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
+	ZBX_DC_HTTPITEM		*httpitem;
 	unsigned char		value_type, type, history, trends;
 	int			history_sec = 0;
 
@@ -1403,10 +1410,10 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&dbsync_env.cache->trapitems, &item->itemid);
 	if (ITEM_TYPE_TRAPPER == item->type && '\0' != *dbrow[15])
 	{
+		zbx_trim_str_list(dbrow[15], ',');
+
 		if (NULL == trapitem)
 			return FAIL;
-
-		zbx_trim_str_list(dbrow[15], ',');
 
 		if (FAIL == dbsync_compare_str(dbrow[15], trapitem->trapper_hosts))
 			return FAIL;
@@ -1546,6 +1553,83 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	else if (NULL != depitem)
 		return FAIL;
 
+	httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&dbsync_env.cache->httpitems, &item->itemid);
+	if (ITEM_TYPE_HTTPAGENT == item->type)
+	{
+		zbx_trim_str_list(dbrow[15], ',');
+
+		if (NULL == httpitem)
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[39], httpitem->timeout))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[40], httpitem->url))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[41], httpitem->query_fields))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[42], httpitem->posts))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[43], httpitem->status_codes))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[44], httpitem->follow_redirects))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[45], httpitem->post_type))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[46], httpitem->http_proxy))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[47], httpitem->headers))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[48], httpitem->retrieve_mode))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[49], httpitem->request_method))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[50], httpitem->output_format))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[51], httpitem->ssl_cert_file))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[52], httpitem->ssl_key_file))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[53], httpitem->ssl_key_password))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[54], httpitem->verify_peer))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[55], httpitem->verify_host))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[19], httpitem->authtype))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[20], httpitem->username))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[21], httpitem->password))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_uchar(dbrow[56], httpitem->allow_traps))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[15], httpitem->trapper_hosts))
+			return FAIL;
+	}
+	else if (NULL != httpitem)
+		return FAIL;
+
 	return SUCCEED;
 }
 
@@ -1638,7 +1722,10 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
 				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,"
 				"i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error,i.jmx_endpoint,"
-				"i.master_itemid"
+				"i.master_itemid,i.timeout,i.url,i.query_fields,i.posts,i.status_codes,"
+				"i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,"
+				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
+				"i.verify_peer,i.verify_host,i.allow_traps"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
@@ -1649,7 +1736,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 39, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 57, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

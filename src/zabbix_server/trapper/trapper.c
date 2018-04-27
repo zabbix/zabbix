@@ -172,7 +172,8 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		goto out;
 	}
 
-	zbx_proxy_update_version(&proxy, jp);
+	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
 	if (SUCCEED != (ret = process_proxy_history_data(&proxy, jp, ts, &error)))
 	{
@@ -180,10 +181,10 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 				proxy.host, sock->peer, error);
 		goto out;
 	}
-
-	update_proxy_lastaccess(proxy.hostid, time(NULL));
 out:
-	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+	/* 'history data' request is sent only by pre 3.4 version proxies */
+	/* that did not have compression support                          */
+	zbx_send_response_ext(sock, ret, error, NULL, ZBX_TCP_PROTOCOL, CONFIG_TIMEOUT);
 
 	zbx_free(error);
 
@@ -229,7 +230,7 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	const char	*__function_name = "recv_proxy_heartbeat";
 
 	char		*error = NULL;
-	int		ret;
+	int		ret, flags = ZBX_TCP_PROTOCOL;
 	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -248,11 +249,16 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_proxy_update_version(&proxy, jp);
+	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
-	update_proxy_lastaccess(proxy.hostid, time(NULL));
+	if (0 != proxy.auto_compress)
+		flags |= ZBX_TCP_COMPRESS;
 out:
-	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+	if (FAIL == ret && 0 != (sock->protocol & ZBX_TCP_COMPRESS))
+		flags |= ZBX_TCP_COMPRESS;
+
+	zbx_send_response_ext(sock, ret, error, NULL, flags, CONFIG_TIMEOUT);
 
 	zbx_free(error);
 
@@ -376,7 +382,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
-		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -397,7 +403,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)) ||
 					FAIL == is_uint31(limit_str, &limit))
 			{
-				zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
+				zbx_send_response(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
 				goto out;
 			}
 		}
@@ -405,7 +411,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (ZBX_GET_QUEUE_UNKNOWN == request_type)
 	{
-		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -491,7 +497,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
 
-	(void)zbx_tcp_send_raw(sock, json.buffer);
+	(void)zbx_tcp_send(sock, json.buffer);
 
 	DCfree_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);
@@ -847,7 +853,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user))
 	{
-		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -865,7 +871,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (ZBX_GET_STATUS_UNKNOWN == request_type)
 	{
-		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -890,7 +896,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
 
-	(void)zbx_tcp_send_raw(sock, json.buffer);
+	(void)zbx_tcp_send(sock, json.buffer);
 
 	zbx_json_free(&json);
 
@@ -913,7 +919,7 @@ static void	active_passive_misconfig(zbx_socket_t *sock)
 			" sends requests to it as to proxy in passive mode", sock->peer);
 
 	zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
-	zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+	zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
 	zbx_free(msg);
 }
 

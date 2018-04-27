@@ -95,7 +95,7 @@ typedef struct
 	unsigned char		location;
 	unsigned char		flags;
 	unsigned char		status;
-	unsigned char		unreachable;
+	unsigned char		queue_priority;
 	unsigned char		schedulable;
 	unsigned char		update_triggers;
 }
@@ -230,6 +230,34 @@ typedef struct
 }
 ZBX_DC_PREPROCITEM;
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	const char	*timeout;
+	const char	*url;
+	const char	*query_fields;
+	const char	*status_codes;
+	const char	*http_proxy;
+	const char	*headers;
+	const char	*username;
+	const char	*ssl_cert_file;
+	const char	*ssl_key_file;
+	const char	*ssl_key_password;
+	const char	*password;
+	const char	*posts;
+	const char	*trapper_hosts;
+	unsigned char	authtype;
+	unsigned char	follow_redirects;
+	unsigned char	post_type;
+	unsigned char	retrieve_mode;
+	unsigned char	request_method;
+	unsigned char	output_format;
+	unsigned char	verify_peer;
+	unsigned char	verify_host;
+	unsigned char	allow_traps;
+}
+ZBX_DC_HTTPITEM;
+
 typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -296,7 +324,6 @@ typedef struct
 	const char	*tls_subject;
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
-	const char	*proxy_address;
 	const char	*error;
 	const char	*snmp_error;
 	const char	*ipmi_error;
@@ -334,8 +361,12 @@ typedef struct
 	int		nextcheck;
 	int		timediff;
 	int		lastaccess;
+	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
+						/* or 0 if no error */
 	int		version;
 	unsigned char	location;
+	unsigned char	auto_compress;
+	const char	*proxy_address;
 }
 ZBX_DC_PROXY;
 
@@ -603,6 +634,7 @@ typedef struct
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
+	int			item_sync_ts;
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
@@ -620,6 +652,7 @@ typedef struct
 	zbx_hashset_t		calcitems;
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;
+	zbx_hashset_t		httpitems;
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;

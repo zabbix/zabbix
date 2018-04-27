@@ -27,6 +27,7 @@ $widget = (new CWidget())->setTitle(_('Scripts'));
 $scriptForm = (new CForm())
 	->setId('scriptForm')
 	->setName('scripts')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
@@ -35,7 +36,7 @@ $scriptFormList = (new CFormList())
 		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
+			->setAttribute('placeholder', _('<sub-menu/sub-menu/...>script'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Type'), 'type')),

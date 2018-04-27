@@ -59,19 +59,23 @@ class CLink extends CTag {
 	public function toString($destroy = true) {
 		$url = $this->url;
 
+		if ($url === null) {
+			$this->setAttribute('role', 'button');
+		}
+
 		if ($this->use_sid) {
 			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
 				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
 				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
 			}
 			$confirm_script = ($this->confirm_message !== '')
-				? 'Confirm('.CJs::encodeJson($this->confirm_message).') && '
+				? 'Confirm('.CHtml::encode(CJs::encodeJson($this->confirm_message)).') && '
 				: '';
 			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', 'sid', true)");
 			$this->setAttribute('href', 'javascript:void(0)');
 		}
 		else {
-			$this->setAttribute('href', $url);
+			$this->setAttribute('href', ($url == null) ? 'javascript:void(0)' : $url);
 
 			if ($this->confirm_message !== '') {
 				$this->onClick('javascript: return Confirm('.CJs::encodeJson($this->confirm_message).');');

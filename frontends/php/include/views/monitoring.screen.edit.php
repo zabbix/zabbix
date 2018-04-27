@@ -36,6 +36,7 @@ if ($data['screen']['templateid']) {
 // create form
 $form = (new CForm())
 	->setName('screenForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['screen']['templateid'] != 0) {
@@ -154,7 +155,7 @@ if (!$data['screen']['templateid']) {
 				'srcfld2' => 'name',
 				'dstfrm' => $form->getName(),
 				'multiselect' => '1'
-			]).');'
+			]).', null, this);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -190,7 +191,7 @@ if (!$data['screen']['templateid']) {
 				'srcfld2' => 'fullname',
 				'dstfrm' => $form->getName(),
 				'multiselect' => '1'
-			]).');'
+			]).', null, this);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)]);
 

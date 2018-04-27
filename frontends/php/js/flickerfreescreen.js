@@ -276,6 +276,7 @@
 				var ajaxRequest = $.ajax({
 					url: ajaxUrl.getUrl(),
 					type: 'post',
+					cache: false,
 					data: {},
 					dataType: 'html',
 					success: function(html) {
@@ -294,7 +295,7 @@
 							}
 						});
 
-						$('.msg-bad').remove();
+						$('.article .msg-bad').remove();
 
 						// set message
 						if (msg_bad) {

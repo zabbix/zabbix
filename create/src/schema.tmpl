@@ -92,6 +92,7 @@ FIELD		|tls_subject	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|tls_psk_identity|t_varchar(128)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|proxy_address	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|auto_compress	|t_integer	|'1'	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -336,6 +337,24 @@ FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|master_itemid	|t_id		|	|NULL		|0			|5|items	|itemid
+FIELD		|timeout	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY
+FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|query_fields	|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|posts		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|status_codes	|t_varchar(255)	|'200'	|NOT NULL	|ZBX_PROXY
+FIELD		|follow_redirects|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
+FIELD		|post_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|headers	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|retrieve_mode	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|request_method	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
+FIELD		|output_format	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|ssl_cert_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|ssl_key_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -528,8 +547,6 @@ FIELD		|refresh_unsupported|t_varchar(32)|'10m'	|NOT NULL	|ZBX_PROXY
 FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|event_expire	|t_varchar(32)	|'1w'	|NOT NULL	|ZBX_NODATA
-FIELD		|event_show_max	|t_integer	|'100'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
 FIELD		|authentication_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_host	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
@@ -557,10 +574,10 @@ FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_NODATA
 FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_NODATA
 FIELD		|ok_period	|t_varchar(32)	|'30m'	|NOT NULL	|ZBX_NODATA
 FIELD		|blink_period	|t_varchar(32)	|'30m'	|NOT NULL	|ZBX_NODATA
-FIELD		|problem_unack_color|t_varchar(6)|'DC0000'|NOT NULL	|ZBX_NODATA
-FIELD		|problem_ack_color|t_varchar(6)	|'DC0000'|NOT NULL	|ZBX_NODATA
-FIELD		|ok_unack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_NODATA
-FIELD		|ok_ack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_NODATA
+FIELD		|problem_unack_color|t_varchar(6)|'CC0000'|NOT NULL	|ZBX_NODATA
+FIELD		|problem_ack_color|t_varchar(6)	|'CC0000'|NOT NULL	|ZBX_NODATA
+FIELD		|ok_unack_color	|t_varchar(6)	|'009900'|NOT NULL	|ZBX_NODATA
+FIELD		|ok_ack_color	|t_varchar(6)	|'009900'|NOT NULL	|ZBX_NODATA
 FIELD		|problem_unack_style|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|problem_ack_style|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|ok_unack_style	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
@@ -569,8 +586,8 @@ FIELD		|snmptrap_logging|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|server_check_interval|t_integer|'10'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_trigger|t_varchar(32)|'365d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_internal|t_varchar(32)|'1d'|NOT NULL	|ZBX_NODATA
-FIELD		|hk_events_discovery|t_varchar(32)|'1d'|NOT NULL	|ZBX_NODATA
+FIELD		|hk_events_internal|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
+FIELD		|hk_events_discovery|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_autoreg|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_services_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_services	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
@@ -585,6 +602,7 @@ FIELD		|hk_trends_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_inventory_mode|t_integer|'-1'	|NOT NULL	|ZBX_NODATA
+FIELD		|custom_color	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1397,6 +1415,13 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|eventid
 INDEX		|2		|tag,value
 
+TABLE|tag_filter|tag_filterid|0
+FIELD		|tag_filterid	|t_id		|	|NOT NULL	|0
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0 			|1|usrgrp	|usrgrpid
+FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|groups	|groupid
+FIELD		|tag	|t_varchar(255)	|'' |NOT NULL	|0
+FIELD		|value	|t_varchar(255)	|'' |NOT NULL	|0
+
 TABLE|event_recovery|eventid|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
 FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid
@@ -1588,7 +1613,11 @@ INDEX		|4		|value_itemid
 INDEX		|5		|value_graphid
 INDEX		|6		|value_sysmapid
 
+TABLE|task_check_now|taskid|0
+FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
+FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050028	|3050029
+ROW		|3050068	|3050068

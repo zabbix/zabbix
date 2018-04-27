@@ -44,22 +44,6 @@
 ?>
 </script>
 
-<script type="text/x-jquery-tmpl" id="edit_dashboard_control">
-<?= (new CSpan([
-	new CList([
-		(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
-		(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
-			->addClass(ZBX_STYLE_BTN_ALT),
-		(new CButton('dashbrd-save', _('Save changes'))),
-		(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
-		''
-	])
-]))
-	->addClass(ZBX_STYLE_DASHBRD_EDIT)
-	->toString()
-?>
-</script>
-
 <script type="text/javascript">
 	// Change dashboard settings.
 	function dashbrd_config() {
@@ -74,7 +58,8 @@
 			{
 				'name': form.data('data').name,
 				'owner': form.data('data').owner
-			}
+			},
+			this
 		);
 	};
 
@@ -95,13 +80,11 @@
 
 	// Add new widget.
 	function dashbrd_add_widget() {
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget');
+		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget', this);
 	};
 
 	var showEditMode = function showEditMode() {
-		jQuery('#dashbrd-edit').closest('ul')
-			.hide()
-			.before(jQuery('#edit_dashboard_control').html())
+		jQuery('#dashbrd-control > li').hide().last().show();
 
 		var ul = jQuery('#dashbrd-config').closest('ul');
 		jQuery('#dashbrd-config', ul).click(dashbrd_config),
@@ -147,6 +130,18 @@
 	jQuery(document).ready(function($) {
 		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
+
+		var $norm_mode_btn = $('.btn-dashbrd-normal');
+		if ($norm_mode_btn.length) {
+			$(window).on('mousemove keyup scroll', function() {
+				clearTimeout($norm_mode_btn.data('timer'));
+				$norm_mode_btn
+					.removeClass('hidden')
+					.data('timer', setTimeout(function() {
+						$norm_mode_btn.addClass('hidden');
+					}, 2000));
+			}).trigger('mousemove');
+		}
 	});
 
 	function dashboardAddMessages(messages) {

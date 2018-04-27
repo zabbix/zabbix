@@ -22,23 +22,27 @@
 $widget = new CWidget();
 
 if ($data['parent_discoveryid'] === null) {
-	$widget->setTitle(_('Graphs'))->addItem(get_header_host_table('graphs', $data['hostid']));
+	$widget
+		->setTitle(_('Graphs'))
+		->addItem(get_header_host_table('graphs', $data['hostid']));
 }
 else {
-	$widget->setTitle(_('Graph prototypes'))
+	$widget
+		->setTitle(_('Graph prototypes'))
 		->addItem(get_header_host_table('graphs', $data['hostid'], $data['parent_discoveryid']));
 }
 
 // Create form.
 $graphForm = (new CForm())
 	->setName('graphForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('ymin_itemid', $this->data['ymin_itemid'])
 	->addVar('ymax_itemid', $this->data['ymax_itemid']);
 
 if ($data['parent_discoveryid'] !== null) {
-	$graphForm->addVar('parent_discoveryid', $data['parent_discoveryid']);
+	$graphForm->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId());
 }
 
 if ($data['graphid'] != 0) {
@@ -188,10 +192,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymin_itemid',
 					'dstfld2' => 'ymin_name',
+					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
 				]).
-					',getOnlyHostParam()));'
+					',getOnlyHostParam()), null, this);'
 			)
 			->setEnabled(!$readonly);
 
@@ -210,7 +215,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'dstfld2' => 'ymin_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
-					]).');'
+					]).', null, this);'
 				);
 		}
 	}
@@ -268,10 +273,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymax_itemid',
 					'dstfld2' => 'ymax_name',
+					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
 				]).
-					',getOnlyHostParam()));'
+					',getOnlyHostParam()), null, this);'
 			)
 			->setEnabled(!$readonly);
 
@@ -290,7 +296,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'dstfld2' => 'ymax_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
-					]).');'
+					]).', null, this);'
 				);
 		}
 	}
@@ -347,7 +353,8 @@ $popup_options_add = [
 	'dstfrm' => $graphForm->getName(),
 	'numeric' => '1',
 	'writeonly' => '1',
-	'multiselect' => '1'
+	'multiselect' => '1',
+	'with_webitems' => '1'
 ];
 if ($data['normal_only']) {
 	$popup_options_add['normal_only'] = '1';
@@ -382,13 +389,13 @@ $items_table->addRow(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
 						->onClick('return PopUp("popup.generic",jQuery.extend('.
-							CJs::encodeJson($popup_options_add).',getOnlyHostParam()));'
+							CJs::encodeJson($popup_options_add).',getOnlyHostParam()), null, this);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
 							->onClick('return PopUp("popup.generic",'.
-								CJs::encodeJson($popup_options_add_prototype).');'
+								CJs::encodeJson($popup_options_add_prototype).', null, this);'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
@@ -421,13 +428,9 @@ $graphFormList->addRow(
 );
 
 // Append tabs to form.
-$graphTab = new CTabView();
-if (!$data['form_refresh']) {
-	$graphTab->setSelected(0);
-}
-$graphTab->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'),
-	$graphFormList
-);
+$graphTab = (new CTabView())
+	->setSelected(0)
+	->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'), $graphFormList);
 
 /*
  * Preview tab
@@ -436,7 +439,7 @@ $graphPreviewTable = (new CTable())
 	->addStyle('width: 100%;')
 	->addRow(
 		(new CRow(
-			(new CDiv())->setId('previewChar')
+			(new CDiv())->setId('previewChart')
 		))->addClass(ZBX_STYLE_CENTER)
 	);
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);

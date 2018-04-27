@@ -1525,7 +1525,8 @@ static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
 	size_t	freed;
 	int	first_value, last_value;
 
-	freed = vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->last_value);
+	freed = sizeof(zbx_vc_chunk_t) + (chunk->last_value - chunk->first_value) * sizeof(zbx_history_record_t);
+	freed += vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->last_value);
 
 	first_value = chunk->first_value;
 	last_value = chunk->last_value;

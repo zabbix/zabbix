@@ -120,7 +120,11 @@ switch ($data['method']) {
 						$sound = $msgsettings['sounds.'.$trigger['priority']];
 					}
 
-					$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
+					$url_problems = (new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_hostids[]', $host['hostid'])
+						->setArgument('filter_set', '1')
+						->getUrl();
 					$url_events = (new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
 						->setArgument('filter_triggerids[]', $event['objectid'])
@@ -136,7 +140,7 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'severity_style' => getSeverityStyle($trigger['priority'], $event['value'] == TRIGGER_VALUE_TRUE),
-						'title' => $title.' [url='.$url_tr_status.']'.CHtml::encode($host['name']).'[/url]',
+						'title' => $title.' [url='.$url_problems.']'.CHtml::encode($host['name']).'[/url]',
 						'body' => [
 							'[url='.$url_events.']'.CHtml::encode($trigger['description']).'[/url]',
 							'[url='.$url_tr_events.']'.
@@ -253,12 +257,7 @@ switch ($data['method']) {
 						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
 					}
 
-					foreach ($hostGroups as $hostGroup) {
-						$result[] = [
-							'id' => $hostGroup['groupid'],
-							'name' => $hostGroup['name']
-						];
-					}
+					$result = CArrayHelper::renameObjectsKeys($hostGroups, ['groupid' => 'id']);
 				}
 				break;
 
@@ -280,12 +279,7 @@ switch ($data['method']) {
 						$hosts = array_slice($hosts, 0, $data['limit']);
 					}
 
-					foreach ($hosts as $host) {
-						$result[] = [
-							'id' => $host['hostid'],
-							'name' => $host['name']
-						];
-					}
+					$result = CArrayHelper::renameObjectsKeys($hosts, ['hostid' => 'id']);
 				}
 				break;
 
@@ -306,12 +300,26 @@ switch ($data['method']) {
 						$templates = array_slice($templates, 0, $data['limit']);
 					}
 
-					foreach ($templates as $template) {
-						$result[] = [
-							'id' => $template['templateid'],
-							'name' => $template['name']
-						];
+					$result = CArrayHelper::renameObjectsKeys($templates, ['templateid' => 'id']);
+				}
+				break;
+
+			case 'proxies':
+				$proxies = API::Proxy()->get([
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
+					'output' => ['proxyid', 'host'],
+					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($proxies) {
+					CArrayHelper::sort($proxies, ['host']);
+
+					if (isset($data['limit'])) {
+						$proxies = array_slice($proxies, 0, $data['limit']);
 					}
+
+					$result = CArrayHelper::renameObjectsKeys($proxies, ['proxyid' => 'id', 'host' => 'name']);
 				}
 				break;
 
@@ -332,12 +340,7 @@ switch ($data['method']) {
 						$applications = array_slice($applications, 0, $data['limit']);
 					}
 
-					foreach ($applications as $application) {
-						$result[] = [
-							'id' => $application['applicationid'],
-							'name' => $application['name']
-						];
-					}
+					$result = CArrayHelper::renameObjectsKeys($applications, ['applicationid' => 'id']);
 				}
 				break;
 
@@ -444,9 +447,7 @@ switch ($data['method']) {
 						$groups = array_slice($groups, 0, $data['limit']);
 					}
 
-					foreach ($groups as $group) {
-						$result[] = CArrayHelper::renameKeys($group, ['usrgrpid' => 'id']);
-					}
+					$result = CArrayHelper::renameObjectsKeys($groups, ['usrgrpid' => 'id']);
 				}
 				break;
 

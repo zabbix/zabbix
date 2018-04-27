@@ -147,7 +147,7 @@ class CTrend extends CApiService {
 
 					$res = DBselect(
 						'SELECT '.implode(',', $sql_fields).
-						' FROM '.$sql_from.' AS t'.
+						' FROM '.$sql_from.' t'.
 						' WHERE '.implode(' AND ', $sql_where),
 						$sql_limit
 					);
@@ -174,7 +174,7 @@ class CTrend extends CApiService {
 
 					$res = DBselect(
 						'SELECT COUNT(*) AS rowscount'.
-						' FROM '.$sql_from.' AS t'.
+						' FROM '.$sql_from.' t'.
 						' WHERE '.implode(' AND ', $sql_where)
 					);
 

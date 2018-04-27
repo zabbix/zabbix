@@ -106,16 +106,6 @@ class testUrlUserPermissions extends CWebTest {
 				]
 			]],
 			[[
-				'url' => 'tr_status.php',
-				'title' =>	'Triggers [refreshed every 30 sec.]',
-				'header' =>	'Triggers',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'charts.php',
 				'title' =>	'Custom graphs [refreshed every 30 sec.]',
 				'header' =>	'Graphs',
@@ -257,7 +247,7 @@ class testUrlUserPermissions extends CWebTest {
 			// Reports
 			[[
 				'url' => 'zabbix.php?action=report.status',
-				'title' =>	'Status of Zabbix',
+				'title' =>	'System information',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

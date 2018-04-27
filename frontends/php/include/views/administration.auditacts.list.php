@@ -37,7 +37,7 @@ $filterColumn->addRow(_('Recipient'), [
 				'srcfld1' => 'alias',
 				'dstfrm' => 'zbx_filter',
 				'dstfld1' => 'alias'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 
@@ -102,8 +102,8 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])
-		? [bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), $alert['sendto']]
-		: $alert['sendto'];
+		? [bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
+		: zbx_nl2br($alert['sendto']);
 
 	$auditTable->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),

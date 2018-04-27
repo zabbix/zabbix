@@ -5,6 +5,7 @@ HISTORY_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
@@ -26,7 +27,8 @@ zbx_history_get_values_WRAP = \
 	-Wl,--wrap=DCget_nextid \
 	-Wl,--wrap=zbx_host_availability_is_set \
 	-Wl,--wrap=zbx_add_event \
-	-Wl,--wrap=zbx_process_events
+	-Wl,--wrap=zbx_process_events \
+	-Wl,--wrap=zbx_clean_events
 
 zbx_history_get_values_LDADD = $(HISTORY_LIBS) @SERVER_LIBS@
 

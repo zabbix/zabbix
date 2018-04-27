@@ -32,9 +32,6 @@
 #include "../../libs/zbxcrypto/tls.h"
 #include "../trapper/proxydata.h"
 
-#define ZBX_TASKS_IGNORE	0
-#define ZBX_TASKS_SEND		1
-
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
@@ -69,6 +66,7 @@ static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeo
 			zabbix_log(LOG_LEVEL_ERR, "TLS connection is configured to be used with passive proxy \"%s\""
 					" but support for TLS was not compiled into %s.", proxy->host,
 					get_program_type_string(program_type));
+			ret = CONFIG_ERROR;
 			goto out;
 #endif
 		default:
@@ -88,15 +86,18 @@ out:
 	return ret;
 }
 
-static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data)
+static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data, size_t size)
 {
 	const char	*__function_name = "send_data_to_proxy";
 
-	int		ret;
+	int		ret, flags = ZBX_TCP_PROTOCOL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, data);
 
-	if (FAIL == (ret = zbx_tcp_send(sock, data)))
+	if (0 != proxy->auto_compress)
+		flags |= ZBX_TCP_COMPRESS;
+
+	if (FAIL == (ret = zbx_tcp_send_ext(sock, data, size, flags, 0)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
 
@@ -145,7 +146,7 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  *                                                                            *
  * Purpose: get historical data from proxy                                    *
  *                                                                            *
- * Parameters: proxy   - [IN] proxy data                                      *
+ * Parameters: proxy   - [IN/OUT] proxy data                                  *
  *             request - [IN] requested data type                             *
  *             data    - [OUT] data received from proxy                       *
  *             ts      - [OUT] timestamp when the proxy connection was        *
@@ -153,12 +154,13 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  *             tasks   - [IN] proxy task response flag                        *
  *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
- *               FAIL - an error occurred                                     *
+ *               other code - an error occurred                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
+ * Comments: The proxy->compress property is updated depending on the         *
+ *           protocol flags sent by proxy.                                    *
  *                                                                            *
  ******************************************************************************/
-static int	get_data_from_proxy(const DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts, int tasks)
+static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "get_data_from_proxy";
 
@@ -178,14 +180,14 @@ static int	get_data_from_proxy(const DC_PROXY *proxy, const char *request, char 
 		if (NULL != ts)
 			zbx_timespec(ts);
 
-		if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer)))
+		if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
 		{
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s)))
 			{
-				if (ZBX_TASKS_IGNORE == tasks)
-					ret = zbx_send_response(&s, SUCCEED, NULL, 0);
-				else
-					ret = zbx_send_proxy_data_respose(proxy, &s, NULL);
+				if (0 != (s.protocol & ZBX_TCP_COMPRESS))
+					proxy->auto_compress = 1;
+
+				ret = zbx_send_proxy_data_response(proxy, &s, NULL);
 
 				if (SUCCEED == ret)
 					*data = zbx_strdup(*data, s.buffer);
@@ -208,10 +210,13 @@ static int	get_data_from_proxy(const DC_PROXY *proxy, const char *request, char 
  *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
- * Parameters: proxy - [IN] proxy data                                        *
+ * Parameters: proxy - [IN/OUT] proxy data                                    *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
- *               FAIL - an error occurred                                     *
+ *               other code - an error occurred                               *
+ *                                                                            *
+ * Comments: This function updates proxy version, compress and lastaccess     *
+ *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	proxy_send_configuration(DC_PROXY *proxy)
@@ -239,7 +244,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen " ZBX_FS_SIZE_T,
 			proxy->host, s.peer, (zbx_fs_size_t)j.buffer_size);
 
-	if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer)))
+	if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
 	{
 		if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 		{
@@ -256,7 +261,11 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 						" \"%s\" at \"%s\": %s", proxy->host, s.peer, zbx_json_strerror);
 			}
 			else
-				zbx_proxy_update_version(proxy, &jp);
+			{
+				proxy->version = zbx_get_protocol_version(&jp);
+				proxy->auto_compress = (0 != (s.protocol & ZBX_TCP_COMPRESS) ? 1 : 0);
+				proxy->lastaccess = time(NULL);
+			}
 		}
 	}
 
@@ -311,21 +320,25 @@ static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **er
  * Purpose: gets host availability data from proxy                            *
  *          ('host availability' request)                                     *
  *                                                                            *
- * Parameters: proxy       - [IN] proxy data                                  *
- *             last_access - [OUT] proxy last access timestamp                *
+ * Parameters: proxy - [IN/OUT] proxy data                                    *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
- *               FAIL - otherwise                                             *
+ *               other code - an error occurred                               *
+ *                                                                            *
+ * Comments: The proxy->version property is updated with the version number   *
+ *           sent by proxy.                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_host_availability(DC_PROXY *proxy, time_t *last_access)
+static int	proxy_get_host_availability(DC_PROXY *proxy)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp;
 	int			ret = FAIL;
 
-	if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer, NULL, ZBX_TASKS_IGNORE))
+	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer, NULL)))
+	{
 		goto out;
+	}
 
 	if ('\0' == *answer)
 	{
@@ -341,8 +354,7 @@ static int	proxy_get_host_availability(DC_PROXY *proxy, time_t *last_access)
 		goto out;
 	}
 
-	*last_access = time(NULL);
-	zbx_proxy_update_version(proxy, &jp);
+	proxy->version = zbx_get_protocol_version(&jp);
 
 	if (SUCCEED != proxy_check_error_response(&jp, &error))
 	{
@@ -373,21 +385,23 @@ out:
  * Purpose: gets historical data from proxy                                   *
  *          ('history data' request)                                          *
  *                                                                            *
- * Parameters: proxy       - [IN] proxy data                                  *
- *             last_access - [OUT] proxy last access timestamp                *
+ * Parameters: proxy - [IN/OUT] proxy data                                    *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
- *               FAIL - otherwise                                             *
+ *               other code - an error occurred                               *
+ *                                                                            *
+ * Comments: The proxy->version property is updated with the version number   *
+ *           sent by proxy.                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
+static int	proxy_get_history_data(DC_PROXY *proxy)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 	zbx_timespec_t		ts;
 
-	while (SUCCEED == get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HISTORY_DATA, &answer, &ts, ZBX_TASKS_IGNORE))
+	while (SUCCEED == (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HISTORY_DATA, &answer, &ts)))
 	{
 		if ('\0' == *answer)
 		{
@@ -404,8 +418,7 @@ static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
 			break;
 		}
 
-		*last_access = time(NULL);
-		zbx_proxy_update_version(proxy, &jp);
+		proxy->version = zbx_get_protocol_version(&jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
@@ -444,21 +457,23 @@ static int	proxy_get_history_data(DC_PROXY *proxy, time_t *last_access)
  * Purpose: gets discovery data from proxy                                    *
  *          ('discovery data' request)                                        *
  *                                                                            *
- * Parameters: proxy       - [IN] proxy data                                  *
- *             last_access - [OUT] proxy last access timestamp                *
+ * Parameters: proxy - [IN/OUT] proxy data                                    *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
- *               FAIL - otherwise                                             *
+ *               other code - an error occurred                               *
+ *                                                                            *
+ * Comments: The proxy->version property is updated with the version number   *
+ *           sent by proxy.                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
+static int	proxy_get_discovery_data(DC_PROXY *proxy)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 	zbx_timespec_t		ts;
 
-	while (SUCCEED == get_data_from_proxy(proxy, ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer, &ts, ZBX_TASKS_IGNORE))
+	while (SUCCEED == (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer, &ts)))
 	{
 		if ('\0' == *answer)
 		{
@@ -476,8 +491,7 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
 			break;
 		}
 
-		*last_access = time(NULL);
-		zbx_proxy_update_version(proxy, &jp);
+		proxy->version = zbx_get_protocol_version(&jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
@@ -516,22 +530,23 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy, time_t *last_access)
  * Purpose: gets auto registration data from proxy                            *
  *          ('auto registration' request)                                     *
  *                                                                            *
- * Parameters: proxy       - [IN] proxy data                                  *
- *             last_access - [OUT] proxy last access timestamp                *
+ * Parameters: proxy - [IN/OUT] proxy data                                    *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
- *               FAIL - otherwise                                             *
+ *               other code - an error occurred                               *
+ *                                                                            *
+ * Comments: The proxy->version property is updated with the version number   *
+ *           sent by proxy.                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
+static int	proxy_get_auto_registration(DC_PROXY *proxy)
 {
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 	zbx_timespec_t		ts;
 
-	while (SUCCEED == get_data_from_proxy(proxy, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer, &ts,
-			ZBX_TASKS_IGNORE))
+	while (SUCCEED == (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer, &ts)))
 	{
 		if ('\0' == *answer)
 		{
@@ -549,8 +564,7 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
 			break;
 		}
 
-		*last_access = time(NULL);
-		zbx_proxy_update_version(proxy, &jp);
+		proxy->version = zbx_get_protocol_version(&jp);
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
@@ -588,7 +602,7 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
  *                                                                            *
  * Purpose: processes proxy data request                                      *
  *                                                                            *
- * Parameters: proxy  - [IN] proxy data                                       *
+ * Parameters: proxy  - [IN/OUT] proxy data                                   *
  *             answer - [IN] data received from proxy                         *
  *             ts     - [IN] timestamp when the proxy connection was          *
  *                           established                                      *
@@ -596,6 +610,9 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy, time_t *last_access)
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments: The proxy->version property is updated with the version number   *
+ *           sent by proxy.                                                   *
  *                                                                            *
  ******************************************************************************/
 static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts, int *more)
@@ -624,7 +641,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 		goto out;
 	}
 
-	zbx_proxy_update_version(proxy, &jp);
+	proxy->version = zbx_get_protocol_version(&jp);
 
 	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, &error)))
 	{
@@ -652,60 +669,69 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy       - [IN] proxy data                                  *
- *             more        - [OUT] available data flag                        *
- *             last_access - [OUT] proxy last access timestamp                *
+ * Parameters: proxy  - [IN] proxy data                                       *
+ *             more   - [OUT] available data flag                             *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
- *               FAIL - otherwise                                             *
+ *               other code - an error occurred                               *
+ *                                                                            *
+ * Comments: This function updates proxy version, compress and lastaccess     *
+ *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_data(DC_PROXY *proxy, int *more, time_t *last_access)
+static int	proxy_get_data(DC_PROXY *proxy, int *more)
 {
 	const char	*__function_name = "proxy_get_data";
 
 	char		*answer = NULL;
-	int		ret = FAIL, version;
+	int		ret;
 	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (0 == (version = proxy->version))
+	if (0 == proxy->version)
 	{
-		if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts, ZBX_TASKS_IGNORE))
+		if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts)))
 			goto out;
 
 		if ('\0' == *answer)
-			zbx_proxy_update_version(proxy, NULL);
+		{
+			proxy->version = ZBX_COMPONENT_VERSION(3, 2);
+			zbx_free(answer);
+		}
 	}
 
-	if (ZBX_COMPONENT_VERSION(3, 2) == version)
+	if (ZBX_COMPONENT_VERSION(3, 2) == proxy->version)
 	{
-		if (SUCCEED != proxy_get_host_availability(proxy, last_access))
+		if (SUCCEED != (ret = proxy_get_host_availability(proxy)))
 			goto out;
 
-		if (SUCCEED != proxy_get_history_data(proxy, last_access))
+		proxy->lastaccess = time(NULL);
+
+		if (SUCCEED != (ret = proxy_get_history_data(proxy)))
 			goto out;
 
-		if (SUCCEED != proxy_get_discovery_data(proxy, last_access))
+		proxy->lastaccess = time(NULL);
+
+		if (SUCCEED != (ret = proxy_get_discovery_data(proxy)))
 			goto out;
 
-		if (SUCCEED != proxy_get_auto_registration(proxy, last_access))
+		proxy->lastaccess = time(NULL);
+
+		if (SUCCEED != (ret = proxy_get_auto_registration(proxy)))
 			goto out;
+
+		proxy->lastaccess = time(NULL);
 
 		/* the above functions will retrieve all available data for 3.2 and older proxies */
 		*more = ZBX_PROXY_DATA_DONE;
-		ret = SUCCEED;
 		goto out;
 	}
 
-	if (NULL == answer && SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts,
-			ZBX_TASKS_SEND))
-	{
+	if (NULL == answer && SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts)))
 		goto out;
-	}
 
-	*last_access = time(NULL);
+	proxy->lastaccess = time(NULL);
 
 	ret = proxy_process_proxy_data(proxy, answer, &ts, more);
 
@@ -725,14 +751,16 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy       - [IN] the proxy data                              *
- *             last_access - [OUT] proxy last access timestamp                *
+ * Parameters: proxy - [IN/OUT] the proxy data                                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
- *               FAIL - otherwise                                             *
+ *               other code - an error occurred                               *
+ *                                                                            *
+ * Comments: This function updates proxy version, compress and lastaccess     *
+ *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_tasks(DC_PROXY *proxy, time_t *last_access)
+static int	proxy_get_tasks(DC_PROXY *proxy)
 {
 	const char	*__function_name = "proxy_get_tasks";
 
@@ -745,10 +773,10 @@ static int	proxy_get_tasks(DC_PROXY *proxy, time_t *last_access)
 	if (ZBX_COMPONENT_VERSION(3, 2) >= proxy->version)
 		goto out;
 
-	if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_TASKS, &answer, &ts, ZBX_TASKS_SEND))
+	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_TASKS, &answer, &ts)))
 		goto out;
 
-	*last_access = time(NULL);
+	proxy->lastaccess = time(NULL);
 
 	ret = proxy_process_proxy_data(proxy, answer, &ts, &more);
 
@@ -778,11 +806,9 @@ static int	process_proxy(void)
 {
 	const char	*__function_name = "process_proxy";
 
-	DC_PROXY	proxy;
-	int		num, i, more;
-	char		*port = NULL;
-	time_t		now, last_access;
-	unsigned char	update_nextcheck;
+	DC_PROXY	proxy, proxy_old;
+	int		num, i;
+	time_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -793,8 +819,10 @@ static int	process_proxy(void)
 
 	for (i = 0; i < num; i++)
 	{
-		update_nextcheck = 0;
-		last_access = 0;
+		int		ret = FAIL;
+		unsigned char	update_nextcheck = 0;
+
+		memcpy(&proxy_old, &proxy, sizeof(DC_PROXY));
 
 		if (proxy.proxy_config_nextcheck <= now)
 			update_nextcheck |= ZBX_PROXY_CONFIG_NEXTCHECK;
@@ -803,47 +831,59 @@ static int	process_proxy(void)
 		if (proxy.proxy_tasks_nextcheck <= now)
 			update_nextcheck |= ZBX_PROXY_TASKS_NEXTCHECK;
 
-		proxy.addr = proxy.addr_orig;
-
-		port = zbx_strdup(port, proxy.port_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&port, MACRO_TYPE_COMMON, NULL, 0);
-		if (FAIL == is_ushort(port, &proxy.port))
+		/* Check if passive proxy has been misconfigured on the server side. If it has happened more */
+		/* recently than last synchronisation of cache then there is no point to retry connecting to */
+		/* proxy again. The next reconnection attempt will happen after cache synchronisation. */
+		if (proxy.last_cfg_error_time < DCconfig_get_last_sync_time())
 		{
-			zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);
-			goto network_error;
-		}
+			char	*port = NULL;
 
-		if (proxy.proxy_config_nextcheck <= now)
-		{
-			if (SUCCEED != proxy_send_configuration(&proxy))
-				goto network_error;
+			proxy.addr = proxy.addr_orig;
 
-			last_access = time(NULL);
-		}
-
-		if (proxy.proxy_data_nextcheck <= now)
-		{
-			do
+			port = zbx_strdup(port, proxy.port_orig);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					&port, MACRO_TYPE_COMMON, NULL, 0);
+			if (FAIL == is_ushort(port, &proxy.port))
 			{
-				if (SUCCEED != proxy_get_data(&proxy, &more, &last_access))
-					goto network_error;
+				zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);
+				ret = CONFIG_ERROR;
+				zbx_free(port);
+				goto error;
 			}
-			while (ZBX_PROXY_DATA_MORE == more);
+			zbx_free(port);
+
+			if (proxy.proxy_config_nextcheck <= now)
+			{
+				if (SUCCEED != (ret = proxy_send_configuration(&proxy)))
+					goto error;
+			}
+
+			if (proxy.proxy_data_nextcheck <= now)
+			{
+				int	more;
+
+				do
+				{
+					if (SUCCEED != (ret = proxy_get_data(&proxy, &more)))
+						goto error;
+				}
+				while (ZBX_PROXY_DATA_MORE == more);
+			}
+			else if (proxy.proxy_tasks_nextcheck <= now)
+			{
+				if (SUCCEED != (ret = proxy_get_tasks(&proxy)))
+					goto error;
+			}
 		}
-		else if (proxy.proxy_tasks_nextcheck <= now)
+error:
+		if (proxy_old.version != proxy.version || proxy_old.auto_compress != proxy.auto_compress ||
+				proxy_old.lastaccess != proxy.lastaccess)
 		{
-			if (SUCCEED != proxy_get_tasks(&proxy, &last_access))
-				goto network_error;
+			zbx_update_proxy_data(&proxy_old, proxy.version, proxy.lastaccess, proxy.auto_compress);
 		}
-network_error:
-		if (0 != last_access)
-			update_proxy_lastaccess(proxy.hostid, last_access);
 
-		DCrequeue_proxy(proxy.hostid, update_nextcheck);
+		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);
 	}
-
-	zbx_free(port);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 

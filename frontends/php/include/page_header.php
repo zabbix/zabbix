@@ -174,6 +174,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			$theme = getUserTheme(CWebUser::$data);
 
 			$pageHeader->addStyle(getTriggerSeverityCss($config));
+			$pageHeader->addStyle(getTriggerStatusCss($config));
 
 			// perform Zabbix server check only for standard pages
 			if ((!defined('ZBX_PAGE_NO_MENU') || defined('ZBX_PAGE_FULLSCREEN')) && $config['server_check_interval']
@@ -205,7 +206,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader->display();
 ?>
 <body lang="<?= CWebUser::getLang() ?>">
-<div class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></div>
+<output class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></output>
 <?php
 }
 
@@ -259,7 +260,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	echo '<div class="'.ZBX_STYLE_ARTICLE.'">';
+	echo '<main>';
 }
 
 // unset multiple variables

@@ -28,6 +28,7 @@ $widget = (new CWidget())->setTitle(_('Services'));
 // create form
 $servicesForm = (new CForm())
 	->setName('servicesForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('parentid', $this->data['parentid'])
 	->addVar('parentname', $this->data['parentname'])
@@ -62,7 +63,7 @@ $servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setA
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.services",jQuery.extend('.
 			CJs::encodeJson($parent_service_popup_options).
-				',{parentid: this.form.parentid.value}));'
+				',{parentid: this.form.parentid.value}), null, this);'
 		)
 ]);
 
@@ -98,7 +99,7 @@ $servicesFormList->addRow(_('Trigger'), [
 				'dstfld2' => 'trigger',
 				'real_hosts' => '1',
 				'with_triggers' => '1'
-			]).');'
+			]).', null, this);'
 		)
 ]);
 $servicesFormList->addRow((new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
@@ -133,6 +134,7 @@ foreach ($this->data['children'] as $child) {
 				(new CButton('remove', _('Remove')))
 					->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('children_'.$child['serviceid'])
 	);
@@ -153,7 +155,7 @@ $servicesDependenciesFormList->addRow(
 		(new CButton('add_child_service', _('Add')))
 			->onClick('return PopUp("popup.services",jQuery.extend('.
 				CJs::encodeJson($dep_service_popup_options).
-					',{parentid: this.form.parentid.value}));'
+					',{parentid: this.form.parentid.value}), null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]))
@@ -202,6 +204,7 @@ foreach ($this->data['times'] as $serviceTime) {
 			(new CButton('remove', _('Remove')))
 				->onClick('javascript: removeTime(\''.$i.'\');')
 				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	$row->setId('times_'.$i);
@@ -282,12 +285,10 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		->addRow(
 			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
 			(new CDiv(createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')))
-				->setId('new_service_time_from')
 		)
 		->addRow(
 			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
 			(new CDiv(createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')))
-				->setId('new_service_time_to')
 		);
 }
 else {
@@ -333,7 +334,7 @@ else {
 					':',
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$timeFromMinuteTextBox
-			]))->setId('new_service_time_from')
+			]))
 		)
 		->addRow(
 			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
@@ -347,7 +348,7 @@ else {
 				':',
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$timeToMinuteTextBox
-			]))->setId('new_service_time_to')
+			]))
 		);
 	$servicesForm->addVar('new_service_time[note]', '');
 }

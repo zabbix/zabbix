@@ -21,6 +21,7 @@
 #include "comms.h"
 #include "log.h"
 #include "../zbxcrypto/tls_tcp.h"
+#include "zbxcompress.h"
 
 #define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
@@ -731,18 +732,18 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
  ******************************************************************************/
 
 #define ZBX_TCP_HEADER_DATA	"ZBXD"
-#define ZBX_TCP_HEADER_VERSION	"\1"
 #define ZBX_TCP_HEADER		ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
-#define ZBX_TCP_HEADER_LEN	5
+#define ZBX_TCP_HEADER_LEN	ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA)
 
 int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
 #define ZBX_TLS_MAX_REC_LEN	16384
 
-	zbx_uint64_t	len64_le;
-	ssize_t		bytes_sent = 0, written = 0;
-	size_t		send_bytes;
+	ssize_t		bytes_sent, written = 0;
+	size_t		send_bytes, offset, send_len = len, reserved = 0;
 	int		ret = SUCCEED;
+	char		*compressed_data = NULL;
+	zbx_uint32_t	len32_le;
 
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
@@ -754,15 +755,36 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 								/* will be short-lived in CPU cache. Static buffer is */
 								/* not used on purpose.				      */
 
-		memcpy(header_buf, ZBX_TCP_HEADER, (size_t)ZBX_TCP_HEADER_LEN);
+		if (0 != (flags & ZBX_TCP_COMPRESS))
+		{
+			if (SUCCEED != zbx_compress(data, len, &compressed_data, &send_len))
+			{
+				zbx_set_socket_strerror("cannot compress data: %s", zbx_compress_strerror());
+				ret = FAIL;
+				goto cleanup;
+			}
 
-		len64_le = zbx_htole_uint64((zbx_uint64_t)len);
-		memcpy(header_buf + ZBX_TCP_HEADER_LEN, &len64_le, sizeof(len64_le));
+			data = compressed_data;
+			reserved = len;
+		}
 
-		take_bytes = MIN(len, ZBX_TLS_MAX_REC_LEN - ZBX_TCP_HEADER_LEN - sizeof(len64_le));
-		memcpy(header_buf + ZBX_TCP_HEADER_LEN + sizeof(len64_le), data, take_bytes);
+		memcpy(header_buf, ZBX_TCP_HEADER_DATA, ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA));
+		offset = ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA);
 
-		send_bytes = ZBX_TCP_HEADER_LEN + sizeof(len64_le) + take_bytes;
+		header_buf[offset++] = flags;
+
+		len32_le = zbx_htole_uint32((zbx_uint32_t)send_len);
+		memcpy(header_buf + offset, &len32_le, sizeof(len32_le));
+		offset += sizeof(len32_le);
+
+		len32_le = zbx_htole_uint32((zbx_uint32_t)reserved);
+		memcpy(header_buf + offset, &len32_le, sizeof(len32_le));
+		offset += sizeof(len32_le);
+
+		take_bytes = MIN(send_len, ZBX_TLS_MAX_REC_LEN - offset);
+		memcpy(header_buf + offset, data, take_bytes);
+
+		send_bytes = offset + take_bytes;
 
 		while (written < (ssize_t)send_bytes)
 		{
@@ -775,15 +797,15 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 			written += bytes_sent;
 		}
 
-		written -= ZBX_TCP_HEADER_LEN + (ssize_t)sizeof(len64_le);
+		written -= offset;
 	}
 
-	while (written < (ssize_t)len)
+	while (written < (ssize_t)send_len)
 	{
 		if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type)
-			send_bytes = len - (size_t)written;
+			send_bytes = send_len - (size_t)written;
 		else
-			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, len - (size_t)written);
+			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, send_len - (size_t)written);
 
 		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, data + written, send_bytes)))
 		{
@@ -793,6 +815,8 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 		written += bytes_sent;
 	}
 cleanup:
+	zbx_free(compressed_data);
+
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
 
@@ -1530,19 +1554,21 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
+ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 {
-#define ZBX_TCP_EXPECT_HEADER	1
-#define ZBX_TCP_EXPECT_LENGTH	2
-#define ZBX_TCP_EXPECT_TEXT_XML	3
-#define ZBX_TCP_EXPECT_SIZE	4
-#define ZBX_TCP_EXPECT_CLOSE	5
-#define ZBX_TCP_EXPECT_XML_END	6
+#define ZBX_TCP_EXPECT_HEADER		1
+#define ZBX_TCP_EXPECT_VERSION		2
+#define ZBX_TCP_EXPECT_VERSION_VALIDATE	3
+#define ZBX_TCP_EXPECT_LENGTH		4
+#define ZBX_TCP_EXPECT_SIZE		5
+
+	const char	*__function_name = "zbx_tcp_recv_ext";
 
 	ssize_t		nbytes;
-	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0, header_bytes = 0;
-	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE;
+	size_t		buf_dyn_bytes = 0, buf_stat_bytes = 0, offset = 0;
+	zbx_uint32_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
+	int		protocol_version;
 
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
@@ -1560,40 +1586,68 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 		if (ZBX_BUF_TYPE_STAT == s->buf_type)
 			buf_stat_bytes += nbytes;
 		else
-			zbx_strncpy_alloc(&s->buffer, &allocated, &buf_dyn_bytes, s->buf_stat, nbytes);
+		{
+			if (buf_dyn_bytes + nbytes <= expected_len)
+				memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, nbytes);
+			buf_dyn_bytes += nbytes;
+		}
 
 		if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 			break;
-
-		/* performance short-circuit, can be omitted */
-		if (ZBX_TCP_EXPECT_SIZE == expect || (ZBX_TCP_EXPECT_CLOSE == expect && ZBX_BUF_TYPE_DYN == s->buf_type))
-			continue;
 
 		if (ZBX_TCP_EXPECT_HEADER == expect)
 		{
 			if (ZBX_TCP_HEADER_LEN > buf_stat_bytes)
 			{
-				if (0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, buf_stat_bytes))
+				if (0 == strncmp(s->buf_stat, ZBX_TCP_HEADER_DATA, buf_stat_bytes))
 					continue;
 
-				expect = ZBX_TCP_EXPECT_TEXT_XML;
+				break;
 			}
 			else
 			{
-				if (0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
-					expect = ZBX_TCP_EXPECT_LENGTH;
-				else
-					expect = ZBX_TCP_EXPECT_TEXT_XML;
+				if (0 != strncmp(s->buf_stat, ZBX_TCP_HEADER_DATA, ZBX_TCP_HEADER_LEN))
+				{
+					/* invalid header, abort receiving */
+					break;
+				}
+
+				expect = ZBX_TCP_EXPECT_VERSION;
+				offset += ZBX_TCP_HEADER_LEN;
 			}
+		}
+
+		if (ZBX_TCP_EXPECT_VERSION == expect)
+		{
+			if (offset + 1 > buf_stat_bytes)
+				continue;
+
+			expect = ZBX_TCP_EXPECT_VERSION_VALIDATE;
+			protocol_version = s->buf_stat[ZBX_TCP_HEADER_LEN];
+
+			if (0 == (protocol_version & ZBX_TCP_PROTOCOL) ||
+					protocol_version > (ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS))
+			{
+				/* invalid protocol version, abort receiving */
+				break;
+			}
+			s->protocol = protocol_version;
+			expect = ZBX_TCP_EXPECT_LENGTH;
+			offset++;
 		}
 
 		if (ZBX_TCP_EXPECT_LENGTH == expect)
 		{
-			if (ZBX_TCP_HEADER_LEN + sizeof(zbx_uint64_t) > buf_stat_bytes)
+			if (offset + 2 * sizeof(zbx_uint32_t) > buf_stat_bytes)
 				continue;
 
-			memcpy(&expected_len, s->buf_stat + ZBX_TCP_HEADER_LEN, sizeof(zbx_uint64_t));
-			expected_len = zbx_letoh_uint64(expected_len);
+			memcpy(&expected_len, s->buf_stat + offset, sizeof(zbx_uint32_t));
+			offset += sizeof(zbx_uint32_t);
+			expected_len = zbx_letoh_uint32(expected_len);
+
+			memcpy(&reserved, s->buf_stat + offset, sizeof(zbx_uint32_t));
+			offset += sizeof(zbx_uint32_t);
+			reserved = zbx_letoh_uint32(reserved);
 
 			if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
 			{
@@ -1604,83 +1658,83 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 				goto out;
 			}
 
+			/* compressed protocol stores uncompressed packet size in the reserved data */
+			if (0 != (protocol_version & ZBX_TCP_COMPRESS) && ZBX_MAX_RECV_DATA_SIZE < reserved)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64
+						" from %s exceeds the maximum size " ZBX_FS_UI64
+						" bytes. Message ignored.", expected_len,
+						s->peer, (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+				nbytes = ZBX_PROTO_ERROR;
+				goto out;
+			}
+
 			if (sizeof(s->buf_stat) > expected_len)
 			{
-				buf_stat_bytes -= ZBX_TCP_HEADER_LEN + sizeof(zbx_uint64_t);
-				memmove(s->buf_stat, s->buf_stat + ZBX_TCP_HEADER_LEN + sizeof(zbx_uint64_t),
-						buf_stat_bytes);
+				buf_stat_bytes -= offset;
+				memmove(s->buf_stat, s->buf_stat + offset, buf_stat_bytes);
 			}
 			else
 			{
 				s->buf_type = ZBX_BUF_TYPE_DYN;
-				s->buffer = (char *)zbx_malloc(NULL, allocated);
-				buf_dyn_bytes = buf_stat_bytes - ZBX_TCP_HEADER_LEN - sizeof(zbx_uint64_t);
+				s->buffer = (char *)zbx_malloc(NULL, expected_len + 1);
+				buf_dyn_bytes = buf_stat_bytes - offset;
 				buf_stat_bytes = 0;
-				memcpy(s->buffer, s->buf_stat + ZBX_TCP_HEADER_LEN + sizeof(zbx_uint64_t),
-						buf_dyn_bytes);
+				memcpy(s->buffer, s->buf_stat + offset, buf_dyn_bytes);
 			}
 
 			expect = ZBX_TCP_EXPECT_SIZE;
-			header_bytes = ZBX_TCP_HEADER_LEN + sizeof(zbx_uint64_t);
 
 			if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 				break;
-
-			continue;
-		}
-
-		if (sizeof(s->buf_stat) == buf_stat_bytes)
-		{
-			s->buf_type = ZBX_BUF_TYPE_DYN;
-			s->buffer = (char *)zbx_malloc(NULL, allocated);
-			buf_dyn_bytes = sizeof(s->buf_stat);
-			buf_stat_bytes = 0;
-			memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
-			continue;
-		}
-
-		if (sizeof(s->buf_stat) == nbytes)
-			continue;
-
-		if (ZBX_TCP_EXPECT_TEXT_XML == expect)
-		{
-			if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
-			{
-				expect = ZBX_TCP_EXPECT_CLOSE;
-				continue;
-			}
-
-			if (ZBX_CONST_STRLEN("<req>") > buf_stat_bytes + buf_dyn_bytes)
-			{
-				if (0 != strncmp(s->buffer, "<req>", buf_stat_bytes + buf_dyn_bytes))
-					break;
-
-				continue;
-			}
-			else
-			{
-				if (0 != strncmp(s->buffer, "<req>", ZBX_CONST_STRLEN("<req>")))
-					break;
-
-				expect = ZBX_TCP_EXPECT_XML_END;
-			}
-		}
-
-		if (ZBX_TCP_EXPECT_XML_END == expect)
-		{
-			/* closing tag received in the last 10 bytes? */
-			s->buffer[buf_stat_bytes + buf_dyn_bytes] = '\0';
-			if (NULL != strstr(s->buffer + buf_stat_bytes + buf_dyn_bytes - (10 > buf_stat_bytes +
-					buf_dyn_bytes ? buf_stat_bytes + buf_dyn_bytes : 10), "</req>"))
-			{
-				break;
-			}
 		}
 	}
 
 	if (ZBX_TCP_EXPECT_SIZE == expect)
 	{
-		if (buf_stat_bytes + buf_dyn_bytes != expected_len)
+		if (buf_stat_bytes + buf_dyn_bytes == expected_len)
+		{
+			if (0 != (protocol_version & ZBX_TCP_COMPRESS))
+			{
+				char	*out;
+				size_t	out_size = reserved;
+
+				out = (char *)zbx_malloc(NULL, reserved + 1);
+				if (FAIL == zbx_uncompress(s->buffer, buf_stat_bytes + buf_dyn_bytes, out, &out_size))
+				{
+					zbx_free(out);
+					zbx_set_socket_strerror("cannot uncompress data: %s", zbx_compress_strerror());
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
+
+				if (out_size != reserved)
+				{
+					zbx_free(out);
+					zbx_set_socket_strerror("size of uncompressed data is less than expected",
+							zbx_compress_strerror());
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
+
+				if (ZBX_BUF_TYPE_DYN == s->buf_type)
+					zbx_free(s->buffer);
+
+				s->buf_type = ZBX_BUF_TYPE_DYN;
+				s->buffer = out;
+				s->read_bytes = reserved;
+
+				zabbix_log(LOG_LEVEL_TRACE, "%s(): received " ZBX_FS_SIZE_T " bytes with"
+						" compression ratio %.1f", __function_name,
+						buf_stat_bytes + buf_dyn_bytes,
+						(double)reserved / (buf_stat_bytes + buf_dyn_bytes));
+			}
+			else
+				s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
+
+			s->buffer[s->read_bytes] = '\0';
+		}
+		else
 		{
 			if (buf_stat_bytes + buf_dyn_bytes < expected_len)
 			{
@@ -1694,10 +1748,99 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 			}
 
 			nbytes = ZBX_PROTO_ERROR;
-			goto out;
 		}
 	}
-	else if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
+	else if (ZBX_TCP_EXPECT_LENGTH == expect)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing data length. Message ignored.", s->peer);
+		nbytes = ZBX_PROTO_ERROR;
+	}
+	else if (ZBX_TCP_EXPECT_VERSION == expect)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing protocol version. Message ignored.",
+				s->peer);
+		nbytes = ZBX_PROTO_ERROR;
+	}
+	else if (ZBX_TCP_EXPECT_VERSION_VALIDATE == expect)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is using unsupported protocol version \"%d\"."
+				" Message ignored.", s->peer, protocol_version);
+		nbytes = ZBX_PROTO_ERROR;
+	}
+	else if (0 != buf_stat_bytes)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header. Message ignored.", s->peer);
+		nbytes = ZBX_PROTO_ERROR;
+	}
+out:
+	if (0 != timeout)
+		zbx_socket_timeout_cleanup(s);
+
+	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes + offset));
+
+#undef ZBX_TCP_EXPECT_HEADER
+#undef ZBX_TCP_EXPECT_LENGTH
+#undef ZBX_TCP_EXPECT_SIZE
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tcp_recv_raw_ext                                             *
+ *                                                                            *
+ * Purpose: receive data till connection is closed                            *
+ *                                                                            *
+ * Return value: number of bytes received - success,                          *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
+ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
+{
+	ssize_t		nbytes;
+	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0;
+	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE;
+
+	if (0 != timeout)
+		zbx_socket_timeout_set(s, timeout);
+
+	zbx_socket_free(s);
+
+	s->buf_type = ZBX_BUF_TYPE_STAT;
+	s->buffer = s->buf_stat;
+
+	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes)))
+	{
+		if (ZBX_PROTO_ERROR == nbytes)
+			goto out;
+
+		if (ZBX_BUF_TYPE_STAT == s->buf_type)
+			buf_stat_bytes += nbytes;
+		else
+		{
+			if (buf_dyn_bytes + nbytes >= allocated)
+			{
+				while (buf_dyn_bytes + nbytes >= allocated)
+					allocated *= 2;
+				s->buffer = (char *)zbx_realloc(s->buffer, allocated);
+			}
+
+			memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, nbytes);
+			buf_dyn_bytes += nbytes;
+		}
+
+		if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
+			break;
+
+		if (sizeof(s->buf_stat) == buf_stat_bytes)
+		{
+			s->buf_type = ZBX_BUF_TYPE_DYN;
+			s->buffer = (char *)zbx_malloc(NULL, allocated);
+			buf_dyn_bytes = sizeof(s->buf_stat);
+			buf_stat_bytes = 0;
+			memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
+		}
+	}
+
+	if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is longer than " ZBX_FS_UI64 " bytes allowed for"
 				" plain text. Message ignored.", s->peer, expected_len);
@@ -1711,14 +1854,7 @@ out:
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
 
-	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes + header_bytes));
-
-#undef ZBX_TCP_EXPECT_HEADER
-#undef ZBX_TCP_EXPECT_LENGTH
-#undef ZBX_TCP_EXPECT_TEXT_XML
-#undef ZBX_TCP_EXPECT_SIZE
-#undef ZBX_TCP_EXPECT_CLOSE
-#undef ZBX_TCP_EXPECT_XML_END
+	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes));
 }
 
 static int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)

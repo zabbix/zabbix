@@ -20,9 +20,11 @@
 
 $widget = (new CWidget())
 	->setTitle(_('User groups'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())->addItem(new CSubmit('form', _('Create user group'))))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create user group'), '?form=create'))
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter('web.usergroup.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),
@@ -71,13 +73,6 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 
 	// gui access
 	$guiAccess = user_auth_type2str($usrgrp['gui_access']);
-	$guiAccessStyle = ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN;
-	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
-		$guiAccessStyle = ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_ORANGE;
-	}
-	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-		$guiAccessStyle = ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED;
-	}
 
 	if (granted2update_group($userGroupId)) {
 		$nextGuiAuth = ($usrgrp['gui_access'] + 1 > GROUP_GUI_ACCESS_DISABLED)
@@ -88,7 +83,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 			$guiAccess,
 			'usergrps.php?action=usergroup.set_gui_access&set_gui_access='.$nextGuiAuth.'&usrgrpid='.$userGroupId
 		))
-			->addClass($guiAccessStyle)
+			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addSID();
 
 		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
@@ -102,10 +97,20 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 				->addSID();
 	}
 	else {
-		$guiAccess = (new CSpan($guiAccess))->addClass($guiAccessStyle);
+		$guiAccess = new CSpan($guiAccess);
 		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
+	}
+
+	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
+		$guiAccess->addClass(ZBX_STYLE_ORANGE);
+	}
+	elseif ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
+		$guiAccess->addClass(ZBX_STYLE_RED);
+	}
+	else {
+		$guiAccess->addClass(ZBX_STYLE_GREEN);
 	}
 
 	if (isset($usrgrp['users'])) {
