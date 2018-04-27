@@ -322,9 +322,10 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 		zbx_vector_history_record_t *values, int range_start, int count, int range_end,
 		const zbx_timespec_t *ts)
 {
-	int	first_timestamp, last_timestamp, i, left = 0, offset;
+	int	first_timestamp, last_timestamp, i, left = 0, values_start;
 
-	offset = values->values_num;
+	/* remember the number of values already stored in values vector */
+	values_start = values->values_num;
 
 	if (0 != range_start)
 		range_start--;
@@ -350,7 +351,8 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 	if (FAIL == zbx_history_get_values(itemid, value_type, range_start, count + 1, range_end, values))
 		return FAIL;
 
-	if (count > values->values_num - offset)
+	/* returned less than requested - all values are read */
+	if (count > values->values_num - values_start)
 		return SUCCEED;
 
 	/* Check if some of values aren't past the required range. For example we have values    */
@@ -360,9 +362,9 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 
 	/* values from history backend are sorted in descending order by timestamp seconds */
 	first_timestamp = values->values[values->values_num - 1].timestamp.sec;
-	last_timestamp = values->values[offset].timestamp.sec;
+	last_timestamp = values->values[values_start].timestamp.sec;
 
-	for (i = offset; i < values->values_num && values->values[i].timestamp.sec == last_timestamp; i++)
+	for (i = values_start; i < values->values_num && values->values[i].timestamp.sec == last_timestamp; i++)
 	{
 		if (0 > zbx_timespec_compare(ts, &values->values[i].timestamp))
 			left++;
@@ -371,7 +373,9 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 	/* read missing data */
 	if (0 != left)
 	{
-		/* drop the first second to ensure cutoff at full second */
+		int	offset;
+
+		/* drop the first (oldest) second to ensure range cutoff at full second */
 		while (0 < values->values_num && values->values[values->values_num - 1].timestamp.sec == first_timestamp)
 		{
 			values->values_num--;
@@ -384,23 +388,23 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 		if (FAIL == zbx_history_get_values(itemid, value_type, range_start, left, first_timestamp, values))
 			return FAIL;
 
-		/* returned less than requested - no more data left */
+		/* returned less than requested - all values are read */
 		if (left > values->values_num - offset)
 			return SUCCEED;
 
 		first_timestamp = values->values[values->values_num - 1].timestamp.sec;
 	}
 
-	/* Drop data from the first second. If the resulting number matches the requested count */
-	/* then all data has been read. Otherwise re-read the first second.                     */
-
+	/* drop the first (oldest) second to ensure range cutoff at full second */
 	while (0 < values->values_num && values->values[values->values_num - 1].timestamp.sec == first_timestamp)
 	{
 		values->values_num--;
 		zbx_history_record_clear(&values->values[values->values_num], value_type);
 	}
 
-	for (i = offset; i < values->values_num; i++)
+	/* check if there are enough values matching the request range */
+
+	for (i = values_start; i < values->values_num; i++)
 	{
 		if (0 <= zbx_timespec_compare(ts, &values->values[i].timestamp))
 			count--;
@@ -409,6 +413,7 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 	if (0 >= count)
 		return SUCCEED;
 
+	/* re-read the first (oldest) second */
 	return zbx_history_get_values(itemid, value_type, first_timestamp - 1, 0, first_timestamp, values);
 }
 
