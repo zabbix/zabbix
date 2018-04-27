@@ -28,7 +28,7 @@ class CControllerDashboardPropertiesCheck extends CController {
 	protected function checkInput() {
 		$fields = [
 			'dashboardid' =>		'db dashboard.dashboardid',
-			'name'		  =>		'string',
+			'name'		  =>		'string|not_empty',
 			'userid'	  =>		'db users.userid'
 		];
 
@@ -69,9 +69,6 @@ class CControllerDashboardPropertiesCheck extends CController {
 		else {
 			if (!$this->hasInput('userid') || $this->getInput('userid') == 0) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'userid', _('cannot be empty')));
-			}
-			elseif ($this->getInput('name') === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty')));
 			}
 		}
 
