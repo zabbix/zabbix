@@ -204,18 +204,17 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		];
 	}
 
+	$r_clock = ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0;
+
 	$table->addRow(array_merge($row, [
 		$show_recovery_data ? $cell_r_clock : null,
 		$show_recovery_data ? $cell_status : null,
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		(new CCol(
-			($problem['r_eventid'] != 0)
-				? zbx_date2age($problem['clock'], $problem['r_clock'])
-				: zbx_date2age($problem['clock'])
-		))
-			->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(zbx_date2age($problem['clock'], $r_clock)))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->setAttribute('aria-label', zbx_date2age($problem['clock'], $r_clock, false)),
 		$data['config']['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
 		array_key_exists($eventid, $actions)
 			? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
