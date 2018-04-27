@@ -1729,7 +1729,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $items  Array of inherited items.
 	 */
-	protected function inheritDependentItems($items) {
+	protected function inheritDependentItems(array $items) {
 		$master_itemids = [];
 
 		foreach ($items as $item) {
@@ -1744,6 +1744,7 @@ abstract class CItemGeneral extends CApiService {
 				'filter' => ['itemid' => array_keys($master_itemids)],
 				'preservekeys' => true
 			]);
+
 			$data = [];
 			$host_master_items = [];
 
@@ -1756,14 +1757,17 @@ abstract class CItemGeneral extends CApiService {
 				if (!array_key_exists($item['hostid'], $host_master_items)) {
 					$host_master_items[$item['hostid']] = [];
 				}
+
 				if ($master_item['hostid'] != $item['hostid']) {
 					if (!array_key_exists($master_item['key_'], $host_master_items[$item['hostid']])) {
 						$inherited_master_items = DB::select('items', [
 							'output' => ['itemid'],
 							'filter' => ['hostid' => $item['hostid'], 'key_' => $master_item['key_']]
 						]);
+
 						$host_master_items[$item['hostid']][$master_item['key_']] = reset($inherited_master_items);
 					}
+
 					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
 					$data[] = [
 						'values' => ['master_itemid' => $inherited_master_item['itemid']],
@@ -1771,6 +1775,7 @@ abstract class CItemGeneral extends CApiService {
 					];
 				}
 			}
+
 			if ($data) {
 				DB::update('items', $data);
 			}
@@ -1789,7 +1794,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @throws APIException if intersection of template items and host items creates dependent items tree with
 	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS or master item recursion.
 	 */
-	protected function validateDependentItemsIntersection(array $db_items, array $hostids, $errorService = null) {
+	protected function validateDependentItemsIntersection(array $db_items, array $hostids) {
 		$hosts_items = [];
 		$tmpl_items = [];
 
