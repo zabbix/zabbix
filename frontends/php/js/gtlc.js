@@ -59,8 +59,13 @@ jQuery(function ($){
 			quickranges: container.find('.time-quick a'),
 			label: container.find('.btn-time')
 		},
-		ui_disabled = false,
-		timerange = {from: element.from.val(), to: element.to.val()};
+		request_data = {
+			idx: container.data()['profileIdx']||'',
+			idx2: container.data()['profileIdx2']||0,
+			from: element.from.val(),
+			to: element.to.val()
+		},
+		ui_disabled = false;
 
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 
@@ -99,6 +104,8 @@ jQuery(function ($){
 			event = 'timeselector.rangechange';
 			data = target.data();
 			data.collapse = true;
+			element.quickranges.removeClass('selected');
+			target.addClass('selected');
 		}
 
 		if (event !== '') {
@@ -107,14 +114,16 @@ jQuery(function ($){
 	});
 
 	// Calendar toggle visibility handlers initialization.
-	$([element.from_clndr, element.to_clndr]).each(function () {
-		var button = $(this),
-			input = element[button.is(element.from_clndr) ? 'from' : 'to'].get(0);
+	if (element.from_clndr.length && element.to_clndr.length) {
+		$([element.from_clndr, element.to_clndr]).each(function () {
+			var button = $(this),
+				input = element[button.is(element.from_clndr) ? 'from' : 'to'].get(0);
 
-		button.data('clndr', create_calendar(null, input, null, '', ''))
-			.data('input', input)
-			.click(toggleCalendarPickerHandler);
-	});
+			button.data('clndr', create_calendar(null, input, null, '', ''))
+				.data('input', input)
+				.click(toggleCalendarPickerHandler);
+		});
+	}
 
 	/**
 	 * Time selector UI update.
@@ -195,14 +204,15 @@ jQuery(function ($){
 
 		disableTimeselectorUI();
 
-		xhr = $.post(endpoint.getUrl(), (e.namespace === 'rangechange') ? {from: data.from, to: data.to} : timerange,
+		xhr = $.post(endpoint.getUrl(),
+			$.extend(request_data, (e.namespace === 'rangechange') ? {from: data.from, to: data.to} : {}),
 			'json'
 		)
 			.success(function (json) {
-				timerange = json.result;
+				request_data = $.extend(request_data, json.result);
 
-				updateTimeselectorUI($.extend(timerange, data, {event: e.namespace}));
-				$.publish('timeselector.rangeupdate', timerange);
+				updateTimeselectorUI($.extend(request_data, data, {event: e.namespace}));
+				$.publish('timeselector.rangeupdate', request_data);
 			})
 			.always(function () {
 				xhr = null;
@@ -360,18 +370,15 @@ var timeControl = {
 				loadSBox: 0,
 				loadImage: 0,
 				mainObject: 0, // object on changing will reflect on all others
-				onDashboard: 0, // object is on dashboard
-				profile: { // if values are not null, will save timeline and fixedperiod state here, on change
-					idx: null,
-					idx2: null
-				}
+				onDashboard: 0 // object is on dashboard
 			}, objData);
 
 			if (this.objectList[id].loadSBox) {
+				var updateProfile = this.objectUpdate.bind(this.objectList[id]);
 				jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
 					timeControl.objectList[id].timeline.from = data.from;
 					timeControl.objectList[id].timeline.to = data.to;
-					timeControl.objectUpdate.bind(this);
+					updateProfile();
 				});
 			}
 		}
@@ -436,7 +443,7 @@ var timeControl = {
 					left: obj.objDims.shiftXleft,
 					right: obj.objDims.shiftXright,
 					top: obj.objDims.shiftYtop,
-					period: obj.timeline.period,
+					period: obj.timeline.to_ts - obj.timeline.from_ts,
 					timestamp: obj.timeline.from_ts
 				}).attr('src', obj.src);
 			});
@@ -565,19 +572,20 @@ var timeControl = {
 
 			location.href = url.getUrl();
 		}
-		else if (this.profile) {
-			var url = new Curl('zabbix.php');
-			url.setArgument('action', 'timeline.update');
+		// Profile data will be updated in timeselector.rangeupdate event.
+		// else if (this.profile) {
+		// 	var url = new Curl('zabbix.php');
+		// 	url.setArgument('action', 'timeline.update');
 
-			sendAjaxData(url.getUrl(), {
-				data: {
-					idx: this.profile.idx,
-					idx2: this.profile.idx2,
-					from: this.timeline.from,
-					to: this.timeline.to
-				}
-			});
-		}
+		// 	sendAjaxData(url.getUrl(), {
+		// 		data: {
+		// 			idx: this.profile.idx,
+		// 			idx2: this.profile.idx2,
+		// 			from: this.timeline.from,
+		// 			to: this.timeline.to
+		// 		}
+		// 	});
+		// }
 	},
 
 	objectReset: function() {

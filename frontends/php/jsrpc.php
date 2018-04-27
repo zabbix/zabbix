@@ -452,28 +452,43 @@ switch ($data['method']) {
 
 	/**
 	 * Timeselector date modification handlers.
-	 *
-	 * 'from'		    Start time in supplied format.
-	 * 'to'             End time in supplied format.
-	 * 'from_date'      Start time in ZBX_DATE_TIME date format.
-	 * 'to_date'        End time in ZBX_DATE_TIME format.
-	 * 'from_ts'        Start time as timestamp.
-	 * 'to_ts'          End time as timestamp.
-	 * 'label'          Selected time interval label, relative date range or absolute date in format ZBX_DATE_TIME.
-	 * 'can_zoomout'    Is allowed to zoom out supplied date range.
-	 * 'can_decrement'  Is allowed to decrement supplied date range.
-	 * 'can_increment'  Is allowed to increment supplied date range.
 	 */
 	case 'timeselector.zoomout' :
 	case 'timeselector.decrement' :
 	case 'timeselector.increment' :
 	case 'timeselector.rangechange' :
-		$now_ts = time();
-		$from = array_key_exists('from', $data) ? $data['from'] : '';
-		$to = array_key_exists('to', $data) ? $data['to'] : '';
-		$from_datetime = $from !== '' ? parseRelativeDate($from, true) : null;
-		$to_datetime = $to !== '' ? parseRelativeDate($to, false) : null;
+		/**
+		 * @var array $data   Input data array.
+		 * ['from']           Start time in relative format or as timestamp.
+		 * ['to']             End time in relative format or as timestamp.
+		 * ['idx']            (optional) Profile idx string.
+		 * ['idx2']           (optional) Profile idx2 integer.
+		 */
+		$data += [
+			'idx' => null,
+			'idx2' => 0,
+			'from' => '',
+			'to' => ''
+		];
+		/**
+		 * @var array $result Response array.
+		 * ['from']           Start time in supplied format.
+		 * ['to']             End time in supplied format.
+		 * ['from_date']      Start time in ZBX_DATE_TIME date format.
+		 * ['to_date']        End time in ZBX_DATE_TIME format.
+		 * ['from_ts']        Start time as timestamp.
+		 * ['to_ts']          End time as timestamp.
+		 * ['label']          Selected time interval label, relative date range or absolute date in format ZBX_DATE_TIME.
+		 * ['can_zoomout']    Is allowed to zoom out supplied date range.
+		 * ['can_decrement']  Is allowed to decrement supplied date range.
+		 * ['can_increment']  Is allowed to increment supplied date range.
+		 */
 		$result = [];
+		$now_ts = time();
+		$from = $data['from'];
+		$to = $data['to'];
+		$from_datetime = $from !== '' ? parseRelativeDate($data['from'], true) : null;
+		$to_datetime = $to !== '' ? parseRelativeDate($data['to'], false) : null;
 
 		if ($from_datetime instanceof DateTimeImmutable && $to_datetime instanceof DateTimeImmutable
 				&& $from_datetime < $to_datetime
@@ -528,6 +543,11 @@ switch ($data['method']) {
 				'can_decrement' => $from_ts - $range >= $min_date,
 				'can_increment' => $to_ts + $range <= $now_ts
 			];
+
+			if ($data['idx'] !== null && $from_datetime !== null && $to_datetime !== null) {
+				CProfile::update($data['idx'].'.from', $from, PROFILE_TYPE_STR, $data['idx2']);
+				CProfile::update($data['idx'].'.to', $to, PROFILE_TYPE_STR, $data['idx2']);
+			}
 		}
 		else {
 			$errors = [

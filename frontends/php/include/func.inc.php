@@ -2565,25 +2565,19 @@ function calculateTime(array $options = []) {
 	$from = $options['from'];
 	$to = $options['to'];
 
-	if ($idx !== null) {
-		if ($from === null) {
-			$from = CProfile::get($idx.'.from', ZBX_PERIOD_DEFAULT, $options['profileIdx2']);
-		}
-
-		if ($to === null) {
-			$to = CProfile::get($idx.'.to', 'now', $options['profileIdx2']);
-		}
-
-		if ($options['updateProfile']) {
-			CProfile::update($idx.'.from', $from, PROFILE_TYPE_STR, $options['profileIdx2']);
-			CProfile::update($idx.'.to', $to, PROFILE_TYPE_STR, $options['profileIdx2']);
-		}
+	if ($from === null) {
+		$from = CProfile::get($idx.'.from', ZBX_PERIOD_DEFAULT, $options['profileIdx2']);
 	}
 
 	$from_ts = parseRelativeDate($from, true);
 	$from_ts = $from_ts !== null
 		? $from_ts->getTimestamp()
 		: parseRelativeDate(ZBX_PERIOD_DEFAULT, true)->getTimestamp();
+
+	if ($to === null) {
+		$to = CProfile::get($idx.'.to', 'now', $options['profileIdx2']);
+	}
+
 	$to_ts = parseRelativeDate($to, false);
 	$to_ts = $to_ts !== null
 		? $to_ts->getTimestamp()
@@ -2605,10 +2599,18 @@ function calculateTime(array $options = []) {
 		$from = $to_ts - ZBX_MAX_PERIOD;
 	}
 
+	if ($idx !== null && $options['updateProfile']) {
+		CProfile::update($idx.'.from', $from, PROFILE_TYPE_STR, $options['profileIdx2']);
+		CProfile::update($idx.'.to', $to, PROFILE_TYPE_STR, $options['profileIdx2']);
+	}
+
 	return [
-		'period' => $period,
+		'profileIdx' => $options['profileIdx'],
+		'profileIdx2' => $options['profileIdx2'],
+		'updateProfile' => $options['updateProfile'],
 		'refreshable' => $from_ts <= $time && $time <= $to_ts,
 		'from_ts' => $from_ts,
+		'to_ts' => $to_ts,
 		'from' => $from,
 		'to' => $to
 	];

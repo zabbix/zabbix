@@ -140,7 +140,8 @@ else {
 
 	$timeline = null;
 	if ($data['show_timeline']) {
-		$timeline = (new CFilter('web.dashbrd.filter.state'))
+		$timeline = (new CFilter())
+			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 
 		if ($data['kioskmode']) {

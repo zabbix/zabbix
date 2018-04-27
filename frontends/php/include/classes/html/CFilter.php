@@ -21,7 +21,6 @@
 
 class CFilter extends CDiv {
 
-	private $filterid;
 	private $columns = [];
 	private $form;
 	private $footer = null;
@@ -40,6 +39,10 @@ class CFilter extends CDiv {
 		'collapsible' => true,
 		'active' => false
 	];
+	// Profile data associated with filter object.
+	protected $idx = null;
+	protected $idx2 = 0;
+
 	/**
 	 * List of predefined time ranges. Start and end of time range are separated by semicolon.
 	 */
@@ -56,18 +59,15 @@ class CFilter extends CDiv {
 		]
 	];
 
-	public function __construct($filterid) {
+	public function __construct() {
 		parent::__construct();
 
 		$this->setId('filter-space');
-		$this->filterid = $filterid;
 
 		$this->form = (new CForm('get'))
 			->cleanItems()
 			->setAttribute('name', $this->name)
 			->setId('id', $this->name);
-
-		$this->setActiveTab(CProfile::get($this->filterid, 0));
 	}
 
 	public function getName() {
@@ -107,12 +107,32 @@ class CFilter extends CDiv {
 	}
 
 	/**
+	 * Set profile 'idx' and 'idx2' data. Set current expanded tab from profile.
+	 *
+	 * @param string $idx
+	 * @param int    $idx2
+	 *
+	 * @return CFilter
+	 */
+	public function setProfile($idx, $idx2) {
+		$this->setActiveTab(CProfile::get($this->idx.'.expanded', $idx2));
+		$this->setAttribute('data-profile-idx', $idx);
+		$this->setAttribute('data-profile-idx2', $idx2);
+
+		return $this;
+	}
+
+	/**
 	 * Set active tab.
 	 *
 	 * @param int $tab  Zero based index of active tab. If set to false all tabs will be collapsed.
+	 *
+	 * @return CFilter
 	 */
 	public function setActiveTab($tab) {
 		$this->tabs_options['active'] = $tab;
+
+		return $this;
 	}
 
 	/**
