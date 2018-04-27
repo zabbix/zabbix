@@ -273,7 +273,7 @@ Bug fixes:
 Changes for 3.4.9rc2
 
 Bug fixes:
-...G...... [ZBX-13781] fixed possible crash due to uninitialised error string in Zabbix Agentd (MVekslers)
+...G...... [ZBX-13781] fixed possible crash in the function "web.page.get" of Zabbix Agentd (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.9rc1
@@ -1478,7 +1478,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.17rc2
 
 Bug fixes:
-...G...... [ZBX-13781] fixed possible crash due to uninitialised error string in Zabbix Agentd (MVekslers)
+...G...... [ZBX-13781] fixed possible crash in the function "web.page.get" of Zabbix Agentd (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17rc1
