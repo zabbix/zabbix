@@ -54,7 +54,7 @@ class C32ImportConverter extends CConverter {
 			}
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items'], [
-					'master_item'	=> []
+					'master_item' => []
 				]);
 			}
 			if (array_key_exists('httptests', $host)) {

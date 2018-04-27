@@ -1355,7 +1355,7 @@ class CDiscoveryRule extends CItemGeneral {
 			// It's possible that master items are non-prototype items.
 			if ($unresolved_master_itemids) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid'],
+					'output' => ['itemid'],
 					'itemids' => array_keys($unresolved_master_itemids),
 					'webitems' => true,
 					'preservekeys' => true
@@ -1369,6 +1369,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				// If still there are IDs left, there's nothing more we can do.
 				if ($unresolved_master_itemids) {
+					reset($unresolved_master_itemids);
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
 						'master_itemid', _s('Item "%1$s" does not exist or you have no access to this item',
 							key($unresolved_master_itemids)

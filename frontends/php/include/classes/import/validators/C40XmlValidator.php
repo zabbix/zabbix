@@ -276,7 +276,7 @@ class C40XmlValidator {
 									]],
 									'interface_ref' =>			['type' => XML_STRING],
 									'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
-									'master_item_prototype' =>	['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
+									'master_item' =>			['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
 										'key' =>					['type' => XML_STRING]
 									]],
 									'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -769,7 +769,7 @@ class C40XmlValidator {
 									]],
 									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
 									'jmx_endpoint' =>			['type' => XML_STRING | XML_REQUIRED],
-									'master_item_prototype' =>	['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item_prototype', 'rules' => [
+									'master_item' =>			['type' => XML_ARRAY | XML_REQUIRED, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
 										'key' =>					['type' => XML_STRING]
 									]],
 									'timeout' =>				['type' => XML_STRING | XML_REQUIRED],

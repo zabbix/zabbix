@@ -62,7 +62,7 @@ class C34ImportConverter extends CConverter {
 	/**
 	 * Convert item elements.
 	 *
-	 * @param array $items
+	 * @param array  $items
 	 *
 	 * @return array
 	 */
@@ -70,11 +70,32 @@ class C34ImportConverter extends CConverter {
 		$default = $this->getItemDefaultFields();
 
 		foreach ($items as &$item) {
-			$item = $item + $default;
+			$item += $default;
 		}
 		unset($item);
 
 		return $items;
+	}
+
+	/**
+	 * Convert item prototype elements.
+	 *
+	 * @param array  $item_prototypes
+	 *
+	 * @return array
+	 */
+	protected function convertItemPrototypes(array $item_prototypes) {
+		$default = $this->getItemDefaultFields();
+
+		foreach ($item_prototypes as &$item_prototype) {
+			$item_prototype['master_item'] = $item_prototype['master_item_prototype'];
+			unset($item_prototype['master_item_prototype']);
+
+			$item_prototype += $default;
+		}
+		unset($item);
+
+		return $item_prototypes;
 	}
 
 	/**

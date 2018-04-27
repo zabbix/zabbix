@@ -1528,7 +1528,8 @@ abstract class CItemGeneral extends CApiService {
 			if ($has_unresolved_masters) {
 				$options = [
 					'output' => ['type', 'name', 'hostid', 'master_itemid'],
-					'itemids' => array_keys($unresolved_master_itemids)
+					'itemids' => array_keys($unresolved_master_itemids),
+					'preservekeys' => true
 				];
 
 				$db_masters = API::Item()->get($options + ['webitems' => true]);

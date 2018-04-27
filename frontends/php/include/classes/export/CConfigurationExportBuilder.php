@@ -761,11 +761,9 @@ class CConfigurationExportBuilder {
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
-				$data['master_item_prototype'] = $master_item;
 			}
-			else {
-				$data['master_item'] = $master_item;
-			}
+
+			$data['master_item'] = $master_item;
 
 			if (isset($item['interface_ref'])) {
 				$data['interface_ref'] = $item['interface_ref'];

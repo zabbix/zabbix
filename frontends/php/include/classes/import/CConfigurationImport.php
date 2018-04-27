@@ -116,8 +116,8 @@ class CConfigurationImport {
 		// import objects
 		$this->processApplications();
 		$this->processValueMaps();
-		$this->processItems();
 		$this->processHttpTests();
+		$this->processItems();
 		$this->processTriggers();
 		$this->processDiscoveryRules();
 		$this->processGraphs();
@@ -961,8 +961,8 @@ class CConfigurationImport {
 		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
 		$this->referencer->refreshItems();
 
-		$xml_itemprototype_key = 'master_item_prototype';
-		$order_tree = $this->getDiscoveryRulesItemsOrder($xml_itemprototype_key);
+		$xml_item_key = 'master_item';
+		$order_tree = $this->getDiscoveryRulesItemsOrder($xml_item_key);
 		// process prototypes
 		$prototypes_to_update = [];
 		$prototypes_to_create = [];
@@ -1021,16 +1021,16 @@ class CConfigurationImport {
 
 					if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
 						$master_itemprototypeid = $this->referencer->resolveItem($hostId,
-							$prototype[$xml_itemprototype_key]['key']
+							$prototype[$xml_item_key]['key']
 						);
 
 						if ($master_itemprototypeid !== false) {
 							$prototype['master_itemid'] = $master_itemprototypeid;
-							unset($prototype[$xml_itemprototype_key]);
+							unset($prototype[$xml_item_key]);
 						}
 					}
 					else {
-						unset($prototype[$xml_itemprototype_key]);
+						unset($prototype[$xml_item_key]);
 					}
 
 					if ($prototype['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -1149,11 +1149,11 @@ class CConfigurationImport {
 		}
 
 		if ($prototypes_to_create) {
-			$this->createEntitiesWithDependency($xml_itemprototype_key, $prototypes_to_create, API::ItemPrototype());
+			$this->createEntitiesWithDependency($xml_item_key, $prototypes_to_create, API::ItemPrototype());
 		}
 
 		if ($prototypes_to_update) {
-			$this->updateEntitiesWithDependency($xml_itemprototype_key, $prototypes_to_update, API::ItemPrototype());
+			$this->updateEntitiesWithDependency($xml_item_key, $prototypes_to_update, API::ItemPrototype());
 		}
 
 		if ($hostPrototypesToCreate) {
@@ -2442,7 +2442,7 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getEntitiesOrder($master_key_identifier, $host_entities, $data_provider) {
+	protected function getEntitiesOrder($master_key_identifier, array $host_entities, $data_provider) {
 		$find_keys = [];
 		$find_hosts = [];
 		$resolved_masters_cache = [];
@@ -2487,12 +2487,20 @@ class CConfigurationImport {
 			// Registering reference when property 'itemRefs' is empty, will not allow first call of
 			// 'resolveValueMap' method update references to existing items.
 			$this->referencer->initItemsReferences();
-			$resolved_entities = $data_provider->get([
+
+			$options = [
 				'output' => ['key_', 'type', 'hostid', 'master_itemid'],
 				'hostids' => array_keys($find_hosts),
 				'filter' => ['key_' => array_keys($find_keys)],
 				'preservekeys' => true
-			]);
+			];
+
+			$resolved_entities = API::Item()->get($options + ['webitems' => true]);
+
+			if ($data_provider instanceof CItemPrototype) {
+				$resolved_entities += API::ItemPrototype()->get($options);
+			}
+
 			$resolve_entity_keys = [];
 			$host_entity_idkey_hash = [];
 
@@ -2511,6 +2519,7 @@ class CConfigurationImport {
 
 					if ($entity['type'] == ITEM_TYPE_DEPENDENT) {
 						$master_itemid = $entity['master_itemid'];
+
 						if (array_key_exists($master_itemid, $host_entity_idkey_hash[$host_key])) {
 							$cache_entity[$master_key_identifier] = [
 								'key' => $host_entity_idkey_hash[$host_key][$master_itemid]
@@ -2525,6 +2534,7 @@ class CConfigurationImport {
 							];
 						}
 					}
+
 					$resolved_masters_cache[$host_key][$entity['key']] = $cache_entity;
 				}
 
@@ -2555,14 +2565,17 @@ class CConfigurationImport {
 						_s('value "%1$s" not found', $master_itemid)
 					));
 				}
+
 				$master_key = $host_entity_idkey_hash[$entity['host']][$master_itemid];
 				$resolved_masters_cache[$entity['host']][$entity['key']] += [
 					$master_key_identifier => ['key' => $master_key]
 				];
 			}
+
 			unset($resolve_entity_keys);
 			unset($host_entity_idkey_hash);
 		}
+
 		// Resolve every entity dependency level.
 		$tree = [];
 
@@ -2599,17 +2612,19 @@ class CConfigurationImport {
 					}
 
 					if ($level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-						$traversal = '"'. implode('" => "', $traversal_path) . '"';
 						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 							_('maximum number of dependency levels reached')
 						));
 					}
 				}
+
 				$host_items_tree[$entity_index] = $level;
 			}
+
 			$tree[$host_key] = $host_items_tree;
 		}
-		// Order item indexes in descending order by nesting level
+
+		// Order item indexes in descending order by nesting level.
 		foreach ($tree as $host_key => &$item_indexes) {
 			asort($item_indexes);
 		}
