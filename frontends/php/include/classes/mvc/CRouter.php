@@ -63,7 +63,6 @@ class CRouter {
 		'dashboard.widget.edit'			=> ['CControllerDashboardWidgetEdit',		'layout.json',			'monitoring.dashboard.widget.edit'],
 		'dashboard.widget.check'		=> ['CControllerDashboardWidgetCheck',		'layout.json',			null],
 		'dashboard.widget.rfrate'		=> ['CControllerDashboardWidgetRfRate',		'layout.json',			null],
-		'dashboard.get'					=> ['CControllerDashboardGet',				'layout.json',			null],
 		'dashboard.properties.check'	=> ['CControllerDashboardPropertiesCheck',	'layout.json',			null],
 		'dashboard.properties.edit'		=> ['CControllerDashboardPropertiesEdit',	'layout.json',			'dashboard.properties.edit'],
 		'dashboard.share.edit'			=> ['CControllerDashboardShareEdit',		'layout.json',			'dashboard.sharing.edit'],
