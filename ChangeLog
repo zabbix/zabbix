@@ -3,6 +3,7 @@ Changes for 4.0.0alpha7
 New features:
 
 Bug fixes:
+........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha6
@@ -280,6 +281,7 @@ Bug fixes:
 Changes for 3.4.9rc3
 
 Bug fixes:
+........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.9rc2
