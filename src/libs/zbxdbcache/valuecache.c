@@ -458,6 +458,12 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 
 	zbx_vector_history_record_sort(values, (zbx_compare_func_t)zbx_history_record_compare_desc_func);
 
+	/* History backend returns values by full second intervals. With nanosecond resolution */
+	/* some of returned values might be outside the requested range, for example:          */
+	/*   returned values: |.o...o..o.|.o...o..o.|.o...o..o.|.o...o..o.|                    */
+	/*   request range:        \_______________________________/                           */
+	/* Check if there are any values before and past the requested range and remove them.  */
+
 	/* find the last value with timestamp less or equal to the requested range end point */
 	for (i = 0; i < values->values_num; i++)
 	{
