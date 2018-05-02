@@ -778,21 +778,23 @@ class CScreenProblem extends CScreenBase {
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
-				$tags_header = (new CColHeader(_('Tags')));
+				if ($this->data['filter']['show_tags'] == PROBLEMS_SHOW_TAGS_NONE) {
+					$tags_header = null;
+				}
+				else {
+					$tags_header = (new CColHeader(_('Tags')));
 
-				switch ($this->data['filter']['show_tags']) {
-					case PROBLEMS_SHOW_TAGS_1:
-						$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
-						break;
-					case PROBLEMS_SHOW_TAGS_2:
-						$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
-						break;
-					case PROBLEMS_SHOW_TAGS_3:
-						$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
-						break;
-					case PROBLEMS_SHOW_TAGS_NONE:
-					default:
-						$tags_header = null;
+					switch ($this->data['filter']['show_tags']) {
+						case PROBLEMS_SHOW_TAGS_1:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
+							break;
+						case PROBLEMS_SHOW_TAGS_2:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
+							break;
+						case PROBLEMS_SHOW_TAGS_3:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
+							break;
+					}
 				}
 
 				$table = (new CTableInfo())
