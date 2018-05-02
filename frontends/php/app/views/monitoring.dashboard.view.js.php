@@ -58,7 +58,7 @@
 			options.new = '1';
 		}
 
-		PopUp('dashboard.properties.edit', options, 'dashboard_prop', this);
+		PopUp('dashboard.properties.edit', options, 'dashboard_properties', this);
 	};
 
 	function dashbrdApplyProperties() {
@@ -68,9 +68,7 @@
 			form_data = {};
 
 		form.trimValues(['#name']);
-		form_data['dashboardid'] = <?=$this->data['dashboard']['dashboardid'];?>;
-		form_data['userid'] = jQuery("[name=userid]", form).val();
-		form_data['name'] = jQuery("[name=name]", form).val();
+		form_data = form.serializeJSON();
 		url.setArgument('action', 'dashboard.properties.check');
 
 		jQuery.ajax({
@@ -98,7 +96,7 @@
 					jQuery('#<?= ZBX_STYLE_PAGE_TITLE ?>').text(form_data['name']);
 					jQuery('#dashboard-direct-link').text(form_data['name']);
 
-					overlayDialogueDestroy('dashboard_prop');
+					overlayDialogueDestroy('dashboard_properties');
 				}
 			}
 		});
@@ -137,7 +135,7 @@
 					if (messages.length) {
 						jQuery('main').prepend(messages);
 					}
-					overlayDialogueDestroy('dashbrd_share');
+					overlayDialogueDestroy('dashboard_share');
 				}
 			}
 		});

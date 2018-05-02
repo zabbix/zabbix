@@ -62,12 +62,9 @@ $table_users = (new CTable())
 	)
 	->addStyle('width: 100%;');
 
-if ($data['dashboard']['dashboardid'] != 0) {
-	$form->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']));
-}
-
 $form
 	->addItem(getMessages())
+	->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']))
 	// indicator to help delete all users
 	->addItem(new CInput('hidden', 'users['.CControllerDashboardShareUpdate::EMPTY_USER.']', '1'))
 	// indicator to help delete all user groups

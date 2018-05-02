@@ -44,6 +44,7 @@ $multiselect = (new CMultiSelect([
 
 $form
 	->addItem(getMessages())
+	->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']))
 	->addItem((new CFormList())
 		->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect)
 		->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
