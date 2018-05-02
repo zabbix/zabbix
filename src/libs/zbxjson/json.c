@@ -191,7 +191,6 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 	return len;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_num2hex                                                      *
