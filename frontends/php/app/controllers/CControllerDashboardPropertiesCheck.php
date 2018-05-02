@@ -63,6 +63,17 @@ class CControllerDashboardPropertiesCheck extends CController {
 			}
 		}
 
+		if (!hasErrorMesssages() && $this->getUserType() == USER_TYPE_SUPER_ADMIN) {
+			$users = API::User()->get([
+				'output' => [],
+				'userids' => $this->getInput('userid')
+			]);
+
+			if (!$users) {
+				error(_s('User with ID "%1$s" is not available.', $this->getInput('userid')));
+			}
+		}
+
 		$output = [];
 		if (($messages = getMessages()) !== null) {
 			$output = [
