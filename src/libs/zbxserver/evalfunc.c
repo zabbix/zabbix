@@ -1498,7 +1498,7 @@ out:
 static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, char **error)
 {
 	const char			*__function_name = "evaluate_NODATA";
-	int				arg1, now, ret = FAIL;
+	int				arg1, ret = FAIL;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts;
@@ -1537,7 +1537,7 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 			goto out;
 		}
 
-		if (seconds + arg1 > now)
+		if (seconds + arg1 > ts.sec)
 		{
 			*error = zbx_strdup(*error,
 					"item does not have enough data after server start or item creation");
