@@ -93,7 +93,7 @@ class C34ImportConverter extends CConverter {
 
 			$item_prototype += $default;
 		}
-		unset($item);
+		unset($item_prototype);
 
 		return $item_prototypes;
 	}
@@ -106,11 +106,11 @@ class C34ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertDiscoveryRules(array $discovery_rules) {
-		$default = $this->getItemDefaultFields();
+		$default = $this->getDiscoveryRuleDefaultFields();
 
 		foreach ($discovery_rules as &$discovery_rule) {
-			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
-			$discovery_rule = $discovery_rule + $default;
+			$discovery_rule['item_prototypes'] = $this->convertItemPrototypes($discovery_rule['item_prototypes']);
+			$discovery_rule += $default;
 		}
 		unset($discovery_rule);
 
@@ -118,7 +118,7 @@ class C34ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Return associative array of item default fields.
+	 * Return associative array of item and item prototype default fields.
 	 *
 	 * @return array
 	 */
@@ -128,6 +128,25 @@ class C34ImportConverter extends CConverter {
 				'timeout', 'url', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 				'verify_peer', 'verify_host', 'allow_traps'
+			], ''
+		));
+		$default['query_fields'] = [];
+		$default['headers'] = [];
+
+		return $default;
+	}
+
+	/**
+	 * Return associative array of LLD rule default fields.
+	 *
+	 * @return array
+	 */
+	protected function getDiscoveryRuleDefaultFields() {
+		$default = array_intersect_key(DB::getDefaults('items'),
+			array_fill_keys([
+				'timeout', 'url', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+				'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
+				'verify_host', 'allow_traps'
 			], ''
 		));
 		$default['query_fields'] = [];
