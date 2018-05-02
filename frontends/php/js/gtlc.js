@@ -375,14 +375,12 @@ var timeControl = {
 				onDashboard: 0 // object is on dashboard
 			}, objData);
 
-			if (this.objectList[id].loadSBox) {
-				var updateProfile = this.objectUpdate.bind(this.objectList[id]);
-				jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
-					timeControl.objectList[id].timeline.from = data.from;
-					timeControl.objectList[id].timeline.to = data.to;
-					updateProfile();
-				});
-			}
+			var objectUpdate = this.objectUpdate.bind(this.objectList[id]);
+			jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
+				timeControl.objectList[id].timeline.from = data.from;
+				timeControl.objectList[id].timeline.to = data.to;
+				objectUpdate();
+			});
 		}
 	},
 
@@ -566,7 +564,7 @@ var timeControl = {
 	},
 
 	objectUpdate: function() {
-		if (this.refreshPage) {
+		if (timeControl.refreshPage) {
 			var url = new Curl(location.href);
 			url.setArgument('from', this.timeline.from);
 			url.setArgument('to', this.timeline.to);
@@ -575,19 +573,6 @@ var timeControl = {
 			location.href = url.getUrl();
 		}
 		// Profile data will be updated in timeselector.rangeupdate event.
-		// else if (this.profile) {
-		// 	var url = new Curl('zabbix.php');
-		// 	url.setArgument('action', 'timeline.update');
-
-		// 	sendAjaxData(url.getUrl(), {
-		// 		data: {
-		// 			idx: this.profile.idx,
-		// 			idx2: this.profile.idx2,
-		// 			from: this.timeline.from,
-		// 			to: this.timeline.to
-		// 		}
-		// 	});
-		// }
 	},
 
 	objectReset: function() {

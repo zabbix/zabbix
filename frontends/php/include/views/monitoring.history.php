@@ -105,11 +105,15 @@ $action_list->addItem([
 $header['right']->addItem($action_list);
 
 // create filter
+$filterForm = new CFilter();
+$filter_tab = [];
+
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
-		$filterForm = (new CFilter('web.history.filter.state'))
+		$filterForm
 			->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null)
 			->addVar('action', $this->data['action']);
+
 		foreach (getRequest('itemids') as $itemId) {
 			$filterForm->addVar('itemids['.$itemId.']', $itemId);
 		}
@@ -177,7 +181,7 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		}
 
 		$filterColumn1->addRow(_('Selected'), $tasks);
-		$filterForm->addColumn($filterColumn1);
+		$filter_tab = [$filterColumn1];
 	}
 }
 
@@ -190,7 +194,7 @@ if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
 else {
 	$profileIdx = 'web.item.graph';
 	$profileIdx2 = reset($this->data['itemids']);
-	$updateProfile = ($this->data['from'] !== null && $this->data['to'] !== null);
+	$updateProfile = ($data['from'] !== null && $data['to'] !== null);
 }
 
 // create history screen
@@ -201,8 +205,8 @@ $screen = CScreenBuilder::getScreen([
 	'profileIdx' => $profileIdx,
 	'profileIdx2' => $profileIdx2,
 	'updateProfile' => $updateProfile,
-	'from' => $this->data['from'],
-	'to' => $this->data['to'],
+	'from' => $data['from'],
+	'to' => $data['to'],
 	'filter' => getRequest('filter'),
 	'filter_task' => getRequest('filter_task'),
 	'mark_color' => getRequest('mark_color'),
@@ -228,33 +232,38 @@ else {
 	$historyWidget->setTitle($header['left'])
 		->setControls($header['right']);
 
-	if (isset($this->data['iv_string'][$this->data['value_type']])) {
-		$filterForm->addNavigator();
-	}
-
 	if (in_array($this->data['action'], [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
-		if(!isset($filterForm)) {
-			$filterForm = new CFilter('web.history.filter.state');
-		}
+		$filterForm->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 
 		// display the graph type filter for graphs with multiple items
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
-			$filterForm->addColumn(
+			$filterForm
+				->hideFilterButtons()
+				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+				->addVar('action', $data['action'])
+				->addVar('itemids', $data['itemids']);
+			$filter_tab = [
 				(new CFormList())->addRow(_('Graph type'),
 					(new CRadioButtonList('graphtype', (int) $this->data['graphtype']))
 						->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
 						->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
 						->setModern(true)
 				)
-			);
-			$filterForm->removeButtons();
-			$filterForm->addVar('fullscreen', $this->data['fullscreen'] ? '1' : null);
-			$filterForm->addVar('action', $this->data['action']);
-			$filterForm->addVar('itemids', $this->data['itemids']);
+			];
 		}
 
-		$filterForm->addNavigator();
+		if ($profileIdx !== null) {
+			$filterForm->setProfile($profileIdx, $profileIdx2);
+		}
+
+		if ($filter_tab) {
+			$filterForm->addFilterTab(_('Filter'), $filter_tab);
+		}
+
 		$historyWidget->addItem($filterForm);
+	}
+	elseif (array_key_exists($data['iv_string'][$data['value_type']])) {
+		$filterForm->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
 
 	$historyWidget->addItem($screen->get());

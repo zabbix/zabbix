@@ -42,9 +42,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.groups.filter.active':
 				case 'web.hostinventories.filter.active':
 				case 'web.hostscreen.filter.active':
-				case 'web.history.filter.state':
-				case 'web.httpconf.filter.state':
-				case 'web.httpdetails.filter.state':
+				case 'web.item.graph.active':
+				case 'web.httpconf.filter.active':
+				case 'web.httptest.active':
 				case 'web.hosts.filter.active':
 				case 'web.items.filter.active':
 				case 'web.latest.filter.active':
@@ -58,28 +58,20 @@ class CControllerProfileUpdate extends CController {
 				case 'web.toptriggers.filter.active':
 				case 'web.triggers.filter.state':
 				case 'web.tr_status.filter.active':
-				case 'web.screens.filter.state':
-				case 'web.screenconf.filter.state':
-				case 'web.slides.filter.state':
-				case 'web.slideconf.filter.state':
-				case 'web.sysmapconf.filter.state':
+				case 'web.screens.filter.active':
+				case 'web.screenconf.filter.active':
+				case 'web.slides.filter.active':
+				case 'web.slideconf.filter.active':
+				case 'web.sysmapconf.filter.active':
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
-				case 'web.dashbrd.filter.state':
+				case 'web.dashbrd.active':
 					$ret = true;
 					break;
 
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
-				case 'web.dashbrd.timelinefixed':
-				case 'web.screens.timelinefixed':
-				case 'web.graphs.timelinefixed':
-				case 'web.httptest.timelinefixed':
 				case 'web.problem.timeline':
-				case 'web.auditacts.timelinefixed':
-				case 'web.auditlogs.timelinefixed':
-				case 'web.item.graph.timelinefixed':
-				case 'web.slides.timelinefixed':
 				case 'web.dashbrd.navtree.item.selected':
 				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 					$ret = $this->hasInput('idx2');
@@ -109,7 +101,6 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			case 'web.latest.toggle':
 			case 'web.latest.toggle_other':
-			case 'web.dashbrd.timelinefixed':
 			case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));

@@ -21,8 +21,6 @@
 $auditWidget = (new CWidget())->setTitle(_('Audit log'));
 
 // header
-// create filter
-$filterForm = new CFilter('web.auditlogs.filter.state');
 
 $filterColumn = new CFormList();
 $filterColumn->addRow(_('User'), [
@@ -55,9 +53,12 @@ $filterColumn->addRow(_('Resource'), new CComboBox('resourcetype', $this->data['
 	[-1 => _('All')] + audit_resource2str()
 ));
 
-$filterForm->addColumn($filterColumn)
-	->addNavigator();
-$auditWidget->addItem($filterForm);
+$auditWidget->addItem(
+	(new CFilter())
+		->setProfile('web.auditlogs.filter', 0)
+		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
+		->addFilterTab(_('Filter'), [$filterColumn])
+);
 
 // create form
 $auditForm = (new CForm('get'))->setName('auditForm');

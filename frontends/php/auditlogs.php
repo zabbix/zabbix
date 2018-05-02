@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 
 $page['title'] = _('Audit log');
 $page['file'] = 'auditlogs.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';

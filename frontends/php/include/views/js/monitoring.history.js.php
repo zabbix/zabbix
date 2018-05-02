@@ -41,17 +41,25 @@
 			$('form[name=zbx_filter]').submit();
 		});
 
+		var time_range = <?= CJs::encodeJson([
+			'from' => $data['from'] === null ? ZBX_PERIOD_DEFAULT : $data['from'],
+			'to' => $data['to'] === null ? 'now' : $data['to']
+		]) ?>;
+		$.subscribe('timeselector.rangeupdate', function(e, data) {
+			time_range.from = data.from;
+			time_range.to = data.to;
+		});
 		$('input[name="graphtype"]').change(function() {
 			var form = $(this).parents('form');
 			form.append($('<input>', {
 				type: 'hidden',
 				name: 'from',
-				value: timeControl.timeline.from
+				value: time_range.from
 			}))
 				.append($('<input>', {
 					type: 'hidden',
 					name: 'to',
-					value: timeControl.timeline.to
+					value: time_range.to
 				}));
 			form.submit();
 		})

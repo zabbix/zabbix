@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 
 $page['title'] = _('Action log');
 $page['file'] = 'auditacts.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -132,21 +132,6 @@ if (!$data['alias'] || $data['users']) {
 	}
 }
 
-// TODO: test/remove
-// get first alert clock
-// $first_alert = null;
-// if ($userid) {
-// 	$first_alert = DBfetch(DBselect(
-// 		'SELECT MIN(a.clock) AS clock'.
-// 		' FROM alerts a'.
-// 		' WHERE a.userid='.zbx_dbstr($userid)
-// 	));
-// }
-// elseif ($data['alias'] === '') {
-// 	$first_alert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'));
-// }
-// $min_start_time = ($first_alert) ? $first_alert['clock'] - 1 : null;
-
 // get actions names
 if ($data['alerts']) {
 	$data['actions'] = API::Action()->get([
@@ -155,12 +140,6 @@ if ($data['alerts']) {
 		'preservekeys' => true
 	]);
 }
-
-// TODO: test/remove
-// Show shorter timeline.
-// if ($min_start_time !== null && $min_start_time > 0) {
-// 	$data['timeline']['from'] = $min_start_time;
-// }
 
 // render view
 $auditView = new CView('administration.auditacts.list', $data);

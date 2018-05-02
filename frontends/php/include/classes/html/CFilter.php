@@ -84,11 +84,6 @@ class CFilter extends CDiv {
 		return $this;
 	}
 
-	public function removeButtons() {
-		$this->show_buttons = false;
-		return $this;
-	}
-
 	public function addNavigator() {
 		$this->navigator = true;
 		return $this;
@@ -107,6 +102,14 @@ class CFilter extends CDiv {
 	}
 
 	/**
+	 * Hide filter tab buttons. Should be called before addFilterTab.
+	 */
+	public function hideFilterButtons() {
+		$this->show_buttons = false;
+		return $this;
+	}
+
+	/**
 	 * Set profile 'idx' and 'idx2' data. Set current expanded tab from profile.
 	 *
 	 * @param string $idx
@@ -118,7 +121,7 @@ class CFilter extends CDiv {
 		$this->idx = $idx;
 		$this->idx2 = $idx2;
 
-		$this->setActiveTab(CProfile::get($idx.'.active', 1, $idx2));
+		$this->setActiveTab(CProfile::get($idx.'.active', 1));
 		$this->setAttribute('data-profile-idx', $idx);
 		$this->setAttribute('data-profile-idx2', $idx2);
 
@@ -294,6 +297,10 @@ class CFilter extends CDiv {
 				$this->tabs[$index] = (new CDiv($this->tabs[$index]))
 					->addClass(ZBX_STYLE_FILTER_CONTAINER)
 					->setId($id);
+
+				if ($index !== $this->tabs_options['active']) {
+					$this->tabs[$index]->addStyle('display: none');
+				}
 			}
 		}
 

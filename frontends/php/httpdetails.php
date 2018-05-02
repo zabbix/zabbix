@@ -201,7 +201,10 @@ CScreenBuilder::insertScreenStandardJs([
 
 // Create graphs widget.
 (new CWidget())
-	->addItem((new CFilter('web.httpdetails.filter.state'))->addNavigator())
+	->addItem((new CFilter())
+		->setProfile($profileIdx, $profileIdx2)
+		->addTimeSelector($graph_time->timeline['from'], $graph_time->timeline['to'])
+	)
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();
 

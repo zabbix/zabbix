@@ -25,8 +25,9 @@ else {
 	$create_button = new CSubmit('form', _('Create web scenario'));
 }
 
-$filter = (new CFilter('web.httpconf.filter.state'))
-	->addColumn(
+$filter = (new CFilter())
+	->setProfile('web.httpconf.filter', 0)
+	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(_('Status'),
 				(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
@@ -35,8 +36,7 @@ $filter = (new CFilter('web.httpconf.filter.state'))
 					->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
 					->setModern(true)
 			)
-	)
-	->addNavigator();
+	]);
 
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))

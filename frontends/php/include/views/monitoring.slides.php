@@ -91,7 +91,9 @@ $controls
 $header->addItem($controls);
 $widget->setControls($header);
 
-$filter = (new CFilter('web.slides.filter.state'))->addNavigator();
+$filter = (new CFilter())
+	->setProfile('web.slides.filter', $data['screen']['slideshowid'])
+	->addTimeSelector($data['from'], $data['to']);
 $widget->addItem($filter);
 
 $widget->addItem(
