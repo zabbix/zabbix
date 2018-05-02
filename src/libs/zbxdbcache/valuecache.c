@@ -458,20 +458,21 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 
 	zbx_vector_history_record_sort(values, (zbx_compare_func_t)zbx_history_record_compare_desc_func);
 
+	/* find the last value with timestamp less or equal to the requested range end point */
 	for (i = 0; i < values->values_num; i++)
 	{
 		if (0 >= zbx_timespec_compare(&values->values[i].timestamp, ts))
 			break;
 	}
 
-	/* check if we have any values with timestamp less than requested */
+	/* all values are past requested range (timestamp greater than requested), return empty vector */
 	if (i == values->values_num)
 	{
 		vc_history_record_vector_clean(values, value_type);
 		return SUCCEED;
 	}
 
-	/* check if we have any values with timestamp greater than requested and remove them */
+	/* remove values with timestamp greater than the requested */
 	if (0 != i)
 	{
 		for (j = 0; j < i; j++)
@@ -483,14 +484,14 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 		values->values_num = j;
 	}
 
-	/* for count based requests check if we have more values than requested and remove them */
+	/* for count based requests remove values exceeding requested count */
 	if (0 != count)
 	{
 		while (count < values->values_num)
 			zbx_history_record_clear(&values->values[--values->values_num], value_type);
 	}
 
-	/* for time based requests check if we have values with timestamp outside requested interval and remove them */
+	/* for time based requests remove values with timestamp outside requested range */
 	if (0 != seconds)
 	{
 		zbx_timespec_t	start = {ts->sec - seconds, ts->ns};
