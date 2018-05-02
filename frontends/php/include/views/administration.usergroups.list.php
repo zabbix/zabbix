@@ -24,19 +24,22 @@ $widget = (new CWidget())
 		->cleanItems()
 		->addItem((new CList())->addItem(new CSubmit('form', _('Create user group'))))
 	)
-	->addItem((new CFilter('web.usergroup.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Name'),
+	->addItem((new CFilter())
+		->setProfile('web.usergroup.filter', 0)
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
 			(new CTextBox('filter_name', $data['filter']['name']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
-		))
-		->addColumn((new CFormList())->addRow(_('Status'),
+			),
+			(new CFormList())->addRow(_('Status'),
 			(new CRadioButtonList('filter_users_status', (int) $data['filter']['users_status']))
 				->addValue(_('Any'), -1)
 				->addValue(_('Enabled'), GROUP_STATUS_ENABLED)
 				->addValue(_('Disabled'), GROUP_STATUS_DISABLED)
 				->setModern(true)
-		))
+			)
+		])
 	);
 
 // create form

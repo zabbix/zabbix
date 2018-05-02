@@ -341,7 +341,9 @@ jQuery(function ($){
  * flickerfreeScreen refresh on timeselector change.
  */
 jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
-	window.flickerfreeScreen.refreshAll(data.from, data.to);
+	if (window.flickerfreeScreen) {
+		window.flickerfreeScreen.refreshAll(data.from, data.to);
+	}
 });
 
 // graphs timeline controls (gtlc)

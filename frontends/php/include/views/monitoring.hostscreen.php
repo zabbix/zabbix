@@ -21,9 +21,13 @@
 
 $screen_widget = new CWidget();
 
-$form = (new CFilter('web.hostscreen.filter.state'))->addNavigator();
+$form = (new CFilter())->addNavigator();
 
-$screen_widget->addItem($form);
+$screen_widget->addItem(
+	(new CFilter())
+		->setProfile('web.hostscreen.filter', 0)
+		->addTimeSelector($data['from'], $data['to'])
+);
 
 if (empty($data['screen']) || empty($data['host'])) {
 	$screen_widget

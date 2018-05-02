@@ -143,10 +143,11 @@ class CFilter extends CDiv {
 	 *
 	 * @param string $header    Tab header title string.
 	 * @param array  $columns   Array of filter columns markup.
+	 * @param array  $footer    Additional markup objects for filter tab, default null.
 	 *
 	 * @return CFilter
 	 */
-	public function addFilterTab($header, $columns) {
+	public function addFilterTab($header, $columns, $footer = null) {
 		$body = [];
 		$row = (new CDiv())->addClass(ZBX_STYLE_ROW);
 
@@ -176,6 +177,10 @@ class CFilter extends CDiv {
 						->addClass(ZBX_STYLE_BTN_ALT)
 						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 				);
+		}
+
+		if ($footer !== null) {
+			$body[] = $footer;
 		}
 
 		return $this->addTab((new CSimpleButton($header))->addClass(ZBX_STYLE_FILTER_TRIGGER), $body);

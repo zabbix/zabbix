@@ -76,7 +76,7 @@ $data = [
 	'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
 	'alias' => CProfile::get('web.auditlogs.filter.alias', ''),
 	'timeline' => calculateTime([
-		'profileIdx' => 'web.auditlogs.timeline',
+		'profileIdx' => 'web.auditlogs.filter',
 		'profileIdx2' => 0,
 		'updateProfile' => (hasRequest('from') && hasRequest('to')),
 		'from' => getRequest('from'),
@@ -151,22 +151,6 @@ if (!empty($data['actions'])) {
 
 // get paging
 $data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlogs.php'));
-
-// TODO: test/remove.
-// get timeline
-// unset($sqlWhere['from'], $sqlWhere['till']);
-
-// $sql = 'SELECT MIN(a.clock) AS clock'.
-// 		' FROM auditlog a,users u'.
-// 		' WHERE a.userid=u.userid'.
-// 			implode('', $sqlWhere);
-// $first_audit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
-// $min_start_time = ($first_audit) ? $first_audit['clock'] - 1 : null;
-
-// // Show shorter timeline.
-// if ($min_start_time !== null && $min_start_time > 0) {
-// 	$data['timeline']['from'] = $min_start_time;
-// }
 
 // render view
 $auditView = new CView('administration.auditlogs.list', $data);

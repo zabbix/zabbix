@@ -32,30 +32,30 @@ class CControllerProfileUpdate extends CController {
 
 		if ($ret) {
 			switch ($this->getInput('idx')) {
-				case 'web.actionconf.filter.state':
-				case 'web.auditacts.filter.state':
-				case 'web.auditlogs.filter.state':
+				case 'web.actionconf.filter.active':
+				case 'web.auditacts.filter.active':
+				case 'web.auditlogs.filter.active':
 				case 'web.avail_report.filter.active':
 				case 'web.charts.filter.active':
-				case 'web.correlation.filter.state':
-				case 'web.discoveryconf.filter.state':
-				case 'web.groups.filter.state':
+				case 'web.correlation.filter.active':
+				case 'web.discoveryconf.filter.active':
+				case 'web.groups.filter.active':
 				case 'web.hostinventories.filter.active':
-				case 'web.hostscreen.filter.state':
+				case 'web.hostscreen.filter.active':
 				case 'web.history.filter.state':
 				case 'web.httpconf.filter.state':
 				case 'web.httpdetails.filter.state':
-				case 'web.hosts.filter.state':
-				case 'web.items.filter.state':
+				case 'web.hosts.filter.active':
+				case 'web.items.filter.active':
 				case 'web.latest.filter.active':
-				case 'web.maintenance.filter.state':
-				case 'web.media_types.filter.state':
+				case 'web.maintenance.filter.active':
+				case 'web.media_types.filter.active':
 				case 'web.overview.filter.active':
 				case 'web.problem.filter.active':
-				case 'web.proxies.filter.state':
-				case 'web.scripts.filter.state':
-				case 'web.templates.filter.state':
-				case 'web.toptriggers.filter.state':
+				case 'web.proxies.filter.active':
+				case 'web.scripts.filter.active':
+				case 'web.templates.filter.active':
+				case 'web.toptriggers.filter.active':
 				case 'web.triggers.filter.state':
 				case 'web.tr_status.filter.active':
 				case 'web.screens.filter.state':
@@ -63,8 +63,8 @@ class CControllerProfileUpdate extends CController {
 				case 'web.slides.filter.state':
 				case 'web.slideconf.filter.state':
 				case 'web.sysmapconf.filter.state':
-				case 'web.user.filter.state':
-				case 'web.usergroup.filter.state':
+				case 'web.user.filter.active':
+				case 'web.usergroup.filter.active':
 				case 'web.dashbrd.filter.state':
 					$ret = true;
 					break;

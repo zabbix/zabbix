@@ -29,13 +29,16 @@ $widget = (new CWidget())
 		->cleanItems()
 		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
 	)
-	->addItem((new CFilter('web.scripts.filter.state'))
+	->addItem((new CFilter())
+		->setProfile('web.scripts.filter', 0)
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+		])
 		->addVar('action', 'script.list')
-		->addColumn((new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
-		))
 	);
 
 $scriptsForm = (new CForm())

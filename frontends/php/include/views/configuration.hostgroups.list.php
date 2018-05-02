@@ -33,12 +33,13 @@ $widget = (new CWidget())
 		->cleanItems()
 		->addItem((new CList())->addItem($create_button))
 	)
-	->addItem((new CFilter('web.groups.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Name'),
+	->addItem((new CFilter())
+		->setProfile('web.groups.filter', 0)
+		->addFilterTab(_('Filter'), [(new CFormList())->addRow(_('Name'),
 			(new CTextBox('filter_name', $data['filter']['name']))
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
-		))
+		)])
 	);
 
 // create form

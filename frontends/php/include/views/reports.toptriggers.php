@@ -21,9 +21,7 @@
 
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
-$filterForm = (new CFilter('web.toptriggers.filter.state'))
-	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
-	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
+$filterForm = new CFilter();
 
 // severities
 $severity_columns = [0 => [], 1 => []];
@@ -109,8 +107,10 @@ $filterColumn2 = (new CFormList())
 	]);
 
 $filterForm
-	->addColumn($filterColumn1)
-	->addColumn($filterColumn2);
+	->setProfile('web.toptriggers.filter', 0)
+	->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2])
+	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
+	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
 
 // table
 $table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of status changes')]);
