@@ -345,4 +345,28 @@ in:
 out:
   result: succeed
   value: "AB-�-C"
+---
+test case: ZBX-13782, escaped Unicode character Curling Stone U+1F94C
+in:
+  json: '{"DeviceLog": "\uD83E\uDD4C"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "🥌"
+---
+test case: ZBX-13782, several escaped Unicode characters Zanabazar Square Letter Za U+11A28
+in:
+  json: '{"DeviceLog": "\uD806\uDE28-\uD806\uDE28-\uD806\uDE28-\uD806\uDE28"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "𑨨-𑨨-𑨨-𑨨"
+---
+test case: ZBX-13782, several escaped Unicode characters Linear B Syllable B008 A U+10000
+in:
+  json: '{"DeviceLog": "\uD800\uDC00\uD800\uDC00\uD800\uDC00\uD800\uDC00"}'
+  path: $.DeviceLog
+out:
+  result: succeed
+  value: "𐀀𐀀𐀀𐀀"
 ...

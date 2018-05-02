@@ -739,7 +739,7 @@ static unsigned int	zbx_hex2num(char c)
  * Purpose: decodes JSON escape character into UTF-8                          *
  *                                                                            *
  * Parameters: p - [IN/OUT] a pointer to the first character in string        *
- *             bytes - [OUT] a 3-element array where 1 - 3 bytes of character *
+ *             bytes - [OUT] a 4-element array where 1 - 4 bytes of character *
  *                     UTF-8 representation are written                       *
  *                                                                            *
  * Return value: number of UTF-8 bytes written into 'bytes' array or          *
@@ -786,7 +786,7 @@ static int	zbx_json_decode_character(const char **p, unsigned char *bytes)
 		return 1;
 	}
 
-	if ('u' == **p)		/* \u0000 - \uFFFF can produce 1-3 bytes in UTF-8 */
+	if ('u' == **p)		/* \u0000 - \uFFFF */
 	{
 		unsigned int	num;
 
@@ -810,13 +810,42 @@ static int	zbx_json_decode_character(const char **p, unsigned char *bytes)
 			bytes[1] = (unsigned char)'\x80' | (unsigned char)(num & 0x003F);
 			return 2;
 		}
-		else			/* 0800 - FFFF */
+		else if (0xD800 > num || 0xDFFF < num)	/* 0800 - D7FF or E000 - FFFF */
 		{
 			bytes[0] = (unsigned char)'\xE0' | (unsigned char)((num & 0xF000) >> 12);
 			bytes[1] = (unsigned char)'\x80' | (unsigned char)((num & 0x0FC0) >> 6);
 			bytes[2] = (unsigned char)'\x80' | (unsigned char)(num & 0x003F);
 			return 3;
 		}
+		else if (0xD7FF < num && num < 0xDC00)	/* high surrogate D800 - DBFF */
+		{
+			unsigned int	num_lo, uc;
+
+			/* collect the low surrogate */
+
+			if ('\\' != **p || 'u' != *(++*p) || FAIL == zbx_is_valid_json_hex(++*p))
+				return 0;
+
+			num_lo = zbx_hex2num(**p) << 12;
+			num_lo += zbx_hex2num(*(++*p)) << 8;
+			num_lo += zbx_hex2num(*(++*p)) << 4;
+			num_lo += zbx_hex2num(*(++*p));
+			++*p;
+
+			if (0xDC00 > num_lo || 0xDFFF < num_lo)
+				return 0;
+
+			/* decode surrogate pair */
+
+			uc = 0x010000 + ((num & 0x03FF) << 10) + (num_lo & 0x03FF);
+
+			bytes[0] = (unsigned char)'\xF0' | (unsigned char)((uc & 0x1C0000) >> 18);
+			bytes[1] = (unsigned char)'\x80' | (unsigned char)((uc & 0x03F000) >> 12);
+			bytes[2] = (unsigned char)'\x80' | (unsigned char)((uc & 0x000FC0) >> 6);
+			bytes[3] = (unsigned char)'\x80' | (unsigned char)(uc & 0x00003F);
+			return 4;
+		}
+		/* error - low surrogate without high surrogate */
 	}
 
 	return 0;
@@ -848,7 +877,7 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 		switch (*p)
 		{
 			int		nbytes, i;
-			unsigned char	uc[3];	/* decoded \uxxxx takes 1 -3 bytes in UTF-8 */
+			unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
 
 			case '\\':
 				++p;
