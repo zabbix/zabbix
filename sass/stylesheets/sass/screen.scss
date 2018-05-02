@@ -44,7 +44,7 @@ a {
 	&:focus {
 		color: $link-hover-color;
 		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, 0.5);
+		border-bottom: 2px solid rgba($link-hover-color, 0.5)
 	}
 
 	&:active {
@@ -712,6 +712,14 @@ output {
 
 			&.red {
 				color: $red;
+			}
+
+			&.orange {
+				color: $orange;
+			}
+
+			&.yellow {
+				color: $dark-yellow;
 			}
 
 			&.green {
@@ -3979,12 +3987,20 @@ a.link-action {
 		color: $red;
 	}
 
+	&.orange {
+		color: $orange;
+	}
+
+	&.yellow {
+		color: $dark-yellow;
+	}
+
 	&.green {
 		color: $green;
 	}
 
-	&.orange {
-		color: $orange;
+	&.grey {
+		color: $font-alt-color;
 	}
 
 	&:hover {
