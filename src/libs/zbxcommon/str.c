@@ -862,21 +862,16 @@ int	parse_key(const char **exp)
 					else if (']' == *s && 0 != array)
 					{
 						array = 0;
+						s++;
 
-						while (' ' == s[1])	/* skip trailing spaces after closing ']' */
+						while (' ' == *s)	/* skip trailing spaces after closing ']' */
 							s++;
 
-						if (0 == array && ']' == s[1])
-						{
-							s++;
+						if (']' == *s)
 							goto succeed;
-						}
 
-						if (',' != s[1] && !(0 != array && ']' == s[1]))
-						{
-							s++;
+						if (',' != *s)
 							goto fail;	/* incorrect syntax */
-						}
 					}
 					else if (']' == *s && 0 == array)
 						goto succeed;
@@ -993,7 +988,7 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
  *            containing only spaces is handled as having one empty parameter *
- *            and 1 ir returned.                                              *
+ *            and 1 is returned.                                              *
  *                                                                            *
  ******************************************************************************/
 int	num_param(const char *p)
@@ -1030,7 +1025,7 @@ int	num_param(const char *p)
 				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
 					p++;
 
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+				if (',' != p[1] && '\0' != p[1])
 					return 0;	/* incorrect syntax */
 			}
 			else if (']' == *p && 0 == array)
