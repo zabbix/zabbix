@@ -64,7 +64,7 @@
 	function dashbrdApplyProperties() {
 		var dashboard = jQuery('.dashbrd-grid-widget-container'),
 			form = jQuery('[name=dashboard_properties_form]'),
-			url = new Curl('zabbix.php'),
+			url = new Curl('zabbix.php', false),
 			form_data = {};
 
 		form.trimValues(['#name']);
@@ -74,6 +74,8 @@
 		jQuery.ajax({
 			data: form_data,
 			url: url.getUrl(),
+			dataType: 'json',
+			method: 'POST',
 			success: function (response) {
 				var errors = [];
 				form.parent().find('>.msg-good, >.msg-bad').remove();
@@ -104,13 +106,15 @@
 
 	function dashbrdConfirmSharing() {
 		var form = jQuery('[name=dashboard_sharing_form]'),
-			url = new Curl('zabbix.php');
+			url = new Curl('zabbix.php', false);
 
 		url.setArgument('action', 'dashboard.share.update');
 
 		jQuery.ajax({
-			data: form.serialize(),
 			url: url.getUrl(),
+			data: form.serializeJSON(),
+			dataType: 'json',
+			method: 'POST',
 			success: function (response) {
 				var errors = [],
 					messages = [];
