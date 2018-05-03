@@ -226,14 +226,14 @@ jQuery(function ($){
 		anchor = null,
 		noclick_area = null;
 
-	$(document).on('mousedown', 'img', dragStartSelectionHandle);
+	$(document).on('mousedown', 'img', selectionHandlerdragStart);
 
 	/**
 	 * Handle selection box drag start event.
 	 *
 	 * @param {object} e    jQuery event object.
 	 */
-	function dragStartSelectionHandle(e) {
+	function selectionHandlerdragStart(e) {
 		if (e.which !== 1) {
 			return;
 		}
