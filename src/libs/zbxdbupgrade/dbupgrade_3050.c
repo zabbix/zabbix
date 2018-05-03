@@ -750,6 +750,16 @@ static int	DBpatch_3050066(void)
 
 static int	DBpatch_3050067(void)
 {
+	return DBdrop_field("config", "event_expire");
+}
+
+static int	DBpatch_3050068(void)
+{
+	return DBdrop_field("config", "event_show_max");
+}
+
+static int	DBpatch_3050069(void)
+{
 	int	res;
 
 	res = DBexecute(
@@ -839,5 +849,7 @@ DBPATCH_ADD(3050064, 0, 1)
 DBPATCH_ADD(3050065, 0, 1)
 DBPATCH_ADD(3050066, 0, 1)
 DBPATCH_ADD(3050067, 0, 1)
+DBPATCH_ADD(3050068, 0, 1)
+DBPATCH_ADD(3050069, 0, 1)
 
 DBPATCH_END()

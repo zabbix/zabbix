@@ -547,8 +547,6 @@ FIELD		|refresh_unsupported|t_varchar(32)|'10m'	|NOT NULL	|ZBX_PROXY
 FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|event_expire	|t_varchar(32)	|'1w'	|NOT NULL	|ZBX_NODATA
-FIELD		|event_show_max	|t_integer	|'100'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
 FIELD		|authentication_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_host	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
@@ -1622,4 +1620,4 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050067	|3050067
+ROW		|3050069	|3050069
