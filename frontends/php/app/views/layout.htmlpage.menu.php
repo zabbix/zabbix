@@ -28,7 +28,7 @@ $user_navigation = (new CList())
 					->setAttribute('autocomplete', 'off')
 					->addClass(ZBX_STYLE_SEARCH),
 				(new CSubmitButton(SPACE))
-					->setAttribute('disabled', 'disabled')
+					->setEnabled(false)
 					->addClass(ZBX_STYLE_BTN_SEARCH)
 			])
 			->setAttribute('role', 'search')
