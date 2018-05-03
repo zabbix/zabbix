@@ -2630,20 +2630,20 @@ function relativeDateToText($start, $end) {
 	$key = $start.':'.$end;
 
 	$ranges = [
-		'now-1d/d:now-1d/d' => 'Yesterday',
-		'now-2d/d:now-2d/d' => 'Day before yesterday',
-		'now-1w/d:now-1w/d' => 'This day last week',
-		'now-1w/w:now-1w/w' => 'Previous week',
-		'now-1M/M:now-1M/M' => 'Previous month',
-		'now-1y/y:now-1y/y' => 'Previous year',
-		'now/d:now/d' => 'Today',
-		'now/d:now' => 'Today so far',
-		'now/w:now/w' => 'This week',
-		'now/w:now' => 'This week so far',
-		'now/M:now/M' => 'This month',
-		'now/M:now' => 'This month so far',
-		'now/y:now/y' => 'This year',
-		'now/y:now' => 'This year so far'
+		'now-1d/d:now-1d/d' => _('Yesterday'),
+		'now-2d/d:now-2d/d' => _('Day before yesterday'),
+		'now-1w/d:now-1w/d' => _('This day last week'),
+		'now-1w/w:now-1w/w' => _('Previous week'),
+		'now-1M/M:now-1M/M' => _('Previous month'),
+		'now-1y/y:now-1y/y' => _('Previous year'),
+		'now/d:now/d' => _('Today'),
+		'now/d:now' => _('Today so far'),
+		'now/w:now/w' => _('This week'),
+		'now/w:now' => _('This week so far'),
+		'now/M:now/M' => _('This month'),
+		'now/M:now' => _('This month so far'),
+		'now/y:now/y' => _('This year'),
+		'now/y:now' => _('This year so far')
 	];
 
 	if (array_key_exists($key, $ranges)) {

@@ -104,7 +104,7 @@
 				ajax_url.setArgument('to', screen.timeline.to);
 			}
 
-			switch (screen.resourcetype) {
+			switch (parseInt(screen.resourcetype, 10)) {
 				// SCREEN_RESOURCE_GRAPH
 				case 0:
 					// falls through
@@ -398,7 +398,9 @@
 					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 						// 'src' should be added only here to trigger load event after new height is received.
 						var zbx_sbox = domImg.data('zbx_sbox');
-						url.setArgument('_', request_start);
+						// Prevent image being cached.
+						url.setArgument('_', request_start.toString(34));
+
 						img.data('zbx_sbox', $.extend(zbx_sbox, {
 							height: parseInt(height, 10),
 							period: screen.timeline.period,
