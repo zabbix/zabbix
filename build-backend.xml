@@ -274,36 +274,51 @@
 
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
-
-	<target name="mock-tests">
+	
+	<macrodef name="make-tests">
+		<!-- Build Zabbix C mock tests with the specified command line arguments -->
+		<attribute name="conf"/>
+		<attribute name="conf-name"/>
+		<sequential>
+			<!-- clean, configure and build -->
+			<exec executable="@{conf}" failonerror="on">
+			</exec>
+			<trycatch>
+				<try>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="tests_build"/>
+					</exec>
+					<exec executable="tests/tests_run.pl" failonerror="on" output="output_@{conf-name}.xml"></exec>
+				</try>
+				<finally>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="clean"/>
+					</exec>
+				</finally>
+			</trycatch>
+		</sequential>
+	</macrodef>
+	
+	<target name="init-cmock-test-conf-options">
+		<!-- Zabbix various configuration parameters for C mock tests -->
+		<property name="conf1" value="./configure -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="conf2" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' ./configure -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+	</target>
+	
+	<target name="mock-tests" depends="init-cmock-test-conf-options">
 		<!-- Build Zabbix with C mock tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<exec executable="./configure" failonerror="on">
-			<arg line="-q"/>
-			<arg line="--enable-server"/>
-			<arg line="--enable-agent"/>
-			<arg line="--enable-proxy"/>
-			<arg line="--enable-ipv6"/>
-			<arg line="--with-mysql"/>
-			<arg line="--with-jabber"/>
-			<arg line="--with-libxml2"/>
-			<arg line="--with-unixodbc"/>
-			<arg line="--with-net-snmp"/>
-			<arg line="--with-ssh2"/>
-			<arg line="--with-openipmi"/>
-			<arg line="--with-libevent"/>
-			<arg line="--with-mbedtls"/>
-			<arg line="--with-ldap"/>
-			<arg line="--with-libcurl"/>
-			<arg line="--with-iconv"/>
-			<arg line="--with-libpcre"/>
-		</exec>
-		<exec executable="make" failonerror="on">
-			<arg line="-s"/>
-			<arg line="-j5"/>
-			<arg line="tests_build"/>
-		</exec>
-		<exec executable="tests/tests_run.pl" failonerror="on" output="output.xml"></exec>
+		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
+		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
+		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>
+				<make-tests conf="${@{name}}" conf-name="@{name}"/>
+			</sequential>
+		</for>
 	</target>
 
 	<target name="run-unit-test">
