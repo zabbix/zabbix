@@ -348,8 +348,8 @@
 #	include <math.h>
 #endif
 
-#ifdef HAVE_PCREPOSIX_H
-#	include <pcreposix.h>
+#ifdef HAVE_PCRE_H
+#	include <pcre.h>
 #endif
 
 #ifdef HAVE_VM_VM_PARAM_H

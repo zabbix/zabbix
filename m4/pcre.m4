@@ -3,7 +3,7 @@
 #
 # Checks for pcre.
 #
-# This macro #defines HAVE_PCREPOSIX_H if required header files are
+# This macro #defines HAVE_PCRE_H if required header files are
 # found, and sets @LIBPCRE_LDFLAGS@ and @LIBPCRE_CFLAGS@ to the necessary
 # values.
 #
@@ -15,13 +15,13 @@ AC_DEFUN([LIBPCRE_TRY_LINK],
 [
 AC_TRY_LINK(
 [
-#include <pcreposix.h>
+#include <pcre.h>
 ],
 [
-	regex_t	re = {0};
-
-	regcomp(&re, "test", 0);
-	regfree(&re);
+	const char* error = NULL;
+	int error_offset = -1;
+	pcre *regexp = pcre_compile("test", PCRE_UTF8, error, error_offset, 0);
+	pcre_free(regexp);
 ],
 found_libpcre="yes")
 ])dnl
@@ -60,24 +60,24 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 
 	AC_MSG_CHECKING(for libpcre support)
 
-	LIBPCRE_LIBS="-lpcreposix -lpcre"
+	LIBPCRE_LIBS="-lpcre"
 
 	if test "x$enable_static" = "xyes"; then
 		LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
 	fi
 
-	if test -n "$_libpcre_dir_set" -o -f /usr/include/pcreposix.h; then
+	if test -n "$_libpcre_dir_set" -o -f /usr/include/pcre.h; then
 		found_libpcre="yes"
-	elif test -f /usr/local/include/pcreposix.h; then
+	elif test -f /usr/local/include/pcre.h; then
 		LIBPCRE_CFLAGS="-I/usr/local/include"
 		LIBPCRE_LDFLAGS="-L/usr/local/lib"
 		found_libpcre="yes"
-	elif test -f /usr/pkg/include/pcreposix.h; then
+	elif test -f /usr/pkg/include/pcre.h; then
 		LIBPCRE_CFLAGS="-I/usr/pkg/include"
 		LIBPCRE_LDFLAGS="-L/usr/pkg/lib"
 		LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS -Wl,-R/usr/pkg/lib"
 		found_libpcre="yes"
-	elif test -f /opt/csw/include/pcreposix.h; then
+	elif test -f /opt/csw/include/pcre.h; then
 		LIBPCRE_CFLAGS="-I/opt/csw/include"
 		LIBPCRE_LDFLAGS="-L/opt/csw/lib"
 		if $(echo "$CFLAGS"|grep -q -- "-m64") ; then
@@ -109,7 +109,7 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 	fi
 
 	if test "x$found_libpcre" = "xyes"; then
-		AC_DEFINE([HAVE_PCREPOSIX_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcreposix -lpcre)])
+		AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
 		AC_MSG_RESULT(yes)
 	else
 		LIBPCRE_CFLAGS=""
