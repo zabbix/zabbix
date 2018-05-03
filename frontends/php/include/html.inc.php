@@ -213,7 +213,7 @@ function get_icon($type, $params = []) {
 			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_RESET)
 				->setTitle(_('Reset'))
-				->onClick('timeControl.objectReset();');
+				->onClick('timeControl.objectReset("'.ZBX_PERIOD_DEFAULT.'", "now");');
 	}
 }
 

@@ -56,7 +56,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.scripts.filter.active':
 				case 'web.templates.filter.active':
 				case 'web.toptriggers.filter.active':
-				case 'web.triggers.filter.state':
+				case 'web.triggers.filter.active':
 				case 'web.tr_status.filter.active':
 				case 'web.screens.filter.active':
 				case 'web.screenconf.filter.active':

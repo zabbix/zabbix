@@ -167,6 +167,8 @@ jQuery(function ($){
 
 	/**
 	 * Show or hide associated to button calendar picker.
+	 *
+	 * @param {object} e    jQuery event object.
 	 */
 	function toggleCalendarPickerHandler(e) {
 		var button = $(this,)
@@ -224,14 +226,14 @@ jQuery(function ($){
 		anchor = null,
 		noclick_area = null;
 
-	$(document).on('mousedown', 'img', selectionHandleDragStart);
+	$(document).on('mousedown', 'img', dragStartSelectionHandle);
 
 	/**
 	 * Handle selection box drag start event.
 	 *
 	 * @param {object} e    jQuery event object.
 	 */
-	function selectionHandleDragStart(e) {
+	function dragStartSelectionHandle(e) {
 		if (e.which !== 1) {
 			return;
 		}
@@ -255,9 +257,9 @@ jQuery(function ($){
 		data = data.zbx_sbox;
 
 		var offset = target.offset(),
-			left = offset.left - 10 + data.left,
-			right = offset.left - 10 + target.width() - data.right,
-			xpos = Math.min(Math.max(left, e.pageX), right);
+			left = data.left,
+			right = target.outerWidth() - data.right,
+			xpos = Math.min(Math.max(left, e.pageX - offset.left), right);
 
 		offset.top += data.top;
 		if ((e.pageY < offset.top) || e.pageY > offset.top + data.height) {
@@ -269,7 +271,8 @@ jQuery(function ($){
 			top: 0,
 			left: 0,
 			height: target.outerHeight() + 'px',
-			width: target.outerWidth() + 'px'
+			width: target.outerWidth() + 'px',
+			overflow: 'hidden'
 		}).insertAfter(target);
 
 		selection = {
@@ -279,12 +282,13 @@ jQuery(function ($){
 				left: xpos,
 				height: data.height + 'px',
 				width: '1px'
-			}).insertAfter(noclick_area),
+			}).appendTo(noclick_area),
+			offset: offset,
 			min: left,
 			max: right,
 			base_x: xpos,
-			seconds_per_px: parseInt(data.period/(right - left)),
-			from_ts: data.timestamp
+			seconds_per_px: (data.to_ts - data.from_ts)/(right - left),
+			from_ts: data.from_ts
 		}
 
 		$(document)
@@ -324,7 +328,7 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandlerDrag(e) {
-		var x = Math.min(Math.max(selection.min, e.pageX), selection.max),
+		var x = Math.min(Math.max(selection.min, e.pageX - selection.offset.left), selection.max),
 			width = Math.abs(x - selection.base_x),
 			seconds = Math.round(width * selection.seconds_per_px),
 			label = formatTimestamp(seconds, false, true)
@@ -377,9 +381,7 @@ var timeControl = {
 
 			var objectUpdate = this.objectUpdate.bind(this.objectList[id]);
 			jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
-				timeControl.objectList[id].timeline.from = data.from;
-				timeControl.objectList[id].timeline.to = data.to;
-				objectUpdate();
+				objectUpdate(data);
 			});
 		}
 	},
@@ -424,7 +426,7 @@ var timeControl = {
 
 				// refresh
 				if (obj.timeline.refreshable) {
-					this.refreshImage(obj);
+					this.refreshImage(id);
 				}
 			}
 		}
@@ -443,8 +445,8 @@ var timeControl = {
 					left: obj.objDims.shiftXleft,
 					right: obj.objDims.shiftXright,
 					top: obj.objDims.shiftYtop,
-					period: obj.timeline.to_ts - obj.timeline.from_ts,
-					timestamp: obj.timeline.from_ts
+					from_ts: obj.timeline.from_ts,
+					to_ts: obj.timeline.to_ts
 				}).attr('src', obj.src);
 			});
 
@@ -457,31 +459,32 @@ var timeControl = {
 		img.data('to', obj.timeline.to);
 	},
 
-	refreshImage: function(obj) {
+	refreshImage: function(id) {
 		// image
-		var id = obj.id,
+		var obj = this.objectList[id],
 			url = new Curl(obj.src);
 		url.setArgument('from', obj.timeline.from);
 		url.setArgument('to', obj.timeline.to);
 
-		var img = jQuery('#' + id).clone()
+		var img = jQuery('#' + id),
+			clone = img.clone()
 				.on('load', function() {
-					jQuery(this).unbind('load');
-					jQuery('#' + id).attr('src', jQuery(this).attr('src'));
-
 					// Update dashboard widget footer.
 					if (obj.onDashboard) {
 						timeControl.updateDashboardFooter(id);
 					}
 				}),
 			async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+				// Prevent image caching.
+				url.setArgument('_', obj.timeline.from_ts.toString(34));
+
 				img.data('zbx_sbox', {
 					height: parseInt(height, 10),
 					left: obj.objDims.shiftXleft,
 					right: obj.objDims.shiftXright,
 					top: obj.objDims.shiftYtop,
-					period: obj.timeline.period,
-					timestamp: obj.timeline.from_ts
+					from_ts: obj.timeline.from_ts,
+					to_ts: obj.timeline.to_ts
 				}).attr('src', url.getUrl());
 			});
 
@@ -563,34 +566,41 @@ var timeControl = {
 		}
 	},
 
-	objectUpdate: function() {
+	/**
+	 * Update object timeline data. Will reload page when timeConrol.refreshPage is set to true.
+	 *
+	 * @param {object} data     Object passed by 'timeselector.rangeupdate'.
+	 */
+	objectUpdate: function(data) {
 		if (timeControl.refreshPage) {
 			var url = new Curl(location.href);
-			url.setArgument('from', this.timeline.from);
-			url.setArgument('to', this.timeline.to);
-			url.unsetArgument('output');
-
-			location.href = url.getUrl();
-		}
-		// Profile data will be updated in timeselector.rangeupdate event.
-	},
-
-	objectReset: function() {
-		// TODO: Should be saved as some kind of 'default' setting. Is used by webscenario, graph
-		// http://z/trunk/frontends/php/httpdetails.php?httptestid=1
-		this.timeline.to = 'now';
-		this.timeline.from = 'now-1h';
-
-		if (this.refreshPage) {
-			var url = new Curl(location.href);
-			url.setArgument('from', this.timeline.from);
-			url.setArgument('to', this.timeline.to);
+			url.setArgument('from', data.from);
+			url.setArgument('to', data.to);
 			url.unsetArgument('output');
 
 			location.href = url.getUrl();
 		}
 		else {
-			jQuery.publish('timeselector.rangechange', {from: this.timeline.from, to: this.timeline.to});
+			this.timeline = jQuery.extend(this.timeline, {
+				from: data.from,
+				from_ts: data.from_ts,
+				to: data.to,
+				to_ts: data.to_ts
+			});
+		}
+	},
+
+	objectReset: function(from, to) {
+		if (this.refreshPage) {
+			var url = new Curl(location.href);
+			url.setArgument('from', from);
+			url.setArgument('to', to);
+			url.unsetArgument('output');
+
+			location.href = url.getUrl();
+		}
+		else {
+			jQuery.publish('timeselector.rangechange', {from: from, to: to});
 		}
 	}
 };

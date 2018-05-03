@@ -398,13 +398,13 @@
 					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 						// 'src' should be added only here to trigger load event after new height is received.
 						var zbx_sbox = domImg.data('zbx_sbox');
-						// Prevent image being cached.
+						// Prevent image caching.
 						url.setArgument('_', request_start.toString(34));
 
 						img.data('zbx_sbox', $.extend(zbx_sbox, {
 							height: parseInt(height, 10),
-							period: screen.timeline.period,
-							timestamp: screen.timeline.from_ts
+							from_ts: screen.timeline.from_ts,
+							to_ts: screen.timeline.to_ts
 						})).attr('src', url.getUrl());
 					});
 					if (async === null) {
