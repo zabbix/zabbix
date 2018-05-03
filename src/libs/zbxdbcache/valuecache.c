@@ -2285,9 +2285,6 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
 	return freed;
 }
 
-#include <setjmp.h>
-#include "cmocka.h"
-
 /******************************************************************************************************************
  *                                                                                                                *
  * Public API                                                                                                     *
