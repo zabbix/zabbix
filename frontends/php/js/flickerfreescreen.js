@@ -426,6 +426,9 @@
 		 */
 		getImageSboxHeight: function (url, cb) {
 			if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(url.getPath()) > -1) {
+				// Prevent request caching.
+				url.setArgument('_', (new Date).getTime().toString(34));
+
 				return $.get(url.getUrl(), {'onlyHeight': 1}, 'json')
 					.success(function(response, status, xhr) {
 						cb(xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'))

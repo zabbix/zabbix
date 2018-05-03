@@ -476,10 +476,7 @@ class CScreenHistory extends CScreenBase {
 
 			$this->dataId = 'historyGraph';
 
-			$timeControlData = [
-				'periodFixed' => CProfile::get('web.history.timelinefixed', 1),
-				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-			];
+			$timeControlData = [];
 
 			if (($this->action == HISTORY_GRAPH || $this->action == HISTORY_BATCH_GRAPH) && !isset($iv_string[$firstItem['value_type']])) {
 				$containerId = 'graph_cont1';

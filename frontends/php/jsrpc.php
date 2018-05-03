@@ -487,8 +487,8 @@ switch ($data['method']) {
 		$now_ts = time();
 		$from = $data['from'];
 		$to = $data['to'];
-		$from_datetime = $from !== '' ? parseRelativeDate($data['from'], true) : null;
-		$to_datetime = $to !== '' ? parseRelativeDate($data['to'], false) : null;
+		$from_datetime = $from !== '' ? parseRelativeDate($from, true) : null;
+		$to_datetime = $to !== '' ? parseRelativeDate($to, false) : null;
 
 		if ($from_datetime instanceof DateTimeImmutable && $to_datetime instanceof DateTimeImmutable
 				&& $from_datetime < $to_datetime
@@ -496,7 +496,7 @@ switch ($data['method']) {
 			$to_ts = $to_datetime->getTimestamp();
 			$from_ts = $from_datetime->getTimestamp();
 
-			$range = $to_ts - $from_ts;
+			$range = $to_ts - $from_ts + 1;
 			// (gch)TODO: ZBX_MAX_PERIOD and it usage should be changed from seconds to year value (2y).
 			$min_date = parseRelativeDate('now-2y', true)->getTimestamp();
 
@@ -543,6 +543,11 @@ switch ($data['method']) {
 				'can_decrement' => $from_ts - $range >= $min_date,
 				'can_increment' => $to_ts + $range <= $now_ts
 			];
+
+			if ($data['method'] !== 'timeselector.rangechange') {
+				$result['from'] = $result['from_date'];
+				$result['to'] = $result['to_date'];
+			}
 
 			if ($data['idx'] !== null && $from_datetime !== null && $to_datetime !== null) {
 				CProfile::update($data['idx'].'.from', $from, PROFILE_TYPE_STR, $data['idx2']);

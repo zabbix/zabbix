@@ -137,9 +137,10 @@ jQuery(function ($){
 		element.to.val(is_timestamp.test(data['to']) ? data['to_date'] : data['to']);
 		element.label.text(data.label);
 
-		$([element.from[0], element.to[0], element.apply[0], element.decrement[0], element.zoomout[0],
-			element.increment[0]
-		]).attr('disabled', false);
+		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', false);
+		element.decrement.attr('disabled', !data.can_decrement);
+		element.zoomout.attr('disabled', !data.can_zoomout);
+		element.increment.attr('disabled', !data.can_increment);
 
 		element.from_clndr.data('clndr').clndr.clndrhide();
 		element.to_clndr.data('clndr').clndr.clndrhide();
@@ -147,6 +148,9 @@ jQuery(function ($){
 		if (data.collapse) {
 			element.label.closest('.ui-tabs-collapsible').tabs('option', 'active', false);
 		}
+
+		element.quickranges.removeClass('selected');
+		element.quickranges.filter('[data-from="'+data.from+'"][data-to="'+data.to+'"]').addClass('selected');
 
 		element.apply.closest('.ui-tabs-panel').removeClass('in-progress');
 		ui_disabled = false;
@@ -226,14 +230,14 @@ jQuery(function ($){
 		anchor = null,
 		noclick_area = null;
 
-	$(document).on('mousedown', 'img', selectionHandlerdragStart);
+	$(document).on('mousedown', 'img', selectionHandlerDragStart);
 
 	/**
 	 * Handle selection box drag start event.
 	 *
 	 * @param {object} e    jQuery event object.
 	 */
-	function selectionHandlerdragStart(e) {
+	function selectionHandlerDragStart(e) {
 		if (e.which !== 1) {
 			return;
 		}
@@ -304,7 +308,7 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandlerDragEnd(e) {
-		var from = selection.from_ts + (selection.dom.offset().left - selection.min) * selection.seconds_per_px,
+		var from = selection.from_ts + (selection.offset.left - selection.min) * selection.seconds_per_px,
 			to = from + selection.dom.width() * selection.seconds_per_px;
 
 		selection.dom.remove();
@@ -434,29 +438,27 @@ var timeControl = {
 
 	addImage: function(id) {
 		var obj = this.objectList[id],
-			img = jQuery('#' + id);
+			img = jQuery('#' + id),
+			zbx_sbox = {
+				left: obj.objDims.shiftXleft,
+				right: obj.objDims.shiftXright,
+				top: obj.objDims.shiftYtop,
+				from_ts: obj.timeline.from_ts,
+				to_ts: obj.timeline.to_ts
+			}
 
 		if (img.length == 0) {
 			img = jQuery('<img/>').attr('id', id).appendTo(('#'+obj.containerid));
 
 			var xhr = flickerfreeScreen.getImageSboxHeight(new Curl(obj.src), function (height) {
-				img.data('zbx_sbox', {
-					height: parseInt(height, 10),
-					left: obj.objDims.shiftXleft,
-					right: obj.objDims.shiftXright,
-					top: obj.objDims.shiftYtop,
-					from_ts: obj.timeline.from_ts,
-					to_ts: obj.timeline.to_ts
-				}).attr('src', obj.src);
+				zbx_sbox.height = parseInt(height, 10);
+				img.data('zbx_sbox', zbx_sbox).attr('src', obj.src);
 			});
 
 			if (xhr === null) {
 				img.attr('src', obj.src);
 			}
 		}
-
-		img.data('from', obj.timeline.from);
-		img.data('to', obj.timeline.to);
 	},
 
 	refreshImage: function(id) {
@@ -466,8 +468,10 @@ var timeControl = {
 		url.setArgument('from', obj.timeline.from);
 		url.setArgument('to', obj.timeline.to);
 
-		var img = jQuery('#' + id),
-			clone = img.clone()
+		var debug;
+
+		var img = jQuery('#' + id)
+				.unbind('load')
 				.on('load', function() {
 					// Update dashboard widget footer.
 					if (obj.onDashboard) {
@@ -476,7 +480,7 @@ var timeControl = {
 				}),
 			async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 				// Prevent image caching.
-				url.setArgument('_', obj.timeline.from_ts.toString(34));
+				url.setArgument('_', obj.timeline.to_ts.toString(34));
 
 				img.data('zbx_sbox', {
 					height: parseInt(height, 10),

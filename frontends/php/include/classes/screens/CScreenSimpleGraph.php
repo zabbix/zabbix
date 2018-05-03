@@ -39,9 +39,7 @@ class CScreenSimpleGraph extends CScreenBase {
 			'id' => $this->getDataId(),
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
-			'loadImage' => 1,
-			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+			'loadImage' => 1
 		];
 
 		// host feature

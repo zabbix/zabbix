@@ -72,9 +72,7 @@ class CScreenChart extends CScreenBase {
 			'objDims' => $graphDims,
 			'loadSBox' => $loadSBox,
 			'loadImage' => 1,
-			'dynamic' => 1,
-			'periodFixed' => CProfile::get($this->profileIdx.'.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+			'dynamic' => 1
 		];
 
 		// output
