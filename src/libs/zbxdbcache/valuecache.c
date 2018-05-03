@@ -2116,10 +2116,19 @@ static void	vch_item_get_values_by_time_and_count(zbx_vc_item_t *item, zbx_vecto
 {
 	int		index, now, range_timestamp;
 	zbx_vc_chunk_t	*chunk;
-	zbx_timespec_t	start = {0, ts->ns};
+	zbx_timespec_t	start;
 
+	/* set start timestamp of the requested time period */
 	if (0 != seconds)
+	{
 		start.sec = ts->sec - seconds;
+		start.ns = ts->ns;
+	}
+	else
+	{
+		start.sec = 0;
+		start.ns = 0;
+	}
 
 	if (FAIL == vch_item_get_last_value(item, ts, &chunk, &index))
 	{
@@ -2127,8 +2136,8 @@ static void	vch_item_get_values_by_time_and_count(zbx_vc_item_t *item, zbx_vecto
 		goto out;
 	}
 
-	/* fill the values vector with item history values until the <count> values are read */
-	/* or no more values within specified time period                                    */
+	/* fill the values vector with item history values until the <count> values are read    */
+	/* or no more values within specified time period                                       */
 	/* fill the values vector with item history values until the start timestamp is reached */
 	while (0 < zbx_timespec_compare(&chunk->slots[chunk->last_value].timestamp, &start))
 	{
