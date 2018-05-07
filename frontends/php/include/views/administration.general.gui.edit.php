@@ -58,9 +58,6 @@ $guiTab = (new CFormList())
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
-	->addRow(_('Enable event acknowledgement'),
-		(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)
-	)
 	->addRow(_('Show warning if Zabbix server is down'),
 		(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))
 			->setChecked($data['server_check_interval'] == SERVER_CHECK_INTERVAL)

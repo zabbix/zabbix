@@ -802,9 +802,6 @@ function getSelementsInfo($sysmap, array $options = []) {
 		$options['severity_min'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	}
 
-	$config = select_config();
-	$showUnacknowledged = $config['event_ack_enable'] ? $sysmap['show_unack'] : EXTACK_OPTION_ALL;
-
 	$triggerIdToSelementIds = [];
 	$subSysmapTriggerIdToSelementIds = [];
 	$hostGroupIdToSelementIds = [];
@@ -817,7 +814,6 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'output' => API_OUTPUT_EXTEND
 		]);
 		$iconMap = reset($iconMap);
-
 	}
 	$hostsToGetInventories = [];
 
@@ -1041,6 +1037,9 @@ function getSelementsInfo($sysmap, array $options = []) {
 		);
 	}
 
+	$config = select_config();
+	$blink_period = timeUnitToSeconds($config['blink_period']);
+
 	$info = [];
 	foreach ($selements as $selementId => $selement) {
 		$i = [
@@ -1128,8 +1127,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 						}
 					}
 
-					$i['latelyChanged'] |=
-						((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
+					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $blink_period);
 				}
 			}
 		}
@@ -1166,11 +1164,11 @@ function getSelementsInfo($sysmap, array $options = []) {
 
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$info[$selementId] = getMapsInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId] = getMapsInfo($selement, $i, $sysmap['show_unack']);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$info[$selementId] = getHostGroupsInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId] = getHostGroupsInfo($selement, $i, $sysmap['show_unack']);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
@@ -1179,7 +1177,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 					$i['maintenance_title'] = $mnt['name'];
 				}
 
-				$info[$selementId] = getHostsInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId] = getHostsInfo($selement, $i, $sysmap['show_unack']);
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
 					$info[$selementId]['iconid'] = getIconByMapping($iconMap,
 						$hostInventories[$selement['elements'][0]['hostid']]
@@ -1198,7 +1196,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 					}
 				}
 
-				$info[$selementId] = getTriggersInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId] = getTriggersInfo($selement, $i, $sysmap['show_unack']);
 				$info[$selementId]['triggerid'] = $critical_triggerid;
 				break;
 
@@ -2103,7 +2101,7 @@ function getMapHighligts($map, $map_info) {
 		$highlights[$id] = [
 			'st' =>  $st_color,
 			'hl' => $hl_color,
-			'ack' => ($hl_color !== null && isset($elementInfo['ack']) && $elementInfo['ack'] && $config['event_ack_enable'])
+			'ack' => ($hl_color !== null && array_key_exists('ack', $elementInfo) && $elementInfo['ack'])
 		];
 	}
 

@@ -243,9 +243,6 @@ function update_config($config) {
 		if (array_key_exists('default_theme', $config)) {
 			$msg[] = _s('Default theme "%1$s".', $config['default_theme']);
 		}
-		if (array_key_exists('event_ack_enable', $config)) {
-			$msg[] = _s('Event acknowledges "%1$s".', $config['event_ack_enable']);
-		}
 		if (array_key_exists('dropdown_first_entry', $config)) {
 			$msg[] = _s('Dropdown first entry "%1$s".', $config['dropdown_first_entry']);
 		}

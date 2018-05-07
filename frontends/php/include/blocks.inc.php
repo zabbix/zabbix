@@ -34,19 +34,17 @@ require_once dirname(__FILE__).'/users.inc.php';
  * @param int    $filter['maintenance']        (optional)
  * @param int    $filter['hide_empty_groups']  (optional)
  * @param int    $filter['ext_ack']            (optional)
- * @param array  $config
- * @param int    $config['event_ack_enable']
  *
  * @return array
  */
-function getSystemStatusData(array $filter, array $config) {
+function getSystemStatusData(array $filter) {
 	$filter_groupids = (array_key_exists('groupids', $filter) && $filter['groupids']) ? $filter['groupids'] : null;
 	$filter_hostids = (array_key_exists('hostids', $filter) && $filter['hostids']) ? $filter['hostids'] : null;
 	$filter_triggerids = null;
 	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
 		? $filter['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
-	$filter_ext_ack = $config['event_ack_enable'] && array_key_exists('ext_ack', $filter)
+	$filter_ext_ack = array_key_exists('ext_ack', $filter)
 		? $filter['ext_ack']
 		: EXTACK_OPTION_ALL;
 
@@ -179,8 +177,7 @@ function getSystemStatusData(array $filter, array $config) {
 		}
 
 		// Get acknowledges and tags.
-		$problems_data = ($config['event_ack_enable']
-				&& in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))
+		$problems_data = in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])
 			? API::Event()->get([
 				'output' => [],
 				'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
@@ -298,7 +295,6 @@ function getSystemStatusData(array $filter, array $config) {
  * @param array  $data['triggers'][<triggerid>]['hosts']
  * @param string $data['triggers'][<triggerid>]['hosts'][]['name']
  * @param array  $config
- * @param int    $config['event_ack_enable']
  * @param string $config['severity_name_*']
  * @param string $backurl
  * @param int    $fullscreen
@@ -310,7 +306,7 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 		? $filter['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 	$filter_hide_empty_groups = array_key_exists('hide_empty_groups', $filter) ? $filter['hide_empty_groups'] : 0;
-	$filter_ext_ack = $config['event_ack_enable'] && array_key_exists('ext_ack', $filter)
+	$filter_ext_ack = array_key_exists('ext_ack', $filter)
 		? $filter['ext_ack']
 		: EXTACK_OPTION_ALL;
 
@@ -362,17 +358,13 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 			$allTriggersNum = $stat['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CLinkAction($allTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $backurl, $data['actions'],
-						$config
-					));
+					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $backurl, $data['actions']));
 			}
 
 			$unackTriggersNum = $stat['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = (new CLinkAction($unackTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $backurl, $data['actions'],
-						$config
-					));
+					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $backurl, $data['actions']));
 			}
 
 			switch ($filter_ext_ack) {
@@ -560,9 +552,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 	}
 
-	$config = select_config();
-
-	if ($config['event_ack_enable'] && $events) {
+	if ($events) {
 		$event_acknowledges = API::Event()->get([
 			'output' => ['eventid'],
 			'eventids' => array_keys($events),
@@ -589,7 +579,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 				: _('Last change'),
 			_('Age'),
 			_('Info'),
-			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Ack'),
 			_('Actions')
 		]);
 
@@ -680,25 +670,21 @@ function make_latest_issues(array $filter = [], $backurl) {
 			]));
 		}
 
-		if ($config['event_ack_enable']) {
-			if (array_key_exists('lastEvent', $trigger)) {
-				$trigger['lastEvent']['acknowledges'] =
-					$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
+		if (array_key_exists('lastEvent', $trigger)) {
+			$trigger['lastEvent']['acknowledges'] =
+				$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
 
-				$ack = getEventAckState($trigger['lastEvent'], $backurl);
-			}
-			else
-				$ack = (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
+			$ack = getEventAckState($trigger['lastEvent'], $backurl);
 		}
 		else {
-			$ack = null;
+			$ack = (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 
 		// description
 		if (array_key_exists('lastEvent', $trigger) || $trigger['comments'] !== '' || $trigger['url'] !== '') {
 			$eventid = array_key_exists('lastEvent', $trigger) ? $trigger['lastEvent']['eventid'] : 0;
 			$description = (new CLinkAction($description))
-				->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $config),'', true, 'max-width: 500px');
+				->setHint(make_popup_eventlist($trigger, $eventid, $backurl),'', true, 'max-width: 500px');
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 
@@ -761,12 +747,10 @@ function make_latest_issues(array $filter = [], $backurl) {
  * @param string $triggers[<triggerid>]['hosts'][]['name']
  * @param string $backurl
  * @param array  $actions
- * @param array  $config
- * @param int    $config['event_ack_enable']
  *
  * @return CTableInfo
  */
-function makeProblemsPopup(array $problems, array $triggers, $backurl, array $actions, array $config) {
+function makeProblemsPopup(array $problems, array $triggers, $backurl, array $actions) {
 	if ($problems) {
 		$tags = makeEventsTags($problems);
 	}
@@ -776,7 +760,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			_('Host'),
 			_('Problem'),
 			_('Duration'),
-			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Ack'),
 			_('Actions'),
 			_('Tags')
 		]);
@@ -787,13 +771,8 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 		$hosts = zbx_objectValues($trigger['hosts'], 'name');
 
 		// ack
-		if ($config['event_ack_enable']) {
-			$problem['acknowledged'] = $problem['acknowledges'] ? EVENT_ACKNOWLEDGED : EVENT_NOT_ACKNOWLEDGED;
-			$ack = getEventAckState($problem, $backurl);
-		}
-		else {
-			$ack = null;
-		}
+		$problem['acknowledged'] = (bool) $problem['acknowledges'] ? EVENT_ACKNOWLEDGED : EVENT_NOT_ACKNOWLEDGED;
+		$ack = getEventAckState($problem, $backurl);
 
 		$table->addRow([
 			implode(', ', $hosts),

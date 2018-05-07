@@ -55,9 +55,8 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'data' => getSystemStatusData($filter, ['event_ack_enable' => $config['event_ack_enable']]),
+			'data' => getSystemStatusData($filter),
 			'config' => [
-				'event_ack_enable' => $config['event_ack_enable'],
 				'severity_name_0' => $config['severity_name_0'],
 				'severity_name_1' => $config['severity_name_1'],
 				'severity_name_2' => $config['severity_name_2'],

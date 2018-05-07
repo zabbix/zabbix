@@ -857,9 +857,6 @@ define('HTTPTEST_VERIFY_PEER_ON',	1);
 define('HTTPTEST_VERIFY_HOST_OFF',	0);
 define('HTTPTEST_VERIFY_HOST_ON',	1);
 
-define('EVENT_ACK_DISABLED',	'0');
-define('EVENT_ACK_ENABLED',		'1');
-
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
 

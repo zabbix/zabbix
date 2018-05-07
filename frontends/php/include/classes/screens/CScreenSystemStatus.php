@@ -35,7 +35,7 @@ class CScreenSystemStatus extends CScreenBase {
 		$page['file'] = $this->pageFile;
 
 		$config = select_config();
-		$data = getSystemStatusData([], $config);
+		$data = getSystemStatusData([]);
 		$table = makeSystemStatus([], $data, $config, $this->pageFile.'?screenid='.$this->screenid);
 
 		$footer = (new CList())

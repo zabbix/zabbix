@@ -1027,16 +1027,13 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName, $fullscreen = 
 			$css = getSeverityStyle($item['severity']);
 
 			// Display event acknowledgement.
-			$config = select_config();
-			if ($config['event_ack_enable']) {
-				$ack = getTriggerLastProblems([$item['triggerid']], ['acknowledged']);
+			$ack = getTriggerLastProblems([$item['triggerid']], ['acknowledged']);
 
-				if ($ack) {
-					$ack = reset($ack);
-					$ack = ($ack['acknowledged'] == 1)
-						? [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
-						: null;
-				}
+			if ($ack) {
+				$ack = reset($ack);
+				$ack = ($ack['acknowledged'] == 1)
+					? [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
+					: null;
 			}
 		}
 

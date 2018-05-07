@@ -76,22 +76,18 @@ $trigger = reset($triggers);
 $alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error', 'esc_step',
 	'clock', 'subject', 'message', 'p_eventid', 'acknowledgeid'
 ];
-$options = [
-	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value', 'name'],
+
+$events = API::Event()->get([
+	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value', 'name', 'acknowledged'],
 	'select_alerts' => $alert_options,
 	'selectTags' => ['tag', 'value'],
+	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
 	'objectids' => getRequest('triggerid')
-];
+]);
 
-if ($config['event_ack_enable']) {
-	$options['output'][] = 'acknowledged';
-	$options['select_acknowledges'] = ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'];
-}
-
-$events = API::Event()->get($options);
 if (!$events) {
 	access_deny();
 }
@@ -146,8 +142,6 @@ unset($alerts_data);
 /*
  * Display
  */
-$config = select_config();
-
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
@@ -160,7 +154,7 @@ $eventTab = (new CTable())
 			))->setHeader(_('Event details'))
 		]),
 		new CDiv([
-			($config['event_ack_enable'] && $event['value'] == TRIGGER_VALUE_TRUE)
+			$event['value'] == TRIGGER_VALUE_TRUE
 				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeAckTab($event['acknowledges'])))
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
 					->setHeader(_('Acknowledgements'), [], false, 'tr_events.php')

@@ -207,16 +207,15 @@ $map_tab->addRow(_('Icon label location'), new CComboBox('label_location', $data
 	]
 ));
 
-if ($data['config']['event_ack_enable']) {
-	// Append show unack to form list.
-	$map_tab->addRow(_('Problem display'),
-		new CComboBox('show_unack', $data['sysmap']['show_unack'], null, [
-			EXTACK_OPTION_ALL => _('All'),
-			EXTACK_OPTION_BOTH => _('Separated'),
-			EXTACK_OPTION_UNACK => _('Unacknowledged only'),
-		])
-	);
-}
+// Append show unack to form list.
+$map_tab->addRow(_('Problem display'),
+	new CComboBox('show_unack', $data['sysmap']['show_unack'], null, [
+		EXTACK_OPTION_ALL => _('All'),
+		EXTACK_OPTION_BOTH => _('Separated'),
+		EXTACK_OPTION_UNACK => _('Unacknowledged only'),
+	])
+);
+
 $map_tab->addRow(_('Minimum trigger severity'),
 	new CSeverity(['name' => 'severity_min', 'value' => (int) $data['sysmap']['severity_min']])
 );

@@ -61,7 +61,7 @@ $table = (new CTableInfo())
 			($data['sortfield'] === 'priority') ? [_('Severity'), $sort_div] : _('Severity')
 		],
 		_('Duration'),
-		$data['config']['event_ack_enable'] ? _('Ack') : null,
+		_('Ack'),
 		_('Actions'),
 		$data['fields']['show_tags'] ? _('Tags') : null
 	]));
@@ -72,9 +72,8 @@ $last_clock = 0;
 if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
-if ($data['config']['event_ack_enable']) {
-	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
-}
+
+$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
 $actions = makeEventsActions($data['data']['problems'], true);
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
@@ -88,12 +87,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	else {
 		$in_closing = false;
 
-		if ($data['config']['event_ack_enable']) {
-			foreach ($problem['acknowledges'] as $acknowledge) {
-				if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-					$in_closing = true;
-					break;
-				}
+		foreach ($problem['acknowledges'] as $acknowledge) {
+			if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+				$in_closing = true;
+				break;
 			}
 		}
 
@@ -111,7 +108,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
 
-	$is_acknowledged = $data['config']['event_ack_enable'] && (bool) $problem['acknowledges'];
+	$is_acknowledged = (bool) $problem['acknowledges'];
 
 	if ($show_recovery_data) {
 		if ($problem['r_eventid'] != 0) {
@@ -155,10 +152,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
-			->setHint(
-				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
-				true
-			)
+			->setHint(make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['fullscreen']), '', true)
 	]));
 
 	$description_style = getSeverityStyle($trigger['priority']);
@@ -212,7 +206,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				: zbx_date2age($problem['clock'])
 		))
 			->addClass(ZBX_STYLE_NOWRAP),
-		$data['config']['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
+		$acknowledges[$problem['eventid']],
 		array_key_exists($eventid, $actions)
 			? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 			: '',

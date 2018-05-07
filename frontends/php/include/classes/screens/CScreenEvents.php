@@ -44,8 +44,9 @@ class CScreenEvents extends CScreenBase {
 			'preservekeys' => true
 		]);
 
-		$options = [
-			'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name'],
+		$events = API::Event()->get([
+			'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged'],
+			'select_acknowledges' => ['userid', 'clock', 'message', 'action'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
@@ -53,14 +54,7 @@ class CScreenEvents extends CScreenBase {
 			'sortfield' => ['clock', 'eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $this->screenitem['elements']
-		];
-
-		if ($config['event_ack_enable']) {
-			$options['output'][] = 'acknowledged';
-			$options['select_acknowledges'] = ['userid', 'clock', 'message', 'action'];
-		}
-
-		$events = API::Event()->get($options);
+		]);
 
 		$sort_clock = [];
 		$sort_event = [];
@@ -113,12 +107,10 @@ class CScreenEvents extends CScreenBase {
 			if ($event['r_eventid'] == 0) {
 				$in_closing = false;
 
-				if ($config['event_ack_enable']) {
-					foreach ($event['acknowledges'] as $acknowledge) {
-						if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-							$in_closing = true;
-							break;
-						}
+				foreach ($event['acknowledges'] as $acknowledge) {
+					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+						$in_closing = true;
+						break;
 					}
 				}
 
@@ -135,9 +127,7 @@ class CScreenEvents extends CScreenBase {
 			$statusSpan = new CSpan($value_str);
 
 			// Add colors span depending on configuration and trigger parameters.
-			addTriggerValueStyle($statusSpan, $value, $event['clock'],
-				$config['event_ack_enable'] && $event['acknowledged']
-			);
+			addTriggerValueStyle($statusSpan, $value, $event['clock'], $event['acknowledged']);
 
 			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),

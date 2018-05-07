@@ -54,7 +54,6 @@ class CScreenProblem extends CScreenBase {
 		$config = select_config();
 
 		$this->config = [
-			'event_ack_enable' => $config['event_ack_enable'],
 			'search_limit' => $config['search_limit'],
 			'severity_color_0' => $config['severity_color_0'],
 			'severity_color_1' => $config['severity_color_1'],
@@ -169,7 +168,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['maintenance']           (optional)
 	 * @param array  $config
 	 * @param int    $config['search_limit']
-	 * @param int    $config['event_ack_enable']
 	 *
 	 * @static
 	 *
@@ -292,8 +290,7 @@ class CScreenProblem extends CScreenBase {
 					$options['severities'] = $filter['severities'];
 				}
 			}
-			if (array_key_exists('unacknowledged', $filter) && $filter['unacknowledged']
-					&& $config['event_ack_enable']) {
+			if (array_key_exists('unacknowledged', $filter) && $filter['unacknowledged']) {
 				$options['acknowledged'] = false;
 			}
 			if (array_key_exists('evaltype', $filter)) {
@@ -435,26 +432,20 @@ class CScreenProblem extends CScreenBase {
 
 	/**
 	 * @param array $eventids
-	 * @param array $config
-	 * @param int   $config['event_ack_enable']
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	private static function getExDataEvents(array $eventids, array $config) {
-		$options = [
+	private static function getExDataEvents(array $eventids) {
+		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid'],
 			'selectTags' => ['tag', 'value'],
+			'select_acknowledges' => ['userid', 'clock', 'message', 'action'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids
-		];
-		if ($config['event_ack_enable']) {
-			$options['select_acknowledges'] = ['userid', 'clock', 'message', 'action'];
-		}
-
-		$events = API::Event()->get($options);
+		]);
 
 		$r_eventids = [];
 
@@ -492,27 +483,21 @@ class CScreenProblem extends CScreenBase {
 
 	/**
 	 * @param array $eventids
-	 * @param array $config
-	 * @param int   $config['event_ack_enable']
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	private static function getExDataProblems(array $eventids, array $config) {
-		$options = [
+	private static function getExDataProblems(array $eventids) {
+		return API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'r_clock', 'correlationid', 'userid'],
 			'selectTags' => ['tag', 'value'],
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
 			'recent' => true
-		];
-		if ($config['event_ack_enable']) {
-			$options['selectAcknowledges'] = ['userid', 'clock', 'message', 'action'];
-		}
-
-		return API::Problem()->get($options);
+		]);
 	}
 
 	/**
@@ -522,15 +507,13 @@ class CScreenProblem extends CScreenBase {
 	 * @param array $filter
 	 * @param int   $filter['details']
 	 * @param int   $filter['show']
-	 * @param array $config
-	 * @param int   $config['event_ack_enable']
 	 * @param bool  $resolve_comments
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter, array $config, $resolve_comments = false) {
+	public static function makeData(array $data, array $filter, $resolve_comments = false) {
 		// unset unused triggers
 		$triggerids = [];
 
@@ -572,8 +555,8 @@ class CScreenProblem extends CScreenBase {
 		$eventids = array_keys($data['problems']);
 
 		$problems_data = ($filter['show'] == TRIGGERS_OPTION_ALL)
-			? self::getExDataEvents($eventids, $config)
-			: self::getExDataProblems($eventids, $config);
+			? self::getExDataEvents($eventids)
+			: self::getExDataProblems($eventids);
 
 		$correlationids = [];
 		$userids = [];
@@ -583,9 +566,7 @@ class CScreenProblem extends CScreenBase {
 
 			$problem['r_eventid'] = $problem_data['r_eventid'];
 			$problem['r_clock'] = $problem_data['r_clock'];
-			if ($config['event_ack_enable']) {
-				$problem['acknowledges'] = $problem_data['acknowledges'];
-			}
+			$problem['acknowledges'] = $problem_data['acknowledges'];
 			$problem['tags'] = $problem_data['tags'];
 			$problem['correlationid'] = $problem_data['correlationid'];
 			$problem['userid'] = $problem_data['userid'];
@@ -688,7 +669,7 @@ class CScreenProblem extends CScreenBase {
 
 		$paging = getPagingLine($data['problems'], ZBX_SORT_UP, clone $url);
 
-		$data = self::makeData($data, $this->data['filter'], $this->config);
+		$data = self::makeData($data, $this->data['filter']);
 
 		if ($data['triggers']) {
 			$triggerids = array_keys($data['triggers']);
@@ -737,19 +718,14 @@ class CScreenProblem extends CScreenBase {
 						->getUrl()
 				);
 
-			if ($this->config['event_ack_enable']) {
-				$header_check_box = (new CColHeader(
-					(new CCheckBox('all_eventids'))
-						->onClick("checkAll('".$form->getName()."', 'all_eventids', 'eventids');")
-				));
+			$header_check_box = (new CColHeader(
+				(new CCheckBox('all_eventids'))
+					->onClick("checkAll('".$form->getName()."', 'all_eventids', 'eventids');")
+			));
 
-				$this->data['filter']['compact_view']
-					? $header_check_box->addStyle('width: 20px;')
-					: $header_check_box->addClass(ZBX_STYLE_CELL_WIDTH);
-			}
-			else {
-				$header_check_box = null;
-			}
+			$this->data['filter']['compact_view']
+				? $header_check_box->addStyle('width: 20px;')
+				: $header_check_box->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			$link = $url
 				->setArgument('page', $this->data['page'])
@@ -800,7 +776,7 @@ class CScreenProblem extends CScreenBase {
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
 							->addStyle('width: 70%;'),
 						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
-						$this->config['event_ack_enable'] ? (new CColHeader(_('Ack')))->addStyle('width: 36px;') : null,
+						(new CColHeader(_('Ack')))->addStyle('width: 36px;'),
 						(new CColHeader(_('Actions')))->addStyle('width: 59px;'),
 						$tags_header
 					]))
@@ -820,16 +796,14 @@ class CScreenProblem extends CScreenBase {
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
 						_('Duration'),
-						$this->config['event_ack_enable'] ? _('Ack') : null,
+						_('Ack'),
 						_('Actions'),
 						$this->data['filter']['show_tags'] ? _('Tags') : null
 					]));
 			}
 
-			if ($this->config['event_ack_enable']) {
-				$url->setArgument('uncheck', '1');
-				$acknowledges = makeEventsAcknowledges($data['problems'], $url->getUrl());
-			}
+			$url->setArgument('uncheck', '1');
+			$acknowledges = makeEventsAcknowledges($data['problems'], $url->getUrl());
 
 			if ($this->data['filter']['show_tags']) {
 				$tags = makeEventsTags($data['problems'], true, $this->data['filter']['show_tags'],
@@ -885,12 +859,10 @@ class CScreenProblem extends CScreenBase {
 				else {
 					$in_closing = false;
 
-					if ($this->config['event_ack_enable']) {
-						foreach ($problem['acknowledges'] as $acknowledge) {
-							if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-								$in_closing = true;
-								break;
-							}
+					foreach ($problem['acknowledges'] as $acknowledge) {
+						if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+							$in_closing = true;
+							break;
 						}
 					}
 
@@ -902,9 +874,7 @@ class CScreenProblem extends CScreenBase {
 				$cell_status = new CSpan($value_str);
 
 				// Add colors and blinking to span depending on configuration and trigger parameters.
-				addTriggerValueStyle($cell_status, $value, $value_clock,
-					$this->config['event_ack_enable'] ? (bool) $problem['acknowledges'] : false
-				);
+				addTriggerValueStyle($cell_status, $value, $value_clock, (bool) $problem['acknowledges']);
 
 				// Info.
 				$info_icons = [];
@@ -973,9 +943,7 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$table->addRow(array_merge($row, [
-					$this->config['event_ack_enable']
-						? new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid'])
-						: null,
+					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
 					getSeverityCell($trigger['priority'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
 					$cell_r_clock,
 					$cell_status,
@@ -985,7 +953,7 @@ class CScreenProblem extends CScreenBase {
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
-					$this->config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
+					$acknowledges[$problem['eventid']],
 					array_key_exists($eventid, $actions)
 						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 						: '',
@@ -996,12 +964,9 @@ class CScreenProblem extends CScreenBase {
 				);
 			}
 
-			$footer = null;
-			if ($this->config['event_ack_enable']) {
-				$footer = new CActionButtonList('action', 'eventids', [
-					'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
-				], 'problem');
-			}
+			$footer = new CActionButtonList('action', 'eventids', [
+				'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
+			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
@@ -1017,7 +982,7 @@ class CScreenProblem extends CScreenBase {
 				_('Host'),
 				_('Problem'),
 				_('Duration'),
-				$this->config['event_ack_enable'] ? _('Ack') : null,
+				_('Ack'),
 				_('Actions'),
 				_('Tags')
 			];
@@ -1033,12 +998,10 @@ class CScreenProblem extends CScreenBase {
 				else {
 					$in_closing = false;
 
-					if ($this->config['event_ack_enable']) {
-						foreach ($problem['acknowledges'] as $acknowledge) {
-							if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-								$in_closing = true;
-								break;
-							}
+					foreach ($problem['acknowledges'] as $acknowledge) {
+						if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+							$in_closing = true;
+							break;
 						}
 					}
 
@@ -1062,7 +1025,7 @@ class CScreenProblem extends CScreenBase {
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
-					$this->config['event_ack_enable'] ? ($problem['acknowledges'] ? _('Yes') : _('No')) : null,
+					$problem['acknowledges'] ? _('Yes') : _('No'),
 					array_key_exists($problem['eventid'], $actions) ? $actions[$problem['eventid']] : '',
 					implode(', ', $tags[$problem['eventid']])
 				];

@@ -40,15 +40,13 @@ $column1 = (new CFormList())
 	);
 
 // ack status
-if ($config['event_ack_enable']) {
-	$column1->addRow(_('Acknowledge status'),
-		new CComboBox('ack_status', $filter['ackStatus'], null, [
-			ZBX_ACK_STS_ANY => _('Any'),
-			ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
-			ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
-		])
-	);
-}
+$column1->addRow(_('Acknowledge status'),
+	new CComboBox('ack_status', $filter['ackStatus'], null, [
+		ZBX_ACK_STS_ANY => _('Any'),
+		ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
+		ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
+	])
+);
 
 // min severity
 $severityNames = [];

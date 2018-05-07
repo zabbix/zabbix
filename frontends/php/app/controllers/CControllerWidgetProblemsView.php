@@ -68,7 +68,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$data = CScreenProblem::makeData($data, [
 			'show' => $fields['show'],
 			'details' => 0
-		], $config, true);
+		], true);
 
 		if ($fields['show_tags']) {
 			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags']);
@@ -85,7 +85,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'show_tags' => $fields['show_tags']
 			],
 			'config' => [
-				'event_ack_enable' => $config['event_ack_enable'],
 				'problem_unack_style' => $config['problem_unack_style'],
 				'problem_ack_style' => $config['problem_ack_style'],
 				'blink_period' => timeUnitToSeconds($config['blink_period'])

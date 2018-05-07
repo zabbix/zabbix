@@ -206,7 +206,6 @@ class CControllerProblemView extends CController {
 			CProfile::delete('web.problem.filter.highlight_row');
 		}
 
-		$config = select_config();
 		$filter_groupids = CProfile::getArray('web.problem.filter.groupids', []);
 		$filter_hostids = CProfile::getArray('web.problem.filter.hostids', []);
 		$filter_triggerids = CProfile::getArray('web.problem.filter.triggerids', []);
@@ -237,6 +236,7 @@ class CControllerProblemView extends CController {
 		}
 		unset($filter_trigger);
 
+		$config = select_config();
 		$severities = [];
 		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
 			$severities[] = getSeverityName($severity, $config);
@@ -304,9 +304,6 @@ class CControllerProblemView extends CController {
 				'show_timeline' => CProfile::get('web.problem.filter.show_timeline', 1),
 				'details' => CProfile::get('web.problem.filter.details', 0),
 				'highlight_row' => CProfile::get('web.problem.filter.highlight_row', 0)
-			],
-			'config' => [
-				'event_ack_enable' => $config['event_ack_enable']
 			]
 		];
 

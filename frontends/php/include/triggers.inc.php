@@ -917,9 +917,6 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 	$desc = null;
 	$acknowledge = [];
 
-	// for how long triggers should blink on status change (set by user in administration->general)
-	$config = select_config();
-
 	if ($trigger) {
 		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
 
@@ -927,28 +924,26 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 			$ack = null;
 
-			if ($config['event_ack_enable']) {
-				$event = getTriggerLastProblems([$trigger['triggerid']], ['eventid', 'acknowledged']);
+			$event = getTriggerLastProblems([$trigger['triggerid']], ['eventid', 'acknowledged']);
 
-				if ($event) {
-					$event = reset($event);
+			if ($event) {
+				$event = reset($event);
 
-					if ($screenid !== null) {
-						$acknowledge = [
-							'eventid' => $event['eventid'],
-							'backurl' => $pageFile.'?screenid='.$screenid
-						];
-					}
-					else {
-						$acknowledge = [
-							'eventid' => $event['eventid'],
-							'backurl' => $pageFile
-						];
-					}
+				if ($screenid !== null) {
+					$acknowledge = [
+						'eventid' => $event['eventid'],
+						'backurl' => $pageFile.'?screenid='.$screenid
+					];
+				}
+				else {
+					$acknowledge = [
+						'eventid' => $event['eventid'],
+						'backurl' => $pageFile
+					];
+				}
 
-					if ($event['acknowledged'] == 1) {
-						$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
-					}
+				if ($event['acknowledged'] == 1) {
+					$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 				}
 			}
 		}
@@ -967,7 +962,8 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 	}
 
 	if ($trigger) {
-		// blinking
+		// Calculate for how long triggers should blink on status change (set by user in administration->general).
+		$config = select_config();
 		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
 		$duration = time() - $trigger['lastchange'];
 
@@ -1219,12 +1215,10 @@ function make_trigger_details($trigger) {
 			: '')
 		]);
 
-	if ($config['event_ack_enable']) {
-		$table->addRow([_('Allow manual close'), ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-			? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
-			: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
-		]);
-	}
+	$table->addRow([_('Allow manual close'), ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+		? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
+		: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
+	]);
 
 	$table->addRow([_('Enabled'), ($trigger['status'] == TRIGGER_STATUS_ENABLED)
 		? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
