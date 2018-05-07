@@ -750,45 +750,76 @@ static int	DBpatch_3050066(void)
 
 static int	DBpatch_3050067(void)
 {
+	return DBdrop_field("config", "event_expire");
+}
+
+static int	DBpatch_3050068(void)
+{
+	return DBdrop_field("config", "event_show_max");
+}
+
+static int	DBpatch_3050069(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update widget_field"
+		" set name='itemids'"
+		" where name='itemid'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='plaintext'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050070(void)
+{
 	const ZBX_FIELD	field = {"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("events", &field);
 }
 
-static int	DBpatch_3050068(void)
+static int	DBpatch_3050071(void)
 {
 	const ZBX_FIELD	field = {"acknowledged", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("problem", &field);
 }
 
-static int	DBpatch_3050069(void)
+static int	DBpatch_3050072(void)
 {
 	const ZBX_FIELD	field = {"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("problem", &field);
 }
 
-static int	DBpatch_3050070(void)
+static int	DBpatch_3050073(void)
 {
 	const ZBX_FIELD	field = {"old_severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("acknowledges", &field);
 }
 
-static int	DBpatch_3050071(void)
+static int	DBpatch_3050074(void)
 {
 	const ZBX_FIELD	field = {"new_severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("acknowledges", &field);
 }
 
-static int	DBpatch_3050072(void)
+static int	DBpatch_3050075(void)
 {
 	return DBdrop_field("config", "event_ack_enable");
 }
 
-static int	DBpatch_3050073(void)
+static int	DBpatch_3050076(void)
 {
 	int	ret;
 
@@ -804,7 +835,7 @@ static int	DBpatch_3050073(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050074(void)
+static int	DBpatch_3050077(void)
 {
 	int	ret;
 
@@ -820,7 +851,7 @@ static int	DBpatch_3050074(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050075(void)
+static int	DBpatch_3050078(void)
 {
 	int	ret;
 
@@ -836,7 +867,7 @@ static int	DBpatch_3050075(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050076(void)
+static int	DBpatch_3050079(void)
 {
 	int		ret = SUCCEED, action;
 	zbx_uint64_t	ackid, eventid;
@@ -890,8 +921,6 @@ out:
 
 	return ret;
 }
-
-
 #endif
 
 DBPATCH_START(3050)
@@ -971,5 +1000,8 @@ DBPATCH_ADD(3050073, 0, 1)
 DBPATCH_ADD(3050074, 0, 1)
 DBPATCH_ADD(3050075, 0, 1)
 DBPATCH_ADD(3050076, 0, 1)
+DBPATCH_ADD(3050077, 0, 1)
+DBPATCH_ADD(3050078, 0, 1)
+DBPATCH_ADD(3050079, 0, 1)
 
 DBPATCH_END()

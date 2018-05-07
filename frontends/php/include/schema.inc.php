@@ -2468,18 +2468,6 @@ return [
 				'ref_table' => 'usrgrp',
 				'ref_field' => 'usrgrpid',
 			],
-			'event_expire' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
-				'default' => '1w',
-			],
-			'event_show_max' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '100',
-			],
 			'default_theme' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,

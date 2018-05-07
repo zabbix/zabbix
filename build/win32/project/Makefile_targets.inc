@@ -25,6 +25,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcomms}.c{..\..\..\src\libs\zbxcomms}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxcompress}.c{..\..\..\src\libs\zbxcompress}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxconf}.c{..\..\..\src\libs\zbxconf}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
