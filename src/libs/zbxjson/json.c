@@ -798,25 +798,25 @@ static unsigned int	zbx_json_decode_character(const char **p, unsigned char *byt
 		num += zbx_hex2num(*(++*p));
 		++*p;
 
-		if (0x0080 > num)	/* 0000 -007F */
+		if (0x007F >= num)	/* 0000 - 007F */
 		{
 			bytes[0] = (unsigned char)num;
 			return 1;
 		}
-		else if (0x0800 > num)	/* 0080 - 07FF */
+		else if (0x07FF >= num)	/* 0080 - 07FF */
 		{
 			bytes[0] = (unsigned char)'\xC0' | (unsigned char)((num & 0x07C0) >> 6);
 			bytes[1] = (unsigned char)'\x80' | (unsigned char)(num & 0x003F);
 			return 2;
 		}
-		else if (0xD800 > num || 0xDFFF < num)	/* 0800 - D7FF or E000 - FFFF */
+		else if (0xD7FF >= num || 0xE000 <= num)	/* 0800 - D7FF or E000 - FFFF */
 		{
 			bytes[0] = (unsigned char)'\xE0' | (unsigned char)((num & 0xF000) >> 12);
 			bytes[1] = (unsigned char)'\x80' | (unsigned char)((num & 0x0FC0) >> 6);
 			bytes[2] = (unsigned char)'\x80' | (unsigned char)(num & 0x003F);
 			return 3;
 		}
-		else if (0xD7FF < num && num < 0xDC00)	/* high surrogate D800 - DBFF */
+		else if (0xD800 <= num && num <= 0xDBFF)	/* high surrogate D800 - DBFF */
 		{
 			unsigned int	num_lo, uc;
 
@@ -831,7 +831,7 @@ static unsigned int	zbx_json_decode_character(const char **p, unsigned char *byt
 			num_lo += zbx_hex2num(*(++*p));
 			++*p;
 
-			if (0xDC00 > num_lo || 0xDFFF < num_lo)
+			if (num_lo < 0xDC00 || 0xDFFF < num_lo)		/* low surrogate range is DC00 - DFFF */
 				return 0;
 
 			/* decode surrogate pair */
