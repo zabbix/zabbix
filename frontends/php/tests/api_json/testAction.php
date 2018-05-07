@@ -123,9 +123,19 @@ class testAction extends CZabbixTest {
 				'success_expected' => false,
 			],
 			[
+				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'action' => ['92'],
+				'success_expected' => true,
+			],
+			[
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'action' => ['16'],
 				'success_expected' => false,
+			],
+			[
+				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'action' => ['93'],
+				'success_expected' => true,
 			],
 			[
 				'login' => ['user' => 'guest', 'password' => ''],
