@@ -464,6 +464,7 @@ var timeControl = {
 	refreshImage: function(id) {
 		// image
 		var obj = this.objectList[id],
+			ignore_cache = (new Date()).getTime().toString(34),
 			url = new Curl(obj.src);
 		url.setArgument('from', obj.timeline.from);
 		url.setArgument('to', obj.timeline.to);
@@ -480,7 +481,7 @@ var timeControl = {
 				}),
 			async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 				// Prevent image caching.
-				url.setArgument('_', obj.timeline.to_ts.toString(34));
+				url.setArgument('_', ignore_cache);
 
 				img.data('zbx_sbox', {
 					height: parseInt(height, 10),
@@ -501,6 +502,7 @@ var timeControl = {
 		graphUrl.setArgument('width', obj.objDims.width);
 		graphUrl.setArgument('from', obj.timeline.from);
 		graphUrl.setArgument('to', obj.timeline.to);
+		url.setArgument('_', ignore_cache);
 
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
 	},

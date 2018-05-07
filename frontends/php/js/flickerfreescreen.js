@@ -112,7 +112,17 @@
 				// SCREEN_RESOURCE_SIMPLE_GRAPH
 				case 1:
 					if (refresh) {
-						self.refreshImg(id);
+						self.refreshImg(id, function() {
+							$('a', '#flickerfreescreen_' + id).each(function() {
+									var obj = $(this),
+									url = new Curl(obj.attr('href'));
+
+									url.setArgument('from', screen.timeline.from);
+									url.setArgument('to', screen.timeline.to);
+
+									obj.attr('href', url.getUrl());
+								});
+							});
 					}
 					break;
 
@@ -346,10 +356,7 @@
 					}
 
 					// Create temp image in buffer.
-					var	img = domImg.clone().css({
-							position: 'relative',
-							zIndex: 2
-						})
+					var	img = $('<img/>')
 						.error(function() {
 							screen.error++;
 							window.flickerfreeScreen.calculateReRefresh(id);
