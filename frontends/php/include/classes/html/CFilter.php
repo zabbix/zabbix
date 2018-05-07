@@ -280,6 +280,9 @@ class CFilter extends CDiv {
 		').on("tabsactivate", function(e, ui) {
 			var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0;
 			updateUserProfile("'.$this->idx.'.active", active, []);
+			if (active) {
+				jQuery(".multiselect", ui.newPanel).multiSelect("resize");
+			}
 		})';
 	}
 
