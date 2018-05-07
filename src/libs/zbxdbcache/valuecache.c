@@ -2521,7 +2521,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
 		int count, const zbx_timespec_t *ts)
 {
-	const char	*__function_name = "zbx_vc_get_value_range";
+	const char	*__function_name = "zbx_vc_get_values";
 	zbx_vc_item_t	*item = NULL;
 	int 		ret = FAIL, cache_used = 1;
 

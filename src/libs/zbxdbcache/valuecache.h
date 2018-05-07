@@ -44,9 +44,9 @@
  *
  * Retrieving data
  *
- *   The history data is accessed with zbx_vc_get_value_range() and zbx_vc_get_value()
+ *   The history data is accessed with zbx_vc_get_values() and zbx_vc_get_value()
  *   functions. Afterwards the retrieved history data must be freed by the caller by using
- *   either zbx_history_record_vector_destroy() function (free the zbx_vc_get_value_range()
+ *   either zbx_history_record_vector_destroy() function (free the zbx_vc_get_values()
  *   call output) or zbx_history_record_clear() function (free the zbx_vc_get_value() call output).
  *
  * Locking

@@ -83,7 +83,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vcmock_get_request_params(handle, &itemid, &value_type, &seconds, &count, &ts);
 	err = zbx_vc_get_values(itemid, value_type, &returned, seconds, count, &ts);
-	zbx_mock_assert_result_eq("zbx_vc_get_value_range() return value", SUCCEED, err);
+	zbx_mock_assert_result_eq("zbx_vc_get_values() return value", SUCCEED, err);
 
 	/* validate results */
 
