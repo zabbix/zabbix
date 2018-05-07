@@ -350,7 +350,7 @@ jQuery(function ($){
  */
 jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
 	if (window.flickerfreeScreen) {
-		window.flickerfreeScreen.refreshAll(data.from, data.to);
+		window.flickerfreeScreen.refreshAll(data);
 	}
 });
 

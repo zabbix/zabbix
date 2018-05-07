@@ -112,17 +112,7 @@
 				// SCREEN_RESOURCE_SIMPLE_GRAPH
 				case 1:
 					if (refresh) {
-						self.refreshImg(id, function() {
-							$('a', '#flickerfreescreen_' + id).each(function() {
-								var obj = $(this),
-									url = new Curl(obj.attr('href'));
-
-								url.setArgument('from', screen.timeline.from);
-								url.setArgument('to', screen.timeline.to);
-
-								obj.attr('href', url.getUrl());
-							});
-						});
+						self.refreshImg(id);
 					}
 					break;
 
@@ -221,13 +211,17 @@
 			}
 		},
 
-		refreshAll: function(from, to) {
+		refreshAll: function(time_object) {
 			for (var id in this.screens) {
 				var screen = this.screens[id];
 
 				if (!empty(screen.id) && typeof screen.timeline !== 'undefined') {
-					screen.timeline.from = from;
-					screen.timeline.to = to;
+					screen.timeline = jQuery.extend(screen.timeline, {
+						from: time_object.from,
+						to: time_object.to,
+						from_ts: time_object.from_ts,
+						to_ts: time_object.to_ts
+					});
 
 					// restart refresh execution starting from Now
 					clearTimeout(screen.timeoutHandler);
@@ -398,14 +392,18 @@
 					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 						// 'src' should be added only here to trigger load event after new height is received.
 						var zbx_sbox = domImg.data('zbx_sbox');
+
+						domImg.data('zbx_sbox', jQuery.extend(zbx_sbox, {
+							height: parseInt(height, 10),
+							from: screen.timeline.from,
+							from_ts: screen.timeline.from_ts,
+							to: screen.timeline.to,
+							to_ts: screen.timeline.to_ts
+						}));
+
 						// Prevent image caching.
 						url.setArgument('_', request_start.toString(34));
-
-						img.data('zbx_sbox', $.extend(zbx_sbox, {
-							height: parseInt(height, 10),
-							from_ts: screen.timeline.from_ts,
-							to_ts: screen.timeline.to_ts
-						})).attr('src', url.getUrl());
+						img.attr('src', url.getUrl());
 					});
 					if (async === null) {
 						img.attr('src', url.getUrl());
