@@ -1747,7 +1747,7 @@ output {
 		margin: 0 -1px 0 0;
 
 		&:first-child{
-			@include border-radius(2px 0 0 2px);
+			@include border-radius(3px 0 0 3px);
 
 			label {
 				@include border-radius(2px 0 0 2px);
@@ -1755,7 +1755,7 @@ output {
 		}
 
 		&:last-child {
-			@include border-radius(0 2px 2px 0);
+			@include border-radius(0 3px 3px 0);
 
 			label {
 				@include border-radius(0 2px 2px 0);
@@ -1763,7 +1763,7 @@ output {
 		}
 
 		&:only-child {
-			@include border-radius(2px);
+			@include border-radius(3px);
 
 			label {
 				@include border-radius(2px);
