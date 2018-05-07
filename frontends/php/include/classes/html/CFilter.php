@@ -186,7 +186,7 @@ class CFilter extends CDiv {
 			$body[] = $footer;
 		}
 
-		return $this->addTab((new CSimpleButton($header))->addClass(ZBX_STYLE_FILTER_TRIGGER), $body);
+		return $this->addTab((new CSpan($header))->addClass(ZBX_STYLE_FILTER_TRIGGER), $body);
 	}
 
 	/**
@@ -227,7 +227,7 @@ class CFilter extends CDiv {
 		}
 
 		$this->addTab(
-			(new CSimpleButton($header))->addClass('btn-time'),
+			(new CSpan($header))->addClass('btn-time'),
 			(new CDiv([
 				(new CDiv(
 					(new CList([
