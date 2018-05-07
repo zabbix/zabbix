@@ -151,8 +151,9 @@ class CFilter extends CDiv {
 	 * @return CFilter
 	 */
 	public function addFilterTab($header, $columns, $footer = null) {
-		$body = [];
 		$row = (new CDiv())->addClass(ZBX_STYLE_ROW);
+		$body = [];
+		$anchor = 'tab_'.count($this->tabs);
 
 		foreach ($columns as $column) {
 			$row->addItem((new CDiv($column))->addClass(ZBX_STYLE_CELL));
@@ -186,7 +187,12 @@ class CFilter extends CDiv {
 			$body[] = $footer;
 		}
 
-		return $this->addTab((new CSpan($header))->addClass(ZBX_STYLE_FILTER_TRIGGER), $body);
+		return $this->addTab(
+			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_FILTER_TRIGGER),
+			(new CDiv($body))
+				->addClass(ZBX_STYLE_FILTER_CONTAINER)
+				->setId($anchor)
+		);
 	}
 
 	/**
@@ -199,15 +205,13 @@ class CFilter extends CDiv {
 	 * @return CFilter
 	 */
 	public function addTimeSelector($from, $to) {
-		// Disable time selector range changes tab.
-		$this->tabs_disabled[] = count($this->tabs);
 		$header = relativeDateToText($from, $to);
 
-		$this->addTab([
+		$this->addTab(new CDiv([
 			(new CSimpleButton())->addClass('btn-time-left'),
 			(new CSimpleButton(_('Zoom out')))->addClass('btn-time-out'),
 			(new CSimpleButton())->addClass('btn-time-right')
-		], null);
+		]), null);
 
 		$predefined_ranges = [];
 
@@ -226,8 +230,10 @@ class CFilter extends CDiv {
 			$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
 		}
 
+		$anchor = 'tab_'.count($this->tabs);
+
 		$this->addTab(
-			(new CSpan($header))->addClass('btn-time'),
+			(new CLink($header, '#'.$anchor))->addClass('btn-time'),
 			(new CDiv([
 				(new CDiv(
 					(new CList([
@@ -239,7 +245,10 @@ class CFilter extends CDiv {
 					]))->addClass(ZBX_STYLE_TABLE_FORMS)
 				))->addClass('time-input'),
 				(new CDiv($predefined_ranges))->addClass('time-quick-range')
-			]))->addClass('time-selection-container')
+			]))
+				->addClass(ZBX_STYLE_FILTER_CONTAINER)
+				->addClass('time-selection-container')
+				->setId($anchor)
 		);
 
 		return $this;
@@ -248,19 +257,12 @@ class CFilter extends CDiv {
 	/**
 	 * Add tab.
 	 *
-	 * @param string $header    Tab header title string.
-	 * @param array  $body      Array of body elements.
+	 * @param string|CTag $header    Tab header title string or CTag contaier.
+	 * @param array  $body           Array of body elements.
 	 *
 	 * @return CFilter
 	 */
 	public function addTab($header, $body) {
-		$tabs = count($this->tabs);
-
-		// By default first non timeselect filter type tab will be set as active.
-		if (!in_array($tabs, $this->tabs_disabled) && $this->tabs_options['active'] === false) {
-			$this->setActiveTab($tabs);
-		}
-
 		$this->headers[] = $header;
 		$this->tabs[] = $body;
 
@@ -290,23 +292,17 @@ class CFilter extends CDiv {
 		$headers = (new CList())->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER);
 
 		foreach ($this->headers as $index => $header) {
-			$id = 'tab_'.$index;
-			$headers->addItem(new CLink($header, '#'.$id));
+			$headers->addItem($header);
 
-			if ($this->tabs[$index] !== null) {
-				$this->tabs[$index] = (new CDiv($this->tabs[$index]))
-					->addClass(ZBX_STYLE_FILTER_CONTAINER)
-					->setId($id);
-
-				if ($index !== $this->tabs_options['active']) {
-					$this->tabs[$index]->addStyle('display: none');
-				}
+			if ($this->tabs[$index] !== null && $index !== $this->tabs_options['active']) {
+				$this->tabs[$index]->addStyle('display: none');
 			}
 		}
 
 		$this->form->addItem($this->tabs);
 
-		$this->addItem($headers)
+		$this
+			->addItem($headers)
 			->addItem($this->form);
 
 		zbx_add_post_js($this->getJS());
