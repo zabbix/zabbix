@@ -281,7 +281,8 @@
 		<attribute name="conf-name"/>
 		<sequential>
 			<!-- clean, configure and build -->
-			<exec executable="@{conf}" failonerror="on">
+			<exec executable="./configure" failonerror="on">
+				<arg line="@{conf}"/>
 			</exec>
 			<trycatch>
 				<try>
@@ -305,8 +306,8 @@
 	
 	<target name="init-cmock-test-conf-options">
 		<!-- Zabbix various configuration parameters for C mock tests -->
-		<property name="conf1" value="./configure -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
-		<property name="conf2" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' ./configure -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="conf1" value="-q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="conf2" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 	</target>
 	
 	<target name="mock-tests" depends="init-cmock-test-conf-options">
