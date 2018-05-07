@@ -1284,3 +1284,37 @@ void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_path_check                                              *
+ *                                                                            *
+ * Purpose: validate json path string                                         *
+ *                                                                            *
+ * Parameters: path   - [IN] the json path                                    *
+ *             error  - [OUT] the error message buffer                        *
+ *             errlen - [IN] the size of error message buffer                 *
+ *                                                                            *
+ * Return value: SUCCEED - the json path component was parsed successfully    *
+ *               FAIL    - json path parsing error                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_path_check(const char *path, char * error, size_t errlen)
+{
+	const char		*next = NULL;
+	zbx_strloc_t		loc;
+	int			type;
+
+	while (1)
+	{
+		if (SUCCEED != zbx_jsonpath_next(path, &next, &loc, &type))
+		{
+			zbx_snprintf(error, errlen, "json path not valid:%s", zbx_json_strerror());
+			return FAIL;
+		}
+
+		if ('\0' == *next)
+			break;
+	}
+
+	return SUCCEED;
+}

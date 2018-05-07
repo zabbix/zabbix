@@ -433,6 +433,8 @@ static void	unescape_trim_params(const char *in, char *out)
 				case 't':
 					*out = '\t';
 					break;
+				default:
+					*out = *(--in);
 			}
 		}
 		else

@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "zbxregexp.h"
 
 typedef struct
 {
@@ -914,9 +915,74 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_items_preproc_step_validate                                  *
+ *                                                                            *
+ * Purpose: validation of a item preprocessing step expressions for discovery *
+ *          process                                                           *
+ *                                                                            *
+ * Parameters: pp       - [IN] the item preprocessing step                    *
+ *             item_key - [IN] Item name for logging                          *
+ *             error    - [IN/OUT] the lld error message                      *
+ *                                                                            *
+ ******************************************************************************/
+int lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, const char * item_key, char ** error)
+{
+	int ret = SUCCEED;
+	zbx_token_t token;
+	char err[MAX_STRING_LEN], *err_dyn = NULL;
+	*err = '\0';
+	char	pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
+
+	if (SUCCEED == zbx_token_find(pp->params, 0, &token, ZBX_TOKEN_SEARCH_BASIC))
+		return SUCCEED;
+
+	switch (pp->type)
+	{
+		case ZBX_PREPROC_REGSUB:
+			zbx_strlcpy(pattern, pp->params, sizeof(pattern));
+			if (NULL == (output = strchr(pattern, '\n')))
+			{
+				zbx_snprintf(err, sizeof(err), "cannot find second parameter:%s", pp->params);
+				ret = FAIL;
+				break;
+			}
+
+			*output++ = '\0';
+
+			if (FAIL == (ret = zbx_regexp_compile(pattern, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, NULL,
+					&err_dyn)))
+			{
+				zbx_strlcpy(err, err_dyn, sizeof(err));
+				zbx_free(err_dyn);
+			}
+			break;
+		case ZBX_PREPROC_JSONPATH:
+			ret = zbx_json_path_check(pp->params, err, sizeof(err));
+			break;
+		case ZBX_PREPROC_XPATH:
+			ret = xml_xpath_check(pp->params, err, sizeof(err));
+			break;
+		case ZBX_PREPROC_MULTIPLIER:
+			if (FAIL == (ret = is_double(pp->params)))
+				zbx_snprintf(err, sizeof(err), "value is not numeric:%s", pp->params);
+			break;
+	}
+
+	if (SUCCEED != ret)
+	{
+		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
+				"%s.\n", item_key, pp->step, err);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_items_validate                                               *
  *                                                                            *
  * Parameters: items - [IN] list of items; must be sorted by itemid           *
+ *             error - [IN/OUT] the lld error message                         *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **error)
@@ -925,7 +991,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			i;
+	int			i,j;
 	zbx_lld_item_t		*item;
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_str_t	keys;
@@ -1039,6 +1105,29 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 	}
 
 	zbx_hashset_destroy(&items_keys);
+
+	/* check preprocessing steps for new and updated discovered items */
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		/* only new items or items with changed key will be validated */
+		if (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
+			continue;
+
+		for (j = 0; j < item->preproc_ops.values_num; j++)
+		{
+			if (SUCCEED != lld_items_preproc_step_validate(item->preproc_ops.values[j], item->key, error))
+			{
+				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+				break;
+			}
+		}
+	}
+
 
 	/* check duplicated keys in DB */
 
@@ -1725,6 +1814,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *             items_index     - [OUT] index of items based on prototype ids  *
  *                                     and lld rows. Used to quckly find an   *
  *                                     item by prototype and lld_row.         *
+ *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
@@ -1823,6 +1913,45 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_items_preproc_step_esc                                       *
+ *                                                                            *
+ * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
+ *          process                                                           *
+ *                                                                            *
+ * Parameters: pp       - [IN] the item preprocessing step                    *
+ *             lld_row  - [IN] lld source value                               *
+ *             item_key - [IN] Item name for logging                          *
+ *             error    - [IN/OUT] the lld error message                      *
+ *                                                                            *
+ ******************************************************************************/
+int lld_items_preproc_step_esc(zbx_lld_item_preproc_t * pp, const zbx_lld_row_t * lld_row, const char * item_key,
+		char **error)
+{
+	int ret, token_type = ZBX_MACRO_ANY;
+	char err[MAX_STRING_LEN];
+	*err = '\0';
+
+	switch (pp->type)
+	{
+		case ZBX_PREPROC_REGSUB:
+			token_type |= ZBX_TOKEN_REGEXP;
+			break;
+		case ZBX_PREPROC_XPATH:
+			token_type |= ZBX_TOKEN_XPATH;
+			break;
+	}
+
+	if (SUCCEED != (ret = substitute_lld_macros(&pp->params, &lld_row->jp_row, token_type, err, sizeof(err))))
+	{
+		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
+				"%s.\n", item_key, pp->step, err);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_items_preproc_make                                           *
  *                                                                            *
  * Purpose: updates existing items preprocessing operations and create new    *
@@ -1830,9 +1959,10 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  *                                                                            *
  * Parameters: item_prototypes - [IN] the item prototypes                     *
  *             items           - [IN/OUT] sorted list of items                *
+ *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
+static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items, char **error)
 {
 	int				i, j, index, preproc_num;
 	zbx_lld_item_t			*item;
@@ -1870,6 +2000,15 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppdst->step = ppsrc->step;
 				ppdst->type = ppsrc->type;
 				ppdst->params = zbx_strdup(NULL, ppsrc->params);
+
+				if (SUCCEED != lld_items_preproc_step_esc(ppdst, item->lld_row, item->key, error))
+				{
+					zbx_free(ppdst->params);
+					zbx_free(ppdst);
+					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+					break;
+				}
+
 				zbx_vector_ptr_append(&item->preproc_ops, ppdst);
 				continue;
 			}
@@ -1896,6 +2035,11 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 			{
 				ppdst->params = zbx_strdup(ppdst->params, ppsrc->params);
 				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS;
+				if (SUCCEED != lld_items_preproc_step_esc(ppdst, item->lld_row, item->key, error))
+				{
+					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+					break;
+				}
 			}
 		}
 	}
@@ -4343,8 +4487,8 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 
 	lld_items_get(&item_prototypes, &items);
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, error);
+	lld_items_preproc_make(&item_prototypes, &items, error);
 	lld_items_validate(hostid, &items, error);
-	lld_items_preproc_make(&item_prototypes, &items);
 
 	lld_items_applications_get(lld_ruleid, &items_applications);
 	lld_items_applications_make(&item_prototypes, &items, &applications_index, &items_applications);

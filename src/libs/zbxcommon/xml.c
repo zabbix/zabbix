@@ -159,3 +159,90 @@ char	*xml_escape_dyn(const char *data)
 
 	return out;
 }
+
+/**********************************************************************************
+ *                                                                                *
+ * Function: xml_escape_xpath_stringsize                                          *
+ *                                                                                *
+ * Purpose: calculate a string size after symbols escaping                        *
+ *                                                                                *
+ * Parameters: string - [IN] the string to check                                  *
+ *                                                                                *
+ * Return value: new size of the string                                           *
+ *                                                                                *
+ **********************************************************************************/
+static size_t	xml_escape_xpath_stringsize(const char *string)
+{
+	size_t		len = 0;
+	const char	*sptr;
+
+	if (NULL == string )
+		return 0;
+
+	for (sptr = string; '\0' != *sptr; sptr++)
+	{
+		switch (*sptr)
+		{
+			case '"':
+				len += 2;
+				break;
+			default:
+				len++;
+		}
+	}
+
+	return len;
+}
+
+/**********************************************************************************
+ *                                                                                *
+ * Function: xml_escape_xpath_insstring                                           *
+ *                                                                                *
+ * Purpose: replace " symbol in string with ""                                    *
+ *                                                                                *
+ * Parameters: string - [IN/OUT] the string to update                             *
+ *                                                                                *
+ **********************************************************************************/
+static void xml_escape_xpath_insstring(char *p, const char *string)
+{
+	const char	*sptr;
+
+	for (sptr = string; '\0' != *sptr; sptr++)
+	{
+		switch (*sptr)
+		{
+			case '"':
+				*p++ = '"';
+				*p++ = *sptr;
+				break;
+			default:
+				*p++ = *sptr;
+		}
+	}
+
+	return;
+}
+
+/**********************************************************************************
+ *                                                                                *
+ * Function: xml_escape_xpath                                                     *
+ *                                                                                *
+ * Purpose: escaping of symbols for using in xpath expression                     *
+ *                                                                                *
+ * Parameters: data - [IN/OUT] the string to update                               *
+ *                                                                                *
+ **********************************************************************************/
+void xml_escape_xpath(char **data)
+{
+	size_t	size;
+	char	*buffer;
+
+	if (0 == (size = xml_escape_xpath_stringsize(*data)))
+		return;
+
+	buffer = zbx_malloc(NULL, size + 1);
+	buffer[size] = '\0';
+	xml_escape_xpath_insstring(buffer, *data);
+	zbx_free(*data);
+	*data = buffer;
+}
