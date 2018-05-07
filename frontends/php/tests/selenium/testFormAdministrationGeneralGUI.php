@@ -26,7 +26,7 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 class testFormAdministrationGeneralGUI extends CWebTest {
 
 	public static function allValues() {
-		return DBdata('SELECT default_theme,dropdown_first_entry,dropdown_first_remember,search_limit,max_in_table,event_ack_enable,server_check_interval FROM config ORDER BY configid');
+		return DBdata('SELECT default_theme,dropdown_first_entry,dropdown_first_remember,search_limit,max_in_table,server_check_interval FROM config ORDER BY configid');
 	}
 
 	/**
@@ -57,7 +57,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestAssertAttribute('//input[@id="max_in_table"]','maxlength', '5');
 
 		$this->zbxTestAssertElementPresentId('dropdown_first_remember');
-		$this->zbxTestAssertElementPresentId('event_ack_enable');
 		$this->zbxTestAssertElementPresentId('server_check_interval');
 
 		$this->zbxTestAssertElementPresentId('update');
@@ -70,13 +69,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		}
 		if ($allValues['dropdown_first_remember']==0) {
 			$this->assertFalse($this->zbxTestCheckboxSelected('dropdown_first_remember'));
-		}
-
-		if ($allValues['event_ack_enable']) {
-			$this->assertTrue($this->zbxTestCheckboxSelected('event_ack_enable'));
-		}
-		if ($allValues['event_ack_enable']==0) {
-			$this->assertFalse($this->zbxTestCheckboxSelected('event_ack_enable'));
 		}
 
 		if ($allValues['server_check_interval']) {
@@ -116,7 +108,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstEntry() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$sql_hash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
+		$sql_hash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestDropdownSelect('dropdown_first_entry', 'None');
@@ -271,36 +263,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 			'Max count of elements to show inside table cell'
 		]);
 		$this->zbxTestTextNotPresent('Configuration updated');
-
-		$this->assertEquals($old_hash, DBhash($sql_hash));
-	}
-
-	public function testFormAdministrationGeneralGUI_EventAckEnable() {
-		$this->zbxTestLogin('adm.gui.php');
-		$sql_hash = 'SELECT '.CTestDbHelper::getTableFields('config', ['event_ack_enable']).' FROM config ORDER BY configid';
-		$old_hash = DBhash($sql_hash);
-
-		$this->zbxTestCheckboxSelect('event_ack_enable');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestTextPresent('Enable event acknowledgement');
-		$this->assertTrue($this->zbxTestCheckboxSelected('event_ack_enable'));
-
-		$sql = 'SELECT event_ack_enable FROM config WHERE event_ack_enable=1';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_ack_enable"');
-
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestCheckboxSelect('event_ack_enable', false);
-
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Enable event acknowledgement']);
-		$this->assertFalse($this->zbxTestCheckboxSelected('event_ack_enable'));
-
-		$sql = 'SELECT event_ack_enable FROM config WHERE event_ack_enable=0';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_ack_enable"');
 
 		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
