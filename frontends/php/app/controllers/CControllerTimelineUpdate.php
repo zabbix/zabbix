@@ -40,7 +40,7 @@ class CControllerTimelineUpdate extends CController {
 				case 'web.screens':
 				case 'web.graphs':
 				case 'web.httptest':
-				case 'web.problem.timeline':
+				case 'web.problem.filter':
 				case 'web.item.graph':
 				case 'web.auditlogs.timeline':
 				case 'web.slides':

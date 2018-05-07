@@ -114,8 +114,7 @@
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
 
 		// Hide filter with timeline.
-		jQuery('.filter-btn-container, #filter-space').hide();
-		timeControl.removeAllSBox();
+		jQuery('#filter-space').hide();
 	};
 
 	// This method is related to forms: "sharing", "dashboard properties".

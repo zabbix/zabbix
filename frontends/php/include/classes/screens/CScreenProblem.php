@@ -270,7 +270,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			if ($filter['show'] == TRIGGERS_OPTION_ALL) {
-				if (array_key_exists('stime', $filter) && array_key_exists('period', $filter)) {
+				if (array_key_exists('from', $filter) && array_key_exists('to', $filter)) {
 					$options['time_from'] = $filter['from'];
 					$options['time_till'] = $filter['to'];
 				}

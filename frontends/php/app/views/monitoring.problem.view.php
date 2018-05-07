@@ -275,18 +275,16 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
 
 	$filter = (new CFilter())
-		->setProfile('web.problem.filter', 0)
+		->setProfile($data['profileIdx'], 0)
 		->addVar('action', 'problem.view')
 		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addVar('page', $data['page']);
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		$filter->addTimeSelector($data['from'], $data['to']);
+		$filter->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
-
-	$this->addPostJS($filter->getJS());
 
 	(new CWidget())
 		->setTitle(_('Problems'))
@@ -321,7 +319,7 @@ if ($data['action'] == 'problem.view') {
 			'dynamic' => 0,
 			'mainObject' => 1,
 			'profile' => [
-				'idx' => 'web.problem.timeline',
+				'idx' => $data['profileIdx'],
 				'idx2' => 0,
 			]
 		];
