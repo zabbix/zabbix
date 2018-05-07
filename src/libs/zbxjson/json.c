@@ -745,7 +745,7 @@ static unsigned int	zbx_hex2num(char c)
  *               0 on error (invalid escape sequence)                         *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_json_decode_character(const char **p, unsigned char *bytes)
+static unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
 {
 	bytes[0] = '\0';
 
@@ -875,7 +875,7 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 	{
 		switch (*p)
 		{
-			int		nbytes, i;
+			unsigned int	nbytes, i;
 			unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
 
 			case '\\':
@@ -883,13 +883,11 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 				if (0 == (nbytes = zbx_json_decode_character(&p, uc)))
 					return NULL;
 
+				if ((size_t)(out - start) + nbytes >= size)
+					return NULL;
+
 				for (i = 0; i < nbytes; ++i)
-				{
-					if ((size_t)(out - start) < size)
-						*out++ = (char)uc[i];
-					else
-						return NULL;
-				}
+					*out++ = (char)uc[i];
 
 				break;
 			case '"':
