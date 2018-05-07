@@ -541,10 +541,6 @@ var timeControl = {
 			dataType: 'json',
 			success: function(resp) {
 				widget['content_footer'].html(resp.footer);
-
-				if ('period_string' in resp) {
-					jQuery('h4 span', widget['content_header']).text(resp.period_string);
-				}
 			}
 		});
 	},

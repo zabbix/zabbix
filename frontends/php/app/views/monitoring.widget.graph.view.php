@@ -99,10 +99,6 @@ if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
 
-if (array_key_exists('period_string', $data)) {
-	$output['period_string'] = $data['period_string'];
-}
-
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	$output['debug'] = CProfiler::getInstance()->make()->toString();

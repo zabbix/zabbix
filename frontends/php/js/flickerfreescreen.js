@@ -230,7 +230,8 @@
 						from: time_object.from,
 						to: time_object.to,
 						from_ts: time_object.from_ts,
-						to_ts: time_object.to_ts
+						to_ts: time_object.to_ts,
+						refreshable: time_object.refreshable
 					});
 
 					// restart refresh execution starting from Now

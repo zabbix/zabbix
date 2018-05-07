@@ -34,11 +34,7 @@ $widget = (new CWidget())
 					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 				)
 			)
-	]))
-	->addItem((new CFilter())
-		->setProfile('web.screens.filter', 0)
-		->addTimeSelector($data['from'], $data['to'])
-	);
+	]));
 
 $controls = (new CList())->addItem(
 	new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
@@ -106,7 +102,7 @@ $widget->setControls($form);
 $screenBuilder = new CScreenBuilder([
 	'screenid' => $data['screen']['screenid'],
 	'mode' => SCREEN_MODE_PREVIEW,
-	'profileIdx' => 'web.screens',
+	'profileIdx' => 'web.screens.filter',
 	'profileIdx2' => $data['screen']['screenid'],
 	'groupid' => getRequest('groupid'),
 	'hostid' => getRequest('hostid'),
@@ -114,9 +110,16 @@ $screenBuilder = new CScreenBuilder([
 	'to' => $data['to'],
 	'updateProfile' => ($data['from'] !== null && $data['to'] !== null)
 ]);
-$widget->addItem(
-	(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-);
+
+$widget
+	->addItem((new CFilter())
+		->setProfile('web.screens.filter', $data['screen']['screenid'])
+		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
+	)
+	->addItem(
+		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+	);
+
 
 CScreenBuilder::insertScreenStandardJs([
 	'timeline' => $screenBuilder->timeline,

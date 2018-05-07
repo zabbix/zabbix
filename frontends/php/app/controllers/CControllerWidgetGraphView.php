@@ -49,9 +49,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 			$this->setResponse(new CControllerResponseData([
 				'only_footer' => true,
-				'period_string' => ($from !== null && $to !== null)
-					? ' ('.convertUnitsS($to->getTimestamp() - $from->getTimestamp()).')'
-					: '',
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]
@@ -364,7 +361,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		}
 
 		$response = [
-			'name' => $this->getInput('name', ''),
+			'name' => $this->getInput('name', $header_label),
 			'graph' => [
 				'dataid' => $dataid,
 				'containerid' => $containerid,
@@ -385,13 +382,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
-
-		if ($response['name'] === '') {
-			$response['name'] = $header_label;
-			$response['period_string'] = array_key_exists('period', $timeline)
-				? ' ('.convertUnitsS($timeline['period']).')'
-				: '';
-		}
 
 		$this->setResponse(new CControllerResponseData($response));
 	}

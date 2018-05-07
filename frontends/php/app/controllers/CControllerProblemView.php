@@ -282,12 +282,12 @@ class CControllerProblemView extends CController {
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable']
-			]
+			],
+			'profileIdx' => 'web.problem.filter',
+			'profileIdx2' => 0
 		];
 
 		if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-			$data['profileIdx'] = 'web.problem.filter';
-			$data['profileIdx2'] = 0;
 			$data['from'] = $this->hasInput('from') ? $this->getInput('from') : null;
 			$data['to'] = $this->hasInput('to') ? $this->getInput('to') : null;
 			$data['updateProfile'] = ($data['from'] !== null && $data['to'] !== null);
