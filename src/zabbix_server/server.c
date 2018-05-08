@@ -61,7 +61,7 @@
 #include "preprocessor/preproc_manager.h"
 #include "preprocessor/preproc_worker.h"
 #include "events.h"
-#include "valuecache.h"
+#include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"

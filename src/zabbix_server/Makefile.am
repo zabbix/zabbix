@@ -24,12 +24,19 @@ SUBDIRS = \
 
 sbin_PROGRAMS = zabbix_server
 
-zabbix_server_SOURCES = \
+noinst_LIBRARIES = libzbxserver.a
+
+libzbxserver_a_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
-	postinit.c postinit.h \
-	server.c
+	postinit.c postinit.h
+
+libzbxserver_a_CFLAGS = \
+	-DZABBIX_DAEMON \
+	-I@top_srcdir@/src/libs/zbxdbcache
+
+zabbix_server_SOURCES = server.c
 
 if ZBXCUNIT
 nodist_zabbix_server_SOURCES = ../libs/zbxcunit/zbxcunit.c ../libs/zbxcunit/zbxcunit.h
@@ -84,7 +91,8 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a 
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	libzbxserver.a
 
 if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a
@@ -95,14 +103,12 @@ zabbix_server_LDADD += @SERVER_LIBS@ $(CUNIT_LDADD)
 zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 
 zabbix_server_CFLAGS = \
-	-DZABBIX_DAEMON \
 	-DDEFAULT_SSL_CERT_LOCATION="\"@CURL_SSL_CERT_LOCATION@\"" \
 	-DDEFAULT_SSL_KEY_LOCATION="\"@CURL_SSL_KEY_LOCATION@\"" \
 	-DDEFAULT_CONFIG_FILE="\"@SERVER_CONFIG_FILE@\"" \
 	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"@EXTERNAL_SCRIPTS_PATH@\"" \
 	-DDEFAULT_ALERT_SCRIPTS_PATH="\"@ALERT_SCRIPTS_PATH@\"" \
-	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\"" \
-	-I@top_srcdir@/src/libs/zbxdbcache
+	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\""
 
 install-data-hook:
 	$(MKDIR_P) "@SERVER_CONFIG_FILE@.d"

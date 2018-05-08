@@ -6,7 +6,9 @@ EXTRA_DIST = \
 
 sbin_PROGRAMS = zabbix_agentd
 
-zabbix_agentd_SOURCES = \
+noinst_LIBRARIES = libzbxagent.a
+
+libzbxagent_a_SOURCES = \
 	active.c active.h \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
@@ -15,10 +17,15 @@ zabbix_agentd_SOURCES = \
 	logfiles.c logfiles.h \
 	zbxconf.c zbxconf.h \
 	listener.c listener.h \
-	procstat.c procstat.h \
-	zabbix_agentd.c
+	procstat.c procstat.h
+
+libzbxagent_a_CFLAGS = \
+	-DZABBIX_DAEMON
+
+zabbix_agentd_SOURCES = zabbix_agentd.c
 
 zabbix_agentd_LDADD = \
+	libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
