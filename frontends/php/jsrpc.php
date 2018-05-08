@@ -497,8 +497,7 @@ switch ($data['method']) {
 			$from_ts = $from_datetime->getTimestamp();
 
 			$range = $to_ts - $from_ts + 1;
-			// (gch)TODO: ZBX_MAX_PERIOD and it usage should be changed from seconds to year value (2y).
-			$min_date = parseRelativeDate('now-2y', true)->getTimestamp();
+			$min_date = $now_ts - ZBX_MAX_PERIOD;
 
 			if ($data['method'] === 'timeselector.zoomout' && ($from_ts > $min_date	|| $to_ts < $now_ts)) {
 				$from_ts -= floor($range / 2);
