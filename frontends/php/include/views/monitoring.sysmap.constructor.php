@@ -64,7 +64,7 @@ $menu = (new CList())
 		75 => '75x75',
 		100 => '100x100'
 	]))
-	->addItem((new CButton('gridalignall', _('Align icons')))->addClass(ZBX_STYLE_BTN_LINK))
+	->addItem((new CButton('gridalignall', _('Align map elements')))->addClass(ZBX_STYLE_BTN_LINK))
 	->addItem((new CSubmit('update', _('Update')))->setId('sysmap_update'));
 
 $container = (new CDiv())->setId(ZBX_STYLE_MAP_AREA);
