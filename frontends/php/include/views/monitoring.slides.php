@@ -36,17 +36,13 @@ $widget = (new CWidget())
 			)
 	]));
 
-// Create header form.
-$header = (new CForm('get'))
-	->setName('slideHeaderForm')
-	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
-
-$controls = (new CList())->addItem(
-	new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
-		'screens.php' => _('Screens'),
-		'slides.php' => _('Slide shows')
-	])
-);
+$controls = (new CList())
+	->addItem(
+		new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
+			'screens.php' => _('Screens'),
+			'slides.php' => _('Slide shows')
+		])
+	);
 
 $favourite_icon = get_icon('favourite', [
 	'fav' => 'web.favorite.screenids',
@@ -79,17 +75,25 @@ if (isset($this->data['isDynamicItems'])) {
 		$this->data['pageFilter']->getHostsCB()
 	]);
 }
-$controls
-	->addItem($data['screen']['editable']
-		? (new CButton('edit', _('Edit slide show')))
-			->onClick('redirect("slideconf.php?form=update&slideshowid='.$data['screen']['slideshowid'].'")')
-		: null
-	)
-	->addItem($favourite_icon)
-	->addItem($refresh_icon)
-	->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-$header->addItem($controls);
-$widget->setControls($header);
+
+$widget->setControls((new CList([
+	(new CForm('get'))
+		->setAttribute('aria-label', _('Main filter'))
+		->setName('slideHeaderForm')
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+		->addItem($controls),
+	(new CTag('nav', true, (new CList())
+		->addItem($data['screen']['editable']
+			? (new CButton('edit', _('Edit slide show')))
+				->onClick('redirect("slideconf.php?form=update&slideshowid='.$data['screen']['slideshowid'].'")')
+			: null
+		)
+		->addItem($favourite_icon)
+		->addItem($refresh_icon)
+		->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+	))
+		->setAttribute('aria-label', _('Content controls'))
+])));
 
 $filter = (new CFilter())
 	->setProfile('web.slides.filter', $data['screen']['slideshowid'])

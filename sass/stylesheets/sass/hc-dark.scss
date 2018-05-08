@@ -1,3 +1,5 @@
+$theme_name: 'hc-dark';
+
 // NOTIFICATION & ALERT
 $red: #ff5050;
 $light-red: #ff3a3a;
@@ -181,15 +183,15 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -317px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -315px -652px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -315px -688px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -351px -617px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -351px -580px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -315px -545px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -315px -581px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -315px -473px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -315px -509px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -318px -618px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -318px -654px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -318px -690px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -354px -619px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -354px -582px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -318px -546px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -318px -582px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -318px -474px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -318px -510px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -612,7 +614,62 @@ ul.top-nav-icons {
 	color: lighten($alt-yellow, 10%);
 }
 
+.dashbrd-widget-graph-link {
+
+	&:focus {
+
+		&:after {
+			background: $blue;
+			height: 3px;
+			bottom: -3px;
+		}
+	}
+}
+
+// Tables
+
+.list-table {
+	&.compact-view {
+
+		.flh-na-bg, .flh-info-bg, .flh-warning-bg, .flh-average-bg, .flh-high-bg, .flh-disaster-bg {
+			&:not(.row-selected):not(:hover) {
+				background: none;
+			}
+		}
+
+		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
+			&:before {
+				min-height: 20px;
+				box-shadow: inset 0 -1px 0 0 $table-border-color;
+			}
+		}
+
+		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
+			&:after {
+				top: 1px;
+				transform: scale(0.8);
+			}
+		}
+
+		td {
+
+			box-shadow: inset 0 -1px 0 0 $table-border-color;
+
+			.icon-wzrd-action {
+				background: transparent url(../img/icon-sprite.svg) no-repeat -318px -624px;
+			}
+		}
+	}
+}
+
+// Filter Checkboxes
+
+.filter-highlight-row-cb {
+	display: none;
+}
+
 // SEVERITY STATUSES
+
 td.log-na-bg {
 	padding-left: 42px !important;
 	color: $font-color;
@@ -917,8 +974,19 @@ td.disaster-bg {
 	content: none;
 }
 
-.notif-body li {
-	padding: 0 0 10px 42px;
+.notif-body {
+	h4 {
+		padding-bottom: 3px;
+		margin-bottom: -3px;
+	}
+
+	p {
+		margin: 0.25em 0 2px 0;
+	}
+
+	li {
+		padding: 0 0 10px 42px;
+	}
 }
 
 .notif-indic {
@@ -1007,7 +1075,8 @@ td.inactive-bg {
 // GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.2);
-	border: 2px solid rgba($font-color,0.6);
+	border: none;
+	outline: 2px solid rgba($font-color,0.6);
 }
 
 .ui-selectable-helper {

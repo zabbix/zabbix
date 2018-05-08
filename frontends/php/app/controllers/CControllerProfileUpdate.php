@@ -42,9 +42,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.groups.filter.active':
 				case 'web.hostinventories.filter.active':
 				case 'web.hostscreen.filter.active':
-				case 'web.item.graph.active':
+				case 'web.history.filter.active':
 				case 'web.httpconf.filter.active':
-				case 'web.httptest.active':
+				case 'web.httpdetails.filter.active':
 				case 'web.hosts.filter.active':
 				case 'web.items.filter.active':
 				case 'web.latest.filter.active':
@@ -57,7 +57,6 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.filter.active':
 				case 'web.toptriggers.filter.active':
 				case 'web.triggers.filter.active':
-				case 'web.tr_status.filter.active':
 				case 'web.screens.filter.active':
 				case 'web.screenconf.filter.active':
 				case 'web.slides.filter.active':
@@ -65,7 +64,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.sysmapconf.filter.active':
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
-				case 'web.dashbrd.active':
+				case 'web.dashbrd.filter.active':
 					$ret = true;
 					break;
 

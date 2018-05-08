@@ -18,12 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-if (empty($this->data['hostid'])) {
-	$create_button = (new CSubmit('form', _('Create web scenario (select host first)')))->setEnabled(false);
-}
-else {
-	$create_button = new CSubmit('form', _('Create web scenario'));
-}
 
 $filter = (new CFilter())
 	->setProfile('web.httpconf.filter', 0)
@@ -41,22 +35,33 @@ $filter = (new CFilter())
 
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-			->addItem([
-				new CLabel(_('Host'), 'hostid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getHostsCB()
-			])
-			->addItem($create_button)
-		)
-	);
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
+				])
+				->addItem([
+					new CLabel(_('Host'), 'hostid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getHostsCB()
+				])
+			),
+		(new CTag('nav', true, ($this->data['pageFilter']->hostid > 0)
+			? new CRedirectButton(_('Create web scenario'), (new CUrl())
+					->setArgument('form', 'create')
+					->setArgument('groupid', $this->data['pageFilter']->groupid)
+					->setArgument('hostid', $this->data['pageFilter']->hostid)
+					->getUrl()
+				)
+			: (new CButton('form', _('Create web scenario (select host first)')))->setEnabled(false)
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	]));
 
 if (!empty($this->data['hostid'])) {
 	$widget->addItem(get_header_host_table('web', $this->data['hostid']));

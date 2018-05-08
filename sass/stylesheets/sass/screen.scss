@@ -1,3 +1,5 @@
+$theme_name: 'blue' !default;
+
 @import '_reset.scss';
 @import '_colors.scss';
 @import '_fonts.scss';
@@ -215,48 +217,23 @@ pre {
 	word-wrap: break-word;
 }
 
-// Main Navigation
-nav {
-	background-color: $main-subnav-bg-color;
-
-	a {
-
-		&:link {
-			@extend %no-border;
-		}
-
-		&:visited {
-			@extend %no-border;
-		}
-
-		&:hover {
-			@extend %no-border;
-		}
-
-		&:focus {
-			@extend %no-border;
-		}
-
-		&:active {
-			@extend %no-border;
-		}
-	}
-}
-
-.nav {
-	@extend nav;
-}
-
-%no-border {
-	border: none;
-}
-
 .top-nav-container {
+	background-color: $main-nav-bg-color;
 	height: 45px;
 	line-height: 45px;
-	padding: 0 10px 0 10px;
+	padding: 0 10px;
 	position: relative;
-	background-color: $main-nav-bg-color;
+}
+
+.top-nav a,
+.top-subnav a,
+.header-logo {
+	&:active,
+	&:hover,
+	&:link,
+	&:visited {
+		border: none;
+	}
 }
 
 .top-nav {
@@ -415,11 +392,11 @@ ul.top-nav-icons {
 }
 
 .top-subnav-container {
+	background-color: $main-subnav-bg-color;
 	height: 30px;
 	line-height: 30px;
-	background-color: $main-subnav-bg-color;
-	position: relative;
 	padding: 0 10px;
+	position: relative;
 }
 
 .top-subnav {
@@ -453,21 +430,21 @@ ul.top-nav-icons {
 		color: $link-main-subnav-hover-color;
 	}
 
-	&:focus {
-		color: $link-main-subnav-active-color;
-		padding: 8px 0 4px 0;
-		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
-		outline: none;
-	}
-
 	&:active {
 		color: $link-main-subnav-active-color;
 	}
 
-	&.selected {
+	&:focus {
+		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
 		color: $link-main-subnav-active-color;
-		padding: 8px 0 4px 0;
+		outline: none;
+		padding-bottom: 4px;
+	}
+
+	&.selected {
 		border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
+		color: $link-main-subnav-active-color;
+		padding-bottom: 4px;
 	}
 }
 
@@ -541,6 +518,10 @@ ul.top-nav-icons {
 			position: relative;
 			padding: 0 0 0 10px;
 		}
+
+		ul li:first-child {
+			padding-left: 0;
+		}
 	}
 
 	.dashbrd-edit {
@@ -580,10 +561,6 @@ ul.top-nav-icons {
 // Article
 article {
 	padding: 10px 10px 0 10px;
-}
-
-.article {
-	@extend article;
 }
 
 // Object Group Navigation
@@ -645,8 +622,12 @@ footer {
 	color: $font-alt-color;
 }
 
-.footer {
-	@extend footer;
+main {
+	@extend article;
+}
+
+output {
+	display: block;
 }
 
 .logo {
@@ -663,7 +644,7 @@ footer {
 	margin: 10px 10px 0 0;
 
 	&:focus {
-	@include box-shadow(0 0 0 2px rgba($blue, .35));
+		@include box-shadow(0 0 0 2px rgba($blue, .35));
 	}
 }
 
@@ -673,6 +654,105 @@ footer {
 	background-color: $ui-bg-color;
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
+
+	&.compact-view {
+		tr {
+			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
+
+				@if $theme_name == 'blue' {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							color: $font-color;
+
+							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
+								color: $font-color;
+								border-bottom-color: rgba($font-color, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+							}
+
+							.tag {
+								background-color: rgba($font-color, 0.5);
+							}
+
+							button:focus {
+								box-shadow: 0 0 0 2px rgba($font-color, 0.5);
+							}
+						}
+					}
+				}
+
+				@if $theme_name == 'dark' {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							color: black;
+
+							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
+								color: black;
+								border-bottom-color: rgba(black, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+							}
+
+							button:focus {
+								box-shadow: 0 0 0 2px rgba(black, 0.5);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.link-action {
+			color: $font-color;
+
+			&.red {
+				color: $red;
+			}
+
+			&.green {
+				color: $green;
+			}
+
+			&:hover {
+				color: $link-hover-color;
+			}
+
+			&:focus {
+				color: $link-hover-color;
+			}
+		}
+
+		td {
+			padding: 2px 5px 2px 5px;
+			border-bottom: none;
+			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
+			color: $font-color;
+
+			.tag {
+				max-width: 40px;
+				margin: -2px 3px 0 0;
+				padding: 2px 3px;
+			}
+
+			.rel-container {
+				display: inline;
+			}
+
+			.icon-wzrd-action {
+				margin: 2px 0 0 2px;
+				height: 12px;
+				min-height: 12px;
+				background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px;
+			}
+		}
+	}
 
 	thead th {
 		color: $font-alt-color;
@@ -2247,15 +2327,15 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -4px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -39px -617px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -39px -580px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -6px -618px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -6px -654px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -6px -689px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -42px -619px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -42px -582px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -6px -546px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -6px -582px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -6px -474px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -6px -510px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -2494,8 +2574,9 @@ $icon-widget-btn: (
 }
 
 %btn-widget {
-	width: 30px;
-	height: 28px;
+	width: 24px;
+	height: 24px;
+	margin: 2px 2px 0 0;
 	@extend %btn-widget-defaults;
 }
 
@@ -2518,7 +2599,6 @@ $icon-widget-btn: (
 	}
 
 	&:focus {
-		@include box-shadow(none);
 		@extend %btn-widget-hover-active;
 	}
 
@@ -2625,7 +2705,7 @@ button[disabled] {
 		display: inline-block;
 
 		a {
-			@extend %no-border;
+			border: none;
 			padding: 8px 10px;
 			@include transition(background-color .2s ease-out);
 
@@ -2664,7 +2744,7 @@ button[disabled] {
 				cursor: default;
 				color: $btn-disabled-font-color;
 				background-color: $transparent;
-				@extend %no-border;
+				border: none;
 			}
 		}
 	}
@@ -3387,6 +3467,27 @@ $form-icon-btn: (
 	}
 }
 
+.dashbrd-widget-graph-link {
+	display: block;
+
+	&:link {
+		border: none;
+	}
+
+	&:focus {
+
+		&:after {
+			content: "";
+			background: rgba($blue, .35);
+			height: 2px;
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: -2px;
+		}
+	}
+}
+
 // Action Menus, Pop-up Menus
 .action-menu {
 	position: absolute;
@@ -3536,7 +3637,7 @@ $form-icon-btn: (
 		& > .overlay-close-btn {
 			position: relative;
 			float: right;
-			top: -12px;
+			top: -13px;
 			right: -8px;
 		}
 	}
@@ -4425,7 +4526,21 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
+// Filter Checkboxes
+
+.table-forms-second-column {
+	display: inline-block;
+	width: 50%;
+	min-width: 200px;
+	text-align: right;
+
+	.second-column-label {
+		padding: 0 10px;
+	}
+}
+
 // Event status colors
+
 .problem-unack-fg {
 	color: $problem-unack-fg-color;
 }
@@ -5025,6 +5140,10 @@ tr.cursor-move {
 	.icon-info {
 		margin-right: 10px;
 
+		&:only-of-type {
+			margin-right: 0;
+		}
+
 		&:last-child {
 			margin-right: 0;
 		}
@@ -5256,6 +5375,10 @@ svg {
 						border: 0px none;
 						opacity: 0.5;
 						float: left;
+
+						&::-moz-focus-inner {
+							padding: 0;
+						}
 					}
 					.edit-item-btn:hover,
 					.remove-item-btn:hover,
@@ -5422,6 +5545,8 @@ svg {
 :placeholder-shown {
 	color: $input-placeholder-color;
 }
+
+@if $theme_name == 'dev' {
 
 /*doc
 ---
@@ -6315,3 +6440,4 @@ Widgets are used as containers to group any related information. Widget consists
 </div>
 ```
 */
+}

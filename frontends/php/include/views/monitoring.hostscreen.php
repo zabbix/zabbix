@@ -62,9 +62,15 @@ else {
 			);
 		}
 
-		$screen_widget->setControls((new CList())
-			->addItem($screen_combobox)
-			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+		$screen_widget->setControls((new CTag('nav', true,
+			(new CForm('get'))
+				->setAttribute('aria-label', _('Main filter'))
+				->addItem((new CList())
+					->addItem($screen_combobox)
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+				)
+			))
+				->setAttribute('aria-label', _('Content controls'))
 		);
 	}
 

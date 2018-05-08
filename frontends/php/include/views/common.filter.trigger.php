@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/js/common.filter.trigger.js.php';
 
-$overview = $this->data['overview'];
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
@@ -50,20 +49,6 @@ if ($config['event_ack_enable']) {
 			ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
 		])
 	);
-}
-
-// events
-if (!$overview) {
-	$config['event_expire'] = convertUnitsS(timeUnitToSeconds($config['event_expire']));
-
-	$eventsComboBox = new CComboBox('show_events', $filter['showEvents'], null, [
-		EVENTS_OPTION_NOEVENT => _('Hide all'),
-		EVENTS_OPTION_ALL => _s('Show all (%1$s)', $config['event_expire'])
-	]);
-	if ($config['event_ack_enable']) {
-		$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK, _s('Show unacknowledged (%1$s)', $config['event_expire']));
-	}
-	$column1->addRow(_('Events'), $eventsComboBox);
 }
 
 // min severity
@@ -157,11 +142,6 @@ $column2->addRow(_('Host inventory'), $inventoryFilterTable);
 $column2->addRow(_('Show hosts in maintenance'),
 	(new CCheckBox('show_maintenance'))->setChecked($filter['showMaintenance'] == 1)
 );
-
-// show details
-if (!$overview) {
-	$column2->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
-}
 
 $filterForm->addFilterTab(_('Filter'), [$column1, $column2]);
 

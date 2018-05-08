@@ -120,7 +120,11 @@ switch ($data['method']) {
 						$sound = $msgsettings['sounds.'.$trigger['priority']];
 					}
 
-					$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
+					$url_problems = (new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_hostids[]', $host['hostid'])
+						->setArgument('filter_set', '1')
+						->getUrl();
 					$url_events = (new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
 						->setArgument('filter_triggerids[]', $event['objectid'])
@@ -136,7 +140,7 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'severity_style' => getSeverityStyle($trigger['priority'], $event['value'] == TRIGGER_VALUE_TRUE),
-						'title' => $title.' [url='.$url_tr_status.']'.CHtml::encode($host['name']).'[/url]',
+						'title' => $title.' [url='.$url_problems.']'.CHtml::encode($host['name']).'[/url]',
 						'body' => [
 							'[url='.$url_events.']'.CHtml::encode($trigger['description']).'[/url]',
 							'[url='.$url_tr_events.']'.
@@ -237,11 +241,11 @@ switch ($data['method']) {
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$hostGroups = API::HostGroup()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : false,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['groupid', 'name'],
-					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
-					'filter' => isset($data['filter']) ? $data['filter'] : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
 				]);
 
 				if ($hostGroups) {
@@ -259,12 +263,13 @@ switch ($data['method']) {
 
 			case 'hosts':
 				$hosts = API::Host()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : false,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['hostid', 'name'],
-					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
-					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
+					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);
+
 
 				if ($hosts) {
 					CArrayHelper::sort($hosts, [
@@ -276,6 +281,38 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($hosts, ['hostid' => 'id']);
+				}
+				break;
+
+			case 'items':
+				$items = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'selectHosts' => ['name'],
+					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
+					'templated' => array_key_exists('real_hosts', $data) ? false : null,
+					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($items) {
+					$items = CMacrosResolverHelper::resolveItemNames($items);
+					CArrayHelper::sort($items, [
+						['field' => 'name_expanded', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$items = array_slice($items, 0, $data['limit']);
+					}
+
+					foreach ($items as $item) {
+						$result[] = [
+							'id' => $item['itemid'],
+							'name' => $item['name_expanded'],
+							'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+						];
+					}
 				}
 				break;
 
@@ -302,7 +339,6 @@ switch ($data['method']) {
 
 			case 'proxies':
 				$proxies = API::Proxy()->get([
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['proxyid', 'host'],
 					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
 					'limit' => $config['search_limit']
@@ -396,7 +432,6 @@ switch ($data['method']) {
 
 			case 'users':
 				$users = API::User()->get([
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['userid', 'alias', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
 						? [

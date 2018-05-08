@@ -36,15 +36,14 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Host groups'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
-			'data' => $this->data['multiSelectHostGroupData'],
+			'object_name' => 'hostGroup',
+			'data' => $data['multiSelectHostGroupData'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'groupids_',
 					'srcfld1' => 'groupid',
-					'multiselect' => '1'
+					'dstfrm' => $filterForm->getName(),
+					'dstfld1' => 'groupids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -52,16 +51,14 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Hosts'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
-			'objectName' => 'hosts',
-			'data' => $this->data['multiSelectHostData'],
+			'object_name' => 'hosts',
+			'data' => $data['multiSelectHostData'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
-					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'hostids_',
 					'srcfld1' => 'hostid',
-					'real_hosts' => '1',
-					'multiselect' => '1'
+					'dstfrm' => $filterForm->getName(),
+					'dstfld1' => 'hostids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -125,7 +122,7 @@ foreach ($this->data['triggers'] as $trigger) {
 	}
 
 	$triggerDescription = (new CLinkAction($trigger['description']))
-		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, null, ['show_description' => false]));
 
 	$table->addRow([
 		$hostName,

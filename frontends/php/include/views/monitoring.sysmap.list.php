@@ -18,14 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())
 	->setTitle(_('Maps'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem(new CSubmit('form', _('Create map')))
-			->addItem((new CButton('form', _('Import')))->onClick('redirect("map.import.php?rules_preset=map")'))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm('get'))
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(new CSubmit('form', _('Create map')))
+				->addItem(
+					(new CButton('form', _('Import')))
+						->onClick('redirect("map.import.php?rules_preset=map")')
+						->removeId()
+				)
+		)))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(
 		(new CFilter())

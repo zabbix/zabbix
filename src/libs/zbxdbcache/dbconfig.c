@@ -28,12 +28,10 @@
 #include "memalloc.h"
 #include "zbxserver.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
-#include "dbcache.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
@@ -193,6 +191,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_CALCULATED:
+		case ITEM_TYPE_HTTPAGENT:
 			if (0 == CONFIG_POLLER_FORKS)
 				break;
 
@@ -312,9 +311,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	{
 		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
-
-	if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (item->nextcheck = DCget_disable_until(item, host)))
-		return;
 
 	if (0 != host->proxy_hostid && NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 		now -= proxy->timediff;
@@ -1077,7 +1073,6 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		DCstrpool_replace(found, &host->proxy_address, row[35]);
 		DCstrpool_replace(found, &host->tls_issuer, row[31]);
 		DCstrpool_replace(found, &host->tls_subject, row[32]);
 
@@ -1267,8 +1262,6 @@ done:
 				zbx_hashset_insert(&psk_owners, &psk_owner_local, sizeof(psk_owner_local));
 			}
 		}
-#else
-		DCstrpool_replace(found, &host->proxy_address, row[31]);
 #endif
 		ZBX_STR2UCHAR(host->tls_connect, row[29]);
 		ZBX_STR2UCHAR(host->tls_accept, row[30]);
@@ -1378,6 +1371,9 @@ done:
 				proxy->last_cfg_error_time = 0;
 			}
 
+			proxy->auto_compress = atoi(row[32 + ZBX_HOST_TLS_OFFSET]);
+			DCstrpool_replace(found, &proxy->proxy_address, row[31 + ZBX_HOST_TLS_OFFSET]);
+
 			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
 			{
 				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
@@ -1403,6 +1399,7 @@ done:
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
 
+			zbx_strpool_release(proxy->proxy_address);
 			zbx_hashset_remove_direct(&config->proxies, proxy);
 		}
 
@@ -1437,6 +1434,7 @@ done:
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
 
+			zbx_strpool_release(proxy->proxy_address);
 			zbx_hashset_remove_direct(&config->proxies, proxy);
 		}
 
@@ -1467,7 +1465,6 @@ done:
 
 		zbx_strpool_release(host->host);
 		zbx_strpool_release(host->name);
-		zbx_strpool_release(host->proxy_address);
 
 		zbx_strpool_release(host->error);
 		zbx_strpool_release(host->snmp_error);
@@ -2286,6 +2283,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_MASTERITEM	*master;
 	ZBX_DC_PREPROCITEM	*preprocitem;
+	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
 
 	time_t			now;
@@ -2510,7 +2508,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[15])
 		{
 			trapitem = (ZBX_DC_TRAPITEM *)DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
-			zbx_trim_str_list(row[15], ',');
 			DCstrpool_replace(found, &trapitem->trapper_hosts, row[15]);
 		}
 		else if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems, &itemid)))
@@ -2696,6 +2693,56 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
+		}
+
+		/* HTTP agent items */
+
+		if (ITEM_TYPE_HTTPAGENT == item->type)
+		{
+			httpitem = (ZBX_DC_HTTPITEM *)DCfind_id(&config->httpitems, itemid, sizeof(ZBX_DC_HTTPITEM),
+					&found);
+
+			DCstrpool_replace(found, &httpitem->timeout, row[39]);
+			DCstrpool_replace(found, &httpitem->url, row[40]);
+			DCstrpool_replace(found, &httpitem->query_fields, row[41]);
+			DCstrpool_replace(found, &httpitem->posts, row[42]);
+			DCstrpool_replace(found, &httpitem->status_codes, row[43]);
+			httpitem->follow_redirects = (unsigned char)atoi(row[44]);
+			httpitem->post_type = (unsigned char)atoi(row[45]);
+			DCstrpool_replace(found, &httpitem->http_proxy, row[46]);
+			DCstrpool_replace(found, &httpitem->headers, row[47]);
+			httpitem->retrieve_mode = (unsigned char)atoi(row[48]);
+			httpitem->request_method = (unsigned char)atoi(row[49]);
+			httpitem->output_format = (unsigned char)atoi(row[50]);
+			DCstrpool_replace(found, &httpitem->ssl_cert_file, row[51]);
+			DCstrpool_replace(found, &httpitem->ssl_key_file, row[52]);
+			DCstrpool_replace(found, &httpitem->ssl_key_password, row[53]);
+			httpitem->verify_peer = (unsigned char)atoi(row[54]);
+			httpitem->verify_host = (unsigned char)atoi(row[55]);
+			httpitem->allow_traps = (unsigned char)atoi(row[56]);
+
+			httpitem->authtype = (unsigned char)atoi(row[19]);
+			DCstrpool_replace(found, &httpitem->username, row[20]);
+			DCstrpool_replace(found, &httpitem->password, row[21]);
+			DCstrpool_replace(found, &httpitem->trapper_hosts, row[15]);
+		}
+		else if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid)))
+		{
+			zbx_strpool_release(httpitem->timeout);
+			zbx_strpool_release(httpitem->url);
+			zbx_strpool_release(httpitem->query_fields);
+			zbx_strpool_release(httpitem->posts);
+			zbx_strpool_release(httpitem->status_codes);
+			zbx_strpool_release(httpitem->http_proxy);
+			zbx_strpool_release(httpitem->headers);
+			zbx_strpool_release(httpitem->ssl_cert_file);
+			zbx_strpool_release(httpitem->ssl_key_file);
+			zbx_strpool_release(httpitem->ssl_key_password);
+			zbx_strpool_release(httpitem->username);
+			zbx_strpool_release(httpitem->password);
+			zbx_strpool_release(httpitem->trapper_hosts);
+
+			zbx_hashset_remove_direct(&config->httpitems, httpitem);
 		}
 
 		/* it is crucial to update type specific (config->snmpitems, config->ipmiitems, etc.) hashsets before */
@@ -2899,6 +2946,29 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
+		/* HTTP agent items */
+
+		if (ITEM_TYPE_HTTPAGENT == item->type)
+		{
+			httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid);
+
+			zbx_strpool_release(httpitem->timeout);
+			zbx_strpool_release(httpitem->url);
+			zbx_strpool_release(httpitem->query_fields);
+			zbx_strpool_release(httpitem->posts);
+			zbx_strpool_release(httpitem->status_codes);
+			zbx_strpool_release(httpitem->http_proxy);
+			zbx_strpool_release(httpitem->headers);
+			zbx_strpool_release(httpitem->ssl_cert_file);
+			zbx_strpool_release(httpitem->ssl_key_file);
+			zbx_strpool_release(httpitem->ssl_key_password);
+			zbx_strpool_release(httpitem->username);
+			zbx_strpool_release(httpitem->password);
+			zbx_strpool_release(httpitem->trapper_hosts);
+
+			zbx_hashset_remove_direct(&config->httpitems, httpitem);
+		}
+
 		/* items */
 
 		item_hk_local.hostid = item->hostid;
@@ -2917,6 +2987,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		zbx_strpool_release(item->key);
 		zbx_strpool_release(item->port);
 		zbx_strpool_release(item->error);
+		zbx_strpool_release(item->delay);
 
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
@@ -4914,6 +4985,8 @@ void	DCsync_configuration(unsigned char mode)
 				config->jmxitems.num_data, config->jmxitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
 				config->calcitems.num_data, config->calcitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpitems  : %d (%d slots)", __function_name,
+				config->httpitems.num_data, config->httpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
@@ -5335,6 +5408,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->calcitems, 0);
 	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
+	CREATE_HASHSET(config->httpitems, 0);
 	CREATE_HASHSET(config->functions, 100);
 	CREATE_HASHSET(config->triggers, 100);
 	CREATE_HASHSET(config->trigdeps, 0);
@@ -5807,6 +5881,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_JMXITEM		*jmxitem;
 	const ZBX_DC_CALCITEM		*calcitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
+	const ZBX_DC_HTTPITEM		*httpitem;
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->type = src_item->type;
@@ -5922,6 +5997,68 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->privatekey = NULL;
 			dst_item->password = NULL;
 			break;
+		case ITEM_TYPE_HTTPAGENT:
+			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &src_item->itemid)))
+			{
+				strscpy(dst_item->timeout_orig, httpitem->timeout);
+				strscpy(dst_item->url_orig, httpitem->url);
+				strscpy(dst_item->query_fields_orig, httpitem->query_fields);
+				strscpy(dst_item->status_codes_orig, httpitem->status_codes);
+				dst_item->follow_redirects = httpitem->follow_redirects;
+				dst_item->post_type = httpitem->post_type;
+				strscpy(dst_item->http_proxy_orig, httpitem->http_proxy);
+				dst_item->headers = zbx_strdup(NULL, httpitem->headers);
+				dst_item->retrieve_mode = httpitem->retrieve_mode;
+				dst_item->request_method = httpitem->request_method;
+				dst_item->output_format = httpitem->output_format;
+				strscpy(dst_item->ssl_cert_file_orig, httpitem->ssl_cert_file);
+				strscpy(dst_item->ssl_key_file_orig, httpitem->ssl_key_file);
+				strscpy(dst_item->ssl_key_password_orig, httpitem->ssl_key_password);
+				dst_item->verify_peer = httpitem->verify_peer;
+				dst_item->verify_host = httpitem->verify_host;
+				dst_item->authtype = httpitem->authtype;
+				strscpy(dst_item->username_orig, httpitem->username);
+				strscpy(dst_item->password_orig, httpitem->password);
+				dst_item->posts = zbx_strdup(NULL, httpitem->posts);
+				dst_item->allow_traps = httpitem->allow_traps;
+				strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);
+			}
+			else
+			{
+				*dst_item->timeout_orig = '\0';
+				*dst_item->url_orig = '\0';
+				*dst_item->query_fields_orig = '\0';
+				*dst_item->status_codes_orig = '\0';
+				dst_item->follow_redirects = 0;
+				dst_item->post_type = 0;
+				*dst_item->http_proxy_orig = '\0';
+				dst_item->headers = zbx_strdup(NULL, "");
+				dst_item->retrieve_mode = 0;
+				dst_item->request_method = 0;
+				dst_item->output_format = 0;
+				*dst_item->ssl_cert_file_orig = '\0';
+				*dst_item->ssl_key_file_orig = '\0';
+				*dst_item->ssl_key_password_orig = '\0';
+				dst_item->verify_peer = 0;
+				dst_item->verify_host = 0;
+				dst_item->authtype = 0;
+				*dst_item->username_orig = '\0';
+				*dst_item->password_orig = '\0';
+				dst_item->posts = zbx_strdup(NULL, "");
+				dst_item->allow_traps = 0;
+				*dst_item->trapper_hosts = '\0';
+			}
+			dst_item->timeout = NULL;
+			dst_item->url = NULL;
+			dst_item->query_fields = NULL;
+			dst_item->status_codes = NULL;
+			dst_item->http_proxy = NULL;
+			dst_item->ssl_cert_file = NULL;
+			dst_item->ssl_key_file = NULL;
+			dst_item->ssl_key_password = NULL;
+			dst_item->username = NULL;
+			dst_item->password = NULL;
+			break;
 		case ITEM_TYPE_TELNET:
 			if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
 			{
@@ -6012,6 +6149,10 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 
 		switch (items[i].type)
 		{
+			case ITEM_TYPE_HTTPAGENT:
+				zbx_free(items[i].headers);
+				zbx_free(items[i].posts);
+				break;
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
@@ -8432,11 +8573,13 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
 	dst_proxy->version = src_proxy->version;
+	dst_proxy->lastaccess = src_proxy->lastaccess;
+	dst_proxy->auto_compress = src_proxy->auto_compress;
 
 	if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
 		strscpy(dst_proxy->host, host->host);
-		strscpy(dst_proxy->proxy_address, host->proxy_address);
+		strscpy(dst_proxy->proxy_address, src_proxy->proxy_address);
 
 		dst_proxy->tls_connect = host->tls_connect;
 		dst_proxy->tls_accept = host->tls_accept;
@@ -10789,29 +10932,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_update_proxy_version                                      *
- *                                                                            *
- * Purpose: updates proxy version in configuration cache                      *
- *                                                                            *
- * Parameters:                                                                *
- *     hostid  - [IN] the proxy identifier                                    *
- *     version - [IN] the new proxy version                                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version)
-{
-	ZBX_DC_PROXY	*dc_proxy;
-
-	LOCK_CACHE;
-
-	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		dc_proxy->version = version;
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dc_items_update_nextcheck                                    *
  *                                                                            *
  * Purpose: updates item nextcheck values in configuration cache              *
@@ -10849,63 +10969,15 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
+		if (ZBX_LOC_NOWHERE != dc_item->location)
+			continue;
+
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
 			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
 	}
 
 	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_dc_update_proxy_lastaccess                                   *
- *                                                                            *
- * Purpose: updates proxy last access timestamp in configuration cache        *
- *                                                                            *
- * Parameter: hostid     - [IN] the proxy identifier (hostid)                 *
- *            lastaccess - [IN] the last time proxy data was received/sent    *
- *            proxy_diff - [OUT] last access updates for proxies that need    *
- *                               to be synced with database                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess, zbx_vector_uint64_pair_t *proxy_diff)
-{
-	ZBX_DC_PROXY	*proxy;
-	int		now;
-
-	LOCK_CACHE;
-
-	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-	{
-		if (lastaccess < config->proxy_lastaccess_ts)
-			proxy->lastaccess = config->proxy_lastaccess_ts;
-		else
-			proxy->lastaccess = lastaccess;
-	}
-
-	if (ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY < (now = time(NULL)) - config->proxy_lastaccess_ts)
-	{
-		zbx_hashset_iter_t	iter;
-
-		zbx_hashset_iter_reset(&config->proxies, &iter);
-
-		while (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
-		{
-			if (proxy->lastaccess >= config->proxy_lastaccess_ts)
-			{
-				zbx_uint64_pair_t	pair = {proxy->hostid, proxy->lastaccess};
-
-				zbx_vector_uint64_pair_append(proxy_diff, pair);
-			}
-		}
-
-		config->proxy_lastaccess_ts = now;
-	}
-
-	UNLOCK_CACHE;
-
-	zbx_vector_uint64_pair_sort(proxy_diff, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -11189,6 +11261,13 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 			proxy_hostid = 0;
 		}
+		else if (0 == dc_item->schedulable)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for item \"%s\" on host \"%s\""
+					": item configuration error", dc_item->key, dc_host->host);
+
+			proxy_hostid = 0;
+		}
 		else if (0 == (proxy_hostid = dc_host->proxy_hostid))
 			dc_requeue_item_at(dc_item, dc_host, nextcheck);
 
@@ -11199,3 +11278,96 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 	UNLOCK_CACHE;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_update_proxy                                              *
+ *                                                                            *
+ * Purpose: updates changed proxy data in configuration cache and updates     *
+ *          diff flags to reflect the updated data                            *
+ *                                                                            *
+ * Parameter: diff - [IN/OUT] the properties to update                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
+{
+	ZBX_DC_PROXY	*proxy;
+
+	LOCK_CACHE;
+
+	if (diff->lastaccess < config->proxy_lastaccess_ts)
+		diff->lastaccess = config->proxy_lastaccess_ts;
+
+	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &diff->hostid)))
+	{
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS))
+		{
+			if (proxy->lastaccess != diff->lastaccess)
+				proxy->lastaccess = diff->lastaccess;
+
+			/* proxy last access in database is updated separately in  */
+			/* every ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY seconds     */
+			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS);
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
+		{
+			if (proxy->version != diff->version)
+				proxy->version = diff->version;
+			else
+				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION);
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
+		{
+			if (proxy->auto_compress != diff->compress)
+				proxy->auto_compress = diff->compress;
+			else
+				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS);
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_proxy_lastaccess                                      *
+ *                                                                            *
+ * Purpose: returns proxy lastaccess changes since last lastaccess request    *
+ *                                                                            *
+ * Parameter: lastaccess - [OUT] last access updates for proxies that need    *
+ *                               to be synced with database, sorted by        *
+ *                               hostid                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
+{
+	ZBX_DC_PROXY	*proxy;
+	int		now;
+
+	if (ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY < (now = time(NULL)) - config->proxy_lastaccess_ts)
+	{
+		zbx_hashset_iter_t	iter;
+
+		LOCK_CACHE;
+
+		zbx_hashset_iter_reset(&config->proxies, &iter);
+
+		while (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
+		{
+			if (proxy->lastaccess >= config->proxy_lastaccess_ts)
+			{
+				zbx_uint64_pair_t	pair = {proxy->hostid, proxy->lastaccess};
+
+				zbx_vector_uint64_pair_append(lastaccess, pair);
+			}
+		}
+
+		config->proxy_lastaccess_ts = now;
+
+		UNLOCK_CACHE;
+
+		zbx_vector_uint64_pair_sort(lastaccess, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+}

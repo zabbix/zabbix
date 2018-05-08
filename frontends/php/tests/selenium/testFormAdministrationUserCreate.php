@@ -29,7 +29,7 @@ class testFormAdministrationUserCreate extends CWebTest {
 	public function testFormAdministrationUserCreate_CreateUser() {
 		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
-		$this->zbxTestClick('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create user');
 		$this->zbxTestInputType('alias', 'User alias');
 		$this->zbxTestInputType('name', 'User name');
 		$this->zbxTestInputType('surname', 'User surname');

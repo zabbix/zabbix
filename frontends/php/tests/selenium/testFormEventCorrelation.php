@@ -472,7 +472,7 @@ class testFormEventCorrelation extends CWebTest {
 
 					],
 				'calculation' => 'Custom expression',
-				'formula' => 'A or (B and C)'
+				'formula' => 'A or (B and not C)'
 				]
 			]
 		];
@@ -525,7 +525,7 @@ class testFormEventCorrelation extends CWebTest {
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
 					],
 					'formula'=> '',
-					'error_message' => 'Incorrect custom expression "Test create with empty expression" for correlation "": expression is empty.'
+					'error_message' => 'Incorrect custom expression "" for correlation "Test create with empty expression": expression is empty.'
 				]
 			],
 			[
@@ -561,9 +561,42 @@ class testFormEventCorrelation extends CWebTest {
 						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
 					],
 					'formula'=> 'Wrong formula',
-					'error_message' => 'Incorrect custom expression "Test create with wrong formula" for correlation "Wrong formula": check expression starting from "Wrong formula".'
+					'error_message' => 'Incorrect custom expression "Wrong formula" for correlation "Test create with wrong formula": check expression starting from "Wrong formula".'
 				]
 			],
+			[
+				[
+					'name' => 'Check case sensitive of operator in formula',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+					],
+					'formula'=> 'A and Not B',
+					'error_message' => 'Incorrect custom expression "A and Not B" for correlation "Check case sensitive of operator in formula": check expression starting from "Not B".'
+				]
+			],
+			[
+				[
+					'name' => 'Check case sensitive of first operator in formula',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+					],
+					'formula'=> 'NOT A and not B',
+					'error_message' => 'Incorrect custom expression "NOT A and not B" for correlation "Check case sensitive of first operator in formula": check expression starting from " A and not B".'
+				]
+			],
+			[
+				[
+					'name' => 'Test create with only NOT in formula',
+					'tags'=>[
+						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
+						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
+					],
+					'formula'=> 'not A not B',
+					'error_message' => 'Incorrect custom expression "not A not B" for correlation "Test create with only NOT in formula": check expression starting from " not B".'
+				]
+			]
 		];
 	}
 
@@ -658,7 +691,7 @@ class testFormEventCorrelation extends CWebTest {
 
 		$this->zbxTestInputTypeOverwrite('name', 'New event correlation for update');
 
-		$this->zbxTestClick('remove');
+		$this->zbxTestClickXpathWait('//tr[@id=\'conditions_0\']//button[text()=\'Remove\']');
 		$this->zbxTestDropdownSelectWait('new_condition_type', 'New event tag');
 		$this->zbxTestInputTypeOverwrite('new_condition_tag', 'New update tag');
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');

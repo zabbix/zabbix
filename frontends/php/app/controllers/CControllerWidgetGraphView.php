@@ -83,7 +83,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		}
 		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH && $fields['itemid']) {
 			$resource_type = SCREEN_RESOURCE_SIMPLE_GRAPH;
-			$resourceid = $fields['itemid'];
+			$resourceid = $fields['itemid'][0];
 			$graph_dims = getGraphDims();
 			$graph_dims['graphHeight'] = $height;
 			$graph_dims['width'] = $width;
@@ -128,22 +128,28 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				$items = get_same_item_for_host(['itemid' => $resourceid], [$dynamic_hostid]);
-				$item = reset($items);
-				$resourceid = ($item && array_key_exists('itemid', $item)) ? $item['itemid'] : null;
+				$src_items = API::Item()->get([
+					'output' => ['key_'],
+					'itemids' => $resourceid,
+					'webitems' => true
+				]);
 
-				if ($resourceid === null
-						|| !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+				$items = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'selectHosts' => ['name'],
+					'hostids' => $dynamic_hostid,
+					'filter' => [
+						'key_' => $src_items[0]['key_'],
+						'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+					],
+					'webitems' => true
+				]);
+
+				$item = reset($items);
+				$resourceid = $items ? $item['itemid'] : null;
+
+				if ($resourceid === null) {
 					$unavailable_object = true;
-					$resourceid = null;
-				}
-				else {
-					$db_item = API::Item()->get([
-						'output' => [],
-						'selectHosts' => ['name'],
-						'itemids' => $item['itemid']
-					]);
-					$item['hosts'] = $db_item[0]['hosts'];
 				}
 			}
 			// Find requested host and change graph details.

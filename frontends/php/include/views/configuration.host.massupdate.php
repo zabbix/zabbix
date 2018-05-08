@@ -26,6 +26,7 @@ $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 // create form
 $hostView = (new CForm())
 	->setName('hostForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'host.massupdate')
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('id', 'hostForm');
@@ -37,35 +38,26 @@ foreach ($data['hosts'] as $hostid) {
 $hostFormList = new CFormList('hostFormList');
 
 // replace host groups
-$hostGroupsToReplace = null;
-if (isset($_REQUEST['groups'])) {
-	$getHostGroups = API::HostGroup()->get([
-		'groupids' => $_REQUEST['groups'],
+$hostgroups_to_replace = isset($_REQUEST['groups'])
+	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
+		'groupids' => $_REQUEST['groups'],
 		'editable' => true
-	]);
-	foreach ($getHostGroups as $getHostGroup) {
-		$hostGroupsToReplace[] = [
-			'id' => $getHostGroup['groupid'],
-			'name' => $getHostGroup['name']
-		];
-	}
-}
+	]), ['groupid' => 'id'])
+	: [];
 
 $replaceGroups = (new CDiv(
 	(new CMultiSelect([
 		'name' => 'groups[]',
-		'objectName' => 'hostGroup',
-		'objectOptions' => ['editable' => true],
-		'data' => $hostGroupsToReplace,
+		'object_name' => 'hostGroup',
+		'data' => $hostgroups_to_replace,
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'host_groups',
+				'srcfld1' => 'groupid',
 				'dstfrm' => $hostView->getName(),
 				'dstfld1' => 'groups_',
-				'srcfld1' => 'groupid',
-				'writeonly' => '1',
-				'multiselect' => '1'
+				'editable' => true
 			]
 		]
 	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -80,102 +72,65 @@ $hostFormList->addRow(
 );
 
 // add new or existing host groups
-$hostGroupsToAdd = null;
+$hostgroups_to_add = [];
 if (isset($_REQUEST['new_groups'])) {
+	$groupids = [];
+
 	foreach ($_REQUEST['new_groups'] as $newHostGroup) {
 		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
-			$hostGroupsToAdd[] = [
+			$hostgroups_to_add[] = [
 				'id' => $newHostGroup['new'],
 				'name' => $newHostGroup['new'].' ('._x('new', 'new element in multiselect').')',
 				'isNew' => true
 			];
 		}
 		else {
-			$hostGroupIds[] = $newHostGroup;
+			$groupids[] = $newHostGroup;
 		}
 	}
 
-	if (isset($hostGroupIds)) {
-		$getHostGroups = API::HostGroup()->get([
-			'groupids' => $hostGroupIds,
-			'output' => ['groupid', 'name']
-		]);
-		foreach ($getHostGroups as $getHostGroup) {
-			$hostGroupsToAdd[] = [
-				'id' => $getHostGroup['groupid'],
-				'name' => $getHostGroup['name']
-			];
-		}
-	}
+	$hostgroups_to_add = array_merge($hostgroups_to_add, $groupids
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $groupids
+		]), ['groupid' => 'id'])
+		: []);
 }
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$hostFormList->addRow(
-		(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
-			->setLabel(_('Add new or existing host groups'))
-			->setChecked(isset($data['visible']['new_groups'])),
-		(new CDiv(
-			(new CMultiSelect([
-				'name' => 'new_groups[]',
-				'objectName' => 'hostGroup',
-				'objectOptions' => ['editable' => true],
-				'data' => $hostGroupsToAdd,
-				'addNew' => true,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'host_groups',
-						'dstfrm' => $hostView->getName(),
-						'dstfld1' => 'new_groups_',
-						'srcfld1' => 'groupid',
-						'writeonly' => '1',
-						'multiselect' => '1'
-					]
+
+$hostFormList->addRow(
+	(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
+		->setLabel((CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
+			? _('Add new or existing host groups')
+			: _('New host group')
+		)
+		->setChecked(isset($data['visible']['new_groups'])),
+	(new CDiv(
+		(new CMultiSelect([
+			'name' => 'new_groups[]',
+			'object_name' => 'hostGroup',
+			'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
+			'data' => $hostgroups_to_add,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $hostView->getName(),
+					'dstfld1' => 'new_groups_',
+					'editable' => true
 				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->setId('newGroups')
-	);
-}
-else {
-	$hostFormList->addRow(
-		(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
-			->setLabel(_('New host group'))
-			->setChecked(isset($data['visible']['new_groups'])),
-		(new CDiv(
-			(new CMultiSelect([
-				'name' => 'new_groups[]',
-				'objectName' => 'hostGroup',
-				'objectOptions' => ['editable' => true],
-				'data' => $hostGroupsToAdd,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'host_groups',
-						'dstfrm' => $hostView->getName(),
-						'dstfld1' => 'new_groups_',
-						'srcfld1' => 'groupid',
-						'writeonly' => '1',
-						'multiselect' => '1'
-					]
-				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->setId('newGroups')
-	);
-}
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))->setId('newGroups')
+);
 
 // Get list of host groups to remove if unsuccessful submit.
-$host_groups_to_remove = null;
-
-if (getRequest('remove_groups')) {
-	$groups = API::HostGroup()->get([
-		'groupids' => getRequest('remove_groups'),
+$host_groups_to_remove = getRequest('remove_groups')
+	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
+		'groupids' => getRequest('remove_groups'),
 		'editable' => true
-	]);
-	foreach ($groups as $group) {
-		$host_groups_to_remove[] = [
-			'id' => $group['groupid'],
-			'name' => $group['name']
-		];
-	}
-}
+	]), ['groupid' => 'id'])
+	: [];
 
 // Remove host groups control.
 $hostFormList->addRow(
@@ -185,17 +140,15 @@ $hostFormList->addRow(
 	(new CDiv(
 		(new CMultiSelect([
 			'name' => 'remove_groups[]',
-			'objectName' => 'hostGroup',
-			'objectOptions' => ['editable' => true],
+			'object_name' => 'hostGroup',
 			'data' => $host_groups_to_remove,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $hostView->getName(),
 					'dstfld1' => 'remove_groups_',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -241,7 +194,7 @@ $newTemplateTable = (new CTable())
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'templates[]',
-			'objectName' => 'templates',
+			'object_name' => 'templates',
 			'data' => $data['linkedTemplates'],
 			'popup' => [
 				'parameters' => [
@@ -249,9 +202,7 @@ $newTemplateTable = (new CTable())
 					'srcfld1' => 'hostid',
 					'srcfld2' => 'host',
 					'dstfrm' => $hostView->getName(),
-					'dstfld1' => 'templates_',
-					'templated_hosts' => '1',
-					'multiselect' => '1'
+					'dstfld1' => 'templates_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

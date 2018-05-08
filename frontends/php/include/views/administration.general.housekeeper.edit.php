@@ -23,9 +23,14 @@ require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.p
 
 $widget = (new CWidget())
 	->setTitle(_('Housekeeping'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.housekeeper.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.housekeeper.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $houseKeeperTab = (new CFormList())
@@ -152,6 +157,9 @@ $houseKeeperView = (new CTabView())
 		[new CButton('resetDefaults', _('Reset defaults'))]
 	));
 
-$widget->addItem((new CForm())->addItem($houseKeeperView));
+$widget->addItem((new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addItem($houseKeeperView)
+);
 
 return $widget;

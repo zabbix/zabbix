@@ -1648,7 +1648,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 			'error'
 		],
 		'eventids' => array_keys($eventids),
-		'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND]],
+		'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND], 'acknowledgeid' => 0],
 		'sortorder' => ['alertid' => ZBX_SORT_DOWN]
 	]);
 

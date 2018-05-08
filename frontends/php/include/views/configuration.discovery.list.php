@@ -20,9 +20,14 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	->setControls((new CTag('nav', true,
+		(new CForm('get'))
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(new CSubmit('form', _('Create discovery rule')))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setProfile('web.discoveryconf.filter', 0)

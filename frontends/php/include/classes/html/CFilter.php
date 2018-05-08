@@ -83,6 +83,7 @@ class CFilter extends CDiv {
 	 */
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+
 		return $this;
 	}
 
@@ -91,6 +92,7 @@ class CFilter extends CDiv {
 	 */
 	public function hideFilterButtons() {
 		$this->show_buttons = false;
+
 		return $this;
 	}
 
@@ -109,6 +111,20 @@ class CFilter extends CDiv {
 		$this->setActiveTab(CProfile::get($idx.'.active', 1));
 		$this->setAttribute('data-profile-idx', $idx);
 		$this->setAttribute('data-profile-idx2', $idx2);
+
+
+		return $this;
+	}
+
+	/**
+	 * Adds an item inside the form object.
+	 *
+	 * @param mixed $item  An item to add inside the form object.
+	 *
+	 * @return \CFilter
+	 */
+	public function addFormItem($item) {
+		$this->form->addItem($item);
 
 		return $this;
 	}
@@ -268,6 +284,7 @@ class CFilter extends CDiv {
 			updateUserProfile("'.$this->idx.'.active", active, []);
 			if (active) {
 				jQuery(".multiselect", ui.newPanel).multiSelect("resize");
+				jQuery("[autofocus=autofocus]", ui.newPanel).focus();
 			}
 		})';
 	}
@@ -292,7 +309,8 @@ class CFilter extends CDiv {
 
 		$this
 			->addItem($headers)
-			->addItem($this->form);
+			->addItem($this->form)
+			->setAttribute('aria-label', _('Filter'));
 
 		zbx_add_post_js($this->getJS());
 
