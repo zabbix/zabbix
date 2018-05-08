@@ -21,16 +21,15 @@
 
 class CFilter extends CDiv {
 
-	private $columns = [];
+	// Filter form object.
 	private $form;
-	private $footer = null;
-	private $navigator = false;
+	// Filter form object name and id attribute.
 	private $name = 'zbx_filter';
-	private $opened = true;
+	// Visibility of 'Apply', 'Reset' from buttons. Visibility is set to all tabs.
 	private $show_buttons = true;
-	private $hidden = false;
-
+	// Array of filter tab headers. Every header is mapped to it content via href(header) and id(content) attribute.
 	protected $headers = [];
+	// Array of filter tab content.
 	protected $tabs = [];
 	// jQuery.tabs disabled tabs list.
 	protected $tabs_disabled = [];
@@ -74,30 +73,16 @@ class CFilter extends CDiv {
 		return $this->name;
 	}
 
-	public function addColumn($column) {
-		$this->columns[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
-		return $this;
-	}
-
-	public function setFooter($footer) {
-		$this->footer = $footer;
-		return $this;
-	}
-
-	public function addNavigator() {
-		$this->navigator = true;
-		return $this;
-	}
-
+	/**
+	 * Add variable to filter form.
+	 *
+	 * @param string $name      Variable name.
+	 * @param string $value     Variable value.
+	 *
+	 * @return CFilter
+	 */
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
-		return $this;
-	}
-
-	public function setHidden() {
-		$this->hidden = true;
-		$this->addStyle('display: none;');
-
 		return $this;
 	}
 
@@ -110,7 +95,7 @@ class CFilter extends CDiv {
 	}
 
 	/**
-	 * Set profile 'idx' and 'idx2' data. Set current expanded tab from profile.
+	 * Set profile 'idx' and 'idx2' data. Set current expanded tab from profile value '{$idx}.active'.
 	 *
 	 * @param string $idx
 	 * @param int    $idx2
@@ -197,10 +182,11 @@ class CFilter extends CDiv {
 
 	/**
 	 * Add time selector specific tab. Should be called before any tab is added. Adds two tabs:
-	 * - time selector range changes: back, zoom out, forward.
-	 * - time selector range form with predefined ranges.
+	 * - time selector range change buttons: back, zoom out, forward.
+	 * - time selector range change form with predefined ranges.
 	 *
-	 * @param string $header    Header text. (ex: Last 7 days)
+	 * @param string $from      Start date. (can be in relative time format, example: now-1w)
+	 * @param string $to        End date. (can be in relative time format, example: now-1w)
 	 *
 	 * @return CFilter
 	 */

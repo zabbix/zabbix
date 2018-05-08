@@ -51,7 +51,8 @@ if (!$data['templateid']) {
 	$widget->addItem(
 		(new CFilter())
 			->setProfile('web.screenconf.filter', 0)
-			->addFilterTab(_('Filter'), [(new CFormList())->addRow(_('Name'),
+			->addFilterTab(_('Filter'), [(new CFormList())->addRow(
+				_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 					->setAttribute('autofocus', 'autofocus')

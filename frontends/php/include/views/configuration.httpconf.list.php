@@ -29,7 +29,8 @@ $filter = (new CFilter())
 	->setProfile('web.httpconf.filter', 0)
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
-			->addRow(_('Status'),
+			->addRow(
+				_('Status'),
 				(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
 					->addValue(_('all'), -1)
 					->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)

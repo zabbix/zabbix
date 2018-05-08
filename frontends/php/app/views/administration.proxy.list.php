@@ -32,17 +32,19 @@ $widget = (new CWidget())
 	->addItem((new CFilter())
 		->setProfile('web.proxies.filter', 0)
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
+			(new CFormList())->addRow(
+				_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
 			),
-			(new CFormList())->addRow(_('Mode'),
-			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-				->addValue(_('Any'), -1)
-				->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
-				->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
-				->setModern(true)
+			(new CFormList())->addRow(
+				_('Mode'),
+				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+					->addValue(_('Any'), -1)
+					->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
+					->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+					->setModern(true)
 			)
 		])
 		->addVar('action', 'proxy.list')

@@ -21,8 +21,6 @@
 
 $screen_widget = new CWidget();
 
-$form = (new CFilter())->addNavigator();
-
 $screen_widget->addItem(
 	(new CFilter())
 		->setProfile('web.hostscreen.filter', 0)

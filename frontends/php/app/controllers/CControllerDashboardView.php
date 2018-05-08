@@ -110,7 +110,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'kioskmode' => $kioskmode,
 				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
-				'show_timeline' => self::showTimeline($this->dashboard['widgets']),
+				'show_timeselector' => self::showTimeline($this->dashboard['widgets']),
 			];
 
 			$options = [

@@ -2681,8 +2681,8 @@ function relativeDateToText($start, $end) {
 
 /**
  * Parse relative date. Allow to define precision part using suffix '/', example (now/w).
- * Supports date as string in format 'Y.m.d H:i:s' and timestamp as integer or string with '@' prefix.
- * Timestamp is returned as initialized DateTime object. In case of parsing error null will be returned.
+ * Supports date as string in format 'Y-m-d H:i:s' and timestamp as integer or string with '@' prefix.
+ * Timestamp is returned as initialized DateTimeImmutable object. In case of parsing error null will be returned.
  *
  * @param string $date      Date in relative format or timestamp.
  * @param bool   $is_start  If set to true date will be modified to lowest value, example (now/w) will be returned
@@ -2704,7 +2704,7 @@ function parseRelativeDate($date, $is_start) {
 
 	if (!ctype_digit($date)) {
 		$date = preg_replace('/[^-+\/0-9a-z]/i', '', $date);
-		// Split relative date in to two parts: Date part and precision (granularity).
+		// Split relative date in to two parts: Date part and precision.
 		list($date_chunk, $precision) = explode('/', $date) + ['', ''];
 
 		$date = preg_replace(array_keys($time_units), array_values($time_units), $date_chunk);

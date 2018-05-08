@@ -139,13 +139,13 @@ else {
 	}
 
 	$timeline = null;
-	if ($data['show_timeline']) {
+	if ($data['show_timeselector']) {
 		$timeline = (new CFilter())
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 
 		if ($data['kioskmode']) {
-			$timeline->setHidden();
+			$timeline->addStyle('display: none;');
 		}
 	}
 
@@ -188,7 +188,7 @@ else {
 	}
 
 	// must be done before adding widgets, because it causes dashboard to resize.
-	if ($data['show_timeline']) {
+	if ($data['show_timeselector']) {
 		$this->addPostJS(
 			'timeControl.useTimeRefresh('.CWebUser::getRefresh().');'.
 			'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.

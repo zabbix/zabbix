@@ -27,17 +27,19 @@ $widget = (new CWidget())
 	->addItem((new CFilter())
 		->setProfile('web.discoveryconf.filter', 0)
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
+			(new CFormList())->addRow(
+				_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
 			),
-			(new CFormList())->addRow(_('Status'),
-			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-				->addValue(_('Any'), -1)
-				->addValue(_('Enabled'), DRULE_STATUS_ACTIVE)
-				->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
-				->setModern(true)
+			(new CFormList())->addRow(
+				_('Status'),
+				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+					->addValue(_('Any'), -1)
+					->addValue(_('Enabled'), DRULE_STATUS_ACTIVE)
+					->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
+					->setModern(true)
 			)
 		])
 	);

@@ -157,11 +157,11 @@ class CScreenBase {
 	 * @param string	$options['action']
 	 * @param int		$options['groupid']
 	 * @param int		$options['hostid']
-	 * @param int		$options['to']
-	 * @param int		$options['from']
-	 * @param string	$options['profileIdx']
-	 * @param int		$options['profileIdx2']
-	 * @param boolean	$options['updateProfile']
+	 * @param int		$options['to']                  End time of selected time period.
+	 * @param int		$options['from']                Start time of selected time period.
+	 * @param string	$options['profileIdx']          Profile idx value.
+	 * @param int		$options['profileIdx2']         Profile idx2 value.
+	 * @param boolean	$options['updateProfile']       Should the profile updated with 'from' and 'to' values.
 	 * @param array		$options['timeline']
 	 * @param string	$options['dataId']
 	 */

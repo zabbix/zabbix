@@ -74,15 +74,14 @@ $timeline = calculateTime([
 ]);
 
 $from = parseRelativeDate($timeline['from'], true);
-if ($from === null) {
-	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
-}
-$from = $from->getTimestamp();
-
 $to = parseRelativeDate($timeline['to'], false);
-if ($to === null) {
+
+if ($from === null || $to === null) {
+	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
 	$to = parseRelativeDate('now', false);
 }
+
+$from = $from->getTimestamp();
 $to = $to->getTimestamp();
 
 $graph = new CPieGraphDraw($dbGraph['graphtype']);

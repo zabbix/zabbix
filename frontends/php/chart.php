@@ -92,10 +92,12 @@ $timeline = calculateTime([
 
 $from = parseRelativeDate($timeline['from'], true);
 $to = parseRelativeDate($timeline['to'], false);
+
 if ($from === null || $to === null) {
 	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
 	$to = parseRelativeDate('now', false);
 }
+
 $from = $from->getTimestamp();
 $to = $to->getTimestamp();
 

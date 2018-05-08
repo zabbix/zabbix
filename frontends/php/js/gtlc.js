@@ -464,7 +464,6 @@ var timeControl = {
 	},
 
 	refreshImage: function(id) {
-		// image
 		var obj = this.objectList[id],
 			ignore_cache = (new Date()).getTime().toString(34),
 			url = new Curl(obj.src);

@@ -134,10 +134,6 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			if ($this->mode != SCREEN_MODE_EDIT) {
-				$this->timeline['from'] = get_min_itemclock_by_graphid($resourceId);
-			}
-
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
 				'&height='.$this->screenitem['height'].'&legend='.$legend.
 				'&graph3d='.$graph3d.$this->getProfileUrlParams();

@@ -44,9 +44,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 	protected function doAction() {
 		if ($this->getInput('only_footer', 0)) {
-			$from = $this->hasInput('from') ? parseRelativeDate($this->getInput('from'), true) : null;
-			$to = $this->hasInput('to') ? parseRelativeDate($this->getInput('to'), false) : null;
-
 			$this->setResponse(new CControllerResponseData([
 				'only_footer' => true,
 				'user' => [
