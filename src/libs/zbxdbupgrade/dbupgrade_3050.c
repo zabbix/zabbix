@@ -779,6 +779,28 @@ static int	DBpatch_3050069(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050070(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from profiles"
+		" where idx like '%%.filter.state'"
+			" or idx like '%%.timelinefixed'"
+			" or idx like '%%.period'"
+			" or idx like '%%.stime'"
+			" or idx like '%%.isnow'"
+	);
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -851,5 +873,6 @@ DBPATCH_ADD(3050066, 0, 1)
 DBPATCH_ADD(3050067, 0, 1)
 DBPATCH_ADD(3050068, 0, 1)
 DBPATCH_ADD(3050069, 0, 1)
+DBPATCH_ADD(3050070, 0, 1)
 
 DBPATCH_END()
