@@ -450,10 +450,12 @@ var timeControl = {
 		if (img.length == 0) {
 			img = jQuery('<img/>').attr('id', id).appendTo(('#'+obj.containerid));
 
-			var xhr = flickerfreeScreen.getImageSboxHeight(new Curl(obj.src), function (height) {
-				zbx_sbox.height = parseInt(height, 10);
-				img.data('zbx_sbox', zbx_sbox).attr('src', obj.src);
-			});
+			var xhr = (obj.loadSBox == 0)
+				? null
+				: flickerfreeScreen.getImageSboxHeight(new Curl(obj.src), function (height) {
+					zbx_sbox.height = parseInt(height, 10);
+					img.data('zbx_sbox', zbx_sbox).attr('src', obj.src);
+				});
 
 			if (xhr === null) {
 				img.attr('src', obj.src);
@@ -479,19 +481,21 @@ var timeControl = {
 						timeControl.updateDashboardFooter(id);
 					}
 				}),
-			async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
-				// Prevent image caching.
-				url.setArgument('_', ignore_cache);
+			async = (obj.loadSBox == 0)
+				? null
+				: flickerfreeScreen.getImageSboxHeight(url, function (height) {
+					// Prevent image caching.
+					url.setArgument('_', ignore_cache);
 
-				img.data('zbx_sbox', {
-					height: parseInt(height, 10),
-					left: obj.objDims.shiftXleft,
-					right: obj.objDims.shiftXright,
-					top: obj.objDims.shiftYtop,
-					from_ts: obj.timeline.from_ts,
-					to_ts: obj.timeline.to_ts
-				}).attr('src', url.getUrl());
-			});
+					img.data('zbx_sbox', {
+						height: parseInt(height, 10),
+						left: obj.objDims.shiftXleft,
+						right: obj.objDims.shiftXright,
+						top: obj.objDims.shiftYtop,
+						from_ts: obj.timeline.from_ts,
+						to_ts: obj.timeline.to_ts
+					}).attr('src', url.getUrl());
+				});
 
 		if (async === null) {
 			img.attr('src', url.getUrl());
@@ -566,6 +570,15 @@ var timeControl = {
 			// plan next time update
 			this.timeRefreshTimeoutHandler = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
 		}
+	},
+
+	removeAllSBox: function() {
+		jQuery.each(this.objectList, function(i, obj) {
+			if (obj.loadSBox == 1) {
+				obj.loadSBox = 0;
+				jQuery('#'+obj.id).data('zbx_sbox', null);
+			}
+		});
 	},
 
 	/**
