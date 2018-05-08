@@ -114,7 +114,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			];
 
 			$options = [
-				'profileIdx' => 'web.dashbrd',
+				'profileIdx' => 'web.dashbrd.filter',
 				'profileIdx2' => $this->dashboard['dashboardid']
 			];
 
