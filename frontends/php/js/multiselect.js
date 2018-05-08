@@ -84,7 +84,7 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Rezise multiselect selected text
+		 * Resize multiselect selected text
 		 *
 		 * @return jQuery
 		 */
@@ -252,6 +252,7 @@ jQuery(function($) {
 				selected_ul.addClass('disabled');
 			}
 			else {
+				// TODO VM: Maybe it is better to end label's "for" with "_ms", and not "_search"?
 				var label = $('label[for='+obj.attr('id')+'search]'),
 					input = $('<input>', {
 						'id': label.length ? label.attr('for') : null,
@@ -286,6 +287,8 @@ jQuery(function($) {
 
 						// Replace trailing slashes to check if search term contains anything else.
 						if (search !== '') {
+							// TODO VM: Delay to open suggestions is 5 seconds. But currently whenever you type second letter,
+							//			suggestions will be shown with unupdated content. I think these if's should not be united.
 							if (input.data('lastSearch') != search && !values.isWaiting) {
 								values.isWaiting = true;
 
@@ -660,6 +663,7 @@ jQuery(function($) {
 		}
 
 		if (found > 0) {
+			// TODO VM: this translation string can be separated into two, separated by forced comma or dot, as they are not dependant on one another.
 			$('[aria-live]', obj).text(sprintf(t('%1$d matches for %2$s found, %3$s, preselected, use down,up arrow keys and enter to select'),
 				found, values.search, preselected
 			));
