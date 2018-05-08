@@ -88,7 +88,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$in_closing = false;
 
 		foreach ($problem['acknowledges'] as $acknowledge) {
-			if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+			if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
 				$in_closing = true;
 				break;
 			}

@@ -27,7 +27,7 @@ class CControllerAcknowledgeCreate extends CController {
 			'message' =>			'db acknowledges.message |flags '.P_CRLF,
 			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
 			'close_problem' =>		'db acknowledges.action|in '.
-										ZBX_ACKNOWLEDGE_ACTION_NONE.','.ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM,
+										ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
 			'backurl' =>			'string'
 		];
 
@@ -64,12 +64,12 @@ class CControllerAcknowledgeCreate extends CController {
 	protected function doAction() {
 		$eventids = $this->getInput('eventids');
 		$acknowledge_type = $this->getInput('acknowledge_type');
-		$close_problem = $this->getInput('close_problem', ZBX_ACKNOWLEDGE_ACTION_NONE);
+		$close_problem = $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE);
 		$eventids_to_ack = $eventids;
 		$result = true;
 
 		// Select events with trigger IDs only if there is a need to close problems or to find related all other events.
-		if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $close_problem == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+		if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $close_problem == ZBX_PROBLEM_UPDATE_CLOSE) {
 			// Get trigger IDs for selected events.
 			$events = API::Event()->get([
 				'output' => ['eventid', 'objectid'],
@@ -81,7 +81,7 @@ class CControllerAcknowledgeCreate extends CController {
 			$triggerids = zbx_objectValues($events, 'objectid');
 		}
 
-		if ($close_problem == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+		if ($close_problem == ZBX_PROBLEM_UPDATE_CLOSE) {
 			// User should have read-write permissions to trigger and trigger must have "manual_close" set to "1".
 			$triggers = API::Trigger()->get([
 				'output' => [],
@@ -117,7 +117,7 @@ class CControllerAcknowledgeCreate extends CController {
 					// Check if it was manually closed.
 					if ($problem_event['acknowledges']) {
 						foreach ($problem_event['acknowledges'] as $acknowledge) {
-							if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+							if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
 								$event_closed = true;
 								break;
 							}

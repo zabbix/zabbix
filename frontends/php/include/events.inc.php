@@ -292,7 +292,7 @@ function make_small_eventlist($startEvent, $backurl) {
 			$in_closing = false;
 
 			foreach ($event['acknowledges'] as $acknowledge) {
-				if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+				if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
 					$in_closing = true;
 					break;
 				}
@@ -477,7 +477,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 				$in_closing = false;
 
 				foreach ($problem['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+					if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
 						$in_closing = true;
 						break;
 					}
@@ -673,7 +673,7 @@ function makeAcknowledgesTable($acknowledges, $users) {
 				? getUserFullname($users[$acknowledge['userid']])
 				: _('Inaccessible user'),
 			zbx_nl2br($acknowledge['message']),
-			($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) ? _('Close problem') : ''
+			($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) ? _('Close problem') : ''
 		]);
 	}
 

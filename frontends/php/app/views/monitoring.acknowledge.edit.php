@@ -44,7 +44,7 @@ if (array_key_exists('event', $data)) {
 				: _('Inaccessible user')
 			))->addClass(ZBX_STYLE_NOWRAP),
 			zbx_nl2br($acknowledge['message']),
-			($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) ? _('Close problem') : ''
+			($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) ? _('Close problem') : ''
 		]);
 	}
 
@@ -78,7 +78,7 @@ $form_list
 	)
 	->addRow(_('Close problem'),
 		(new CCheckBox('close_problem'))
-			->setChecked($data['close_problem'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM)
+			->setChecked($data['close_problem'] == ZBX_PROBLEM_UPDATE_CLOSE)
 			->setEnabled($data['close_problem_chbox'])
 	);
 

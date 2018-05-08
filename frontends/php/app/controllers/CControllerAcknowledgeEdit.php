@@ -31,7 +31,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'message' =>			'db acknowledges.message',
 			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
 			'close_problem' =>		'db acknowledges.action|in '.
-										ZBX_ACKNOWLEDGE_ACTION_NONE.','.ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM,
+										ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
 			'backurl' =>			'string'
 		];
 
@@ -77,7 +77,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'sid' => $this->getUserSID(),
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
-			'close_problem' => $this->getInput('close_problem', ZBX_ACKNOWLEDGE_ACTION_NONE),
+			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'acknowledge_type' => $this->getInput('acknowledge_type', ZBX_ACKNOWLEDGE_SELECTED),
 			'backurl' => $this->getInput('backurl', 'zabbix.php?action=problem.view'),
 			'unack_problem_events_count' => 0,
@@ -158,7 +158,7 @@ class CControllerAcknowledgeEdit extends CController {
 
 			if ($problem_event['acknowledges']) {
 				foreach ($problem_event['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+					if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
 						$event_closed = true;
 						break;
 					}

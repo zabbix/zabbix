@@ -108,7 +108,7 @@ class CScreenEvents extends CScreenBase {
 				$in_closing = false;
 
 				foreach ($event['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+					if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
 						$in_closing = true;
 						break;
 					}

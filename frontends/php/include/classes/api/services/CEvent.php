@@ -358,20 +358,18 @@ class CEvent extends CApiService {
 
 		// severities
 		if ($options['severities'] !== null) {
-			zbx_value2array($options['severities']);
-
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['t'] = 'triggers t';
-				$sqlParts['where']['e-t'] = 'e.objectid=t.triggerid';
-				$sqlParts['where']['t'] = dbConditionInt('t.priority', $options['severities']);
+				zbx_value2array($options['severities']);
+				$sqlParts['where'][] = dbConditionInt('e.severity', $options['severities']);
 			}
 			// ignore this filter for items and lld rules
 		}
 
 		// acknowledged
 		if (!is_null($options['acknowledged'])) {
-			$sqlParts['where'][] = 'e.acknowledged='.($options['acknowledged'] ? 1 : 0);
+			$acknowledged = $options['acknowledged'] ? EVENT_ACKNOWLEDGED : EVENT_NOT_ACKNOWLEDGED;
+			$sqlParts['where'][] = 'e.acknowledged='.$acknowledged;
 		}
 
 		// tags
@@ -527,13 +525,15 @@ class CEvent extends CApiService {
 	/**
 	 * Acknowledges the given events and closes them if necessary.
 	 *
-	 * @param array  $data					And array of event acknowledgement data.
-	 * @param mixed  $data['eventids']		An event ID or an array of event IDs to acknowledge.
-	 * @param string $data['message']		Acknowledgement message.
-	 * @param int	 $data['action']		Close problem
-	 *										Possible values are:
-	 *											0x00 - ZBX_ACKNOWLEDGE_ACTION_NONE;
-	 *											0x01 - ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM.
+	 * @param array  $data                  And array of operation data.
+	 * @param mixed  $data['eventids']      An event ID or an array of event IDs.
+	 * @param string $data['message']       Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param string $data['severity']      New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param int    $data['action']        Flags of performed operations combined:
+	 *                                       - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                       - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                       - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                       - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
 	 *
 	 * @return array
 	 */
@@ -544,77 +544,152 @@ class CEvent extends CApiService {
 
 		$eventids = zbx_toHash($data['eventids']);
 
-		if (!DBexecute('UPDATE events SET acknowledged=1 WHERE '.dbConditionInt('eventid', $eventids))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-		}
+		$acknowledgable_events = $this->get([
+			'output' => ['value', 'severity', 'acknowledged', 'objectid'],
+			'selectRelatedObject' => ['manual_close'],
+			'eventids' => $eventids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'preservekeys' => true
+		]);
 
-		$time = time();
+		$ack_eventids = [];
+		$sev_change_eventids = [];
 		$acknowledges = [];
-		$action = array_key_exists('action', $data) ? $data['action'] : ZBX_ACKNOWLEDGE_ACTION_NONE;
+		$time = time();
 
-		foreach ($eventids as $eventid) {
-			$acknowledges[] = [
-				'userid' => self::$userData['userid'],
-				'eventid' => $eventid,
-				'clock' => $time,
-				'message' => $data['message'],
-				'action' => $action
-			];
-		}
+		foreach ($acknowledgable_events as $eventid => $event) {
+			$action = ZBX_PROBLEM_UPDATE_NONE;
+			$old_severity = 0;
+			$new_severity = 0;
 
-		$acknowledgeids = DB::insert('acknowledges', $acknowledges);
-
-		$ack_count = count($acknowledgeids);
-
-		if ($action == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-			// Close the problem manually.
-
-			$tasks = [];
-
-			for ($i = 0; $i < $ack_count; $i++) {
-				$tasks[] = [
-					'type' => ZBX_TM_TASK_CLOSE_PROBLEM,
-					'status' => ZBX_TM_STATUS_NEW,
-					'clock' => $time
-				];
+			// Perform ZBX_PROBLEM_UPDATE_CLOSE action flag.
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) != 0
+					&& $event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+					&& $event['value'] == TRIGGER_VALUE_TRUE) {
+				$action += ZBX_PROBLEM_UPDATE_CLOSE;
 			}
 
-			$taskids = DB::insert('task', $tasks);
+			// Perform ZBX_PROBLEM_UPDATE_ACKNOWLEDGE action flag.
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) != 0
+					&& $event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED
+					&& $event['value'] == TRIGGER_VALUE_TRUE) {
+				$action += ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
+				$ack_eventids[] = $eventid;
+			}
 
+			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) != 0 && $data['message'] !== '') {
+				$action += ZBX_PROBLEM_UPDATE_MESSAGE;
+			}
+			else {
+				$data['message'] = '';
+			}
+
+			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) != 0 && $data['severity'] !== $event['severity']) {
+				$action += ZBX_PROBLEM_UPDATE_SEVERITY;
+				$old_severity = $event['severity'];
+				$new_severity = $data['severity'];
+				$sev_change_eventids[] = $eventid;
+			}
+
+			if ($action !== ZBX_PROBLEM_UPDATE_NONE) {
+				$acknowledges[] = [
+					'userid' => self::$userData['userid'],
+					'eventid' => $eventid,
+					'clock' => $time,
+					'message' => $data['message'],
+					'action' => $action,
+					'old_severity' => $old_severity,
+					'new_severity' => $new_severity
+				];
+			}
+		}
+
+		// Make changes in problem and events tables.
+		if ($acknowledges) {
+			// Acknowladge problems and events.
+			if ($ack_eventids) {
+				DB::update('problem', [
+					'values' => ['acknowledged' => EVENT_ACKNOWLEDGED],
+					'where' => ['eventid' => $ack_eventids]
+				]);
+
+				DB::update('events', [
+					'values' => ['acknowledged' => EVENT_ACKNOWLEDGED],
+					'where' => ['eventid' => $ack_eventids]
+				]);
+			}
+
+			// Change severity.
+			if ($sev_change_eventids) {
+				DB::update('problem', [
+					'values' => ['severity' => $data['severity']],
+					'where' => ['eventid' => $sev_change_eventids]
+				]);
+
+				DB::update('events', [
+					'values' => ['severity' => $data['severity']],
+					'where' => ['eventid' => $sev_change_eventids]
+				]);
+			}
+
+			// Store operation history data.
+			$acknowledgeids = DB::insertBatch('acknowledges', $acknowledges);
+
+			// Create tasks to close problems manually.
+			$tasks = [];
 			$task_close = [];
 
-			for ($i = 0; $i < $ack_count; $i++) {
-				$task_close[] = [
-					'taskid' => $taskids[$i],
-					'acknowledgeid' => $acknowledgeids[$i]
-				];
+			foreach ($acknowledgeids as $k => $id) {
+				$acknowledgement = $acknowledges[$k];
+
+				if (ZBX_PROBLEM_UPDATE_CLOSE & $acknowledgement['action']) {
+					$tasks[$k] = [
+						'type' => ZBX_TM_TASK_CLOSE_PROBLEM,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time
+					];
+
+					$task_close[$k] = [
+						'acknowledgeid' => $id
+					];
+				}
 			}
 
-			DB::insert('task_close_problem', $task_close, false);
+			if ($tasks) {
+				$taskids = DB::insertBatch('task', $tasks);
+				$task_close = array_replace_recursive($task_close, zbx_toObject($taskids, 'taskid', true));
+				DB::insertBatch('task_close_problem', $task_close, false);
+			}
+
+			// Create tasks to perform server-side acknowledgement operations.
+			$tasks = [];
+			$tasks_ack = [];
+
+			foreach ($acknowledgeids as $k => $id) {
+				$acknowledgement = $acknowledges[$k];
+
+				if (ZBX_PROBLEM_UPDATE_ACKNOWLEDGE & $acknowledgement['action']) {
+					$tasks[$k] = [
+						'type' => ZBX_TM_TASK_ACKNOWLEDGE,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time
+					];
+
+					$tasks_ack[$k] = [
+						'acknowledgeid' => $id
+					];
+				}
+			}
+
+			if ($tasks) {
+				$taskids = DB::insertBatch('task', $tasks);
+				$tasks_ack = array_replace_recursive($tasks_ack, zbx_toObject($taskids, 'taskid', true));
+				DB::insertBatch('task_acknowledge', $tasks_ack, false);
+			}
 		}
-
-		$tasks = [];
-
-		for ($i = 0; $i < $ack_count; $i++) {
-			$tasks[] = [
-				'type' => ZBX_TM_TASK_ACKNOWLEDGE,
-				'status' => ZBX_TM_STATUS_NEW,
-				'clock' => $time
-			];
-		}
-
-		$taskids = DB::insertBatch('task', $tasks);
-
-		$tasks_ack = [];
-
-		for ($i = 0; $i < $ack_count; $i++) {
-			$tasks_ack[] = [
-				'taskid' => $taskids[$i],
-				'acknowledgeid' => $acknowledgeids[$i]
-			];
-		}
-
-		DB::insertBatch('task_acknowledge', $tasks_ack, false);
 
 		return ['eventids' => array_values($eventids)];
 	}
@@ -622,36 +697,61 @@ class CEvent extends CApiService {
 	/**
 	 * Validates the input parameters for the acknowledge() method.
 	 *
-	 * @throws APIException     if the input is invalid
+	 * @param array  $data                  And array of operation data.
+	 * @param mixed  $data['eventids']      An event ID or an array of event IDs.
+	 * @param string $data['message']       Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param string $data['severity']      New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param int    $data['action']        Flags of performed operations combined:
+	 *                                       - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                       - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                       - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                       - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
 	 *
-	 * @param array     $data
+	 * @throws APIException                 If the input is invalid.
 	 */
 	protected function validateAcknowledge(array $data) {
-		$dbfields = ['eventids' => null, 'message' => null];
+		$dbfields = ['eventids' => null, 'action' => null, 'message' => '', 'severity' => ''];
 
 		if (!check_db_fields($dbfields, $data)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 
-		if ($data['message'] === '') {
+		$action = array_key_exists('action', $data) ? $data['action'] : ZBX_PROBLEM_UPDATE_NONE;
+		$uniqe_eventids = array_keys(array_flip($data['eventids']));
+
+		if (is_numeric($data['severity'])) {
+			$data['severity'] = intval($data['severity']);
+		}
+
+		if ($action & ZBX_PROBLEM_UPDATE_CLOSE) {
+			$this->checkCanBeManuallyClosed($uniqe_eventids);
+		}
+
+		if ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
+			$this->checkCanBeAcknowledged($uniqe_eventids);
+		}
+
+		if (($action & ZBX_PROBLEM_UPDATE_MESSAGE) != 0 && $data['message'] === '') {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'message', _('cannot be empty'))
 			);
 		}
 
-		$this->checkCanBeAcknowledged($data['eventids']);
+		if (($action & ZBX_PROBLEM_UPDATE_SEVERITY) != 0
+				&& !in_array($data['severity'], range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1), true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'severity',
+				_s('unexpected value "%1$s"', $data['severity'])
+			));
+		}
 
-		if (array_key_exists('action', $data)) {
-			if ($data['action'] != ZBX_ACKNOWLEDGE_ACTION_NONE
-					&& $data['action'] != ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'action', _s('unexpected value "%1$s"', $data['action'])
-				));
-			}
-
-			if ($data['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-				$this->checkCanBeManuallyClosed(array_unique($data['eventids']));
-			}
+		// Chack that at least one valid flag is set.
+		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) == 0
+				&& ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == 0
+				&& ($action & ZBX_PROBLEM_UPDATE_MESSAGE) == 0
+				&& ($action & ZBX_PROBLEM_UPDATE_SEVERITY) == 0) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_s('unexpected value "%1$s"', $data['action'])
+			));
 		}
 	}
 
@@ -884,76 +984,68 @@ class CEvent extends CApiService {
 	}
 
 	/**
-	 * Checks if the given events exist, are accessible and can be acknowledged.
+	 * Checks if at least one of given events can be acknowledged.
 	 *
-	 * @param array $eventids
+	 * Event can be acknowledged if (all criterias must fulfill):
+	 *  - event exists and is accessible;
+	 *  - event's source is trigger;
+	 *  - event is in PROBLEM state;
+	 *  - event is not already acknowledged.
 	 *
-	 * @throws APIException			If an event does not exist, is not accessible, is not a trigger event or event is
-	 *								not in PROBLEM state.
+	 * @param array $eventids       Array of event IDs.
+	 *
+	 * @throws APIException			Throws an exception:
+	 *                               - If at least one of given event doesn't exist or is not accessible;
+	 *                               - If at least one of given event is not a trigger event;
+	 *                               - If all given events are already acknowledged;
+	 *                               - If none of given event is not problem state.
 	 */
 	protected function checkCanBeAcknowledged(array $eventids) {
 		$allowed_events = $this->get([
-			'output' => ['eventid', 'value'],
+			'output' => ['value', 'acknowledged'],
 			'eventids' => $eventids,
 			'preservekeys' => true
 		]);
 
+		$event_can_be_acknowledged = false;
+
 		foreach ($eventids as $eventid) {
-			if (array_key_exists($eventid, $allowed_events)) {
-				// Prohibit acknowledging OK events.
-				if ($allowed_events[$eventid]['value'] == TRIGGER_VALUE_FALSE) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_s('Cannot acknowledge problem: %1$s.', _('event is not in PROBLEM state'))
-					);
-				}
+			if (array_key_exists($eventid, $allowed_events)
+					&& $allowed_events[$eventid]['value'] == TRIGGER_VALUE_TRUE
+					&& $allowed_events[$eventid]['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+				$event_can_be_acknowledged = true;
+				break;
 			}
-			else {
-				// Check if an event actually exists but maybe belongs to a different source or object.
+		}
 
-				$event = API::getApiService()->select($this->tableName(), [
-					'output' => ['eventid', 'source', 'object'],
-					'eventids' => $eventid,
-					'limit' => 1
-				]);
-				$event = reset($event);
-
-				// If the event exists, check if we have permissions to access it.
-				if ($event) {
-					$event = $this->get([
-						'output' => ['eventid'],
-						'eventids' => $event['eventid'],
-						'source' => $event['source'],
-						'object' => $event['object'],
-						'limit' => 1
-					]);
-				}
-
-				if ($event) {
-					// The event exists, is accessible but belongs to a different object or source.
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only trigger events can be acknowledged.'));
-				}
-				else {
-					// The event either doesn't exist or is not accessible.
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-			}
+		if ($event_can_be_acknowledged === false) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Cannot acknowledge problem. Possible reasons:\n1. %1$s \n2. %2$s \n3. %3$s \n4. %4$s',
+					_('no permissions to referred object or it does not exist'),
+					_('event is already acknowledged'),
+					_('event is not in PROBLEM state'),
+					_('event type is not trigger')
+				)
+			);
 		}
 	}
 
 	/**
-	 * Checks if the given events can be closed manually.
+	 * Checks if at least one of given events can be closed manually.
 	 *
-	 * @param array $eventids
+	 * @param array $eventids       Array of event IDs.
 	 *
-	 * @throws APIException			If an event does not exist, is not accessible or trigger does not allow manual closing.
+	 * @throws APIException         Throws an exception:
+	 *                               - If at least one event does not exist or is not accessible;
+	 *                               - If none of given event is in problem state;
+	 *                               - If none of given event can be closed manually according the triggers
+	 *                                 configuration.
 	 */
 	protected function checkCanBeManuallyClosed(array $eventids) {
 		$events_count = count($eventids);
 
 		$events = $this->get([
-			'output' => [],
+			'countOutput' => true,
 			'eventids' => $eventids,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -970,21 +1062,27 @@ class CEvent extends CApiService {
 			'eventids' => $eventids,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'value' => TRIGGER_VALUE_TRUE,
+			'value' => TRIGGER_VALUE_TRUE
 		]);
 
-		if ($events_count != count($events)) {
+		if (count($events) == 0) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('Cannot close problem: %1$s.', _('event is not in PROBLEM state'))
 			);
 		}
 
+		$problem_can_be_closed_manually = false;
 		foreach ($events as $event) {
-			if ($event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
-				);
+			if ($event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+				$problem_can_be_closed_manually = true;
+				break;
 			}
+		}
+
+		if ($problem_can_be_closed_manually === false) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
+			);
 		}
 	}
 
