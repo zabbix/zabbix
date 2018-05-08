@@ -1,0 +1,38 @@
+---
+test case: too many parameters
+in:
+  filename: ""
+  extraparams: 1
+out:
+  retval: fail
+  msg: "Too many parameters."
+---
+test case: invalid first parameter
+in:
+  filename: ""
+  extraparams: 0
+out:
+  retval: fail
+  msg: "Invalid first parameter."
+---
+test case: file does not exist
+files:
+  foobar.bla: |
+    123456
+in:
+  filename: "foobar123.bla"
+  extraparams: 0
+out:
+  retval: ok
+  file_exists: 0
+---
+test case: file exists
+files:
+  foobar.bla: |
+    123456
+in:
+  filename: "foobar.bla"
+  extraparams: 0
+out:
+  retval: ok
+  file_exists: 1
