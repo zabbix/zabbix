@@ -933,6 +933,9 @@ int lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, const cha
 	*err = '\0';
 	char	pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
 
+	if (0 == (pp->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE))
+		return SUCCEED;
+
 	if (SUCCEED == zbx_token_find(pp->params, 0, &token, ZBX_TOKEN_SEARCH_BASIC))
 		return SUCCEED;
 
@@ -1112,10 +1115,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 		item = (zbx_lld_item_t *)items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-			continue;
-
-		/* only new items or items with changed key will be validated */
-		if (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 			continue;
 
 		for (j = 0; j < item->preproc_ops.values_num; j++)
