@@ -8,6 +8,7 @@ use Path::Tiny qw(path);
 use IPC::Run3 qw(run3);
 use Time::HiRes qw(time);
 use File::Basename qw(dirname);
+use Getopt::Long qw(GetOptions);
 
 use constant TEST_SUITE_ATTRIBUTES	=> ('name', 'tests', 'skipped', 'errors', 'failures', 'time');
 use constant TEST_CASE_ATTRIBUTES	=> ('name', 'assertions', 'time');
@@ -91,6 +92,10 @@ sub launch($$$)
 	push(@{$test_suite->{'testcases'}}, $test_case);
 }
 
+my $xml;
+
+die("Bad command-line arguments") unless(GetOptions(('xml:s' => \$xml)));
+
 my $iter = path(".")->iterator({
 	'recurse'		=> 1,
 	'follow_symlinks'	=> 0
@@ -121,7 +126,7 @@ while (my $path = $iter->())
 	push(@test_suites, $test_suite);
 }
 
-if (-t STDOUT)
+unless (defined($xml))
 {
 	use Term::ANSIColor qw(:constants);
 
@@ -293,7 +298,7 @@ if (-t STDOUT)
 }
 
 print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-print("<testsuites>\n");
+print("<testsuites" . ($xml ? " package=\"" . escape_xml_attribute($xml) . "\"" : "") . ">\n");
 
 foreach my $test_suite (@test_suites)
 {
