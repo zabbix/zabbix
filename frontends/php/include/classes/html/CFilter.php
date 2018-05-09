@@ -278,20 +278,28 @@ class CFilter extends CDiv {
 	 */
 	public function getJS() {
 		$id = '#' . $this->getId();
-		$js = 'jQuery("'.$id.'").tabs('.
+		$js = 'var multiselects = jQuery("'.$id.'").tabs('.
 			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled])).
-		').find(".multiselect").multiSelect("resize");';
+		').find(".multiselect");'.
+		'if (multiselects.lengt) {'.
+		'	multiselects.multiSelect("resize");'.
+		'}';
 
 		if ($this->idx !== null && $this->idx !== '') {
 			$idx = $this->idx . '.active';
-			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {
-				var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0;
-				updateUserProfile("'.$idx.'", active, []);
-				if (active) {
-					jQuery(".multiselect", ui.newPanel).multiSelect("resize");
-					jQuery("[autofocus=autofocus]", ui.newPanel).focus();
-				}
-			});';
+			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {'.
+			'	var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0,'.
+			'		multiselects = jQuery(".multiselect", ui.newPanel);'.
+			'	updateUserProfile("'.$idx.'", active, []);'.
+
+			'	if (multiselects.length) {'.
+			'		multiselects.multiSelect("resize");'.
+			'	}'.
+
+			'	if (active) {'.
+			'		jQuery("[autofocus=autofocus]", ui.newPanel).focus();'.
+			'	}'.
+			'});';
 		}
 
 		return $js;

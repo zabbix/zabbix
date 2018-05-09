@@ -145,7 +145,7 @@ jQuery(function ($){
 		element.from_clndr.data('clndr').clndr.clndrhide();
 		element.to_clndr.data('clndr').clndr.clndrhide();
 
-		if (data.collapse) {
+		if (data.collapse && 'error' in data === false) {
 			element.label.closest('.ui-tabs-collapsible').tabs('option', 'active', false);
 		}
 
@@ -216,9 +216,22 @@ jQuery(function ($){
 		)
 			.success(function (json) {
 				request_data = $.extend(request_data, json.result);
-
+				container.find('.red').remove();
 				updateTimeselectorUI($.extend(request_data, data, {event: e.namespace}));
-				$.publish('timeselector.rangeupdate', request_data);
+
+				if (request_data.error) {
+					$.each(request_data.error, function(field, message) {
+						var input = $('#'+field);
+
+						if (input.length) {
+							$('<div class="red"/>').css({position: 'absolute'}).text(message).insertAfter(input);
+						}
+					});
+					delete request_data.error;
+				}
+				else {
+					$.publish('timeselector.rangeupdate', request_data);
+				}
 			})
 			.always(function () {
 				xhr = null;

@@ -589,17 +589,17 @@ switch ($data['method']) {
 			}
 		}
 		else {
-			$errors = [
-				'from' => !$from_datetime instanceof DateTimeImmutable || $from_datetime > $to_datetime
-					? _s('Invalid date "%s".', $from)
-					: '',
-				'to' => !$to_datetime instanceof DateTimeImmutable || $to_datetime < $from_datetime
-					? _s('Invalid date "%s".', $to)
-					: ''
-			];
-			$result += [
-				'error' => array_filter($errors)
-			];
+			$result['error'] = [];
+
+			if (!$from_datetime instanceof DateTimeImmutable || ($to_datetime instanceof DateTimeImmutable
+					&& $from_datetime > $to_datetime) || $from === $to) {
+				$result['error']['from'] = _s('Invalid date "%s".', $from);
+			}
+
+			if (!$to_datetime instanceof DateTimeImmutable || ($from_datetime instanceof DateTimeImmutable
+					&& $to_datetime < $from_datetime) || $from === $to) {
+				$result['error']['to'] = _s('Invalid date "%s".', $to);
+			}
 		}
 
 		// Add default values.
