@@ -27,12 +27,17 @@ class CControllerAcknowledgeEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'eventids' =>			'required|array_db acknowledges.eventid',
-			'message' =>			'db acknowledges.message',
-			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
-			'close_problem' =>		'db acknowledges.action|in '.
-										ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
-			'backurl' =>			'string'
+			'eventids' =>					'required|array_db acknowledges.eventid',
+			'message' =>					'db acknowledges.message',
+			'scope' =>						'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
+			'change_severity' =>			'db acknowledges.action|in '.
+												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
+			'severity' =>					'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
+			'acknowledge_problem' =>		'db acknowledges.action|in '.
+												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
+			'close_problem' =>				'db acknowledges.action|in '.
+												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
+			'backurl' =>					'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -77,136 +82,90 @@ class CControllerAcknowledgeEdit extends CController {
 			'sid' => $this->getUserSID(),
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
-			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
-			'acknowledge_type' => $this->getInput('acknowledge_type', ZBX_ACKNOWLEDGE_SELECTED),
+			'scope' => $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),
 			'backurl' => $this->getInput('backurl', 'zabbix.php?action=problem.view'),
-			'unack_problem_events_count' => 0,
-			'unack_events_count' => 0
+			'change_severity' => $this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE),
+			'severity' => $this->hasInput('severity') ? $this->getInput('severity') : null,
+			'acknowledge_problem' => $this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
+			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
+			'related_problems_count' => 1,
+			'problem_can_be_closed' => false,
+			'problem_can_be_acknowledged' => false
 		];
 
-		if (count($this->getInput('eventids')) == 1) {
-			$events = API::Event()->get([
-				'output' => [],
-				'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
-				'eventids' => $this->getInput('eventids'),
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER
-			]);
-
-			if ($events) {
-				$data['event'] = [
-					'acknowledges' => $events[0]['acknowledges']
-				];
-				order_result($data['acknowledges'], 'clock', ZBX_SORT_DOWN);
-			}
-		}
-
+		// Select events:
 		$events = API::Event()->get([
-			'output' => ['eventid', 'objectid', 'acknowledged', 'value'],
+			'output' => ['eventid', 'objectid', 'acknowledged', 'value', 'r_eventid'],
+			'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'preservekeys' => true
 		]);
 
+		// Show action list if only one event is requested.
+		if (count($events) == 1) {
+			$data['event'] = [
+				'acknowledges' => reset($events)['acknowledges']
+			];
+		}
+		else {
+			$data['related_problems_count'] = count($events);
+		}
+
+		// Loop through events to figure out what operations should be allowed.
 		$triggerids = [];
 
 		foreach ($events as $event) {
-			if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
-				$data['unack_problem_events_count']++;
-				$data['unack_events_count']++;
-			}
-			elseif ($event['value'] == TRIGGER_VALUE_FALSE) {
-				$data['unack_problem_events_count']++;
-			}
-			$triggerids[$event['objectid']] = true;
-		}
-
-		$triggerids = array_keys($triggerids);
-
-		$event_cond = false;
-		$data['close_problem_chbox'] = false;
-
-		// At least one trigger should have RW permissions and should be allowed manual close.
-		$trigger_cond = (bool) API::Trigger()->get([
-			'output' => [],
-			'triggerids' => $triggerids,
-			'filter' => ['manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED],
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		// Get events in problem state with acknowledges.
-		$problems_events = API::Event()->get([
-			'output' => ['r_eventid'],
-			'select_acknowledges' => ['action'],
-			'eventids' => array_keys($events),
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'value' => TRIGGER_VALUE_TRUE,
-			'preservekeys' => true
-		]);
-
-		// At least one event should not be closed.
-		foreach ($problems_events as $problem_event) {
-			// Check if it was closed by event recovery.
-			if ($problem_event['r_eventid'] != 0) {
-				continue;
+			// Find at least one unacknowledged event.
+			if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+				$data['problem_can_be_acknowledged'] = true;
 			}
 
-			$event_closed = false;
+			// Find if event is in PROBLEM state; Then look if no ZBX_PROBLEM_UPDATE_CLOSE action flag.
+			if ($event['value'] == TRIGGER_VALUE_TRUE && $event['r_eventid'] == 0 && !$data['problem_can_be_closed']) {
+				$event_closed = false;
 
-			if ($problem_event['acknowledges']) {
-				foreach ($problem_event['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
-						$event_closed = true;
-						break;
+				if ($event['acknowledges']) {
+					foreach ($event['acknowledges'] as $acknowledge) {
+						if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+							$event_closed = true;
+							break;
+						}
 					}
 				}
 
 				if (!$event_closed) {
-					$event_cond = true;
-					break;
+					$data['problem_can_be_closed'] = true;
+					$triggerids[$event['objectid']] = true;
 				}
 			}
-			else {
-				// No acknowledges yet, so event is still open.
-				$event_cond = true;
-				break;
+		}
+
+		/**
+		 * If there are open problems, check if they can be closed manually.
+		 *
+		 * At least one of triggers in PROBLEM state should have read-write permissions and should have 'manual_close'
+		 * flat set to ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED.
+		 *
+		 * Additional API request is needed because through Event.get we cannot see which trigger is editable.
+		 */
+		if ($data['problem_can_be_closed']) {
+			$can_be_closed = (bool) API::Trigger()->get([
+				'output' => [],
+				'triggerids' => array_keys($triggerids),
+				'filter' => ['manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED],
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			if (!$can_be_closed) {
+				$data['problem_can_be_closed'] = false;
 			}
 		}
 
-		/*
-		 * Show checkbox as enabled if trigger conditions (has permissions and allowed to close) and
-		 * event conditions (problem state and not closed) are both set to true. Otherwise checkbox is disabled.
-		 */
-		if ($trigger_cond && $event_cond) {
-			$data['close_problem_chbox'] = true;
-		}
-
-		$data['unack_problem_events_count'] += API::Event()->get([
-			'countOutput' => true,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'objectids' => $triggerids,
-			'filter' => [
-				'acknowledged' => EVENT_NOT_ACKNOWLEDGED,
-				'value' => TRIGGER_VALUE_TRUE
-			]
-		]);
-
-		$data['unack_events_count'] += API::Event()->get([
-			'countOutput' => true,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'objectids' => $triggerids,
-			'filter' => [
-				'acknowledged' => EVENT_NOT_ACKNOWLEDGED
-			]
-		]);
-
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Event acknowledgements'));
+		$response->setTitle(_('Update problem'));
 		$this->setResponse($response);
 	}
 }
