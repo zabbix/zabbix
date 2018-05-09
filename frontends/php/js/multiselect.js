@@ -252,8 +252,7 @@ jQuery(function($) {
 				selected_ul.addClass('disabled');
 			}
 			else {
-				// TODO VM: Maybe it is better to end label's "for" with "_ms", and not "_search"?
-				var label = $('label[for='+obj.attr('id')+'search]'),
+				var label = $('label[for='+obj.attr('id')+'ms]'),
 					input = $('<input>', {
 						'id': label.length ? label.attr('for') : null,
 						'class': 'input',
@@ -287,46 +286,46 @@ jQuery(function($) {
 
 						// Replace trailing slashes to check if search term contains anything else.
 						if (search !== '') {
-							// TODO VM: Delay to open suggestions is 5 seconds. But currently whenever you type second letter,
-							//			suggestions will be shown with unupdated content. I think these if's should not be united.
-							if (input.data('lastSearch') != search && !values.isWaiting) {
-								values.isWaiting = true;
+							if (input.data('lastSearch') != search) {
+								if (!values.isWaiting) {
+									values.isWaiting = true;
 
-								var jqxhr = null;
-								window.setTimeout(function() {
-									values.isWaiting = false;
+									var jqxhr = null;
+									window.setTimeout(function() {
+										values.isWaiting = false;
 
-									var search = input.val();
+										var search = input.val();
 
-									// re-check search after delay
-									if (search !== '' && input.data('lastSearch') != search) {
-										values.search = search;
+										// re-check search after delay
+										if (search !== '' && input.data('lastSearch') != search) {
+											values.search = search;
 
-										input.data('lastSearch', values.search);
+											input.data('lastSearch', values.search);
 
-										if (jqxhr != null) {
-											jqxhr.abort();
-										}
-
-										values.isAjaxLoaded = false;
-										var request_data = {
-											search: values.search,
-											limit: getLimit(values, options)
-										}
-
-										jqxhr = $.ajax({
-											url: options.url + '&curtime=' + new CDate().getTime(),
-											type: 'GET',
-											dataType: 'json',
-											cache: false,
-											data: request_data,
-											success: function(data) {
-												values.isAjaxLoaded = true;
-												loadAvailable(data.result, obj, values, options);
+											if (jqxhr != null) {
+												jqxhr.abort();
 											}
-										});
-									}
-								}, 500);
+
+											values.isAjaxLoaded = false;
+											var request_data = {
+												search: values.search,
+												limit: getLimit(values, options)
+											}
+
+											jqxhr = $.ajax({
+												url: options.url + '&curtime=' + new CDate().getTime(),
+												type: 'GET',
+												dataType: 'json',
+												cache: false,
+												data: request_data,
+												success: function(data) {
+													values.isAjaxLoaded = true;
+													loadAvailable(data.result, obj, values, options);
+												}
+											});
+										}
+									}, 500);
+								}
 							}
 							else {
 								if ($('.available', obj).is(':hidden')) {
@@ -650,7 +649,7 @@ jQuery(function($) {
 			$.each(data, function (i, item) {
 				if (typeof values.available[item.id] !== 'undefined') {
 					if (found == 0) {
-						preselected = item.prefix+item.name;
+						preselected = (item.prefix || '') + item.name;
 					}
 					addAvailable(item, obj, values, options);
 					found++;
@@ -659,10 +658,12 @@ jQuery(function($) {
 		}
 
 		if (found > 0) {
-			// TODO VM: this translation string can be separated into two, separated by forced comma or dot, as they are not dependant on one another.
-			$('[aria-live]', obj).text(sprintf(t('%1$d matches for %2$s found, %3$s, preselected, use down,up arrow keys and enter to select'),
-				found, values.search, preselected
-			));
+			$('[aria-live]', obj).text(
+				(values.isMoreMatchesFound
+					? sprintf(t('More than %1$d matches for %2$s found'), found, values.search)
+					: sprintf(t('%1$d matches for %2$s found'), found, values.search)) +
+				', ' + sprintf(t('%1$s preselected, use down,up arrow keys and enter to select'), preselected)
+			);
 		}
 		else {
 			$('[aria-live]', obj).text(options.labels['No matches found']);

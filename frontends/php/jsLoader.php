@@ -199,7 +199,9 @@ $tranStrings = [
 		'Added, %1$s' => pgettext(ZBX_CONTEXT_SCREEN_READER, 'Added, %1$s'),
 		'Removed, %1$s' => pgettext(ZBX_CONTEXT_SCREEN_READER, 'Removed, %1$s'),
 		'Selected, %1$s in position %2$d of %3$d' => pgettext(ZBX_CONTEXT_SCREEN_READER, 'Selected, %1$s in position %2$d of %3$d'),
-		'%1$d matches for %2$s found, %3$s, preselected, use down,up arrow keys and enter to select' => pgettext(ZBX_CONTEXT_SCREEN_READER, '%1$d matches for %2$s found, %3$s, preselected, use down,up arrow keys and enter to select')
+		'More than %1$d matches for %2$s found' => pgettext(ZBX_CONTEXT_SCREEN_READER, 'More than %1$d matches for %2$s found'),
+		'%1$d matches for %2$s found' => pgettext(ZBX_CONTEXT_SCREEN_READER, '%1$d matches for %2$s found'),
+		'%1$s preselected, use down,up arrow keys and enter to select' => pgettext(ZBX_CONTEXT_SCREEN_READER, '%1$s preselected, use down,up arrow keys and enter to select')
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),

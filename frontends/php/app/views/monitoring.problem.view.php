@@ -107,8 +107,7 @@ if ($data['action'] == 'problem.view') {
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
-		// TODO VM: Maybe it is better to end label's "for" with "_ms", and not "_search"?
-		->addRow((new CLabel(_('Hosts'), 'filter_hostids_search')),
+		->addRow((new CLabel(_('Hosts'), 'filter_hostids_ms')),
 			(new CMultiSelect([
 				'name' => 'filter_hostids[]',
 				'object_name' => 'hosts',
