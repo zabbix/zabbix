@@ -5,6 +5,8 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
+..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
 
 --------------------------------------------------------------------------------
@@ -283,6 +285,8 @@ Bug fixes:
 Changes for 3.4.9rc3
 
 Bug fixes:
+..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
+..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
 
 --------------------------------------------------------------------------------
@@ -1494,6 +1498,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.17rc2
 
 Bug fixes:
+..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ...G...... [ZBX-13781] fixed possible crash in the function "web.page.get" of Zabbix Agentd (MVekslers)
 
 --------------------------------------------------------------------------------
