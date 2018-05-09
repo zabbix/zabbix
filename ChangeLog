@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 ..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
 ..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
@@ -287,6 +288,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.9
@@ -1512,6 +1514,7 @@ Changes for 3.0.18rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17
