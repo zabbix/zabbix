@@ -1531,6 +1531,7 @@ define('ZBX_STYLE_TOP_NAV_HELP', 'top-nav-help');
 define('ZBX_STYLE_TOP_NAV_ICONS', 'top-nav-icons');
 define('ZBX_STYLE_TOP_NAV_PROFILE', 'top-nav-profile');
 define('ZBX_STYLE_TOP_NAV_SIGNOUT', 'top-nav-signout');
+define('ZBX_STYLE_TOP_NAV_SUPPORT', 'top-nav-support');
 define('ZBX_STYLE_TOP_NAV_ZBBSHARE', 'top-nav-zbbshare');
 define('ZBX_STYLE_TOP_SUBNAV', 'top-subnav');
 define('ZBX_STYLE_TOP_SUBNAV_CONTAINER', 'top-subnav-container');
