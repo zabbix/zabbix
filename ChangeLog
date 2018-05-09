@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+...G...PS. [ZBX-13782] fixed decoding of Unicode characters in JSON (Andris)
 ..F....... [ZBX-13767] fixed "undefined index: acknowledges" error on problems page (agriscenko)
 ..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)
 ..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
@@ -293,6 +294,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-13782] fixed decoding of Unicode characters in JSON (Andris)
 ..F....... [ZBX-13767] fixed "undefined index: acknowledges" error on problems page (agriscenko)
 ..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)
 ..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)

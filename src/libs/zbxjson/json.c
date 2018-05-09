@@ -191,6 +191,29 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 	return len;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_num2hex                                                      *
+ *                                                                            *
+ * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      c - number 0-15                                                       *
+ *                                                                            *
+ * Return value:                                                              *
+ *      '0'-'f'                                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+static char	zbx_num2hex(unsigned char c)
+{
+	if (c >= 10)
+		return (char)(c + 0x57); /* a-f */
+	else
+		return (char)(c + 0x30); /* 0-9 */
+}
+
 static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t type)
 {
 	const char	*sptr;
@@ -656,59 +679,175 @@ static const char	*zbx_json_decodenull(const char *p)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_decode_character                                        *
+ * Function: zbx_is_valid_json_hex                                            *
  *                                                                            *
- * Purpose: decodes escape character                                          *
+ * Purpose: chack if a 4 character sequence is a valid hex number 0000 - FFFF *
  *                                                                            *
- * Parameters: p - [IN/OUT] a pointer to the next character in string         *
+ * Parameters:                                                                *
+ *      p - pointer to the 1st character                                      *
  *                                                                            *
- * Return value: 0 - invalid escape character                                 *
- *               !0 - the escaped character                                   *
+ * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static char	zbx_json_decode_character(const char **p)
+static int	zbx_is_valid_json_hex(const char *p)
 {
-	char	out;
+	int	i;
 
-	switch (*(++*p))
+	for (i = 0; i < 4; ++i, ++p)
 	{
-		case '"':
-			out = '"';
-			break;
-		case '\\':
-			out = '\\';
-			break;
-		case '/':
-			out = '/';
-			break;
-		case 'b':
-			out = '\b';
-			break;
-		case 'f':
-			out = '\f';
-			break;
-		case 'n':
-			out = '\n';
-			break;
-		case 'r':
-			out = '\r';
-			break;
-		case 't':
-			out = '\t';
-			break;
-		case 'u':
-			*p += 3; /* "u00" */
-			out = zbx_hex2num(**p) << 4;
-			out += zbx_hex2num(*(++*p));
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return '\0';
+		if (0 == isxdigit(*p))
+			return FAIL;
 	}
 
-	++*p;
+	return SUCCEED;
+}
 
-	return out;
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hex2num                                                      *
+ *                                                                            *
+ * Purpose: convert hexit c ('0'-'9''a'-'f''A'-'F') to number (0-15)          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      c - char ('0'-'9''a'-'f''A'-'F')                                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *      0-15                                                                  *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned int	zbx_hex2num(char c)
+{
+	int	res;
+
+	if (c >= 'a')
+		res = c - 0x57; /* a-f */
+	else if (c >= 'A')
+		res = c - 0x37; /* A-F */
+	else
+		res = c - 0x30; /* 0-9 */
+
+	return (unsigned int)res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_decode_character                                        *
+ *                                                                            *
+ * Purpose: decodes JSON escape character into UTF-8                          *
+ *                                                                            *
+ * Parameters: p - [IN/OUT] a pointer to the first character in string        *
+ *             bytes - [OUT] a 4-element array where 1 - 4 bytes of character *
+ *                     UTF-8 representation are written                       *
+ *                                                                            *
+ * Return value: number of UTF-8 bytes written into 'bytes' array or          *
+ *               0 on error (invalid escape sequence)                         *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
+{
+	bytes[0] = '\0';
+
+	switch (**p)
+	{
+		case '"':
+			bytes[0] = '"';
+			break;
+		case '\\':
+			bytes[0] = '\\';
+			break;
+		case '/':
+			bytes[0] = '/';
+			break;
+		case 'b':
+			bytes[0] = '\b';
+			break;
+		case 'f':
+			bytes[0] = '\f';
+			break;
+		case 'n':
+			bytes[0] = '\n';
+			break;
+		case 'r':
+			bytes[0] = '\r';
+			break;
+		case 't':
+			bytes[0] = '\t';
+			break;
+		default:
+			break;
+	}
+
+	if ('\0' != bytes[0])
+	{
+		++*p;
+		return 1;
+	}
+
+	if ('u' == **p)		/* \u0000 - \uFFFF */
+	{
+		unsigned int	num;
+
+		if (FAIL == zbx_is_valid_json_hex(++*p))
+			return 0;
+
+		num = zbx_hex2num(**p) << 12;
+		num += zbx_hex2num(*(++*p)) << 8;
+		num += zbx_hex2num(*(++*p)) << 4;
+		num += zbx_hex2num(*(++*p));
+		++*p;
+
+		if (0x007F >= num)	/* 0000 - 007F */
+		{
+			bytes[0] = (unsigned char)num;
+			return 1;
+		}
+		else if (0x07FF >= num)	/* 0080 - 07FF */
+		{
+			bytes[0] = (unsigned char)'\xC0' | (unsigned char)((num & 0x07C0) >> 6);
+			bytes[1] = (unsigned char)'\x80' | (unsigned char)(num & 0x003F);
+			return 2;
+		}
+		else if (0xD7FF >= num || 0xE000 <= num)	/* 0800 - D7FF or E000 - FFFF */
+		{
+			bytes[0] = (unsigned char)'\xE0' | (unsigned char)((num & 0xF000) >> 12);
+			bytes[1] = (unsigned char)'\x80' | (unsigned char)((num & 0x0FC0) >> 6);
+			bytes[2] = (unsigned char)'\x80' | (unsigned char)(num & 0x003F);
+			return 3;
+		}
+		else if (0xD800 <= num && num <= 0xDBFF)	/* high surrogate D800 - DBFF */
+		{
+			unsigned int	num_lo, uc;
+
+			/* collect the low surrogate */
+
+			if ('\\' != **p || 'u' != *(++*p) || FAIL == zbx_is_valid_json_hex(++*p))
+				return 0;
+
+			num_lo = zbx_hex2num(**p) << 12;
+			num_lo += zbx_hex2num(*(++*p)) << 8;
+			num_lo += zbx_hex2num(*(++*p)) << 4;
+			num_lo += zbx_hex2num(*(++*p));
+			++*p;
+
+			if (num_lo < 0xDC00 || 0xDFFF < num_lo)		/* low surrogate range is DC00 - DFFF */
+				return 0;
+
+			/* decode surrogate pair */
+
+			uc = 0x010000 + ((num & 0x03FF) << 10) + (num_lo & 0x03FF);
+
+			bytes[0] = (unsigned char)'\xF0' | (unsigned char)((uc & 0x1C0000) >> 18);
+			bytes[1] = (unsigned char)'\x80' | (unsigned char)((uc & 0x03F000) >> 12);
+			bytes[2] = (unsigned char)'\x80' | (unsigned char)((uc & 0x000FC0) >> 6);
+			bytes[3] = (unsigned char)'\x80' | (unsigned char)(uc & 0x00003F);
+			return 4;
+		}
+		/* error - low surrogate without high surrogate */
+	}
+
+	return 0;
 }
 
 /******************************************************************************
@@ -736,9 +875,20 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 	{
 		switch (*p)
 		{
+			unsigned int	nbytes, i;
+			unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
+
 			case '\\':
-				if ('\0' != (*out = zbx_json_decode_character(&p)))
-					out++;
+				++p;
+				if (0 == (nbytes = zbx_json_decode_character(&p, uc)))
+					return NULL;
+
+				if ((size_t)(out - start) + nbytes >= size)
+					return NULL;
+
+				for (i = 0; i < nbytes; ++i)
+					*out++ = (char)uc[i];
+
 				break;
 			case '"':
 				*out = '\0';
