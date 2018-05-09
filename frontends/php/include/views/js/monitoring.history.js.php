@@ -21,6 +21,11 @@
 					value: time_range.to
 				}));
 			form.submit();
-		})
+		});
+
+		$('#filter-space').submit(function() {
+			$('[name="from"]').first().attr("disabled", "disabled");
+			$('[name="to"]').first().attr("disabled", "disabled");
+		});
 	});
 </script>

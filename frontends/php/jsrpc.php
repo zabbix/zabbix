@@ -584,8 +584,8 @@ switch ($data['method']) {
 			}
 
 			if ($data['idx'] !== null && $from_datetime !== null && $to_datetime !== null) {
-				CProfile::update($data['idx'].'.from', $from, PROFILE_TYPE_STR, $data['idx2']);
-				CProfile::update($data['idx'].'.to', $to, PROFILE_TYPE_STR, $data['idx2']);
+				CProfile::update($data['idx'].'.from', $from, PROFILE_TYPE_STR, (int)$data['idx2']);
+				CProfile::update($data['idx'].'.to', $to, PROFILE_TYPE_STR, (int)$data['idx2']);
 			}
 		}
 		else {

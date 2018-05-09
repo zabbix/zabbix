@@ -277,16 +277,24 @@ class CFilter extends CDiv {
 	 * @return string
 	 */
 	public function getJS() {
-		return 'jQuery("#'.$this->getId().'").tabs('.
+		$id = '#' . $this->getId();
+		$js = 'jQuery("'.$id.'").tabs('.
 			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled])).
-		').on("tabsactivate", function(e, ui) {
-			var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0;
-			updateUserProfile("'.$this->idx.'.active", active, []);
-			if (active) {
-				jQuery(".multiselect", ui.newPanel).multiSelect("resize");
-				jQuery("[autofocus=autofocus]", ui.newPanel).focus();
-			}
-		})';
+		').find(".multiselect").multiSelect("resize");';
+
+		if ($this->idx !== null && $this->idx !== '') {
+			$idx = $this->idx . '.active';
+			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {
+				var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0;
+				updateUserProfile("'.$idx.'", active, []);
+				if (active) {
+					jQuery(".multiselect", ui.newPanel).multiSelect("resize");
+					jQuery("[autofocus=autofocus]", ui.newPanel).focus();
+				}
+			});';
+		}
+
+		return $js;
 	}
 
 	/**
