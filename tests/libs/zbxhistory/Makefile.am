@@ -17,10 +17,7 @@ HISTORY_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_history_get_values_SOURCES = \
-	zbx_history_get_values.c \
-	../../zbxmockdb.c \
-	../../zbxmockdb.h \
-	../../zbxmocktest.h
+	zbx_history_get_values.c
 
 zbx_history_get_values_WRAP = \
 	-Wl,--wrap=zbx_sleep_loop \

@@ -2713,5 +2713,5 @@ void	zbx_vc_disable(void)
 }
 
 #ifdef HAVE_TESTS
-#	include "valuecache_test.c"
+#	include "../../../tests/libs/zbxdbcache/valuecache_test.c"
 #endif
