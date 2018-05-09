@@ -191,12 +191,10 @@
 		}
 
 		if (typeof data.users !== 'undefined') {
-			removeUserShares();
 			addPopupValues({'object': 'userid', 'values': data.users });
 		}
 
 		if (typeof data.userGroups !== 'undefined') {
-			removeUserGroupShares();
 			addPopupValues({'object': 'usrgrpid', 'values': data.userGroups });
 		}
 	};
@@ -301,20 +299,10 @@
 	}
 
 	function removeUserGroupShares(usrgrpid) {
-		if (typeof usrgrpid === 'undefined') {
-			jQuery("[id^='user_group_shares']").remove();
-		}
-		else {
-			jQuery('#user_group_shares_' + usrgrpid).remove();
-		}
+		jQuery('#user_group_shares_' + usrgrpid).remove();
 	}
 
 	function removeUserShares(userid) {
-		if (typeof userid === 'undefined') {
-			jQuery("[id^='user_shares']").remove();
-		}
-		else {
-			jQuery('#user_shares_' + userid).remove();
-		}
+		jQuery('#user_shares_' + userid).remove();
 	}
 </script>
