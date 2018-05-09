@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha7
 
 New features:
+..F....... [ZBXNEXT-4528] added link to Zabbix official support page (Andzs, ashubin)
 ........S. [ZBXNEXT-4520] added values to boolean mapping: "ok, master" as 1 and "err, slave" as 0 (viktors)
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
@@ -289,6 +290,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
 --------------------------------------------------------------------------------
@@ -1515,6 +1517,7 @@ Changes for 3.0.18rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
 --------------------------------------------------------------------------------
