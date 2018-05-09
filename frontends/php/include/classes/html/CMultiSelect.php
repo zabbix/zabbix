@@ -35,7 +35,6 @@ class CMultiSelect extends CTag {
 
 		$this->addClass('multiselect');
 		$this->setId(zbx_formatDomId($options['name']));
-		$this->js_event_name = sprintf('multiselect_%s_init', $this->getId());
 
 		// Autocomplete url.
 		$url = new CUrl('jsrpc.php');
