@@ -23,6 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
+#include "module.h"
 
 const char	*zbx_mock_get_parameter_string(const char *path)
 {
@@ -139,6 +140,11 @@ int	zbx_mock_str_to_return_code(const char *str)
 	if (0 == strcmp(str, "CONFIG_ERROR"))
 		return CONFIG_ERROR;
 
+	if (0 == strcmp(str, "SYSINFO_RET_OK"))
+		return SYSINFO_RET_OK;
+
+	if (0 == strcmp(str, "SYSINFO_RET_FAIL"))
+		return SYSINFO_RET_FAIL;
 
 	fail_msg("Unknown return code  \"%s\"", str);
 	return 0;

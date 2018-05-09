@@ -65,7 +65,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		);
 		$this->zbxTestTextNotPresent('Info');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent(['Enable', 'Disable', 'Mass update', 'Delete']);
+		$this->zbxTestTextPresent(['Create disabled', 'Mass update', 'Delete']);
 	}
 
 	/**
