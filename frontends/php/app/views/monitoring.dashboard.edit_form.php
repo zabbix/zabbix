@@ -23,24 +23,25 @@ $this->addJsFile('multiselect.js');
 $this->includeJSfile('app/views/monitoring.dashboard.edit_form.js.php');
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('dashboard_form')
 	->setAttribute('style', 'display: none;');
 
 $multiselect = (new CMultiSelect([
 	'name' => 'userid',
-	'selectedLimit' => 1,
-	'objectName' => 'users',
+	'object_name' => 'users',
 	'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
+	'multiple' => false,
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'users',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'userid',
 			'srcfld1' => 'userid',
-			'srcfld2' => 'fullname'
+			'srcfld2' => 'fullname',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid'
 		]
 	],
-	'callPostEvent' => true
+	'call_post_event' => true
 ]))
 	->setAttribute('data-default-owner', CJs::encodeJson($data['dashboard']['owner']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

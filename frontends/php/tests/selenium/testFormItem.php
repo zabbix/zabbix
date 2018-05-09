@@ -486,7 +486,7 @@ class testFormItem extends CWebTest {
 		}
 
 		$this->zbxTestLogin(
-			'items.php?form='.(isset($itemid) ? 'update' : 'Create+item').
+			'items.php?form='.(isset($itemid) ? 'update' : 'create').
 			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '')
 		);
 
@@ -2121,7 +2121,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$this->zbxTestCheckTitle('Configuration of items');
 
 		if (isset($data['type'])) {
@@ -2172,7 +2172,7 @@ class testFormItem extends CWebTest {
 		}
 
 		if (array_key_exists('master_item',$data))	{
-			$this->zbxTestClickWait('button');
+			$this->zbxTestClickButtonMultiselect('master_itemid');
 			$this->zbxTestLaunchOverlayDialog('Items');
 			$this->zbxTestClickLinkTextWait($data['master_item']);
 		}
@@ -2634,7 +2634,7 @@ class testFormItem extends CWebTest {
 		$dbRow = DBfetch($dbResult);
 		$hostid = $dbRow['hostid'];
 
-		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=Create+item');
+		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=create');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 

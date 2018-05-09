@@ -88,7 +88,8 @@ if ($data['action']['filter']['conditions']) {
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('javascript: removeCondition('.$i.');')
-						->addClass(ZBX_STYLE_BTN_LINK),
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->removeId(),
 					new CVar('conditions['.$i.']', $condition)
 				]))->addClass(ZBX_STYLE_NOWRAP)
 			],
@@ -150,19 +151,15 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'hostGroup',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -171,11 +168,8 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_TEMPLATE:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'templates',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'templates',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -183,9 +177,7 @@ switch ($data['new_condition']['conditiontype']) {
 					'srcfld2' => 'host',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'templated_hosts' => '1',
-					'multiselect' => '1',
-					'writeonly' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -194,19 +186,15 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'hosts',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'hosts',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'hostid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -215,20 +203,16 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_TRIGGER:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'triggers',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'triggers',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'triggers',
+					'srcfld1' => 'triggerid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'triggerid',
-					'writeonly' => '1',
-					'multiselect' => '1',
-					'noempty' => '1'
+					'editable' => true,
+					'noempty' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -299,9 +283,9 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value]',
-			'objectName' => 'proxies',
-			'selectedLimit' => 1,
-			'defaultValue' => 0,
+			'object_name' => 'proxies',
+			'multiple' => false,
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'proxies',
@@ -418,7 +402,7 @@ $action_tab->addRow(_('Enabled'),
 );
 
 // Operations tab.
-$operation_tab = new CFormList('operationlist');
+$operation_tab = new CFormList();
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operation_tab->addRow((new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
@@ -525,7 +509,8 @@ if ($data['action']['operations']) {
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_OPERATION.');')
-								->addClass(ZBX_STYLE_BTN_LINK),
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->removeId(),
 							new CVar('operations['.$operationid.']', $operation)
 						]
 					])
@@ -545,7 +530,8 @@ if ($data['action']['operations']) {
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_OPERATION.');')
-								->addClass(ZBX_STYLE_BTN_LINK),
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->removeId(),
 							new CVar('operations['.$operationid.']', $operation)
 						]
 					])
@@ -1036,17 +1022,15 @@ if (!empty($data['new_operation'])) {
 				(new CLabel(_('Host groups'), 'new_operation[groupids][]'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[groupids][]',
-					'objectName' => 'hostGroup',
-					'objectOptions' => ['editable' => true],
+					'object_name' => 'hostGroup',
 					'data' => $data['new_operation']['groups'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
+							'srcfld1' => 'groupid',
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'new_operation_groupids_',
-							'srcfld1' => 'groupid',
-							'writeonly' => '1',
-							'multiselect' => '1'
+							'editable' => true
 						]
 					]
 				]))
@@ -1061,8 +1045,7 @@ if (!empty($data['new_operation'])) {
 				(new CLabel(_('Templates'), 'new_operation[templateids][]'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[templateids][]',
-					'objectName' => 'templates',
-					'objectOptions' => ['editable' => true],
+					'object_name' => 'templates',
 					'data' => $data['new_operation']['templates'],
 					'popup' => [
 						'parameters' => [
@@ -1071,9 +1054,7 @@ if (!empty($data['new_operation'])) {
 							'srcfld2' => 'host',
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'new_operation_templateids_',
-							'templated_hosts' => '1',
-							'multiselect' => '1',
-							'writeonly' => '1'
+							'editable' => true
 						]
 					]
 				]))
@@ -1145,7 +1126,8 @@ if (!empty($data['new_operation'])) {
 					(new CCol([
 						(new CButton('remove', _('Remove')))
 							->onClick('javascript: removeOperationCondition('.$i.');')
-							->addClass(ZBX_STYLE_BTN_LINK),
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->removeId(),
 						new CVar('new_operation[opconditions]['.$i.'][conditiontype]', $opcondition['conditiontype']),
 						new CVar('new_operation[opconditions]['.$i.'][operator]', $opcondition['operator']),
 						new CVar('new_operation[opconditions]['.$i.'][value]', $opcondition['value'])
@@ -1282,7 +1264,7 @@ $bottom_note = _('At least one operation must exist.');
 // Recovery operation tab.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$bottom_note = _('At least one operation or recovery operation must exist.');
-	$recovery_tab = (new CFormList('operationlist'))
+	$recovery_tab = (new CFormList())
 		->addRow(_('Default subject'),
 			(new CTextBox('r_shortdata', $data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
@@ -1335,7 +1317,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 								->onClick(
 									'javascript: removeOperation('.$operationid.', '.ACTION_RECOVERY_OPERATION.');'
 								)
-								->addClass(ZBX_STYLE_BTN_LINK),
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->removeId(),
 							new CVar('recovery_operations['.$operationid.']', $operation)
 						]
 					])
@@ -1878,7 +1861,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$bottom_note = _('At least one operation, recovery operation or acknowledge operation must exist.');
 	$action_formname = $actionForm->getName();
 
-	$acknowledge_tab = (new CFormList('operationlist'))
+	$acknowledge_tab = (new CFormList())
 		->addRow(_('Default subject'),
 			(new CTextBox('ack_shortdata', $data['action']['ack_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
@@ -1928,7 +1911,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_ACKNOWLEDGE_OPERATION.
 									');'
 								)
-								->addClass(ZBX_STYLE_BTN_LINK),
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->removeId(),
 							new CVar('ack_operations['.$operationid.']', $operation)
 						]
 					])

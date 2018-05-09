@@ -75,7 +75,8 @@ if ($data['correlation']['filter']['conditions']) {
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('javascript: removeCondition('.$i.');')
-						->addClass(ZBX_STYLE_BTN_LINK),
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->removeId(),
 					new CVar('conditions['.$i.']', $condition)
 				]))->addClass(ZBX_STYLE_NOWRAP)
 			],
@@ -122,19 +123,14 @@ switch ($data['new_condition']['type']) {
 	case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[groupids][]',
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'hostGroup',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'new_condition_groupids_',
 					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'new_condition_groupids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -205,7 +201,7 @@ $correlation_tab
 	);
 
 // Operations tab.
-$operation_tab = new CFormList('operationlist');
+$operation_tab = new CFormList();
 
 $operations_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
@@ -223,7 +219,8 @@ if ($data['correlation']['operations']) {
 			(new CCol([
 				(new CButton('remove', _('Remove')))
 					->onClick('javascript: removeOperation('.$operationid.');')
-					->addClass(ZBX_STYLE_BTN_LINK),
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId(),
 				new CVar('operations['.$operationid.']', $operation)
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		], null, 'operations_'.$operationid);

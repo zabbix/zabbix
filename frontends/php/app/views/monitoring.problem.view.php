@@ -44,7 +44,10 @@ $options = [
 			'show_tags' => $data['filter']['show_tags'],
 			'maintenance' => $data['filter']['maintenance'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
-			'details' => $data['filter']['details']
+			'compact_view' => $data['filter']['compact_view'],
+			'show_timeline' => $data['filter']['show_timeline'],
+			'details' => $data['filter']['details'],
+			'highlight_row' => $data['filter']['highlight_row']
 		]
 	]
 ];
@@ -92,15 +95,14 @@ if ($data['action'] == 'problem.view') {
 		->addRow((new CLabel(_('Host groups'), 'filter_groupids_search')),
 			(new CMultiSelect([
 				'name' => 'filter_groupids[]',
-				'objectName' => 'hostGroup',
+				'object_name' => 'hostGroup',
 				'data' => $data['filter']['groups'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'host_groups',
-						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_groupids_',
 						'srcfld1' => 'groupid',
-						'multiselect' => '1'
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_groupids_'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -109,16 +111,14 @@ if ($data['action'] == 'problem.view') {
 		->addRow((new CLabel(_('Hosts'), 'filter_hostids_search')),
 			(new CMultiSelect([
 				'name' => 'filter_hostids[]',
-				'objectName' => 'hosts',
+				'object_name' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'hosts',
-						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_hostids_',
 						'srcfld1' => 'hostid',
-						'real_hosts' => '1',
-						'multiselect' => '1'
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'filter_hostids_'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -143,10 +143,7 @@ if ($data['action'] == 'problem.view') {
 		->addRow((new CLabel(_('Triggers'), 'filter_triggerids_search')),
 			(new CMultiSelect([
 				'name' => 'filter_triggerids[]',
-				'objectName' => 'triggers',
-				'objectOptions' => [
-					'monitored' => true
-				],
+				'object_name' => 'triggers',
 				'data' => $data['filter']['triggers'],
 				'popup' => [
 					'parameters' => [
@@ -154,10 +151,9 @@ if ($data['action'] == 'problem.view') {
 						'srcfld1' => 'triggerid',
 						'dstfrm' => 'zbx_filter',
 						'dstfld1' => 'filter_triggerids_',
-						'monitored_hosts' => '1',
-						'with_monitored_triggers' => '1',
-						'multiselect' => '1',
-						'noempty' => '1'
+						'monitored_hosts' => true,
+						'with_monitored_triggers' => true,
+						'noempty' => true
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -272,23 +268,44 @@ if ($data['action'] == 'problem.view') {
 				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
 				->setModern(true)
 		)
-		->addRow(_('Show hosts in maintenance'),
-			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1)
-		);
-
-	if ($data['config']['event_ack_enable']) {
-		$filter_column2->addRow(_('Show unacknowledged only'),
-			(new CCheckBox('filter_unacknowledged'))->setChecked($data['filter']['unacknowledged'] == 1)
-		);
-	}
-
-	$filter_column2
-		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
+		->addRow(_('Show hosts in maintenance'), [
+			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1),
+			$data['config']['event_ack_enable']
+				? (new CDiv([
+					(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
+						->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+					(new CCheckBox('filter_unacknowledged'))
+						->setChecked($data['filter']['unacknowledged'] == 1)
+				]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+				: null
+		])
+		->addRow(_('Compact view'), [
+			(new CCheckBox('filter_compact_view'))->setChecked($data['filter']['compact_view'] == 1),
+			(new CDiv([
+				(new CLabel(_('Show timeline'), 'filter_show_timeline'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+				(new CCheckBox('filter_show_timeline'))
+					->setChecked($data['filter']['show_timeline'] == 1)
+					->setEnabled($data['filter']['compact_view'] == 0),
+			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+		])
+		->addRow(_('Show details'), [
+			(new CCheckBox('filter_details'))
+				->setChecked($data['filter']['details'] == 1)
+				->setEnabled($data['filter']['compact_view'] == 0),
+			(new CDiv([
+				(new CLabel(_('Highlight whole row'), 'filter_highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+				(new CCheckBox('filter_highlight_row'))
+					->setChecked($data['filter']['highlight_row'] == 1)
+					->setEnabled($data['filter']['compact_view'] == 1)
+			]))
+				->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
+				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+		]);
 
 	$filter = (new CFilter('web.problem.filter.state'))
-		->addVar('action', 'problem.view')
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-		->addVar('page', $data['page'])
+		->addFormItem((new CVar('action', 'problem.view'))->removeId())
+		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
+		->addFormItem((new CVar('page', $data['page']))->removeId())
 		->addColumn($filter_column1)
 		->addColumn($filter_column2);
 

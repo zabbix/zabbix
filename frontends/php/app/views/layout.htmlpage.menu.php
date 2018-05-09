@@ -22,6 +22,7 @@ $user_navigation = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
 		(new CForm('get', 'search.php'))
+			->cleanItems()
 			->addItem([
 				(new CTextBox('search', '', false, 255))
 					->setAttribute('autocomplete', 'off')
@@ -129,6 +130,5 @@ if ($data['server_name'] !== '') {
 		(new CDiv())
 			->addItem($top_menu)
 			->addItem($sub_menu_div)
-			->addClass(ZBX_STYLE_NAV)
 	)
 	->show();

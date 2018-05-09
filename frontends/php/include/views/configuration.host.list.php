@@ -40,7 +40,11 @@ $widget = (new CWidget())
 				->setArgument('form', 'create')
 				->getUrl()
 			))
-			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
+			->addItem(
+				(new CButton('form', _('Import')))
+					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->removeId()
+			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]));
@@ -67,7 +71,7 @@ $filter = (new CFilter('web.hosts.filter.state'))
 				_('Proxy'),
 				(new CMultiSelect([
 					'name' => 'filter_proxyids[]',
-					'objectName' => 'proxies',
+					'object_name' => 'proxies',
 					'data' => $data['proxies_ms'],
 					'popup' => [
 						'parameters' => [
@@ -75,8 +79,7 @@ $filter = (new CFilter('web.hosts.filter.state'))
 							'srcfld1' => 'proxyid',
 							'srcfld2' => 'host',
 							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_proxyids_',
-							'multiselect' => '1'
+							'dstfld1' => 'filter_proxyids_'
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),

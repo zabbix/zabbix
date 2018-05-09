@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.0alpha6])
+AC_INIT([Zabbix],[4.0.0alpha7])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1418,7 +1418,30 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
+
+	dnl Check for zlib, used by Zabbix server-proxy communications
+	ZLIB_CHECK_CONFIG([no])
+	if test "x$found_zlib" != "xyes"; then
+		AC_MSG_ERROR([Unable to use zlib (zlib check failed)])
+	fi
+
+	AC_SUBST(ZLIB_CFLAGS)
 fi
+
+SERVER_LDFLAGS="$SERVER_LDFLAGS $ZLIB_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $ZLIB_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $ZLIB_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $ZLIB_LIBS"
+
+AGENT_LDFLAGS="$AGENT_LDFLAGS $ZLIB_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $ZLIB_LIBS"
+
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $ZLIB_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $ZLIB_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $ZLIB_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS"
 
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 
@@ -1578,17 +1601,6 @@ dnl Starting from 2.0 agent can do web monitoring
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
-found_iconv="no"
-dnl Check for libiconv [by default - skip]
-LIBICONV_CHECK_CONFIG([no])
-if test "x$found_iconv" != "xyes"; then
-	AC_MSG_ERROR([Unable to use iconv (libiconv check failed)])
-fi
-LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
-LIBS="$LIBS $ICONV_LIBS"
-
-AC_SUBST(ICONV_CFLAGS)
-
 dnl Check for libpcre, used by Zabbix for regular expressions
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
 	LIBPCRE_CHECK_CONFIG([no])
@@ -1606,6 +1618,17 @@ else
 fi
 
 AC_SUBST(LIBPCRE_CFLAGS)
+
+found_iconv="no"
+dnl Check for libiconv [by default - skip]
+LIBICONV_CHECK_CONFIG([no])
+if test "x$found_iconv" != "xyes"; then
+	AC_MSG_ERROR([Unable to use iconv (libiconv check failed)])
+fi
+LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
+LIBS="$LIBS $ICONV_LIBS"
+
+AC_SUBST(ICONV_CFLAGS)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
@@ -1689,6 +1712,7 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxsysinfo/common/Makefile
 	tests/libs/zbxcommshigh/Makefile
 	tests/libs/zbxcommon/Makefile
+	tests/libs/zbxalgo/Makefile
 )])
 
 AC_OUTPUT([
@@ -1742,6 +1766,7 @@ AC_OUTPUT([
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxipcservice/Makefile
 	src/libs/zbxhistory/Makefile
+	src/libs/zbxcompress/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
@@ -1859,6 +1884,10 @@ fi
 
 if test "x$ICONV_CFLAGS" != "x"; then
 	echo "    iconv:                 ${ICONV_CFLAGS}"
+fi
+
+if test "x$ZLIB_CFLAGS" != "x"; then
+	echo "    zlib:                  ${ZLIB_CFLAGS}"
 fi
 
 echo "
