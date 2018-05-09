@@ -44,16 +44,15 @@ $userGroupFormList = (new CFormList())
 		new CLabel(_('Users'), 'userids[]'),
 		(new CMultiSelect([
 			'name' => 'userids[]',
-			'objectName' => 'users',
+			'object_name' => 'users',
 			'data' => $data['users_ms'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'users',
-					'dstfrm' => $userGroupForm->getName(),
-					'dstfld1' => 'userids_',
 					'srcfld1' => 'userid',
 					'srcfld2' => 'fullname',
-					'multiselect' => '1'
+					'dstfrm' => $userGroupForm->getName(),
+					'dstfld1' => 'userids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -139,15 +138,14 @@ $new_permissions_table = (new CTable())
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
+			'object_name' => 'hostGroup',
 			'data' => $data['permission_groups'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => $userGroupForm->getName(),
-					'dstfld1' => 'groupids_',
 					'srcfld1' => 'groupid',
-					'multiselect' => '1'
+					'dstfrm' => $userGroupForm->getName(),
+					'dstfld1' => 'groupids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
@@ -224,18 +222,17 @@ $new_tag_filter_table = (new CTable())
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'tag_filter_groupids[]',
-			'objectName' => 'hostGroup',
+			'object_name' => 'hostGroup',
 			'data' => $data['tag_filter_groups'],
-			'styles' => ['margin-top' => '-.3em'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => $userGroupForm->getName(),
-					'dstfld1' => 'tag_filter_groupids_',
 					'srcfld1' => 'groupid',
-					'multiselect' => '1'
+					'dstfrm' => $userGroupForm->getName(),
+					'dstfld1' => 'tag_filter_groupids_'
 				]
-			]
+			],
+			'styles' => ['margin-top' => '-.3em']
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		new CCol(
 			(new CTextBox('tag', $data['tag']))
