@@ -1669,7 +1669,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		} while ($has_unresolved_masters);
 
-		// Validate every root mater items childrens count.
+		// Validate every root master items childrens count.
 		foreach (array_keys($root_items) as $root_itemid) {
 			$dependency_level = 0;
 			$find_itemids = [$root_itemid => $dependency_level];
