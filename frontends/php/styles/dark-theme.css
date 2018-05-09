@@ -851,13 +851,19 @@ output {
       padding: 8px 5px 5px 5px;
       border-bottom-width: 1px; }
 
+.subfilter,
 .subfilter-enabled {
   display: inline-block;
-  position: relative;
   height: 18px;
-  padding: 0 4px;
-  color: #f2f2f2;
+  position: relative; }
+
+.subfilter {
+  margin-right: 10px; }
+
+.subfilter-enabled {
   background-color: #4f4f4f;
+  color: #f2f2f2;
+  padding: 0 4px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
