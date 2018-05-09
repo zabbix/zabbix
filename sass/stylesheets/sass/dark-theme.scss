@@ -196,3 +196,25 @@ $ok-ack-fg-color: #00ff00;
 		}
 	}
 }
+
+// Time selection
+
+.ui-tabs-nav {
+	.ui-tabs-active {
+		.btn-time {
+			&::after {
+				background: url(../img/icon-sprite.svg) no-repeat -87px -585px;
+			}
+		}
+	}
+}
+
+.time-quick {
+	li {
+		a {
+			&:focus {
+				color: $white;
+			}
+		}
+	}
+}

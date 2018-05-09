@@ -1062,3 +1062,91 @@ td.inactive-bg {
 		}
 	}
 }
+
+// Time selection
+
+.ui-tabs-nav {
+	.btn-time {
+		&:hover {
+			background-color: darken($btn-bg-color, 10%);
+		}
+
+		&:focus {
+			background-color: lighten($btn-bg-color, 10%);
+			@include box-shadow(0 0 0 2px rgba($blue, 1));
+		}
+	}
+
+	.filter-trigger {
+		&:hover {
+			background-color: darken($btn-bg-color, 10%);
+		}
+
+		&:focus {
+			background-color: lighten($btn-bg-color, 10%);
+			@include box-shadow(0 0 0 2px rgba($blue, 1));
+		}
+	}
+
+	.ui-state-focus {
+		.filter-trigger, .btn-time {
+			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			background-color: lighten($btn-bg-color, 10%);
+		}
+	}
+
+	.ui-state-focus {
+		&.ui-tabs-active {
+			.filter-trigger, .btn-time {
+				background-color: $ui-hover-color;
+				border-color: $ui-hover-color;
+				@include box-shadow(0 0 0 2px rgba($blue, 1));
+			}
+		}
+	}
+}
+
+.btn-time-right {
+	background: url(../img/icon-sprite.svg) no-repeat -242px -623px;
+
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+		background-color: lighten($btn-bg-color, 10%);
+	}
+
+	&:disabled {
+		background: url(../img/icon-sprite.svg) no-repeat -242px -623px;
+	}
+}
+
+.btn-time-left {
+	background: url(../img/icon-sprite.svg) no-repeat -244px -657px;
+
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+		background-color: lighten($btn-bg-color, 10%);
+	}
+
+	&:disabled {
+		background: url(../img/icon-sprite.svg) no-repeat -244px -657px;
+	}
+}
+
+.time-quick {
+	li {
+		a {
+			&:focus {
+				@include box-shadow(0 0 0 2px rgba($blue, 1));
+				@include border-radius(2px);
+			}
+		}
+	}
+}
