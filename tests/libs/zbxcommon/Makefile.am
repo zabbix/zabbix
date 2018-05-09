@@ -1,5 +1,8 @@
 if SERVER
-SERVER_tests = zbx_function_find 
+SERVER_tests = \
+	zbx_function_find \
+	parse_key \
+	replace_key_params_dyn
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -86,5 +89,33 @@ zbx_function_find_LDADD += @SERVER_LIBS@
 zbx_function_find_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_function_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+parse_key_SOURCES = \
+	parse_key.c \
+	$(COMMON_SRC_FILES)
+
+parse_key_LDADD = \
+	$(COMMON_LIB_FILES) \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a 
+
+parse_key_LDADD += @SERVER_LIBS@ 
+
+parse_key_LDFLAGS = @SERVER_LDFLAGS@
+
+parse_key_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+replace_key_params_dyn_SOURCES = \
+	replace_key_params_dyn.c \
+	$(COMMON_SRC_FILES)
+
+replace_key_params_dyn_LDADD = \
+	$(COMMON_LIB_FILES) \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a 
+
+replace_key_params_dyn_LDADD += @SERVER_LIBS@ 
+
+replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@
+
+replace_key_params_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

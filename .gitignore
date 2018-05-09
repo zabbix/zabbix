@@ -378,9 +378,15 @@ tests/Makefile.in
 tests/libs/.deps
 tests/libs/Makefile
 tests/libs/Makefile.in
+tests/libs/zbxalgo/.deps
+tests/libs/zbxalgo/Makefile
+tests/libs/zbxalgo/Makefile.in
+tests/libs/zbxalgo/evaluate
 tests/libs/zbxcommon/.deps
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
+tests/libs/zbxcommon/parse_key
+tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
@@ -407,6 +413,7 @@ tests/libs/zbxsysinfo/common/.deps
 tests/libs/zbxsysinfo/common/Makefile
 tests/libs/zbxsysinfo/common/Makefile.in
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME
+tests/libs/zbxsysinfo/common/WEB_PAGE_GET
 tests/libs/zbxsysinfo/linux/.deps
 tests/libs/zbxsysinfo/linux/KERNEL_MAXFILES
 tests/libs/zbxsysinfo/linux/KERNEL_MAXPROC
