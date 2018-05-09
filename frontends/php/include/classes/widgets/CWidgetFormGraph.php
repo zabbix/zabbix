@@ -19,7 +19,7 @@
 **/
 
 
-class CGraphWidgetForm extends CWidgetForm {
+class CWidgetFormGraph extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_GRAPH);
@@ -41,9 +41,12 @@ class CGraphWidgetForm extends CWidgetForm {
 
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-			// item field
-			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
+			// Item multiselector with single value.
+			$field_item = (new CWidgetFieldItem('itemid', _('Item')))
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+				->setMultiple(false)
+				->setFilterParameter('numeric', true)
+				->setFilterParameter('with_simple_graph_items', true);
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);
@@ -62,6 +65,15 @@ class CGraphWidgetForm extends CWidgetForm {
 
 			$this->fields[] = $field_graph;
 		}
+
+		// Show legend checkbox.
+		$field_legend = (new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1);
+
+		if (array_key_exists('show_legend', $this->data)) {
+			$field_legend->setValue($this->data['show_legend']);
+		}
+
+		$this->fields[] = $field_legend;
 
 		// Show legend checkbox.
 		$field_legend = (new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1);

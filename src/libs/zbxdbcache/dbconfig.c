@@ -28,12 +28,10 @@
 #include "memalloc.h"
 #include "zbxserver.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
-#include "dbcache.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
@@ -2989,6 +2987,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		zbx_strpool_release(item->key);
 		zbx_strpool_release(item->port);
 		zbx_strpool_release(item->error);
+		zbx_strpool_release(item->delay);
 
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
@@ -11259,6 +11258,13 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for itemid [" ZBX_FS_UI64 "]"
 					": item is not in cache", itemids->values[i]);
+
+			proxy_hostid = 0;
+		}
+		else if (0 == dc_item->schedulable)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for item \"%s\" on host \"%s\""
+					": item configuration error", dc_item->key, dc_host->host);
 
 			proxy_hostid = 0;
 		}

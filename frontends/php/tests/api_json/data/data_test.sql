@@ -237,18 +237,22 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99004,10084,1,2,1,'127.0.0.1','','161');
 
 -- event correlation
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'API Event correlation for delete', 'Test description delete', 0, 0, '');
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
 INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99000, 'delete tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99000, 99000, 0);
 
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99001, 'Event correlation for delete1', 'Test description delete1', 0, 0, '');
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99001, 'API Event correlation for delete1', 'Test description delete1', 0, 0, '');
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99001, 99001, 0);
 INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99001, 'update tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99001, 99001, 0);
 
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'Event correlation for delete2', 'Test description delete1', 0, 0, '');
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'API Event correlation for delete2', 'Test description delete2', 0, 0, '');
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99002, 99002, 0);
 INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99002, 'update tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99002, 99002, 0);
 
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99003, 'API Event correlation for delete3', 'Test description delete3', 0, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'update tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);

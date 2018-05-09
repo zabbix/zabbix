@@ -22,7 +22,7 @@
 /**
  * Clock widget form.
  */
-class CClockWidgetForm extends CWidgetForm {
+class CWidgetFormClock extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_CLOCK);
@@ -43,12 +43,15 @@ class CClockWidgetForm extends CWidgetForm {
 
 		// Item field
 		if ($field_time_type->getValue() === TIME_TYPE_HOST) {
-			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_ITEM))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
+			// Item multiselector with single value.
+			$field_item = (new CWidgetFieldItem('itemid', _('Item')))
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+				->setMultiple(false);
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);
 			}
+
 			$this->fields[] = $field_item;
 		}
 	}

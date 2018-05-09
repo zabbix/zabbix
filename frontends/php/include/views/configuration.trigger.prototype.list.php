@@ -169,10 +169,10 @@ $triggersForm->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'triggerprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Enable selected trigger prototypes?')
+				'confirm' => _('Create triggers from selected prototypes as enabled?')
 			],
 			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Disable selected trigger prototypes?')
+				'confirm' => _('Create triggers from selected prototypes as disabled?')
 			],
 			'triggerprototype.massupdateform' => ['name' => _('Mass update')],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),

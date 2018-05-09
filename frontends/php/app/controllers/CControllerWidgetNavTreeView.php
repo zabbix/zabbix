@@ -21,14 +21,14 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetNavigationtreeView extends CControllerWidget {
+class CControllerWidgetNavTreeView extends CControllerWidget {
 
 	private $problems_per_severity_tpl;
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_NAVIGATION_TREE);
+		$this->setType(WIDGET_NAV_TREE);
 		$this->setValidationRules([
 			'name' => 'string',
 			'uniqueid' => 'required|string',

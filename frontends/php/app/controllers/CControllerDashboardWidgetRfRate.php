@@ -21,11 +21,12 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerDashbrdWidgetRfRate extends CController {
+class CControllerDashboardWidgetRfRate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'widgets' =>	'required|array'
+			'widgetid' =>	'required|db widget.widgetid',
+			'rf_rate' =>	'required|in 0,10,30,60,120,600,900'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -42,13 +43,9 @@ class CControllerDashbrdWidgetRfRate extends CController {
 	}
 
 	protected function doAction() {
-		foreach ($this->getInput('widgets') as $widget) {
-			if (array_key_exists('rf_rate', $widget)) {
-				CProfile::update('web.dashbrd.widget.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT,
-					$widget['widgetid']
-				);
-			}
-		}
+		CProfile::update('web.dashbrd.widget.rf_rate', $this->getInput('rf_rate'), PROFILE_TYPE_INT,
+			$this->getInput('widgetid')
+		);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 	}

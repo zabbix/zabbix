@@ -65,7 +65,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_uint32_t	num;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("func_pos", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'func_pos' parameter from test case data: %s",
 				zbx_mock_error_string(error));
@@ -78,7 +78,7 @@ void	zbx_mock_test_entry(void **state)
 		func_pos_exp = num;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("par_l", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'par_l' parameter from test case data: %s",
 				zbx_mock_error_string(error));
@@ -91,7 +91,7 @@ void	zbx_mock_test_entry(void **state)
 		par_l_exp = num;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("par_r", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'par_r' parameter from test case data: %s",
 				zbx_mock_error_string(error));

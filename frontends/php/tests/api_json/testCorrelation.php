@@ -21,131 +21,102 @@
 
 require_once dirname(__FILE__) . '/../include/class.czabbixtest.php';
 
+/**
+ * @backup correlation
+ */
 class testCorrelation extends CZabbixTest {
 
-	public function testUsers_backup() {
-		DBsave_tables('correlation');
-	}
-
-	public static function delete_permissions() {
-		return [
-			[
-				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
-				'correlation' => ['99000']
-			],
-			[
-				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
-				'correlation' => ['99000']
-			],
-			[
-				'login' => ['user' => 'guest', 'password' => ''],
-				'correlation' => ['99000']
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider delete_permissions
-	 */
-	public function testCorrelationDelete_Permissions($login, $user) {
-		$result = $this->api_call_with_user('correlation.delete', $login, $user, $debug);
-
-		if (false) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
-			foreach ($result['result']['correlation ids'] as $id) {
-				$dbResult = 'select * from correlation where correlationid=' . $id;
-				$this->assertEquals(1, DBcount($dbResult));
-			}
-		} else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertEquals('You do not have permission to perform this operation.', $result['error']['data']);
-		}
-	}
-
-	public static function correlation_delete() {
+	public static function getCorrelationDeleteData() {
 		return [
 			// Check correlation id validation.
 			[
 				'correlation' => [''],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'correlation' => ['abc'],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'correlation' => ['1.1'],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'correlation' => ['123456'],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'correlation' => ['99000', '99000'],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (99000) already exists.'
 			],
 			[
 				'correlation' => ['99000', 'abcd'],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
 				'correlation' => ['99000', '91234567'],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'correlation' => ['99000', ''],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			// Successfully delete correlation.
 			[
 				'correlation' => ['99000'],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'correlation' => ['99001', '99002'],
-				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider correlation_delete
+	 * @dataProvider getCorrelationDeleteData
 	 */
-	public function testCorrelation_Delete($correlation, $success_expected, $expected_error) {
-		$result = $this->api_acall('correlation.delete', $correlation, $debug);
+	public function testCorrelation_Delete($correlation, $expected_error) {
+		$result = $this->call('correlation.delete', $correlation, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['correlationids'] as $id) {
-				$dbResult = 'select * from correlation where correlationid=' . $id;
+				$dbResult = 'SELECT NULL from correlation where correlationid='. $id;
 				$this->assertEquals(0, DBcount($dbResult));
 			}
-		} else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
-	public function testCorrelation_restore() {
-		DBrestore_tables('correlation');
+	public static function getCorrelationDeletePermissionsData() {
+		return [
+			[
+				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'correlation' => ['99003'],
+				'expected_error'=> 'You do not have permission to perform this operation.'
+			],
+			[
+				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'correlation' => ['99003'],
+				'expected_error'=> 'You do not have permission to perform this operation.'
+			],
+			[
+				'login' => ['user' => 'guest', 'password' => ''],
+				'correlation' => ['99003'],
+				'expected_error'=> 'You do not have permission to perform this operation.'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCorrelationDeletePermissionsData
+	 */
+	public function testCorrelation_DeletePermissions($login, $correlation, $expected_error) {
+		$sqlCorrelation = 'SELECT * FROM correlation ORDER BY correlationid';
+		$oldHashCorrelation = DBhash($sqlCorrelation);
+
+		$this->authorize($login['user'], $login['password']);
+		$this->call('correlation.delete', $correlation, $expected_error);
+
+		$this->assertEquals($oldHashCorrelation, DBhash($sqlCorrelation));
 	}
 }

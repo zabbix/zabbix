@@ -22,10 +22,10 @@
 /**
  * System widget form.
  */
-class CSystemWidgetForm extends CWidgetForm {
+class CWidgetFormProblemsBySv extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_SYSTEM_STATUS);
+		parent::__construct($data, WIDGET_PROBLEMS_BY_SV);
 
 		// host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
