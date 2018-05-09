@@ -46,7 +46,7 @@ class CScreenEvents extends CScreenBase {
 
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged'],
-			'select_acknowledges' => ['userid', 'clock', 'message', 'action'],
+			'select_acknowledges' => ['action'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
@@ -108,7 +108,7 @@ class CScreenEvents extends CScreenBase {
 				$in_closing = false;
 
 				foreach ($event['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
+					if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
 						$in_closing = true;
 						break;
 					}
@@ -127,7 +127,7 @@ class CScreenEvents extends CScreenBase {
 			$statusSpan = new CSpan($value_str);
 
 			// Add colors span depending on configuration and trigger parameters.
-			addTriggerValueStyle($statusSpan, $value, $event['clock'], $event['acknowledged']);
+			addTriggerValueStyle($statusSpan, $value, $event['clock'], $event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),

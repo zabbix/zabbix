@@ -439,9 +439,9 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
-			'output' => ['eventid', 'r_eventid'],
+			'output' => ['eventid', 'r_eventid', 'acknowledged'],
 			'selectTags' => ['tag', 'value'],
-			'select_acknowledges' => ['userid', 'clock', 'message', 'action'],
+			'select_acknowledges' => ['action'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids
@@ -490,9 +490,9 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getExDataProblems(array $eventids) {
 		return API::Problem()->get([
-			'output' => ['eventid', 'r_eventid', 'r_clock', 'correlationid', 'userid'],
+			'output' => ['eventid', 'r_eventid', 'r_clock', 'correlationid', 'userid', 'acknowledged'],
 			'selectTags' => ['tag', 'value'],
-			'selectAcknowledges' => ['userid', 'clock', 'message', 'action'],
+			'selectAcknowledges' => ['action'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -570,6 +570,7 @@ class CScreenProblem extends CScreenBase {
 			$problem['tags'] = $problem_data['tags'];
 			$problem['correlationid'] = $problem_data['correlationid'];
 			$problem['userid'] = $problem_data['userid'];
+			$problem['acknowledged'] = $problem_data['acknowledged'];
 
 			if ($problem['correlationid'] != 0) {
 				$correlationids[$problem['correlationid']] = true;
@@ -802,9 +803,6 @@ class CScreenProblem extends CScreenBase {
 					]));
 			}
 
-			$url->setArgument('uncheck', '1');
-			$acknowledges = makeEventsAcknowledges($data['problems'], $url->getUrl());
-
 			if ($this->data['filter']['show_tags']) {
 				$tags = makeEventsTags($data['problems'], true, $this->data['filter']['show_tags'],
 					array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : []
@@ -823,6 +821,12 @@ class CScreenProblem extends CScreenBase {
 				$dependencies = getTriggerDependencies($data['triggers']);
 			}
 
+			// Create link to Problem update page.
+			$problem_update_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'acknowledge.edit')
+				->setArgument('backurl', $url->setArgument('uncheck', '1')->getUrl());
+
+			// Add problems to table.
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
 
@@ -860,7 +864,7 @@ class CScreenProblem extends CScreenBase {
 					$in_closing = false;
 
 					foreach ($problem['acknowledges'] as $acknowledge) {
-						if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
+						if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
 							$in_closing = true;
 							break;
 						}
@@ -874,7 +878,9 @@ class CScreenProblem extends CScreenBase {
 				$cell_status = new CSpan($value_str);
 
 				// Add colors and blinking to span depending on configuration and trigger parameters.
-				addTriggerValueStyle($cell_status, $value, $value_clock, (bool) $problem['acknowledges']);
+				addTriggerValueStyle($cell_status, $value, $value_clock,
+					$problem['acknowledged'] == EVENT_ACKNOWLEDGED
+				);
 
 				// Info.
 				$info_icons = [];
@@ -942,6 +948,14 @@ class CScreenProblem extends CScreenBase {
 					];
 				}
 
+				// Create acknowledge link.
+				$problem_update_url->setArgument('eventids', [$problem['eventid']]);
+				$acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
+				$problem_update_link = (new CLink($acknowledged ? _('Yes') : _('No'), $problem_update_url->getUrl()))
+					->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_LINK_ALT);
+
+				// Add table row.
 				$table->addRow(array_merge($row, [
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
 					getSeverityCell($trigger['priority'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
@@ -953,7 +967,7 @@ class CScreenProblem extends CScreenBase {
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
-					$acknowledges[$problem['eventid']],
+					$problem_update_link,
 					array_key_exists($eventid, $actions)
 						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 						: '',
@@ -999,7 +1013,7 @@ class CScreenProblem extends CScreenBase {
 					$in_closing = false;
 
 					foreach ($problem['acknowledges'] as $acknowledge) {
-						if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
+						if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
 							$in_closing = true;
 							break;
 						}
@@ -1025,7 +1039,7 @@ class CScreenProblem extends CScreenBase {
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
-					$problem['acknowledges'] ? _('Yes') : _('No'),
+					($problem['acknowledged'] == EVENT_ACKNOWLEDGED) ? _('Yes') : _('No'),
 					array_key_exists($problem['eventid'], $actions) ? $actions[$problem['eventid']] : '',
 					implode(', ', $tags[$problem['eventid']])
 				];

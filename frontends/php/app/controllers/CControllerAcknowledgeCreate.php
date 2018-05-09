@@ -117,7 +117,7 @@ class CControllerAcknowledgeCreate extends CController {
 					// Check if it was manually closed.
 					if ($problem_event['acknowledges']) {
 						foreach ($problem_event['acknowledges'] as $acknowledge) {
-							if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
+							if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
 								$event_closed = true;
 								break;
 							}

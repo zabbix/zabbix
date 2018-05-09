@@ -26,7 +26,8 @@ $sort_div = (new CSpan())
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
+	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null)
+	->getUrl();
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
@@ -73,7 +74,6 @@ if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
 
-$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
 $actions = makeEventsActions($data['data']['problems'], true);
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
@@ -88,7 +88,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$in_closing = false;
 
 		foreach ($problem['acknowledges'] as $acknowledge) {
-			if ($acknowledge['action'] == ZBX_PROBLEM_UPDATE_CLOSE) {
+			if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
 				$in_closing = true;
 				break;
 			}
@@ -108,7 +108,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
 
-	$is_acknowledged = (bool) $problem['acknowledges'];
+	$is_acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
 
 	if ($show_recovery_data) {
 		if ($problem['r_eventid'] != 0) {
@@ -152,7 +152,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
-			->setHint(make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['fullscreen']), '', true)
+			->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen']), '', true)
 	]));
 
 	$description_style = getSeverityStyle($trigger['priority']);
@@ -194,6 +194,13 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		];
 	}
 
+	// Create acknowledge url.
+	$problem_update_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'acknowledge.edit')
+		->setArgument('eventids', [$problem['eventid']])
+		->setArgument('backurl', $backurl)
+		->getUrl();
+
 	$table->addRow(array_merge($row, [
 		$show_recovery_data ? $cell_r_clock : null,
 		$show_recovery_data ? $cell_status : null,
@@ -206,7 +213,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				: zbx_date2age($problem['clock'])
 		))
 			->addClass(ZBX_STYLE_NOWRAP),
-		$acknowledges[$problem['eventid']],
+		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
+			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ALT),
 		array_key_exists($eventid, $actions)
 			? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 			: '',

@@ -119,7 +119,7 @@ function getSystemStatusData(array $filter) {
 	unset($group);
 
 	$options = [
-		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name'],
+		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
 		'source' => EVENT_SOURCE_TRIGGERS,
@@ -176,24 +176,10 @@ function getSystemStatusData(array $filter) {
 			}
 		}
 
-		// Get acknowledges and tags.
-		$problems_data = in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])
-			? API::Event()->get([
-				'output' => [],
-				'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
-				'eventids' => array_keys($problems),
-				'preservekeys' => true
-			])
-			: [];
-
 		$visible_problems = [];
 
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
-
-			$problem['acknowledges'] = array_key_exists($eventid, $problems_data)
-				? $problems_data[$eventid]['acknowledges']
-				: [];
 
 			// groups
 			foreach ($trigger['groups'] as $trigger_group) {
@@ -212,7 +198,8 @@ function getSystemStatusData(array $filter) {
 					$group['stats'][$trigger['priority']]['count']++;
 				}
 
-				if (in_array($filter_ext_ack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && !$problem['acknowledges']) {
+				if (in_array($filter_ext_ack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH])
+						&& $problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 					if ($group['stats'][$trigger['priority']]['count_unack'] < ZBX_WIDGET_ROWS) {
 						$group['stats'][$trigger['priority']]['problems_unack'][] = $problem;
 						$visible_problems[$eventid] = ['eventid' => $eventid];
@@ -276,13 +263,7 @@ function getSystemStatusData(array $filter) {
  * @param string $data['groups'][]['stats']['problems'][]['objectid']
  * @param int    $data['groups'][]['stats']['problems'][]['clock']
  * @param int    $data['groups'][]['stats']['problems'][]['ns']
- * @param int    $data['groups'][]['stats']['problems'][]['acknowledges']
- * @param int    $data['groups'][]['stats']['problems'][]['acknowledges'][]['clock']
- * @param string $data['groups'][]['stats']['problems'][]['acknowledges'][]['message']
- * @param int    $data['groups'][]['stats']['problems'][]['acknowledges'][]['action']
- * @param string $data['groups'][]['stats']['problems'][]['acknowledges'][]['alias']
- * @param string $data['groups'][]['stats']['problems'][]['acknowledges'][]['name']
- * @param string $data['groups'][]['stats']['problems'][]['acknowledges'][]['surname']
+ * @param int    $data['groups'][]['stats']['problems'][]['acknowledged']
  * @param array  $data['groups'][]['stats']['problems'][]['tags']
  * @param string $data['groups'][]['stats']['problems'][]['tags'][]['tag']
  * @param string $data['groups'][]['stats']['problems'][]['tags'][]['value']
@@ -674,7 +655,17 @@ function make_latest_issues(array $filter = [], $backurl) {
 			$trigger['lastEvent']['acknowledges'] =
 				$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
 
-			$ack = getEventAckState($trigger['lastEvent'], $backurl);
+			$acknowledged = $trigger['lastEvent']['acknowledged'] == EVENT_ACKNOWLEDGED;
+
+			$problem_update_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'acknowledge.edit')
+				->setArgument('eventids', [$trigger['lastEvent']['eventid']])
+				->setArgument('backurl', $backurl)
+				->getUrl();
+
+			$ack = (new CLink($acknowledged ? _('Yes') : _('No'), $problem_update_url))
+				->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
 			$ack = (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
@@ -729,13 +720,7 @@ function make_latest_issues(array $filter = [], $backurl) {
  * @param string $problems[]['objectid']
  * @param int    $problems[]['clock']
  * @param int    $problems[]['ns']
- * @param array  $problems[]['acknowledges']
- * @param int    $problems[]['acknowledges'][]['clock']
- * @param string $problems[]['acknowledges'][]['message']
- * @param int    $problems[]['acknowledges'][]['action']
- * @param string $problems[]['acknowledges'][]['alias']
- * @param string $problems[]['acknowledges'][]['name']
- * @param string $problems[]['acknowledges'][]['surname']
+ * @param array  $problems[]['acknowledged']
  * @param array  $problems[]['tags']
  * @param string $problems[]['tags'][]['tag']
  * @param string $problems[]['tags'][]['value']
@@ -771,8 +756,15 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 		$hosts = zbx_objectValues($trigger['hosts'], 'name');
 
 		// ack
-		$problem['acknowledged'] = (bool) $problem['acknowledges'] ? EVENT_ACKNOWLEDGED : EVENT_NOT_ACKNOWLEDGED;
-		$ack = getEventAckState($problem, $backurl);
+		$problem_update_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'acknowledge.edit')
+			->setArgument('eventids', [$problem['eventid']])
+			->setArgument('backurl', $backurl)
+			->getUrl();
+
+		$ack = (new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
+			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ALT);
 
 		$table->addRow([
 			implode(', ', $hosts),
