@@ -232,8 +232,7 @@ else {
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-	if ($screen !== null && $data['action'] !== HISTORY_LATEST
-			&& array_key_exists($data['value_type'], $data['iv_string'])) {
+	if ($screen !== null && $data['action'] !== HISTORY_LATEST) {
 		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
 

@@ -133,9 +133,11 @@ jQuery(function ($){
 	function updateTimeselectorUI(data) {
 		var is_timestamp = /^\d+$/;
 
-		element.from.val(is_timestamp.test(data['from']) ? data['from_date'] : data['from']);
-		element.to.val(is_timestamp.test(data['to']) ? data['to_date'] : data['to']);
-		element.label.text(data.label);
+		if ('error' in data === false) {
+			element.from.val(is_timestamp.test(data['from']) ? data['from_date'] : data['from']);
+			element.to.val(is_timestamp.test(data['to']) ? data['to_date'] : data['to']);
+			element.label.text(data.label);
+		}
 
 		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', false);
 		element.decrement.attr('disabled', !data.can_decrement);
