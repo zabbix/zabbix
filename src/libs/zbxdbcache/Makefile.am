@@ -12,6 +12,11 @@ libzbxdbcache_a_SOURCES = \
 	valuecache.h \
 	dbconfig_dump.c
 
+if ZBXCMOCKA
+TEST_FLAGS = -I@top_srcdir@/tests/libs/zbxdbcache
+endif
+
 libzbxdbcache_a_CFLAGS = \
 	-I@top_srcdir@/src/zabbix_server/ \
-	-I@top_srcdir@/src/libs/zbxalgo
+	-I@top_srcdir@/src/libs/zbxalgo \
+	$(TEST_FLAGS)
