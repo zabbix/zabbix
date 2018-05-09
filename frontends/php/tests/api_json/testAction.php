@@ -20,73 +20,61 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
+/**
+ * @backup actions
+ */
 class testAction extends CZabbixTest {
-
-	public function testAction_backup() {
-		DBsave_tables('actions');
-	}
 
 	public static function getActionDeleteData() {
 		return [
 			[
 				'action' => [],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": cannot be empty.'
 			],
 			// Check action id validation.
 			[
 				'action' => [''],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'action' => ['abc'],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'action' => ['1.1'],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'action' => ['123456'],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'action' => ['17', '17'],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (17) already exists.'
 			],
 			[
 				'action' => ['17', 'abcd'],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			// Successfully delete action.
 			// Trigger action.
 			[
 				'action' => ['17'],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			// Discovery action
 			[
 				'action' => ['90'],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			// Auto registration action
 			[
 				'action' => ['91'],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			// Internal action
 			[
 				'action' => ['6'],
-				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -95,57 +83,48 @@ class testAction extends CZabbixTest {
 	/**
 	* @dataProvider getActionDeleteData
 	*/
-	public function testAction_Delete($action, $success_expected, $expected_error) {
-		$result = $this->api_acall('action.delete', $action, $debug);
+	public function testAction_Delete($action, $expected_error) {
+		$result = $this->call('action.delete', $action, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['actionids'] as $id) {
 				$dbResult = 'SELECT * FROM actions WHERE actionid='.$id;
 				$this->assertEquals(0, DBcount($dbResult));
 			}
-		}
-		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
 	public static function getActionUserPermissionsData() {
 		return [
 			[
-				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'login' => ['user' => 'action-user', 'password' => 'zabbix'],
 				'action' => ['16'],
-				'success_expected' => false,
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
-				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'login' => ['user' => 'action-user', 'password' => 'zabbix'],
 				'action' => ['92'],
-				'success_expected' => true,
+				'expected_error' => null
 			],
 			[
-				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'login' => ['user' => 'action-admin', 'password' => 'zabbix'],
 				'action' => ['16'],
-				'success_expected' => false,
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
-				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'login' => ['user' => 'action-admin', 'password' => 'zabbix'],
 				'action' => ['93'],
-				'success_expected' => true,
+				'expected_error' => null
 			],
 			[
 				'login' => ['user' => 'guest', 'password' => ''],
 				'action' => ['16'],
-				'success_expected' => false
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'login' => ['user' => 'guest', 'password' => ''],
 				'action' => ['18'],
-				'success_expected' => true
+				'expected_error' => null
 			]
 		];
 	}
@@ -153,31 +132,21 @@ class testAction extends CZabbixTest {
 	/**
 	 * @dataProvider getActionUserPermissionsData
 	 */
-	public function testAction_Permissions($login, $action, $success_expected) {
+	public function testAction_Permissions($login, $action, $expected_error) {
 		$actions = 'SELECT * FROM actions ORDER BY actionid';
 		$old_actions=DBhash($actions);
 
-		$result = $this->api_call_with_user('action.delete', $login, $action, $debug);
+		$this->authorize($login['user'], $login['password']);
+		$result = $this->call('action.delete', $action, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['actionids'] as $id) {
 				$dbResult = 'SELECT * FROM actions WHERE actionid='.$id;
 				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
 		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
 			$this->assertEquals($old_actions, DBhash($actions));
-			$this->assertEquals('No permissions to referred object or it does not exist!', $result['error']['data']);
 		}
-	}
-
-	public function testAction_restore() {
-		DBrestore_tables('actions');
 	}
 }
