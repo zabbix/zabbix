@@ -379,8 +379,11 @@ $itemFormList->addRow(
 	'ssl_key_password_row'
 );
 
+$master_itemname = ($data['master_itemid'] != 0) ? $data['hostname'].NAME_DELIMITER.$data['master_itemname'] : '';
+
 // Append master item select.
-$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))
+$master_item = [
+	(new CTextBox('master_itemname', $master_itemname, true))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
@@ -394,7 +397,7 @@ if (!$readonly) {
 			CJs::encodeJson([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',
-				'srcfld2' => 'master_itemname',
+				'srcfld2' => 'name',
 				'dstfrm' => $itemForm->getName(),
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',
