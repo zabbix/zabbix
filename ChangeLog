@@ -1,10 +1,12 @@
 Changes for 4.0.0alpha7
 
 New features:
+..F....... [ZBXNEXT-4528] added link to Zabbix official support page (Andzs, ashubin)
 ........S. [ZBXNEXT-4520] added values to boolean mapping: "ok, master" as 1 and "err, slave" as 0 (viktors)
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 ..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
 ..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
@@ -280,6 +282,15 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.10rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.9
@@ -1498,6 +1509,15 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.18rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17
