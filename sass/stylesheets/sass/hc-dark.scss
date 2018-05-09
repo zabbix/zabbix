@@ -1,3 +1,5 @@
+$theme_name: 'hc-dark';
+
 // NOTIFICATION & ALERT
 $red: #ff5050;
 $light-red: #ff3a3a;
@@ -627,7 +629,50 @@ ul.top-nav-icons {
 	}
 }
 
+// Tables
+
+.list-table {
+	&.compact-view {
+
+		.flh-na-bg, .flh-info-bg, .flh-warning-bg, .flh-average-bg, .flh-high-bg, .flh-disaster-bg {
+			&:not(.row-selected):not(:hover) {
+				background: none;
+			}
+		}
+
+		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
+			&:before {
+				min-height: 20px;
+				box-shadow: inset 0 -1px 0 0 $table-border-color;
+			}
+		}
+
+		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
+			&:after {
+				top: 1px;
+				transform: scale(0.8);
+			}
+		}
+
+		td {
+
+			box-shadow: inset 0 -1px 0 0 $table-border-color;
+
+			.icon-wzrd-action {
+				background: transparent url(../img/icon-sprite.svg) no-repeat -318px -624px;
+			}
+		}
+	}
+}
+
+// Filter Checkboxes
+
+.filter-highlight-row-cb {
+	display: none;
+}
+
 // SEVERITY STATUSES
+
 td.log-na-bg {
 	padding-left: 42px !important;
 	color: $font-color;

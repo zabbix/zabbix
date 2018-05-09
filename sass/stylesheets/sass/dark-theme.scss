@@ -1,3 +1,5 @@
+$theme_name: 'dark';
+
 // NOTIFICATION & ALERT
 $red: #e45959;
 $light-red: #503434;
@@ -140,6 +142,7 @@ $ok-ack-fg-color: #00ff00;
 	}
 }
 
+
 // Important! @import string should come after variables
 @import 'screen.scss';
 
@@ -154,6 +157,35 @@ $ok-ack-fg-color: #00ff00;
 	&:focus {
 		border-bottom: 4px solid lighten($main-nav-bg-color, 30%) !important;
 		outline: none;
+	}
+}
+
+// Tables
+
+.list-table {
+	&.compact-view {
+		tr {
+			&:hover {
+				td {
+					&.na-bg, &.info-bg, &.warning-bg, &.average-bg, &.high-bg, &.disaster-bg {
+						color: black;
+					}
+				}
+			}
+
+			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
+				td {
+					box-shadow: inset 0 -1px 0 0 rgba(black, 0.1);
+				}
+			}
+		}
+
+		td {
+			&.na-bg, &.info-bg, &.warning-bg, &.average-bg, &.high-bg, &.disaster-bg {
+				color: black;
+				box-shadow: inset 0 -1px 0 0 rgba(black, 0.1);
+			}
+		}
 	}
 }
 
