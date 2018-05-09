@@ -270,8 +270,10 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
-char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
-char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
+
+char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
+char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
+int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -513,6 +515,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageURL", CONFIG_HISTORY_STORAGE_URL, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
+			"cURL library"));
 #endif
 
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
@@ -708,6 +712,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HistoryStorageTypes",		&CONFIG_HISTORY_STORAGE_OPTS,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
+		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
+			PARM_OPT,	0,			1},
 		{"ExportDir",			&CONFIG_EXPORT_DIR,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"ExportFileSize",		&CONFIG_EXPORT_FILE_SIZE,		TYPE_UINT64,
