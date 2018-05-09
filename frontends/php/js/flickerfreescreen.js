@@ -262,8 +262,8 @@
 					success: function(html) {
 						var html = $(html);
 
-						$('.article .msg-bad').remove();
-						html.find('.msg-bad').insertBefore('.article > :first-child');
+						$('main .msg-bad').remove();
+						html.find('.msg-bad').insertBefore('main > :first-child');
 
 						// Replace existing markup with server response.
 						if (request_start > screen.timestamp) {
