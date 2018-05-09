@@ -68,17 +68,18 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldGroup) {
 		// multiselect.js must be preloaded in parent view.
 
+		$field_name = $field->getName().'[]';
+
 		$field_groupids = (new CMultiSelect([
-			'name' => $field->getName().'[]',
-			'objectName' => 'hostGroup',
+			'name' => $field_name,
+			'object_name' => 'hostGroup',
 			'data' => $data['captions']['ms']['groups'][$field->getName()],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => $field->getName().'_',
 					'srcfld1' => 'groupid',
-					'multiselect' => '1'
+					'dstfrm' => $form->getName(),
+					'dstfld1' => zbx_formatDomId($field_name),
 				]
 			],
 			'add_post_js' => false
@@ -95,17 +96,18 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldHost) {
 		// multiselect.js must be preloaded in parent view.
 
+		$field_name = $field->getName().'[]';
+
 		$field_hostids = (new CMultiSelect([
-			'name' => $field->getName().'[]',
-			'objectName' => 'hosts',
+			'name' => $field_name,
+			'object_name' => 'hosts',
 			'data' => $data['captions']['ms']['hosts'][$field->getName()],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => $field->getName().'_',
 					'srcfld1' => 'hostid',
-					'multiselect' => '1'
+					'dstfrm' => $form->getName(),
+					'dstfld1' => zbx_formatDomId($field_name)
 				]
 			],
 			'add_post_js' => false
@@ -118,6 +120,35 @@ foreach ($data['dialogue']['fields'] as $field) {
 		);
 
 		$js_scripts[] = $field_hostids->getPostJS();
+	}
+	elseif ($field instanceof CWidgetFieldItem) {
+		// multiselect.js must be preloaded in parent view.
+
+		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
+
+		$field_itemsids = (new CMultiSelect([
+			'name' => $field_name,
+			'object_name' => 'items',
+			'multiple' => $field->isMultiple(),
+			'data' => $data['captions']['ms']['items'][$field->getName()],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => zbx_formatDomId($field_name)
+				] + $field->getFilterParameters()
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired($aria_required);
+
+		$form_list->addRow((new CLabel($field->getLabel(), $field_name))->setAsteriskMark($aria_required),
+			$field_itemsids
+		);
+
+		$js_scripts[] = $field_itemsids->getPostJS();
 	}
 	elseif ($field instanceof CWidgetFieldReference) {
 		$form->addVar($field->getName(), $field->getValue() ? $field->getValue() : '');

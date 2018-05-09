@@ -2172,7 +2172,7 @@ class testFormItem extends CWebTest {
 		}
 
 		if (array_key_exists('master_item',$data))	{
-			$this->zbxTestClickWait('button');
+			$this->zbxTestClickButtonMultiselect('master_itemid');
 			$this->zbxTestLaunchOverlayDialog('Items');
 			$this->zbxTestClickLinkTextWait($data['master_item']);
 		}
