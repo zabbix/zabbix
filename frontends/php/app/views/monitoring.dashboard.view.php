@@ -136,7 +136,6 @@ else {
 							''
 						])
 					]))
-						->setAttribute('role', 'navigation')
 						->setAttribute('aria-label', _('Content controls'))
 						->addClass(ZBX_STYLE_DASHBRD_EDIT)
 					]))

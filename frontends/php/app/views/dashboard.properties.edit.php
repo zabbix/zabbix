@@ -25,17 +25,17 @@ $form = (new CForm())
 
 $multiselect = (new CMultiSelect([
 	'name' => 'userid',
-	'selectedLimit' => 1,
-	'objectName' => 'users',
+	'object_name' => 'users',
 	'data' => [$data['dashboard']['owner']],
 	'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
+	'multiple' => false,
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'users',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'userid',
 			'srcfld1' => 'userid',
-			'srcfld2' => 'fullname'
+			'srcfld2' => 'fullname',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid'
 		]
 	]
 ]))

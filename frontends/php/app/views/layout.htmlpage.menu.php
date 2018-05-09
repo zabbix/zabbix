@@ -130,6 +130,5 @@ if ($data['server_name'] !== '') {
 		(new CDiv())
 			->addItem($top_menu)
 			->addItem($sub_menu_div)
-			->addClass(ZBX_STYLE_NAV)
 	)
 	->show();
