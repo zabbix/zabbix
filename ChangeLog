@@ -1521,6 +1521,7 @@ Changes for 3.0.18rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-13774] fixed creating and updating items with multiple specific scheduling intervals (Ivo)
 ..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)
 ..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
 ..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
