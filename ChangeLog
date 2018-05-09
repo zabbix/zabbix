@@ -282,6 +282,13 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.10rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 3.4.9
 
 3.4.9rc3 was released as 3.4.9 without any changes
