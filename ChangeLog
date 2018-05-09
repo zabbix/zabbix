@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
 ........S. [ZBX-12390] fixed problem when triggers might not use correct value if an item values within one second were received in wrong historical order (wiper)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 ..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
@@ -290,6 +291,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
 ..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
@@ -1517,6 +1519,7 @@ Changes for 3.0.18rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
 ..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
