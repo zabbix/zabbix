@@ -281,7 +281,7 @@ class CFilter extends CDiv {
 		$js = 'var multiselects = jQuery("'.$id.'").tabs('.
 			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled])).
 		').find(".multiselect");'.
-		'if (multiselects.lengt) {'.
+		'if (multiselects.length) {'.
 		'	multiselects.multiSelect("resize");'.
 		'}';
 

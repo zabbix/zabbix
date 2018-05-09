@@ -178,14 +178,13 @@ jQuery(function ($){
 		var button = $(this,)
 			offset = button.offset();
 
-		if (ui_disabled) {
-			e.preventDefault();
-			return false;
+		if (!ui_disabled) {
+			button.data('clndr').clndr.clndrshow(parseInt(offset.top + button.outerHeight(), 10),
+				parseInt(offset.left, 10), button.data('input')
+			);
 		}
 
-		button.data('clndr').clndr.clndrshow(parseInt(offset.top + button.outerHeight(), 10), parseInt(offset.left, 10),
-			button.data('input')
-		);
+		return cancelEvent(e);
 	}
 
 	/**
