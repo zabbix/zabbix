@@ -1028,7 +1028,7 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$csv[] = [
-					getSeverityName($trigger['priority'], $this->config),
+					getSeverityName($problem['severity'], $this->config),
 					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
 					($problem['r_eventid'] != 0)
 						? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])

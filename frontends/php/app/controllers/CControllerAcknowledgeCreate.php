@@ -43,7 +43,7 @@ class CControllerAcknowledgeCreate extends CController {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=acknowledge.edit');
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot acknowledge event'));
+					$response->setMessageError(_('Cannot update event'));
 					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
@@ -152,12 +152,12 @@ class CControllerAcknowledgeCreate extends CController {
 
 		if ($result) {
 			$response = new CControllerResponseRedirect($this->getInput('backurl', 'zabbix.php?action=problem.view'));
-			$response->setMessageOk(_n('Event acknowledged', 'Events acknowledged', count($eventids)));
+			$response->setMessageOk(_n('Event updated', 'Events updated', count($eventids)));
 		}
 		else {
 			$response = new CControllerResponseRedirect('zabbix.php?action=acknowledge.edit');
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_n('Cannot acknowledge event', 'Cannot acknowledge events', count($eventids)));
+			$response->setMessageError(_n('Cannot update event', 'Cannot update events', count($eventids)));
 		}
 		$this->setResponse($response);
 	}
