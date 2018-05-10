@@ -1715,7 +1715,7 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxcommshigh/Makefile
 	tests/libs/zbxcommon/Makefile
 	tests/libs/zbxalgo/Makefile
-	),
+	)
 	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
 ])
 
