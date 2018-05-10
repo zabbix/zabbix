@@ -16,6 +16,7 @@ Bug fixes:
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
 ........S. [ZBX-12372] fixed duplication of prefix "/" for second parameter "path" in items "web.page.*" (MVekslers)
+...G...... [ZBX-14315] fixed validation of "max_depth" in "vfs.dir.size" for agent (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha6
@@ -304,6 +305,7 @@ Bug fixes:
 ..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 ........S. [ZBX-12372] fixed duplication of prefix "/" for second parameter "path" in items "web.page.*" (MVekslers)
+...G...... [ZBX-14315] fixed validation of "max_depth" in "vfs.dir.size" for agent (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.9
