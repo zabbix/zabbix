@@ -681,7 +681,7 @@ static const char	*zbx_json_decodenull(const char *p)
  *                                                                            *
  * Function: zbx_is_valid_json_hex                                            *
  *                                                                            *
- * Purpose: chack if a 4 character sequence is a valid hex number 0000 - FFFF *
+ * Purpose: check if a 4 character sequence is a valid hex number 0000 - FFFF *
  *                                                                            *
  * Parameters:                                                                *
  *      p - pointer to the 1st character                                      *
