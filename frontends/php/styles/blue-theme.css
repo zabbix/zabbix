@@ -3649,7 +3649,7 @@ svg {
   .navtree .tree .tree-item > .tree-row {
     width: 100%;
     min-width: 320px;
-    border-bottom: 1px solid #dfe4e7;
+    border-bottom: 1px solid #ebeef0;
     padding: 8px 0; }
     .navtree .tree .tree-item > .tree-row:hover {
       background-color: #e8f5ff; }
