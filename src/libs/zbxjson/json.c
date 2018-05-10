@@ -722,11 +722,11 @@ static unsigned int	zbx_hex2num(char c)
 	int	res;
 
 	if (c >= 'a')
-		res = c - 0x57;	/* a-f */
+		res = c - 'a' + 10;	/* a-f */
 	else if (c >= 'A')
-		res = c - 0x37;	/* A-F */
+		res = c - 'A' + 10;	/* A-F */
 	else
-		res = c - 0x30;	/* 0-9 */
+		res = c - '0';		/* 0-9 */
 
 	return (unsigned int)res;
 }
