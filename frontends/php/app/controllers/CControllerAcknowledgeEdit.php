@@ -117,28 +117,34 @@ class CControllerAcknowledgeEdit extends CController {
 		$triggerids = [];
 
 		foreach ($events as $event) {
-			// Find at least one unacknowledged event.
-			if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+			$event_closed = false;
+
+			// Find if event is in PROBLEM state; Then look if no ZBX_PROBLEM_UPDATE_CLOSE action flag.
+			if ($event['r_eventid'] != 0 || $event['value'] == TRIGGER_VALUE_FALSE) {
+				$event_closed = true;
+			}
+			elseif ($event['acknowledges']) {
+				foreach ($event['acknowledges'] as $acknowledge) {
+					if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+						$event_closed = true;
+						break;
+					}
+				}
+			}
+
+			if (!$event_closed) {
+				$data['problem_can_be_closed'] = true;
+				$triggerids[$event['objectid']] = true;
+			}
+
+			// If event is not acknowledged and is not closed.
+			if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED && !$event_closed) {
 				$data['problem_can_be_acknowledged'] = true;
 			}
 
-			// Find if event is in PROBLEM state; Then look if no ZBX_PROBLEM_UPDATE_CLOSE action flag.
-			if ($event['value'] == TRIGGER_VALUE_TRUE && $event['r_eventid'] == 0 && !$data['problem_can_be_closed']) {
-				$event_closed = false;
-
-				if ($event['acknowledges']) {
-					foreach ($event['acknowledges'] as $acknowledge) {
-						if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
-							$event_closed = true;
-							break;
-						}
-					}
-				}
-
-				if (!$event_closed) {
-					$data['problem_can_be_closed'] = true;
-					$triggerids[$event['objectid']] = true;
-				}
+			// Stop loop events if at least one acknowledgable and closable event is found.
+			if ($data['problem_can_be_closed'] && $data['problem_can_be_acknowledged']) {
+				break;
 			}
 		}
 
@@ -146,7 +152,10 @@ class CControllerAcknowledgeEdit extends CController {
 		 * If there are open problems, check if they can be closed manually.
 		 *
 		 * At least one of triggers in PROBLEM state should have read-write permissions and should have 'manual_close'
-		 * flat set to ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED.
+		 * flag set to ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED.
+		 *
+		 * Even if it is found that problem is not closable due 'manual_close', it won't change the
+		 * problem_can_be_acknowledged anymore.
 		 *
 		 * Additional API request is needed because through Event.get we cannot see which trigger is editable.
 		 */

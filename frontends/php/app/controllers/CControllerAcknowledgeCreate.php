@@ -94,7 +94,7 @@ class CControllerAcknowledgeCreate extends CController {
 		// Change severity.
 		if ($this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SEVERITY) {
 			$data['action'] += ZBX_PROBLEM_UPDATE_SEVERITY;
-			$data['severity'] = $this->getInput('severity');
+			$data['severity'] = $this->getInput('severity', '');
 		}
 
 		// Acknowledge events.
