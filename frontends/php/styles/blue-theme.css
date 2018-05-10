@@ -497,6 +497,10 @@ output {
     color: #1f2c33; }
     .list-table.compact-view .link-action.red {
       color: #e33734; }
+    .list-table.compact-view .link-action.orange {
+      color: #f24f1d; }
+    .list-table.compact-view .link-action.yellow {
+      color: #e99003; }
     .list-table.compact-view .link-action.green {
       color: #429e47; }
     .list-table.compact-view .link-action:hover {
@@ -1203,18 +1207,30 @@ output {
     position: relative;
     display: inline-block;
     margin: 0 -1px 0 0; }
-    .radio-segmented li:first-child label {
-      -webkit-border-radius: 2px 0 0 2px;
-      -moz-border-radius: 2px 0 0 2px;
-      border-radius: 2px 0 0 2px; }
-    .radio-segmented li:last-child label {
-      -webkit-border-radius: 0 2px 2px 0;
-      -moz-border-radius: 0 2px 2px 0;
-      border-radius: 0 2px 2px 0; }
-    .radio-segmented li:only-child label {
-      -webkit-border-radius: 2px;
-      -moz-border-radius: 2px;
-      border-radius: 2px; }
+    .radio-segmented li:first-child {
+      -webkit-border-radius: 3px 0 0 3px;
+      -moz-border-radius: 3px 0 0 3px;
+      border-radius: 3px 0 0 3px; }
+      .radio-segmented li:first-child label {
+        -webkit-border-radius: 2px 0 0 2px;
+        -moz-border-radius: 2px 0 0 2px;
+        border-radius: 2px 0 0 2px; }
+    .radio-segmented li:last-child {
+      -webkit-border-radius: 0 3px 3px 0;
+      -moz-border-radius: 0 3px 3px 0;
+      border-radius: 0 3px 3px 0; }
+      .radio-segmented li:last-child label {
+        -webkit-border-radius: 0 2px 2px 0;
+        -moz-border-radius: 0 2px 2px 0;
+        border-radius: 0 2px 2px 0; }
+    .radio-segmented li:only-child {
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      border-radius: 3px; }
+      .radio-segmented li:only-child label {
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px; }
   .radio-segmented label {
     padding: 4px 11px;
     border: 1px solid #acbbc2;
@@ -2753,10 +2769,14 @@ a.link-action {
   color: #1f2c33; }
   a.link-action.red {
     color: #e33734; }
-  a.link-action.green {
-    color: #429e47; }
   a.link-action.orange {
     color: #f24f1d; }
+  a.link-action.yellow {
+    color: #e99003; }
+  a.link-action.green {
+    color: #429e47; }
+  a.link-action.grey {
+    color: #768d99; }
   a.link-action:hover {
     color: #0275b8;
     border-bottom: 1px solid rgba(2, 117, 184, 0.5); }
