@@ -889,8 +889,8 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 
 // Problem and event tag constants.
-define('TAG_EVAL_TYPE_AND',		0);
-define('TAG_EVAL_TYPE_OR',		1);
+define('TAG_EVAL_TYPE_AND_OR',	0);
+define('TAG_EVAL_TYPE_OR',		2);
 define('TAG_OPERATOR_LIKE',		0);
 define('TAG_OPERATOR_EQUAL',	1);
 

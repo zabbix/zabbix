@@ -221,8 +221,8 @@ if ($data['action'] == 'problem.view') {
 	$filter_tags_table->addRow(
 		(new CCol(
 			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
-				->addValue(_('AND'), TAG_EVAL_TYPE_AND)
-				->addValue(_('OR'), TAG_EVAL_TYPE_OR)
+				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 				->setModern(true)
 		))->setColSpan(4)
 	);
