@@ -35,7 +35,7 @@
 	</target>
 
 	<!-- Cppcheck static analysis target -->
-	<target name="cppcheck-static-analysis">
+	<target name="cppcheck-static-analyzer">
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<exec executable="scan-build" failonerror="on">
 			<arg line="./configure"/>
@@ -91,9 +91,6 @@
 			</sequential>
 		</for>
 	</target>
-
-	<!-- Static analysis container target -->
-	<target name="static-analysis" depends="cppcheck-static-analysis,clang-static-analyzer"/>
 
 	<target name="init">
 		<!-- Create database schema -->
@@ -223,27 +220,6 @@
 
 	<target name="create-db" depends="create-db-mysql,create-db-postgresql"/>
 
-	<target name="make-gcc" depends="init-conf-options">
-		<!-- Build Zabbix with various configuration parameters -->
-		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
-		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
-		<for list="${conf.list}" param="name" delimiter=",">
-			<sequential>
-				<make args="${@{name}}"/>
-			</sequential>
-		</for>
-	</target>
-
-	<!-- Target "make-gcc" cannot have "init" dependency because it brakes "build-dist" -->
-	<target name="init-make-gcc" depends="init,make-gcc"/>
-
-	<target name="make-clang">
-		<!-- Build Zabbix with clang -->
-		<sequential>
-			<make cc="clang" args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		</sequential>
-	</target>
-
 	<target name="make-db-mysql" unless="${with.mysql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
@@ -321,7 +297,7 @@
 		<property name="cmocka-1-default" value="-q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 		<property name="cmocka-2-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 	</target>
-	
+
 	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">
 		<!-- Build Zabbix with cmocka tests -->
 		<delete dir="tests_results"/>
@@ -351,6 +327,17 @@
 		<make args="--enable-server --with-mysql --with-libxml2" target="test" post-action="run-unit-test"/>
 	</target>
 
+	<target name="make-gcc" depends="init-conf-options">
+		<!-- Build Zabbix with various configuration parameters -->
+		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
+		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
+		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>
+				<make args="${@{name}}"/>
+			</sequential>
+		</for>
+	</target>
+
 	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
 	<target name="make-dist" depends="init">
@@ -372,5 +359,5 @@
 		</sequential>
 	</target>
 
-	<target name="build" depends="init,make-clang,make-dist"/>
+	<target name="build" depends="init,make-dist"/>
 </project>
