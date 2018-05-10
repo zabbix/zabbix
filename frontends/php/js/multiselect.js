@@ -398,8 +398,8 @@ jQuery(function($) {
 
 									if (suggest) {
 										selected.addClass('suggest-hover');
+										aria_live.text(selected.data('label'));
 									}
-									aria_live.text(selected.data('label'));
 
 									scrollAvailable(obj);
 									return cancelEvent(e);
