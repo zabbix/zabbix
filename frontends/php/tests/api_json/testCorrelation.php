@@ -81,8 +81,7 @@ class testCorrelation extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['correlationids'] as $id) {
-				$dbResult = 'SELECT NULL from correlation where correlationid='. $id;
-				$this->assertEquals(0, DBcount($dbResult));
+				$this->assertEquals(0, DBcount('SELECT NULL from correlation where correlationid='. $id));
 			}
 		}
 	}
@@ -111,12 +110,12 @@ class testCorrelation extends CZabbixTest {
 	 * @dataProvider getCorrelationDeletePermissionsData
 	 */
 	public function testCorrelation_DeletePermissions($login, $correlation, $expected_error) {
-		$sqlCorrelation = 'SELECT * FROM correlation ORDER BY correlationid';
-		$oldHashCorrelation = DBhash($sqlCorrelation);
+		$sql_correlation = 'SELECT * FROM correlation ORDER BY correlationid';
+		$old_hash_correlation = DBhash($sql_correlation);
 
 		$this->authorize($login['user'], $login['password']);
 		$this->call('correlation.delete', $correlation, $expected_error);
 
-		$this->assertEquals($oldHashCorrelation, DBhash($sqlCorrelation));
+		$this->assertEquals($old_hash_correlation, DBhash($sql_correlation));
 	}
 }
