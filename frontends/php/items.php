@@ -45,7 +45,6 @@ $fields = [
 	'key' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Key')],
 	'master_itemid' =>			[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({type}) && {type}=='.ITEM_TYPE_DEPENDENT, _('Master item')],
-	'master_itemname' =>		[T_ZBX_STR, O_OPT, null,	null,			null],
 	'delay' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 		'(isset({add}) || isset({update})) && isset({type}) && {type}!='.ITEM_TYPE_TRAPPER.
 			' && {type}!='.ITEM_TYPE_SNMPTRAP.' && {type}!='.ITEM_TYPE_DEPENDENT,
@@ -1357,7 +1356,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 				'verify_peer', 'verify_host', 'allow_traps'
 			],
-			'selectHosts' => ['status'],
+			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectPreprocessing' => ['type', 'params'],
 			'itemids' => getRequest('itemid')
@@ -1378,14 +1377,14 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_item_options = [
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'itemids' => $item['master_itemid'],
+				'itemids' => getRequest('master_itemid', $item['master_itemid']),
 				'webitems' => true
 			];
 		}
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output' => ['status'],
+			'output' => ['hostid', 'name', 'status'],
 			'hostids' => getRequest('hostid'),
 			'templated_hosts' => true
 		]);
@@ -1475,7 +1474,6 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'initial_item_type' => null,
 		'multiple_interface_types' => false,
 		'visible' => getRequest('visible', []),
-		'master_itemname' => getRequest('master_itemname', ''),
 		'master_itemid' => getRequest('master_itemid', 0),
 		'url' =>  getRequest('url', ''),
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
@@ -1486,6 +1484,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 	$data['displayApplications'] = true;
 	$data['displayInterfaces'] = true;
+	$data['displayMasteritems'] = true;
 
 	if ($data['headers']) {
 		$headers = [];
@@ -1515,6 +1514,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	if ($hostCount > 1) {
 		$data['displayApplications'] = false;
 		$data['displayInterfaces'] = false;
+		$data['displayMasteritems'] = false;
 	}
 	else {
 		// get template count to display applications multiselect only for single template
@@ -1537,6 +1537,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 			// and don't display application multiselect for multiple templates
 			if ($hostCount == 1 && $templateCount == 1 || $templateCount > 1) {
 				$data['displayApplications'] = false;
+				$data['displayMasteritems'] = false;
 			}
 		}
 
@@ -1556,16 +1557,39 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 			// set the initial chosen interface to one of the interfaces the items use
 			$items = API::Item()->get([
 				'itemids' => $data['itemids'],
-				'output' => ['itemid', 'type']
+				'output' => ['itemid', 'type', 'name']
 			]);
 			$usedInterfacesTypes = [];
+			$items_names = [];
 			foreach ($items as $item) {
 				$usedInterfacesTypes[$item['type']] = itemTypeInterface($item['type']);
+				$items_names[$item['itemid']] = $item['name'];
 			}
 			$initialItemType = min(array_keys($usedInterfacesTypes));
 			$data['type'] = (getRequest('type') !== null) ? ($data['type']) : $initialItemType;
 			$data['initial_item_type'] = $initialItemType;
 			$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
+			$data['items_names'] = $items_names;
+		}
+	}
+
+	if ($data['master_itemid'] != 0 && $data['displayMasteritems']) {
+		$master_items = API::Item()->get([
+			'output' => ['itemid', 'name'],
+			'selectHosts' => ['name'],
+			'itemids' => $data['master_itemid'],
+			'hostids' => $data['hostid'],
+			'webitems' => true
+		]);
+
+		if ($master_items) {
+			$data['master_itemname'] = $master_items[0]['name'];
+			$data['master_hostname'] = $master_items[0]['hosts'][0]['name'];
+		}
+		else {
+			$data['master_itemid'] = 0;
+			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
+			$has_errors = true;
 		}
 	}
 
