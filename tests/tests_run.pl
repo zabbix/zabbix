@@ -298,11 +298,13 @@ unless (defined($xml))
 }
 
 print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-print("<testsuites" . ($xml ? " package=\"" . escape_xml_attribute($xml) . "\"" : "") . ">\n");
+print("<testsuites>\n");
 
 foreach my $test_suite (@test_suites)
 {
 	print("  <testsuite");
+
+	$test_suite->{'name'} = $xml . "." . $test_suite->{'name'} unless ($xml eq "");
 
 	foreach my $attribute (TEST_SUITE_ATTRIBUTES)
 	{
@@ -315,7 +317,7 @@ foreach my $test_suite (@test_suites)
 	foreach my $test_case (@{$test_suite->{'testcases'}})
 	{
 		print("    <testcase");
-
+		
 		foreach my $attribute (TEST_CASE_ATTRIBUTES)
 		{
 			die("missing test case attribute \"$attribute\"") unless (exists($test_case->{$attribute}));
