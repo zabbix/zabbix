@@ -41,13 +41,13 @@ class testPageReportsNotifications extends CWebTest {
 		$this->zbxTestAssertElementText('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=3")]','SMS');
 		$this->zbxTestAssertElementText('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=4")]','SMS via IP');
 		// Check columns exist for all users
-		$this->zbxTestAssertElementText('//table/thead/tr/th[4]/div/div', 'admin-zabbix');
-		$this->zbxTestAssertElementText('//table/thead/tr/th[5]/div/div', 'disabled-user');
-		$this->zbxTestAssertElementText('//table/thead/tr/th[6]/div/div', 'guest');
-		$this->zbxTestAssertElementText('//table/thead/tr/th[7]/div/div', 'no-access-to-the-frontend');
-		$this->zbxTestAssertElementText('//table/thead/tr/th[8]/div/div', 'test-user');
-		$this->zbxTestAssertElementText('//table/thead/tr/th[9]/div/div', 'user-for-blocking');
-		$this->zbxTestAssertElementText('//table/thead/tr/th[10]/div/div', 'user-zabbix');
+		$this->zbxTestAssertElementPresentXpath('//table/thead/tr/th', 'admin-zabbix');
+		$this->zbxTestAssertElementPresentXpath('//table/thead/tr/th', 'disabled-user');
+		$this->zbxTestAssertElementPresentXpath('//table/thead/tr/th', 'guest');
+		$this->zbxTestAssertElementPresentXpath('//table/thead/tr/th', 'no-access-to-the-frontend');
+		$this->zbxTestAssertElementPresentXpath('//table/thead/tr/th', 'test-user');
+		$this->zbxTestAssertElementPresentXpath('//table/thead/tr/th', 'user-for-blocking');
+		$this->zbxTestAssertElementPresentXpath('//table/thead/tr/th', 'user-zabbix');
 	}
 
 	// Check media_type drop downs
@@ -57,43 +57,40 @@ class testPageReportsNotifications extends CWebTest {
 		$this->zbxTestDropdownSelect('period', 'Monthly');
 		// Select 2017 monthly
 		$this->zbxTestDropdownSelect('year', '2017');
-		// Check report for November 2017
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[2]', '3 (2/0/1/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[3]', '2 (1/0/1/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[4]', '5 (3/0/2/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[5]', '3 (1/0/2/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[6]', '2 (0/0/2/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[7]', '4 (3/0/1/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[8]', '3 (1/0/2/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[9]', '2 (1/0/1/0)');
+		// Check report for 2017
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '1 (1/0/0/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '2 (1/0/1/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '3 (1/0/2/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '4 (2/0/2/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '5 (3/0/2/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '6 (3/0/3/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '7 (3/0/4/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '8 (4/0/4/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '9 (5/0/4/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '10 (5/0/5/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '11 (5/0/6/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '12 (6/0/6/0)');
 		// Check report for 2016
 		$this->zbxTestDropdownSelect('year','2016');
-		$this->zbxTestAssertElementText('//table/tbody/tr[2]/td[5]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[2]/td[7]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[11]/td[2]', '1 (1/0/0/0)');
-
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '13 (6/0/7/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '14 (6/0/8/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '15 (6/0/9/0)');
 		// Select yearly filtering
 		$this->zbxTestDropdownSelect('period', 'Yearly');
 		// Check report with yearly filtering
 		$this->zbxTestAssertElementNotPresentId('year');
-		$this->zbxTestAssertElementText('//table/tbody/tr[1]/td[2]', '5 (5/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[2]/td[6]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[3]/td[4]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[3]/td[8]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[4]/td[3]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[4]/td[9]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[2]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[5]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[7]', '1 (1/0/0/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[2]', '3 (2/0/1/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[3]', '2 (1/0/1/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[4]', '5 (3/0/2/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[5]', '3 (1/0/2/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[6]', '2 (0/0/2/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[7]', '4 (3/0/1/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[8]', '3 (1/0/2/0)');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[9]', '2 (1/0/1/0)');
-
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '5 (5/0/0/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '15 (6/0/9/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '14 (6/0/8/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '13 (6/0/7/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '10 (6/0/4/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '16 (8/0/8/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '7 (3/0/4/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '12 (6/0/6/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '8 (4/0/4/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '14 (6/0/8/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '6 (3/0/3/0)');
+		$this->zbxTestAssertElementPresentXpath('//table/tbody/tr/td', '5 (3/0/2/0)');
 		// Check filtering by media type
 		$this->zbxTestDropdownSelect('media_type', 'Email');
 		// Check links
@@ -105,22 +102,17 @@ class testPageReportsNotifications extends CWebTest {
 		// Check report for Emails
 		$this->zbxTestAssertElementNotPresentId('year');
 		$this->zbxTestAssertElementText('//table/tbody/tr[1]/td[2]', '5');
-		$this->zbxTestAssertElementText('//table/tbody/tr[2]/td[6]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[3]/td[4]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[3]/td[8]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[4]/td[3]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[4]/td[9]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[2]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[5]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[7]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[2]', '2');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[3]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[4]', '3');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[5]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[7]', '3');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[8]', '1');
-		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[9]', '1');
-
+		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[5]', '6');
+		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[9]', '6');
+		$this->zbxTestAssertElementText('//table/tbody/tr[5]/td[10]', '6');
+		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[2]', '6');
+		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[4]', '8');
+		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[5]', '3');
+		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[6]', '6');
+		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[7]', '4');
+		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[8]', '6');
+		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[9]', '3');
+		$this->zbxTestAssertElementText('//table/tbody/tr[6]/td[10]', '3');
 		// Check links than all media selected
 		$this->zbxTestDropdownSelect('media_type', 'all');
 		$this->zbxTestAssertElementText('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=1")]','Email');
