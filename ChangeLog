@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+A.F....... [ZBX-13680] fixed action not being cloned due to existing operation id being submitted (agriscenko)
 ..F....... [ZBX-13775] fixed map tree widget border color (Andzs)
 ..F....... [ZBX-13780] fixed status color styles (Andzs)
 ..F....... [ZBX-12350] fixed severity picker styles (Andzs, ashubin)
@@ -299,6 +300,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-13680] fixed action not being cloned due to existing operation id being submitted (agriscenko)
 ..F....... [ZBX-13775] fixed map tree widget border color (Andzs)
 ...G...PS. [ZBX-13782] fixed decoding of Unicode characters in JSON (Andris)
 ..F....... [ZBX-13767] fixed "undefined index: acknowledges" error on problems page (agriscenko)
