@@ -690,7 +690,7 @@ jQuery(function($) {
 			removeDefaultValue(obj, options);
 			values.selected[item.id] = item;
 
-			var prefix = (typeof item.prefix === 'undefined') ? '' : item.prefix,
+			var prefix = (item.prefix || ''),
 				item_disabled = (typeof(item.disabled) !== 'undefined' && item.disabled);
 
 			// add hidden input
@@ -714,7 +714,7 @@ jQuery(function($) {
 
 			var li = $('<li>', {
 				'data-id': item.id,
-				'data-label': item.prefix + item.name
+				'data-label': prefix + item.name
 			}).append(
 				$('<span>', {
 					'class': 'subfilter-enabled'
@@ -769,7 +769,7 @@ jQuery(function($) {
 	function addAvailable(item, obj, values, options) {
 		var li = $('<li>', {
 			'data-id': item.id,
-			'data-label': item.prefix + item.name
+			'data-label': (item.prefix || '') + item.name
 		})
 		.click(function() {
 			select(item.id, obj, values, options);
