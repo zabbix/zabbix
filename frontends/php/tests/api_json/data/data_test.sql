@@ -254,3 +254,24 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, 
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (93, 91, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (93,1,'Problem: {TRIGGER.NAME}','Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {TRIGGER.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}',NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (94, 93, 47);
+
+-- event correlation
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99000, 'delete tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99000, 99000, 0);
+
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99001, 'Event correlation for update', 'Test description update', 0, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99001, 99001, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99001, 'update tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99001, 99001, 0);
+
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'Event correlation for cancel', 'Test description cancel', 1, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99002, 99002, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99002, 'cancel tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99002, 99002, 0);
+
+INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99003, 'Event correlation for clone', 'Test description clone', 0, 0, '');
+INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
+INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag');
+INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
