@@ -96,8 +96,8 @@ $widget->setControls((new CList([
 ])));
 
 $filter = (new CFilter())
-	->setProfile('web.slides.filter', $data['screen']['slideshowid'])
-	->addTimeSelector($data['from'], $data['to']);
+	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 $widget->addItem($filter);
 
 $widget->addItem(

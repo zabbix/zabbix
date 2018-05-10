@@ -104,7 +104,7 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['s
 			$screenBuilder = new CScreenBuilder([
 				'screen' => $dbScreen,
 				'mode' => SCREEN_MODE_PREVIEW,
-				'profileIdx' => 'web.slides',
+				'profileIdx' => 'web.slides.filter',
 				'profileIdx2' => $elementId,
 				'hostid' => getRequest('hostid'),
 				'from' => getRequest('from'),
@@ -172,6 +172,14 @@ else {
 		redirect('slideconf.php');
 	}
 }
+
+$data['timeline'] = calculateTime([
+	'profileIdx' => 'web.slides.filter',
+	'profileIdx2' => $data['elementId'],
+	'updateProfile' => true,
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
+]);
 
 $data['fullscreen'] = getRequest('fullscreen');
 
