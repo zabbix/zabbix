@@ -344,7 +344,7 @@ function getItemFilterForm(&$items) {
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
+					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupid',
 					'editable' => true
 				]
@@ -390,7 +390,7 @@ function getItemFilterForm(&$items) {
 				'parameters' => [
 					'srctbl' => 'host_templates',
 					'srcfld1' => 'hostid',
-					'dstfrm' => $form->getName(),
+					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_hostid',
 					'editable' => true,
 					'templated_hosts' => true
