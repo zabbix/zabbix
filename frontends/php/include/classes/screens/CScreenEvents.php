@@ -34,7 +34,7 @@ class CScreenEvents extends CScreenBase {
 		]);
 
 		$triggers = API::Trigger()->get([
-			'output' => ['priority'],
+			'output' => [],
 			'selectHosts' => ['hostid', 'name'],
 			'skipDependent' => true,
 			'monitored' => true,
@@ -45,12 +45,12 @@ class CScreenEvents extends CScreenBase {
 		]);
 
 		$events = API::Event()->get([
-			'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged'],
+			'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
 			'select_acknowledges' => ['action'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
-			'objectids' => zbx_objectValues($triggers, 'triggerid'),
+			'objectids' => array_keys($triggers),
 			'sortfield' => ['clock', 'eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $this->screenitem['elements']
@@ -64,8 +64,7 @@ class CScreenEvents extends CScreenBase {
 				continue;
 			}
 
-			$events[$key]['trigger'] = $triggers[$event['objectid']];
-			$events[$key]['host'] = reset($events[$key]['trigger']['hosts']);
+			$events[$key]['host'] = reset($triggers[$event['objectid']]['hosts']);
 			$sort_clock[$key] = $event['clock'];
 			$sort_event[$key] = $event['eventid'];
 		}
@@ -101,7 +100,6 @@ class CScreenEvents extends CScreenBase {
 		}
 
 		foreach ($events as $event) {
-			$trigger = $event['trigger'];
 			$host = $event['host'];
 
 			if ($event['r_eventid'] == 0) {
@@ -138,7 +136,7 @@ class CScreenEvents extends CScreenBase {
 					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 				),
 				$statusSpan,
-				getSeverityCell($trigger['priority'], $config)
+				getSeverityCell($event['severity'], $config)
 			]);
 		}
 

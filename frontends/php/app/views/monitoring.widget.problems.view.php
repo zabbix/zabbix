@@ -155,7 +155,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen']), '', true)
 	]));
 
-	$description_style = getSeverityStyle($trigger['priority']);
+	$description_style = getSeverityStyle($problem['severity']);
 
 	if ($value == TRIGGER_VALUE_TRUE) {
 		$description->addClass($description_style);

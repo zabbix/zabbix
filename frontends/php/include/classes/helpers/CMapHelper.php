@@ -289,10 +289,10 @@ class CMapHelper {
 					$triggers[$id] = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
 
 					if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
-							&& $triggers[$id]['priority'] >= $max_severity) {
+							&& $triggers[$id]['lastEvent']['severity'] >= $max_severity) {
 						$drawtype = $triggers[$id]['drawtype'];
 						$color = $triggers[$id]['color'];
-						$max_severity = $triggers[$id]['priority'];
+						$max_severity = $triggers[$id]['lastEvent']['severity'];
 					}
 				}
 

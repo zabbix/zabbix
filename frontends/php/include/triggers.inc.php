@@ -155,7 +155,7 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 /**
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
- * @param int         $severity     Trigger severity.
+ * @param int         $severity     Trigger, Event or Problem severity.
  * @param array|null  $config       Array of configuration parameters to get trigger severity name; can be omitted
  *                                  if $text is not null.
  * @param string|null $text         Trigger severity name.
@@ -1151,7 +1151,15 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	return API::Trigger()->get($options);
 }
 
-function make_trigger_details($trigger) {
+/**
+ * Make trigger info block.
+ *
+ * @param array $trigger			Trigger described in info block.
+ * @param int	$event_severity		Event severity.
+ *
+ * @return object
+ */
+function make_trigger_details($trigger, $event_severity) {
 	$hostNames = [];
 
 	$config = select_config();
@@ -1189,7 +1197,7 @@ function make_trigger_details($trigger) {
 		])
 		->addRow([
 			_('Severity'),
-			getSeverityCell($trigger['priority'], $config)
+			getSeverityCell($event_severity, $config)
 		]);
 
 	$trigger = CMacrosResolverHelper::resolveTriggerExpressions(zbx_toHash($trigger, 'triggerid'), [

@@ -78,7 +78,7 @@ $alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'us
 ];
 
 $events = API::Event()->get([
-	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value', 'name', 'acknowledged'],
+	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value', 'name', 'acknowledged', 'severity'],
 	'select_alerts' => $alert_options,
 	'selectTags' => ['tag', 'value'],
 	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'],
@@ -145,7 +145,7 @@ unset($alerts_data);
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
-			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
+			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['severity'])))
 				->setHeader(_('Event source details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
 				make_event_details($event,

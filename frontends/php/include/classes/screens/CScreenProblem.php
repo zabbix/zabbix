@@ -92,7 +92,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataEvents(array $options) {
 		return API::Event()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name'],
+			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
@@ -124,7 +124,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataProblems(array $options) {
 		return API::Problem()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name'],
+			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'sortfield' => ['eventid'],
@@ -958,7 +958,7 @@ class CScreenProblem extends CScreenBase {
 				// Add table row.
 				$table->addRow(array_merge($row, [
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
-					getSeverityCell($trigger['priority'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
+					getSeverityCell($problem['severity'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
 					$cell_r_clock,
 					$cell_status,
 					makeInformationList($info_icons),
@@ -973,7 +973,7 @@ class CScreenProblem extends CScreenBase {
 						: '',
 					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]), ($this->data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
-					? getSeverityFlhStyle($trigger['priority'])
+					? getSeverityFlhStyle($problem['severity'])
 					: null
 				);
 			}

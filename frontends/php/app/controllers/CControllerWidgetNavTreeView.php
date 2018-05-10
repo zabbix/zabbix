@@ -138,7 +138,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid'],
 					'groupids' => array_keys($host_groups),
-					'min_severity' => $severity_min,
 					'skipDependent' => true,
 					'selectGroups' => ['groupid'],
 					'preservekeys' => true
@@ -160,7 +159,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 					'output' => ['triggerid'],
 					'selectHosts' => ['hostid'],
 					'hostids' => array_keys($hosts),
-					'min_severity' => $severity_min,
 					'skipDependent' => true,
 					'preservekeys' => true,
 					'monitored' => true
@@ -179,9 +177,8 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			// Count problems per trigger.
 			if ($problems_per_trigger) {
 				$triggers = API::Trigger()->get([
-					'output' => ['triggerid', 'priority'],
+					'output' => [],
 					'triggerids' => array_keys($problems_per_trigger),
-					'min_severity' => $severity_min,
 					'skipDependent' => true,
 					'selectGroups' => ['groupid'],
 					'preservekeys' => true,
@@ -189,18 +186,17 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 				]);
 
 				$problems = API::Problem()->get([
-					'output' => ['objectid'],
+					'output' => ['objectid', 'severity'],
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
-					'objectids' => zbx_objectValues($triggers, 'triggerid'),
+					'objectids' => array_keys($triggers),
 					'severities' => range($severity_min, TRIGGER_SEVERITY_COUNT - 1),
 					'preservekeys' => true
 				]);
 
 				if ($problems) {
 					foreach ($problems as $problem) {
-						$trigger = $triggers[$problem['objectid']];
-						$problems_per_trigger[$problem['objectid']][$trigger['priority']]++;
+						$problems_per_trigger[$problem['objectid']][$problem['severity']]++;
 					}
 				}
 			}

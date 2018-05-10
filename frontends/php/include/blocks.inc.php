@@ -119,7 +119,7 @@ function getSystemStatusData(array $filter) {
 	unset($group);
 
 	$options = [
-		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged'],
+		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
 		'source' => EVENT_SOURCE_TRIGGERS,
@@ -151,7 +151,7 @@ function getSystemStatusData(array $filter) {
 		}
 
 		$options = [
-			'output' => ['priority'],
+			'output' => [],
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['name'],
 			'triggerids' => array_keys($triggerids),
@@ -190,22 +190,22 @@ function getSystemStatusData(array $filter) {
 				$group = &$data['groups'][$trigger_group['groupid']];
 
 				if (in_array($filter_ext_ack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-					if ($group['stats'][$trigger['priority']]['count'] < ZBX_WIDGET_ROWS) {
-						$group['stats'][$trigger['priority']]['problems'][] = $problem;
+					if ($group['stats'][$problem['severity']]['count'] < ZBX_WIDGET_ROWS) {
+						$group['stats'][$problem['severity']]['problems'][] = $problem;
 						$visible_problems[$eventid] = ['eventid' => $eventid];
 					}
 
-					$group['stats'][$trigger['priority']]['count']++;
+					$group['stats'][$problem['severity']]['count']++;
 				}
 
 				if (in_array($filter_ext_ack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH])
 						&& $problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-					if ($group['stats'][$trigger['priority']]['count_unack'] < ZBX_WIDGET_ROWS) {
-						$group['stats'][$trigger['priority']]['problems_unack'][] = $problem;
+					if ($group['stats'][$problem['severity']]['count_unack'] < ZBX_WIDGET_ROWS) {
+						$group['stats'][$problem['severity']]['problems_unack'][] = $problem;
 						$visible_problems[$eventid] = ['eventid' => $eventid];
 					}
 
-					$group['stats'][$trigger['priority']]['count_unack']++;
+					$group['stats'][$problem['severity']]['count_unack']++;
 				}
 
 				$group['has_problems'] = true;
@@ -272,7 +272,6 @@ function getSystemStatusData(array $filter) {
  * @param array  $data['triggers']
  * @param string $data['triggers'][<triggerid>]['expression']
  * @param string $data['triggers'][<triggerid>]['description']
- * @param int    $data['triggers'][<triggerid>]['priority']
  * @param array  $data['triggers'][<triggerid>]['hosts']
  * @param string $data['triggers'][<triggerid>]['hosts'][]['name']
  * @param array  $config
@@ -721,13 +720,13 @@ function make_latest_issues(array $filter = [], $backurl) {
  * @param int    $problems[]['clock']
  * @param int    $problems[]['ns']
  * @param array  $problems[]['acknowledged']
+ * @param array  $problems[]['severity']
  * @param array  $problems[]['tags']
  * @param string $problems[]['tags'][]['tag']
  * @param string $problems[]['tags'][]['value']
  * @param array  $triggers
  * @param string $triggers[<triggerid>]['expression']
  * @param string $triggers[<triggerid>]['description']
- * @param int    $triggers[<triggerid>]['priority']
  * @param array  $triggers[<triggerid>]['hosts']
  * @param string $triggers[<triggerid>]['hosts'][]['name']
  * @param string $backurl
@@ -768,7 +767,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 
 		$table->addRow([
 			implode(', ', $hosts),
-			getSeverityCell($trigger['priority'], null, $problem['name']),
+			getSeverityCell($problem['severity'], null, $problem['name']),
 			zbx_date2age($problem['clock']),
 			$ack,
 			array_key_exists($problem['eventid'], $actions)
