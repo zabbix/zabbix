@@ -807,9 +807,9 @@ class CScreenProblem extends CScreenBase {
 						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
 						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 30%;'),
+							->addStyle('width: 35%;'),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 70%;'),
+							->addStyle('width: 65%;'),
 						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
 						$this->config['event_ack_enable'] ? (new CColHeader(_('Ack')))->addStyle('width: 36px;') : null,
 						(new CColHeader(_('Actions')))->addStyle('width: 59px;'),
