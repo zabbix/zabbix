@@ -422,16 +422,17 @@ jQuery(function($) {
 												? (selected.is(':first-child') ? selected.next() : selected.prev())
 												: (selected.is(':last-child') ? selected.prev() : selected.next());
 
+											removeSelected(id, obj, values, options);
+
 											if (selected.length) {
 												var collection = $('.selected li', obj);
 												selected.addClass('selected');
-												aria_text += ',' + sprintf(t('Selected, %1$s in position %2$d of %3$d'),
+												aria_text += ', ' + sprintf(t('Selected, %1$s in position %2$d of %3$d'),
 													selected.data('label'), collection.index(selected) + 1,
 													collection.length
 												);
 											}
 
-											removeSelected(id, obj, values, options);
 											aria_live.text(aria_text);
 										}
 									}
