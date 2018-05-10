@@ -286,6 +286,8 @@ jQuery(function($) {
 
 						// Replace trailing slashes to check if search term contains anything else.
 						if (search !== '') {
+							$('.selected li.selected', obj).removeClass('selected');
+
 							if (input.data('lastSearch') != search) {
 								if (!values.isWaiting) {
 									values.isWaiting = true;
@@ -366,7 +368,13 @@ jQuery(function($) {
 									if (collection.length) {
 										var prev = collection.filter('.selected').removeClass('selected').prev();
 										prev = (prev.length ? prev : collection.last()).addClass('selected');
-										aria_live.text(prev.data('label'));
+
+										if (prev.hasClass('disabled')) {
+											aria_live.text(sprintf(t('%1$s, read only'), prev.data('label')));
+										}
+										else {
+											aria_live.text(prev.data('label'));
+										}
 									}
 								}
 								break;
@@ -378,33 +386,33 @@ jQuery(function($) {
 									if (collection.length) {
 										var next = collection.filter('.selected').removeClass('selected').next();
 										next = (next.length ? next : collection.first()).addClass('selected');
-										aria_live.text(next.data('label'));
+
+										if (next.hasClass('disabled')) {
+											aria_live.text(sprintf(t('%1$s, read only'), next.data('label')));
+										}
+										else {
+											aria_live.text(next.data('label'));
+										}
 									}
 								}
 								break;
 
 							case KEY.ARROW_UP:
 							case KEY.ARROW_DOWN:
-								var collection = $('.available:visible li', obj);
-								if (collection.length) {
-									var selected = collection.filter('.suggest-hover').removeClass('suggest-hover'),
-										suggest = (e.which == KEY.ARROW_UP)
-											? !selected.is(':first-child')
-											: !selected.is(':last-child');
+								var collection = $('.available:visible li', obj),
+									selected = collection.filter('.suggest-hover').removeClass('suggest-hover');
 
+								if (selected.length) {
 									selected = (e.which == KEY.ARROW_UP)
-										? (selected.length ? selected.prev() : collection.last())
-										: (selected.length ? selected.next() : collection.first());
+										? (selected.is(':first-child') ? collection.last() : selected.prev())
+										: (selected.is(':last-child') ? collection.first() : selected.next());
 
-									if (suggest) {
-										selected.addClass('suggest-hover');
-										aria_live.text(selected.data('label'));
-									}
-
-									scrollAvailable(obj);
-									return cancelEvent(e);
+									selected.addClass('suggest-hover');
+									aria_live.text(selected.data('label'));
 								}
-								break;
+
+								scrollAvailable(obj);
+								return cancelEvent(e);
 
 							case KEY.BACKSPACE:
 							case KEY.DELETE:
@@ -427,14 +435,32 @@ jQuery(function($) {
 											if (selected.length) {
 												var collection = $('.selected li', obj);
 												selected.addClass('selected');
-												aria_text += ', ' + sprintf(t('Selected, %1$s in position %2$d of %3$d'),
-													selected.data('label'), collection.index(selected) + 1,
-													collection.length
-												);
+												if (selected.hasClass('disabled')) {
+													aria_text += ', ' + sprintf(
+														t('Selected, %1$s, read only, in position %2$d of %3$d'),
+														selected.data('label'), collection.index(selected) + 1,
+														collection.length
+													);
+												}
+												else {
+													aria_text += ', ' + sprintf(
+														t('Selected, %1$s in position %2$d of %3$d'),
+														selected.data('label'), collection.index(selected) + 1,
+														collection.length
+													);
+												}
+
 											}
 
 											aria_live.text(aria_text);
 										}
+										else if (item.disabled) {
+											aria_live.text(t('Can not be removed'));
+										}
+									}
+									else if (e.which == KEY.BACKSPACE) {
+										selected = $('.selected li:last-child', obj).addClass('selected');
+										aria_live.text(selected.data('label'));
 									}
 
 									return cancelEvent(e);
