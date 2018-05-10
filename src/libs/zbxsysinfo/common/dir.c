@@ -116,7 +116,7 @@ static int	compare_descriptors(const void *file_a, const void *file_b)
 static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT *result, regex_t **regex_incl,
 		regex_t **regex_excl, int *max_depth, char **dir, zbx_stat_t *status, int depth_param, int param_count)
 {
-	char	*dir_param, *regex_incl_str, *regex_excl_str, *max_depth_str, *max_depth_ptr = NULL, *error = NULL;
+	char	*dir_param, *regex_incl_str, *regex_excl_str, *max_depth_str, *max_depth_ptr, *error = NULL;
 
 	if (param_count < request->nparam)
 	{
