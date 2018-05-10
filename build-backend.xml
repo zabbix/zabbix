@@ -276,7 +276,7 @@
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
 	
 	<macrodef name="make-tests">
-		<!-- Build Zabbix C mock tests with the specified command line arguments -->
+		<!-- Build Zabbix cmocka tests with the specified command line arguments -->
 		<attribute name="conf"/>
 		<attribute name="conf-name"/>
 		<sequential>
@@ -291,7 +291,10 @@
 						<arg line="-j5"/>
 						<arg line="tests_build"/>
 					</exec>
-					<exec executable="tests/tests_run.pl" failonerror="on" output="output_@{conf-name}.xml"></exec>
+					<mkdir dir="tests_results/@{conf-name}"/>
+					<exec executable="tests/tests_run.pl" failonerror="on" output="tests_results/@{conf-name}/output.xml">
+						<arg line="-x @{conf-name}"/>
+					</exec>
 				</try>
 				<finally>
 					<exec executable="make" failonerror="on">
@@ -299,25 +302,36 @@
 						<arg line="-j5"/>
 						<arg line="clean"/>
 					</exec>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="-C"/>
+						<arg line="tests"/>
+						<arg line="clean"/>
+					</exec>
 				</finally>
 			</trycatch>
 		</sequential>
 	</macrodef>
 	
-	<target name="init-cmock-test-conf-options">
-		<!-- Zabbix various configuration parameters for C mock tests -->
-		<property name="conf1" value="-q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
-		<property name="conf2" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+	<target name="init-cmocka-test-conf-options">
+		<!-- Zabbix various configuration parameters for cmocka tests -->
+		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
+			and configuration title: cmocka-<number>-<title> -->
+		<property name="cmocka-1-default" value="-q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="cmocka-2-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 	</target>
 	
-	<target name="mock-tests" depends="init-cmock-test-conf-options">
-		<!-- Build Zabbix with C mock tests -->
+	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">
+		<!-- Build Zabbix with cmocka tests -->
+		<delete dir="tests_results"/>
+		<mkdir dir="tests_results"/>
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
+		<propertyselector property="conf.list" delimiter="," match="cmocka-(.*)" select="\1"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 		<for list="${conf.list}" param="name" delimiter=",">
 			<sequential>
-				<make-tests conf="${@{name}}" conf-name="@{name}"/>
+				<make-tests conf="${cmocka-@{name}}" conf-name="@{name}"/>
 			</sequential>
 		</for>
 	</target>

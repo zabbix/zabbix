@@ -317,7 +317,7 @@ foreach my $test_suite (@test_suites)
 	foreach my $test_case (@{$test_suite->{'testcases'}})
 	{
 		print("    <testcase");
-		
+
 		foreach my $attribute (TEST_CASE_ATTRIBUTES)
 		{
 			die("missing test case attribute \"$attribute\"") unless (exists($test_case->{$attribute}));
@@ -365,3 +365,8 @@ foreach my $test_suite (@test_suites)
 }
 
 print("</testsuites>\n");
+
+foreach my $test_suite (@test_suites)
+{
+	exit(-1) unless ($test_suite->{'failures'} + $test_suite->{'errors'} == 0);
+}
