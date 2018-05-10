@@ -1995,7 +1995,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppsrc = (zbx_lld_item_preproc_t *)item_proto->preproc_ops.values[j];
 				ppdst = (zbx_lld_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_preproc_t));
 				ppdst->item_preprocid = 0;
-				ppdst->flags = ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED;
+				ppdst->flags = ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE;
 				ppdst->step = ppsrc->step;
 				ppdst->type = ppsrc->type;
 				ppdst->params = zbx_strdup(NULL, ppsrc->params);
