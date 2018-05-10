@@ -15,6 +15,7 @@ Bug fixes:
 ........S. [ZBX-12390] fixed problem when triggers might not use correct value if an item values within one second were received in wrong historical order (wiper)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
+........S. [ZBX-12372] fixed duplication of prefix "/" for second parameter "path" in items "web.page.*" (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha6
@@ -302,6 +303,7 @@ Bug fixes:
 ..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
 ..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
+........S. [ZBX-12372] fixed duplication of prefix "/" for second parameter "path" in items "web.page.*" (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.9
@@ -1532,6 +1534,7 @@ A.F....... [ZBX-13774] fixed creating and updating items with multiple specific 
 ..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
 ..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
 .......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
+........S. [ZBX-12372] fixed duplication of prefix "/" for second parameter "path" in items "web.page.*" (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17

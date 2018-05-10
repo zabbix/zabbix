@@ -56,11 +56,11 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		zbx_snprintf(request, sizeof(request),
-				"GET /%s HTTP/1.1\r\n"
+				"GET %s%s HTTP/1.1\r\n"
 				"Host: %s\r\n"
 				"Connection: close\r\n"
 				"\r\n",
-				path, host);
+				'\0' == *path || '/' != *path ? "/" : "", path, host);
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
