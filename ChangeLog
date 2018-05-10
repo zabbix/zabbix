@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+..F....... [ZBX-12350] fixed severity picker styles (Andzs, ashubin)
 ...G...PS. [ZBX-13782] fixed decoding of Unicode characters in JSON (Andris)
 ..F....... [ZBX-13767] fixed "undefined index: acknowledges" error on problems page (agriscenko)
 ..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)

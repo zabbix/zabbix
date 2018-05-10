@@ -1767,16 +1767,28 @@ output {
 		display: inline-block;
 		margin: 0 -1px 0 0;
 
-		&:first-child label {
-			@include border-radius(2px 0 0 2px);
+		&:first-child{
+			@include border-radius(3px 0 0 3px);
+
+			label {
+				@include border-radius(2px 0 0 2px);
+			}
 		}
 
-		&:last-child label {
-			@include border-radius(0 2px 2px 0);
+		&:last-child {
+			@include border-radius(0 3px 3px 0);
+
+			label {
+				@include border-radius(0 2px 2px 0);
+			}
 		}
 
-		&:only-child label {
-			@include border-radius(2px);
+		&:only-child {
+			@include border-radius(3px);
+
+			label {
+				@include border-radius(2px);
+			}
 		}
 	}
 
