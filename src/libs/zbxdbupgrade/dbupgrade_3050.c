@@ -779,6 +779,21 @@ static int	DBpatch_3050069(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050070(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute("update profiles set value_int=2 where idx='web.problem.filter.evaltype' and value_int=1");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -851,5 +866,6 @@ DBPATCH_ADD(3050066, 0, 1)
 DBPATCH_ADD(3050067, 0, 1)
 DBPATCH_ADD(3050068, 0, 1)
 DBPATCH_ADD(3050069, 0, 1)
+DBPATCH_ADD(3050070, 0, 1)
 
 DBPATCH_END()
