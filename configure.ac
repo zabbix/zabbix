@@ -1705,7 +1705,9 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/Makefile
 	tests/libs/Makefile
 	tests/libs/zbxconf/Makefile
+	tests/libs/zbxdbcache/Makefile
 	tests/libs/zbxdbhigh/Makefile
+	tests/libs/zbxhistory/Makefile
 	tests/libs/zbxjson/Makefile
 	tests/libs/zbxsysinfo/Makefile
 	tests/libs/zbxsysinfo/linux/Makefile
@@ -1713,7 +1715,9 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxcommshigh/Makefile
 	tests/libs/zbxcommon/Makefile
 	tests/libs/zbxalgo/Makefile
-)])
+	)
+	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
+])
 
 AC_OUTPUT([
 	Makefile

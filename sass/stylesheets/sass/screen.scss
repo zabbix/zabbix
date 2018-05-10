@@ -366,6 +366,12 @@ ul.top-nav-icons {
 		-webkit-transform-style: preserve-3d;
 	}
 
+	.top-nav-support {
+		background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
+		width: auto;
+		padding: 0 6px 0 17px;
+	}
+
 	form {
 		position: relative;
 	}
@@ -378,6 +384,13 @@ ul.top-nav-icons {
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
+
+		@media (max-width: 1050px) {
+			width: 130px;
+		}
+
+		transition: width 0.5s;
+		-webkit-transition: width 0.5s;
 
 		&:focus {
 			background-color: $form-bg-color;
@@ -1207,13 +1220,21 @@ output {
 	}
 }
 
+.subfilter,
 .subfilter-enabled {
 	display: inline-block;
-	position: relative;
 	height: 18px;
-	padding: 0 4px;
-	color: $font-selected-color;
+	position: relative;
+}
+
+.subfilter {
+	margin-right: 10px;
+}
+
+.subfilter-enabled {
 	background-color: $ui-bg-selected-color;
+	color: $font-selected-color;
+	padding: 0 4px;
 	@include border-radius(2px);
 
 	.link-action {
@@ -1754,16 +1775,28 @@ output {
 		display: inline-block;
 		margin: 0 -1px 0 0;
 
-		&:first-child label {
-			@include border-radius(2px 0 0 2px);
+		&:first-child{
+			@include border-radius(3px 0 0 3px);
+
+			label {
+				@include border-radius(2px 0 0 2px);
+			}
 		}
 
-		&:last-child label {
-			@include border-radius(0 2px 2px 0);
+		&:last-child {
+			@include border-radius(0 3px 3px 0);
+
+			label {
+				@include border-radius(0 2px 2px 0);
+			}
 		}
 
-		&:only-child label {
-			@include border-radius(2px);
+		&:only-child {
+			@include border-radius(3px);
+
+			label {
+				@include border-radius(2px);
+			}
 		}
 	}
 

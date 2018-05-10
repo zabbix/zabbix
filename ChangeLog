@@ -1,12 +1,18 @@
 Changes for 4.0.0alpha7
 
 New features:
+..F....... [ZBXNEXT-4528] added link to Zabbix official support page (Andzs, ashubin)
 ........S. [ZBXNEXT-4520] added values to boolean mapping: "ok, master" as 1 and "err, slave" as 0 (viktors)
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
-..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
-..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
+..F....... [ZBX-12350] fixed severity picker styles (Andzs, ashubin)
+...G...PS. [ZBX-13782] fixed decoding of Unicode characters in JSON (Andris)
+..F....... [ZBX-13767] fixed "undefined index: acknowledges" error on problems page (agriscenko)
+..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)
+..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
+........S. [ZBX-12390] fixed problem when triggers might not use correct value if an item values within one second were received in wrong historical order (wiper)
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
 
 --------------------------------------------------------------------------------
@@ -34,6 +40,8 @@ A......... [ZBX-3783] added audit for action.delete() and correlation.delete() m
 ..F....... [ZBXNEXT-4414] added support for configurable number of displayed tags (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
+..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ..F....... [ZBX-13750] fixed hover and focus style for edit dashboard cancel button, improved top nav css coding style (Andzs, ashubin)
 ........S. [ZBX-13694] disable check now for items with scheduler configuration errors (wiper)
 ...G...PS. [ZBX-9882] removed Zapcat-style and multi-level array type support in item key parameters (Andris, viktors)
@@ -282,6 +290,19 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.10rc1
+
+New features:
+
+Bug fixes:
+...G...PS. [ZBX-13782] fixed decoding of Unicode characters in JSON (Andris)
+..F....... [ZBX-13767] fixed "undefined index: acknowledges" error on problems page (agriscenko)
+..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)
+..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
+..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 3.4.9
 
 3.4.9rc3 was released as 3.4.9 without any changes
@@ -290,8 +311,6 @@ Changes for 3.4.9
 Changes for 3.4.9rc3
 
 Bug fixes:
-..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
-..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
 
 --------------------------------------------------------------------------------
@@ -304,6 +323,8 @@ Bug fixes:
 Changes for 3.4.9rc1
 
 Bug fixes:
+..F....... [ZBX-14337] fixed persistent xss in map navigation tree widget (vjaceslavs)
+..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ..F....... [ZBX-12821] fixed multiple javascript memory leaks (miks)
 ........S. [ZBX-13755] fixed proxy lastaccess update on 32-bit Zabbix server (vso)
 ..F....... [ZBX-12425] fixed selection of web items in the "Plain text" screen element (Sasha)
@@ -1505,6 +1526,11 @@ Changes for 3.0.18rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-13774] fixed creating and updating items with multiple specific scheduling intervals (Ivo)
+..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)
+..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
+..F....... [ZBX-12882] fixed in popup window being allowed to select applications from different hosts when editing item mass update form (agriscenko)
+.......PS. [ZBX-13788] fixed host availability stuck in unknown state after proxy changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17
@@ -1515,13 +1541,13 @@ Changes for 3.0.17
 Changes for 3.0.17rc2
 
 Bug fixes:
-..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ...G...... [ZBX-13781] fixed possible crash in the function "web.page.get" of Zabbix Agentd (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.17rc1
 
 Bug fixes:
+..F....... [ZBX-14336] fixed persistent xss vulnerability in services (vjaceslavs)
 ..F....... [ZBX-12425] fixed selection of web items in the "Plain text" screen element (Sasha)
 ...G...... [ZBX-13781] fixed CRLF injection in Zabbix Agentd (MVekslers)
 ........S. [ZBX-13766] fixed comparison of two large float numbers in expressions (Sergejs)
