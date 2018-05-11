@@ -91,9 +91,10 @@ $output = [
 	'body' => (new CDiv([
 		$data['message'],
 		(new CForm())
+			->cleanItems()
 			->setId('expression_testing_from')
-			->addVar('expression', $data['expression'])
-			->addVar('test_expression', 1)
+			->addItem((new CVar('expression', $data['expression']))->removeId())
+			->addItem((new CVar('test_expression', 1))->removeId())
 			->addItem([
 				$form_list,
 				(new CInput('submit', 'submit'))->addStyle('display: none;')

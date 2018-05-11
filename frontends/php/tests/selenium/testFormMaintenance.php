@@ -34,13 +34,13 @@ class testFormMaintenance extends CWebTest {
 	public $name = 'Test maintenance';
 
 	/**
-	 * Create maintenace with periods and host group.
+	 * Create maintenance with periods and host group.
 	 */
 	public function testFormMaintenance_Create() {
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create maintenance period');
 
 		// Type maintenance name.
 		$this->zbxTestInputTypeWait('mname', $this->name);

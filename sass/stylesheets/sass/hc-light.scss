@@ -1,3 +1,5 @@
+$theme_name: 'hc-light';
+
 // NOTIFICATION & ALERT
 $red: #990000;
 $light-red: #cc0000;
@@ -5,7 +7,7 @@ $lighter-red: #cc0000;
 
 $orange: #ed3400;
 
-$dark-yellow: #e99003;
+$dark-yellow: #af6b00;
 $yellow: #a78820;
 $light-yellow: #f4f4f4;
 $lighter-yellow: #f4f4f4;
@@ -161,15 +163,15 @@ $form-icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -163px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -163px -652px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -163px -688px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -198px -617px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -198px -580px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -163px -545px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -163px -581px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -163px -473px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -163px -509px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -165px -618px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -165px -654px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -165px -690px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -201px -619px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -201px -582px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -165px -546px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -165px -582px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -165px -474px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -165px -510px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -191,11 +193,14 @@ $icon-widget-btn: (
 .top-nav-zbbshare {
 	background: url(../img/icon-sprite.svg) no-repeat -165px -68px !important;
 }
+.top-nav-support {
+	background: url(../img/icon-sprite.svg) no-repeat -245px -68px !important;
+}
 .btn-search{
 	background: url(../img/icon-sprite.svg) no-repeat -162px -7px !important;
 }
 .btn-dashbrd-conf {
-	background: url(../img/icon-sprite.svg) no-repeat -200px -619px !important;
+	background: url(../img/icon-sprite.svg) no-repeat -201px -619px !important;
 }
 
 .list-table {
@@ -241,9 +246,38 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu-item {
-	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -164px -835px !important;
+.action-menu {
+
+	.action-menu-item-disabled {
+		color: $form-disabled-font-color;
+	}
+
+	.action-menu-item {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
+			background-color: black;
+			color: white;
+
+			.arrow-right {
+				border-left-color: white;
+			}
+
+			&.selected {
+
+				&::before {
+					background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
+				}
+			}
+		}
+
+		&.selected {
+
+			&::before {
+				background: url(../img/icon-sprite.svg) no-repeat -164px -835px;
+			}
+		}
 	}
 }
 
@@ -402,14 +436,16 @@ a.link-action {
 }
 
 .top-subnav a {
+
 	&.selected {
 		font-weight: bold;
-		border-bottom: 4px solid #fff !important;
+		border-bottom: 4px solid #fff;
 	}
+
 	&:focus {
 		color: $link-main-subnav-active-color;
 		padding: 8px 0 4px 0;
-		border-bottom: 4px solid rgba($ui-hover-color, .8) !important;
+		border-bottom: 4px solid rgba($ui-hover-color, .8);
 		outline: none;
 	}
 }
@@ -551,7 +587,62 @@ ul.top-nav-icons {
 	color: darken($dark-yellow, 10%);
 }
 
+.dashbrd-widget-graph-link {
+
+	&:focus {
+
+		&:after {
+			background: $blue;
+			height: 3px;
+			bottom: -3px;
+		}
+	}
+}
+
+// Tables
+
+.list-table {
+	&.compact-view {
+
+		.flh-na-bg, .flh-info-bg, .flh-warning-bg, .flh-average-bg, .flh-high-bg, .flh-disaster-bg {
+			&:not(.row-selected):not(:hover) {
+				background: none;
+			}
+		}
+
+		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
+			&:before {
+				min-height: 20px;
+				box-shadow: inset 0 -1px 0 0 $table-border-color;
+			}
+		}
+
+		td.na-bg, td.normal-bg, td.info-bg, td.warning-bg, td.average-bg, td.high-bg, td.disaster-bg {
+			&:after {
+				top: 1px;
+				transform: scale(0.8);
+			}
+		}
+
+		td {
+
+			box-shadow: inset 0 -1px 0 0 $table-border-color;
+
+			.icon-wzrd-action {
+				background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+			}
+		}
+	}
+}
+
+// Checkbox disabling
+
+.filter-highlight-row-cb {
+	display: none;
+}
+
 // SEVERITY STATUSES
+
 td.log-na-bg {
 	padding-left: 42px !important;
 	color: $font-color;
@@ -856,8 +947,19 @@ td.disaster-bg {
 	content: none;
 }
 
-.notif-body li {
-	padding: 0 0 10px 42px;
+.notif-body {
+	h4 {
+		padding-bottom: 3px;
+		margin-bottom: -3px;
+	}
+
+	p {
+		margin: 0.25em 0 2px 0;
+	}
+
+	li {
+		padding: 0 0 10px 42px;
+	}
 }
 
 .notif-indic {
@@ -937,7 +1039,8 @@ td.inactive-bg {
 // GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.1);
-	border: 2px solid rgba($font-color,0.6);
+	border: none;
+	outline: 2px solid rgba($font-color,0.6);
 }
 
 .ui-selectable-helper {

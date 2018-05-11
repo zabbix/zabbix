@@ -576,7 +576,7 @@
 		delete fields['type'];
 		delete fields['name'];
 
-		url.setArgument('action', 'dashbrd.widget.check');
+		url.setArgument('action', 'dashboard.widget.check');
 
 		if (Object.keys(fields).length != 0) {
 			ajax_data['fields'] = JSON.stringify(fields);
@@ -1272,6 +1272,7 @@
 					data = $this.data('dashboardGrid'),
 					body = data.dialogue['body'],
 					footer = $('.overlay-dialogue-footer', data.dialogue['div']),
+					header = $('.dashbrd-widget-head', data.dialogue['div']),
 					form = $('form', body),
 					widget = data.dialogue['widget'], // widget currently beeing edited
 					url = new Curl('zabbix.php'),
@@ -1281,7 +1282,7 @@
 				// Disable saving, while form is beeing updated.
 				$('.dialogue-widget-save', footer).prop('disabled', true);
 
-				url.setArgument('action', 'dashbrd.widget.config');
+				url.setArgument('action', 'dashboard.widget.edit');
 
 				if (form.length) {
 					// Take values from form.
@@ -1343,6 +1344,8 @@
 						if (typeof(resp.messages) !== 'undefined') {
 							body.append(resp.messages);
 						}
+
+						body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
 
 						// Change submit function for returned form.
 						$('#widget_dialogue_form', body).on('submit', function(e) {

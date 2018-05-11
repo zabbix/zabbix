@@ -31,6 +31,7 @@ if (!empty($data['hostid'])) {
 // Create form.
 $triggersForm = (new CForm())
 	->setName('triggersForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('expression_constructor', $data['expression_constructor'])
@@ -129,6 +130,7 @@ $expression_row = [
 			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}), null, this);'
 		)
 		->setEnabled(!$readonly)
+		->removeId()
 ];
 
 if ($data['expression_constructor'] == IM_TREE) {
@@ -190,7 +192,6 @@ $triggersFormList->addRow(
 if ($data['expression_constructor'] == IM_TREE) {
 	$expressionTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
-		->setId('exp_list')
 		->setHeader([
 			$readonly ? null : _('Target'),
 			_('Expression'),
@@ -235,6 +236,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 						? (new CCheckBox('expr_target_single', $e['id']))
 							->setChecked($i == 0)
 							->onClick('check_target(this, '.TRIGGER_EXPRESSION.');')
+							->removeId()
 						: null,
 					$e['list'],
 					!$readonly
@@ -262,7 +264,8 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value}, null,'.
 					'this);')
-		->addClass(ZBX_STYLE_BTN_LINK);
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->removeId();
 
 	if (!$allowed_testing) {
 		$testButton->setEnabled(false);
@@ -327,6 +330,7 @@ $recovery_expression_row = [
 				',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}), null, this);'
 		)
 		->setEnabled(!$readonly)
+		->removeId()
 ];
 
 if ($data['recovery_expression_constructor'] == IM_TREE) {
@@ -384,7 +388,6 @@ $triggersFormList->addRow(
 if ($data['recovery_expression_constructor'] == IM_TREE) {
 	$recovery_expression_table = (new CTable())
 		->setAttribute('style', 'width: 100%;')
-		->setId('exp_list')
 		->setHeader([
 			$readonly ? null : _('Target'),
 			_('Expression'),
@@ -430,6 +433,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 						? (new CCheckBox('recovery_expr_target_single', $e['id']))
 							->setChecked($i == 0)
 							->onClick('check_target(this, '.TRIGGER_RECOVERY_EXPRESSION.');')
+							->removeId()
 						: null,
 					$e['list'],
 					!$readonly
@@ -457,7 +461,8 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick('return PopUp("popup.testtriggerexpr",'.
 			'{expression: this.form.elements["recovery_expression"].value}, null, this);')
-		->addClass(ZBX_STYLE_BTN_LINK);
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->removeId();
 
 	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
@@ -606,6 +611,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 					: (new CButton('remove', _('Remove')))
 						->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
 						->addClass(ZBX_STYLE_BTN_LINK)
+						->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('dependency_'.$dependency['triggerid'])
 	);

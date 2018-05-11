@@ -5,7 +5,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, .article, aside, canvas, details, embed, figure, figcaption, footer, .footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, main, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -14,7 +14,7 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline; }
 
-article, .article, aside, details, figcaption, figure, footer, .footer, header, hgroup, menu, nav, .nav, section {
+article, main, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
   display: block; }
 
 body {
@@ -164,18 +164,23 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-nav, .nav {
-  background-color: #e0e0e0; }
-
-nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hover, nav a:focus, .nav a:focus, nav a:active, .nav a:active, .ui-tabs-nav li a, .ui-tabs-nav li.ui-state-disabled a {
-  border: none; }
-
 .top-nav-container {
+  background-color: #000;
   height: 45px;
   line-height: 45px;
-  padding: 0 10px 0 10px;
-  position: relative;
-  background-color: #000; }
+  padding: 0 10px;
+  position: relative; }
+
+.top-nav a:active, .top-nav a:hover, .top-nav a:link, .top-nav a:visited,
+.top-subnav a:active,
+.top-subnav a:hover,
+.top-subnav a:link,
+.top-subnav a:visited,
+.header-logo:active,
+.header-logo:hover,
+.header-logo:link,
+.header-logo:visited {
+  border: none; }
 
 .top-nav {
   font-size: 1.167em;
@@ -268,6 +273,10 @@ ul.top-nav-icons {
     width: auto;
     padding: 0 6px 0 17px;
     -webkit-transform-style: preserve-3d; }
+  ul.top-nav-icons .top-nav-support {
+    background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
+    width: auto;
+    padding: 0 6px 0 17px; }
   ul.top-nav-icons form {
     position: relative; }
   ul.top-nav-icons input {
@@ -278,7 +287,12 @@ ul.top-nav-icons {
     color: #fff;
     padding: 4px 24px 4px 5px;
     opacity: 1;
-    filter: alpha(opacity=100); }
+    filter: alpha(opacity=100);
+    transition: width 0.5s;
+    -webkit-transition: width 0.5s; }
+    @media (max-width: 1050px) {
+      ul.top-nav-icons input {
+        width: 130px; } }
     ul.top-nav-icons input:focus {
       background-color: #383838;
       border: 1px solid #666;
@@ -289,11 +303,11 @@ ul.top-nav-icons {
       filter: alpha(opacity=100); }
 
 .top-subnav-container {
+  background-color: #e0e0e0;
   height: 30px;
   line-height: 30px;
-  background-color: #e0e0e0;
-  position: relative;
-  padding: 0 10px; }
+  padding: 0 10px;
+  position: relative; }
 
 .top-subnav {
   background-color: #e0e0e0;
@@ -316,17 +330,17 @@ ul.top-nav-icons {
     color: rgba(0, 0, 0, 0.8); }
   .top-subnav a:hover {
     color: black; }
-  .top-subnav a:focus {
-    color: black;
-    padding: 8px 0 4px 0;
-    border-bottom: 4px solid rgba(34, 34, 34, 0.5) !important;
-    outline: none; }
   .top-subnav a:active {
     color: black; }
-  .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+  .top-subnav a:focus {
+    border-bottom: 4px solid rgba(34, 34, 34, 0.5) !important;
     color: black;
-    padding: 8px 0 4px 0;
-    border-bottom: 4px solid white; }
+    outline: none;
+    padding-bottom: 4px; }
+  .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+    border-bottom: 4px solid white;
+    color: black;
+    padding-bottom: 4px; }
 
 .arrow-up {
   border-left: 4px solid transparent;
@@ -381,6 +395,8 @@ ul.top-nav-icons {
     vertical-align: top;
     position: relative;
     padding: 0 0 0 10px; }
+  .header-title ul ul li:first-child {
+    padding-left: 0; }
   .header-title .dashbrd-edit {
     position: relative;
     display: inline-block;
@@ -405,7 +421,7 @@ ul.top-nav-icons {
       .header-title .dashbrd-edit ul li .btn-dashbrd-conf {
         vertical-align: middle; }
 
-article, .article {
+article, main {
   padding: 10px 10px 0 10px; }
 
 .object-group {
@@ -439,13 +455,16 @@ article, .article {
   .hor-list li:last-child {
     margin: 0; }
 
-footer, .footer {
+footer {
   position: absolute;
   bottom: 0;
   width: 100%;
   height: 30px;
   text-align: center;
   color: #cacaca; }
+
+output {
+  display: block; }
 
 .logo {
   float: left;
@@ -468,6 +487,36 @@ footer, .footer {
   background-color: #000;
   border-collapse: separate;
   border: 1px solid #444; }
+  .list-table.compact-view .link-action {
+    color: #fff; }
+    .list-table.compact-view .link-action.red {
+      color: #ff5050; }
+    .list-table.compact-view .link-action.orange {
+      color: #ff7800; }
+    .list-table.compact-view .link-action.yellow {
+      color: #ffa20d; }
+    .list-table.compact-view .link-action.green {
+      color: #23d545; }
+    .list-table.compact-view .link-action:hover {
+      color: #fff; }
+    .list-table.compact-view .link-action:focus {
+      color: #fff; }
+  .list-table.compact-view td {
+    padding: 2px 5px 2px 5px;
+    border-bottom: none;
+    box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.1);
+    color: #fff; }
+    .list-table.compact-view td .tag {
+      max-width: 40px;
+      margin: -2px 3px 0 0;
+      padding: 2px 3px; }
+    .list-table.compact-view td .rel-container {
+      display: inline; }
+    .list-table.compact-view td .icon-wzrd-action {
+      margin: 2px 0 0 2px;
+      height: 12px;
+      min-height: 12px;
+      background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px; }
   .list-table thead th {
     color: #cacaca;
     height: 100%;
@@ -776,13 +825,19 @@ footer, .footer {
       padding: 8px 5px 5px 5px;
       border-bottom-width: 1px; }
 
+.subfilter,
 .subfilter-enabled {
   display: inline-block;
-  position: relative;
   height: 18px;
-  padding: 0 4px;
-  color: #fff;
+  position: relative; }
+
+.subfilter {
+  margin-right: 10px; }
+
+.subfilter-enabled {
   background-color: #ddd;
+  color: #fff;
+  padding: 0 4px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
@@ -913,7 +968,7 @@ footer, .footer {
 
 .suggest-found {
   font-weight: bold;
-  color: #e99003; }
+  color: #ffa20d; }
 
 .scrollbar {
   position: relative;
@@ -1146,18 +1201,30 @@ footer, .footer {
     position: relative;
     display: inline-block;
     margin: 0 -1px 0 0; }
-    .radio-segmented li:first-child label {
-      -webkit-border-radius: 2px 0 0 2px;
-      -moz-border-radius: 2px 0 0 2px;
-      border-radius: 2px 0 0 2px; }
-    .radio-segmented li:last-child label {
-      -webkit-border-radius: 0 2px 2px 0;
-      -moz-border-radius: 0 2px 2px 0;
-      border-radius: 0 2px 2px 0; }
-    .radio-segmented li:only-child label {
-      -webkit-border-radius: 2px;
-      -moz-border-radius: 2px;
-      border-radius: 2px; }
+    .radio-segmented li:first-child {
+      -webkit-border-radius: 3px 0 0 3px;
+      -moz-border-radius: 3px 0 0 3px;
+      border-radius: 3px 0 0 3px; }
+      .radio-segmented li:first-child label {
+        -webkit-border-radius: 2px 0 0 2px;
+        -moz-border-radius: 2px 0 0 2px;
+        border-radius: 2px 0 0 2px; }
+    .radio-segmented li:last-child {
+      -webkit-border-radius: 0 3px 3px 0;
+      -moz-border-radius: 0 3px 3px 0;
+      border-radius: 0 3px 3px 0; }
+      .radio-segmented li:last-child label {
+        -webkit-border-radius: 0 2px 2px 0;
+        -moz-border-radius: 0 2px 2px 0;
+        border-radius: 0 2px 2px 0; }
+    .radio-segmented li:only-child {
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      border-radius: 3px; }
+      .radio-segmented li:only-child label {
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px; }
   .radio-segmented label {
     padding: 4px 11px;
     border: 1px solid #666;
@@ -1543,31 +1610,31 @@ button {
   background: #e0e0e0 url(../img/icon-sprite.svg) no-repeat -7px -439px; }
 
 .btn-widget-action {
-  background: url(../img/icon-sprite.svg) no-repeat -4px -616px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -618px; }
 
 .btn-widget-collapse {
-  background: url(../img/icon-sprite.svg) no-repeat -5px -652px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -654px; }
 
 .btn-widget-expand {
-  background: url(../img/icon-sprite.svg) no-repeat -5px -688px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -689px; }
 
 .btn-widget-edit {
-  background: url(../img/icon-sprite.svg) no-repeat -39px -617px; }
+  background: url(../img/icon-sprite.svg) no-repeat -42px -619px; }
 
 .btn-widget-delete {
-  background: url(../img/icon-sprite.svg) no-repeat -39px -580px; }
+  background: url(../img/icon-sprite.svg) no-repeat -42px -582px; }
 
 .btn-alarm-on {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -545px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -546px; }
 
 .btn-alarm-off {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -581px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -582px; }
 
 .btn-sound-on {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -473px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -474px; }
 
 .btn-sound-off {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -509px; }
+  background: url(../img/icon-sprite.svg) no-repeat -6px -510px; }
 
 .btn-dashbrd-conf {
   background: url(../img/icon-sprite.svg) no-repeat -42px -619px; }
@@ -1590,8 +1657,9 @@ button {
     filter: alpha(opacity=0); }
 
 .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off {
-  width: 30px;
-  height: 28px; }
+  width: 24px;
+  height: 24px;
+  margin: 2px 2px 0 0; }
 
 .btn-dashbrd-conf {
   width: 24px;
@@ -1607,10 +1675,6 @@ button {
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
-  .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-widget-delete:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-dashbrd-conf:focus {
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none; }
 
 .btn-conf, .btn-kiosk, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
@@ -1676,6 +1740,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .ui-tabs-nav li {
     display: inline-block; }
     .ui-tabs-nav li a {
+      border: none;
       padding: 8px 10px;
       -webkit-transition: background-color 0.2s ease-out;
       -moz-transition: background-color 0.2s ease-out;
@@ -1698,7 +1763,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .ui-tabs-nav li.ui-state-disabled a {
       cursor: default;
       color: #7d7d7d;
-      background-color: transparent; }
+      background-color: transparent;
+      border: none; }
 
 .icon-maint {
   margin: 0 18px 0 0; }
@@ -2231,6 +2297,19 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: inline-block;
     padding: 8px 0 8px 13px; }
 
+.dashbrd-widget-graph-link {
+  display: block; }
+  .dashbrd-widget-graph-link:link {
+    border: none; }
+  .dashbrd-widget-graph-link:focus:after {
+    content: "";
+    background: rgba(255, 255, 255, 0.35);
+    height: 2px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px; }
+
 .action-menu {
   position: absolute;
   z-index: 1000;
@@ -2243,6 +2322,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .action-menu:focus {
+    outline: none; }
   .action-menu li {
     display: block; }
     .action-menu li div {
@@ -2263,11 +2344,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -webkit-transition: background-color 0.2s ease-out;
     -moz-transition: background-color 0.2s ease-out;
     transition: background-color 0.2s ease-out; }
-    .action-menu .action-menu-item:hover {
-      background-color: #454545; }
-    .action-menu .action-menu-item:focus {
-      background-color: #454545; }
-    .action-menu .action-menu-item:active {
+    .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
       background-color: #454545; }
     .action-menu .action-menu-item.selected::before {
       display: block;
@@ -2353,7 +2430,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
-      top: -12px;
+      top: -13px;
       right: -8px; }
   .overlay-dialogue.modal-popup {
     max-width: 1024px;
@@ -2585,7 +2662,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   z-index: 98;
   overflow: hidden;
   background-color: rgba(167, 136, 32, 0.35);
-  border: 1px solid rgba(233, 144, 3, 0.6);
+  border: 1px solid rgba(255, 162, 13, 0.6);
   border-top: none;
   border-bottom: none; }
 
@@ -2593,13 +2670,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: absolute;
   z-index: 100;
   background-color: rgba(167, 136, 32, 0.35);
-  border: 1px solid rgba(233, 144, 3, 0.6); }
+  border: 1px solid rgba(255, 162, 13, 0.6); }
 
 #map-area .map-element-area-bg {
   background-color: rgba(69, 69, 69, 0.35); }
 
 .map-element-selected {
-  border: 3px dashed #e99003;
+  border: 3px dashed #ffa20d;
   margin: -3px; }
 
 .debug-output {
@@ -2659,7 +2736,7 @@ a.orange:hover, a.orange:focus {
   color: #fff; }
 
 .yellow, a.yellow {
-  color: #e99003; }
+  color: #ffa20d; }
 
 a.yellow:hover, a.yellow:focus {
   color: #fff; }
@@ -2686,10 +2763,14 @@ a.link-action {
   color: #fff; }
   a.link-action.red {
     color: #ff5050; }
-  a.link-action.green {
-    color: #23d545; }
   a.link-action.orange {
     color: #ff7800; }
+  a.link-action.yellow {
+    color: #ffa20d; }
+  a.link-action.green {
+    color: #23d545; }
+  a.link-action.grey {
+    color: #cacaca; }
   a.link-action:hover {
     color: #fff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
@@ -2905,6 +2986,14 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
 .inactive-bg, td.inactive-bg {
   color: #4b0c0c;
   background-color: #e45959; }
+
+.table-forms-second-column {
+  display: inline-block;
+  width: 50%;
+  min-width: 200px;
+  text-align: right; }
+  .table-forms-second-column .second-column-label {
+    padding: 0 10px; }
 
 .problem-unack-fg {
   color: #ff3333; }
@@ -3346,6 +3435,8 @@ tr.cursor-move td * {
   white-space: nowrap; }
   .rel-container .icon-info {
     margin-right: 10px; }
+    .rel-container .icon-info:only-of-type {
+      margin-right: 0; }
     .rel-container .icon-info:last-child {
       margin-right: 0; }
 
@@ -3552,7 +3643,7 @@ svg {
   .navtree .tree .tree-item > .tree-row {
     width: 100%;
     min-width: 320px;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid #333;
     padding: 8px 0; }
     .navtree .tree .tree-item > .tree-row:hover {
       background-color: #222; }
@@ -3589,6 +3680,11 @@ svg {
         border: 0px none;
         opacity: 0.5;
         float: left; }
+        .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn::-moz-focus-inner,
+        .navtree .tree .tree-item > .tree-row > .tools .remove-item-btn::-moz-focus-inner,
+        .navtree .tree .tree-item > .tree-row > .tools .import-items-btn::-moz-focus-inner,
+        .navtree .tree .tree-item > .tree-row > .tools .add-child-btn::-moz-focus-inner {
+          padding: 0; }
       .navtree .tree .tree-item > .tree-row > .tools .edit-item-btn:hover,
       .navtree .tree .tree-item > .tree-row > .tools .remove-item-btn:hover,
       .navtree .tree .tree-item > .tree-row > .tools .import-items-btn:hover,
@@ -3685,885 +3781,6 @@ svg {
 :placeholder-shown {
   color: #bbb; }
 
-/*doc
----
-//title: About
-name: about
-category: About
----
-
-##About the Zabbix Styleguide
-
-The Zabbix styleguide is our journey to the bright future of a more modular and systematic approach to design. It is a single source of information for front-end developers and designers. Instead of reinventing the wheel every time there is a need to implement an already existing UI pattern, developers can consult with the styleguide.
-
-* A common design language inside the company and community
-* More modular approach to design, reusable components
-* A single source of information for front-end developers
-
-May the force be with you!
-*/
-/*doc
----
-//title: Components
-name: components
-category: Components
----
-*/
-/*doc
----
-parent: components
-title: Typography
-name: typography
----
-
-The default font face is Arial. Relative units (em) should be used to set the type size and line height.
-
-##Headings
-
-```html_example
-<h1>Main Heading</h1><br>
-<h2>Section Header</h2><br>
-<h3>Contextual Menu Heading</h3><br>
-<h4>Widget and Dialog Heading</h4>
-```
-
-##Paragraphs
-
-Paragraphs are used to visually separate blocks of multiple sentences.
-
-```html_example
-<p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
-<p class="grey">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
-```
-*/
-/*doc
----
-parent: components
-title: Tables
-name: table
----
-
-Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Test host</a></td>
-            <td><a href="">Applications</a></td>
-            <td><a href="">Items</a></td>
-            <td><a href="">Triggers</a></td>
-            <td><a href="">Graphs</a></td>
-            <td><a href="">Discovery</a></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr class="row-selected">
-            <td><input type="checkbox" checked=""></td>
-            <td><a href="">Zabbix server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Main server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Backup server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Table with Pagination
-
-Pagination is used to separate large amounts of tabular data into descrete peices.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Test host</a></td>
-            <td><a href="">Applications</a></td>
-            <td><a href="">Items</a></td>
-            <td><a href="">Triggers</a></td>
-            <td><a href="">Graphs</a></td>
-            <td><a href="">Discovery</a></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr class="row-selected">
-            <td><input type="checkbox" checked=""></td>
-            <td><a href="">Zabbix server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Main server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Backup server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-<div class="table-paging">
-   <a href=""><span class="arrow-left"></span></a><a href="">1</a><a href="" class="paging-selected">2</a><a href="">3</a><a href=""><span class="arrow-right"></span></a>
-</div>
-```
-
-##Table with No Results
-
-In cases when no data can be shown, table should be accompanied by an explanatory text. It should not be left blank.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr class="nothing-to-show">
-            <td colspan="11">We couldn't find any results</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Tables with Elements and Highlights
-
-Besides textual information tables may contain other elements like icons. Table cells may be highlighted with various colors, for example to indicate severity level.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Example</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>Alert labels</td>
-            <td>asdasasdasd</td>
-            <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
-         </tr>
-         <tr>
-            <td>Icons</td>
-            <td>asdasasdasd</td>
-            <td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
-         </tr>
-         <tr>
-            <td>Links with icons</td>
-            <td>asdasasdasd</td>
-            <td><span class="rel-container"><a href="">Some link</a><span class="icon-maint cursor-pointer"></span></span></td>
-         </tr>
-         <tr>
-            <td>Labels</td>
-            <td>asdasasdasd</td>
-            <td>
-               <div class="status-container"><span class="status-green">label</span> <span class="status-grey">label</span></div>
-               <div class="status-container"><span class="status-red">label</span></div>
-            </td>
-         </tr>
-         <tr>
-            <td>Tree</td>
-            <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
-            <td>
-               <div class="treeview"><span class="arrow-right"></span></div>
-               <a href="#">Collapsed</a>
-               <div class="treeview"><span class="arrow-down"></span></div>
-               <a href="#">Expanded</a>
-            </td>
-         </tr>
-          <tr>
-            <td>Severity</td>
-            <td>asdasd</td>
-            <td class="normal-bg">
-               <span class="link-action">25</span>
-            </td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-*/
-/*doc
----
-parent: components
-title: Forms
-name: forms
----
-
-Forms contain UI elements that are used to submit information.
-
-##Primary Button
-
-```html_example
-<button type="button">Primary Button</button>
-<button type="button" disabled>Primary Button</button>
-```
-
-##Secondary Button
-
-```html_example
-<button type="button" class="btn-alt">Secondary Button</button>
-<button type="button" class="btn-alt" disabled>Secondary Button</button>
-```
-
-##Form Button
-
-```html_example
-<button type="button" class="btn-grey">Form Button</button>
-<button type="button" class="btn-grey" disabled>Form Button</button>
-```
-
-##Link Button
-
-```html_example
-<button type="button" class="btn-link">Link Button</button>
-<button type="button" class="btn-link" disabled>Link Button</button>
-```
-
-##Icon Button
-
-```html_example
-<button type="button" class="btn-max" title="Maximize"></button>
-<button type="button" class="btn-max" title="Maximize" disabled></button>
-```
-
-##Inputs
-
-Text on html5 input types
-
-```html_example
-<ul class="table-forms">
-   <li>
-      <div class="table-forms-td-left"><label for="DefaultInput">Default Input</label></div>
-      <div class="table-forms-td-right">
-         <input type="text" placeholder="Text" id="DefaultInput">
-         <div class="red">You can't leave this empty.</div>
-      </div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="ReadOnlyInput" readonly></div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="ButtonInput">Input with a Button</label></div>
-      <div class="table-forms-td-right">
-         <input type="text" placeholder="Text" id="ButtonInput"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
-      </div>
-   </li>
-</ul>
-```
-
-##Selects
-
-```html_example
-<select>
-   <option>Select options</option>
-   <option>Option 1</option>
-   <option>Option 2</option>
-   <option>Option 3</option>
-</select>
-<select disabled>
-   <option>Select options</option>
-   <option>Option 1</option>
-   <option>Option 2</option>
-   <option>Option 3</option>
-</select>
-```
-
-## Radios
-
-```html_example
-<label for="Radio"><input type="radio" id="Radio">I am a radio</label>
-<label for="RadioDisbld"><input type="radio" id="RadioDisbld" disabled>I am a disabled radio</label>
-```
-
-## Segmented Radio Controls
-
-```html_example
-<p>
-<ul class="radio-segmented">
-   <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
-</ul>
-</p>
-```
-
-## Checkboxes
-
-```html_example
-<label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
-<label for="ChecBoxkDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
-```
-
-## Radio and Checkbox Lists
-
-```html_example
-<ul class="list-check-radio">
-   <li><label for="RadioDescr"><input type="radio" id="RadioDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
-   <li><label for="CheckBoxDescr"><input type="checkbox" id="CheckBoxDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
-</ul>
-```
-*/
-/*doc
----
-parent: components
-title: Dialogs
-name: dialog
----
-
-Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clicking/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
-
-##Alert Dialogs
-
-Alert dialogs are used to urgently inform the user about a certain situation. Primary action button, labeled with the specific action, should be furthest to the right and continue the process. Secondary action button should be placed to the left of the primary action button and return the user to the general screen. Avoid labeling buttons with *No*, *Ok*, *Confirm*, *Done* and asking equally uninformative questions like *Are you sure?*
-
-```html_example
-<div class="overlay-dialogue">
-   <!--<span class="overlay-close-btn"></span>-->
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Delete the selected item?</h4>
-   </div>
-   <div class="overlay-dialogue-body">Some explanatory information</div>
-   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
-</div>
-
-<div class="overlay-dialogue">
-   <!--<span class="overlay-close-btn"></span>-->
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Delete the selected item?</h4>
-   </div>
-   <div class="overlay-dialogue-body"></div>
-   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
-</div>
-```
-
-##Dialogs with Scrollable Content
-
-In exceptional cases dialogs may contain additional information inside a scrollable area.
-
-```html_example
-<div class="overlay-dialogue" style="max-width: 500px">
-   <span class="overlay-close-btn"></span>
-   <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments.
-   </div>
-   <div class="overlay-descr-url"><a href="">A random link goes here</a></div>
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Duration</th>
-            <th>Age</th>
-            <th>Ack</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>2015-09-08 13:47:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>15d 23h 45m</td>
-            <td>15d 23h 45m</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-05 06:14:58</td>
-            <td><span class="green">OK</span></td>
-            <td>1m 4d 7h</td>
-            <td>1m 20d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-05 05:32:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>42m</td>
-            <td>1m 20d 8h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-04 06:11:58</td>
-            <td><span class="green">OK</span></td>
-            <td>23h 21m</td>
-            <td>1m 21d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-04 05:38:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>33m</td>
-            <td>1m 21d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Contextual Dialogs
-
-Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
-
-```html_example
-<ul class="action-menu">
-   <li>
-      <h3>Favourite screens</h3>
-   </li>
-   <li><span class="action-menu-item">Add</span></li>
-   <li>
-      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
-      <ul class="action-menu" style="top: 47px; left: 203px;">
-         <li><span class="action-menu-item">Zabbix server</span></li>
-      </ul>
-   </li>
-   <li><span class="action-menu-item">Remove all</span></li>
-   <li>
-      <div></div>
-   </li>
-   <li>
-      <h3>Favourite slide shows</h3>
-   </li>
-   <li><span class="action-menu-item selected">Add</span></li>
-   <li><span class="action-menu-item-disabled">Remove</span></li>
-   <li><span class="action-menu-item-disabled">Remove all</span></li>
-</ul>
-```
-*/
-/*doc
----
-parent: components
-title: Notifications
-name: notifications
----
-
-Notificatiions are used to provide feedback after certain actions or give information.
-
-##Success Notification
-
-Success notification appears after an action has been completed without errors. Has green background.
-
-```html_example
-<div class="msg-good">
-   Well done! You successfully added new parameters.
-   <div class="msg-details">
-      <span class="link-action">Details</span>
-      <ul class="msg-details-border">
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-      </ul>
-   </div>
-   <span class="overlay-close-btn" title="Close"></span>
-</div>
-```
-
-##Error Notification
-
-Error notification appears after an action has been completed with errors or an error in general. Has red background.
-
-```html_example
-<div class="msg-bad">
-   Oh snap! Check form fields and try submitting again.
-   <div class="msg-details">
-      <span class="link-action">Details</span>
-      <ul class="msg-details-border">
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-      </ul>
-   </div>
-   <span class="overlay-close-btn" title="Close"></span>
-</div>
-```
-
-##Global Notification
-
-Global notification.
-
-```html_example
-<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
-```
-*/
-/*doc
----
-parent: components
-title: Icons
-name: icons
----
-
-Icons:
-
-```html_example
-<div class="icon-help"></div>
-```
-*/
-/*doc
----
-parent: components
-title: Datepickers
-name: date
----
-
-Datepickers are used to select a single date or a date range.
-
-```html_example
-<div class="overlay-dialogue calendar">
-   <div class="calendar-header">
-      <div class="calendar-year">
-         <button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button>
-      </div>
-      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
-   </div>
-   <table>
-      <thead>
-         <tr>
-            <th>M</th>
-            <th>T</th>
-            <th>W</th>
-            <th>T</th>
-            <th>F</th>
-            <th>S</th>
-            <th>S</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td class="grey">29</td>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
-         </tr>
-         <tr>
-            <td>7</td>
-            <td>8</td>
-            <td>9</td>
-            <td>10</td>
-            <td>11</td>
-            <td>12</td>
-            <td>13</td>
-         </tr>
-         <tr>
-            <td>14</td>
-            <td>15</td>
-            <td class="selected">16</td>
-            <td>17</td>
-            <td>18</td>
-            <td>19</td>
-            <td>20</td>
-         </tr>
-         <tr>
-            <td>21</td>
-            <td>22</td>
-            <td>23</td>
-            <td>24</td>
-            <td>25</td>
-            <td>26</td>
-            <td>27</td>
-         </tr>
-         <tr>
-            <td>28</td>
-            <td>29</td>
-            <td>30</td>
-            <td>31</td>
-            <td class="grey">1</td>
-            <td class="grey">2</td>
-            <td class="grey">3</td>
-         </tr>
-         <tr>
-            <td class="grey">4</td>
-            <td class="grey">5</td>
-            <td class="grey">6</td>
-            <td class="grey">7</td>
-            <td class="grey">8</td>
-            <td class="grey">9</td>
-            <td class="grey">10</td>
-         </tr>
-      </tbody>
-   </table>
-   <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
-   <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Set date</button></div>
-</div>
-```
-*/
-/*doc
----
-parent: components
-title: Navigation
-name: navigation
----
-
-##Main Navigation
-
-Main navigation is used to jump between high level sections of the application.
-
-```html_example
-<nav role="navigation">
-   <div class="top-nav-container">
-      <ul class="top-nav">
-         <li class="selected"><a href="#">Monitoring</a></li>
-         <li><a href="#">Inventory</a></li>
-         <li><a href="#">Reports</a></li>
-         <li><a href="#">Configuration</a></li>
-         <li><a href="#">Administration</a></li>
-      </ul>
-      <!--<ul class="top-nav-icons">
-         <li>
-            <form><input type="text"><button type="button" class="btn-search"></button></form>
-         </li>
-         <li><a href="#" class="top-nav-help" title="Help"></a></li>
-         <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
-         <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
-         <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
-      </ul>-->
-   </div>
-   <div class="top-subnav-container">
-      <ul class="top-subnav">
-         <li><a href="#" class="selected">Dashboard</a></li>
-         <li><a href="#">Overview</a></li>
-         <li><a href="#">Web</a></li>
-         <li><a href="#">Latest data</a></li>
-         <li><a href="#">Triggers</a></li>
-         <li><a href="#">Events</a></li>
-         <li><a href="#">Graphs</a></li>
-         <li><a href="#">Screens</a></li>
-         <li><a href="#">Maps</a></li>
-         <li><a href="#">Discovery</a></li>
-         <li><a href="#">Services</a></li>
-      </ul>
-      <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
-   </div>
-</nav>
-```
-
-##Object Navigation
-
-```html_example
-<ul class="object-group">
-   <li><b><a href="#">All hosts</a> / Zabbix server:</b></li>
-   <li class="green">Enabled</li>
-   <li>
-      <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
-   </li>
-   <li><span class="selected"><a href="#">Discovery</a></span></li>
-   <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
-   <li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li>
-   <li><span><a href="#">Triggers</a>&nbsp;<sup>41</sup></span></li>
-   <li><span><a href="#">Graphs</a>&nbsp;<sup>11</sup></span></li>
-   <li><span><a href="#">Discovery rules</a>&nbsp;<sup>2</sup></span></li>
-   <li><span><a href="#">Web scenarios</a></span></li>
-</ul>
-```
-
-##Tabs
-
-Tabs are used to switch between sections of grouped content. Don't use tabs as a navigation between urelated content.
-
-```html_example
-<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
-```
-*/
-/*doc
----
-parent: components
-title: Links
-name: links
----
-
-A link is used to navigate through different parts of the front-end. *Alternative* links are used to indicate a particular state or type. *Action* links are used call out any additional content, like contextual menus and popovers.
-
-```html_example
-<p><a href="#">Default link</a></p>
-<p><a href="#" class="grey link-alt">Alternative link</a></p>
-<p><a href="#" class="green link-alt">Alternative link</a></p>
-<p><a href="#" class="red link-alt">Alternative link</a></p>
-<p><span class="link-action">Action link</span></p>
-<p><span class="green link-action">Action link</span></p>
-<p><span class="yellow link-action">Action link</span></p>
-<span class="red link-action">Action link</span>
-```
-*/
-/*doc
----
-parent: components
-title: Labels
-name: labels
----
-
-Labels add information. Different colors
-
-```html_example
-<div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
-```
-*/
-/*doc
----
-parent: components
-title: Progress Indicators
-name: progress
----
-
-Progress indocators are used to show data retrieval or an ongoing computation. Use progress indicators to make UI look more fast and responsive.
-
-```html_example
-<div class="preloader-container">
-   <div class="preloader"></div>
-</div>
-```
-*/
-/*doc
----
-parent: components
-title: Widgets
-name: widgets
----
-
-Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*. Widgets can be collapsed and expanded.
-
-```html_example
-<div class="dashbrd-widget">
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Favorite screens</h4>
-      <ul>
-         <li><button type="button" class="btn-widget-action" title="Action"></button></li>
-         <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
-         <!--<li><button type="button" class="btn-widget-expand" title="Expand"></button></li>-->
-      </ul>
-   </div>
-   <table class="list-table">
-      <tbody>
-         <tr>
-            <td><a href="#">Zabbix server</a></td>
-         </tr>
-         <tr>
-            <td><a href="#">My 2nd megaserver</a></td>
-         </tr>
-      </tbody>
-   </table>
-   <ul class="dashbrd-widget-foot">
-      <li><a href="#">Screens</a></li>
-      <li><a href="#">Slide shows</a></li>
-   </ul>
-</div>
-```
-*/
 .icon-maint {
   margin: 0 18px 0 0; }
   .icon-maint::before {
@@ -4622,31 +3839,31 @@ Widgets are used as containers to group any related information. Widget consists
   background: #e0e0e0 url(../img/icon-sprite.svg) no-repeat -43px -439px; }
 
 .btn-widget-action {
-  background: url(../img/icon-sprite.svg) no-repeat -317px -616px; }
+  background: url(../img/icon-sprite.svg) no-repeat -318px -618px; }
 
 .btn-widget-collapse {
-  background: url(../img/icon-sprite.svg) no-repeat -315px -652px; }
+  background: url(../img/icon-sprite.svg) no-repeat -318px -654px; }
 
 .btn-widget-expand {
-  background: url(../img/icon-sprite.svg) no-repeat -315px -688px; }
+  background: url(../img/icon-sprite.svg) no-repeat -318px -690px; }
 
 .btn-widget-edit {
-  background: url(../img/icon-sprite.svg) no-repeat -351px -617px; }
+  background: url(../img/icon-sprite.svg) no-repeat -354px -619px; }
 
 .btn-widget-delete {
-  background: url(../img/icon-sprite.svg) no-repeat -351px -580px; }
+  background: url(../img/icon-sprite.svg) no-repeat -354px -582px; }
 
 .btn-alarm-on {
-  background: url(../img/icon-sprite.svg) no-repeat -315px -545px; }
+  background: url(../img/icon-sprite.svg) no-repeat -318px -546px; }
 
 .btn-alarm-off {
-  background: url(../img/icon-sprite.svg) no-repeat -315px -581px; }
+  background: url(../img/icon-sprite.svg) no-repeat -318px -582px; }
 
 .btn-sound-on {
-  background: url(../img/icon-sprite.svg) no-repeat -315px -473px; }
+  background: url(../img/icon-sprite.svg) no-repeat -318px -474px; }
 
 .btn-sound-off {
-  background: url(../img/icon-sprite.svg) no-repeat -315px -509px; }
+  background: url(../img/icon-sprite.svg) no-repeat -318px -510px; }
 
 .top-nav-help {
   background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important; }
@@ -4659,6 +3876,9 @@ Widgets are used as containers to group any related information. Widget consists
 
 .top-nav-zbbshare {
   background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important; }
+
+.top-nav-support {
+  background: url(../img/icon-sprite.svg) no-repeat -245px -32px !important; }
 
 .btn-search {
   background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important; }
@@ -4689,8 +3909,18 @@ Widgets are used as containers to group any related information. Widget consists
 .icon .center {
   background: url(../img/icon-sprite.svg) no-repeat -325px -799px !important; }
 
-.action-menu-item::before {
-  background: url(../img/icon-sprite.svg) no-repeat -317px -835px !important; }
+.action-menu {
+  background-color: #383838;
+  border: 1px solid #666; }
+  .action-menu .action-menu-item-disabled {
+    color: #7d7d7d; }
+  .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
+    background-color: black;
+    color: white; }
+    .action-menu .action-menu-item:hover .arrow-right, .action-menu .action-menu-item:focus .arrow-right, .action-menu .action-menu-item:active .arrow-right, .action-menu .action-menu-item.highlighted .arrow-right {
+      border-left-color: white; }
+  .action-menu .action-menu-item.selected::before {
+    background: url(../img/icon-sprite.svg) no-repeat -317px -835px; }
 
 ul.top-nav-icons input {
   border: 1px solid #666 !important;
@@ -4909,6 +4139,27 @@ ul.top-nav-icons a:focus {
 
 .suggest-found {
   color: #ffd98c; }
+
+.dashbrd-widget-graph-link:focus:after {
+  background: white;
+  height: 3px;
+  bottom: -3px; }
+
+.list-table.compact-view .flh-na-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-info-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-warning-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-average-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-high-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-disaster-bg:not(.row-selected):not(:hover) {
+  background: none; }
+.list-table.compact-view td.na-bg:before, .list-table.compact-view td.normal-bg:before, .list-table.compact-view td.info-bg:before, .list-table.compact-view td.average-bg:before, .list-table.compact-view td.warning-bg:before, .list-table.compact-view td.high-bg:before, .list-table.compact-view td.disaster-bg:before, .list-table.compact-view td.normal-bg:before, .list-table.compact-view td.info-bg:before, .list-table.compact-view td.warning-bg:before, .list-table.compact-view td.average-bg:before, .list-table.compact-view td.high-bg:before, .list-table.compact-view td.disaster-bg:before {
+  min-height: 20px;
+  box-shadow: inset 0 -1px 0 0 #333; }
+.list-table.compact-view td.na-bg:after, .list-table.compact-view td.normal-bg:after, .list-table.compact-view td.info-bg:after, .list-table.compact-view td.average-bg:after, .list-table.compact-view td.warning-bg:after, .list-table.compact-view td.high-bg:after, .list-table.compact-view td.disaster-bg:after, .list-table.compact-view td.normal-bg:after, .list-table.compact-view td.info-bg:after, .list-table.compact-view td.warning-bg:after, .list-table.compact-view td.average-bg:after, .list-table.compact-view td.high-bg:after, .list-table.compact-view td.disaster-bg:after {
+  top: 1px;
+  transform: scale(0.8); }
+.list-table.compact-view td {
+  box-shadow: inset 0 -1px 0 0 #333; }
+  .list-table.compact-view td .icon-wzrd-action {
+    background: transparent url(../img/icon-sprite.svg) no-repeat -318px -624px; }
+
+.filter-highlight-row-cb {
+  display: none; }
 
 td.log-na-bg, td.log-info-bg, td.log-warning-bg, td.log-high-bg, td.log-disaster-bg {
   padding-left: 42px !important;
@@ -5131,6 +4382,11 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .disaster-bg.blink-hidden:after {
   content: none; }
 
+.notif-body h4 {
+  padding-bottom: 3px;
+  margin-bottom: -3px; }
+.notif-body p {
+  margin: 0.25em 0 2px 0; }
 .notif-body li {
   padding: 0 0 10px 42px; }
 
@@ -5194,7 +4450,8 @@ td.inactive-bg {
 
 .graph-selection {
   background-color: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.6); }
+  border: none;
+  outline: 2px solid rgba(255, 255, 255, 0.6); }
 
 .ui-selectable-helper {
   background-color: rgba(255, 255, 255, 0.2);

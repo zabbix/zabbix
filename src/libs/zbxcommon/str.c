@@ -322,6 +322,26 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 	(*str)[*offset] = '\0';
 }
 
+void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
+{
+	if (NULL == *str)
+	{
+		*alloc_len = n + 1;
+		*offset = 0;
+		*str = (char *)zbx_malloc(*str, *alloc_len);
+	}
+	else if (*offset + n >= *alloc_len)
+	{
+		while (*offset + n >= *alloc_len)
+			*alloc_len *= 2;
+		*str = (char *)zbx_realloc(*str, *alloc_len);
+	}
+
+	memcpy(*str + *offset, src, n);
+	*offset += n;
+	(*str)[*offset] = '\0';
+}
+
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src)
 {
 	zbx_strncpy_alloc(str, alloc_len, offset, src, strlen(src));
@@ -513,9 +533,9 @@ void	zbx_lrtrim(char *str, const char *charlist)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_remove_chars(register char *str, const char *charlist)
+void	zbx_remove_chars(char *str, const char *charlist)
 {
-	register char *p;
+	char	*p;
 
 	if (NULL == str || NULL == charlist || '\0' == *str || '\0' == *charlist)
 		return;
@@ -801,10 +821,15 @@ int	zbx_check_hostname(const char *hostname, char **error)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
+ * Comments: the pointer is advanced to the first invalid character even if   *
+ *           FAIL is returned (meaning there is a syntax error in item key).  *
+ *           If necessary, the caller must keep a copy of pointer original    *
+ *           value.                                                           *
+ *                                                                            *
  ******************************************************************************/
-int	parse_key(char **exp)
+int	parse_key(const char **exp)
 {
-	char	*s;
+	const char	*s;
 
 	for (s = *exp; SUCCEED == is_key_char(*s); s++)
 		;
@@ -825,31 +850,28 @@ int	parse_key(char **exp)
 				case 0:
 					if (',' == *s)
 						;
-					else if (']' == *s && '[' == s[1] && 0 == array)	/* Zapcat */
-						s++;
 					else if ('"' == *s)
 						state = 1;
 					else if ('[' == *s)
-						array++;
+					{
+						if (0 == array)
+							array = 1;
+						else
+							goto fail;	/* incorrect syntax: multi-level array */
+					}
 					else if (']' == *s && 0 != array)
 					{
-						array--;
+						array = 0;
+						s++;
 
-						/* skip spaces */
-						while (' ' == s[1])
+						while (' ' == *s)	/* skip trailing spaces after closing ']' */
 							s++;
 
-						if (0 == array && ']' == s[1])
-						{
-							s++;
+						if (']' == *s)
 							goto succeed;
-						}
 
-						if (',' != s[1] && !(0 != array && ']' == s[1]))
-						{
-							s++;
+						if (',' != *s)
 							goto fail;	/* incorrect syntax */
-						}
 					}
 					else if (']' == *s && 0 == array)
 						goto succeed;
@@ -860,15 +882,8 @@ int	parse_key(char **exp)
 				case 1:
 					if ('"' == *s)
 					{
-						/* skip spaces */
-						while (' ' == s[1])
+						while (' ' == s[1])	/* skip trailing spaces after closing quotes */
 							s++;
-
-						if (0 == array && ']' == s[1] && '[' == s[2])	/* Zapcat */
-						{
-							state = 0;
-							break;
-						}
 
 						if (0 == array && ']' == s[1])
 						{
@@ -889,12 +904,7 @@ int	parse_key(char **exp)
 					break;
 				/* unquoted */
 				case 2:
-					if (0 == array && ']' == *s && '[' == s[1])	/* Zapcat */
-					{
-						s--;
-						state = 0;
-					}
-					else if (',' == *s || (']' == *s && 0 != array))
+					if (',' == *s || (']' == *s && 0 != array))
 					{
 						s--;
 						state = 0;
@@ -966,16 +976,19 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Function: num_param                                                        *
  *                                                                            *
- * Purpose: calculate count of parameters from parameter list (param)         *
+ * Purpose: find number of parameters in parameter list                       *
  *                                                                            *
  * Parameters:                                                                *
  *      param  - parameter list                                               *
  *                                                                            *
- * Return value: count of parameters                                          *
+ * Return value: number of parameters (starting from 1) or                    *
+ *               0 if syntax error                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
+ *            containing only spaces is handled as having one empty parameter *
+ *            and 1 is returned.                                              *
  *                                                                            *
  ******************************************************************************/
 int	num_param(const char *p)
@@ -999,18 +1012,24 @@ int	num_param(const char *p)
 			else if ('"' == *p)
 				state = 1;
 			else if ('[' == *p)
-				array++;
+			{
+				if (0 == array)
+					array = 1;
+				else
+					return 0;	/* incorrect syntax: multi-level array */
+			}
 			else if (']' == *p && 0 != array)
 			{
-				array--;
+				array = 0;
 
-				/* skip spaces */
-				while (' ' == p[1])
+				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
 					p++;
 
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+				if (',' != p[1] && '\0' != p[1])
 					return 0;	/* incorrect syntax */
 			}
+			else if (']' == *p && 0 == array)
+				return 0;		/* incorrect syntax */
 			else if (' ' != *p)
 				state = 2;
 			break;
@@ -1018,8 +1037,7 @@ int	num_param(const char *p)
 		case 1:
 			if ('"' == *p)
 			{
-				/* skip spaces */
-				while (' ' == p[1])
+				while (' ' == p[1])	/* skip trailing spaces after closing quotes */
 					p++;
 
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
@@ -1037,6 +1055,8 @@ int	num_param(const char *p)
 				p--;
 				state = 0;
 			}
+			else if (']' == *p && 0 == array)
+				return 0;		/* incorrect syntax */
 			break;
 		}
 	}
@@ -1433,7 +1453,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 
 	size_t			i, l = 0;
 	int			level = 0, num = 0, ret = SUCCEED;
-	zbx_parser_state_t	state = ZBX_STATE_END;
+	zbx_parser_state_t	state = ZBX_STATE_NEW;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type)
 	{
@@ -1456,15 +1476,6 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 
 	for (; '\0' != (*data)[i] && FAIL != ret; i++)
 	{
-		if (0 == level)
-		{
-			/* first square bracket + Zapcat compatibility */
-			if (ZBX_STATE_END == state && '[' == (*data)[i])
-				state = ZBX_STATE_NEW;
-			else
-				break;
-		}
-
 		switch (state)
 		{
 			case ZBX_STATE_NEW:	/* a new parameter started */
@@ -1479,6 +1490,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case '[':
+						if (2 == level)
+							goto clean;	/* incorrect syntax: multi-level array */
 						level++;
 						if (1 == level)
 							num++;
@@ -1509,6 +1522,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case ']':
+						if (0 == level)
+							goto clean;	/* incorrect syntax: redundant ']' */
 						level--;
 						break;
 					default:
@@ -1597,52 +1612,6 @@ void	remove_param(char *param, int num)
 	}
 
 	*param = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_num2hex                                                      *
- *                                                                            *
- * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
- *                                                                            *
- * Parameters:                                                                *
- *      c - number 0-15                                                       *
- *                                                                            *
- * Return value:                                                              *
- *      '0'-'f'                                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-char	zbx_num2hex(u_char c)
-{
-	if (c >= 10)
-		return c + 0x57; /* a-f */
-	else
-		return c + 0x30; /* 0-9 */
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_hex2num                                                      *
- *                                                                            *
- * Purpose: convert hexit c ('0'-'9''a'-'f') to number (0-15)                 *
- *                                                                            *
- * Parameters:                                                                *
- *      c - char ('0'-'9''a'-'f')                                             *
- *                                                                            *
- * Return value:                                                              *
- *      0-15                                                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-u_char	zbx_hex2num(char c)
-{
-	if (c >= 'a')
-		return c - 0x57; /* a-f */
-	else
-		return c - 0x30; /* 0-9 */
 }
 
 /******************************************************************************
@@ -3790,13 +3759,15 @@ static size_t	zbx_no_function(const char *expr)
  *             lpp_len    - [OUT] length of the last parsed parameter         *
  *                                                                            *
  * Return value: SUCCEED -  closing parenthesis was found or other custom     *
- *                          terminator and not quoted                         *
- *               FAIL    -  does not look like a valid                        *
- *                          function parameter list                           *
+ *                          terminator and not quoted and return info about a *
+ *                          last processed parameter.                         *
+ *               FAIL    -  does not look like a valid function parameter     *
+ *                          list and return info about a last processed       *
+ *                          parameter.                                        *
  *                                                                            *
  ******************************************************************************/
 static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r, size_t *lpp_offset,
-			size_t *lpp_len)
+		size_t *lpp_len)
 {
 #define ZBX_FUNC_PARAM_NEXT		0
 #define ZBX_FUNC_PARAM_QUOTED		1
@@ -3805,6 +3776,8 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
 
 	const char	*ptr;
 	int		state = ZBX_FUNC_PARAM_NEXT;
+
+	*lpp_offset = 0;
 
 	for (ptr = expr; '\0' != *ptr; ptr++)
 	{
@@ -3882,7 +3855,7 @@ static int	function_validate_parameters(const char *expr, char terminator, size_
  *                                                                            *
  ******************************************************************************/
 static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r, size_t *lpp_offset,
-			size_t *lpp_len)
+		size_t *lpp_len)
 {
 	if (SUCCEED == function_validate_parameters(expr + par_l + 1, ')', par_r, lpp_offset, lpp_len))
 	{
@@ -3936,7 +3909,7 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  ******************************************************************************/
 static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len)
 {
-	size_t	lpp_offset = 0, lpp_len;
+	size_t	lpp_offset, lpp_len;
 
 	/* try to validate function name */
 	if (SUCCEED != function_parse_name(expr, par_l))
@@ -4397,12 +4370,10 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 {
 	size_t				offset;
 	zbx_token_simple_macro_t	*data;
-	const char			*ptr;
+	const char			*ptr = key;
 	zbx_strloc_t			key_loc, func_loc, func_param;
 
-	ptr = key;
-
-	if (SUCCEED != parse_key((char **)&ptr))
+	if (SUCCEED != parse_key(&ptr))
 	{
 		zbx_token_t	key_token;
 

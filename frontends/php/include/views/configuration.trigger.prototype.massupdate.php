@@ -28,6 +28,7 @@ $triggersWidget->addItem(get_header_host_table('trigger_prototypes', $data['host
 
 $triggersForm = (new CForm())
 	->setName('triggersForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
@@ -39,7 +40,8 @@ $triggersFormList = (new CFormList('triggersFormList'))
 	->addRow(
 		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
 			->setLabel(_('Severity'))
-			->setChecked(isset($data['visible']['priority'])),
+			->setChecked(isset($data['visible']['priority']))
+			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv(
 			new CSeverity([
 				'name' => 'priority',
@@ -76,6 +78,7 @@ foreach ($data['dependencies'] as $dependency) {
 			(new CButton('remove', _('Remove')))
 				->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
 				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 

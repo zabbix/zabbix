@@ -698,13 +698,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			// copy items
-			if (!copyItems($srcHostId, $hostId)) {
+			/*
+			 * First copy web scenarios with web items, so that later regular items can use web item as their master
+			 * item.
+			 */
+			if (!copyHttpTests($srcHostId, $hostId)) {
 				throw new Exception();
 			}
 
-			// copy web scenarios
-			if (!copyHttpTests($srcHostId, $hostId)) {
+			if (!copyItems($srcHostId, $hostId)) {
 				throw new Exception();
 			}
 
@@ -900,20 +902,12 @@ if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) &
 	order_result($data['proxies'], 'host');
 
 	// get templates data
-	$data['linkedTemplates'] = null;
-	if (!empty($data['templates'])) {
-		$getLinkedTemplates = API::Template()->get([
-			'templateids' => $data['templates'],
-			'output' => ['templateid', 'name']
-		]);
-
-		foreach ($getLinkedTemplates as $getLinkedTemplate) {
-			$data['linkedTemplates'][] = [
-				'id' => $getLinkedTemplate['templateid'],
-				'name' => $getLinkedTemplate['name']
-			];
-		}
-	}
+	$data['linkedTemplates'] = !empty($data['templates'])
+		? CArrayHelper::renameObjectsKeys(API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $data['templates']
+		]), ['templateid' => 'id'])
+		: [];
 
 	$hostView = new CView('configuration.host.massupdate', $data);
 }

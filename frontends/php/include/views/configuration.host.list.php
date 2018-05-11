@@ -23,18 +23,31 @@ require_once dirname(__FILE__).'/js/configuration.host.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$data['pageFilter']->getGroupsCB()
-			])
-			->addItem(new CSubmit('form', _('Create host')))
-			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
-		)
-	);
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getGroupsCB()
+				])
+			),
+		(new CTag('nav', true, (new CList())
+			->addItem(new CRedirectButton(_('Create host'), (new CUrl())
+				->removeArgument('hostid')
+				->setArgument('form', 'create')
+				->getUrl()
+			))
+			->addItem(
+				(new CButton('form', _('Import')))
+					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->removeId()
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	]));
 
 // filter
 $filter = (new CFilter('web.hosts.filter.state'))
@@ -58,7 +71,7 @@ $filter = (new CFilter('web.hosts.filter.state'))
 				_('Proxy'),
 				(new CMultiSelect([
 					'name' => 'filter_proxyids[]',
-					'objectName' => 'proxies',
+					'object_name' => 'proxies',
 					'data' => $data['proxies_ms'],
 					'popup' => [
 						'parameters' => [
@@ -66,8 +79,7 @@ $filter = (new CFilter('web.hosts.filter.state'))
 							'srcfld1' => 'proxyid',
 							'srcfld2' => 'host',
 							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_proxyids_',
-							'multiselect' => '1'
+							'dstfld1' => 'filter_proxyids_'
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),

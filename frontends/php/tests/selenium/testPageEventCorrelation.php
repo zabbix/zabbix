@@ -1,0 +1,127 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2018 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+
+/**
+ * @backup correlation
+ */
+class testPageEventCorrelation extends CWebTest {
+
+	public function testPageEventCorrelation_CheckLayout() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestCheckTitle('Event correlation rules');
+		$this->zbxTestCheckHeader('Event correlation');
+		// Check Create correlation button
+		$this->zbxTestAssertElementText("//button[@id='form']", 'Create correlation');
+		// Check table headers
+		$this->zbxTestTextPresent(['Name', 'Conditions', 'Operations', 'Status']);
+		// Check the correlation names in frontend
+		$correlation = [];
+		$sql_all_correlations = "SELECT correlationid, name FROM correlation";
+		$result = DBselect($sql_all_correlations);
+		while ($row = DBfetch($result)) {
+			$correlation [$row['correlationid']] = $row['name'];
+		}
+		$this->zbxTestTextPresent($correlation);
+		// Check table footer to make sure that some results are found
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');
+	}
+
+	public function testPageEventCorrelation_FilterByName() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestInputType('filter_name', 'for cancel');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Event correlation for cancel');
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
+	public function testPageEventCorrelation_FilterByEnabled() {
+		$this->zbxTestLogin('correlation.php');
+		$this->testPageEventCorrelation_FilterReset();
+		$this->zbxTestClickXpath("//ul[@id='filter_status']//label[text()='Enabled']");
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Event correlation for clone');
+		$this->zbxTestAssertElementText("//tbody/tr[2]/td[2]/a", 'Event correlation for delete');
+		$this->zbxTestAssertElementText("//tbody/tr[3]/td[2]/a", 'Event correlation for update');
+		$this->zbxTestTextPresent('Displaying 3 of 3 found');
+	}
+
+	public function testPageEventCorrelation_FilterByDisabled() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickXpath("//ul[@id='filter_status']//label[text()='Disabled']");
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Event correlation for cancel');
+		$this->zbxTestTextPresent('Displaying 1 of 1 found');
+	}
+
+	public function testPageEventCorrelation_FilterReset() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
+	public function testPageEventCorrelation_SingleEnableDisable(){
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickButtonText('Reset');
+		// Enable correlation
+		$this->zbxTestClickXpathWait("//a[contains(@onclick,'correlationid[]=99002')]");
+		$this->zbxTestTextPresent('Correlation enabled');
+		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 0'));
+		// Disable correlation
+		$this->zbxTestClickXpathWait("//a[contains(@onclick,'correlationid[]=99002')]");
+		$this->zbxTestTextPresent('Correlation disabled');
+		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 1'));
+	}
+
+	public function testPageEventCorrelation_MassEnableDisable() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickButtonText('Reset');
+		// Mass enable correlation
+		$this->zbxTestCheckboxSelect('g_correlationid_99002');
+		$this->zbxTestClickButton('correlation.massenable');
+		$this->zbxTestAcceptAlert();
+		$this->zbxTestCheckTitle('Event correlation rules');
+		$this->zbxTestTextPresent('Correlation enabled');
+		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 0'));
+		// Mass disable correlation
+		$this->zbxTestCheckboxSelect('g_correlationid_99002');
+		$this->zbxTestClickButton('correlation.massdisable');
+		$this->zbxTestAcceptAlert();
+		$this->zbxTestCheckTitle('Event correlation rules');
+		$this->zbxTestTextPresent('Correlation disabled');
+		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 1'));
+	}
+
+	public function testPageEventCorrelation_MassDelete() {
+		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestCheckboxSelect('g_correlationid_99000');
+		$this->zbxTestClickButton('correlation.massdelete');
+		$this->zbxTestAcceptAlert();
+		$this->zbxTestCheckTitle('Event correlation rules');
+		$this->zbxTestTextPresent('Selected correlations deleted');
+		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99000'));
+	}
+}

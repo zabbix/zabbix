@@ -31,8 +31,10 @@ void	zbx_mock_test_entry(void **state)
 	int			expected_result = FAIL, actual_result = FAIL;
 	size_t 			func_pos, par_l, par_r;
 	size_t 			func_pos_exp, par_l_exp, par_r_exp;
-	const int 		max_error_len = 255;
-	char 			error_text[max_error_len];
+	const int 		max_error_len = MAX_STRING_LEN;
+	char 			error_text[MAX_STRING_LEN];
+
+	*error_text = '\0';
 
 	ZBX_UNUSED(state);
 
@@ -60,38 +62,46 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == expected_result)
 	{
+		zbx_uint32_t	num;
+
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("func_pos", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'func_pos' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint64(tmp, &func_pos_exp))
+		else if(SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("func_pos parameter \"%s\" is not numeric.", tmp);
 		}
 
+		func_pos_exp = num;
+
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("par_l", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'par_l' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint64(tmp, &par_l_exp))
+		else if(SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("par_l parameter \"%s\" is not numeric.", tmp);
 		}
 
+		par_l_exp = num;
+
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("par_r", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle,&tmp)))
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'par_r' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint64(tmp, &par_r_exp))
+		else if(SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("par_r parameter \"%s\" is not numeric.", tmp);
 		}
+
+		par_r_exp = num;
 	}
 
 	if (FAIL == expected_result && (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("error", &param_handle)) ||
@@ -112,20 +122,20 @@ void	zbx_mock_test_entry(void **state)
 	{
 		if (func_pos != func_pos_exp)
 		{
-			fail_msg("Position %i of 'function' not equal expected %i. Error:%s", func_pos, func_pos_exp,
-				error_text);
+			fail_msg("Position "ZBX_FS_SIZE_T" of 'function' not equal expected "ZBX_FS_SIZE_T". Error:%s",
+				func_pos, func_pos_exp, error_text);
 		}
 
 		if (par_l != par_l_exp)
 		{
-			fail_msg("Position %i of left '(' not equal expected %i. Error:%s", par_l, par_l_exp,
-				error_text);
+			fail_msg("Position "ZBX_FS_SIZE_T" of left '(' not equal expected "ZBX_FS_SIZE_T". Error:%s",
+				par_l, par_l_exp, error_text);
 		}
 
 		if (par_r != par_r_exp)
 		{
-			fail_msg("Position %i of right ')' not equal expected %i. Error:%s", par_r, par_r_exp,
-				error_text);
+			fail_msg("Position "ZBX_FS_SIZE_T" of right ')' not equal expected "ZBX_FS_SIZE_T". Error:%s",
+				par_r, par_r_exp, error_text);
 		}
 	}
 	else /* SYSINFO_RET_FAIL == expected_result */

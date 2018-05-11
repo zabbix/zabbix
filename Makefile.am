@@ -109,6 +109,7 @@ test:
 if ZBXCMOCKA
 WRAP_DB_FUNCS = \
 	-Wl,--wrap=zbx_db_vselect \
+	-Wl,--wrap=zbx_db_select_n \
 	-Wl,--wrap=zbx_db_fetch \
 	-Wl,--wrap=__zbx_DBexecute \
 	-Wl,--wrap=DBbegin \
@@ -134,12 +135,16 @@ WRAP_COMM_FUNCS = \
 	-Wl,--wrap=read \
 	-Wl,--wrap=connect
 
+WRAP_LOG = \
+	-Wl,--wrap=__zbx_zabbix_log
+
 COMMON_WRAP_FUNCS = \
 	$(WRAP_DB_FUNCS) \
 	$(WRAP_IO_FUNCS) \
 	$(WRAP_FS_FUNCS) \
 	$(WRAP_EXIT) \
-	$(WRAP_COMM_FUNCS)
+	$(WRAP_COMM_FUNCS) \
+	$(WRAP_LOG)
 
 tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) && \

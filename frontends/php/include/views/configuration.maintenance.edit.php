@@ -24,6 +24,7 @@ $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 // create form
 $maintenanceForm = (new CForm())
 	->setName('maintenanceForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
 if (isset($this->data['maintenanceid'])) {
 	$maintenanceForm->addVar('maintenanceid', $this->data['maintenanceid']);
@@ -191,19 +192,15 @@ $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 	->addRow(new CLabel(_('Hosts in maintenance'), 'hosts[]'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
-			'objectName' => 'hosts',
-			'objectOptions' => [
-				'editable' => true
-			],
+			'object_name' => 'hosts',
 			'data' => $data['hosts_ms'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
 					'dstfrm' => $maintenanceForm->getName(),
 					'dstfld1' => 'hostids_',
-					'srcfld1' => 'hostid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -211,19 +208,15 @@ $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 	->addRow(new CLabel(_('Groups in maintenance'), 'groups[]'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
+			'object_name' => 'hostGroup',
 			'data' => $data['groups_ms'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $maintenanceForm->getName(),
 					'dstfld1' => 'groupids_',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

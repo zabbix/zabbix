@@ -27,6 +27,7 @@ $widget = (new CWidget())->setTitle(_('Scripts'));
 $scriptForm = (new CForm())
 	->setId('scriptForm')
 	->setName('scripts')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
@@ -81,18 +82,18 @@ $scriptFormList
 	)
 	->addRow(null, (new CMultiSelect([
 		'name' => 'groupid',
-		'selectedLimit' => 1,
-		'objectName' => 'hostGroup',
+		'object_name' => 'hostGroup',
+		'multiple' => false,
 		'data' => $data['hostgroup'],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'host_groups',
+				'srcfld1' => 'groupid',
 				'dstfrm' => $scriptForm->getName(),
-				'dstfld1' => 'groupid',
-				'srcfld1' => 'groupid'
+				'dstfld1' => 'groupid'
 			]
-		]]))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
+		]
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
 	->addRow((new CLabel(_('Required host permissions'), 'host_access')),
 		(new CRadioButtonList('host_access', (int) $data['host_access']))
 			->addValue(_('Read'), PERM_READ)
