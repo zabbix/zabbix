@@ -53,7 +53,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	char		*host_esc, dns[INTERFACE_DNS_LEN_MAX], *ch_error;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		ret = FAIL;
+	int		ret = FAIL, host_metadata_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s'", __function_name, host);
 
@@ -69,24 +69,34 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	result =
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		DBselect(
-			"select hostid,status,tls_accept,tls_issuer,tls_subject,tls_psk_identity"
-			" from hosts"
-			" where host='%s'"
-				" and status in (%d,%d)"
-				" and flags<>%d"
-				" and proxy_hostid is null",
+			"select h.hostid,h.status,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,"
+			"a.host_metadata"
+			" from hosts h"
+				" left join autoreg_host a"
+					" on a.proxy_hostid is null and h.host=a.host"
+			" where h.host='%s'"
+				" and h.status in (%d,%d)"
+				" and h.flags<>%d"
+				" and h.proxy_hostid is null",
 			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+		host_metadata_offset = 6;
 #else
 		DBselect(
-			"select hostid,status,tls_accept"
-			" from hosts"
-			" where host='%s'"
-				" and status in (%d,%d)"
-				" and flags<>%d"
-				" and proxy_hostid is null",
+			"select h.hostid,h.status,h.tls_accept,a.host_metadata"
+			" from hosts h"
+				" left join autoreg_host a"
+					" on a.proxy_hostid is null and h.host=a.host"
+			" where h.host='%s'"
+				" and h.status in (%d,%d)"
+				" and h.flags<>%d"
+				" and h.proxy_hostid is null",
 			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+		host_metadata_offset = 3;
 #endif
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = DBfetch(result)) && (SUCCEED == DBis_null(row[host_metadata_offset]) ||
+			0 == strcmp(host_metadata, row[host_metadata_offset])))
 	{
 		if (HOST_STATUS_MONITORED == atoi(row[1]))
 		{
@@ -161,7 +171,10 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	}
 	else
 	{
-		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
+		if (NULL == row)
+			zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
+		else
+			zbx_snprintf(error, MAX_STRING_LEN, "host [%s] with metadata [%s] not found", host, host_metadata);
 
 		/* remove ::ffff: prefix from IPv4-mapped IPv6 addresses */
 		if (0 == strncmp("::ffff:", ip, 7) && SUCCEED == is_ip4(ip + 7))

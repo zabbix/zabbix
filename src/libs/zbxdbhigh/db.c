@@ -1324,12 +1324,14 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		/* delete from vector if already exist in hosts table */
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select host"
-				" from hosts"
-				" where proxy_hostid=" ZBX_FS_UI64
+				"select h.host,a.host_metadata"
+				" from hosts h"
+				" left join autoreg_host a"
+					" on h.proxy_hostid=a.proxy_hostid and h.host=a.host"
+				" where h.proxy_hostid=" ZBX_FS_UI64
 					" and",
 				proxy_hostid);
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
 				(const char **)hosts.values, hosts.values_num);
 
 		result = DBselect("%s", sql);
@@ -1340,12 +1342,16 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 			{
 				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
-				if (0 == strcmp(autoreg_host->host, row[0]))
+				if (0 != strcmp(autoreg_host->host, row[0]))
+					continue;
+
+				if (SUCCEED == DBis_null(row[1]) || 0 == strcmp(autoreg_host->host_metadata, row[1]))
 				{
 					zbx_vector_ptr_remove(autoreg_hosts, i);
 					autoreg_host_free(autoreg_host);
-					break;
 				}
+
+				break;
 			}
 
 		}
