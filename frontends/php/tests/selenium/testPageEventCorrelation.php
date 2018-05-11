@@ -34,13 +34,10 @@ class testPageEventCorrelation extends CWebTest {
 		// Check table headers
 		$this->zbxTestTextPresent(['Name', 'Conditions', 'Operations', 'Status']);
 		// Check the correlation names in frontend
-		$correlation = [];
-		$sql_all_correlations = "SELECT correlationid, name FROM correlation";
-		$result = DBselect($sql_all_correlations);
-		while ($row = DBfetch($result)) {
-			$correlation [$row['correlationid']] = $row['name'];
+		$correlations = DBfetchArray(DBSelect('SELECT name FROM correlation'));
+		foreach ($correlations as $correlation) {
+			$this->zbxTestTextPresent($correlation['name']);
 		}
-		$this->zbxTestTextPresent($correlation);
 		// Check table footer to make sure that some results are found
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
@@ -99,29 +96,29 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickButtonText('Reset');
 		// Mass enable correlation
-		$this->zbxTestCheckboxSelect('g_correlationid_99002');
+		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massenable');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Event correlation rules');
-		$this->zbxTestTextPresent('Correlation enabled');
-		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 0'));
+		$this->zbxTestTextPresent('Correlations enabled');
+		$this->assertEquals(4, DBcount('SELECT NULL FROM correlation WHERE status = 0'));
 		// Mass disable correlation
-		$this->zbxTestCheckboxSelect('g_correlationid_99002');
+		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massdisable');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Event correlation rules');
-		$this->zbxTestTextPresent('Correlation disabled');
-		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 1'));
+		$this->zbxTestTextPresent('Correlations disabled');
+		$this->assertEquals(4, DBcount('SELECT NULL FROM correlation WHERE status = 1'));
 	}
 
 	public function testPageEventCorrelation_MassDelete() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestCheckboxSelect('g_correlationid_99000');
+		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massdelete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Event correlation rules');
 		$this->zbxTestTextPresent('Selected correlations deleted');
-		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99000'));
+		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation'));
 	}
 }
