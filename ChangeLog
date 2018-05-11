@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
 ........S. [ZBX-14312] fixed possible deadlock in history syncer when housekeeper is deleting events (vso)
 ..F....... [ZBX-13697] fixed session expiration when changing default authentication method (miks)
 ..F....... [ZBX-13768] fixed disabled 'add' button showing in templated item preprocesing form (miks)
@@ -303,6 +304,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
 ........S. [ZBX-14312] fixed possible deadlock in history syncer when housekeeper is deleting events (vso)
 ..F....... [ZBX-13697] fixed session expiration when changing default authentication method (miks)
 A.F....... [ZBX-13680] fixed action not being cloned due to existing operation id being submitted (agriscenko)
@@ -1540,6 +1542,7 @@ Changes for 3.0.18rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
 A.F....... [ZBX-13774] fixed creating and updating items with multiple specific scheduling intervals (Ivo)
 ..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)
 ..F....... [ZBX-12644] fixed filter being partially reset when using pagination in availability report page (Ivo)
