@@ -85,7 +85,7 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_UpdateDuplicate() {
 		$hostGroup = DBfetch(DBselect(
-			'SELECT name FROM groups'.
+			'SELECT name FROM hstgrp'.
 			' WHERE name<>'.zbx_dbstr($this->hostGroup), 1
 		));
 

@@ -391,6 +391,13 @@ abstract class CTriggerGeneral extends CApiService {
 				'filter' => ['triggerid' => $triggerids],
 				'preservekeys' => true
 			]);
+
+			// Rename column 'name' to 'function'.
+			$function = reset($functions);
+			if ($function && array_key_exists('name', $function)) {
+				$functions = CArrayHelper::renameObjectsKeys($functions, ['name' => 'function']);
+			}
+
 			$relationMap = $this->createRelationMap($functions, 'triggerid', 'functionid');
 
 			$functions = $this->unsetExtraFields($functions, ['triggerid', 'functionid'], $options['selectFunctions']);

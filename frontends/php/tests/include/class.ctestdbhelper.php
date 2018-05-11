@@ -38,7 +38,7 @@ class CTestDbHelper {
 
 			if ($subgroups) {
 				$hostgroups = array_merge($hostgroups, DBfetchArray(DBselect(
-					'SELECT * FROM groups WHERE name LIKE '.zbx_dbstr($hostgroups[0]['name'].'/%')
+					'SELECT * FROM hstgrp WHERE name LIKE '.zbx_dbstr($hostgroups[0]['name'].'/%')
 				)));
 			}
 

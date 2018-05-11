@@ -550,13 +550,13 @@ class testConfiguration extends CZabbixTest {
 									</group>
 								</groups>
 								</zabbix_export>',
-				'sql' => 'select * from groups where name=\'API host group xml import\''
+				'sql' => 'select * from hstgrp where name=\'API host group xml import\''
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import"}]}}',
-				'sql' => 'select * from groups where name=\'API host group json import\''
+				'sql' => 'select * from hstgrp where name=\'API host group json import\''
 			],
 			[
 				'format' => 'xml',
@@ -651,14 +651,14 @@ class testConfiguration extends CZabbixTest {
 									</group>
 								</groups>
 								</zabbix_export>',
-				'sql' => 'select * from groups where name=\'API host group xml import as non Super Admin\'',
+				'sql' => 'select * from hstgrp where name=\'API host group xml import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
-				'sql' => 'select * from groups where name=\'API host group json import as non Super Admin\'',
+				'sql' => 'select * from hstgrp where name=\'API host group json import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[

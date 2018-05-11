@@ -141,7 +141,7 @@ class testHostGroup extends CZabbixTest {
 			$this->assertFalse(array_key_exists('error', $result));
 
 			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from groups where groupid='.$id);
+				$dbResult = DBSelect('select * from hstgrp where groupid='.$id);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $hostgroup[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
@@ -327,7 +327,7 @@ class testHostGroup extends CZabbixTest {
 			$this->assertFalse(array_key_exists('error', $result));
 
 			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from groups where groupid='.$id);
+				$dbResult = DBSelect('select * from hstgrp where groupid='.$id);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $hostgroups[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
@@ -467,7 +467,7 @@ class testHostGroup extends CZabbixTest {
 			$this->assertFalse(array_key_exists('error', $result));
 
 			foreach ($result['result']['groupids'] as $id) {
-				$dbResult = 'select * from groups where groupid='.$id;
+				$dbResult = 'select * from hstgrp where groupid='.$id;
 				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
