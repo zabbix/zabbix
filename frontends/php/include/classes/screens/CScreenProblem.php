@@ -441,7 +441,7 @@ class CScreenProblem extends CScreenBase {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'acknowledged'],
 			'selectTags' => ['tag', 'value'],
-			'select_acknowledges' => ['action'],
+			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids
@@ -492,7 +492,7 @@ class CScreenProblem extends CScreenBase {
 		return API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'r_clock', 'correlationid', 'userid', 'acknowledged'],
 			'selectTags' => ['tag', 'value'],
-			'selectAcknowledges' => ['action'],
+			'selectAcknowledges' => API_OUTPUT_EXTEND,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -672,17 +672,20 @@ class CScreenProblem extends CScreenBase {
 
 		$data = self::makeData($data, $this->data['filter']);
 
+		$original_severity = [];
+
 		if ($data['triggers']) {
 			$triggerids = array_keys($data['triggers']);
 
 			$db_triggers = API::Trigger()->get([
-				'output' => ['triggerid'],
+				'output' => ['triggerid', 'priority'],
 				'selectDependencies' => ['triggerid'],
 				'triggerids' => $triggerids,
 				'preservekeys' => true
 			]);
 
 			foreach ($data['triggers'] as $triggerid => &$trigger) {
+				$original_severity[$triggerid] = $trigger['priority'];
 				$trigger['dependencies'] = array_key_exists($triggerid, $db_triggers)
 					? $db_triggers[$triggerid]['dependencies']
 					: [];
@@ -707,7 +710,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($this->data['action'] === 'problem.view') {
-			$actions = makeEventsActions($data['problems'], true);
+			$actions = makeEventsActionsTable($data['problems'], getDefaultActionOptions(), true);
 			$url_form = clone $url;
 
 			$form = (new CForm('get', 'zabbix.php'))
@@ -955,6 +958,48 @@ class CScreenProblem extends CScreenBase {
 					->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT);
 
+				$action_icons = [];
+
+				// Add messages icon.
+				$messages_action = $actions[$problem['eventid']]['messages'];
+				if ($messages_action['count']) {
+					$action_icons[] = makeActionIcon(ZBX_STYLE_ACTION_ICON_MSGS, $messages_action['table'],
+						$messages_action['count']
+					);
+				}
+
+				// Add severity change icon.
+				$severity_action = $actions[$problem['eventid']]['severity_changes'];
+				if ($severity_action['count']) {
+					if ($original_severity[$problem['objectid']] > $problem['severity']) {
+						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
+					}
+					elseif ($original_severity[$problem['objectid']] < $problem['severity']) {
+						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+					}
+					else {
+						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
+					}
+
+					$action_icons[] = makeActionIcon($icon_style, $severity_action['table']);
+				}
+
+				// Add actions list icon.
+				$action_list = $actions[$problem['eventid']]['action_list'];
+				if ($action_list['count']) {
+					if ($action_list['has_fail_action']) {
+						$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
+					}
+					elseif ($action_list['has_uncomplete_action']) {
+						$icon_style = ZBX_STYLE_ACTIONS_NUM_YELLOW;
+					}
+					else {
+						$icon_style = ZBX_STYLE_ACTIONS_NUM_GRAY;
+					}
+
+					$action_icons[] = makeActionIcon($icon_style, $action_list['table'], $action_list['count']);
+				}
+
 				// Add table row.
 				$table->addRow(array_merge($row, [
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
@@ -968,9 +1013,7 @@ class CScreenProblem extends CScreenBase {
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					$problem_update_link,
-					array_key_exists($eventid, $actions)
-						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
-						: '',
+					$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : '',
 					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]), ($this->data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
 					? getSeverityFlhStyle($problem['severity'])

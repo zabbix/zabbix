@@ -74,7 +74,7 @@ if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
 
-$actions = makeEventsActions($data['data']['problems'], true);
+$actions = makeEventsActionsTable($data['data']['problems'], getDefaultActionOptions());
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
@@ -172,6 +172,47 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
+	// Make action icons.
+	$action_icons = [];
+
+	// Add messages icon.
+	$messages_action = $actions[$problem['eventid']]['messages'];
+	if ($messages_action['count']) {
+		$action_icons[] = makeActionIcon(ZBX_STYLE_ACTION_ICON_MSGS, $messages_action['table'], $messages_action['count']);
+	}
+
+	// Add severity change icon.
+	$severity_action = $actions[$problem['eventid']]['severity_changes'];
+	if ($severity_action['count']) {
+		if ($trigger['priority'] > $problem['severity']) {
+			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
+		}
+		elseif ($trigger['priority'] < $problem['severity']) {
+			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+		}
+		else {
+			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
+		}
+
+		$action_icons[] = makeActionIcon($icon_style, $severity_action['table']);
+	}
+
+	// Add actions list icon.
+	$action_list = $actions[$problem['eventid']]['action_list'];
+	if ($action_list['count']) {
+		if ($action_list['has_fail_action']) {
+			$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
+		}
+		elseif ($action_list['has_uncomplete_action']) {
+			$icon_style = ZBX_STYLE_ACTIONS_NUM_YELLOW;
+		}
+		else {
+			$icon_style = ZBX_STYLE_ACTIONS_NUM_GRAY;
+		}
+
+		$action_icons[] = makeActionIcon($icon_style, $action_list['table'], $action_list['count']);
+	}
+
 	if ($show_timeline) {
 		if ($last_clock != 0) {
 			CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
@@ -216,9 +257,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
 			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT),
-		array_key_exists($eventid, $actions)
-			? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
-			: '',
+		$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : '',
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }

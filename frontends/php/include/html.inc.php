@@ -905,6 +905,30 @@ function makeInformationIcon($message)
 }
 
 /**
+ * Renders an action icon.
+ *
+ * @param string $action type
+ * @param string $message
+ * @param int    $count number
+ *
+ * @return CSpan
+ */
+function makeActionIcon($action_type, $message = null, $count = null)
+{
+	$icon = (new CSpan())->addClass($action_type);
+
+	if ($count) {
+		$icon->setAttribute('data-count', $count);
+	}
+
+	if ($message) {
+		$icon->setHint($message);
+	}
+
+	return $icon;
+}
+
+/**
  * Renders an error icon like red [i] with error message
  *
  * @param string $error

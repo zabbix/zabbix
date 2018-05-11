@@ -3751,3 +3751,117 @@ svg {
 
 :placeholder-shown {
   color: #9d9d9d; }
+
+.icon-action-command,
+.icon-action-close,
+.icon-action-msg,
+.icon-action-msgs,
+.icon-action-severity-up,
+.icon-action-severity-down,
+.icon-action-severity-changed,
+.icon-action-message,
+.icon-action-ack,
+.icon-problem-generated,
+.icon-problem-recovery,
+.icon-actions-number-gray,
+.icon-actions-number-yellow,
+.icon-actions-number-red {
+  display: inline-block;
+  position: relative;
+  height: 18px;
+  width: 16px;
+  margin: 0 5px 0 0;
+  top: 5px; }
+  .icon-action-command::before,
+  .icon-action-close::before,
+  .icon-action-msg::before,
+  .icon-action-msgs::before,
+  .icon-action-severity-up::before,
+  .icon-action-severity-down::before,
+  .icon-action-severity-changed::before,
+  .icon-action-message::before,
+  .icon-action-ack::before,
+  .icon-problem-generated::before,
+  .icon-problem-recovery::before,
+  .icon-actions-number-gray::before,
+  .icon-actions-number-yellow::before,
+  .icon-actions-number-red::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    background-image: url(../img/icon-sprite.svg);
+    background-repeat: no-repeat; }
+  .icon-action-command[data-count]::after,
+  .icon-action-close[data-count]::after,
+  .icon-action-msg[data-count]::after,
+  .icon-action-msgs[data-count]::after,
+  .icon-action-severity-up[data-count]::after,
+  .icon-action-severity-down[data-count]::after,
+  .icon-action-severity-changed[data-count]::after,
+  .icon-action-message[data-count]::after,
+  .icon-action-ack[data-count]::after,
+  .icon-problem-generated[data-count]::after,
+  .icon-problem-recovery[data-count]::after,
+  .icon-actions-number-gray[data-count]::after,
+  .icon-actions-number-yellow[data-count]::after,
+  .icon-actions-number-red[data-count]::after {
+    position: absolute;
+    content: attr(data-count);
+    text-align: center;
+    margin-top: -1px;
+    font-size: 10px;
+    width: 18px; }
+
+.icon-action-command::before {
+  background-position: -224px -246px; }
+
+.icon-action-close::before {
+  background-position: -198px -246px; }
+
+.icon-action-msg::before {
+  background-position: -299px -246px; }
+
+.icon-action-severity-up::before {
+  background-position: -349px -246px; }
+
+.icon-action-severity-down::before {
+  background-position: -375px -246px; }
+
+.icon-action-severity-changed::before {
+  background-position: -249px -246px; }
+
+.icon-action-message::before {
+  background-position: -174px -245px; }
+
+.icon-action-ack::before {
+  background-position: -323px -246px; }
+
+.icon-problem-generated::before {
+  background-position: -449px -246px; }
+
+.icon-problem-recovery::before {
+  background-position: -424px -246px; }
+
+.icon-action-msgs[data-count]::after {
+  color: #ffffff; }
+.icon-action-msgs::before {
+  background-position: -474px -246px; }
+
+.icon-actions-number-gray[data-count]::after {
+  color: #768d99; }
+.icon-actions-number-gray::before {
+  background-position: -499px -245px; }
+
+.icon-actions-number-yellow[data-count]::after {
+  color: #FFA059; }
+.icon-actions-number-yellow::before {
+  background-position: -549px -245px; }
+
+.icon-actions-number-red[data-count]::after {
+  color: #e33734; }
+.icon-actions-number-red::before {
+  background-position: -524px -245px; }

@@ -96,7 +96,7 @@ class CControllerAcknowledgeEdit extends CController {
 		// Select events:
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'acknowledged', 'value', 'r_eventid'],
-			'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
+			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -105,9 +105,7 @@ class CControllerAcknowledgeEdit extends CController {
 
 		// Show action list if only one event is requested.
 		if (count($events) == 1) {
-			$data['event'] = [
-				'acknowledges' => reset($events)['acknowledges']
-			];
+			$data['event'] = reset($events);
 		}
 		else {
 			$data['related_problems_count'] = count($events);

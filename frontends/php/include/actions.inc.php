@@ -1620,16 +1620,394 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 }
 
 /**
+ * Function returns default action options for makeEventsActionsTable, used to generate action icons and tables in
+ * problem and event lists.
+ */
+function getDefaultActionOptions() {
+	return [[
+		'key' => 'messages',
+		'operations' => ZBX_PROBLEM_UPDATE_MESSAGE,
+		'columns' => ['time', 'user', 'action', 'message'],
+		'message_max_length' => 30,
+		'style' => 'CTableInfo'
+	], [
+		'key' => 'severity_changes',
+		'operations' => ZBX_PROBLEM_UPDATE_SEVERITY,
+		'columns' => ['time', 'user', 'severity_changes'],
+		'style' => 'CTableInfo'
+	], [
+		'key' => 'action_list',
+		'operations' => ZBX_PROBLEM_UPDATE_CLOSE + ZBX_PROBLEM_UPDATE_ACKNOWLEDGE +
+			ZBX_PROBLEM_UPDATE_MESSAGE + ZBX_PROBLEM_UPDATE_SEVERITY,
+		'columns' => ['time', 'user_recipient', 'action', 'message', 'status', 'info'],
+		'message_max_length' => 30,
+		'style' => 'CTableInfo'
+	]];
+}
+
+/**
  * Get list of event actions.
  *
- * @param array  $problems
- * @param string $problems[]['eventid']
- * @param string $problems[]['r_eventid']  Recovery event ID (optional).
+ * @param array      $problems
+ * @param string     $problems[]['eventid']
+ * @param string     $problems[]['r_eventid']             Recovery event ID (optional).
+ * @param string     $problems[]['acknowledges']          Event update operations.
+ * @param array      $options
+ * @param int        $options[]['key']                    Action list name.
+ * @param int        $options[]['operations']             Flag of included manual actions.
+ * @param boolean    $options[]['actions']                Contains automatic operations.
+ * @param boolean    $options[]['columns']                Table columns.
+ * @param string     $options[]['style']                  Table style. Possible options: CTableInfo or CTable (dafault).
+ *
  * @param bool   $display_recovery_alerts  Include recovery events.
  * @param bool   $html                     If true, display action status with hint box in HTML format.
  *
  * @return array
  */
+function makeEventsActionsTable(array $events, array $options, $html = true) {
+	$data = makeEventsActionsData($events, $options, $html);
+	$mediatypes = $data['mediatypes'];
+	$users = $data['users'];
+	$return = [];
+
+	// List of possible table header column names. Used for each given key in $options[]['columns'].
+	$header_labels = [
+		'step' => _('Step'),
+		'time' => _('Time'),
+		'user' => _('User'),
+		'user_action' => _('User action'),
+		'user_recipient' => _('User/Recipient'),
+		'message' => _('Message'),
+		'message_command' => _('Message/Command'),
+		'severity_changes' => _('Severity changes'),
+		'action' => _('Action'),
+		'status' => _('Status'),
+		'info' => _('Info')
+	];
+
+	foreach ($users as &$user) {
+		$user = getUserFullname($user);
+	}
+	unset($user);
+
+	foreach ($events as $event) {
+		$actions = $data['events'][$event['eventid']];
+
+		foreach ($options as $opt) {
+			$table_header = [];
+			foreach ($opt['columns'] as $col) {
+				$table_header[] = $header_labels[$col];
+			}
+
+			$table = (array_key_exists('style', $opt) && $opt['style'] === 'CTableInfo')
+				? (new CTableInfo())->setHeader($table_header)
+				: (new CTable())->setHeader($table_header);
+
+			$actions_count = 0;
+			$uncomplete = false;
+			$fail = false;
+
+			if (array_key_exists($opt['key'], $actions)) {
+				$message_max_length = array_key_exists('message_max_length', $opt) ? $opt['message_max_length'] : null;
+
+				foreach ($actions[$opt['key']] as $action) {
+					$is_manual = array_key_exists('actions', $action);
+					$actions_count++;
+					$row = [];
+
+					if (!$is_manual) {
+						if ($action['alerttype'] == ALERT_TYPE_MESSAGE) {
+							$mediatype = $mediatypes[$action['mediatypeid']];
+
+							if ($action['status'] == ALERT_STATUS_NEW || $action['status'] == ALERT_STATUS_NOT_SENT) {
+								$action['retries_left'] = $mediaType['maxattempts'] - $action['retries'];
+								$uncomplete = true;
+							}
+							elseif ($action['status'] == ALERT_STATUS_SENT) {
+								$fail = true;
+							}
+						}
+					}
+
+					foreach ($opt['columns'] as $col) {
+						switch ($col) {
+							case 'step':
+								$row[] = !$is_manual ? $action['esc_step'] : '';
+								break;
+
+							case 'time':
+								$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['time']);
+								break;
+
+							case 'user_recipient':
+							case 'user':
+								if ($is_manual) {
+									$row[] = array_key_exists($action['user'], $users)
+										? $users[$action['user']]
+										: _('Inaccessible user');
+								}
+								elseif ($action['alerttype'] == ALERT_TYPE_MESSAGE) {
+									$row[] = array_key_exists($action['userid'], $users)
+										? $users[$action['userid']]
+										: _('Inaccessible user');
+								}
+								else {
+									$row[] = '';
+								}
+								break;
+
+							case 'severity_changes':
+								if (array_key_exists('old_severity', $action)) {
+									$row[] = _s('%1$s &rarr; %2$s', $action['old_severity'], $action['new_severity']);
+								}
+								break;
+
+							case 'message_command':
+							case 'message':
+								if ($is_manual) {
+									if ($message_max_length) {
+										$row[] = strlen($action['message']) > $message_max_length
+											? mb_substr($action['message'], 0, $message_max_length) . '...'
+											: $action['message'];
+									}
+									else {
+										$row[] = $action['message'];
+									}
+								}
+								elseif ($action['alerttype'] == ALERT_TYPE_MESSAGE) {
+									$row[] = array_key_exists($action['mediatypeid'], $mediatypes)
+										? $mediatypes[$action['mediatypeid']]['description']
+										: '';
+								}
+								elseif ($action['alerttype'] == ALERT_TYPE_COMMAND) {
+									$row[] = _('Remote command');
+								}
+								else {
+									$row[] = '';
+								}
+								break;
+
+							case 'user_action':
+							case 'action':
+								if ($is_manual) {
+									$row[] = (new CCol($action['actions']))->addClass(ZBX_STYLE_NOWRAP);
+								}
+								elseif ($action['alerttype'] == ALERT_TYPE_MESSAGE) {
+									$row[] = $html ? makeActionIcon(ZBX_STYLE_ACTION_MESSAGE) : _('Messages');
+								}
+								elseif ($action['alerttype'] == ALERT_TYPE_COMMAND) {
+									$row[] = $html ? makeActionIcon(ZBX_STYLE_ACTION_COMMAND) : _('Messages');
+								}
+								else {
+									$row[] = '';
+								}
+								break;
+
+							case 'status':
+								$row[] = '';
+								break;
+
+							case 'info':
+								if (!$is_manual) {
+									$info_icons = [];
+									if ($action['error'] !== ''
+											&& !($action['status'] == ALERT_STATUS_NEW
+												|| $action['status'] == ALERT_STATUS_NOT_SENT)) {
+										$info_icons[] = makeErrorIcon($action['error']);
+									}
+
+									$row[] = makeInformationList($info_icons);
+								}
+								else {
+									$row[] = '';
+								}
+								break;
+
+							default:
+								$row[] = '';
+								break;
+						}
+					}
+
+					$table->addRow($row);
+				}
+			}
+
+			$return[$event['eventid']][$opt['key']]['table'] = $table;
+			$return[$event['eventid']][$opt['key']]['count'] = $actions_count;
+			$return[$event['eventid']][$opt['key']]['has_fail_action'] = $fail;
+			$return[$event['eventid']][$opt['key']]['has_uncomplete_action'] = $uncomplete;
+		}
+	}
+
+	return $return;
+}
+
+/**
+ * Function prepares data for makeEventsActionsTable.
+ *
+ * @return array
+ */
+function makeEventsActionsData(array $events, array $options, $html = true) {
+	if (!$events) {
+		return [];
+	}
+
+	$config = select_config();
+	$severities = [];
+	$mediatypeids = [];
+	$return = [];
+	$alerts = [];
+	$userids = [];
+
+	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+		$severities[$severity] = getSeverityName($severity, $config);
+	}
+
+	// Select all eventids and objectids.
+	$eventids = [];
+	foreach ($events as $event) {
+		$return[$event['eventid']] = [];
+		$eventids[$event['eventid']] = true;
+		if (array_key_exists('r_eventid', $event) && $event['r_eventid'] != 0) {
+			$eventids[$event['r_eventid']] = true;
+		}
+	}
+
+	// Find what's requested.
+	$request_alerts = false;
+	foreach ($options as $opt) {
+		if (array_key_exists('actions', $opt) && $opt['actions']) {
+			$request_alerts = true;
+			break;
+		}
+	}
+
+	// Get automatic actions.
+	if ($request_alerts) {
+		$db_alerts = API::Alert()->get([
+			'output' => ['eventid', 'p_eventid', 'mediatypeid', 'userid', 'esc_step', 'clock', 'status', 'alerttype',
+				'error'
+			],
+			'eventids' => array_keys($eventids),
+			'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND], 'acknowledgeid' => 0],
+			'sortorder' => ['alertid' => ZBX_SORT_DOWN]
+		]);
+
+		foreach ($db_alerts as $db_alert) {
+			$alert = [
+				'esc_step' => $db_alert['esc_step'],
+				'time' => $db_alert['clock'],
+				'status' => $db_alert['status'],
+				'alerttype' => $db_alert['alerttype'],
+				'error' => $db_alert['error'],
+				'p_eventid' => $db_alert['p_eventid']
+			];
+
+			if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
+				$alert['mediatypeid'] = $db_alert['mediatypeid'];
+				$alert['userid'] = $db_alert['userid'];
+
+				if ($alert['mediatypeid'] != 0) {
+					$mediatypeids[$db_alert['mediatypeid']] = true;
+				}
+
+				if ($alert['userid'] != 0) {
+					$userids[$db_alert['userid']] = true;
+				}
+			}
+
+			$alerts[$db_alert['eventid']][] = $alert;
+		}
+	}
+
+	// Create array of automatica and manually performed actions combined.
+	foreach ($events as $event) {
+		foreach ($options as $opt) {
+			// Check what automatic actions should be included.
+			if (array_key_exists('actions', $opt) && $opt['actions'] && array_key_exists($event['eventid'], $alerts)) {
+				$return[$event['eventid']][$opt['key']] = $alerts[$event['eventid']];
+			}
+
+			// Check what manual operations should be included.
+			if ($opt['operations'] != ZBX_PROBLEM_UPDATE_NONE && $event['acknowledges']) {
+				foreach ($event['acknowledges'] as $ack) {
+					$userids[$ack['userid']] = true;
+
+					$row = [
+						'step' => null,
+						'time' => $ack['clock'],
+						'user' => $ack['userid'],
+						'actions' => [],
+						'message' => '',
+						'status' => null,
+						'info' => null
+					];
+
+					if ($opt['operations'] & ZBX_PROBLEM_UPDATE_CLOSE && $ack['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+						$row['actions'][] = $html ? makeActionIcon(ZBX_STYLE_ACTION_ICON_CLOSE) : _('Close problem');
+					}
+
+					if ($opt['operations'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+							&& $ack['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
+						$row['actions'][] = $html ? makeActionIcon(ZBX_STYLE_ACTION_ICON_ACK) : _('Acknowledged');
+					}
+
+					if ($opt['operations'] & ZBX_PROBLEM_UPDATE_MESSAGE
+							&& $ack['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) {
+						$row['actions'][] = $html ? makeActionIcon(ZBX_STYLE_ACTION_ICON_MSG) : _('Messages');
+						$row['message'] = $ack['message'];
+					}
+
+					if ($opt['operations'] & ZBX_PROBLEM_UPDATE_SEVERITY
+							&& $ack['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) {
+						$row['old_severity'] = $severities[$ack['old_severity']];
+						$row['new_severity'] = $severities[$ack['new_severity']];
+
+						$message = _s('%1$s &rarr; %2$s', $severities[$ack['old_severity']],
+							$severities[$ack['new_severity']]
+						);
+
+						$action_type = $ack['new_severity'] > $ack['old_severity']
+							? ZBX_STYLE_ACTION_ICON_SEV_UP
+							: ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+
+						$row['actions'][] = $html ? makeActionIcon($action_type, $message) : _('Changed severity');
+					}
+
+					if ($row['actions']) {
+						$return[$event['eventid']][$opt['key']][] = $row;
+					}
+				}
+			}
+
+			order_result($return[$event['eventid']], 'clock', ZBX_SORT_DOWN);
+		}
+	}
+
+	$users = $userids
+		? API::User()->get([
+			'output' => ['alias', 'name', 'surname'],
+			'userids' => array_keys($userids),
+			'preservekeys' => true
+		])
+		: [];
+
+	$mediatypes = $mediatypeids
+		? API::Mediatype()->get([
+			'output' => ['description'],
+			'mediatypeids' => array_keys($mediatypeids),
+			'preservekeys' => true
+		])
+		: [];
+
+	return [
+		'events' => $return,
+		'mediatypes' => $mediatypes,
+		'users' => $users
+	];
+}
+
 function makeEventsActions(array $problems, $display_recovery_alerts = false, $html = true) {
 	if (!$problems) {
 		return [];

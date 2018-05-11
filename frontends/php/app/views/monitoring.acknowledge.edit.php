@@ -31,24 +31,16 @@ $form_list = (new CFormList())
 	);
 
 if (array_key_exists('event', $data)) {
-	$acknowledgesTable = (new CTable())
-		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Time'), _('User'), _('Message'), _('User action')]);
-
-	foreach ($data['event']['acknowledges'] as $acknowledge) {
-		$acknowledgesTable->addRow([
-			(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock'])))->addClass(ZBX_STYLE_NOWRAP),
-			(new CCol(array_key_exists('alias', $acknowledge)
-				? getUserFullname($acknowledge)
-				: _('Inaccessible user')
-			))->addClass(ZBX_STYLE_NOWRAP),
-			zbx_nl2br($acknowledge['message']),
-			($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) ? _('Close problem') : ''
-		]);
-	}
+	$options = [
+		'key' => 'acknowledges',
+		'operations' => 15,
+		'columns' => ['time', 'user', 'user_action', 'message'],
+		'message_max_length' => 30
+	];
+	$table = makeEventsActionsTable([$data['event']], [$options]);
 
 	$form_list->addRow(_('History'),
-		(new CDiv($acknowledgesTable))
+		(new CDiv($table[$data['event']['eventid']]['acknowledges']['table']))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
