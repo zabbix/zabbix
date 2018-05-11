@@ -34,7 +34,7 @@
 		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
 	</target>
 
-	<!-- Cppcheck static analysis target -->
+	<!-- Cppcheck static analyzer target -->
 	<target name="cppcheck-static-analyzer">
 		<exec executable="./bootstrap.sh" failonerror="on"></exec>
 		<exec executable="scan-build" failonerror="on">
