@@ -1244,6 +1244,7 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_MULTIPLIER:
 						// Check if custom multiplier is a valid number.
 						$params = $preprocessing['params'];
+
 						if (is_array($params)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 						}
@@ -1255,8 +1256,8 @@ abstract class CItemGeneral extends CApiService {
 
 						if (!is_numeric($params)
 								&& (new CUserMacroParser())->parse($params) != CParser::PARSE_SUCCESS
-								&& (get_class($this) !== 'CItemPrototype'
-								|| (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS)) {
+								&& (!($this instanceof CItemPrototype)
+									|| (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'params', _('a numeric value is expected')
 							));
