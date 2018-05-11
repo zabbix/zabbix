@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+..F....... [ZBX-13697] fixed session expiration when changing default authentication method (miks)
 ..F....... [ZBX-13768] fixed disabled 'add' button showing in templated item preprocesing form (miks)
 A.F....... [ZBX-13680] fixed action not being cloned due to existing operation id being submitted (agriscenko)
 ..F....... [ZBX-13775] fixed map tree widget border color (Andzs)
@@ -301,6 +302,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13697] fixed session expiration when changing default authentication method (miks)
 A.F....... [ZBX-13680] fixed action not being cloned due to existing operation id being submitted (agriscenko)
 ..F....... [ZBX-13775] fixed map tree widget border color (Andzs)
 ...G...PS. [ZBX-13782] fixed decoding of Unicode characters in JSON (Andris)
