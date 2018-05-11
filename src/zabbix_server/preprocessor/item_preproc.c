@@ -196,7 +196,9 @@ static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *valu
 {
 	char	*err = NULL;
 
-	if (SUCCEED == item_preproc_multiplier_variant(value_type, value, params, &err))
+	if (FAIL == is_double(params))
+		err = zbx_dsprintf(NULL, "a numerical value is expected");
+	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, params, &err))
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
