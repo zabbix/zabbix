@@ -955,7 +955,7 @@ int	is_ascii_string(const char *str);
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_lrtrim(char *str, const char *charlist);
-void	zbx_remove_chars(register char *str, const char *charlist);
+void	zbx_remove_chars(char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	del_zeroes(char *s);
@@ -1007,8 +1007,6 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 		const zbx_custom_interval_t *custom_intervals, time_t now);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	zbx_check_time_period(const char *period, time_t time, int *res);
-char	zbx_num2hex(u_char c);
-u_char	zbx_hex2num(char c);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
