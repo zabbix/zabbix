@@ -110,7 +110,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'kioskmode' => $kioskmode,
 				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
-				'show_timeselector' => self::showTimeline($this->dashboard['widgets']),
+				'show_timeselector' => self::showTimeSelector($this->dashboard['widgets']),
 			];
 
 			$options = [
@@ -516,7 +516,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	/**
-	 * Checks, if any of widgets needs timeline.
+	 * Checks, if any of widgets needs time selector.
 	 *
 	 * @param array $widgets
 	 *
@@ -524,7 +524,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return bool
 	 */
-	private static function showTimeline($widgets) {
+	private static function showTimeSelector(array $widgets) {
 		foreach ($widgets as $widget) {
 			if (CWidgetConfig::usesTimeline($widget['type'])) {
 				return true;
