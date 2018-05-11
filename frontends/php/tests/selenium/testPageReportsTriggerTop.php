@@ -243,7 +243,12 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'filter_from_year' => '2016',
-					'severity' => '2',
+					'severities' =>
+						[
+							'Not classified',
+							'Information',
+							'Warning'
+						],
 					'result' =>
 						[
 							'Test trigger to check tag filter on problem page'
@@ -253,14 +258,15 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'filter_from_year' => '2016',
-					'severity' => '5'
+					'severities' =>
+						[
+							'Not classified',
+							'Warning',
+							'Information',
+							'Average'
+						]
 				]
-			],
-			[
-				[
-					'calendar'=>true,
-				]
-			],
+			]
 		];
 }
 
@@ -282,6 +288,8 @@ class testPageReportsTriggerTop extends CWebTest {
 		if (array_key_exists('host', $data)) {
 			$this->zbxTestClickButtonMultiselect('hostids_');
 			$this->zbxTestLaunchOverlayDialog('Hosts');
+			$this->zbxTestDropdownHasOptions('groupid', ['Host group for tag permissions', 'Zabbix servers', 'ZBX6648 All Triggers','ZBX6648 Disabled Triggers','ZBX6648 Enabled Triggers']);
+			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestClickLinkTextWait($data['host']);
 			$this->zbxTestAssertElementText('//div[@id=\'hostids_\']/div/ul/li/span/span', $data['host']);
 		}
@@ -327,19 +335,11 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestInputTypeOverwrite('filter_till_minute',$data['filter_till_minute']);
 		}
 
-		$severity_count=0;
-		if (array_key_exists('severity', $data)) {
-			while ($severity_count <= $data['severity']) {
-				$this->zbxTestCheckboxSelect('severities_'.$severity_count, false);
-				$severity_count++;
+		if (array_key_exists('severities', $data)) {
+			foreach ($data['severities'] as $severity) {
+				$severity_id = $this->zbxTestGetAttributeValue('//label[text()=\''.$severity.'\']', 'for');
+				$this->zbxTestClick($severity_id);
 			}
-		}
-
-		if (array_key_exists('calendar_from', $data)) {
-			$this->zbxTestClickXpathWait('//form[@id=\'id\']/div/div/div[2]/ul/li/div[2]/button');
-			$this->zbxTestClickXpath('(//button[@value=\'Now\'])[1]');
-			$this->zbxTestClickXpath('(//button[@value=\'Now\'])[2]');
-			$this->zbxTestClickXpathWait('(//button[@type=\'button\'])[20]');
 		}
 
 		$this->zbxTestClickXpath('//button[@name=\'filter_set\']');
