@@ -58,7 +58,7 @@ FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ipmi_authtype	|t_integer	|'-1'	|NOT NULL	|ZBX_PROXY
@@ -66,9 +66,9 @@ FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|maintenanceid	|t_id		|	|NULL		|ZBX_NODATA		|2|maintenances	|		|RESTRICT
 FIELD		|maintenance_status|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -78,7 +78,7 @@ FIELD		|snmp_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ipmi_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|snmp_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|jmx_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
@@ -547,8 +547,6 @@ FIELD		|refresh_unsupported|t_varchar(32)|'10m'	|NOT NULL	|ZBX_PROXY
 FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|event_expire	|t_varchar(32)	|'1w'	|NOT NULL	|ZBX_NODATA
-FIELD		|event_show_max	|t_integer	|'100'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
 FIELD		|authentication_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_host	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
@@ -1622,4 +1620,4 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050066	|3050066
+ROW		|3050069	|3050069

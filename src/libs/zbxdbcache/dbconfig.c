@@ -10212,9 +10212,42 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_condition_clean                                            *
+ * Function: DCtouch_hosts_availability                                       *
  *                                                                            *
- * Purpose: cleans condition data structure                                    *
+ * Purpose: sets availability timestamp to current time for the specified     *
+ *          hosts                                                             *
+ *                                                                            *
+ * Parameters: hostids - [IN] the host identifiers                            *
+ *                                                                            *
+ ******************************************************************************/
+void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids)
+{
+	const char	*__function_name = "DCtouch_hosts_availability";
+	ZBX_DC_HOST	*dc_host;
+	int		i, now;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostids:%d", __function_name, hostids->values_num);
+
+	now = time(NULL);
+
+	LOCK_CACHE;
+
+	for (i = 0; i < hostids->values_num; i++)
+	{
+		if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostids->values[i])))
+			dc_host->availability_ts = now;
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_condition_clean                                           *
+ *                                                                            *
+ * Purpose: cleans condition data structure                                   *
  *                                                                            *
  * Parameters: condition - [IN] the condition data to free                    *
  *                                                                            *
@@ -11258,6 +11291,13 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for itemid [" ZBX_FS_UI64 "]"
 					": item is not in cache", itemids->values[i]);
+
+			proxy_hostid = 0;
+		}
+		else if (0 == dc_item->schedulable)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for item \"%s\" on host \"%s\""
+					": item configuration error", dc_item->key, dc_host->host);
 
 			proxy_hostid = 0;
 		}

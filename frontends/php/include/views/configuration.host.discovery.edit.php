@@ -617,11 +617,21 @@ $conditionTable = (new CTable())
 
 $conditions = $this->data['conditions'];
 if (!$conditions) {
-	$conditions = [['macro' => '', 'value' => '', 'formulaid' => num2letter(0)]];
+	$conditions = [[
+		'macro' => '',
+		'operator' => CONDITION_OPERATOR_REGEXP,
+		'value' => '',
+		'formulaid' => num2letter(0)
+	]];
 }
 else {
 	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
 }
+
+$operators = [
+	CONDITION_OPERATOR_REGEXP => _('matches'),
+	CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
+];
 
 // fields
 foreach ($conditions as $i => $condition) {
@@ -651,7 +661,9 @@ foreach ($conditions as $i => $condition) {
 			->addClass('element-table-remove')
 	];
 
-	$row = [$formulaId, $macro, new CSpan(_('matches')), $value,
+	$row = [$formulaId, $macro,
+		(new CComboBox('conditions['.$i.'][operator]', $condition['operator'], null, $operators))->addClass('operator'),
+		$value,
 		(new CCol($deleteButtonCell))->addClass(ZBX_STYLE_NOWRAP)
 	];
 	$conditionTable->addRow($row, 'form_row');

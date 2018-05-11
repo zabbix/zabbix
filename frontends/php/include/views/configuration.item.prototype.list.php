@@ -152,10 +152,10 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_itemid',
 		[
 			'itemprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Enable selected item prototypes?')
+				'confirm' => _('Create items from selected prototypes as enabled?')
 			],
 			'itemprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Disable selected item prototypes?')
+				'confirm' => _('Create items from selected prototypes as disabled?')
 			],
 			'itemprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected item prototypes?')
