@@ -377,37 +377,104 @@ class CEvent extends CApiService {
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			$where = '';
+			$prev_tag = '';
+			$value = '';
 			$cnt = count($options['tags']);
+			$tag_num = 0;
+			$tag_count = [];
+
+			// Count identical tag names.
+			foreach ($options['tags'] as $tag) {
+				if (array_key_exists($tag['tag'], $tag_count)) {
+					$tag_count[$tag['tag']]++;
+				}
+				else {
+					$tag_count[$tag['tag']] = 1;
+				}
+			}
+
+			CArrayHelper::sort($options['tags'], ['tag']);
 
 			foreach ($options['tags'] as $tag) {
 				if (!array_key_exists('value', $tag)) {
 					$tag['value'] = '';
 				}
 
-				if ($tag['value'] !== '') {
-					if (!array_key_exists('operator', $tag)) {
-						$tag['operator'] = TAG_OPERATOR_LIKE;
-					}
-
-					switch ($tag['operator']) {
-						case TAG_OPERATOR_EQUAL:
-							$tag['value'] = ' AND et.value='.zbx_dbstr($tag['value']);
-							break;
-
-						case TAG_OPERATOR_LIKE:
-						default:
-							$tag['value'] = str_replace('!', '!!', $tag['value']);
-							$tag['value'] = str_replace('%', '!%', $tag['value']);
-							$tag['value'] = str_replace('_', '!_', $tag['value']);
-							$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
-							$tag['value'] = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
-					}
+				if (!array_key_exists('operator', $tag)) {
+					$tag['operator'] = TAG_OPERATOR_LIKE;
 				}
-				elseif ($tag['operator'] == TAG_OPERATOR_EQUAL) {
-					$tag['value'] = ' AND et.value='.zbx_dbstr($tag['value']);
+
+				switch ($tag['operator']) {
+					case TAG_OPERATOR_EQUAL:
+						if ($tag_count[$tag['tag']] > 1) {
+							if ($tag_num == 0) {
+								// First value of many. Open Brace for OR statement.
+								$value = ' AND (et.value='.zbx_dbstr($tag['value']);
+							}
+							elseif ($prev_tag === $tag['tag']) {
+								// Not the first value. Add next OR statement.
+								$value .= ' OR et.value='.zbx_dbstr($tag['value']);
+							}
+
+							$prev_tag = $tag['tag'];
+
+							if ($tag_num + 1 == $tag_count[$tag['tag']]) {
+								// That was last value. Close brace.
+								$value .= ')';
+								$tag_num = 0;
+							}
+							else {
+								// Skip to next tag and value if not last.
+								$tag_num++;
+								continue 2;
+							}
+						}
+						else {
+							// Only one value for this tag name.
+							$value = ' AND et.value='.zbx_dbstr($tag['value']);
+							$prev_tag = $tag['tag'];
+						}
+						break;
+
+					case TAG_OPERATOR_LIKE:
+					default:
+						$tag['value'] = str_replace('!', '!!', $tag['value']);
+						$tag['value'] = str_replace('%', '!%', $tag['value']);
+						$tag['value'] = str_replace('_', '!_', $tag['value']);
+						$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
+
+						if ($tag_count[$tag['tag']] > 1) {
+							if ($tag_num == 0) {
+								// First value of many. Open Brace for OR statement.
+								$value = ' AND (UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
+							}
+							elseif ($prev_tag === $tag['tag']) {
+								// Not the first value. Add next OR statement.
+								$value .= ' OR UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
+							}
+
+							$prev_tag = $tag['tag'];
+
+							if ($tag_num + 1 == $tag_count[$tag['tag']]) {
+								// That was last value. Close brace.
+								$value .= ')';
+								$tag_num = 0;
+							}
+							else {
+								// Skip to next tag and value if not last.
+								$tag_num++;
+								continue 2;
+							}
+						}
+						else {
+							// Only one value for this tag name.
+							$value = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
+							$prev_tag = $tag['tag'];
+						}
 				}
 
 				if ($where !== '') {
+					// Join the EXISTS blocks depeding on evaltype.
 					$where .= ($options['evaltype'] == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
 				}
 
@@ -415,7 +482,7 @@ class CEvent extends CApiService {
 					'SELECT NULL'.
 					' FROM event_tag et'.
 					' WHERE e.eventid=et.eventid'.
-						' AND et.tag='.zbx_dbstr($tag['tag']).$tag['value'].
+						' AND et.tag='.zbx_dbstr($tag['tag']).$value.
 				')';
 			}
 
