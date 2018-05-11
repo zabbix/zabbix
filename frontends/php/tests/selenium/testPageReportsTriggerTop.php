@@ -60,107 +60,6 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertElementText('//table//td[@colspan=\'4\']', 'No data found.');
 	}
 
-	public function testPageReportsTriggerTop_CheckDataFilter() {
-		$this->zbxTestLogin('toptriggers.php');
-		$this->zbxTestClickButtonText('Reset');
-
-		// Check default values of date filter
-		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
-		$this->zbxTestAssertElementValue('filter_from_month', date('m'));
-		$this->zbxTestAssertElementValue('filter_from_day', date('d'));
-		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_year', date('Y'));
-		$this->zbxTestAssertElementValue('filter_till_month', date('m'));
-		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('+1 day')));
-		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-		// Check 'Yesterday' button
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[7]');
-		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 day')));
-		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('-1 day')));
-		$this->zbxTestAssertElementValue('filter_from_day', date('d',strtotime('-1 day')));
-		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('-1 day')));
-		$this->zbxTestAssertElementValue('filter_till_month', date('m',strtotime('-1 day')));
-		$this->zbxTestAssertElementValue('filter_till_day', date('d'));
-		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-		// Check 'Current week' button
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[8]');
-		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('monday this week')));
-		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('monday this week')));
-		$this->zbxTestAssertElementValue('filter_from_day', date('d',strtotime('monday this week')));
-		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('monday next week')));
-		$this->zbxTestAssertElementValue('filter_till_month', date('m',strtotime('monday next week')));
-		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('monday next week')));
-		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-		// Check 'Current month' button
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[9]');
-		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
-		$this->zbxTestAssertElementValue('filter_from_month', date('m'));
-		$this->zbxTestAssertElementValue('filter_from_day', date('01'));
-		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('+1 month')));
-		$this->zbxTestAssertElementValue('filter_till_month', date('m',strtotime('+1 month')));
-		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
-		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-		// Check 'Current year' button
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[10]');
-		$this->zbxTestAssertElementValue('filter_from_year', date('Y'));
-		$this->zbxTestAssertElementValue('filter_from_month', date('01'));
-		$this->zbxTestAssertElementValue('filter_from_day', date('01'));
-		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('+1 year')));
-		$this->zbxTestAssertElementValue('filter_till_month', date('01'));
-		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
-		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-		// Check 'Last week' button
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[11]');
-		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('monday last week')));
-		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('monday last week')));
-		$this->zbxTestAssertElementValue('filter_from_day', date('d',strtotime('monday last week')));
-		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_year', date('Y',strtotime('monday this week')));
-		$this->zbxTestAssertElementValue('filter_till_month', date('m',strtotime('monday this week')));
-		$this->zbxTestAssertElementValue('filter_till_day', date('d',strtotime('monday this week')));
-		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-		// Check 'Last month' button
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[12]');
-		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 month')));
-		$this->zbxTestAssertElementValue('filter_from_month', date('m',strtotime('-1 month')));
-		$this->zbxTestAssertElementValue('filter_from_day', date('01'));
-		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_year', date('Y'));
-		$this->zbxTestAssertElementValue('filter_till_month', date('m'));
-		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
-		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-		// Check 'Last year' button
-		$this->zbxTestClickXpath('(//button[@type=\'button\'])[13]');
-		$this->zbxTestAssertElementValue('filter_from_year', date('Y',strtotime('-1 year')));
-		$this->zbxTestAssertElementValue('filter_from_month', date('01'));
-		$this->zbxTestAssertElementValue('filter_from_day', date('01'));
-		$this->zbxTestAssertElementValue('filter_from_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_from_minute', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_year', date('Y'));
-		$this->zbxTestAssertElementValue('filter_till_month', date('01'));
-		$this->zbxTestAssertElementValue('filter_till_day', date('01'));
-		$this->zbxTestAssertElementValue('filter_till_hour', date('00'));
-		$this->zbxTestAssertElementValue('filter_till_minute', date('00'));
-	}
-
 	public static function filter() {
 		return [
 			[
@@ -171,7 +70,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'host_gr_name' => 'Zabbix servers',
-					'filter_from_year' => '2016',
+					'data_from' => '01.01.2016 00:00',
 					'result'=>
 						[
 							'Test trigger to check tag filter on problem page',
@@ -190,7 +89,7 @@ class testPageReportsTriggerTop extends CWebTest {
 				[
 					'host_gr_name' => 'Zabbix servers',
 					'host' => 'ЗАББИКС Сервер',
-					'filter_from_year' => '2016',
+					'data_from' => '01.01.2016 00:00',
 					'result' =>
 						[
 							'Test trigger to check tag filter on problem page',
@@ -207,32 +106,16 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'host_gr_name' => 'Zabbix servers',
-					'filter_from_year' => '2016',
-					'filter_from_month' => '01',
-					'filter_from_day' => '01',
-					'filter_from_hour' => '15',
-					'filter_from_minute' => '15',
-					'filter_till_year' => '2017',
-					'filter_till_month' => '01',
-					'filter_till_day' => '01',
-					'filter_till_hour' => '15',
-					'filter_till_minute' => '15'
+					'data_from' => '01.01.2016 15:15',
+					'data_till' => '01.01.2017 15:15'
 				]
 			],
 			[
 				[
 					'host_gr_name' => 'Zabbix servers',
 					'host' => 'ЗАББИКС Сервер',
-					'filter_from_year' => '2017',
-					'filter_from_month' => '10',
-					'filter_from_day' => '22',
-					'filter_from_hour' => '01',
-					'filter_from_minute' => '01',
-					'filter_till_year' => '2017',
-					'filter_till_month' => '10',
-					'filter_till_day' => '24',
-					'filter_till_hour' => '01',
-					'filter_till_minute' => '01',
+					'data_from' => '22.10.2017 01:01',
+					'data_till' => '24.10.2017 01:01',
 					'result' =>
 						[
 							'Test trigger to check tag filter on problem page',
@@ -242,7 +125,28 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
-					'filter_from_year' => '2016',
+					'data_from' => '23.10.2017 12:35',
+					'data_till' => '23.10.2017 12:36',
+					'result' =>
+						[
+							'Trigger for tag permissions MySQL'
+						]
+				]
+			],
+			[
+				[
+					'data_from' => '23.10.2017 12:33',
+					'data_till' => '23.10.2017 12:36',
+					'result' =>
+						[
+							'Test trigger to check tag filter on problem page',
+							'Trigger for tag permissions MySQL'
+						]
+				]
+			],
+			[
+				[
+					'data_from' => '01.01.2016 00:00',
 					'severities' =>
 						[
 							'Not classified',
@@ -257,7 +161,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
-					'filter_from_year' => '2016',
+					'data_from' => '01.01.2016 00:00',
 					'severities' =>
 						[
 							'Not classified',
@@ -295,44 +199,27 @@ class testPageReportsTriggerTop extends CWebTest {
 		}
 
 		// Update date in 'From' field
-		if (array_key_exists('filter_from_year', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_from_year',$data['filter_from_year']);
+		if (array_key_exists('data_from',$data)) {
+			$data1 = explode(' ',$data['data_from']);
+			$day_f = explode('.',$data1[0]);
+			$time_f = explode(':',$data1[1]);
+			$this->zbxTestInputTypeOverwrite('filter_from_day',$day_f[0]);
+			$this->zbxTestInputTypeOverwrite('filter_from_month',$day_f[1]);
+			$this->zbxTestInputTypeOverwrite('filter_from_year',$day_f[2]);
+			$this->zbxTestInputTypeOverwrite('filter_from_hour',$time_f[0]);
+			$this->zbxTestInputTypeOverwrite('filter_from_minute',$time_f[1]);
 		}
 
-		if (array_key_exists('filter_from_month', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_from_month',$data['filter_from_month']);
-		}
-
-		if (array_key_exists('filter_from_day', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_from_day',$data['filter_from_day']);
-		}
-
-		if (array_key_exists('filter_from_hour', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_from_hour',$data['filter_from_hour']);
-		}
-
-		if (array_key_exists('filter_from_minute', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_from_minute',$data['filter_from_minute']);
-		}
-
-		if (array_key_exists('filter_till_year', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_till_year',$data['filter_till_year']);
-		}
-
-		if (array_key_exists('filter_till_month', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_till_month',$data['filter_till_month']);
-		}
-
-		if (array_key_exists('filter_till_day', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_till_day',$data['filter_till_day']);
-		}
-
-		if (array_key_exists('filter_till_hour', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_till_hour',$data['filter_till_hour']);
-		}
-
-		if (array_key_exists('filter_till_minute', $data)) {
-			$this->zbxTestInputTypeOverwrite('filter_till_minute',$data['filter_till_minute']);
+		// Update date in 'Till' field
+		if (array_key_exists('data_till',$data)) {
+			$data2 = explode(' ',$data['data_till']);
+			$day_t = explode('.',$data2[0]);
+			$time_t = explode(':',$data2[1]);
+			$this->zbxTestInputTypeOverwrite('filter_till_day',$day_t[0]);
+			$this->zbxTestInputTypeOverwrite('filter_till_month',$day_t[1]);
+			$this->zbxTestInputTypeOverwrite('filter_till_year',$day_t[2]);
+			$this->zbxTestInputTypeOverwrite('filter_till_hour',$time_t[0]);
+			$this->zbxTestInputTypeOverwrite('filter_till_minute',$time_t[1]);
 		}
 
 		if (array_key_exists('severities', $data)) {
