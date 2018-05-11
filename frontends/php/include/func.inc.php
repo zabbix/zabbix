@@ -2674,6 +2674,7 @@ function relativeDateToText($start, $end) {
 			$date = $date->format(ZBX_DATE_TIME);
 		}
 	}
+	unset($date);
 
 	return implode(' - ', $range);
 }
