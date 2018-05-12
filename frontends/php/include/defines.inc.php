@@ -611,8 +611,8 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
 );
 define('ACTION_DEFAULT_MSG_ACKNOWLEDGE',
-		"{USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME} with the following message:\n".
-		"{ACK.MESSAGE}\n\n".
+		"{USER.FULLNAME} acknowledged problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME} with the following message:\n".
+		"{EVENT.UPDATE.MESSAGE}\n\n".
 		"Current problem status is {EVENT.STATUS}"
 );
 define('ACTION_DEFAULT_MSG_PROBLEM', "Problem started at {EVENT.TIME} on {EVENT.DATE}\nProblem name: {TRIGGER.NAME}\n".
