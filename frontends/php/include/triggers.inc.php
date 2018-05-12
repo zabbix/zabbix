@@ -1155,11 +1155,10 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
  * Make trigger info block.
  *
  * @param array $trigger			Trigger described in info block.
- * @param int	$event_severity		Event severity.
  *
  * @return object
  */
-function make_trigger_details($trigger, $event_severity) {
+function make_trigger_details($trigger) {
 	$hostNames = [];
 
 	$config = select_config();
@@ -1197,7 +1196,7 @@ function make_trigger_details($trigger, $event_severity) {
 		])
 		->addRow([
 			_('Severity'),
-			getSeverityCell($event_severity, $config)
+			getSeverityCell($trigger['priority'], $config)
 		]);
 
 	$trigger = CMacrosResolverHelper::resolveTriggerExpressions(zbx_toHash($trigger, 'triggerid'), [

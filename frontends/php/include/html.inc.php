@@ -907,22 +907,23 @@ function makeInformationIcon($message)
 /**
  * Renders an action icon.
  *
- * @param string $action type
- * @param string $message
- * @param int    $count number
+ * @param array  $icon_data
+ * @param string $icon_data[icon]   Icon style.
+ * @param string $icon_data[hint]   Hintbox content.
+ * @param int    $icon_data[num]    Number displayed over the icon.
  *
  * @return CSpan
  */
-function makeActionIcon($action_type, $message = null, $count = null)
+function makeActionIcon(array $icon_data)
 {
-	$icon = (new CSpan())->addClass($action_type);
+	$icon = (new CSpan())->addClass($icon_data['icon']);
 
-	if ($count) {
-		$icon->setAttribute('data-count', $count);
+	if (array_key_exists('num', $icon_data) && $icon_data['num'] > 0) {
+		$icon->setAttribute('data-count', $icon_data['num']);
 	}
 
-	if ($message) {
-		$icon->setHint($message);
+	if (array_key_exists('hint', $icon_data)) {
+		$icon->setHint($icon_data['hint']);
 	}
 
 	return $icon;

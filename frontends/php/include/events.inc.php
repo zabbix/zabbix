@@ -156,10 +156,16 @@ function make_event_details($event, $backurl) {
 		->setArgument('backurl', $backurl)
 		->getUrl();
 
+	$config = select_config();
+
 	$table = (new CTableInfo())
 		->addRow([
 			_('Event'),
 			$event['name']
+		])
+		->addRow([
+			_('Severity'),
+			getSeverityCell($event['severity'], $config)
 		])
 		->addRow([
 			_('Time'),
@@ -278,13 +284,14 @@ function make_small_eventlist($startEvent, $backurl) {
 
 	$triggerids = [];
 	foreach ($events as &$event) {
+		$triggerids[] = $event['objectid'];
+
 		if (array_key_exists($event['r_eventid'], $r_events)) {
 			$event['r_clock'] = $r_events[$event['r_eventid']]['clock'];
 			$event['correlationid'] = $r_events[$event['r_eventid']]['correlationid'];
 			$event['userid'] = $r_events[$event['r_eventid']]['userid'];
 		}
 		else {
-			$triggerids[] = $event['objectid'];
 			$event['r_clock'] = 0;
 			$event['correlationid'] = 0;
 			$event['userid'] = 0;
@@ -292,7 +299,7 @@ function make_small_eventlist($startEvent, $backurl) {
 	}
 	unset($event);
 
-	$actions = makeEventsActionsTable($events, getDefaultActionOptions());
+	$actions = makeEventsActionsTables($events, getDefaultActionOptions());
 
 	// Get trigger severities.
 	$db_triggers = $triggerids
@@ -340,43 +347,49 @@ function make_small_eventlist($startEvent, $backurl) {
 		$action_icons = [];
 
 		// Add messages icon.
-		$messages_action = $actions[$event['eventid']]['messages'];
-		if ($messages_action['count']) {
-			$action_icons[] = makeActionIcon(ZBX_STYLE_ACTION_ICON_MSGS, $messages_action['table'],
-				$messages_action['count']
-			);
+		if ($actions[$event['eventid']]['messages']['count']) {
+			$action_icons[] = makeActionIcon([
+				'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
+				'hint' => $actions[$event['eventid']]['messages']['table'],
+				'count' => $actions[$event['eventid']]['messages']['count']
+			]);
 		}
 
 		// Add severity change icon.
-		$severity_action = $actions[$event['eventid']]['severity_changes'];
-		if ($severity_action['count']) {
+		if ($actions[$event['eventid']]['severity_changes']['count']) {
 			if ($db_triggers[$event['objectid']]['priority'] > $event['severity']) {
-				$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
+				$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
 			}
 			elseif ($db_triggers[$event['objectid']]['priority'] < $event['severity']) {
-				$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+				$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
 			}
 			else {
 				$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
 			}
 
-			$action_icons[] = makeActionIcon($icon_style, $severity_action['table']);
+			$action_icons[] = makeActionIcon([
+				'icon' => $icon_style,
+				'hint' => $actions[$event['eventid']]['severity_changes']['table']
+			]);
 		}
 
 		// Add actions list icon.
-		$action_list = $actions[$event['eventid']]['action_list'];
-		if ($action_list['count']) {
-			if ($action_list['has_fail_action']) {
+		if ($actions[$event['eventid']]['action_list']['count']) {
+			if ($actions[$event['eventid']]['action_list']['has_fail_action']) {
 				$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
 			}
-			elseif ($action_list['has_uncomplete_action']) {
+			elseif ($actions[$event['eventid']]['action_list']['has_uncomplete_action']) {
 				$icon_style = ZBX_STYLE_ACTIONS_NUM_YELLOW;
 			}
 			else {
 				$icon_style = ZBX_STYLE_ACTIONS_NUM_GRAY;
 			}
 
-			$action_icons[] = makeActionIcon($icon_style, $action_list['table'], $action_list['count']);
+			$action_icons[] = makeActionIcon([
+				'icon' => $icon_style,
+				'hint' => $actions[$event['eventid']]['action_list']['table'],
+				'count' => $actions[$event['eventid']]['action_list']['count']
+			]);
 		}
 
 		// Create link to Problem update page.

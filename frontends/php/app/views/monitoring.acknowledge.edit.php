@@ -37,7 +37,7 @@ if (array_key_exists('event', $data)) {
 		'columns' => ['time', 'user', 'user_action', 'message'],
 		'message_max_length' => 30
 	];
-	$table = makeEventsActionsTable([$data['event']], [$options]);
+	$table = makeEventsActionsTables([$data['event']], [$options]);
 
 	$form_list->addRow(_('History'),
 		(new CDiv($table[$data['event']['eventid']]['acknowledges']['table']))

@@ -73,15 +73,10 @@ if (!$triggers) {
 
 $trigger = reset($triggers);
 
-$alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error', 'esc_step',
-	'clock', 'subject', 'message', 'p_eventid', 'acknowledgeid'
-];
-
 $events = API::Event()->get([
 	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value', 'name', 'acknowledged', 'severity'],
-	'select_alerts' => $alert_options,
 	'selectTags' => ['tag', 'value'],
-	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname', 'old_severity', 'new_severity'],
+	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity'],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
@@ -93,18 +88,9 @@ if (!$events) {
 }
 $event = reset($events);
 
-$alerts = [];
-$r_alerts = [];
-
-if ($event['alerts']) {
-	$alerts = $event['alerts'];
-	CArrayHelper::sort($alerts, [['field' => 'alertid', 'order' => ZBX_SORT_DOWN]]);
-}
-
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
 		'output' => ['correlationid', 'userid'],
-		'select_alerts' => $alert_options,
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'eventids' => [$event['r_eventid']],
@@ -116,38 +102,19 @@ if ($event['r_eventid'] != 0) {
 
 		$event['correlationid'] = $r_event['correlationid'];
 		$event['userid'] = $r_event['userid'];
-
-		if ($r_event['alerts']) {
-			CArrayHelper::sort($r_alerts, [['field' => 'alertid', 'order' => ZBX_SORT_DOWN]]);
-			foreach ($r_event['alerts'] as $alert) {
-				if ($alert['p_eventid'] == $event['eventid']) {
-					$r_alerts[] = $alert;
-				}
-			}
-		}
 	}
 }
 
-// Filter out acknowledgement notification messages.
-$all_alerts = [&$alerts, &$r_alerts];
-
-foreach ($all_alerts as &$alerts_data) {
-	foreach ($alerts_data as $index => $alert) {
-		if ($alert['acknowledgeid'] > 0) {
-			unset($alerts_data[$index]);
-		}
-	}
-}
-unset($alerts_data);
-
-$table_options = [[
+$table_options = [
 	'key' => 'actions_list',
 	'actions' => true,
 	'operations' => 15,
 	'style' => 'CTableInfo',
-	'columns' => ['step', 'time', 'user_recipient', 'action', 'message_command', 'status', 'info']
-]];
-$actions_table = makeEventsActionsTable($events, $table_options);
+	'columns' => ['step', 'time', 'user_recipient', 'action', 'message_command', 'status', 'info'],
+	'show_problem' => true
+];
+
+$actions_table = makeEventsActionsTables([$event], [$table_options]);
 $actions_table = $actions_table[$event['eventid']]['actions_list']['table'];
 
 /*
@@ -156,7 +123,7 @@ $actions_table = $actions_table[$event['eventid']]['actions_list']['table'];
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
-			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['severity'])))
+			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
 				->setHeader(_('Event source details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
 				make_event_details($event,

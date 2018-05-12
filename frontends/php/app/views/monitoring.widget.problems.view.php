@@ -74,7 +74,7 @@ if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
 
-$actions = makeEventsActionsTable($data['data']['problems'], getDefaultActionOptions());
+$actions = makeEventsActionsTables($data['data']['problems'], getDefaultActionOptions());
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
@@ -176,41 +176,49 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	$action_icons = [];
 
 	// Add messages icon.
-	$messages_action = $actions[$problem['eventid']]['messages'];
-	if ($messages_action['count']) {
-		$action_icons[] = makeActionIcon(ZBX_STYLE_ACTION_ICON_MSGS, $messages_action['table'], $messages_action['count']);
+	if ($actions[$problem['eventid']]['messages']['count'] > 0) {
+		$action_icons[] = makeActionIcon([
+			'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
+			'hint' => $actions[$problem['eventid']]['messages']['table'],
+			'count' => $actions[$problem['eventid']]['messages']['count']
+		]);
 	}
 
 	// Add severity change icon.
-	$severity_action = $actions[$problem['eventid']]['severity_changes'];
-	if ($severity_action['count']) {
+	if ($actions[$problem['eventid']]['severity_changes']['count']) {
 		if ($trigger['priority'] > $problem['severity']) {
-			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
+			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
 		}
 		elseif ($trigger['priority'] < $problem['severity']) {
-			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
 		}
 		else {
 			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
 		}
 
-		$action_icons[] = makeActionIcon($icon_style, $severity_action['table']);
+		$action_icons[] = makeActionIcon([
+			'icon' => $icon_style,
+			'hint' => $actions[$problem['eventid']]['severity_changes']['table']
+		]);
 	}
 
 	// Add actions list icon.
-	$action_list = $actions[$problem['eventid']]['action_list'];
-	if ($action_list['count']) {
-		if ($action_list['has_fail_action']) {
+	if ($actions[$problem['eventid']]['action_list']['count']) {
+		if ($actions[$problem['eventid']]['action_list']['has_fail_action']) {
 			$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
 		}
-		elseif ($action_list['has_uncomplete_action']) {
+		elseif ($actions[$problem['eventid']]['action_list']['has_uncomplete_action']) {
 			$icon_style = ZBX_STYLE_ACTIONS_NUM_YELLOW;
 		}
 		else {
 			$icon_style = ZBX_STYLE_ACTIONS_NUM_GRAY;
 		}
 
-		$action_icons[] = makeActionIcon($icon_style, $action_list['table'], $action_list['count']);
+		$action_icons[] = makeActionIcon([
+			'icon' => $icon_style,
+			'hint' => $actions[$problem['eventid']]['action_list']['table'],
+			'count' => $actions[$problem['eventid']]['action_list']['count']
+		]);
 	}
 
 	if ($show_timeline) {

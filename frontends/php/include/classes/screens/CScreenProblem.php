@@ -710,7 +710,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($this->data['action'] === 'problem.view') {
-			$actions = makeEventsActionsTable($data['problems'], getDefaultActionOptions(), true);
+			$actions = makeEventsActionsTables($data['problems'], getDefaultActionOptions(), true);
 			$url_form = clone $url;
 
 			$form = (new CForm('get', 'zabbix.php'))
@@ -961,43 +961,49 @@ class CScreenProblem extends CScreenBase {
 				$action_icons = [];
 
 				// Add messages icon.
-				$messages_action = $actions[$problem['eventid']]['messages'];
-				if ($messages_action['count']) {
-					$action_icons[] = makeActionIcon(ZBX_STYLE_ACTION_ICON_MSGS, $messages_action['table'],
-						$messages_action['count']
-					);
+				if ($actions[$problem['eventid']]['messages']['count']) {
+					$action_icons[] = makeActionIcon([
+						'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
+						'hint' => $actions[$problem['eventid']]['messages']['table'],
+						'count' => $actions[$problem['eventid']]['messages']['count']
+					]);
 				}
 
 				// Add severity change icon.
-				$severity_action = $actions[$problem['eventid']]['severity_changes'];
-				if ($severity_action['count']) {
+				if ($actions[$problem['eventid']]['severity_changes']['count']) {
 					if ($original_severity[$problem['objectid']] > $problem['severity']) {
-						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
+						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
 					}
 					elseif ($original_severity[$problem['objectid']] < $problem['severity']) {
-						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
 					}
 					else {
 						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
 					}
 
-					$action_icons[] = makeActionIcon($icon_style, $severity_action['table']);
+					$action_icons[] = makeActionIcon([
+						'icon' => $icon_style,
+						'hint' => $actions[$problem['eventid']]['severity_changes']['table']
+					]);
 				}
 
 				// Add actions list icon.
-				$action_list = $actions[$problem['eventid']]['action_list'];
-				if ($action_list['count']) {
-					if ($action_list['has_fail_action']) {
+				if ($actions[$problem['eventid']]['action_list']['count']) {
+					if ($actions[$problem['eventid']]['action_list']['has_fail_action']) {
 						$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
 					}
-					elseif ($action_list['has_uncomplete_action']) {
+					elseif ($actions[$problem['eventid']]['action_list']['has_uncomplete_action']) {
 						$icon_style = ZBX_STYLE_ACTIONS_NUM_YELLOW;
 					}
 					else {
 						$icon_style = ZBX_STYLE_ACTIONS_NUM_GRAY;
 					}
 
-					$action_icons[] = makeActionIcon($icon_style, $action_list['table'], $action_list['count']);
+					$action_icons[] = makeActionIcon([
+						'icon' => $icon_style,
+						'hint' => $actions[$problem['eventid']]['action_list']['table'],
+						'count' => $actions[$problem['eventid']]['action_list']['count']
+					]);
 				}
 
 				// Add table row.
@@ -1028,7 +1034,8 @@ class CScreenProblem extends CScreenBase {
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
 		else {
-			$actions = makeEventsActions($data['problems'], true, false);
+			$actions = makeEventsActionsTables($data['problems'], getDefaultActionOptions(), false);
+
 			$csv = [];
 
 			$csv[] = [
@@ -1070,6 +1077,18 @@ class CScreenProblem extends CScreenBase {
 					$hosts[] = $trigger_host['name'];
 				}
 
+				$actions_performed = [];
+				if ($actions[$problem['eventid']]['messages']['count'] > 0) {
+					$actions_performed[] = _('Messages') . ' ('.$actions[$problem['eventid']]['messages']['count'].')';
+				}
+				if ($actions[$problem['eventid']]['severity_changes']['count'] > 0) {
+					$actions_performed[] = _('Severity changes');
+				}
+				if ($actions[$problem['eventid']]['action_list']['count'] > 0) {
+					$actions_performed[]
+						= _('Actions') . ' ('.$actions[$problem['eventid']]['action_list']['count'].')';
+				}
+
 				$csv[] = [
 					getSeverityName($problem['severity'], $this->config),
 					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
@@ -1083,7 +1102,7 @@ class CScreenProblem extends CScreenBase {
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					($problem['acknowledged'] == EVENT_ACKNOWLEDGED) ? _('Yes') : _('No'),
-					array_key_exists($problem['eventid'], $actions) ? $actions[$problem['eventid']] : '',
+					implode(', ', $actions_performed),
 					implode(', ', $tags[$problem['eventid']])
 				];
 			}

@@ -112,7 +112,7 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
-define('ZBX_SHOW_TECHNICAL_ERRORS', false);
+define('ZBX_SHOW_TECHNICAL_ERRORS', true);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
