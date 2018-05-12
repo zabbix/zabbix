@@ -1446,6 +1446,7 @@ function getDefaultActionOptions() {
 			ZBX_PROBLEM_UPDATE_MESSAGE + ZBX_PROBLEM_UPDATE_SEVERITY,
 		'columns' => ['time', 'user_recipient', 'action', 'message', 'status', 'info'],
 		'message_max_length' => 30,
+		'actions' => true,
 		'style' => 'CTableInfo',
 		'show_problem' => true
 	]];

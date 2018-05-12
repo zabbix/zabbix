@@ -180,7 +180,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$action_icons[] = makeActionIcon([
 			'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
 			'hint' => $actions[$problem['eventid']]['messages']['table'],
-			'count' => $actions[$problem['eventid']]['messages']['count']
+			'num' => $actions[$problem['eventid']]['messages']['count']
 		]);
 	}
 
@@ -217,7 +217,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$action_icons[] = makeActionIcon([
 			'icon' => $icon_style,
 			'hint' => $actions[$problem['eventid']]['action_list']['table'],
-			'count' => $actions[$problem['eventid']]['action_list']['count']
+			'num' => $actions[$problem['eventid']]['action_list']['count']
 		]);
 	}
 

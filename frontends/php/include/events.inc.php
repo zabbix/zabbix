@@ -351,7 +351,7 @@ function make_small_eventlist($startEvent, $backurl) {
 			$action_icons[] = makeActionIcon([
 				'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
 				'hint' => $actions[$event['eventid']]['messages']['table'],
-				'count' => $actions[$event['eventid']]['messages']['count']
+				'num' => $actions[$event['eventid']]['messages']['count']
 			]);
 		}
 
@@ -388,7 +388,7 @@ function make_small_eventlist($startEvent, $backurl) {
 			$action_icons[] = makeActionIcon([
 				'icon' => $icon_style,
 				'hint' => $actions[$event['eventid']]['action_list']['table'],
-				'count' => $actions[$event['eventid']]['action_list']['count']
+				'num' => $actions[$event['eventid']]['action_list']['count']
 			]);
 		}
 
