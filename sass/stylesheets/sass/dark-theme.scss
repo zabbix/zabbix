@@ -157,8 +157,7 @@ $ok-ack-fg-color: #00ff00;
 	}
 }
 
-// Tables
-
+// TABLES
 .list-table {
 	&.compact-view {
 		tr {
@@ -188,21 +187,18 @@ $ok-ack-fg-color: #00ff00;
 
 // GRAPH AND MAP
 .btn-back-map-container {
-
 	.btn-back-map {
-
 		.btn-back-map-icon {
 			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
 		}
 	}
 }
 
-// Time selection
-
+// TIME SELECTION
 .ui-tabs-nav {
 	.ui-tabs-active {
 		.btn-time {
-			&::after {
+			&:after {
 				background: url(../img/icon-sprite.svg) no-repeat -87px -585px;
 			}
 		}

@@ -1063,80 +1063,63 @@ td.inactive-bg {
 	}
 }
 
-// Time selection
-
+// TIME SELECTION
 .ui-tabs-nav {
-	.btn-time {
-		&:hover {
-			background-color: darken($btn-bg-color, 10%);
-		}
-
-		&:focus {
-			background-color: lighten($btn-bg-color, 10%);
-			@include box-shadow(0 0 0 2px rgba($blue, 1));
-		}
-	}
-
+	.btn-time,
 	.filter-trigger {
 		&:hover {
 			background-color: darken($btn-bg-color, 10%);
 		}
 
 		&:focus {
-			background-color: lighten($btn-bg-color, 10%);
-			@include box-shadow(0 0 0 2px rgba($blue, 1));
-		}
-	}
-
-	.ui-state-focus {
-		.filter-trigger, .btn-time {
 			@include box-shadow(0 0 0 2px rgba($blue, 1));
 			background-color: lighten($btn-bg-color, 10%);
 		}
 	}
 
 	.ui-state-focus {
+		.btn-time,
+		.filter-trigger {
+			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			background-color: lighten($btn-bg-color, 10%);
+		}
+
 		&.ui-tabs-active {
-			.filter-trigger, .btn-time {
+			.btn-time,
+			.filter-trigger {
+				@include box-shadow(0 0 0 2px rgba($blue, 1));
 				background-color: $ui-hover-color;
 				border-color: $ui-hover-color;
-				@include box-shadow(0 0 0 2px rgba($blue, 1));
 			}
 		}
-	}
-}
-
-.btn-time-right {
-	background: url(../img/icon-sprite.svg) no-repeat -242px -623px;
-
-	&:hover {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
-
-	&:focus {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-		background-color: lighten($btn-bg-color, 10%);
-	}
-
-	&:disabled {
-		background: url(../img/icon-sprite.svg) no-repeat -242px -623px;
 	}
 }
 
 .btn-time-left {
 	background: url(../img/icon-sprite.svg) no-repeat -244px -657px;
 
-	&:hover {
+	&:disabled {
+		background-position: -244px -657px;
+	}
+}
+
+.btn-time-right {
+	background: url(../img/icon-sprite.svg) no-repeat -242px -623px;
+
+	&:disabled {
+		background-position: -242px -623px;
+	}
+}
+
+.btn-time-right,
+.btn-time-left {
+	&:hover,
+	&:focus {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&:focus {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
 		background-color: lighten($btn-bg-color, 10%);
-	}
-
-	&:disabled {
-		background: url(../img/icon-sprite.svg) no-repeat -244px -657px;
 	}
 }
 

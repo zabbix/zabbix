@@ -1101,95 +1101,84 @@ td.inactive-bg {
 	}
 }
 
-// Time selection
-
+// TIME SELECTION
 .ui-tabs-nav {
 	.btn-time {
-		&::after {
-			background: url(../img/icon-sprite.svg) no-repeat -246px -581px;
-		}
-
-		&:hover {
-			background-color: darken($btn-bg-color, 10%);
-		}
-
-		&:focus {
-			background-color: darken($btn-bg-color, 10%);
-			@include box-shadow(0 0 0 2px rgba($blue, 1));
+		&:after {
+			background-position: -246px -581px;
 		}
 	}
 
+	.btn-time,
 	.filter-trigger {
 		&:hover {
 			background-color: darken($btn-bg-color, 10%);
 		}
 
 		&:focus {
-			background-color: darken($btn-bg-color, 10%);
 			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			background-color: darken($btn-bg-color, 10%);
 		}
 	}
 
 	.ui-state-focus {
-		.filter-trigger, .btn-time {
+		.btn-time,
+		.filter-trigger {
 			@include box-shadow(0 0 0 2px rgba($blue, 1));
 			background-color: darken($btn-bg-color, 10%);
+		}
+
+		&.ui-tabs-active {
+			.btn-time,
+			.filter-trigger {
+				@include box-shadow(0 0 0 2px rgba($blue, 1));
+				background-color: $ui-hover-color;
+			}
 		}
 	}
 
 	.ui-tabs-active {
 		.btn-time {
-			&::after {
-				background: url(../img/icon-sprite.svg) no-repeat -87px -585px;
+			&:after {
+				background-position: -87px -585px;
 			}
 		}
-	}
-
-	.ui-state-focus {
-		&.ui-tabs-active {
-			.filter-trigger, .btn-time {
-				background-color: $ui-hover-color;
-				@include box-shadow(0 0 0 2px rgba($blue, 1));
-			}
-		}
-	}
-}
-
-.btn-time-right {
-	background: url(../img/icon-sprite.svg) no-repeat -395px -623px;
-
-	&:hover {
-		background: url(../img/icon-sprite.svg) no-repeat -243px -624px;
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
-
-	&:focus {
-		background: url(../img/icon-sprite.svg) no-repeat -243px -624px;
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-		background-color: darken($btn-bg-color, 10%);
-	}
-
-	&:disabled {
-		background: url(../img/icon-sprite.svg) no-repeat -395px -623px;
 	}
 }
 
 .btn-time-left {
 	background: url(../img/icon-sprite.svg) no-repeat -397px -657px;
 
-	&:hover {
-		background: url(../img/icon-sprite.svg) no-repeat -245px -658px;
+	&:hover,
+	&:focus {
+		background-position: -245px -658px;
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&:focus {
-		background: url(../img/icon-sprite.svg) no-repeat -245px -658px;
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
 		background-color: darken($btn-bg-color, 10%);
 	}
 
 	&:disabled {
-		background: url(../img/icon-sprite.svg) no-repeat -397px -657px;
+		background-position: -397px -657px;
+	}
+}
+
+.btn-time-right {
+	background: url(../img/icon-sprite.svg) no-repeat -395px -623px;
+
+	&:hover,
+	&:focus {
+		background-position: -243px -624px;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		background-color: darken($btn-bg-color, 10%);
+	}
+
+	&:disabled {
+		background-position: -395px -623px;
 	}
 }
 

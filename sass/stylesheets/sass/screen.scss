@@ -1170,11 +1170,11 @@ output {
 }
 
 .filter-container {
-	position: relative;
-	padding: 10px 0;
-	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
+	margin: 0 0 10px 0;
+	padding: 10px 0;
+	position: relative;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
@@ -2315,116 +2315,95 @@ $icon-widget-btn: (
 	}
 }
 
-// Time selection
-
+// TIME SELECTION
 .ui-tabs-nav {
-
-	.btn-time {
+	.btn-time,
+	.filter-trigger {
+		@include border-radius(2px);
 		color: $btn-font-color;
 		background-color: $btn-bg-color;
 		border: 1px solid $btn-bg-color;
 		position: relative;
 		margin: 0 0 0 6px;
-		padding: 0 34px 0 10px;
 		min-width: 94px;
 		min-height: 24px;
-		@include border-radius(2px);
 		vertical-align: bottom;
 
-		&::after {
+		&:after {
 			content: "";
-			margin: 0 5px 0 5px;
 			position: absolute;
+		}
+
+		&:focus,
+		&:hover {
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+	}
+
+	.btn-time {
+		padding: 0 34px 0 10px;
+
+		&:after {
+			margin: 0 5px;
 			right: 0;
 			bottom: 0;
 			height: 24px;
 			width: 24px;
 			background: url(../img/icon-sprite.svg) no-repeat -87px -581px;
 		}
-
-		&:focus, &:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
 	}
 
 	.filter-trigger {
-		color: $btn-font-color;
-		background-color: $btn-bg-color;
-		border: 1px solid $btn-bg-color;
-		position: relative;
-		margin: 0 0 0 6px;
 		padding: 0 21px 0 10px;
-		min-width: 94px;
-		min-height: 24px;
-		@include border-radius(2px);
-		vertical-align: bottom;
 
-		&::after {
+		&:after {
 			@extend .arrow-down;
-			content: "";
-			position: absolute;
 			top: 8px;
 			margin-left: 6px;
 			border-top-color: $btn-font-color;
 		}
-
-		&:focus, &:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
 	}
 
 	.ui-state-focus {
-		.filter-trigger, .btn-time {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		.btn-time,
+		.filter-trigger {
 			@include box-shadow(0 0 0 2px rgba($blue, .35));
 		}
 	}
 
 	.ui-tabs-active {
-		.btn-time {
-			color: $font-color;
-			background-color: $ui-bg-color;
-			border: 1px solid $ui-border-color;
-			border-bottom: none;
-			margin: 0 0 0 6px;
-			padding: 0 34px 4px 10px;
-			@include border-radius(2px 2px 0 0);
-
-			&::after {
-				content: "";
-				margin: 0 5px 0 5px;
-				position: absolute;
-				right: 0;
-				bottom: 0;
-				height: 24px;
-				width: 24px;
-				background: url(../img/icon-sprite.svg) no-repeat -246px -585px;
-			}
-		}
-
+		.btn-time,
 		.filter-trigger {
 			color: $font-color;
 			background-color: $ui-bg-color;
 			border: 1px solid $ui-border-color;
 			border-bottom: none;
 			margin: 0 0 0 6px;
-			padding: 0 21px 4px 10px;
-			position: relative;
 			@include border-radius(2px 2px 0 0);
+		}
 
-			&::after {
+		.btn-time {
+			padding: 0 34px 4px 10px;
+
+			&:after {
+				background: url(../img/icon-sprite.svg) no-repeat -246px -585px;
+			}
+		}
+
+		.filter-trigger {
+			padding: 0 21px 4px 10px;
+
+			&:after {
 				@extend .arrow-up;
-				content: "";
-				position: absolute;
-				top: 8px;
-				margin-left: 6px;
 				border-bottom-color: $font-color;
 			}
 		}
 	}
+
 	.ui-state-hover {
 		&.ui-tabs-active {
-			.filter-trigger, .btn-time {
+			.btn-time,
+			.filter-trigger  {
 				background-color: $action-hover-color;
 				padding-bottom: 4px;
 			}
@@ -2433,7 +2412,8 @@ $icon-widget-btn: (
 
 	.ui-state-focus {
 		&.ui-tabs-active {
-			.filter-trigger, .btn-time {
+			.btn-time,
+			.filter-trigger {
 				padding-bottom: 4px;
 				@include box-shadow(0 0 0 2px rgba($blue, .35));
 			}
@@ -2470,64 +2450,69 @@ $icon-widget-btn: (
 	}
 }
 
+.btn-time-left,
 .btn-time-right {
+	background: url(../img/icon-sprite.svg) no-repeat;
+	content: "";
+	border: none;
 	height: 24px;
 	width: 24px;
-	border: none;
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -83px -623px;
 	vertical-align: top;
 
-	&:focus, &:hover {
+	&:focus,
+	&:hover {
 		border: 1px solid $ui-border-color;
-		background: url(../img/icon-sprite.svg) no-repeat -396px -624px;
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&:disabled {
 		border: none;
-		background: url(../img/icon-sprite.svg) no-repeat -83px -623px;
 		opacity: 0.4;
+	}
+}
+
+.btn-time-right {
+	background-position: -83px -623px;
+
+	&:focus,
+	&:hover {
+		background-position: -396px -624px;
+	}
+
+	&:disabled {
+		background-position: -83px -623px;
 	}
 }
 
 .btn-time-left {
-	height: 24px;
-	width: 24px;
-	border: none;
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -85px -657px;
-	vertical-align: top;
+	background-position: -85px -657px;
 
-	&:focus, &:hover {
-		border: 1px solid $ui-border-color;
-		background: url(../img/icon-sprite.svg) no-repeat -398px -658px;
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	&:focus,
+	&:hover {
+		background-position: -398px -658px;
 	}
 
 	&:disabled {
-		border: none;
-		background: url(../img/icon-sprite.svg) no-repeat -85px -657px;
-		opacity: 0.4;
+		background-position: -85px -657px;
 	}
 }
 
 .btn-time-out {
-	height: 24px;
-	margin: 0 5px 0 5px;
-	border: none;
 	background: none;
+	border: 1px solid transparent;
 	color: $font-color;
+	height: 24px;
+	margin: 0 5px;
 	vertical-align: top;
 
 	&:disabled {
-		border: none;
+		background: transparent;
+		border-color: transparent;
 		opacity: 0.8;
 	}
 }
 
 .time-quick {
-
 	font-size: 14px;
 	line-height: 1.5em;
 
@@ -2539,25 +2524,26 @@ $icon-widget-btn: (
 			margin-left: -10px;
 			border-bottom: 0;
 
-			&:hover {
+			&:hover,
+			&:focus,
+			&.selected {
+				@include border-radius(2px);
 				border-bottom: 0;
+			}
+
+			&:hover {
 				background: $action-hover-color;
 				@include transition(background-color .2s ease-out);
-				@include border-radius(2px);
 			}
 
 			&:focus {
 				@include box-shadow(0 0 0 2px rgba($blue, .35));
-				border-bottom: 0;
-				@include border-radius(2px);
 			}
 
 			&.selected {
-				color: $white;
-				border-bottom: 0;
 				background: $ui-bg-selected-color;
+				color: $white;
 				@include transition(background-color .2s ease-out);
-				@include border-radius(2px);
 			}
 		}
 	}
@@ -2568,9 +2554,9 @@ $icon-widget-btn: (
 	justify-content: flex-end;
 
 	.time-input {
-		text-align: right;
-		padding: 10px 30px 10px 10px;
 		border-right: 1px solid $ui-border-color;
+		padding: 10px 30px 10px 10px;
+		text-align: right;
 		white-space: nowrap;
 
 		li {
@@ -2631,12 +2617,12 @@ $icon-widget-btn: (
 }
 
 .btn-dashbrd-normal {
+	@include box-shadow(1px 1px 2px $action-shadow-color);
+	@include opacity(1);
 	position: fixed;
 	right: 45px;
 	top: 5px;
 	z-index: 1010;
-	@include box-shadow(1px 1px 2px $action-shadow-color);
-	@include opacity(1);
 	@include transition(opacity 1s);
 
 	&.hidden {
