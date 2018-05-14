@@ -410,10 +410,10 @@ static void	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, char **out)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
 
-		if (TRIGGER_SEVERITY_COUNT > ack->old_severity)
+		if (TRIGGER_SEVERITY_COUNT > ack->old_severity && 0 <= ack->old_severity)
 			from = cfg.severity_name[ack->old_severity];
 
-		if (TRIGGER_SEVERITY_COUNT > ack->new_severity)
+		if (TRIGGER_SEVERITY_COUNT > ack->new_severity && 0 <= ack->new_severity)
 			to = cfg.severity_name[ack->new_severity];
 
 		if (0 != buf_offset)
