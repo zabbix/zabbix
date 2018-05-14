@@ -45,8 +45,9 @@ static int	is_profiler_path(const char *path)
 
 	len = strlen(path);
 
-	if (ZBX_CONST_STRLEN(".gcda") < len && 0 == strcmp(path + len - ZBX_CONST_STRLEN(".gcda"), ".gcda") ||
-			ZBX_CONST_STRLEN(".gcno") < len && 0 == strcmp(path + len - ZBX_CONST_STRLEN(".gcno"), ".gcno"))
+	if ((ZBX_CONST_STRLEN(".gcda") < len && 0 == strcmp(path + len - ZBX_CONST_STRLEN(".gcda"), ".gcda")) ||
+			(ZBX_CONST_STRLEN(".gcno") < len &&
+					0 == strcmp(path + len - ZBX_CONST_STRLEN(".gcno"), ".gcno")))
 	{
 		return SUCCEED;
 	}
