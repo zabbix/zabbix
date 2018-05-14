@@ -2355,11 +2355,12 @@ $icon-widget-btn: (
 	vertical-align: top;
 
 	&:disabled {
-		background: transparent;
-		border-color: transparent;
+		background: transparent !important;
+		border-color: transparent !important;
 		opacity: 0.8;
 	}
 }
+
 
 .time-quick {
 	font-size: 14px;
