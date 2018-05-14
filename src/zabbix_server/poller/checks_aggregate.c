@@ -416,15 +416,16 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	zbx_vector_uint64_t		itemids;
 	history_value_t			value, item_result;
 	zbx_history_record_t		group_value;
-	int				ret = FAIL, now, *errcodes = NULL, i, count, seconds;
+	int				ret = FAIL, *errcodes = NULL, i, count, seconds;
 	DC_ITEM				*items = NULL;
 	zbx_vector_history_record_t	values, group_values;
 	char				*error = NULL;
+	zbx_timespec_t			ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
 			__function_name, grp_func, groups, itemkey, item_func, ZBX_NULL2STR(param));
 
-	now = time(NULL);
+	zbx_timespec(&ts);
 
 	zbx_vector_uint64_create(&itemids);
 	if (FAIL == aggregate_get_items(&itemids, groups, itemkey, &error))
@@ -472,8 +473,8 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 		zbx_history_record_vector_create(&values);
 
-		if (SUCCEED == zbx_vc_get_value_range(items[i].itemid, items[i].value_type, &values, seconds,
-				count, now) && 0 < values.values_num)
+		if (SUCCEED == zbx_vc_get_values(items[i].itemid, items[i].value_type, &values, seconds, count, &ts) &&
+				0 < values.values_num)
 		{
 			evaluate_history_func(&values, items[i].value_type, item_func, &item_result);
 
