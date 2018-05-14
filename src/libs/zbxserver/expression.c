@@ -1646,7 +1646,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 
 /******************************************************************************
  *                                                                            *
- * Function: get_event_ack_history                                            *
+ * Function: get_event_update_history                                         *
  *                                                                            *
  * Purpose: retrieve event acknowledges history                               *
  *                                                                            *
@@ -1657,7 +1657,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid)
+static void	get_event_update_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2357,7 +2357,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	{
 		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY) || 0 == strcmp(macro, MVAR_EVENT_UPDATE_HISTORY))
 		{
-			get_event_ack_history(event, replace_to, recipient_userid);
+			get_event_update_history(event, replace_to, recipient_userid);
 		}
 		else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
 		{
