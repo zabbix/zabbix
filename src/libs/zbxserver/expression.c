@@ -1664,12 +1664,6 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 	char		*buf = NULL;
 	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
 
-	if (0 == event->acknowledged)
-	{
-		*replace_to = zbx_strdup(*replace_to, "");
-		return;
-	}
-
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
