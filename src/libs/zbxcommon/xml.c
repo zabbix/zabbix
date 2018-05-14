@@ -194,7 +194,7 @@ static size_t	xml_escape_xpath_stringsize(const char *string)
  * Parameters: string - [IN/OUT] the string to update                             *
  *                                                                                *
  **********************************************************************************/
-static void xml_escape_xpath_insstring(char *p, const char *string)
+static void xml_escape_xpath_string(char *p, const char *string)
 {
 	const char	*sptr = string;
 
@@ -226,7 +226,7 @@ void xml_escape_xpath(char **data)
 
 	buffer = zbx_malloc(NULL, size + 1);
 	buffer[size] = '\0';
-	xml_escape_xpath_insstring(buffer, *data);
+	xml_escape_xpath_string(buffer, *data);
 	zbx_free(*data);
 	*data = buffer;
 }

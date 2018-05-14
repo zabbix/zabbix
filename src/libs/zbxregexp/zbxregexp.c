@@ -807,7 +807,7 @@ static size_t	zbx_regexp_escape_stringsize(const char *string)
  *             string - [IN] the string to update                                 *
  *                                                                                *
  **********************************************************************************/
-static void zbx_regexp_escape_insstring(char *p, const char *string)
+static void zbx_regexp_escape_string(char *p, const char *string)
 {
 	const char	*sptr;
 
@@ -866,7 +866,7 @@ void zbx_regexp_escape(char **string)
 
 	buffer = zbx_malloc(NULL, size + 1);
 	buffer[size] = '\0';
-	zbx_regexp_escape_insstring(buffer, *string);
+	zbx_regexp_escape_string(buffer, *string);
 	zbx_free(*string);
 	*string = buffer;
 }
