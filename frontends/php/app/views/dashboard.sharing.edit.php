@@ -18,16 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$this->addJsFile('multiselect.js');
-$this->includeJSfile('app/views/monitoring.dashboard.sharing_form.js.php');
-
-$form = (new CForm('post', (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.update')
-	->getUrl()
-))
-	->setName('dashboard_sharing_form')
-	->addStyle('display: none;');
+$form = (new CForm('post'))->setName('dashboard_sharing_form');
 
 $table_user_groups = (new CTable())
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
@@ -71,15 +62,13 @@ $table_users = (new CTable())
 	)
 	->addStyle('width: 100%;');
 
-if ($data['dashboard']['dashboardid'] != 0) {
-	$form->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']));
-}
-
 $form
+	->addItem(getMessages())
+	->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']))
 	// indicator to help delete all users
-	->addItem(new CInput('hidden', 'users['.CControllerDashboardUpdate::EMPTY_USER.']', '1'))
+	->addItem(new CInput('hidden', 'users['.CControllerDashboardShareUpdate::EMPTY_USER.']', '1'))
 	// indicator to help delete all user groups
-	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardUpdate::EMPTY_GROUP.']', '1'))
+	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardShareUpdate::EMPTY_GROUP.']', '1'))
 	->addItem((new CFormList('sharing_form'))
 		->addRow(_('Type'),
 			(new CRadioButtonList('private', PRIVATE_SHARING))
@@ -99,4 +88,25 @@ $form
 		)
 	);
 
-return $form;
+$output = [
+	'header' => _('Dashboard sharing'),
+	'body' => $form->toString(),
+	'script_inline' => 
+		'jQuery(document).ready(function($) {'.
+			'$("[name='.$form->getName().']").fillDashbrdSharingForm('.json_encode($data['dashboard']).');'.
+		'});',
+	'buttons' => [
+		[
+			'title' => _('Update'),
+			'isSubmit' => true,
+			'action' => 'return dashbrdConfirmSharing();'
+		]
+	]
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);
