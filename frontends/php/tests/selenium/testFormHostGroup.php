@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
- * @backup groups
+ * @backup hstgrp
  */
 class testFormHostGroup extends CWebTest {
 	private $hostGroup = 'Test Group';
@@ -59,7 +59,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group added');
 
-		$sql = "SELECT * FROM groups WHERE name='$this->hostGroup'";
+		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup'";
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -106,7 +106,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 
-		$sql = "SELECT * FROM groups WHERE name='$this->hostGroup ". 2 ."'";
+		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -118,7 +118,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group deleted');
 
-		$sql = "SELECT * FROM groups WHERE name='$this->hostGroup ". 2 ."'";
+		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
 		$this->assertEquals(0, DBcount($sql));
 	}
 }
