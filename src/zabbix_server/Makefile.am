@@ -84,7 +84,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a 
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a
 
 if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a
@@ -105,8 +105,8 @@ zabbix_server_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxdbcache
 
 install-data-hook:
-	$(MKDIR_P) "@SERVER_CONFIG_FILE@.d"
-	$(MKDIR_P) "@EXTERNAL_SCRIPTS_PATH@"
-	$(MKDIR_P) "@ALERT_SCRIPTS_PATH@"
-	$(MKDIR_P) "@LOAD_MODULE_PATH@"
-	test -f "@SERVER_CONFIG_FILE@" || cp "../../conf/zabbix_server.conf" "@SERVER_CONFIG_FILE@"
+	$(MKDIR_P) "$(DESTDIR)@SERVER_CONFIG_FILE@.d"
+	$(MKDIR_P) "$(DESTDIR)@EXTERNAL_SCRIPTS_PATH@"
+	$(MKDIR_P) "$(DESTDIR)@ALERT_SCRIPTS_PATH@"
+	$(MKDIR_P) "$(DESTDIR)@LOAD_MODULE_PATH@"
+	test -f "$(DESTDIR)@SERVER_CONFIG_FILE@" || cp "../../conf/zabbix_server.conf" "$(DESTDIR)@SERVER_CONFIG_FILE@"
