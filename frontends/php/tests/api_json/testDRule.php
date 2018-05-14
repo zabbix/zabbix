@@ -56,6 +56,10 @@ class testDRule extends CZabbixTest {
 				'drule' => ['3', 'abcd'],
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
+			[
+				'drule' => [9],
+				'expected_error' => 'Discovery rule "API discovery rule used in action" is used in "API action for Discovery check" action.'
+			],
 			// Successfully delete action.
 			// Discovery rule without proxy
 			[
