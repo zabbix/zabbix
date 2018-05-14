@@ -59,42 +59,6 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				['']
 			],
 			[
-				'key[][]', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'error' => '',
-					'match' => 'key[][]',
-					'key' => 'key',
-					'parameters' => [
-						0 => [
-							'type' => CItemKey::PARAM_ARRAY,
-							'raw' => '[]',
-							'pos' => 3,
-							'parameters' => [
-								0 => [
-									'type' => CItemKey::PARAM_UNQUOTED,
-									'raw' => '',
-									'pos' => 1
-								]
-							]
-						],
-						1 => [
-							'type' => CItemKey::PARAM_ARRAY,
-							'raw' => '[]',
-							'pos' => 5,
-							'parameters' => [
-								0 => [
-									'type' => CItemKey::PARAM_UNQUOTED,
-									'raw' => '',
-									'pos' => 1
-								]
-							]
-						]
-					]
-				],
-				['', '']
-			],
-			[
 				'key[""]', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -384,122 +348,6 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				['a', 'b', 'c']
 			],
 			[
-				'key["a","b","c"]["d"]', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'error' => '',
-					'match' => 'key["a","b","c"]["d"]',
-					'key' => 'key',
-					'parameters' => [
-						0 => [
-							'type' => CItemKey::PARAM_ARRAY,
-							'raw' => '["a","b","c"]',
-							'pos' => 3,
-							'parameters' => [
-								0 => [
-									'type' => CItemKey::PARAM_QUOTED,
-									'raw' => '"a"',
-									'pos' => 1
-								],
-								1 => [
-									'type' => CItemKey::PARAM_QUOTED,
-									'raw' => '"b"',
-									'pos' => 5
-								],
-								2 => [
-									'type' => CItemKey::PARAM_QUOTED,
-									'raw' => '"c"',
-									'pos' => 9
-								]
-							]
-						],
-						1 => [
-							'type' => CItemKey::PARAM_ARRAY,
-							'raw' => '["d"]',
-							'pos' => 16,
-							'parameters' => [
-								0 => [
-									'type' => CItemKey::PARAM_QUOTED,
-									'raw' => '"d"',
-									'pos' => 1
-								]
-							]
-						]
-					]
-				],
-				['a', 'b', 'c', 'd']
-			],
-			[
-				'key["a","b","c",[["d", ["e\",]" ] ], f"]]', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'error' => '',
-					'match' => 'key["a","b","c",[["d", ["e\",]" ] ], f"]]',
-					'key' => 'key',
-					'parameters' => [
-						0 => [
-							'type' => CItemKey::PARAM_ARRAY,
-							'raw' => '["a","b","c",[["d", ["e\",]" ] ], f"]]',
-							'pos' => 3,
-							'parameters' => [
-								0 => [
-									'type' => CItemKey::PARAM_QUOTED,
-									'raw' => '"a"',
-									'pos' => 1
-								],
-								1 => [
-									'type' => CItemKey::PARAM_QUOTED,
-									'raw' => '"b"',
-									'pos' => 5
-								],
-								2 => [
-									'type' => CItemKey::PARAM_QUOTED,
-									'raw' => '"c"',
-									'pos' => 9
-								],
-								3 => [
-									'type' => CItemKey::PARAM_ARRAY,
-									'raw' => '[["d", ["e\",]" ] ], f"]',
-									'pos' => 13,
-									'parameters' => [
-										0 => [
-											'type' => CItemKey::PARAM_ARRAY,
-											'raw' => '["d", ["e\",]" ] ]',
-											'pos' => 1,
-											'parameters' => [
-												0 => [
-													'type' => CItemKey::PARAM_QUOTED,
-													'raw' => '"d"',
-													'pos' => 1
-												],
-												1 => [
-													'type' => CItemKey::PARAM_ARRAY,
-													'raw' => '["e\",]" ]',
-													'pos' => 6,
-													'parameters' => [
-														0 => [
-															'type' => CItemKey::PARAM_QUOTED,
-															'raw' => '"e\",]"',
-															'pos' => 1
-														]
-													]
-												]
-											]
-										],
-										1 => [
-											'type' => CItemKey::PARAM_UNQUOTED,
-											'raw' => 'f"',
-											'pos' => 21
-										]
-									]
-								]
-							]
-						]
-					]
-				],
-				['a', 'b', 'c', '["d", ["e\",]" ] ], f"']
-			],
-			[
 				'key["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -708,6 +556,30 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'parameters' => []
 				],
 				[]
+			],
+			[
+				'key[][]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => 'incorrect syntax near "[]"',
+					'match' => 'key[]',
+					'key' => 'key',
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['']
 			]
 		];
 	}
