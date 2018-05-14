@@ -250,7 +250,7 @@
 
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
-	
+
 	<macrodef name="make-tests">
 		<!-- Build Zabbix cmocka tests with the specified command line arguments -->
 		<attribute name="conf"/>
@@ -289,7 +289,7 @@
 			</trycatch>
 		</sequential>
 	</macrodef>
-	
+
 	<target name="init-cmocka-test-conf-options">
 		<!-- Zabbix various configuration parameters for cmocka tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
@@ -310,6 +310,32 @@
 				<make-tests conf="${cmocka-@{name}}" conf-name="@{name}"/>
 			</sequential>
 		</for>
+	</target>
+
+	<target name="gen-test-coverage-report">
+		<!-- Generate Zabbix cmocka tests coverage report-->
+		<delete dir="tests_results"/>
+		<mkdir dir="tests_results"/>
+		<mkdir dir="tests_results/html"/>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--directory"/>
+			<arg line="."/>
+			<arg line="-zerocounters"/>
+		</exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre" conf-name="gen-test-coverage-report"/>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--directory"/>
+			<arg line="."/>
+			<arg line="--capture"/>
+			<arg line="--output-file"/>
+			<arg line="tests_results/html/app.info"/>
+		</exec>
+		<exec executable="genhtml" failonerror="on">
+			<arg line="-o"/>
+			<arg line="tests_results/html"/>
+			<arg line="tests_results/html/app.info"/>
+		</exec>
 	</target>
 
 	<target name="run-unit-test">
