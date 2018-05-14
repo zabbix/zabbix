@@ -82,7 +82,10 @@ class CControllerPopupTrigDescView extends CController {
 			'trigger' => $this->trigger,
 			'isTriggerEditable' => (bool) $rw_triggers,
 			'isCommentExist' => ($this->trigger['comments'] !== ''),
-			'resolved' => CMacrosResolverHelper::resolveTriggerDescription($this->trigger)
+			'resolved' => CMacrosResolverHelper::resolveTriggerDescription($this->trigger),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
 		if (($messages = getMessages($this->hasInput('success'))) !== null) {
