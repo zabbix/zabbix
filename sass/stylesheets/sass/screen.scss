@@ -1399,158 +1399,6 @@ output {
 	color: $dark-yellow;
 }
 
-// Timeline
-.scrollbar {
-	position: relative;
-	margin: 0 auto;
-	margin-bottom: 10px;
-	line-height: 1em;
-	height: 52px;
-
-	.selected {
-		font-weight: bold;
-	}
-}
-
-.sublevel {
-	height: 22px;
-	border: 1px solid $table-border-color;
-	background-color: $table-border-color;
-	margin: 5px 0;
-	@include border-radius(2px);
-
-	button {
-
-		&:first-child {
-			float: left;
-			margin-left: -1px;
-		}
-
-		&:last-child {
-			float: right;
-			margin-right: -1px;
-		}
-	}
-
-	.btn-grey {
-		height: 22px;
-		line-height: 22px;
-		background-color: $btn-form-bg-color;
-		margin-top: -1px;
-	}
-}
-
-.info {
-	height: 14px;
-
-	.zoom {
-		float: left;
-		white-space: nowrap;
-
-		a {
-			margin: 0 4px;
-		}
-	}
-
-	.timeline {
-		float: right;
-		white-space: nowrap;
-	}
-}
-
-.overlevel {
-	position: absolute;
-	top: 14px;
-	left: 30px;
-	height: 24px;
-	margin: 5px 0;
-}
-
-.bar {
-	position: absolute;
-	z-index: 1;
-	height: 22px;
-	border: 1px solid $form-border-color;
-	@include border-radius(2px);
-}
-
-.icon {
-	position: relative;
-	height: 22px;
-	background-color: $form-bg-color;
-	border-color: $form-border-color;
-	@include border-radius(2px);
-	@include transition(background-color .2s ease-out);
-
-	&:hover {
-		background-color: $ui-hover-color;
-	}
-
-	&:focus {
-		background-color: $ui-hover-color;
-		border-color: $form-border-focus-color;
-	}
-
-	&:active {
-		background-color: $ui-hover-color;
-		border-color: $form-border-focus-color;
-	}
-
-	.center {
-		width: 10px;
-		height: 22px;
-		background: url(../img/icon-sprite.svg) no-repeat -13px -799px;
-		margin: 0 auto;
-	}
-}
-
-.ghost {
-	position: absolute;
-	top: 0;
-	height: 22px;
-	line-height: 22px;
-	border: 1px solid $form-border-color;
-	@include border-radius(2px);
-}
-
-.left_arr {
-	position: absolute;
-	top: 1px;
-	width: auto;
-	height: 22px;
-	line-height: 22px;
-	padding: 0 5px;
-	z-index: 99;
-	cursor: e-resize;
-}
-
-.right_arr {
-	@extend .left_arr;
-}
-
-.subline {
-	height: 14px;
-
-	.nav_links {
-		float: left;
-		@extend .zoom;
-
-		a {
-			margin: 0 4px;
-		}
-	}
-
-	.period {
-		float: right;
-		text-align: right;
-		margin-left: 8px;
-	}
-
-	.info_period {
-		@extend .period;
-	}
-}
-
 // Forms
 .table-forms-container {
 	margin: 0 0 10px 0;
@@ -2368,6 +2216,7 @@ $icon-widget-btn: (
 		.btn-time,
 		.filter-trigger {
 			@include box-shadow(0 0 0 2px rgba($blue, .35));
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -3975,11 +3824,6 @@ $form-icon-btn: (
 }
 
 // Maps, Screens, Graphs
-.box_on {
-	position: absolute;
-	z-index: 99;
-}
-
 .screen-table {
 	background-color: $ui-bg-color;
 	width: 100%;
