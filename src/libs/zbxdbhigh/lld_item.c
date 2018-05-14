@@ -924,20 +924,22 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
  *             item_key - [IN] Item name for logging                          *
  *             error    - [IN/OUT] the lld error message                      *
  *                                                                            *
+ * Return value: SUCCEED - if preprocessing step is valid                     *
+ *               FAIL    - if preprocessing step is not valid                 *
+ *                                                                            *
  ******************************************************************************/
-int lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, const char * item_key, char ** error)
+static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, const char * item_key, char ** error)
 {
-	int ret = SUCCEED;
-	zbx_token_t token;
-	char err[MAX_STRING_LEN], *err_dyn = NULL;
+	int		ret = SUCCEED;
+	zbx_token_t	token;
+	char		err[MAX_STRING_LEN], *err_dyn = NULL;
+	char		pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
+
 	*err = '\0';
-	char	pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
 
-	if (0 == (pp->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE))
-		return SUCCEED;
-
-	if (SUCCEED == zbx_token_find(pp->params, 0, &token, ZBX_TOKEN_SEARCH_BASIC)
-			&& 0 != (token.type & ZBX_TOKEN_USER_MACRO))
+	if (0 == (pp->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE)
+			|| (SUCCEED == zbx_token_find(pp->params, 0, &token, ZBX_TOKEN_SEARCH_BASIC)
+			&& 0 != (token.type & ZBX_TOKEN_USER_MACRO)))
 	{
 		return SUCCEED;
 	}
@@ -948,7 +950,7 @@ int lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, const cha
 			zbx_strlcpy(pattern, pp->params, sizeof(pattern));
 			if (NULL == (output = strchr(pattern, '\n')))
 			{
-				zbx_snprintf(err, sizeof(err), "cannot find second parameter:%s", pp->params);
+				zbx_snprintf(err, sizeof(err), "cannot find second parameter: %s", pp->params);
 				ret = FAIL;
 				break;
 			}
@@ -970,7 +972,7 @@ int lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, const cha
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
 			if (FAIL == (ret = is_double(pp->params)))
-				zbx_snprintf(err, sizeof(err), "value is not numeric:%s", pp->params);
+				zbx_snprintf(err, sizeof(err), "value is not numeric: %s", pp->params);
 			break;
 	}
 
@@ -997,7 +999,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			i,j;
+	int			i, j;
 	zbx_lld_item_t		*item;
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_str_t	keys;
@@ -1925,12 +1927,16 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  *             item_key - [IN] Item name for logging                          *
  *             error    - [IN/OUT] the lld error message                      *
  *                                                                            *
+ * Return value: SUCCEED - if preprocessing steps are valid                   *
+ *               FAIL    - if substitute_lld_macros fails                     *
+ *                                                                            *
  ******************************************************************************/
-int lld_items_preproc_step_esc(zbx_lld_item_preproc_t * pp, const zbx_lld_row_t * lld_row, const char * item_key,
+static int	lld_items_preproc_step_esc(zbx_lld_item_preproc_t * pp, const zbx_lld_row_t * lld_row, const char * item_key,
 		char **error)
 {
-	int ret, token_type = ZBX_MACRO_ANY;
-	char err[MAX_STRING_LEN];
+	int	ret, token_type = ZBX_MACRO_ANY;
+	char	err[MAX_STRING_LEN];
+
 	*err = '\0';
 
 	switch (pp->type)

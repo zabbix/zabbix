@@ -5652,16 +5652,22 @@ exit:
  *             err       - [IN] the libxml2 error message                     *
  *                                                                            *
  ******************************************************************************/
-static void libxml_handle_error(void *user_data, xmlErrorPtr err)
+static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
 {
+	zbx_libxml_error_t	*err_ctx;
+
 	if (NULL == user_data)
 		return;
-	zbx_libxml_error_t * err_ctx = (zbx_libxml_error_t *)user_data;
+
+	err_ctx = (zbx_libxml_error_t *)user_data;
 	zbx_strlcat(err_ctx->buf, err->message, err_ctx->len);
+
 	if (NULL != err->str1)
 		zbx_strlcat(err_ctx->buf, err->str1, err_ctx->len);
+
 	if (NULL != err->str2)
 		zbx_strlcat(err_ctx->buf, err->str2, err_ctx->len);
+
 	if (NULL != err->str3)
 		zbx_strlcat(err_ctx->buf, err->str3, err_ctx->len);
 }
@@ -5683,14 +5689,23 @@ static void libxml_handle_error(void *user_data, xmlErrorPtr err)
  ******************************************************************************/
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 {
-#ifdef HAVE_LIBXML2
-	zbx_libxml_error_t err;
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(xpath);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(errlen);
+	return FAIL;
+#else
+	zbx_libxml_error_t	err;
+	xmlXPathContextPtr	ctx;
+	xmlXPathCompExprPtr	p;
 
 	err.buf = error;
 	err.len = errlen;
-	xmlXPathContextPtr ctx = xmlXPathNewContext(NULL);
+
+	ctx = xmlXPathNewContext(NULL);
 	xmlSetStructuredErrorFunc(&err, &libxml_handle_error);
-	xmlXPathCompExprPtr p = xmlXPathCtxtCompile(ctx, (xmlChar *)xpath);
+
+	p = xmlXPathCtxtCompile(ctx, (xmlChar *)xpath);
 	xmlSetStructuredErrorFunc(NULL, NULL);
 
 	if (NULL == p)

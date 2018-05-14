@@ -180,16 +180,7 @@ static size_t	xml_escape_xpath_stringsize(const char *string)
 		return 0;
 
 	for (sptr = string; '\0' != *sptr; sptr++)
-	{
-		switch (*sptr)
-		{
-			case '"':
-				len += 2;
-				break;
-			default:
-				len++;
-		}
-	}
+		len += (('"' == *sptr) ? 2 : 1);
 
 	return len;
 }
@@ -205,22 +196,15 @@ static size_t	xml_escape_xpath_stringsize(const char *string)
  **********************************************************************************/
 static void xml_escape_xpath_insstring(char *p, const char *string)
 {
-	const char	*sptr;
+	const char	*sptr = string;
 
-	for (sptr = string; '\0' != *sptr; sptr++)
+	while ('\0' != *sptr)
 	{
-		switch (*sptr)
-		{
-			case '"':
-				*p++ = '"';
-				*p++ = *sptr;
-				break;
-			default:
-				*p++ = *sptr;
-		}
-	}
+		if ('"' == *sptr)
+			*p++ = '"';
 
-	return;
+		*p++ = *sptr++;
+	}
 }
 
 /**********************************************************************************

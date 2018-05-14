@@ -87,5 +87,4 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
 
-
 #endif
