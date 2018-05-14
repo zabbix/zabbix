@@ -914,7 +914,7 @@ class testFormAction extends CWebTest {
 				$def_longdata_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
 					' Problem name: {TRIGGER.NAME}'.
 					' Host: {HOST.NAME}'.
-					' Severity: {TRIGGER.SEVERITY}'.
+					' Severity: {EVENT.SEVERITY}'.
 					' Original problem ID: {EVENT.ID}'.
 					' {TRIGGER.URL}';
 					break;
@@ -1217,7 +1217,7 @@ class testFormAction extends CWebTest {
 						$new_operation_opmessage_message_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
 							' Problem name: {TRIGGER.NAME}'.
 							' Host: {HOST.NAME}'.
-							' Severity: {TRIGGER.SEVERITY}'.
+							' Severity: {EVENT.SEVERITY}'.
 							' Original problem ID: {EVENT.ID}'.
 							' {TRIGGER.URL}';
 							break;
@@ -1560,7 +1560,7 @@ class testFormAction extends CWebTest {
 					$r_longdata_val = 'Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}'.
 						' Problem name: {TRIGGER.NAME}'.
 						' Host: {HOST.NAME}'.
-						' Severity: {TRIGGER.SEVERITY}'.
+						' Severity: {EVENT.SEVERITY}'.
 						' Original problem ID: {EVENT.ID}'.
 						' {TRIGGER.URL}';
 						break;
