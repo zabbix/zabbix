@@ -363,7 +363,7 @@ class CHostGroup extends CApiService {
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('groups', [
+			$db_parent_groups = DB::select('hstgrp', [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
 			]);
@@ -418,7 +418,7 @@ class CHostGroup extends CApiService {
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('groups', [
+			$db_parent_groups = DB::select('hstgrp', [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
 			]);
@@ -497,7 +497,7 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		DB::update('groups', $upd_groups);
+		DB::update('hstgrp', $upd_groups);
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groups, $db_groups);
 
@@ -705,7 +705,7 @@ class CHostGroup extends CApiService {
 
 		DB::delete('operations', ['operationid' => $delOperationids]);
 
-		DB::delete('groups', ['groupid' => $groupids]);
+		DB::delete('hstgrp', ['groupid' => $groupids]);
 
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $db_groups);
 
@@ -720,7 +720,7 @@ class CHostGroup extends CApiService {
 	 * @throws APIException  if host group already exists.
 	 */
 	private function checkDuplicates(array $names) {
-		$db_groups = DB::select('groups', [
+		$db_groups = DB::select('hstgrp', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
 			'limit' => 1

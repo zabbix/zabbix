@@ -31,7 +31,7 @@ class CTestDbHelper {
 	 */
 	public static function setHostGroupPermissions($usergroup_name, $hostgroup_name, $permission, $subgroups = false) {
 		$usergroup = DB::find('usrgrp', ['name' => $usergroup_name]);
-		$hostgroups = DB::find('groups', ['name' => $hostgroup_name]);
+		$hostgroups = DB::find('hstgrp', ['name' => $hostgroup_name]);
 
 		if ($usergroup && $hostgroups) {
 			$usergroup = $usergroup[0];
