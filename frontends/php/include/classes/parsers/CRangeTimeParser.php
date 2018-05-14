@@ -20,9 +20,24 @@
 
 
 /**
- * A parser for relative time in "now[/<yMwdhm>][<+->N<yMwdhms>[/<yMwdhm>]]" format.
+ * A parser for time used in the time selector.
  */
-class CRelativeTimeParser extends CParser {
+class CRangeTimeParser extends CParser {
+
+	/**
+	 * @var CRelativeTimeParser
+	 */
+	private $relative_time_parser;
+
+	/**
+	 * @var CAbsoluteTimeParser
+	 */
+	private $absolute_time_parser;
+
+	public function __construct() {
+		$this->relative_time_parser = new CRelativeTimeParser();
+		$this->absolute_time_parser = new CAbsoluteTimeParser();
+	}
 
 	/**
 	 * Parse the given period.
@@ -36,7 +51,13 @@ class CRelativeTimeParser extends CParser {
 
 		$p = $pos;
 
-		if (!self::parseRelativeTime($source, $p)) {
+		if ($this->relative_time_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->relative_time_parser->getLength();
+		}
+		elseif ($this->absolute_time_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->absolute_time_parser->getLength();
+		}
+		else {
 			return self::PARSE_FAIL;
 		}
 
@@ -44,29 +65,5 @@ class CRelativeTimeParser extends CParser {
 		$this->match = substr($source, $pos, $this->length);
 
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
-	}
-
-	/**
-	 * Parse relative time.
-	 *
-	 * @param string	$source
-	 * @param int		$pos
-	 *
-	 * @return bool
-	 */
-	private static function parseRelativeTime($source, &$pos) {
-		$pattern_precision = '\/[yMwdhm]';
-		$pattern_precision1 = '(?P<precision1>'.$pattern_precision.')';
-		$pattern_precision2 = '(?P<precision2>'.$pattern_precision.')';
-		$pattern_offset = '(?P<offset>[0-9]+[yMwdhms])';
-		$pattern = 'now'.$pattern_precision1.'?([+-]'.$pattern_offset.$pattern_precision2.'?)?';
-
-		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
-			return false;
-		}
-
-		$pos += strlen($matches[0]);
-
-		return true;
 	}
 }

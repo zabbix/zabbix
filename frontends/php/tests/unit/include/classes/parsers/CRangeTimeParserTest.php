@@ -19,13 +19,99 @@
 **/
 
 
-class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
+class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * An array of relative times and parsed results.
 	 */
 	public static function testProvider() {
 		return [
+			// Absolute time.
+			[
+				'2018-04-15 12:45:34', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15 12:45:34'
+				]
+			],
+			[
+				'2018-04-15 12:45', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15 12:45'
+				]
+			],
+			[
+				'2018-04-15 12', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15 12'
+				]
+			],
+			[
+				'2018-04-15', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15'
+				]
+			],
+			[
+				'2018-04 12:45:34', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04 12:45:34'
+				]
+			],
+			[
+				'2018-04 12:45', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04 12:45'
+				]
+			],
+			[
+				'2018-04 12', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04 12'
+				]
+			],
+			[
+				'2018-04', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04'
+				]
+			],
+			[
+				'2018 12:45:34', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018 12:45:34'
+				]
+			],
+			[
+				'2018 12:45', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018 12:45'
+				]
+			],
+			[
+				'2018 12', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018 12'
+				]
+			],
+			[
+				'2018', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018'
+				]
+			],
+			// Relative time.
 			[
 				'now', 0,
 				[
@@ -240,7 +326,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 	 * @param array  $expected
 	 */
 	public function testParse($source, $pos, $expected) {
-		$parser = new CRelativeTimeParser();
+		$parser = new CRangeTimeParser();
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
