@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 class testHostGroup extends CZabbixTest {
 
 	public function testHostGroup_backup() {
-		DBsave_tables('groups');
+		DBsave_tables('hstgrp');
 	}
 
 	public static function hostgroup_create() {
@@ -340,7 +340,7 @@ class testHostGroup extends CZabbixTest {
 			$this->assertEquals($expected_error, $result['error']['data']);
 			foreach ($hostgroups as $hostgroup) {
 				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] != 'Templates'){
-					$dbResult = "SELECT * FROM groups WHERE name='".$hostgroup['name']."'";
+					$dbResult = "SELECT * FROM hstgrp WHERE name='".$hostgroup['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
@@ -547,6 +547,6 @@ class testHostGroup extends CZabbixTest {
 	}
 
 	public function testHostGroup_restore() {
-		DBrestore_tables('groups');
+		DBrestore_tables('hstgrp');
 	}
 }
