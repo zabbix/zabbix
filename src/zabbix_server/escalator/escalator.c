@@ -2081,13 +2081,10 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 
 	DB_ROW		row;
 	DB_RESULT	result;
-	DB_ACKNOWLEDGE	ack;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " acknowledgeid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, escalation->acknowledgeid,
 			zbx_escalation_status_string(escalation->status));
-
-	memset(&ack, 0, sizeof(ack));
 
 	result = DBselect(
 			"select message,userid,clock,action,old_severity,new_severity from acknowledges"
@@ -2096,7 +2093,9 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ack.message = zbx_strdup(NULL, row[0]);
+		DB_ACKNOWLEDGE	ack;
+
+		ack.message = row[0];
 		ZBX_STR2UINT64(ack.userid, row[1]);
 		ack.clock = atoi(row[2]);
 		ack.acknowledgeid = escalation->acknowledgeid;
@@ -2107,7 +2106,6 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 		escalation_execute_acknowledge_operations(event, r_event, action, &ack);
 	}
 
-	zbx_free(ack.message);
 	DBfree_result(result);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;

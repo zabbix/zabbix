@@ -1661,7 +1661,6 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_ACKNOWLEDGE	ack;
 	char		*buf = NULL;
 	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
 
@@ -1673,6 +1672,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
+
 	result = DBselect("select clock,userid,message,action,old_severity,new_severity"
 			" from acknowledges"
 			" where eventid=" ZBX_FS_UI64 " order by clock",
@@ -1681,6 +1681,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 	while (NULL != (row = DBfetch(result)))
 	{
 		const char	*user_name;
+		DB_ACKNOWLEDGE	ack;
 
 		ack.clock = atoi(row[0]);
 		ZBX_STR2UINT64(ack.userid, row[1]);
