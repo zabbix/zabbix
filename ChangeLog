@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+...G...PS. [ZBX-14328] improved logging of command execution failures (vjaceslavs)
 ....I..... [ZBX-13803] fixed "make install" to respect DESTDIR variable, this is essential for packaging (dimir)
 ..F....... [ZBX-12603] fixed tab navigation and keyboard interaction in dashboard sharing and properties dialogues; added validation inside popups (miks, vmurzins)
 ........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
