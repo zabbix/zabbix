@@ -76,7 +76,7 @@ jQuery(function($) {
 				data[data.length] = {
 					id: id,
 					name: item.name,
-					prefix: (item.prefix === 'undefined') ? '' : item.prefix
+					prefix: (typeof item.prefix === 'undefined') ? '' : item.prefix
 				};
 			}
 
@@ -369,12 +369,10 @@ jQuery(function($) {
 										var prev = collection.filter('.selected').removeClass('selected').prev();
 										prev = (prev.length ? prev : collection.last()).addClass('selected');
 
-										if (prev.hasClass('disabled')) {
-											aria_live.text(sprintf(t('%1$s, read only'), prev.data('label')));
-										}
-										else {
-											aria_live.text(prev.data('label'));
-										}
+										aria_live.text((prev.hasClass('disabled'))
+											? sprintf(t('%1$s, read only'), prev.data('label'))
+											: prev.data('label')
+										);
 									}
 								}
 								break;
@@ -387,12 +385,10 @@ jQuery(function($) {
 										var next = collection.filter('.selected').removeClass('selected').next();
 										next = (next.length ? next : collection.first()).addClass('selected');
 
-										if (next.hasClass('disabled')) {
-											aria_live.text(sprintf(t('%1$s, read only'), next.data('label')));
-										}
-										else {
-											aria_live.text(next.data('label'));
-										}
+										aria_live.text((next.hasClass('disabled'))
+											? sprintf(t('%1$s, read only'), next.data('label'))
+											: next.data('label')
+										);
 									}
 								}
 								break;
@@ -435,30 +431,27 @@ jQuery(function($) {
 											if (selected.length) {
 												var collection = $('.selected li', obj);
 												selected.addClass('selected');
-												if (selected.hasClass('disabled')) {
-													aria_text += ', ' + sprintf(
-														t('Selected, %1$s, read only, in position %2$d of %3$d'),
-														selected.data('label'), collection.index(selected) + 1,
-														collection.length
-													);
-												}
-												else {
-													aria_text += ', ' + sprintf(
-														t('Selected, %1$s in position %2$d of %3$d'),
-														selected.data('label'), collection.index(selected) + 1,
-														collection.length
-													);
-												}
 
+												aria_text += ', ' + sprintf(
+													(selected.hasClass('disabled'))
+														? t('Selected, %1$s, read only, in position %2$d of %3$d')
+														: t('Selected, %1$s in position %2$d of %3$d'),
+													selected.data('label'),
+													collection.index(selected) + 1,
+													collection.length
+												);
 											}
 
 											aria_live.text(aria_text);
 										}
-										else if (item.disabled) {
+										else {
 											aria_live.text(t('Can not be removed'));
 										}
 									}
 									else if (e.which == KEY.BACKSPACE) {
+										/* Pressing Backspace on empty input field should select last element in
+										 * multiselect. For next Backspace press to be able to remove it.
+										 */
 										selected = $('.selected li:last-child', obj).addClass('selected');
 										aria_live.text(selected.data('label'));
 									}
