@@ -687,7 +687,7 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90279, 20006, 4)
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 20006, 10025);
 INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, params, description, posts, headers) VALUES (24338, 'item1', 'key1', 20006, 10025, '30s', 3, '', '', '', '');
 INSERT INTO triggers (triggerid, description, value, state, lastchange, comments) VALUES (100029, 'trigger host.host:{HOST.HOST} | host.host2:{HOST.HOST2} | host.name:{HOST.NAME} | item.value:{ITEM.VALUE} | item.value1:{ITEM.VALUE1} | item.lastvalue:{ITEM.LASTVALUE} | host.ip:{HOST.IP} | host.dns:{HOST.DNS} | host.conn:{HOST.CONN}', 0, 1, '1339761311', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99946, 24338, 100029, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99946, 24338, 100029, 'last', '0');
 
 -- inheritance testing
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15000, 'Inheritance test template', 'Inheritance test template', 3, '');
@@ -762,14 +762,14 @@ INSERT INTO triggers (triggerid, expression, description, comments, templateid) 
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (99005, '{99734}=0', 'testInheritanceTrigger2', '', 99001);
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (99006, '{99735}=0', 'testInheritanceTrigger3', '', 99002);
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (99007, '{99736}=0', 'testInheritanceTrigger4', '', 99003);
-INSERT INTO functions (functionid, triggerid, itemid, function, parameter) VALUES (99729, 99000, 15000, 'last', '');
-INSERT INTO functions (functionid, triggerid, itemid, function, parameter) VALUES (99730, 99001, 15000, 'last', '');
-INSERT INTO functions (functionid, triggerid, itemid, function, parameter) VALUES (99731, 99002, 15000, 'last', '');
-INSERT INTO functions (functionid, triggerid, itemid, function, parameter) VALUES (99732, 99003, 15000, 'last', '');
-INSERT INTO functions (functionid, triggerid, itemid, function, parameter) VALUES (99733, 99004, 15005, 'last', '');
-INSERT INTO functions (functionid, triggerid, itemid, function, parameter) VALUES (99734, 99005, 15005, 'last', '');
-INSERT INTO functions (functionid, triggerid, itemid, function, parameter) VALUES (99735, 99006, 15005, 'last', '');
-INSERT INTO functions (functionid, triggerid, itemid, function, parameter) VALUES (99736, 99007, 15005, 'last', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99729, 99000, 15000, 'last', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99730, 99001, 15000, 'last', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99731, 99002, 15000, 'last', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99732, 99003, 15000, 'last', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99733, 99004, 15005, 'last', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99734, 99005, 15005, 'last', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99735, 99006, 15005, 'last', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99736, 99007, 15005, 'last', '');
 
 -- testFormGraph.LayoutCheck testInheritanceGraph.SimpleUpdate
 INSERT INTO graphs (graphid, name)             VALUES (15000, 'testInheritanceGraph1');
@@ -899,14 +899,14 @@ INSERT INTO triggers (triggerid, expression, description, comments, flags, templ
 INSERT INTO triggers (triggerid, expression, description, comments, flags, templateid) VALUES (99013, '{99742}=0', 'testInheritanceTriggerPrototype2', '', 2, 99009);
 INSERT INTO triggers (triggerid, expression, description, comments, flags, templateid) VALUES (99014, '{99743}=0', 'testInheritanceTriggerPrototype3', '', 2, 99010);
 INSERT INTO triggers (triggerid, expression, description, comments, flags, templateid) VALUES (99015, '{99744}=0', 'testInheritanceTriggerPrototype4', '', 2, 99011);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99737, 15021, 99008, 'last', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99738, 15021, 99009, 'last', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99739, 15021, 99010, 'last', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99740, 15021, 99011, 'last', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99741, 15026, 99012, 'last', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99742, 15026, 99013, 'last', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99743, 15026, 99014, 'last', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (99744, 15026, 99015, 'last', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99737, 15021, 99008, 'last', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99738, 15021, 99009, 'last', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99739, 15021, 99010, 'last', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99740, 15021, 99011, 'last', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99741, 15026, 99012, 'last', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99742, 15026, 99013, 'last', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99743, 15026, 99014, 'last', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99744, 15026, 99015, 'last', '');
 
 -- testInheritanceWeb.SimpleUpdate
 INSERT INTO httptest (httptestid, name, delay, agent, hostid)             VALUES (15000, 'testInheritanceWeb1', '1m', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 15000);
@@ -1050,16 +1050,16 @@ INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, descrip
 
 -- testFormTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14000, '{14000}=0', 'testFormTrigger1', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14000, 30004, 14000, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (14000, 30004, 14000, 'last', '0');
 
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14001, '{14001}=0', 'testFormTrigger2', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14001, 30004, 14001, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (14001, 30004, 14001, 'last', '0');
 
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14002, '{14002}=0', 'testFormTrigger3', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14002, 30004, 14002, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (14002, 30004, 14002, 'last', '0');
 
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14003, '{14003}=0', 'testFormTrigger4', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14003, 30004, 14003, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (14003, 30004, 14003, 'last', '0');
 
 -- testFormGraph.LayoutCheck testFormGraph.SimpleUpdate
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (300000,'testFormGraph1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,0);
@@ -1101,10 +1101,10 @@ INSERT INTO triggers (triggerid,expression,description,url,status,value,priority
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99519,'{99948}=0','testFormTriggerPrototype2','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99520,'{99949}=0','testFormTriggerPrototype3','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99521,'{99950}=0','testFormTriggerPrototype4','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (99947,23804,99518,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (99948,23804,99519,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (99949,23804,99520,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (99950,23804,99521,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99947,23804,99518,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99948,23804,99519,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99949,23804,99520,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99950,23804,99521,'last','0');
 
 -- testFormGraphPrototype.LayoutCheck and testFormGraphPrototype.SimpleUpdate
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (600000,'testFormGraphPrototype1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
@@ -1257,16 +1257,16 @@ INSERT INTO triggers (triggerid,expression,description,url,status,value,priority
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100015,'{100015}=0','TriggerProto ZBX6663 Second','',0,0,0,0,'','',100014,0,0,2);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100016,'{100016}=0','TriggerProto ZBX6663 Second','',0,0,0,0,'','',100014,0,0,2);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100017,'{100017}=0','TriggerProto ZBX6663 HSecond','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100008,40038,100008,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100009,40039,100009,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100010,40040,100010,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100011,40041,100011,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100012,40042,100012,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100013,40054,100013,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100014,40048,100014,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100015,40049,100015,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100016,40050,100016,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100017,40052,100017,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100008,40038,100008,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100009,40039,100009,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100010,40040,100010,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100011,40041,100011,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100012,40042,100012,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100013,40054,100013,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100014,40048,100014,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100015,40049,100015,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100016,40050,100016,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100017,40052,100017,'last','0');
 INSERT INTO graphs (graphid,name,width,height,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags) VALUES (700008,'Graph ZBX6663',900,200,0.0000,100.0000,NULL,1,1,0,1,0,0.0000,0.0000,0,0,NULL,NULL,0);
 INSERT INTO graphs (graphid,name,width,height,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags) VALUES (700009,'Graph ZBX6663 Second',900,200,0.0000,100.0000,NULL,1,1,0,1,0,0.0000,0.0000,0,0,NULL,NULL,0);
 INSERT INTO graphs (graphid,name,width,height,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags) VALUES (700010,'Graph ZBX6663 Second',900,200,0.0000,100.0000,700009,1,1,0,1,0,0.0000,0.0000,0,0,NULL,NULL,0);
@@ -1314,10 +1314,10 @@ INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (935,102
 INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (936,102,40034,4);
 
 -- testZBX6648.eventsFilter
-INSERT INTO groups (groupid,name,internal) VALUES (50000,'ZBX6648 Group No Hosts',0);
-INSERT INTO groups (groupid,name,internal) VALUES (50001,'ZBX6648 Disabled Triggers',0);
-INSERT INTO groups (groupid,name,internal) VALUES (50002,'ZBX6648 Enabled Triggers',0);
-INSERT INTO groups (groupid,name,internal) VALUES (50003,'ZBX6648 All Triggers',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50000,'ZBX6648 Group No Hosts',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50001,'ZBX6648 Disabled Triggers',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50002,'ZBX6648 Enabled Triggers',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50003,'ZBX6648 All Triggers',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50003, 'ZBX6648 Disabled Triggers Host', 'ZBX6648 Disabled Triggers Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50004, 'ZBX6648 Enabled Triggers Host', 'ZBX6648 Enabled Triggers Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50005, 'ZBX6648 All Triggers Host', 'ZBX6648 All Triggers Host', 0, '');
@@ -1334,10 +1334,10 @@ INSERT INTO triggers (triggerid,expression,description,url,status,value,priority
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100019,'{100019}=0','zbx6648 trigger enabled','',0,0,0,0,'','',NULL,0,0,0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100020,'{100020}=0','zbx6648 trigger all enabled','',0,0,0,0,'','',NULL,0,0,0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100021,'{100021}=0','zbx6648 trigger all disabled','',1,0,0,0,'','',NULL,0,0,0);
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100018,40055,100018,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100019,40056,100019,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100020,40057,100020,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100021,40057,100021,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100018,40055,100018,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100019,40056,100019,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100020,40057,100020,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100021,40057,100021,'last','0');
 
 -- testPageItems, testPageTriggers, testPageDiscoveryRules, testPageItemPrototype, testPageTriggerPrototype
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50006, 'Template-layout-test-001', 'Template-layout-test-001', 3, '');
@@ -1355,13 +1355,13 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (514,
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname,posts,headers) VALUES (40062,0,'','',50006,'Item-layout-test-001','item-layout-test-001','30s','90d','365d',0,3,'','','',0,'','','',0,'',NULL,NULL,'','',0,'','','','',0,0,50020,'','',0,'30',0,0,0,'','','');
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname,posts,headers) VALUES (40063,0,'','',50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',0,'','','',0,'',NULL,NULL,'','',0,'','','','',0,0,50019,'','',0,'30',0,0,0,'','','');
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100022,'{100022}=0','Trigger-proto-layout-test-001','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100022,40060,100022,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100022,40060,100022,'last','0');
 INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (100023, '{100023}=0', 'Trigger-proto-layout-test-001', '', 2);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (100023, 40061 ,100023,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100023, 40061 ,100023,'last',0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100024,'{100024}=0','Trigger-layout-test-001','',1,0,0,0,'','',NULL,0,0,0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100025,'{100025}=0','Trigger-layout-test-002','',0,0,0,0,'','',NULL,0,0,0);
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100024,40063,100024,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100025,40062,100025,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100024,40063,100024,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100025,40062,100025,'last','0');
 
 -- testFormMap.ZBX6840
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50008, 'Host-map-test-zbx6840', 'Host-map-test-zbx6840', 0, '');
@@ -1369,8 +1369,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50008, 50008, 4)
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50008, 50021);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname,posts,headers) VALUES (40065,0,'','',50008,'Item-layout-test-zbx6840','item-layout-test-002','30s','90d','365d',0,3,'','','',0,'','','',0,'',NULL,NULL,'','',0,'','','','',0,0,50021,'','',0,'30',0,0,0,'','','');
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100026,'{100026}=0&{100027}=0','Trigger-map-test-zbx6840','',0,1,0,0,'','',NULL,0,0,0);
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100026,40065,100026,'last','0');
-INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (100027,23287,100026,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100026,40065,100026,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100027,23287,100026,'last','0');
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, grid_size, grid_show, grid_align, label_format, label_type_host, label_type_hostgroup, label_type_trigger, label_type_map, label_type_image, label_string_host, label_string_hostgroup, label_string_trigger, label_string_map, label_string_image, iconmapid, expand_macros, severity_min, userid, private) VALUES (5, 'testZBX6840', 800, 600, NULL, 0, 0, 0, 0, 0, 0, 50, 1, 1, 0, 2, 2, 2, 2, 2, '', '', '', '', '', NULL, 0, 0, 1, 0);
 INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (8,5,10084,0,19,NULL,'Host element (Zabbix Server)',-1,413,268,NULL,NULL,0,0,200,200,0,0);
 INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (9,5,0,2,15,NULL,'Trigger element (zbx6840)',-1,213,218,NULL,NULL,0,0,200,200,0,0);
@@ -1431,7 +1431,7 @@ UPDATE users SET rows_per_page = 100 WHERE userid = 1;
 
 -- Create two triggers with event
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger to check tag filter on problem page','{13083}>100','0','0','','3','','1','0','0','','','99250');
-INSERT INTO functions (functionid,triggerid,itemid,function,parameter) VALUES ('99528','99250','23292','avg','5m');
+INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('99528','99250','23292','avg','5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99250','97');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('service','abcdef','99250','98');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Database','','99250','99');
@@ -1441,7 +1441,7 @@ INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (92,0,
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (90,92,'Service','abc'),(91,92,'service','abcdef'),(92,92,'Database',''),(98,92,'Tag4',''),(99,92,'Tag5','5');
 
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger with tag','{13083}>100','0','0','','2','','1','0','0','','','99251');
-INSERT INTO functions (functionid,triggerid,itemid,function,parameter) VALUES ('99529','99251','23292','avg','5m');
+INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('99529','99251','23292','avg','5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99251','100');
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (93,0,0,99251,1508761428,128786843,1,'Test trigger with tag');
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
@@ -1455,16 +1455,16 @@ INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, 
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (90, 90, 90);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (91, 91, 90);
 -- Tag based permissions: host group, host, item, two triggers
-INSERT INTO groups (groupid, name, internal) VALUES (50004, 'Host group for tag permissions', 0);
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50004, 'Host group for tag permissions', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'Host for tag permissions', 'Host for tag permissions', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90280, 50009, 50004);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 50009, 50022);
 INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, params, description, posts, headers) VALUES (40066, 'tag.item', 'tag.key', 50009, 50022, '30s', 3, '', '', '', '');
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100027, 'Trigger for tag permissions MySQL', '{13083}=0', 0, 1, '1339761311', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (100028, 40066, 100027, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100028, 40066, 100027, 'last', '0');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (101, 'Service','MySQL', 100027);
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100028, 'Trigger for tag permissions Oracle', '{13083}=0', 0, 1, '1339761311', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (100029, 40066, 100028, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100029, 40066, 100028, 'last', '0');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (102, 'Service','Oracle', 100028);
 -- Tag based permissions: triggers problems events
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (94,0,0,100027,1508751328,128786843,1,'Trigger for tag permissions MySQL');
