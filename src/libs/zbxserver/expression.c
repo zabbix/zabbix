@@ -1706,7 +1706,10 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 			zbx_free(actions);
 		}
 
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n\n", ack.message);
+		if ('\0' != *ack.message)
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n", ack.message);
+
+		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
 	}
 	DBfree_result(result);
 
