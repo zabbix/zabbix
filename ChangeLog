@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
 
 Bug fixes:
+..F....... [ZBX-12603] fixed tab navigation and keyboard interaction in dashboard sharing and properties dialogues; added validation inside popups (miks, vmurzins)
 ........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
 ........S. [ZBX-14312] fixed possible deadlock in history syncer when housekeeper is deleting events (vso)
 ..F....... [ZBX-13697] fixed session expiration when changing default authentication method (miks)
