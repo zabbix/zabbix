@@ -2928,7 +2928,7 @@ $form-icon-btn: (
 // Dashboard
 .dashbrd-grid-widget-container {
 	position: relative;
-	margin: 0 -.25rem;
+	margin: -.25rem;
 }
 
 .dashbrd-grid-widget-placeholder {
@@ -2942,9 +2942,7 @@ $form-icon-btn: (
 	width: 16%;
 	height: 200px;
 	background-color: $ui-bg-color;
-	border-style: solid;
-	border-width: 1px;
-	border-color: $ui-border-color;
+	border: 1px solid $ui-border-color;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
