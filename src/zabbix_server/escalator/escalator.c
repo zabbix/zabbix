@@ -2209,7 +2209,8 @@ static void	add_ack_escalation_r_eventids(zbx_vector_ptr_t *escalations, zbx_vec
 	{
 		zbx_db_get_eventid_r_eventid_pairs(&ack_eventids, event_pairs, &r_eventids);
 
-		zbx_vector_uint64_append_array(eventids, r_eventids.values, r_eventids.values_num);
+		if (0 < r_eventids.values_num)
+			zbx_vector_uint64_append_array(eventids, r_eventids.values, r_eventids.values_num);
 	}
 
 	zbx_vector_uint64_destroy(&ack_eventids);
