@@ -5716,6 +5716,6 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 
 	xmlXPathFreeCompExpr(p);
 	xmlXPathFreeContext(ctx);
-#endif
 	return SUCCEED;
+#endif
 }
