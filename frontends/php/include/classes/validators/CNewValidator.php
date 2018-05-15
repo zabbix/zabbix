@@ -34,10 +34,18 @@ class CNewValidator {
 	 */
 	private $validationRuleParser;
 
+	/**
+	 * Parser for range date/time.
+	 *
+	 * @var CRangeTimeParser
+	 */
+	private $range_time_parser;
+
 	public function __construct(array $input, array $rules) {
 		$this->input = $input;
 		$this->rules = $rules;
 		$this->validationRuleParser = new CValidationRule();
+		$this->range_time_parser = null;
 
 		$this->validate();
 	}
@@ -244,6 +252,18 @@ class CNewValidator {
 					break;
 
 				/*
+				 * 'range_time' => true
+				 */
+				case 'range_time':
+					if (array_key_exists($field, $this->input) && !$this->isRangeTime($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time is expected'))
+						);
+						return false;
+					}
+					break;
+
+				/*
 				 * 'string' => true
 				 */
 				case 'string':
@@ -412,6 +432,14 @@ class CNewValidator {
 		}
 
 		return 31;
+	}
+
+	private function isRangeTime($value) {
+		if ($this->range_time_parser === null) {
+			$this->range_time_parser = new CRangeTimeParser();
+		}
+
+		return is_string($value) && $this->range_time_parser->parse($value) == CParser::PARSE_SUCCESS;
 	}
 
 	private function is_time($value) {

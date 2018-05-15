@@ -139,6 +139,11 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'time' => true
 				]
 			],
+			['range_time', '',
+				[
+					'range_time' => true
+				]
+			],
 			['array_id', '',
 				[
 					'array_id' => true

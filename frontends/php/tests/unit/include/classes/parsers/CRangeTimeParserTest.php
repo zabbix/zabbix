@@ -315,6 +315,13 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 					'match' => 'now/M-1s'
 				]
 			],
+			[
+				'', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
 		];
 	}
 

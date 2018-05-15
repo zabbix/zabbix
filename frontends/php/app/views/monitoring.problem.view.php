@@ -301,7 +301,7 @@ if ($data['action'] == 'problem.view') {
 		]);
 
 	$filter = (new CFilter())
-		->setProfile($data['profileIdx'], 0)
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
 		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
 		->addFormItem((new CVar('page', $data['page']))->removeId());
@@ -347,7 +347,7 @@ if ($data['action'] == 'problem.view') {
 			'mainObject' => 1,
 			'profile' => [
 				'idx' => $data['profileIdx'],
-				'idx2' => 0,
+				'idx2' => $data['profileIdx2'],
 			]
 		];
 

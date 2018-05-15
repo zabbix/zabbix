@@ -61,8 +61,8 @@ class CControllerProblemView extends CController {
 			'filter_show_timeline' =>	'in 1',
 			'filter_details' =>			'in 1',
 			'filter_highlight_row' =>	'in 1',
-			'from' =>					'string',
-			'to' =>						'string'
+			'from' =>					'range_time',
+			'to' =>						'range_time'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -26,10 +26,10 @@ class CControllerTimelineUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'idx' =>		'required|string',
-			'idx2' =>		'required|id',
-			'from' =>		'string|not_empty',
-			'to' =>			'string|not_empty'
+			'idx' =>	'required|string',
+			'idx2' =>	'required|id',
+			'from' =>	'required|range_time',
+			'to' =>		'required|range_time'
 		];
 
 		$ret = $this->validateInput($fields);

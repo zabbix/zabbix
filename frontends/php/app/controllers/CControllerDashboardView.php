@@ -38,8 +38,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'groupid' =>			'db groups.groupid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
-			'from' =>				'string|not_empty',
-			'to' =>					'string|not_empty'
+			'from' =>				'range_time',
+			'to' =>					'range_time'
 		];
 
 		$ret = $this->validateInput($fields);
