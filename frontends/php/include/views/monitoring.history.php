@@ -129,7 +129,7 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 		if ($data['value_type'] == ITEM_VALUE_TYPE_LOG || $data['value_type'] == ITEM_VALUE_TYPE_TEXT
 				|| !$data['itemids']) {
 			$filterColumn1 = (new CFormList())
-				->addRow(_('Items list'),
+				->addRow((new CLabel(_('Items list'), 'itemids__ms')),
 					(new CMultiSelect([
 						'name' => 'itemids[]',
 						'object_name' => 'items',

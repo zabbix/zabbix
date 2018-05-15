@@ -83,7 +83,7 @@ $multiselect_userid = (new CMultiSelect($multiselect_data))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAriaRequired();
 
-$map_tab->addRow((new CLabel(_('Owner'), $multiselect_userid->getId()))->setAsteriskMark(), $multiselect_userid);
+$map_tab->addRow((new CLabel(_('Owner'), 'userid_ms'))->setAsteriskMark(), $multiselect_userid);
 
 $map_tab->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['sysmap']['name']))

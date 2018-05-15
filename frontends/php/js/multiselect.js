@@ -252,7 +252,7 @@ jQuery(function($) {
 				selected_ul.addClass('disabled');
 			}
 			else {
-				var label = $('label[for='+obj.attr('id')+'ms]'),
+				var label = $('label[for='+obj.attr('id')+'_ms]'),
 					input = $('<input>', {
 						'id': label.length ? label.attr('for') : null,
 						'class': 'input',

@@ -77,7 +77,7 @@ if (!$this->data['is_profile']) {
 	}
 
 	$userFormList->addRow(
-		(new CLabel(_('Groups'), 'user_groups[]'))->setAsteriskMark(),
+		(new CLabel(_('Groups'), 'user_groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'user_groups[]',
 			'object_name' => 'usersGroups',

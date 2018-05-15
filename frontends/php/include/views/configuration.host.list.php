@@ -68,7 +68,7 @@ $filter = (new CFilter('web.hosts.filter.state'))
 					->setModern(true)
 			)
 			->addRow(
-				_('Proxy'),
+				(new CLabel(_('Proxy'), 'filter_proxyids__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_proxyids[]',
 					'object_name' => 'proxies',

@@ -393,7 +393,7 @@ $itemFormList->addRow(
 
 // Append master item select.
 $itemFormList->addRow(
-	(new CLabel(_('Master item'), 'master_itemname'))->setAsteriskMark(),
+	(new CLabel(_('Master item'), 'master_itemid_ms'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'master_itemid',
 		'object_name' => 'items',

@@ -189,7 +189,7 @@ $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 	->addRow('',
 		(new CLabel(_('At least one host or host group must be selected.')))->setAsteriskMark()
 	)
-	->addRow(new CLabel(_('Hosts in maintenance'), 'hosts[]'),
+	->addRow(new CLabel(_('Hosts in maintenance'), 'hostids__ms'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',
@@ -205,7 +205,7 @@ $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(new CLabel(_('Groups in maintenance'), 'groups[]'),
+	->addRow(new CLabel(_('Groups in maintenance'), 'groupids__ms'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',

@@ -1019,7 +1019,7 @@ if (!empty($data['new_operation'])) {
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Host groups'), 'new_operation[groupids][]'))->setAsteriskMark(),
+				(new CLabel(_('Host groups'), 'new_operation_groupids__ms'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[groupids][]',
 					'object_name' => 'hostGroup',
@@ -1042,7 +1042,7 @@ if (!empty($data['new_operation'])) {
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Templates'), 'new_operation[templateids][]'))->setAsteriskMark(),
+				(new CLabel(_('Templates'), 'new_operation_templateids__ms'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[templateids][]',
 					'object_name' => 'templates',

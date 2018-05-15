@@ -92,7 +92,7 @@ if ($data['action'] == 'problem.view') {
 				->addValue(_('History'), TRIGGERS_OPTION_ALL)
 				->setModern(true)
 		)
-		->addRow((new CLabel(_('Host groups'), 'filter_groupids_search')),
+		->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
 			(new CMultiSelect([
 				'name' => 'filter_groupids[]',
 				'object_name' => 'hostGroup',
@@ -107,7 +107,7 @@ if ($data['action'] == 'problem.view') {
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
-		->addRow((new CLabel(_('Hosts'), 'filter_hostids_ms')),
+		->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
 			(new CMultiSelect([
 				'name' => 'filter_hostids[]',
 				'object_name' => 'hosts',
@@ -139,7 +139,7 @@ if ($data['action'] == 'problem.view') {
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])
-		->addRow((new CLabel(_('Triggers'), 'filter_triggerids_search')),
+		->addRow((new CLabel(_('Triggers'), 'filter_triggerids__ms')),
 			(new CMultiSelect([
 				'name' => 'filter_triggerids[]',
 				'object_name' => 'triggers',

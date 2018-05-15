@@ -48,7 +48,7 @@ $multiselect = (new CMultiSelect([
 	->setAriaRequired();
 
 $form->addItem((new CFormList())
-	->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect)
+	->addRow((new CLabel(_('Owner'), 'userid_ms'))->setAsteriskMark(), $multiselect)
 	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
