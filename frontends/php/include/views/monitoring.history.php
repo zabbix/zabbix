@@ -171,22 +171,13 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 			}
 
 			$filterColumn1->addRow(_('Selected'), $tasks);
-			$filter_tab = [$filterColumn1];
+			$filter_tab[] = $filterColumn1;
 		}
 	}
 }
 
-// for batch graphs don't remember the time selection in the profiles
-if ($data['action'] == HISTORY_BATCH_GRAPH) {
-	$profileIdx = null;
-	$profileIdx2 = null;
-	$updateProfile = false;
-}
-else {
-	$profileIdx = 'web.item.graph.filter';
-	$profileIdx2 = reset($this->data['itemids']);
-	$updateProfile = ($data['from'] !== null && $data['to'] !== null);
-}
+$profileIdx = 'web.item.graph.filter';
+$profileIdx2 = ($data['action'] == HISTORY_BATCH_GRAPH) ? 0 : reset($data['itemids']);
 
 // create history screen
 if ($data['itemids']) {
@@ -196,7 +187,7 @@ if ($data['itemids']) {
 		'itemids' => $data['itemids'],
 		'profileIdx' => $profileIdx,
 		'profileIdx2' => $profileIdx2,
-		'updateProfile' => $updateProfile,
+		'updateProfile' => ($data['from'] !== null && $data['to'] !== null),
 		'from' => $data['from'],
 		'to' => $data['to'],
 		'filter' => getRequest('filter'),
@@ -205,9 +196,6 @@ if ($data['itemids']) {
 		'plaintext' => $data['plaintext'],
 		'graphtype' => $data['graphtype']
 	]);
-}
-else {
-	$screen = null;
 }
 
 // append plaintext to widget
@@ -230,9 +218,9 @@ else {
 		->setTitle($header['left'])
 		->setControls((new CTag('nav', true, $header['right']))
 			->setAttribute('aria-label', _('Content controls'))
-	);
+		);
 
-	if ($screen !== null && $data['action'] !== HISTORY_LATEST) {
+	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {
 		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
 
@@ -252,9 +240,7 @@ else {
 		];
 	}
 
-	if ($profileIdx !== null) {
-		$filter_form->setProfile($profileIdx, $profileIdx2);
-	}
+	$filter_form->setProfile($profileIdx, $profileIdx2);
 
 	if ($filter_tab) {
 		$filter_form->addFilterTab(_('Filter'), $filter_tab);

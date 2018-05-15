@@ -25,9 +25,7 @@ $filter = new CFilter();
 
 if (empty($data['screen']) || empty($data['host'])) {
 	$screen_builder = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screen_builder->timeline
-		]);
+	CScreenBuilder::insertScreenStandardJs(['timeline' => $screen_builder->timeline]);
 
 	$filter
 		->setProfile('web.screens.filter', 0)
