@@ -69,31 +69,21 @@ class CAbsoluteTimeParser extends CParser {
 			return false;
 		}
 
-		if (!array_key_exists('M', $matches) || $matches['M'] === '') {
+		$matches += ['M' => 1, 'D' => 1, 'h' => 0, 'm' => 0, 's' => 0];
+
+		if ($matches['M'] === '') {
 			$matches['M'] = 1;
 		}
 
-		if (!array_key_exists('D', $matches) || $matches['D'] === '') {
+		if ($matches['D'] === '') {
 			$matches['D'] = 1;
-		}
-
-		if (!array_key_exists('h', $matches)) {
-			$matches['h'] = 0;
-		}
-
-		if (!array_key_exists('m', $matches)) {
-			$matches['m'] = 0;
-		}
-
-		if (!array_key_exists('s', $matches)) {
-			$matches['s'] = 0;
 		}
 
 		if (1 > $matches['M'] || $matches['M'] > 12 || 1 > $matches['D'] || $matches['D'] > 31) {
 			return false;
 		}
 
-		if ($matches['h'] > 24 || $matches['m'] > 59 || $matches['s'] > 59) {
+		if ($matches['h'] > 23 || $matches['m'] > 59 || $matches['s'] > 59) {
 			return false;
 		}
 
