@@ -788,8 +788,19 @@ class CScreenProblem extends CScreenBase {
 					$tags_header = null;
 				}
 				else {
-					$tags_width = 26 + 49 * $this->data['filter']['show_tags'];
-					$tags_header = (new CColHeader(_('Tags')))->addStyle('width: '.$tags_width.'px;');
+					$tags_header = (new CColHeader(_('Tags')));
+
+					switch ($this->data['filter']['show_tags']) {
+						case PROBLEMS_SHOW_TAGS_1:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
+							break;
+						case PROBLEMS_SHOW_TAGS_2:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
+							break;
+						case PROBLEMS_SHOW_TAGS_3:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
+							break;
+					}
 				}
 
 				$table = (new CTableInfo())
@@ -802,9 +813,9 @@ class CScreenProblem extends CScreenBase {
 						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
 						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 30%;'),
+							->addStyle('width: 35%;'),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 70%;'),
+							->addStyle('width: 65%;'),
 						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
 						$this->config['event_ack_enable'] ? (new CColHeader(_('Ack')))->addStyle('width: 36px;') : null,
 						(new CColHeader(_('Actions')))->addStyle('width: 59px;'),

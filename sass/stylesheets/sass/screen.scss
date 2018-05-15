@@ -758,6 +758,18 @@ output {
 				max-width: 40px;
 				margin: -2px 3px 0 0;
 				padding: 2px 3px;
+
+				@media screen and (min-width: 1200px) {
+					max-width: 71px;
+				}
+
+				@media screen and (min-width: 1400px) {
+					max-width: 102px;
+				}
+
+				@media screen and (min-width: 1600px) {
+					max-width: 133px;
+				}
 			}
 
 			.rel-container {
@@ -782,6 +794,60 @@ output {
 		vertical-align: bottom;
 		border-bottom: 2px solid darken($table-border-color, 5%);
 		text-align: left;
+
+		&.column-tags-1 {
+			width: 75px;
+		}
+
+		&.column-tags-2 {
+			width: 124px;
+		}
+
+		&.column-tags-3 {
+			width: 173px;
+		}
+
+		@media screen and (min-width: 1200px) {
+			&.column-tags-1 {
+				width: 106px;
+			}
+
+			&.column-tags-2 {
+				width: 186px;
+			}
+
+			&.column-tags-3 {
+				width: 266px;
+			}
+		}
+
+		@media screen and (min-width: 1400px) {
+			&.column-tags-1 {
+				width: 137px;
+			}
+
+			&.column-tags-2 {
+				width: 248px;
+			}
+
+			&.column-tags-3 {
+				width: 359px;
+			}
+		}
+
+		@media screen and (min-width: 1600px) {
+			&.column-tags-1 {
+				width: 168px;
+			}
+
+			&.column-tags-2 {
+				width: 310px;
+			}
+
+			&.column-tags-3 {
+				width: 452px;
+			}
+		}
 
 		.arrow-up {
 			margin: 0 0 0 3px;
