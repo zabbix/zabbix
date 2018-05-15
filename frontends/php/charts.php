@@ -31,8 +31,6 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
-ob_start();
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -66,6 +64,11 @@ if (getRequest('graphid')) {
 	}
 }
 
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
+
 $pageFilter = new CPageFilter([
 	'groups' => ['real_hosts' => true, 'with_graphs' => true],
 	'hosts' => ['with_graphs' => true],
@@ -74,35 +77,6 @@ $pageFilter = new CPageFilter([
 	'graphs' => ['templated' => 0],
 	'graphid' => getRequest('graphid')
 ]);
-
-if (hasRequest('from') && hasRequest('to')) {
-	calculateTime([
-		'profileIdx' => 'web.graphs.filter',
-		'profileIdx2' => $pageFilter->graphid,
-		'updateProfile' => true,
-		'from' => getRequest('from'),
-		'to' => getRequest('to')
-	]);
-
-	$curl = (new CUrl())
-		->removeArgument('from')
-		->removeArgument('to');
-
-	ob_end_clean();
-
-	DBstart();
-	CProfile::flush();
-	DBend();
-
-	redirect($curl->getUrl());
-}
-
-ob_end_flush();
-
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
-}
 
 /*
  * Display
@@ -118,7 +92,10 @@ $data = [
 	],
 	'timeline' => calculateTime([
 		'profileIdx' => 'web.graphs.filter',
-		'profileIdx2' => $pageFilter->graphid
+		'profileIdx2' => $pageFilter->graphid,
+		'updateProfile' => (hasRequest('from') && hasRequest('to')),
+		'from' => getRequest('from'),
+		'to' => getRequest('to')
 	])
 ];
 
