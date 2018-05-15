@@ -389,21 +389,49 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
  *                                                                            *
  * Function: get_problem_update_actions                                       *
  *                                                                            *
- * Purpose: get comma delimited list of problem update actions                *
+ * Purpose: get human readable list of problem update actions                 *
  *                                                                            *
- * Parameters: ack - [IN] the acknowledge (problem update) data               *
- *             out - [OUT] the output buffer                                  *
+ * Parameters: ack     - [IN] the acknowledge (problem update) data           *
+ *             actions - [IN] the required action flags                       *
+ *             out     - [OUT] the output buffer                              *
+ *                                                                            *
+ * Return value: SUCCEED - successfully returned list of problem update       *
+ *               FAIL    - no matching actions were made                      *
  *                                                                            *
  ******************************************************************************/
-static void	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, char **out)
+static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, char **out)
 {
-	char	*buf = NULL;
+	char	*buf = NULL, *prefixes[] = {"", ", ", ", ", ", "};
 	size_t	buf_alloc = 0, buf_offset = 0;
+	int	i, index, flags;
 
-	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
+	if (0 == (flags = ack->action & actions))
+		return FAIL;
+
+	for (i = 0, index = 0; i < ZBX_PROBLEM_UPDATE_ACTION_COUNT; i++)
+	{
+		if (0 != (flags & (1 << i)))
+			index++;
+	}
+
+	if (1 < index)
+		prefixes[index - 1] = " and ";
+
+	index = 0;
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
+	{
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "acknowledged");
+		index++;
+	}
 
-	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_SEVERITY))
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_MESSAGE))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "commented");
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_SEVERITY))
 	{
 		zbx_config_t	cfg;
 		const char	*from = "unknown", *to = "unknown";
@@ -416,30 +444,23 @@ static void	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, char **out)
 		if (TRIGGER_SEVERITY_COUNT > ack->new_severity && 0 <= ack->new_severity)
 			to = cfg.severity_name[ack->new_severity];
 
-		if (0 != buf_offset)
-			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, ", ");
-
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "severity changed from %s to %s",
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "changed severity from %s to %s",
 				from, to);
 
 		zbx_config_clean(&cfg);
 	}
 
-	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_CLOSE))
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_CLOSE))
 	{
-		if (0 != buf_offset)
-			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, ", ");
-
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "closed");
 	}
 
-	if (0 != buf_offset)
-	{
-		zbx_free(*out);
-		*out = buf;
-	}
-	else
-		*out = zbx_strdup(*out, "");
+	zbx_free(*out);
+	*out = buf;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1675,6 +1696,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 	while (NULL != (row = DBfetch(result)))
 	{
 		const char	*user_name;
+		char		*actions = NULL;
 		DB_ACKNOWLEDGE	ack;
 
 		ack.clock = atoi(row[0]);
@@ -1696,12 +1718,9 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 				zbx_time2str(ack.clock),
 				user_name);
 
-		if (0 != (ack.action & (ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SEVERITY |
-				ZBX_PROBLEM_UPDATE_CLOSE)))
+		if (SUCCEED == get_problem_update_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY, &actions))
 		{
-			char	*actions = NULL;
-
-			get_problem_update_actions(&ack, &actions);
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
 			zbx_free(actions);
 		}
@@ -2801,7 +2820,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_ACTION))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-						get_problem_update_actions(ack, &replace_to);
+					{
+						get_problem_update_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+								ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
+								ZBX_PROBLEM_UPDATE_SEVERITY, &replace_to);
+					}
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{

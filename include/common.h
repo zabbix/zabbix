@@ -726,6 +726,9 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_PROBLEM_UPDATE_MESSAGE	0x0004
 #define ZBX_PROBLEM_UPDATE_SEVERITY	0x0008
 
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	4
+
+
 #define ZBX_USER_ONLINE_TIME	600
 
 /* user permissions */
