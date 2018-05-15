@@ -36,7 +36,7 @@
 
 	<!-- Cppcheck static analyzer target -->
 	<target name="cppcheck-static-analyzer">
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="scan-build" failonerror="on">
 			<arg line="./configure"/>
 			<arg line="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent --with-ldap --with-libcurl"/>
@@ -60,7 +60,7 @@
 	<!-- Clang Static Analyzer target with various configuration parameters -->
 	<target name="clang-static-analyzer" depends="init-conf-options">
 		<delete dir="clang-scan-build-reports"/>
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 		<for list="${conf.list}" param="name" delimiter=",">
@@ -94,8 +94,8 @@
 
 	<target name="init">
 		<!-- Create database schema -->
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<exec executable="./configure" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on"/>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
 			<arg line="-j5"/>
@@ -302,7 +302,7 @@
 		<!-- Build Zabbix with cmocka tests -->
 		<delete dir="tests_results"/>
 		<mkdir dir="tests_results"/>
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<propertyselector property="conf.list" delimiter="," match="cmocka-(.*)" select="\1"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 		<for list="${conf.list}" param="name" delimiter=",">
