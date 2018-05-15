@@ -2017,7 +2017,6 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				if (SUCCEED != lld_items_preproc_step_esc(ppsrc, item->lld_row, item->key, &sub_params,
 						error))
 				{
-					zbx_free(ppdst->params);
 					zbx_free(ppdst);
 					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 					break;
