@@ -671,17 +671,16 @@ class CEvent extends CApiService {
 			foreach ($acknowledgeids as $k => $id) {
 				$acknowledgement = $acknowledges[$k];
 
-				if (ZBX_PROBLEM_UPDATE_ACKNOWLEDGE & $acknowledgement['action']) {
-					$tasks[$k] = [
-						'type' => ZBX_TM_TASK_ACKNOWLEDGE,
-						'status' => ZBX_TM_STATUS_NEW,
-						'clock' => $time
-					];
+				// Acknowledge task should be created for each acknowledge operation, regardless of it's action.
+				$tasks[$k] = [
+					'type' => ZBX_TM_TASK_ACKNOWLEDGE,
+					'status' => ZBX_TM_STATUS_NEW,
+					'clock' => $time
+				];
 
-					$tasks_ack[$k] = [
-						'acknowledgeid' => $id
-					];
-				}
+				$tasks_ack[$k] = [
+					'acknowledgeid' => $id
+				];
 			}
 
 			if ($tasks) {
