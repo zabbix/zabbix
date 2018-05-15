@@ -2053,11 +2053,12 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 
 			if (0 != strcmp(ppdst->params, sub_params))
 			{
-				ppdst->params = zbx_strdup(ppdst->params, sub_params);
+				zbx_free(ppdst->params);
+				ppdst->params = sub_params;
 				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS;
 			}
-
-			zbx_free(sub_params);
+			else
+				zbx_free(sub_params);
 		}
 	}
 }
