@@ -1808,10 +1808,12 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 					->setId('details-arrow')
 					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
 				)
+				->setAttribute('aria-expanded', $show_details ? 'true' : 'false')
 				->onClick('javascript: '.
 					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
 						'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));'.
-					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'
+					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'.
+					'jQuery(this).attr(\'aria-expanded\', jQuery(this).find(\'.'.ZBX_STYLE_ARROW_DOWN.'\').length == 0)'
 				);
 		}
 
@@ -1832,7 +1834,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	}
 
 	// Details link should be in front of title.
-	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))->addClass($class);
+	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
+		->addClass($class)
+		->setAttribute('role', 'contentinfo')
+		->setAttribute('aria-label', $good ? _('Success message') : _('Error message'));
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
