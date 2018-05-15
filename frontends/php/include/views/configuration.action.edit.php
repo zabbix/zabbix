@@ -1858,7 +1858,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 // Acknowledge operations
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$bottom_note = _('At least one operation, recovery operation or acknowledge operation must exist.');
+	$bottom_note = _('At least one operation, recovery operation or update operation must exist.');
 	$action_formname = $actionForm->getName();
 
 	$acknowledge_tab = (new CFormList())
@@ -2343,7 +2343,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		);
 	}
 
-	$action_tabs->addTab('acknowledgeTab', _('Acknowledgement operations'), $acknowledge_tab);
+	$action_tabs->addTab('acknowledgeTab', _('Update operations'), $acknowledge_tab);
 }
 
 if (!hasRequest('form_refresh')) {

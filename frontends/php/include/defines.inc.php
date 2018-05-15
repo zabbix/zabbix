@@ -599,7 +599,7 @@ define('EZ_TEXTING_LIMIT_CANADA',	1);
 
 define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
 define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
-define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Acknowledged: {TRIGGER.NAME}');
+define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Updated problem: {EVENT.NAME}');
 define('ACTION_DEFAULT_SUBJ_PROBLEM', 'Problem: {TRIGGER.NAME}');
 define('ACTION_DEFAULT_SUBJ_RECOVERY', 'Resolved: {TRIGGER.NAME}');
 
@@ -611,7 +611,7 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
 );
 define('ACTION_DEFAULT_MSG_ACKNOWLEDGE',
-		"{USER.FULLNAME} acknowledged problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME} with the following message:\n".
+		"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
 		"{EVENT.UPDATE.MESSAGE}\n\n".
 		"Current problem status is {EVENT.STATUS}"
 );

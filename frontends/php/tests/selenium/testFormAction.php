@@ -1580,7 +1580,7 @@ class testFormAction extends CWebTest {
 		}
 
 		if (array_key_exists('acknowledge_msg', $data)) {
-			$this->zbxTestTabSwitch('Acknowledgement operations');
+			$this->zbxTestTabSwitch('Update operations');
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('ack_shortdata'));
 			$acknowledge_msg = $data['acknowledge_msg'];
 		}
@@ -1592,7 +1592,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertElementPresentId('tab_acknowledgeTab');
 		}
 		else {
-			$this->zbxTestTextNotPresent('Acknowledgement operations');
+			$this->zbxTestTextNotPresent('Update operations');
 			$this->zbxTestAssertElementNotPresentId('tab_acknowledgeTab');
 		}
 
