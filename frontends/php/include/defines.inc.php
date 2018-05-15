@@ -613,7 +613,7 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 define('ACTION_DEFAULT_MSG_ACKNOWLEDGE',
 		"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
 		"{EVENT.UPDATE.MESSAGE}\n\n".
-		"Current problem status is {EVENT.STATUS}"
+		"Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}."
 );
 define('ACTION_DEFAULT_MSG_PROBLEM', "Problem started at {EVENT.TIME} on {EVENT.DATE}\nProblem name: {TRIGGER.NAME}\n".
 		"Host: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}");
