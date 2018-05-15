@@ -34,7 +34,7 @@ class CControllerAcknowledgeEdit extends CController {
 												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>					'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
 			'acknowledge_problem' =>		'db acknowledges.action|in '.
-												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
+												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
 			'close_problem' =>				'db acknowledges.action|in '.
 												ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
 			'backurl' =>					'string'
@@ -82,10 +82,10 @@ class CControllerAcknowledgeEdit extends CController {
 			'sid' => $this->getUserSID(),
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
-			'scope' => $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),
+			'scope' => (int) $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),
 			'backurl' => $this->getInput('backurl', 'zabbix.php?action=problem.view'),
 			'change_severity' => $this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE),
-			'severity' => $this->hasInput('severity') ? $this->getInput('severity') : null,
+			'severity' => $this->hasInput('severity') ? (int) $this->getInput('severity') : null,
 			'acknowledge_problem' => $this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 1,

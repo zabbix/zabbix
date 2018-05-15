@@ -72,7 +72,7 @@ $form_list
 			(new CCheckBox('change_severity', ZBX_PROBLEM_UPDATE_SEVERITY))
 				->onClick('javascript: jQuery("#severity input").attr("disabled", this.checked ? false : true)')
 				->setChecked($data['change_severity']),
-			(new CSeverity(['name' => 'severity', 'value' => null], $data['change_severity']))
+			(new CSeverity(['name' => 'severity', 'value' => $data['severity']], $data['change_severity']))
 		]))
 			->addClass('hor-list')
 	)

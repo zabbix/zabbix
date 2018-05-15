@@ -157,7 +157,10 @@ class CControllerAcknowledgeCreate extends CController {
 		else {
 			$response = new CControllerResponseRedirect('zabbix.php?action=acknowledge.edit');
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_n('Cannot update event', 'Cannot update events', count($eventids)));
+			$response->setMessageError(($data['action'] === ZBX_PROBLEM_UPDATE_NONE)
+				? _('At least one update operation is mandatory')
+				: _n('Cannot update event', 'Cannot update events', count($eventids))
+			);
 		}
 		$this->setResponse($response);
 	}
