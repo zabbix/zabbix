@@ -1150,38 +1150,33 @@ int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, i
 		loc->r = loc->l + pos - 1;
 
 		next += pos;
-
-		SKIP_WHITESPACE(next);
-
-		if (']' != *next++)
-			return zbx_jsonpath_error(*pnext);
-
-		*pnext = next;
 		*type = ZBX_JSONPATH_ARRAY_INDEX;
 
-		return SUCCEED;
+		SKIP_WHITESPACE(next);
 	}
-
-	loc->l = next - path + 1;
-
-	for (quotes = *next++; quotes != *next; next++)
+	else
 	{
-		if ('\0' == *next)
+		loc->l = next - path + 1;
+
+		for (quotes = *next++; quotes != *next; next++)
+		{
+			if ('\0' == *next)
+				return zbx_jsonpath_error(*pnext);
+		}
+
+		if ((pos = next - path) == loc->l)
 			return zbx_jsonpath_error(*pnext);
+
+		loc->r = pos - 1;
+		*type = ZBX_JSONPATH_COMPONENT_BRACKET;
+
+		SKIP_WHITESPACE_NEXT(next);
 	}
-
-	if ((pos = next - path) == loc->l)
-		return zbx_jsonpath_error(*pnext);
-
-	loc->r = pos - 1;
-
-	SKIP_WHITESPACE_NEXT(next);
 
 	if (']' != *next++)
 		return zbx_jsonpath_error(*pnext);
 
 	*pnext = next;
-	*type = ZBX_JSONPATH_COMPONENT_BRACKET;
 
 	return SUCCEED;
 }
