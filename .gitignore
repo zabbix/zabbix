@@ -398,6 +398,7 @@ tests/libs/zbxconf/.deps
 tests/libs/zbxconf/Makefile
 tests/libs/zbxconf/Makefile.in
 tests/libs/zbxconf/parse_cfg_file
+tests/libs/zbxdbcache/..........[!!-~][DEV-845]
 tests/libs/zbxdbcache/..........[!!-~][ZBX-12390]
 tests/libs/zbxdbcache/.deps
 tests/libs/zbxdbcache/.dirstamp
@@ -405,6 +406,7 @@ tests/libs/zbxdbcache/ADFGIJLPST
 tests/libs/zbxdbcache/Makefile
 tests/libs/zbxdbcache/Makefile.in
 tests/libs/zbxdbcache/zbx_vc_add_values
+tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values
 tests/libs/zbxdbhigh/.deps
 tests/libs/zbxdbhigh/DBselect_uint64
