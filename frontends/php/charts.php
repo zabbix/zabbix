@@ -35,13 +35,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>	[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
-	'hostid' =>		[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
-	'graphid' =>	[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
-	'from' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'to' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null],
-	'action' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'"'), null]
+	'groupid' =>	[T_ZBX_INT,			O_OPT, P_SYS, DB_ID,		null],
+	'hostid' =>		[T_ZBX_INT,			O_OPT, P_SYS, DB_ID,		null],
+	'graphid' =>	[T_ZBX_INT,			O_OPT, P_SYS, DB_ID,		null],
+	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS, null,			null],
+	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS, null,			null],
+	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS, IN('0,1'),	null],
+	'action' =>		[T_ZBX_STR,			O_OPT, P_SYS, IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'"'), null]
 ];
 check_fields($fields);
 

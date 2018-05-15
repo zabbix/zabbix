@@ -34,11 +34,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	// filter
-	'filter_rst' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'filter_set' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'alias' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'from' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
-	'to' =>			[T_ZBX_STR, O_OPT, null,	null,	null]
+	'filter_rst' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'filter_set' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'alias' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
+	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null]
 ];
 check_fields($fields);
 

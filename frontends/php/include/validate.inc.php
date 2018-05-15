@@ -123,7 +123,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$caption = $field;
 	}
 
-	if (is_array($var)) {
+	if (is_array($var) && $type != T_ZBX_RANGE_TIME) {
 		$err = ZBX_VALID_OK;
 
 		foreach ($var as $v) {
@@ -225,6 +225,14 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		if ($simple_interval_parser->parse($var) != CParser::PARSE_SUCCESS) {
 			$error = true;
 			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a time unit is expected'));
+		}
+	}
+	elseif ($type == T_ZBX_RANGE_TIME) {
+		$range_time_parser = new CRangeTimeParser();
+
+		if (!is_string($var) || $range_time_parser->parse($var) != CParser::PARSE_SUCCESS) {
+			$error = true;
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a time range is expected'));
 		}
 	}
 

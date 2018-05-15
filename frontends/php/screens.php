@@ -37,17 +37,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'hostid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'tr_groupid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'tr_hostid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'elementid' =>	[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null],
-	'screenname' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'step' =>		[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null],
-	'from' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'to' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'reset' =>		[T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null],
-	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null]
+	'groupid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
+	'hostid' =>		[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
+	'tr_groupid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
+	'tr_hostid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
+	'elementid' =>	[T_ZBX_INT,			O_OPT, P_SYS|P_NZERO, DB_ID, null],
+	'screenname' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,		null],
+	'step' =>		[T_ZBX_INT,			O_OPT, P_SYS,	BETWEEN(0, 65535), null],
+	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
+	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
+	'reset' =>		[T_ZBX_STR,			O_OPT, P_SYS,	IN('"reset"'), null],
+	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'), null]
 ];
 check_fields($fields);
 

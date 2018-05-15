@@ -33,11 +33,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'from' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'to' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'reset' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'httptestid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
-	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null]
+	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
+	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
+	'reset' =>		[T_ZBX_STR,			O_OPT, P_SYS|P_ACT, null,	null],
+	'httptestid' =>	[T_ZBX_INT,			O_MAND, P_SYS,	DB_ID,		null],
+	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'),	null]
 ];
 check_fields($fields);
 
