@@ -61,7 +61,7 @@ class CRelativeTimeParser extends CParser {
 		$pattern_offset = '(?P<offset>[0-9]+[yMwdhms]?\b)';
 		$pattern = 'now'.$pattern_precision1.'?([+-]'.$pattern_offset.$pattern_precision2.'?)?';
 
-		if (!preg_match('/^'.$pattern.'/', substr($source, $pos).' ', $matches)) {
+		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
 			return false;
 		}
 
