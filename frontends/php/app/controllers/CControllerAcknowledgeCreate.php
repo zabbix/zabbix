@@ -69,6 +69,7 @@ class CControllerAcknowledgeCreate extends CController {
 	protected function doAction() {
 		$eventids = $this->getInput('eventids');
 		$message = $this->getInput('message', '');
+		$updated_events_count = 0;
 		$result = false;
 
 		$data = [
@@ -99,13 +100,14 @@ class CControllerAcknowledgeCreate extends CController {
 
 		// Acknowledge events.
 		if ($data['action'] != ZBX_PROBLEM_UPDATE_NONE) {
-			// Aacknowledge directly selected events.
+			// Acknowledge directly selected events.
 			if ($eventids) {
 				$data['eventids'] = $eventids;
 				$result = API::Event()->acknowledge($data);
+				$updated_events_count += count($eventids); // TODO VM: maybe we should count events in $result, if this may be different from $eventids.
 			}
 
-			// Acknowledge events that are created from the same trigger if ZBX_ACKNOWLEDGE_PROBLEM has sekected.
+			// Acknowledge events that are created from the same trigger if ZBX_ACKNOWLEDGE_PROBLEM is selected.
 			if ($this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED) == ZBX_ACKNOWLEDGE_PROBLEM) {
 				// Get trigger IDs for selected events.
 				$events = API::Event()->get([
@@ -115,33 +117,32 @@ class CControllerAcknowledgeCreate extends CController {
 					'object' => EVENT_OBJECT_TRIGGER,
 					'preservekeys' => true
 				]);
-				$triggerids = zbx_objectValues($events, 'objectid');
+				$triggerids = array_unique(zbx_objectValues($events, 'objectid'));
+
+				$last_eventid = '-1'; // keeps eventid of last updated problem in previous update bulk
 
 				while ($result) {
-					// Filter unacknowledged events by trigger IDs. Selected events were already acknowledged (and closed).
-					$events = API::Event()->get([
-						'output' => [],
-						'source' => EVENT_SOURCE_TRIGGERS,
-						'object' => EVENT_OBJECT_TRIGGER,
+					// Update related events by trigger IDs. Selected events were already updated.
+					$problems = API::Problem()->get([
+						'output' => ['eventid'],
 						'objectids' => $triggerids,
-						'filter' => [
-							'acknowledged' => EVENT_NOT_ACKNOWLEDGED,
-							'value' => TRIGGER_VALUE_TRUE
-						],
 						'preservekeys' => true,
+						'order' => 'eventids',
+						'eventid_from' => bcadd($last_eventid, 1, 0),
 						'limit' => ZBX_DB_MAX_INSERTS
 					]);
 
-					if ($events) {
-						// Remove perviously updated events.
-						foreach ($eventids as $i => $eventid) {
-							if (array_key_exists($eventid, $events)) {
-								unset($eventids[$i]);
-							}
-						}
+					// Skip update for selected events
+					foreach($eventids as $id => $eventid){
+						unset($problems[$eventid]);
+					}
 
-						$data['eventids'] = array_keys($events);
+					if ($problems) {
+						$data['eventids'] = array_keys($problems);
 						$result = API::Event()->acknowledge($data);
+						$updated_events_count += count($problems);
+						// Get last processed eventid, for next iteration to start from it.
+						$last_eventid = end($data['eventids']);
 					}
 					else {
 						break;
@@ -152,14 +153,14 @@ class CControllerAcknowledgeCreate extends CController {
 
 		if ($result) {
 			$response = new CControllerResponseRedirect($this->getInput('backurl', 'zabbix.php?action=problem.view'));
-			$response->setMessageOk(_n('Event updated', 'Events updated', count($eventids)));
+			$response->setMessageOk(_n('Event updated', 'Events updated', $updated_events_count));
 		}
 		else {
 			$response = new CControllerResponseRedirect('zabbix.php?action=acknowledge.edit');
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(($data['action'] === ZBX_PROBLEM_UPDATE_NONE)
 				? _('At least one update operation is mandatory')
-				: _n('Cannot update event', 'Cannot update events', count($eventids))
+				: _n('Cannot update event', 'Cannot update events', $updated_events_count)
 			);
 		}
 		$this->setResponse($response);
