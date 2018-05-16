@@ -1,3 +1,4 @@
+if SERVER
 noinst_PROGRAMS = zbx_vc_get_values zbx_vc_add_values
 
 VALUECACHE_LIBS = \
@@ -68,4 +69,4 @@ zbx_vc_add_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests
-
+endif
