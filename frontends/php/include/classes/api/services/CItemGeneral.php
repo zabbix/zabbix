@@ -349,9 +349,14 @@ abstract class CItemGeneral extends CApiService {
 					}
 
 					// If delay is 0, there must be at least one either flexible or scheduling interval.
-					if ($delay_sec < 0 || $delay_sec > SEC_PER_DAY || ($delay_sec == 0 && !$intervals)) {
+					if ($delay_sec == 0 && !$intervals) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Item will not be refreshed. Please enter a correct update interval.')
+							_('Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.')
+						);
+					}
+					elseif ($delay_sec < 0 || $delay_sec > SEC_PER_DAY) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.')
 						);
 					}
 

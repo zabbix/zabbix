@@ -47,21 +47,105 @@
 <script type="text/javascript">
 	// Change dashboard settings.
 	function dashbrd_config() {
-		var form = jQuery('form[name="dashboard_form"]');
+		var dashboard = jQuery('.dashbrd-grid-widget-container').data('dashboardGrid'),
+			options = {
+				dashboardid: <?=$this->data['dashboard']['dashboardid'];?>,
+				userid: dashboard['dashboard']['userid'],
+				name: dashboard['dashboard']['name']
+			};
 
-		showDialogForm(
-			form,
-			{
-				'title': <?= CJs::encodeJson(_('Dashboard properties')) ?>,
-				'action_title': <?= CJs::encodeJson(_('Apply')) ?>
-			},
-			{
-				'name': form.data('data').name,
-				'owner': form.data('data').owner
-			},
-			this
-		);
+		if (options.dashboardid == 0) {
+			options.new = '1';
+		}
+
+		PopUp('dashboard.properties.edit', options, 'dashboard_properties', this);
 	};
+
+	function dashbrdApplyProperties() {
+		var dashboard = jQuery('.dashbrd-grid-widget-container'),
+			form = jQuery('[name=dashboard_properties_form]'),
+			url = new Curl('zabbix.php', false),
+			form_data = {};
+
+		form.trimValues(['#name']);
+		form_data = form.serializeJSON();
+		url.setArgument('action', 'dashboard.properties.check');
+
+		jQuery.ajax({
+			data: form_data,
+			url: url.getUrl(),
+			dataType: 'json',
+			method: 'POST',
+			success: function (response) {
+				var errors = [];
+				form.parent().find('>.msg-good, >.msg-bad').remove();
+
+				if (typeof response === 'object') {
+					if ('errors' in response) {
+						errors = response.errors;
+					}
+				}
+
+				if (errors.length) {
+					jQuery(errors).insertBefore(form);
+				}
+				else {
+					dashboard.dashboardGrid('setDashboardData', {
+						name: form_data['name'],
+						userid: form_data['userid']
+					});
+
+					jQuery('#<?= ZBX_STYLE_PAGE_TITLE ?>').text(form_data['name']);
+					jQuery('#dashboard-direct-link').text(form_data['name']);
+
+					overlayDialogueDestroy('dashboard_properties');
+				}
+			}
+		});
+	}
+
+	function dashbrdConfirmSharing() {
+		var form = jQuery('[name=dashboard_sharing_form]'),
+			url = new Curl('zabbix.php', false);
+
+		url.setArgument('action', 'dashboard.share.update');
+
+		jQuery.ajax({
+			url: url.getUrl(),
+			data: form.serializeJSON(),
+			dataType: 'json',
+			method: 'POST',
+			success: function (response) {
+				var errors = [],
+					messages = [];
+
+				form.parent().find('>.msg-good, >.msg-bad').remove();
+
+				if (typeof response === 'object') {
+					if ('errors' in response) {
+						errors = response.errors;
+					}
+					else if ('messages' in response) {
+						messages = response.messages;
+					}
+				}
+
+				if (errors.length) {
+					jQuery(errors).insertBefore(form);
+				}
+				else {
+					jQuery('main').find('> .msg-bad, > .msg-good').remove();
+
+					if (messages.length) {
+						jQuery('main').prepend(messages);
+					}
+					overlayDialogueDestroy('dashboard_share');
+				}
+			}
+		});
+
+		return false;
+	}
 
 	// Save changes and cancel editing dashboard.
 	function dashbrd_save_changes() {
@@ -100,29 +184,17 @@
 		timeControl.removeAllSBox();
 	};
 
-	// This method is related to forms: "sharing", "dashboard properties".
-	jQuery.fn.fillForm = function(data) {
-		if (typeof data.name) {
-			this.find('#name').val(data.name);
-		}
-		if ('owner' in data) {
-			if ('id' in data.owner) {
-				this.find('#userid').multiSelect('addData', data.owner);
-			} else {
-				this.find('#userid').multiSelect('clean');
-			}
-		}
+	// Method to fill data in dashboard sharing form.
+	jQuery.fn.fillDashbrdSharingForm = function(data) {
 		if (typeof data.private !== 'undefined') {
 			addPopupValues({'object': 'private', 'values': [data.private] });
 		}
 
 		if (typeof data.users !== 'undefined') {
-			removeUserShares();
 			addPopupValues({'object': 'userid', 'values': data.users });
 		}
 
 		if (typeof data.userGroups !== 'undefined') {
-			removeUserGroupShares();
 			addPopupValues({'object': 'usrgrpid', 'values': data.userGroups });
 		}
 	};
@@ -142,12 +214,18 @@
 					}, 2000));
 			}).trigger('mousemove');
 		}
+
+		<?php if ($this->data['dashboard']['dashboardid'] == 0) { ?>
+		// When creating new dashboard, open it in edit mode, with opened properties popup.
+		showEditMode();
+		dashbrd_config();
+		<?php } ?>
 	});
 
 	function dashboardAddMessages(messages) {
 		var $message_div = jQuery('<div>').attr('id','dashbrd-messages');
 		$message_div.append(messages);
-		jQuery('.article').prepend($message_div);
+		jQuery('main').prepend($message_div);
 	}
 
 	function dashboardRemoveMessages() {
@@ -221,20 +299,10 @@
 	}
 
 	function removeUserGroupShares(usrgrpid) {
-		if (typeof usrgrpid === 'undefined') {
-			jQuery("[id^='user_group_shares']").remove();
-		}
-		else {
-			jQuery('#user_group_shares_' + usrgrpid).remove();
-		}
+		jQuery('#user_group_shares_' + usrgrpid).remove();
 	}
 
 	function removeUserShares(userid) {
-		if (typeof userid === 'undefined') {
-			jQuery("[id^='user_shares']").remove();
-		}
-		else {
-			jQuery('#user_shares_' + userid).remove();
-		}
+		jQuery('#user_shares_' + userid).remove();
 	}
 </script>
