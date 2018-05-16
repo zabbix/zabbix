@@ -519,6 +519,7 @@ switch ($data['method']) {
 		 * ['can_increment']  Is allowed to increment supplied date range.
 		 */
 		$result = [];
+		$error = [];
 		$now_ts = time();
 		$from = $data['from'];
 		$to = $data['to'];
@@ -529,7 +530,7 @@ switch ($data['method']) {
 		if ($from_datetime instanceof DateTime && $to_datetime instanceof DateTime && $from_datetime < $to_datetime) {
 			$to_ts = $to_datetime->getTimestamp();
 			$from_ts = $from_datetime->getTimestamp();
-			$range = $to_ts - $from_ts;
+			$range = $to_ts - $from_ts + 1;
 
 			if ($data['method'] === 'timeselector.zoomout' && ($from_ts > $min_ts	|| $to_ts < $now_ts)) {
 				$from_ts -= floor($range / 2);
@@ -576,12 +577,25 @@ switch ($data['method']) {
 			];
 
 			if ($data['method'] !== 'timeselector.rangechange') {
-				$result['from'] = $result['from_date'];
-				$result['to'] = $result['to_date'];
+				$from = $result['from_date'];
+				$to = $result['to_date'];
+				$result['from'] = $from;
+				$result['to'] = $to;
+			}
+
+			if ($to_ts - $from_ts > ZBX_MAX_PERIOD) {
+				$error['from'] = _n('Maximum time period to display is %1$s day.',
+					'Maximum time period to display is %1$s days.',
+					(int) ZBX_MAX_PERIOD / SEC_PER_DAY
+				);
+			}
+			elseif ($to_ts - $from_ts < ZBX_MIN_PERIOD) {
+				$error['from'] = _n('Minimum time period to display is %1$s minute.',
+					'Minimum time period to display is %1$s minutes.',
+					(int) ZBX_MIN_PERIOD / SEC_PER_MIN
+				);
 			}
 		}
-
-		$error = [];
 
 		if ($from_datetime === null || ($to_datetime instanceof DateTime && $from_datetime > $to_datetime)) {
 			$error['from'] = _s('Invalid date "%s".', $from);
@@ -589,19 +603,6 @@ switch ($data['method']) {
 
 		if ($to_datetime === null || ($from_datetime instanceof DateTime && $to_datetime < $from_datetime)) {
 			$error['to'] = _s('Invalid date "%s".', $to);
-		}
-
-		if ($to_ts - $from_ts > ZBX_MAX_PERIOD) {
-			$error['from'] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.',
-				(int) ZBX_MAX_PERIOD / SEC_PER_DAY
-			);
-		}
-		elseif ($to_ts - $from_ts < ZBX_MIN_PERIOD) {
-			$error['from'] = _n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.',
-				(int) ZBX_MIN_PERIOD / SEC_PER_MIN
-			);
 		}
 
 		if ($error) {
