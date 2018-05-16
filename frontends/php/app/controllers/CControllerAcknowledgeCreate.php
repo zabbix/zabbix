@@ -78,23 +78,23 @@ class CControllerAcknowledgeCreate extends CController {
 
 		// Close event(s).
 		if ($this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-			$data['action'] += ZBX_PROBLEM_UPDATE_CLOSE;
+			$data['action'] |= ZBX_PROBLEM_UPDATE_CLOSE;
 		}
 
 		// Acknowledge event(s).
 		if ($this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
-			$data['action'] += ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
+			$data['action'] |= ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
 		}
 
 		// Add message.
 		if ($message !== '') {
-			$data['action'] += ZBX_PROBLEM_UPDATE_MESSAGE;
+			$data['action'] |= ZBX_PROBLEM_UPDATE_MESSAGE;
 			$data['message'] = $message;
 		}
 
 		// Change severity.
 		if ($this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SEVERITY) {
-			$data['action'] += ZBX_PROBLEM_UPDATE_SEVERITY;
+			$data['action'] |= ZBX_PROBLEM_UPDATE_SEVERITY;
 			$data['severity'] = $this->getInput('severity', '');
 		}
 

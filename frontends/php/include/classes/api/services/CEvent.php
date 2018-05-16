@@ -564,31 +564,33 @@ class CEvent extends CApiService {
 			$new_severity = 0;
 
 			// Perform ZBX_PROBLEM_UPDATE_CLOSE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) != 0
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_CLOSE
 					&& $event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 					&& $event['value'] == TRIGGER_VALUE_TRUE) {
-				$action += ZBX_PROBLEM_UPDATE_CLOSE;
+				$action |= ZBX_PROBLEM_UPDATE_CLOSE;
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_ACKNOWLEDGE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) != 0
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) === ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
 					&& $event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED
 					&& $event['value'] == TRIGGER_VALUE_TRUE) {
-				$action += ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
+				$action |= ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
 				$ack_eventids[] = $eventid;
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) != 0 && $data['message'] !== '') {
-				$action += ZBX_PROBLEM_UPDATE_MESSAGE;
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) === ZBX_PROBLEM_UPDATE_MESSAGE
+					&& $data['message'] !== '') {
+				$action |= ZBX_PROBLEM_UPDATE_MESSAGE;
 			}
 			else {
 				$data['message'] = '';
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) != 0 && $data['severity'] !== $event['severity']) {
-				$action += ZBX_PROBLEM_UPDATE_SEVERITY;
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) === ZBX_PROBLEM_UPDATE_SEVERITY
+					&& $data['severity'] !== $event['severity']) {
+				$action |= ZBX_PROBLEM_UPDATE_SEVERITY;
 				$old_severity = $event['severity'];
 				$new_severity = $data['severity'];
 				$sev_change_eventids[] = $eventid;
@@ -727,21 +729,22 @@ class CEvent extends CApiService {
 			$data['severity'] = intval($data['severity']);
 		}
 
-		if ($action & ZBX_PROBLEM_UPDATE_CLOSE) {
+		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_CLOSE) {
 			$this->checkCanBeManuallyClosed($eventids);
 		}
 
-		if ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
+		if (($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) === ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
 			$this->checkCanBeAcknowledged($eventids);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_MESSAGE) != 0 && $data['message'] === '') {
+		if (($action & ZBX_PROBLEM_UPDATE_MESSAGE) === ZBX_PROBLEM_UPDATE_MESSAGE
+				&& $data['message'] === '') {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'message', _('cannot be empty'))
 			);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_SEVERITY) != 0
+		if (($action & ZBX_PROBLEM_UPDATE_SEVERITY) === ZBX_PROBLEM_UPDATE_SEVERITY
 				&& !in_array($data['severity'], range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1), true)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'severity',
 				_s('unexpected value "%1$s"', $data['severity'])
@@ -749,10 +752,10 @@ class CEvent extends CApiService {
 		}
 
 		// Chack that at least one valid flag is set.
-		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) == 0
-				&& ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == 0
-				&& ($action & ZBX_PROBLEM_UPDATE_MESSAGE) == 0
-				&& ($action & ZBX_PROBLEM_UPDATE_SEVERITY) == 0) {
+		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_NONE
+				&& ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) === ZBX_PROBLEM_UPDATE_NONE
+				&& ($action & ZBX_PROBLEM_UPDATE_MESSAGE) === ZBX_PROBLEM_UPDATE_NONE
+				&& ($action & ZBX_PROBLEM_UPDATE_SEVERITY) === ZBX_PROBLEM_UPDATE_NONE) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				_s('unexpected value "%1$s"', $data['action'])
 			));
@@ -1086,7 +1089,7 @@ class CEvent extends CApiService {
 
 			if ($event['acknowledges']) {
 				foreach ($event['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_CLOSE) {
 						$event_closed = true;
 						break;
 					}

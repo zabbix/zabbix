@@ -124,7 +124,7 @@ class CControllerAcknowledgeEdit extends CController {
 			}
 			elseif ($event['acknowledges']) {
 				foreach ($event['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_CLOSE) {
 						$event_closed = true;
 						break;
 					}
