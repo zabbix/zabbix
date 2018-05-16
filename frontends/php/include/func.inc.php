@@ -2604,8 +2604,8 @@ function calculateTime(array $options = []) {
 /**
  * Convert relative date range string to translated string. Function does not check is passed date range correct.
  *
- * @param string $start     Start date of date range.
- * @param string $end       End date of date range.
+ * @param string $from     Start date of date range.
+ * @param string $to       End date of date range.
  *
  * @return string
  */
