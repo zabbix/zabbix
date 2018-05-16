@@ -33,8 +33,3 @@ define('DATE_TIME_FORMAT_SHORT', _('m-d H:i'));
 define('DATE_FORMAT', _('Y-m-d'));
 define('TIME_FORMAT_SECONDS', _('H:i:s'));
 define('TIME_FORMAT', _('H:i'));
-
-/**
- * Screen reader context.
- */
-define('ZBX_CONTEXT_SCREEN_READER', 'screen reader');

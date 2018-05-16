@@ -159,7 +159,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
 				true
 			)
-			->setAttribute('aria-label', _x('%1$s, Severity, %2$s', ZBX_CONTEXT_SCREEN_READER,
+			->setAttribute('aria-label', _x('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], getSeverityName($trigger['priority'], $data['config'])
 			))
 	]));
@@ -224,7 +224,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 }
 
 $output = [
-	'aria_label' => _x('%1$s widget', ZBX_CONTEXT_SCREEN_READER, $data['name']).', '.$data['info'],
+	'aria_label' => _x('%1$s widget', 'screen reader', $data['name']).', '.$data['info'],
 	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' => (new CList([$data['info'], _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()

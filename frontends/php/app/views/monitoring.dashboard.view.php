@@ -89,7 +89,7 @@ else {
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashbrd-actions')
 							->setTitle(_('Actions'))
-							->setAttribute('aria-label', _x('Dashboard actions', ZBX_CONTEXT_SCREEN_READER))
+							->setAttribute('aria-label', _x('Dashboard actions', 'screen reader'))
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup([
 								'type' => 'dashboard',
