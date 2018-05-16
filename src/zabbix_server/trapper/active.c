@@ -171,26 +171,27 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 				goto done;
 			}
 		}
-#endif
-		if (HOST_STATUS_MONITORED == atoi(row[1]))
-		{
-			ZBX_STR2UINT64(*hostid, row[0]);
-			ret = SUCCEED;
-		}
-		else
-			zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not monitored", host);
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		old_metadata = row[6];
 #else
 		old_metadata = row[3];
 #endif
+
 		if (FAIL == DBis_null(old_metadata) && 0 != strcmp(old_metadata, host_metadata))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "host [%s] has changed metadata from [%s] to [%s]", host,
 					old_metadata, host_metadata);
 			db_register_host(host, ip, port, host_metadata);
 		}
+
+		if (HOST_STATUS_MONITORED != atoi(row[1]))
+		{
+			zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not monitored", host);
+			goto done;
+		}
+
+		ZBX_STR2UINT64(*hostid, row[0]);
+		ret = SUCCEED;
 	}
 	else
 	{
