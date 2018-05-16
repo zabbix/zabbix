@@ -163,7 +163,7 @@ jQuery(function ($){
 		}
 
 		element.quickranges.removeClass('selected');
-		element.quickranges.filter('[data-from="'+data.from+'"][data-to="'+data.to+'"]').addClass('selected');
+		element.quickranges.filter('[data-label="'+data.label+'"]').addClass('selected');
 
 		element.apply.closest('.ui-tabs-panel').removeClass('in-progress');
 		ui_disabled = false;
