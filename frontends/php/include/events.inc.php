@@ -249,8 +249,6 @@ function make_small_eventlist($startEvent, $backurl) {
 			_('Actions')
 		]);
 
-	$clock = $startEvent['clock'];
-
 	$events = API::Event()->get([
 		'output' => ['eventid', 'r_eventid', 'source', 'object', 'objectid', 'clock', 'ns', 'acknowledged', 'severity'],
 		'select_acknowledges' => API_OUTPUT_EXTEND,

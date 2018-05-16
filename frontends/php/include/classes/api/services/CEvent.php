@@ -609,7 +609,7 @@ class CEvent extends CApiService {
 
 		// Make changes in problem and events tables.
 		if ($acknowledges) {
-			// Acknowladge problems and events.
+			// Acknowledge problems and events.
 			if ($ack_eventids) {
 				DB::update('problem', [
 					'values' => ['acknowledged' => EVENT_ACKNOWLEDGED],
@@ -696,38 +696,43 @@ class CEvent extends CApiService {
 	/**
 	 * Validates the input parameters for the acknowledge() method.
 	 *
-	 * @param array  $data                  And array of operation data.
-	 * @param mixed  $data['eventids']      An event ID or an array of event IDs.
-	 * @param string $data['message']       Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param string $data['severity']      New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param int    $data['action']        Flags of performed operations combined:
-	 *                                       - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
-	 *                                       - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-	 *                                       - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
-	 *                                       - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
+	 * @param array         $data              And array of operation data.
+	 * @param string|array  $data['eventids']  An event ID or an array of event IDs.
+	 * @param string        $data['message']   Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param string        $data['severity']  New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param int           $data['action']    Flags of performed operations combined:
+	 *                                           - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                           - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                           - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                           - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
 	 *
-	 * @throws APIException                 If the input is invalid.
+	 * @throws APIException                    If the input is invalid.
 	 */
 	protected function validateAcknowledge(array $data) {
-		$dbfields = ['eventids' => null, 'action' => null, 'message' => '', 'severity' => ''];
+		$db_fields = [
+			'eventids' => null,
+			'action' => null,
+			'message' => '',
+			'severity' => ''
+		];
 
-		if (!check_db_fields($dbfields, $data)) {
+		if (!check_db_fields($db_fields, $data)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 
 		$action = array_key_exists('action', $data) ? $data['action'] : ZBX_PROBLEM_UPDATE_NONE;
-		$uniqe_eventids = array_keys(array_flip($data['eventids']));
+		$eventids = array_keys(array_flip($data['eventids']));
 
 		if (is_numeric($data['severity'])) {
 			$data['severity'] = intval($data['severity']);
 		}
 
 		if ($action & ZBX_PROBLEM_UPDATE_CLOSE) {
-			$this->checkCanBeManuallyClosed($uniqe_eventids);
+			$this->checkCanBeManuallyClosed($eventids);
 		}
 
 		if ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
-			$this->checkCanBeAcknowledged($uniqe_eventids);
+			$this->checkCanBeAcknowledged($eventids);
 		}
 
 		if (($action & ZBX_PROBLEM_UPDATE_MESSAGE) != 0 && $data['message'] === '') {
