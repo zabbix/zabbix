@@ -2609,9 +2609,9 @@ function calculateTime(array $options = []) {
  *
  * @return string
  */
-function relativeDateToText($start, $end) {
-	$start = preg_replace('/[^-+\/0-9a-z]/i', '', $start);
-	$end = preg_replace('/[^-+\/0-9a-z]/i', '', $end);
+function relativeDateToText($from, $to) {
+	$start = preg_replace('/[^-+\/0-9a-z]/i', '', $from);
+	$end = preg_replace('/[^-+\/0-9a-z]/i', '', $to);
 	$key = $start.':'.$end;
 
 	$ranges = [
@@ -2639,20 +2639,21 @@ function relativeDateToText($start, $end) {
 		list($count, $mod) = sscanf($start, 'now-%d%1s') + ['', ''];
 
 		$ranges = [
-			'm' => ['Last %1$d minute', 'Last %1$d minutes'],
-			'h' => ['Last %1$d hour', 'Last %1$d hours'],
-			'd' => ['Last %1$d day', 'Last %1$d days'],
-			'M' => ['Last %1$d month', 'Last %1$d months'],
-			'y' => ['Last %1$d year', 'Last %1$d years'],
+			's' => _n('Last %1$d second', 'Last %1$d seconds', $count),
+			'm' => _n('Last %1$d minute', 'Last %1$d minutes', $count),
+			'h' => _n('Last %1$d hour', 'Last %1$d hours', $count),
+			'd' => _n('Last %1$d day', 'Last %1$d days', $count),
+			'M' => _n('Last %1$d month', 'Last %1$d months', $count),
+			'y' => _n('Last %1$d year', 'Last %1$d years', $count)
 		];
 
 		if ($count > 0 && array_key_exists($mod, $ranges)) {
-			return _n($ranges[$mod][0], $ranges[$mod][1], $count);
+			return $ranges[$mod];
 		}
 	}
 
 	$range = [
-		parseRelativeDate($start, true), parseRelativeDate($end, false)
+		parseRelativeDate($from, true), parseRelativeDate($to, false)
 	];
 
 	foreach ($range as &$date) {
@@ -2667,18 +2668,19 @@ function relativeDateToText($start, $end) {
 
 /**
  * Parse relative date. Allow to define precision part using suffix '/', example (now/w).
- * Supports date as string in format 'Y-m-d H:i:s' and timestamp as integer or string with '@' prefix.
- * Timestamp is returned as initialized DateTimeImmutable object. In case of parsing error null will be returned.
+ * Supports date as string in format 'Y-m-d H:i:s' and timestamp as integer.
+ * Timestamp is returned as initialized DateTime object. In case of parsing error null will be returned.
  *
  * @param string $date      Date in relative format or timestamp.
  * @param bool   $is_start  If set to true date will be modified to lowest value, example (now/w) will be returned
  *                          as Monday of this week. When set to false precisiion will modify date to highest value,
  *                          same example will return Sunday of this week.
  *
- * @return DateTimeImmutable|null
+ * @return DateTime|null
  */
 function parseRelativeDate($date, $is_start) {
 	$time_units = [
+		'/(\d+s?\b)/' => '$1 seconds',
 		'/(\d+)m/' => '$1 minute',
 		'/(\d+)h/' => '$1 hour',
 		'/(\d+)d/' => '$1 day',
@@ -2688,19 +2690,26 @@ function parseRelativeDate($date, $is_start) {
 	];
 	$precision = '';
 
-	if (!ctype_digit($date)) {
-		$date = preg_replace('/[^-+\/0-9a-z]/i', '', $date);
-		// Split relative date in to two parts: Date part and precision.
-		list($date_chunk, $precision) = explode('/', $date) + ['', ''];
+	if (ctype_digit($date)) {
+		return (new DateTime())->setTimestamp($date);
+	}
 
-		$date = preg_replace(array_keys($time_units), array_values($time_units), $date_chunk);
+	if ((new CAbsoluteTimeParser())->parse($date) === CParser::PARSE_SUCCESS) {
+		return new DateTime($date);
 	}
-	else {
-		return (new DateTimeImmutable())->setTimestamp($date);
+
+	if ((new CRelativeTimeParser())->parse($date) !== CParser::PARSE_SUCCESS) {
+		return null;
 	}
+
+	$date = preg_replace('/[^-+\/0-9a-z]/i', '', $date);
+	// Split relative date in to two parts: Date part and precision.
+	list($date_chunk, $precision) = explode('/', $date) + ['', ''];
+
+	$date = preg_replace(array_keys($time_units), array_values($time_units), $date_chunk);
 
 	try {
-		$date = new DateTimeImmutable($date);
+		$date = new DateTime($date);
 
 		$modifiers = $is_start
 			? [
@@ -2721,7 +2730,10 @@ function parseRelativeDate($date, $is_start) {
 			];
 
 		if ($precision && array_key_exists($precision, $modifiers)) {
-			$date = $date->modify($modifiers[$precision]);
+			$date->modify($modifiers[$precision]);
+		}
+		else if ($precision !== '') {
+			$date = null;
 		}
 	}
 	catch (Exception $e) {

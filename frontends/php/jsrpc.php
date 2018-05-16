@@ -525,8 +525,7 @@ switch ($data['method']) {
 		$from_datetime = $from !== '' ? parseRelativeDate($from, true) : null;
 		$to_datetime = $to !== '' ? parseRelativeDate($to, false) : null;
 
-		if ($from_datetime instanceof DateTimeImmutable && $to_datetime instanceof DateTimeImmutable
-				&& $from_datetime < $to_datetime
+		if ($from_datetime instanceof DateTime && $to_datetime instanceof DateTime && $from_datetime < $to_datetime
 				&& ($to_datetime->getTimestamp() - $from_datetime->getTimestamp()) >= ZBX_MIN_PERIOD) {
 			$to_ts = $to_datetime->getTimestamp();
 			$from_ts = $from_datetime->getTimestamp();
@@ -591,12 +590,12 @@ switch ($data['method']) {
 		else {
 			$result['error'] = [];
 
-			if (!$from_datetime instanceof DateTimeImmutable || ($to_datetime instanceof DateTimeImmutable
+			if (!$from_datetime instanceof DateTime || ($to_datetime instanceof DateTime
 					&& $from_datetime > $to_datetime) || $from === $to) {
 				$result['error']['from'] = _s('Invalid date "%s".', $from);
 			}
 
-			if (!$to_datetime instanceof DateTimeImmutable || ($from_datetime instanceof DateTimeImmutable
+			if (!$to_datetime instanceof DateTime || ($from_datetime instanceof DateTime
 					&& $to_datetime < $from_datetime) || $from === $to) {
 				$result['error']['to'] = _s('Invalid date "%s".', $to);
 			}
