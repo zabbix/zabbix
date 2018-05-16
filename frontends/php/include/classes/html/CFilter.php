@@ -46,8 +46,8 @@ class CFilter extends CDiv {
 	 * List of predefined time ranges. Start and end of time range are separated by semicolon.
 	 */
 	protected $time_ranges = [
-		['now-2d/d:now', 'now-7d/d:now', 'now-30d/d:now', 'now-3M/M:now', 'now-6M/M:now', 'now-1y/y:now',
-			'now-2y/y:now'
+		['now-2d/d:now', 'now-7d/d:now', 'now-30d/d:now', 'now-3M/M:now', 'now-6M/M:now', 'now-1y:now',
+			'now-2y:now'
 		],
 		['now-1d/d:now-1d/d', 'now-2d/d:now-2d/d', 'now-1w/d:now-1w/d', 'now-1w/w:now-1w/w', 'now-1M/M:now-1M/M',
 			'now-1y/y:now-1y/y'

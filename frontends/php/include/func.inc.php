@@ -2574,17 +2574,16 @@ function calculateTime(array $options = []) {
 			'Minimum time period to display is %1$s minutes.',
 			(int) ZBX_MIN_PERIOD / SEC_PER_MIN
 		));
-		$from = $to_ts - ZBX_MIN_PERIOD;
+		$from = (new DateTime())->setTimestamp($to_ts - ZBX_MIN_PERIOD)->format(ZBX_DATE_TIME);
 	}
 	elseif ($period > ZBX_MAX_PERIOD) {
 		error(_n('Maximum time period to display is %1$s day.',
 			'Maximum time period to display is %1$s days.',
 			(int) ZBX_MAX_PERIOD / SEC_PER_DAY
 		));
-		$from = $to_ts - ZBX_MAX_PERIOD;
+		$from = (new DateTime())->setTimestamp($to_ts - ZBX_MAX_PERIOD)->format(ZBX_DATE_TIME);
 	}
-
-	if ($idx !== null && $options['updateProfile']) {
+	elseif ($idx !== null && $options['updateProfile']) {
 		CProfile::update($idx.'.from', $from, PROFILE_TYPE_STR, $options['profileIdx2']);
 		CProfile::update($idx.'.to', $to, PROFILE_TYPE_STR, $options['profileIdx2']);
 	}

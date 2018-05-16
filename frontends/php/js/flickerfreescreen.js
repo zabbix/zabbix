@@ -262,15 +262,14 @@
 					success: function(html) {
 						var html = $(html);
 
-						$('main .msg-bad').remove();
-						html.find('.msg-bad').insertBefore('main > :first-child');
-
 						// Replace existing markup with server response.
 						if (request_start > screen.timestamp) {
 							screen.timestamp = request_start;
 							screen.isRefreshing = false;
 
+							$('main .msg-bad').remove();
 							$('#flickerfreescreen_' + id).replaceWith(html);
+							$('main .msg-bad').insertBefore('main > :first-child');
 
 							window.flickerfreeScreenShadow.isShadowed(id, false);
 							window.flickerfreeScreenShadow.fadeSpeed(id, 0);
