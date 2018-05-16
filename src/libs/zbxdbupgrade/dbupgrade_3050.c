@@ -843,7 +843,8 @@ static int	DBpatch_3050077(void)
 		return SUCCEED;
 
 	ret = DBexecute("update events set severity="
-			"(select priority from triggers where triggerid=objectid) where source=0 and object=0");
+			"(select priority from triggers where triggerid=objectid) "
+				"where source=0 and object=0 and value=1");
 
 	if (ZBX_DB_OK > ret)
 		return FAIL;
