@@ -88,7 +88,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'severity' => $this->hasInput('severity') ? (int) $this->getInput('severity') : null,
 			'acknowledge_problem' => $this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
-			'related_problems_count' => 1,
+			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
 			'problem_can_be_acknowledged' => false
 		];
@@ -107,9 +107,6 @@ class CControllerAcknowledgeEdit extends CController {
 		if (count($events) == 1) {
 			$data['event'] = reset($events);
 		}
-		else {
-			$data['related_problems_count'] = count($events);
-		}
 
 		// Loop through events to figure out what operations should be allowed.
 		$close_triggerids = []; // List of triggers with possibly closable problems. To check, if they can be closed.
@@ -123,6 +120,7 @@ class CControllerAcknowledgeEdit extends CController {
 			// We can't close events, that already were resolved. We can't close "resolve" events.
 			if ($event['r_eventid'] != 0 || $event['value'] == TRIGGER_VALUE_FALSE) {
 				$event_closed = true;
+				$data['related_problems_count']++; // count selected but closed events.
 			}
 			elseif ($event['acknowledges']) {
 				foreach ($event['acknowledges'] as $acknowledge) {
@@ -171,7 +169,8 @@ class CControllerAcknowledgeEdit extends CController {
 			}
 		}
 
-		$data['related_problems_count'] = API::Problem()->get([
+		// Add number of selected and related problem events to count of selected resolved events.
+		$data['related_problems_count'] += API::Problem()->get([
 			'countOutput' => true,
 			'objectids' => array_keys($event_triggerids)
 		]);
