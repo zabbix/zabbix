@@ -1327,7 +1327,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				"select h.host,a.host_metadata"
 				" from hosts h"
 				" left join autoreg_host a"
-					" on h.proxy_hostid=a.proxy_hostid and h.host=a.host"
+					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
 				" where h.proxy_hostid=" ZBX_FS_UI64
 					" and",
 				proxy_hostid);
