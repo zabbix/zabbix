@@ -2714,10 +2714,6 @@ function parseRelativeDate($date, $is_start) {
 		return (new DateTime())->setTimestamp($date);
 	}
 
-	if ($date === 'now-300s') {
-		$debug = 1;
-	}
-
 	if ((new CAbsoluteTimeParser())->parse($date) === CParser::PARSE_SUCCESS) {
 		return new DateTime($date);
 	}
