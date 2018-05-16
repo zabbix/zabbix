@@ -169,6 +169,11 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 	{
 		*max_depth = TRAVERSAL_DEPTH_UNLIMITED;
 	}
+	else if (' ' == *max_depth_str || FAIL == is_int_prefix(max_depth_str))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter. Contain non digital prefix."));
+		return FAIL;
+	}
 	else if (-1 > (*max_depth = (int)strtol(max_depth_str, &max_depth_ptr, 10)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
