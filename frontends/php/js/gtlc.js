@@ -146,8 +146,13 @@ jQuery(function ($){
 			zoomout: data.can_zoomout
 		}, function (elm, state) {
 			if (state) {
-				element[elm].removeClass('disabled');
+				element[elm].removeAttr('disabled');
 			}
+			else {
+				element[elm].attr('disabled', true);
+			}
+
+			element[elm].removeClass('disabled');
 		});
 
 		element.from_clndr.data('clndr').clndr.clndrhide();
