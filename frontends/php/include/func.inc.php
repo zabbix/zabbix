@@ -2636,19 +2636,39 @@ function relativeDateToText($from, $to) {
 	}
 
 	if ($end === 'now') {
-		list($count, $mod) = sscanf($start, 'now-%d%1s') + ['', ''];
+		list($count, $mod) = sscanf($start, 'now-%d%1s');
 
-		$ranges = [
-			's' => _n('Last %1$d second', 'Last %1$d seconds', $count),
-			'm' => _n('Last %1$d minute', 'Last %1$d minutes', $count),
-			'h' => _n('Last %1$d hour', 'Last %1$d hours', $count),
-			'd' => _n('Last %1$d day', 'Last %1$d days', $count),
-			'M' => _n('Last %1$d month', 'Last %1$d months', $count),
-			'y' => _n('Last %1$d year', 'Last %1$d years', $count)
-		];
+		if ($count > 0) {
+			$mod = $mod === null ? 's' : $mod;
 
-		if ($count > 0 && array_key_exists($mod, $ranges)) {
-			return $ranges[$mod];
+			switch ($mod) {
+				case 's':
+					if ($count < 60 || $count % 60 != 0) {
+						return _n('Last %1$d second', 'Last %1$d seconds', $count);
+					}
+					$count = $count / 60;
+					// Break through and convert $count to minutes.
+				case 'm':
+					if ($count < 60 || $count % 60 != 0) {
+						return _n('Last %1$d minute', 'Last %1$d minutes', $count);
+					}
+					$count = $count / 60;
+					// Break through and convert $count to hours.
+				case 'h':
+					if ($count < 24 || $count % 24 != 0) {
+						return _n('Last %1$d hour', 'Last %1$d hours', $count);
+					}
+					$count = $count / 24;
+					// Break through and convert $count to days.
+				case 'd':
+					return _n('Last %1$d day', 'Last %1$d days', $count);
+
+				case 'M':
+					return _n('Last %1$d month', 'Last %1$d months', $count);
+
+				case 'y':
+					return _n('Last %1$d year', 'Last %1$d years', $count);
+			}
 		}
 	}
 
@@ -2680,7 +2700,7 @@ function relativeDateToText($from, $to) {
  */
 function parseRelativeDate($date, $is_start) {
 	$time_units = [
-		'/(\d+s?\b)/' => '$1 seconds',
+		'/(\d+)s?\b/' => '$1 seconds',
 		'/(\d+)m/' => '$1 minute',
 		'/(\d+)h/' => '$1 hour',
 		'/(\d+)d/' => '$1 day',
@@ -2692,6 +2712,10 @@ function parseRelativeDate($date, $is_start) {
 
 	if (ctype_digit($date)) {
 		return (new DateTime())->setTimestamp($date);
+	}
+
+	if ($date === 'now-300s') {
+		$debug = 1;
 	}
 
 	if ((new CAbsoluteTimeParser())->parse($date) === CParser::PARSE_SUCCESS) {

@@ -222,10 +222,13 @@ class CFilter extends CDiv {
 
 			foreach ($column_ranges as $range) {
 				list($range_from, $range_to) = explode(':', $range);
+				$is_selected = parseRelativeDate($from, true) == parseRelativeDate($range_from, true)
+					&& parseRelativeDate($to, false) == parseRelativeDate($range_to, false);
+
 				$column->addItem((new CLink(relativeDateToText($range_from, $range_to)))
 					->setAttribute('data-from', $range_from)
 					->setAttribute('data-to', $range_to)
-					->addClass(($from == $range_from && $to == $range_to) ? ZBX_STYLE_SELECTED : null)
+					->addClass($is_selected ? ZBX_STYLE_SELECTED : null)
 				);
 			}
 
