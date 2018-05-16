@@ -96,7 +96,7 @@ class CControllerAcknowledgeEdit extends CController {
 		// Select events:
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'acknowledged', 'value', 'r_eventid'],
-			'select_acknowledges' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => API_OUTPUT_EXTEND, // TODO VM: should be replaced with an array of specific values.
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -112,12 +112,15 @@ class CControllerAcknowledgeEdit extends CController {
 		}
 
 		// Loop through events to figure out what operations should be allowed.
-		$triggerids = [];
+		$close_triggerids = []; // List of triggers with possibly closable problems. To check, if they can be closed.
+		$event_triggerids = []; // List of all triggers, to count related_problems_count
 
 		foreach ($events as $event) {
 			$event_closed = false;
+			$event_triggerids[$event['objectid']] = true;
 
 			// Find if event is in PROBLEM state; Then look if no ZBX_PROBLEM_UPDATE_CLOSE action flag.
+			// We can't close events, that already were resolved. We can't close "resolve" events.
 			if ($event['r_eventid'] != 0 || $event['value'] == TRIGGER_VALUE_FALSE) {
 				$event_closed = true;
 			}
@@ -132,18 +135,15 @@ class CControllerAcknowledgeEdit extends CController {
 
 			if (!$event_closed) {
 				$data['problem_can_be_closed'] = true;
-				$triggerids[$event['objectid']] = true;
+				$close_triggerids[$event['objectid']] = true;
+
+				// If event is not acknowledged and is not closed.
+				if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+					$data['problem_can_be_acknowledged'] = true;
+				}
 			}
 
-			// If event is not acknowledged and is not closed.
-			if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED && !$event_closed) {
-				$data['problem_can_be_acknowledged'] = true;
-			}
-
-			// Stop loop events if at least one acknowledgable and closable event is found.
-			if ($data['problem_can_be_closed'] && $data['problem_can_be_acknowledged']) {
-				break;
-			}
+			// TODO VM: This check was removed, because we need triggerids for all closable events.
 		}
 
 		/**
@@ -160,7 +160,7 @@ class CControllerAcknowledgeEdit extends CController {
 		if ($data['problem_can_be_closed']) {
 			$can_be_closed = (bool) API::Trigger()->get([
 				'output' => [],
-				'triggerids' => array_keys($triggerids),
+				'triggerids' => array_keys($close_triggerids),
 				'filter' => ['manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED],
 				'editable' => true,
 				'preservekeys' => true
@@ -170,6 +170,11 @@ class CControllerAcknowledgeEdit extends CController {
 				$data['problem_can_be_closed'] = false;
 			}
 		}
+
+		$data['related_problems_count'] = API::Problem()->get([
+			'countOutput' => true,
+			'objectids' => array_keys($event_triggerids)
+		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Update problem'));
