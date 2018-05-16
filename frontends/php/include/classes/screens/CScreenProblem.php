@@ -1028,7 +1028,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
+				'acknowledge.edit' => ['name' => _('Mass update')]
 			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
