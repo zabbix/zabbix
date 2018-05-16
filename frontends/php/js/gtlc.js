@@ -80,8 +80,7 @@ jQuery(function ($){
 			target = $(e.target);
 
 		if (ui_disabled) {
-			e.preventDefault();
-			return false;
+			return cancelEvent(e);
 		}
 		else if (target.is(element.increment)) {
 			event = 'timeselector.increment';
@@ -140,9 +139,16 @@ jQuery(function ($){
 		}
 
 		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', false);
-		element.decrement.attr('disabled', !data.can_decrement);
-		element.zoomout.attr('disabled', !data.can_zoomout);
-		element.increment.attr('disabled', !data.can_increment);
+
+		$.each({
+			decrement: data.can_decrement,
+			increment: data.can_increment,
+			zoomout: data.can_zoomout
+		}, function (elm, state) {
+			if (state) {
+				element[elm].removeClass('disabled');
+			}
+		});
 
 		element.from_clndr.data('clndr').clndr.clndrhide();
 		element.to_clndr.data('clndr').clndr.clndrhide();
@@ -163,9 +169,8 @@ jQuery(function ($){
 	 */
 	function disableTimeselectorUI() {
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
-		$([element.from[0], element.to[0], element.apply[0], element.decrement[0], element.zoomout[0],
-			element.increment[0]
-		]).attr('disabled', true);
+		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
+		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
 		element.from_clndr.data('clndr').clndr.clndrhide();
 		element.to_clndr.data('clndr').clndr.clndrhide();
 		ui_disabled = true;
