@@ -326,12 +326,14 @@
 		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre" conf-name="gen-test-coverage-report"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
-			<arg line="."/>
+			<arg line="src"/>
 			<arg line="--capture"/>
 			<arg line="--output-file"/>
 			<arg line="tests_results/html/app.info"/>
 		</exec>
 		<exec executable="genhtml" failonerror="on">
+			<arg line="-p"/>
+			<arg line="$(pwd)"/>
 			<arg line="-o"/>
 			<arg line="tests_results/html"/>
 			<arg line="tests_results/html/app.info"/>
