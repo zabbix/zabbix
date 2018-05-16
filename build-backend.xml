@@ -333,7 +333,7 @@
 		</exec>
 		<exec executable="genhtml" failonerror="on">
 			<arg line="-p"/>
-			<arg line="$(pwd)"/>
+			<arg line="${user.dir}"/>
 			<arg line="-o"/>
 			<arg line="tests_results/html"/>
 			<arg line="tests_results/html/app.info"/>
