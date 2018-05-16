@@ -114,72 +114,67 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #endif
 	if (NULL != (row = DBfetch(result)))
 	{
-		if (HOST_STATUS_MONITORED == atoi(row[1]))
+		if (0 == ((unsigned int)atoi(row[2]) & sock->connection_type))
 		{
-			unsigned int	tls_accept;
+			zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
+					" \"%s\"", zbx_tcp_connection_type_name(sock->connection_type), host);
+			goto done;
+		}
 
-			tls_accept = (unsigned int)atoi(row[2]);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+		{
+			zbx_tls_conn_attr_t	attr;
 
-			if (0 == (tls_accept & sock->connection_type))
+			if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
 			{
-				zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
-						" \"%s\"", zbx_tcp_connection_type_name(sock->connection_type), host);
+				THIS_SHOULD_NEVER_HAPPEN;
+
+				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
+						" \"%s\"", host);
 				goto done;
 			}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+			/* simplified match, not compliant with RFC 4517, 4518 */
+			if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
 			{
-				zbx_tls_conn_attr_t	attr;
-
-				if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-
-					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
-							" \"%s\"", host);
-					goto done;
-				}
-
-				/* simplified match, not compliant with RFC 4517, 4518 */
-				if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
-				{
-					zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for"
-							" host \"%s\"", host);
-					goto done;
-				}
-
-				/* simplified match, not compliant with RFC 4517, 4518 */
-				if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
-				{
-					zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for"
-							" host \"%s\"", host);
-					goto done;
-				}
+				zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for"
+						" host \"%s\"", host);
+				goto done;
 			}
-			else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+
+			/* simplified match, not compliant with RFC 4517, 4518 */
+			if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
 			{
-				zbx_tls_conn_attr_t	attr;
-
-				if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-
-					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
-							" \"%s\"", host);
-					goto done;
-				}
-
-				if (strlen(row[5]) != attr.psk_identity_len ||
-						0 != memcmp(row[5], attr.psk_identity, attr.psk_identity_len))
-				{
-					zbx_snprintf(error, MAX_STRING_LEN, "false PSK identity for host \"%s\"", host);
-					goto done;
-				}
+				zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for"
+						" host \"%s\"", host);
+				goto done;
 			}
+		}
+		else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+		{
+			zbx_tls_conn_attr_t	attr;
+
+			if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+
+				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
+						" \"%s\"", host);
+				goto done;
+			}
+
+			if (strlen(row[5]) != attr.psk_identity_len ||
+					0 != memcmp(row[5], attr.psk_identity, attr.psk_identity_len))
+			{
+				zbx_snprintf(error, MAX_STRING_LEN, "false PSK identity for host \"%s\"", host);
+				goto done;
+			}
+		}
 #endif
+		if (HOST_STATUS_MONITORED == atoi(row[1]))
+		{
 			ZBX_STR2UINT64(*hostid, row[0]);
-
 			ret = SUCCEED;
 		}
 		else
@@ -190,7 +185,6 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #else
 		old_metadata = row[3];
 #endif
-
 		if (FAIL == DBis_null(old_metadata) && 0 != strcmp(old_metadata, host_metadata))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "host [%s] has changed metadata from [%s] to [%s]", host,
