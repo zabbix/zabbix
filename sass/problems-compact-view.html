@@ -119,8 +119,13 @@
 				</nav>
 			</div>
 		</div>
-		<div aria-label="Filter">
-			<div class="filter-btn-container"><button type="button" class="filter-trigger filter-active" id="filter-mode">Filter<span id="filter-arrow" class="arrow-up"></span></button></div>
+		<div id="filter-space" aria-label="Filter" class="ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible">
+			<ul class="filter-btn-container ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+				<li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tab_2" aria-labelledby="ui-id-2" aria-selected="true">
+					<a class="filter-trigger ui-tabs-anchor" href="#tab_2" role="presentation" tabindex="-1" id="ui-id-2">Filter</a>
+				</li>
+			</ul>
+			<form method="GET">
 			<div class="filter-container" id="filter-space" style="">
 				<form method="get" action="zabbix.php" accept-charset="utf-8" name="zbx_filter" id="id">
 					<input type="hidden" id="action" name="action" value="problem.view"><input type="hidden" id="page" name="page" value="1">

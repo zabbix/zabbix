@@ -1394,7 +1394,6 @@ define('ZBX_STYLE_OK_ACK_FG', 'ok-ack-fg');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
-define('ZBX_STYLE_FILTER_ACTIVE', 'filter-active');
 define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
