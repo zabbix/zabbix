@@ -888,8 +888,7 @@ function getItemFilterForm(&$items) {
 		$table_subfilter->addRow([$interval_output]);
 	}
 
-	$filter->addFilterTab(_('Filter'),
-		[$filterColumn1, $filterColumn2, $filterColumn3, $filterColumn4],
+	$filter->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2, $filterColumn3, $filterColumn4],
 		$table_subfilter
 	);
 

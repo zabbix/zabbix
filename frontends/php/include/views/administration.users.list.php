@@ -49,22 +49,18 @@ $widget = (new CWidget())
 	->addItem((new CFilter())
 		->setProfile('web.user.filter', 0)
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(
-				_('Alias'),
+			(new CFormList())->addRow(_('Alias'),
 				(new CTextBox('filter_alias', $data['filter']['alias']))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 			),
-			(new CFormList())->addRow(
-				_('Name'),
+			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			),
-			(new CFormList())->addRow(
-				_('Surname'),
+			(new CFormList())->addRow(_('Surname'),
 				(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			),
-			(new CFormList())->addRow(
-				_('User type'),
+			(new CFormList())->addRow(_('User type'),
 				(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
 					->addValue(_('Any'), -1)
 					->addValue(user_type2str(USER_TYPE_ZABBIX_USER), USER_TYPE_ZABBIX_USER)

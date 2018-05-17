@@ -440,14 +440,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Triggers
 	 */
-	$triggerTable = (new CTableInfo())
-		->setHeader([
-			_('Host'),
-			_('Name'),
-			_('Problems'),
-			_('Ok'),
-			_('Graph')
-		]);
+	$triggerTable = (new CTableInfo())->setHeader([_('Host'), _('Name'), _('Problems'), _('Ok'), _('Graph')]);
 
 	$triggers = API::Trigger()->get($triggerOptions);
 

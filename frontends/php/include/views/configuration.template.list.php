@@ -48,12 +48,13 @@ $widget = (new CWidget())
 	]))
 	->addItem((new CFilter())
 		->setProfile('web.templates.filter', 0)
-		->addFilterTab(_('Filter'), [(new CFormList())->addRow(
-			_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
-		)])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+		])
 	);
 
 $form = (new CForm())->setName('templates');

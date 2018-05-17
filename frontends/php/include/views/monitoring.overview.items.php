@@ -74,23 +74,24 @@ $widget = (new CWidget())
 $filter = (new CFilter())
 	->setProfile('web.overview.filter', 0)
 	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-	->addFilterTab(_('Filter'), [(new CFormList())->addRow([
-		(new CTextBox('application', $data['filter']['application']))
-			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_name', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'applications',
-					'srcfld1' => 'name',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'application',
-					'real_hosts' => '1',
-					'with_applications' => '1'
-				]).', null, this);'
-			)
+	->addFilterTab(_('Filter'), [
+		(new CFormList())->addRow(_('Application'), [
+			(new CTextBox('application', $data['filter']['application']))
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				->setAttribute('autofocus', 'autofocus'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton('application_name', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'application',
+						'real_hosts' => '1',
+						'with_applications' => '1'
+					]).', null, this);'
+				)
 		])
 	]);
 

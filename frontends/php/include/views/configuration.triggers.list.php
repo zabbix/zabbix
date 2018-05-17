@@ -32,22 +32,19 @@ $filter = (new CFilter())
 	->setProfile('web.triggers.filter', 0)
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
-			->addRow(
-				_('Severity'),
+			->addRow(_('Severity'),
 				new CSeverity([
 					'name' => 'filter_priority', 'value' => (int) $this->data['filter_priority'], 'all' => true
 				])
 			)
-			->addRow(
-				_('State'),
+			->addRow(_('State'),
 				(new CRadioButtonList('filter_state', (int) $this->data['filter_state']))
 					->addValue(_('all'), -1)
 					->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
 					->addValue(_('Unknown'), TRIGGER_STATE_UNKNOWN)
 					->setModern(true)
 			)
-			->addRow(
-				_('Status'),
+			->addRow(_('Status'),
 				(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
 					->addValue(_('all'), -1)
 					->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
