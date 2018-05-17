@@ -98,13 +98,11 @@ if ($data['resourcetype'] > -1) {
 	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
 }
 
-$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr($data['timeline']['from_ts']);
-$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr($data['timeline']['to_ts']);
-
 $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
 		' FROM auditlog a,users u'.
 		' WHERE a.userid=u.userid'.
 			implode('', $sqlWhere).
+			' AND a.clock BETWEEN '.zbx_dbstr($data['timeline']['from_ts']).' AND '.zbx_dbstr($data['timeline']['to_ts']).
 		' ORDER BY a.clock DESC';
 $dbAudit = DBselect($sql, $config['search_limit'] + 1);
 while ($audit = DBfetch($dbAudit)) {
