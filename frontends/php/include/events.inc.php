@@ -317,7 +317,7 @@ function make_small_eventlist($startEvent, $backurl) {
 			$in_closing = false;
 
 			foreach ($event['acknowledges'] as $acknowledge) {
-				if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 					$in_closing = true;
 					break;
 				}
@@ -555,7 +555,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 				$in_closing = false;
 
 				foreach ($problem['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 						$in_closing = true;
 						break;
 					}

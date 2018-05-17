@@ -867,7 +867,7 @@ class CScreenProblem extends CScreenBase {
 					$in_closing = false;
 
 					foreach ($problem['acknowledges'] as $acknowledge) {
-						if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+						if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 							$in_closing = true;
 							break;
 						}
@@ -1063,7 +1063,7 @@ class CScreenProblem extends CScreenBase {
 					$in_closing = false;
 
 					foreach ($problem['acknowledges'] as $acknowledge) {
-						if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+						if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 							$in_closing = true;
 							break;
 						}

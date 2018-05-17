@@ -42,7 +42,7 @@ function makeAckTab($acknowledges) {
 				? getUserFullname($acknowledge)
 				: _('Inaccessible user'),
 			zbx_nl2br($acknowledge['message']),
-			($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) ? _('Close problem') : ''
+			(($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) ? _('Close problem') : ''
 		]);
 	}
 

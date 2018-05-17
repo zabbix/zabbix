@@ -654,7 +654,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			$trigger['lastEvent']['acknowledges'] =
 				$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
 
-			$acknowledged = $trigger['lastEvent']['acknowledged'] == EVENT_ACKNOWLEDGED;
+			$acknowledged = ($trigger['lastEvent']['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 			$problem_update_url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'acknowledge.edit')

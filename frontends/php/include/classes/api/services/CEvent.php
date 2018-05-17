@@ -564,14 +564,14 @@ class CEvent extends CApiService {
 			$new_severity = 0;
 
 			// Perform ZBX_PROBLEM_UPDATE_CLOSE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_CLOSE
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE
 					&& $event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 					&& $event['value'] == TRIGGER_VALUE_TRUE) {
 				$action |= ZBX_PROBLEM_UPDATE_CLOSE;
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_ACKNOWLEDGE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) === ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
 					&& $event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED
 					&& $event['value'] == TRIGGER_VALUE_TRUE) {
 				$action |= ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
@@ -579,7 +579,7 @@ class CEvent extends CApiService {
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) === ZBX_PROBLEM_UPDATE_MESSAGE
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE
 					&& $data['message'] !== '') {
 				$action |= ZBX_PROBLEM_UPDATE_MESSAGE;
 			}
@@ -588,7 +588,7 @@ class CEvent extends CApiService {
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) === ZBX_PROBLEM_UPDATE_SEVERITY
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY
 					&& $data['severity'] !== $event['severity']) {
 				$action |= ZBX_PROBLEM_UPDATE_SEVERITY;
 				$old_severity = $event['severity'];
@@ -647,7 +647,7 @@ class CEvent extends CApiService {
 			foreach ($acknowledgeids as $k => $id) {
 				$acknowledgement = $acknowledges[$k];
 
-				if (ZBX_PROBLEM_UPDATE_CLOSE & $acknowledgement['action']) {
+				if (($acknowledgement['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE){
 					$tasks[$k] = [
 						'type' => ZBX_TM_TASK_CLOSE_PROBLEM,
 						'status' => ZBX_TM_STATUS_NEW,
@@ -729,33 +729,33 @@ class CEvent extends CApiService {
 			$data['severity'] = intval($data['severity']);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_CLOSE) {
+		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 			$this->checkCanBeManuallyClosed($eventids);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) === ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
+		if (($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
 			$this->checkCanBeAcknowledged($eventids);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_MESSAGE) === ZBX_PROBLEM_UPDATE_MESSAGE
+		if (($action & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE
 				&& $data['message'] === '') {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'message', _('cannot be empty'))
 			);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_SEVERITY) === ZBX_PROBLEM_UPDATE_SEVERITY
-				&& !in_array($data['severity'], range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1), true)) {
+		if (!in_array($data['severity'], range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1), true)
+				&& ($action & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'severity',
 				_s('unexpected value "%1$s"', $data['severity'])
 			));
 		}
 
 		// Chack that at least one valid flag is set.
-		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_NONE
-				&& ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) === ZBX_PROBLEM_UPDATE_NONE
-				&& ($action & ZBX_PROBLEM_UPDATE_MESSAGE) === ZBX_PROBLEM_UPDATE_NONE
-				&& ($action & ZBX_PROBLEM_UPDATE_SEVERITY) === ZBX_PROBLEM_UPDATE_NONE) {
+		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_NONE
+				&& ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_NONE
+				&& ($action & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_NONE
+				&& ($action & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_NONE) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				_s('unexpected value "%1$s"', $data['action'])
 			));
@@ -1049,7 +1049,7 @@ class CEvent extends CApiService {
 	 *                                 configuration.
 	 */
 	protected function checkCanBeManuallyClosed(array $eventids) {
-		$rw_events_count = $this->get([
+		$events_count = $this->get([
 			'countOutput' => true,
 			'eventids' => $eventids,
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -1057,7 +1057,7 @@ class CEvent extends CApiService {
 			'editable' => true
 		]);
 
-		if (count($eventids) != $rw_events_count) {
+		if (count($eventids) != $events_count) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
@@ -1078,6 +1078,7 @@ class CEvent extends CApiService {
 		}
 
 		$problem_can_be_closed_manually = false;
+
 		foreach ($events as $event) {
 			if ($event['relatedObject']['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 					|| $event['r_eventid'] != 0) {
@@ -1089,7 +1090,7 @@ class CEvent extends CApiService {
 
 			if ($event['acknowledges']) {
 				foreach ($event['acknowledges'] as $acknowledge) {
-					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) === ZBX_PROBLEM_UPDATE_CLOSE) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 						$event_closed = true;
 						break;
 					}
@@ -1102,7 +1103,7 @@ class CEvent extends CApiService {
 			}
 		}
 
-		if ($problem_can_be_closed_manually === false) {
+		if (!$problem_can_be_closed_manually) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
 			);

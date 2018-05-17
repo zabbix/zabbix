@@ -1889,23 +1889,24 @@ function makeEventsActionsData(array $events, array $options) {
 						'info' => null
 					];
 
-					if ($opt['operations'] & ZBX_PROBLEM_UPDATE_CLOSE && $ack['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+					if (($opt['operations'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE
+							&& ($ack['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 						$row['actions'][] = ['icon' => ZBX_STYLE_ACTION_ICON_CLOSE];
 					}
 
-					if ($opt['operations'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-							&& $ack['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
+					if (($opt['operations'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+							&& ($ack['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
 						$row['actions'][] = ['icon' => ZBX_STYLE_ACTION_ICON_ACK];
 					}
 
-					if ($opt['operations'] & ZBX_PROBLEM_UPDATE_MESSAGE
-							&& $ack['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) {
+					if (($opt['operations'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE
+							&& ($ack['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
 						$row['actions'][] = ['icon' => ZBX_STYLE_ACTION_ICON_MSG];
 						$row['message'] = $ack['message'];
 					}
 
-					if ($opt['operations'] & ZBX_PROBLEM_UPDATE_SEVERITY
-							&& $ack['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) {
+					if (($opt['operations'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY
+							&& ($ack['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
 						$row['old_severity'] = $severities[$ack['old_severity']];
 						$row['new_severity'] = $severities[$ack['new_severity']];
 
