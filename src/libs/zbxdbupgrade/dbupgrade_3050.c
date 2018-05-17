@@ -793,7 +793,6 @@ static int	DBpatch_3050070(void)
 			" or idx like '%%.period'"
 			" or idx like '%%.stime'"
 			" or idx like '%%.isnow'"
-			" or idx like 'web.tr_status.%%'"
 	);
 
 	if (ZBX_DB_OK > res)
