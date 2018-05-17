@@ -103,7 +103,8 @@ if (!$data['alias'] || $data['users']) {
 			],
 			'selectMediatypes' => ['mediatypeid', 'description', 'maxattempts'],
 			'userids' => $userid,
-			'time_from' => $data['timeline']['from_ts'],
+			// API::Alert operates with 'open' time interval therefore before call have to alter 'from' value.
+			'time_from' => $data['timeline']['from_ts'] - 1,
 			'time_till' => $data['timeline']['to_ts'],
 			'eventsource' => $eventSource['source'],
 			'eventobject' => $eventSource['object'],
