@@ -1584,7 +1584,7 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 
 							case 'severity_changes':
 								if ($is_manual && array_key_exists('old_severity', $action)) {
-									$row[] = $action['old_severity'].SPACE.'&rArr;'.SPACE.$action['new_severity'];
+									$row[] = $action['old_severity'].'&nbsp;&rArr;&nbsp;'.$action['new_severity'];
 								}
 								else {
 									$row[] = '';
@@ -1909,7 +1909,7 @@ function makeEventsActionsData(array $events, array $options) {
 						$row['old_severity'] = $severities[$ack['old_severity']];
 						$row['new_severity'] = $severities[$ack['new_severity']];
 
-						$message = $row['old_severity'].SPACE.'&rArr;'.SPACE.$row['new_severity'];
+						$message = $row['old_severity'].'&nbsp;&rArr;&nbsp;'.$row['new_severity'];
 
 						$action_type = ($ack['new_severity'] > $ack['old_severity'])
 							? ZBX_STYLE_ACTION_ICON_SEV_UP
