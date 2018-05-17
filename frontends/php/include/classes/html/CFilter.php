@@ -112,7 +112,6 @@ class CFilter extends CDiv {
 		$this->setAttribute('data-profile-idx', $idx);
 		$this->setAttribute('data-profile-idx2', $idx2);
 
-
 		return $this;
 	}
 
@@ -121,7 +120,7 @@ class CFilter extends CDiv {
 	 *
 	 * @param mixed $item  An item to add inside the form object.
 	 *
-	 * @return \CFilter
+	 * @return CFilter
 	 */
 	public function addFormItem($item) {
 		$this->form->addItem($item);
@@ -281,29 +280,30 @@ class CFilter extends CDiv {
 	 *
 	 * @return string
 	 */
-	public function getJS() {
-		$id = '#' . $this->getId();
+	private function getJS() {
+		$id = '#'.$this->getId();
 		$js = 'var multiselects = jQuery("'.$id.'").tabs('.
 			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled])).
 		').find(".multiselect");'.
+
 		'if (multiselects.length) {'.
-		'	multiselects.multiSelect("resize");'.
+			'multiselects.multiSelect("resize");'.
 		'}';
 
 		if ($this->idx !== null && $this->idx !== '') {
-			$idx = $this->idx . '.active';
+			$idx = $this->idx.'.active';
 			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {'.
-			'	var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0,'.
-			'		multiselects = jQuery(".multiselect", ui.newPanel);'.
-			'	updateUserProfile("'.$idx.'", active, []);'.
+				'var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0,'.
+					'multiselects = jQuery(".multiselect", ui.newPanel);'.
+				'updateUserProfile("'.$idx.'", active, []);'.
 
-			'	if (multiselects.length) {'.
-			'		multiselects.multiSelect("resize");'.
-			'	}'.
+				'if (multiselects.length) {'.
+					'multiselects.multiSelect("resize");'.
+				'}'.
 
-			'	if (active) {'.
-			'		jQuery("[autofocus=autofocus]", ui.newPanel).focus();'.
-			'	}'.
+				'if (active) {'.
+					'jQuery("[autofocus=autofocus]", ui.newPanel).focus();'.
+				'}'.
 			'});';
 		}
 
