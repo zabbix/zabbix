@@ -1031,7 +1031,7 @@ class CEvent extends CApiService {
 					_('no permissions to referred object or it does not exist'),
 					_('event is already acknowledged'),
 					_('event is not in PROBLEM state'),
-					_('event type is not trigger')
+					_('event source is not trigger')
 				)
 			);
 		}

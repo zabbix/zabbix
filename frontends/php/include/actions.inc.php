@@ -1442,8 +1442,8 @@ function getDefaultActionOptions() {
 		'style' => 'CTableInfo'
 	], [
 		'key' => 'action_list',
-		'operations' => ZBX_PROBLEM_UPDATE_CLOSE + ZBX_PROBLEM_UPDATE_ACKNOWLEDGE +
-			ZBX_PROBLEM_UPDATE_MESSAGE + ZBX_PROBLEM_UPDATE_SEVERITY,
+		'operations' => ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+			ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY,
 		'columns' => ['time', 'user_recipient', 'action', 'message', 'status', 'info'],
 		'message_max_length' => 30,
 		'actions' => true,
@@ -1455,21 +1455,18 @@ function getDefaultActionOptions() {
 /**
  * Get list of event actions.
  *
- * @param array      $problems
- * @param string     $problems[]['eventid']
- * @param string     $problems[]['r_eventid']             Recovery event ID (optional).
- * @param string     $problems[]['acknowledges']          Event update operations.
- * @param array      $options
- * @param int        $options[]['key']                    Action list name, just to identify it when asking multiple
- *                                                        tables.
- * @param int        $options[]['operations']             Flag of included manual actions.
- * @param boolean    $options[]['actions']                Contains automatic operations.
- * @param boolean    $options[]['columns']                Table columns.
- * @param boolean    $options[]['show_problem']           Include the problem causing and recovery events.
- * @param string     $options[]['style']                  Table style. Possible options: CTableInfo or CTable (dafault).
- *
- * @param bool   $display_recovery_alerts  Include recovery events.
- * @param bool   $html                     If true, display action status with hint box in HTML format.
+ * @param array    $events
+ * @param string   $events[]['eventid']
+ * @param string   $events[]['r_eventid']      Recovery event ID (optional).
+ * @param string   $events[]['acknowledges']   Event update operations.
+ * @param array    $options
+ * @param int      $options[]['key']           Action list name, just to identify it when asking multiple tables.
+ * @param int      $options[]['operations']    Flag of included manual actions.
+ * @param boolean  $options[]['actions']       Contains automatic operations.
+ * @param boolean  $options[]['columns']       Table columns.
+ * @param boolean  $options[]['show_problem']  Include the problem causing and recovery events.
+ * @param string   $options[]['style']         Table style. Possible options: CTableInfo or CTable (default).
+ * @param bool     $html                       If true, display action status with hint box in HTML format.
  *
  * @return array
  */
@@ -1553,7 +1550,7 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 
 							$uncomplete = true;
 						}
-						elseif ($action['status'] == ALERT_STATUS_SENT) {
+						elseif ($action['status'] == ALERT_STATUS_FAILED) {
 							$fail = true;
 						}
 					}
@@ -1799,7 +1796,8 @@ function makeEventsActionsData(array $events, array $options) {
 	if ($request_alerts) {
 		// Get alerts.
 		$db_alerts = API::Alert()->get([
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['alerttype','clock','error','esc_step','eventid','mediatypeid','message','p_eventid','retries',
+				'status','userid'],
 			'eventids' => array_keys($eventids + $recovery_eventids),
 			'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND], 'acknowledgeid' => 0],
 			'sortorder' => ['alertid' => ZBX_SORT_DOWN]
@@ -1812,7 +1810,8 @@ function makeEventsActionsData(array $events, array $options) {
 				'status' => $db_alert['status'],
 				'alerttype' => $db_alert['alerttype'],
 				'error' => $db_alert['error'],
-				'p_eventid' => $db_alert['p_eventid']
+				'p_eventid' => $db_alert['p_eventid'],
+				'retries' => $db_alert['retries']
 			];
 
 			if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
@@ -1941,7 +1940,7 @@ function makeEventsActionsData(array $events, array $options) {
 
 	$mediatypes = $mediatypeids
 		? API::Mediatype()->get([
-			'output' => ['description'],
+			'output' => ['description', 'maxattempts'],
 			'mediatypeids' => array_keys($mediatypeids),
 			'preservekeys' => true
 		])
@@ -1954,6 +1953,17 @@ function makeEventsActionsData(array $events, array $options) {
 	];
 }
 
+/**
+ * Get list of event actions.
+ *
+ * @param array  $problems
+ * @param string $problems[]['eventid']
+ * @param string $problems[]['r_eventid']  Recovery event ID (optional).
+ * @param bool   $display_recovery_alerts  Include recovery events.
+ * @param bool   $html                     If true, display action status with hint box in HTML format.
+ *
+ * @return array
+ */
 function makeEventsActions(array $problems, $display_recovery_alerts = false, $html = true) {
 	if (!$problems) {
 		return [];
