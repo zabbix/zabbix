@@ -76,7 +76,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	DB_ROW		row;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s'", __function_name, host);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __function_name, host, host_metadata);
 
 	if (FAIL == zbx_check_hostname(host, &ch_error))
 	{
