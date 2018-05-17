@@ -344,11 +344,7 @@ if ($data['action'] == 'problem.view') {
 			'loadSBox' => 0,
 			'loadImage' => 0,
 			'dynamic' => 0,
-			'mainObject' => 1,
-			'profile' => [
-				'idx' => $data['profileIdx'],
-				'idx2' => $data['profileIdx2'],
-			]
+			'mainObject' => 1
 		];
 
 		$this->addPostJS('timeControl.useTimeRefresh('.zbx_jsvalue(CWebUser::getRefresh()).');');

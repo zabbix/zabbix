@@ -128,11 +128,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 			$data['timeControlData'] = [
 				'mainObject' => 1,
-				'onDashboard' => 1,
-				'profile' => [
-					'idx' => $options['profileIdx'],
-					'idx2' => $options['profileIdx2']
-				]
+				'onDashboard' => 1
 			];
 
 			if (self::hasDynamicWidgets($data['grid_widgets'])) {

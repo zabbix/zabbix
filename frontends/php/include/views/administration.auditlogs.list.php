@@ -108,11 +108,7 @@ $objData = [
 	'loadSBox' => 0,
 	'loadImage' => 0,
 	'dynamic' => 0,
-	'mainObject' => 1,
-	'profile' => [
-		'idx' => 'web.auditlogs',
-		'idx2' => 0,
-	]
+	'mainObject' => 1
 ];
 zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($this->data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');

@@ -650,11 +650,7 @@ class CScreenBuilder {
 
 		$timeControlData = [
 			'id' => 'scrollbar',
-			'mainObject' => 1,
-			'profile' => [
-				'idx' => $options['profileIdx'],
-				'idx2' => $options['profileIdx2']
-			]
+			'mainObject' => 1
 		];
 
 		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($options['timeline']).', '.zbx_jsvalue($timeControlData).');');
