@@ -1584,7 +1584,7 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 
 							case 'severity_changes':
 								if ($is_manual && array_key_exists('old_severity', $action)) {
-									$row[] = _s('%1$s &rarr; %2$s', $action['old_severity'], $action['new_severity']);
+									$row[] = $action['old_severity'].SPACE.'&rArr;'.SPACE.$action['new_severity'];
 								}
 								else {
 									$row[] = '';
@@ -1595,7 +1595,7 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 							case 'message':
 								if ($is_manual) {
 									if ($message_max_length) {
-										$row[] = strlen($action['message']) > $message_max_length
+										$row[] = (strlen($action['message']) > $message_max_length)
 											? mb_substr($action['message'], 0, $message_max_length) . '...'
 											: $action['message'];
 									}
