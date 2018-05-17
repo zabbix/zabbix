@@ -1,5 +1,12 @@
-noinst_PROGRAMS = zbx_tcp_recv_ext zbx_tcp_recv_raw_ext
+if AGENT
+AGENT_tests = \
+	zbx_tcp_recv_ext \
+	zbx_tcp_recv_raw_ext
+endif
 
+noinst_PROGRAMS = $(AGENT_tests)
+
+if AGENT
 COMMON_SRC_FILES = \
 	../../../src/zabbix_agent/active.c ../../../../src/zabbix_agent/active.h \
 	../../../src/zabbix_agent/stats.c \
@@ -63,3 +70,5 @@ zbx_tcp_recv_raw_ext_LDADD += @AGENT_LIBS@
 zbx_tcp_recv_raw_ext_LDFLAGS = @AGENT_LDFLAGS@
 
 zbx_tcp_recv_raw_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+endif
