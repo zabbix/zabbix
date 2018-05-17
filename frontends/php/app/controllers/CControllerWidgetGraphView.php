@@ -377,7 +377,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'time_control_data' => $time_control_data,
 			'timeline' => $timeline,
 			'fs_data' => $fs_data,
-			'dashboardid' => $dashboardid,
 			'only_footer' => false,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
