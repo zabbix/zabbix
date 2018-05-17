@@ -1796,8 +1796,9 @@ function makeEventsActionsData(array $events, array $options) {
 	if ($request_alerts) {
 		// Get alerts.
 		$db_alerts = API::Alert()->get([
-			'output' => ['alerttype','clock','error','esc_step','eventid','mediatypeid','message','p_eventid','retries',
-				'status','userid'],
+			'output' => ['eventid', 'userid', 'clock', 'mediatypeid', 'message', 'status', 'retries', 'error',
+				'esc_step', 'alerttype', 'p_eventid'
+			],
 			'eventids' => array_keys($eventids + $recovery_eventids),
 			'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND], 'acknowledgeid' => 0],
 			'sortorder' => ['alertid' => ZBX_SORT_DOWN]
