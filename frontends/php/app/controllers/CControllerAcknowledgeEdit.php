@@ -140,8 +140,6 @@ class CControllerAcknowledgeEdit extends CController {
 					$data['problem_can_be_acknowledged'] = true;
 				}
 			}
-
-			// TODO VM: This check was removed, because we need triggerids for all closable events.
 		}
 
 		/**

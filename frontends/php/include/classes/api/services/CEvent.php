@@ -596,7 +596,6 @@ class CEvent extends CApiService {
 				$sev_change_eventids[] = $eventid;
 			}
 
-			// TODO VM: check was removed, as action is already checked in validateAcknowledge() and it should not be possible to get here with no action.
 			$acknowledges[] = [
 				'userid' => self::$userData['userid'],
 				'eventid' => $eventid,
@@ -1027,7 +1026,7 @@ class CEvent extends CApiService {
 		if ($event_can_be_acknowledged === false) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('Cannot acknowledge problem. Possible reasons:\n1. %1$s \n2. %2$s \n3. %3$s \n4. %4$s',
-					_('no permissions to referred object or it does not exist'),
+					_('No permissions to referred object or it does not exist'), // TODO VM: updated to translation we have, but final message has impropper case.
 					_('event is already acknowledged'),
 					_('event is not in PROBLEM state'),
 					_('event source is not trigger')
