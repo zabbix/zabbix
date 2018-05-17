@@ -36,9 +36,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'content_width' => 'int32',
 			'content_height' => 'int32',
 			'only_footer' => 'in 1',
-			'fullscreen' => 'in 0,1',
-			'from' => 'string',
-			'to' => 'string'
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
