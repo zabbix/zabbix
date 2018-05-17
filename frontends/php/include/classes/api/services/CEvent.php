@@ -722,22 +722,32 @@ class CEvent extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 
-		$action = array_key_exists('action', $data) ? $data['action'] : ZBX_PROBLEM_UPDATE_NONE;
 		$eventids = array_keys(array_flip($data['eventids']));
+
+		// Chack that at least one valid flag is set.
+		$min_action = ZBX_PROBLEM_UPDATE_CLOSE;
+		$max_action = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
+				| ZBX_PROBLEM_UPDATE_SEVERITY;
+
+		if ($data['action'] < $min_action || $data['action'] > $max_action) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_s('unexpected value "%1$s"', $data['action'])
+			));
+		}
 
 		if (is_numeric($data['severity'])) {
 			$data['severity'] = intval($data['severity']);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+		if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 			$this->checkCanBeManuallyClosed($eventids);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
+		if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
 			$this->checkCanBeAcknowledged($eventids);
 		}
 
-		if (($action & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE
+		if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE
 				&& $data['message'] === '') {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'message', _('cannot be empty'))
@@ -745,19 +755,9 @@ class CEvent extends CApiService {
 		}
 
 		if (!in_array($data['severity'], range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1), true)
-				&& ($action & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
+				&& ($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'severity',
 				_s('unexpected value "%1$s"', $data['severity'])
-			));
-		}
-
-		// Chack that at least one valid flag is set.
-		if (($action & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_NONE
-				&& ($action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_NONE
-				&& ($action & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_NONE
-				&& ($action & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_NONE) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
-				_s('unexpected value "%1$s"', $data['action'])
 			));
 		}
 	}
