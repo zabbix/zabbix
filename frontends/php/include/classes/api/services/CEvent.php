@@ -589,24 +589,23 @@ class CEvent extends CApiService {
 
 			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
 			if (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY
-					&& $data['severity'] !== $event['severity']) {
+					&& $data['severity'] != $event['severity']) {
 				$action |= ZBX_PROBLEM_UPDATE_SEVERITY;
 				$old_severity = $event['severity'];
 				$new_severity = $data['severity'];
 				$sev_change_eventids[] = $eventid;
 			}
 
-			if ($action !== ZBX_PROBLEM_UPDATE_NONE) {
-				$acknowledges[] = [
-					'userid' => self::$userData['userid'],
-					'eventid' => $eventid,
-					'clock' => $time,
-					'message' => $data['message'],
-					'action' => $action,
-					'old_severity' => $old_severity,
-					'new_severity' => $new_severity
-				];
-			}
+			// TODO VM: check was removed, as action is already checked in validateAcknowledge() and it should not be possible to get here with no action.
+			$acknowledges[] = [
+				'userid' => self::$userData['userid'],
+				'eventid' => $eventid,
+				'clock' => $time,
+				'message' => $data['message'],
+				'action' => $action,
+				'old_severity' => $old_severity,
+				'new_severity' => $new_severity
+			];
 		}
 
 		// Make changes in problem and events tables.
