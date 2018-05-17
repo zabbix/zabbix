@@ -441,7 +441,7 @@ class CScreenProblem extends CScreenBase {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'acknowledged'],
 			'selectTags' => ['tag', 'value'],
-			'select_acknowledges' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids
@@ -492,7 +492,7 @@ class CScreenProblem extends CScreenBase {
 		return API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'r_clock', 'correlationid', 'userid', 'acknowledged'],
 			'selectTags' => ['tag', 'value'],
-			'selectAcknowledges' => API_OUTPUT_EXTEND,
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -710,7 +710,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($this->data['action'] === 'problem.view') {
-			$actions = makeEventsActionsTables($data['problems'], getDefaultActionOptions(), true);
+			$actions = makeEventsActionsTables($data['problems'], getDefaultActionOptions());
 			$url_form = clone $url;
 
 			$form = (new CForm('get', 'zabbix.php'))

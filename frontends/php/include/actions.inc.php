@@ -1910,11 +1910,9 @@ function makeEventsActionsData(array $events, array $options) {
 						$row['old_severity'] = $severities[$ack['old_severity']];
 						$row['new_severity'] = $severities[$ack['new_severity']];
 
-						$message = _s('%1$s &rarr; %2$s', $severities[$ack['old_severity']],
-							$severities[$ack['new_severity']]
-						);
+						$message = $row['old_severity'].SPACE.'&rArr;'.SPACE.$row['new_severity'];
 
-						$action_type = $ack['new_severity'] > $ack['old_severity']
+						$action_type = ($ack['new_severity'] > $ack['old_severity'])
 							? ZBX_STYLE_ACTION_ICON_SEV_UP
 							: ZBX_STYLE_ACTION_ICON_SEV_DOWN;
 

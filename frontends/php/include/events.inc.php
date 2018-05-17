@@ -251,7 +251,7 @@ function make_small_eventlist($startEvent, $backurl) {
 
 	$events = API::Event()->get([
 		'output' => ['eventid', 'r_eventid', 'source', 'object', 'objectid', 'clock', 'ns', 'acknowledged', 'severity'],
-		'select_acknowledges' => API_OUTPUT_EXTEND,
+		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,

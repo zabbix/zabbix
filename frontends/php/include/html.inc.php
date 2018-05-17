@@ -840,8 +840,7 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
  *
  * @return CDiv
  */
-function makePageFooter($with_version = true)
-{
+function makePageFooter($with_version = true) {
 	return (new CTag('footer', true, [
 		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
 		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
@@ -860,8 +859,7 @@ function makePageFooter($with_version = true)
  *
  * @return CComboBox
  */
-function makeAdministrationGeneralMenu($selected)
-{
+function makeAdministrationGeneralMenu($selected) {
 	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
@@ -884,8 +882,7 @@ function makeAdministrationGeneralMenu($selected)
  *
  * @return CSpan
  */
-function makeInformationList($info_icons)
-{
+function makeInformationList($info_icons) {
 	return $info_icons ? (new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER) : '';
 }
 
@@ -896,8 +893,7 @@ function makeInformationList($info_icons)
  *
  * @return CSpan
  */
-function makeInformationIcon($message)
-{
+function makeInformationIcon($message) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
@@ -909,13 +905,12 @@ function makeInformationIcon($message)
  *
  * @param array  $icon_data
  * @param string $icon_data[icon]   Icon style.
- * @param string $icon_data[hint]   Hintbox content.
- * @param int    $icon_data[num]    Number displayed over the icon.
+ * @param string $icon_data[hint]   Hintbox content (optional).
+ * @param int    $icon_data[num]    Number displayed over the icon (optional).
  *
  * @return CSpan
  */
-function makeActionIcon(array $icon_data)
-{
+function makeActionIcon(array $icon_data) {
 	$icon = (new CSpan())->addClass($icon_data['icon']);
 
 	if (array_key_exists('num', $icon_data) && $icon_data['num'] > 0) {
@@ -936,8 +931,7 @@ function makeActionIcon(array $icon_data)
  *
  * @return CSpan
  */
-function makeErrorIcon($error)
-{
+function makeErrorIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
@@ -951,8 +945,7 @@ function makeErrorIcon($error)
  *
  * @return CSpan
  */
-function makeUnknownIcon($error)
-{
+function makeUnknownIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
@@ -966,8 +959,7 @@ function makeUnknownIcon($error)
  *
  * @return CSpan
  */
-function makeWarningIcon($error)
-{
+function makeWarningIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
@@ -979,8 +971,7 @@ function makeWarningIcon($error)
  *
  * @return CButton
  */
-function makeDebugButton()
-{
+function makeDebugButton() {
 	return (new CDiv(
 		(new CLink(_('Debug'), '#debug'))
 			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
@@ -1006,8 +997,7 @@ function makeDebugButton()
  *
  * @return string
  */
-function getTriggerSeverityCss($config)
-{
+function getTriggerSeverityCss($config) {
 	$css = '';
 
 	$severities = [
@@ -1039,8 +1029,7 @@ function getTriggerSeverityCss($config)
  *
  * @return string
  */
-function getTriggerStatusCss($config)
-{
+function getTriggerStatusCss($config) {
 	$css = '';
 
 	if ($config['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED) {
