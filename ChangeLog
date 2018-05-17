@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-4528] added link to Zabbix official support page (Andzs, ashubin)
 ........S. [ZBXNEXT-4520] added values to boolean mapping: "ok, master" as 1 and "err, slave" as 0 (viktors)
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
+........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
 A.F....... [ZBX-13361] fixed error messages when configuring an existing item to have an update interval (miks)
