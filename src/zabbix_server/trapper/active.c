@@ -191,13 +191,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #else
 		old_metadata = row[3];
 #endif
-
 		if (FAIL == DBis_null(old_metadata) && 0 != strcmp(old_metadata, host_metadata))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "host [%s] has changed metadata from [%s] to [%s]", host,
-					old_metadata, host_metadata);
 			db_register_host(host, ip, port, host_metadata);
-		}
 
 		if (HOST_STATUS_MONITORED != atoi(row[1]))
 		{
