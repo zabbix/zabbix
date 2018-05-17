@@ -139,6 +139,8 @@ function getActionsBySysmap($sysmap, array $options = []) {
 		'nopermissions' => true
 	]);
 
+	$fullscreen = array_key_exists('fullscreen', $options) ? $options['fullscreen'] : false;
+
 	foreach ($sysmap['selements'] as $selementid => $elem) {
 		$hostId = null;
 		$scripts = null;
@@ -178,9 +180,12 @@ function getActionsBySysmap($sysmap, array $options = []) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
 				$gotos['submap'] = [
 					'sysmapid' => $elem['elements'][0]['sysmapid'],
-					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null,
-					'fullscreen' => array_key_exists('fullscreen', $options) ? $options['fullscreen'] : 0
+					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
 				];
+
+				if ($fullscreen) {
+					$gotos['submap']['fullscreen'] = true;
+				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
@@ -220,9 +225,7 @@ function getActionsBySysmap($sysmap, array $options = []) {
 
 		order_result($elem['urls'], 'name');
 
-		$map = CMenuPopupHelper::getMap($hostId, $scripts, $gotos, $elem['urls'],
-			array_key_exists('fullscreen', $options) ? $options['fullscreen'] : false
-		);
+		$map = CMenuPopupHelper::getMap($hostId, $scripts, $gotos, $elem['urls'], $fullscreen);
 		if ($map == ['type' => 'map']) {
 			$map = null;
 		}
@@ -2116,7 +2119,6 @@ function getMapHighligts($map, $map_info) {
  * @param array $sysmap
  * @param array $options                  Options used to retrieve actions.
  * @param int   $options['severity_min']  Minimal severity used.
- * @param int   $options['fullscreen']    Fullscreen flag.
  *
  * @return array
  */
