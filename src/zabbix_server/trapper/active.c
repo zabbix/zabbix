@@ -29,6 +29,20 @@
 
 extern unsigned char	program_type;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: db_register_host                                                 *
+ *                                                                            *
+ * Purpose: perform active agent auto registration                            *
+ *                                                                            *
+ * Parameters: host          - [IN] name of the host to be added or updated   *
+ *             ip            - [IN] IP address of the host                    *
+ *             port          - [IN] port of the host                          *
+ *             host_metadata - [IN] host metadata                             *
+ *                                                                            *
+ * Comments: helper function for get_hostid_by_host                           *
+ *                                                                            *
+ ******************************************************************************/
 static void	db_register_host(const char *host, const char *ip, unsigned short port, const char *host_metadata)
 {
 	char	dns[INTERFACE_DNS_LEN_MAX];
@@ -63,7 +77,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: NB! adds host to the database if it does not exist               *
+ * Comments: NB! adds host to the database if it does not exist or if it      *
+ *           exists but metadata has changed                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
