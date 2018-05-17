@@ -46,15 +46,42 @@ class CFilter extends CDiv {
 	 * List of predefined time ranges. Start and end of time range are separated by semicolon.
 	 */
 	protected $time_ranges = [
-		['now-2d/d:now', 'now-7d/d:now', 'now-30d/d:now', 'now-3M/M:now', 'now-6M/M:now', 'now-1y:now',
-			'now-2y:now'
+		[
+			['now-2d/d', 'now'],
+			['now-7d/d', 'now'],
+			['now-30d/d', 'now'],
+			['now-3M/M', 'now'],
+			['now-6M/M', 'now'],
+			['now-1y', 'now'],
+			['now-2y', 'now']
 		],
-		['now-1d/d:now-1d/d', 'now-2d/d:now-2d/d', 'now-1w/d:now-1w/d', 'now-1w/w:now-1w/w', 'now-1M/M:now-1M/M',
-			'now-1y/y:now-1y/y'
+		[
+			['now-1d/d', 'now-1d/d'],
+			['now-2d/d', 'now-2d/d'],
+			['now-1w/d', 'now-1w/d'],
+			['now-1w/w', 'now-1w/w'],
+			['now-1M/M', 'now-1M/M'],
+			['now-1y/y', 'now-1y/y']
 		],
-		['now/d:now/d', 'now/d:now', 'now/w:now/w', 'now/w:now', 'now/M:now/M', 'now/M:now', 'now/y:now/y', 'now/y:now'],
-		['now-5m:now', 'now-15m:now', 'now-30m:now', 'now-1h:now', 'now-3h:now', 'now-6h:now', 'now-12h:now',
-			'now-24h:now'
+		[
+			['now/d', 'now/d'],
+			['now/d', 'now'],
+			['now/w', 'now/w'],
+			['now/w', 'now'],
+			['now/M', 'now/M'],
+			['now/M', 'now'],
+			['now/y', 'now/y'],
+			['now/y', 'now']
+		],
+		[
+			['now-5m', 'now'],
+			['now-15m', 'now'],
+			['now-30m', 'now'],
+			['now-1h', 'now'],
+			['now-3h', 'now'],
+			['now-6h', 'now'],
+			['now-12h', 'now'],
+			['now-24h', 'now']
 		]
 	];
 
@@ -209,25 +236,24 @@ class CFilter extends CDiv {
 		$header = relativeDateToText($from, $to);
 
 		$this->addTab(new CDiv([
-			(new CSimpleButton())->addClass('btn-time-left'),
-			(new CSimpleButton(_('Zoom out')))->addClass('btn-time-out'),
-			(new CSimpleButton())->addClass('btn-time-right')
+			(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+			(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
+			(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
 		]), null);
 
 		$predefined_ranges = [];
 
 		foreach ($this->time_ranges as $column_ranges) {
-			$column = (new CList())->addClass('time-quick');
+			$column = (new CList())->addClass(ZBX_STYLE_TIME_QUICK);
 
 			foreach ($column_ranges as $range) {
-				list($range_from, $range_to) = explode(':', $range);
-				$label = relativeDateToText($range_from, $range_to);
-				$is_selected = parseRelativeDate($from, true) == parseRelativeDate($range_from, true)
-					&& parseRelativeDate($to, false) == parseRelativeDate($range_to, false);
+				$label = relativeDateToText($range[0], $range[1]);
+				$is_selected = parseRelativeDate($from, true) == parseRelativeDate($range[0], true)
+					&& parseRelativeDate($to, false) == parseRelativeDate($range[1], false);
 
 				$column->addItem((new CLink($label))
-					->setAttribute('data-from', $range_from)
-					->setAttribute('data-to', $range_to)
+					->setAttribute('data-from', $range[0])
+					->setAttribute('data-to', $range[1])
 					->setAttribute('data-label', $label)
 					->addClass($is_selected ? ZBX_STYLE_SELECTED : null)
 				);
@@ -239,7 +265,7 @@ class CFilter extends CDiv {
 		$anchor = 'tab_'.count($this->tabs);
 
 		$this->addTab(
-			(new CLink($header, '#'.$anchor))->addClass('btn-time'),
+			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
 			(new CDiv([
 				(new CDiv(
 					(new CList([
@@ -249,11 +275,11 @@ class CFilter extends CDiv {
 						(new CButton('to_calendar'))->addClass(ZBX_STYLE_ICON_CAL),
 						(new CButton('apply', _('Apply')))
 					]))->addClass(ZBX_STYLE_TABLE_FORMS)
-				))->addClass('time-input'),
-				(new CDiv($predefined_ranges))->addClass('time-quick-range')
+				))->addClass(ZBX_STYLE_TIME_INPUT),
+				(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
 			]))
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
-				->addClass('time-selection-container')
+				->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
 				->setId($anchor)
 		);
 
