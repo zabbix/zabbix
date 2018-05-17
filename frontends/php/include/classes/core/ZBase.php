@@ -93,7 +93,6 @@ class ZBase {
 		require_once $this->getRootDir().'/include/db.inc.php';
 
 		// page specific includes
-		require_once $this->getRootDir().'/include/acknow.inc.php';
 		require_once $this->getRootDir().'/include/actions.inc.php';
 		require_once $this->getRootDir().'/include/discovery.inc.php';
 		require_once $this->getRootDir().'/include/draw.inc.php';
