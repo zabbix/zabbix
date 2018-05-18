@@ -35,6 +35,9 @@ var chkbxRange = {
 		var path = new Curl();
 		var filename = basename(path.getPath(), '.php');
 		this.cookieName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
+		// Erase old checkboxes.
+		this.chkboxes = {};
+		this.startbox = null;
 
 		this.resetOtherPageCookies();
 
@@ -212,7 +215,6 @@ var chkbxRange = {
 			objectIds.push(this.getObjectIdFromName(checkboxes[i].name));
 		}
 		this.checkObjects(object, objectIds, checked);
-
 	},
 
 	/**

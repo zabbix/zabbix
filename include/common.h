@@ -360,6 +360,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_LESS_EQUAL		6
 #define CONDITION_OPERATOR_NOT_IN		7
 #define CONDITION_OPERATOR_REGEXP		8
+#define CONDITION_OPERATOR_NOT_REGEXP		9
 
 /* event type action condition values */
 #define EVENT_TYPE_ITEM_NOTSUPPORTED		0
@@ -954,7 +955,7 @@ int	is_ascii_string(const char *str);
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_lrtrim(char *str, const char *charlist);
-void	zbx_remove_chars(register char *str, const char *charlist);
+void	zbx_remove_chars(char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	del_zeroes(char *s);
@@ -1006,8 +1007,6 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 		const zbx_custom_interval_t *custom_intervals, time_t now);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	zbx_check_time_period(const char *period, time_t time, int *res);
-char	zbx_num2hex(u_char c);
-u_char	zbx_hex2num(char c);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
@@ -1092,6 +1091,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
 char	*xml_escape_dyn(const char *data);
+void	xml_escape_xpath(char **data);
 
 int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
 		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
@@ -1231,7 +1231,7 @@ int	is_discovery_macro(const char *name);
 int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);
 
-int	parse_key(char **exp);
+int	parse_key(const char **exp);
 
 int	parse_host_key(char *exp, char **host, char **key);
 
@@ -1314,6 +1314,8 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_NUMERIC	0x08000
 #define ZBX_TOKEN_JSON		0x10000
 #define ZBX_TOKEN_XML		0x20000
+#define ZBX_TOKEN_REGEXP	0x40000
+#define ZBX_TOKEN_XPATH		0x80000
 
 /* location of a substring */
 typedef struct

@@ -392,35 +392,36 @@ $itemFormList->addRow(
 );
 
 // Append master item select.
-$master_item = [
-	(new CTextBox('master_itemname', $data['master_itemname'], true))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
-	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
-];
-
-if (!$readonly) {
-	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-	$master_item[] = (new CButton('button', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'master_itemname',
-				'dstfrm' => $itemForm->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'only_hostid' => $data['hostid'],
-				'excludeids' => [$data['itemid']],
-				'with_webitems' => 1
-			]).', null, this);'
-		);
-}
-
 $itemFormList->addRow(
 	(new CLabel(_('Master item'), 'master_itemname'))->setAsteriskMark(),
-	$master_item,
+	(new CMultiSelect([
+		'name' => 'master_itemid',
+		'object_name' => 'items',
+		'multiple' => false,
+		'disabled' => $readonly,
+		'data' => ($data['master_itemid'] > 0)
+			? [
+				[
+					'id' => $data['master_itemid'],
+					'prefix' => $host['name'].NAME_DELIMITER,
+					'name' => $data['master_itemname']
+				]
+			]
+			: [],
+		'popup' => [
+			'parameters' => [
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'hostid' => $data['hostid'],
+				'excludeids' => $data['itemid'] != 0 ? [$data['itemid']] : [],
+				'webitems' => true
+			]
+		]
+	]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired(),
 	'row_master_item'
 );
 
@@ -1029,13 +1030,12 @@ foreach ($data['preprocessing'] as $i => $step) {
 }
 
 $preprocessing->addRow(
-	$readonly
-		? null
-		: (new CCol(
-			(new CButton('param_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-		))->setColSpan(5)
+	(new CCol(
+		(new CButton('param_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+			->setEnabled(!$readonly)
+	))->setColSpan(5)
 );
 
 $item_preproc_list = (new CFormList('item_preproc_list'))

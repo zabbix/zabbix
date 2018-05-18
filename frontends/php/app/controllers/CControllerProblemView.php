@@ -57,7 +57,10 @@ class CControllerProblemView extends CController {
 			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
 			'filter_maintenance' =>		'in 1',
 			'filter_unacknowledged' =>	'in 1',
+			'filter_compact_view' =>	'in 1',
+			'filter_show_timeline' =>	'in 1',
 			'filter_details' =>			'in 1',
+			'filter_highlight_row' =>	'in 1',
 			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
 			'stime' =>					'time',
 			'isNow' =>					'in 0,1'
@@ -167,7 +170,16 @@ class CControllerProblemView extends CController {
 			CProfile::update('web.problem.filter.unacknowledged', $this->getInput('filter_unacknowledged', 0),
 				PROFILE_TYPE_INT
 			);
+			CProfile::update('web.problem.filter.compact_view', $this->getInput('filter_compact_view', 0),
+				PROFILE_TYPE_INT
+			);
+			CProfile::update('web.problem.filter.show_timeline', $this->getInput('filter_show_timeline', 0),
+				PROFILE_TYPE_INT
+			);
 			CProfile::update('web.problem.filter.details', $this->getInput('filter_details', 0), PROFILE_TYPE_INT);
+			CProfile::update('web.problem.filter.highlight_row', $this->getInput('filter_highlight_row', 0),
+				PROFILE_TYPE_INT
+			);
 		}
 		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.problem.filter.show');
@@ -188,7 +200,10 @@ class CControllerProblemView extends CController {
 			CProfile::delete('web.problem.filter.show_tags');
 			CProfile::delete('web.problem.filter.maintenance');
 			CProfile::delete('web.problem.filter.unacknowledged');
+			CProfile::delete('web.problem.filter.compact_view');
+			CProfile::delete('web.problem.filter.show_timeline');
 			CProfile::delete('web.problem.filter.details');
+			CProfile::delete('web.problem.filter.highlight_row');
 		}
 
 		$config = select_config();
@@ -285,7 +300,10 @@ class CControllerProblemView extends CController {
 				'show_tags' => CProfile::get('web.problem.filter.show_tags', PROBLEMS_SHOW_TAGS_3),
 				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),
 				'unacknowledged' => CProfile::get('web.problem.filter.unacknowledged', 0),
-				'details' => CProfile::get('web.problem.filter.details', 0)
+				'compact_view' => CProfile::get('web.problem.filter.compact_view', 0),
+				'show_timeline' => CProfile::get('web.problem.filter.show_timeline', 1),
+				'details' => CProfile::get('web.problem.filter.details', 0),
+				'highlight_row' => CProfile::get('web.problem.filter.highlight_row', 0)
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable']

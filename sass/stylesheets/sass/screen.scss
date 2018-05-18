@@ -1,3 +1,5 @@
+$theme_name: 'blue' !default;
+
 @import '_reset.scss';
 @import '_colors.scss';
 @import '_fonts.scss';
@@ -42,7 +44,7 @@ a {
 	&:focus {
 		color: $link-hover-color;
 		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, 0.5);
+		border-bottom: 2px solid rgba($link-hover-color, 0.5)
 	}
 
 	&:active {
@@ -215,48 +217,23 @@ pre {
 	word-wrap: break-word;
 }
 
-// Main Navigation
-nav {
-	a {
-
-		&:link {
-			@extend %no-border;
-		}
-
-		&:visited {
-			@extend %no-border;
-		}
-
-		&:hover {
-			@extend %no-border;
-		}
-
-		&:focus {
-			@extend %no-border;
-		}
-
-		&:active {
-			@extend %no-border;
-		}
-	}
-}
-
-.nav {
-	@extend nav;
-
-	background-color: $main-subnav-bg-color;
-}
-
-%no-border {
-	border: none;
-}
-
 .top-nav-container {
+	background-color: $main-nav-bg-color;
 	height: 45px;
 	line-height: 45px;
-	padding: 0 10px 0 10px;
+	padding: 0 10px;
 	position: relative;
-	background-color: $main-nav-bg-color;
+}
+
+.top-nav a,
+.top-subnav a,
+.header-logo {
+	&:active,
+	&:hover,
+	&:link,
+	&:visited {
+		border: none;
+	}
 }
 
 .top-nav {
@@ -389,6 +366,12 @@ ul.top-nav-icons {
 		-webkit-transform-style: preserve-3d;
 	}
 
+	.top-nav-support {
+		background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
+		width: auto;
+		padding: 0 6px 0 17px;
+	}
+
 	form {
 		position: relative;
 	}
@@ -401,6 +384,13 @@ ul.top-nav-icons {
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
+
+		@media (max-width: 1050px) {
+			width: 130px;
+		}
+
+		transition: width 0.5s;
+		-webkit-transition: width 0.5s;
 
 		&:focus {
 			background-color: $form-bg-color;
@@ -415,11 +405,11 @@ ul.top-nav-icons {
 }
 
 .top-subnav-container {
+	background-color: $main-subnav-bg-color;
 	height: 30px;
 	line-height: 30px;
-	background-color: $main-subnav-bg-color;
-	position: relative;
 	padding: 0 10px;
+	position: relative;
 }
 
 .top-subnav {
@@ -453,21 +443,21 @@ ul.top-nav-icons {
 		color: $link-main-subnav-hover-color;
 	}
 
-	&:focus {
-		color: $link-main-subnav-active-color;
-		padding: 8px 0 4px 0;
-		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
-		outline: none;
-	}
-
 	&:active {
 		color: $link-main-subnav-active-color;
 	}
 
-	&.selected {
+	&:focus {
+		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
 		color: $link-main-subnav-active-color;
-		padding: 8px 0 4px 0;
+		outline: none;
+		padding-bottom: 4px;
+	}
+
+	&.selected {
 		border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
+		color: $link-main-subnav-active-color;
+		padding-bottom: 4px;
 	}
 }
 
@@ -665,7 +655,7 @@ output {
 	margin: 10px 10px 0 0;
 
 	&:focus {
-	@include box-shadow(0 0 0 2px rgba($blue, .35));
+		@include box-shadow(0 0 0 2px rgba($blue, .35));
 	}
 }
 
@@ -676,6 +666,125 @@ output {
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
+	&.compact-view {
+		tr {
+			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
+
+				@if $theme_name == 'blue' {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							color: $font-color;
+
+							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
+								color: $font-color;
+								border-bottom-color: rgba($font-color, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+							}
+
+							.tag {
+								background-color: rgba($font-color, 0.5);
+							}
+
+							button:focus {
+								box-shadow: 0 0 0 2px rgba($font-color, 0.5);
+							}
+						}
+					}
+				}
+
+				@if $theme_name == 'dark' {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							color: black;
+
+							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
+								color: black;
+								border-bottom-color: rgba(black, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+							}
+
+							button:focus {
+								box-shadow: 0 0 0 2px rgba(black, 0.5);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.link-action {
+			color: $font-color;
+
+			&.red {
+				color: $red;
+			}
+
+			&.orange {
+				color: $orange;
+			}
+
+			&.yellow {
+				color: $dark-yellow;
+			}
+
+			&.green {
+				color: $green;
+			}
+
+			&:hover {
+				color: $link-hover-color;
+			}
+
+			&:focus {
+				color: $link-hover-color;
+			}
+		}
+
+		td {
+			padding: 2px 5px 2px 5px;
+			border-bottom: none;
+			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
+			color: $font-color;
+
+			.tag {
+				max-width: 40px;
+				margin: -2px 3px 0 0;
+				padding: 2px 3px;
+
+				@media screen and (min-width: 1200px) {
+					max-width: 71px;
+				}
+
+				@media screen and (min-width: 1400px) {
+					max-width: 102px;
+				}
+
+				@media screen and (min-width: 1600px) {
+					max-width: 133px;
+				}
+			}
+
+			.rel-container {
+				display: inline;
+			}
+
+			.icon-wzrd-action {
+				margin: 2px 0 0 2px;
+				height: 12px;
+				min-height: 12px;
+				background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px;
+			}
+		}
+	}
+
 	thead th {
 		color: $font-alt-color;
 		height: 100%;
@@ -685,6 +794,60 @@ output {
 		vertical-align: bottom;
 		border-bottom: 2px solid darken($table-border-color, 5%);
 		text-align: left;
+
+		&.column-tags-1 {
+			width: 75px;
+		}
+
+		&.column-tags-2 {
+			width: 124px;
+		}
+
+		&.column-tags-3 {
+			width: 173px;
+		}
+
+		@media screen and (min-width: 1200px) {
+			&.column-tags-1 {
+				width: 106px;
+			}
+
+			&.column-tags-2 {
+				width: 186px;
+			}
+
+			&.column-tags-3 {
+				width: 266px;
+			}
+		}
+
+		@media screen and (min-width: 1400px) {
+			&.column-tags-1 {
+				width: 137px;
+			}
+
+			&.column-tags-2 {
+				width: 248px;
+			}
+
+			&.column-tags-3 {
+				width: 359px;
+			}
+		}
+
+		@media screen and (min-width: 1600px) {
+			&.column-tags-1 {
+				width: 168px;
+			}
+
+			&.column-tags-2 {
+				width: 310px;
+			}
+
+			&.column-tags-3 {
+				width: 452px;
+			}
+		}
 
 		.arrow-up {
 			margin: 0 0 0 3px;
@@ -1123,13 +1286,21 @@ output {
 	}
 }
 
+.subfilter,
 .subfilter-enabled {
 	display: inline-block;
-	position: relative;
 	height: 18px;
-	padding: 0 4px;
-	color: $font-selected-color;
+	position: relative;
+}
+
+.subfilter {
+	margin-right: 10px;
+}
+
+.subfilter-enabled {
 	background-color: $ui-bg-selected-color;
+	color: $font-selected-color;
+	padding: 0 4px;
 	@include border-radius(2px);
 
 	.link-action {
@@ -1670,16 +1841,28 @@ output {
 		display: inline-block;
 		margin: 0 -1px 0 0;
 
-		&:first-child label {
-			@include border-radius(2px 0 0 2px);
+		&:first-child{
+			@include border-radius(3px 0 0 3px);
+
+			label {
+				@include border-radius(2px 0 0 2px);
+			}
 		}
 
-		&:last-child label {
-			@include border-radius(0 2px 2px 0);
+		&:last-child {
+			@include border-radius(0 3px 3px 0);
+
+			label {
+				@include border-radius(0 2px 2px 0);
+			}
 		}
 
-		&:only-child label {
-			@include border-radius(2px);
+		&:only-child {
+			@include border-radius(3px);
+
+			label {
+				@include border-radius(2px);
+			}
 		}
 	}
 
@@ -2417,7 +2600,7 @@ button[disabled] {
 		display: inline-block;
 
 		a {
-			@extend %no-border;
+			border: none;
 			padding: 8px 10px;
 			@include transition(background-color .2s ease-out);
 
@@ -2456,7 +2639,7 @@ button[disabled] {
 				cursor: default;
 				color: $btn-disabled-font-color;
 				background-color: $transparent;
-				@extend %no-border;
+				border: none;
 			}
 		}
 	}
@@ -3903,12 +4086,20 @@ a.link-action {
 		color: $red;
 	}
 
+	&.orange {
+		color: $orange;
+	}
+
+	&.yellow {
+		color: $dark-yellow;
+	}
+
 	&.green {
 		color: $green;
 	}
 
-	&.orange {
-		color: $orange;
+	&.grey {
+		color: $font-alt-color;
 	}
 
 	&:hover {
@@ -4238,7 +4429,21 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
+// Filter Checkboxes
+
+.table-forms-second-column {
+	display: inline-block;
+	width: 50%;
+	min-width: 200px;
+	text-align: right;
+
+	.second-column-label {
+		padding: 0 10px;
+	}
+}
+
 // Event status colors
+
 .problem-unack-fg {
 	color: $problem-unack-fg-color;
 }
@@ -4813,6 +5018,10 @@ tr.cursor-move {
 	.icon-info {
 		margin-right: 10px;
 
+		&:only-of-type {
+			margin-right: 0;
+		}
+
 		&:last-child {
 			margin-right: 0;
 		}
@@ -4999,7 +5208,7 @@ svg {
 			> .tree-row {
 				width: 100%;
 				min-width: 320px;
-				border-bottom: 1px solid $ui-border-color;
+				border-bottom: 1px solid $table-border-color;
 				padding: 8px 0;
 
 				&:hover {
@@ -5214,6 +5423,8 @@ svg {
 :placeholder-shown {
 	color: $input-placeholder-color;
 }
+
+@if $theme_name == 'dev' {
 
 /*doc
 ---
@@ -6107,3 +6318,4 @@ Widgets are used as containers to group any related information. Widget consists
 </div>
 ```
 */
+}

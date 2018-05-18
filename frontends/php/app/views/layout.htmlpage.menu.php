@@ -35,11 +35,18 @@ $user_menu = (new CList())
 	->setAttribute('role', 'navigation')
 	->setAttribute('aria-label', _('User menu'))
 	->addItem((new CListItem(
+			(new CLink('Support', 'https://www.zabbix.com/support/'))
+				->addClass(ZBX_STYLE_TOP_NAV_SUPPORT)
+				->setAttribute('target', '_blank')
+				->setTitle(_('Zabbix Technical Support'))
+		))->addStyle('padding-left:0')
+	)
+	->addItem((new CListItem(
 			(new CLink('Share', 'https://share.zabbix.com/'))
 				->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
 				->setAttribute('target', '_blank')
 				->setTitle(_('Zabbix Share'))
-		))->addStyle('padding-left: 0')
+		))
 	)
 	->addItem(
 		(new CLink(SPACE, 'http://www.zabbix.com/documentation/4.0/'))
@@ -130,6 +137,5 @@ if ($data['server_name'] !== '') {
 		(new CDiv())
 			->addItem($top_menu)
 			->addItem($sub_menu_div)
-			->addClass(ZBX_STYLE_NAV)
 	)
 	->show();

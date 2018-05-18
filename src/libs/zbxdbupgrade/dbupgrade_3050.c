@@ -748,6 +748,37 @@ static int	DBpatch_3050066(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050067(void)
+{
+	return DBdrop_field("config", "event_expire");
+}
+
+static int	DBpatch_3050068(void)
+{
+	return DBdrop_field("config", "event_show_max");
+}
+
+static int	DBpatch_3050069(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update widget_field"
+		" set name='itemids'"
+		" where name='itemid'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='plaintext'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -817,5 +848,8 @@ DBPATCH_ADD(3050063, 0, 1)
 DBPATCH_ADD(3050064, 0, 1)
 DBPATCH_ADD(3050065, 0, 1)
 DBPATCH_ADD(3050066, 0, 1)
+DBPATCH_ADD(3050067, 0, 1)
+DBPATCH_ADD(3050068, 0, 1)
+DBPATCH_ADD(3050069, 0, 1)
 
 DBPATCH_END()
