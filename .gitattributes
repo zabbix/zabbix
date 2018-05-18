@@ -352,6 +352,8 @@ src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
 tests/libs/zbxcommon/replace_key_params_dyn.yaml -text
+tests/libs/zbxcommshigh/zbx_tcp_recv_ext.yaml.no_zlib -text
+tests/libs/zbxcommshigh/zbx_tcp_recv_ext.yaml.with_zlib -text
 tests/libs/zbxdbcache/zbx_vc_add_values.yaml -text
 tests/libs/zbxdbcache/zbx_vc_get_values.yaml -text
 tests/libs/zbxhistory/zbx_history_get_values.yaml -text

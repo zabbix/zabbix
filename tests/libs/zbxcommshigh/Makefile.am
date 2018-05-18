@@ -63,3 +63,21 @@ zbx_tcp_recv_raw_ext_LDADD += @AGENT_LIBS@
 zbx_tcp_recv_raw_ext_LDFLAGS = @AGENT_LDFLAGS@
 
 zbx_tcp_recv_raw_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+## Separate test cases with compression and do not execute them with agent only configuration
+all: create-yaml
+
+if !SERVER
+create-yaml: zbx_tcp_recv_ext.yaml.no_zlib
+	cat zbx_tcp_recv_ext.yaml.no_zlib > zbx_tcp_recv_ext.yaml
+endif
+
+if SERVER
+create-yaml: zbx_tcp_recv_ext.yaml.no_zlib
+	cat zbx_tcp_recv_ext.yaml.with_zlib zbx_tcp_recv_ext.yaml.no_zlib > zbx_tcp_recv_ext.yaml
+endif
+
+rm-yaml:
+	rm -f zbx_tcp_recv_ext.yaml
+
+clean-local: rm-yaml
