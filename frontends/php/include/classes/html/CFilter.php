@@ -248,8 +248,7 @@ class CFilter extends CDiv {
 
 			foreach ($column_ranges as $range) {
 				$label = relativeDateToText($range[0], $range[1]);
-				$is_selected = parseRelativeDate($from, true) == parseRelativeDate($range[0], true)
-					&& parseRelativeDate($to, false) == parseRelativeDate($range[1], false);
+				$is_selected = relativeDateToText($from, $to) === $label;
 
 				$column->addItem((new CLink($label))
 					->setAttribute('data-from', $range[0])
