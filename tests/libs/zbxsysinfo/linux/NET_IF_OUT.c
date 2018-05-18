@@ -28,7 +28,6 @@ void	zbx_mock_test_entry(void **state)
 	AGENT_REQUEST		request;
 	AGENT_RESULT 		param_result;
 	zbx_mock_error_t	error;
-	zbx_mock_handle_t	init_param_handle;
 	const char		*init_param;
 	zbx_mock_handle_t	param_handle;
 	const char		*expected_param_value_string, *expected_return_string;
