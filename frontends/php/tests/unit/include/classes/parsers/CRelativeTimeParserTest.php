@@ -128,7 +128,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-1x', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'now'
+					'match' => 'now-1'
 				]
 			],
 			[
@@ -177,7 +177,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1x', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'now/M'
+					'match' => 'now/M-1'
 				]
 			],
 			[
@@ -250,6 +250,34 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 					'match' => 'now-777/d'
 				]
 			],
+			[
+				'now/M-300', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'now/M-300'
+				]
+			],
+			[
+				'now/M-300s', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'now/M-300s'
+				]
+			],
+			[
+				'now/M-777/d', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'now/M-777/d'
+				]
+			],
+			[
+				'now-300sTEXT', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'now-300s'
+				]
+			]
 		];
 	}
 
