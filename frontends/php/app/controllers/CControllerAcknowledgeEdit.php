@@ -132,13 +132,14 @@ class CControllerAcknowledgeEdit extends CController {
 			}
 
 			if (!$event_closed) {
-				$data['problem_can_be_closed'] = true;
 				$close_triggerids[$event['objectid']] = true;
+				// If at least one event is not closed, enable 'Close problem' checkbox.
+				$data['problem_can_be_closed'] = true;
+			}
 
-				// If event is not acknowledged and is not closed.
-				if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-					$data['problem_can_be_acknowledged'] = true;
-				}
+			if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+				// If at least one event is not acknowledged, enable 'Acknowledge' checkbox.
+				$data['problem_can_be_acknowledged'] = true;
 			}
 		}
 

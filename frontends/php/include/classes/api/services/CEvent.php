@@ -539,17 +539,17 @@ class CEvent extends CApiService {
 	 */
 	public function acknowledge(array $data) {
 		$data['eventids'] = zbx_toArray($data['eventids']);
+		$data['eventids'] = array_keys(array_flip($data['eventids']));
 
 		$this->validateAcknowledge($data);
 
-		$eventids = zbx_toHash($data['eventids']);
-
-		$acknowledgable_events = $this->get([
-			'output' => ['value', 'severity', 'acknowledged', 'objectid'],
-			'selectRelatedObject' => ['manual_close'],
-			'eventids' => $eventids,
+		$events = $this->get([
+			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid'],
+			'select_acknowledges' => ['action'],
+			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE,
 			'preservekeys' => true
 		]);
 
@@ -558,33 +558,29 @@ class CEvent extends CApiService {
 		$acknowledges = [];
 		$time = time();
 
-		foreach ($acknowledgable_events as $eventid => $event) {
+		foreach ($events as $eventid => $event) {
 			$action = ZBX_PROBLEM_UPDATE_NONE;
 			$old_severity = 0;
 			$new_severity = 0;
+			$message = '';
 
 			// Perform ZBX_PROBLEM_UPDATE_CLOSE action flag.
 			if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE
-					&& $event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
-					&& $event['value'] == TRIGGER_VALUE_TRUE) {
+					&& !$this->isEventClosed($event)) {
 				$action |= ZBX_PROBLEM_UPDATE_CLOSE;
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_ACKNOWLEDGE action flag.
 			if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-					&& $event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED
-					&& $event['value'] == TRIGGER_VALUE_TRUE) {
+					&& $event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 				$action |= ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
 				$ack_eventids[] = $eventid;
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE
-					&& $data['message'] !== '') {
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
 				$action |= ZBX_PROBLEM_UPDATE_MESSAGE;
-			}
-			else {
-				$data['message'] = '';
+				$message = $data['message'];
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
@@ -596,15 +592,18 @@ class CEvent extends CApiService {
 				$sev_change_eventids[] = $eventid;
 			}
 
-			$acknowledges[] = [
-				'userid' => self::$userData['userid'],
-				'eventid' => $eventid,
-				'clock' => $time,
-				'message' => $data['message'],
-				'action' => $action,
-				'old_severity' => $old_severity,
-				'new_severity' => $new_severity
-			];
+			// For some of selected events action might not pe performed, as event is already with given change.
+			if ($action != ZBX_PROBLEM_UPDATE_NONE) {
+				$acknowledges[] = [
+					'userid' => self::$userData['userid'],
+					'eventid' => $eventid,
+					'clock' => $time,
+					'message' => $message,
+					'action' => $action,
+					'old_severity' => $old_severity,
+					'new_severity' => $new_severity
+				];
+			}
 		}
 
 		// Make changes in problem and events tables.
@@ -690,7 +689,7 @@ class CEvent extends CApiService {
 			}
 		}
 
-		return ['eventids' => array_values($eventids)];
+		return ['eventids' => $data['eventids']];
 	}
 
 	/**
@@ -720,8 +719,6 @@ class CEvent extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 
-		$eventids = array_keys(array_flip($data['eventids']));
-
 		// Chack that at least one valid flag is set.
 		$min_action = ZBX_PROBLEM_UPDATE_CLOSE;
 		$max_action = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
@@ -733,31 +730,134 @@ class CEvent extends CApiService {
 			));
 		}
 
-		if (is_numeric($data['severity'])) {
-			$data['severity'] = intval($data['severity']);
+		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
+		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
+		$has_severity_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY);
+
+		$events = $this->get([
+			'output' => [],
+			'selectRelatedObject' => $has_close_action ? ['manual_close'] : null,
+			'eventids' => $data['eventids'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE
+		]);
+
+		/*
+		 * If at least one of following is given, API call should not be processed:
+		 * - eventid for OK event
+		 * - eventid with source, that is not trigger
+		 * - no read rights for related trigger
+		 * - unexisting eventid
+		 */
+		if (count($data['eventids']) != count($events)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-			$this->checkCanBeManuallyClosed($eventids);
+		$editable_events_count = $this->get([
+			'countOutput' => true,
+			'eventids' => $data['eventids'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'editable' => true
+		]);
+
+		if ($has_close_action) {
+			$this->checkCanBeManuallyClosed($events, $editable_events_count);
 		}
 
-		if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
-			$this->checkCanBeAcknowledged($eventids);
-		}
-
-		if (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE
-				&& $data['message'] === '') {
+		if ($has_message_action && $data['message'] === '') {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'message', _('cannot be empty'))
 			);
 		}
 
-		if (!in_array($data['severity'], range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1), true)
-				&& ($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
+		if ($has_severity_action) {
+			$this->checkCanChangeSeverity($data['eventids'], $editable_events_count, $data['severity']);
+		}
+	}
+
+	/**
+	 * Checks if events can be closed manually.
+	 *
+	 * @param array $events                 Array of event objects.
+	 * @param int   $editable_events_count  Count of editable events.
+	 *
+	 * @throws APIException         Throws an exception:
+	 *                               - If at least one event is not editable;
+	 *                               - If any of given event can be closed manually according the triggers
+	 *                                 configuration.
+	 */
+	protected function checkCanBeManuallyClosed(array $events, $editable_events_count) {
+
+		if (count($events) != $editable_events_count) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		foreach ($events as $event) {
+			if ($event['relatedObject']['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks if severity can be changed for all given events.
+	 *
+	 * @param array $events                 Array of event objects.
+	 * @param int   $editable_events_count  Count of editable events.
+	 * @param int   $severity               New severity.
+	 *
+	 * @throws APIException			Throws an exception:
+	 *                               - If unknown severity is given;
+	 *                               - If at least one event is not editable.
+	 */
+	protected function checkCanChangeSeverity(array $events, $editable_events_count, $severity) {
+
+		if (count($events) != $editable_events_count) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$validator = new CLimitedSetValidator([
+			'values' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+				TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
+			]
+		]);
+
+		if (!$validator->validate($severity)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'severity',
-				_s('unexpected value "%1$s"', $data['severity'])
+				_s('unexpected value "%1$s"', $severity)
 			));
 		}
+	}
+
+	/**
+	 * Checks if events is closed.
+	 *
+	 * @param array $event                              Event object.
+	 * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
+	 * @param array $event['acknowledges']              List of problem updates.
+	 * @param array $event['acknowledges'][]['action']  Action performed in update.
+	 *
+	 * @return boolean
+	 */
+	protected function isEventClosed(array $event) {
+
+		$event_closed = bccomp($event['r_eventid'], '0') ? true : false;
+
+		if (!$event_closed) {
+			foreach ($event['acknowledges'] as $acknowledge) {
+				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+					// If at least one manual close update was found, event is closing.
+					$event_closed = true;
+					break;
+				}
+			}
+		}
+
+		return $event_closed;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -986,126 +1086,6 @@ class CEvent extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Checks if at least one of given events can be acknowledged.
-	 *
-	 * Event can be acknowledged if (all criterias must fulfill):
-	 *  - event exists and is accessible;
-	 *  - event's source is trigger;
-	 *  - event is in PROBLEM state;
-	 *  - event is not already acknowledged.
-	 *
-	 * @param array $eventids       Array of event IDs.
-	 *
-	 * @throws APIException			Throws an exception:
-	 *                               - If at least one of given event doesn't exist or is not accessible;
-	 *                               - If at least one of given event is not a trigger event;
-	 *                               - If all given events are already acknowledged;
-	 *                               - If none of given event is not problem state.
-	 */
-	protected function checkCanBeAcknowledged(array $eventids) {
-		$allowed_events = $this->get([
-			'output' => ['value', 'acknowledged'],
-			'eventids' => $eventids,
-			'preservekeys' => true
-		]);
-
-		$event_can_be_acknowledged = false;
-
-		foreach ($eventids as $eventid) {
-			if (array_key_exists($eventid, $allowed_events)
-					&& $allowed_events[$eventid]['value'] == TRIGGER_VALUE_TRUE
-					&& $allowed_events[$eventid]['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-				$event_can_be_acknowledged = true;
-				break;
-			}
-		}
-
-		if ($event_can_be_acknowledged === false) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Cannot acknowledge problem. Possible reasons:\n1. %1$s \n2. %2$s \n3. %3$s \n4. %4$s',
-					_('No permissions to referred object or it does not exist'), // TODO VM: updated to translation we have, but final message has impropper case.
-					_('event is already acknowledged'),
-					_('event is not in PROBLEM state'),
-					_('event source is not trigger')
-				)
-			);
-		}
-	}
-
-	/**
-	 * Checks if at least one of given events can be closed manually.
-	 *
-	 * @param array $eventids       Array of event IDs.
-	 *
-	 * @throws APIException         Throws an exception:
-	 *                               - If at least one event does not exist or is not accessible;
-	 *                               - If none of given event is in problem state;
-	 *                               - If none of given event can be closed manually according the triggers
-	 *                                 configuration.
-	 */
-	protected function checkCanBeManuallyClosed(array $eventids) {
-		$events_count = $this->get([
-			'countOutput' => true,
-			'eventids' => $eventids,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'editable' => true
-		]);
-
-		if (count($eventids) != $events_count) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$events = $this->get([
-			'output' => ['r_eventid'],
-			'selectRelatedObject' => ['manual_close'],
-			'select_acknowledges' => ['action'],
-			'eventids' => $eventids,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'value' => TRIGGER_VALUE_TRUE
-		]);
-
-		if (count($events) == 0) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Cannot close problem: %1$s.', _('event is not in PROBLEM state'))
-			);
-		}
-
-		$problem_can_be_closed_manually = false;
-
-		foreach ($events as $event) {
-			if ($event['relatedObject']['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
-					|| $event['r_eventid'] != 0) {
-				continue;
-			}
-
-			// Check if it was manually closed.
-			$event_closed = false;
-
-			if ($event['acknowledges']) {
-				foreach ($event['acknowledges'] as $acknowledge) {
-					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-						$event_closed = true;
-						break;
-					}
-				}
-			}
-
-			if (!$event_closed) {
-				$problem_can_be_closed_manually = true;
-				break;
-			}
-		}
-
-		if (!$problem_can_be_closed_manually) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
-			);
-		}
 	}
 
 	/**
