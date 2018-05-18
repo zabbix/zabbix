@@ -56,6 +56,6 @@ zabbix_agentd_CFLAGS = \
 	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\""
 
 install-data-hook:
-	$(MKDIR_P) "@AGENT_CONFIG_FILE@.d"
-	$(MKDIR_P) "@LOAD_MODULE_PATH@"
-	test -f "@AGENT_CONFIG_FILE@" || cp "../../conf/zabbix_agentd.conf" "@AGENT_CONFIG_FILE@"
+	$(MKDIR_P) "$(DESTDIR)@AGENT_CONFIG_FILE@.d"
+	$(MKDIR_P) "$(DESTDIR)@LOAD_MODULE_PATH@"
+	test -f "$(DESTDIR)@AGENT_CONFIG_FILE@" || cp "../../conf/zabbix_agentd.conf" "$(DESTDIR)@AGENT_CONFIG_FILE@"

@@ -74,10 +74,6 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	libzbxproxy.a
 
-if PROXY_IPCSERVICE
-zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a
-endif
-
 zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
 
 if HAVE_IPMI
@@ -96,7 +92,7 @@ zabbix_proxy_CFLAGS = \
 	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\""
 
 install-data-hook:
-	$(MKDIR_P) "@PROXY_CONFIG_FILE@.d"
-	$(MKDIR_P) "@EXTERNAL_SCRIPTS_PATH@"
-	$(MKDIR_P) "@LOAD_MODULE_PATH@"
-	test -f "@PROXY_CONFIG_FILE@" || cp "../../conf/zabbix_proxy.conf" "@PROXY_CONFIG_FILE@"
+	$(MKDIR_P) "$(DESTDIR)@PROXY_CONFIG_FILE@.d"
+	$(MKDIR_P) "$(DESTDIR)@EXTERNAL_SCRIPTS_PATH@"
+	$(MKDIR_P) "$(DESTDIR)@LOAD_MODULE_PATH@"
+	test -f "$(DESTDIR)@PROXY_CONFIG_FILE@" || cp "../../conf/zabbix_proxy.conf" "$(DESTDIR)@PROXY_CONFIG_FILE@"
