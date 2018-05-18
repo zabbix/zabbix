@@ -90,7 +90,8 @@ class CControllerAcknowledgeEdit extends CController {
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
-			'problem_can_be_acknowledged' => false
+			'problem_can_be_acknowledged' => false,
+			'problem_severity_can_be_changed' => false
 		];
 
 		// Select events:
@@ -109,12 +110,11 @@ class CControllerAcknowledgeEdit extends CController {
 		}
 
 		// Loop through events to figure out what operations should be allowed.
-		$close_triggerids = []; // List of triggers with possibly closable problems. To check, if they can be closed.
-		$event_triggerids = []; // List of all triggers, to count related_problems_count
+		$triggerids = []; // List of all triggers, to count related_problems_count and check trigger mermissions
 
 		foreach ($events as $event) {
 			$event_closed = false;
-			$event_triggerids[$event['objectid']] = true;
+			$triggerids[$event['objectid']] = true;
 
 			// Find if event is in PROBLEM state; Then look if no ZBX_PROBLEM_UPDATE_CLOSE action flag.
 			// We can't close events, that already were resolved. We can't close "resolve" events.
@@ -132,7 +132,6 @@ class CControllerAcknowledgeEdit extends CController {
 			}
 
 			if (!$event_closed) {
-				$close_triggerids[$event['objectid']] = true;
 				// If at least one event is not closed, enable 'Close problem' checkbox.
 				$data['problem_can_be_closed'] = true;
 			}
@@ -146,32 +145,38 @@ class CControllerAcknowledgeEdit extends CController {
 		/**
 		 * If there are open problems, check if they can be closed manually.
 		 *
-		 * At least one of triggers in PROBLEM state should have read-write permissions and should have 'manual_close'
-		 * flag set to ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED.
-		 *
-		 * Even if it is found that problem is not closable due 'manual_close', it won't change the
-		 * problem_can_be_acknowledged anymore.
+		 * At least one of triggers in PROBLEM state.
+		 * All triggers should have read-write permissions and should have 'manual_close' flag set to
+		 * ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED.
 		 *
 		 * Additional API request is needed because through Event.get we cannot see which trigger is editable.
 		 */
-		if ($data['problem_can_be_closed']) {
-			$can_be_closed = (bool) API::Trigger()->get([
-				'output' => [],
-				'triggerids' => array_keys($close_triggerids),
-				'filter' => ['manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED],
-				'editable' => true,
-				'preservekeys' => true
-			]);
+		$triggers = API::Trigger()->get([
+			'output' => ['manual_close'],
+			'triggerids' => array_keys($triggerids),
+			'editable' => true
+		]);
 
-			if (!$can_be_closed) {
-				$data['problem_can_be_closed'] = false;
+		if (count($triggers) == count($triggerids)) {
+			$data['problem_severity_can_be_changed'] = true;
+
+			foreach ($triggers as $trigger) {
+				if ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED) {
+					// If at least one trigger does not have manual close, disable checkbox.
+					$data['problem_can_be_closed'] = false;
+					break;
+				}
 			}
+		}
+		else {
+			// No read-write permissions to at least one trigger
+			$data['problem_can_be_closed'] = false;
 		}
 
 		// Add number of selected and related problem events to count of selected resolved events.
 		$data['related_problems_count'] += API::Problem()->get([
 			'countOutput' => true,
-			'objectids' => array_keys($event_triggerids)
+			'objectids' => array_keys($triggerids)
 		]);
 
 		$response = new CControllerResponseData($data);
