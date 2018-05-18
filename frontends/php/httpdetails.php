@@ -196,11 +196,7 @@ zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($graph_in->ti
 $graph_time->insertFlickerfreeJs();
 
 // scroll
-CScreenBuilder::insertScreenStandardJs([
-	'timeline' => $graph_in->timeline,
-	'profileIdx' => $profileIdx,
-	'profileIdx2' => $profileIdx2
-]);
+CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
 // Create graphs widget.
 (new CWidget())

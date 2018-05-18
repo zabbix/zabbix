@@ -120,10 +120,6 @@ $widget
 		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 	);
 
-CScreenBuilder::insertScreenStandardJs([
-	'timeline' => $screenBuilder->timeline,
-	'profileIdx' => $screenBuilder->profileIdx,
-	'profileIdx2' => $screenBuilder->profileIdx2
-]);
+CScreenBuilder::insertScreenStandardJs($screenBuilder->timeline);
 
 return $widget;

@@ -98,17 +98,11 @@ if (!empty($this->data['graphid'])) {
 
 	$chartsWidget->addItem($chartTable);
 
-	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screen->timeline,
-		'profileIdx' => $screen->profileIdx,
-		'profileIdx2' => $screen->profileIdx2
-	]);
+	CScreenBuilder::insertScreenStandardJs($screen->timeline);
 }
 else {
 	$screen = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screen->timeline
-	]);
+	CScreenBuilder::insertScreenStandardJs($screen->timeline);
 
 	$chartsWidget->addItem(new CTableInfo());
 }

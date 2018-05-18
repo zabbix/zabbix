@@ -113,14 +113,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'show_timeselector' => self::showTimeSelector($this->dashboard['widgets']),
 			];
 
-			$options = [
-				'profileIdx' => 'web.dashbrd.filter',
-				'profileIdx2' => $this->dashboard['dashboardid']
-			];
-
 			$data['timeline'] = calculateTime([
-				'profileIdx' => $options['profileIdx'],
-				'profileIdx2' => $options['profileIdx2'],
+				'profileIdx' => 'web.dashbrd.filter',
+				'profileIdx2' => $this->dashboard['dashboardid'],
 				'updateProfile' => true,
 				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 				'to' => $this->hasInput('to') ? $this->getInput('to') : null

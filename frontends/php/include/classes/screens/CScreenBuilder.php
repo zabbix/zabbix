@@ -639,21 +639,15 @@ class CScreenBuilder {
 	 *
 	 * @static
 	 *
-	 * @param array $options
-	 * @param array $options['timeline']
-	 * @param string $options['profileIdx']
+	 * @param array $timeline
 	 */
-	public static function insertScreenScrollJs(array $options = []) {
-		$options['timeline'] = array_key_exists('timeline', $options) ? $options['timeline'] : '';
-		$options['profileIdx'] = array_key_exists('profileIdx', $options) ? $options['profileIdx'] : '';
-		$options['profileIdx2'] = array_key_exists('profileIdx2', $options) ? $options['profileIdx2'] : 0;
-
-		$timeControlData = [
+	private static function insertScreenScrollJs(array $timeline) {
+		$obj_data = [
 			'id' => 'scrollbar',
 			'mainObject' => 1
 		];
 
-		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($options['timeline']).', '.zbx_jsvalue($timeControlData).');');
+		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($obj_data).');');
 	}
 
 	/**
@@ -697,14 +691,12 @@ class CScreenBuilder {
 	/**
 	 * Insert javascript for standard screens.
 	 *
-	 * @param array $options
-	 * @param array $options['timeline']
-	 * @param string $options['profileIdx']
+	 * @param array $timeline
 	 *
 	 * @static
 	 */
-	public static function insertScreenStandardJs(array $options = []) {
-		CScreenBuilder::insertScreenScrollJs($options);
+	public static function insertScreenStandardJs(array $timeline) {
+		CScreenBuilder::insertScreenScrollJs($timeline);
 		CScreenBuilder::insertScreenRefreshTimeJs();
 		CScreenBuilder::insertProcessObjectsJs();
 	}

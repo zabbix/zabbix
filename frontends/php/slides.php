@@ -117,11 +117,7 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['s
 				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 				->toString();
 
-			CScreenBuilder::insertScreenStandardJs([
-				'timeline' => $screenBuilder->timeline,
-				'profileIdx' => $screenBuilder->profileIdx,
-				'profileIdx2' => $screenBuilder->profileIdx2
-			]);
+			CScreenBuilder::insertScreenStandardJs($screenBuilder->timeline);
 
 			insertPagePostJs();
 		}

@@ -25,7 +25,7 @@ $filter = new CFilter();
 
 if (empty($data['screen']) || empty($data['host'])) {
 	$screen_builder = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs(['timeline' => $screen_builder->timeline]);
+	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
 
 	$filter
 		->setProfile('web.screens.filter', 0)
@@ -94,11 +94,7 @@ else {
 			(new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 		);
 
-	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screen_builder->timeline,
-		'profileIdx' => $screen_builder->profileIdx,
-		'profileIdx2' => $screen_builder->profileIdx2
-	]);
+	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
 }
 
 return $screen_widget;
