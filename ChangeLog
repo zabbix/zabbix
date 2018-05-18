@@ -8,6 +8,7 @@ New features:
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-14345] fixed lock wait timeout error handling on MySQL to avoid possible data loss (vso)
 A.F....... [ZBX-13361] fixed error messages when configuring an existing item to have an update interval (miks)
 ...G...PS. [ZBX-14328] improved logging of command execution failures (vjaceslavs)
 ....I..... [ZBX-13803] fixed "make install" to respect DESTDIR variable, this is essential for packaging (dimir)
