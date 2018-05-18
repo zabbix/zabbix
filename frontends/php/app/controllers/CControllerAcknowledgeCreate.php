@@ -119,7 +119,8 @@ class CControllerAcknowledgeCreate extends CController {
 				]);
 				$triggerids = array_unique(zbx_objectValues($events, 'objectid'));
 
-				$last_eventid = '-1'; // keeps eventid of last updated problem in previous update bulk
+				// Keeps eventid of last updated problem in previous update bulk.
+				$last_eventid = '-1';
 
 				while ($result) {
 					// Update related events by trigger IDs. Selected events were already updated.
@@ -127,13 +128,13 @@ class CControllerAcknowledgeCreate extends CController {
 						'output' => ['eventid'],
 						'objectids' => $triggerids,
 						'preservekeys' => true,
-						'order' => 'eventids',
+						'sortfield' => 'eventid',
 						'eventid_from' => bcadd($last_eventid, 1, 0),
 						'limit' => ZBX_DB_MAX_INSERTS
 					]);
 
-					// Skip update for selected events
-					foreach($eventids as $id => $eventid){
+					// Skip update for selected events.
+					foreach ($eventids as $eventid){
 						unset($problems[$eventid]);
 					}
 
