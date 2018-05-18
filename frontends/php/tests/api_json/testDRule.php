@@ -60,6 +60,10 @@ class testDRule extends CZabbixTest {
 				'drule' => ['15'],
 				'expected_error' => 'Discovery rule "API discovery rule used in action" is used in "API action for Discovery check" action.'
 			],
+			[
+				'drule' => ['16'],
+				'expected_error' => 'Discovery rule "API discovery rule used in action 2" is used in "API action for Discovery rule" action.'
+			],
 			// Successfully delete action.
 			// Discovery rule without proxy
 			[
