@@ -46,7 +46,7 @@
 jQuery(function ($){
 	var container = $('#filter-space'),
 		xhr = null,
-		endpoint = new Curl('jsrpc.php'),
+		endpoint = new Curl('zabbix.php'),
 		element = {
 			from: container.find('[name=from]'),
 			to: container.find('[name=to]'),
@@ -67,13 +67,14 @@ jQuery(function ($){
 		},
 		ui_disabled = false;
 
+	endpoint.setArgument('action', 'timeselector.update');
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 
 	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout',
-		timeselectorEventHandler
+		timeSelectorEventHandler
 	);
 
-	// Time selectorm DOM elements event triggerers initialization.
+	// Time selector DOM elements event triggerers initialization.
 	container.on('click', function (e) {
 		var event = '',
 			data = {},
@@ -129,12 +130,10 @@ jQuery(function ($){
 	 *
 	 * @param {object} data Server response on 'timeselector.rangechange' request.
 	 */
-	function updateTimeselectorUI(data) {
-		var is_timestamp = /^\d+$/;
-
+	function updateTimeSelectorUI(data) {
 		if ('error' in data === false) {
-			element.from.val(is_timestamp.test(data['from']) ? data['from_date'] : data['from']);
-			element.to.val(is_timestamp.test(data['to']) ? data['to_date'] : data['to']);
+			element.from.val(data.from);
+			element.to.val(data.to);
 			element.label.text(data.label);
 		}
 
@@ -172,7 +171,7 @@ jQuery(function ($){
 	/**
 	 * Disable time selector UI.
 	 */
-	function disableTimeselectorUI() {
+	function disableTimeSelectorUI() {
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
 		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
@@ -212,26 +211,29 @@ jQuery(function ($){
 	 * @param {object} e        jQuery event object.
 	 * @param {object} data     Object with published data for event.
 	 */
-	function timeselectorEventHandler(e, data) {
-		endpoint.setArgument('method', [e.type, e.namespace].join('.'));
+	function timeSelectorEventHandler(e, data) {
+		var args = {
+			'idx': request_data.idx,
+			'idx2': request_data.idx2,
+			'from': (e.namespace === 'rangechange') ? data.from : request_data.from,
+			'to': (e.namespace === 'rangechange') ? data.to : request_data.to
+		};
+		endpoint.setArgument('method', e.namespace);
 
 		if (xhr && xhr.abort) {
 			return;
 		}
 
-		disableTimeselectorUI();
+		disableTimeSelectorUI();
 
-		xhr = $.post(endpoint.getUrl(),
-			$.extend(request_data, (e.namespace === 'rangechange') ? {from: data.from, to: data.to} : {}),
-			'json'
-		)
+		xhr = $.post(endpoint.getUrl(), args, 'json')
 			.success(function (json) {
-				request_data = $.extend(request_data, json.result);
+				request_data = $.extend(data, request_data, json, {event: e.namespace});
 				container.find('.red').remove();
-				updateTimeselectorUI($.extend(request_data, data, {event: e.namespace}));
+				updateTimeSelectorUI(request_data);
 
-				if (request_data.error) {
-					$.each(request_data.error, function(field, message) {
+				if (json.error) {
+					$.each(json.error, function(field, message) {
 						var input = $('#'+field);
 
 						if (input.length) {
@@ -370,7 +372,7 @@ jQuery(function ($){
 });
 
 /**
- * flickerfreeScreen refresh on timeselector change.
+ * flickerfreeScreen refresh on time selector change.
  */
 jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
 	if (window.flickerfreeScreen) {

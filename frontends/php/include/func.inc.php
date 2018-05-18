@@ -2609,9 +2609,7 @@ function calculateTime(array $options = []) {
  * @return string
  */
 function relativeDateToText($from, $to) {
-	$start = preg_replace('/[^-+\/0-9a-z]/i', '', $from);
-	$end = preg_replace('/[^-+\/0-9a-z]/i', '', $to);
-	$key = $start.':'.$end;
+	$relative = new CRelativeTimeParser();
 
 	$ranges = [
 		'now-1d/d:now-1d/d' => _('Yesterday'),
@@ -2630,59 +2628,61 @@ function relativeDateToText($from, $to) {
 		'now/y:now' => _('This year so far')
 	];
 
-	if (array_key_exists($key, $ranges)) {
-		return $ranges[$key];
-	}
+	if ($relative->parse($from) === CParser::PARSE_SUCCESS && $relative->parse($to) === CParser::PARSE_SUCCESS) {
+		$key = $from.':'.$to;
 
-	if ($end === 'now') {
-		list($count, $mod) = sscanf($start, 'now-%d%1s');
+		if (array_key_exists($key, $ranges)) {
+			return $ranges[$key];
+		}
 
-		if ($count > 0) {
-			$mod = $mod === null ? 's' : $mod;
+		if ($to === 'now') {
+			$relative->parse($from);
+			list($count, $mod) = sscanf($relative->getMatch(), 'now-%d%1s');
 
-			switch ($mod) {
-				case 's':
-					if ($count < 60 || $count % 60 != 0) {
-						return _n('Last %1$d second', 'Last %1$d seconds', $count);
-					}
-					$count = $count / 60;
-					// Break through and convert $count to minutes.
-				case 'm':
-					if ($count < 60 || $count % 60 != 0) {
-						return _n('Last %1$d minute', 'Last %1$d minutes', $count);
-					}
-					$count = $count / 60;
-					// Break through and convert $count to hours.
-				case 'h':
-					if ($count < 24 || $count % 24 != 0) {
-						return _n('Last %1$d hour', 'Last %1$d hours', $count);
-					}
-					$count = $count / 24;
-					// Break through and convert $count to days.
-				case 'd':
-					return _n('Last %1$d day', 'Last %1$d days', $count);
+			if ($count > 0) {
+				$mod = $mod === null ? 's' : $mod;
 
-				case 'M':
-					return _n('Last %1$d month', 'Last %1$d months', $count);
+				switch ($mod) {
+					case 's':
+						if ($count < 60 || $count % 60 != 0) {
+							return _n('Last %1$d second', 'Last %1$d seconds', $count);
+						}
+						$count = $count / 60;
+						// Break through and convert $count to minutes.
+					case 'm':
+						if ($count < 60 || $count % 60 != 0) {
+							return _n('Last %1$d minute', 'Last %1$d minutes', $count);
+						}
+						$count = $count / 60;
+						// Break through and convert $count to hours.
+					case 'h':
+						if ($count < 24 || $count % 24 != 0) {
+							return _n('Last %1$d hour', 'Last %1$d hours', $count);
+						}
+						$count = $count / 24;
+						// Break through and convert $count to days.
+					case 'd':
+						return _n('Last %1$d day', 'Last %1$d days', $count);
 
-				case 'y':
-					return _n('Last %1$d year', 'Last %1$d years', $count);
+					case 'M':
+						return _n('Last %1$d month', 'Last %1$d months', $count);
+
+					case 'y':
+						return _n('Last %1$d year', 'Last %1$d years', $count);
+				}
 			}
 		}
 	}
 
-	$range = [
-		parseRelativeDate($from, true), parseRelativeDate($to, false)
-	];
+	$absolute = new CAbsoluteTimeParser();
+	$from = $absolute->parse($from) === CParser::PARSE_SUCCESS
+		? (new DateTime($absolute->getMatch()))
+		: (new DateTime())->setTimestamp($from);
+	$to = $absolute->parse($to) === CParser::PARSE_SUCCESS
+		? (new DateTime($absolute->getMatch()))
+		: (new DateTime())->setTimestamp($to);
 
-	foreach ($range as &$date) {
-		if ($date !== null) {
-			$date = $date->format(ZBX_DATE_TIME);
-		}
-	}
-	unset($date);
-
-	return implode(' - ', $range);
+	return implode(' - ', [$from->format(ZBX_DATE_TIME), $to->format(ZBX_DATE_TIME)]);
 }
 
 /**
