@@ -8,6 +8,7 @@ New features:
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
+........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
 .......PS. [ZBX-14345] fixed lock wait timeout error handling on MySQL to avoid possible data loss (vso)
 A.F....... [ZBX-13361] fixed error messages when configuring an existing item to have an update interval (miks)
 ...G...PS. [ZBX-14328] improved logging of command execution failures (vjaceslavs)
@@ -311,6 +312,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
 A.F....... [ZBX-13361] fixed error messages when configuring an existing item to have an update interval (miks)
 ........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
 ........S. [ZBX-14312] fixed possible deadlock in history syncer when housekeeper is deleting events (vso)
@@ -1550,6 +1552,7 @@ Changes for 3.0.18rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
 ........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
 A.F....... [ZBX-13774] fixed creating and updating items with multiple specific scheduling intervals (Ivo)
 ..F....... [ZBX-12175] fixed subfilter entries with long names going off the screen (agriscenko, Andzs)

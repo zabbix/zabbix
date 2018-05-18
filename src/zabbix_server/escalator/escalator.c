@@ -709,7 +709,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	}
 
 	now = (int)time(NULL);
-	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, NULL == command ? "" : command);
+	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(command));
 
 	if (NULL == r_event)
 	{
@@ -1051,6 +1051,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 			}
 		}
+		else
+			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
 
 		alertid = DBget_maxid("alerts");
 
