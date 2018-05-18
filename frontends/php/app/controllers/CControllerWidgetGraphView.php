@@ -65,10 +65,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$dataid = 'graph_'.$uniqueid;
 		$containerid = 'graph_container_'.$uniqueid;
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
-		$dashboardid = $this->getInput('dashboardid', 0);
 		$resourceid = null;
 		$profileIdx = 'web.dashbrd.filter';
-		$profileIdx2 = $dashboardid;
+		$profileIdx2 = $this->getInput('dashboardid', 0);
 		$unavailable_object = false;
 		$header_label = '';
 
