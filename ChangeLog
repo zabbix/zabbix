@@ -1,11 +1,14 @@
 Changes for 4.0.0alpha7
 
 New features:
+..F....... [ZBXNEXT-4526] increased tags column size in Compact view mode (agriscenko)
 ..F....... [ZBXNEXT-4528] added link to Zabbix official support page (Andzs, ashubin)
 ........S. [ZBXNEXT-4520] added values to boolean mapping: "ok, master" as 1 and "err, slave" as 0 (viktors)
 ..F....... [ZBXNEXT-4185] added support of multiple items in "Plain text" widget (ashubin)
+........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
+A.F....... [ZBX-13361] fixed error messages when configuring an existing item to have an update interval (miks)
 ...G...PS. [ZBX-14328] improved logging of command execution failures (vjaceslavs)
 ....I..... [ZBX-13803] fixed "make install" to respect DESTDIR variable, this is essential for packaging (dimir)
 ..F....... [ZBX-12603] fixed tab navigation and keyboard interaction in dashboard sharing and properties dialogues; added validation inside popups (miks, vmurzins)
@@ -307,6 +310,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-13361] fixed error messages when configuring an existing item to have an update interval (miks)
 ........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
 ........S. [ZBX-14312] fixed possible deadlock in history syncer when housekeeper is deleting events (vso)
 ..F....... [ZBX-13697] fixed session expiration when changing default authentication method (miks)

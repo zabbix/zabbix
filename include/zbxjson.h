@@ -193,6 +193,7 @@ int		zbx_json_count(const struct zbx_json_parse *jp);
 const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, int *is_null);
 void		zbx_json_escape(char **string);
 
+int	zbx_json_path_check(const char *path, char * error, size_t errlen);
 int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
 void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc);
 
