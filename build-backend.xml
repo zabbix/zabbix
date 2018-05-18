@@ -319,7 +319,7 @@
 		<mkdir dir="tests_results/html"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
-			<arg line="."/>
+			<arg line="src"/>
 			<arg line="-zerocounters"/>
 		</exec>
 		<exec executable="./bootstrap.sh" failonerror="on"/>
