@@ -628,19 +628,5 @@ var timeControl = {
 				to_ts: data.to_ts
 			});
 		}
-	},
-
-	objectReset: function(from, to) {
-		if (this.refreshPage) {
-			var url = new Curl(location.href);
-			url.setArgument('from', from);
-			url.setArgument('to', to);
-			url.unsetArgument('output');
-
-			location.href = url.getUrl();
-		}
-		else {
-			jQuery.publish('timeselector.rangechange', {from: from, to: to});
-		}
 	}
 };

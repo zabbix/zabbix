@@ -171,8 +171,7 @@ $icon-btn: (
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -295px,
 	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -329px,
 	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -367px,
-	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -403px,
-	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -439px
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -403px
 );
 
 @each $icon-btn, $bgimage in $icon-btn {

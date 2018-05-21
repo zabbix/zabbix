@@ -75,7 +75,6 @@ $details_screen = CScreenBuilder::getScreen([
 		(new CForm())
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
 				->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
 			)
 		))

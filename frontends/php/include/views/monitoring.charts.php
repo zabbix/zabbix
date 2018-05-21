@@ -52,7 +52,6 @@ if ($this->data['graphid']) {
 	$content_control->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid',
 		'elid' => $this->data['graphid']])
 	);
-	$content_control->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
 }
 
 $content_control->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));

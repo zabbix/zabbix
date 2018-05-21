@@ -208,12 +208,6 @@ function get_icon($type, $params = []) {
 		case 'overviewhelp':
 			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_INFO);
-
-		case 'reset':
-			return (new CRedirectButton(SPACE, null))
-				->addClass(ZBX_STYLE_BTN_RESET)
-				->setTitle(_('Reset'))
-				->onClick('timeControl.objectReset("'.ZBX_PERIOD_DEFAULT.'", "now");');
 	}
 }
 
