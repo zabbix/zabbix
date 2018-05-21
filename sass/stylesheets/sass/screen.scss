@@ -2402,14 +2402,21 @@ $icon-widget-btn: (
 
 
 .time-quick {
-	font-size: 14px;
-	line-height: 1.5em;
+	font-size: 12px;
+	line-height: 20px;
 
 	li {
+
+		&:last-of-type {
+			a {
+				margin-bottom: 0;
+			}
+		}
+
 		a {
 			display: inline-block;
 			padding: 2px 10px;
-			margin-bottom: 4px;
+			margin-bottom: 2px;
 			margin-left: -10px;
 			border-bottom: 0;
 
@@ -2444,9 +2451,17 @@ $icon-widget-btn: (
 
 	.time-input {
 		border-right: 1px solid $ui-border-color;
-		padding: 10px 30px 10px 10px;
+		padding: 0 30px 0 10px;
 		text-align: right;
 		white-space: nowrap;
+
+		.time-input-error {
+			margin: -8px 32px 0 0;
+		}
+
+		ul {
+			padding: 0 0 10px 0;
+		}
 
 		li {
 			display: inline-block;
@@ -2470,7 +2485,7 @@ $icon-widget-btn: (
 			display: inline-flex;
 			vertical-align: top;
 			text-align: left;
-			margin: 10px;
+			margin: 0 10px 0 10px;
 		}
 
 		.time-quick-selected {
@@ -2480,22 +2495,6 @@ $icon-widget-btn: (
 			color: $font-selected-color;
 			background-color: $ui-bg-selected-color;
 			border-bottom: 0;
-		}
-	}
-
-	@media (max-width: 1280px) {
-		flex-direction: column-reverse;
-
-		.time-input {
-			align-self: flex-end;
-			border-top: 1px solid $ui-border-color;
-			border-right: none;
-			padding: 20px 0 10px 10px;
-			margin: 20px 20px 0 0;
-		}
-
-		.time-quick-range {
-			align-self: flex-end;
 		}
 	}
 }
