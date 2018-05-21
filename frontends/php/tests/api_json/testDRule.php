@@ -125,7 +125,7 @@ class testDRule extends CZabbixTest {
 	 * @dataProvider getDRuleUserPermissionsData
 	 */
 	public function testDRule_Permissions($login, $drule, $expected_error) {
-		$sql = 'SELECT * FROM drules ORDER BY actionid';
+		$sql = 'SELECT * FROM drules ORDER BY druleid';
 		$old_drule=DBhash($sql);
 
 		$this->authorize($login['user'], $login['password']);
