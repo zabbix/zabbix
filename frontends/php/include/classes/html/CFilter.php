@@ -47,11 +47,11 @@ class CFilter extends CDiv {
 	 */
 	protected $time_ranges = [
 		[
-			['now-2d/d', 'now'],
-			['now-7d/d', 'now'],
-			['now-30d/d', 'now'],
-			['now-3M/M', 'now'],
-			['now-6M/M', 'now'],
+			['now-2d', 'now'],
+			['now-7d', 'now'],
+			['now-30d', 'now'],
+			['now-3M', 'now'],
+			['now-6M', 'now'],
 			['now-1y', 'now'],
 			['now-2y', 'now']
 		],

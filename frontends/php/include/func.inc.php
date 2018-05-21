@@ -2654,7 +2654,7 @@ function relativeDateToText($from, $to) {
 					// break; is not missing here.
 
 				case 'h':
-					if ($count < 24 || $count % 24 != 0) {
+					if ($count < 25 || $count % 24 != 0) {
 						return _n('Last %1$d hour', 'Last %1$d hours', $count);
 					}
 					$count = $count / 24;
