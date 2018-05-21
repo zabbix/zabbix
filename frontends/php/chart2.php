@@ -121,20 +121,9 @@ foreach ($dbGraph['hosts'] as $gItemHost) {
 	}
 }
 
-$from = parseRelativeDate($timeline['from'], true);
-$to = parseRelativeDate($timeline['to'], false);
-
-if ($from === null || $to === null) {
-	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
-	$to = parseRelativeDate('now', false);
-}
-
-$from = $from->getTimestamp();
-$to = $to->getTimestamp();
-
 $graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
-$graph->setPeriod($to - $from);
-$graph->setSTime($from);
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
 
 $width = getRequest('width', 0);
 if ($width <= 0) {

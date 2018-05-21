@@ -145,23 +145,12 @@ $timeline = calculateTime([
 	'to' => getRequest('to')
 ]);
 
-$from = parseRelativeDate($timeline['from'], true);
-$to = parseRelativeDate($timeline['to'], false);
-
-if ($from === null || $to === null) {
-	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
-	$to = parseRelativeDate('now', false);
-}
-
-$from = $from->getTimestamp();
-$to = $to->getTimestamp();
-
 CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
 
 $graph = new CLineGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
 $graph->setHeader($name);
-$graph->setPeriod($to - $from);
-$graph->setSTime($from);
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
 $graph->setWidth(getRequest('width', 900));
 $graph->setHeight(getRequest('height', 200));
 $graph->showLegend(getRequest('legend', 1));

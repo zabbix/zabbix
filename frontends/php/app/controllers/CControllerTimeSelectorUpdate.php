@@ -24,25 +24,32 @@
  */
 class CControllerTimeSelectorUpdate extends CController {
 
-	private $data = [];
-	private $relative_parser;
-	private $absolute_parser;
+	/**
+	 * @var CRangeTimeParser
+	 */
+	private $range_time_parser;
 
-	protected function init() {
-		$this->relative_parser = new CRelativeTimeParser();
-		$this->absolute_parser = new CAbsoluteTimeParser();
+	private $data = [];
+
+	public function __construct() {
+		$this->range_time_parser = new CRangeTimeParser();
 	}
 
 	protected function checkInput() {
+		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.graphs.filter', 'web.httpdetails.filter',
+			'web.problem.filter', 'web.auditlogs.filter', 'web.slides.filter', 'web.auditacts.filter',
+			'web.item.graph.filter'
+		];
+
 		$fields = [
-			'method' => 'required|string|in increment,zoomout,decrement,rangechange',
-			'idx' => 'required|string',
+			'method' => 'required|in increment,zoomout,decrement,rangechange',
+			'idx' => 'required|in '.implode(',', $profiles),
 			'idx2' => 'required|id',
 			'from' => 'required|string',
 			'to' => 'required|string'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateProfile() && $this->validateInputDate();
+		$ret = $this->validateInput($fields) && $this->validateInputDateRange();
 
 		if (!$ret) {
 			$this->data += [
@@ -63,46 +70,71 @@ class CControllerTimeSelectorUpdate extends CController {
 
 	protected function doAction() {
 		$method = $this->getInput('method');
-		$from = $this->getInput('from');
-		$to = $this->getInput('to');
-		$now_ts = time();
-		$min_ts = $now_ts - ZBX_MAX_PERIOD;
-		$from_ts = parseRelativeDate($from, true)->getTimestamp();
-		$to_ts = parseRelativeDate($to, false)->getTimestamp();
-		$interval = $to_ts - $from_ts + 1;
-		$data = [];
-		$datetime = new DateTime();
+		$date = new DateTime();
+		$value = [];
+		$ts = [];
+		$ts['now'] = time();
+
+		foreach (['from', 'to'] as $field) {
+			$value[$field] = $this->getInput($field);
+
+			if ($this->range_time_parser->parse($value[$field]) !== CParser::PARSE_SUCCESS) {
+				$this->data['error'][$field] = _('Invalid date.');
+			}
+
+			$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
+		}
+
+		$period = $ts['to'] - $ts['from'] + 1;
 
 		switch ($method) {
 			case 'decrement':
-				$interval *= -1;
+				$offset = $period;
+
+				if ($ts['from'] - $offset < 0) {
+					$offset = $ts['from'];
+				}
+
+				$ts['from'] -= $offset;
+				$ts['to'] -= $offset;
+
+				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
+				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
+				break;
 
 			case 'increment':
-				$from_ts += $interval;
-				$to_ts += $interval;
-				$from = $datetime->setTimestamp($from_ts)->format(ZBX_DATE_TIME);
-				$to = $datetime->setTimestamp($to_ts)->format(ZBX_DATE_TIME);
+				$offset = $period;
+
+				if ($ts['to'] + $offset > $ts['now']) {
+					$offset = $ts['now'] - $ts['to'];
+				}
+
+				$ts['from'] += $offset;
+				$ts['to'] += $offset;
+
+				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
+				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
 				break;
 
 			case 'zoomout':
-				$from_ts -= floor($interval / 2);
-				$to_ts += floor($interval / 2);
-
-				if ($to_ts > $now_ts) {
-					$from_ts -= $to_ts - $now_ts;
+				$right_offset = (int) ($period / 2);
+				if ($ts['to'] + $right_offset > $ts['now']) {
+					$right_offset = $ts['now'] - $ts['to'];
+				}
+				$left_offset = $period - $right_offset;
+				if ($ts['from'] - $left_offset < 0) {
+					$left_offset = $ts['from'];
 				}
 
-				if ($from_ts < $min_ts) {
-					$to_ts += $min_ts - $from_ts;
-					$from_ts = $min_ts;
+				$ts['from'] -= $left_offset;
+				$ts['to'] += $right_offset;
+
+				if ($ts['to'] - $ts['from'] > ZBX_MAX_PERIOD) {
+					$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD;
 				}
 
-				if ($to_ts > $now_ts) {
-					$to_ts = $now_ts;
-				}
-
-				$from = $datetime->setTimestamp($from_ts)->format(ZBX_DATE_TIME);
-				$to = $datetime->setTimestamp($to_ts)->format(ZBX_DATE_TIME);
+				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
+				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
 				break;
 		}
 
@@ -110,24 +142,22 @@ class CControllerTimeSelectorUpdate extends CController {
 			'profileIdx' => $this->getInput('idx'),
 			'profileIdx2' => $this->getInput('idx2'),
 			'updateProfile' => true,
-			'from' => $from,
-			'to' => $to
+			'from' => $value['from'],
+			'to' => $value['to']
 		]);
 
-		$data += [
-			'label' => relativeDateToText($from, $to),
-			'from' => $from,
-			'from_ts' => $from_ts,
-			'from_date' => $datetime->setTimestamp($from_ts)->format(ZBX_DATE_TIME),
-			'to' => $to,
-			'to_ts' => $to_ts,
-			'to_date' => $datetime->setTimestamp($to_ts)->format(ZBX_DATE_TIME),
-			'can_zoomout' => $from_ts > $min_ts || $to_ts < $now_ts,
-			'can_decrement' => $from_ts - $range >= $min_ts,
-			'can_increment' => $to_ts + $range <= $now_ts
-		];
-
-		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($data)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
+			'label' => relativeDateToText($value['from'], $value['to']),
+			'from' => $value['from'],
+			'from_ts' => $ts['from'],
+			'from_date' => $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME),
+			'to' => $value['to'],
+			'to_ts' => $ts['to'],
+			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME),
+			'can_zoomout' => ($ts['to'] - $ts['from'] < ZBX_MAX_PERIOD),
+			'can_decrement' => ($ts['from'] > 0),
+			'can_increment' => ($ts['to'] < $ts['now'])
+		])]));
 	}
 
 	/**
@@ -135,53 +165,33 @@ class CControllerTimeSelectorUpdate extends CController {
 	 *
 	 * @return bool
 	 */
-	protected function validateInputDate() {
-		$error = [];
+	protected function validateInputDateRange() {
+		$this->data['error'] = [];
+		$ts = [];
 
 		foreach (['from', 'to'] as $field) {
 			$value = $this->getInput($field);
 
-			if ($this->relative_parser->parse($value) !== CParser::PARSE_SUCCESS
-					&& $this->absolute_parser->parse($value) !== CParser::PARSE_SUCCESS) {
-				$error[$field] = _s('Invalid date "%s".', $value);
+			if ($this->range_time_parser->parse($value) !== CParser::PARSE_SUCCESS) {
+				$this->data['error'][$field] = _('Invalid date.');
 			}
+
+			$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
 		}
 
-		$from = parseRelativeDate($this->getInput('from'), true);
-		$to = parseRelativeDate($this->getInput('to'), false);
-		$interval = ($from !== null && $to !== null) ? $to->getTimestamp() - $from->getTimestamp() : null;
+		$period = $ts['to'] - $ts['from'];
 
-		if ($interval !== null && $interval > ZBX_MAX_PERIOD) {
-			$error['from'] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.',
-				(int) ZBX_MAX_PERIOD / SEC_PER_DAY
+		if ($period < ZBX_MIN_PERIOD) {
+			$this->data['error']['from'] = _n('Minimum time period to display is %1$s minute.',
+				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
 			);
 		}
-		elseif ($interval !== null && $interval < ZBX_MIN_PERIOD) {
-			$error['from'] = _n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.',
-				(int) ZBX_MIN_PERIOD / SEC_PER_MIN
+		elseif ($period > ZBX_MAX_PERIOD) {
+			$this->data['error']['from'] = _n('Maximum time period to display is %1$s day.',
+				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
 			);
 		}
 
-		if ($error) {
-			$this->data['error'] = $error;
-		}
-
-		return ($error == []);
-	}
-
-	/**
-	 * Validates profile 'idx' string value. Return true on success.
-	 *
-	 * @return bool
-	 */
-	function validateProfile() {
-		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.graphs.filter', 'web.httpdetails.filter',
-			'web.problem.filter', 'web.item.graph', 'web.auditlogs.filter', 'web.slides.filter', 'web.auditacts.filter',
-			'web.item.graph.filter'
-		];
-
-		return in_array($this->getInput('idx'), $profiles);
+		return !$this->data['error'];
 	}
 }

@@ -30,6 +30,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [],
 					'match' => 'now'
 				]
 			],
@@ -37,6 +38,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/y', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'y']
+					],
 					'match' => 'now/y'
 				]
 			],
@@ -44,6 +48,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M']
+					],
 					'match' => 'now/M'
 				]
 			],
@@ -51,6 +58,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w']
+					],
 					'match' => 'now/w'
 				]
 			],
@@ -58,6 +68,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/d', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'd']
+					],
 					'match' => 'now/d'
 				]
 			],
@@ -65,6 +78,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/h', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'h']
+					],
 					'match' => 'now/h'
 				]
 			],
@@ -72,6 +88,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/m', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'm']
+					],
 					'match' => 'now/m'
 				]
 			],
@@ -79,6 +98,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/s', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [],
 					'match' => 'now'
 				]
 			],
@@ -86,6 +106,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-1y', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'y']
+					],
 					'match' => 'now-1y'
 				]
 			],
@@ -93,6 +116,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-1M', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'M']
+					],
 					'match' => 'now-1M'
 				]
 			],
@@ -100,6 +126,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-1w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'w']
+					],
 					'match' => 'now-1w'
 				]
 			],
@@ -107,6 +136,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-1h', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'h']
+					],
 					'match' => 'now-1h'
 				]
 			],
@@ -114,6 +146,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-1m', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'm']
+					],
 					'match' => 'now-1m'
 				]
 			],
@@ -121,6 +156,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-1s', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 's']
+					],
 					'match' => 'now-1s'
 				]
 			],
@@ -128,6 +166,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-1x', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 's']
+					],
 					'match' => 'now-1'
 				]
 			],
@@ -135,6 +176,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1y', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'y']
+					],
 					'match' => 'now/M-1y'
 				]
 			],
@@ -142,6 +187,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1M', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'M']
+					],
 					'match' => 'now/M-1M'
 				]
 			],
@@ -149,6 +198,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'w']
+					],
 					'match' => 'now/M-1w'
 				]
 			],
@@ -156,6 +209,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1h', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'h']
+					],
 					'match' => 'now/M-1h'
 				]
 			],
@@ -163,6 +220,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1m', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'm']
+					],
 					'match' => 'now/M-1m'
 				]
 			],
@@ -170,6 +231,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1s', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 's']
+					],
 					'match' => 'now/M-1s'
 				]
 			],
@@ -177,6 +242,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1x', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 's']
+					],
 					'match' => 'now/M-1'
 				]
 			],
@@ -184,6 +253,11 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1y/w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'y'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w']
+					],
 					'match' => 'now/M-1y/w'
 				]
 			],
@@ -191,6 +265,11 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1M/w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w']
+					],
 					'match' => 'now/M-1M/w'
 				]
 			],
@@ -198,6 +277,11 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1w/w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'w'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w']
+					],
 					'match' => 'now/M-1w/w'
 				]
 			],
@@ -205,6 +289,11 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1h/w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'h'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w']
+					],
 					'match' => 'now/M-1h/w'
 				]
 			],
@@ -212,6 +301,11 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1m/w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'm'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w']
+					],
 					'match' => 'now/M-1m/w'
 				]
 			],
@@ -219,6 +313,11 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1s/w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 's'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w']
+					],
 					'match' => 'now/M-1s/w'
 				]
 			],
@@ -226,6 +325,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-1s/x', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 's']
+					],
 					'match' => 'now/M-1s'
 				]
 			],
@@ -233,6 +336,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-300', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '300', 'suffix' => 's']
+					],
 					'match' => 'now-300'
 				]
 			],
@@ -240,6 +346,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-300s', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '300', 'suffix' => 's']
+					],
 					'match' => 'now-300s'
 				]
 			],
@@ -247,6 +356,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-777/d', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '777', 'suffix' => 's'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'd']
+					],
 					'match' => 'now-777/d'
 				]
 			],
@@ -254,6 +367,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-300', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '300', 'suffix' => 's']
+					],
 					'match' => 'now/M-300'
 				]
 			],
@@ -261,6 +378,10 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-300s', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '300', 'suffix' => 's']
+					],
 					'match' => 'now/M-300s'
 				]
 			],
@@ -268,6 +389,11 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now/M-777/d', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '777', 'suffix' => 's'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'd']
+					],
 					'match' => 'now/M-777/d'
 				]
 			],
@@ -275,6 +401,9 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'now-300sTEXT', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '300', 'suffix' => 's'],
+					],
 					'match' => 'now-300s'
 				]
 			]
@@ -293,6 +422,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
+			'tokens' => $parser->getTokens(),
 			'match' => $parser->getMatch()
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());

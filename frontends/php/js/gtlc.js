@@ -234,7 +234,7 @@ jQuery(function ($){
 
 				if (json.error) {
 					$.each(json.error, function(field, message) {
-						var input = $('#'+field);
+						var input = $('#' + field);
 
 						if (input.length) {
 							$('<div class="red"/>').css({position: 'absolute'}).text(message).insertAfter(input);

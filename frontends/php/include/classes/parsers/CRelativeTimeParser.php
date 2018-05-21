@@ -24,6 +24,14 @@
  */
 class CRelativeTimeParser extends CParser {
 
+	const ZBX_TOKEN_PRECISION = 0;
+	const ZBX_TOKEN_OFFSET = 1;
+
+	/**
+	 * @var array $tokens  An array of tokens for relative date.
+	 */
+	private $tokens;
+
 	/**
 	 * Parse the given period.
 	 *
@@ -33,10 +41,11 @@ class CRelativeTimeParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->tokens = [];
 
 		$p = $pos;
 
-		if (!self::parseRelativeTime($source, $p)) {
+		if (!$this->parseRelativeTime($source, $p)) {
 			return self::PARSE_FAIL;
 		}
 
@@ -54,19 +63,53 @@ class CRelativeTimeParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private static function parseRelativeTime($source, &$pos) {
+	private function parseRelativeTime($source, &$pos) {
 		$pattern_precision = '\/[yMwdhm]';
 		$pattern_precision1 = '(?P<precision1>'.$pattern_precision.')';
 		$pattern_precision2 = '(?P<precision2>'.$pattern_precision.')';
-		$pattern_offset = '(?P<offset>[0-9]+[yMwdhms]?)';
-		$pattern = 'now'.$pattern_precision1.'?([+-]'.$pattern_offset.$pattern_precision2.'?)?';
+		$pattern_offset = '(?P<offset>(?P<offset_sign>[+-])(?P<offset_value>[0-9]+)(?P<offset_suffix>[yMwdhms])?)';
+		$pattern = 'now'.$pattern_precision1.'?('.$pattern_offset.$pattern_precision2.'?)?';
 
 		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
 			return false;
 		}
 
+		if (array_key_exists('precision1', $matches) && $matches['precision1'] !== '') {
+			$this->tokens[] = [
+				'type' => self::ZBX_TOKEN_PRECISION,
+				'suffix' => substr($matches['precision1'], 1)
+			];
+		}
+
+		if (array_key_exists('offset', $matches) && $matches['offset'] !== '') {
+			$this->tokens[] = [
+				'type' => self::ZBX_TOKEN_OFFSET,
+				'sign' => $matches['offset_sign'],
+				'value' => $matches['offset_value'],
+				'suffix' => (array_key_exists('offset_suffix', $matches) && $matches['offset_suffix'] !== '')
+					? $matches['offset_suffix']
+					: 's'
+			];
+		}
+
+		if (array_key_exists('precision2', $matches) && $matches['precision2'] !== '') {
+			$this->tokens[] = [
+				'type' => self::ZBX_TOKEN_PRECISION,
+				'suffix' => substr($matches['precision2'], 1)
+			];
+		}
+
 		$pos += strlen($matches[0]);
 
 		return true;
+	}
+
+	/**
+	 * Returns an array of tokens.
+	 *
+	 * @return array
+	 */
+	public function getTokens() {
+		return $this->tokens;
 	}
 }

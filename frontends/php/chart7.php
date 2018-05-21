@@ -96,21 +96,10 @@ $timeline = calculateTime([
 	'to' => getRequest('to')
 ]);
 
-$from = parseRelativeDate($timeline['from'], true);
-$to = parseRelativeDate($timeline['to'], false);
-
-if ($from === null || $to === null) {
-	$from = parseRelativeDate(ZBX_PERIOD_DEFAULT, true);
-	$to = parseRelativeDate('now', false);
-}
-
-$from = $from->getTimestamp();
-$to = $to->getTimestamp();
-
 $graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
 $graph->setHeader(getRequest('name', ''));
-$graph->setPeriod($from - $to);
-$graph->setSTime($from);
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
 
 if (!empty($_REQUEST['graph3d'])) {
 	$graph->switchPie3D();

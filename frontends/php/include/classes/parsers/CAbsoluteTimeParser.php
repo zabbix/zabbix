@@ -25,6 +25,13 @@
 class CAbsoluteTimeParser extends CParser {
 
 	/**
+	 * Full date in "YYYY-MM-DD hh:mm:ss" format.
+	 *
+	 * @var string $date
+	 */
+	private $date;
+
+	/**
 	 * Parse the given period.
 	 *
 	 * @param string $source  Source string that needs to be parsed.
@@ -33,10 +40,11 @@ class CAbsoluteTimeParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->date = '';
 
 		$p = $pos;
 
-		if (!self::parseAbsoluteTime($source, $p)) {
+		if (!$this->parseAbsoluteTime($source, $p)) {
 			return self::PARSE_FAIL;
 		}
 
@@ -54,7 +62,7 @@ class CAbsoluteTimeParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private static function parseAbsoluteTime($source, &$pos) {
+	private function parseAbsoluteTime($source, &$pos) {
 		$pattern_Y = '(?P<Y>[12][0-9]{3})';
 		$pattern_M = '(?P<M>[0-9]{1,2})';
 		$pattern_D = '(?P<D>[0-9]{1,2})';
@@ -95,8 +103,22 @@ class CAbsoluteTimeParser extends CParser {
 			return false;
 		}
 
+		$this->date = $date;
 		$pos += strlen($matches[0]);
 
 		return true;
+	}
+
+	/**
+	 * Returns date in "YYYY-MM-DD hh:mm:ss" format.
+	 *
+	 * @return DateTime|null
+	 */
+	public function getDateTime() {
+		if ($this->date === '') {
+			return null;
+		}
+
+		return new DateTime($this->date);
 	}
 }

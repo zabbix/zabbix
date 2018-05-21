@@ -2538,65 +2538,62 @@ function makeUpdateIntervalFilter($field_name, $values) {
  * @return array
  */
 function calculateTime(array $options = []) {
-	$time = time();
 	$options = array_filter($options) + [
-		'updateProfile' => false,
 		'profileIdx' => null,
 		'profileIdx2' => 0,
+		'updateProfile' => false,
 		'from' => null,
 		'to' => null
 	];
-	$idx = $options['profileIdx'];
-	$from = $options['from'];
-	$to = $options['to'];
+	$range_time_parser = new CRangeTimeParser();
 
-	if ($from === null) {
-		$from = CProfile::get($idx.'.from', ZBX_PERIOD_DEFAULT, $options['profileIdx2']);
+	foreach (['from', 'to'] as $type) {
+		if ($options[$type] === null) {
+			// TODO Sasha: 'profileIdx' can be null?
+			$options[$type] = CProfile::get($options['profileIdx'].'.'.$type,
+				$type === 'from' ? ZBX_PERIOD_DEFAULT : 'now', $options['profileIdx2']
+			);
+		}
+
+		$range_time_parser->parse($options[$type]);
+
+		$ts[$type] = $range_time_parser->getDateTime($type === 'from')->getTimestamp();
 	}
 
-	$from_ts = parseRelativeDate($from, true);
-	$from_ts = $from_ts !== null
-		? $from_ts->getTimestamp()
-		: parseRelativeDate(ZBX_PERIOD_DEFAULT, true)->getTimestamp();
-
-	if ($to === null) {
-		$to = CProfile::get($idx.'.to', 'now', $options['profileIdx2']);
-	}
-
-	$to_ts = parseRelativeDate($to, false);
-	$to_ts = $to_ts !== null
-		? $to_ts->getTimestamp()
-		: parseRelativeDate('now', true)->getTimestamp();
-	$period = $to_ts - $from_ts;
+	$period = $ts['to'] - $ts['from'];
 
 	if ($period < ZBX_MIN_PERIOD) {
-		error(_n('Minimum time period to display is %1$s minute.',
-			'Minimum time period to display is %1$s minutes.',
+		error(_n('Minimum time period to display is %1$s minute.', 'Minimum time period to display is %1$s minutes.',
 			(int) ZBX_MIN_PERIOD / SEC_PER_MIN
 		));
-		$from = (new DateTime())->setTimestamp($to_ts - ZBX_MIN_PERIOD)->format(ZBX_DATE_TIME);
+		$ts['from'] = $ts['to'] - ZBX_MIN_PERIOD;
+		$options['from'] = (new DateTime())->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
 	}
 	elseif ($period > ZBX_MAX_PERIOD) {
-		error(_n('Maximum time period to display is %1$s day.',
-			'Maximum time period to display is %1$s days.',
+		error(_n('Maximum time period to display is %1$s day.', 'Maximum time period to display is %1$s days.',
 			(int) ZBX_MAX_PERIOD / SEC_PER_DAY
 		));
-		$from = (new DateTime())->setTimestamp($to_ts - ZBX_MAX_PERIOD)->format(ZBX_DATE_TIME);
+		$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD;
+		$options['from'] = (new DateTime())->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
 	}
-	elseif ($idx !== null && $options['updateProfile']) {
-		CProfile::update($idx.'.from', $from, PROFILE_TYPE_STR, $options['profileIdx2']);
-		CProfile::update($idx.'.to', $to, PROFILE_TYPE_STR, $options['profileIdx2']);
+
+	// TODO Sasha: 'profileIdx' can be null?
+	if ($options['profileIdx'] !== null && $options['updateProfile']) {
+		CProfile::update($options['profileIdx'].'.from', $options['from'], PROFILE_TYPE_STR, $options['profileIdx2']);
+		CProfile::update($options['profileIdx'].'.to', $options['to'], PROFILE_TYPE_STR, $options['profileIdx2']);
 	}
+
+	$time = time();
 
 	return [
 		'profileIdx' => $options['profileIdx'],
 		'profileIdx2' => $options['profileIdx2'],
 		'updateProfile' => $options['updateProfile'],
-		'refreshable' => $from_ts <= $time && $time <= $to_ts,
-		'from_ts' => $from_ts,
-		'to_ts' => $to_ts,
-		'from' => $from,
-		'to' => $to
+		'refreshable' => ($ts['from'] <= $time && $time <= $ts['to']),
+		'from_ts' => $ts['from'],
+		'to_ts' => $ts['to'],
+		'from' => $options['from'],
+		'to' => $options['to']
 	];
 }
 
@@ -2609,7 +2606,6 @@ function calculateTime(array $options = []) {
  * @return string
  */
 function relativeDateToText($from, $to) {
-	$relative_time_parser = new CRelativeTimeParser();
 	$key = $from.':'.$to;
 	$ranges = [
 		'now-1d/d:now-1d/d' => _('Yesterday'),
@@ -2632,125 +2628,59 @@ function relativeDateToText($from, $to) {
 		return $ranges[$key];
 	}
 
-	if ($relative_time_parser->parse($from) === CParser::PARSE_SUCCESS) {
-		list($count, $mod) = sscanf($from, 'now-%d%1s');
+	if ($to === 'now') {
+		$relative_time_parser = new CRelativeTimeParser();
 
-		if ($to === 'now' && $count > 0 && str_replace('/', '', $from) == $from) {
-			$mod = $mod === null ? 's' : $mod;
+		if ($relative_time_parser->parse($from) == CParser::PARSE_SUCCESS) {
+			$tokens = $relative_time_parser->getTokens();
 
-			switch ($mod) {
-				case 's':
-					if ($count < 60 || $count % 60 != 0) {
-						return _n('Last %1$d second', 'Last %1$d seconds', $count);
-					}
-					$count = $count / 60;
-					// break; is not missing here.
+			if (count($tokens) == 1 && $tokens[0]['type'] == CRelativeTimeParser::ZBX_TOKEN_OFFSET
+					&& $tokens[0]['sign'] === '-') {
+				$suffix = $tokens[0]['suffix'];
+				$value = (int) $tokens[0]['value'];
 
-				case 'm':
-					if ($count < 60 || $count % 60 != 0) {
-						return _n('Last %1$d minute', 'Last %1$d minutes', $count);
-					}
-					$count = $count / 60;
-					// break; is not missing here.
+				switch ($suffix) {
+					case 's':
+						if ($value < 60 || $value % 60 != 0) {
+							return _n('Last %1$d second', 'Last %1$d seconds', $value);
+						}
+						$value /= 60;
+						// break; is not missing here.
 
-				case 'h':
-					if ($count < 25 || $count % 24 != 0) {
-						return _n('Last %1$d hour', 'Last %1$d hours', $count);
-					}
-					$count = $count / 24;
-					// break; is not missing here.
+					case 'm':
+						if ($value < 60 || $value % 60 != 0) {
+							return _n('Last %1$d minute', 'Last %1$d minutes', $value);
+						}
+						$value /= 60;
+						// break; is not missing here.
 
-				case 'd':
-					return _n('Last %1$d day', 'Last %1$d days', $count);
+					case 'h':
+						if ($value < 24 || $value % 24 != 0) {
+							return _n('Last %1$d hour', 'Last %1$d hours', $value);
+						}
+						$value /= 24;
+						// break; is not missing here.
 
-				case 'M':
-					return _n('Last %1$d month', 'Last %1$d months', $count);
+					case 'd':
+						return _n('Last %1$d day', 'Last %1$d days', $value);
 
-				case 'y':
-					return _n('Last %1$d year', 'Last %1$d years', $count);
+					case 'M':
+						return _n('Last %1$d month', 'Last %1$d months', $value);
+
+					case 'y':
+						return _n('Last %1$d year', 'Last %1$d years', $value);
+				}
 			}
 		}
 	}
 
-	$from = parseRelativeDate($from, true);
-	$to = parseRelativeDate($to, false);
+	$range_time_parser = new CRangeTimeParser();
 
-	return $from->format(ZBX_DATE_TIME).' - '.$to->format(ZBX_DATE_TIME);
-}
+	$range_time_parser->parse($from);
+	$result = $range_time_parser->getDateTime(true)->format(ZBX_DATE_TIME).' - ';
 
-/**
- * Parse relative date. Allow to define precision part using suffix '/', example (now/w).
- * Supports date as string in format 'Y-m-d H:i:s' and timestamp as integer.
- * Timestamp is returned as initialized DateTime object. In case of parsing error null will be returned.
- *
- * @param string $date      Date in relative format or timestamp.
- * @param bool   $is_start  If set to true date will be modified to lowest value, example (now/w) will be returned
- *                          as Monday of this week. When set to false precisiion will modify date to highest value,
- *                          same example will return Sunday of this week.
- *
- * @return DateTime|null
- */
-function parseRelativeDate($date, $is_start) {
-	$time_units = [
-		'/(\d+)s?\b/' => '$1 seconds',
-		'/(\d+)m/' => '$1 minute',
-		'/(\d+)h/' => '$1 hour',
-		'/(\d+)d/' => '$1 day',
-		'/(\d+)w/' => '$1 week',
-		'/(\d+)M/' => '$1 month',
-		'/(\d+)y/' => '$1 year'
-	];
-	$precision = '';
+	$range_time_parser->parse($to);
+	$result .= $range_time_parser->getDateTime(false)->format(ZBX_DATE_TIME);
 
-	if (ctype_digit($date)) {
-		return (new DateTime())->setTimestamp($date);
-	}
-
-	if ((new CAbsoluteTimeParser())->parse($date) === CParser::PARSE_SUCCESS) {
-		return new DateTime($date);
-	}
-
-	if ((new CRelativeTimeParser())->parse($date) !== CParser::PARSE_SUCCESS) {
-		return null;
-	}
-
-	$date = preg_replace('/[^-+\/0-9a-z]/i', '', $date);
-	// Split relative date in to two parts: Date part and precision.
-	list($date_chunk, $precision) = explode('/', $date) + ['', ''];
-
-	$date = preg_replace(array_keys($time_units), array_values($time_units), $date_chunk);
-
-	try {
-		$date = new DateTime($date);
-
-		$modifiers = $is_start
-			? [
-				'm' => $date->format('H:i:00'),
-				'h' => $date->format('H:00:00'),
-				'd' => '00:00:00',
-				'w' => 'Monday this week 00:00:00',
-				'M' => 'first day of this month 00:00:00',
-				'y' => 'first day of January this year 00:00:00'
-			]
-			: [
-				'm' => $date->format('H:i:59'),
-				'h' => $date->format('H:59:59'),
-				'd' => '23:59:59',
-				'w' => 'Sunday this week 23:59:59',
-				'M' => 'last day of this month 23:59:59',
-				'y' => 'last day of December this year 23:59:59'
-			];
-
-		if ($precision && array_key_exists($precision, $modifiers)) {
-			$date->modify($modifiers[$precision]);
-		}
-		else if ($precision !== '') {
-			$date = null;
-		}
-	}
-	catch (Exception $e) {
-		$date = null;
-	}
-
-	return $date;
+	return $result;
 }
