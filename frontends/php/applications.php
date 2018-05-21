@@ -230,55 +230,98 @@ else {
 	if ($pageFilter->hostsSelected) {
 		$config = select_config();
 
-		// get application ids
-		$applications = API::Application()->get([
-			'output' => ['applicationid'],
-			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
-			'groupids' => $pageFilter->groupids,
-			'editable' => true,
-			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1
-		]);
-		$applicationids = zbx_objectValues($applications, 'applicationid');
-
-		// get applications
+		// Get applications.
 		$data['applications'] = API::Application()->get([
 			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
+			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
+			'groupids' => $pageFilter->groupids,
 			'selectHost' => ['hostid', 'name'],
 			'selectItems' => ['itemid'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectApplicationDiscovery' => ['ts_delete'],
-			'applicationids' => $applicationids
+			'editable' => true,
+			'sortfield' => $sortField,
+			'limit' => $config['search_limit'] + 1,
+			'preservekeys' => true
 		]);
 
 		order_result($data['applications'], $sortField, $sortOrder);
 
-		// fetch template application source parents
-		$applicationSourceParentIds = getApplicationSourceParentIds($applicationids);
-		$parentAppIds = [];
-
-		foreach ($applicationSourceParentIds as $applicationParentIds) {
-			foreach ($applicationParentIds as $parentId) {
-				$parentAppIds[$parentId] = $parentId;
+		// Get the farthest application ancestor for each application.
+		$source_templates = [];
+		$applications = $data['applications'];
+		foreach ($applications as $applicationid => $application) {
+			foreach ($application['templateids'] as $templateid) {
+				$source_templates[$applicationid][$templateid] = [];
 			}
 		}
 
-		if ($parentAppIds) {
-			$parentTemplates = DBfetchArrayAssoc(DBselect(
-				'SELECT a.applicationid,h.hostid,h.name'.
-				' FROM applications a,hosts h'.
-				' WHERE a.hostid=h.hostid'.
-					' AND '.dbConditionInt('a.applicationid', $parentAppIds)
-			), 'applicationid');
+		while ($applications) {
+			$templateids = [];
+			foreach ($applications as $applicationid => $application) {
+				foreach ($application['templateids'] as $templateid) {
+					$templateids[] = $templateid;
+				}
+			}
 
-			foreach ($data['applications'] as &$application) {
-				if ($application['templateids'] && isset($applicationSourceParentIds[$application['applicationid']])) {
-					foreach ($applicationSourceParentIds[$application['applicationid']] as $parentAppId) {
-						$application['sourceTemplates'][] = $parentTemplates[$parentAppId];
+			if (!$templateids) {
+				break;
+			}
+
+			$applications = API::Application()->get([
+				'output' => ['applicationid', 'hostid', 'templateids'],
+				'selectHost' => ['hostid', 'name'],
+				'applicationids' => array_keys(array_flip($templateids)),
+				'preservekeys' => true
+			]);
+
+			foreach ($source_templates as $applicationid => $source_templateids) {
+				foreach ($source_templateids as $source_templateid => $source_template) {
+					if (array_key_exists($source_templateid, $applications)) {
+						if ($applications[$source_templateid]['templateids']) {
+							unset($source_templates[$applicationid][$source_templateid]);
+							foreach ($applications[$source_templateid]['templateids'] as $templateid) {
+								$source_templates[$applicationid][$templateid] = [];
+							}
+						}
+						else {
+							$source_templates[$applicationid][$source_templateid] =
+								$applications[$source_templateid]['host'];
+						}
 					}
 				}
 			}
-			unset($application);
+		}
+
+		$templateids = [];
+		foreach ($source_templates as $applicationid => $source_templateids) {
+			foreach ($source_templateids as $source_templateid => $source_template) {
+				if ($source_template) {
+					$templateids[] = $source_templateid;
+					$source_templates[$applicationid][$source_templateid]['accessible'] = true;
+				}
+				else {
+					$source_templates[$applicationid][$source_templateid]['accessible'] = false;
+				}
+			}
+		}
+
+		$editable_templates = $templateids
+			? API::Application()->get([
+				'output' => ['applicationid'],
+				'applicationids' => array_keys(array_flip($templateids)),
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+		foreach ($source_templates as $applicationid => $source_templateids) {
+			foreach ($source_templateids as $source_templateid => $source_template) {
+				if (array_key_exists($source_templateid, $editable_templates)) {
+					$source_templates[$applicationid][$source_templateid]['editable'] = true;
+				} else {
+					$source_templates[$applicationid][$source_templateid]['editable'] = false;
+				}
+			}
 		}
 
 		/*
@@ -286,7 +329,11 @@ else {
 		 * deleted. Also we need only 'ts_delete' for view, so get rid of the multidimensional array inside
 		 * 'applicationDiscovery' property.
 		 */
-		foreach ($data['applications'] as &$application) {
+		foreach ($data['applications'] as $applicationid => &$application) {
+			if (array_key_exists($applicationid, $source_templates)) {
+				$application['sourceTemplates'] = $source_templates[$applicationid];
+			}
+
 			if ($application['applicationDiscovery']) {
 				if (count($application['applicationDiscovery']) > 1) {
 					$ts_delete = zbx_objectValues($application['applicationDiscovery'], 'ts_delete');
@@ -336,28 +383,6 @@ else {
 		->setArgument('hostid', $data['hostid']);
 
 	$data['paging'] = getPagingLine($data['applications'], $sortOrder, $url);
-
-	// Select writable templates IDs.
-	$hostids = [];
-
-	foreach ($data['applications'] as $application) {
-		if (array_key_exists('sourceTemplates', $application)) {
-			$hostids = array_merge($hostids, zbx_objectValues($application['sourceTemplates'], 'hostid'));
-		}
-
-		$hostids[] = $application['host']['hostid'];
-	}
-
-	$data['writable_templates'] = [];
-
-	if ($hostids) {
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys(array_flip($hostids)),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-	}
 
 	// render view
 	$applicationView = new CView('configuration.application.list', $data);

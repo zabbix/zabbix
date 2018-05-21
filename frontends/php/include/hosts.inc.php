@@ -561,60 +561,6 @@ function updateHostStatus($hostids, $status) {
 }
 
 /**
- * Returns the farthest application ancestor for each given application.
- *
- * @param array $applicationIds
- * @param array $templateApplicationIds		array with parent application IDs as keys and arrays of child application
- * 											IDs as values
- *
- * @return array	an array with child IDs as keys and arrays of ancestor IDs as values
- */
-function getApplicationSourceParentIds(array $applicationIds, array $templateApplicationIds = []) {
-	$query = DBSelect(
-		'SELECT at.applicationid,at.templateid'.
-		' FROM application_template at'.
-		' WHERE '.dbConditionInt('at.applicationid', $applicationIds)
-	);
-
-	$applicationIds = [];
-	$unsetApplicationIds = [];
-	while ($applicationTemplate = DBfetch($query)) {
-		// check if we already have an application inherited from the current application
-		// if we do - copy all of its child applications to the parent template
-		if (isset($templateApplicationIds[$applicationTemplate['applicationid']])) {
-			$templateApplicationIds[$applicationTemplate['templateid']] = $templateApplicationIds[$applicationTemplate['applicationid']];
-			$unsetApplicationIds[$applicationTemplate['applicationid']] = $applicationTemplate['applicationid'];
-		}
-		// if no - just add the application
-		else {
-			$templateApplicationIds[$applicationTemplate['templateid']][] = $applicationTemplate['applicationid'];
-		}
-		$applicationIds[$applicationTemplate['applicationid']] = $applicationTemplate['templateid'];
-	}
-
-	// unset children of all applications that we found a new parent for
-	foreach ($unsetApplicationIds as $applicationId) {
-		unset($templateApplicationIds[$applicationId]);
-	}
-
-	// continue while we still have new applications to check
-	if ($applicationIds) {
-		return getApplicationSourceParentIds($applicationIds, $templateApplicationIds);
-	}
-	else {
-		// return an inverse hash with application IDs as keys and arrays of parent application IDs as values
-		$result = [];
-		foreach ($templateApplicationIds as $templateId => $applicationIds) {
-			foreach ($applicationIds as $applicationId) {
-				$result[$applicationId][] = $templateId;
-			}
-		}
-
-		return $result;
-	}
-}
-
-/**
  * Returns the farthest host prototype ancestor for each given host prototype.
  *
  * @param array $hostPrototypeIds

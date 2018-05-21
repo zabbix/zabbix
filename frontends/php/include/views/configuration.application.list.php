@@ -78,13 +78,16 @@ foreach ($this->data['applications'] as $application) {
 		CArrayHelper::sort($application['sourceTemplates'], ['name']);
 
 		foreach ($application['sourceTemplates'] as $template) {
-			if (array_key_exists($template['hostid'], $data['writable_templates'])) {
-				$name[] = (new CLink($template['name'], 'applications.php?hostid='.$template['hostid']))
+			if ($template['editable']) {
+				$name[] = (new CLink(CHtml::encode($template['name']), 'applications.php?hostid='.$template['hostid']))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY);
 			}
 			else {
-				$name[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+				$name[] = (new CSpan($template['accessible']
+					? CHtml::encode($template['name'])
+					: _('Inaccessible template')
+				))->addClass(ZBX_STYLE_GREY);
 			}
 			$name[] = ', ';
 		}
