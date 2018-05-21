@@ -1062,3 +1062,66 @@ td.inactive-bg {
 		}
 	}
 }
+
+.icon-action-command::before {
+	background-position: -249px -325px;
+}
+.icon-action-close::before {
+	background-position: -224px -325px;
+}
+.icon-action-msg::before {
+	background-position: -299px -285px;
+}
+.icon-action-severity-up::before {
+	background-position: -349px -285px;
+}
+.icon-action-severity-down::before {
+	background-position: -375px -285px;
+}
+.icon-action-severity-changed::before {
+	background-position: -399px -285px;
+}
+.icon-action-message::before {
+	background-position: -199px -285px;
+}
+.icon-action-ack::before {
+	background-position: -323px -285px;
+}
+.icon-problem-generated::before {
+	background-position: -449px -285px;
+}
+.icon-problem-recovery::before {
+	background-position: -424px -285px;
+}
+.icon-action-msgs {
+	&[data-count]::after {
+		color: $ui-bg-color;
+	}
+	&::before {
+		background-position: -474px -285px;
+	}
+}
+.icon-actions-number-gray {
+	&[data-count]::after {
+		color: $ui-bg-selected-color;
+	}
+	&::before {
+		background-position: -499px -285px;
+	}
+}
+.icon-actions-number-yellow {
+	&[data-count]::after {
+		color: $alt-orange;
+	}
+	&::before {
+		background-position: -549px -285px;
+	}
+}
+.icon-actions-number-red {
+	&[data-count]::after {
+		color: $red;
+	}
+	&::before {
+		background-position: -524px -285px;
+	}
+}

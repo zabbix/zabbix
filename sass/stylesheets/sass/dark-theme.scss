@@ -196,3 +196,15 @@ $ok-ack-fg-color: #00ff00;
 		}
 	}
 }
+
+.icon-action-severity-up::before {
+	background-position: -624px -245px;
+}
+.icon-action-severity-down::before {
+	background-position: -649px -245px;
+}
+.icon-actions-number-gray {
+	&[data-count]::after {
+		color: $font-selected-color;
+	}
+}

@@ -704,6 +704,48 @@ output {
 						}
 					}
 				}
+
+				@if $theme_name == 'blue', "dark" {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							.icon-action-command,
+							.icon-action-close,
+							.icon-action-msg,
+							.icon-action-msgs,
+							.icon-action-severity-up,
+							.icon-action-severity-down,
+							.icon-action-severity-changed,
+							.icon-action-message,
+							.icon-action-ack,
+							.icon-problem-generated,
+							.icon-problem-recovery,
+							.icon-actions-number-gray,
+							.icon-actions-number-yellow,
+							.icon-actions-number-red {
+								@include border-radius(2px);
+								background-color: $ui-bg-color;
+
+								// &:not(:last-of-type) {
+								// 	border-right: 5px solid $ui-bg-color;
+								// 	margin-right: 0;
+								// }
+								&:only-of-type, &:last-of-type {
+									margin: 0;
+								}
+								// &:last-of-type {
+								// 	@include border-radius(0 2px 2px 0);
+								// }
+								// &:first-of-type {
+								// 	@include border-radius(2px 0 0 2px);
+								// }
+								// &:only-of-type {
+								// 	@include border-radius(2px);
+								// }
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -5326,9 +5368,11 @@ svg {
 	display: inline-block;
 	position: relative;
 	height: 18px;
-	width: 16px;
+	width: 18px;
 	margin: 0 5px 0 0;
-	top: 5px;
+	top:0;
+	bottom:0;
+	vertical-align: bottom;
 
 	&::before {
 		content: '';
@@ -5353,46 +5397,46 @@ svg {
 }
 
 .icon-action-command::before {
-	background-position: -224px -246px;
+	background-position: -249px -245px;
 }
 .icon-action-close::before {
-	background-position: -198px -246px;
+	background-position: -224px -245px;
 }
 .icon-action-msg::before {
-	background-position: -299px -246px;
+	background-position: -299px -245px;
 }
 .icon-action-severity-up::before {
-	background-position: -349px -246px;
+	background-position: -349px -245px;
 }
 .icon-action-severity-down::before {
-	background-position: -375px -246px;
+	background-position: -375px -245px;
 }
 .icon-action-severity-changed::before {
-	background-position: -399px -246px;
+	background-position: -399px -245px;
 }
 .icon-action-message::before {
-	background-position: -174px -245px;
+	background-position: -199px -245px;
 }
 .icon-action-ack::before {
-	background-position: -323px -246px;
+	background-position: -323px -245px;
 }
 .icon-problem-generated::before {
-	background-position: -449px -246px;
+	background-position: -449px -245px;
 }
 .icon-problem-recovery::before {
-	background-position: -424px -246px;
+	background-position: -424px -245px;
 }
 .icon-action-msgs {
 	&[data-count]::after {
-		color: #ffffff;
+		color: $font-selected-color;
 	}
 	&::before {
-		background-position: -474px -246px;
+		background-position: -474px -245px;
 	}
 }
 .icon-actions-number-gray {
 	&[data-count]::after {
-		color: #768d99;
+		color: $ui-bg-selected-color;
 	}
 	&::before {
 		background-position: -499px -245px;
@@ -5400,7 +5444,7 @@ svg {
 }
 .icon-actions-number-yellow {
 	&[data-count]::after {
-		color: #FFA059;
+		color: $alt-orange;
 	}
 	&::before {
 		background-position: -549px -245px;
@@ -5408,7 +5452,7 @@ svg {
 }
 .icon-actions-number-red {
 	&[data-count]::after {
-		color: #e33734;
+		color: $red;
 	}
 	&::before {
 		background-position: -524px -245px;
@@ -6172,6 +6216,23 @@ Main navigation is used to jump between high level sections of the application.
          <li><a href="#" class="top-nav-help" title="Help"></a></li>
          <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
          <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
+	display: inline-block;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	margin: 1px 3px 1px 0;
+	padding: 2px 3px;
+	text-align: center;
+	line-height: 1em;
+	max-width: 133px;
+	vertical-align: middle;
+	@extend %overflow-ellipsis;
+	@include border-radius(2px);
+
+	&:last-child {
+		margin: 0;
+	}
+}
+
          <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
       </ul>-->
    </div>
