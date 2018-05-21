@@ -71,6 +71,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE,
 			'countOutput' => true
 		]);
 

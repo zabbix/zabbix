@@ -129,6 +129,9 @@ class CEvent extends CApiService {
 				? $this->getEvents(['value' => [TRIGGER_VALUE_FALSE]] + $options)
 				: [];
 			if ($options['countOutput']) {
+				$problems = ($problems === []) ? 0 : $problems;
+				$recovery = ($recovery === []) ? 0 : $recovery;
+
 				if ($options['groupCount']) {
 					$problems = zbx_toHash($problems, 'objectid');
 					$recovery = zbx_toHash($recovery, 'objectid');
