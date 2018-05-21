@@ -1432,7 +1432,7 @@ function getDefaultActionOptions() {
 	return [[
 		'key' => 'messages',
 		'operations' => ZBX_PROBLEM_UPDATE_MESSAGE,
-		'columns' => ['time', 'user', 'action', 'message'],
+		'columns' => ['time', 'user', 'message'],
 		'message_max_length' => 30,
 		'style' => 'CTableInfo'
 	], [
