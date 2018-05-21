@@ -24,16 +24,8 @@ $screen_widget = new CWidget();
 $filter = new CFilter();
 
 if (empty($data['screen']) || empty($data['host'])) {
-	$screen_builder = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
-
-	$filter
-		->setProfile('web.screens.filter')
-		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
-
 	$screen_widget
 		->setTitle(_('Screens'))
-		->addItem($filter)
 		->addItem(new CTableInfo());
 }
 else {
