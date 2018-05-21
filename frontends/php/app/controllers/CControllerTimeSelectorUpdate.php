@@ -148,7 +148,7 @@ class CControllerTimeSelectorUpdate extends CController {
 		}
 
 		$from = parseRelativeDate($this->getInput('from'), true);
-		$to = parseRelativeDate($this->getInput('to', false));
+		$to = parseRelativeDate($this->getInput('to'), false);
 		$interval = ($from !== null && $to !== null) ? $to->getTimestamp() - $from->getTimestamp() : null;
 
 		if ($interval !== null && $interval > ZBX_MAX_PERIOD) {
