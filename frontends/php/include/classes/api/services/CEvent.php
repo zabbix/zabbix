@@ -541,10 +541,10 @@ class CEvent extends CApiService {
 	 * @return array
 	 */
 	public function acknowledge(array $data) {
+		$this->validateAcknowledge($data);
+
 		$data['eventids'] = zbx_toArray($data['eventids']);
 		$data['eventids'] = array_keys(array_flip($data['eventids']));
-
-		$this->validateAcknowledge($data);
 
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
 
@@ -722,6 +722,9 @@ class CEvent extends CApiService {
 		if (!check_db_fields($db_fields, $data)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
+
+		$data['eventids'] = zbx_toArray($data['eventids']);
+		$data['eventids'] = array_keys(array_flip($data['eventids']));
 
 		// Chack that at least one valid flag is set.
 		$min_action = ZBX_PROBLEM_UPDATE_CLOSE;
