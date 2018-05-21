@@ -1,4 +1,8 @@
-noinst_PROGRAMS = zbx_tcp_recv_ext zbx_tcp_recv_raw_ext
+if SERVER
+ZLIB_tests = zbx_tcp_recv_ext_zlib
+endif
+
+noinst_PROGRAMS = zbx_tcp_recv_ext zbx_tcp_recv_raw_ext $(ZLIB_tests)
 
 COMMON_SRC_FILES = \
 	../../../src/zabbix_agent/active.c ../../../../src/zabbix_agent/active.h \
@@ -51,6 +55,21 @@ zbx_tcp_recv_ext_LDFLAGS = @AGENT_LDFLAGS@
 
 zbx_tcp_recv_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+if SERVER
+zbx_tcp_recv_ext_zlib_SOURCES = \
+	zbx_tcp_recv_ext.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_recv_ext_zlib_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tcp_recv_ext_zlib_LDADD += @AGENT_LIBS@
+
+zbx_tcp_recv_ext_zlib_LDFLAGS = @AGENT_LDFLAGS@
+
+zbx_tcp_recv_ext_zlib_CFLAGS = $(COMMON_COMPILER_FLAGS)
+endif
+
 zbx_tcp_recv_raw_ext_SOURCES = \
 	zbx_tcp_recv_raw_ext.c \
 	$(COMMON_SRC_FILES)
@@ -63,21 +82,3 @@ zbx_tcp_recv_raw_ext_LDADD += @AGENT_LIBS@
 zbx_tcp_recv_raw_ext_LDFLAGS = @AGENT_LDFLAGS@
 
 zbx_tcp_recv_raw_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-## Separate test cases with compression and do not execute them with agent only configuration
-all: create-yaml
-
-if !SERVER
-create-yaml: zbx_tcp_recv_ext.yaml.no_zlib
-	cat zbx_tcp_recv_ext.yaml.no_zlib > zbx_tcp_recv_ext.yaml
-endif
-
-if SERVER
-create-yaml: zbx_tcp_recv_ext.yaml.no_zlib
-	cat zbx_tcp_recv_ext.yaml.with_zlib zbx_tcp_recv_ext.yaml.no_zlib > zbx_tcp_recv_ext.yaml
-endif
-
-rm-yaml:
-	rm -f zbx_tcp_recv_ext.yaml
-
-clean-local: rm-yaml
