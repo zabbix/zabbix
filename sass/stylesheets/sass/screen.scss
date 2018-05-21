@@ -2980,17 +2980,20 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-empty-placeholder {
-	width: 16%;
-	height: 200px;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: calc(100% / 6 - .65rem);
+	height: 200px;
 	margin: .25rem;
-	padding: 10px;
 
 	h1 {
+		padding: 10px;
 		text-align: center;
 	}
 }
