@@ -727,11 +727,10 @@ class CEvent extends CApiService {
 		$data['eventids'] = array_keys(array_flip($data['eventids']));
 
 		// Chack that at least one valid flag is set.
-		$min_action = ZBX_PROBLEM_UPDATE_CLOSE;
-		$max_action = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
+		$action_mask = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
 				| ZBX_PROBLEM_UPDATE_SEVERITY;
 
-		if ($data['action'] < $min_action || $data['action'] > $max_action) {
+		if (($data['action'] & $action_mask) != $data['action']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				_s('unexpected value "%1$s"', $data['action'])
 			));
