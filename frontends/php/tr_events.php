@@ -134,7 +134,7 @@ $eventTab = (new CTable())
 			$event['value'] == TRIGGER_VALUE_TRUE
 				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, $actions_table))
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
-					->setHeader(_('Acknowledgements'), [], false, 'tr_events.php')
+					->setHeader(_('Actions'), [], false, 'tr_events.php')
 				: null,
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
 				make_small_eventlist($event,
