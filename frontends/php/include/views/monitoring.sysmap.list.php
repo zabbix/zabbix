@@ -35,7 +35,7 @@ $widget = (new CWidget())
 	)
 	->addItem(
 		(new CFilter())
-			->setProfile('web.sysmapconf.filter', 0)
+			->setProfile('web.sysmapconf.filter')
 			->addFilterTab(_('Filter'), [
 				(new CFormList())->addRow(_('Name'),
 					(new CTextBox('filter_name', $data['filter']['name']))

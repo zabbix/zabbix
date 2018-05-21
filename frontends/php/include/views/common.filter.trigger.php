@@ -25,7 +25,7 @@ $filter = $this->data['filter'];
 $config = $this->data['config'];
 
 $filterForm = (new CFilter())
-	->setProfile($filter['filterid'], 0)
+	->setProfile($filter['filterid'])
 	->addVar('fullscreen', $filter['fullScreen'] ? '1' : null)
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);

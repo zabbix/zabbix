@@ -31,7 +31,7 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
-		->setProfile('web.correlation.filter', 0)
+		->setProfile('web.correlation.filter')
 		->addFilterTab(_('Filter'), [
 			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))

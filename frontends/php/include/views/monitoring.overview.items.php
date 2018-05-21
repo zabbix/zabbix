@@ -72,7 +72,7 @@ $widget = (new CWidget())
 
 // filter
 $filter = (new CFilter())
-	->setProfile('web.overview.filter', 0)
+	->setProfile('web.overview.filter')
 	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 	->addFilterTab(_('Filter'), [
 		(new CFormList())->addRow(_('Application'), [

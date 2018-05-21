@@ -104,7 +104,7 @@ $filterColumn2 = (new CFormList())
 	]);
 
 $filterForm
-	->setProfile('web.toptriggers.filter', 0)
+	->setProfile('web.toptriggers.filter')
 	->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2])
 	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
 	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));

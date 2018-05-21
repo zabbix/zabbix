@@ -28,7 +28,7 @@ if (empty($data['screen']) || empty($data['host'])) {
 	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
 
 	$filter
-		->setProfile('web.screens.filter', 0)
+		->setProfile('web.screens.filter')
 		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
 
 	$screen_widget

@@ -271,7 +271,7 @@ function getItemFilterForm(&$items) {
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
 	$filter = (new CFilter())
-		->setProfile('web.items.filter', 0)
+		->setProfile('web.items.filter')
 		->addVar('subfilter_hosts', $subfilter_hosts)
 		->addVar('subfilter_apps', $subfilter_apps)
 		->addVar('subfilter_types', $subfilter_types)

@@ -27,7 +27,7 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
-		->setProfile('web.usergroup.filter', 0)
+		->setProfile('web.usergroup.filter')
 		->addFilterTab(_('Filter'), [
 			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))

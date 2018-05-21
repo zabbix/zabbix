@@ -328,7 +328,7 @@ $widget = (new CWidget())
 
 // Filter
 $filterForm = (new CFilter())
-	->setProfile('web.latest.filter', 0)
+	->setProfile('web.latest.filter')
 	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = (new CFormList())

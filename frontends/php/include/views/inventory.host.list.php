@@ -42,7 +42,7 @@ foreach ($inventoryFields as $inventoryField) {
 // filter
 $hostInventoryWidget->addItem(
 	(new CFilter())
-		->setProfile('web.hostinventories.filter', 0)
+		->setProfile('web.hostinventories.filter')
 		->addFilterTab(_('Filter'), [
 			(new CFormList())->addRow(_('Field'), [
 				$inventoryFieldsComboBox,

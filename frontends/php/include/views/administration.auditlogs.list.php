@@ -55,7 +55,7 @@ $filterColumn->addRow(_('Resource'), new CComboBox('resourcetype', $this->data['
 
 $auditWidget->addItem(
 	(new CFilter())
-		->setProfile('web.auditlogs.filter', 0)
+		->setProfile('web.auditlogs.filter')
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
 		->addFilterTab(_('Filter'), [$filterColumn])
 );

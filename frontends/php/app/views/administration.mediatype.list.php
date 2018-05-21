@@ -32,7 +32,7 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
-		->setProfile('web.media_types.filter', 0)
+		->setProfile('web.media_types.filter')
 		->addFilterTab(_('Filter'), [
 			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))

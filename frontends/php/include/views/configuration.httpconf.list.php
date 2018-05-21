@@ -20,7 +20,7 @@
 
 
 $filter = (new CFilter())
-	->setProfile('web.httpconf.filter', 0)
+	->setProfile('web.httpconf.filter')
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(_('Status'),

@@ -53,7 +53,7 @@ $widget->setControls((new CTag('nav', true, $form))
 if (!$data['templateid']) {
 	$widget->addItem(
 		(new CFilter())
-			->setProfile('web.screenconf.filter', 0)
+			->setProfile('web.screenconf.filter')
 			->addFilterTab(_('Filter'), [
 				(new CFormList())->addRow(_('Name'),
 					(new CTextBox('filter_name', $data['filter']['name']))

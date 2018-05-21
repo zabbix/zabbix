@@ -47,7 +47,7 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	]))
 	->addItem((new CFilter())
-		->setProfile('web.templates.filter', 0)
+		->setProfile('web.templates.filter')
 		->addFilterTab(_('Filter'), [
 			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))

@@ -29,7 +29,7 @@ else {
 }
 
 $filter = (new CFilter())
-	->setProfile('web.triggers.filter', 0)
+	->setProfile('web.triggers.filter')
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(_('Severity'),
