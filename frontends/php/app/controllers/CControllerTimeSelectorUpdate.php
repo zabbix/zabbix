@@ -178,7 +178,8 @@ class CControllerTimeSelectorUpdate extends CController {
 	 */
 	function validateProfile() {
 		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.graphs.filter', 'web.httptest.filter',
-			'web.problem.filter', 'web.item.graph', 'web.auditlogs.filter', 'web.slides.filter'
+			'web.problem.filter', 'web.item.graph', 'web.auditlogs.filter', 'web.slides.filter', 'web.auditacts.filter',
+			'web.item.graph.filter'
 		];
 
 		return in_array($this->getInput('idx'), $profiles);
