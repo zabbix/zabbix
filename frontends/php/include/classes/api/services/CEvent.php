@@ -746,10 +746,10 @@ class CEvent extends CApiService {
 
 		/*
 		 * If at least one of following is given, API call should not be processed:
-		 * - eventid for OK event
-		 * - eventid with source, that is not trigger
-		 * - no read rights for related trigger
-		 * - unexisting eventid
+		 *   - eventid for OK event
+		 *   - eventid with source, that is not trigger
+		 *   - no read rights for related trigger
+		 *   - unexisting eventid
 		 */
 		if (count($data['eventids']) != count($events)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -784,13 +784,12 @@ class CEvent extends CApiService {
 	 * @param array $events                 Array of event objects.
 	 * @param int   $editable_events_count  Count of editable events.
 	 *
-	 * @throws APIException         Throws an exception:
-	 *                               - If at least one event is not editable;
-	 *                               - If any of given event can be closed manually according the triggers
-	 *                                 configuration.
+	 * @throws APIException                 Throws an exception:
+	 *                                        - If at least one event is not editable;
+	 *                                        - If any of given event can be closed manually according the triggers
+	 *                                          configuration.
 	 */
 	protected function checkCanBeManuallyClosed(array $events, $editable_events_count) {
-
 		if (count($events) != $editable_events_count) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
@@ -811,12 +810,11 @@ class CEvent extends CApiService {
 	 * @param int   $editable_events_count  Count of editable events.
 	 * @param int   $severity               New severity.
 	 *
-	 * @throws APIException			Throws an exception:
-	 *                               - If unknown severity is given;
-	 *                               - If at least one event is not editable.
+	 * @throws APIException                 Throws an exception:
+	 *                                        - If unknown severity is given;
+	 *                                        - If at least one event is not editable.
 	 */
 	protected function checkCanChangeSeverity(array $events, $editable_events_count, $severity) {
-
 		if (count($events) != $editable_events_count) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
@@ -835,30 +833,27 @@ class CEvent extends CApiService {
 	}
 
 	/**
-	 * Checks if events is closed.
+	 * Checks if events are closed.
 	 *
 	 * @param array $event                              Event object.
 	 * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
 	 * @param array $event['acknowledges']              List of problem updates.
 	 * @param array $event['acknowledges'][]['action']  Action performed in update.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function isEventClosed(array $event) {
-
-		$event_closed = bccomp($event['r_eventid'], '0') ? true : false;
-
-		if (!$event_closed) {
+		if (bccomp($event['r_eventid'], '0') == 1) {
+			return true;
+		}
+		else {
 			foreach ($event['acknowledges'] as $acknowledge) {
 				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 					// If at least one manual close update was found, event is closing.
-					$event_closed = true;
-					break;
+					return true;
 				}
 			}
 		}
-
-		return $event_closed;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
