@@ -134,7 +134,7 @@ else {
 /*
  * Display
  */
-$profileIdx = getRequest('profileIdx', 'web.httptest');
+$profileIdx = getRequest('profileIdx', 'web.httpdetails.filter');
 $profileIdx2 = getRequest('httptestid', getRequest('profileIdx2'));
 
 $timeline = calculateTime([

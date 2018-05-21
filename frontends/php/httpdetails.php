@@ -93,7 +93,7 @@ $graph_dims['width'] = -50;
 $graph_dims['graphHeight'] = 150;
 
 // profile
-$profileIdx = 'web.httptest';
+$profileIdx = 'web.httpdetails.filter';
 $profileIdx2 = getRequest('httptestid');
 
 /*

@@ -177,7 +177,7 @@ class CControllerTimeSelectorUpdate extends CController {
 	 * @return bool
 	 */
 	function validateProfile() {
-		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.graphs.filter', 'web.httptest.filter',
+		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.graphs.filter', 'web.httpdetails.filter',
 			'web.problem.filter', 'web.item.graph', 'web.auditlogs.filter', 'web.slides.filter', 'web.auditacts.filter',
 			'web.item.graph.filter'
 		];
