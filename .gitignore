@@ -447,6 +447,4 @@ tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
-upgrades/Makefile
-upgrades/Makefile.in
 /zabbix-*.tar.gz

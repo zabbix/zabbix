@@ -1802,7 +1802,6 @@ AC_OUTPUT([
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
-	upgrades/Makefile
 	man/Makefile
 	])
 
