@@ -1457,16 +1457,17 @@ function getDefaultActionOptions() {
  *
  * @param array    $events
  * @param string   $events[]['eventid']
- * @param string   $events[]['r_eventid']      Recovery event ID (optional).
- * @param string   $events[]['acknowledges']   Event update operations.
+ * @param string   $events[]['r_eventid']           Recovery event ID (optional).
+ * @param string   $events[]['acknowledges']        Event update operations.
  * @param array    $options
- * @param int      $options[]['key']           Action list name, just to identify it when asking multiple tables.
- * @param int      $options[]['operations']    Flag of included manual actions.
- * @param boolean  $options[]['actions']       Contains automatic operations.
- * @param boolean  $options[]['columns']       Table columns.
- * @param boolean  $options[]['show_problem']  Include the problem causing and recovery events.
- * @param string   $options[]['style']         Table style. Possible options: CTableInfo or CTable (default).
- * @param bool     $html                       If true, display action status with hint box in HTML format.
+ * @param int      $options[]['key']                Action list name, just to identify it when asking multiple tables.
+ * @param int      $options[]['operations']         Flag of included manual actions.
+ * @param boolean  $options[]['actions']            Contains automatic operations.
+ * @param boolean  $options[]['columns']            Table columns.
+ * @param boolean  $options[]['show_problem']       Include the problem causing and recovery events.
+ * @param boolean  $options[]['show_full_message']  Show email message with subject. Show remote command script.
+ * @param string   $options[]['style']              Table style. Possible options: CTableInfo or CTable (default).
+ * @param bool     $html                            If true, display action status with hint box in HTML format.
  *
  * @return array
  */
@@ -1593,6 +1594,9 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 
 							case 'message_command':
 							case 'message':
+								$show_full_message = array_key_exists('show_full_message', $opt)
+									&& $opt['show_full_message'] === true;
+
 								if ($is_manual) {
 									if ($message_max_length) {
 										$row[] = (strlen($action['message']) > $message_max_length)
@@ -1604,12 +1608,14 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 									}
 								}
 								elseif ($is_alert && $action['alerttype'] == ALERT_TYPE_MESSAGE) {
-									$row[] = array_key_exists($action['mediatypeid'], $mediatypes)
-										? $mediatypes[$action['mediatypeid']]['description']
-										: '';
+									$row[] = $show_full_message
+										? [bold($action['subject']), BR(), BR(), zbx_nl2br($action['message'])]
+										: (array_key_exists($action['mediatypeid'], $mediatypes)
+											? $mediatypes[$action['mediatypeid']]['description']
+											: '');
 								}
 								elseif ($is_alert && $action['alerttype'] == ALERT_TYPE_COMMAND) {
-									$row[] = $action['message'];
+									$row[] = ($show_full_message) ? $action['message'] : '';
 								}
 								else {
 									$row[] = '';
@@ -1796,8 +1802,8 @@ function makeEventsActionsData(array $events, array $options) {
 	if ($request_alerts) {
 		// Get alerts.
 		$db_alerts = API::Alert()->get([
-			'output' => ['eventid', 'userid', 'clock', 'mediatypeid', 'message', 'status', 'retries', 'error',
-				'esc_step', 'alerttype', 'p_eventid'
+			'output' => ['alerttype', 'clock', 'error', 'esc_step', 'eventid', 'mediatypeid', 'message', 'retries',
+				'status', 'subject', 'userid', 'p_eventid'
 			],
 			'eventids' => array_keys($eventids + $recovery_eventids),
 			'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND], 'acknowledgeid' => 0],
@@ -1818,6 +1824,8 @@ function makeEventsActionsData(array $events, array $options) {
 			if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
 				$alert['mediatypeid'] = $db_alert['mediatypeid'];
 				$alert['userid'] = $db_alert['userid'];
+				$alert['message'] = $db_alert['message'];
+				$alert['subject'] = $db_alert['subject'];
 
 				if ($alert['mediatypeid'] != 0) {
 					$mediatypeids[$db_alert['mediatypeid']] = true;

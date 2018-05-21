@@ -107,10 +107,12 @@ if ($event['r_eventid'] != 0) {
 $table_options = [
 	'key' => 'actions_list',
 	'actions' => true,
-	'operations' => 15,
+	'operations' => ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+		ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY,
 	'style' => 'CTableInfo',
 	'columns' => ['step', 'time', 'user_recipient', 'action', 'message_command', 'status', 'info'],
-	'show_problem' => true
+	'show_problem' => true,
+	'show_full_message' => true
 ];
 
 $actions_table = makeEventsActionsTables([$event], [$table_options]);
