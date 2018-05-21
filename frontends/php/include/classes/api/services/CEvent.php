@@ -543,9 +543,11 @@ class CEvent extends CApiService {
 
 		$this->validateAcknowledge($data);
 
+		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
+
 		$events = $this->get([
 			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid'],
-			'select_acknowledges' => ['action'],
+			'select_acknowledges' => $has_close_action? ['action'] : null,
 			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -565,8 +567,7 @@ class CEvent extends CApiService {
 			$message = '';
 
 			// Perform ZBX_PROBLEM_UPDATE_CLOSE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE
-					&& !$this->isEventClosed($event)) {
+			if ($has_close_action && !$this->isEventClosed($event)) {
 				$action |= ZBX_PROBLEM_UPDATE_CLOSE;
 			}
 
