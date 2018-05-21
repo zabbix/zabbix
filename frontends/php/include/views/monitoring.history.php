@@ -246,11 +246,12 @@ else {
 		$filter_form->addFilterTab(_('Filter'), $filter_tab);
 	}
 
-	if ($data['action'] !== HISTORY_LATEST) {
-		$historyWidget->addItem($filter_form);
-	}
 
 	if ($data['itemids']) {
+		if ($data['action'] !== HISTORY_LATEST) {
+			$historyWidget->addItem($filter_form);
+		}
+
 		$historyWidget->addItem($screen->get());
 
 		if ($data['action'] !== HISTORY_LATEST) {
@@ -258,6 +259,10 @@ else {
 		}
 	}
 	else {
+		if ($filter_tab) {
+			$historyWidget->addItem($filter_form);
+		}
+
 		$historyWidget->addItem(
 			(new CTableInfo())
 				->setHeader([
