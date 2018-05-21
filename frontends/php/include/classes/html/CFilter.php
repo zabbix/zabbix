@@ -248,7 +248,7 @@ class CFilter extends CDiv {
 
 			foreach ($column_ranges as $range) {
 				$label = relativeDateToText($range[0], $range[1]);
-				$is_selected = relativeDateToText($from, $to) === $label;
+				$is_selected = ($header === $label);
 
 				$column->addItem((new CLink($label))
 					->setAttribute('data-from', $range[0])
