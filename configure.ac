@@ -1916,7 +1916,7 @@ echo "    Native Jabber:         ${have_jabber}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${SERVER_LDFLAGS} ${LDFLAGS}
     Libraries:             ${SERVER_LIBS} ${LIBS}
-    Config file:           ${SERVER_CONFIG_FILE}
+    Configuration file:    ${SERVER_CONFIG_FILE}
     External scripts:      ${EXTERNAL_SCRIPTS_PATH}
     Alert scripts:         ${ALERT_SCRIPTS_PATH}
     Modules:               ${LOAD_MODULE_PATH}"
@@ -1944,7 +1944,7 @@ echo "    SNMP:                  ${have_snmp}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}
-    Config file:           ${PROXY_CONFIG_FILE}
+    Configuration file:    ${PROXY_CONFIG_FILE}
     External scripts:      ${EXTERNAL_SCRIPTS_PATH}
     Modules:               ${LOAD_MODULE_PATH}"
 
@@ -1959,7 +1959,7 @@ echo "  Agent details:
     TLS:                   ${have_tls}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
     Libraries:             ${AGENT_LIBS} ${LIBS}
-    Config file:           ${AGENT_CONFIG_FILE}
+    Configuration file:    ${AGENT_CONFIG_FILE}
     Modules:               ${LOAD_MODULE_PATH}"
 
 fi
