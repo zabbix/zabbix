@@ -31,6 +31,7 @@ A.F....... [ZBX-13680] fixed action not being cloned due to existing operation i
 ........S. [ZBX-14313] fixed trigger level correlation when multiple tags are set (wiper)
 ........S. [ZBX-12372] fixed duplication of prefix "/" for second parameter "path" in items "web.page.*" (MVekslers)
 ...G...... [ZBX-14315] fixed validation of "max_depth" in "vfs.dir.size" for agent (MVekslers)
+........S. [ZBX-13778] fixed logically dead code in JSON Path parser (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha6

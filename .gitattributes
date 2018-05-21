@@ -319,7 +319,6 @@ src/libs/zbxdbcache/dbsync.c -text
 src/libs/zbxdbcache/dbsync.h -text
 src/libs/zbxdbhigh/trigger.c -text
 src/libs/zbxipcservice/ipcservice.c -text
-src/libs/zbxjson/json_test.c -text
 src/libs/zbxserver/macrofunc.c -text
 src/libs/zbxserver/macrofunc.h -text
 src/zabbix_java/lib/android-json-4.3_r3.1.jar -text svneol=unset#application/java-archive
