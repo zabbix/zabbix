@@ -1808,7 +1808,7 @@ function makeEventsActionsData(array $events, array $options) {
 				'status', 'subject', 'userid', 'p_eventid'
 			],
 			'eventids' => array_keys($eventids + $recovery_eventids),
-			'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND], 'acknowledgeid' => 0],
+			'filter' => ['alerttype' => [ALERT_TYPE_MESSAGE, ALERT_TYPE_COMMAND]],
 			'sortorder' => ['alertid' => ZBX_SORT_DOWN]
 		]);
 
