@@ -1,5 +1,10 @@
-noinst_PROGRAMS = zbx_vc_get_values zbx_vc_add_values zbx_vc_get_value
+if SERVER
+SERVER_tests = zbx_vc_get_values zbx_vc_add_values zbx_vc_get_value
+endif
 
+noinst_PROGRAMS = $(SERVER_tests)
+
+if SERVER
 VALUECACHE_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
@@ -97,5 +102,4 @@ zbx_vc_get_value_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests
-
-
+endif
