@@ -184,7 +184,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			return false;
 		}
 
-		$period = $ts['to'] - $ts['from'];
+		$period = $ts['to'] - $ts['from'] + 1;
 
 		if ($period < ZBX_MIN_PERIOD) {
 			$this->data['error']['from'] = _n('Minimum time period to display is %1$s minute.',
