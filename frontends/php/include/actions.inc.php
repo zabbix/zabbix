@@ -1594,13 +1594,13 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 
 							case 'message_command':
 							case 'message':
-								$show_full_message = array_key_exists('show_full_message', $opt)
-									&& $opt['show_full_message'] === true;
+								$show_full_message = (array_key_exists('show_full_message', $opt)
+										&& $opt['show_full_message'] === true);
 
 								if ($is_manual) {
 									if ($message_max_length) {
 										$row[] = (strlen($action['message']) > $message_max_length)
-											? mb_substr($action['message'], 0, $message_max_length) . '...'
+											? mb_substr($action['message'], 0, $message_max_length).'...'
 											: $action['message'];
 									}
 									else {
@@ -1612,7 +1612,8 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 										? [bold($action['subject']), BR(), BR(), zbx_nl2br($action['message'])]
 										: (array_key_exists($action['mediatypeid'], $mediatypes)
 											? $mediatypes[$action['mediatypeid']]['description']
-											: '');
+											: ''
+										);
 								}
 								elseif ($is_alert && $action['alerttype'] == ALERT_TYPE_COMMAND) {
 									$row[] = ($show_full_message) ? $action['message'] : '';
@@ -1626,6 +1627,7 @@ function makeEventsActionsTables(array $events, array $options, $html = true) {
 							case 'action':
 								if (!$is_alert && $action['actions']) {
 									$action_icons = [];
+
 									foreach ($action['actions'] as $act_icon) {
 										if ($html) {
 											$action_icons[] = makeActionIcon($act_icon);
