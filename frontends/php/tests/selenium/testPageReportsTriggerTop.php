@@ -22,21 +22,17 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageReportsTriggerTop extends CWebTest {
 
-	public function testPageReportsTriggerTop_CheckLayout(){
+	public function testPageReportsTriggerTop_FilterLayout() {
 		$this->zbxTestLogin('toptriggers.php');
 		$this->zbxTestCheckTitle('100 busiest triggers');
 		$this->zbxTestCheckHeader('100 busiest triggers');
-		$this->zbxTestTextPresent('Host groups','Hosts','Severity','Filter','From', 'Till');
+		$this->zbxTestTextPresent('Host groups', 'Hosts', 'Severity', 'Filter', 'From', 'Till');
 
 		$this->zbxTestClickButtonText('Reset');
 
-		// Check Host groups "Select" button
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[3]', 'Select');
-		// Check Hosts "Select" button
-		$this->zbxTestAssertElementText('(//button[@type=\'button\'])[2]', 'Select');
-		// Check date button for 'From' field
+		// Check the calendar button for 'From' field
 		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li/div[2]/button');
-		// Check date button for 'Till' field
+		// Check the calendar button for 'Till' field
 		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li[2]/div[2]/button');
 
 		// Check selected severities
@@ -57,169 +53,162 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestAssertVisibleId('groupids_');
 
 		// Ckeck empty trigger list
-		$this->zbxTestAssertElementText('//table//td[@colspan=\'4\']', 'No data found.');
+		$this->zbxTestAssertElementText('//tr[@class=\'nothing-to-show\']/td', 'No data found.');
 	}
 
-	public static function filter() {
+	public static function getFilterData() {
 		return [
 			[
 				[
-					'host_gr_name' => 'Zabbix servers'
+					'host_group' => 'Zabbix servers'
 				]
 			],
 			[
 				[
-					'host_gr_name' => 'Zabbix servers',
-					'data_from' => '01.01.2016 00:00',
-					'result'=>
-						[
-							'Test trigger to check tag filter on problem page',
-							'Test trigger with tag'
-						]
+					'host_group' => 'Zabbix servers',
+					'date' => [
+						'from' => '01.01.2016 00:00'
+					],
+					'result' => [
+						'Test trigger to check tag filter on problem page',
+						'Test trigger with tag'
+					]
 				]
 			],
 			[
 				[
-					'host_gr_name' => 'Zabbix servers',
+					'host_group' => 'Zabbix servers',
 					'host' => 'Host ZBX6663',
-					'filter_from_year' => '2016'
+					'date' => [
+						'from' => '01.01.2016 00:00'
+					],
 				]
 			],
 			[
 				[
-					'host_gr_name' => 'Zabbix servers',
+					'host_group' => 'Zabbix servers',
 					'host' => 'ЗАББИКС Сервер',
-					'data_from' => '01.01.2016 00:00',
-					'result' =>
-						[
-							'Test trigger to check tag filter on problem page',
-							'Test trigger with tag'
-						]
+					'date' => [
+						'from' => '01.01.2016 00:00'
+					],
+					'result' => [
+						'Test trigger to check tag filter on problem page',
+						'Test trigger with tag'
+					]
 				]
 			],
 			[
 				[
-					'host_gr_name' => 'Zabbix servers',
+					'host_group' => 'Zabbix servers',
 					'host' => 'ЗАББИКС Сервер',
 				]
 			],
 			[
 				[
-					'host_gr_name' => 'Zabbix servers',
-					'data_from' => '01.01.2016 15:15',
-					'data_till' => '01.01.2017 15:15'
+					'host_group' => 'Zabbix servers',
+					'date' => [
+						'from' => '01.01.2016 15:15',
+						'till' => '01.01.2017 15:15'
+					]
 				]
 			],
 			[
 				[
-					'host_gr_name' => 'Zabbix servers',
+					'host_group' => 'Zabbix servers',
 					'host' => 'ЗАББИКС Сервер',
-					'data_from' => '22.10.2017 01:01',
-					'data_till' => '24.10.2017 01:01',
-					'result' =>
-						[
-							'Test trigger to check tag filter on problem page',
-							'Test trigger with tag'
-						]
+					'date' => [
+						'from' => '22.10.2017 01:01',
+						'till' => '24.10.2017 01:01'
+					],
+					'result' => [
+						'Test trigger to check tag filter on problem page',
+						'Test trigger with tag'
+					]
 				]
 			],
 			[
 				[
-					'data_from' => '23.10.2017 12:35',
-					'data_till' => '23.10.2017 12:36',
-					'result' =>
-						[
-							'Trigger for tag permissions MySQL'
-						]
+					'date' => [
+						'from' => '23.10.2017 12:35',
+						'till' => '23.10.2017 12:36'
+					],
+					'result' => [
+						'Trigger for tag permissions MySQL'
+					]
 				]
 			],
 			[
 				[
-					'data_from' => '23.10.2017 12:33',
-					'data_till' => '23.10.2017 12:36',
-					'result' =>
-						[
-							'Test trigger to check tag filter on problem page',
-							'Trigger for tag permissions MySQL'
-						]
+					'date' => [
+						'from' => '23.10.2017 12:33',
+						'till' => '23.10.2017 12:36'
+					],
+					'result' => [
+						'Test trigger to check tag filter on problem page',
+						'Trigger for tag permissions MySQL'
+					]
 				]
 			],
 			[
 				[
-					'data_from' => '01.01.2016 00:00',
-					'severities' =>
-						[
-							'Not classified',
-							'Information',
-							'Warning'
-						],
-					'result' =>
-						[
-							'Test trigger to check tag filter on problem page'
-						]
+					'date' => [
+						'from' => '01.01.2016 00:00'
+					],
+					'severities' => [
+						'Not classified',
+						'Information',
+						'Warning'
+					],
+					'result' => [
+						'Test trigger to check tag filter on problem page'
+					]
 				]
 			],
 			[
 				[
-					'data_from' => '01.01.2016 00:00',
-					'severities' =>
-						[
-							'Not classified',
-							'Warning',
-							'Information',
-							'Average'
-						]
+					'date' => [
+						'from' => '01.01.2016 00:00'
+					],
+					'severities' => [
+						'Not classified',
+						'Warning',
+						'Information',
+						'Average'
+					]
 				]
 			]
 		];
-}
+	}
 
 	/**
-	 * @dataProvider filter
+	 * @dataProvider getFilterData
 	 */
 	public function testPageReportsTriggerTop_CheckFilter($data) {
 		$this->zbxTestLogin('toptriggers.php');
 		// Click button 'Reset'
 		$this->zbxTestClickButtonText('Reset');
 
-		if (array_key_exists('host_gr_name', $data)) {
+		if (array_key_exists('host_group', $data)) {
 			$this->zbxTestClickButtonMultiselect('groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->zbxTestClickLinkTextWait($data['host_gr_name']);
-			$this->zbxTestAssertElementText('//div[@id=\'groupids_\']/div/ul/li/span/span', $data['host_gr_name']);
+			$this->zbxTestClickLinkTextWait($data['host_group']);
+			$this->zbxTestMultiselectAssertSelected('groupids_', $data['host_group']);
 		}
 
 		if (array_key_exists('host', $data)) {
 			$this->zbxTestClickButtonMultiselect('hostids_');
 			$this->zbxTestLaunchOverlayDialog('Hosts');
-			$this->zbxTestDropdownHasOptions('groupid', ['Host group for tag permissions', 'Zabbix servers', 'ZBX6648 All Triggers','ZBX6648 Disabled Triggers','ZBX6648 Enabled Triggers']);
+			$this->zbxTestDropdownHasOptions('groupid', ['Host group for tag permissions', 'Zabbix servers',
+				'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers']
+			);
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestClickLinkTextWait($data['host']);
-			$this->zbxTestAssertElementText('//div[@id=\'hostids_\']/div/ul/li/span/span', $data['host']);
+			$this->zbxTestMultiselectAssertSelected('hostids_', $data['host']);
 		}
 
-		// Update date in 'From' field
-		if (array_key_exists('data_from',$data)) {
-			$data1 = explode(' ',$data['data_from']);
-			$day_f = explode('.',$data1[0]);
-			$time_f = explode(':',$data1[1]);
-			$this->zbxTestInputTypeOverwrite('filter_from_day',$day_f[0]);
-			$this->zbxTestInputTypeOverwrite('filter_from_month',$day_f[1]);
-			$this->zbxTestInputTypeOverwrite('filter_from_year',$day_f[2]);
-			$this->zbxTestInputTypeOverwrite('filter_from_hour',$time_f[0]);
-			$this->zbxTestInputTypeOverwrite('filter_from_minute',$time_f[1]);
-		}
-
-		// Update date in 'Till' field
-		if (array_key_exists('data_till',$data)) {
-			$data2 = explode(' ',$data['data_till']);
-			$day_t = explode('.',$data2[0]);
-			$time_t = explode(':',$data2[1]);
-			$this->zbxTestInputTypeOverwrite('filter_till_day',$day_t[0]);
-			$this->zbxTestInputTypeOverwrite('filter_till_month',$day_t[1]);
-			$this->zbxTestInputTypeOverwrite('filter_till_year',$day_t[2]);
-			$this->zbxTestInputTypeOverwrite('filter_till_hour',$time_t[0]);
-			$this->zbxTestInputTypeOverwrite('filter_till_minute',$time_t[1]);
+		// Fill in the date in filter
+		if (array_key_exists('date', $data)) {
+			$this->fillInDate($data['date']);
 		}
 
 		if (array_key_exists('severities', $data)) {
@@ -234,7 +223,27 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestTextPresent($data['result']);
 		}
 		else {
-			$this->zbxTestAssertElementText('//table//td[@colspan=\'4\']', 'No data found.');
+			$this->zbxTestAssertElementText('//tr[@class=\'nothing-to-show\']/td', 'No data found.');
+		}
+	}
+
+	/*
+	 * Update date in 'From' and/or 'Till' filter field
+	 */
+
+	public function fillInDate($data) {
+		foreach ($data as $i => $full_date) {
+			$split_date = explode(' ', $full_date);
+			$date = explode('.', $split_date[0]);
+			$time = explode(':', $split_date[1]);
+
+			$fields = [
+				'day' => $date[0], 'month' => $date[1], 'year' => $date[2], 'hour' => $time[0], 'minute' => $time[1]
+			];
+
+			foreach ($fields as $key => $value) {
+				$this->zbxTestInputTypeOverwrite('filter_'.$i.'_'.$key, $value);
+			}
 		}
 	}
 }
