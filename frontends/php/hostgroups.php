@@ -274,7 +274,9 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'config' => $config
+		'config' => $config,
+		'profileIdx' => 'web.groups.filter',
+		'active_tab' => CProfile::get('web.groups.filter.active', 1)
 	];
 
 	$groups = API::HostGroup()->get([

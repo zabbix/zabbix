@@ -111,6 +111,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
 				'show_timeselector' => self::showTimeSelector($this->dashboard['widgets']),
+				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
 			];
 
 			$data['timeline'] = calculateTime([

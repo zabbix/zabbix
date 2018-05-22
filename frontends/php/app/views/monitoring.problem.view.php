@@ -302,6 +302,7 @@ if ($data['action'] == 'problem.view') {
 
 	$filter = (new CFilter())
 		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
 		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
 		->addFormItem((new CVar('page', $data['page']))->removeId());

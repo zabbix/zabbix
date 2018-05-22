@@ -272,6 +272,7 @@ function getItemFilterForm(&$items) {
 
 	$filter = (new CFilter())
 		->setProfile('web.items.filter')
+		->setActiveTab(CProfile::get('web.items.filter.active', 1))
 		->addVar('subfilter_hosts', $subfilter_hosts)
 		->addVar('subfilter_apps', $subfilter_apps)
 		->addVar('subfilter_types', $subfilter_types)

@@ -111,7 +111,6 @@ $widget = (new CWidget())
 $filter = $data['filter'];
 $filterFormView = new CView('common.filter.trigger', [
 	'filter' => [
-		'filterid' => 'web.overview.filter',
 		'showTriggers' => $filter['showTriggers'],
 		'ackStatus' => $filter['ackStatus'],
 		'showSeverity' => $filter['showSeverity'],
@@ -125,7 +124,9 @@ $filterFormView = new CView('common.filter.trigger', [
 		'groupId' => $data['groupid'],
 		'fullScreen' => $data['fullscreen']
 	],
-	'config' => $data['config']
+	'config' => $data['config'],
+	'profileIdx' => $data['profileIdx'],
+	'active_tab' => $data['active_tab']
 ]);
 $filterForm = $filterFormView->render();
 

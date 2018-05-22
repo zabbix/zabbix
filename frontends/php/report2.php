@@ -431,6 +431,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	$reportWidget->addItem(
 		(new CFilter())
 			->setProfile('web.avail_report.filter')
+			->setActiveTab(CProfile::get('web.avail_report.filter.active', 1))
 			->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
 			->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']))
 			->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']))

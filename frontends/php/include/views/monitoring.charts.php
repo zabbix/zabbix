@@ -64,6 +64,7 @@ $chartsWidget = (new CWidget())
 
 $filterForm = (new CFilter())
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->setActiveTab($data['active_tab'])
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 $chartsWidget->addItem($filterForm);
 

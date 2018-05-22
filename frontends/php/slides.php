@@ -177,6 +177,8 @@ $data['timeline'] = calculateTime([
 	'to' => getRequest('to')
 ]);
 
+$data['active_tab'] = CProfile::get('web.slides.filter.active', 1);
+
 $data['fullscreen'] = getRequest('fullscreen');
 
 if ($data['screen']) {

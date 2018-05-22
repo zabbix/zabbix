@@ -176,17 +176,14 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 	}
 }
 
-$profileIdx = 'web.item.graph.filter';
-$profileIdx2 = ($data['action'] == HISTORY_BATCH_GRAPH) ? 0 : reset($data['itemids']);
-
 // create history screen
 if ($data['itemids']) {
 	$screen = CScreenBuilder::getScreen([
 		'resourcetype' => SCREEN_RESOURCE_HISTORY,
 		'action' => $data['action'],
 		'itemids' => $data['itemids'],
-		'profileIdx' => $profileIdx,
-		'profileIdx2' => $profileIdx2,
+		'profileIdx' => $data['profileIdx'],
+		'profileIdx2' => $data['profileIdx2'],
 		'updateProfile' => ($data['from'] !== null && $data['to'] !== null),
 		'from' => $data['from'],
 		'to' => $data['to'],
@@ -240,7 +237,9 @@ else {
 		];
 	}
 
-	$filter_form->setProfile($profileIdx, $profileIdx2);
+	$filter_form
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab']);
 
 	if ($filter_tab) {
 		$filter_form->addFilterTab(_('Filter'), $filter_tab);

@@ -60,7 +60,9 @@ $data = [
 	'fullscreen' => getRequest('fullscreen', 0),
 	'screenid' => getRequest('screenid', CProfile::get('web.hostscreen.screenid', null)),
 	'from' => getRequest('from'),
-	'to' => getRequest('to')
+	'to' => getRequest('to'),
+	'profileIdx' => 'web.screens.filter',
+	'active_tab' => CProfile::get('web.screens.filter.active', 1)
 ];
 CProfile::update('web.hostscreen.screenid', $data['screenid'], PROFILE_TYPE_ID);
 

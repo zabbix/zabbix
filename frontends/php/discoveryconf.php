@@ -313,7 +313,9 @@ else {
 	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'filter' => $filter
+		'filter' => $filter,
+		'profileIdx' => 'web.discoveryconf.filter',
+		'active_tab' => CProfile::get('web.discoveryconf.filter.active', 1)
 	];
 
 	// get drules

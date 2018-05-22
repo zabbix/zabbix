@@ -671,7 +671,9 @@ else {
 			'max_in_table' => $config['max_in_table']
 		],
 		'writable_templates' => $writable_templates,
-		'writable_hosts' => $writable_hosts
+		'writable_hosts' => $writable_hosts,
+		'profileIdx' => 'web.templates.filter',
+		'active_tab' => CProfile::get('web.templates.filter.active', 1)
 	];
 
 	$view = new CView('configuration.template.list', $data);

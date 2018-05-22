@@ -96,7 +96,8 @@ $data = [
 		'updateProfile' => (hasRequest('from') && hasRequest('to')),
 		'from' => getRequest('from'),
 		'to' => getRequest('to')
-	])
+	]),
+	'active_tab' => CProfile::get('web.graphs.filter.active', 1)
 ];
 
 // render view

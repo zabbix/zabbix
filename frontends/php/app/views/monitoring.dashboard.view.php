@@ -160,6 +160,7 @@ else {
 	if ($data['show_timeselector']) {
 		$timeline = (new CFilter())
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 
 		if ($data['kioskmode']) {

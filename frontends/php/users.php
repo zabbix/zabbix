@@ -363,7 +363,9 @@ else {
 		'config' => $config,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'filter' => $filter
+		'filter' => $filter,
+		'profileIdx' => 'web.user.filter',
+		'active_tab' => CProfile::get('web.user.filter.active', 1)
 	];
 
 	// get user groups

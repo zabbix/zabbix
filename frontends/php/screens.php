@@ -121,6 +121,10 @@ else {
 		'screenids' => [$data['screen']['screenid']],
 		'editable' => true
 	]);
+	$data += [
+		'profileIdx' => 'web.screens.filter',
+		'active_tab' => CProfile::get('web.screens.filter.active', 1)
+	];
 }
 ob_end_flush();
 

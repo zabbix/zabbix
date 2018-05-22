@@ -51,7 +51,8 @@ $widget = (new CWidget())
 
 // filter
 $filter = (new CFilter())
-	->setProfile('web.hosts.filter')
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(_('Name'),

@@ -97,6 +97,7 @@ $widget->setControls((new CList([
 
 $filter = (new CFilter())
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->setActiveTab($data['active_tab'])
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 $widget->addItem($filter);
 

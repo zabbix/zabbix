@@ -106,8 +106,15 @@ $data = [
 	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL),
 	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'iv_string' => [ITEM_VALUE_TYPE_LOG => true, ITEM_VALUE_TYPE_TEXT => true],
-	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => true, ITEM_VALUE_TYPE_UINT64 => true]
+	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => true, ITEM_VALUE_TYPE_UINT64 => true],
+	'profileIdx' => 'web.item.graph.filter',
+	'profileIdx2' => 0,
+	'active_tab' => CProfile::get('web.item.graph.filter.active', 1)
 ];
+
+if ($data['action'] != HISTORY_BATCH_GRAPH && is_array($data['itemids'])) {
+	$data['profileIdx2'] = reset($data['itemids']);
+}
 
 // render view
 $historyView = new CView('monitoring.history', $data);

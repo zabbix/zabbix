@@ -40,7 +40,8 @@ $widget = (new CWidget())
 // filter
 $widget->addItem(
 	(new CFilter())
-		->setProfile('web.slideconf.filter')
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
 			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))

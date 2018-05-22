@@ -140,7 +140,9 @@ else {
 		'config' => select_config(),
 		'hosts' => [],
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'profileIdx' => 'web.hostinventories.filter',
+		'active_tab' => CProfile::get('web.hostinventories.filter.active', 1)
 	];
 
 	// filter

@@ -329,6 +329,7 @@ $widget = (new CWidget())
 // Filter
 $filterForm = (new CFilter())
 	->setProfile('web.latest.filter')
+	->setActiveTab(CProfile::get('web.latest.filter.active', 1))
 	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = (new CFormList())

@@ -420,7 +420,9 @@ else {
 			'name' => CProfile::get('web.sysmapconf.filter_name', '')
 		],
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'profileIdx' => 'web.sysmapconf.filter',
+		'active_tab' => CProfile::get('web.sysmapconf.filter.active', 1)
 	];
 
 	// get maps

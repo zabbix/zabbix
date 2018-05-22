@@ -81,7 +81,8 @@ $data = [
 		'updateProfile' => (hasRequest('from') && hasRequest('to')),
 		'from' => getRequest('from'),
 		'to' => getRequest('to')
-	])
+	]),
+	'active_tab' => CProfile::get('web.auditlogs.filter.active', 1)
 ];
 
 // get audit

@@ -151,6 +151,10 @@ $data['pageFilter'] = new CPageFilter([
 
 $data['groupid'] = $data['pageFilter']->groupid;
 $data['hostid'] = $data['pageFilter']->hostid;
+$data += [
+	'profileIdx' => 'web.overview.filter',
+	'active_tab' => CProfile::get('web.overview.filter.active', 1)
+];
 
 // fetch trigger data
 if ($type == SHOW_TRIGGERS) {

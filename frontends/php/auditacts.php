@@ -73,7 +73,8 @@ $data = [
 		'updateProfile' => (hasRequest('from') && hasRequest('to')),
 		'from' => getRequest('from'),
 		'to' => getRequest('to')
-	])
+	]),
+	'active_tab' => CProfile::get('web.auditacts.filter.active', 1)
 ];
 
 $userid = null;

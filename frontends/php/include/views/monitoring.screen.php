@@ -102,7 +102,7 @@ $widget->setControls((new CTag('nav', true, (new CList())
 $screenBuilder = new CScreenBuilder([
 	'screenid' => $data['screen']['screenid'],
 	'mode' => SCREEN_MODE_PREVIEW,
-	'profileIdx' => 'web.screens.filter',
+	'profileIdx' => $data['profileIdx'],
 	'profileIdx2' => $data['screen']['screenid'],
 	'groupid' => getRequest('groupid'),
 	'hostid' => getRequest('hostid'),
@@ -113,7 +113,8 @@ $screenBuilder = new CScreenBuilder([
 
 $widget
 	->addItem((new CFilter())
-		->setProfile('web.screens.filter', $data['screen']['screenid'])
+		->setProfile($data['profileIdx'], $data['screen']['screenid'])
+		->setActiveTab($data['active_tab'])
 		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
 	)
 	->addItem(

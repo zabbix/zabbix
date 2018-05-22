@@ -201,6 +201,7 @@ CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 (new CWidget())
 	->addItem((new CFilter())
 		->setProfile($profileIdx, $profileIdx2)
+		->setActiveTab(CProfile::get($profileIdx.'.active', 1))
 		->addTimeSelector($graph_time->timeline['from'], $graph_time->timeline['to'])
 	)
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))

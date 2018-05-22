@@ -72,12 +72,13 @@ else {
 		'hostid' => $data['hostid'],
 		'from' => $data['from'],
 		'to' => $data['to'],
-		'profileIdx' => 'web.screens.filter',
+		'profileIdx' => $data['profileIdx'],
 		'profileIdx2' => $data['screen']['screenid']
 	]);
 
 	$filter
-		->setProfile('web.screens.filter', $data['screen']['screenid'])
+		->setProfile($data['profileIdx'], $data['screen']['screenid'])
+		->setActiveTab($data['active_tab'])
 		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
 
 	$screen_widget

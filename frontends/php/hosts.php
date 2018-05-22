@@ -1350,7 +1350,9 @@ else {
 		'templates' => $templates,
 		'writable_templates' => $writable_templates,
 		'proxies' => $proxies,
-		'proxies_ms' => $proxies_ms
+		'proxies_ms' => $proxies_ms,
+		'profileIdx' => 'web.hosts.filter',
+		'active_tab' => CProfile::get('web.hosts.filter.active', 1)
 	];
 
 	$hostView = new CView('configuration.host.list', $data);

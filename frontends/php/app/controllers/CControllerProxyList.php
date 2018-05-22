@@ -80,7 +80,9 @@ class CControllerProxyList extends CController {
 			'filter' => $filter,
 			'config' => [
 				'max_in_table' => $config['max_in_table']
-			]
+			],
+			'profileIdx' => 'web.proxies.filter',
+			'active_tab' => CProfile::get('web.proxies.filter.active', 1)
 		];
 
 		$data['proxies'] = API::Proxy()->get([

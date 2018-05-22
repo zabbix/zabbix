@@ -124,7 +124,7 @@ class CFilter extends CDiv {
 	}
 
 	/**
-	 * Set profile 'idx' and 'idx2' data. Set current expanded tab from profile value '{$idx}.active'.
+	 * Set profile 'idx' and 'idx2' data.
 	 *
 	 * @param string $idx     Profile 'idx' string.
 	 * @param int    $idx2    Profile 'idx2' identifier, default 0.
@@ -135,7 +135,6 @@ class CFilter extends CDiv {
 		$this->idx = $idx;
 		$this->idx2 = $idx2;
 
-		$this->setActiveTab(CProfile::get($idx.'.active', 1));
 		$this->setAttribute('data-profile-idx', $idx);
 		$this->setAttribute('data-profile-idx2', $idx2);
 
