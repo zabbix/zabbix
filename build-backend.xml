@@ -36,7 +36,7 @@
 
 	<!-- Cppcheck static analyzer target -->
 	<target name="cppcheck-static-analyzer">
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="scan-build" failonerror="on">
 			<arg line="./configure"/>
 			<arg line="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent --with-ldap --with-libcurl"/>
@@ -60,7 +60,7 @@
 	<!-- Clang Static Analyzer target with various configuration parameters -->
 	<target name="clang-static-analyzer" depends="init-conf-options">
 		<delete dir="clang-scan-build-reports"/>
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 		<for list="${conf.list}" param="name" delimiter=",">
@@ -94,8 +94,8 @@
 
 	<target name="init">
 		<!-- Create database schema -->
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<exec executable="./configure" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on"/>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
 			<arg line="-j5"/>
@@ -250,7 +250,7 @@
 
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
-	
+
 	<macrodef name="make-tests">
 		<!-- Build Zabbix cmocka tests with the specified command line arguments -->
 		<attribute name="conf"/>
@@ -289,7 +289,7 @@
 			</trycatch>
 		</sequential>
 	</macrodef>
-	
+
 	<target name="init-cmocka-test-conf-options">
 		<!-- Zabbix various configuration parameters for cmocka tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
@@ -304,7 +304,7 @@
 		<!-- Build Zabbix with cmocka tests -->
 		<delete dir="tests_results"/>
 		<mkdir dir="tests_results"/>
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<propertyselector property="conf.list" delimiter="," match="cmocka-(.*)" select="\1"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 		<for list="${conf.list}" param="name" delimiter=",">
@@ -312,6 +312,34 @@
 				<make-tests conf="${cmocka-@{name}}" conf-name="@{name}"/>
 			</sequential>
 		</for>
+	</target>
+
+	<target name="gen-test-coverage-report">
+		<!-- Generate Zabbix cmocka tests coverage report-->
+		<delete dir="tests_results"/>
+		<mkdir dir="tests_results"/>
+		<mkdir dir="tests_results/html"/>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--directory"/>
+			<arg line="src"/>
+			<arg line="-zerocounters"/>
+		</exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql" conf-name="gen-test-coverage-report"/>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--directory"/>
+			<arg line="src"/>
+			<arg line="--capture"/>
+			<arg line="--output-file"/>
+			<arg line="tests_results/html/app.info"/>
+		</exec>
+		<exec executable="genhtml" failonerror="on">
+			<arg line="-p"/>
+			<arg line="${user.dir}"/>
+			<arg line="-o"/>
+			<arg line="tests_results/html"/>
+			<arg line="tests_results/html/app.info"/>
+		</exec>
 	</target>
 
 	<target name="run-unit-test">
