@@ -117,7 +117,7 @@ jQuery(function ($){
 			var button = $(this),
 				input = element[button.is(element.from_clndr) ? 'from' : 'to'].get(0);
 
-			button.data('clndr', create_calendar(null, input, null, '', ''))
+			button.data('clndr', create_calendar(null, input, null, button.attr('id'), ''))
 				.data('input', input)
 				.click(toggleCalendarPickerHandler);
 		});
@@ -180,7 +180,7 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function toggleCalendarPickerHandler(e) {
-		var button = $(this,)
+		var button = $(this),
 			offset = button.offset();
 
 		if (!ui_disabled) {
