@@ -24,8 +24,19 @@
 #ifdef _WINDOWS
 #	include "sysinfo.h"
 #endif
+#define ZBX_PTHREAD
 
 #ifndef _WINDOWS
+#ifdef ZBX_PTHREAD
+typedef struct
+{
+	pthread_mutex_t		mutexes[ZBX_MUTEX_COUNT];
+}
+zbx_shared_lock_t;
+
+static zbx_shared_lock_t	*shared_lock;
+static int			shm_id = -1;
+#else
 #	if !HAVE_SEMUN
 		union semun
 		{
@@ -44,6 +55,7 @@
 
 	static int		ZBX_SEM_LIST_ID = -1;
 	static unsigned char	mutexes = 0;
+#endif
 #endif
 
 /******************************************************************************
@@ -68,6 +80,42 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 	{
 		*error = zbx_dsprintf(*error, "error on mutex creating: %s", strerror_from_system(GetLastError()));
 		return FAIL;
+	}
+#else
+#ifdef	ZBX_PTHREAD
+	if (-1 == shm_id)
+	{
+		int			i;
+		pthread_mutexattr_t	mta;
+
+		if (-1 == (shm_id = shmget(IPC_PRIVATE, ZBX_SIZE_T_ALIGN8(sizeof(zbx_shared_lock_t)),
+				IPC_CREAT | IPC_EXCL | 0600)))
+		{
+			*error = zbx_dsprintf(*error, "cannot allocate shared memory for locks");
+			return FAIL;
+		}
+
+		if ((void *)(-1) == (shared_lock = (zbx_shared_lock_t *)shmat(shm_id, NULL, 0)))
+		{
+			*error = zbx_dsprintf(*error, "cannot attach shared memory for locks: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		memset(shared_lock, 0, sizeof(zbx_shared_lock_t));
+
+		/* immediately mark the new shared memory for destruction after attaching to it */
+		if (-1 == shmctl(shm_id, IPC_RMID, 0))
+		{
+			*error = zbx_dsprintf(*error, "cannot mark the new shared memory for destruction: %s",
+					zbx_strerror(errno));
+			return FAIL;
+		}
+
+		pthread_mutexattr_init(&mta);
+		pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED);
+
+		for (i = 0; ZBX_MUTEX_COUNT > i; i++)
+			pthread_mutex_init(&shared_lock->mutexes[i], &mta);
 	}
 #else
 	if (-1 == ZBX_SEM_LIST_ID)
@@ -99,9 +147,9 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 			return FAIL;
 		}
 	}
-
-	*mutex = name;
 	mutexes++;
+#endif
+	*mutex = name;
 #endif
 	return SUCCEED;
 }
@@ -120,7 +168,9 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #ifndef _WINDOWS
+#ifndef	ZBX_PTHREAD
 	struct sembuf	sem_lock;
+#endif
 #else
 	DWORD   dwWaitResult;
 #endif
@@ -152,6 +202,13 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 			exit(EXIT_FAILURE);
 	}
 #else
+#ifdef	ZBX_PTHREAD
+	if (0 != pthread_mutex_lock(&shared_lock->mutexes[*mutex]))
+	{
+		zbx_error("[file:'%s',line:%d] lock failed: %s", filename, line, zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+#else
 	sem_lock.sem_num = *mutex;
 	sem_lock.sem_op = -1;
 	sem_lock.sem_flg = SEM_UNDO;
@@ -164,6 +221,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 			exit(EXIT_FAILURE);
 		}
 	}
+#endif
 #endif
 }
 
@@ -181,7 +239,9 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #ifndef _WINDOWS
+#ifndef	ZBX_PTHREAD
 	struct sembuf	sem_unlock;
+#endif
 #endif
 
 	if (ZBX_MUTEX_NULL == *mutex)
@@ -192,6 +252,13 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
+		exit(EXIT_FAILURE);
+	}
+#else
+#ifdef	ZBX_PTHREAD
+	if (0 != pthread_mutex_unlock(&shared_lock->mutexes[*mutex]))
+	{
+		zbx_error("[file:'%s',line:%d] unlock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 #else
@@ -207,6 +274,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 			exit(EXIT_FAILURE);
 		}
 	}
+#endif
 #endif
 }
 
@@ -230,8 +298,13 @@ void	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 	if (0 == CloseHandle(*mutex))
 		zbx_error("error on mutex destroying: %s", strerror_from_system(GetLastError()));
 #else
+#ifdef	ZBX_PTHREAD
+	if (0 != pthread_mutex_destroy(&shared_lock->mutexes[*mutex]))
+		zbx_error("cannot remove semaphore %d: %s", *mutex, zbx_strerror(errno));
+#else
 	if (0 == --mutexes && -1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
 		zbx_error("cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));
+#endif
 #endif
 	*mutex = ZBX_MUTEX_NULL;
 }
