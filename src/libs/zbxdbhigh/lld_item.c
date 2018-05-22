@@ -1914,20 +1914,23 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
  *             dependencies - [IN] item dependencies                          *
  *                                                                            *
  * Returns: number of dependencies                                            *
+ *                                                                            *
  ******************************************************************************/
 static int lld_item_dependencies_count(zbx_item_dependence_t *dependence, const zbx_vector_ptr_t *dependencies)
 {
 	int i, num = 0;
-
-	if (ZBX_FLAG_DISCOVERY_PROTOTYPE != dependence->item_flags && 0 < dependence->master_itemid)
-		num++;
 
 	for (i = 0; i < dependencies->values_num; i++)
 	{
 		zbx_item_dependence_t	*next_dep = (zbx_item_dependence_t *)dependencies->values[i];
 
 		if (next_dep->master_itemid == dependence->itemid)
+		{
+			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != dependence->item_flags)
+				num++;
+
 			num += lld_item_dependencies_count(next_dep, dependencies);
+		}
 	}
 
 	return num;
@@ -1967,6 +1970,22 @@ static int lld_item_dependencies_num_check(zbx_uint64_t itemid, const zbx_vector
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_item_dependence_create                                       *
+ *                                                                            *
+ * Purpose: create a item dependence                                          *
+ *                                                                            *
+ * Parameters: itemid        - [IN] item id                                   *
+ *             master_itemid - [IN] master item id                            *
+ *             item_flags    - [IN] item flags (ZBX_FLAG_DISCOVERY_*)         *
+ *                                                                            *
+ * Returns: item dependence                                                   *
+ *                                                                            *
+ * Comments: Memory is allocated to store item dependence. This memory must   *
+ *           be freed by the caller.                                          *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_item_dependence_t	*lld_item_dependence_create(zbx_uint64_t itemid, zbx_uint64_t master_itemid,
 				unsigned int item_flags)
 {
@@ -2510,13 +2529,10 @@ static zbx_item_dependence_t	*lld_item_dependence_add(DB_ROW row, zbx_vector_ptr
  *          account item prototypes                                           *
  *                                                                            *
  * Parameters: item_prototypes   - [IN] item prototypes                       *
- *             items             - [IN] items that don't take into account in *
- *                                      dependencies                          *
  *             item_dependencies - [OUT] list of dependencies                 *
  *                                                                            *
  ******************************************************************************/
-static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *items,
-		zbx_vector_ptr_t *item_dependencies)
+static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *item_dependencies)
 {
 	const char		*__function_name = "lld_item_dependencies_get";
 
@@ -2533,12 +2549,6 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, c
 	zbx_vector_uint64_create(&current_itemids);
 	zbx_vector_uint64_create(&next_check_itemids);
 	zbx_vector_uint64_create(&next_check_masteritemids);
-
-	for (i = 0; i < items->values_num; i++)
-	{
-		if (0 < ((zbx_lld_item_t *)items->values[i])->itemid)
-			zbx_vector_uint64_append(&current_itemids, ((zbx_lld_item_t *)items->values[i])->itemid);
-	}
 
 	for (i = 0; i < item_prototypes->values_num; i++)
 	{
@@ -2564,14 +2574,6 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, c
 				ZBX_FLAG_DISCOVERY_PROTOTYPE);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", next_check_itemids.values,
 				next_check_itemids.values_num);
-
-		if (0 < current_itemids.values_num)
-		{
-			/* exclude items that were created by current prototypes earlier */
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", current_itemids.values,
-					current_itemids.values_num);
-		}
 
 		zbx_vector_uint64_clear(&next_check_itemids);
 
@@ -2599,14 +2601,6 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, c
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "master_itemid", next_check_masteritemids.values,
 				next_check_masteritemids.values_num);
 
-		if (0 < current_itemids.values_num)
-		{
-			/* exclude items that were created by current prototypes earlier */
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", current_itemids.values,
-					current_itemids.values_num);
-		}
-
 		zbx_vector_uint64_clear(&next_check_masteritemids);
 
 		result = DBselect("%s", sql);
@@ -2621,7 +2615,6 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, c
 
 	zbx_free(sql);
 
-	zbx_vector_uint64_destroy(&current_itemids);
 	zbx_vector_uint64_destroy(&next_check_itemids);
 	zbx_vector_uint64_destroy(&next_check_masteritemids);
 
@@ -2711,7 +2704,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	}
 
 	zbx_vector_ptr_create(&item_dependencies);
-	lld_item_dependencies_get(item_prototypes, items, &item_dependencies);
+	lld_item_dependencies_get(item_prototypes, &item_dependencies);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -3975,8 +3968,8 @@ static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes
 	{
 		for (j = 0; j < lld_rows->values_num; j++)
 		{
-			lld_application_make((zbx_lld_application_prototype_t *)application_prototypes->values[i], (zbx_lld_row_t *)lld_rows->values[j], applications,
-					applications_index);
+			lld_application_make((zbx_lld_application_prototype_t *)application_prototypes->values[i],
+					(zbx_lld_row_t *)lld_rows->values[j], applications, applications_index);
 		}
 	}
 
