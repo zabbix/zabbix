@@ -357,23 +357,3 @@ tests/libs/zbxdbcache/zbx_vc_add_values.yaml -text
 tests/libs/zbxdbcache/zbx_vc_get_value.yaml -text
 tests/libs/zbxdbcache/zbx_vc_get_values.yaml -text
 tests/libs/zbxhistory/zbx_history_get_values.yaml -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
