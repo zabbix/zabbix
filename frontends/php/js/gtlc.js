@@ -96,14 +96,12 @@ jQuery(function ($){
 			event = 'timeselector.rangechange';
 			data = {
 				from: element.from.val(),
-				to: element.to.val(),
-				collapse: true
+				to: element.to.val()
 			}
 		}
 		else if (element.quickranges.index(target) != -1) {
 			event = 'timeselector.rangechange';
 			data = target.data();
-			data.collapse = true;
 			element.quickranges.removeClass('selected');
 			target.addClass('selected');
 		}
@@ -156,10 +154,6 @@ jQuery(function ($){
 
 		element.from_clndr.data('clndr').clndr.clndrhide();
 		element.to_clndr.data('clndr').clndr.clndrhide();
-
-		if (data.collapse && 'error' in data === false) {
-			element.label.closest('.ui-tabs-collapsible').tabs('option', 'active', false);
-		}
 
 		element.quickranges.removeClass('selected');
 		element.quickranges.filter('[data-label="'+data.label+'"]').addClass('selected');
