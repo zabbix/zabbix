@@ -1030,13 +1030,12 @@ foreach ($data['preprocessing'] as $i => $step) {
 }
 
 $preprocessing->addRow(
-	$readonly
-		? null
-		: (new CCol(
-			(new CButton('param_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-		))->setColSpan(5)
+	(new CCol(
+		(new CButton('param_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+			->setEnabled(!$readonly)
+	))->setColSpan(5)
 );
 
 $item_preproc_list = (new CFormList('item_preproc_list'))
