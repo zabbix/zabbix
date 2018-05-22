@@ -112,8 +112,8 @@ $data = [
 	'active_tab' => CProfile::get('web.item.graph.filter.active', 1)
 ];
 
-if ($data['action'] != HISTORY_BATCH_GRAPH && is_array($data['itemids'])) {
-	$data['profileIdx2'] = reset($data['itemids']);
+if ($data['action'] != HISTORY_BATCH_GRAPH && is_array($itemids)) {
+	$data['profileIdx2'] = reset($itemids);
 }
 
 // render view

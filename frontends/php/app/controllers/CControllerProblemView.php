@@ -308,7 +308,6 @@ class CControllerProblemView extends CController {
 				'event_ack_enable' => $config['event_ack_enable']
 			],
 			'profileIdx' => 'web.problem.filter',
-			'profileIdx2' => 0,
 			'active_tab' => CProfile::get('web.problem.filter.active', 1)
 		];
 

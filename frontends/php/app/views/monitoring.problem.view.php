@@ -61,7 +61,7 @@ switch ($data['filter']['show']) {
 
 	case TRIGGERS_OPTION_ALL:
 		$options['profileIdx'] = $data['profileIdx'];
-		$options['profileIdx2'] = $data['profileIdx2'];
+		$options['profileIdx2'] = 0;
 		$options['updateProfile'] = $data['updateProfile'];
 		$options['from'] = $data['from'];
 		$options['to'] = $data['to'];
@@ -301,7 +301,7 @@ if ($data['action'] == 'problem.view') {
 		]);
 
 	$filter = (new CFilter())
-		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
 		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())

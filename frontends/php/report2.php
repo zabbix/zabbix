@@ -474,7 +474,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		]);
 	}
 
-	$reportWidget->addItem([$triggerTable, $paging])
+	$reportWidget
+		->addItem([$triggerTable, $paging])
 		->show();
 }
 
