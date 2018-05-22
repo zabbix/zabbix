@@ -41,7 +41,6 @@ class CControllerProfileUpdate extends CController {
 				case 'web.discoveryconf.filter.active':
 				case 'web.groups.filter.active':
 				case 'web.hostinventories.filter.active':
-				case 'web.hostscreen.filter.active':
 				case 'web.httpconf.filter.active':
 				case 'web.httpdetails.filter.active':
 				case 'web.hosts.filter.active':
@@ -70,7 +69,6 @@ class CControllerProfileUpdate extends CController {
 
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
-				case 'web.problem.filter':
 				case 'web.dashbrd.navtree.item.selected':
 				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 					$ret = $this->hasInput('idx2');
