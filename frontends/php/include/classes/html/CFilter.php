@@ -31,8 +31,6 @@ class CFilter extends CDiv {
 	protected $headers = [];
 	// Array of filter tab content.
 	protected $tabs = [];
-	// jQuery.tabs disabled tabs list.
-	protected $tabs_disabled = [];
 	// jQuery.tabs initialization options.
 	protected $tabs_options = [
 		'collapsible' => true,
@@ -307,7 +305,7 @@ class CFilter extends CDiv {
 	private function getJS() {
 		$id = '#'.$this->getId();
 		$js = 'var multiselects = jQuery("'.$id.'").tabs('.
-			CJs::encodeJson(array_merge($this->tabs_options, ['disabled' => $this->tabs_disabled])).
+			CJs::encodeJson($this->tabs_options).
 		').find(".multiselect");'.
 
 		'if (multiselects.length) {'.
