@@ -223,20 +223,25 @@ jQuery(function ($){
 		xhr = $.post(endpoint.getUrl(), args, 'json')
 			.success(function (json) {
 				request_data = $.extend(data, request_data, json, {event: e.namespace});
-				container.find('.red').remove();
 				updateTimeSelectorUI(request_data);
 
 				if (json.error) {
-					$.each(json.error, function(field, message) {
-						var input = $('#' + field);
+					container.find('.time-input-error').each(function (i, elm) {
+						var node = $(elm),
+							field = node.attr('data-error-for');
 
-						if (input.length) {
-							$('<div class="red"/>').css({position: 'absolute'}).text(message).insertAfter(input);
+						if (json.error[field]) {
+							node.show()
+								.find('.red').text(json.error[field]);
+						}
+						else {
+							node.hide();
 						}
 					});
 					delete request_data.error;
 				}
 				else {
+					container.find('.time-input-error').hide();
 					$.publish('timeselector.rangeupdate', request_data);
 				}
 			})

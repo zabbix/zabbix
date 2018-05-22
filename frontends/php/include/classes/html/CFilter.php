@@ -263,15 +263,27 @@ class CFilter extends CDiv {
 		$this->addTab(
 			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
 			(new CDiv([
-				(new CDiv(
-					(new CList([
+				(new CDiv([
+					new CList([
 						new CLabel(_('From:'), 'from'), new CTextBox('from', $from),
-						(new CButton('from_calendar'))->addClass(ZBX_STYLE_ICON_CAL),
+						(new CButton('from_calendar'))->addClass(ZBX_STYLE_ICON_CAL)
+					]),
+					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+						->setAttribute('data-error-for', 'from')
+						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+						->addStyle('display: none'),
+					new CList([
 						new CLabel(_('To:'), 'to'), new CTextBox('to', $to),
-						(new CButton('to_calendar'))->addClass(ZBX_STYLE_ICON_CAL),
+						(new CButton('to_calendar'))->addClass(ZBX_STYLE_ICON_CAL)
+					]),
+					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+						->setAttribute('data-error-for', 'to')
+						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+						->addStyle('display: none'),
+					new CList([
 						(new CButton('apply', _('Apply')))
-					]))->addClass(ZBX_STYLE_TABLE_FORMS)
-				))->addClass(ZBX_STYLE_TIME_INPUT),
+					])
+				]))->addClass(ZBX_STYLE_TIME_INPUT),
 				(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
 			]))
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
