@@ -295,7 +295,9 @@
 		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
 		<property name="cmocka-1-default" value="-q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
-		<property name="cmocka-2-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="cmocka-2-agent-only" value="-q --enable-agent"/>
+		<property name="cmocka-3-server-only" value="-q --enable-server --with-mysql"/>
+		<property name="cmocka-4-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 	</target>
 
 	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">
