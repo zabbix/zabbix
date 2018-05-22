@@ -25,10 +25,19 @@
 #include "zbxalgo.h"
 #include "valuecache.h"
 #include "macrofunc.h"
+#include "zbxregexp.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
 #	include <libxml/tree.h>
 #	include <libxml/xpath.h>
+#	include <libxml/xmlerror.h>
+
+typedef struct
+{
+	char	*buf;
+	size_t	len;
+}
+zbx_libxml_error_t;
 #endif
 
 /* The following definitions are used to identify the request field */
@@ -4679,7 +4688,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 		}
 
 		if (0 == ret_unknown && SUCCEED != evaluate_function(value, &items[i], func->function,
-				func->parameter, func->timespec.sec, &error))
+				func->parameter, &func->timespec, &error))
 		{
 			/* compose and store error message for future use */
 			if (NULL != error)
@@ -5145,6 +5154,14 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 		replace_to_esc = xml_escape_dyn(replace_to);
 		zbx_free(replace_to);
 		replace_to = replace_to_esc;
+	}
+	else if (0 != (flags & ZBX_TOKEN_REGEXP))
+	{
+		zbx_regexp_escape(&replace_to);
+	}
+	else if (0 != (flags & ZBX_TOKEN_XPATH))
+	{
+		xml_escape_xpath(&replace_to);
 	}
 
 	(*data)[token->token.r + 1] = c;
@@ -5709,3 +5726,81 @@ exit:
 #endif
 }
 
+#ifdef HAVE_LIBXML2
+/******************************************************************************
+ *                                                                            *
+ * Function: libxml_handle_error                                              *
+ *                                                                            *
+ * Purpose: libxml2 callback function for error handle                        *
+ *                                                                            *
+ * Parameters: user_data - [IN/OUT] the user context                          *
+ *             err       - [IN] the libxml2 error message                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+{
+	zbx_libxml_error_t	*err_ctx;
+
+	if (NULL == user_data)
+		return;
+
+	err_ctx = (zbx_libxml_error_t *)user_data;
+	zbx_strlcat(err_ctx->buf, err->message, err_ctx->len);
+
+	if (NULL != err->str1)
+		zbx_strlcat(err_ctx->buf, err->str1, err_ctx->len);
+
+	if (NULL != err->str2)
+		zbx_strlcat(err_ctx->buf, err->str2, err_ctx->len);
+
+	if (NULL != err->str3)
+		zbx_strlcat(err_ctx->buf, err->str3, err_ctx->len);
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: xml_xpath_check                                                  *
+ *                                                                            *
+ * Purpose: validate xpath string                                             *
+ *                                                                            *
+ * Parameters: xpath  - [IN] the xpath value                                  *
+ *             error  - [OUT] the error message buffer                        *
+ *             errlen - [IN] the size of error message buffer                 *
+ *                                                                            *
+ * Return value: SUCCEED - the xpath component was parsed successfully        *
+ *               FAIL    - xpath parsing error                                *
+ *                                                                            *
+ ******************************************************************************/
+int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(xpath);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(errlen);
+	return FAIL;
+#else
+	zbx_libxml_error_t	err;
+	xmlXPathContextPtr	ctx;
+	xmlXPathCompExprPtr	p;
+
+	err.buf = error;
+	err.len = errlen;
+
+	ctx = xmlXPathNewContext(NULL);
+	xmlSetStructuredErrorFunc(&err, &libxml_handle_error);
+
+	p = xmlXPathCtxtCompile(ctx, (xmlChar *)xpath);
+	xmlSetStructuredErrorFunc(NULL, NULL);
+
+	if (NULL == p)
+	{
+		xmlXPathFreeContext(ctx);
+		return FAIL;
+	}
+
+	xmlXPathFreeCompExpr(p);
+	xmlXPathFreeContext(ctx);
+	return SUCCEED;
+#endif
+}

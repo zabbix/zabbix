@@ -105,9 +105,16 @@ if ($data['isCommentExist']) {
 	];
 }
 
-echo (new CJson())->encode([
+$output = [
 	'header' => $data['title'],
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => $script_inline
-]);
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);

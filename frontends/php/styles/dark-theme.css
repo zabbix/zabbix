@@ -13,6 +13,9 @@
 .top-nav-zbbshare {
   background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important; }
 
+.top-nav-support {
+  background: url(../img/icon-sprite.svg) no-repeat -245px -32px !important; }
+
 .btn-search {
   background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important; }
 
@@ -291,6 +294,10 @@ ul.top-nav-icons {
     width: auto;
     padding: 0 6px 0 17px;
     -webkit-transform-style: preserve-3d; }
+  ul.top-nav-icons .top-nav-support {
+    background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
+    width: auto;
+    padding: 0 6px 0 17px; }
   ul.top-nav-icons form {
     position: relative; }
   ul.top-nav-icons input {
@@ -301,7 +308,12 @@ ul.top-nav-icons {
     color: #f2f2f2;
     padding: 4px 24px 4px 5px;
     opacity: 1;
-    filter: alpha(opacity=100); }
+    filter: alpha(opacity=100);
+    transition: width 0.5s;
+    -webkit-transition: width 0.5s; }
+    @media (max-width: 1050px) {
+      ul.top-nav-icons input {
+        width: 130px; } }
     ul.top-nav-icons input:focus {
       background-color: #383838;
       border: 1px solid #4f4f4f;
@@ -505,10 +517,255 @@ output {
       background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px; }
     .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td button:focus {
       box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); }
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-command,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-close,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-msg,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-msgs,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-up,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-down,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-message,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-ack,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-problem-generated,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-problem-recovery,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow,
+  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-red, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-command,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-close,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-msg,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-msgs,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-up,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-down,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-message,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-ack,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-problem-generated,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-problem-recovery,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow,
+  .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-red, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-command,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-close,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-msg,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-msgs,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-up,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-down,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-message,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-ack,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-problem-generated,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-problem-recovery,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow,
+  .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-red, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-command,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-close,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-msg,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-msgs,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-up,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-down,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-message,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-ack,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-problem-generated,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-problem-recovery,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow,
+  .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-red, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-command,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-close,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-msg,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-msgs,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-up,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-down,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-message,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-ack,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-problem-generated,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-problem-recovery,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow,
+  .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-red, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-command,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-close,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-msg,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-msgs,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-up,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-down,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-message,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-ack,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-problem-generated,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-problem-recovery,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow,
+  .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-red {
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    background-color: #2b2b2b; }
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-command:only-of-type, .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-command:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-close:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-close:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-msg:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-msg:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-msgs:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-msgs:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-message:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-message:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-ack:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-action-ack:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-problem-generated:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-problem-generated:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:last-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:only-of-type,
+    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:last-of-type, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-command:only-of-type, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-command:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-close:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-close:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-msg:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-msg:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-msgs:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-msgs:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-message:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-message:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-ack:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-action-ack:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-problem-generated:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-problem-generated:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:last-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:only-of-type,
+    .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:last-of-type, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-command:only-of-type, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-command:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-close:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-close:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-msg:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-msg:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-msgs:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-msgs:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-message:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-message:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-ack:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-action-ack:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-problem-generated:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-problem-generated:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:last-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:only-of-type,
+    .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:last-of-type, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-command:only-of-type, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-command:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-close:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-close:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-msg:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-msg:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-msgs:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-msgs:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-message:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-message:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-ack:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-action-ack:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-problem-generated:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-problem-generated:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:last-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:only-of-type,
+    .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:last-of-type, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-command:only-of-type, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-command:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-close:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-close:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-msg:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-msg:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-msgs:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-msgs:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-message:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-message:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-ack:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-action-ack:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-problem-generated:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-problem-generated:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:last-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:only-of-type,
+    .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:last-of-type, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-command:only-of-type, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-command:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-close:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-close:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-msg:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-msg:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-msgs:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-msgs:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-up:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-down:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-severity-changed:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-message:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-message:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-ack:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-action-ack:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-problem-generated:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-problem-generated:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-problem-recovery:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-gray:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-yellow:last-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:only-of-type,
+    .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-actions-number-red:last-of-type {
+      margin: 0; }
   .list-table.compact-view .link-action {
     color: #f2f2f2; }
     .list-table.compact-view .link-action.red {
       color: #e45959; }
+    .list-table.compact-view .link-action.orange {
+      color: #f24f1d; }
+    .list-table.compact-view .link-action.yellow {
+      color: #e99003; }
     .list-table.compact-view .link-action.green {
       color: #59db8f; }
     .list-table.compact-view .link-action:hover {
@@ -524,6 +781,15 @@ output {
       max-width: 40px;
       margin: -2px 3px 0 0;
       padding: 2px 3px; }
+      @media screen and (min-width: 1200px) {
+        .list-table.compact-view td .tag {
+          max-width: 71px; } }
+      @media screen and (min-width: 1400px) {
+        .list-table.compact-view td .tag {
+          max-width: 102px; } }
+      @media screen and (min-width: 1600px) {
+        .list-table.compact-view td .tag {
+          max-width: 133px; } }
     .list-table.compact-view td .rel-container {
       display: inline; }
     .list-table.compact-view td .icon-wzrd-action {
@@ -540,6 +806,33 @@ output {
     vertical-align: bottom;
     border-bottom: 2px solid #2b2b2b;
     text-align: left; }
+    .list-table thead th.column-tags-1 {
+      width: 75px; }
+    .list-table thead th.column-tags-2 {
+      width: 124px; }
+    .list-table thead th.column-tags-3 {
+      width: 173px; }
+    @media screen and (min-width: 1200px) {
+      .list-table thead th.column-tags-1 {
+        width: 106px; }
+      .list-table thead th.column-tags-2 {
+        width: 186px; }
+      .list-table thead th.column-tags-3 {
+        width: 266px; } }
+    @media screen and (min-width: 1400px) {
+      .list-table thead th.column-tags-1 {
+        width: 137px; }
+      .list-table thead th.column-tags-2 {
+        width: 248px; }
+      .list-table thead th.column-tags-3 {
+        width: 359px; } }
+    @media screen and (min-width: 1600px) {
+      .list-table thead th.column-tags-1 {
+        width: 168px; }
+      .list-table thead th.column-tags-2 {
+        width: 310px; }
+      .list-table thead th.column-tags-3 {
+        width: 452px; } }
     .list-table thead th .arrow-up {
       margin: 0 0 0 3px;
       border-bottom-color: #737373; }
@@ -839,13 +1132,19 @@ output {
       padding: 8px 5px 5px 5px;
       border-bottom-width: 1px; }
 
+.subfilter,
 .subfilter-enabled {
   display: inline-block;
-  position: relative;
   height: 18px;
-  padding: 0 4px;
-  color: #f2f2f2;
+  position: relative; }
+
+.subfilter {
+  margin-right: 10px; }
+
+.subfilter-enabled {
   background-color: #4f4f4f;
+  color: #f2f2f2;
+  padding: 0 4px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
@@ -1209,18 +1508,30 @@ output {
     position: relative;
     display: inline-block;
     margin: 0 -1px 0 0; }
-    .radio-segmented li:first-child label {
-      -webkit-border-radius: 2px 0 0 2px;
-      -moz-border-radius: 2px 0 0 2px;
-      border-radius: 2px 0 0 2px; }
-    .radio-segmented li:last-child label {
-      -webkit-border-radius: 0 2px 2px 0;
-      -moz-border-radius: 0 2px 2px 0;
-      border-radius: 0 2px 2px 0; }
-    .radio-segmented li:only-child label {
-      -webkit-border-radius: 2px;
-      -moz-border-radius: 2px;
-      border-radius: 2px; }
+    .radio-segmented li:first-child {
+      -webkit-border-radius: 3px 0 0 3px;
+      -moz-border-radius: 3px 0 0 3px;
+      border-radius: 3px 0 0 3px; }
+      .radio-segmented li:first-child label {
+        -webkit-border-radius: 2px 0 0 2px;
+        -moz-border-radius: 2px 0 0 2px;
+        border-radius: 2px 0 0 2px; }
+    .radio-segmented li:last-child {
+      -webkit-border-radius: 0 3px 3px 0;
+      -moz-border-radius: 0 3px 3px 0;
+      border-radius: 0 3px 3px 0; }
+      .radio-segmented li:last-child label {
+        -webkit-border-radius: 0 2px 2px 0;
+        -moz-border-radius: 0 2px 2px 0;
+        border-radius: 0 2px 2px 0; }
+    .radio-segmented li:only-child {
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      border-radius: 3px; }
+      .radio-segmented li:only-child label {
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px; }
   .radio-segmented label {
     padding: 4px 11px;
     border: 1px solid #4f4f4f;
@@ -2759,10 +3070,14 @@ a.link-action {
   color: #f2f2f2; }
   a.link-action.red {
     color: #e45959; }
-  a.link-action.green {
-    color: #59db8f; }
   a.link-action.orange {
     color: #f24f1d; }
+  a.link-action.yellow {
+    color: #e99003; }
+  a.link-action.green {
+    color: #59db8f; }
+  a.link-action.grey {
+    color: #737373; }
   a.link-action:hover {
     color: #4796c4;
     border-bottom: 1px solid rgba(71, 150, 196, 0.5); }
@@ -3635,7 +3950,7 @@ svg {
   .navtree .tree .tree-item > .tree-row {
     width: 100%;
     min-width: 320px;
-    border-bottom: 1px solid #303030;
+    border-bottom: 1px solid #383838;
     padding: 8px 0; }
     .navtree .tree .tree-item > .tree-row:hover {
       background-color: #383838; }
@@ -3790,9 +4105,11 @@ svg {
   display: inline-block;
   position: relative;
   height: 18px;
-  width: 16px;
+  width: 18px;
   margin: 0 5px 0 0;
-  top: 5px; }
+  top: 0;
+  bottom: 0;
+  vertical-align: bottom; }
   .icon-action-command::before,
   .icon-action-close::before,
   .icon-action-msg::before,
@@ -3838,52 +4155,52 @@ svg {
     width: 18px; }
 
 .icon-action-command::before {
-  background-position: -224px -246px; }
+  background-position: -249px -245px; }
 
 .icon-action-close::before {
-  background-position: -198px -246px; }
+  background-position: -224px -245px; }
 
 .icon-action-msg::before {
-  background-position: -299px -246px; }
+  background-position: -299px -245px; }
 
 .icon-action-severity-up::before {
-  background-position: -349px -246px; }
+  background-position: -349px -245px; }
 
 .icon-action-severity-down::before {
-  background-position: -375px -246px; }
+  background-position: -375px -245px; }
 
 .icon-action-severity-changed::before {
-  background-position: -249px -246px; }
+  background-position: -399px -245px; }
 
 .icon-action-message::before {
-  background-position: -174px -245px; }
+  background-position: -199px -245px; }
 
 .icon-action-ack::before {
-  background-position: -323px -246px; }
+  background-position: -323px -245px; }
 
 .icon-problem-generated::before {
-  background-position: -449px -246px; }
+  background-position: -449px -245px; }
 
 .icon-problem-recovery::before {
-  background-position: -424px -246px; }
+  background-position: -424px -245px; }
 
 .icon-action-msgs[data-count]::after {
-  color: #ffffff; }
+  color: #f2f2f2; }
 .icon-action-msgs::before {
-  background-position: -474px -246px; }
+  background-position: -474px -245px; }
 
 .icon-actions-number-gray[data-count]::after {
-  color: #768d99; }
+  color: #4f4f4f; }
 .icon-actions-number-gray::before {
   background-position: -499px -245px; }
 
 .icon-actions-number-yellow[data-count]::after {
-  color: #FFA059; }
+  color: #ffa059; }
 .icon-actions-number-yellow::before {
   background-position: -549px -245px; }
 
 .icon-actions-number-red[data-count]::after {
-  color: #e33734; }
+  color: #e45959; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
 
@@ -3904,3 +4221,12 @@ svg {
 
 .btn-back-map-container .btn-back-map .btn-back-map-icon {
   background: url(../img/icon-sprite.svg) no-repeat -85px -725px; }
+
+.icon-action-severity-up::before {
+  background-position: -624px -245px; }
+
+.icon-action-severity-down::before {
+  background-position: -649px -245px; }
+
+.icon-actions-number-gray[data-count]::after {
+  color: #f2f2f2; }
