@@ -2565,10 +2565,13 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, c
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", next_check_itemids.values,
 				next_check_itemids.values_num);
 
-		/* exclude items that were created by current prototypes earlier */
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", current_itemids.values,
-				current_itemids.values_num);
+		if (0 < current_itemids.values_num)
+		{
+			/* exclude items that were created by current prototypes earlier */
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and not");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", current_itemids.values,
+					current_itemids.values_num);
+		}
 
 		zbx_vector_uint64_clear(&next_check_itemids);
 
@@ -2596,10 +2599,13 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, c
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "master_itemid", next_check_masteritemids.values,
 				next_check_masteritemids.values_num);
 
-		/* exclude items that were created by current prototypes earlier */
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", current_itemids.values,
-				current_itemids.values_num);
+		if (0 < current_itemids.values_num)
+		{
+			/* exclude items that were created by current prototypes earlier */
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and not");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", current_itemids.values,
+					current_itemids.values_num);
+		}
 
 		zbx_vector_uint64_clear(&next_check_masteritemids);
 
