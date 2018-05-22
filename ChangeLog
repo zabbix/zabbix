@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha7
 
 New features:
+..F.....S. [ZBXNEXT-4320] added ability to store history data in date based indices of elasticsearch (vjaceslavs)
 ..F....... [ZBXNEXT-4526] increased tags column size in Compact view mode (agriscenko)
 ..F....... [ZBXNEXT-4528] added link to Zabbix official support page (Andzs, ashubin)
 ........S. [ZBXNEXT-4520] added values to boolean mapping: "ok, master" as 1 and "err, slave" as 0 (viktors)
