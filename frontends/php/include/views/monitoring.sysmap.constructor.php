@@ -25,34 +25,35 @@ include dirname(__FILE__).'/js/monitoring.sysmaps.js.php';
 $menu = (new CList())
 	->addClass(ZBX_STYLE_OBJECT_GROUP)
 	->addItem([
-		_('Map element').':'.SPACE,
+		_('Map element').':&nbsp;',
 		(new CButton('selementAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-		SPACE.'/'.SPACE,
+		'&nbsp;/&nbsp;',
 		(new CButton('selementRemove', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
 	])
 	->addItem([
-		_('Shape').':'.SPACE,
+		_('Shape').':&nbsp;',
 		(new CButton('shapeAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-		SPACE.'/'.SPACE,
+		'&nbsp;/&nbsp;',
 		(new CButton('shapesRemove', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
 	])
 	->addItem([
-		_('Link').':'.SPACE,
+		_('Link').':&nbsp;',
 		(new CButton('linkAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-		SPACE.'/'.SPACE,
+		'&nbsp;/&nbsp;',
 		(new CButton('linkRemove', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
 	])
 	->addItem([
-		_('Expand macros').':'.SPACE,
-		(new CButton('expand_macros', ($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON)
-				? _('On') : _('Off')))->addClass(ZBX_STYLE_BTN_LINK)
+		_('Expand macros').':&nbsp;',
+		(new CButton('expand_macros',
+			($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off')
+		))->addClass(ZBX_STYLE_BTN_LINK)
 	])
 	->addItem([
-		_('Grid').':'.SPACE,
+		_('Grid').':&nbsp;',
 		(new CButton('gridshow',
 			($data['sysmap']['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden')
 		))->addClass(ZBX_STYLE_BTN_LINK),
-		SPACE.'/'.SPACE,
+		'&nbsp;/&nbsp;',
 		(new CButton('gridautoalign',
 			($data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off')
 		))->addClass(ZBX_STYLE_BTN_LINK)
