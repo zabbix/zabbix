@@ -2738,7 +2738,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		}
 	}
 
-	zbx_vector_ptr_clear(&item_dependencies);
+	zbx_vector_ptr_clear_ext(&item_dependencies, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&item_dependencies);
 
 	if (0 != new_items)
