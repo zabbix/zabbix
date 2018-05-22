@@ -175,8 +175,13 @@ class CControllerTimeSelectorUpdate extends CController {
 			if ($this->range_time_parser->parse($value) !== CParser::PARSE_SUCCESS) {
 				$this->data['error'][$field] = _('Invalid date.');
 			}
+			else {
+				$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			}
+		}
 
-			$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
+		if ($this->data['error']) {
+			return false;
 		}
 
 		$period = $ts['to'] - $ts['from'];
