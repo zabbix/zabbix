@@ -1499,3 +1499,41 @@ INSERT INTO correlation (correlationid, name, description, evaltype, status, for
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
 INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
+
+-- host prototypes
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90001, 'Host for host prototype tests', 'Host for host prototype tests', 0, '', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99000, 90001, 4);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('Discovery rule 1', 'key1', 90001, 4, 90001, 1, '30s', '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('Discovery rule 2', 'key2', 90001, 4, 90002, 1, '30s', '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('Discovery rule 3', 'key3', 90001, 4, 90003, 1, '30s', '', '', '', '');
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90002, 'Host prototype {#1}', 'Host prototype {#1}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90003, 'Host prototype {#2}', 'Host prototype {#2}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90004, 'Host prototype {#3}', 'Host prototype {#3}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90005, 'Host prototype {#4}', 'Host prototype {#4}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90006, 'Host prototype {#5}', 'Host prototype {#5}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90007, 'Host prototype {#6}', 'Host prototype {#6}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90008, 'Host prototype {#7}', 'Host prototype {#7}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90009, 'Host prototype {#8}', 'Host prototype {#8}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90010, 'Host prototype {#9}', 'Host prototype {#9}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90011, 'Host prototype {#10}', 'Host prototype {#10}', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90002, 90001);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90003, 90001);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90004, 90001);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90005, 90002);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90006, 90002);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90007, 90002);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90008, 90003);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90009, 90003);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90010, 90003);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90011, 90003);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1000, 90002, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1001, 90003, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1002, 90004, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1003, 90005, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1004, 90006, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1005, 90007, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1006, 90008, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1007, 90009, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1008, 90010, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1009, 90011, '', 5, NULL);
+

@@ -38,6 +38,7 @@ require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDiscovery.php';
 require_once dirname(__FILE__).'/testPageDiscoveryRules.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
+require_once dirname(__FILE__).'/testPageHostPrototypes.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageItems.php';
@@ -134,6 +135,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDiscoveryRules');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
+		$suite->addTestSuite('testPageHostPrototypes');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageItems');
