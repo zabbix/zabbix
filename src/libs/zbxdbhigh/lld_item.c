@@ -2020,11 +2020,16 @@ static zbx_item_dependence_t	*lld_item_dependence_create(zbx_uint64_t itemid, zb
  *                                             checked for limit on the       *
  *                                             number of dependencies         *
  *             error                - [IN/OUT] the lld error message          *
+ *             limit_exceeded       - [IN/OUT] limit is exceeded              *
+ *                                                                            *
+ * Returns: SUCCEED - the item was added successfully into bulk insert        *
+ *          FAIL    - otherwise                                               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_lld_item_t *item,
 		zbx_uint64_t *itemid, zbx_uint64_t *itemdiscoveryid, zbx_db_insert_t *db_insert,
-		zbx_db_insert_t *db_insert_idiscovery, zbx_vector_ptr_t *item_dependencies, char **error)
+		zbx_db_insert_t *db_insert_idiscovery, zbx_vector_ptr_t *item_dependencies, char **error,
+		unsigned char *limit_exceeded)
 {
 	int	index;
 
@@ -2044,7 +2049,13 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
-		if (SUCCEED == lld_item_dependencies_num_check(item_prototype->itemid, item_dependencies))
+		if (0 == *limit_exceeded &&
+				SUCCEED != lld_item_dependencies_num_check(item_prototype->itemid, item_dependencies))
+		{
+			*limit_exceeded = 1;
+		}
+
+		if (0 == *limit_exceeded)
 		{
 			item->itemid = (*itemid)++;
 
@@ -2072,8 +2083,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 					item_prototype->follow_redirects, item_prototype->post_type, item->http_proxy,
 					item->headers, item_prototype->retrieve_mode, item_prototype->request_method,
 					item_prototype->output_format, item->ssl_cert_file, item->ssl_key_file,
-					item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host,
-					item_prototype->allow_traps);
+					item->ssl_key_password, item_prototype->verify_peer,
+					item_prototype->verify_host, item_prototype->allow_traps);
 
 			zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, item->itemid,
 					item->parent_itemid, item_prototype->key);
@@ -2093,7 +2104,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		dependent = (zbx_lld_item_t *)item->dependent_items.values[index];
 		dependent->master_itemid = item->itemid;
 		lld_item_save(hostid, item_prototypes, dependent, itemid, itemdiscoveryid, db_insert,
-				db_insert_idiscovery, item_dependencies, error);
+				db_insert_idiscovery, item_dependencies, error, limit_exceeded);
 	}
 }
 
@@ -2648,6 +2659,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	zbx_db_insert_t		db_insert, db_insert_idiscovery;
 	zbx_lld_item_index_t	item_index_local;
 	zbx_vector_ptr_t	item_dependencies;
+	unsigned char		limit_exceeded = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2715,7 +2727,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		if (0 == item->master_itemid)
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
-					&db_insert_idiscovery, &item_dependencies, error);
+					&db_insert_idiscovery, &item_dependencies, error, &limit_exceeded);
 		}
 		else
 		{
@@ -2726,7 +2738,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 			if (NULL == zbx_hashset_search(items_index, &item_index_local))
 			{
 				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
-						&db_insert_idiscovery, &item_dependencies, error);
+						&db_insert_idiscovery, &item_dependencies, error, &limit_exceeded);
 			}
 		}
 	}
