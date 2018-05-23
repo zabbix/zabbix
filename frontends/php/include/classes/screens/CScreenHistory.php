@@ -167,9 +167,8 @@ class CScreenHistory extends CScreenBase {
 			else {
 				$config = select_config();
 
-				// Interval start value is non-inclusive, hence the + 1 second.
 				$options += [
-					'time_from' => $this->timeline['from_ts'] + 1,
+					'time_from' => $this->timeline['from_ts'],
 					'time_till' => $this->timeline['to_ts'],
 					'limit' => $config['search_limit']
 				];
