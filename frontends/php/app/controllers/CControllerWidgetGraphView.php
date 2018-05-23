@@ -337,7 +337,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 			}
 
-			$graph_src->setArgument('updateProfile', false);
 			$graph_src->setArgument('profileIdx', $profileIdx);
 			$graph_src->setArgument('profileIdx2', $profileIdx2);
 

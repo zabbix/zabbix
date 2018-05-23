@@ -33,7 +33,6 @@ $fields = [
 	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,				null],
 	'profileIdx' =>		[T_ZBX_STR,			O_OPT, null,	null,				null],
 	'profileIdx2' =>	[T_ZBX_STR,			O_OPT, null,	null,				null],
-	'updateProfile' =>	[T_ZBX_STR,			O_OPT, null,	null,				null],
 	'name' =>			[T_ZBX_STR,			O_OPT, null,	null,				null],
 	'width' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(20, 65535),	null],
 	'height' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(0, 65535),	null],
@@ -91,7 +90,7 @@ foreach ($items as $item) {
 $timeline = calculateTime([
 	'profileIdx' => getRequest('profileIdx'),
 	'profileIdx2' => getRequest('profileIdx2'),
-	'updateProfile' => (getRequest('updateProfile', '0') === '1'),
+	'updateProfile' => false,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
 ]);
