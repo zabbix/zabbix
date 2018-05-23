@@ -2378,6 +2378,15 @@ button {
 	&:focus {
 		@extend %btn-search-hover-focus;
 	}
+
+	&[disabled] {
+		background-color: $transparent;
+
+		&:hover {
+			background-color: $transparent;
+			@include opacity(0.75);
+		}
+	}
 }
 
 .filter-trigger {
