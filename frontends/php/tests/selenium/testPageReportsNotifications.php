@@ -36,10 +36,12 @@ class testPageReportsNotifications extends CWebTest {
 		$this->zbxTestDropdownAssertSelected('period', 'Weekly');
 		$this->zbxTestDropdownAssertSelected('year', '2018');
 		// Check media type links
-		$this->zbxTestAssertElementText('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=1")]', 'Email');
-		$this->zbxTestAssertElementText('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=2")]', 'Jabber');
-		$this->zbxTestAssertElementText('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=3")]', 'SMS');
-		$this->zbxTestAssertElementText('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=4")]', 'SMS via IP');
+		$media_types = [];
+		$media_types = DBdata('SELECT mediatypeid, description FROM media_type', false);
+		foreach ($media_types as $media) {
+			$media = $media[0];
+			$this->zbxTestAssertElementText("//a[contains(@href, 'mediatypeid=".$media['mediatypeid']."')]", $media['description']);
+		}
 
 		// Get users from DB
 		$user_alias = [];
@@ -163,10 +165,12 @@ class testPageReportsNotifications extends CWebTest {
 			$this->zbxTestDropdownSelect('media_type', $data['media_type']);
 			$this->zbxTestAssertElementNotPresentId('year');
 			// Check media links not displayed
-			$this->zbxTestAssertElementNotPresentXpath('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=1")]');
-			$this->zbxTestAssertElementNotPresentXpath('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=2")]');
-			$this->zbxTestAssertElementNotPresentXpath('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=3")]');
-			$this->zbxTestAssertElementNotPresentXpath('//a[contains(@href, "zabbix.php?action=mediatype.edit&mediatypeid=4")]');
+			$media_types = [];
+			$media_types = DBdata('SELECT mediatypeid FROM media_type', false);
+			foreach ($media_types as $media) {
+				$media = $media[0];
+				$this->zbxTestAssertElementNotPresentXpath("//a[contains(@href, 'mediatypeid=".$media['mediatypeid']."')]");
+			}
 		}
 
 		// Get user column number in table
