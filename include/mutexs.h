@@ -41,7 +41,7 @@
 #	define ZBX_MUTEX_CACHE		1
 #	define ZBX_MUTEX_TRENDS		2
 #	define ZBX_MUTEX_CACHE_IDS	3
-#	define ZBX_MUTEX_CONFIG		4
+/*#	define ZBX_MUTEX_CONFIG		4*/
 #	define ZBX_MUTEX_SELFMON	5
 #	define ZBX_MUTEX_CPUSTATS	6
 #	define ZBX_MUTEX_DISKSTATS	7
@@ -53,15 +53,25 @@
 #	define ZBX_MUTEX_PROXY_HISTORY	13
 #	define ZBX_MUTEX_COUNT		14
 
+#	define ZBX_RWLOCK_CONFIG	0
+#	define ZBX_RWLOCK_COUNT		1
 #endif	/* _WINDOWS */
 
-#define zbx_mutex_lock(mutex)			__zbx_mutex_lock(__FILE__, __LINE__, mutex)
-#define zbx_mutex_unlock(mutex)			__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
+#define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
+#define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
+
+#define zbx_rwlock_wrlock(mutex)	__zbx_rwlock_wrlock(__FILE__, __LINE__, mutex)
+#define zbx_rwlock_rdlock(mutex)	__zbx_rwlock_rdlock(__FILE__, __LINE__, mutex)
+#define zbx_rwlock_unlock(mutex)	__zbx_rwlock_unlock(__FILE__, __LINE__, mutex)
 
 int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error);
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex);
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex);
 void	zbx_mutex_destroy(ZBX_MUTEX *mutex);
+
+void	__zbx_rwlock_wrlock(const char *filename, int line, ZBX_MUTEX *mutex);
+void	__zbx_rwlock_rdlock(const char *filename, int line, ZBX_MUTEX *mutex);
+void	__zbx_rwlock_unlock(const char *filename, int line, ZBX_MUTEX *mutex);
 
 #ifdef _WINDOWS
 ZBX_MUTEX_NAME	zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix);

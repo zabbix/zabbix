@@ -31,6 +31,7 @@
 typedef struct
 {
 	pthread_mutex_t		mutexes[ZBX_MUTEX_COUNT];
+	pthread_rwlock_t	rwlocks[ZBX_RWLOCK_COUNT];
 }
 zbx_shared_lock_t;
 
@@ -87,6 +88,7 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 	{
 		int			i;
 		pthread_mutexattr_t	mta;
+		pthread_rwlockattr_t	rwa;
 
 		if (-1 == (shm_id = shmget(IPC_PRIVATE, ZBX_SIZE_T_ALIGN8(sizeof(zbx_shared_lock_t)),
 				IPC_CREAT | IPC_EXCL | 0600)))
@@ -114,8 +116,27 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 		pthread_mutexattr_init(&mta);
 		pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED);
 
-		for (i = 0; ZBX_MUTEX_COUNT > i; i++)
-			pthread_mutex_init(&shared_lock->mutexes[i], &mta);
+		for (i = 0; i < ZBX_MUTEX_COUNT; i++)
+		{
+			if (0 != pthread_mutex_init(&shared_lock->mutexes[i], &mta))
+			{
+				*error = zbx_dsprintf(*error, "cannot create mutex: %s", zbx_strerror(errno));
+				return FAIL;
+			}
+		}
+
+		pthread_rwlockattr_init(&rwa);
+		pthread_rwlockattr_setpshared(&rwa, PTHREAD_PROCESS_SHARED);
+
+		for (i = 0; i < ZBX_RWLOCK_COUNT; i++)
+		{
+
+			if (0 != pthread_rwlock_init(&shared_lock->rwlocks[i], &rwa))
+			{
+				*error = zbx_dsprintf(*error, "cannot create rwlock: %s", zbx_strerror(errno));
+				return FAIL;
+			}
+		}
 	}
 #else
 	if (-1 == ZBX_SEM_LIST_ID)
@@ -348,3 +369,40 @@ ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
 	return name;
 }
 #endif
+
+void	__zbx_rwlock_wrlock(const char *filename, int line, ZBX_MUTEX *mutex)
+{
+	if (ZBX_MUTEX_NULL == *mutex)
+		return;
+
+	if (0 != pthread_rwlock_wrlock(&shared_lock->rwlocks[*mutex]))
+	{
+		zbx_error("[file:'%s',line:%d] write lock failed: %s", filename, line, zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	__zbx_rwlock_rdlock(const char *filename, int line, ZBX_MUTEX *mutex)
+{
+	if (ZBX_MUTEX_NULL == *mutex)
+		return;
+
+	if (0 != pthread_rwlock_rdlock(&shared_lock->rwlocks[*mutex]))
+	{
+		zbx_error("[file:'%s',line:%d] read lock failed: %s", filename, line, zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	__zbx_rwlock_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
+{
+	if (ZBX_MUTEX_NULL == *mutex)
+		return;
+
+	if (0 != pthread_rwlock_unlock(&shared_lock->rwlocks[*mutex]))
+	{
+		zbx_error("[file:'%s',line:%d] read write lock unlock failed: %s", filename, line, zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+}
+

@@ -39,8 +39,9 @@
 
 static int	sync_in_progress = 0;
 
-#define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
-#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_unlock(&config_lock)
+#define	LOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(&config_lock)
+#define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(&config_lock)
+#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(&config_lock)
 #define START_SYNC	LOCK_CACHE; sync_in_progress = 1
 #define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE
 
@@ -5371,7 +5372,7 @@ int	init_configuration_cache(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_UI64, __function_name, CONFIG_CONF_CACHE_SIZE);
 
-	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG, error)))
+	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto out;
 
 	if (SUCCEED != (ret = zbx_mem_create(&config_mem, CONFIG_CONF_CACHE_SIZE, "configuration cache",
@@ -6314,7 +6315,7 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, 
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < num; i++)
 	{
