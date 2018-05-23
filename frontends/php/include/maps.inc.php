@@ -334,7 +334,7 @@ function add_elementNames(&$selements) {
 
 	$triggers = $triggerids
 		? API::Trigger()->get([
-			'output' => ['description', 'expression'],
+			'output' => ['description', 'expression', 'priority'],
 			'selectHosts' => ['name'],
 			'selectLastEvent' => ['severity'],
 			'triggerids' => $triggerids,
@@ -379,7 +379,9 @@ function add_elementNames(&$selements) {
 						$trigger = $triggers[$element['triggerid']];
 						$element['elementName'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
 						$element['elementExpressionTrigger'] = $trigger['expression'];
-						$element['priority'] = $trigger['lastEvent']['severity'];
+						$element['priority'] = array_key_exists('severity', $trigger['lastEvent'])
+								? $trigger['lastEvent']['severity']
+								: $trigger['priority'];
 					}
 					else {
 						unset($selement['elements'][$enum]);
@@ -962,7 +964,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 	// get triggers data, triggers from current map, select all
 	if (!empty($triggerIdToSelementIds)) {
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'status', 'value', 'lastchange', 'description', 'expression'],
+			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectHosts' => ['maintenance_status', 'maintenanceid'],
 			'selectLastEvent' => ['acknowledged', 'severity'],
 			'triggerids' => array_keys($triggerIdToSelementIds),
@@ -980,7 +982,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 	// triggers from submaps, skip dependent
 	if (!empty($subSysmapTriggerIdToSelementIds)) {
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'status', 'value', 'lastchange', 'description', 'expression'],
+			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectLastEvent' => ['acknowledged', 'severity'],
 			'triggerids' => array_keys($subSysmapTriggerIdToSelementIds),
 			'filter' => ['state' => null],
@@ -1007,7 +1009,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 	// triggers from all hosts/hostgroups, skip dependent
 	if ($monitored_hostids) {
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'status', 'value', 'lastchange', 'description', 'expression'],
+			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectHosts' => ['hostid'],
 			'selectItems' => ['itemid'],
 			'selectLastEvent' => ['acknowledged', 'severity'],
@@ -1039,7 +1041,6 @@ function getSelementsInfo($sysmap, array $options = []) {
 	}
 
 	$config = select_config();
-	$blink_period = timeUnitToSeconds($config['blink_period']);
 
 	$info = [];
 	foreach ($selements as $selementId => $selement) {
@@ -1101,7 +1102,10 @@ function getSelementsInfo($sysmap, array $options = []) {
 		$critical_triggerid = 0;
 
 		foreach ($selement['triggers'] as $trigger) {
-			if ($options['severity_min'] <= $trigger['lastEvent']['severity']) {
+			$trigger_severity = array_key_exists('severity', $trigger['lastEvent'])
+					? $trigger['lastEvent']['severity']
+					: $trigger['priority'];
+			if ($options['severity_min'] <= $trigger_severity) {
 				if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
 					$i['trigger_disabled']++;
 				}
@@ -1114,8 +1118,8 @@ function getSelementsInfo($sysmap, array $options = []) {
 							$critical_triggerid = $trigger['triggerid'];
 						}
 
-						if ($i['priority'] < $trigger['lastEvent']['severity']) {
-							$i['priority'] = $trigger['lastEvent']['severity'];
+						if ($i['priority'] < $trigger_severity) {
+							$i['priority'] = $trigger_severity;
 							$critical_triggerid = $trigger['triggerid'];
 						}
 
@@ -1128,7 +1132,8 @@ function getSelementsInfo($sysmap, array $options = []) {
 						}
 					}
 
-					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $blink_period);
+					$i['latelyChanged'] |=
+							((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
 				}
 			}
 		}
@@ -2133,7 +2138,7 @@ function getMapLinktriggerInfo($sysmap, $options) {
 	}
 
 	return API::Trigger()->get([
-		'output' => ['status', 'value'],
+		'output' => ['status', 'value', 'priority'],
 		'min_severity' => $options['severity_min'],
 		'selectLastEvent' => ['severity'],
 		'preservekeys' => true,
