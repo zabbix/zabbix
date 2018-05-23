@@ -65,7 +65,7 @@ class CScreenSimpleGraph extends CScreenBase {
 			: 'chart3.php?';
 
 		$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-			? '&from='.ZBX_PERIOD_DEFAULT.'&to=now'
+			? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
 			: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
 
 		$timeControlData['src'] .= $this->getProfileUrlParams();

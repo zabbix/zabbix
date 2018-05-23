@@ -138,7 +138,7 @@ class CScreenGraph extends CScreenBase {
 				'&height='.$this->screenitem['height'].'&legend='.$legend.
 				'&graph3d='.$graph3d.$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&from='.ZBX_PERIOD_DEFAULT.'&to=now'
+				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
 				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
 		}
 		else {
@@ -156,7 +156,7 @@ class CScreenGraph extends CScreenBase {
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
 				'&height='.$this->screenitem['height'].'&legend='.$legend.$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&from='.ZBX_PERIOD_DEFAULT.'&to=now'
+				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
 				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
 		}
 

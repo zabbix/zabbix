@@ -2551,7 +2551,7 @@ function calculateTime(array $options = []) {
 		if ($options[$type] === null) {
 			// TODO Sasha: 'profileIdx' can be null?
 			$options[$type] = CProfile::get($options['profileIdx'].'.'.$type,
-				$type === 'from' ? ZBX_PERIOD_DEFAULT : 'now', $options['profileIdx2']
+				$type === 'from' ? ZBX_PERIOD_DEFAULT_FROM : ZBX_PERIOD_DEFAULT_TO, $options['profileIdx2']
 			);
 		}
 

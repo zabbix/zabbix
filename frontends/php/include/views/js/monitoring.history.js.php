@@ -1,7 +1,7 @@
 <script type="text/javascript">
 	jQuery(function($){
 		var time_range = <?= CJs::encodeJson([
-			'from' => $data['from'] === null ? ZBX_PERIOD_DEFAULT : $data['from'],
+			'from' => $data['from'] === null ? ZBX_PERIOD_DEFAULT_FROM : $data['from'],
 			'to' => $data['to'] === null ? 'now' : $data['to']
 		]) ?>;
 		$.subscribe('timeselector.rangeupdate', function(e, data) {
