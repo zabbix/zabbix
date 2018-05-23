@@ -9,6 +9,7 @@ New features:
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-12359] fixed "Automatic icon selection" checkbox not working and displaying two icons at once in map constructor (Ivo)
 ..F....... [ZBX-12239] fixed global search form allowing to submit empty search queries (agriscenko)
 ..F....... [ZBX-12177] renamed "Icon" to "Map element" in Network map properties and constructor (agriscenko)
 ........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
@@ -316,6 +317,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12359] fixed "Automatic icon selection" checkbox not working and displaying two icons at once in map constructor (Ivo)
 ........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
 A.F....... [ZBX-13361] fixed error messages when configuring an existing item to have an update interval (miks)
 ........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
