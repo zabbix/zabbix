@@ -668,7 +668,7 @@ output {
 
 	&.compact-view {
 		tr {
-			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
+			&[class*='flh-'] {
 
 				@if $theme_name == 'blue' {
 
@@ -722,20 +722,7 @@ output {
 
 					&:not(.row-selected):not(:hover) {
 						td {
-							.icon-action-command,
-							.icon-action-close,
-							.icon-action-msg,
-							.icon-action-msgs,
-							.icon-action-severity-up,
-							.icon-action-severity-down,
-							.icon-action-severity-changed,
-							.icon-action-message,
-							.icon-action-ack,
-							.icon-problem-generated,
-							.icon-problem-recovery,
-							.icon-actions-number-gray,
-							.icon-actions-number-yellow,
-							.icon-actions-number-red {
+							[class*='icon-'] {
 								@include border-radius(2px);
 								background-color: $ui-bg-color;
 
