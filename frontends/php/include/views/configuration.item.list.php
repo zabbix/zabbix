@@ -84,16 +84,22 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
-	if (!empty($item['template_host'])) {
-		if (array_key_exists($item['template_host']['hostid'], $data['writable_templates'])) {
-			$description[] = (new CLink(CHtml::encode($item['template_host']['name']),
-				'?hostid='.$item['template_host']['hostid'].'&filter_set=1'
+	if (array_key_exists($item['itemid'], $this->data['parent_templates'])) {
+		$root_template = end($this->data['parent_templates'][$item['itemid']]);
+		$root_template = reset($root_template);
+
+		if ($root_template['editable']) {
+			$description[] = (new CLink(CHtml::encode($root_template['name']),
+				'?hostid='.$root_template['hostid'].'&filter_set=1'
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$description[] = (new CSpan(CHtml::encode($item['template_host']['name'])))->addClass(ZBX_STYLE_GREY);
+			$description[] = (new CSpan($root_template['accessible']
+				? CHtml::encode($root_template['name'])
+				: _('Inaccessible template')
+			))->addClass(ZBX_STYLE_GREY);
 		}
 
 		$description[] = NAME_DELIMITER;
@@ -167,8 +173,7 @@ foreach ($this->data['items'] as $item) {
 
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$trigger_description[] = (new CSpan('HOST'))->addClass(ZBX_STYLE_GREY);
-				$trigger_description[] = ':';
+				$trigger_description[] = (new CSpan('Inaccessible template'))->addClass(ZBX_STYLE_GREY);
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
@@ -181,9 +186,8 @@ foreach ($this->data['items'] as $item) {
 				else {
 					$trigger_description[] = (new CSpan(CHtml::encode($realHost['name'])))->addClass(ZBX_STYLE_GREY);
 				}
-
-				$trigger_description[] = ':';
 			}
+			$trigger_description[] = NAME_DELIMITER;
 		}
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');

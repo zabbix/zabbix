@@ -1418,6 +1418,31 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
+	if ($item) {
+		$parent_templates = getItemsParentTemplates([$item]);
+
+		if (array_key_exists($item['itemid'], $parent_templates)) {
+			foreach ($parent_templates[$item['itemid']] as $templates) {
+				foreach ($templates as $templateid => $template) {
+					if ($template['editable']) {
+						$data['templates'][] = new CLink(CHtml::encode($template['name']),
+							'items.php?form=update&itemid='.$templateid
+						);
+					}
+					else {
+						$data['templates'][] = (new CSpan($template['accessible']
+							? CHtml::encode($template['name'])
+							: _('Inaccessible template')
+						))->addClass(ZBX_STYLE_GREY);
+					}
+				}
+				$data['templates'][] = '&nbsp;&rArr;&nbsp;';
+			}
+			$data['templates'] = array_reverse($data['templates']);
+			array_shift($data['templates']);
+		}
+	}
+
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
 		['field' => 'main', 'order' => ZBX_SORT_DOWN]
@@ -1802,25 +1827,12 @@ else {
 		$data['items'] = [];
 	}
 
-	// set values for subfilters, if any of subfilters = false then item shouldnt be shown
-	if ($data['items']) {
-		// fill template host
-		fillItemsWithChildTemplates($data['items']);
+	$data['parent_templates'] = [];
 
-		$dbHostItems = DBselect(
-			'SELECT i.itemid,h.name,h.hostid'.
-			' FROM hosts h,items i'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
-		);
-		while ($dbHostItem = DBfetch($dbHostItems)) {
-			foreach ($data['items'] as &$item) {
-				if ($item['templateid'] == $dbHostItem['itemid']) {
-					$item['template_host'] = $dbHostItem;
-				}
-			}
-			unset($item);
-		}
+	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
+	if ($data['items']) {
+		// Get parent templates.
+		$data['parent_templates'] = getItemsParentTemplates($data['items']);
 
 		// resolve name macros
 		$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
@@ -1995,9 +2007,14 @@ else {
 		$hostids = array_merge($hostids, zbx_objectValues($real_host, 'hostid'));
 	}
 
-	foreach ($data['items'] as $item) {
-		if (array_key_exists('template_host', $item)) {
-			$hostids = array_merge($hostids, zbx_objectValues($item['template_host'], 'hostid'));
+	foreach ($data['parent_templates'] as $list) {
+		foreach ($list as $templates) {
+			$root_template = end($templates);
+			$root_template = reset($templates);
+
+			if ($root_template['accessible']) {
+				$hostids[] = $root_template['hostid'];
+			}
 		}
 	}
 

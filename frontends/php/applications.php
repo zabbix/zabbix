@@ -247,82 +247,7 @@ else {
 
 		order_result($data['applications'], $sortField, $sortOrder);
 
-		// Get the farthest application ancestor for each application.
-		$source_templates = [];
-		$applications = $data['applications'];
-		foreach ($applications as $applicationid => $application) {
-			foreach ($application['templateids'] as $templateid) {
-				$source_templates[$applicationid][$templateid] = [];
-			}
-		}
-
-		while ($applications) {
-			$templateids = [];
-			foreach ($applications as $applicationid => $application) {
-				foreach ($application['templateids'] as $templateid) {
-					$templateids[] = $templateid;
-				}
-			}
-
-			if (!$templateids) {
-				break;
-			}
-
-			$applications = API::Application()->get([
-				'output' => ['applicationid', 'hostid', 'templateids'],
-				'selectHost' => ['hostid', 'name'],
-				'applicationids' => array_keys(array_flip($templateids)),
-				'preservekeys' => true
-			]);
-
-			foreach ($source_templates as $applicationid => $source_templateids) {
-				foreach ($source_templateids as $source_templateid => $source_template) {
-					if (array_key_exists($source_templateid, $applications)) {
-						if ($applications[$source_templateid]['templateids']) {
-							unset($source_templates[$applicationid][$source_templateid]);
-							foreach ($applications[$source_templateid]['templateids'] as $templateid) {
-								$source_templates[$applicationid][$templateid] = [];
-							}
-						}
-						else {
-							$source_templates[$applicationid][$source_templateid] =
-								$applications[$source_templateid]['host'];
-						}
-					}
-				}
-			}
-		}
-
-		$templateids = [];
-		foreach ($source_templates as $applicationid => $source_templateids) {
-			foreach ($source_templateids as $source_templateid => $source_template) {
-				if ($source_template) {
-					$templateids[] = $source_templateid;
-					$source_templates[$applicationid][$source_templateid]['accessible'] = true;
-				}
-				else {
-					$source_templates[$applicationid][$source_templateid]['accessible'] = false;
-				}
-			}
-		}
-
-		$editable_templates = $templateids
-			? API::Application()->get([
-				'output' => ['applicationid'],
-				'applicationids' => array_keys(array_flip($templateids)),
-				'editable' => true,
-				'preservekeys' => true
-			])
-			: [];
-		foreach ($source_templates as $applicationid => $source_templateids) {
-			foreach ($source_templateids as $source_templateid => $source_template) {
-				if (array_key_exists($source_templateid, $editable_templates)) {
-					$source_templates[$applicationid][$source_templateid]['editable'] = true;
-				} else {
-					$source_templates[$applicationid][$source_templateid]['editable'] = false;
-				}
-			}
-		}
+		$data['root_templates'] = getApplicationsRootTemplates($data['applications']);
 
 		/*
 		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
@@ -330,10 +255,6 @@ else {
 		 * 'applicationDiscovery' property.
 		 */
 		foreach ($data['applications'] as $applicationid => &$application) {
-			if (array_key_exists($applicationid, $source_templates)) {
-				$application['sourceTemplates'] = $source_templates[$applicationid];
-			}
-
 			if ($application['applicationDiscovery']) {
 				if (count($application['applicationDiscovery']) > 1) {
 					$ts_delete = zbx_objectValues($application['applicationDiscovery'], 'ts_delete');

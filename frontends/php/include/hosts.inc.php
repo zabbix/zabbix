@@ -561,6 +561,95 @@ function updateHostStatus($hostids, $status) {
 }
 
 /**
+ * Returns the farthest application ancestor template for each given application.
+ *
+ * @param array $applications
+ *
+ * @return array
+ */
+function getApplicationsRootTemplates(array $applications) {
+	$root_templates = [];
+
+	foreach ($applications as $applicationid => $application) {
+		foreach ($application['templateids'] as $templateid) {
+			$root_templates[$applicationid][$templateid] = [];
+		}
+	}
+
+	while ($applications) {
+		$templateids = [];
+
+		foreach ($applications as $applicationid => $application) {
+			foreach ($application['templateids'] as $templateid) {
+				$templateids[] = $templateid;
+			}
+		}
+
+		if (!$templateids) {
+			break;
+		}
+
+		$applications = API::Application()->get([
+			'output' => ['applicationid', 'hostid', 'templateids'],
+			'selectHost' => ['hostid', 'name'],
+			'applicationids' => array_keys(array_flip($templateids)),
+			'preservekeys' => true
+		]);
+
+		foreach ($root_templates as $applicationid => $root_templateids) {
+			foreach ($root_templateids as $root_templateid => $root_template) {
+				if (array_key_exists($root_templateid, $applications)) {
+					if ($applications[$root_templateid]['templateids']) {
+						unset($root_templates[$applicationid][$root_templateid]);
+						foreach ($applications[$root_templateid]['templateids'] as $templateid) {
+							$root_templates[$applicationid][$templateid] = [];
+						}
+					}
+					else {
+						$root_templates[$applicationid][$root_templateid] = $applications[$root_templateid]['host'];
+					}
+				}
+			}
+		}
+	}
+
+	$templateids = [];
+	foreach ($root_templates as $applicationid => $root_templateids) {
+		foreach ($root_templateids as $root_templateid => $root_template) {
+			if ($root_template) {
+				$templateids[] = $root_templateid;
+				$root_templates[$applicationid][$root_templateid]['accessible'] = true;
+			}
+			else {
+				$root_templates[$applicationid][$root_templateid]['accessible'] = false;
+			}
+		}
+	}
+
+	$editable_templates = $templateids
+		? API::Application()->get([
+			'output' => ['applicationid'],
+			'applicationids' => array_keys(array_flip($templateids)),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	foreach ($root_templates as $applicationid => $root_templateids) {
+		foreach ($root_templateids as $root_templateid => $root_template) {
+			if (array_key_exists($root_templateid, $editable_templates)) {
+				$root_templates[$applicationid][$root_templateid]['editable'] = true;
+			}
+			else {
+				$root_templates[$applicationid][$root_templateid]['editable'] = false;
+			}
+		}
+	}
+
+	return $root_templates;
+}
+
+/**
  * Returns the farthest host prototype ancestor for each given host prototype.
  *
  * @param array $hostPrototypeIds

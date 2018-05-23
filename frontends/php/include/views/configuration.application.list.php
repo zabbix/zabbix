@@ -72,12 +72,13 @@ foreach ($this->data['applications'] as $application) {
 	$info_icons = [];
 
 	// inherited app, display the template list
-	if ($application['templateids'] && !empty($application['sourceTemplates'])) {
+	if ($application['templateids']
+			&& array_key_exists($application['applicationid'], $this->data['root_templates'])) {
 		$name = [];
+		$root_templates = $this->data['root_templates'][$application['applicationid']];
+		CArrayHelper::sort($root_templates, ['name']);
 
-		CArrayHelper::sort($application['sourceTemplates'], ['name']);
-
-		foreach ($application['sourceTemplates'] as $template) {
+		foreach ($root_templates as $template) {
 			if ($template['editable']) {
 				$name[] = (new CLink(CHtml::encode($template['name']), 'applications.php?hostid='.$template['hostid']))
 					->addClass(ZBX_STYLE_LINK_ALT)

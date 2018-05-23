@@ -1155,16 +1155,7 @@ function getItemFormData(array $item = [], array $options = []) {
 					}
 					// plain item
 					else {
-						if (array_key_exists($host['hostid'], $writable)) {
-							$data['templates'][] = new CLink($host['name'],
-								'items.php?form=update&itemid='.$item['itemid']
-							);
-						}
-						else {
-							$data['templates'][] = new CSpan($host['name']);
-						}
-
-						$data['templates'][] = SPACE.'&rArr;'.SPACE;
+						// moved to controller
 					}
 				}
 				$itemid = $item['templateid'];

@@ -782,20 +782,84 @@ function get_realhost_by_itemid($itemid) {
 	return get_host_by_itemid($itemid);
 }
 
-function fillItemsWithChildTemplates(&$items) {
-	$processSecondLevel = false;
-	$dbItems = DBselect('SELECT i.itemid,i.templateid FROM items i WHERE '.dbConditionInt('i.itemid', zbx_objectValues($items, 'templateid')));
-	while ($dbItem = DBfetch($dbItems)) {
-		foreach ($items as $itemid => $item) {
-			if ($item['templateid'] == $dbItem['itemid'] && !empty($dbItem['templateid'])) {
-				$items[$itemid]['templateid'] = $dbItem['templateid'];
-				$processSecondLevel = true;
-			}
+function getItemsParentTemplates(array $items) {
+	$parent_templates = [];
+	$templates_hostids = [];
+
+	foreach ($items as $item) {
+		if ($item['templateid']) {
+			$parent_templates[$item['itemid']][] = [
+				$item['templateid'] => []
+			];
 		}
 	}
-	if ($processSecondLevel) {
-		fillItemsWithChildTemplates($items); // attention recursion!
+
+	$db_items = $items;
+
+	while ($db_items) {
+		$db_itemids = zbx_objectValues($db_items, 'templateid');
+
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'templateid'],
+			'selectHosts' => ['hostid', 'name'],
+			'itemids' => $db_itemids,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_templates as &$list) {
+			foreach ($list as &$templates) {
+				foreach ($templates as $templateid => &$template) {
+					if (in_array($templateid, $db_itemids)) {
+						if (array_key_exists($templateid, $db_items)) {
+							$template = reset($db_items[$templateid]['hosts']);
+							$template['accessible'] = true;
+
+							$templates_hostids[] = $template['hostid'];
+
+							if ($db_items[$templateid]['templateid']) {
+								$list[] = [
+									$db_items[$templateid]['templateid'] => []
+								];
+							}
+						}
+						else {
+							$template['accessible'] = false;
+						}
+					}
+				}
+				unset($template);
+			}
+			unset($templates);
+		}
+		unset($list);
 	}
+
+	$editable_templates = $templates_hostids
+		? API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys(array_flip($templates_hostids)),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	foreach ($parent_templates as &$list) {
+		foreach ($list as &$templates) {
+			foreach ($templates as &$template) {
+				if ($template['accessible'] && array_key_exists($template['hostid'], $editable_templates)) {
+					$template['editable'] = true;
+				}
+				else {
+					$template['editable'] = false;
+				}
+			}
+			unset($template);
+		}
+		unset($templates);
+	}
+	unset($list);
+
+	return $parent_templates;
 }
 
 function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
