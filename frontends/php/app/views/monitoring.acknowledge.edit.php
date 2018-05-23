@@ -86,6 +86,9 @@ $form_list
 		(new CCheckBox('close_problem', ZBX_PROBLEM_UPDATE_CLOSE))
 			->setChecked($data['close_problem'])
 			->setEnabled($data['problem_can_be_closed'])
+	)
+	->addRow('',
+		(new CDiv((new CLabel(_('At least one update operation or message must exist.')))->setAsteriskMark()))
 	);
 
 $footer_buttons = makeFormFooter(
