@@ -255,6 +255,7 @@ jQuery(function ($){
 					delete request_data.error;
 				}
 				else {
+					updateUrlFromToArguments(json.from, json.to);
 					container.find('.time-input-error').hide();
 					$.publish('timeselector.rangeupdate', request_data);
 				}
@@ -262,6 +263,30 @@ jQuery(function ($){
 			.always(function () {
 				xhr = null;
 			});
+	}
+
+	/**
+	 * Replaces 'from' and/or 'to' URL arguments with new values in browser history.
+	 *
+	 * @param {string} from    Value for 'from' argument.
+	 * @param {string} to      Value for 'to' argument.
+	 */
+	function updateUrlFromToArguments(from, to) {
+		var url = new Curl(),
+			args = url.getArguments();
+
+		if ('from' in args) {
+			url.setArgument('from', from);
+		}
+
+		if ('to' in args) {
+			url.setArgument('to', to);
+		}
+
+		if (('from' in args) || ('to' in args)) {
+			url.unsetArgument('sid');
+			history.replaceState(history.state, '', url.getUrl());
+		}
 	}
 
 	// Time selection box for graphs.
