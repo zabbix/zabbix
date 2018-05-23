@@ -106,10 +106,8 @@
 
 			switch (parseInt(screen.resourcetype, 10)) {
 				// SCREEN_RESOURCE_GRAPH
-				case 0:
-					// falls through
-
 				// SCREEN_RESOURCE_SIMPLE_GRAPH
+				case 0:
 				case 1:
 					if (refresh) {
 						self.refreshImg(id, function() {
@@ -141,11 +139,6 @@
 				// SCREEN_RESOURCE_CLOCK
 				case 7:
 					// don't refresh anything
-					break;
-
-				// SCREEN_RESOURCE_SCREEN
-				case 8:
-					self.refreshProfile(id, ajax_url);
 					break;
 
 				// SCREEN_RESOURCE_HISTORY
@@ -190,12 +183,12 @@
 					}
 					break;
 
+				// SCREEN_RESOURCE_SCREEN
 				// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-				case 19:
-					// falls through
-
 				// SCREEN_RESOURCE_LLD_GRAPH
+				case 8:
 				case 20:
+				case 19:
 					self.refreshProfile(id, ajax_url);
 					break;
 
