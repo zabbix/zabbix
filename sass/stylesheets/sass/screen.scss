@@ -2212,7 +2212,6 @@ $icon-widget-btn: (
 		border: 1px solid $btn-bg-color;
 		position: relative;
 		margin: 0 0 0 6px;
-		min-width: 94px;
 		min-height: 24px;
 		vertical-align: bottom;
 
@@ -2241,13 +2240,15 @@ $icon-widget-btn: (
 	}
 
 	.filter-trigger {
-		padding: 0 21px 0 10px;
+		padding: 0 34px 0 10px;
 
 		&:after {
-			@extend .arrow-down;
-			top: 8px;
-			margin-left: 6px;
-			border-top-color: $btn-font-color;
+			margin: 0 5px;
+			right: 0;
+			bottom: 0;
+			height: 24px;
+			width: 24px;
+			background: url(../img/icon-sprite.svg) no-repeat -87px -545px;
 		}
 	}
 
@@ -2279,11 +2280,10 @@ $icon-widget-btn: (
 		}
 
 		.filter-trigger {
-			padding: 0 21px 4px 10px;
+			padding: 0 34px 4px 10px;
 
 			&:after {
-				@extend .arrow-up;
-				border-bottom-color: $font-color;
+				background: url(../img/icon-sprite.svg) no-repeat -246px -549px;
 			}
 		}
 	}
@@ -2456,7 +2456,7 @@ $icon-widget-btn: (
 		white-space: nowrap;
 
 		.time-input-error {
-			margin: -8px 32px 0 0;
+			margin: -8px 29px 0 0;
 		}
 
 		ul {

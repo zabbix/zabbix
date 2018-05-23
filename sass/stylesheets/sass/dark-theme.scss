@@ -192,7 +192,7 @@ $ok-ack-fg-color: #00ff00;
 .btn-back-map-container {
 	.btn-back-map {
 		.btn-back-map-icon {
-			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+			background-position: -85px -725px;
 		}
 	}
 }
@@ -202,7 +202,13 @@ $ok-ack-fg-color: #00ff00;
 	.ui-tabs-active {
 		.btn-time {
 			&:after {
-				background: url(../img/icon-sprite.svg) no-repeat -87px -585px;
+				background-position: -87px -585px;
+			}
+		}
+
+		.filter-trigger {
+			&:after {
+				background-position: -87px -549px;
 			}
 		}
 	}

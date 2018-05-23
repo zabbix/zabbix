@@ -1055,7 +1055,7 @@ td.inactive-bg {
 	.btn-back-map {
 
 		.btn-back-map-icon {
-			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+			background-position: -85px -725px;
 		}
 	}
 }
@@ -1093,7 +1093,7 @@ td.inactive-bg {
 }
 
 .btn-time-left {
-	background: url(../img/icon-sprite.svg) no-repeat -244px -657px;
+	background-position: -244px -657px;
 
 	&:disabled {
 		background-position: -244px -657px;
@@ -1101,7 +1101,7 @@ td.inactive-bg {
 }
 
 .btn-time-right {
-	background: url(../img/icon-sprite.svg) no-repeat -242px -623px;
+	background-position: -242px -623px;
 
 	&:disabled {
 		background-position: -242px -623px;

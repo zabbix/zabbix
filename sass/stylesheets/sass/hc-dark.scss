@@ -1092,7 +1092,7 @@ td.inactive-bg {
 
 	.btn-back-map {
 		.btn-back-map-icon {
-			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+			background-position: -85px -725px;
 		}
 	}
 }
@@ -1102,6 +1102,12 @@ td.inactive-bg {
 	.btn-time {
 		&:after {
 			background-position: -246px -581px;
+		}
+	}
+
+	.filter-trigger {
+		&:after {
+			background-position: -246px -545px;
 		}
 	}
 
@@ -1139,11 +1145,17 @@ td.inactive-bg {
 				background-position: -87px -585px;
 			}
 		}
+
+		.filter-trigger {
+			&:after {
+				background-position: -87px -549px;
+			}
+		}
 	}
 }
 
 .btn-time-left {
-	background: url(../img/icon-sprite.svg) no-repeat -397px -657px;
+	background-position: -397px -657px;
 
 	&:hover,
 	&:focus {
@@ -1161,7 +1173,7 @@ td.inactive-bg {
 }
 
 .btn-time-right {
-	background: url(../img/icon-sprite.svg) no-repeat -395px -623px;
+	background-position: -395px -623px;
 
 	&:hover,
 	&:focus {
