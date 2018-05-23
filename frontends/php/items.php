@@ -2007,15 +2007,14 @@ else {
 		$hostids = array_merge($hostids, zbx_objectValues($real_host, 'hostid'));
 	}
 
-	foreach ($data['parent_templates'] as $list) {
-		foreach ($list as $templates) {
-			$root_template = end($templates);
-			$root_template = reset($templates);
+	foreach ($data['parent_templates'] as $templates) {
+		$root_template = end($templates);
+		$root_template = reset($root_template);
 
-			if ($root_template['accessible']) {
-				$hostids[] = $root_template['hostid'];
-			}
+		if ($root_template['accessible']) {
+			$hostids[] = $root_template['hostid'];
 		}
+
 	}
 
 	$data['writable_templates'] = [];
