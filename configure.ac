@@ -58,11 +58,11 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
   zone.h nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
-  sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h pcre.h \
+  sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h event.h)
+  dlfcn.h sys/utsname.h sys/un.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -1886,8 +1886,8 @@ if test "x$ICONV_CFLAGS" != "x"; then
 	echo "    iconv:                 ${ICONV_CFLAGS}"
 fi
 
-if test "x$ZLIB_CFLAGS" != "x"; then
-	echo "    zlib:                  ${ZLIB_CFLAGS}"
+if test "x$LIBEVENT_CFLAGS" != "x"; then
+	echo "    libevent:              ${LIBEVENT_CFLAGS}"
 fi
 
 echo "

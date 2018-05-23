@@ -377,10 +377,6 @@
 #	include <procinfo.h>
 #endif
 
-#ifdef HAVE_EVENT_H
-#	include <event.h>
-#endif
-
 #ifdef HAVE_LIBCURL
 #	include <curl/curl.h>
 #	if !defined(HAVE_FUNCTION_CURL_EASY_ESCAPE)
@@ -419,10 +415,6 @@
 #ifdef HAVE_ZONE_H
 #	include <zone.h>
 #	include <utmpx.h>
-#endif
-
-#ifdef HAVE_LIBEVENT
-#	include <event.h>
 #endif
 
 #endif

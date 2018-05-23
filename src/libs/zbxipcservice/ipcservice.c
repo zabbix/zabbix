@@ -2,6 +2,10 @@
 
 #ifdef HAVE_IPCSERVICE
 
+#ifdef HAVE_LIBEVENT
+#	include <event.h>
+#endif
+
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "log.h"

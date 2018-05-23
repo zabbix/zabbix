@@ -44,7 +44,7 @@
  *               If filename fails to pass, 0 is returned.                    *
  *                                                                            *
  ******************************************************************************/
-static int	filename_matches(const char *fname, const pcre *regex_incl, const pcre *regex_excl)
+static int	filename_matches(const char *fname, const zbx_regexp_t *regex_incl, const zbx_regexp_t *regex_excl)
 {
 	return ((NULL == regex_incl || 0 == zbx_regexp_match_precompiled(fname, regex_incl)) &&
 			(NULL == regex_excl || 0 != zbx_regexp_match_precompiled(fname, regex_excl)));
@@ -110,8 +110,8 @@ static int	compare_descriptors(const void *file_a, const void *file_b)
 	return (fa->st_ino != fb->st_ino || fa->st_dev != fb->st_dev);
 }
 
-static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT *result, pcre **regex_incl,
-		pcre **regex_excl, int *max_depth, char **dir, zbx_stat_t *status, int depth_param, int param_count)
+static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT *result, zbx_regexp_t **regex_incl,
+		zbx_regexp_t **regex_excl, int *max_depth, char **dir, zbx_stat_t *status, int depth_param, int param_count)
 {
 	char	*dir_param, *regex_incl_str, *regex_excl_str, *max_depth_str;
 	const char	*error = NULL;
@@ -135,9 +135,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 
 	if (NULL != regex_incl_str && '\0' != *regex_incl_str)
 	{
-		*regex_incl = zbx_regexp_compile(regex_incl_str, PCRE_MULTILINE | PCRE_NO_AUTO_CAPTURE, &error);
-
-		if (NULL == *regex_incl)
+		if (SUCCEED != zbx_regexp_compile(regex_incl_str, regex_incl, &error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in second parameter: %s", error));
@@ -147,9 +145,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 
 	if (NULL != regex_excl_str && '\0' != *regex_excl_str)
 	{
-		*regex_excl = zbx_regexp_compile(regex_excl_str, PCRE_MULTILINE | PCRE_NO_AUTO_CAPTURE, &error);
-
-		if (NULL == *regex_excl)
+		if (SUCCEED != zbx_regexp_compile(regex_excl_str, regex_excl, &error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in third parameter: %s", error));
@@ -366,7 +362,7 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 	return SUCCEED;
 }
 
-static void	regex_incl_excl_free(pcre *regex_incl, pcre *regex_excl)
+static void	regex_incl_excl_free(zbx_regexp_t *regex_incl, zbx_regexp_t *regex_excl)
 {
 	if (NULL != regex_incl)
 		zbx_regexp_free(regex_incl);
@@ -491,7 +487,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list;
 	zbx_stat_t		status;
-	pcre			*regex_incl = NULL, *regex_excl = NULL;
+	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL;
 	zbx_directory_item_t	*item;
 	zbx_vector_ptr_t	descriptors;
 
@@ -649,7 +645,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_t	list, descriptors;
 	zbx_directory_item_t	*item;
 	zbx_stat_t		status;
-	pcre			*regex_incl = NULL, *regex_excl = NULL;
+	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL;
 	DIR 			*directory;
 	struct dirent 		*entry;
 	zbx_file_descriptor_t	*file;
@@ -799,7 +795,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		count = 0;
 	zbx_vector_ptr_t	list;
 	zbx_stat_t		status;
-	pcre			*regex_incl = NULL, *regex_excl = NULL;
+	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL;
 	zbx_directory_item_t	*item;
 	zbx_uint64_t		min_size = 0, max_size = 0x7fffffffffffffff;
 	time_t			min_time = 0, max_time = 0x7fffffff;
@@ -958,7 +954,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_t	list;
 	zbx_directory_item_t	*item;
 	zbx_stat_t		status;
-	pcre			*regex_incl = NULL, *regex_excl = NULL;
+	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL;
 	DIR 			*directory;
 	struct dirent 		*entry;
 	zbx_uint64_t		min_size = 0, max_size = 0x7FFFffffFFFFffff;
