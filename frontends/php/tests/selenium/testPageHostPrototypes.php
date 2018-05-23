@@ -80,7 +80,6 @@ class testPageHostPrototypes extends CWebTest {
 		$this->selectHostPrototype($data);
 		$this->zbxTestClickButtonText('Create disabled');
 		$this->zbxTestAcceptAlert();
-
 		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
@@ -95,7 +94,8 @@ class testPageHostPrototypes extends CWebTest {
 					$hostid = $hostid[0];
 					$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE status=0 AND hostid='" . $hostid['hostid'] . "'"));
 				}
-			} else {
+			}
+			else {
 				$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE status='0' AND host='" . $host_name . "'"));
 			}
 		}
@@ -108,7 +108,6 @@ class testPageHostPrototypes extends CWebTest {
 		$this->selectHostPrototype($data);
 		$this->zbxTestClickButtonText('Create enabled');
 		$this->zbxTestAcceptAlert();
-
 		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
 		$this->zbxTestCheckFatalErrors();
 
@@ -121,7 +120,8 @@ class testPageHostPrototypes extends CWebTest {
 					$hostid = $hostid[0];
 					$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE status=1 AND hostid='" . $hostid['hostid'] . "'"));
 				}
-			} else {
+			}
+			else {
 				$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE status='1' AND host='" . $host_name . "'"));
 			}
 		}
@@ -134,7 +134,6 @@ class testPageHostPrototypes extends CWebTest {
 		$this->selectHostPrototype($data);
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
-
 		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
 		$this->zbxTestCheckFatalErrors();
 
@@ -147,7 +146,8 @@ class testPageHostPrototypes extends CWebTest {
 					$hostid = $hostid[0];
 					$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE hostid='" . $hostid['hostid'] . "'"));
 				}
-			} else {
+			}
+			else {
 				$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE host='" . $host_name . "'"));
 			}
 		}
