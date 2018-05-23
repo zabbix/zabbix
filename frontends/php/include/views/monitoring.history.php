@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/monitoring.history.js.php';
-
 $historyWidget = new CWidget();
 
 $header = [
@@ -233,6 +231,7 @@ else {
 					->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
 					->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
 					->setModern(true)
+					->onChange('jQuery(this).closest("form").submit();')
 			)
 		];
 	}
