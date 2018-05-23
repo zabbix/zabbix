@@ -568,7 +568,7 @@ ZABBIX.apps.map = (function($) {
 					var link;
 
 					if (that.selection.count.selements !== 2) {
-						alert(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
+						alert(locale['S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED']);
 
 						return false;
 					}
