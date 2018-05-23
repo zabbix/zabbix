@@ -1,0 +1,986 @@
+---
+# TC0
+# Test that floating type values are cached normally.
+test case: Add numeric (float) type values
+in:
+  history: []
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 600
+    count: 0
+    end: 2017-01-10 10:05:00.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data: &row1 
+        value: 0.1
+        ts: 2017-01-10 10:00:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data: &row2
+        value: 0.2
+        ts: 2017-01-10 10:00:30.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data: &row3
+        value: 0.3
+        ts: 2017-01-10 10:00:30.500000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data: &row4
+        value: 0.4
+        ts: 2017-01-10 10:01:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data: &row5
+        value: 0.5
+        ts: 2017-01-10 10:01:30.000000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      - *row2
+      - *row3
+      - *row4
+      - *row5
+      status:
+      active_range: 901
+      values_total: 5
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC1
+# Test that character type values are cached normally.
+test case: Add character type values
+in:
+  history: []
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 600
+    count: 0
+    end: 2017-01-10 10:05:00.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &row1
+        value: value 1
+        ts: 2017-01-10 10:00:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &row2
+        value: value 2
+        ts: 2017-01-10 10:00:30.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &row3
+        value: value 3
+        ts: 2017-01-10 10:00:30.500000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &row4
+        value: value 4
+        ts: 2017-01-10 10:01:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &row5
+        value: value 5
+        ts: 2017-01-10 10:01:30.000000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row1
+      - *row2
+      - *row3
+      - *row4
+      - *row5
+      status:
+      active_range: 901
+      values_total: 5
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC2
+# Test that log type values are cached normally.
+test case: Add log type values
+in:
+  history: []
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    seconds: 600
+    count: 0
+    end: 2017-01-10 10:05:00.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row1
+        value: value 1
+        source: log source 1
+        logeventid: 1000001
+        severity: 1
+        timestamp: 1001 
+        ts: 2017-01-10 10:00:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row2
+        value: value 2
+        source: log source 2
+        logeventid: 1000002
+        severity: 2
+        timestamp: 1002 
+        ts: 2017-01-10 10:00:30.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row3
+        value: value 3
+        source: log source 3
+        logeventid: 1000003
+        severity: 3
+        timestamp: 1003 
+        ts: 2017-01-10 10:00:30.500000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row4
+        value: value 4
+        source: log source 4
+        logeventid: 1000004
+        severity: 4
+        timestamp: 1004 
+        ts: 2017-01-10 10:01:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row5
+        value: value 5
+        source: log source 5
+        logeventid: 1000005
+        severity: 5
+        timestamp: 1005 
+        ts: 2017-01-10 10:01:30.000000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data:
+      - *row1
+      - *row2
+      - *row3
+      - *row4
+      - *row5
+      status:
+      active_range: 901
+      values_total: 5
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC3
+# Test that unsigned 64 bit integer type values are cached normally.
+test case: Add numeric (unsigned) type values
+in:
+  history: []
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    seconds: 600
+    count: 0
+    end: 2017-01-10 10:05:00.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_UINT64
+      data: &row1
+        value: 10000001
+        ts: 2017-01-10 10:00:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_UINT64
+      data: &row2
+        value: 10000002
+        ts: 2017-01-10 10:00:30.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_UINT64
+      data: &row3
+        value: 10000003
+        ts: 2017-01-10 10:00:30.500000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_UINT64
+      data: &row4
+        value: 10000004
+        ts: 2017-01-10 10:01:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_UINT64
+      data: &row5
+        value: 10000005
+        ts: 2017-01-10 10:01:30.000000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_UINT64
+      data:
+      - *row1
+      - *row2
+      - *row3
+      - *row4
+      - *row5
+      status:
+      active_range: 901
+      values_total: 5
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC4
+# Test that text type values are cached normally.
+test case: Add text type values
+in:
+  history: []
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    seconds: 600
+    count: 0
+    end: 2017-01-10 10:05:00.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_TEXT
+      data: &row1
+        value: long text value 1
+        ts: 2017-01-10 10:00:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_TEXT
+      data: &row2
+        value: long text value 2
+        ts: 2017-01-10 10:00:30.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_TEXT
+      data: &row3
+        value: long text value 3
+        ts: 2017-01-10 10:00:30.500000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_TEXT
+      data: &row4
+        value: long text value 4
+        ts: 2017-01-10 10:01:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_TEXT
+      data: &row5
+        value: long text value 5
+        ts: 2017-01-10 10:01:30.000000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_TEXT
+      data:
+      - *row1
+      - *row2
+      - *row3
+      - *row4
+      - *row5
+      status:
+      active_range: 901
+      values_total: 5
+      db_cached_from: 2017-01-10 09:55:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC5
+# Test that values are not added to cache if they weren't used (requested) before.
+test case: Try to add value without having cached it first
+in:
+  history: []
+  precache: []
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &row1
+        value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC6
+# Test that value is correctly added after the cached data.
+test case: Add value at the end of the cached data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 5.9
+        ts: 2017-01-10 10:00:05.900000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
+      - *new1
+      status:
+      active_range: 601
+      values_total: 7
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC7
+# Test that value is not cached (to avoid having gaps in cache).
+test case: Add value at the beginning of the cached data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 1.1
+        ts: 2017-01-10 10:00:01.100000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
+      status:
+      active_range: 601
+      values_total: 6
+      db_cached_from: 2017-01-10 10:00:02.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC8
+# Test that first second of cached values is dropped from cache.
+test case: Add value at the beginning of the cached data matching the seconds value of first item
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 4.1
+        ts: 2017-01-10 10:00:04.100000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row52
+      - *row55
+      - *row57
+      status:
+      active_range: 601
+      values_total: 3
+      db_cached_from: 2017-01-10 10:00:05.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC9
+# Test that he value is correctly inserted in the middle of cached values.
+test case: Add value in the middle of cached data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 5.0
+        ts: 2017-01-10 10:00:05.000000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *new1
+      - *row52
+      - *row55
+      - *row57
+      status:
+      active_range: 601
+      values_total: 7
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC10
+# Test that he value is correctly appended after cached values.
+test case: Add value at the end of cached data matching timestamp of the latest value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 5.7 (2)
+        ts: 2017-01-10 10:00:05.700000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
+      - *new1
+      status:
+      active_range: 601
+      values_total: 7
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC11
+# Test that he value is correctly appended after cached values and 'cached all' flag is not changed.
+test case: Add value at the end of fully cached data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 0
+    count: 10
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 5.9
+        ts: 2017-01-10 10:00:05.900000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
+      - *new1
+      status: ZBX_ITEM_STATUS_CACHED_ALL
+      active_range: 0
+      values_total: 7
+      db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC12
+# Test that the value is not added and 'cached all' flag is removed.
+test case: Add value at the beginning of the fully cached data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 0
+    count: 10
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 1.1
+        ts: 2017-01-10 10:00:01.100000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
+      status:
+      active_range: 0
+      values_total: 6
+      db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC13
+# Test that the value is correctly added after the cached values.
+test case: Add value at the end of the cached data in low memory mode
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    cache mode: ZBX_VC_MODE_LOWMEM
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 5.9
+        ts: 2017-01-10 10:00:05.900000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
+      - *new1
+      status:
+      active_range: 601
+      values_total: 7
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
+    mode: ZBX_VC_MODE_LOWMEM
+---
+# TC14
+# Test that value cache is switched to low memory mode if value adding failed.
+test case: Try adding value wihout enough space in cache
+in:
+  history: []
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    seconds: 600
+    count: 0
+    end: 2017-01-10 10:05:00.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    cache size: 500
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row1
+        value: value 1
+        source: log source 1
+        logeventid: 1000001
+        severity: 1
+        timestamp: 1001 
+        ts: 2017-01-10 10:00:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row2
+        value: value 2
+        source: log source 2
+        logeventid: 1000002
+        severity: 2
+        timestamp: 1002 
+        ts: 2017-01-10 10:00:30.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row3
+        value: value 3
+        source: log source 3
+        logeventid: 1000003
+        severity: 3
+        timestamp: 1003 
+        ts: 2017-01-10 10:00:30.500000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row4
+        value: value 4
+        source: log source 4
+        logeventid: 1000004
+        severity: 4
+        timestamp: 1004 
+        ts: 2017-01-10 10:01:00.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_LOG
+      data: &row5
+        value: value 5
+        source: log source 5
+        logeventid: 1000005
+        severity: 5
+        timestamp: 1005 
+        ts: 2017-01-10 10:01:30.000000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+    mode: ZBX_VC_MODE_LOWMEM
+---
+# TC15
+# Test that adding value with different value type causes item to be dropped from cache
+test case: Add value with different value type
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_TEXT
+      data: &new1
+        value: value 5.9
+        ts: 2017-01-10 10:00:05.900000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC16
+# Test that adding values causes old data (outside active request range) to be dropped.
+test case: Add values after time causing old data to be dropped
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-10 10:20:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 10.5.9
+        ts: 2017-01-10 10:10:05.900000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *new1
+      status:
+      active_range: 601
+      values_total: 1
+      db_cached_from: 2017-01-10 10:00:06.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+...

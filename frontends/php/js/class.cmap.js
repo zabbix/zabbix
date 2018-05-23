@@ -568,7 +568,7 @@ ZABBIX.apps.map = (function($) {
 					var link;
 
 					if (that.selection.count.selements !== 2) {
-						alert(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
+						alert(locale['S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED']);
 
 						return false;
 					}
@@ -2729,9 +2729,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'hosts',
 				name: 'elementValue',
 				selectedLimit: 1,
-				objectOptions: {
-					editable: true
-				},
 				popup: {
 					parameters: {
 						srctbl: 'hosts',
@@ -2748,7 +2745,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
-					editable: true,
 					real_hosts: true
 				},
 				popup: {
@@ -2771,9 +2767,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'hostGroup',
 				name: 'elementValue',
 				selectedLimit: 1,
-				objectOptions: {
-					editable: true
-				},
 				popup: {
 					parameters: {
 						srctbl: 'host_groups',

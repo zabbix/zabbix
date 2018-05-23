@@ -111,7 +111,7 @@ jQuery(function($) {
 				break;
 
 			case 'dashboard':
-				data = getMenuPopupDashboard(data);
+				data = getMenuPopupDashboard(data, obj);
 				break;
 		}
 
