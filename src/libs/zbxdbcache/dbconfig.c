@@ -84,7 +84,7 @@ static int	sync_in_progress = 0;
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
 static ZBX_DC_CONFIG	*config = NULL;
-static ZBX_MUTEX	config_lock = ZBX_MUTEX_NULL;
+static ZBX_RWLOCK	config_lock = ZBX_RWLOCK_NULL;
 static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	program_type;
@@ -5372,7 +5372,7 @@ int	init_configuration_cache(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_UI64, __function_name, CONFIG_CONF_CACHE_SIZE);
 
-	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
+	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto out;
 
 	if (SUCCEED != (ret = zbx_mem_create(&config_mem, CONFIG_CONF_CACHE_SIZE, "configuration cache",
@@ -5540,7 +5540,7 @@ void	free_configuration_cache(void)
 
 	UNLOCK_CACHE;
 
-	zbx_mutex_destroy(&config_lock);
+	zbx_rwlock_destroy(&config_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

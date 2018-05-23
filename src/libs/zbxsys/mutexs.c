@@ -59,6 +59,65 @@ static int			shm_id = -1;
 #endif
 #endif
 
+static int	zbx_locks_create(char **error)
+{
+	int			i;
+	pthread_mutexattr_t	mta;
+	pthread_rwlockattr_t	rwa;
+
+	if (-1 != shm_id)
+		return SUCCEED;
+
+	if (-1 == (shm_id = shmget(IPC_PRIVATE, ZBX_SIZE_T_ALIGN8(sizeof(zbx_shared_lock_t)),
+			IPC_CREAT | IPC_EXCL | 0600)))
+	{
+		*error = zbx_dsprintf(*error, "cannot allocate shared memory for locks");
+		return FAIL;
+	}
+
+	if ((void *)(-1) == (shared_lock = (zbx_shared_lock_t *)shmat(shm_id, NULL, 0)))
+	{
+		*error = zbx_dsprintf(*error, "cannot attach shared memory for locks: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	memset(shared_lock, 0, sizeof(zbx_shared_lock_t));
+
+	/* immediately mark the new shared memory for destruction after attaching to it */
+	if (-1 == shmctl(shm_id, IPC_RMID, 0))
+	{
+		*error = zbx_dsprintf(*error, "cannot mark the new shared memory for destruction: %s",
+				zbx_strerror(errno));
+		return FAIL;
+	}
+
+	pthread_mutexattr_init(&mta);
+	pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED);
+
+	for (i = 0; i < ZBX_MUTEX_COUNT; i++)
+	{
+		if (0 != pthread_mutex_init(&shared_lock->mutexes[i], &mta))
+		{
+			*error = zbx_dsprintf(*error, "cannot create mutex: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+	}
+
+	pthread_rwlockattr_init(&rwa);
+	pthread_rwlockattr_setpshared(&rwa, PTHREAD_PROCESS_SHARED);
+
+	for (i = 0; i < ZBX_RWLOCK_COUNT; i++)
+	{
+		if (0 != pthread_rwlock_init(&shared_lock->rwlocks[i], &rwa))
+		{
+			*error = zbx_dsprintf(*error, "cannot create rwlock: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_mutex_create                                                 *
@@ -84,60 +143,8 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 	}
 #else
 #ifdef	ZBX_PTHREAD
-	if (-1 == shm_id)
-	{
-		int			i;
-		pthread_mutexattr_t	mta;
-		pthread_rwlockattr_t	rwa;
-
-		if (-1 == (shm_id = shmget(IPC_PRIVATE, ZBX_SIZE_T_ALIGN8(sizeof(zbx_shared_lock_t)),
-				IPC_CREAT | IPC_EXCL | 0600)))
-		{
-			*error = zbx_dsprintf(*error, "cannot allocate shared memory for locks");
-			return FAIL;
-		}
-
-		if ((void *)(-1) == (shared_lock = (zbx_shared_lock_t *)shmat(shm_id, NULL, 0)))
-		{
-			*error = zbx_dsprintf(*error, "cannot attach shared memory for locks: %s", zbx_strerror(errno));
-			return FAIL;
-		}
-
-		memset(shared_lock, 0, sizeof(zbx_shared_lock_t));
-
-		/* immediately mark the new shared memory for destruction after attaching to it */
-		if (-1 == shmctl(shm_id, IPC_RMID, 0))
-		{
-			*error = zbx_dsprintf(*error, "cannot mark the new shared memory for destruction: %s",
-					zbx_strerror(errno));
-			return FAIL;
-		}
-
-		pthread_mutexattr_init(&mta);
-		pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED);
-
-		for (i = 0; i < ZBX_MUTEX_COUNT; i++)
-		{
-			if (0 != pthread_mutex_init(&shared_lock->mutexes[i], &mta))
-			{
-				*error = zbx_dsprintf(*error, "cannot create mutex: %s", zbx_strerror(errno));
-				return FAIL;
-			}
-		}
-
-		pthread_rwlockattr_init(&rwa);
-		pthread_rwlockattr_setpshared(&rwa, PTHREAD_PROCESS_SHARED);
-
-		for (i = 0; i < ZBX_RWLOCK_COUNT; i++)
-		{
-
-			if (0 != pthread_rwlock_init(&shared_lock->rwlocks[i], &rwa))
-			{
-				*error = zbx_dsprintf(*error, "cannot create rwlock: %s", zbx_strerror(errno));
-				return FAIL;
-			}
-		}
-	}
+	if (FAIL == zbx_locks_create(error))
+		return FAIL;
 #else
 	if (-1 == ZBX_SEM_LIST_ID)
 	{
@@ -370,9 +377,19 @@ ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
 }
 #endif
 
-void	__zbx_rwlock_wrlock(const char *filename, int line, ZBX_MUTEX *mutex)
+int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error)
 {
-	if (ZBX_MUTEX_NULL == *mutex)
+	if (FAIL == zbx_locks_create(error))
+		return FAIL;
+
+	*rwlock = name;
+
+	return SUCCEED;
+}
+
+void	__zbx_rwlock_wrlock(const char *filename, int line, const ZBX_RWLOCK *mutex)
+{
+	if (ZBX_RWLOCK_NULL == *mutex)
 		return;
 
 	if (0 != pthread_rwlock_wrlock(&shared_lock->rwlocks[*mutex]))
@@ -382,9 +399,9 @@ void	__zbx_rwlock_wrlock(const char *filename, int line, ZBX_MUTEX *mutex)
 	}
 }
 
-void	__zbx_rwlock_rdlock(const char *filename, int line, ZBX_MUTEX *mutex)
+void	__zbx_rwlock_rdlock(const char *filename, int line, const ZBX_RWLOCK *mutex)
 {
-	if (ZBX_MUTEX_NULL == *mutex)
+	if (ZBX_RWLOCK_NULL == *mutex)
 		return;
 
 	if (0 != pthread_rwlock_rdlock(&shared_lock->rwlocks[*mutex]))
@@ -394,9 +411,9 @@ void	__zbx_rwlock_rdlock(const char *filename, int line, ZBX_MUTEX *mutex)
 	}
 }
 
-void	__zbx_rwlock_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
+void	__zbx_rwlock_unlock(const char *filename, int line, const ZBX_RWLOCK *mutex)
 {
-	if (ZBX_MUTEX_NULL == *mutex)
+	if (ZBX_RWLOCK_NULL == *mutex)
 		return;
 
 	if (0 != pthread_rwlock_unlock(&shared_lock->rwlocks[*mutex]))
@@ -404,5 +421,13 @@ void	__zbx_rwlock_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 		zbx_error("[file:'%s',line:%d] read write lock unlock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+}
+
+void	zbx_rwlock_destroy(ZBX_RWLOCK *mutex)
+{
+	if (0 != pthread_rwlock_destroy(&shared_lock->rwlocks[*mutex]))
+		zbx_error("cannot remove semaphore %d: %s", *mutex, zbx_strerror(errno));
+
+	*mutex = ZBX_MUTEX_NULL;
 }
 
