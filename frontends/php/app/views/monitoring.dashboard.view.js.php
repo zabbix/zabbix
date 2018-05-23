@@ -180,7 +180,7 @@
 		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
 
 		// Hide filter with timeline.
-		jQuery('.filter-btn-container, #filter-space').hide();
+		jQuery('.filter-btn-container, .filter-space').hide();
 		timeControl.removeAllSBox();
 	};
 

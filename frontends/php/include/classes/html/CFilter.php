@@ -86,7 +86,8 @@ class CFilter extends CDiv {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setId('filter-space');
+		$this->addClass('filter-space')
+			->setId(uniqid('filter_'));
 
 		$this->form = (new CForm('get'))
 			->cleanItems()

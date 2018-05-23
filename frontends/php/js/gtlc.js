@@ -44,7 +44,7 @@
 
 // Time range selector.
 jQuery(function ($){
-	var container = $('#filter-space'),
+	var container = $('.filter-space').first(),
 		xhr = null,
 		endpoint = new Curl('zabbix.php'),
 		element = {
