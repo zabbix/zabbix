@@ -74,6 +74,9 @@ jQuery(function ($){
 		timeSelectorEventHandler
 	);
 
+	element.from.keydown(preventSubmitHandler);
+	element.to.keydown(preventSubmitHandler);
+
 	// Time selector DOM elements event triggerers initialization.
 	container.on('click', function (e) {
 		var event = '',
@@ -121,6 +124,17 @@ jQuery(function ($){
 				.data('input', input)
 				.click(toggleCalendarPickerHandler);
 		});
+	}
+
+	/**
+	 * Prevent form submit on enter key press.
+	 *
+	 * @param {object} e jQuery event object.
+	 */
+	function preventSubmitHandler(e) {
+		if (e.which == 13) {
+			return cancelEvent(e);
+		}
 	}
 
 	/**
