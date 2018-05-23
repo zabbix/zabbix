@@ -83,7 +83,7 @@ CArrayHelper::sort($items, ['name', 'hostname', 'itemid']);
  * Display
  */
 $timeline = calculateTime([
-	'profileIdx' => getRequest('profileIdx', 'web.screens'),
+	'profileIdx' => getRequest('profileIdx'),
 	'profileIdx2' => getRequest('profileIdx2'),
 	'updateProfile' => (getRequest('updateProfile', '0') === '1'),
 	'from' => getRequest('from'),
