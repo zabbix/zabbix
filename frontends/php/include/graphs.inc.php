@@ -156,23 +156,6 @@ function get_hosts_by_graphid($graphid) {
 	);
 }
 
-/**
- * Description:
- *	Return the time of the 1st appearance of items included in graph in trends
- * Comment:
- *	sql is split to many sql's to optimize search on history tables
- */
-function get_min_itemclock_by_graphid($graphid) {
-	$items = DBfetchArray(DBselect(
-		'SELECT DISTINCT i.itemid,i.value_type,i.history,i.trends,i.hostid'.
-		' FROM items i,graphs_items gi'.
-		' WHERE i.itemid=gi.itemid'.
-			' AND gi.graphid='.zbx_dbstr($graphid)
-	));
-
-	return Manager::History()->getMinClock($items);
-}
-
 function getGraphByGraphId($graphId) {
 	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
 

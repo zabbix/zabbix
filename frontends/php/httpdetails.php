@@ -118,8 +118,6 @@ $items = DBfetchArray(DBselect(
 		' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
 ));
 
-$graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, Manager::History()->getMinClock($items));
-
 $url = (new CUrl('chart3.php'))
 	->setArgument('height', 150)
 	->setArgument('name', $http_test_name.': '._('Speed'))

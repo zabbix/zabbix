@@ -467,13 +467,6 @@ class CScreenHistory extends CScreenBase {
 		if (str_in_array($this->action, [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
 			$graphDims = getGraphDims();
 
-			/*
-			 * Interval start value is non-inclusive, therefore should subtract 1 second to be able to show row with
-			 * minimum clock value.
-			 */
-			$this->timeline['starttime']
-				= date(TIMESTAMP_FORMAT, Manager::History()->getMinClock([$firstItem]) - 1);
-
 			$this->dataId = 'historyGraph';
 
 			$timeControlData = [];
