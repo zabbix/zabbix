@@ -234,8 +234,12 @@ jQuery(function ($){
 
 		disableTimeSelectorUI();
 
-		xhr = $.post(endpoint.getUrl(), args, 'json')
-			.success(function (json) {
+		xhr = $.ajax({
+			url: endpoint.getUrl(),
+			type: 'post',
+			cache: false,
+			data: args,
+			success: function (json) {
 				request_data = $.extend(data, request_data, json, {event: e.namespace});
 				updateTimeSelectorUI(request_data);
 
@@ -259,10 +263,19 @@ jQuery(function ($){
 					container.find('.time-input-error').hide();
 					$.publish('timeselector.rangeupdate', request_data);
 				}
-			})
-			.always(function () {
+
 				xhr = null;
-			});
+			},
+			error: function () {
+				var request = this,
+					retry = function() {
+						$.ajax(request);
+					};
+
+				// Retry with 2s interval.
+				setTimeout(retry, 2000);
+			}
+		});
 	}
 
 	/**
