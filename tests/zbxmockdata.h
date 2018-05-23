@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,8 +40,10 @@ typedef enum
 	ZBX_MOCK_NOT_A_STRING,
 	ZBX_MOCK_INTERNAL_ERROR,
 	ZBX_MOCK_INVALID_YAML_PATH,
+	ZBX_MOCK_NOT_A_TIMESTAMP,
+	ZBX_MOCK_NOT_ENOUGH_MEMORY,
 	ZBX_MOCK_NOT_A_BINARY,
-	ZBX_MOCK_NOT_AN_UINT64,
+	ZBX_MOCK_NOT_AN_UINT64
 }
 zbx_mock_error_t;
 
@@ -58,5 +60,12 @@ zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value);
 zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, size_t *length);
 zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter);
 zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value);
+
+/* date/time support */
+#define ZBX_MOCK_TIMESTAMP_MAX_LEN	64
+
+zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts);
+zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size);
+zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer, size_t size);
 
 #endif	/* ZABBIX_MOCK_DATA_H */

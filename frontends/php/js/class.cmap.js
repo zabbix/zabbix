@@ -2729,9 +2729,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'hosts',
 				name: 'elementValue',
 				selectedLimit: 1,
-				objectOptions: {
-					editable: true
-				},
 				popup: {
 					parameters: {
 						srctbl: 'hosts',
@@ -2748,7 +2745,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
-					editable: true,
 					real_hosts: true
 				},
 				popup: {
@@ -2771,9 +2767,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'hostGroup',
 				name: 'elementValue',
 				selectedLimit: 1,
-				objectOptions: {
-					editable: true
-				},
 				popup: {
 					parameters: {
 						srctbl: 'host_groups',

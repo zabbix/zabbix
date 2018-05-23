@@ -226,7 +226,6 @@ $tranStrings = [
 		'Refresh interval' => _('Refresh interval'),
 		'Refresh interval multiplier' => _('Refresh interval multiplier'),
 		'Scripts' => _('Scripts'),
-		'Something went wrong. Please try again later!' => _('Something went wrong. Please try again later!'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
 		'Update' => _('Update'),
