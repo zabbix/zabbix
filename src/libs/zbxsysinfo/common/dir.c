@@ -169,7 +169,8 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 	}
 	else if (SUCCEED != is_uint31(max_depth_str, max_depth))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter. Contain non digital prefix."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid %s parameter.", (4 == depth_param ?
+						"fifth" : "sixth")));
 		return FAIL;
 	}
 
