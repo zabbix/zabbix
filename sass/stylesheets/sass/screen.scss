@@ -681,12 +681,12 @@ output {
 								border-bottom-color: rgba($font-color, 0.5);
 							}
 
-							.icon-wzrd-action {
-								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
-							}
-
 							.tag {
 								background-color: rgba($font-color, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background-position: -165px -624px;
 							}
 
 							button:focus {
@@ -708,7 +708,7 @@ output {
 							}
 
 							.icon-wzrd-action {
-								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+								background-position: -165px -624px;
 							}
 
 							button:focus {
@@ -718,7 +718,7 @@ output {
 					}
 				}
 
-				@if $theme_name == 'blue', "dark" {
+				@if $theme_name == 'blue' or $theme_name == "dark" {
 
 					&:not(.row-selected):not(:hover) {
 						td {
@@ -742,6 +742,10 @@ output {
 								// &:only-of-type {
 								// 	@include border-radius(2px);
 								// }
+							}
+
+							.icon-wzrd-action {
+								background-color: transparent;
 							}
 						}
 					}
@@ -768,25 +772,36 @@ output {
 				color: $green;
 			}
 
-			&:hover {
-				color: $link-hover-color;
-			}
-
+			&:hover,
 			&:focus {
 				color: $link-hover-color;
 			}
 		}
 
 		td {
-			padding: 2px 5px 2px 5px;
 			border-bottom: none;
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
 			color: $font-color;
+			height: 22px;
+			line-height: 1;
+			padding: 0 5px;
+			vertical-align: middle;
+
+			[class*='icon-'] {
+				vertical-align: middle;
+
+				&:after {
+					margin: 0;
+					line-height: 14px;
+				}
+			}
 
 			.tag {
+				display: inline-block;
+				line-height: 16px;
+				margin-right: 3px;
+				padding: 0 3px;
 				max-width: 40px;
-				margin: -2px 3px 0 0;
-				padding: 2px 3px;
 
 				@media screen and (min-width: 1200px) {
 					max-width: 71px;
@@ -801,15 +816,12 @@ output {
 				}
 			}
 
-			.rel-container {
-				display: inline;
-			}
-
 			.icon-wzrd-action {
-				margin: 2px 0 0 2px;
+				background: url(../img/icon-sprite.svg) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
-				background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px;
+				margin: 0;
+				position: relative;
 			}
 		}
 	}
@@ -908,16 +920,8 @@ output {
 			border: none;
 			@include transition(background-color .2s ease-out);
 
-			&:hover {
-				text-decoration: none;
-				background-color: $ui-hover-color;
-			}
-
-			&:focus {
-				text-decoration: none;
-				background-color: $ui-hover-color;
-			}
-
+			&:hover,
+			&:focus,
 			&:active {
 				text-decoration: none;
 				background-color: $ui-hover-color;
@@ -931,7 +935,7 @@ output {
 			background-color: $ui-hover-color;
 
 			.timeline-axis {
-				background-color:  $ui-bg-color;
+				background-color: $ui-bg-color;
 			}
 
 			.timeline-date {

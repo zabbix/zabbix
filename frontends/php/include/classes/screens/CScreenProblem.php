@@ -798,7 +798,7 @@ class CScreenProblem extends CScreenBase {
 							->addStyle('width: 65%;'),
 						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
 						(new CColHeader(_('Ack')))->addStyle('width: 36px;'),
-						(new CColHeader(_('Actions')))->addStyle('width: 59px;'),
+						(new CColHeader(_('Actions')))->addStyle('width: 64px;'),
 						$tags_header
 					]))
 						->addClass(ZBX_STYLE_COMPACT_VIEW)
