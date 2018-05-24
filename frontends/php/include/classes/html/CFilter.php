@@ -319,7 +319,7 @@ class CFilter extends CDiv {
 		$id = '#'.$this->getId();
 		$js = 'var multiselects = jQuery("'.$id.'").tabs('.
 			CJs::encodeJson($this->tabs_options).
-		').find(".multiselect");'.
+		').show().find(".multiselect");'.
 
 		'if (multiselects.length) {'.
 			'multiselects.multiSelect("resize");'.
@@ -364,6 +364,7 @@ class CFilter extends CDiv {
 		$this->form->addItem($this->tabs);
 
 		$this
+			->addStyle('display:none')
 			->addItem($headers)
 			->addItem($this->form)
 			->setAttribute('aria-label', _('Filter'));
