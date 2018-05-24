@@ -793,7 +793,7 @@ class CScreenProblem extends CScreenBase {
 						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
 						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 35%;'),
+							->addStyle('width: 40%;'),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
 							->addStyle('width: 65%;'),
 						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
