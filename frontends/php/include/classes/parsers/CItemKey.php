@@ -146,15 +146,14 @@ class CItemKey extends CParser {
 		$this->key = substr($data, $offset, $p - $offset);
 		$p2 = $p;
 
-		if (!$_18_simple_check) {
+		if (!$_18_simple_check && isset($data[$p2]) && $data[$p2] == '[') {
 			$_parameters = [
 				'type' => self::PARAM_ARRAY,
 				'raw' => '',
 				'pos' => $p2 - $offset,
 				'parameters' => []
 			];
-			if (isset($data[$p2]) && $data[$p2] == '['
-					&& $this->parseKeyParameters($data, $p2, $_parameters['parameters'])) {
+			if ($this->parseKeyParameters($data, $p2, $_parameters['parameters'])) {
 				$_parameters['raw'] = substr($data, $p, $p2 - $p);
 				$this->parameters[] = $_parameters;
 				$p = $p2;
@@ -209,8 +208,8 @@ class CItemKey extends CParser {
 								break 3;
 							}
 
-							foreach ($_parameters['parameters'] as $nested) {
-								if ($nested['type'] == self::PARAM_ARRAY) {
+							foreach ($_parameters['parameters'] as $param) {
+								if ($param['type'] == self::PARAM_ARRAY) {
 									break 4;
 								}
 							}

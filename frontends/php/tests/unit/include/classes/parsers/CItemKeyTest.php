@@ -390,43 +390,43 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'key[a,[b,]]', 0,
-			[
-				'rc' => CParser::PARSE_SUCCESS,
-				'error' => '',
-				'match' => 'key[a,[b,]]',
-				'key' => 'key',
-				'parameters' => [
-					0 => [
-						'type' => CItemKey::PARAM_ARRAY,
-						'raw' => '[a,[b,]]',
-						'pos' => 3,
-						'parameters' => [
-							0 => [
-								'type' => CItemKey::PARAM_UNQUOTED,
-								'raw' => 'a',
-								'pos' => 1
-							],
-							1 => [
-								'type' => CItemKey::PARAM_ARRAY,
-								'raw' => '[b,]',
-								'pos' => 3,
-								'parameters' => [
-									0 => [
-										'type' => CItemKey::PARAM_UNQUOTED,
-										'raw' => 'b',
-										'pos' => 1
-									],
-									1 => [
-										'type' => CItemKey::PARAM_UNQUOTED,
-										'raw' => '',
-										'pos' => 3
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key[a,[b,]]',
+					'key' => 'key',
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[a,[b,]]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'a',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_ARRAY,
+									'raw' => '[b,]',
+									'pos' => 3,
+									'parameters' => [
+										0 => [
+											'type' => CItemKey::PARAM_UNQUOTED,
+											'raw' => 'b',
+											'pos' => 1
+										],
+										1 => [
+											'type' => CItemKey::PARAM_UNQUOTED,
+											'raw' => '',
+											'pos' => 3
+										]
 									]
 								]
 							]
 						]
 					]
-				]
-			],
+				],
 				['a', 'b,']
 			],
 			[
