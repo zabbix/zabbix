@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageAdministrationAudit extends CWebTest {
+class testPageReportsAudit extends CWebTest {
 
 	private $actions = [
 		-1 => 'All',
@@ -64,7 +64,7 @@ class testPageAdministrationAudit extends CWebTest {
 		AUDIT_RESOURCE_VALUE_MAP => 'Value map'
 	];
 
-	public function testPageAdministrationAudit_CheckLayout() {
+	public function testPageReportsAudit_CheckLayout() {
 		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
@@ -166,7 +166,7 @@ class testPageAdministrationAudit extends CWebTest {
 	/**
 	* @dataProvider auditActions
 	*/
-	public function testPageAdministrationAudit_Filter($action, $resourcetype) {
+	public function testPageReportsAudit_Filter($action, $resourcetype) {
 		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');

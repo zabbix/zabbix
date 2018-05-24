@@ -26,8 +26,6 @@ require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageProblems.php';
 require_once dirname(__FILE__).'/testPageScreens.php';
 require_once dirname(__FILE__).'/testPageActions.php';
-require_once dirname(__FILE__).'/testPageAdministrationAudit.php';
-require_once dirname(__FILE__).'/testPageAdministrationAuditActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
@@ -51,6 +49,10 @@ require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
 require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 */
+require_once dirname(__FILE__).'/testPageReportsActionLog.php';
+require_once dirname(__FILE__).'/testPageReportsAudit.php';
+require_once dirname(__FILE__).'/testPageReportsNotifications.php';
+require_once dirname(__FILE__).'/testPageReportsTriggerTop.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageSlideShows.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
@@ -120,8 +122,6 @@ class SeleniumTests {
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testPageActions');
-		$suite->addTestSuite('testPageAdministrationAudit');
-		$suite->addTestSuite('testPageAdministrationAuditActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
@@ -149,6 +149,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageQueueOverview');
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
 */
+		$suite->addTestSuite('testPageReportsActionLog');
+		$suite->addTestSuite('testPageReportsAudit');
+		$suite->addTestSuite('testPageReportsNotifications');
+		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageScreens');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageSlideShows');
