@@ -1,23 +1,22 @@
 <?php
-
 /*
- * * Zabbix
- * * Copyright (C) 2001-2018 Zabbix SIA
- * *
- * * This program is free software; you can redistribute it and/or modify
- * * it under the terms of the GNU General Public License as published by
- * * the Free Software Foundation; either version 2 of the License, or
- * * (at your option) any later version.
- * *
- * * This program is distributed in the hope that it will be useful,
- * * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * * GNU General Public License for more details.
- * *
- * * You should have received a copy of the GNU General Public License
- * * along with this program; if not, write to the Free Software
- * * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * */
+** Zabbix
+** Copyright (C) 2001-2018 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
 
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
@@ -34,7 +33,7 @@ class testPageHostPrototypes extends CWebTest {
 			if ($host_name === 'all') {
 				$this->zbxTestCheckboxSelect('all_hosts');
 			} else {
-				$result = DBselect("SELECT hostid FROM hosts WHERE host='" . $host_name . "'");
+				$result = DBselect('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host_name));
 				while ($row = DBfetch($result)) {
 					$this->zbxTestCheckboxSelect('group_hostid_' . $row['hostid']);
 				}
@@ -89,14 +88,14 @@ class testPageHostPrototypes extends CWebTest {
 		foreach ($data['host_list'] as $host) {
 			$host_name = $host['host'];
 			if ($host_name === 'all') {
-				$result = DBdata("SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='" . $data['item'] . "')", false);
+				$result = DBdata('SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='.zbx_dbstr($data['item']).')', false);
 				foreach ($result as $hostid) {
 					$hostid = $hostid[0];
-					$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE status=0 AND hostid='" . $hostid['hostid'] . "'"));
+					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status=0 AND hostid='.zbx_dbstr($hostid['hostid'])));
 				}
 			}
 			else {
-				$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE status='0' AND host='" . $host_name . "'"));
+				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status=0 AND host='.zbx_dbstr($host_name)));
 			}
 		}
 	}
@@ -115,14 +114,14 @@ class testPageHostPrototypes extends CWebTest {
 		foreach ($data['host_list'] as $host) {
 			$host_name = $host['host'];
 			if ($host_name === 'all') {
-				$result = DBdata("SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='" . $data['item'] . "')", false);
+				$result = DBdata('SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='.zbx_dbstr($data['item']).')', false);
 				foreach ($result as $hostid) {
 					$hostid = $hostid[0];
-					$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE status=1 AND hostid='" . $hostid['hostid'] . "'"));
+					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status=1 AND hostid='.zbx_dbstr($hostid['hostid'])));
 				}
 			}
 			else {
-				$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE status='1' AND host='" . $host_name . "'"));
+				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status=1 AND host='.zbx_dbstr($host_name)));
 			}
 		}
 	}
@@ -141,14 +140,14 @@ class testPageHostPrototypes extends CWebTest {
 		foreach ($data['host_list'] as $host) {
 			$host_name = $host['host'];
 			if ($host_name === 'all') {
-				$result = DBdata("SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='" . $data['item'] . "')", false);
+				$result = DBdata('SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='.zbx_dbstr($data['item']).')', false);
 				foreach ($result as $hostid) {
 					$hostid = $hostid[0];
-					$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE hostid='" . $hostid['hostid'] . "'"));
+					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE hostid='.zbx_dbstr($hostid['hostid'])));
 				}
 			}
 			else {
-				$this->assertEquals(0, DBcount("SELECT null FROM hosts WHERE host='" . $host_name . "'"));
+				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($host_name)));
 			}
 		}
 	}
