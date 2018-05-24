@@ -10,6 +10,7 @@ New features:
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-13783] dropped support for Zapcat-style and multi-level parameter arrays from item key validation in frontend (agriscenko)
 ..F....... [ZBX-12359] fixed "Automatic icon selection" checkbox not working and displaying two icons at once in map constructor (Ivo)
 ..F....... [ZBX-12239] fixed global search form allowing to submit empty search queries (agriscenko)
 ..F....... [ZBX-12177] renamed "Icon" to "Map element" in Network map properties and constructor (agriscenko)
