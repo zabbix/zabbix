@@ -1560,6 +1560,7 @@ Changes for 3.0.18rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
 ........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
 ........S. [ZBX-13043] removed error message for when user has defined media but all of them are disabled (viktors)
 A.F....... [ZBX-13774] fixed creating and updating items with multiple specific scheduling intervals (Ivo)
