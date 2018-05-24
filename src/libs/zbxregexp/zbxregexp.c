@@ -741,3 +741,132 @@ int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const c
 {
 	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
 }
+
+/**********************************************************************************
+ *                                                                                *
+ * Function: zbx_regexp_escape_stringsize                                         *
+ *                                                                                *
+ * Purpose: calculate a string size after symbols escaping                        *
+ *                                                                                *
+ * Parameters: string - [IN] the string to check                                  *
+ *                                                                                *
+ * Return value: new size of the string                                           *
+ *                                                                                *
+ **********************************************************************************/
+static size_t	zbx_regexp_escape_stringsize(const char *string)
+{
+	size_t		len = 0;
+	const char	*sptr;
+
+	if (NULL == string )
+		return 0;
+
+	for (sptr = string; '\0' != *sptr; sptr++)
+	{
+		switch (*sptr)
+		{
+			case '.':
+			case '\\':
+			case '+':
+			case '*':
+			case '?':
+			case '[':
+			case '^':
+			case ']':
+			case '$':
+			case '(':
+			case ')':
+			case '{':
+			case '}':
+			case '=':
+			case '!':
+			case '>':
+			case '<':
+			case '|':
+			case ':':
+			case '-':
+			case '#':
+				len += 2;
+				break;
+			default:
+				len++;
+		}
+	}
+
+	return len;
+}
+
+/**********************************************************************************
+ *                                                                                *
+ * Function: zbx_regexp_escape_insstring                                          *
+ *                                                                                *
+ * Purpose: replace . \ + * ? [ ^ ] $ ( ) { } = ! < > | : - symbols in string     *
+ *          with combination of \ and escaped symbol                              *
+ *                                                                                *
+ * Parameters: p      - [IN/OUT] buffer for new string after update               *
+ *             string - [IN] the string to update                                 *
+ *                                                                                *
+ **********************************************************************************/
+static void zbx_regexp_escape_string(char *p, const char *string)
+{
+	const char	*sptr;
+
+	for (sptr = string; '\0' != *sptr; sptr++)
+	{
+		switch (*sptr)
+		{
+			case '.':
+			case '\\':
+			case '+':
+			case '*':
+			case '?':
+			case '[':
+			case '^':
+			case ']':
+			case '$':
+			case '(':
+			case ')':
+			case '{':
+			case '}':
+			case '=':
+			case '!':
+			case '>':
+			case '<':
+			case '|':
+			case ':':
+			case '-':
+			case '#':
+				*p++ = '\\';
+				*p++ = *sptr;
+				break;
+			default:
+				*p++ = *sptr;
+		}
+	}
+
+	return;
+}
+
+/**********************************************************************************
+ *                                                                                *
+ * Function: zbx_regexp_escape                                                    *
+ *                                                                                *
+ * Purpose: escaping of symbols for using in regexp expression                    *
+ *                                                                                *
+ * Parameters: string - [IN/OUT] the string to update                             *
+ *                                                                                *
+ **********************************************************************************/
+void zbx_regexp_escape(char **string)
+{
+	size_t	size;
+	char	*buffer;
+
+	if (0 == (size = zbx_regexp_escape_stringsize(*string)))
+		return;
+
+	buffer = zbx_malloc(NULL, size + 1);
+	buffer[size] = '\0';
+	zbx_regexp_escape_string(buffer, *string);
+	zbx_free(*string);
+	*string = buffer;
+}
