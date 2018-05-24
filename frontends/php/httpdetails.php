@@ -59,6 +59,14 @@ if (!$httptest) {
 	access_deny();
 }
 
+$timeline = calculateTime([
+	'profileIdx' => 'web.httpdetails.filter',
+	'profileIdx2' => $httptest['httptestid'],
+	'from' => getRequest('from'),
+	'to' => getRequest('to'),
+	'updateProfile' => (hasRequest('from') && hasRequest('to'))
+]);
+
 $http_test_name = CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name']);
 
 // Create details widget.
@@ -66,8 +74,8 @@ $details_screen = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_HTTPTEST_DETAILS,
 	'mode' => SCREEN_MODE_JS,
 	'dataId' => 'httptest_details',
-	'profileIdx2' => $httptest['httptestid']
-]);
+	'updateProfile' => false,
+] + $timeline);
 
 (new CWidget())
 	->setTitle(_('Details of web scenario').': '.$http_test_name)
@@ -92,10 +100,6 @@ $graph_dims = getGraphDims();
 $graph_dims['width'] = -50;
 $graph_dims['graphHeight'] = 150;
 
-// profile
-$profileIdx = 'web.httpdetails.filter';
-$profileIdx2 = getRequest('httptestid');
-
 /*
  * Graph in
  */
@@ -103,12 +107,8 @@ $graph_in = new CScreenBase([
 	'resourcetype' => SCREEN_RESOURCE_GRAPH,
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_in',
-	'profileIdx' => $profileIdx,
-	'profileIdx2' => $profileIdx2,
-	'from' => getRequest('from'),
-	'to' => getRequest('to'),
-	'updateProfile' => (hasRequest('from') && hasRequest('to'))
-]);
+	'updateProfile' => false
+] + $timeline);
 
 $items = DBfetchArray(DBselect(
 	'SELECT i.itemid,i.value_type,i.history,i.trends,i.hostid'.
@@ -155,12 +155,8 @@ $graph_time = new CScreenBase([
 	'resourcetype' => SCREEN_RESOURCE_GRAPH,
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_time',
-	'profileIdx' => $profileIdx,
-	'profileIdx2' => $profileIdx2,
-	'from' => getRequest('from'),
-	'to' => getRequest('to'),
-	'updateProfile' => (hasRequest('from') || hasRequest('to'))
-]);
+	'updateProfile' => false
+] + $timeline);
 
 $url = (new CUrl('chart3.php'))
 	->setArgument('height', 150)
@@ -198,9 +194,9 @@ CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 // Create graphs widget.
 (new CWidget())
 	->addItem((new CFilter())
-		->setProfile($profileIdx, $profileIdx2)
-		->setActiveTab(CProfile::get($profileIdx.'.active', 1))
-		->addTimeSelector($graph_time->timeline['from'], $graph_time->timeline['to'])
+		->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
+		->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
+		->addTimeSelector($timeline['from'], $timeline['to'])
 	)
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();

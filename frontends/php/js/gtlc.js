@@ -503,12 +503,11 @@ var timeControl = {
 					if (!obj.refresh) {
 						this.addImage(id);
 					}
+					else if (obj.timeline.refreshable) {
+						this.refreshImage(id);
+					}
 				}
 
-				// refresh
-				if (obj.timeline.refreshable) {
-					this.refreshImage(id);
-				}
 			}
 		}
 	},
@@ -520,38 +519,49 @@ var timeControl = {
 				left: obj.objDims.shiftXleft,
 				right: obj.objDims.shiftXright,
 				top: obj.objDims.shiftYtop,
+				height: obj.objDims.graphHeight,
 				from_ts: obj.timeline.from_ts,
 				to_ts: obj.timeline.to_ts
-			}
+			},
+			url = new Curl(obj.src, false);
+
+		url.setArgument('_', (new Date()).getTime().toString(34));
 
 		if (img.length == 0) {
-			img = jQuery('<img/>').attr('id', id).appendTo(('#'+obj.containerid));
+			img = jQuery('<img/>', {id: id}).appendTo(('#'+obj.containerid));
 
 			var xhr = (obj.loadSBox == 0)
 				? null
-				: flickerfreeScreen.getImageSboxHeight(new Curl(obj.src), function (height) {
+				: flickerfreeScreen.getImageSboxHeight(url, function (height) {
 					zbx_sbox.height = parseInt(height, 10);
 					img.data('zbx_sbox', zbx_sbox).attr('src', obj.src);
 				});
 
 			if (xhr === null) {
-				img.attr('src', obj.src);
+				img.attr('src', url.getUrl());
 			}
+
+			img.data('zbx_sbox', zbx_sbox);
 		}
 	},
 
 	refreshImage: function(id) {
 		var obj = this.objectList[id],
-			ignore_cache = (new Date()).getTime().toString(34),
-			url = new Curl(obj.src);
+			url = new Curl(obj.src, false);
+
+		url.setArgument('_', (new Date()).getTime().toString(34));
 		url.setArgument('from', obj.timeline.from);
 		url.setArgument('to', obj.timeline.to);
 
 		var debug;
 
-		var img = jQuery('#' + id)
-				.unbind('load')
+		var img = jQuery('#' + id),
+			clone = jQuery('<img/>', {
+					id: img.attr('id'),
+					'class': img.attr('class')
+				})
 				.on('load', function() {
+					img.replaceWith(clone);
 					// Update dashboard widget footer.
 					if (obj.onDashboard) {
 						timeControl.updateDashboardFooter(id);
@@ -560,10 +570,7 @@ var timeControl = {
 			async = (obj.loadSBox == 0)
 				? null
 				: flickerfreeScreen.getImageSboxHeight(url, function (height) {
-					// Prevent image caching.
-					url.setArgument('_', ignore_cache);
-
-					img.data('zbx_sbox', {
+					clone.data('zbx_sbox', {
 						height: parseInt(height, 10),
 						left: obj.objDims.shiftXleft,
 						right: obj.objDims.shiftXright,
@@ -574,15 +581,18 @@ var timeControl = {
 				});
 
 		if (async === null) {
-			img.attr('src', url.getUrl());
+			if (img.data('zbx_sbox')) {
+				clone.data('zbx_sbox', img.data('zbx_sbox'));
+			}
+
+			clone.attr('src', url.getUrl());
 		}
 
 		// link
-		var graphUrl = new Curl(jQuery('#' + obj.containerid).attr('href'));
+		var graphUrl = new Curl(jQuery('#' + obj.containerid).attr('href'), false);
 		graphUrl.setArgument('width', obj.objDims.width);
 		graphUrl.setArgument('from', obj.timeline.from);
 		graphUrl.setArgument('to', obj.timeline.to);
-		url.setArgument('_', ignore_cache);
 
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
 	},

@@ -82,7 +82,7 @@
 				},
 				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default';
 				ajax_url = new Curl('jsrpc.php'),
-				refresh = (!empty(is_self_refresh) || !empty(screen.timeline.refreshable)),
+				refresh = (!empty(is_self_refresh) || (screen.timeline && !empty(screen.timeline.refreshable))),
 				self = this;
 
 			ajax_url.setArgument('type', 9); // PAGE_TYPE_TEXT
@@ -338,19 +338,32 @@
 
 				$('img', '#flickerfreescreen_' + id).each(function() {
 					var domImg = $(this),
-						url = new Curl(domImg.attr('src')),
+						url = new Curl(domImg.attr('src'), false),
 						on_dashboard = timeControl.objectList[id].onDashboard;
 
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
 					url.setArgument('from', screen.timeline.from);
 					url.setArgument('to', screen.timeline.to);
+					// Prevent image caching.
+					url.setArgument('_', request_start.toString(34));
 
 					if (typeof screen.updateProfile === 'undefined') {
 						url.setArgument('updateProfile', 0);
 					}
 
 					// Create temp image in buffer.
-					var	img = $('<img/>')
+					var	img = $('<img/>', {
+							'class': domImg.attr('class'),
+							id: domImg.attr('id'),
+							name: domImg.attr('name'),
+							border: domImg.attr('border'),
+							usemap: domImg.attr('usemap'),
+							alt: domImg.attr('alt'),
+							css: {
+								position: 'relative',
+								zIndex: 2
+							}
+						})
 						.error(function() {
 							screen.error++;
 							window.flickerfreeScreen.calculateReRefresh(id);
@@ -370,7 +383,10 @@
 									img.fadeTo(0, 0.6);
 								}
 
-								domImg.attr('src', img.attr('src'));
+								if (domImg.data('zbx_sbox')) {
+									img.data('zbx_sbox', domImg.data('zbx_sbox'));
+								}
+								domImg.replaceWith(img);
 
 								// Callback function on success.
 								if (!empty(successAction)) {
@@ -394,17 +410,13 @@
 						// 'src' should be added only here to trigger load event after new height is received.
 						var zbx_sbox = domImg.data('zbx_sbox');
 
-						domImg.data('zbx_sbox', jQuery.extend(zbx_sbox, {
+						img.data('zbx_sbox', jQuery.extend(zbx_sbox, {
 							height: parseInt(height, 10),
 							from: screen.timeline.from,
 							from_ts: screen.timeline.from_ts,
 							to: screen.timeline.to,
 							to_ts: screen.timeline.to_ts
-						}));
-
-						// Prevent image caching.
-						url.setArgument('_', request_start.toString(34));
-						img.attr('src', url.getUrl());
+						})).attr('src', url.getUrl());
 					});
 					if (async === null) {
 						img.attr('src', url.getUrl());
@@ -424,7 +436,8 @@
 		 * @return {object|null}
 		 */
 		getImageSboxHeight: function (url, cb) {
-			if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(url.getPath()) > -1) {
+			if (['chart.php', 'chart2.php', 'chart3.php'].indexOf(url.getPath()) > -1
+					&& url.getArgument('outer') === '1') {
 				// Prevent request caching.
 				url.setArgument('_', (new Date).getTime().toString(34));
 
