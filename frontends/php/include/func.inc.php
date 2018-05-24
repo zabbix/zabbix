@@ -2560,7 +2560,7 @@ function calculateTime(array $options = []) {
 		$ts[$type] = $range_time_parser->getDateTime($type === 'from')->getTimestamp();
 	}
 
-	$period = $ts['to'] - $ts['from'];
+	$period = $ts['to'] - $ts['from'] + 1;
 
 	if ($period < ZBX_MIN_PERIOD) {
 		error(_n('Minimum time period to display is %1$s minute.', 'Minimum time period to display is %1$s minutes.',
