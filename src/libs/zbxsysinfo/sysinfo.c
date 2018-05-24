@@ -78,10 +78,7 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	zbx_strncpy_alloc(cmd, &cmd_alloc, &cmd_offset, command, pl - command);
 
 	if ('\0' == *pl)	/* no parameters specified */
-	{
-		zbx_strncpy_alloc(param, &param_alloc, &param_offset, "", 0);
 		return ZBX_COMMAND_WITHOUT_PARAMS;
-	}
 
 	if ('[' != *pl)		/* unsupported character */
 		return ZBX_COMMAND_ERROR;
@@ -374,7 +371,8 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 			goto out;	/* key is badly formatted */
 	}
 
-	request->key = zbx_strdup(NULL, key);
+	request->key = key;
+	key = NULL;
 
 	ret = SUCCEED;
 out:
@@ -386,15 +384,11 @@ out:
 
 void	test_parameter(const char *key)
 {
-#define	ZBX_COL_WIDTH	45
+#define ZBX_KEY_COLUMN_WIDTH	45
 
 	AGENT_RESULT	result;
-	int		n;
 
-	n = printf("%s", key);
-
-	if (0 < n && ZBX_COL_WIDTH > n)
-		printf("%-*s", ZBX_COL_WIDTH - n, " ");
+	printf("%-*s", ZBX_KEY_COLUMN_WIDTH, key);
 
 	init_result(&result);
 
@@ -428,6 +422,8 @@ void	test_parameter(const char *key)
 	printf("\n");
 
 	fflush(stdout);
+
+#undef ZBX_KEY_COLUMN_WIDTH
 }
 
 void	test_parameters(void)

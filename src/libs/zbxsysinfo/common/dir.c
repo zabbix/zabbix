@@ -27,6 +27,9 @@
 #	include "disk.h"
 #endif
 
+#define SKIP_WHITESPACE(src)	\
+	while ('\0' != *(src) && NULL != strchr(ZBX_WHITESPACE, *(src))) (src)++
+
 /******************************************************************************
  *                                                                            *
  * Function: filename_matches                                                 *
@@ -113,7 +116,7 @@ static int	compare_descriptors(const void *file_a, const void *file_b)
 static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT *result, regex_t **regex_incl,
 		regex_t **regex_excl, int *max_depth, char **dir, zbx_stat_t *status, int depth_param, int param_count)
 {
-	char	*dir_param, *regex_incl_str, *regex_excl_str, *max_depth_str, *error = NULL;
+	char	*dir_param, *regex_incl_str, *regex_excl_str, *max_depth_str, *max_depth_ptr, *error = NULL;
 
 	if (param_count < request->nparam)
 	{
@@ -166,10 +169,25 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 	{
 		*max_depth = TRAVERSAL_DEPTH_UNLIMITED;
 	}
-	else if (-1 > (*max_depth = atoi(max_depth_str)))
+	else if (' ' == *max_depth_str || FAIL == is_int_prefix(max_depth_str))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter. Contain non digital prefix."));
+		return FAIL;
+	}
+	else if (-1 > (*max_depth = (int)strtol(max_depth_str, &max_depth_ptr, 10)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return FAIL;
+	}
+	else
+	{
+		SKIP_WHITESPACE(max_depth_ptr);
+
+		if ('\0' != *max_depth_ptr)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter. Expected numeric value."));
+			return FAIL;
+		}
 	}
 
 	*dir = zbx_strdup(*dir, dir_param);

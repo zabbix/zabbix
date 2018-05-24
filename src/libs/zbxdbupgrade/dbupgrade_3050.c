@@ -520,9 +520,7 @@ static int	DBpatch_3050042(void)
 
 static int	DBpatch_3050043(void)
 {
-	int	res;
-
-	res = DBexecute(
+	const char	*sql =
 		"update widget_field"
 		" set value_int=3"
 		" where name='show_tags'"
@@ -531,12 +529,15 @@ static int	DBpatch_3050043(void)
 				" from widget w"
 				" where widget_field.widgetid=w.widgetid"
 					" and w.type='problems'"
-			")");
+			")";
 
-	if (ZBX_DB_OK > res)
-		return FAIL;
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-	return SUCCEED;
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
 }
 
 static int	DBpatch_3050044(void)
@@ -545,6 +546,9 @@ static int	DBpatch_3050044(void)
 		"delete from profiles"
 		" where idx in ('web.paging.lastpage','web.menu.view.last') and value_str='tr_status.php'"
 			" or idx like 'web.tr_status%'";
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		return SUCCEED;
@@ -555,6 +559,9 @@ static int	DBpatch_3050044(void)
 static int	DBpatch_3050045(void)
 {
 	const char	*sql = "update users set url='zabbix.php?action=problem.view' where url like '%tr_status.php%'";
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		return SUCCEED;
@@ -699,6 +706,9 @@ static int	DBpatch_3050065(void)
 {
 	int	ret;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	/* 5 - HOST_STATUS_PROXY_ACTIVE, 6 - HOST_STATUS_PROXY_PASSIVE */
 	ret = DBexecute("update hosts set auto_compress=0 where status=5 or status=6");
 
@@ -707,6 +717,68 @@ static int	DBpatch_3050065(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_3050066(void)
+{
+	int		i;
+	const char      *types[] = {
+			"actlog", "actionlog",
+			"dscvry", "discovery",
+			"favgrph", "favgraphs",
+			"favmap", "favmaps",
+			"favscr", "favscreens",
+			"hoststat", "problemhosts",
+			"navigationtree", "navtree",
+			"stszbx", "systeminfo",
+			"sysmap", "map",
+			"syssum", "problemsbysv",
+			"webovr", "web",
+			NULL
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != types[i]; i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update widget set type='%s' where type='%s'", types[i + 1], types[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050067(void)
+{
+	return DBdrop_field("config", "event_expire");
+}
+
+static int	DBpatch_3050068(void)
+{
+	return DBdrop_field("config", "event_show_max");
+}
+
+static int	DBpatch_3050069(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update widget_field"
+		" set name='itemids'"
+		" where name='itemid'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='plaintext'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -775,5 +847,9 @@ DBPATCH_ADD(3050062, 0, 1)
 DBPATCH_ADD(3050063, 0, 1)
 DBPATCH_ADD(3050064, 0, 1)
 DBPATCH_ADD(3050065, 0, 1)
+DBPATCH_ADD(3050066, 0, 1)
+DBPATCH_ADD(3050067, 0, 1)
+DBPATCH_ADD(3050068, 0, 1)
+DBPATCH_ADD(3050069, 0, 1)
 
 DBPATCH_END()

@@ -1,20 +1,13 @@
 if AGENT
-AGENT_tests = SYSTEM_LOCALTIME
+AGENT_tests = \
+	SYSTEM_LOCALTIME \
+	WEB_PAGE_GET
 endif
 
 noinst_PROGRAMS = $(AGENT_tests)
 
 if AGENT
 COMMON_SRC_FILES = \
-	../../../../src/zabbix_agent/active.c ../../../../src/zabbix_agent/active.h \
-	../../../../src/zabbix_agent/stats.c \
-	../../../../src/zabbix_agent/cpustat.c \
-	../../../../src/zabbix_agent/diskdevices.c \
-	../../../../src/zabbix_agent/vmstats.c \
-	../../../../src/zabbix_agent/logfiles.c \
-	../../../../src/zabbix_agent/zbxconf.c \
-	../../../../src/zabbix_agent/listener.c \
-	../../../../src/zabbix_agent/procstat.c \
 	../../../zbxmocktest.h
 
 COMMON_LIB_FILES = \
@@ -37,6 +30,8 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
+	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
@@ -58,4 +53,26 @@ SYSTEM_LOCALTIME_LDADD += @AGENT_LIBS@
 SYSTEM_LOCALTIME_LDFLAGS = @AGENT_LDFLAGS@
 
 SYSTEM_LOCALTIME_CFLAGS = $(SYSTEM_LOCALTIME_WRAP_FUNCS) $(COMMON_COMPILER_FLAGS)
+
+
+
+WEB_PAGE_GET_SOURCES = \
+	WEB_PAGE_GET.c \
+	$(COMMON_SRC_FILES)
+
+WEB_PAGE_GET_WRAP_FUNCS = \
+	-Wl,--wrap=zbx_tcp_connect \
+	-Wl,--wrap=zbx_tcp_send_ext \
+	-Wl,--wrap=zbx_tcp_recv_raw_ext \
+	-Wl,--wrap=zbx_tcp_close
+
+WEB_PAGE_GET_LDADD = \
+	$(COMMON_LIB_FILES)
+
+WEB_PAGE_GET_LDADD += @AGENT_LIBS@
+
+WEB_PAGE_GET_LDFLAGS = @AGENT_LDFLAGS@
+
+WEB_PAGE_GET_CFLAGS = $(WEB_PAGE_GET_WRAP_FUNCS) $(COMMON_COMPILER_FLAGS)
+
 endif

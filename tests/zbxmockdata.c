@@ -28,7 +28,7 @@
 static zbx_vector_ptr_t		handle_pool;		/* a place to store handles provided to mock data user */
 static zbx_vector_str_t		string_pool;		/* a place to store strings provided to mock data user */
 static yaml_document_t		test_case;		/* parsed YAML document with test case data */
-static const yaml_node_t	*root;                  /* the root document node */
+static const yaml_node_t	*root;			/* the root document node */
 static const yaml_node_t	*in = NULL;		/* pointer to "in" section of test case document */
 static const yaml_node_t	*out = NULL;		/* pointer to "out" section of test case document */
 static const yaml_node_t	*db_data = NULL;	/* pointer to "db data" section of test case document */
@@ -79,11 +79,14 @@ static const char	*zbx_yaml_error_string(yaml_error_type_t error)
 
 static int	zbx_yaml_scalar_cmp(const char *str, const yaml_node_t *node)
 {
+	size_t	len;
+
 	if (YAML_SCALAR_NODE != node->type)
 		fail_msg("Internal error: scalar comparison of nonscalar node.");
 
-	return strncmp(str, (const char *)node->data.scalar.value, node->data.scalar.length) ||
-			strlen(str) > node->data.scalar.length;
+	len = strlen(str);
+	ZBX_RETURN_IF_NOT_EQUAL(len, node->data.scalar.length);
+	return memcmp(str, node->data.scalar.value, len);
 }
 
 static int	zbx_yaml_scalar_ncmp(const char *str, size_t len, const yaml_node_t *node)
@@ -546,11 +549,8 @@ static zbx_mock_error_t	zbx_yaml_path_next(const char **pnext, const char **key,
 	/* process array index component */
 	if (0 != isdigit(*next))
 	{
-		for (pos = 0; 0 != isdigit(next[pos]); pos++)
+		for (pos = 1; 0 != isdigit(next[pos]); pos++)
 			;
-
-		if (0 == pos)
-			return ZBX_MOCK_INVALID_YAML_PATH;
 
 		*key = next;
 		*key_len = pos;

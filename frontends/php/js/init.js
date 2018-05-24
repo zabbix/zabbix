@@ -20,8 +20,20 @@
 
 jQuery(function($) {
 
-	if ($('#search').length) {
+	var $search = $('#search');
+
+	if ($search.length) {
 		createSuggest('search');
+
+		$search.keyup(function() {
+			$search
+				.siblings('button')
+				.attr('disabled', ($.trim($search.val()) === '') ? true : null);
+		}).closest('form').submit(function() {
+			if ($.trim($search.val()) === '') {
+				return false;
+			}
+		});
 	}
 
 	if (IE) {
@@ -99,7 +111,7 @@ jQuery(function($) {
 				break;
 
 			case 'dashboard':
-				data = getMenuPopupDashboard(data);
+				data = getMenuPopupDashboard(data, obj);
 				break;
 		}
 

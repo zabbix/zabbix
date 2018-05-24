@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha6');
+define('ZABBIX_VERSION',		'4.0.0alpha7');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050065);
+define('ZABBIX_DB_VERSION',		3050069);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -253,6 +253,7 @@ define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
 define('CONDITION_OPERATOR_REGEXP',		8);
+define('CONDITION_OPERATOR_NOT_REGEXP',	9);
 
 // correlation statuses
 define('ZBX_CORRELATION_ENABLED',		0);
@@ -739,7 +740,7 @@ define('VALIGN_BOTTOM',		2);
 define('STYLE_HORIZONTAL',	0);
 define('STYLE_VERTICAL',	1);
 
-// view style [Overview]
+// view style [Overview, Plaintext]
 define('STYLE_LEFT',	0);
 define('STYLE_TOP',		1);
 
@@ -1200,24 +1201,24 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 
 // dashboard widgets
-define('WIDGET_DISCOVERY_STATUS',		'dscvry');
-define('WIDGET_FAVOURITE_GRAPHS',		'favgrph');
-define('WIDGET_FAVOURITE_MAPS',			'favmap');
-define('WIDGET_FAVOURITE_SCREENS',		'favscr');
-define('WIDGET_HOST_STATUS',			'hoststat');
-define('WIDGET_PROBLEMS',				'problems');
-define('WIDGET_SYSTEM_STATUS',			'syssum');
-define('WIDGET_WEB_OVERVIEW',			'webovr');
-define('WIDGET_ZABBIX_STATUS',			'stszbx');
-define('WIDGET_GRAPH',					'graph');
-define('WIDGET_CLOCK',					'clock');
-define('WIDGET_SYSMAP',					'sysmap');
-define('WIDGET_NAVIGATION_TREE',		'navigationtree');
-define('WIDGET_PLAIN_TEXT',				'plaintext');
-define('WIDGET_URL',					'url');
-define('WIDGET_ACTION_LOG',				'actlog');
-define('WIDGET_DATA_OVERVIEW',			'dataover');
-define('WIDGET_TRIG_OVERVIEW',			'trigover');
+define('WIDGET_ACTION_LOG',		'actionlog');
+define('WIDGET_CLOCK',			'clock');
+define('WIDGET_DATA_OVER',		'dataover');
+define('WIDGET_DISCOVERY',		'discovery');
+define('WIDGET_FAV_GRAPHS',		'favgraphs');
+define('WIDGET_FAV_MAPS',		'favmaps');
+define('WIDGET_FAV_SCREENS',	'favscreens');
+define('WIDGET_GRAPH',			'graph');
+define('WIDGET_MAP',			'map');
+define('WIDGET_NAV_TREE',		'navtree');
+define('WIDGET_PLAIN_TEXT',		'plaintext');
+define('WIDGET_PROBLEM_HOSTS',	'problemhosts');
+define('WIDGET_PROBLEMS',		'problems');
+define('WIDGET_PROBLEMS_BY_SV',	'problemsbysv');
+define('WIDGET_SYSTEM_INFO',	'systeminfo');
+define('WIDGET_TRIG_OVER',		'trigover');
+define('WIDGET_URL',			'url');
+define('WIDGET_WEB',			'web');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
@@ -1371,6 +1372,10 @@ define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');
 define('ZBX_STYLE_CLOCK_HAND_SEC', 'clock-hand-sec');
 define('ZBX_STYLE_CLOCK_LINES', 'clock-lines');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
+define('ZBX_STYLE_COLUMN_TAGS_1', 'column-tags-1');
+define('ZBX_STYLE_COLUMN_TAGS_2', 'column-tags-2');
+define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
+define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER', 'dashbrd-grid-widget-container');
@@ -1390,11 +1395,18 @@ define('ZBX_STYLE_OK_ACK_FG', 'ok-ack-fg');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
-define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
+define('ZBX_STYLE_FILTER_ACTIVE', 'filter-active');
 define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
+define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
+define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
-define('ZBX_STYLE_FILTER_ACTIVE', 'filter-active');
+define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
+define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
+define('ZBX_STYLE_FLH_HIGH_BG', 'flh-high-bg');
+define('ZBX_STYLE_FLH_INFO_BG', 'flh-info-bg');
+define('ZBX_STYLE_FLH_NA_BG', 'flh-na-bg');
+define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
@@ -1439,7 +1451,6 @@ define('ZBX_STYLE_MSG_BAD_GLOBAL', 'msg-bad-global');
 define('ZBX_STYLE_MSG_DETAILS', 'msg-details');
 define('ZBX_STYLE_MSG_DETAILS_BORDER', 'msg-details-border');
 define('ZBX_STYLE_NA_BG', 'na-bg');
-define('ZBX_STYLE_NAV', 'nav');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
 define('ZBX_STYLE_NOTIF_BODY', 'notif-body');
 define('ZBX_STYLE_NOTIF_INDIC', 'notif-indic');
@@ -1468,6 +1479,7 @@ define('ZBX_STYLE_RIGHT', 'right');
 define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_SCREEN_TABLE', 'screen-table');
 define('ZBX_STYLE_SEARCH', 'search');
+define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
 define('ZBX_STYLE_SELECTED', 'selected');
 define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
@@ -1495,10 +1507,12 @@ define('ZBX_STYLE_STATUS_NA_BG', 'status-na-bg');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_SUBFILTER', 'subfilter');
 define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');
 define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
+define('ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN', 'table-forms-second-column');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
@@ -1521,6 +1535,7 @@ define('ZBX_STYLE_TOP_NAV_HELP', 'top-nav-help');
 define('ZBX_STYLE_TOP_NAV_ICONS', 'top-nav-icons');
 define('ZBX_STYLE_TOP_NAV_PROFILE', 'top-nav-profile');
 define('ZBX_STYLE_TOP_NAV_SIGNOUT', 'top-nav-signout');
+define('ZBX_STYLE_TOP_NAV_SUPPORT', 'top-nav-support');
 define('ZBX_STYLE_TOP_NAV_ZBBSHARE', 'top-nav-zbbshare');
 define('ZBX_STYLE_TOP_SUBNAV', 'top-subnav');
 define('ZBX_STYLE_TOP_SUBNAV_CONTAINER', 'top-subnav-container');
