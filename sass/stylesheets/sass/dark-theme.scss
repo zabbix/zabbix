@@ -200,6 +200,11 @@ $ok-ack-fg-color: #00ff00;
 	}
 }
 
+.icon-action-msgs {
+	&[data-count]::after {
+		color: $font-selected-color;
+	}
+}
 .icon-action-severity-up::before {
 	background-position: -624px -245px;
 }

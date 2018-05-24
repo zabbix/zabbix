@@ -5524,7 +5524,7 @@ svg {
 }
 .icon-action-msgs {
 	&[data-count]::after {
-		color: $font-selected-color;
+		color: $ui-bg-color;
 	}
 	&::before {
 		background-position: -474px -245px;
@@ -5532,7 +5532,7 @@ svg {
 }
 .icon-actions-number-gray {
 	&[data-count]::after {
-		color: $ui-bg-selected-color;
+		color: $font-color;
 	}
 	&::before {
 		background-position: -499px -245px;
@@ -5540,7 +5540,7 @@ svg {
 }
 .icon-actions-number-yellow {
 	&[data-count]::after {
-		color: $alt-orange;
+		color: $font-color;
 	}
 	&::before {
 		background-position: -549px -245px;
@@ -5548,7 +5548,7 @@ svg {
 }
 .icon-actions-number-red {
 	&[data-count]::after {
-		color: $red;
+		color: $font-color;
 	}
 	&::before {
 		background-position: -524px -245px;

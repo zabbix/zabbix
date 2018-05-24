@@ -1097,33 +1097,21 @@ td.inactive-bg {
 	background-position: -424px -285px;
 }
 .icon-action-msgs {
-	&[data-count]::after {
-		color: $ui-bg-color;
-	}
 	&::before {
 		background-position: -474px -285px;
 	}
 }
 .icon-actions-number-gray {
-	&[data-count]::after {
-		color: $ui-bg-selected-color;
-	}
 	&::before {
 		background-position: -499px -285px;
 	}
 }
 .icon-actions-number-yellow {
-	&[data-count]::after {
-		color: $alt-orange;
-	}
 	&::before {
 		background-position: -549px -285px;
 	}
 }
 .icon-actions-number-red {
-	&[data-count]::after {
-		color: $red;
-	}
 	&::before {
 		background-position: -524px -285px;
 	}
