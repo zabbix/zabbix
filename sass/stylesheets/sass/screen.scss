@@ -725,23 +725,6 @@ output {
 							[class*='icon-'] {
 								@include border-radius(2px);
 								background-color: $ui-bg-color;
-
-								// &:not(:last-of-type) {
-								// 	border-right: 5px solid $ui-bg-color;
-								// 	margin-right: 0;
-								// }
-								&:only-of-type, &:last-of-type {
-									margin: 0;
-								}
-								// &:last-of-type {
-								// 	@include border-radius(0 2px 2px 0);
-								// }
-								// &:first-of-type {
-								// 	@include border-radius(2px 0 0 2px);
-								// }
-								// &:only-of-type {
-								// 	@include border-radius(2px);
-								// }
 							}
 
 							.icon-wzrd-action {
