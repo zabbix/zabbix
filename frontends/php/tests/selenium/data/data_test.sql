@@ -1433,7 +1433,7 @@ UPDATE users SET rows_per_page = 100 WHERE userid = 1;
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (100, 'Icon mapping one', 10);
 INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (1, 100, 2, 1, 'expresssion one', 0);
 INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (2, 100, 2, 1, 'expresssion two', 1);
-INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (101, 'Icon mapping two', 15);
+INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (101, 'Icon mapping for update', 15);
 INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (3, 101, 5, 4, '(1!@#$%^-=2*)', 0);
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (102, 'Icon mapping testForm update expression', 16);
 INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (4, 102, 6, 5, 'one more expression', 0);
