@@ -59,6 +59,7 @@ static int			shm_id = -1;
 #endif
 #endif
 
+#ifdef ZBX_PTHREAD
 static int	zbx_locks_create(char **error)
 {
 	int			i;
@@ -117,6 +118,7 @@ static int	zbx_locks_create(char **error)
 
 	return SUCCEED;
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -376,7 +378,7 @@ ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
 	return name;
 }
 #endif
-
+#ifdef ZBX_PTHREAD
 int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error)
 {
 	if (FAIL == zbx_locks_create(error))
@@ -425,9 +427,7 @@ void	__zbx_rwlock_unlock(const char *filename, int line, const ZBX_RWLOCK *mutex
 
 void	zbx_rwlock_destroy(ZBX_RWLOCK *mutex)
 {
-	if (0 != pthread_rwlock_destroy(&shared_lock->rwlocks[*mutex]))
-		zbx_error("cannot remove semaphore %d: %s", *mutex, zbx_strerror(errno));
-
-	*mutex = ZBX_MUTEX_NULL;
+	*mutex = ZBX_RWLOCK_NULL;
 }
+#endif
 
