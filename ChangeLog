@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha7
 
 New features:
+....I..... [ZBXNEXT-4565] removed old upgrade DB patches (viktors)
 ..F.....S. [ZBXNEXT-4320] added ability to store history data in date based indices of elasticsearch (vjaceslavs)
 ..F....... [ZBXNEXT-4526] increased tags column size in Compact view mode (agriscenko)
 ..F....... [ZBXNEXT-4528] added link to Zabbix official support page (Andzs, ashubin)
