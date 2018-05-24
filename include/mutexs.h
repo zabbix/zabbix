@@ -78,6 +78,8 @@ zbx_rwlock_lock_type_t;
 
 #endif	/* _WINDOWS */
 
+int	zbx_locks_create(char **error);
+
 #define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
 #define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
 

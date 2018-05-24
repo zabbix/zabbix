@@ -923,6 +923,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
+	if (SUCCEED != zbx_locks_create(error))
+	{
+		zbx_error("cannot create locks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
 	{
 		zbx_error("cannot open log: %s", error);

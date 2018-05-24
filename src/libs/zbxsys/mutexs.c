@@ -59,9 +59,9 @@ static int			shm_id = -1;
 #endif
 #endif
 
-#ifdef ZBX_PTHREAD
-static int	zbx_locks_create(char **error)
+int	zbx_locks_create(char **error)
 {
+#ifdef ZBX_PTHREAD
 	int			i;
 	pthread_mutexattr_t	mta;
 	pthread_rwlockattr_t	rwa;
@@ -115,15 +115,43 @@ static int	zbx_locks_create(char **error)
 			return FAIL;
 		}
 	}
+#else
+	if (-1 == ZBX_SEM_LIST_ID)
+	{
+		union semun	semopts;
+		int		i;
 
+		if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT, 0600)))
+		{
+			*error = zbx_dsprintf(*error, "cannot create semaphore set: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		/* set default semaphore value */
+
+		semopts.val = 1;
+		for (i = 0; ZBX_MUTEX_COUNT > i; i++)
+		{
+			if (-1 != semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
+				continue;
+
+			*error = zbx_dsprintf(*error, "cannot initialize semaphore: %s", zbx_strerror(errno));
+
+			if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
+				zbx_error("cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));
+
+			ZBX_SEM_LIST_ID = -1;
+
+			return FAIL;
+		}
+	}
+#endif
 	return SUCCEED;
 }
-
+#ifdef ZBX_PTHREAD
 int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error)
 {
-	if (FAIL == zbx_locks_create(error))
-		return FAIL;
-
+	ZBX_UNUSED(error);
 	*rwlock = name;
 
 	return SUCCEED;
@@ -195,39 +223,8 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 		return FAIL;
 	}
 #else
-#ifdef	ZBX_PTHREAD
-	if (FAIL == zbx_locks_create(error))
-		return FAIL;
-#else
-	if (-1 == ZBX_SEM_LIST_ID)
-	{
-		union semun	semopts;
-		int		i;
-
-		if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT, 0600)))
-		{
-			*error = zbx_dsprintf(*error, "cannot create semaphore set: %s", zbx_strerror(errno));
-			return FAIL;
-		}
-
-		/* set default semaphore value */
-
-		semopts.val = 1;
-		for (i = 0; ZBX_MUTEX_COUNT > i; i++)
-		{
-			if (-1 != semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
-				continue;
-
-			*error = zbx_dsprintf(*error, "cannot initialize semaphore: %s", zbx_strerror(errno));
-
-			if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
-				zbx_error("cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));
-
-			ZBX_SEM_LIST_ID = -1;
-
-			return FAIL;
-		}
-	}
+	ZBX_UNUSED(error);
+#ifndef	ZBX_PTHREAD
 	mutexes++;
 #endif
 	*mutex = name;
