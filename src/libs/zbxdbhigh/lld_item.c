@@ -2002,8 +2002,9 @@ static zbx_item_dependence_t	*lld_item_dependence_create(zbx_uint64_t itemid, zb
  *                                                                            *
  * Function: lld_item_save                                                    *
  *                                                                            *
- * Purpose: recursively prepare LLD item bulk insert if any and               *
- *          update dependent items with their masters                         *
+ * Purpose: recursively prepare LLD item bulk insert and update dependent     *
+ *          items with their masters if limit of dependent items isn't        *
+ *          exceeded else collect lld error messages only                     *
  *                                                                            *
  * Parameters: hostid               - [IN] parent host id                     *
  *             item_prototypes      - [IN] item prototypes                    *
@@ -2020,7 +2021,8 @@ static zbx_item_dependence_t	*lld_item_dependence_create(zbx_uint64_t itemid, zb
  *                                             checked for limit on the       *
  *                                             number of dependencies         *
  *             error                - [IN/OUT] the lld error message          *
- *             limit_exceeded       - [IN/OUT] limit is exceeded              *
+ *             limit_exceeded       - [IN/OUT] limit of dependent items       *
+ *                                             exceeded                       *
  *                                                                            *
  * Returns: SUCCEED - the item was added successfully into bulk insert        *
  *          FAIL    - otherwise                                               *
@@ -2506,10 +2508,10 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
  ******************************************************************************/
 static zbx_item_dependence_t	*lld_item_dependence_add(DB_ROW row, zbx_vector_ptr_t *item_dependencies)
 {
-	zbx_item_dependence_t		*dependence = NULL;
-	zbx_uint64_t			itemid, master_itemid;
-	unsigned int			item_flags;
-	int				i;
+	zbx_item_dependence_t	*dependence = NULL;
+	zbx_uint64_t		itemid, master_itemid;
+	unsigned int		item_flags;
+	int			i;
 
 	ZBX_STR2UINT64(itemid, row[0]);
 	ZBX_DBROW2UINT64(master_itemid, row[1]);
