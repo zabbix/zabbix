@@ -423,18 +423,28 @@ clean:
 	return hostid;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_discovery_or_auto_registration                                *
+ *                                                                            *
+ * Purpose: checks if the event is discovery or auto registration event       *
+ *                                                                            *
+ * Return value: SUCCEED - it's discovery or auto registration event          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	is_discovery_or_auto_registration(const DB_EVENT *event)
 {
-	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
-		return FAIL;
-
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE &&
-			event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	if (event->source == EVENT_SOURCE_DISCOVERY && (event->object == EVENT_OBJECT_DHOST ||
+			event->object == EVENT_OBJECT_DSERVICE))
 	{
-		return FAIL;
+		return SUCCEED;
 	}
 
-	return SUCCEED;
+	if (event->source == EVENT_SOURCE_AUTO_REGISTRATION && event->object == EVENT_OBJECT_ZABBIX_ACTIVE)
+		return SUCCEED;
+
+	return FAIL;
 }
 
 /******************************************************************************
