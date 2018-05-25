@@ -2566,14 +2566,14 @@ function calculateTime(array $options = []) {
 		error(_n('Minimum time period to display is %1$s minute.', 'Minimum time period to display is %1$s minutes.',
 			(int) ZBX_MIN_PERIOD / SEC_PER_MIN
 		));
-		$ts['from'] = $ts['to'] - ZBX_MIN_PERIOD;
+		$ts['from'] = $ts['to'] - ZBX_MIN_PERIOD + 1;
 		$options['from'] = (new DateTime())->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
 	}
 	elseif ($period > ZBX_MAX_PERIOD) {
 		error(_n('Maximum time period to display is %1$s day.', 'Maximum time period to display is %1$s days.',
 			(int) ZBX_MAX_PERIOD / SEC_PER_DAY
 		));
-		$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD;
+		$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD + 1;
 		$options['from'] = (new DateTime())->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
 	}
 
