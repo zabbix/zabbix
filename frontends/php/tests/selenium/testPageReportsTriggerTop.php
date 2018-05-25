@@ -192,6 +192,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestClickButtonMultiselect('groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
 			$this->zbxTestClickLinkTextWait($data['host_group']);
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_dialogue']"));
 			$this->zbxTestMultiselectAssertSelected('groupids_', $data['host_group']);
 		}
 
@@ -203,6 +204,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			);
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_dialogue']"));
 			$this->zbxTestMultiselectAssertSelected('hostids_', $data['host']);
 		}
 
@@ -219,6 +221,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		}
 
 		$this->zbxTestClickXpath('//button[@name=\'filter_set\']');
+		$this->zbxTestWaitForPageToLoad();
 		if (array_key_exists('result', $data)) {
 			$this->zbxTestTextPresent($data['result']);
 		}
