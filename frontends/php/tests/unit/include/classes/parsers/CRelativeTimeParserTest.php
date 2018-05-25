@@ -398,6 +398,47 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'now/y/M/w/d/h/m-1y+2M-4w-3d+2h+15m-25s-7/d', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'y'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'd'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'h'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'm'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'y'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '+', 'value' => '2', 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '4', 'suffix' => 'w'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '3', 'suffix' => 'd'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '+', 'value' => '2', 'suffix' => 'h'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '+', 'value' => '15', 'suffix' => 'm'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '25', 'suffix' => 's'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '7', 'suffix' => 's'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'd']
+					],
+					'match' => 'now/y/M/w/d/h/m-1y+2M-4w-3d+2h+15m-25s-7/d'
+				]
+			],
+			[
+				'now/y/M/w/d/h/m-1y+2?-4w-3d+2h+15m-25s-7/d', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'y'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'M'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'w'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'd'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'h'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'm'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'y'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '+', 'value' => '2', 'suffix' => 's'],
+					],
+					'match' => 'now/y/M/w/d/h/m-1y+2'
+				]
+			],
+			[
 				'now-300sTEXT', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,

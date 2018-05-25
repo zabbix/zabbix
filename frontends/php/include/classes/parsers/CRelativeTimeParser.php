@@ -64,40 +64,64 @@ class CRelativeTimeParser extends CParser {
 	 * @return bool
 	 */
 	private function parseRelativeTime($source, &$pos) {
-		$pattern_precision = '\/[yMwdhm]';
-		$pattern_precision1 = '(?P<precision1>'.$pattern_precision.')';
-		$pattern_precision2 = '(?P<precision2>'.$pattern_precision.')';
-		$pattern_offset = '(?P<offset>(?P<offset_sign>[+-])(?P<offset_value>[0-9]+)(?P<offset_suffix>[yMwdhms])?)';
-		$pattern = 'now'.$pattern_precision1.'?('.$pattern_offset.$pattern_precision2.'?)?';
+		if (strncmp(substr($source, $pos), 'now', 3) != 0) {
+			return false;
+		}
+
+		$pos += 3;
+
+		while ($this->parsePrecision($source, $pos) || $this->parseOffset($source, $pos)) {
+		}
+
+		return true;
+	}
+
+	/**
+	 * Parse precision.
+	 *
+	 * @param string	$source
+	 * @param int		$pos
+	 *
+	 * @return bool
+	 */
+	private function parsePrecision($source, &$pos) {
+		$pattern = '(\/[yMwdhm])';
 
 		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
 			return false;
 		}
 
-		if (array_key_exists('precision1', $matches) && $matches['precision1'] !== '') {
-			$this->tokens[] = [
-				'type' => self::ZBX_TOKEN_PRECISION,
-				'suffix' => substr($matches['precision1'], 1)
-			];
+		$this->tokens[] = [
+			'type' => self::ZBX_TOKEN_PRECISION,
+			'suffix' => substr($matches[0], 1)
+		];
+
+		$pos += strlen($matches[0]);
+
+		return true;
+	}
+
+	/**
+	 * Parse offset.
+	 *
+	 * @param string	$source
+	 * @param int		$pos
+	 *
+	 * @return bool
+	 */
+	private function parseOffset($source, &$pos) {
+		$pattern = '(?P<offset_sign>[+-])(?P<offset_value>[0-9]+)(?P<offset_suffix>[yMwdhms])?';
+
+		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
+			return false;
 		}
 
-		if (array_key_exists('offset', $matches) && $matches['offset'] !== '') {
-			$this->tokens[] = [
-				'type' => self::ZBX_TOKEN_OFFSET,
-				'sign' => $matches['offset_sign'],
-				'value' => $matches['offset_value'],
-				'suffix' => (array_key_exists('offset_suffix', $matches) && $matches['offset_suffix'] !== '')
-					? $matches['offset_suffix']
-					: 's'
-			];
-		}
-
-		if (array_key_exists('precision2', $matches) && $matches['precision2'] !== '') {
-			$this->tokens[] = [
-				'type' => self::ZBX_TOKEN_PRECISION,
-				'suffix' => substr($matches['precision2'], 1)
-			];
-		}
+		$this->tokens[] = [
+			'type' => self::ZBX_TOKEN_OFFSET,
+			'sign' => $matches['offset_sign'],
+			'value' => $matches['offset_value'],
+			'suffix' => array_key_exists('offset_suffix', $matches) ? $matches['offset_suffix'] : 's'
+		];
 
 		$pos += strlen($matches[0]);
 
