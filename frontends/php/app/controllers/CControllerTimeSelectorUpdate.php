@@ -138,7 +138,7 @@ class CControllerTimeSelectorUpdate extends CController {
 				break;
 		}
 
-		calculateTime([
+		$timeline = calculateTime([
 			'profileIdx' => $this->getInput('idx'),
 			'profileIdx2' => $this->getInput('idx2'),
 			'updateProfile' => true,
@@ -148,6 +148,7 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
 			'label' => relativeDateToText($value['from'], $value['to']),
+			'refreshable' => $timeline['refreshable'],
 			'from' => $value['from'],
 			'from_ts' => $ts['from'],
 			'from_date' => $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME),

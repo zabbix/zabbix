@@ -549,6 +549,10 @@ var timeControl = {
 		var obj = this.objectList[id],
 			url = new Curl(obj.src, false);
 
+		if (!obj.timeline.refreshable) {
+			return;
+		}
+
 		url.setArgument('_', (new Date()).getTime().toString(34));
 		url.setArgument('from', obj.timeline.from);
 		url.setArgument('to', obj.timeline.to);
@@ -686,7 +690,8 @@ var timeControl = {
 				from: data.from,
 				from_ts: data.from_ts,
 				to: data.to,
-				to_ts: data.to_ts
+				to_ts: data.to_ts,
+				refreshable: data.refreshable
 			});
 		}
 	}
