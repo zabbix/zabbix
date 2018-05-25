@@ -119,6 +119,7 @@ if ($data['action'] != HISTORY_BATCH_GRAPH && is_array($itemids)) {
 // render view
 $historyView = new CView('monitoring.history', $data);
 $historyView->render();
+show_messages();
 $historyView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

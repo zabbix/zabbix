@@ -103,6 +103,7 @@ $data = [
 // render view
 $chartsView = new CView('monitoring.charts', $data);
 $chartsView->render();
+show_messages();
 $chartsView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

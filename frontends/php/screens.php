@@ -131,6 +131,7 @@ ob_end_flush();
 // render view
 $screenView = new CView('monitoring.screen', $data);
 $screenView->render();
+show_messages();
 $screenView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -154,6 +154,7 @@ $data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlo
 // render view
 $auditView = new CView('administration.auditlogs.list', $data);
 $auditView->render();
+show_messages();
 $auditView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

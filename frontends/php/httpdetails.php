@@ -67,6 +67,8 @@ $timeline = calculateTime([
 	'updateProfile' => (hasRequest('from') && hasRequest('to'))
 ]);
 
+show_messages();
+
 $http_test_name = CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name']);
 
 // Create details widget.

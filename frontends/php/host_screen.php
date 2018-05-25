@@ -99,6 +99,7 @@ if (!empty($data['screen']['hostid'])) {
 // render view
 $screenView = new CView('monitoring.hostscreen', $data);
 $screenView->render();
+show_messages();
 $screenView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
