@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,11 +49,18 @@ class testPageReportsNotifications extends CWebTest {
 		while ($row = DBfetch($get_user_alias)) {
 			$user_alias[] = $row['alias'];
 		}
+		sort($user_alias);
 
-		// Check that all users from DB exist in table header on page
+		$users = [];
 		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th[@class="vertical_rotation"]'));
 		foreach ($elements as $i => $element) {
-			$this->assertRegexp('/^'.$user_alias[$i].'( \(.+\))*$/', $element->getText());
+			$users[] = $element->getText();
+		}
+		sort($users);
+
+		// Check that all users from DB exist in table header on page
+		foreach ($users as $i => $user) {
+			$this->assertRegexp('/^'.$user_alias[$i].'( \(.+\))*$/', $users[$i]);
 		}
 	}
 
@@ -76,7 +83,7 @@ class testPageReportsNotifications extends CWebTest {
 						[
 							'alias' => 'test-user',
 							'notifications' => [ '', '', '3 (1/0/2/0)', '', '', '', '', '', '', '', '11 (5/0/6/0)', '']
-						],
+						]
 					]
 				]
 			],
