@@ -44,7 +44,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 			'remember selected',
 			'Limit for search and filter results',
 			'Max count of elements to show inside table cell',
-			'Enable event acknowledgement',
 			'Show warning if Zabbix server is down'
 		]);
 
