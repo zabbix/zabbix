@@ -922,14 +922,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
-
+#ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
 	{
 		zbx_error("cannot create locks: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
+#endif
 	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
 	{
 		zbx_error("cannot open log: %s", error);
@@ -1136,6 +1136,10 @@ void	zbx_free_service_resources(void)
 
 		zbx_free(threads);
 	}
+
+#ifdef ZBX_PTHREAD
+	zbx_locks_disable();
+#endif
 
 	free_metrics();
 	alias_list_free();

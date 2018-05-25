@@ -1182,6 +1182,9 @@ void	zbx_on_exit(void)
 	free_metrics();
 
 	zbx_sleep(2);	/* wait for all child processes to exit */
+#ifdef ZBX_PTHREAD
+	zbx_locks_disable();
+#endif
 
 #ifdef HAVE_OPENIPMI
 	zbx_ipc_service_free_env();

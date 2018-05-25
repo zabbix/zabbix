@@ -93,6 +93,7 @@ void	__zbx_rwlock_wrlock(const char *filename, int line, const ZBX_RWLOCK_NAME *
 void	__zbx_rwlock_rdlock(const char *filename, int line, const ZBX_RWLOCK_NAME *mutex);
 void	__zbx_rwlock_unlock(const char *filename, int line, const ZBX_RWLOCK_NAME *mutex);
 void	zbx_rwlock_destroy(ZBX_RWLOCK *mutex);
+void	zbx_locks_disable(void);
 #else
 #define zbx_rwlock_create(rwlock, name, error)	zbx_mutex_create(rwlock, name, error)
 #define zbx_rwlock_wrlock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
