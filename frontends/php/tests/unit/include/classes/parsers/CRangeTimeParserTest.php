@@ -209,6 +209,15 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 				'datetime' => ['modifiers' => [[], []]]
 			],
 			[
+				'now/y-5/M-5/w-5/d-5', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'time_type' => CRangeTimeParser::ZBX_TIME_RELATIVE,
+					'match' => 'now/y-5/M-5/w-5/d-5'
+				],
+				'datetime' => ['modifiers' => [['first day of January this year 00:00:00', '-5 seconds', 'first day of this month 00:00:00', '-5 seconds', 'Monday this week 00:00:00', '-5 seconds', 'today', '-5 seconds'], ['last day of December this year 23:59:59', '-5 seconds', 'last day of this month 23:59:59', '-5 seconds', 'Sunday this week 23:59:59', '-5 seconds', 'tomorrow', '-1 second', '-5 seconds']]]
+			],
+			[
 				'now-1y', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -270,6 +279,24 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 					'match' => 'now-1'
 				],
 				'datetime' => ['modifiers' => [['-1 second'], ['-1 second']]]
+			],
+			[
+				'now-1y-2M-3w-4d-5h-6m-7s-8', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'time_type' => CRangeTimeParser::ZBX_TIME_RELATIVE,
+					'match' => 'now-1y-2M-3w-4d-5h-6m-7s-8'
+				],
+				'datetime' => ['modifiers' => [['-1 year', '-2 months', '-3 weeks', '-4 days', '-5 hours', '-6 minutes', '-7 seconds', '-8 seconds'], ['-1 year', '-2 months', '-3 weeks', '-4 days', '-5 hours', '-6 minutes', '-7 seconds', '-8 seconds']]]
+			],
+			[
+				'now+1y+2M+3w+4d+5h+6m+7s+8', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'time_type' => CRangeTimeParser::ZBX_TIME_RELATIVE,
+					'match' => 'now+1y+2M+3w+4d+5h+6m+7s+8'
+				],
+				'datetime' => ['modifiers' => [['+1 year', '+2 months', '+3 weeks', '+4 days', '+5 hours', '+6 minutes', '+7 seconds', '+8 seconds'], ['+1 year', '+2 months', '+3 weeks', '+4 days', '+5 hours', '+6 minutes', '+7 seconds', '+8 seconds']]]
 			],
 			[
 				'now/M-1y', 0,
