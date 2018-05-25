@@ -77,7 +77,7 @@
 					'23': ['mode', 'groupid', 'hostid', 'resourcetype', 'data', 'page'],
 					'24': ['mode', 'resourcetype', 'data', 'page'],
 					'default': ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
-						'updateProfile', 'screenitemid'
+						'screenitemid'
 					]
 				},
 				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default';
@@ -346,10 +346,6 @@
 					url.setArgument('to', screen.timeline.to);
 					// Prevent image caching.
 					url.setArgument('_', request_start.toString(34));
-
-					if (typeof screen.updateProfile === 'undefined') {
-						url.setArgument('updateProfile', 0);
-					}
 
 					// Create temp image in buffer.
 					var	img = $('<img/>', {
