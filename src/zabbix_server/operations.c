@@ -413,6 +413,20 @@ clean:
 	return hostid;
 }
 
+int	is_discovery_or_auto_registration(const DB_EVENT *event)
+{
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
+		return FAIL;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE &&
+			event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: op_host_add                                                      *
@@ -431,10 +445,7 @@ void	op_host_add(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
-		return;
-
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	if (FAIL == is_discovery_or_auto_registration())
 		return;
 
 	add_discovered_host(event);
@@ -531,10 +542,7 @@ void	op_host_disable(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
-		return;
-
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	if (FAIL == is_discovery_or_auto_registration())
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -571,14 +579,8 @@ void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
+	if (FAIL == is_discovery_or_auto_registration())
 		return;
-
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE &&
-			event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
-	{
-		return;
-	}
 
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
@@ -607,10 +609,7 @@ void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
-		return;
-
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	if (FAIL == is_discovery_or_auto_registration())
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -710,10 +709,7 @@ void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
-		return;
-
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	if (FAIL == is_discovery_or_auto_registration())
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
