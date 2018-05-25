@@ -627,13 +627,17 @@ article {
 
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
-	float: left;
+	max-width: 90%;
+	margin-bottom: -27px;
 	position: relative;
 	z-index: 3;
-	margin: 0;
 
-	& li[role="navigation"] {
-		max-width: 170px;
+	& > li {
+		line-height: 27px;
+	}
+
+	& li:first-child {
+		max-width: 256px;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
