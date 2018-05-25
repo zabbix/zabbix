@@ -225,8 +225,8 @@ typedef struct
 }
 zbx_vc_item_weight_t;
 
-ZBX_VECTOR_DECL(vc_itemweight, zbx_vc_item_weight_t);
-ZBX_VECTOR_IMPL(vc_itemweight, zbx_vc_item_weight_t);
+ZBX_VECTOR_DECL(vc_itemweight, zbx_vc_item_weight_t)
+ZBX_VECTOR_IMPL(vc_itemweight, zbx_vc_item_weight_t)
 
 /* the value cache */
 static zbx_vc_cache_t	*vc_cache = NULL;

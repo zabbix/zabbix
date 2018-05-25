@@ -105,8 +105,8 @@ ZBX_MEM_FUNC1_DECL_FREE(__prefix);
 
 #define ZBX_MEM_FUNC_IMPL(__prefix, __info)				\
 									\
-ZBX_MEM_FUNC1_IMPL_MALLOC(__prefix, __info);				\
-ZBX_MEM_FUNC1_IMPL_REALLOC(__prefix, __info);				\
-ZBX_MEM_FUNC1_IMPL_FREE(__prefix, __info);
+ZBX_MEM_FUNC1_IMPL_MALLOC(__prefix, __info)				\
+ZBX_MEM_FUNC1_IMPL_REALLOC(__prefix, __info)				\
+ZBX_MEM_FUNC1_IMPL_FREE(__prefix, __info)
 
 #endif

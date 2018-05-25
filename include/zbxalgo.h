@@ -316,15 +316,15 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
 #define ZBX_PTR_VECTOR_DECL(__id, __type)									\
 														\
-ZBX_VECTOR_DECL(__id, __type);											\
+ZBX_VECTOR_DECL(__id, __type)											\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_func_t clean_func);
 
-ZBX_VECTOR_DECL(uint64, zbx_uint64_t);
-ZBX_PTR_VECTOR_DECL(str, char *);
-ZBX_PTR_VECTOR_DECL(ptr, void *);
-ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t);
-ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t);
+ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
+ZBX_PTR_VECTOR_DECL(str, char *)
+ZBX_PTR_VECTOR_DECL(ptr, void *)
+ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)
+ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t)
 
 /* this function is only for use with zbx_vector_XXX_clear_ext() */
 /* and only if the vector does not contain nested allocations */
