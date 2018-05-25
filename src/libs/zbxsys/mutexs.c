@@ -92,8 +92,17 @@ int	zbx_locks_create(char **error)
 		return FAIL;
 	}
 
-	pthread_mutexattr_init(&mta);
-	pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED);
+	if (0 != pthread_mutexattr_init(&mta))
+	{
+		*error = zbx_dsprintf(*error, "cannot initialize mutex attribute: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	if (0 != pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED))
+	{
+		*error = zbx_dsprintf(*error, "cannot set shared mutex attribute: %s", zbx_strerror(errno));
+		return FAIL;
+	}
 
 	for (i = 0; i < ZBX_MUTEX_COUNT; i++)
 	{
@@ -104,8 +113,17 @@ int	zbx_locks_create(char **error)
 		}
 	}
 
-	pthread_rwlockattr_init(&rwa);
-	pthread_rwlockattr_setpshared(&rwa, PTHREAD_PROCESS_SHARED);
+	if (0 != pthread_rwlockattr_init(&rwa))
+	{
+		*error = zbx_dsprintf(*error, "cannot initialize read write lock attribute: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	if (0 != pthread_rwlockattr_setpshared(&rwa, PTHREAD_PROCESS_SHARED))
+	{
+		*error = zbx_dsprintf(*error, "cannot set shared read write lock attribute: %s", zbx_strerror(errno));
+		return FAIL;
+	}
 
 	for (i = 0; i < ZBX_RWLOCK_COUNT; i++)
 	{
