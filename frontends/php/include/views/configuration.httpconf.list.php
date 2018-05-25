@@ -64,7 +64,9 @@ $widget = (new CWidget())
 	]));
 
 if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$breadcrumb = get_header_host_table('web', $this->data['hostid']);
+	$breadcrumb->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
+	$widget->addItem($breadcrumb);
 }
 
 $widget->addItem($filter);

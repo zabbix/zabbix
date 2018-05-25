@@ -625,6 +625,21 @@ article {
 	}
 }
 
+// Breadcrumbs inline with filter block
+.filter-breadcrumb {
+	float: left;
+	position: relative;
+	z-index: 3;
+	margin: 0;
+
+	& li[role="navigation"] {
+		max-width: 170px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
 // Footer
 footer {
 	position: absolute;
