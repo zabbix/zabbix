@@ -76,9 +76,8 @@ zbx_rwlock_lock_type_t;
 #	define ZBX_RWLOCK_NULL		ZBX_MUTEX_NULL
 #endif
 
-#endif	/* _WINDOWS */
-
 int	zbx_locks_create(char **error);
+#endif	/* _WINDOWS */
 
 #define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
 #define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)

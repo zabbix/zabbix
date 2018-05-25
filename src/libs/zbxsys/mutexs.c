@@ -21,12 +21,11 @@
 #include "log.h"
 #include "mutexs.h"
 
-#ifdef _WINDOWS
-#	include "sysinfo.h"
-#endif
 #define ZBX_PTHREAD
 
-#ifndef _WINDOWS
+#ifdef _WINDOWS
+#	include "sysinfo.h"
+#else
 #ifdef ZBX_PTHREAD
 typedef struct
 {
@@ -57,9 +56,7 @@ static int			shm_id = -1, locks_disabled;
 	static int		ZBX_SEM_LIST_ID = -1;
 	static unsigned char	mutexes = 0;
 #endif
-#endif
 
-#ifndef _WINDOWS
 int	zbx_locks_create(char **error)
 {
 
