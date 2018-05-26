@@ -43,7 +43,7 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
 					'match' => '2018-04-15 12:45'
 				],
-				'datetime' => ['values' => ['2018-04-15 12:45:00', '2018-04-15 12:45:00']]
+				'datetime' => ['values' => ['2018-04-15 12:45:00', '2018-04-15 12:45:59']]
 			],
 			[
 				'2018-04-15 12', 0,
@@ -52,7 +52,7 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
 					'match' => '2018-04-15 12'
 				],
-				'datetime' => ['values' => ['2018-04-15 12:00:00', '2018-04-15 12:00:00']]
+				'datetime' => ['values' => ['2018-04-15 12:00:00', '2018-04-15 12:59:59']]
 			],
 			[
 				'2018-04-15', 0,
@@ -61,34 +61,7 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
 					'match' => '2018-04-15'
 				],
-				'datetime' => ['values' => ['2018-04-15 00:00:00', '2018-04-15 00:00:00']]
-			],
-			[
-				'2018-04 12:45:34', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
-					'match' => '2018-04 12:45:34'
-				],
-				'datetime' => ['values' => ['2018-04-01 12:45:34', '2018-04-01 12:45:34']]
-			],
-			[
-				'2018-04 12:45', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
-					'match' => '2018-04 12:45'
-				],
-				'datetime' => ['values' => ['2018-04-01 12:45:00', '2018-04-01 12:45:00']]
-			],
-			[
-				'2018-04 12', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
-					'match' => '2018-04 12'
-				],
-				'datetime' => ['values' => ['2018-04-01 12:00:00', '2018-04-01 12:00:00']]
+				'datetime' => ['values' => ['2018-04-15 00:00:00', '2018-04-15 23:59:59']]
 			],
 			[
 				'2018-04', 0,
@@ -97,34 +70,7 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
 					'match' => '2018-04'
 				],
-				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-01 00:00:00']]
-			],
-			[
-				'2018 12:45:34', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
-					'match' => '2018 12:45:34'
-				],
-				'datetime' => ['values' => ['2018-01-01 12:45:34', '2018-01-01 12:45:34']]
-			],
-			[
-				'2018 12:45', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
-					'match' => '2018 12:45'
-				],
-				'datetime' => ['values' => ['2018-01-01 12:45:00', '2018-01-01 12:45:00']]
-			],
-			[
-				'2018 12', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
-					'match' => '2018 12'
-				],
-				'datetime' => ['values' => ['2018-01-01 12:00:00', '2018-01-01 12:00:00']]
+				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
 			],
 			[
 				'2018', 0,
@@ -133,7 +79,7 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 					'time_type' => CRangeTimeParser::ZBX_TIME_ABSOLUTE,
 					'match' => '2018'
 				],
-				'datetime' => ['values' => ['2018-01-01 00:00:00', '2018-01-01 00:00:00']]
+				'datetime' => ['values' => ['2018-01-01 00:00:00', '2018-12-31 23:59:59']]
 			],
 			// Relative time.
 			[
@@ -456,8 +402,8 @@ class CRangeTimeParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 
 		if (array_key_exists('values', $datetime)) {
-			$this->assertSame($parser->getDateTime(true)->format('Y-m-d H:i:s'), $datetime['values'][0]);
-			$this->assertSame($parser->getDateTime(false)->format('Y-m-d H:i:s'), $datetime['values'][1]);
+			$this->assertSame($datetime['values'][0], $parser->getDateTime(true)->format('Y-m-d H:i:s'));
+			$this->assertSame($datetime['values'][1], $parser->getDateTime(false)->format('Y-m-d H:i:s'));
 		}
 		elseif (array_key_exists('modifiers', $datetime) || array_key_exists('formats', $datetime)) {
 			foreach ([0, 1] as $index) {

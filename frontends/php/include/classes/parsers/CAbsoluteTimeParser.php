@@ -32,6 +32,11 @@ class CAbsoluteTimeParser extends CParser {
 	private $date;
 
 	/**
+	 * @var array $tokens
+	 */
+	private $tokens;
+
+	/**
 	 * Parse the given period.
 	 *
 	 * @param string $source  Source string that needs to be parsed.
@@ -55,7 +60,7 @@ class CAbsoluteTimeParser extends CParser {
 	}
 
 	/**
-	 * Parse absolute time.
+	 * Prse absolute time.
 	 *
 	 * @param string	$source
 	 * @param int		$pos
@@ -69,12 +74,20 @@ class CAbsoluteTimeParser extends CParser {
 		$pattern_h = '(?P<h>[0-9]{1,2})';
 		$pattern_m = '(?P<m>[0-9]{1,2})';
 		$pattern_s = '(?P<s>[0-9]{1,2})';
-		$pattern_date = $pattern_Y.'(-'.$pattern_M.'(-'.$pattern_D.')?)?';
-		$pattern_time = '( +'.$pattern_h.'(:'.$pattern_m.'(:'.$pattern_s.')?)?)?';
-		$pattern = $pattern_date.$pattern_time;
+//		$pattern_date = $pattern_Y.'(-'.$pattern_M.'(-'.$pattern_D.')?)?';
+//		$pattern_time = '( +'.$pattern_h.'(:'.$pattern_m.'(:'.$pattern_s.')?)?)?';
+		$pattern = $pattern_Y.'(-'.$pattern_M.'(-'.$pattern_D.'( +'.$pattern_h.'(:'.$pattern_m.'(:'.$pattern_s.')?)?)?)?)?';
 
 		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
 			return false;
+		}
+
+		$this->tokens['Y'] = $matches['Y'];
+
+		foreach (['M', 'D', 'h', 'm', 's'] as $key) {
+			if (array_key_exists($key, $matches) && $matches[$key] !== '') {
+				$this->tokens[$key] = $matches[$key];
+			}
 		}
 
 		$matches += ['M' => 1, 'D' => 1, 'h' => 0, 'm' => 0, 's' => 0];
@@ -112,13 +125,42 @@ class CAbsoluteTimeParser extends CParser {
 	/**
 	 * Returns date in "YYYY-MM-DD hh:mm:ss" format.
 	 *
+	 * @param bool   $is_start  If set to true date will be modified to lowest value, example "2018" will be returned
+	 *                          as "2018-01-01 00:00:00", otherwise "2018-12-31 23:59:59".
+	 *
 	 * @return DateTime|null
 	 */
-	public function getDateTime() {
+	public function getDateTime($is_start) {
 		if ($this->date === '') {
 			return null;
 		}
 
-		return new DateTime($this->date);
+		$date = new DateTime($this->date);
+
+		if ($is_start) {
+			return $date;
+		}
+
+		if (!array_key_exists('M', $this->tokens)) {
+			return $date->modify('last day of December this year 23:59:59');
+		}
+
+		if (!array_key_exists('D', $this->tokens)) {
+			return $date->modify('last day of this month 23:59:59');
+		}
+
+		if (!array_key_exists('h', $this->tokens)) {
+			return $date->modify('23:59:59');
+		}
+
+		if (!array_key_exists('m', $this->tokens)) {
+			return new DateTime($date->format('Y-m-d H:59:59'));
+		}
+
+		if (!array_key_exists('s', $this->tokens)) {
+			return new DateTime($date->format('Y-m-d H:i:59'));
+		}
+
+		return $date;
 	}
 }

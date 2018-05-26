@@ -136,4 +136,74 @@ class CRelativeTimeParser extends CParser {
 	public function getTokens() {
 		return $this->tokens;
 	}
+
+	/**
+	 * Timestamp is returned as initialized DateTime object. Returns null when timestamp is not valid.
+	 *
+	 * @param bool   $is_start  If set to true date will be modified to lowest value, example (now/w) will be returned
+	 *                          as Monday of this week. When set to false precisiion will modify date to highest value,
+	 *                          same example will return Sunday of this week.
+	 *
+	 * @return DateTime|null
+	 */
+	public function getDateTime($is_start) {
+		if ($this->match === '') {
+			return null;
+		}
+
+		$date = new DateTime('now');
+
+		foreach ($this->getTokens() as $token) {
+			switch ($token['type']) {
+				case CRelativeTimeParser::ZBX_TOKEN_PRECISION:
+					if ($token['suffix'] === 'm' || $token['suffix'] === 'h' || $token['suffix'] === 'd') {
+						$formats = $is_start
+							? [
+								'd' => 'Y-m-d 00:00:00',
+								'm' => 'Y-m-d H:i:00',
+								'h' => 'Y-m-d H:00:00'
+							]
+							: [
+								'd' => 'Y-m-d 23:59:59',
+								'm' => 'Y-m-d H:i:59',
+								'h' => 'Y-m-d H:59:59'
+							];
+
+						$date = new DateTime($date->format($formats[$token['suffix']]));
+					}
+					else {
+						$modifiers = $is_start
+							? [
+								'w' => 'Monday this week 00:00:00',
+								'M' => 'first day of this month 00:00:00',
+								'y' => 'first day of January this year 00:00:00'
+							]
+							: [
+								'w' => 'Sunday this week 23:59:59',
+								'M' => 'last day of this month 23:59:59',
+								'y' => 'last day of December this year 23:59:59'
+							];
+
+						$date->modify($modifiers[$token['suffix']]);
+					}
+					break;
+
+				case CRelativeTimeParser::ZBX_TOKEN_OFFSET:
+					$units = [
+						's' => 'second',
+						'm' => 'minute',
+						'h' => 'hour',
+						'd' => 'day',
+						'w' => 'week',
+						'M' => 'month',
+						'y' => 'year'
+					];
+
+					$date->modify($token['sign'].$token['value'].' '.$units[$token['suffix']]);
+					break;
+			}
+		}
+
+		return $date;
+	}
 }
