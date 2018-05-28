@@ -114,6 +114,30 @@ class CAbsoluteTimeParserTest extends PHPUnit_Framework_TestCase {
 				],
 				'datetime' => ['values' => [null, null]]
 			],
+			[
+				'2018-11-01 23:59:61', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2018-11-01 23:72:00', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2018-11-01 24:00:00', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
 		];
 	}
 

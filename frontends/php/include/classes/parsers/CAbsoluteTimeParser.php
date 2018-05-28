@@ -99,14 +99,8 @@ class CAbsoluteTimeParser extends CParser {
 
 		$datetime = date_create($date);
 
-		if ($datetime === false) {
+		if ($datetime === false || $datetime->getLastErrors()['warning_count'] != 0) {
 			return false;
-		}
-
-		foreach ($this->tokens as $key => $value) {
-			if ($datetime->format($key) - $value != 0) {
-				return false;
-			}
 		}
 
 		$this->date = $date;
