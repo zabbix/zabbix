@@ -1108,39 +1108,12 @@ void	zbx_free_service_resources(void)
 {
 	if (NULL != threads)
 	{
-		int		i;
-#if !defined(_WINDOWS)
-		sigset_t	set;
-
-		/* ignore SIGCHLD signals in order for zbx_sleep() to work */
-		sigemptyset(&set);
-		sigaddset(&set, SIGCHLD);
-		sigprocmask(SIG_BLOCK, &set, NULL);
-#else
-		/* wait for threads to finish first. although listener threads will never end */
-		WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
-#endif
-		for (i = 0; i < threads_num; i++)
-		{
-			if (threads[i])
-				zbx_thread_kill(threads[i]);
-		}
-
-		for (i = 0; i < threads_num; i++)
-		{
-			if (threads[i])
-				zbx_thread_wait(threads[i]);
-
-			threads[i] = ZBX_THREAD_HANDLE_NULL;
-		}
-
+		zbx_threads_wait(threads, threads_num);	/* wait for all child processes to exit */
 		zbx_free(threads);
 	}
-
 #ifdef ZBX_PTHREAD
 	zbx_locks_disable();
 #endif
-
 	free_metrics();
 	alias_list_free();
 	free_collector_data();

@@ -1159,33 +1159,13 @@ void	zbx_on_exit(void)
 
 	if (NULL != threads)
 	{
-		int		i;
-		sigset_t	set;
-
-		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
-		sigemptyset(&set);
-		sigaddset(&set, SIGCHLD);
-		sigprocmask(SIG_BLOCK, &set, NULL);
-
-		for (i = 0; i < threads_num; i++)
-		{
-			if (threads[i])
-			{
-				kill(threads[i], SIGTERM);
-				threads[i] = ZBX_THREAD_HANDLE_NULL;
-			}
-		}
-
+		zbx_threads_wait(threads, threads_num);	/* wait for all child processes to exit */
 		zbx_free(threads);
 	}
-
-	free_metrics();
-
-	zbx_sleep(2);	/* wait for all child processes to exit */
 #ifdef ZBX_PTHREAD
 	zbx_locks_disable();
 #endif
-
+	free_metrics();
 #ifdef HAVE_OPENIPMI
 	zbx_ipc_service_free_env();
 #endif
