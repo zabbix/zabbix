@@ -266,6 +266,23 @@ class CDiscoveryRule extends CItemGeneral {
 			unset($rule);
 		}
 
+		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
+		$json = new CJson();
+
+		foreach ($result as &$item) {
+			if (array_key_exists('query_fields', $item)) {
+				$query_fields = ($item['query_fields'] !== '') ? $json->decode($item['query_fields'], true) : [];
+				$item['query_fields'] = $json->hasError() ? [] : $query_fields;
+			}
+
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = $this->headersStringToArray($item['headers']);
+			}
+
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
+		}
+
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
@@ -283,6 +300,33 @@ class CDiscoveryRule extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
+		$json = new CJson();
+
+		foreach ($items as &$item) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('query_fields', $item)) {
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+				}
+
+				if (array_key_exists('headers', $item)) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+
+				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
+						&& !array_key_exists('retrieve_mode', $item)) {
+					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
+		}
+		unset($item);
+
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -299,17 +343,47 @@ class CDiscoveryRule extends CItemGeneral {
 	public function update($items) {
 		$items = zbx_toArray($items);
 
-		$dbItems = $this->get([
-			'output' => ['itemid', 'name'],
+		$db_items = $this->get([
+			'output' => ['itemid', 'name', 'type', 'authtype', 'allow_traps', 'retrieve_mode'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
 		]);
 
-		$this->checkInput($items, true, $dbItems);
+		$this->checkInput($items, true, $db_items);
+
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+
+		$defaults = DB::getDefaults('items');
+		$clean = [
+			ITEM_TYPE_HTTPAGENT => [
+				'url' => '',
+				'query_fields' => '',
+				'timeout' => $defaults['timeout'],
+				'status_codes' => $defaults['status_codes'],
+				'follow_redirects' => $defaults['follow_redirects'],
+				'request_method' => $defaults['request_method'],
+				'allow_traps' => $defaults['allow_traps'],
+				'post_type' => $defaults['post_type'],
+				'http_proxy' => '',
+				'headers' => '',
+				'retrieve_mode' => $defaults['retrieve_mode'],
+				'output_format' => $defaults['output_format'],
+				'ssl_key_password' => '',
+				'verify_peer' => $defaults['verify_peer'],
+				'verify_host' => $defaults['verify_host'],
+				'ssl_cert_file' => '',
+				'ssl_key_file' => '',
+				'posts' => ''
+			]
+		];
+
+		$json = new CJson();
 
 		// set the default values required for updating
 		foreach ($items as &$item) {
+			$type_change = (array_key_exists('type', $item) && $item['type'] != $db_items[$item['itemid']]['type']);
+
 			if (isset($item['filter'])) {
 				foreach ($item['filter']['conditions'] as &$condition) {
 					$condition += [
@@ -318,6 +392,55 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 				unset($condition);
 			}
+
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
+				$item = array_merge($item, $clean[ITEM_TYPE_HTTPAGENT]);
+
+				if ($item['type'] != ITEM_TYPE_SSH) {
+					$item['authtype'] = $defaults['authtype'];
+					$item['username'] = '';
+					$item['password'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_TRAPPER) {
+					$item['trapper_hosts'] = '';
+				}
+			}
+
+			if ($db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
+				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
+				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
+						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
+					$item['username'] = '';
+					$item['password'] = '';
+				}
+
+				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF
+						&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
+					$item['trapper_hosts'] = '';
+				}
+
+				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+				}
+
+				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+
+				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
+						&& !array_key_exists('retrieve_mode', $item)
+						&& $db_items[$item['itemid']]['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
+					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
 		}
 		unset($item);
 
@@ -523,6 +646,27 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'preservekeys' => true
 		]);
+		$json = new CJson();
+
+		foreach ($tpl_items as &$item) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
+					$item['query_fields'] = $item['query_fields'] ? $json->encode($item['query_fields']) : '';
+				}
+
+				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
+					$item['headers'] = $this->headersArrayToString($item['headers']);
+				}
+			}
+			else {
+				$item['query_fields'] = '';
+				$item['headers'] = '';
+			}
+
+			// Option 'Convert to JSON' is not supported for discovery rule.
+			unset($item['output_format']);
+		}
+		unset($item);
 
 		$this->inherit($tpl_items, $data['hostids']);
 
@@ -969,7 +1113,7 @@ class CDiscoveryRule extends CItemGeneral {
 					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
 				]),
 				'operator' => new CLimitedSetValidator([
-					'values' => [CONDITION_OPERATOR_REGEXP],
+					'values' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP],
 					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
 				])
 			],
@@ -1072,7 +1216,10 @@ class CDiscoveryRule extends CItemGeneral {
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint'
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'url',
+				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'preservekeys' => true
@@ -1171,7 +1318,9 @@ class CDiscoveryRule extends CItemGeneral {
 				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor',
 				'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description',
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid',
-				'templateid', 'type'
+				'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects',
+				'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],

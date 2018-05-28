@@ -335,7 +335,7 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickButtonText('Create graph prototype');
+			$this->zbxTestContentControlButtonClickTextWait('Create graph prototype');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');

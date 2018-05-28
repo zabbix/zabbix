@@ -213,7 +213,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = dbConditionString('f.function', $options['functions']);
+			$sqlParts['where'][] = dbConditionString('f.name', $options['functions']);
 		}
 
 		// monitored
@@ -339,7 +339,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['groups'] = 'groups g';
+			$sqlParts['from']['hstgrp'] = 'hstgrp g';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';

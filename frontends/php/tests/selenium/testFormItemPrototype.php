@@ -1354,7 +1354,7 @@ class testFormItemPrototype extends CWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 					]
 				]
 			],
@@ -1380,7 +1380,7 @@ class testFormItemPrototype extends CWebTest {
 					'delay' => 86401,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -2270,7 +2270,7 @@ class testFormItemPrototype extends CWebTest {
 			$keyName = $data['key'];
 		}
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
 
 		if (isset($data['type'])) {
 			$type = $data['type'];
@@ -2715,6 +2715,34 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Change per second']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Item prototype with preprocessing rule with LLD macro',
+					'key' => 'item-prototype-LLD-macro',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '{#DELIM}(.*)', 'output' => '\1'],
+						['type' => 'Trim', 'params' => '{#DELIM}'],
+						['type' => 'XML XPath', 'params' => 'number(/values/Item/value[../key=\'{#DELIM}\'])'],
+						['type' => 'JSON Path', 'params' => '$.data[\'{#KEY}\']'],
+						['type' => 'Custom multiplier', 'params' => '{#VALUE}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Item prototype with preprocessing rule with user macro',
+					'key' => 'item-prototype-user-macro',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '{$DELIM}(.*)', 'output' => '\1'],
+						['type' => 'Trim', 'params' => '{$DELIM}'],
+						['type' => 'XML XPath', 'params' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
+						['type' => 'JSON Path', 'params' => '$.data[\'{$KEY}\']'],
+						['type' => 'Custom multiplier', 'params' => '{$VALUE}']
 					]
 				]
 			]

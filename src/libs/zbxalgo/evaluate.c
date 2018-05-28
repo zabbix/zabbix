@@ -436,13 +436,13 @@ static double	evaluate_term4(int *unknown_idx)
 		else
 		{
 			if ('<' == op)
-				result = (result <= operand - ZBX_DOUBLE_EPSILON);
+				result = (result < operand - ZBX_DOUBLE_EPSILON);
 			else if ('l' == op)
-				result = (result < operand + ZBX_DOUBLE_EPSILON);
+				result = (result <= operand + ZBX_DOUBLE_EPSILON);
 			else if ('g' == op)
-				result = (result > operand - ZBX_DOUBLE_EPSILON);
+				result = (result >= operand - ZBX_DOUBLE_EPSILON);
 			else
-				result = (result >= operand + ZBX_DOUBLE_EPSILON);
+				result = (result > operand + ZBX_DOUBLE_EPSILON);
 		}
 	}
 

@@ -43,7 +43,7 @@ if (!empty($this->data['httptestid'])) {
 /*
  * Scenario tab
  */
-$httpFormList = new CFormList('httpFormList');
+$httpFormList = new CFormList();
 
 // Parent http tests
 if (!empty($this->data['templates'])) {

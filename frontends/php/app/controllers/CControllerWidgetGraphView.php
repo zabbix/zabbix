@@ -85,7 +85,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		}
 		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH && $fields['itemid']) {
 			$resource_type = SCREEN_RESOURCE_SIMPLE_GRAPH;
-			$resourceid = $fields['itemid'];
+			$resourceid = $fields['itemid'][0];
 			$graph_dims = getGraphDims();
 			$graph_dims['graphHeight'] = $height;
 			$graph_dims['width'] = $width;
@@ -135,7 +135,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$src_items = API::Item()->get([
 					'output' => ['key_'],
-					'itemids' => $resourceid
+					'itemids' => $resourceid,
+					'webitems' => true
 				]);
 
 				$items = API::Item()->get([

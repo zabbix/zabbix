@@ -486,7 +486,7 @@ class testFormItem extends CWebTest {
 		}
 
 		$this->zbxTestLogin(
-			'items.php?form='.(isset($itemid) ? 'update' : 'Create+item').
+			'items.php?form='.(isset($itemid) ? 'update' : 'create').
 			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '')
 		);
 
@@ -1257,7 +1257,7 @@ class testFormItem extends CWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 					]
 				]
 			],
@@ -1283,7 +1283,7 @@ class testFormItem extends CWebTest {
 					'delay' => 86401,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -2121,7 +2121,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$this->zbxTestCheckTitle('Configuration of items');
 
 		if (isset($data['type'])) {
@@ -2172,7 +2172,7 @@ class testFormItem extends CWebTest {
 		}
 
 		if (array_key_exists('master_item',$data))	{
-			$this->zbxTestClickWait('button');
+			$this->zbxTestClickButtonMultiselect('master_itemid');
 			$this->zbxTestLaunchOverlayDialog('Items');
 			$this->zbxTestClickLinkTextWait($data['master_item']);
 		}
@@ -2360,7 +2360,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//li[30]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText("//input[@id='history']/..", 'Overridden by global housekeeping settings (99d)');
 		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('adm.gui.php');
@@ -2622,6 +2622,20 @@ class testFormItem extends CWebTest {
 						['type' => 'Change per second']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Item with preprocessing rule with user macro',
+					'key' => 'item-user-macro',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '{$DELIM}(.*)', 'output' => '\1'],
+						['type' => 'Trim', 'params' => '{$DELIM}'],
+						['type' => 'XML XPath', 'params' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
+						['type' => 'JSON Path', 'params' => '$.data[\'{$KEY}\']'],
+						['type' => 'Custom multiplier', 'params' => '{$VALUE}']
+					]
+				]
 			]
 		];
 	}
@@ -2634,7 +2648,7 @@ class testFormItem extends CWebTest {
 		$dbRow = DBfetch($dbResult);
 		$hostid = $dbRow['hostid'];
 
-		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=Create+item');
+		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=create');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 

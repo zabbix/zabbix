@@ -156,6 +156,14 @@ typedef struct
 	unsigned char		status;
 	unsigned char		history;
 	unsigned char		trends;
+	unsigned char		follow_redirects;
+	unsigned char		post_type;
+	unsigned char		retrieve_mode;
+	unsigned char		request_method;
+	unsigned char		output_format;
+	unsigned char		verify_peer;
+	unsigned char		verify_host;
+	unsigned char		allow_traps;
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char			*units;
 	char			*delay;
@@ -178,6 +186,16 @@ typedef struct
 	char			password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 	char			snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 	char			jmx_endpoint_orig[ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
+	char			timeout_orig[ITEM_TIMEOUT_LEN_MAX], *timeout;
+	char			url_orig[ITEM_URL_LEN_MAX], *url;
+	char			query_fields_orig[ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
+	char			*posts;
+	char			status_codes_orig[ITEM_STATUS_CODES_LEN_MAX], *status_codes;
+	char			http_proxy_orig[ITEM_HTTP_PROXY_LEN_MAX], *http_proxy;
+	char			*headers;
+	char			ssl_cert_file_orig[ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
+	char			ssl_key_file_orig[ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
+	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	char			*error;
 }
 DC_ITEM;
@@ -244,11 +262,13 @@ typedef struct
 	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
 						/* or 0 if no error */
 	int		version;
+	int		lastaccess;
 	char		addr_orig[INTERFACE_ADDR_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
 
+	unsigned char	auto_compress;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
 
@@ -691,6 +711,7 @@ void	zbx_db_condition_clean(DB_CONDITION *condition);
 void	zbx_conditions_eval_clean(zbx_hashset_t *uniq_conditions);
 
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
+void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids);
 
 void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint64_t hostid);
 void	zbx_host_availability_clean(zbx_host_availability_t *availability);
@@ -744,8 +765,10 @@ typedef struct
 zbx_agent_value_t;
 
 void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
-void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess, zbx_vector_uint64_pair_t *proxy_diff);
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
+
+void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff);
+void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess);
 
 typedef struct
 {

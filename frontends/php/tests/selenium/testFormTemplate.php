@@ -107,7 +107,7 @@ class testFormTemplate extends CWebTest {
 	public function testFormTemplate_Create($data) {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
 		$this->zbxTestAssertElementValue('template_name', $data['name']);
 
@@ -163,7 +163,7 @@ class testFormTemplate extends CWebTest {
 				}
 			}
 			if (isset ($data['new_group'])) {
-				$this->assertEquals(1, DBcount("SELECT groupid FROM groups WHERE name='".$data['new_group']."'"));
+				$this->assertEquals(1, DBcount("SELECT groupid FROM hstgrp WHERE name='".$data['new_group']."'"));
 			}
 		}
 

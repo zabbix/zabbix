@@ -71,7 +71,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkText($name);
 
-		$this->zbxTestClickButtonText('Edit map');
+		$this->zbxTestContentControlButtonClickTextWait('Edit map');
 		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('sysmap_update');
 		$this->zbxTestAcceptAlert();

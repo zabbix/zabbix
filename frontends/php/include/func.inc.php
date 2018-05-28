@@ -641,11 +641,11 @@ function convert_units($options = []) {
 	// any other unit
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
 			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
-		if (preg_match('/^\-?\d+\.\d+$/', $options['value'])) {
-			if (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
-				$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
-			}
-			$options['value'] = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $options['value']);
+		if (preg_match('/\.\d+$/', $options['value'])) {
+			$format = (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
+				? '%.'.ZBX_UNITS_ROUNDOFF_UPPER_LIMIT.'f'
+				: '%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f';
+			$options['value'] = sprintf($format, $options['value']);
 		}
 		$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $options['value']);
 		$options['value'] = rtrim($options['value'], '.');
@@ -1878,16 +1878,19 @@ function filter_messages(array $messages = []) {
  * Returns the message box when messages are present; null otherwise
  *
  * @param  boolean	$good			Parameter passed to makeMessageBox to specify message box style.
+ * @param  string	$title			Message box title.
  * @global array	$ZBX_MESSAGES
  *
  * @return CDiv|null
  */
-function getMessages($good = false)
+function getMessages($good = false, $title = null)
 {
 	global $ZBX_MESSAGES;
 
-	$message_box = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES)
-		? makeMessageBox($good, filter_messages($ZBX_MESSAGES))
+	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+
+	$message_box = ($title || $messages)
+		? makeMessageBox($good, $messages, $title)
 		: null;
 
 	$ZBX_MESSAGES = [];
@@ -2315,23 +2318,6 @@ function hasErrorMesssages() {
 	}
 
 	return false;
-}
-
-/**
- * Get all messages as array.
- *
- * @return array
- */
-function getMessagesAsArray() {
-	global $ZBX_MESSAGES;
-
-	$result = [];
-	if (isset($ZBX_MESSAGES)) {
-		foreach ($ZBX_MESSAGES as $message) {
-			$result[] = $message['message'];
-		}
-	}
-	return $result;
 }
 
 /**

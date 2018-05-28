@@ -48,65 +48,42 @@ $map_tab = (new CFormList());
 // Map owner multiselect.
 $multiselect_data = [
 	'name' => 'userid',
-	'selectedLimit' => 1,
-	'objectName' => 'users',
+	'object_name' => 'users',
+	'multiple' => false,
 	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
+	'data' => [],
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'users',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'userid',
 			'srcfld1' => 'userid',
-			'srcfld2' => 'fullname'
+			'srcfld2' => 'fullname',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid'
 		]
 	]
 ];
 
 $map_ownerid = $data['sysmap']['userid'];
 
-// If map owner does not exist or is not allowed to display.
-if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users'])) {
-	// Map owner data.
-	if ($map_ownerid) {
-		$owner_data = [[
+if ($map_ownerid != 0) {
+	$multiselect_data['data'][] = array_key_exists($map_ownerid, $data['users'])
+		? [
 			'id' => $map_ownerid,
 			'name' => getUserFullname($data['users'][$map_ownerid])
-		]];
-	}
-	else {
-		$owner_data = [];
-	}
-
-	$multiselect_data['data'] = $owner_data;
-
-	// Append multiselect to map tab.
-	$multiselect_userid = (new CMultiSelect($multiselect_data))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired();
-
-	$map_tab->addRow((new CLabel(_('Owner'), $multiselect_userid->getId()))->setAsteriskMark(), $multiselect_userid);
+		]
+		: [
+			'id' => $map_ownerid,
+			'name' => _('Inaccessible user'),
+			'inaccessible' => true
+		];
 }
-else {
-	$multiselect_userid = (new CMultiSelect($multiselect_data))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired();
 
-	// Administrators can change map owner, but cannot see users from other groups.
-	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-		$map_tab
-			->addRow((new CLabel(_('Owner'), $multiselect_userid->getId()))->setAsteriskMark(), $multiselect_userid)
-			->addRow('', _('Inaccessible user'), 'inaccessible_user');
-	}
-	else {
-		// For regular users and guests, only information message is displayed without multiselect.
-		$map_tab->addRow(_('Owner'), [
-			(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
-			(new CSpan($multiselect_userid))
-				->addStyle('display: none;')
-				->setId('multiselect_userid_wrapper')
-		]);
-	}
-}
+// Append multiselect to map tab.
+$multiselect_userid = (new CMultiSelect($multiselect_data))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAriaRequired();
+
+$map_tab->addRow((new CLabel(_('Owner'), $multiselect_userid->getId()))->setAsteriskMark(), $multiselect_userid);
 
 $map_tab->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['sysmap']['name']))
@@ -214,14 +191,14 @@ $map_tab
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append icon label to form list.
+// Append map element label to form list.
 unset($data['labelTypes'][MAP_LABEL_TYPE_CUSTOM]);
-$map_tab->addRow(_('Icon label type'),
+$map_tab->addRow(_('Map element label type'),
 	new CComboBox('label_type', $data['sysmap']['label_type'], null, $data['labelTypes'])
 );
 
-// Append icon label location to form list.
-$map_tab->addRow(_('Icon label location'), new CComboBox('label_location', $data['sysmap']['label_location'], null,
+// Append map element label location to form list.
+$map_tab->addRow(_('Map element label location'), new CComboBox('label_location', $data['sysmap']['label_location'], null,
 	[
 		0 => _('Bottom'),
 		1 => _('Left'),

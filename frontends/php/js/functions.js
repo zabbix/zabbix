@@ -516,6 +516,7 @@ function getOverlayDialogueId() {
  * @param {object} params.content                           Window content.
  * @param {object} params.controls                          Window controls.
  * @param {array}  params.buttons                           Window buttons.
+ * @param {string} params.debug                             Debug HTML displayed in modal window.
  * @param {string} params.buttons[]['title']                Text on the button.
  * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
  *                                                          on click.
@@ -664,7 +665,8 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 					.attr('aria-labeledby', headerid)
 				.end()
 		)
-		.append(overlay_dialogue_footer);
+		.append(overlay_dialogue_footer)
+		.append(typeof params.debug !== 'undefined' ? params.debug : null);
 
 	if (overlay_bg !== null) {
 		jQuery(overlay_bg).on('remove', function(event) {
@@ -868,21 +870,57 @@ function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 	};
 })(jQuery);
 
-function makeErrorMessageBox(errors, elementId) {
-	var div = jQuery('<div>').addClass('msg-bad').attr('id', elementId);
-	var details = jQuery('<div>').addClass('msg-details'),
-		ul = jQuery('<ul>');
+/**
+ * Parse url string to object. Hash starting part of URL will be removed.
+ * Return object where 'url' key contain parsed url, 'pairs' key is array of objects with parsed arguments.
+ * For malformed URL strings will return false.
+ *
+ * @param {string} url    URL string to parse.
+ *
+ * @return {object|bool}
+ */
+function parseUrlString(url) {
+	var url = url.replace(/#.+/, ''),
+		pos = url.indexOf('?'),
+		valid = true,
+		pairs = [],
+		query;
 
-	errors.each(function (error) {
-		// split long messages
-		var msg = '';
-		error.match(/[\s\S]{1,120}/g).each(function (error_part) {
-			msg = msg + jQuery.escapeHtml(error_part) + "\n";
+	if (pos != -1) {
+		query = url.substring(pos + 1);
+		url = url.substring(0, pos);
+
+		jQuery.each(query.split('&'), function(i, pair) {
+			if (jQuery.trim(pair)) {
+				pair = pair.replace(/\+/g, ' ').split('=', 2);
+				pair.push('');
+
+				try {
+					if (/%[01]/.match(pair[0]) || /%[01]/.match(pair[1]) ) {
+						// Non-printable characters in URL.
+						throw null;
+					}
+
+					pairs.push({
+						'name': decodeURIComponent(pair[0]),
+						'value': decodeURIComponent(pair[1])
+					});
+				}
+				catch( e ) {
+					valid = false;
+					// Break jQuery.each iteration.
+					return false;
+				}
+			}
 		});
-		ul.append(jQuery('<li>').append(msg));
-	});
-	details.append(ul);
-	div.append(details);
+	}
 
-	return div;
+	if (!valid) {
+		return false;
+	}
+
+	return {
+		'url': url,
+		'pairs': pairs
+	};
 }

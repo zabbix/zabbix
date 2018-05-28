@@ -25,6 +25,20 @@
 #include "zbxalgo.h"
 #include "valuecache.h"
 #include "macrofunc.h"
+#include "zbxregexp.h"
+#ifdef HAVE_LIBXML2
+#	include <libxml/parser.h>
+#	include <libxml/tree.h>
+#	include <libxml/xpath.h>
+#	include <libxml/xmlerror.h>
+
+typedef struct
+{
+	char	*buf;
+	size_t	len;
+}
+zbx_libxml_error_t;
+#endif
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -661,7 +675,7 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.name"
-			" from groups g,hosts_groups hg,items i,functions f"
+			" from hstgrp g,hosts_groups hg,items i,functions f"
 			" where g.groupid=hg.groupid"
 				" and hg.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -2563,7 +2577,7 @@ static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_al
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, DC_ITEM *dc_item,
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen)
 {
 	const char		*__function_name = "substitute_simple_macros";
@@ -3899,6 +3913,50 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					replace_to = zbx_strdup(replace_to, interface.addr);
 			}
 		}
+		else if (0 == indexed_macro && (0 != (macro_type & (MACRO_TYPE_HTTP_RAW | MACRO_TYPE_HTTP_JSON |
+				MACRO_TYPE_HTTP_XML))))
+		{
+			if (ZBX_TOKEN_USER_MACRO == token.type)
+			{
+				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+				pos = token.token.r;
+			}
+			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			{
+				replace_to = zbx_strdup(replace_to, dc_host->host);
+			}
+			else if (0 == strcmp(m, MVAR_HOST_NAME))
+			{
+				replace_to = zbx_strdup(replace_to, dc_host->name);
+			}
+			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+					replace_to = zbx_strdup(replace_to, interface.ip_orig);
+			}
+			else if	(0 == strcmp(m, MVAR_HOST_DNS))
+			{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+					replace_to = zbx_strdup(replace_to, interface.dns_orig);
+			}
+			else if (0 == strcmp(m, MVAR_HOST_CONN))
+			{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+					replace_to = zbx_strdup(replace_to, interface.addr);
+			}
+			else if (0 == strcmp(m, MVAR_ITEM_ID))
+			{
+				replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, dc_item->itemid);
+			}
+			else if (0 == strcmp(m, MVAR_ITEM_KEY))
+			{
+				replace_to = zbx_strdup(replace_to, dc_item->key);
+			}
+			else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
+			{
+				replace_to = zbx_strdup(replace_to, dc_item->key_orig);
+			}
+		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_ALERT))
 		{
 			if (0 == strcmp(m, MVAR_ALERT_SENDTO))
@@ -4030,6 +4088,18 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 							N_functionid);
 				}
 			}
+		}
+
+		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
+			zbx_json_escape(&replace_to);
+
+		if (0 != (macro_type & MACRO_TYPE_HTTP_XML) && NULL != replace_to)
+		{
+			char	*replace_to_esc;
+
+			replace_to_esc = xml_escape_dyn(replace_to);
+			zbx_free(replace_to);
+			replace_to = replace_to_esc;
 		}
 
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
@@ -4533,7 +4603,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 		}
 
 		if (0 == ret_unknown && SUCCEED != evaluate_function(value, &items[i], func->function,
-				func->parameter, func->timespec.sec, &error))
+				func->parameter, &func->timespec, &error))
 		{
 			/* compose and store error message for future use */
 			if (NULL != error)
@@ -4988,6 +5058,26 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 			ret = FAIL;
 		}
 	}
+	else if (0 != (flags & ZBX_TOKEN_JSON))
+	{
+		zbx_json_escape(&replace_to);
+	}
+	else if (0 != (flags & ZBX_TOKEN_XML))
+	{
+		char	*replace_to_esc;
+
+		replace_to_esc = xml_escape_dyn(replace_to);
+		zbx_free(replace_to);
+		replace_to = replace_to_esc;
+	}
+	else if (0 != (flags & ZBX_TOKEN_REGEXP))
+	{
+		zbx_regexp_escape(&replace_to);
+	}
+	else if (0 != (flags & ZBX_TOKEN_XPATH))
+	{
+		xml_escape_xpath(&replace_to);
+	}
 
 	(*data)[token->token.r + 1] = c;
 
@@ -5382,4 +5472,250 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
+}
+
+#ifdef HAVE_LIBXML2
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_in_xml_elements                                *
+ *                                                                            *
+ * Comments: auxiliary function for substitute_macros_xml()                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+		xmlNode *node)
+{
+	xmlChar	*value;
+	xmlAttr	*attr;
+	char	*value_tmp;
+
+	for (;NULL != node; node = node->next)
+	{
+		switch (node->type)
+		{
+			case XML_TEXT_NODE:
+				if (NULL == (value = xmlNodeGetContent(node)))
+					break;
+
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+
+				if (NULL != item)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+							NULL, &value_tmp, MACRO_TYPE_HTTP_XML, NULL, 0);
+				}
+				else
+					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
+
+				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+
+				zbx_free(value_tmp);
+				xmlFree(value);
+				break;
+			case XML_CDATA_SECTION_NODE:
+				if (NULL == (value = xmlNodeGetContent(node)))
+					break;
+
+				value_tmp = zbx_strdup(NULL, (const char *)value);
+
+				if (NULL != item)
+				{
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host, item, NULL,
+							NULL, &value_tmp, MACRO_TYPE_HTTP_RAW, NULL, 0);
+				}
+				else
+					substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+
+				zbx_free(value_tmp);
+				xmlFree(value);
+				break;
+			case XML_ELEMENT_NODE:
+				for (attr = node->properties; NULL != attr; attr = attr->next)
+				{
+					if (NULL == attr->name || NULL == (value = xmlGetProp(node, attr->name)))
+						continue;
+
+					value_tmp = zbx_strdup(NULL, (const char *)value);
+
+					if (NULL != item)
+					{
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &item->host,
+								item, NULL, NULL, &value_tmp, MACRO_TYPE_HTTP_XML,
+								NULL, 0);
+					}
+					else
+						substitute_lld_macros(&value_tmp, jp_row, ZBX_MACRO_XML, NULL, 0);
+
+					xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
+
+					zbx_free(value_tmp);
+					xmlFree(value);
+				}
+				break;
+			default:
+				break;
+		}
+
+		substitute_macros_in_xml_elements(item, jp_row, node->children);
+	}
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_xml                                            *
+ *                                                                            *
+ * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
+ *          a node or in CDATA section, validate XML                          *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] pointer to a buffer that contains XML        *
+ *             item   - [IN] item for simple macro substitution               *
+ *             jp_row - [IN] discovery data for LLD macro substitution        *
+ *             error  - [OUT] reason for XML parsing failure                  *
+ *             maxerrlen - [IN] the size of error buffer                      *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL if XML validation has failed                 *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
+		int maxerrlen)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(jp_row);
+	zbx_snprintf(error, maxerrlen, "Support for XML was not compiled in");
+	return FAIL;
+#else
+	const char	*__function_name = "substitute_macros_xml";
+	xmlDoc		*doc;
+	xmlErrorPtr	pErr;
+	xmlNode		*root_element;
+	xmlChar		*mem;
+	int		size, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == (doc = xmlReadMemory(*data, strlen(*data), "noname.xml", NULL, 0)))
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+			zbx_snprintf(error, maxerrlen, "Cannot parse XML value: %s", pErr->message);
+		else
+			zbx_snprintf(error, maxerrlen, "Cannot parse XML value");
+
+		goto exit;
+	}
+
+	if (NULL == (root_element = xmlDocGetRootElement(doc)))
+	{
+		zbx_snprintf(error, maxerrlen, "Cannot parse XML root");
+		goto clean;
+	}
+
+	substitute_macros_in_xml_elements(item, jp_row, root_element);
+	xmlDocDumpMemory(doc, &mem, &size);
+
+	if (NULL == mem)
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+			zbx_snprintf(error, maxerrlen, "Cannot save XML: %s", pErr->message);
+		else
+			zbx_snprintf(error, maxerrlen, "Cannot save XML");
+
+		goto clean;
+	}
+
+	zbx_free(*data);
+	*data = zbx_malloc(NULL, size + 1);
+	memcpy(*data, (const char *)mem, size + 1);
+	xmlFree(mem);
+	ret = SUCCEED;
+clean:
+	xmlFreeDoc(doc);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+#endif
+}
+
+#ifdef HAVE_LIBXML2
+/******************************************************************************
+ *                                                                            *
+ * Function: libxml_handle_error                                              *
+ *                                                                            *
+ * Purpose: libxml2 callback function for error handle                        *
+ *                                                                            *
+ * Parameters: user_data - [IN/OUT] the user context                          *
+ *             err       - [IN] the libxml2 error message                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+{
+	zbx_libxml_error_t	*err_ctx;
+
+	if (NULL == user_data)
+		return;
+
+	err_ctx = (zbx_libxml_error_t *)user_data;
+	zbx_strlcat(err_ctx->buf, err->message, err_ctx->len);
+
+	if (NULL != err->str1)
+		zbx_strlcat(err_ctx->buf, err->str1, err_ctx->len);
+
+	if (NULL != err->str2)
+		zbx_strlcat(err_ctx->buf, err->str2, err_ctx->len);
+
+	if (NULL != err->str3)
+		zbx_strlcat(err_ctx->buf, err->str3, err_ctx->len);
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: xml_xpath_check                                                  *
+ *                                                                            *
+ * Purpose: validate xpath string                                             *
+ *                                                                            *
+ * Parameters: xpath  - [IN] the xpath value                                  *
+ *             error  - [OUT] the error message buffer                        *
+ *             errlen - [IN] the size of error message buffer                 *
+ *                                                                            *
+ * Return value: SUCCEED - the xpath component was parsed successfully        *
+ *               FAIL    - xpath parsing error                                *
+ *                                                                            *
+ ******************************************************************************/
+int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(xpath);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(errlen);
+	return FAIL;
+#else
+	zbx_libxml_error_t	err;
+	xmlXPathContextPtr	ctx;
+	xmlXPathCompExprPtr	p;
+
+	err.buf = error;
+	err.len = errlen;
+
+	ctx = xmlXPathNewContext(NULL);
+	xmlSetStructuredErrorFunc(&err, &libxml_handle_error);
+
+	p = xmlXPathCtxtCompile(ctx, (xmlChar *)xpath);
+	xmlSetStructuredErrorFunc(NULL, NULL);
+
+	if (NULL == p)
+	{
+		xmlXPathFreeContext(ctx);
+		return FAIL;
+	}
+
+	xmlXPathFreeCompExpr(p);
+	xmlXPathFreeContext(ctx);
+	return SUCCEED;
+#endif
 }

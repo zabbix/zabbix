@@ -3,12 +3,11 @@ noinst_PROGRAMS = DBselect_uint64
 
 DBselect_uint64_SOURCES = \
 	DBselect_uint64.c \
-	../../../src/zabbix_server/actions.c \
-	../../../src/zabbix_server/events.c \
-	../../../src/zabbix_server/operations.c \
 	../../zbxmocktest.h
 
 DBselect_uint64_LDADD = \
+	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
@@ -52,6 +51,7 @@ DBselect_uint64_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \

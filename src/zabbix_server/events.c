@@ -540,7 +540,7 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hg.groupid"
-				" from groups g,hosts_groups hg,items i,functions f"
+				" from hstgrp g,hosts_groups hg,items i,functions f"
 				" where f.triggerid=" ZBX_FS_UI64
 				" and i.itemid=f.itemid"
 				" and hg.hostid=i.hostid"
@@ -1667,7 +1667,7 @@ void	zbx_export_events(void)
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select distinct g.name"
-					" from groups g, hosts_groups hg"
+					" from hstgrp g, hosts_groups hg"
 					" where g.groupid=hg.groupid"
 						" and");
 
@@ -2065,19 +2065,20 @@ static int	event_check_dependency(const DB_EVENT *event, const zbx_vector_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: match_tags                                                       *
+ * Function: match_tag                                                        *
  *                                                                            *
- * Purpose: match two tag vectors                                             *
+ * Purpose: checks if the two tag sets have matching tag                      *
  *                                                                            *
- * Parameters: tags1 - [IN] the first tag vector                              *
+ * Parameters: name  - [IN] the name of tag to match                          *
+ *             tags1 - [IN] the first tag vector                              *
  *             tags2 - [IN] the second tag vector                             *
  *                                                                            *
- * Return value: SUCCEED - at least one tag/value from the first vector       *
- *                         matches tag/value from the second vector.          *
+ * Return value: SUCCEED - both tag sets contains a tag with the specified    *
+ *                         name and the same value                            *
  *               FAIL    - otherwise.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	match_tags(const zbx_vector_ptr_t *tags1, const zbx_vector_ptr_t *tags2)
+static int	match_tag(const char *name, const zbx_vector_ptr_t *tags1, const zbx_vector_ptr_t *tags2)
 {
 	int		i, j;
 	zbx_tag_t	*tag1, *tag2;
@@ -2086,11 +2087,14 @@ static int	match_tags(const zbx_vector_ptr_t *tags1, const zbx_vector_ptr_t *tag
 	{
 		tag1 = (zbx_tag_t *)tags1->values[i];
 
+		if (0 != strcmp(tag1->tag, name))
+			continue;
+
 		for (j = 0; j < tags2->values_num; j++)
 		{
 			tag2 = (zbx_tag_t *)tags2->values[j];
 
-			if (0 == strcmp(tag1->tag, tag2->tag) && 0 == strcmp(tag1->value, tag2->value))
+			if (0 == strcmp(tag2->tag, name) && 0 == strcmp(tag1->value, tag2->value))
 				return SUCCEED;
 		}
 	}
@@ -2229,7 +2233,8 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
 
 				if (problem->triggerid == event->objectid)
 				{
-					if (SUCCEED == match_tags(&problem->tags, &event->tags))
+					if (SUCCEED == match_tag(event->trigger.correlation_tag,
+							&problem->tags, &event->tags))
 					{
 						recover_event(problem->eventid, EVENT_SOURCE_TRIGGERS,
 								EVENT_OBJECT_TRIGGER, event->objectid);

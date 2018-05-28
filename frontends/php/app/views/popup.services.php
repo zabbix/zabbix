@@ -22,10 +22,12 @@
 $output = [];
 
 // Create form.
-$services_form = (new CForm())->setName('services_form');
+$services_form = (new CForm())
+	->cleanItems()
+	->setName('services_form');
 
 if (array_key_exists('service', $data)) {
-	$services_form->addVar('serviceid', $data['service']['serviceid']);
+	$services_form->addItem((new CVar('serviceid', $data['service']['serviceid']))->removeId());
 }
 
 // Create table.
@@ -136,5 +138,10 @@ $output += [
 	'header' => $data['title'],
 	'body' => (new CDiv($services_form))->toString()
 ];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo (new CJson())->encode($output);

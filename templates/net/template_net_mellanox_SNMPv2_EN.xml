@@ -11,10 +11,10 @@
       <template>
          <template>Template Net Mellanox SNMPv2</template>
          <name>Template Net Mellanox SNMPv2</name>
-         <description>Template Net Mellanox version: 0.14
-MIBs used:
-ENTITY-SENSORS-MIB
-ENTITY-STATE-MIB
+         <description>Template Net Mellanox version: 0.14&#13;
+MIBs used:&#13;
+ENTITY-SENSORS-MIB&#13;
+ENTITY-STATE-MIB&#13;
 ENTITY-MIB</description>
          <groups>
             <group>
@@ -112,9 +112,9 @@ ENTITY-MIB</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-SENSORS-MIB
-The most recent measurement obtained by the agent for this sensor.
-To correctly interpret the value of this object, the associated entPhySensorType,
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
+The most recent measurement obtained by the agent for this sensor.&#13;
+To correctly interpret the value of this object, the associated entPhySensorType,&#13;
 entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -162,7 +162,7 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-SENSORS-MIB
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
 The operational status of the sensor {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -182,8 +182,8 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Mellanox SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}
-or
+                     <expression>{Template Net Mellanox SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+or&#13;
 {Template Net Mellanox SNMPv2:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>1</recovery_mode>
                      <recovery_expression>{Template Net Mellanox SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -193,7 +193,7 @@ or
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -216,7 +216,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -312,9 +312,9 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-SENSORS-MIB
-The most recent measurement obtained by the agent for this sensor.
-To correctly interpret the value of this object, the associated entPhySensorType,
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
+The most recent measurement obtained by the agent for this sensor.&#13;
+To correctly interpret the value of this object, the associated entPhySensorType,&#13;
 entPhySensorScale, and entPhySensorPrecision objects must also be examined.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -357,7 +357,7 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: ENTITY-SENSORS-MIB
+                     <description>MIB: ENTITY-SENSORS-MIB&#13;
 The operational status of the sensor {#SENSOR_INFO}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -386,7 +386,7 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -534,7 +534,7 @@ Please check the fan unit</description>
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>
@@ -642,7 +642,7 @@ Device serial number has changed. Ack to close</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the power supply unit for errors</description>
                      <type>0</type>
                      <manual_close>0</manual_close>

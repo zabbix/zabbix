@@ -26,7 +26,7 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_DISCOVERY_STATUS);
+		$this->setType(WIDGET_DISCOVERY);
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',

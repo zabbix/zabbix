@@ -21,11 +21,12 @@
 
 // Create form.
 $expression_form = (new CForm())
+	->cleanItems()
 	->setName('expression')
 	->addVar('action', 'popup.triggerexpr')
 	->addVar('dstfrm', $data['dstfrm'])
 	->addVar('dstfld1', $data['dstfld1'])
-	->addVar('hostid', $data['hostid'])
+	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
 	->addVar('itemid', $data['itemid'])
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
@@ -80,7 +81,8 @@ if ($data['parent_discoveryid'] !== '') {
 				'dstfld2' => 'description',
 				'parent_discoveryid' => $data['parent_discoveryid']
 			]).', null, this);'
-		);
+		)
+		->removeId();
 }
 
 $expression_form_list->addRow((new CLabel(_('Item'), 'description'))->setAsteriskMark(), $item);
@@ -195,5 +197,10 @@ $output = [
 			'}'.
 		'});'
 ];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo (new CJson())->encode($output);

@@ -76,6 +76,7 @@ $media_form = (new CFormList(_('Media')))
 	);
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('media_form')
 	->addVar('action', 'popup.media')
 	->addVar('add', '1')
@@ -116,5 +117,10 @@ $output = [
 		]
 	]
 ];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo (new CJson())->encode($output);

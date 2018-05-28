@@ -25,7 +25,9 @@ $output = [
 	'script_inline' => require 'app/views/popup.triggerwizard.js.php'
 ];
 
+// SID for this form is added by JS getUrl() and "form_refresh" is not used at all.
 $form = (new CForm('post', 'zabbix.php'))
+	->cleanItems()
 	->setName('sform')
 	->addVar('sform', '1')
 	->addVar('action', 'popup.triggerwizard')
@@ -124,7 +126,6 @@ $form->addItem(
 		->addRow(_('Item'), [
 			(new CTextBox('item', $options['item_name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setId('item')
 				->setAttribute('disabled', 'disabled'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton(null, _('Select')))
@@ -136,8 +137,7 @@ $form->addItem(
 						'srcfld2' => 'name',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'itemid',
-						'dstfld2' => 'item',
-						'with_webitems' => '1'
+						'dstfld2' => 'item'
 					]).', null, this);'
 				)
 		])
@@ -202,5 +202,10 @@ $output['buttons'] = [[
 						'.attr("data-dialogueid")'.
 				');'
 ]];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo (new CJson())->encode($output);
