@@ -1085,6 +1085,8 @@ static int	DBpatch_3050100(void)
 static int	DBpatch_3050101(void)
 {
 #ifdef HAVE_POSTGRESQL
+	if (FAIL == DBindex_exists("hstgrp", "groups_pkey"))
+		return SUCCEED;
 	return DBrename_index("hstgrp", "groups_pkey", "hstgrp_pkey", "groupid", 0);
 #else
 	return SUCCEED;
