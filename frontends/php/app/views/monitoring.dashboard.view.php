@@ -84,7 +84,7 @@ else {
 					(new CList())
 						->addItem((
 							(new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable'])))
-						->addItem((new CButton(SPACE))
+						->addItem((new CButton('', '&nbsp;'))
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashbrd-actions')
 							->setTitle(_('Actions'))

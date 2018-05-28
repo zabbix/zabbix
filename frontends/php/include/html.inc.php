@@ -173,7 +173,7 @@ function get_icon($type, $params = []) {
 						->setArgument('fullscreen', null)
 						->setArgument('kioskmode', null);
 
-					$icon = (new CRedirectButton(' ', $url->getUrl()))
+					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
 						->setTitle(_('Normal view'))
 						->addClass(ZBX_STYLE_BTN_MIN)
 						->addClass($kioskmode ? ZBX_STYLE_BTN_DASHBRD_NORMAL : null);
@@ -183,7 +183,7 @@ function get_icon($type, $params = []) {
 						->setArgument('fullscreen', '1')
 						->setArgument('kioskmode', '1');
 
-					$icon = (new CRedirectButton(' ', $url->getUrl()))
+					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
 						->setTitle(_('Kiosk mode'))
 						->addClass(ZBX_STYLE_BTN_KIOSK);
 				}
@@ -193,7 +193,7 @@ function get_icon($type, $params = []) {
 					->setArgument('fullscreen', '1')
 					->setArgument('kioskmode', null);
 
-				$icon = (new CRedirectButton(' ', $url->getUrl()))
+				$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
 					->setTitle(_('Fullscreen'))
 					->addClass(ZBX_STYLE_BTN_MAX);
 			}

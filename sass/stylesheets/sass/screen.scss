@@ -578,15 +578,17 @@ article {
 
 // Object Group Navigation
 .object-group {
-	margin: 0 0 10px 0;
+	min-height: 24px;
+	line-height: 24px;
+	margin-bottom: 5px;
 
 	li {
-		display: inline-block;
-		padding: 0 5px 0 0;
-		vertical-align: middle;
+		float: left;
+		margin-right: 5px;
 
 		span {
-			padding: 4px 7px;
+			display: inline-block;
+			padding: 0 7px;
 		}
 
 		.status-container, .rel-container {
@@ -627,20 +629,22 @@ article {
 
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
-	max-width: calc(100% - 450px);
-	margin-bottom: -27px;
+	display: inline-block;
+	max-width: calc(100% - 100px);
 	position: relative;
+	top: 0;
 	z-index: 3;
 
-	& > li {
-		line-height: 27px;
-	}
-
-	& li:first-child {
+	& > li:first-child {
+		float: left;
 		max-width: 256px;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	& + .filter-space {
+		margin-top: -33px;
 	}
 }
 
@@ -2251,10 +2255,10 @@ $icon-widget-btn: (
 		&:after {
 			margin: 0 5px;
 			right: 0;
-			bottom: 0;
+			top: 0;
 			height: 24px;
 			width: 24px;
-			background: url(../img/icon-sprite.svg) no-repeat -87px -581px;
+			background: url(../img/icon-sprite.svg) no-repeat -87px -583px;
 		}
 	}
 
@@ -2264,10 +2268,10 @@ $icon-widget-btn: (
 		&:after {
 			margin: 0 5px;
 			right: 0;
-			bottom: 0;
+			top: 0;
 			height: 24px;
 			width: 24px;
-			background: url(../img/icon-sprite.svg) no-repeat -87px -545px;
+			background: url(../img/icon-sprite.svg) no-repeat -87px -547px;
 		}
 	}
 
@@ -2287,22 +2291,19 @@ $icon-widget-btn: (
 			border: 1px solid $ui-border-color;
 			border-bottom: none;
 			margin: 0 0 0 6px;
+			padding: 0 34px 7px 10px;
 			@include border-radius(2px 2px 0 0);
 		}
 
 		.btn-time {
-			padding: 0 34px 4px 10px;
-
 			&:after {
-				background: url(../img/icon-sprite.svg) no-repeat -246px -585px;
+				background-position: -246px -583px;
 			}
 		}
 
 		.filter-trigger {
-			padding: 0 34px 4px 10px;
-
 			&:after {
-				background: url(../img/icon-sprite.svg) no-repeat -246px -549px;
+				background-position: -246px -547px;
 			}
 		}
 	}
@@ -2312,7 +2313,6 @@ $icon-widget-btn: (
 			.btn-time,
 			.filter-trigger  {
 				background-color: $action-hover-color;
-				padding-bottom: 4px;
 			}
 		}
 	}
@@ -2321,7 +2321,6 @@ $icon-widget-btn: (
 		&.ui-tabs-active {
 			.btn-time,
 			.filter-trigger {
-				padding-bottom: 4px;
 				@include box-shadow(0 0 0 2px rgba($blue, .35));
 			}
 		}
@@ -2340,18 +2339,19 @@ $icon-widget-btn: (
 	}
 
 	.filter-btn-container {
-		height: 26px;
+		height: 29px;
 		z-index: 2;
 	}
 
 	.ui-tabs-nav {
-		height: 26px;
+		height: 29px;
 		border-bottom: none;
 
 		a {
 			display: inline-block;
 			box-sizing: border-box;
 			line-height: 22px;
+			margin-bottom: 5px;
 			text-align: center;
 		}
 	}
