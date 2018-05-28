@@ -188,6 +188,11 @@ class testPageReportsTriggerTop extends CWebTest {
 		// Click button 'Reset'
 		$this->zbxTestClickButtonText('Reset');
 
+		// Fill in the date in filter
+		if (array_key_exists('date', $data)) {
+			$this->fillInDate($data['date']);
+		}
+
 		if (array_key_exists('host_group', $data)) {
 			$this->zbxTestClickButtonMultiselect('groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -208,11 +213,6 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestMultiselectAssertSelected('hostids_', $data['host']);
 		}
 
-		// Fill in the date in filter
-		if (array_key_exists('date', $data)) {
-			$this->fillInDate($data['date']);
-		}
-
 		if (array_key_exists('severities', $data)) {
 			foreach ($data['severities'] as $severity) {
 				$severity_id = $this->zbxTestGetAttributeValue('//label[text()=\''.$severity.'\']', 'for');
@@ -220,7 +220,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			}
 		}
 
-		$this->zbxTestClickXpath('//button[@name=\'filter_set\']');
+		$this->zbxTestClickXpathWait('//button[@name=\'filter_set\']');
 		$this->zbxTestWaitForPageToLoad();
 		if (array_key_exists('result', $data)) {
 			$this->zbxTestTextPresent($data['result']);
@@ -245,6 +245,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			];
 
 			foreach ($fields as $key => $value) {
+				$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('filter_'.$i.'_'.$key));
 				$this->zbxTestInputTypeOverwrite('filter_'.$i.'_'.$key, $value);
 			}
 		}
