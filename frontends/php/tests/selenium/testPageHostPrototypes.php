@@ -91,11 +91,11 @@ class testPageHostPrototypes extends CWebTest {
 				$result = DBdata('SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='.zbx_dbstr($data['item']).')', false);
 				foreach ($result as $hostid) {
 					$hostid = $hostid[0];
-					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status=0 AND hostid='.zbx_dbstr($hostid['hostid'])));
+					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status='.HOST_STATUS_MONITORED.' AND hostid='.zbx_dbstr($hostid['hostid'])));
 				}
 			}
 			else {
-				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status=0 AND host='.zbx_dbstr($host_name)));
+				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status='.HOST_STATUS_MONITORED.' AND host='.zbx_dbstr($host_name)));
 			}
 		}
 	}
@@ -117,11 +117,11 @@ class testPageHostPrototypes extends CWebTest {
 				$result = DBdata('SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='.zbx_dbstr($data['item']).')', false);
 				foreach ($result as $hostid) {
 					$hostid = $hostid[0];
-					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status=1 AND hostid='.zbx_dbstr($hostid['hostid'])));
+					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED.' AND hostid='.zbx_dbstr($hostid['hostid'])));
 				}
 			}
 			else {
-				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status=1 AND host='.zbx_dbstr($host_name)));
+				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED.' AND host='.zbx_dbstr($host_name)));
 			}
 		}
 	}
