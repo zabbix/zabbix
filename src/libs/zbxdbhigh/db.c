@@ -1345,11 +1345,11 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				if (0 != strcmp(autoreg_host->host, row[0]))
 					continue;
 
-				if (SUCCEED == DBis_null(row[1]) || 0 == strcmp(autoreg_host->host_metadata, row[1]))
-				{
-					zbx_vector_ptr_remove(autoreg_hosts, i);
-					autoreg_host_free(autoreg_host);
-				}
+				if (SUCCEED == DBis_null(row[1]) || 0 != strcmp(autoreg_host->host_metadata, row[1]))
+					break;
+
+				zbx_vector_ptr_remove(autoreg_hosts, i);
+				autoreg_host_free(autoreg_host);
 
 				break;
 			}

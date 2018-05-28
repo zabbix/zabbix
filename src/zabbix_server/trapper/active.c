@@ -191,8 +191,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #else
 		old_metadata = row[3];
 #endif
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) ||
-				(FAIL == DBis_null(old_metadata) && 0 != strcmp(old_metadata, host_metadata)))
+		/* metadata is available only on Zabbix server */
+		if (SUCCEED == DBis_null(old_metadata) || 0 != strcmp(old_metadata, host_metadata))
 		{
 			db_register_host(host, ip, port, host_metadata);
 		}
