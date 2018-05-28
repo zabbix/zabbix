@@ -7,8 +7,8 @@ UPDATE hosts SET status=0 WHERE host='Zabbix server';
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
-INSERT INTO groups (groupid,name,internal) VALUES (50012,'API group for hosts',0);
-INSERT INTO groups (groupid,name,internal) VALUES (50013,'API group for templates',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50012,'API group for hosts',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50013,'API group for templates',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
@@ -51,21 +51,21 @@ INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, 
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
 
 -- host groups
-INSERT INTO groups (groupid,name,internal) VALUES (50005,'API host group for update',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50005,'API host group for update',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50009, 50005);
-INSERT INTO groups (groupid,name,internal) VALUES (50006,'API host group for update internal',1);
-INSERT INTO groups (groupid,name,internal) VALUES (50007,'API host group delete internal',1);
-INSERT INTO groups (groupid,name,internal) VALUES (50008,'API host group delete',0);
-INSERT INTO groups (groupid,name,internal) VALUES (50009,'API host group delete2',0);
-INSERT INTO groups (groupid,name,internal) VALUES (50010,'API host group delete3',0);
-INSERT INTO groups (groupid,name,internal) VALUES (50011,'API host group delete4',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50006,'API host group for update internal',1);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50007,'API host group delete internal',1);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50008,'API host group delete',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50009,'API host group delete2',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50010,'API host group delete3',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50011,'API host group delete4',0);
 -- discovered host groups
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '');
-INSERT INTO groups (groupid,name,internal) VALUES (50014,'API group for host prototype',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50014,'API group for host prototype',0);
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NULL,40066);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (8, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (9, 50011, '', 50014, NULL);
-INSERT INTO groups (groupid,name,internal,flags) VALUES (50015,'API discovery group {#HV.NAME}',0,4);
+INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (50015,'API discovery group {#HV.NAME}',0,4);
 INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 8, 'API discovery group {#HV.NAME}');
 
 -- user group
@@ -128,12 +128,12 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (5
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50013, 50012);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, 'API Host for read permissions', 'API Host for read permissions', 0, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50023,50012,1,1,1,'127.0.0.1','','10050');
-INSERT INTO groups (groupid,name,internal) VALUES (50016,'API group with read permissions',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50016,'API group with read permissions',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50012, 50012, 50016);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (3, 14, 2, 50016);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'API Host for deny permissions', 'API Host for deny permissions', 0, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50025,50014,1,1,1,'127.0.0.1','','10050');
-INSERT INTO groups (groupid,name,internal) VALUES (50017,'API group with deny permissions',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50017,'API group with deny permissions',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50014, 50014, 50017);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (4, 14, 0, 50017);
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (6,'API script for update one','/sbin/shutdown -r',2,NULL,NULL,'');

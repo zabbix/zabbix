@@ -735,7 +735,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			// Selecting functions.
 			$result = DBselect(
-				'SELECT f.functionid,f.itemid,f.function,f.parameter'.
+				'SELECT f.functionid,f.itemid,f.name,f.parameter'.
 				' FROM functions f'.
 				' WHERE '.dbConditionInt('f.functionid', $functionids)
 			);
@@ -747,6 +747,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			while ($row = DBfetch($result)) {
 				$itemids[$row['itemid']] = true;
+				$row['function'] = $row['name'];
+				unset($row['name']);
 
 				$functions['{'.$row['functionid'].'}'] = $row;
 				unset($functions['{'.$row['functionid'].'}']['functionid']);

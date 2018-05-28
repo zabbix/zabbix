@@ -49,14 +49,14 @@ class CTestDbHelper {
 	 */
 	public static function setHostGroupPermissions($usergroup_name, $hostgroup_name, $permission, $subgroups = false) {
 		$usergroup = DB::find('usrgrp', ['name' => $usergroup_name]);
-		$hostgroups = DB::find('groups', ['name' => $hostgroup_name]);
+		$hostgroups = DB::find('hstgrp', ['name' => $hostgroup_name]);
 
 		if ($usergroup && $hostgroups) {
 			$usergroup = $usergroup[0];
 
 			if ($subgroups) {
 				$hostgroups = array_merge($hostgroups, DBfetchArray(DBselect(
-					'SELECT * FROM groups WHERE name LIKE '.zbx_dbstr($hostgroups[0]['name'].'/%')
+					'SELECT * FROM hstgrp WHERE name LIKE '.zbx_dbstr($hostgroups[0]['name'].'/%')
 				)));
 			}
 
