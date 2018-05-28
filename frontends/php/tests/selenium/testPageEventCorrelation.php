@@ -31,36 +31,68 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestCheckHeader('Event correlation');
 		// Check Create correlation button
 		$this->zbxTestAssertElementText("//button[@id='form']", 'Create correlation');
+
 		// Check table headers
-		$this->zbxTestTextPresent(['Name', 'Conditions', 'Operations', 'Status']);
+		$headers = ['', 'Name', 'Conditions', 'Operations', 'Status'];
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//thead/tr/th'));
+		foreach ($elements as $element) {
+			$get_headers[] = $element->getText();
+		}
+		$this->assertEquals($headers, $get_headers);
+
 		// Check the correlation names in frontend
 		$correlations = DBfetchArray(DBSelect('SELECT name FROM correlation'));
 		foreach ($correlations as $correlation) {
-			$this->zbxTestTextPresent($correlation['name']);
+			$correlation_names[] = $correlation['name'];
 		}
-		// Check table footer to make sure that some results are found
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
+		$this->zbxTestTextPresent($correlation_names);
+
+		// Check table footer to make sure that results are found
+		$i = DBcount('SELECT NULL FROM correlation');
+		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$i.' of '.$i.' found');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');
 	}
 
 	public function testPageEventCorrelation_FilterByName() {
+		$name = 'Event correlation for cancel';
+
 		$this->zbxTestLogin('correlation.php');
+		$this->zbxTestCheckHeader('Event correlation');
 		$this->zbxTestInputType('filter_name', 'for cancel');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Event correlation for cancel');
-		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $name);
+		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
+		// Other correlation names are not displayed on frontend
+		$correlations = DBfetchArray(DBSelect('SELECT name FROM correlation WHERE name<>'.zbx_dbstr($name)));
+		foreach ($correlations as $correlation) {
+			$correlation_names[] = $correlation['name'];
+		}
+		$this->zbxTestTextNotPresent($correlation_names);
 	}
 
 	public function testPageEventCorrelation_FilterByEnabled() {
 		$this->zbxTestLogin('correlation.php');
-		$this->testPageEventCorrelation_FilterReset();
+		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickXpath("//ul[@id='filter_status']//label[text()='Enabled']");
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Event correlation for clone');
-		$this->zbxTestAssertElementText("//tbody/tr[2]/td[2]/a", 'Event correlation for delete');
-		$this->zbxTestAssertElementText("//tbody/tr[3]/td[2]/a", 'Event correlation for update');
-		$this->zbxTestTextPresent('Displaying 3 of 3 found');
+		$this->zbxTestWaitForPageToLoad();
+
+		// Get correlation names from UI after filtering
+		$correlations_from_ui = $this->getCorrelationNamesFromTable();
+
+		// Get enabled correlation names from DB
+		$sql = 'SELECT name FROM correlation WHERE status='.ZBX_CORRELATION_ENABLED.' ORDER BY name';
+		$correlations_from_db = DBfetchArray(DBSelect($sql));
+		foreach ($correlations_from_db as $correlation) {
+			$correlation_names[] = $correlation['name'];
+		}
+		// Compare result from DB and UI
+		$this->assertEquals($correlations_from_ui, $correlation_names);
+
+		$count = DBcount($sql);
+		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$count.' of '.$count.' found');
 	}
 
 	public function testPageEventCorrelation_FilterByDisabled() {
@@ -68,87 +100,159 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickXpath("//ul[@id='filter_status']//label[text()='Disabled']");
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Event correlation for cancel');
-		$this->zbxTestTextPresent('Displaying 1 of 1 found');
+		$this->zbxTestWaitForPageToLoad();
+
+		// Get correlation names from UI after filtering
+		$correlations_from_ui = $this->getCorrelationNamesFromTable();
+
+		// Get disabled correlation names from DB
+		$sql = 'SELECT name FROM correlation WHERE status='.ZBX_CORRELATION_DISABLED.' ORDER BY name';
+		$correlations_from_db = DBfetchArray(DBSelect($sql));
+		foreach ($correlations_from_db as $correlation) {
+			$correlation_names[] = $correlation['name'];
+		}
+		// Compare result from DB and UI
+		$this->assertEquals($correlations_from_ui, $correlation_names);
+
+		$count = DBcount($sql);
+		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$count.' of '.$count.' found');
 	}
 
 	public function testPageEventCorrelation_FilterReset() {
 		$this->zbxTestLogin('correlation.php');
-		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestCheckHeader('Event correlation');
+		$this->zbxTestInputType('filter_name', 'NONE');
 		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestAssertElementText("//tr[@class='nothing-to-show']", 'No data found.');
+		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestAssertElementNotPresentXpath("//tr[@class='nothing-to-show']");
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
-	public function testPageEventCorrelation_SingleEnableDisableByLink(){
-		$this->zbxTestLogin('correlation.php');
-		$this->zbxTestClickButtonText('Reset');
-		// Enable correlation
-		$this->zbxTestClickXpathWait("//a[contains(@onclick,'correlationid[]=99002')]");
-		$this->zbxTestTextPresent('Correlation enabled');
-		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 0'));
-		// Disable correlation
-		$this->zbxTestClickXpathWait("//a[contains(@onclick,'correlationid[]=99002')]");
-		$this->zbxTestTextPresent('Correlation disabled');
-		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 1'));
+	/**
+	 * Get correlation names from table in UI
+	 */
+	private function getCorrelationNamesFromTable() {
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//tbody/tr/td[2]/a'));
+		foreach ($elements as $element) {
+			$correlations[] = $element->getText();
+		}
+		sort($correlations);
+		return $correlations;
 	}
 
-	public function testPageEventCorrelation_SingleEnableDisableByCheckbox(){
-		$this->zbxTestLogin('correlation.php');
-		$this->zbxTestClickButtonText('Reset');
-		// Enable correlation
-		$this->zbxTestCheckboxSelect('g_correlationid_99002');
-		$this->zbxTestClickButton('correlation.massenable');
-		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Event correlation rules');
-		$this->zbxTestTextPresent('Correlation enabled');
-		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 0'));
-		// Disable correlation
-		$this->zbxTestCheckboxSelect('g_correlationid_99002');
-		$this->zbxTestClickButton('correlation.massdisable');
-		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Event correlation rules');
-		$this->zbxTestTextPresent('Correlation disabled');
-		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99002 AND status = 1'));
+	public static function getCorrelationData() {
+		return [
+			[
+				[
+					'name' => 'Event correlation for cancel',
+					'make_status' => ZBX_CORRELATION_ENABLED
+				]
+			],
+			[
+				[
+					'name' => 'Event correlation for cancel',
+					'make_status' => ZBX_CORRELATION_DISABLED
+				]
+			]
+		];
 	}
 
-	public function testPageEventCorrelation_MassEnableDisable() {
+	/**
+	 * @dataProvider getCorrelationData
+	 */
+	public function testPageEventCorrelation_SingleEnableDisableByLink($data) {
 		$this->zbxTestLogin('correlation.php');
-		$this->zbxTestClickButtonText('Reset');
-		// Mass enable correlation
+		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($data['name'])));
+		// Enable or disable correlation by its link
+		$this->zbxTestClickXpathWait("//a[contains(@onclick,'correlationid[]=".$id['correlationid']."')]");
+
+		// Check enabled correlation message
+		if ($data['make_status']===ZBX_CORRELATION_ENABLED) {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation enabled');
+		}
+		// Check disabled correlation message
+		else {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation disabled');
+		}
+
+		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
+						.' AND status ='.$data['make_status']));
+	}
+
+	/**
+	 * @dataProvider getCorrelationData
+	 */
+	public function testPageEventCorrelation_SingleEnableDisableByCheckbox($data) {
+		$this->zbxTestLogin('correlation.php');
+		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($data['name'])));
+		$this->zbxTestCheckboxSelect('g_correlationid_'.$id['correlationid']);
+
+		// Enable correlation
+		if ($data['make_status']===ZBX_CORRELATION_ENABLED) {
+			$this->zbxTestClickButton('correlation.massenable');
+			$this->zbxTestAcceptAlert();
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation enabled');
+		}
+		// Disable correlation
+		else {
+			$this->zbxTestClickButton('correlation.massdisable');
+			$this->zbxTestAcceptAlert();
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation disabled');
+		}
+		$this->zbxTestCheckFatalErrors();
+
+		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
+						.' AND status ='.$data['make_status']));
+	}
+
+	public function testPageEventCorrelation_DisableAll() {
+		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massenable');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Event correlation rules');
-		$this->zbxTestTextPresent('Correlations enabled');
-		$this->assertEquals(4, DBcount('SELECT NULL FROM correlation WHERE status = 0'));
-		// Mass disable correlation
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations enabled');
+		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_DISABLED));
+	}
+
+	public function testPageEventCorrelation_EnableAll() {
+		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massdisable');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Event correlation rules');
-		$this->zbxTestTextPresent('Correlations disabled');
-		$this->assertEquals(4, DBcount('SELECT NULL FROM correlation WHERE status = 1'));
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations disabled');
+		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_ENABLED));
 	}
 
 	public function testPageEventCorrelation_SingleDelete() {
+		$name = 'Event correlation for delete';
+		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($name)));
+
 		$this->zbxTestLogin('correlation.php');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestCheckboxSelect('g_correlationid_99000');
+		$this->zbxTestCheckboxSelect('g_correlationid_'.$id['correlationid']);
 		$this->zbxTestClickButton('correlation.massdelete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Event correlation rules');
-		$this->zbxTestTextPresent('Selected correlations deleted');
-		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE correlationid = 99000'));
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected correlations deleted');
+		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']));
 	}
 
-	public function testPageEventCorrelation_MassDelete() {
+	public function testPageEventCorrelation_DeleteAll() {
 		$this->zbxTestLogin('correlation.php');
-		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massdelete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Event correlation rules');
-		$this->zbxTestTextPresent('Selected correlations deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected correlations deleted');
+		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation'));
 	}
+
 }
