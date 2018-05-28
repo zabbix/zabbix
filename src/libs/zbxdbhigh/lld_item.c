@@ -1908,66 +1908,125 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
  *                                                                            *
  * Function: lld_item_dependencies_count                                      *
  *                                                                            *
- * Purpose: recursively count the number of other dependencies                *
+ * Purpose: recursively count the number of dependencies                      *
  *                                                                            *
- * Parameters: dependence   - [IN] dependence                                 *
- *             dependencies - [IN] item dependencies                          *
+ * Parameters: dependence       - [IN] dependence                             *
+ *             dependencies     - [IN] item dependencies                      *
+ *             dependencies_num - [IN\OUT] number of dependencies             *
+ *             depht_level      - [IN\OUT] depth level                        *
  *                                                                            *
- * Returns: number of dependencies                                            *
+ * Returns: SUCCEED - the number of dependencies was successfully counted     *
+ *          FAIL    - the limit of dependencies is reached                    *
  *                                                                            *
  ******************************************************************************/
-static int lld_item_dependencies_count(zbx_item_dependence_t *dependence, const zbx_vector_ptr_t *dependencies)
+static int	lld_item_dependencies_count(const zbx_item_dependence_t *dependence,
+		const zbx_vector_ptr_t *dependencies, int *dependencies_num, unsigned char *depth_level)
 {
-	int i, num = 0;
+	int	ret = FAIL, i, curr_depth_calculated = 0;
 
 	for (i = 0; i < dependencies->values_num; i++)
 	{
 		zbx_item_dependence_t	*next_dep = (zbx_item_dependence_t *)dependencies->values[i];
 
-		if (next_dep->master_itemid == dependence->itemid)
-		{
-			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != dependence->item_flags)
-				num++;
+		if (next_dep->master_itemid != dependence->itemid)
+			continue;
 
-			num += lld_item_dependencies_count(next_dep, dependencies);
+		/* check for the number of item dependencies */
+		if ((ZBX_FLAG_DISCOVERY_PROTOTYPE != dependence->item_flags &&
+				ZBX_DEPENDENT_ITEM_MAX_COUNT < ++(*dependencies_num)))
+		{
+			goto out;
+		}
+
+		if (0 == curr_depth_calculated)
+		{
+			curr_depth_calculated = 1;
+
+			if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < ++(*depth_level))
+			{
+				/* API doesn't allow to configure dependencies deeper */
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out;
+			}
+		}
+
+
+		if (0 < next_dep->master_itemid && SUCCEED != lld_item_dependencies_count(
+				next_dep, dependencies, dependencies_num, depth_level))
+		{
+			goto out;
 		}
 	}
 
-	return num;
+	ret = SUCCEED;
+out:
+	if (1 == curr_depth_calculated)
+		(*depth_level)--;
+
+	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_item_dependencies_num_check                                  *
+ * Function: lld_item_dependencies_check                                      *
  *                                                                            *
- * Purpose: recursively check the limits of dependent items                   *
+ * Purpose: check the limits of dependent items                               *
  *                                                                            *
- * Parameters: itemid       - [IN] item ID to be checked for limit            *
- *             dependencies - [IN] item dependencies                          *
+ * Parameters: itemid           - [IN] item ID to be checked for limit        *
+ *             dependencies     - [IN] item dependencies                      *
  *                                                                            *
- * Returns: SUCCEED - the limit is not exceeded                               *
- *          FAIL    - the limit is exceeded                                   *
+ * Returns: SUCCEED - the check was successful                                *
+ *          FAIL    - the limit of dependencies is exceeded                   *
  *                                                                            *
  ******************************************************************************/
-static int lld_item_dependencies_num_check(zbx_uint64_t itemid, const zbx_vector_ptr_t *dependencies)
+static int	lld_item_dependencies_check(const zbx_uint64_t itemid, const zbx_vector_ptr_t *dependencies)
 {
-	int i;
+	zbx_item_dependence_t	*dependence = NULL, *top_dependence = NULL, *tmp_dep;
+	int 			i, dependence_num = 0;
+	unsigned char		depth_level = 0;
 
+	/* find the dependency of the item by item id */
 	for (i = 0; i < dependencies->values_num; i++)
 	{
-		zbx_item_dependence_t	*next_dep = (zbx_item_dependence_t *)dependencies->values[i];
+		dependence = (zbx_item_dependence_t *)dependencies->values[i];
+		if (itemid == dependence->itemid)
+			break;
+	}
+	if (NULL == dependence || i == dependencies->values_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
 
-		if (next_dep->itemid != itemid)
-			continue;
-
-		if (ZBX_DEPENDENT_ITEM_MAX_COUNT < lld_item_dependencies_count(next_dep, dependencies) ||
-				SUCCEED != lld_item_dependencies_num_check(next_dep->master_itemid, dependencies))
+	/* find the top dependency that doesn't have a master item id */
+	while(NULL == top_dependence)
+	{
+		for (i = 0; i < dependencies->values_num; i++)
 		{
+			tmp_dep = (zbx_item_dependence_t *)dependencies->values[i];
+
+			if (dependence->master_itemid == tmp_dep->itemid)
+			{
+				dependence = tmp_dep;
+				break;
+			}
+		}
+
+		if (0 == dependence->master_itemid)
+		{
+			top_dependence = dependence;
+		}
+		else if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < ++depth_level)
+		{
+			/* API doesn't allow to configure dependencies deeper */
+			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
 		}
 	}
 
-	return SUCCEED;
+	depth_level = 0;
+
+	return lld_item_dependencies_count(top_dependence, dependencies, &dependence_num, &depth_level);
 }
 
 /******************************************************************************
@@ -2009,7 +2068,7 @@ static zbx_item_dependence_t	*lld_item_dependence_create(zbx_uint64_t itemid, zb
  * Parameters: hostid               - [IN] parent host id                     *
  *             item_prototypes      - [IN] item prototypes                    *
  *             item                 - [IN/OUT] item to be saved and set       *
- *                                             master for dependentent items  *
+ *                                             master for dependent items     *
  *             itemid               - [IN/OUT] item id used for insert        *
  *                                             operations                     *
  *             itemdiscoveryid      - [IN/OUT] item discovery id used for     *
@@ -2020,18 +2079,15 @@ static zbx_item_dependence_t	*lld_item_dependence_create(zbx_uint64_t itemid, zb
  *             item_dependencies    - [IN/OUT] item dependencies to be        *
  *                                             checked for limit on the       *
  *                                             number of dependencies         *
- *             error                - [IN/OUT] the lld error message          *
  *             limit_exceeded       - [IN/OUT] limit of dependent items       *
  *                                             exceeded                       *
- *                                                                            *
- * Returns: SUCCEED - the item was added successfully into bulk insert        *
- *          FAIL    - otherwise                                               *
+ *             error                - [IN/OUT] the lld error message          *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_lld_item_t *item,
 		zbx_uint64_t *itemid, zbx_uint64_t *itemdiscoveryid, zbx_db_insert_t *db_insert,
-		zbx_db_insert_t *db_insert_idiscovery, zbx_vector_ptr_t *item_dependencies, char **error,
-		unsigned char *limit_exceeded)
+		zbx_db_insert_t *db_insert_idiscovery, zbx_vector_ptr_t *item_dependencies,
+		unsigned char *limit_exceeded, char **error)
 {
 	int	index;
 
@@ -2051,54 +2107,54 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
-		if (0 == *limit_exceeded &&
-				SUCCEED != lld_item_dependencies_num_check(item_prototype->itemid, item_dependencies))
-		{
-			*limit_exceeded = 1;
-		}
+		item->itemid = (*itemid)++;
 
-		if (0 == *limit_exceeded)
+		if (0 < item_prototype->master_itemid)
 		{
-			item->itemid = (*itemid)++;
-
-			if (0 < item_prototype->master_itemid)
+			if (0 == *limit_exceeded && SUCCEED != lld_item_dependencies_check(
+					item_prototype->itemid, item_dependencies))
 			{
-				zbx_vector_ptr_append(item_dependencies, lld_item_dependence_create(item->itemid,
-						item->master_itemid, ZBX_FLAG_DISCOVERY_CREATED));
+				*limit_exceeded = 1;
 			}
 
-			zbx_db_insert_add_values(db_insert, item->itemid, item->name, item->key, hostid,
-					(int)item_prototype->type, (int)item_prototype->value_type,
-					item->delay, item->history, item->trends,
-					(int)item_prototype->status, item_prototype->trapper_hosts, item->units,
-					item_prototype->formula, item_prototype->logtimefmt, item_prototype->valuemapid,
-					item->params, item->ipmi_sensor, item_prototype->snmp_community, item->snmp_oid,
-					item_prototype->port, item_prototype->snmpv3_securityname,
-					(int)item_prototype->snmpv3_securitylevel,
-					(int)item_prototype->snmpv3_authprotocol, item_prototype->snmpv3_authpassphrase,
-					(int)item_prototype->snmpv3_privprotocol, item_prototype->snmpv3_privpassphrase,
-					(int)item_prototype->authtype, item->username,
-					item->password, item_prototype->publickey, item_prototype->privatekey,
-					item->description, item_prototype->interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-					item_prototype->snmpv3_contextname, item->jmx_endpoint, item->master_itemid,
-					item->timeout, item->url, item->query_fields, item->posts, item->status_codes,
-					item_prototype->follow_redirects, item_prototype->post_type, item->http_proxy,
-					item->headers, item_prototype->retrieve_mode, item_prototype->request_method,
-					item_prototype->output_format, item->ssl_cert_file, item->ssl_key_file,
-					item->ssl_key_password, item_prototype->verify_peer,
-					item_prototype->verify_host, item_prototype->allow_traps);
+			if (1 == *limit_exceeded)
+			{
+				*error = zbx_strdcatf(*error,
+						"Cannot create %s item: maximum dependent items count reached.\n",
+						item->key);
+				goto out;
+			}
 
-			zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, item->itemid,
-					item->parent_itemid, item_prototype->key);
+			/* create and add a new dependency of the current item for the next limit check */
+			zbx_vector_ptr_append(item_dependencies, lld_item_dependence_create(
+					item->itemid, item->master_itemid, ZBX_FLAG_DISCOVERY_CREATED));
 		}
-		else
-		{
-			*error = zbx_strdcatf(*error, "Cannot create %s item: maximum dependent items count reached.\n",
-					item->key);
-			return;
-		}
+
+		zbx_db_insert_add_values(db_insert, item->itemid, item->name, item->key, hostid,
+				(int)item_prototype->type, (int)item_prototype->value_type,
+				item->delay, item->history, item->trends,
+				(int)item_prototype->status, item_prototype->trapper_hosts, item->units,
+				item_prototype->formula, item_prototype->logtimefmt, item_prototype->valuemapid,
+				item->params, item->ipmi_sensor, item_prototype->snmp_community, item->snmp_oid,
+				item_prototype->port, item_prototype->snmpv3_securityname,
+				(int)item_prototype->snmpv3_securitylevel,
+				(int)item_prototype->snmpv3_authprotocol, item_prototype->snmpv3_authpassphrase,
+				(int)item_prototype->snmpv3_privprotocol, item_prototype->snmpv3_privpassphrase,
+				(int)item_prototype->authtype, item->username,
+				item->password, item_prototype->publickey, item_prototype->privatekey,
+				item->description, item_prototype->interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
+				item_prototype->snmpv3_contextname, item->jmx_endpoint, item->master_itemid,
+				item->timeout, item->url, item->query_fields, item->posts, item->status_codes,
+				item_prototype->follow_redirects, item_prototype->post_type, item->http_proxy,
+				item->headers, item_prototype->retrieve_mode, item_prototype->request_method,
+				item_prototype->output_format, item->ssl_cert_file, item->ssl_key_file,
+				item->ssl_key_password, item_prototype->verify_peer,
+				item_prototype->verify_host, item_prototype->allow_traps);
+
+		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, item->itemid,
+				item->parent_itemid, item_prototype->key);
 	}
-
+out:
 	for (index = 0; index < item->dependent_items.values_num; index++)
 	{
 		zbx_lld_item_t	*dependent;
@@ -2106,7 +2162,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		dependent = (zbx_lld_item_t *)item->dependent_items.values[index];
 		dependent->master_itemid = item->itemid;
 		lld_item_save(hostid, item_prototypes, dependent, itemid, itemdiscoveryid, db_insert,
-				db_insert_idiscovery, item_dependencies, error, limit_exceeded);
+				db_insert_idiscovery, item_dependencies, limit_exceeded, error);
 	}
 }
 
@@ -2550,7 +2606,7 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 	const char		*__function_name = "lld_item_dependencies_get";
 
 	zbx_item_dependence_t	*dependence;
-	zbx_vector_uint64_t	current_itemids, next_check_itemids, next_check_masteritemids;
+	zbx_vector_uint64_t	next_check_itemids, next_check_masteritemids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
 	DB_RESULT		result;
@@ -2559,7 +2615,6 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&current_itemids);
 	zbx_vector_uint64_create(&next_check_itemids);
 	zbx_vector_uint64_create(&next_check_masteritemids);
 
@@ -2578,9 +2633,8 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 		}
 	}
 
-	while (0 < next_check_itemids.values_num && depth_level < ZBX_DEPENDENT_ITEM_MAX_LEVELS)
+	while (0 < next_check_itemids.values_num)
 	{
-		depth_level++;
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid,master_itemid,flags from items where flags<>%d and",
@@ -2601,12 +2655,18 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 			}
 		}
 		DBfree_result(result);
+
+		if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < ++depth_level)
+		{
+			/* API doesn't allow to configure dependencies deeper than ZBX_DEPENDENT_ITEM_MAX_LEVELS */
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+		}
 	}
 
 	depth_level = 0;
-	while (0 < next_check_masteritemids.values_num && depth_level < ZBX_DEPENDENT_ITEM_MAX_LEVELS)
+	while (0 < next_check_masteritemids.values_num)
 	{
-		depth_level++;
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid,master_itemid,flags from items where flags<>%d and",
@@ -2624,8 +2684,15 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 				zbx_vector_uint64_append(&next_check_masteritemids, dependence->itemid);
 		}
 		DBfree_result(result);
-	}
 
+		if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < ++depth_level)
+		{
+			/* API doesn't allow to configure dependencies deeper */
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+		}
+	}
+out:
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&next_check_itemids);
@@ -2729,7 +2796,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		if (0 == item->master_itemid)
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
-					&db_insert_idiscovery, &item_dependencies, error, &limit_exceeded);
+					&db_insert_idiscovery, &item_dependencies, &limit_exceeded, error);
 		}
 		else
 		{
@@ -2740,7 +2807,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 			if (NULL == zbx_hashset_search(items_index, &item_index_local))
 			{
 				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
-						&db_insert_idiscovery, &item_dependencies, error, &limit_exceeded);
+						&db_insert_idiscovery, &item_dependencies, &limit_exceeded, error);
 			}
 		}
 	}
