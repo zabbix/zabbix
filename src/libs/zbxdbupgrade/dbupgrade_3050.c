@@ -779,6 +779,8 @@ static int	DBpatch_3050069(void)
 	return SUCCEED;
 }
 
+/* remove references to table that is about to be renamed, this is required on IBM DB2 */
+
 static int	DBpatch_3050070(void)
 {
 #ifdef HAVE_IBM_DB2
