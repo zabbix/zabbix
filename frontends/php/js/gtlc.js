@@ -75,8 +75,8 @@ jQuery(function ($){
 		timeSelectorEventHandler
 	);
 
-	element.from.keydown(preventSubmitHandler);
-	element.to.keydown(preventSubmitHandler);
+	element.from.keydown(submitChangeHandler);
+	element.to.keydown(submitChangeHandler);
 
 	// Time selector DOM elements event triggerers initialization.
 	container.on('click', function (e) {
@@ -128,12 +128,16 @@ jQuery(function ($){
 	}
 
 	/**
-	 * Prevent form submit on enter key press.
+	 * Trigger timeselector.rangechange event on 'enter' key press in 'from' or 'to' input field.
 	 *
 	 * @param {object} e jQuery event object.
 	 */
-	function preventSubmitHandler(e) {
+	function submitChangeHandler(e) {
 		if (e.which == 13) {
+			$.publish('timeselector.rangechange', {
+				from: element.from.val(),
+				to: element.to.val()
+			});
 			return cancelEvent(e);
 		}
 	}
@@ -216,6 +220,7 @@ jQuery(function ($){
 	 *   timeselector.decrement      Event to decrement current time selector interval.
 	 *   timeselector.increment      Event to increment current time selector interval.
 	 *   timeselector.zoomout        Event to zoomout current time selector interval.
+	 *   timeselector.rangeoffset    Event to apply offset to from and to values.
 	 *
 	 * @param {object} e        jQuery event object.
 	 * @param {object} data     Object with published data for event.
