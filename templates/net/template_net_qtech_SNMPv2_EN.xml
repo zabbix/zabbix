@@ -11,9 +11,9 @@
       <template>
          <template>Template Net QTech QSW SNMPv2</template>
          <name>Template Net QTech QSW SNMPv2</name>
-         <description>Template Net QTech QSW version: 0.14
-MIBs used:
-QTECH-MIB
+         <description>Template Net QTech QSW version: 0.14&#13;
+MIBs used:&#13;
+QTECH-MIB&#13;
 ENTITY-MIB</description>
          <groups>
             <group>
@@ -60,7 +60,7 @@ ENTITY-MIB</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: QTECH-MIB
+               <description>MIB: QTECH-MIB&#13;
 CPU utilization in %</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -102,7 +102,7 @@ CPU utilization in %</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: QTECH-MIB
+               <description>MIB: QTECH-MIB&#13;
 Used memory in Bytes</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -144,7 +144,7 @@ Used memory in Bytes</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: QTECH-MIB
+               <description>MIB: QTECH-MIB&#13;
 Total memory in Bytes</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -568,7 +568,7 @@ Total memory in Bytes</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>
@@ -585,7 +585,7 @@ Device serial number has changed. Ack to close</description>
          <url/>
          <status>0</status>
          <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Firmware version has changed. Ack to close</description>
          <type>0</type>
          <manual_close>1</manual_close>

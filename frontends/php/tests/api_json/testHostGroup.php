@@ -21,11 +21,10 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
+/**
+ * @backup hstgrp
+ */
 class testHostGroup extends CZabbixTest {
-
-	public function testHostGroup_backup() {
-		DBsave_tables('hstgrp');
-	}
 
 	public static function hostgroup_create() {
 		return [
@@ -34,7 +33,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'non existent parametr',
 					'flags' => '4'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
 			],
 			// Check hostgroup name.
@@ -42,14 +40,12 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					'name' => '',
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'hostgroup' => [
 					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			// Check for duplicated host groups names.
@@ -57,7 +53,6 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					'name' => 'Templates',
 				],
-				'success_expected' => false,
 				'expected_error' => 'Host group "Templates" already exists.'
 			],
 			[
@@ -69,7 +64,6 @@ class testHostGroup extends CZabbixTest {
 						'name' => 'Templates',
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Host group "Templates" already exists.'
 			],
 			[
@@ -81,7 +75,6 @@ class testHostGroup extends CZabbixTest {
 						'name' => 'Host groups with two identical name',
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Host groups with two identical name) already exists.'
 			],
 			// Check successfully create.
@@ -91,7 +84,6 @@ class testHostGroup extends CZabbixTest {
 						'name' => 'API host group create',
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -103,7 +95,6 @@ class testHostGroup extends CZabbixTest {
 						'name' => 'æų',
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -112,7 +103,6 @@ class testHostGroup extends CZabbixTest {
 						'name' => 'АПИ хост группа УТФ-8'
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -124,7 +114,6 @@ class testHostGroup extends CZabbixTest {
 						'name' => 'API/Nested'
 					],
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -133,26 +122,17 @@ class testHostGroup extends CZabbixTest {
 	/**
 	* @dataProvider hostgroup_create
 	*/
-	public function testHostGroup_Create($hostgroup, $success_expected, $expected_error) {
-		$result = $this->api_acall('hostgroup.create', $hostgroup, $debug);
+	public function testHostGroup_Create($hostgroup, $expected_error) {
+		$result = $this->call('hostgroup.create', $hostgroup, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from hstgrp where groupid='.$id);
+				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $hostgroup[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
 				$this->assertEquals($dbRow['internal'], 0);
 			}
-		}
-		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertSame($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -166,7 +146,6 @@ class testHostGroup extends CZabbixTest {
 					'flags' => '4'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
 			],
 			// Check groupid.
@@ -176,7 +155,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'without groupid'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "groupid" is missing.'
 			],
 			[
@@ -186,7 +164,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'empty groupid'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
 			],
 			[
@@ -196,7 +173,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'groupid with not existing id'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -206,7 +182,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'id not number'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
 			],
 			[
@@ -216,7 +191,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'æųæų'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
 			],
 			// Check name.
@@ -227,7 +201,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => ''
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
@@ -237,7 +210,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			[
@@ -247,7 +219,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'Templates'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Host group "Templates" already exists.'
 			],
 			[
@@ -261,7 +232,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'API update two host group with the same names'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (name)=(API update two host group with the same names) already exists.'
 			],
 			[
@@ -275,7 +245,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'update host group twice2'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (groupid)=(50005) already exists.'
 			],
 			[
@@ -285,7 +254,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'API updated discovered group'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Cannot update a discovered host group.'
 			],
 			// Check successfully update.
@@ -296,7 +264,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'API host group updated'
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -310,7 +277,6 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'Апи УТФ-8 обновлённый'
 					],
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -319,29 +285,21 @@ class testHostGroup extends CZabbixTest {
 	/**
 	* @dataProvider hostgroup_update
 	*/
-	public function testHostGroup_Update($hostgroups, $success_expected, $expected_error) {
-		$result = $this->api_acall('hostgroup.update', $hostgroups, $debug);
+	public function testHostGroup_Update($hostgroups, $expected_error) {
+		$result = $this->call('hostgroup.update', $hostgroups, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from hstgrp where groupid='.$id);
+				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $hostgroups[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
 			}
 		}
 		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertEquals($expected_error, $result['error']['data']);
 			foreach ($hostgroups as $hostgroup) {
-				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] != 'Templates'){
-					$dbResult = "SELECT * FROM hstgrp WHERE name='".$hostgroup['name']."'";
-					$this->assertEquals(0, DBcount($dbResult));
+				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] !== 'Templates'){
+					$this->assertEquals(0, DBcount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name'])));
 				}
 			}
 		}
@@ -353,28 +311,24 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					''
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'hostgroup' => [
 					'123456'
 				],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'hostgroup' => [
 					'abc'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'hostgroup' => [
 					'.'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
@@ -382,7 +336,6 @@ class testHostGroup extends CZabbixTest {
 					'50008',
 					'123456'
 				],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -390,7 +343,6 @@ class testHostGroup extends CZabbixTest {
 					'50008',
 					'abc'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
@@ -398,7 +350,6 @@ class testHostGroup extends CZabbixTest {
 					'5008',
 					''
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
@@ -406,28 +357,24 @@ class testHostGroup extends CZabbixTest {
 					'50008',
 					'50008'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (50008) already exists.'
 			],
 			[
 				'hostgroup' => [
 					'50007'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Host group "API host group delete internal" is internal and can not be deleted.'
 			],
 			[
 				'hostgroup' => [
 					'50014'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Group "API group for host prototype" cannot be deleted, because it is used by a host prototype.'
 			],
 			[
 				'hostgroup' => [
 					'50013'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Template "API Template" cannot be without host group.'
 			],
 			[
@@ -435,14 +382,12 @@ class testHostGroup extends CZabbixTest {
 					'50005',
 					'50012'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Host "API Host" cannot be without host group.'
 			],
 			[
 				'hostgroup' => [
 					'50009'
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -450,7 +395,6 @@ class testHostGroup extends CZabbixTest {
 					'50010',
 					'50011'
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -459,23 +403,13 @@ class testHostGroup extends CZabbixTest {
 	/**
 	* @dataProvider hostgroup_delete
 	*/
-	public function testHostGroup_Delete($hostgroups, $success_expected, $expected_error) {
-		$result = $this->api_acall('hostgroup.delete', $hostgroups, $debug);
+	public function testHostGroup_Delete($hostgroups, $expected_error) {
+		$result = $this->call('hostgroup.delete', $hostgroups, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $id) {
-				$dbResult = 'select * from hstgrp where groupid='.$id;
-				$this->assertEquals(0, DBcount($dbResult));
+				$this->assertEquals(0, DBcount('select * from hstgrp where groupid='.zbx_dbstr($id)));
 			}
-		}
-		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -538,15 +472,7 @@ class testHostGroup extends CZabbixTest {
 	* @dataProvider hostgroup_user_permission
 	*/
 	public function testHostGroup_UserPermissions($method, $user, $hostgroups, $expected_error) {
-		$result = $this->api_call_with_user($method, $user, $hostgroups, $debug);
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-
-		$this->assertEquals($expected_error, $result['error']['data']);
-	}
-
-	public function testHostGroup_restore() {
-		DBrestore_tables('hstgrp');
+		$this->authorize($user['user'], $user['password']);
+		$this->call($method, $hostgroups, $expected_error);
 	}
 }

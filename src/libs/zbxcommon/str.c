@@ -533,9 +533,9 @@ void	zbx_lrtrim(char *str, const char *charlist)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_remove_chars(register char *str, const char *charlist)
+void	zbx_remove_chars(char *str, const char *charlist)
 {
-	register char *p;
+	char	*p;
 
 	if (NULL == str || NULL == charlist || '\0' == *str || '\0' == *charlist)
 		return;
@@ -862,21 +862,16 @@ int	parse_key(const char **exp)
 					else if (']' == *s && 0 != array)
 					{
 						array = 0;
+						s++;
 
-						while (' ' == s[1])	/* skip trailing spaces after closing ']' */
+						while (' ' == *s)	/* skip trailing spaces after closing ']' */
 							s++;
 
-						if (0 == array && ']' == s[1])
-						{
-							s++;
+						if (']' == *s)
 							goto succeed;
-						}
 
-						if (',' != s[1] && !(0 != array && ']' == s[1]))
-						{
-							s++;
+						if (',' != *s)
 							goto fail;	/* incorrect syntax */
-						}
 					}
 					else if (']' == *s && 0 == array)
 						goto succeed;
@@ -993,7 +988,7 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
  *            containing only spaces is handled as having one empty parameter *
- *            and 1 ir returned.                                              *
+ *            and 1 is returned.                                              *
  *                                                                            *
  ******************************************************************************/
 int	num_param(const char *p)
@@ -1030,7 +1025,7 @@ int	num_param(const char *p)
 				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
 					p++;
 
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+				if (',' != p[1] && '\0' != p[1])
 					return 0;	/* incorrect syntax */
 			}
 			else if (']' == *p && 0 == array)
@@ -1617,52 +1612,6 @@ void	remove_param(char *param, int num)
 	}
 
 	*param = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_num2hex                                                      *
- *                                                                            *
- * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
- *                                                                            *
- * Parameters:                                                                *
- *      c - number 0-15                                                       *
- *                                                                            *
- * Return value:                                                              *
- *      '0'-'f'                                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-char	zbx_num2hex(u_char c)
-{
-	if (c >= 10)
-		return c + 0x57; /* a-f */
-	else
-		return c + 0x30; /* 0-9 */
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_hex2num                                                      *
- *                                                                            *
- * Purpose: convert hexit c ('0'-'9''a'-'f') to number (0-15)                 *
- *                                                                            *
- * Parameters:                                                                *
- *      c - char ('0'-'9''a'-'f')                                             *
- *                                                                            *
- * Return value:                                                              *
- *      0-15                                                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-u_char	zbx_hex2num(char c)
-{
-	if (c >= 'a')
-		return c - 0x57; /* a-f */
-	else
-		return c - 0x30; /* 0-9 */
 }
 
 /******************************************************************************

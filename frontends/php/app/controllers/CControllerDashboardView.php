@@ -185,7 +185,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$error = null;
 
 		if ($this->hasInput('new')) {
-			$dashboard = $this->getNewDashboard();
+			$dashboard = self::getNewDashboard();
 		}
 		elseif ($this->hasInput('source_dashboardid')) {
 			// Clone dashboard and show as new.
@@ -198,7 +198,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			]);
 
 			if ($dashboards) {
-				$dashboard = $this->getNewDashboard();
+				$dashboard = self::getNewDashboard();
 				$dashboard['name'] = $dashboards[0]['name'];
 				$dashboard['widgets'] = $this->unsetInaccessibleFields($dashboards[0]['widgets']);
 				$dashboard['sharing'] = [
@@ -239,7 +239,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				if ($dashboards) {
 					$this->prepareEditableFlag($dashboards);
 					$dashboard = array_shift($dashboards);
-					$dashboard['owner'] = $this->getOwnerData($dashboard['userid']);
+					$dashboard['owner'] = self::getOwnerData($dashboard['userid']);
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
@@ -395,24 +395,24 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return array
 	 */
-	private function getNewDashboard() {
+	public static function getNewDashboard() {
 		return [
 			'dashboardid' => 0,
 			'name' => _('New dashboard'),
 			'editable' => true,
 			'widgets' => [],
-			'owner' => $this->getOwnerData(CWebUser::$data['userid'])
+			'owner' => self::getOwnerData(CWebUser::$data['userid'])
 		];
 	}
 
 	/**
-	 * Get owner datails.
+	 * Get owner details.
 	 *
 	 * @param string $userid
 	 *
 	 * @return array
 	 */
-	private function getOwnerData($userid) {
+	public static function getOwnerData($userid) {
 		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
 
 		$users = API::User()->get([

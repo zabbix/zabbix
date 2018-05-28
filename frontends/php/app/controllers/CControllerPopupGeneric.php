@@ -189,7 +189,7 @@ class CControllerPopupGeneric extends CController {
 			'items' => [
 				'title' => _('Items'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'itemid,name,master_itemname',
+				'allowed_src_fields' => 'itemid,name',
 				'form' => [
 					'name' => 'itemform',
 					'id' => 'items'
@@ -252,7 +252,7 @@ class CControllerPopupGeneric extends CController {
 			'item_prototypes' => [
 				'title' => _('Item prototypes'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'itemid,name,flags,master_itemname',
+				'allowed_src_fields' => 'itemid,name,flags',
 				'form' => [
 					'name' => 'itemform',
 					'id' => 'items'
@@ -344,6 +344,7 @@ class CControllerPopupGeneric extends CController {
 			'multiselect' =>				'in 1',
 			'submit' =>						'string',
 			'excludeids' =>					'array',
+			'disableids' =>					'array',
 			'only_hostid' =>				'db hosts.hostid',
 			'monitored_hosts' =>			'in 1',
 			'templated_hosts' =>			'in 1',
@@ -355,15 +356,14 @@ class CControllerPopupGeneric extends CController {
 			'with_simple_graph_items' =>	'in 1',
 			'with_triggers' =>				'in 1',
 			'with_monitored_triggers' =>	'in 1',
+			'with_webitems' =>	            'in 1',
 			'itemtype' =>					'in '.implode(',', $this->allowed_item_types),
 			'value_types' =>				'array',
 			'numeric' =>					'in 1',
 			'reference' =>					'string',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
-			'submit_parent' =>				'in 1',
-			'templateid' =>					'db hosts.hostid',
-			'with_webitems' =>				'in 1'
+			'submit_parent' =>				'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -436,7 +436,6 @@ class CControllerPopupGeneric extends CController {
 	}
 
 	protected function doAction() {
-		$excludeids = zbx_toHash($this->getInput('excludeids', []));
 		$records = [];
 
 		$value_types = null;
@@ -500,13 +499,21 @@ class CControllerPopupGeneric extends CController {
 			$options['hosts']['editable'] = true;
 		}
 
-		$host_status = null;
 		$templated = null;
+
+		if ($this->source_table == 'hosts') {
+			$options['groups']['real_hosts'] = true;
+			$templated = 0;
+		}
+		elseif ($this->source_table == 'templates') {
+			$options['hosts']['templated_hosts'] = true;
+			$options['groups']['templated_hosts'] = true;
+			$templated = 1;
+		}
 
 		if ($this->hasInput('monitored_hosts')) {
 			$options['groups']['monitored_hosts'] = true;
 			$options['hosts']['monitored_hosts'] = true;
-			$host_status = 'monitored_hosts';
 		}
 		elseif ($this->hasInput('real_hosts')) {
 			$options['groups']['real_hosts'] = true;
@@ -516,7 +523,6 @@ class CControllerPopupGeneric extends CController {
 			$options['hosts']['templated_hosts'] = true;
 			$options['groups']['templated_hosts'] = true;
 			$templated = 1;
-			$host_status = 'templated_hosts';
 		}
 		else {
 			$options['groups']['with_hosts_and_templates'] = true;
@@ -570,11 +576,13 @@ class CControllerPopupGeneric extends CController {
 			'dstfrm' => $this->getInput('dstfrm', ''),
 			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
-			'excludeids' => $excludeids,
 			'multiselect' => $this->getInput('multiselect', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
+
+		$excludeids = $this->getInput('excludeids', []);
+		$disableids = $this->getInput('disableids', []);
 
 		$page_options['parentid'] = $page_options['dstfld1'] !== '' ? zbx_jsvalue($page_options['dstfld1']) : 'null';
 
@@ -604,7 +612,7 @@ class CControllerPopupGeneric extends CController {
 			}
 		}
 
-		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'templateid', 'value_types'];
+		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'value_types'];
 		foreach ($option_fields_value as $field) {
 			if ($this->hasInput($field)) {
 				$page_options[$field] = $this->getInput($field);
@@ -654,12 +662,6 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::Template()->get($options);
 
-				// Do not show itself.
-				if (array_key_exists('templateid', $page_options)
-						&& array_key_exists($page_options['templateid'], $records)) {
-					unset($records[$page_options['templateid']]);
-				}
-
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['templateid' => 'id']);
 				break;
@@ -702,6 +704,10 @@ class CControllerPopupGeneric extends CController {
 					'output' => ['groupid', 'name'],
 					'preservekeys' => true
 				];
+
+				if (array_key_exists('normal_only', $page_options)) {
+					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+				}
 
 				if (array_key_exists('writeonly', $page_options)) {
 					$options['editable'] = true;
@@ -816,14 +822,6 @@ class CControllerPopupGeneric extends CController {
 					$records = API::Item()->get($options);
 				}
 
-				if ($excludeids) {
-					foreach ($records as $item) {
-						if (array_key_exists($item['itemid'], $excludeids)) {
-							unset($records[$item['itemid']]);
-						}
-					}
-				}
-
 				$records = CMacrosResolverHelper::resolveItemNames($records);
 				CArrayHelper::sort($records, ['name_expanded']);
 				break;
@@ -891,6 +889,7 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::Map()->get($options);
+
 				CArrayHelper::sort($records, ['name']);
 				break;
 
@@ -980,6 +979,18 @@ class CControllerPopupGeneric extends CController {
 				break;
 		}
 
+		foreach ($excludeids as $excludeid) {
+			if (array_key_exists($excludeid, $records)) {
+				unset($records[$excludeid]);
+			}
+		}
+
+		foreach ($disableids as $disableid) {
+			if (array_key_exists($disableid, $records)) {
+				$records[$disableid]['_disabled'] = true;
+			}
+		}
+
 		$data = [
 			'title' => $this->popup_properties[$this->source_table]['title'],
 			'popup_type' => $this->source_table,
@@ -991,7 +1002,10 @@ class CControllerPopupGeneric extends CController {
 			'multiselect' => $page_options['multiselect'],
 			'table_columns' => $this->popup_properties[$this->source_table]['table_columns'],
 			'table_records' => $records,
-			'allowed_item_types' => $this->allowed_item_types
+			'allowed_item_types' => $this->allowed_item_types,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
 		if ($this->source_table === 'triggers' || $this->source_table === 'trigger_prototypes') {

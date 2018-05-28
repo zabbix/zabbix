@@ -337,6 +337,7 @@ static int	is_recoverable_mysql_error(void)
 		case ER_TABLEACCESS_DENIED_ERROR:	/* user without some privilege */
 		case ER_UNKNOWN_ERROR:
 		case ER_LOCK_DEADLOCK:
+		case ER_LOCK_WAIT_TIMEOUT:
 			return SUCCEED;
 	}
 

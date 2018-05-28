@@ -11,10 +11,10 @@
       <template>
          <template>Template Net Alcatel Timetra TiMOS SNMPv2</template>
          <name>Template Net Alcatel Timetra TiMOS SNMPv2</name>
-         <description>Template Net Alcatel Timetra TiMOS version: 0.14
-MIBs used:
-TIMETRA-SYSTEM-MIB
-SNMPv2-MIB
+         <description>Template Net Alcatel Timetra TiMOS version: 0.14&#13;
+MIBs used:&#13;
+TIMETRA-SYSTEM-MIB&#13;
+SNMPv2-MIB&#13;
 TIMETRA-CHASSIS-MIB</description>
          <groups>
             <group>
@@ -67,7 +67,7 @@ TIMETRA-CHASSIS-MIB</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: TIMETRA-SYSTEM-MIB
+               <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 The value of sgiCpuUsage indicates the current CPU utilization for the system.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -109,7 +109,7 @@ The value of sgiCpuUsage indicates the current CPU utilization for the system.</
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: TIMETRA-SYSTEM-MIB
+               <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in kilobytes, currently in use on the system.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -156,7 +156,7 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: TIMETRA-SYSTEM-MIB
+               <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobytes, in the overall system that is not allocated to memory pools, but is available in case a memory pool needs to grow.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -380,7 +380,7 @@ The value of sgiKbMemoryAvailable indicates the amount of freememory, in kilobyt
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: TIMETRA-SYSTEM-MIB
+                     <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 The current temperature reading in degrees celsius from this hardware component's temperature sensor.  If this component does not contain a temperature sensor, then the value -1 is returned.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -407,7 +407,7 @@ The current temperature reading in degrees celsius from this hardware component'
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -430,7 +430,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <url/>
                      <status>0</status>
                      <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -526,7 +526,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: TIMETRA-SYSTEM-MIB
+                     <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 Current status of the Fan tray.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -555,7 +555,7 @@ Current status of the Fan tray.</description>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check the fan unit</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
@@ -660,7 +660,7 @@ Please check the fan unit</description>
                      <url/>
                      <status>0</status>
                      <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Device serial number has changed. Ack to close</description>
                      <type>0</type>
                      <manual_close>1</manual_close>

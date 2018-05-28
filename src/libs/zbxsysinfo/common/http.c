@@ -21,7 +21,6 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 
-#include "log.h"
 #include "comms.h"
 #include "cfg.h"
 
@@ -29,7 +28,7 @@
 
 #define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
 static const char URI_PROHIBIT_CHARS[] = {0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xA,0xB,0xC,0xD,0xE,0xF,0x10,0x11,0x12,\
-	0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F};
+	0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F,0};
 
 static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer,
 		size_t max_buffer_len, char **error)
@@ -57,11 +56,11 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		zbx_snprintf(request, sizeof(request),
-				"GET /%s HTTP/1.1\r\n"
+				"GET %s%s HTTP/1.1\r\n"
 				"Host: %s\r\n"
 				"Connection: close\r\n"
 				"\r\n",
-				path, host);
+				'/' != *path ? "/" : "", path, host);
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
@@ -77,7 +76,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 	if (FAIL == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "HTTP get error: %s", zbx_socket_strerror());
+		*error = zbx_dsprintf(NULL, "HTTP get error: %s", zbx_socket_strerror());
 		return SYSINFO_RET_FAIL;
 	}
 
