@@ -47,13 +47,14 @@ class CControllerTimeSelectorUpdate extends CController {
 			'idx2' => 'required|id',
 			'from' => 'required|string',
 			'to' => 'required|string',
-			'offset' => 'int32|ge 0',
-			'period' => 'int32|ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD
+			'from_offset' => 'int32|ge 0',
+			'to_offset' => 'int32|ge 0'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateInputDateRange();
 
-		if ($this->getInput('method') === 'rangeoffset' && (!$this->hasInput('offset') || !$this->hasInput('period'))) {
+		if ($this->getInput('method') === 'rangeoffset' && (!$this->hasInput('from_offset')
+				|| !$this->hasInput('to_offset'))) {
 			$ret = false;
 		}
 
@@ -140,10 +141,18 @@ class CControllerTimeSelectorUpdate extends CController {
 				break;
 
 			case 'rangeoffset':
-				$ts['from'] += $this->getInput('offset');
-				$ts['to'] = $ts['from'] + $this->getInput('period');
-				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
-				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
+				$from_offset = $this->getInput('from_offset');
+				$to_offset = $this->getInput('to_offset');
+
+				if ($from_offset > 0) {
+					$ts['from'] += $from_offset;
+					$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
+				}
+
+				if ($to_offset > 0) {
+					$ts['to'] -= $to_offset;
+					$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
+				}
 				break;
 		}
 
@@ -192,6 +201,11 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		if ($this->data['error']) {
 			return false;
+		}
+
+		if ($this->getInput('method') === 'rangeoffset') {
+			$ts['from'] += $this->getInput('from_offset');
+			$ts['to'] -= $this->getInput('to_offset');
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;

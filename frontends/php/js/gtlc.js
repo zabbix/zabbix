@@ -229,8 +229,8 @@ jQuery(function ($){
 		};
 
 		if (e.namespace === 'rangeoffset') {
-			args.offset = data.offset;
-			args.period = data.period;
+			args.from_offset = data.from_offset;
+			args.to_offset = data.to_offset;
 		}
 
 		endpoint.setArgument('method', e.namespace);
@@ -335,14 +335,17 @@ jQuery(function ($){
 
 		/**
 		 * @prop {object}  data
-		 * @prop {integer} data.height      Height of selection box.
-		 * @prop {integer} data.left        Left margin of selection box.
-		 * @prop {integer} data.right       Right margin of selection box.
-		 * @prop {integer} data.top         Top margin of selection box.
-		 * @prop {integer} data.period      Period length in seconds of selection box.
-		 * @prop {integer} data.timestamp   Timestamp for start time of selection box.
+		 * @prop {integer} data.height            Height of selection box.
+		 * @prop {integer} data.left              Left margin of selection box.
+		 * @prop {integer} data.right             Right margin of selection box.
+		 * @prop {integer} data.top               Top margin of selection box.
+		 * @prop {integer} data.from_ts           Timestamp for start time of selection box.
+		 * @prop {integer} data.to_ts             Timestamp for end time of selection box.
+		 * @prop {integer} data.prevent_refresh   Mark image as non updateable during selection.
 		 */
 		data = data.zbx_sbox;
+		data.prevent_refresh = true;
+		target.data('zbx_sbox', data);
 
 		var offset = target.offset(),
 			left = data.left,
@@ -380,7 +383,11 @@ jQuery(function ($){
 
 		$(document)
 			.on('mouseup', selectionHandlerDragEnd)
-			.on('mousemove', selectionHandlerDrag);
+			.on('mousemove', selectionHandlerDrag)
+			.on('mouseup', function () {
+				data.prevent_refresh = false;
+				target.data('zbx_sbox', data.zbx_sbox);
+			});
 
 		return false;
 	}
@@ -391,8 +398,8 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandlerDragEnd(e) {
-		var offset = (selection.dom.position().left - selection.min) * selection.seconds_per_px,
-			period = selection.dom.width() * selection.seconds_per_px;
+		var from_offset = (selection.dom.position().left - selection.min) * selection.seconds_per_px,
+			to_offset = (selection.max - selection.dom.width() - selection.dom.position().left) * selection.seconds_per_px;
 
 		selection.dom.remove();
 		selection = null;
@@ -403,10 +410,10 @@ jQuery(function ($){
 		noclick_area.remove();
 		noclick_area = null;
 
-		if (period >= 60) {
+		if (from_offset > 0 || to_offset > 0) {
 			$.publish('timeselector.rangeoffset', {
-				offset: Math.ceil(offset),
-				period: Math.ceil(period)
+				from_offset: Math.ceil(from_offset),
+				to_offset: Math.ceil(to_offset)
 			});
 		}
 	}
@@ -555,9 +562,11 @@ var timeControl = {
 
 	refreshImage: function(id) {
 		var obj = this.objectList[id],
-			url = new Curl(obj.src, false);
+			url = new Curl(obj.src, false),
+			img = jQuery('#' + id),
+			zbx_sbox = img.data('zbx_sbox');
 
-		if (!obj.timeline.refreshable) {
+		if (!obj.timeline.refreshable || (zbx_sbox && zbx_sbox.prevent_refresh)) {
 			return;
 		}
 
@@ -567,8 +576,7 @@ var timeControl = {
 
 		var debug;
 
-		var img = jQuery('#' + id),
-			clone = jQuery('<img/>', {
+		var clone = jQuery('<img/>', {
 					id: img.attr('id'),
 					'class': img.attr('class')
 				})

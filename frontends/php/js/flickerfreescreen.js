@@ -339,7 +339,14 @@
 				$('img', '#flickerfreescreen_' + id).each(function() {
 					var domImg = $(this),
 						url = new Curl(domImg.attr('src'), false),
-						on_dashboard = timeControl.objectList[id].onDashboard;
+						on_dashboard = timeControl.objectList[id].onDashboard,
+						zbx_sbox = domImg.data('zbx_sbox');
+
+					if (zbx_sbox && zbx_sbox.prevent_refresh) {
+						screen.isRefreshing = false;
+						window.flickerfreeScreenShadow.end(id);
+						return;
+					}
 
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
 					url.setArgument('from', screen.timeline.from);
