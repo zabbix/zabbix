@@ -70,7 +70,8 @@ jQuery(function ($){
 	endpoint.setArgument('action', 'timeselector.update');
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 
-	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout',
+	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout'+
+		' timeselector.rangeoffset',
 		timeSelectorEventHandler
 	);
 
@@ -226,6 +227,12 @@ jQuery(function ($){
 			'from': (e.namespace === 'rangechange') ? data.from : request_data.from,
 			'to': (e.namespace === 'rangechange') ? data.to : request_data.to
 		};
+
+		if (e.namespace === 'rangeoffset') {
+			args.offset = data.offset;
+			args.period = data.period;
+		}
+
 		endpoint.setArgument('method', e.namespace);
 
 		if (xhr && xhr.abort) {
@@ -368,8 +375,7 @@ jQuery(function ($){
 			min: left,
 			max: right,
 			base_x: xpos,
-			seconds_per_px: (data.to_ts - data.from_ts)/(right - left),
-			from_ts: data.from_ts
+			seconds_per_px: (data.to_ts - data.from_ts)/(right - left)
 		}
 
 		$(document)
@@ -385,8 +391,8 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandlerDragEnd(e) {
-		var from = selection.from_ts + (selection.dom.position().left - selection.min) * selection.seconds_per_px,
-			to = from + selection.dom.width() * selection.seconds_per_px;
+		var offset = (selection.dom.position().left - selection.min) * selection.seconds_per_px,
+			period = selection.dom.width() * selection.seconds_per_px;
 
 		selection.dom.remove();
 		selection = null;
@@ -397,10 +403,12 @@ jQuery(function ($){
 		noclick_area.remove();
 		noclick_area = null;
 
-		$.publish('timeselector.rangechange', {
-			from: Math.round(from),
-			to: Math.round(to)
-		});
+		if (period >= 60) {
+			$.publish('timeselector.rangeoffset', {
+				offset: Math.ceil(offset),
+				period: Math.ceil(period)
+			});
+		}
 	}
 
 	/**

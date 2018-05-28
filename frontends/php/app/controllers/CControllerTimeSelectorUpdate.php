@@ -42,14 +42,20 @@ class CControllerTimeSelectorUpdate extends CController {
 		];
 
 		$fields = [
-			'method' => 'required|in increment,zoomout,decrement,rangechange',
+			'method' => 'required|in increment,zoomout,decrement,rangechange,rangeoffset',
 			'idx' => 'required|in '.implode(',', $profiles),
 			'idx2' => 'required|id',
 			'from' => 'required|string',
-			'to' => 'required|string'
+			'to' => 'required|string',
+			'offset' => 'int32|ge 0',
+			'period' => 'int32|ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateInputDateRange();
+
+		if ($this->getInput('method') === 'rangeoffset' && (!$this->hasInput('offset') || !$this->hasInput('period'))) {
+			$ret = false;
+		}
 
 		if (!$ret) {
 			$this->data += [
@@ -77,11 +83,7 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		foreach (['from', 'to'] as $field) {
 			$value[$field] = $this->getInput($field);
-
-			if ($this->range_time_parser->parse($value[$field]) !== CParser::PARSE_SUCCESS) {
-				$this->data['error'][$field] = _('Invalid date.');
-			}
-
+			$this->range_time_parser->parse($value[$field]);
 			$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
 		}
 
@@ -133,6 +135,13 @@ class CControllerTimeSelectorUpdate extends CController {
 					$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD;
 				}
 
+				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
+				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
+				break;
+
+			case 'rangeoffset':
+				$ts['from'] += $this->getInput('offset');
+				$ts['to'] = $ts['from'] + $this->getInput('period');
 				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
 				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
 				break;
