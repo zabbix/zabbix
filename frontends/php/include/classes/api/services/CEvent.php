@@ -376,122 +376,7 @@ class CEvent extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$where = '';
-			$prev_tag = '';
-			$value = '';
-			$cnt = count($options['tags']);
-			$tag_num = 0;
-			$tag_count = [];
-
-			// Count identical tag names.
-			foreach ($options['tags'] as $tag) {
-				if (array_key_exists($tag['tag'], $tag_count)) {
-					$tag_count[$tag['tag']]++;
-				}
-				else {
-					$tag_count[$tag['tag']] = 1;
-				}
-			}
-
-			CArrayHelper::sort($options['tags'], ['tag']);
-
-			foreach ($options['tags'] as $tag) {
-				if (!array_key_exists('value', $tag)) {
-					$tag['value'] = '';
-				}
-
-				if (!array_key_exists('operator', $tag)) {
-					$tag['operator'] = TAG_OPERATOR_LIKE;
-				}
-
-				switch ($tag['operator']) {
-					case TAG_OPERATOR_EQUAL:
-						if ($tag_count[$tag['tag']] > 1) {
-							if ($tag_num == 0) {
-								// First value of many. Open Brace for OR statement.
-								$value = ' AND (et.value='.zbx_dbstr($tag['value']);
-							}
-							elseif ($prev_tag === $tag['tag']) {
-								// Not the first value. Add next OR statement.
-								$value .= ' OR et.value='.zbx_dbstr($tag['value']);
-							}
-
-							$prev_tag = $tag['tag'];
-
-							if ($tag_num + 1 == $tag_count[$tag['tag']]) {
-								// That was last value. Close brace.
-								$value .= ')';
-								$tag_num = 0;
-							}
-							else {
-								// Skip to next tag and value if not last.
-								$tag_num++;
-								continue 2;
-							}
-						}
-						else {
-							// Only one value for this tag name.
-							$value = ' AND et.value='.zbx_dbstr($tag['value']);
-							$prev_tag = $tag['tag'];
-						}
-						break;
-
-					case TAG_OPERATOR_LIKE:
-					default:
-						$tag['value'] = str_replace('!', '!!', $tag['value']);
-						$tag['value'] = str_replace('%', '!%', $tag['value']);
-						$tag['value'] = str_replace('_', '!_', $tag['value']);
-						$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
-
-						if ($tag_count[$tag['tag']] > 1) {
-							if ($tag_num == 0) {
-								// First value of many. Open Brace for OR statement.
-								$value = ' AND (UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
-							}
-							elseif ($prev_tag === $tag['tag']) {
-								// Not the first value. Add next OR statement.
-								$value .= ' OR UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
-							}
-
-							$prev_tag = $tag['tag'];
-
-							if ($tag_num + 1 == $tag_count[$tag['tag']]) {
-								// That was last value. Close brace.
-								$value .= ')';
-								$tag_num = 0;
-							}
-							else {
-								// Skip to next tag and value if not last.
-								$tag_num++;
-								continue 2;
-							}
-						}
-						else {
-							// Only one value for this tag name.
-							$value = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
-							$prev_tag = $tag['tag'];
-						}
-				}
-
-				if ($where !== '') {
-					// Join the EXISTS blocks depeding on evaltype.
-					$where .= ($options['evaltype'] == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
-				}
-
-				$where .= 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM event_tag et'.
-					' WHERE e.eventid=et.eventid'.
-						' AND et.tag='.zbx_dbstr($tag['tag']).$value.
-				')';
-			}
-
-			// Add closing parenthesis if there are more than one OR statements.
-			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
-				$where = '('.$where.')';
-			}
-
-			$sqlParts['where'][] = $where;
+			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags']);
 		}
 
 		// time_from
@@ -554,6 +439,68 @@ class CEvent extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Returns SQL condition for tag filters.
+	 *
+	 * @param array $tags
+	 * @param int   $evaltype
+	 * @param bool  $is_events
+	 *
+	 * @return array
+	 */
+	public static function getTagsWhereCondition(array $tags, $evaltype, $is_events = true) {
+		$alias = $is_events ? 'et' : 'pt';
+		$parent_alias = $is_events ? 'e' : 'p';
+		$table = $is_events ? 'event_tag' : 'problem_tag';
+		$values_by_tag = [];
+
+		foreach ($tags as $tag) {
+			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
+			$value = array_key_exists('value', $tag) ? $tag['value'] : '';
+
+			if (!array_key_exists($tag['tag'], $values_by_tag) || is_array($values_by_tag[$tag['tag']])) {
+				if ($operator == TAG_OPERATOR_EQUAL) {
+					$values_by_tag[$tag['tag']][] = $alias.'.value='.zbx_dbstr($value);
+				}
+				elseif ($value !== '') {
+					$value = str_replace('!', '!!', $value);
+					$value = str_replace('%', '!%', $value);
+					$value = str_replace('_', '!_', $value);
+					$value = '%'.mb_strtoupper($value).'%';
+
+					$values_by_tag[$tag['tag']][] = 'UPPER('.$alias.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+				}
+				// ($value === '') - all other conditions can be omited
+				else {
+					$values_by_tag[$tag['tag']] = false;
+				}
+			}
+		}
+
+		$sql_where = [];
+
+		foreach ($values_by_tag as $tag => $values) {
+			if (!is_array($values) || count($values) == 0) {
+				$values = '';
+			}
+			elseif (count($values) == 1) {
+				$values = ' AND '.$values[0];
+			}
+			else {
+				$values = $values ? ' AND ('.implode(' OR ', $values).')' : '';
+			}
+
+			$sql_where[] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM '.$table.' '.$alias.
+				' WHERE '.$parent_alias.'.eventid='.$alias.'.eventid'.
+					' AND '.$alias.'.tag='.zbx_dbstr($tag).$values.
+			')';
+		}
+
+		return implode(($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ', $sql_where);
 	}
 
 	/**
