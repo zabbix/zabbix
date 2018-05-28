@@ -486,12 +486,6 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 					" and t.status=%d",
 				proxy_hostid, DRULE_STATUS_MONITORED);
 	}
-	else if (0 == strcmp(table->table, "autoreg_host"))
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" where t.proxy_hostid=" ZBX_FS_UI64,
-				proxy_hostid);
-	}
 	else if (0 == strcmp(table->table, "dchecks"))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -682,7 +676,6 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 	{
 		"globalmacro",
 		"hosts",
-		"autoreg_host",
 		"interface",
 		"hosts_templates",
 		"hostmacro",
