@@ -162,10 +162,9 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		}
 	}
 
-	if (NULL == max_depth_str || '\0' == *max_depth_str
-			|| 0 == strcmp(max_depth_str, "-1"))	/* <max_depth> default value */
+	if (NULL == max_depth_str || '\0' == *max_depth_str || 0 == strcmp(max_depth_str, "-1"))
 	{
-		*max_depth = TRAVERSAL_DEPTH_UNLIMITED;
+		*max_depth = TRAVERSAL_DEPTH_UNLIMITED; /* <max_depth> default value */
 	}
 	else if (SUCCEED != is_uint31(max_depth_str, max_depth))
 	{
