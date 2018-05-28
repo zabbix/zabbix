@@ -59,7 +59,6 @@ static int			shm_id = -1, locks_disabled;
 
 int	zbx_locks_create(char **error)
 {
-
 #ifdef ZBX_PTHREAD
 	int			i;
 	pthread_mutexattr_t	mta;
@@ -163,17 +162,10 @@ int	zbx_locks_create(char **error)
 		}
 	}
 #endif
-
 	return SUCCEED;
 }
 
 #ifdef ZBX_PTHREAD
-void	zbx_locks_disable(void)
-{
-	/* attempting to destroy a locked pthread mutex results in undefined behavior */
-	locks_disabled = 1;
-}
-
 int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error)
 {
 	ZBX_UNUSED(error);
@@ -239,6 +231,12 @@ void	zbx_rwlock_destroy(ZBX_RWLOCK *mutex)
 		zbx_error("cannot remove semaphore %d: %s", *mutex, zbx_strerror(errno));
 
 	*mutex = ZBX_RWLOCK_NULL;
+}
+
+void	zbx_locks_disable(void)
+{
+	/* attempting to destroy a locked pthread mutex results in undefined behavior */
+	locks_disabled = 1;
 }
 #endif
 #endif

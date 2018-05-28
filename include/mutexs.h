@@ -79,9 +79,6 @@ zbx_rwlock_lock_type_t;
 int	zbx_locks_create(char **error);
 #endif	/* _WINDOWS */
 
-#define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
-#define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
-
 #ifdef ZBX_PTHREAD
 #define zbx_rwlock_wrlock(mutex)		__zbx_rwlock_wrlock(__FILE__, __LINE__, mutex)
 #define zbx_rwlock_rdlock(mutex)		__zbx_rwlock_rdlock(__FILE__, __LINE__, mutex)
@@ -100,6 +97,9 @@ void	zbx_locks_disable(void);
 #define zbx_rwlock_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
 #define zbx_rwlock_destroy(mutex)		zbx_mutex_destroy(mutex)
 #endif
+
+#define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
+#define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
 
 int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error);
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex);
