@@ -333,7 +333,7 @@ class CControllerPopupGeneric extends CController {
 			'dstfld1' =>					'string|not_empty',
 			'srctbl' =>						'string',
 			'srcfld1' =>					'string|required|in '.$this->popup_properties[$this->source_table]['allowed_src_fields'],
-			'groupid' =>					'db groups.groupid',
+			'groupid' =>					'db hstgrp.groupid',
 			'group' =>						'string',
 			'hostid' =>						'db hosts.hostid',
 			'host' =>						'string',

@@ -42,7 +42,14 @@ zbx_dbpatch_t;
 
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 
+#ifdef HAVE_MYSQL
+#define ZBX_FS_SQL_NAME "`%s`"
+#else
+#define ZBX_FS_SQL_NAME "%s"
+#endif
+
 int	DBcreate_table(const ZBX_TABLE *table);
+int	DBrename_table(const char *table_name, const char *new_name);
 int	DBdrop_table(const char *table_name);
 int	DBadd_field(const char *table_name, const ZBX_FIELD *field);
 int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIELD *field);
