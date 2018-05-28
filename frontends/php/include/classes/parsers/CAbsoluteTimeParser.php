@@ -43,6 +43,7 @@ class CAbsoluteTimeParser extends CParser {
 	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
+		$this->tokens = [];
 		$this->length = 0;
 		$this->match = '';
 		$this->date = '';
@@ -69,14 +70,12 @@ class CAbsoluteTimeParser extends CParser {
 	 */
 	private function parseAbsoluteTime($source, &$pos) {
 		$pattern_Y = '(?P<Y>[12][0-9]{3})';
-		$pattern_M = '(?P<M>[0-9]{1,2})';
-		$pattern_D = '(?P<D>[0-9]{1,2})';
-		$pattern_h = '(?P<h>[0-9]{1,2})';
 		$pattern_m = '(?P<m>[0-9]{1,2})';
+		$pattern_d = '(?P<d>[0-9]{1,2})';
+		$pattern_h = '(?P<h>[0-9]{1,2})';
+		$pattern_i = '(?P<i>[0-9]{1,2})';
 		$pattern_s = '(?P<s>[0-9]{1,2})';
-//		$pattern_date = $pattern_Y.'(-'.$pattern_M.'(-'.$pattern_D.')?)?';
-//		$pattern_time = '( +'.$pattern_h.'(:'.$pattern_m.'(:'.$pattern_s.')?)?)?';
-		$pattern = $pattern_Y.'(-'.$pattern_M.'(-'.$pattern_D.'( +'.$pattern_h.'(:'.$pattern_m.'(:'.$pattern_s.')?)?)?)?)?';
+		$pattern = $pattern_Y.'(-'.$pattern_m.'(-'.$pattern_d.'( +'.$pattern_h.'(:'.$pattern_i.'(:'.$pattern_s.')?)?)?)?)?';
 
 		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
 			return false;
@@ -84,36 +83,30 @@ class CAbsoluteTimeParser extends CParser {
 
 		$this->tokens['Y'] = $matches['Y'];
 
-		foreach (['M', 'D', 'h', 'm', 's'] as $key) {
-			if (array_key_exists($key, $matches) && $matches[$key] !== '') {
+		$matches = array_filter($matches);
+
+		foreach (['m', 'd', 'h', 'i', 's'] as $key) {
+			if (array_key_exists($key, $matches)) {
 				$this->tokens[$key] = $matches[$key];
 			}
 		}
 
-		$matches += ['M' => 1, 'D' => 1, 'h' => 0, 'm' => 0, 's' => 0];
+		$matches += ['m' => 1, 'd' => 1, 'h' => 0, 'i' => 0, 's' => 0];
 
-		if ($matches['M'] === '') {
-			$matches['M'] = 1;
-		}
-
-		if ($matches['D'] === '') {
-			$matches['D'] = 1;
-		}
-
-		if (1 > $matches['M'] || $matches['M'] > 12 || 1 > $matches['D'] || $matches['D'] > 31) {
-			return false;
-		}
-
-		if ($matches['h'] > 23 || $matches['m'] > 59 || $matches['s'] > 59) {
-			return false;
-		}
-
-		$date = sprintf('%04d-%02d-%02d %02d:%02d:%02d', $matches['Y'], $matches['M'], $matches['D'], $matches['h'],
-			$matches['m'], $matches['s']
+		$date = sprintf('%04d-%02d-%02d %02d:%02d:%02d', $matches['Y'], $matches['m'], $matches['d'], $matches['h'],
+			$matches['i'], $matches['s']
 		);
 
-		if (date_create($date) === false) {
+		$datetime = date_create($date);
+
+		if ($datetime === false) {
 			return false;
+		}
+
+		foreach ($this->tokens as $key => $value) {
+			if ($datetime->format($key) - $value != 0) {
+				return false;
+			}
 		}
 
 		$this->date = $date;
@@ -141,11 +134,11 @@ class CAbsoluteTimeParser extends CParser {
 			return $date;
 		}
 
-		if (!array_key_exists('M', $this->tokens)) {
+		if (!array_key_exists('m', $this->tokens)) {
 			return $date->modify('last day of December this year 23:59:59');
 		}
 
-		if (!array_key_exists('D', $this->tokens)) {
+		if (!array_key_exists('d', $this->tokens)) {
 			return $date->modify('last day of this month 23:59:59');
 		}
 
@@ -153,7 +146,7 @@ class CAbsoluteTimeParser extends CParser {
 			return $date->modify('23:59:59');
 		}
 
-		if (!array_key_exists('m', $this->tokens)) {
+		if (!array_key_exists('i', $this->tokens)) {
 			return new DateTime($date->format('Y-m-d H:59:59'));
 		}
 
