@@ -188,11 +188,6 @@ class testPageReportsTriggerTop extends CWebTest {
 		// Click button 'Reset'
 		$this->zbxTestClickButtonText('Reset');
 
-		// Fill in the date in filter
-		if (array_key_exists('date', $data)) {
-			$this->fillInDate($data['date']);
-		}
-
 		if (array_key_exists('host_group', $data)) {
 			$this->zbxTestClickButtonMultiselect('groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -211,6 +206,11 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['host']);
 			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_dialogue']"));
 			$this->zbxTestMultiselectAssertSelected('hostids_', $data['host']);
+		}
+
+		// Fill in the date in filter
+		if (array_key_exists('date', $data)) {
+			$this->fillInDate($data['date']);
 		}
 
 		if (array_key_exists('severities', $data)) {
@@ -233,7 +233,6 @@ class testPageReportsTriggerTop extends CWebTest {
 	/*
 	 * Update date in 'From' and/or 'Till' filter field
 	 */
-
 	public function fillInDate($data) {
 		foreach ($data as $i => $full_date) {
 			$split_date = explode(' ', $full_date);
@@ -247,6 +246,12 @@ class testPageReportsTriggerTop extends CWebTest {
 			foreach ($fields as $key => $value) {
 				$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('filter_'.$i.'_'.$key));
 				$this->zbxTestInputTypeOverwrite('filter_'.$i.'_'.$key, $value);
+
+				// Fire onchange event.
+				$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
+						'event.initEvent("change", false, true);'.
+						'document.getElementById("filter_'.$i.'_'.$key.'").dispatchEvent(event);'
+				);
 			}
 		}
 	}
