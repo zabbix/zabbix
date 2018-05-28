@@ -627,7 +627,7 @@ article {
 
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
-	max-width: 90%;
+	max-width: calc(100% - 450px);
 	margin-bottom: -27px;
 	position: relative;
 	z-index: 3;
