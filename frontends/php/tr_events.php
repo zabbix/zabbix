@@ -105,19 +105,7 @@ if ($event['r_eventid'] != 0) {
 	}
 }
 
-$table_options = [
-	'key' => 'actions_list',
-	'actions' => true,
-	'operations' => ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
-		ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY,
-	'style' => 'CTableInfo',
-	'columns' => ['step', 'time', 'user_recipient', 'action', 'message_command', 'status', 'info'],
-	'show_problem' => true,
-	'show_full_message' => true
-];
-
-$actions_table = makeEventsActionsTables([$event], [$table_options]);
-$actions_table = $actions_table[$event['eventid']]['actions_list']['table'];
+$actions_data = getEventDetailsActions($event);
 
 /*
  * Display
@@ -134,7 +122,7 @@ $eventTab = (new CTable())
 			))->setHeader(_('Event details'))
 		]),
 		new CDiv([
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, $actions_table))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeEventDetailsActionsTable($actions_data)))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
 				->setHeader(_('Actions'), [], false, 'tr_events.php'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,

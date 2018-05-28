@@ -913,12 +913,18 @@ function makeInformationIcon($message) {
 function makeActionIcon(array $icon_data) {
 	$icon = (new CSpan())->addClass($icon_data['icon']);
 
-	if (array_key_exists('num', $icon_data) && $icon_data['num'] > 0) {
+	if (array_key_exists('num', $icon_data)) {
+		if ($icon_data['num'] > 99) {
+			$icon_data['num'] = '99+';
+		}
 		$icon->setAttribute('data-count', $icon_data['num']);
 	}
 
 	if (array_key_exists('hint', $icon_data)) {
 		$icon->setHint($icon_data['hint']);
+	}
+	elseif (array_key_exists('title', $icon_data)) {
+		$icon->setTitle($icon_data['title']);
 	}
 
 	return $icon;
