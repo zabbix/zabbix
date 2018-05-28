@@ -240,12 +240,6 @@ class CScreenProblem extends CScreenBase {
 			$filter_hostids = null;
 		}
 
-		if (array_key_exists('name', $filter) && $filter['name'] !== '') {
-			$filter_groupids = null;
-			$filter_hostids = null;
-			$filter_applicationids = null;
-		}
-
 		$data = [
 			'problems' => [],
 			'triggers' => []

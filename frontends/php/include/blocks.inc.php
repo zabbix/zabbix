@@ -87,9 +87,6 @@ function getSystemStatusData(array $filter, array $config) {
 			'search' => ['description' => $filter['problem']],
 			'preservekeys' => true
 		]));
-
-		$filter_groupids = null;
-		$filter_hostids = null;
 	}
 
 	$data = [
