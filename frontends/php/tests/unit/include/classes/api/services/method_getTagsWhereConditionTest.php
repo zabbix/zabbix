@@ -73,9 +73,9 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_OR
 				],
-				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag1\' AND (UPPER(et.value) LIKE \'%VALUE1%\' ESCAPE \'!\' OR UPPER(et.value) LIKE \'%VALUE2%\' ESCAPE \'!\' OR et.value=\'Value3\'))'.
+				'(EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag1\' AND (UPPER(et.value) LIKE \'%VALUE1%\' ESCAPE \'!\' OR UPPER(et.value) LIKE \'%VALUE2%\' ESCAPE \'!\' OR et.value=\'Value3\'))'.
 				' OR EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag2\' AND (et.value=\'Value4\' OR UPPER(et.value) LIKE \'%VALUE5%\' ESCAPE \'!\'))'.
-				' OR EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag3\')'
+				' OR EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag3\'))'
 			],
 			[
 				[

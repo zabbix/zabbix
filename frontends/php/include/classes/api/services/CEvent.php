@@ -500,7 +500,9 @@ class CEvent extends CApiService {
 			')';
 		}
 
-		return implode(($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ', $sql_where);
+		$sql_where = implode(($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ', $sql_where);
+
+		return (count($values_by_tag) > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
 	}
 
 	/**
