@@ -783,6 +783,7 @@ static int	DBpatch_3050070(void)
 {
 	int	res;
 
+	/* delete old autoreg_host entries that have same host for different Zabbix proxy */
 	res = DBexecute("delete from autoreg_host"
 			" where autoreg_host.proxy_hostid is not null and not exists ("
 				"select null from hosts"
@@ -799,6 +800,7 @@ static int	DBpatch_3050071(void)
 {
 	int	res;
 
+	/* delete autoreg_host entries that have same host for Zabbix server and Zabbix proxy */
 	res = DBexecute("delete from autoreg_host"
 			" where autoreg_host.proxy_hostid is null and not exists ("
 				"select null from hosts"
