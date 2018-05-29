@@ -540,6 +540,8 @@ var timeControl = {
 				right: obj.objDims.shiftXright,
 				top: obj.objDims.shiftYtop,
 				height: obj.objDims.graphHeight,
+				from: obj.timeline.from,
+				to: obj.timeline.to,
 				from_ts: obj.timeline.from_ts,
 				to_ts: obj.timeline.to_ts
 			},
@@ -579,37 +581,38 @@ var timeControl = {
 		url.setArgument('from', obj.timeline.from);
 		url.setArgument('to', obj.timeline.to);
 
-		var debug;
-
 		var clone = jQuery('<img/>', {
-					id: img.attr('id'),
-					'class': img.attr('class')
-				})
-				.on('load', function() {
-					img.replaceWith(clone);
-					// Update dashboard widget footer.
-					if (obj.onDashboard) {
-						timeControl.updateDashboardFooter(id);
-					}
-				}),
-			async = (obj.loadSBox == 0)
-				? null
-				: flickerfreeScreen.getImageSboxHeight(url, function (height) {
-					clone.data('zbx_sbox', {
-						height: parseInt(height, 10),
-						left: obj.objDims.shiftXleft,
-						right: obj.objDims.shiftXright,
-						top: obj.objDims.shiftYtop,
-						from_ts: obj.timeline.from_ts,
-						to_ts: obj.timeline.to_ts
-					}).attr('src', url.getUrl());
-				});
+				id: img.attr('id'),
+				'class': img.attr('class')
+			})
+			.on('load', function() {
+				clone.insertBefore(img);
+				img.hide().remove();
+				// Update dashboard widget footer.
+				if (obj.onDashboard) {
+					timeControl.updateDashboardFooter(id);
+				}
+			}),
+			zbx_sbox = img.data('zbx_sbox');
+
+		clone.data('zbx_sbox', jQuery.extend(zbx_sbox, {
+			left: obj.objDims.shiftXleft,
+			right: obj.objDims.shiftXright,
+			top: obj.objDims.shiftYtop,
+			from: screen.timeline.from,
+			from_ts: screen.timeline.from_ts,
+			to: screen.timeline.to,
+			to_ts: screen.timeline.to_ts
+		}));
+
+		var async = (obj.loadSBox == 0)
+			? null
+			: flickerfreeScreen.getImageSboxHeight(url, function (height) {
+				zbx_sbox.height = parseInt(height, 10);
+				clone.data('zbx_sbox', zbx_sbox).attr('src', url.getUrl());
+			});
 
 		if (async === null) {
-			if (img.data('zbx_sbox')) {
-				clone.data('zbx_sbox', img.data('zbx_sbox'));
-			}
-
 			clone.attr('src', url.getUrl());
 		}
 

@@ -389,7 +389,9 @@
 								if (domImg.data('zbx_sbox')) {
 									img.data('zbx_sbox', domImg.data('zbx_sbox'));
 								}
-								domImg.replaceWith(img);
+
+								img.insertBefore(domImg);
+								domImg.hide().remove();
 
 								// Callback function on success.
 								if (!empty(successAction)) {
