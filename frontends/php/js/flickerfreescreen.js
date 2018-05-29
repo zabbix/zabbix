@@ -409,18 +409,22 @@
 							}
 						});
 
-					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
-						// 'src' should be added only here to trigger load event after new height is received.
-						var zbx_sbox = domImg.data('zbx_sbox');
+					var zbx_sbox = domImg.data('zbx_sbox');
 
-						img.data('zbx_sbox', jQuery.extend(zbx_sbox, {
-							height: parseInt(height, 10),
-							from: screen.timeline.from,
-							from_ts: screen.timeline.from_ts,
-							to: screen.timeline.to,
-							to_ts: screen.timeline.to_ts
-						})).attr('src', url.getUrl());
-					});
+					img.data('zbx_sbox', jQuery.extend(zbx_sbox, {
+						from: screen.timeline.from,
+						from_ts: screen.timeline.from_ts,
+						to: screen.timeline.to,
+						to_ts: screen.timeline.to_ts
+					}));
+
+					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+							zbx_sbox.height = parseInt(height, 10);
+							img.data('zbx_sbox', zbx_sbox);
+							// 'src' should be added only here to trigger load event after new height is received.
+							img.attr('src', url.getUrl());
+						});
+
 					if (async === null) {
 						img.attr('src', url.getUrl());
 					}
