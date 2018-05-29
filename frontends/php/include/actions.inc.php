@@ -1332,6 +1332,7 @@ function count_operations_delay($operations, $def_period) {
 	return $delays;
 }
 
+// TODO VM: delete
 function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recovery_alerts) {
 	$table = (new CTableInfo())->setHeader([_('Step'), _('Time'), _('User'), _('Details'), _('Status'), _('Info')]);
 
@@ -1424,34 +1425,7 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 	];
 }
 
-/**
- * Function returns default action options for makeEventsActionsTable, used to generate action icons and tables in
- * problem and event lists.
- */
-function getDefaultActionOptions() {
-	return [[
-		'key' => 'messages',
-		'operations' => ZBX_PROBLEM_UPDATE_MESSAGE,
-		'columns' => ['time', 'user', 'message'],
-		'message_max_length' => 30,
-		'style' => 'CTableInfo'
-	], [
-		'key' => 'severity_changes',
-		'operations' => ZBX_PROBLEM_UPDATE_SEVERITY,
-		'columns' => ['time', 'user', 'severity_changes'],
-		'style' => 'CTableInfo'
-	], [
-		'key' => 'action_list',
-		'operations' => ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
-			ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY,
-		'columns' => ['time', 'user_recipient', 'action', 'message', 'status', 'info'],
-		'message_max_length' => 30,
-		'actions' => true,
-		'style' => 'CTableInfo',
-		'show_problem' => true
-	]];
-}
-
+// TODO VM: delete
 /**
  * Get list of event actions.
  *
@@ -1668,6 +1642,7 @@ function getEventsMessages(array $events) {
  *
  * @param array  $events                                      Array with event objects with acknowledges
  * @param string $events[]['eventid']                         Problem event id
+ * @param string $events[]['severity']                        Current event severity
  * @param string $events[]['objectid']                        Related trigger id
  * @param array  $events[]['acknowledges']                    Array with manual updates to problem
  * @param array  $events[]['acknowledges'][]['action']        Action that was performed by problem update

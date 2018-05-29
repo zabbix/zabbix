@@ -151,7 +151,7 @@ function getSystemStatusData(array $filter) {
 		}
 
 		$options = [
-			'output' => [],
+			'output' => ['priority'],
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['name'],
 			'triggerids' => array_keys($triggerids),
@@ -213,17 +213,46 @@ function getSystemStatusData(array $filter) {
 			unset($group);
 		}
 
-		// actions
-		$data['actions'] = makeEventsActions($visible_problems);
-
-		// tags
+		// actions & tags
 		$problems_data = API::Problem()->get([
-			'output' => [],
+			'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'severity'],
 			'eventids' => array_keys($visible_problems),
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'selectTags' => ['tag', 'value'],
 			'preservekeys' => true
 		]);
 
+		// actions
+		$config = select_config();
+		$messages = getEventsMessages($problems_data);
+		$severities = getEventsSeverityChanges($problems_data, $data['triggers']);
+		// TODO VM: possible to save one API call, if r_clock for problem will be used
+		$actions = getEventsActions($problems_data);
+		$data['actions'] = [
+			'config' => [
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			],
+			'messages' => $messages['data'],
+			'severities' => $severities['data'],
+			'all_actions' => $actions['data'],
+			'users' => API::User()->get([
+				'output' => ['alias', 'name', 'surname'],
+				'userids' => array_keys($messages['userids'] + $severities['userids'] + $actions['userids']),
+				'preservekeys' => true
+			]),
+			'mediatypes' => API::Mediatype()->get([
+				'output' => ['description', 'maxattempts'],
+				'mediatypeids' => array_keys($actions['mediatypeids']),
+				'preservekeys' => true
+			])
+		];
+
+		// tags
 		foreach ($data['groups'] as &$group) {
 			foreach ($group['stats'] as &$stat) {
 				foreach (['problems', 'problems_unack'] as $key) {
@@ -765,14 +794,28 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT);
 
+		// Make icons for actions column.
+		$action_icons = [
+			makeEventMessagesIcon($actions['messages'][$problem['eventid']], $actions['users']),
+			makeEventSeverityChangesIcon(
+				$actions['severities'][$problem['eventid']],
+				$actions['users'],
+				$actions['config']
+			),
+			makeEventActionsIcon(
+				$actions['all_actions'][$problem['eventid']],
+				$actions['users'],
+				$actions['mediatypes'],
+				$actions['config']
+			)
+		];
+
 		$table->addRow([
 			implode(', ', $hosts),
 			getSeverityCell($problem['severity'], null, $problem['name']),
 			zbx_date2age($problem['clock']),
 			$ack,
-			array_key_exists($problem['eventid'], $actions)
-				? (new CCol($actions[$problem['eventid']]))->addClass(ZBX_STYLE_NOWRAP)
-				: '',
+			$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : '',
 			$tags[$problem['eventid']]
 		]);
 	}
