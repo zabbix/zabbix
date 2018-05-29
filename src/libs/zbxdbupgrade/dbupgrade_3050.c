@@ -794,6 +794,31 @@ static int	DBpatch_3050070(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050071(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"update widget_field"
+		" set value_int=2"
+		" where name='evaltype'"
+			" and value_int=1"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='problems'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -867,5 +892,6 @@ DBPATCH_ADD(3050067, 0, 1)
 DBPATCH_ADD(3050068, 0, 1)
 DBPATCH_ADD(3050069, 0, 1)
 DBPATCH_ADD(3050070, 0, 1)
+DBPATCH_ADD(3050071, 0, 1)
 
 DBPATCH_END()
