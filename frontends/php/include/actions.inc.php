@@ -2134,14 +2134,13 @@ function eventType($type = null) {
  * @param array  $events[]['acknowledges']               Array with manual updates to problem
  * @param array  $events[]['acknowledges'][]['message']  Message text
  * @param array  $events[]['acknowledges'][]['clock']    Time when message was added
- * @param array  $events[]['acknowledges'][]['alias']    Author's alias
- * @param array  $events[]['acknowledges'][]['name']     Author's name
- * @param array  $events[]['acknowledges'][]['surname']  Author's surname
+ * @param array  $events[]['acknowledges'][]['userid']   Author's userid
  *
  * @return array
  */
 function getEventsMessages(array $events) {
 	$messages = [];
+	$userids = [];
 
 	// Create array of messages for each event
 	foreach ($events as $event) {
@@ -2152,15 +2151,11 @@ function getEventsMessages(array $events) {
 				// Alias is mandatory for each user, so if alias is not returned, we don't have rights for this user.
 				$event_messages[] = [
 					'message' => $ack['message'],
-					'user' => array_key_exists('alias', $ack)
-						? [
-							'alias' => $ack['alias'],
-							'name' => $ack['name'],
-							'surname' => $ack['surname']
-						]
-						: [],
+					'userid' => $ack['userid'],
 					'clock' => $ack['clock']
 				];
+
+				$userids[$ack['userid']] = true;
 			}
 		}
 
@@ -2172,7 +2167,10 @@ function getEventsMessages(array $events) {
 		];
 	}
 
-	return $messages;
+	return [
+		'data' => $messages,
+		'userids' => $userids
+	];
 }
 
 /**
@@ -2185,9 +2183,7 @@ function getEventsMessages(array $events) {
  * @param array  $events[]['acknowledges'][]['clock']         Time when severity was changed
  * @param array  $events[]['acknowledges'][]['old_severity']  Severity before the change
  * @param array  $events[]['acknowledges'][]['new_severity']  Severity after the change
- * @param array  $events[]['acknowledges'][]['alias']         Responsible user's alias
- * @param array  $events[]['acknowledges'][]['name']          Responsible user's name
- * @param array  $events[]['acknowledges'][]['surname']       Responsible user's surname
+ * @param array  $events[]['acknowledges'][]['userid']        Responsible user's userid
  * @param array  $triggers                                    Related trigger data
  * @param array  $triggers[]['priority']                      Severity of trigger
  *
@@ -2195,6 +2191,7 @@ function getEventsMessages(array $events) {
  */
 function getEventsSeverityChanges(array $events, array $triggers) {
 	$severities = [];
+	$userids = [];
 
 	// Create array of messages for each event
 	foreach ($events as $event) {
@@ -2205,15 +2202,11 @@ function getEventsSeverityChanges(array $events, array $triggers) {
 				$event_severities[] = [
 					'old_severity' => $ack['old_severity'],
 					'new_severity' => $ack['new_severity'],
-					'user' => array_key_exists('alias', $ack)
-						? [
-							'alias' => $ack['alias'],
-							'name' => $ack['name'],
-							'surname' => $ack['surname']
-						]
-						: [],
+					'userid' => $ack['userid'],
 					'clock' => $ack['clock']
 				];
+
+				$userids[$ack['userid']] = true;
 			}
 		}
 
@@ -2227,7 +2220,10 @@ function getEventsSeverityChanges(array $events, array $triggers) {
 		];
 	}
 
-	return $severities;
+	return [
+		'data' => $severities,
+		'userids' => $userids
+	];
 }
 
 /**
@@ -2261,8 +2257,7 @@ function getEventsActions(array $events, array $r_events = []) {
 		}
 	}
 
-	// TODO VM: maybe this can be removed.
-	if ($r_events === []) {
+	if ($r_eventids && !$r_events) {
 		$r_events = API::Event()->get([
 			'output' => ['clock'],
 			'eventids' => $r_eventids,
@@ -2270,10 +2265,12 @@ function getEventsActions(array $events, array $r_events = []) {
 		]);
 	}
 
-	$alerts = API::Alert()->get([
-		'output' => ['alerttype', 'clock', 'error', 'eventid', 'mediatypeid', 'retries', 'status', 'userid'],
-		'eventids' => array_keys($alert_eventids)
-	]);
+	$alerts = $alert_eventids
+		? API::Alert()->get([
+			'output' => ['alerttype', 'clock', 'error', 'eventid', 'mediatypeid', 'retries', 'status', 'userid'],
+			'eventids' => array_keys($alert_eventids)
+		])
+		: [];
 
 	// Create array of actions for each event
 	foreach ($events as $event) {
@@ -2290,16 +2287,8 @@ function getEventsActions(array $events, array $r_events = []) {
 
 	return [
 		'data' => $actions,
-		'mediatypes' => API::Mediatype()->get([
-			'output' => ['description', 'maxattempts'],
-			'mediatypeids' => array_keys($mediatypeids),
-			'preservekeys' => true
-		]),
-		'users' => API::User()->get([
-			'output' => ['alias', 'name', 'surname'],
-			'userids' => array_keys($userids),
-			'preservekeys' => true
-		])
+		'mediatypeids' => $mediatypeids,
+		'userids' => $userids
 	];
 }
 
@@ -2315,7 +2304,6 @@ function getEventsActions(array $events, array $r_events = []) {
  * @return array
  */
 function getEventDetailsActions(array $event) {
-	$config = select_config();
 	$r_events = [];
 
 	// Select eventids for alert retrieval.
@@ -2343,24 +2331,8 @@ function getEventDetailsActions(array $event) {
 
 	return [
 		'actions' => $actions['actions'],
-		'config' => [
-			'severity_name_0' => $config['severity_name_0'],
-			'severity_name_1' => $config['severity_name_1'],
-			'severity_name_2' => $config['severity_name_2'],
-			'severity_name_3' => $config['severity_name_3'],
-			'severity_name_4' => $config['severity_name_4'],
-			'severity_name_5' => $config['severity_name_5'],
-		],
-		'mediatypes' => API::Mediatype()->get([
-			'output' => ['maxattempts'],
-			'mediatypeids' => array_keys($actions['mediatypeids']),
-			'preservekeys' => true
-		]),
-		'users' => API::User()->get([
-			'output' => ['alias', 'name', 'surname'],
-			'userids' => array_keys($actions['userids']),
-			'preservekeys' => true
-		])
+		'mediatypeids' => $actions['mediatypeids'],
+		'userids' => $actions['userids']
 	];
 }
 
@@ -2465,15 +2437,14 @@ function getSingleEventActions(array $event, array $r_events, array $alerts) {
  * @param array  $data
  * @param array  $data['messages']
  * @param array  $data['messages']['message']          Message text
- * @param array  $data['messages']['user']
- * @param array  $data['messages']['user']['alias']    Author's alias
- * @param array  $data['messages']['user']['name']     Author's name
- * @param array  $data['messages']['user']['surname']  Author's surname
+ * @param array  $data['messages']['clock']            Message creation time
+ * @param array  $data['messages']['userid']           Message author id
  * @param string $data['count']                        Total number of messages
+ * @param string $users                                User name, surname and alias
  *
  * @return array
  */
-function makeEventMessagesIcon(array $data) {
+function makeEventMessagesIcon(array $data, array $users) {
 	$total = $data['count'];
 
 	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message')]);
@@ -2486,8 +2457,8 @@ function makeEventMessagesIcon(array $data) {
 		$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $message['clock']);
 
 		// User
-		$row[] = ($message['user'] !== [])
-			? getUserFullname($message['user'])
+		$row[] = array_key_exists($message['userid'], $users)
+			? getUserFullname($users[$message['userid']])
 			: _('Inaccessible user');
 
 		// Message
@@ -2524,16 +2495,15 @@ function makeEventMessagesIcon(array $data) {
  * @param array  $data['severities']
  * @param array  $data['severities']['old_severity']     Event severity before change
  * @param array  $data['severities']['new_severity']     Event severity after change
- * @param array  $data['severities']['user']
- * @param array  $data['severities']['user']['alias']    Author's alias
- * @param array  $data['severities']['user']['name']     Author's name
- * @param array  $data['severities']['user']['surname']  Author's surname
+ * @param array  $data['severities']['clock']            Severity change time
+ * @param array  $data['severities']['userid']           Responsible user's id
  * @param string $data['count']                          Total number of severity changes
- * @param array  $config                                 Zabbix config.
+ * @param array  $users                                  User name, surname and alias
+ * @param array  $config                                 Zabbix config
  *
  * @return array
  */
-function makeEventSeverityChangesIcon(array $data, array $config) {
+function makeEventSeverityChangesIcon(array $data, array $users, array $config) {
 	$total = $data['count'];
 
 	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Severity changes')]);
@@ -2546,8 +2516,8 @@ function makeEventSeverityChangesIcon(array $data, array $config) {
 		$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']);
 
 		// User
-		$row[] = ($severity['user'] !== [])
-			? getUserFullname($severity['user'])
+		$row[] = array_key_exists($severity['userid'], $users)
+			? getUserFullname($users[$severity['userid']])
 			: _('Inaccessible user');
 
 		// Severity changes
@@ -2703,22 +2673,18 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
  * @param string $data['actions']['mediatypeid']   Id for mediatype, where alert message was sent. (only for ZBX_EVENT_HISTORY_ALERT)
  * @param int    $data['actions']['retries']       How many retries was done for pending alert message. (only for ZBX_EVENT_HISTORY_ALERT)
  * @param string $data['actions']['error']         Error message in case of failed alert. (only for ZBX_EVENT_HISTORY_ALERT)
- * @param array  $data['users']                    User name, surname and alias.
- * @param array  $data['mediatypes']               Mediatypes with maxattempts value.
- * @param array  $data['config']                   Zabbix config.
+ * @param array  $users                            User name, surname and alias.
+ * @param array  $mediatypes                       Mediatypes with maxattempts value.
+ * @param array  $config                           Zabbix config.
  *
  * @return array
  */
-function makeEventDetailsActionsTable(array $data) {
-	$actions = $data['actions'];
-	$mediatypes = $data['mediatypes'];
-	$users = $data['users'];
-
+function makeEventDetailsActionsTable(array $data, array $users, array $mediatypes, array $config) {
 	$table = (new CTableInfo())->setHeader([
 		_('Step'), _('Time'), _('User/Recipient'), _('Action'), _('Message/Command'), _('Status'), _('Info')
 	]);
 
-	foreach ($actions as $action) {
+	foreach ($data['actions'] as $action) {
 		$message = '';
 		if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_MESSAGE) {
 			$message = [bold($action['subject']), BR(), BR(), zbx_nl2br($action['message'])];
@@ -2733,7 +2699,7 @@ function makeEventDetailsActionsTable(array $data) {
 			($action['action_type'] == ZBX_EVENT_HISTORY_ALERT) ? $action['esc_step'] : '',
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeAlertTableUser($action, $users),
-			makeActionTableIcon($action, $data['config']),
+			makeActionTableIcon($action, $config),
 			$message,
 			makeActionTableStatus($action),
 			makeActionTableInfo($action, $mediatypes)

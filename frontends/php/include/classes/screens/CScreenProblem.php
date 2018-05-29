@@ -588,6 +588,12 @@ class CScreenProblem extends CScreenBase {
 		}
 		unset($problem);
 
+		$data['actions']['messages'] = getEventsMessages($data['problems']);
+		$data['actions']['severities'] = getEventsSeverityChanges($data['problems'], $data['triggers']);
+		// TODO VM: It is possible to remove one API::Event()->get() call, if r_clock from $event is used.
+		//			But it is not normal to have it in events array, as here we are passing problems, not events.
+		$data['actions']['all_actions'] = getEventsActions($data['problems']);
+
 		$data['correlations'] = $correlationids
 			? API::Correlation()->get([
 				'output' => ['name'],
@@ -596,10 +602,20 @@ class CScreenProblem extends CScreenBase {
 			])
 			: [];
 
+		$userids = $userids + $data['actions']['messages']['userids'] + $data['actions']['severities']['userids']
+				+ $data['actions']['all_actions']['userids'];
 		$data['users'] = $userids
 			? API::User()->get([
 				'output' => ['alias', 'name', 'surname'],
 				'userids' => array_keys($userids),
+				'preservekeys' => true
+			])
+			: [];
+
+		$data['mediatypes'] = $data['actions']['all_actions']['mediatypeids']
+			? API::Mediatype()->get([
+				'output' => ['description', 'maxattempts'],
+				'mediatypeids' => array_keys($data['actions']['all_actions']['mediatypeids']),
 				'preservekeys' => true
 			])
 			: [];

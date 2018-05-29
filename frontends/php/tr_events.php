@@ -105,7 +105,26 @@ if ($event['r_eventid'] != 0) {
 	}
 }
 
-$actions_data = getEventDetailsActions($event);
+$config = select_config();
+$severity_config = [
+	'severity_name_0' => $config['severity_name_0'],
+	'severity_name_1' => $config['severity_name_1'],
+	'severity_name_2' => $config['severity_name_2'],
+	'severity_name_3' => $config['severity_name_3'],
+	'severity_name_4' => $config['severity_name_4'],
+	'severity_name_5' => $config['severity_name_5']
+];
+$actions = getEventDetailsActions($event);
+$users = API::User()->get([
+	'output' => ['alias', 'name', 'surname'],
+	'userids' => array_keys($actions['userids']),
+	'preservekeys' => true
+]);
+$mediatypes = API::Mediatype()->get([
+	'output' => ['maxattempts'],
+	'mediatypeids' => array_keys($actions['mediatypeids']),
+	'preservekeys' => true
+]);
 
 /*
  * Display
@@ -122,7 +141,9 @@ $eventTab = (new CTable())
 			))->setHeader(_('Event details'))
 		]),
 		new CDiv([
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeEventDetailsActionsTable($actions_data)))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK,
+					makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
+			))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
 				->setHeader(_('Actions'), [], false, 'tr_events.php'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,

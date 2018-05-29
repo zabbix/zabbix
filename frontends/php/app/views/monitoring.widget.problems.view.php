@@ -173,53 +173,23 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	}
 
 	// Make action icons.
-	$action_icons = [];
-
-	// Add messages icon.
-	if ($actions[$problem['eventid']]['messages']['count'] > 0) {
-		$action_icons[] = makeActionIcon([
-			'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
-			'hint' => $actions[$problem['eventid']]['messages']['table'],
-			'num' => $actions[$problem['eventid']]['messages']['count']
-		]);
-	}
-
-	// Add severity change icon.
-	if ($actions[$problem['eventid']]['severity_changes']['count']) {
-		if ($trigger['priority'] > $problem['severity']) {
-			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
-		}
-		elseif ($trigger['priority'] < $problem['severity']) {
-			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
-		}
-		else {
-			$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
-		}
-
-		$action_icons[] = makeActionIcon([
-			'icon' => $icon_style,
-			'hint' => $actions[$problem['eventid']]['severity_changes']['table']
-		]);
-	}
-
-	// Add actions list icon.
-	if ($actions[$problem['eventid']]['action_list']['count']) {
-		if ($actions[$problem['eventid']]['action_list']['has_fail_action']) {
-			$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
-		}
-		elseif ($actions[$problem['eventid']]['action_list']['has_uncomplete_action']) {
-			$icon_style = ZBX_STYLE_ACTIONS_NUM_YELLOW;
-		}
-		else {
-			$icon_style = ZBX_STYLE_ACTIONS_NUM_GRAY;
-		}
-
-		$action_icons[] = makeActionIcon([
-			'icon' => $icon_style,
-			'hint' => $actions[$problem['eventid']]['action_list']['table'],
-			'num' => $actions[$problem['eventid']]['action_list']['count']
-		]);
-	}
+	$action_icons = [
+		makeEventMessagesIcon(
+			$data['data']['actions']['messages']['data'][$problem['eventid']],
+			$data['data']['users']
+		),
+		makeEventSeverityChangesIcon(
+			$data['data']['actions']['severities']['data'][$problem['eventid']],
+			$data['data']['users'],
+			$data['config']
+		),
+		makeEventActionsIcon(
+			$data['data']['actions']['all_actions']['data'][$problem['eventid']],
+			$data['data']['users'],
+			$data['data']['mediatypes'],
+			$data['config']
+		)
+	];
 
 	if ($show_timeline) {
 		if ($last_clock != 0) {

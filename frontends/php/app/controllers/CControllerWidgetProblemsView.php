@@ -87,7 +87,13 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'config' => [
 				'problem_unack_style' => $config['problem_unack_style'],
 				'problem_ack_style' => $config['problem_ack_style'],
-				'blink_period' => timeUnitToSeconds($config['blink_period'])
+				'blink_period' => timeUnitToSeconds($config['blink_period']),
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
 			],
 			'data' => $data,
 			'info' => $info,
