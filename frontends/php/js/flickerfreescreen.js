@@ -363,8 +363,9 @@
 							usemap: domImg.attr('usemap'),
 							alt: domImg.attr('alt'),
 							css: {
-								position: 'relative',
-								zIndex: 2
+								position: 'absolute',
+								top: 0,
+								left: 0
 							}
 						})
 						.error(function() {
@@ -386,12 +387,8 @@
 									img.fadeTo(0, 0.6);
 								}
 
-								if (domImg.data('zbx_sbox')) {
-									img.data('zbx_sbox', domImg.data('zbx_sbox'));
-								}
-
-								img.insertBefore(domImg);
-								domImg.hide().remove();
+								img.css({position: 'relative', zIndex: 2});
+								domImg.remove();
 
 								// Callback function on success.
 								if (!empty(successAction)) {
@@ -422,13 +419,15 @@
 
 					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 							zbx_sbox.height = parseInt(height, 10);
-							img.data('zbx_sbox', zbx_sbox);
 							// 'src' should be added only here to trigger load event after new height is received.
-							img.attr('src', url.getUrl());
+							img.data('zbx_sbox', zbx_sbox)
+								.attr('src', url.getUrl())
+								.insertBefore(domImg);
 						});
 
 					if (async === null) {
-						img.attr('src', url.getUrl());
+						img.attr('src', url.getUrl())
+							.insertBefore(domImg);
 					}
 				});
 			}

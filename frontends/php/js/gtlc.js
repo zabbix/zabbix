@@ -583,37 +583,44 @@ var timeControl = {
 
 		var clone = jQuery('<img/>', {
 				id: img.attr('id'),
-				'class': img.attr('class')
+				'class': img.attr('class'),
+				css: {
+					position: 'absolute',
+					top: 0,
+					left: 0
+				}
 			})
 			.on('load', function() {
-				clone.insertBefore(img);
-				img.hide().remove();
+				clone.css({position: 'relative'});
+				img.remove();
 				// Update dashboard widget footer.
 				if (obj.onDashboard) {
 					timeControl.updateDashboardFooter(id);
 				}
-			}),
-			zbx_sbox = img.data('zbx_sbox');
+			});
 
 		clone.data('zbx_sbox', jQuery.extend(zbx_sbox, {
 			left: obj.objDims.shiftXleft,
 			right: obj.objDims.shiftXright,
 			top: obj.objDims.shiftYtop,
-			from: screen.timeline.from,
-			from_ts: screen.timeline.from_ts,
-			to: screen.timeline.to,
-			to_ts: screen.timeline.to_ts
+			from: obj.timeline.from,
+			from_ts: obj.timeline.from_ts,
+			to: obj.timeline.to,
+			to_ts: obj.timeline.to_ts
 		}));
 
 		var async = (obj.loadSBox == 0)
 			? null
 			: flickerfreeScreen.getImageSboxHeight(url, function (height) {
 				zbx_sbox.height = parseInt(height, 10);
-				clone.data('zbx_sbox', zbx_sbox).attr('src', url.getUrl());
+				clone.data('zbx_sbox', zbx_sbox)
+					.attr('src', url.getUrl())
+					.insertBefore(img);
 			});
 
 		if (async === null) {
-			clone.attr('src', url.getUrl());
+			clone.attr('src', url.getUrl())
+				.insertBefore(img);
 		}
 
 		// link
