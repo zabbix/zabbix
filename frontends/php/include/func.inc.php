@@ -2597,14 +2597,20 @@ function getTimeSelectorPeriod(array $period) {
 	$range_time_parser = new CRangeTimeParser();
 	$idx = array_key_exists('profileIdx', $period) ? $period['profileIdx'] : null;
 	$idx2 = array_key_exists('profileIdx2', $period) ? $period['profileIdx2'] : null;
-	$profile = array_filter($period) + [
-		'from' => ($idx === null)
-			? ZBX_PERIOD_DEFAULT_FROM
-			: CProfile::get($idx.'.from', ZBX_PERIOD_DEFAULT_FROM, $idx2),
-		'to' => ($idx === null)
-			? ZBX_PERIOD_DEFAULT_TO
-			: CProfile::get($idx.'.to', ZBX_PERIOD_DEFAULT_TO, $idx2)
-	];
+	$profile = array_filter($period);
+
+	if ($idx === null) {
+		$profile['from'] = ZBX_PERIOD_DEFAULT_FROM;
+		$profile['to'] = ZBX_PERIOD_DEFAULT_TO;
+	}
+
+	if (!array_key_exists('from', $profile)) {
+		$profile['from'] = CProfile::get($idx.'.from', ZBX_PERIOD_DEFAULT_FROM, $idx2);
+	}
+
+	if (!array_key_exists('to', $profile)) {
+		$profile['to'] = CProfile::get($idx.'.to', ZBX_PERIOD_DEFAULT_TO, $idx2);
+	}
 
 	$range_time_parser->parse($profile['from']);
 	$profile['from_ts'] = $range_time_parser->getDateTime(true)->getTimestamp();
