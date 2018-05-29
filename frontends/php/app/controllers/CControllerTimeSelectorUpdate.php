@@ -196,18 +196,14 @@ class CControllerTimeSelectorUpdate extends CController {
 			$to = (new DateTime())->setTimestamp($to)->format(ZBX_DATE_TIME);
 		}
 
-		$valid = validTimeSelectorPeriod($from ,$to, $errors);
-
-		if ($valid) {
-			return true;
+		if (!validTimeSelectorPeriod($from, $to, $errors)) {
+			foreach ($errors as $key => $value) {
+				// Period error messages ('min_period', 'max_period') will be stored within key 'from'.
+				$key = ($key === 'to') ? $key : 'from';
+				$this->data['error'][$key] = $value;
+			}
 		}
 
-		foreach ($errors as $key => $value) {
-			// Period error messages ('min_period', 'max_period') will be stored within key 'from'.
-			$key = ($key === 'to') ? $key : 'from';
-			$this->data['error'][$key] = $value;
-		}
-
-		return false;
+		return !$this->data['error'];
 	}
 }
