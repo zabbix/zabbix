@@ -98,7 +98,7 @@ class CControllerAcknowledgeEdit extends CController {
 		// Select events:
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'acknowledged', 'value', 'r_eventid'],
-			'select_acknowledges' => API_OUTPUT_EXTEND, // TODO VM: should be replaced with an array of specific values.
+			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -107,11 +107,26 @@ class CControllerAcknowledgeEdit extends CController {
 
 		// Show action list if only one event is requested.
 		if (count($events) == 1) {
-			$data['event'] = reset($events);
+			$config = select_config();
+			$data['config'] = [
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			];
+			$history = getEventUpdates(reset($events));
+			$data['history'] = $history['data'];
+			$data['users'] = API::User()->get([
+				'output' => ['alias', 'name', 'surname'],
+				'userids' => array_keys($history['userids']),
+				'preservekeys' => true
+			]);
 		}
 
 		// Loop through events to figure out what operations should be allowed.
-		$triggerids = []; // List of all triggers, to count related_problems_count and check trigger mermissions
+		$triggerids = [];
 
 		foreach ($events as $event) {
 			$event_closed = false;

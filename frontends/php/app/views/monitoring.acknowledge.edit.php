@@ -30,17 +30,9 @@ $form_list = (new CFormList())
 			->setAttribute('autofocus', 'autofocus')
 	);
 
-if (array_key_exists('event', $data)) {
-	$options = [
-		'key' => 'acknowledges',
-		'operations' => 15,
-		'columns' => ['time', 'user', 'user_action', 'message'],
-		'message_max_length' => 30
-	];
-	$table = makeEventsActionsTables([$data['event']], [$options]);
-
+if (array_key_exists('history', $data)) {
 	$form_list->addRow(_('History'),
-		(new CDiv($table[$data['event']['eventid']]['acknowledges']['table']))
+		(new CDiv(makeEventHistoryTable($data['history'], $data['users'], $data['config'])))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);

@@ -74,8 +74,6 @@ if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
 
-$actions = makeEventsActionsTables($data['data']['problems'], getDefaultActionOptions());
-
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
 

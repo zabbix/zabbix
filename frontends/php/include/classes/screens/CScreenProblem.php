@@ -1039,8 +1039,6 @@ class CScreenProblem extends CScreenBase {
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
 		else {
-			$actions = makeEventsActionsTables($data['problems'], getDefaultActionOptions(), false);
-
 			$csv = [];
 
 			$csv[] = [
