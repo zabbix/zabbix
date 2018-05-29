@@ -104,6 +104,16 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 				],
 				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag\' AND et.value=\'Value\')'
 			],
+			[
+				[
+					[
+						['tag' => 'Tag', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''],
+						['tag' => 'Tag', 'operator' => TAG_OPERATOR_EQUAL, 'value' => '']
+					],
+					TAG_EVAL_TYPE_AND_OR
+				],
+				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag\')'
+			],
 		];
 	}
 
