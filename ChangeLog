@@ -323,6 +323,7 @@ Changes for 3.4.10rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14414] fixed PHP 7.2 error message in the Monitoring->Latest data page (Sasha)
 A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
 ..F....... [ZBX-12359] fixed "Automatic icon selection" checkbox not working and displaying two icons at once in map constructor (Ivo)
