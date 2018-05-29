@@ -835,7 +835,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['preprocessing'] = $preprocessing;
 			}
 
-			if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
+			if (getRequest('type') == ITEM_TYPE_DEPENDENT && hasRequest('master_itemid')
+					&& bccomp($db_item['master_itemid'], getRequest('master_itemid')) != 0) {
 				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
