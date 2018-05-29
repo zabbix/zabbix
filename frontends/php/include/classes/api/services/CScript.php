@@ -418,7 +418,7 @@ class CScript extends CApiService {
 
 		$groupids = array_keys($groupids);
 
-		$db_groups = DB::select('groups', [
+		$db_groups = DB::select('hstgrp', [
 			'output' => [],
 			'groupids' => $groupids,
 			'preservekeys' => true

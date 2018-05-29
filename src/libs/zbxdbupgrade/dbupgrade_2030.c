@@ -513,10 +513,10 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 	max = min + __UINT64_C(100000000000000) - 1;
 
 	if (NULL == (result = DBselect(
-			"select %s,%s"
-			" from %s"
-			" where not %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64
-			" order by %s",
+			"select " ZBX_FS_SQL_NAME "," ZBX_FS_SQL_NAME
+			" from " ZBX_FS_SQL_NAME
+			" where not " ZBX_FS_SQL_NAME " between " ZBX_FS_UI64 " and " ZBX_FS_UI64
+			" order by " ZBX_FS_SQL_NAME ,
 			key_name, field_name, table_name, key_name, min, max, key_name)))
 	{
 		return FAIL;
@@ -536,7 +536,8 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 
 		name_esc = DBdyn_escape_string_len(name, field_length);
 
-		if (ZBX_DB_OK > DBexecute("update %s set %s='%s' where %s=" ZBX_FS_UI64,
+		if (ZBX_DB_OK > DBexecute("update " ZBX_FS_SQL_NAME " set " ZBX_FS_SQL_NAME "='%s'"
+				" where " ZBX_FS_SQL_NAME "=" ZBX_FS_UI64,
 				table_name, field_name, name_esc, key_name, id))
 		{
 			zbx_free(name_esc);

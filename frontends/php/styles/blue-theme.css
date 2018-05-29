@@ -1598,6 +1598,12 @@ button {
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
+  .btn-search[disabled] {
+    background-color: transparent; }
+    .btn-search[disabled]:hover {
+      background-color: transparent;
+      opacity: 0.75;
+      filter: alpha(opacity=75); }
 
 .filter-trigger {
   position: relative;
