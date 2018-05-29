@@ -1395,6 +1395,48 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		hosts.values_num = 0;
 	}
 
+	if (0 != autoreg_hosts->values_num)
+	{
+		for (i = 0; i < autoreg_hosts->values_num; i++)
+		{
+			autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+			if (0 == autoreg_host->autoreg_hostid)
+				zbx_vector_str_append(&hosts, autoreg_host->host);
+		}
+
+		if (0 != hosts.values_num)
+		{
+			/* update autoreg_id in vector if already exists in autoreg_host table */
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select autoreg_hostid,host"
+					" from autoreg_host"
+					" where");
+			DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host", (const char **)hosts.values,
+					hosts.values_num);
+
+			result = DBselect("%s", sql);
+
+			while (NULL != (row = DBfetch(result)))
+			{
+				for (i = 0; i < autoreg_hosts->values_num; i++)
+				{
+					autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+					if (0 == autoreg_host->autoreg_hostid && 0 == strcmp(autoreg_host->host, row[1]))
+					{
+						ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
+						break;
+					}
+				}
+			}
+			DBfree_result(result);
+
+			hosts.values_num = 0;
+		}
+	}
+
 	zbx_vector_str_destroy(&hosts);
 	zbx_free(sql);
 }
@@ -1465,9 +1507,11 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 					" set listen_ip='%s',"
 						"listen_dns='%s',"
 						"listen_port=%hu,"
-						"host_metadata='%s'"
+						"host_metadata='%s',"
+						"proxy_hostid=%s"
 					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
-				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->autoreg_hostid);
+				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, DBsql_id_ins(proxy_hostid),
+				autoreg_host->autoreg_hostid);
 
 			zbx_free(host_metadata_esc);
 			zbx_free(dns_esc);
