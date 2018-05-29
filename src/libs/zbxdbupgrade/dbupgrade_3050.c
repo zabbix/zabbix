@@ -779,6 +779,38 @@ static int	DBpatch_3050069(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050070(void)
+{
+	int	res;
+
+	res = DBexecute("delete from autoreg_host"
+			" where autoreg_host.proxy_hostid is not null and not exists ("
+				"select null from hosts"
+				" where autoreg_host.proxy_hostid=hosts.proxy_hostid and autoreg_host.host=hosts.host"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050071(void)
+{
+	int	res;
+
+	res = DBexecute("delete from autoreg_host"
+			" where autoreg_host.proxy_hostid is null and not exists ("
+				"select null from hosts"
+				" where hosts.proxy_hostid is null and autoreg_host.host=hosts.host"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -851,5 +883,7 @@ DBPATCH_ADD(3050066, 0, 1)
 DBPATCH_ADD(3050067, 0, 1)
 DBPATCH_ADD(3050068, 0, 1)
 DBPATCH_ADD(3050069, 0, 1)
+DBPATCH_ADD(3050070, 0, 1)
+DBPATCH_ADD(3050071, 0, 1)
 
 DBPATCH_END()
