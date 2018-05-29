@@ -594,6 +594,8 @@ class CScreenProblem extends CScreenBase {
 		//			But it is not normal to have it in events array, as here we are passing problems, not events.
 		$data['actions']['all_actions'] = getEventsActions($data['problems']);
 
+		// TODO VM: By adding extra loop, it is possible to remove 'acknowledges' array from each problem, as it is not used further.
+
 		$data['correlations'] = $correlationids
 			? API::Correlation()->get([
 				'output' => ['name'],
@@ -732,7 +734,6 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($this->data['action'] === 'problem.view') {
-			$actions = makeEventsActionsTables($data['problems'], getDefaultActionOptions());
 			$url_form = clone $url;
 
 			$form = (new CForm('get', 'zabbix.php'))
@@ -991,53 +992,24 @@ class CScreenProblem extends CScreenBase {
 					->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT);
 
-				$action_icons = [];
-
-				// Add messages icon.
-				if ($actions[$problem['eventid']]['messages']['count']) {
-					$action_icons[] = makeActionIcon([
-						'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
-						'hint' => $actions[$problem['eventid']]['messages']['table'],
-						'num' => $actions[$problem['eventid']]['messages']['count']
-					]);
-				}
-
-				// Add severity change icon.
-				if ($actions[$problem['eventid']]['severity_changes']['count']) {
-					if ($original_severity[$problem['objectid']] > $problem['severity']) {
-						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
-					}
-					elseif ($original_severity[$problem['objectid']] < $problem['severity']) {
-						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
-					}
-					else {
-						$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
-					}
-
-					$action_icons[] = makeActionIcon([
-						'icon' => $icon_style,
-						'hint' => $actions[$problem['eventid']]['severity_changes']['table']
-					]);
-				}
-
-				// Add actions list icon.
-				if ($actions[$problem['eventid']]['action_list']['count']) {
-					if ($actions[$problem['eventid']]['action_list']['has_fail_action']) {
-						$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
-					}
-					elseif ($actions[$problem['eventid']]['action_list']['has_uncomplete_action']) {
-						$icon_style = ZBX_STYLE_ACTIONS_NUM_YELLOW;
-					}
-					else {
-						$icon_style = ZBX_STYLE_ACTIONS_NUM_GRAY;
-					}
-
-					$action_icons[] = makeActionIcon([
-						'icon' => $icon_style,
-						'hint' => $actions[$problem['eventid']]['action_list']['table'],
-						'num' => $actions[$problem['eventid']]['action_list']['count']
-					]);
-				}
+				// Make action icons.
+				$action_icons = [
+					makeEventMessagesIcon(
+						$data['actions']['messages']['data'][$problem['eventid']],
+						$data['users']
+					),
+					makeEventSeverityChangesIcon(
+						$data['actions']['severities']['data'][$problem['eventid']],
+						$data['users'],
+						$this->config
+					),
+					makeEventActionsIcon(
+						$data['actions']['all_actions']['data'][$problem['eventid']],
+						$data['users'],
+						$data['mediatypes'],
+						$this->config
+					)
+				];
 
 				// Add table row.
 				$table->addRow(array_merge($row, [
@@ -1111,14 +1083,16 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$actions_performed = [];
-				if ($actions[$problem['eventid']]['messages']['count'] > 0) {
-					$actions_performed[] = _('Messages').' ('.$actions[$problem['eventid']]['messages']['count'].')';
+				if ($data['actions']['messages']['data'][$problem['eventid']]['count'] > 0) {
+					$actions_performed[] =
+							_('Messages').' ('.$data['actions']['messages']['data'][$problem['eventid']]['count'].')';
 				}
-				if ($actions[$problem['eventid']]['severity_changes']['count'] > 0) {
+				if ($data['actions']['severities']['data'][$problem['eventid']]['count'] > 0) {
 					$actions_performed[] = _('Severity changes');
 				}
-				if ($actions[$problem['eventid']]['action_list']['count'] > 0) {
-					$actions_performed[] = _('Actions').' ('.$actions[$problem['eventid']]['action_list']['count'].')';
+				if ($data['actions']['all_actions']['data'][$problem['eventid']]['count'] > 0) {
+					$actions_performed[] =
+							_('Actions').' ('.$data['actions']['all_actions']['data'][$problem['eventid']]['count'].')';
 				}
 
 				$csv[] = [
