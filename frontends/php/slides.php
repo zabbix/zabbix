@@ -169,58 +169,68 @@ else {
 	}
 }
 
-$data['timeline'] = calculateTime([
+$errors = [];
+$timeline = getTimeSelectorPeriod([
 	'profileIdx' => 'web.slides.filter',
 	'profileIdx2' => $data['elementId'],
-	'updateProfile' => true,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
 ]);
 
-$data['active_tab'] = CProfile::get('web.slides.filter.active', 1);
-
-$data['fullscreen'] = getRequest('fullscreen');
-
-if ($data['screen']) {
-	// get groups and hosts
-	if (check_dynamic_items($data['elementId'], 1)) {
-		$data['isDynamicItems'] = true;
-
-		$data['pageFilter'] = new CPageFilter([
-			'groups' => [
-				'monitored_hosts' => true,
-				'with_items' => true
-			],
-			'hosts' => [
-				'monitored_hosts' => true,
-				'with_items' => true,
-				'DDFirstLabel' => _('not selected')
-			],
-			'hostid' => getRequest('hostid'),
-			'groupid' => getRequest('groupid')
-		]);
-
-		$data['groupid'] = $data['pageFilter']->groupid;
-		$data['hostid'] = $data['pageFilter']->hostid;
-	}
-
-	// get element
-	$data['element'] = get_slideshow_by_slideshowid($data['elementId'], PERM_READ);
-	$data['screen']['editable'] = (bool) get_slideshow_by_slideshowid($data['elementId'], PERM_READ_WRITE);
-
-	if ($data['screen']['delay'] > 0) {
-		$data['element']['delay'] = $data['screen']['delay'];
-	}
-
-	show_messages();
+if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
+	show_error_message(reset($errors));
 }
+else {
+	if (hasRequest('from') || hasRequest('to')) {
+		updateTimeSelectorPeriod($timeline['profileIdx'], $timeline['profileIdx2'], $timeline['from'], $timeline['to']);
+	}
 
-// refresh
-$data['refreshMultiplier'] = CProfile::get('web.slides.rf_rate.'.WIDGET_SLIDESHOW, 1, $data['elementId']);
+	$data['timeline'] = $timeline;
+	$data['active_tab'] = CProfile::get('web.slides.filter.active', 1);
 
-// render view
-$slidesView = new CView('monitoring.slides', $data);
-$slidesView->render();
-$slidesView->show();
+	$data['fullscreen'] = getRequest('fullscreen');
+
+	if ($data['screen']) {
+		// get groups and hosts
+		if (check_dynamic_items($data['elementId'], 1)) {
+			$data['isDynamicItems'] = true;
+
+			$data['pageFilter'] = new CPageFilter([
+				'groups' => [
+					'monitored_hosts' => true,
+					'with_items' => true
+				],
+				'hosts' => [
+					'monitored_hosts' => true,
+					'with_items' => true,
+					'DDFirstLabel' => _('not selected')
+				],
+				'hostid' => getRequest('hostid'),
+				'groupid' => getRequest('groupid')
+			]);
+
+			$data['groupid'] = $data['pageFilter']->groupid;
+			$data['hostid'] = $data['pageFilter']->hostid;
+		}
+
+		// get element
+		$data['element'] = get_slideshow_by_slideshowid($data['elementId'], PERM_READ);
+		$data['screen']['editable'] = (bool) get_slideshow_by_slideshowid($data['elementId'], PERM_READ_WRITE);
+
+		if ($data['screen']['delay'] > 0) {
+			$data['element']['delay'] = $data['screen']['delay'];
+		}
+
+		show_messages();
+	}
+
+	// refresh
+	$data['refreshMultiplier'] = CProfile::get('web.slides.rf_rate.'.WIDGET_SLIDESHOW, 1, $data['elementId']);
+
+	// render view
+	$slidesView = new CView('monitoring.slides', $data);
+	$slidesView->render();
+	$slidesView->show();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';

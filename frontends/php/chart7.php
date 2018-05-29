@@ -87,35 +87,40 @@ foreach ($items as $item) {
 /*
  * Display
  */
-$timeline = calculateTime([
+$errors = [];
+$timeline = getTimeSelectorPeriod([
 	'profileIdx' => getRequest('profileIdx'),
 	'profileIdx2' => getRequest('profileIdx2'),
-	'updateProfile' => false,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
 ]);
 
-$graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
-$graph->setHeader(getRequest('name', ''));
-$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
-$graph->setSTime($timeline['from_ts']);
-
-if (!empty($_REQUEST['graph3d'])) {
-	$graph->switchPie3D();
+if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
+	show_error_message(reset($errors));
 }
+else {
+	$graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
+	$graph->setHeader(getRequest('name', ''));
+	$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+	$graph->setSTime($timeline['from_ts']);
 
-if (getRequest('widget_view') === '1') {
-	$graph->draw_header = false;
-	$graph->with_vertical_padding = false;
+	if (!empty($_REQUEST['graph3d'])) {
+		$graph->switchPie3D();
+	}
+
+	if (getRequest('widget_view') === '1') {
+		$graph->draw_header = false;
+		$graph->with_vertical_padding = false;
+	}
+
+	$graph->showLegend(getRequest('legend', 0));
+	$graph->setWidth(getRequest('width', 400));
+	$graph->setHeight(getRequest('height', 300));
+
+	foreach ($items as $item) {
+		$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
+	}
+	$graph->draw();
 }
-
-$graph->showLegend(getRequest('legend', 0));
-$graph->setWidth(getRequest('width', 400));
-$graph->setHeight(getRequest('height', 300));
-
-foreach ($items as $item) {
-	$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
-}
-$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

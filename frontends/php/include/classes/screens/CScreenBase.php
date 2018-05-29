@@ -341,12 +341,11 @@ class CScreenBase {
 
 		// Calculate timeline.
 		if ($this->required_parameters['timeline'] && $this->timeline === null) {
-			$this->timeline = calculateTime([
+			$this->timeline = getTimeSelectorPeriod([
 				'profileIdx' => $this->profileIdx,
 				'profileIdx2' => $this->profileIdx2,
-				'updateProfile' => $this->updateProfile,
 				'from' => array_key_exists('from', $options) ? $options['from'] : null,
-				'to' => array_key_exists('to', $options) ? $options['to'] : null,
+				'to' => array_key_exists('to', $options) ? $options['to'] : null
 			]);
 		}
 

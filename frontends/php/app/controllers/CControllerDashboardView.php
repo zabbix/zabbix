@@ -114,13 +114,24 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
 			];
 
-			$data['timeline'] = calculateTime([
+			$timeline = getTimeSelectorPeriod([
 				'profileIdx' => 'web.dashbrd.filter',
 				'profileIdx2' => $this->dashboard['dashboardid'],
-				'updateProfile' => true,
 				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 				'to' => $this->hasInput('to') ? $this->getInput('to') : null
 			]);
+
+			if ($this->hasInput('from') || $this->hasInput('to')) {
+				if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
+					$this->setResponse(new CControllerResponseData(['error' => reset($errors)]));
+
+					return;
+				}
+
+				updateTimeSelectorPeriod($timeline['profileIdx'], $timeline['profileIdx2'], $timeline['from'], $timeline['to']);
+			}
+
+			$data['timeline'] = $timeline;
 
 			$data['timeControlData'] = [
 				'mainObject' => 1,

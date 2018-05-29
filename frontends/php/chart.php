@@ -81,75 +81,80 @@ CArrayHelper::sort($items, ['name', 'hostname', 'itemid']);
 /*
  * Display
  */
-$timeline = calculateTime([
+$errors = [];
+$timeline = getTimeSelectorPeriod([
 	'profileIdx' => getRequest('profileIdx'),
 	'profileIdx2' => getRequest('profileIdx2'),
-	'updateProfile' => false,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
 ]);
 
-$graph = new CLineGraphDraw(getRequest('type'));
-$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
-$graph->setSTime($timeline['from_ts']);
-$graph->showLegend(getRequest('legend', 1));
-
-// change how the graph will be displayed if more than one item is selected
-if (getRequest('batch')) {
-	// set a default header
-	if (count($hostNames) == 1) {
-		$graph->setHeader($hostNames[0].NAME_DELIMITER._('Item values'));
-	}
-	else {
-		$graph->setHeader(_('Item values'));
-	}
-
-	// hide triggers
-	$graph->showTriggers(false);
-}
-
-if (hasRequest('width')) {
-	$graph->setWidth(getRequest('width'));
-}
-if (hasRequest('height')) {
-	$graph->setHeight(getRequest('height'));
-}
-if (hasRequest('outer')) {
-	$graph->setOuter(getRequest('outer'));
-}
-
-if (getRequest('widget_view') === '1') {
-	$graph->draw_header = false;
-	$graph->with_vertical_padding = false;
-}
-
-foreach ($items as $item) {
-	$graph->addItem($item + [
-		'color' => rgb2hex(get_next_color(1)),
-		'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
-		'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
-	]);
-}
-
-$min_dimentions = $graph->getMinDimensions();
-if ($min_dimentions['width'] > $graph->getWidth()) {
-	$graph->setWidth($min_dimentions['width']);
-}
-if ($min_dimentions['height'] > $graph->getHeight()) {
-	$graph->setHeight($min_dimentions['height']);
-}
-
-if (getRequest('onlyHeight', '0') === '1') {
-	$graph->drawDimensions();
-	$height = $graph->getHeight();
-
-	if (getRequest('widget_view') === '1') {
-		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
-	}
-	header('X-ZBX-SBOX-HEIGHT: '.$height);
+if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
+	show_error_message(reset($errors));
 }
 else {
-	$graph->draw();
+	$graph = new CLineGraphDraw(getRequest('type'));
+	$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+	$graph->setSTime($timeline['from_ts']);
+	$graph->showLegend(getRequest('legend', 1));
+
+	// change how the graph will be displayed if more than one item is selected
+	if (getRequest('batch')) {
+		// set a default header
+		if (count($hostNames) == 1) {
+			$graph->setHeader($hostNames[0].NAME_DELIMITER._('Item values'));
+		}
+		else {
+			$graph->setHeader(_('Item values'));
+		}
+
+		// hide triggers
+		$graph->showTriggers(false);
+	}
+
+	if (hasRequest('width')) {
+		$graph->setWidth(getRequest('width'));
+	}
+	if (hasRequest('height')) {
+		$graph->setHeight(getRequest('height'));
+	}
+	if (hasRequest('outer')) {
+		$graph->setOuter(getRequest('outer'));
+	}
+
+	if (getRequest('widget_view') === '1') {
+		$graph->draw_header = false;
+		$graph->with_vertical_padding = false;
+	}
+
+	foreach ($items as $item) {
+		$graph->addItem($item + [
+			'color' => rgb2hex(get_next_color(1)),
+			'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+			'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
+		]);
+	}
+
+	$min_dimentions = $graph->getMinDimensions();
+	if ($min_dimentions['width'] > $graph->getWidth()) {
+		$graph->setWidth($min_dimentions['width']);
+	}
+	if ($min_dimentions['height'] > $graph->getHeight()) {
+		$graph->setHeight($min_dimentions['height']);
+	}
+
+	if (getRequest('onlyHeight', '0') === '1') {
+		$graph->drawDimensions();
+		$height = $graph->getHeight();
+
+		if (getRequest('widget_view') === '1') {
+			$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+		header('X-ZBX-SBOX-HEIGHT: '.$height);
+	}
+	else {
+		$graph->draw();
+	}
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

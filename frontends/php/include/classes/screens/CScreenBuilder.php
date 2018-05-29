@@ -145,13 +145,18 @@ class CScreenBuilder {
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
 		$this->updateProfile = array_key_exists('updateProfile', $options) ? $options['updateProfile'] : false;
 
-		$this->timeline = calculateTime([
+		$this->timeline = getTimeSelectorPeriod([
 			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
-			'updateProfile' => $this->updateProfile,
 			'from' => array_key_exists('from', $options) ? $options['from'] : null,
 			'to' => array_key_exists('to', $options) ? $options['to'] : null
 		]);
+
+		if ($this->updateProfile) {
+			updateTimeSelectorPeriod($this->profileIdx, $this->profileIdx2, $this->timeline['from'],
+				$this->timeline['to']
+			);
+		}
 	}
 
 	/**

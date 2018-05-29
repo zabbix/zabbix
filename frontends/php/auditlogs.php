@@ -70,91 +70,101 @@ elseif (hasRequest('filter_rst')) {
 /*
  * Display
  */
-$data = [
-	'actions' => [],
-	'action' => CProfile::get('web.auditlogs.filter.action', -1),
-	'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
-	'alias' => CProfile::get('web.auditlogs.filter.alias', ''),
-	'timeline' => calculateTime([
-		'profileIdx' => 'web.auditlogs.filter',
-		'profileIdx2' => 0,
-		'updateProfile' => (hasRequest('from') && hasRequest('to')),
-		'from' => getRequest('from'),
-		'to' => getRequest('to')
-	]),
-	'active_tab' => CProfile::get('web.auditlogs.filter.active', 1)
-];
+$timeline = getTimeSelectorPeriod([
+	'profileIdx' => 'web.auditlogs.filter',
+	'profileIdx2' => 0,
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
+]);
 
-// get audit
-$config = select_config();
-
-$sqlWhere = [];
-if (!empty($data['alias'])) {
-	$sqlWhere['alias'] = ' AND u.alias='.zbx_dbstr($data['alias']);
+if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
+	show_error_message(reset($errors));
 }
-if ($data['action'] > -1) {
-	$sqlWhere['action'] = ' AND a.action='.zbx_dbstr($data['action']);
-}
-if ($data['resourcetype'] > -1) {
-	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
-}
-
-$sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
-		' FROM auditlog a,users u'.
-		' WHERE a.userid=u.userid'.
-			implode('', $sqlWhere).
-			' AND a.clock BETWEEN '.zbx_dbstr($data['timeline']['from_ts']).' AND '.zbx_dbstr($data['timeline']['to_ts']).
-		' ORDER BY a.clock DESC';
-$dbAudit = DBselect($sql, $config['search_limit'] + 1);
-while ($audit = DBfetch($dbAudit)) {
-	switch ($audit['action']) {
-		case AUDIT_ACTION_ADD:
-			$action = _('Added');
-			break;
-		case AUDIT_ACTION_UPDATE:
-			$action = _('Updated');
-			break;
-		case AUDIT_ACTION_DELETE:
-			$action = _('Deleted');
-			break;
-		case AUDIT_ACTION_LOGIN:
-			$action = _('Login');
-			break;
-		case AUDIT_ACTION_LOGOUT:
-			$action = _('Logout');
-			break;
-		case AUDIT_ACTION_ENABLE:
-			$action = _('Enabled');
-			break;
-		case AUDIT_ACTION_DISABLE:
-			$action = _('Disabled');
-			break;
-		default:
-			$action = _('Unknown action');
+else {
+	if (hasRequest('from') || hasRequest('to')) {
+		updateTimeSelectorPeriod($timeline['profileIdx'], 0, $timeline['from'], $timeline['to']);
 	}
-	$audit['action'] = $action;
-	$audit['resourcetype'] = audit_resource2str($audit['resourcetype']);
 
-	if (empty($audit['details'])) {
-		$audit['details'] = DBfetchArray(DBselect(
-			'SELECT ad.table_name,ad.field_name,ad.oldvalue,ad.newvalue'.
-			' FROM auditlog_details ad'.
-			' WHERE ad.auditid='.zbx_dbstr($audit['auditid'])
-		));
+	$data = [
+		'actions' => [],
+		'action' => CProfile::get('web.auditlogs.filter.action', -1),
+		'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
+		'alias' => CProfile::get('web.auditlogs.filter.alias', ''),
+		'timeline' => $timeline,
+		'active_tab' => CProfile::get('web.auditlogs.filter.active', 1)
+	];
+
+	// get audit
+	$config = select_config();
+
+	$sqlWhere = [];
+	if (!empty($data['alias'])) {
+		$sqlWhere['alias'] = ' AND u.alias='.zbx_dbstr($data['alias']);
 	}
-	$data['actions'][$audit['auditid']] = $audit;
-}
-if (!empty($data['actions'])) {
-	order_result($data['actions'], 'clock', ZBX_SORT_DOWN);
-}
+	if ($data['action'] > -1) {
+		$sqlWhere['action'] = ' AND a.action='.zbx_dbstr($data['action']);
+	}
+	if ($data['resourcetype'] > -1) {
+		$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
+	}
 
-// get paging
-$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlogs.php'));
+	$sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
+			' FROM auditlog a,users u'.
+			' WHERE a.userid=u.userid'.
+				implode('', $sqlWhere).
+				' AND a.clock BETWEEN '.zbx_dbstr($data['timeline']['from_ts']).' AND '.zbx_dbstr($data['timeline']['to_ts']).
+			' ORDER BY a.clock DESC';
+	$dbAudit = DBselect($sql, $config['search_limit'] + 1);
+	while ($audit = DBfetch($dbAudit)) {
+		switch ($audit['action']) {
+			case AUDIT_ACTION_ADD:
+				$action = _('Added');
+				break;
+			case AUDIT_ACTION_UPDATE:
+				$action = _('Updated');
+				break;
+			case AUDIT_ACTION_DELETE:
+				$action = _('Deleted');
+				break;
+			case AUDIT_ACTION_LOGIN:
+				$action = _('Login');
+				break;
+			case AUDIT_ACTION_LOGOUT:
+				$action = _('Logout');
+				break;
+			case AUDIT_ACTION_ENABLE:
+				$action = _('Enabled');
+				break;
+			case AUDIT_ACTION_DISABLE:
+				$action = _('Disabled');
+				break;
+			default:
+				$action = _('Unknown action');
+		}
+		$audit['action'] = $action;
+		$audit['resourcetype'] = audit_resource2str($audit['resourcetype']);
 
-// render view
-$auditView = new CView('administration.auditlogs.list', $data);
-$auditView->render();
-show_messages();
-$auditView->show();
+		if (empty($audit['details'])) {
+			$audit['details'] = DBfetchArray(DBselect(
+				'SELECT ad.table_name,ad.field_name,ad.oldvalue,ad.newvalue'.
+				' FROM auditlog_details ad'.
+				' WHERE ad.auditid='.zbx_dbstr($audit['auditid'])
+			));
+		}
+		$data['actions'][$audit['auditid']] = $audit;
+	}
+	if (!empty($data['actions'])) {
+		order_result($data['actions'], 'clock', ZBX_SORT_DOWN);
+	}
+
+	// get paging
+	$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlogs.php'));
+
+	// render view
+	$auditView = new CView('administration.auditlogs.list', $data);
+	$auditView->render();
+	show_messages();
+	$auditView->show();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';

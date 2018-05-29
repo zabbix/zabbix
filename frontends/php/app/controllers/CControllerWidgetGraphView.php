@@ -91,13 +91,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		}
 		$graph_dims['shiftYtop'] = CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
 
-		// Prepare timeline details
-		$timeline = calculateTime([
+		$timeline = getTimeSelectorPeriod([
 			'profileIdx' => $profileIdx,
-			'profileIdx2' => $profileIdx2,
-			'updateProfile' => false,
-			'from' => null,
-			'to' => null
+			'profileIdx2' => $profileIdx2
 		]);
 
 		$time_control_data = [

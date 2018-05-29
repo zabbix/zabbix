@@ -136,56 +136,60 @@ else {
  */
 $profileIdx = getRequest('profileIdx', 'web.httpdetails.filter');
 $profileIdx2 = getRequest('httptestid', getRequest('profileIdx2'));
-
-$timeline = calculateTime([
+$errors = [];
+$timeline = getTimeSelectorPeriod([
 	'profileIdx' => $profileIdx,
 	'profileIdx2' => $profileIdx2,
-	'updateProfile' => false,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
 ]);
 
-CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
-
-$graph = new CLineGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
-$graph->setHeader($name);
-$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
-$graph->setSTime($timeline['from_ts']);
-$graph->setWidth(getRequest('width', 900));
-$graph->setHeight(getRequest('height', 200));
-$graph->showLegend(getRequest('legend', 1));
-$graph->showWorkPeriod(getRequest('showworkperiod', 1));
-$graph->showTriggers(getRequest('showtriggers', 1));
-$graph->setYMinAxisType(getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
-$graph->setYMaxAxisType(getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
-$graph->setYAxisMin(getRequest('yaxismin', 0.00));
-$graph->setYAxisMax(getRequest('yaxismax', 100.00));
-$graph->setYMinItemId(getRequest('ymin_itemid', 0));
-$graph->setYMaxItemId(getRequest('ymax_itemid', 0));
-$graph->setLeftPercentage(getRequest('percent_left', 0));
-$graph->setRightPercentage(getRequest('percent_right', 0));
-$graph->setOuter(getRequest('outer', 0));
-
-if (getRequest('widget_view') === '1') {
-	$graph->draw_header = false;
-	$graph->with_vertical_padding = false;
-}
-
-foreach ($graph_items as $graph_item) {
-	$graph->addItem($graph_item);
-}
-
-if (getRequest('onlyHeight', '0') === '1') {
-	$graph->drawDimensions();
-	$height = $graph->getHeight();
-
-	if (getRequest('widget_view') === '1') {
-		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
-	}
-	header('X-ZBX-SBOX-HEIGHT: '.$height);
+if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
+	show_error_message(reset($errors));
 }
 else {
-	$graph->draw();
+	CProfile::update($idx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
+
+	$graph = new CLineGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
+	$graph->setHeader($name);
+	$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+	$graph->setSTime($timeline['from_ts']);
+	$graph->setWidth(getRequest('width', 900));
+	$graph->setHeight(getRequest('height', 200));
+	$graph->showLegend(getRequest('legend', 1));
+	$graph->showWorkPeriod(getRequest('showworkperiod', 1));
+	$graph->showTriggers(getRequest('showtriggers', 1));
+	$graph->setYMinAxisType(getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
+	$graph->setYMaxAxisType(getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
+	$graph->setYAxisMin(getRequest('yaxismin', 0.00));
+	$graph->setYAxisMax(getRequest('yaxismax', 100.00));
+	$graph->setYMinItemId(getRequest('ymin_itemid', 0));
+	$graph->setYMaxItemId(getRequest('ymax_itemid', 0));
+	$graph->setLeftPercentage(getRequest('percent_left', 0));
+	$graph->setRightPercentage(getRequest('percent_right', 0));
+	$graph->setOuter(getRequest('outer', 0));
+
+	if (getRequest('widget_view') === '1') {
+		$graph->draw_header = false;
+		$graph->with_vertical_padding = false;
+	}
+
+	foreach ($graph_items as $graph_item) {
+		$graph->addItem($graph_item);
+	}
+
+	if (getRequest('onlyHeight', '0') === '1') {
+		$graph->drawDimensions();
+		$height = $graph->getHeight();
+
+		if (getRequest('widget_view') === '1') {
+			$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+		header('X-ZBX-SBOX-HEIGHT: '.$height);
+	}
+	else {
+		$graph->draw();
+	}
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -81,29 +81,38 @@ $pageFilter = new CPageFilter([
 /*
  * Display
  */
-$data = [
-	'pageFilter' => $pageFilter,
-	'graphid' => $pageFilter->graphid,
-	'fullscreen' => $_REQUEST['fullscreen'],
-	'action' => getRequest('action', HISTORY_GRAPH),
-	'actions' => [
-		HISTORY_GRAPH => _('Graph'),
-		HISTORY_VALUES => _('Values')
-	],
-	'timeline' => calculateTime([
-		'profileIdx' => 'web.graphs.filter',
-		'profileIdx2' => $pageFilter->graphid,
-		'updateProfile' => (hasRequest('from') && hasRequest('to')),
-		'from' => getRequest('from'),
-		'to' => getRequest('to')
-	]),
-	'active_tab' => CProfile::get('web.graphs.filter.active', 1)
-];
+$timeline = getTimeSelectorPeriod([
+	'profileIdx' => 'web.graphs.filter',
+	'profileIdx2' => $pageFilter->graphid,
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
+]);
 
-// render view
-$chartsView = new CView('monitoring.charts', $data);
-$chartsView->render();
-show_messages();
-$chartsView->show();
+if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
+	show_error_message(reset($errors));
+}
+else {
+	if (hasRequest('from') || hasRequest('to')) {
+		updateTimeSelectorPeriod($timeline['profileIdx'], $timeline['profileIdx2'], $timeline['from'], $timeline['to']);
+	}
+
+	$data = [
+		'pageFilter' => $pageFilter,
+		'graphid' => $pageFilter->graphid,
+		'fullscreen' => $_REQUEST['fullscreen'],
+		'action' => getRequest('action', HISTORY_GRAPH),
+		'actions' => [
+			HISTORY_GRAPH => _('Graph'),
+			HISTORY_VALUES => _('Values')
+		],
+		'timeline' => $timeline,
+		'active_tab' => CProfile::get('web.graphs.filter.active', 1)
+	];
+
+	// render view
+	$chartsView = new CView('monitoring.charts', $data);
+	$chartsView->render();
+	$chartsView->show();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';

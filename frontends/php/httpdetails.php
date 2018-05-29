@@ -59,148 +59,153 @@ if (!$httptest) {
 	access_deny();
 }
 
-$timeline = calculateTime([
+$errors = [];
+$timeline = getTimeSelectorPeriod([
 	'profileIdx' => 'web.httpdetails.filter',
 	'profileIdx2' => $httptest['httptestid'],
 	'from' => getRequest('from'),
-	'to' => getRequest('to'),
-	'updateProfile' => (hasRequest('from') && hasRequest('to'))
+	'to' => getRequest('to')
 ]);
 
-show_messages();
+if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
+	show_error_message(reset($errors));
+}
+else {
+	if (hasRequest('from') || hasRequest('to')) {
+		updateTimeSelectorPeriod($timeline['profileIdx'], 0, $timeline['from'], $timeline['to']);
+	}
 
-$http_test_name = CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name']);
+	$http_test_name = CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name']);
 
-// Create details widget.
-$details_screen = CScreenBuilder::getScreen([
-	'resourcetype' => SCREEN_RESOURCE_HTTPTEST_DETAILS,
-	'mode' => SCREEN_MODE_JS,
-	'dataId' => 'httptest_details',
-	'updateProfile' => false,
-] + $timeline);
+	// Create details widget.
+	$details_screen = CScreenBuilder::getScreen([
+		'resourcetype' => SCREEN_RESOURCE_HTTPTEST_DETAILS,
+		'mode' => SCREEN_MODE_JS,
+		'dataId' => 'httptest_details'
+	] + $timeline);
 
-(new CWidget())
-	->setTitle(_('Details of web scenario').': '.$http_test_name)
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	)
-	->addItem($details_screen->get())
-	->show();
+	(new CWidget())
+		->setTitle(_('Details of web scenario').': '.$http_test_name)
+		->setControls((new CTag('nav', true,
+			(new CForm())
+				->cleanItems()
+				->addItem((new CList())
+					->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+				)
+			))
+				->setAttribute('aria-label', _('Content controls'))
+		)
+		->addItem($details_screen->get())
+		->show();
 
-echo BR();
+	echo BR();
 
-$graphs = [];
+	$graphs = [];
 
-// dims
-$graph_dims = getGraphDims();
-$graph_dims['width'] = -50;
-$graph_dims['graphHeight'] = 150;
+	// dims
+	$graph_dims = getGraphDims();
+	$graph_dims['width'] = -50;
+	$graph_dims['graphHeight'] = 150;
 
-/*
- * Graph in
- */
-$graph_in = new CScreenBase([
-	'resourcetype' => SCREEN_RESOURCE_GRAPH,
-	'mode' => SCREEN_MODE_PREVIEW,
-	'dataId' => 'graph_in',
-	'updateProfile' => false
-] + $timeline);
+	/*
+	 * Graph in
+	 */
+	$graph_in = new CScreenBase([
+		'resourcetype' => SCREEN_RESOURCE_GRAPH,
+		'mode' => SCREEN_MODE_PREVIEW,
+		'dataId' => 'graph_in',
+		'updateProfile' => false
+	] + $timeline);
 
-$items = DBfetchArray(DBselect(
-	'SELECT i.itemid,i.value_type,i.history,i.trends,i.hostid'.
-	' FROM items i,httpstepitem hi,httpstep hs'.
-	' WHERE i.itemid=hi.itemid'.
-		' AND hi.httpstepid=hs.httpstepid'.
-		' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
-));
+	$items = DBfetchArray(DBselect(
+		'SELECT i.itemid,i.value_type,i.history,i.trends,i.hostid'.
+		' FROM items i,httpstepitem hi,httpstep hs'.
+		' WHERE i.itemid=hi.itemid'.
+			' AND hi.httpstepid=hs.httpstepid'.
+			' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
+	));
 
-$url = (new CUrl('chart3.php'))
-	->setArgument('height', 150)
-	->setArgument('name', $http_test_name.': '._('Speed'))
-	->setArgument('http_item_type', HTTPSTEP_ITEM_TYPE_IN)
-	->setArgument('httptestid', $httptest['httptestid'])
-	->setArgument('graphtype', GRAPH_TYPE_STACKED)
-	->setArgument('from', $graph_in->timeline['from'])
-	->setArgument('to', $graph_in->timeline['to'])
-	->setArgument('profileIdx', $graph_in->profileIdx)
-	->setArgument('profileIdx2', $graph_in->profileIdx2)
-	->getUrl();
+	$url = (new CUrl('chart3.php'))
+		->setArgument('height', 150)
+		->setArgument('name', $http_test_name.': '._('Speed'))
+		->setArgument('http_item_type', HTTPSTEP_ITEM_TYPE_IN)
+		->setArgument('httptestid', $httptest['httptestid'])
+		->setArgument('graphtype', GRAPH_TYPE_STACKED)
+		->setArgument('from', $graph_in->timeline['from'])
+		->setArgument('to', $graph_in->timeline['to'])
+		->setArgument('profileIdx', $graph_in->profileIdx)
+		->setArgument('profileIdx2', $graph_in->profileIdx2)
+		->getUrl();
 
-$graphs[] = (new CDiv(new CLink(null, $url)))
-	->addClass('flickerfreescreen')
-	->setId('flickerfreescreen_graph_in')
-	->setAttribute('data-timestamp', time());
+	$graphs[] = (new CDiv(new CLink(null, $url)))
+		->addClass('flickerfreescreen')
+		->setId('flickerfreescreen_graph_in')
+		->setAttribute('data-timestamp', time());
 
-$time_control_data = [
-	'id' => 'graph_in',
-	'containerid' => 'flickerfreescreen_graph_in',
-	'src' => $url,
-	'objDims' => $graph_dims,
-	'loadSBox' => 1,
-	'loadImage' => 1
-];
-zbx_add_post_js('timeControl.addObject("graph_in", '.zbx_jsvalue($graph_in->timeline).', '.
-	zbx_jsvalue($time_control_data).');'
-);
-$graph_in->insertFlickerfreeJs();
+	$time_control_data = [
+		'id' => 'graph_in',
+		'containerid' => 'flickerfreescreen_graph_in',
+		'src' => $url,
+		'objDims' => $graph_dims,
+		'loadSBox' => 1,
+		'loadImage' => 1
+	];
+	zbx_add_post_js('timeControl.addObject("graph_in", '.zbx_jsvalue($graph_in->timeline).', '.
+		zbx_jsvalue($time_control_data).');'
+	);
+	$graph_in->insertFlickerfreeJs();
 
-/*
- * Graph time
- */
-$graph_time = new CScreenBase([
-	'resourcetype' => SCREEN_RESOURCE_GRAPH,
-	'mode' => SCREEN_MODE_PREVIEW,
-	'dataId' => 'graph_time',
-	'updateProfile' => false
-] + $timeline);
+	/*
+	 * Graph time
+	 */
+	$graph_time = new CScreenBase([
+		'resourcetype' => SCREEN_RESOURCE_GRAPH,
+		'mode' => SCREEN_MODE_PREVIEW,
+		'dataId' => 'graph_time'
+	] + $timeline);
 
-$url = (new CUrl('chart3.php'))
-	->setArgument('height', 150)
-	->setArgument('name', $http_test_name.': '._('Response time'))
-	->setArgument('http_item_type', HTTPSTEP_ITEM_TYPE_TIME)
-	->setArgument('httptestid', $httptest['httptestid'])
-	->setArgument('graphtype', GRAPH_TYPE_STACKED)
-	->setArgument('from', $graph_time->timeline['from'])
-	->setArgument('to', $graph_time->timeline['to'])
-	->setArgument('profileIdx', $graph_time->profileIdx)
-	->setArgument('profileIdx2', $graph_time->profileIdx2)
-	->getUrl();
+	$url = (new CUrl('chart3.php'))
+		->setArgument('height', 150)
+		->setArgument('name', $http_test_name.': '._('Response time'))
+		->setArgument('http_item_type', HTTPSTEP_ITEM_TYPE_TIME)
+		->setArgument('httptestid', $httptest['httptestid'])
+		->setArgument('graphtype', GRAPH_TYPE_STACKED)
+		->setArgument('from', $graph_time->timeline['from'])
+		->setArgument('to', $graph_time->timeline['to'])
+		->setArgument('profileIdx', $graph_time->profileIdx)
+		->setArgument('profileIdx2', $graph_time->profileIdx2)
+		->getUrl();
 
-$graphs[] = (new CDiv(new CLink(null, $url)))
-	->addClass('flickerfreescreen')
-	->setId('flickerfreescreen_graph_time')
-	->setAttribute('data-timestamp', time());
+	$graphs[] = (new CDiv(new CLink(null, $url)))
+		->addClass('flickerfreescreen')
+		->setId('flickerfreescreen_graph_time')
+		->setAttribute('data-timestamp', time());
 
-$time_control_data = [
-	'id' => 'graph_time',
-	'containerid' => 'flickerfreescreen_graph_time',
-	'src' => $url,
-	'objDims' => $graph_dims,
-	'loadSBox' => 1,
-	'loadImage' => 1
-];
-zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($graph_in->timeline).', '.
-	zbx_jsvalue($time_control_data).');'
-);
-$graph_time->insertFlickerfreeJs();
+	$time_control_data = [
+		'id' => 'graph_time',
+		'containerid' => 'flickerfreescreen_graph_time',
+		'src' => $url,
+		'objDims' => $graph_dims,
+		'loadSBox' => 1,
+		'loadImage' => 1
+	];
+	zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($graph_in->timeline).', '.
+		zbx_jsvalue($time_control_data).');'
+	);
+	$graph_time->insertFlickerfreeJs();
 
-// scroll
-CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
+	// scroll
+	CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
-// Create graphs widget.
-(new CWidget())
-	->addItem((new CFilter())
-		->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
-		->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
-		->addTimeSelector($timeline['from'], $timeline['to'])
-	)
-	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
-	->show();
+	// Create graphs widget.
+	(new CWidget())
+		->addItem((new CFilter())
+			->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
+			->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
+			->addTimeSelector($timeline['from'], $timeline['to'])
+		)
+		->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
+		->show();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';
