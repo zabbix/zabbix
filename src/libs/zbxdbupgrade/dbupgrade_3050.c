@@ -813,6 +813,21 @@ static int	DBpatch_3050071(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050072(void)
+{
+	return DBcreate_index("autoreg_host", "autoreg_host_2", "proxy_hostid", 0);
+}
+
+static int	DBpatch_3050073(void)
+{
+	return DBdrop_index("autoreg_host", "autoreg_host_1");
+}
+
+static int	DBpatch_3050074(void)
+{
+	return DBcreate_index("autoreg_host", "autoreg_host_1", "host", 0);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -887,5 +902,8 @@ DBPATCH_ADD(3050068, 0, 1)
 DBPATCH_ADD(3050069, 0, 1)
 DBPATCH_ADD(3050070, 0, 1)
 DBPATCH_ADD(3050071, 0, 1)
+DBPATCH_ADD(3050072, 0, 1)
+DBPATCH_ADD(3050073, 0, 1)
+DBPATCH_ADD(3050074, 0, 1)
 
 DBPATCH_END()
