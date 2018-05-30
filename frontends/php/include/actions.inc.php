@@ -2230,9 +2230,7 @@ function makeEventHistoryTable(array $actions, array $users, array $config) {
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
 			makeActionTableIcon($action, $config),
-			(mb_strlen($action['message']) > ZBX_EVENT_MESSAGE_MAX_LENGTH)
-				? mb_substr($action['message'], 0, ZBX_EVENT_MESSAGE_MAX_LENGTH).'...'
-				: $action['message']
+			$action['message']
 		]);
 	}
 
@@ -2277,7 +2275,7 @@ function makeActionTableUser(array $action, array $users) {
 function makeEventDetailsTableUser(array $action, array $users) {
 	if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_MESSAGE) {
 		return array_key_exists($action['userid'], $users)
-			? [bold(getUserFullname($users[$action['userid']])), BR(), zbx_nl2br($action['sendto'])]
+			? [getUserFullname($users[$action['userid']]), BR(), italic(zbx_nl2br($action['sendto']))]
 			: _('Inaccessible user');
 	}
 	elseif ($action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE) {
@@ -2349,7 +2347,7 @@ function makeActionTableIcon(array $action, array $config) {
 					: ZBX_STYLE_ACTION_MESSAGE;
 			$title = ($action['alerttype'] == ALERT_TYPE_COMMAND)
 				? _('Remote command')
-				: _('Message action');
+				: _('Alert message');
 			return makeActionIcon(['icon' => $action_icon, 'title' => $title]);
 	}
 }
