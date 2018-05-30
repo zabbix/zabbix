@@ -591,8 +591,10 @@ var timeControl = {
 				}
 			})
 			.on('load', function() {
-				clone.css({position: 'relative'});
-				img.remove();
+				jQuery('#' + id)
+					.first().css({position: 'relative'})
+					.siblings('img').remove();
+
 				// Update dashboard widget footer.
 				if (obj.onDashboard) {
 					timeControl.updateDashboardFooter(id);
