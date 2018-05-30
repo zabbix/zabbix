@@ -21,12 +21,10 @@
 #include "log.h"
 #include "mutexs.h"
 
-#define ZBX_PTHREAD
-
 #ifdef _WINDOWS
 #	include "sysinfo.h"
 #else
-#ifdef ZBX_PTHREAD
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 typedef struct
 {
 	pthread_mutex_t		mutexes[ZBX_MUTEX_COUNT];
@@ -59,7 +57,7 @@ static int			shm_id = -1, locks_disabled;
 
 int	zbx_locks_create(char **error)
 {
-#ifdef ZBX_PTHREAD
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 	int			i;
 	pthread_mutexattr_t	mta;
 	pthread_rwlockattr_t	rwa;
@@ -165,7 +163,7 @@ int	zbx_locks_create(char **error)
 	return SUCCEED;
 }
 
-#ifdef ZBX_PTHREAD
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error)
 {
 	ZBX_UNUSED(error);
@@ -265,7 +263,7 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 	}
 #else
 	ZBX_UNUSED(error);
-#ifndef	ZBX_PTHREAD
+#ifndef	HAVE_PTHREAD_PROCESS_SHARED
 	mutexes++;
 #endif
 	*mutex = name;
@@ -287,7 +285,7 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #ifndef _WINDOWS
-#ifndef	ZBX_PTHREAD
+#ifndef	HAVE_PTHREAD_PROCESS_SHARED
 	struct sembuf	sem_lock;
 #endif
 #else
@@ -321,7 +319,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 			exit(EXIT_FAILURE);
 	}
 #else
-#ifdef	ZBX_PTHREAD
+#ifdef	HAVE_PTHREAD_PROCESS_SHARED
 	if (0 != locks_disabled)
 		return;
 
@@ -361,7 +359,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #ifndef _WINDOWS
-#ifndef	ZBX_PTHREAD
+#ifndef	HAVE_PTHREAD_PROCESS_SHARED
 	struct sembuf	sem_unlock;
 #endif
 #endif
@@ -377,7 +375,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 		exit(EXIT_FAILURE);
 	}
 #else
-#ifdef	ZBX_PTHREAD
+#ifdef	HAVE_PTHREAD_PROCESS_SHARED
 	if (0 != locks_disabled)
 		return;
 
@@ -423,7 +421,7 @@ void	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 	if (0 == CloseHandle(*mutex))
 		zbx_error("error on mutex destroying: %s", strerror_from_system(GetLastError()));
 #else
-#ifdef	ZBX_PTHREAD
+#ifdef	HAVE_PTHREAD_PROCESS_SHARED
 	if (0 != locks_disabled)
 		return;
 

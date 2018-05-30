@@ -1604,9 +1604,6 @@ AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 dnl Check for process shared libpthread lock support
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
 	LIBPTHREAD_CHECK_CONFIG([no])
-	if test "x$found_libpthread" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpthread(libpthread check failed)])
-	fi
 fi
 
 CFLAGS="$CFLAGS $LIBPTHREAD_CFLAGS"

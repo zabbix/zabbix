@@ -1212,7 +1212,7 @@ void	zbx_on_exit(void)
 		zbx_threads_wait(threads, threads_num);	/* wait for all child processes to exit */
 		zbx_free(threads);
 	}
-#ifdef ZBX_PTHREAD
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
 	free_metrics();

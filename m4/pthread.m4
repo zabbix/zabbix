@@ -22,12 +22,25 @@ int	main()
 	pthread_mutexattr_t	mta;
 	pthread_rwlockattr_t	rwa;
 	pthread_mutex_t		mutex;
-	pthread_rwlock_t	rwloc;
+	pthread_rwlock_t	rwlock;
 
 	if (0 != pthread_mutexattr_init(&mta))
-	{
 		return 1;
-	}
+
+	if (0 != pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED))
+		return 2;
+
+	if (0 != pthread_mutex_init(&mutex, &mta))
+		return 3;
+
+	if (0 != pthread_rwlockattr_init(&rwa))
+		return 4;
+
+	if (0 != pthread_rwlockattr_setpshared(&rwa, PTHREAD_PROCESS_SHARED))
+		return 5;
+
+	if (0 != pthread_rwlock_init(&rwlock, &rwa))
+		return 6;
 
 	return 0;
 }
@@ -114,7 +127,7 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 	fi
 
 	if test "x$found_libpthread" = "xyes"; then
-		AC_DEFINE([HAVE_LIBPTHREAD_H], 1, [Define to 1 if you have the 'libpthread' library (-lpthread)])
+		AC_DEFINE([HAVE_PTHREAD_PROCESS_SHARED], 1, [Define to 1 if you have the 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag (-lpthread)])
 		AC_MSG_RESULT(yes)
 	else
 		LIBPTHREAD_CFLAGS=""

@@ -31,7 +31,6 @@
 #	define ZBX_MUTEX_PERFSTAT	zbx_mutex_create_per_process_name(L"ZBX_MUTEX_PERFSTAT")
 
 #else	/* not _WINDOWS */
-#define ZBX_PTHREAD
 typedef enum
 {
 	ZBX_MUTEX_LOG = 0,
@@ -47,7 +46,7 @@ typedef enum
 	ZBX_MUTEX_SQLITE3,
 	ZBX_MUTEX_PROCSTAT,
 	ZBX_MUTEX_PROXY_HISTORY,
-#ifndef ZBX_PTHREAD
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
 	ZBX_MUTEX_CONFIG,
 #endif
 	ZBX_MUTEX_COUNT,
@@ -58,7 +57,7 @@ zbx_mutex_lock_type_t;
 #	define ZBX_MUTEX		zbx_mutex_lock_type_t
 #	define ZBX_MUTEX_NAME		zbx_mutex_lock_type_t
 
-#ifdef ZBX_PTHREAD
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 typedef enum
 {
 	ZBX_RWLOCK_CONFIG = 0,
@@ -79,7 +78,7 @@ zbx_rwlock_lock_type_t;
 int	zbx_locks_create(char **error);
 #endif	/* _WINDOWS */
 
-#ifdef ZBX_PTHREAD
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 #define zbx_rwlock_wrlock(mutex)		__zbx_rwlock_wrlock(__FILE__, __LINE__, mutex)
 #define zbx_rwlock_rdlock(mutex)		__zbx_rwlock_rdlock(__FILE__, __LINE__, mutex)
 #define zbx_rwlock_unlock(mutex)		__zbx_rwlock_unlock(__FILE__, __LINE__, mutex)
