@@ -547,10 +547,10 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 	$problems = getTriggerLastProblems(array_keys($triggers), ['eventid', 'objectid', 'clock', 'acknowledged', 'ns']);
 
-	$events = [];
+	$eventids = [];
 	foreach ($problems as $problem) {
 		$triggers[$problem['objectid']]['lastEvent'] = $problem;
-		$events[$problem['eventid']] = ['eventid' => $problem['eventid']];
+		$eventids[$problem['eventid']] = true;
 	}
 
 	// get acknowledges
@@ -561,17 +561,38 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 	}
 
-	if ($events) {
-		$event_acknowledges = API::Event()->get([
-			'output' => ['eventid'],
-			'eventids' => array_keys($events),
-			'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
+	// get actions
+	$events = $eventids
+		? API::Event()->get([
+			'output' => ['eventid', 'objectid', 'clock', 'severity', 'r_eventid'],
+			'eventids' => array_keys($eventids),
+			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'preservekeys' => true
-		]);
-	}
+		])
+		: [];
 
-	// actions
-	$actions = makeEventsActions($events);
+	$config = select_config();
+	$severity_config = [
+		'severity_name_0' => $config['severity_name_0'],
+		'severity_name_1' => $config['severity_name_1'],
+		'severity_name_2' => $config['severity_name_2'],
+		'severity_name_3' => $config['severity_name_3'],
+		'severity_name_4' => $config['severity_name_4'],
+		'severity_name_5' => $config['severity_name_5']
+	];
+	$messages = getEventsMessages($events);
+	$severities = getEventsSeverityChanges($events, $triggers);
+	$actions = getEventsActions($events);
+	$users = API::User()->get([
+		'output' => ['alias', 'name', 'surname'],
+		'userids' => array_keys($messages['userids'] + $severities['userids'] + $actions['userids']),
+		'preservekeys' => true
+	]);
+	$mediatypes = API::Mediatype()->get([
+		'output' => ['description', 'maxattempts'],
+		'mediatypeids' => array_keys($actions['mediatypeids']),
+		'preservekeys' => true
+	]);
 
 	// indicator of sort field
 	if ($show_sort_indicator) {
@@ -680,9 +701,6 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		if (array_key_exists('lastEvent', $trigger)) {
-			$trigger['lastEvent']['acknowledges'] =
-				$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
-
 			$acknowledged = ($trigger['lastEvent']['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 			$problem_update_url = (new CUrl('zabbix.php'))
@@ -715,10 +733,12 @@ function make_latest_issues(array $filter = [], $backurl) {
 				->setArgument('filter_set', '1')
 		);
 
-		// actions
-		$action_hint = (array_key_exists('lastEvent', $trigger) && isset($actions[$trigger['lastEvent']['eventid']]))
-			? $actions[$trigger['lastEvent']['eventid']]
-			: SPACE;
+		// Make icons for actions column.
+		$action_icons = [
+			makeEventMessagesIcon($messages['data'][$trigger['lastEvent']['eventid']], $users),
+			makeEventSeverityChangesIcon($severities['data'][$trigger['lastEvent']['eventid']], $users, $severity_config),
+			makeEventActionsIcon($actions['data'][$trigger['lastEvent']['eventid']], $users, $mediatypes, $severity_config)
+		];
 
 		$table->addRow([
 			(new CCol($host_list)),
@@ -727,7 +747,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			zbx_date2age($trigger['lastchange']),
 			makeInformationList($info_icons),
 			$ack,
-			(new CCol($action_hint))->addClass(ZBX_STYLE_NOWRAP)
+			$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : ''
 		]);
 	}
 
