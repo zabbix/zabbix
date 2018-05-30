@@ -305,6 +305,7 @@
 
 						// set html
 						if ($('#flickerfreescreen_' + id).data('timestamp') < htmlTimestamp) {
+							$('[data-hintbox=1]', $('#flickerfreescreen_' + id)).trigger('remove');
 							$('#flickerfreescreen_' + id).replaceWith(html);
 
 							screen.isRefreshing = false;
@@ -315,6 +316,7 @@
 							window.flickerfreeScreenShadow.validate(id);
 						}
 						else if (!html.length) {
+							$('[data-hintbox=1]', $('#flickerfreescreen_' + id)).trigger('remove');
 							$('#flickerfreescreen_' + id).remove();
 						}
 
