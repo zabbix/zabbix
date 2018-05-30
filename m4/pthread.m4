@@ -20,7 +20,7 @@ AC_TRY_LINK(
 [
 	pthread_mutexattr_t	mta;
 	pthread_mutex_t		mutex;
-r
+
 	pthread_mutexattr_init(&mta);
 	pthread_mutex_init(&mutex, &mta);
 ],
