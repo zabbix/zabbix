@@ -781,49 +781,66 @@ static int	DBpatch_3050069(void)
 
 static int	DBpatch_3050070(void)
 {
-	int	res;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
 
-	/* delete old autoreg_host entries that have same host for different Zabbix proxy */
-	res = DBexecute("delete from autoreg_host"
-			" where autoreg_host.proxy_hostid is not null and not exists ("
-				"select null from hosts"
-				" where autoreg_host.proxy_hostid=hosts.proxy_hostid and autoreg_host.host=hosts.host"
-			")");
+	zbx_vector_uint64_create(&ids);
 
-	if (ZBX_DB_OK > res)
-		return FAIL;
+	result = DBselect(
+			"select a.autoreg_hostid,a.proxy_hostid,h.proxy_hostid"
+			" from autoreg_host a"
+			" left join hosts h"
+				" on h.host=a.host");
 
-	return SUCCEED;
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	autoreg_proxy_hostid, host_proxy_hostid;
+
+		ZBX_DBROW2UINT64(autoreg_proxy_hostid, row[1]);
+		ZBX_DBROW2UINT64(host_proxy_hostid, row[2]);
+
+		if (SUCCEED == DBis_null(row[2]) || autoreg_proxy_hostid != host_proxy_hostid)
+		{
+			zbx_uint64_t	id;
+
+			ZBX_STR2UINT64(id, row[0]);
+			zbx_vector_uint64_append(&ids, id);
+		}
+	}
+	DBfree_result(result);
+
+	if (0 != ids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from autoreg_host where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid", ids.values, ids.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
 }
 
 static int	DBpatch_3050071(void)
 {
-	int	res;
-
-	/* delete autoreg_host entries that have same host for Zabbix server and Zabbix proxy */
-	res = DBexecute("delete from autoreg_host"
-			" where autoreg_host.proxy_hostid is null and not exists ("
-				"select null from hosts"
-				" where hosts.proxy_hostid is null and autoreg_host.host=hosts.host"
-			")");
-
-	if (ZBX_DB_OK > res)
-		return FAIL;
-
-	return SUCCEED;
+	return DBcreate_index("autoreg_host", "autoreg_host_2", "proxy_hostid", 0);
 }
 
 static int	DBpatch_3050072(void)
 {
-	return DBcreate_index("autoreg_host", "autoreg_host_2", "proxy_hostid", 0);
-}
-
-static int	DBpatch_3050073(void)
-{
 	return DBdrop_index("autoreg_host", "autoreg_host_1");
 }
 
-static int	DBpatch_3050074(void)
+static int	DBpatch_3050073(void)
 {
 	return DBcreate_index("autoreg_host", "autoreg_host_1", "host", 0);
 }
@@ -904,6 +921,5 @@ DBPATCH_ADD(3050070, 0, 1)
 DBPATCH_ADD(3050071, 0, 1)
 DBPATCH_ADD(3050072, 0, 1)
 DBPATCH_ADD(3050073, 0, 1)
-DBPATCH_ADD(3050074, 0, 1)
 
 DBPATCH_END()
