@@ -76,7 +76,7 @@
 					<li><a tabindex="0" href="">Discovery</a></li>
 					<li><a tabindex="0" href="">Services</a></li>
 				</ul>
-				<div class="server-name">Server name</div>
+				<div class="server-name">ZABBIX SERVER NAME</div>
 			</nav>
 		</div>
 	</header>
@@ -88,88 +88,71 @@
 			<div class="cell nowrap">
 				<nav aria-label="Content controls">
 					<form method="get" action="zabbix.php" accept-charset="utf-8">
-						<input type="hidden" id="action" name="action" value="problem.view"><input type="hidden" id="page" name="page" value="1">
-						<ul>
-							<li><button type="button" data-url="">Export to CSV</button></li>
-							<li><button type="button" data-url="" title="Fullscreen" class="btn-max"> </button></li>
-						</ul>
+						<input type="hidden" id="action" name="action" value="problem.view"><input type="hidden" id="fullscreen" name="fullscreen" value="1"><input type="hidden" id="page" name="page" value="1">
+						<ul><li><button type="button" data-url="zabbix.php?action=problem.view.csv&amp;page=1">Export to CSV</button></li><li><button type="button" data-url="zabbix.php?action=problem.view&amp;page=1&amp;filter_show=2&amp;filter_groupids%5B0%5D=4&amp;filter_application=&amp;filter_name=&amp;filter_severity=0&amp;filter_inventory%5B0%5D%5Bfield%5D=type&amp;filter_inventory%5B0%5D%5Bvalue%5D=&amp;filter_evaltype=0&amp;filter_tags%5B0%5D%5Btag%5D=&amp;filter_tags%5B0%5D%5Boperator%5D=0&amp;filter_tags%5B0%5D%5Bvalue%5D=&amp;filter_show_tags=3&amp;filter_maintenance=1&amp;filter_set=1" title="Normal view" class="btn-min">&nbsp;</button></li></ul>
 					</form>
 				</nav>
 			</div>
 		</div>
-		<div id="filter_1234" data-profile-idx="web.problem.filter" data-profile-idx2="0" aria-label="Filter" class="filter-space ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible">
+		<div class="filter-space ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible" id="filter_5b0d5e0da3713" data-profile-idx="web.problem.filter" data-profile-idx2="0" style="" aria-label="Filter">
 			<ul class="filter-btn-container ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
 				<li>
-					<div><button type="button" class="btn-time-left"></button><button type="button" class="btn-time-out">Zoom out</button><button type="button" class="btn-time-right" disabled="disabled"></button></div>
-				</li>
-				<li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tab_1" aria-labelledby="ui-id-1" aria-selected="true"><a class="btn-time ui-tabs-anchor" href="#tab_1" role="presentation" tabindex="-1" id="ui-id-1">Last 7 days</a></li>
-				<li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tab_2" aria-labelledby="ui-id-2" aria-selected="false"><a class="filter-trigger ui-tabs-anchor" href="#tab_2" role="presentation" tabindex="-1" id="ui-id-2">Filter</a></li>
-			</ul>
+					<div><button type="button" class="btn-time-left" disabled="disabled"></button><button type="button" class="btn-time-out" disabled="disabled">Zoom out</button><button type="button" class="btn-time-right" disabled="disabled"></button></div>
+				</li><li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tab_1" aria-labelledby="ui-id-1" aria-selected="true"><a class="btn-time ui-tabs-anchor" href="#tab_1" role="presentation" tabindex="-1" id="ui-id-1">Last 7 days</a></li><li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tab_2" aria-labelledby="ui-id-2" aria-selected="false"><a class="filter-trigger ui-tabs-anchor" href="#tab_2" role="presentation" tabindex="-1" id="ui-id-2">Filter</a></li></ul>
 			<form method="get" action="zabbix.php" accept-charset="utf-8" name="zbx_filter" id="id">
-				<input type="hidden" name="action" value="problem.view"><input type="hidden" name="page" value="1">
-				<div class="filter-container time-selection-container ui-tabs-panel ui-widget-content ui-corner-bottom" id="tab_1" style="display: flex;" aria-labelledby="ui-id-1" role="tabpanel" aria-expanded="true" aria-hidden="false">
+				<input type="hidden" name="action" value="problem.view"><input type="hidden" name="fullscreen" value="1"><input type="hidden" name="page" value="1">
+				<div class="filter-container time-selection-container ui-tabs-panel ui-widget-content ui-corner-bottom" id="tab_1" style="" aria-labelledby="ui-id-1" role="tabpanel" aria-expanded="true" aria-hidden="false">
 					<div class="time-input">
-						<ul>
-							<li><label for="from">From:</label></li>
-							<li><input type="text" id="from" name="from" value="now-2y" maxlength="255"></li>
-							<li><button type="button" id="from_calendar" name="from_calendar" class="icon-cal"></button></li>
-						</ul>
-						<ul class="time-input-error">
-							<li class="red">Maximum time period to display is 731 days.</li>
-						</ul>
-						<ul>
-							<li><label for="to">To:</label></li>
-							<li><input type="text" id="to" name="to" value="now" maxlength="255"></li>
-							<li><button type="button" id="to_calendar" name="to_calendar" class="icon-cal"></button></li>
-						</ul>
-						<ul>
-							<li><button type="button" id="apply" name="apply">Apply</button></li>
-						</ul>
+						<ul><li><label for="from">From:</label></li><li><input type="text" id="from" name="from" value="now-7d" maxlength="255"></li><li><button type="button" id="from_calendar" name="from_calendar" class="icon-cal"></button></li></ul>
+						<ul data-error-for="from" class="time-input-error" style=""><li class="red">Maximum time period to display is 731 days.</li></ul>
+						<ul><li><label for="to">To:</label></li><li><input type="text" id="to" name="to" value="now" maxlength="255"></li><li><button type="button" id="to_calendar" name="to_calendar" class="icon-cal"></button></li></ul>
+						<ul data-error-for="to" class="time-input-error" style="display: none"><li class="red"></li></ul>
+						<ul><li><button type="button" id="apply" name="apply">Apply</button></li></ul>
 					</div>
 					<div class="time-quick-range">
 						<div class="cell">
 							<ul class="time-quick">
-								<li><a data-from="now-2d/d" data-to="now" role="button" href="javascript:void(0)">Last 2 days</a></li>
-								<li><a data-from="now-7d/d" data-to="now" role="button" href="javascript:void(0)" class="selected">Last 7 days</a></li>
-								<li><a data-from="now-30d/d" data-to="now" role="button" href="javascript:void(0)">Last 30 days</a></li>
-								<li><a data-from="now-3M/M" data-to="now" role="button" href="javascript:void(0)">Last 3 months</a></li>
-								<li><a data-from="now-6M/M" data-to="now" role="button" href="javascript:void(0)">Last 6 months</a></li>
-								<li><a data-from="now-1y/y" data-to="now" role="button" href="javascript:void(0)">Last 1 year</a></li>
-								<li><a data-from="now-2y/y" data-to="now" role="button" href="javascript:void(0)">Last 2 years</a></li>
+								<li><a data-from="now-2d" data-to="now" data-label="Last 2 days" role="button" href="javascript:void(0)">Last 2 days</a></li>
+								<li><a data-from="now-7d" data-to="now" data-label="Last 7 days" class="selected" role="button" href="javascript:void(0)">Last 7 days</a></li>
+								<li><a data-from="now-30d" data-to="now" data-label="Last 30 days" role="button" href="javascript:void(0)">Last 30 days</a></li>
+								<li><a data-from="now-3M" data-to="now" data-label="Last 3 months" role="button" href="javascript:void(0)">Last 3 months</a></li>
+								<li><a data-from="now-6M" data-to="now" data-label="Last 6 months" role="button" href="javascript:void(0)">Last 6 months</a></li>
+								<li><a data-from="now-1y" data-to="now" data-label="Last 1 year" role="button" href="javascript:void(0)">Last 1 year</a></li>
+								<li><a data-from="now-2y" data-to="now" data-label="Last 2 years" role="button" href="javascript:void(0)">Last 2 years</a></li>
 							</ul>
 						</div>
 						<div class="cell">
 							<ul class="time-quick">
-								<li><a data-from="now-1d/d" data-to="now-1d/d" role="button" href="javascript:void(0)">Yesterday</a></li>
-								<li><a data-from="now-2d/d" data-to="now-2d/d" role="button" href="javascript:void(0)">Day before yesterday</a></li>
-								<li><a data-from="now-1w/d" data-to="now-1w/d" role="button" href="javascript:void(0)">This day last week</a></li>
-								<li><a data-from="now-1w/w" data-to="now-1w/w" role="button" href="javascript:void(0)">Previous week</a></li>
-								<li><a data-from="now-1M/M" data-to="now-1M/M" role="button" href="javascript:void(0)">Previous month</a></li>
-								<li><a data-from="now-1y/y" data-to="now-1y/y" role="button" href="javascript:void(0)">Previous year</a></li>
+								<li><a data-from="now-1d/d" data-to="now-1d/d" data-label="Yesterday" role="button" href="javascript:void(0)">Yesterday</a></li>
+								<li><a data-from="now-2d/d" data-to="now-2d/d" data-label="Day before yesterday" role="button" href="javascript:void(0)">Day before yesterday</a></li>
+								<li><a data-from="now-1w/d" data-to="now-1w/d" data-label="This day last week" role="button" href="javascript:void(0)">This day last week</a></li>
+								<li><a data-from="now-1w/w" data-to="now-1w/w" data-label="Previous week" role="button" href="javascript:void(0)">Previous week</a></li>
+								<li><a data-from="now-1M/M" data-to="now-1M/M" data-label="Previous month" role="button" href="javascript:void(0)">Previous month</a></li>
+								<li><a data-from="now-1y/y" data-to="now-1y/y" data-label="Previous year" role="button" href="javascript:void(0)">Previous year</a></li>
 							</ul>
 						</div>
 						<div class="cell">
 							<ul class="time-quick">
-								<li><a data-from="now/d" data-to="now/d" role="button" href="javascript:void(0)">Today</a></li>
-								<li><a data-from="now/d" data-to="now" role="button" href="javascript:void(0)">Today so far</a></li>
-								<li><a data-from="now/w" data-to="now/w" role="button" href="javascript:void(0)">This week</a></li>
-								<li><a data-from="now/w" data-to="now" role="button" href="javascript:void(0)">This week so far</a></li>
-								<li><a data-from="now/M" data-to="now/M" role="button" href="javascript:void(0)">This month</a></li>
-								<li><a data-from="now/M" data-to="now" role="button" href="javascript:void(0)">This month so far</a></li>
-								<li><a data-from="now/y" data-to="now/y" role="button" href="javascript:void(0)">This year</a></li>
-								<li><a data-from="now/y" data-to="now" role="button" href="javascript:void(0)">This year so far</a></li>
+								<li><a data-from="now/d" data-to="now/d" data-label="Today" role="button" href="javascript:void(0)">Today</a></li>
+								<li><a data-from="now/d" data-to="now" data-label="Today so far" role="button" href="javascript:void(0)">Today so far</a></li>
+								<li><a data-from="now/w" data-to="now/w" data-label="This week" role="button" href="javascript:void(0)">This week</a></li>
+								<li><a data-from="now/w" data-to="now" data-label="This week so far" role="button" href="javascript:void(0)">This week so far</a></li>
+								<li><a data-from="now/M" data-to="now/M" data-label="This month" role="button" href="javascript:void(0)">This month</a></li>
+								<li><a data-from="now/M" data-to="now" data-label="This month so far" role="button" href="javascript:void(0)">This month so far</a></li>
+								<li><a data-from="now/y" data-to="now/y" data-label="This year" role="button" href="javascript:void(0)">This year</a></li>
+								<li><a data-from="now/y" data-to="now" data-label="This year so far" role="button" href="javascript:void(0)">This year so far</a></li>
 							</ul>
 						</div>
 						<div class="cell">
 							<ul class="time-quick">
-								<li><a data-from="now-5m" data-to="now" role="button" href="javascript:void(0)">Last 5 minutes</a></li>
-								<li><a data-from="now-15m" data-to="now" role="button" href="javascript:void(0)">Last 15 minutes</a></li>
-								<li><a data-from="now-30m" data-to="now" role="button" href="javascript:void(0)">Last 30 minutes</a></li>
-								<li><a data-from="now-1h" data-to="now" role="button" href="javascript:void(0)">Last 1 hour</a></li>
-								<li><a data-from="now-3h" data-to="now" role="button" href="javascript:void(0)">Last 3 hours</a></li>
-								<li><a data-from="now-6h" data-to="now" role="button" href="javascript:void(0)">Last 6 hours</a></li>
-								<li><a data-from="now-12h" data-to="now" role="button" href="javascript:void(0)">Last 12 hours</a></li>
-								<li><a data-from="now-24h" data-to="now" role="button" href="javascript:void(0)">Last 24 hours</a></li>
+								<li><a data-from="now-5m" data-to="now" data-label="Last 5 minutes" role="button" href="javascript:void(0)">Last 5 minutes</a></li>
+								<li><a data-from="now-15m" data-to="now" data-label="Last 15 minutes" role="button" href="javascript:void(0)">Last 15 minutes</a></li>
+								<li><a data-from="now-30m" data-to="now" data-label="Last 30 minutes" role="button" href="javascript:void(0)">Last 30 minutes</a></li>
+								<li><a data-from="now-1h" data-to="now" data-label="Last 1 hour" role="button" href="javascript:void(0)">Last 1 hour</a></li>
+								<li><a data-from="now-3h" data-to="now" data-label="Last 3 hours" role="button" href="javascript:void(0)">Last 3 hours</a></li>
+								<li><a data-from="now-6h" data-to="now" data-label="Last 6 hours" role="button" href="javascript:void(0)">Last 6 hours</a></li>
+								<li><a data-from="now-12h" data-to="now" data-label="Last 12 hours" role="button" href="javascript:void(0)">Last 12 hours</a></li>
+								<li><a data-from="now-24h" data-to="now" data-label="Last 1 day" role="button" href="javascript:void(0)">Last 1 day</a></li>
 							</ul>
 						</div>
 					</div>
