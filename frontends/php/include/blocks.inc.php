@@ -226,7 +226,7 @@ function getSystemStatusData(array $filter) {
 		$config = select_config();
 		$messages = getEventsMessages($problems_data);
 		$severities = getEventsSeverityChanges($problems_data, $data['triggers']);
-		// TODO VM: possible to save one API call, if r_clock for problem will be used
+		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$actions = getEventsActions($problems_data);
 		$data['actions'] = [
 			'config' => [

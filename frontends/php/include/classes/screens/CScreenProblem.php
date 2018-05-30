@@ -590,11 +590,8 @@ class CScreenProblem extends CScreenBase {
 
 		$data['actions']['messages'] = getEventsMessages($data['problems']);
 		$data['actions']['severities'] = getEventsSeverityChanges($data['problems'], $data['triggers']);
-		// TODO VM: It is possible to remove one API::Event()->get() call, if r_clock from $event is used.
-		//			But it is not normal to have it in events array, as here we are passing problems, not events.
+		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$data['actions']['all_actions'] = getEventsActions($data['problems']);
-
-		// TODO VM: By adding extra loop, it is possible to remove 'acknowledges' array from each problem, as it is not used further.
 
 		$data['correlations'] = $correlationids
 			? API::Correlation()->get([

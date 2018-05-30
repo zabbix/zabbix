@@ -1788,7 +1788,7 @@ function getEventDetailsActions(array $event) {
 	// Get automatic actions (alerts).
 	$alerts = API::Alert()->get([
 		'output' => ['alerttype', 'clock', 'error', 'eventid', 'esc_step', 'mediatypeid', 'message', 'retries',
-			'status', 'subject', 'userid'
+			'sendto', 'status', 'subject', 'userid'
 		],
 		'eventids' => $alert_eventids
 	]);
@@ -2111,7 +2111,7 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
 
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
-			makeAlertTableUser($action, $users),
+			makeActionTableUser($action, $users),
 			makeActionTableIcon($action, $config),
 			$message,
 			makeActionTableStatus($action),
@@ -2189,11 +2189,10 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 			$message = $action['message'];
 		}
 
-		// TODO VM: for makeAlertTableUser() we should also add email address.
 		$table->addRow([
 			($action['action_type'] == ZBX_EVENT_HISTORY_ALERT) ? $action['esc_step'] : '',
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
-			makeAlertTableUser($action, $users),
+			makeEventDetailsTableUser($action, $users),
 			makeActionTableIcon($action, $config),
 			$message,
 			makeActionTableStatus($action),
@@ -2224,14 +2223,16 @@ function makeEventHistoryTable(array $actions, array $users, array $config) {
 	$table = (new CTable())->setHeader([_('Time'), _('User'), _('User action'), _('Message')]);
 
 	foreach ($actions as $action) {
-		// Added in order to reuse makeAlertTableUser() and makeActionTableIcon()
+		// Added in order to reuse makeActionTableUser() and makeActionTableIcon()
 		$action['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
-			makeAlertTableUser($action, $users),
+			makeActionTableUser($action, $users),
 			makeActionTableIcon($action, $config),
-			$action['message']
+			(mb_strlen($action['message']) > ZBX_EVENT_MESSAGE_MAX_LENGTH)
+				? mb_substr($action['message'], 0, ZBX_EVENT_MESSAGE_MAX_LENGTH).'...'
+				: $action['message']
 		]);
 	}
 
@@ -2249,9 +2250,37 @@ function makeEventHistoryTable(array $actions, array $users, array $config) {
  *
  * @return string
  */
-function makeAlertTableUser(array $action, array $users) {
+function makeActionTableUser(array $action, array $users) {
 	if (($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_MESSAGE)
 			|| $action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE) {
+		return array_key_exists($action['userid'], $users)
+			? getUserFullname($users[$action['userid']])
+			: _('Inaccessible user');
+	}
+	else {
+		return '';
+	}
+}
+
+/**
+ * Creates username for message author or alert receiver. Also contains 'sendto' for message actions.
+ *
+ * @param array $action
+ * @param array $action['action_type']  Type of event table action (ZBX_EVENT_HISTORY_*)
+ * @param array $action['alerttype']    Type of alert
+ * @param array $action['userid']       ID of message author, or alert receiver
+ * @param array $action['sendto']       Receiver media address for automatic action
+ * @param array $users                  Array with user data - alias, name, surname
+ *
+ * @return string
+ */
+function makeEventDetailsTableUser(array $action, array $users) {
+	if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_MESSAGE) {
+		return array_key_exists($action['userid'], $users)
+			? [bold(getUserFullname($users[$action['userid']])), BR(), zbx_nl2br($action['sendto'])]
+			: _('Inaccessible user');
+	}
+	elseif ($action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE) {
 		return array_key_exists($action['userid'], $users)
 			? getUserFullname($users[$action['userid']])
 			: _('Inaccessible user');
@@ -2320,7 +2349,7 @@ function makeActionTableIcon(array $action, array $config) {
 					: ZBX_STYLE_ACTION_MESSAGE;
 			$title = ($action['alerttype'] == ALERT_TYPE_COMMAND)
 				? _('Remote command')
-				: _('Alert message');
+				: _('Message action');
 			return makeActionIcon(['icon' => $action_icon, 'title' => $title]);
 	}
 }

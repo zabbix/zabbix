@@ -104,7 +104,7 @@ class CControllerAcknowledgeCreate extends CController {
 			if ($eventids) {
 				$data['eventids'] = $eventids;
 				$result = API::Event()->acknowledge($data);
-				$updated_events_count += count($eventids); // TODO VM: maybe we should count events in $result, if this may be different from $eventids.
+				$updated_events_count += count($eventids);
 			}
 
 			// Acknowledge events that are created from the same trigger if ZBX_ACKNOWLEDGE_PROBLEM is selected.

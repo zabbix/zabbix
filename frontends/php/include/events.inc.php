@@ -274,7 +274,7 @@ function make_small_eventlist($startEvent, $backurl) {
 
 	$r_events = $r_eventids
 		? API::Event()->get([
-			'output' => ['clock', 'correlationid', 'userid'],
+			'output' => ['clock'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => array_keys($r_eventids),
@@ -286,16 +286,9 @@ function make_small_eventlist($startEvent, $backurl) {
 	foreach ($events as &$event) {
 		$triggerids[] = $event['objectid'];
 
-		if (array_key_exists($event['r_eventid'], $r_events)) {
-			$event['r_clock'] = $r_events[$event['r_eventid']]['clock'];
-			$event['correlationid'] = $r_events[$event['r_eventid']]['correlationid']; // TODO VM: unused?
-			$event['userid'] = $r_events[$event['r_eventid']]['userid']; // TODO VM: unused?
-		}
-		else {
-			$event['r_clock'] = 0;
-			$event['correlationid'] = 0; // TODO VM: unused?
-			$event['userid'] = 0; // TODO VM: unused?
-		}
+		$event['r_clock'] = array_key_exists($event['r_eventid'], $r_events)
+			? $r_events[$event['r_eventid']]['clock']
+			: 0;
 	}
 	unset($event);
 
