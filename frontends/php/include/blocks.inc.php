@@ -223,20 +223,11 @@ function getSystemStatusData(array $filter) {
 		]);
 
 		// actions
-		$config = select_config();
 		$messages = getEventsMessages($problems_data);
 		$severities = getEventsSeverityChanges($problems_data, $data['triggers']);
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$actions = getEventsActions($problems_data);
 		$data['actions'] = [
-			'config' => [
-				'severity_name_0' => $config['severity_name_0'],
-				'severity_name_1' => $config['severity_name_1'],
-				'severity_name_2' => $config['severity_name_2'],
-				'severity_name_3' => $config['severity_name_3'],
-				'severity_name_4' => $config['severity_name_4'],
-				'severity_name_5' => $config['severity_name_5']
-			],
 			'messages' => $messages['data'],
 			'severities' => $severities['data'],
 			'all_actions' => $actions['data'],
@@ -367,13 +358,17 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 			$allTriggersNum = $stat['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CLinkAction($allTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $backurl, $data['actions']));
+					->setHint(makeProblemsPopup(
+							$stat['problems'], $data['triggers'], $backurl, $data['actions'], $config
+					));
 			}
 
 			$unackTriggersNum = $stat['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = (new CLinkAction($unackTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $backurl, $data['actions']));
+					->setHint(makeProblemsPopup(
+							$stat['problems_unack'], $data['triggers'], $backurl, $data['actions'], $config
+					));
 			}
 
 			switch ($filter_ext_ack) {
@@ -780,10 +775,11 @@ function make_latest_issues(array $filter = [], $backurl) {
  * @param string $triggers[<triggerid>]['hosts'][]['name']
  * @param string $backurl
  * @param array  $actions
+ * @param array  $config
  *
  * @return CTableInfo
  */
-function makeProblemsPopup(array $problems, array $triggers, $backurl, array $actions) {
+function makeProblemsPopup(array $problems, array $triggers, $backurl, array $actions, array $config) {
 	if ($problems) {
 		$tags = makeEventsTags($problems);
 	}
@@ -820,13 +816,13 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			makeEventSeverityChangesIcon(
 				$actions['severities'][$problem['eventid']],
 				$actions['users'],
-				$actions['config']
+				$config
 			),
 			makeEventActionsIcon(
 				$actions['all_actions'][$problem['eventid']],
 				$actions['users'],
 				$actions['mediatypes'],
-				$actions['config']
+				$config
 			)
 		];
 
