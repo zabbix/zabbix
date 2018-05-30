@@ -160,7 +160,6 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
 			'label' => relativeDateToText($value['from'], $value['to']),
-			'refreshable' => ($ts['from'] <= $ts['now'] && $ts['now'] <= $ts['to']),
 			'from' => $value['from'],
 			'from_ts' => $ts['from'],
 			'from_date' => $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME),

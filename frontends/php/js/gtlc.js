@@ -523,13 +523,27 @@ var timeControl = {
 					if (!obj.refresh) {
 						this.addImage(id);
 					}
-					else if (obj.timeline.refreshable) {
+					else if (this.isRefreshable(obj.timeline)) {
 						this.refreshImage(id);
 					}
 				}
 
 			}
 		}
+	},
+
+	/**
+	 * Returns is the supplied 'timeline' interval refreshable.
+	 *
+	 * @param {object} timeline
+	 * @param {int}    timeline.from_ts    Interval 'from' value as timestamp.
+	 * @param {int}    timeline.to_ts      Interval 'to' value as timestamp.
+	 */
+	isRefreshable: function(timeline) {
+		var timestamp = Math.floor((new Date()).getTime()/1000),
+			buffer = 300;
+
+		return timeline.from_ts - buffer <= timestamp && timestamp <= timeline.to_ts + buffer;
 	},
 
 	addImage: function(id) {
@@ -570,10 +584,10 @@ var timeControl = {
 	refreshImage: function(id) {
 		var obj = this.objectList[id],
 			url = new Curl(obj.src, false),
-			img = jQuery('#' + id),
+			img = jQuery('#' + id).last(),
 			zbx_sbox = img.data('zbx_sbox');
 
-		if (!obj.timeline.refreshable || (zbx_sbox && zbx_sbox.prevent_refresh)) {
+		if (!this.isRefreshable(obj.timeline) || (zbx_sbox && zbx_sbox.prevent_refresh)) {
 			return;
 		}
 
@@ -723,8 +737,7 @@ var timeControl = {
 				from: data.from,
 				from_ts: data.from_ts,
 				to: data.to,
-				to_ts: data.to_ts,
-				refreshable: data.refreshable
+				to_ts: data.to_ts
 			});
 		}
 	}

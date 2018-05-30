@@ -2614,10 +2614,8 @@ function getTimeSelectorPeriod(array $period) {
 
 	$range_time_parser->parse($profile['from']);
 	$profile['from_ts'] = $range_time_parser->getDateTime(true)->getTimestamp();
-	$time = time();
 	$range_time_parser->parse($profile['to']);
 	$profile['to_ts'] = $range_time_parser->getDateTime(false)->getTimestamp();
-	$profile['refreshable'] = ($profile['from_ts'] <= $time && $time <= $profile['to_ts']);
 
 	return $profile;
 }

@@ -82,7 +82,7 @@
 				},
 				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default';
 				ajax_url = new Curl('jsrpc.php'),
-				refresh = (!empty(is_self_refresh) || (screen.timeline && !empty(screen.timeline.refreshable))),
+				refresh = (!empty(is_self_refresh) || (screen.timeline && timeControl.isRefreshable(screen.timeline))),
 				self = this;
 
 			ajax_url.setArgument('type', 9); // PAGE_TYPE_TEXT
@@ -223,8 +223,7 @@
 						from: time_object.from,
 						to: time_object.to,
 						from_ts: time_object.from_ts,
-						to_ts: time_object.to_ts,
-						refreshable: time_object.refreshable
+						to_ts: time_object.to_ts
 					});
 
 					// restart refresh execution starting from Now
