@@ -3497,8 +3497,6 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 --------------------------------------------------------------------------------
 Changes for 2.2.22rc1
 
-New features:
-
 Bug fixes:
 ...G...... [ZBX-13781] fixed CRLF injection in Zabbix Agentd (MVekslers)
 
