@@ -543,7 +543,8 @@ var timeControl = {
 		var timestamp = Math.floor((new Date()).getTime()/1000),
 			buffer = 300;
 
-		return timeline.from_ts - buffer <= timestamp && timestamp <= timeline.to_ts + buffer;
+		return (timeline.from_ts - buffer <= timestamp && timestamp <= timeline.to_ts + buffer)
+			|| (timeline.to.indexOf('/') == -1 && timeline.to.indexOf('now') != -1);
 	},
 
 	addImage: function(id) {
