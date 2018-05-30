@@ -38,7 +38,7 @@
 #include "dbsync.h"
 
 static int	sync_in_progress = 0;
-#define	LOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(&config_lock)
+
 #define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(&config_lock)
 #define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(&config_lock)
 #define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(&config_lock)
