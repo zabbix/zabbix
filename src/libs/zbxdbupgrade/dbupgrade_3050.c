@@ -801,7 +801,7 @@ static int	DBpatch_3050070(void)
 		ZBX_DBROW2UINT64(autoreg_proxy_hostid, row[1]);
 		ZBX_DBROW2UINT64(host_proxy_hostid, row[2]);
 
-		if (SUCCEED == DBis_null(row[2]) || autoreg_proxy_hostid != host_proxy_hostid)
+		if (autoreg_proxy_hostid != host_proxy_hostid)
 		{
 			zbx_uint64_t	id;
 
