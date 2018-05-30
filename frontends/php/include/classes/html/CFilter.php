@@ -353,6 +353,11 @@ class CFilter extends CDiv {
 	public function toString($destroy = true) {
 		$headers = (new CList())->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER);
 
+		if ($this->tabs_options['active'] !== false
+				&& !array_key_exists($this->tabs_options['active'], $this->headers)) {
+			$this->tabs_options['active'] = 0;
+		}
+
 		foreach ($this->headers as $index => $header) {
 			$headers->addItem($header);
 

@@ -104,15 +104,25 @@ class CControllerProblemView extends CController {
 	protected function doAction() {
 		$sortField = $this->getInput('sort', CProfile::get('web.problem.sort', 'clock'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.problem.sortorder', ZBX_SORT_DOWN));
+		$active_tab = CProfile::get('web.problem.filter.active', 1);
 
 		CProfile::update('web.problem.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.problem.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
 		if (hasRequest('filter_set')) {
-			CProfile::update('web.problem.filter.show', $this->getInput('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM),
-				PROFILE_TYPE_INT
-			);
+			$show_db_type = CProfile::get('web.problem.filter.show', TRIGGERS_OPTION_RECENT_PROBLEM);
+			$show_type = $this->getInput('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM);
+
+			if ($show_db_type != $show_type) {
+				CProfile::update('web.problem.filter.show', $show_type, PROFILE_TYPE_INT);
+
+				if ($show_type == TRIGGERS_OPTION_ALL && $active_tab == 1) {
+					$active_tab = 2;
+					CProfile::update('web.problem.filter.active', $active_tab, PROFILE_TYPE_INT);
+				}
+			}
+
 			CProfile::updateArray('web.problem.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
 			);
@@ -308,7 +318,7 @@ class CControllerProblemView extends CController {
 				'event_ack_enable' => $config['event_ack_enable']
 			],
 			'profileIdx' => 'web.problem.filter',
-			'active_tab' => CProfile::get('web.problem.filter.active', 1)
+			'active_tab' => $active_tab
 		];
 
 		if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
