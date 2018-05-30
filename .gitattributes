@@ -319,7 +319,6 @@ src/libs/zbxdbcache/dbsync.c -text
 src/libs/zbxdbcache/dbsync.h -text
 src/libs/zbxdbhigh/trigger.c -text
 src/libs/zbxipcservice/ipcservice.c -text
-src/libs/zbxjson/json_test.c -text
 src/libs/zbxserver/macrofunc.c -text
 src/libs/zbxserver/macrofunc.h -text
 src/zabbix_java/lib/android-json-4.3_r3.1.jar -text svneol=unset#application/java-archive
@@ -352,26 +351,9 @@ src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
 tests/libs/zbxcommon/replace_key_params_dyn.yaml -text
+tests/libs/zbxcommshigh/zbx_tcp_recv_ext.yaml -text
+tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib.yaml -text
 tests/libs/zbxdbcache/zbx_vc_add_values.yaml -text
+tests/libs/zbxdbcache/zbx_vc_get_value.yaml -text
 tests/libs/zbxdbcache/zbx_vc_get_values.yaml -text
 tests/libs/zbxhistory/zbx_history_get_values.yaml -text
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
-upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png

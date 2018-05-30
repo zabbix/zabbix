@@ -2110,7 +2110,7 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 	ZBX_DC_FUNCTION		*function;
 
 	if (NULL == (result = DBselect(
-			"select i.itemid,f.functionid,f.function,f.parameter,t.triggerid"
+			"select i.itemid,f.functionid,f.name,f.parameter,t.triggerid"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -3070,7 +3070,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_hostgroup_t	*group;
 
-	if (NULL == (result = DBselect("select groupid,name from groups")))
+	if (NULL == (result = DBselect("select groupid,name from hstgrp")))
 		return FAIL;
 
 	dbsync_prepare(sync, 2, NULL);
@@ -3111,6 +3111,36 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	DBfree_result(result);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbsync_item_pp_preproc_row                                       *
+ *                                                                            *
+ * Purpose: applies necessary preprocessing before row is compared/used       *
+ *                                                                            *
+ * Parameter: row - [IN] the row to preprocess                                *
+ *                                                                            *
+ * Return value: the preprocessed row of item_preproc table                   *
+ *                                                                            *
+ * Comments: The row preprocessing can be used to expand user macros in       *
+ *           some columns.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static char	**dbsync_item_pp_preproc_row(char **row)
+{
+	zbx_uint64_t	hostid;
+
+	if (SUCCEED == dbsync_check_row_macros(row, 3))
+	{
+		/* get associated host identifier */
+		ZBX_STR2UINT64(hostid, row[5]);
+
+		/* expand user macros */
+		row[3] = zbx_dc_expand_user_macros(row[3], &hostid, 1, NULL);
+	}
+
+	return row;
 }
 
 /******************************************************************************
@@ -3164,9 +3194,10 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
 	zbx_dc_preproc_op_t	*preproc;
+	char			**row;
 
 	if (NULL == (result = DBselect(
-			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step"
+			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,i.hostid"
 			" from item_preproc pp,items i,hosts h"
 			" where pp.itemid=i.itemid"
 				" and i.hostid=h.hostid"
@@ -3178,7 +3209,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 5, NULL);
+	dbsync_prepare(sync, 6, dbsync_item_pp_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -3192,20 +3223,21 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	while (NULL != (dbrow = DBfetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
+
+		row = dbsync_preproc_row(sync, dbrow);
 
 		if (NULL == (preproc = (zbx_dc_preproc_op_t *)zbx_hashset_search(&dbsync_env.cache->preprocops,
 				&rowid)))
 		{
 			tag = ZBX_DBSYNC_ROW_ADD;
 		}
-		else if (FAIL == dbsync_compare_item_preproc(preproc, dbrow))
+		else if (FAIL == dbsync_compare_item_preproc(preproc, row))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, dbrow);
+			dbsync_add_row(sync, rowid, tag, row);
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->preprocops, &iter);

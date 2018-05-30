@@ -124,11 +124,18 @@ function getActionsBySysmap($sysmap, array $options = []) {
 	]);
 
 	$triggers = API::Trigger()->get([
-		'output' => ['triggerid'],
-		'selectHosts' => ['hostid', 'status'],
+		'output' => [],
 		'triggerids' => $triggerIds,
 		'preservekeys' => true,
 		'nopermissions' => true
+	]);
+
+	$moniored_triggers = API::Trigger()->get([
+		'output' => [],
+		'triggerids' => array_keys($triggers),
+		'monitored' => true,
+		'nopermissions' => true,
+		'preservekeys' => true
 	]);
 
 	$host_groups = API::HostGroup()->get([
@@ -138,6 +145,8 @@ function getActionsBySysmap($sysmap, array $options = []) {
 		'preservekeys' => true,
 		'nopermissions' => true
 	]);
+
+	$fullscreen = array_key_exists('fullscreen', $options) ? $options['fullscreen'] : false;
 
 	foreach ($sysmap['selements'] as $selementid => $elem) {
 		$hostId = null;
@@ -178,23 +187,20 @@ function getActionsBySysmap($sysmap, array $options = []) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
 				$gotos['submap'] = [
 					'sysmapid' => $elem['elements'][0]['sysmapid'],
-					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null,
-					'fullscreen' => array_key_exists('fullscreen', $options) ? $options['fullscreen'] : 0
+					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
 				];
+
+				if ($fullscreen) {
+					$gotos['submap']['fullscreen'] = true;
+				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$gotos['showEvents'] = false;
 				foreach ($elem['elements'] as $element) {
 					if (array_key_exists($element['triggerid'], $triggers)) {
-						$trigger = $triggers[$element['triggerid']];
-
-						foreach ($trigger['hosts'] as $host) {
-							if ($host['status'] == HOST_STATUS_MONITORED) {
-								$gotos['showEvents'] = true;
-
-								break;
-							}
+						if (array_key_exists($element['triggerid'], $moniored_triggers)) {
+							$gotos['showEvents'] = true;
 						}
 
 						$gotos['events']['triggerids'][] = $element['triggerid'];
@@ -220,9 +226,7 @@ function getActionsBySysmap($sysmap, array $options = []) {
 
 		order_result($elem['urls'], 'name');
 
-		$map = CMenuPopupHelper::getMap($hostId, $scripts, $gotos, $elem['urls'],
-			array_key_exists('fullscreen', $options) ? $options['fullscreen'] : false
-		);
+		$map = CMenuPopupHelper::getMap($hostId, $scripts, $gotos, $elem['urls'], $fullscreen);
 		if ($map == ['type' => 'map']) {
 			$map = null;
 		}
@@ -970,14 +974,28 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'selectLastEvent' => ['acknowledged'],
 			'triggerids' => array_keys($triggerIdToSelementIds),
 			'filter' => ['state' => null],
-			'nopermissions' => true
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		$monitored_triggers = API::Trigger()->get([
+			'output' => [],
+			'triggerids' => array_keys($triggers),
+			'monitored' => true,
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
 
 		foreach ($triggers as $trigger) {
+			if (!array_key_exists($trigger['triggerid'], $monitored_triggers)) {
+				$trigger['status'] = TRIGGER_STATUS_DISABLED;
+			}
+
 			foreach ($triggerIdToSelementIds[$trigger['triggerid']] as $belongs_to_sel) {
 				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 			}
 		}
+		unset($triggers, $monitored_triggers);
 	}
 
 	// triggers from submaps, skip dependent
@@ -993,11 +1011,24 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'only_true' => true
 		]);
 
+		$monitored_triggers = API::Trigger()->get([
+			'output' => [],
+			'triggerids' => array_keys($triggers),
+			'monitored' => true,
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
 		foreach ($triggers as $trigger) {
+			if (!array_key_exists($trigger['triggerid'], $monitored_triggers)) {
+				$trigger['status'] = TRIGGER_STATUS_DISABLED;
+			}
+
 			foreach ($subSysmapTriggerIdToSelementIds[$trigger['triggerid']] as $belongs_to_sel) {
 				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 			}
 		}
+		unset($triggers, $monitored_triggers);
 	}
 
 	$monitored_hostids = [];
@@ -2116,7 +2147,6 @@ function getMapHighligts($map, $map_info) {
  * @param array $sysmap
  * @param array $options                  Options used to retrieve actions.
  * @param int   $options['severity_min']  Minimal severity used.
- * @param int   $options['fullscreen']    Fullscreen flag.
  *
  * @return array
  */

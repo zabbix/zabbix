@@ -171,7 +171,10 @@ class CControllerPopupMedia extends CController {
 				'options' => $page_options,
 				'db_mediatypes' => $db_mediatypes,
 				'mediatypes' => $mediatypes,
-				'severities' => $this->severities
+				'severities' => $this->severities,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

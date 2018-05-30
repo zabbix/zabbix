@@ -1156,7 +1156,7 @@ AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
 AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
 
-AM_CONDITIONAL([ZBXCMOCKA], [test -d tests/])
+AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
@@ -1802,7 +1802,6 @@ AC_OUTPUT([
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
-	upgrades/Makefile
 	man/Makefile
 	])
 
@@ -1916,7 +1915,7 @@ echo "    Native Jabber:         ${have_jabber}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${SERVER_LDFLAGS} ${LDFLAGS}
     Libraries:             ${SERVER_LIBS} ${LIBS}
-    Config file:           ${SERVER_CONFIG_FILE}
+    Configuration file:    ${SERVER_CONFIG_FILE}
     External scripts:      ${EXTERNAL_SCRIPTS_PATH}
     Alert scripts:         ${ALERT_SCRIPTS_PATH}
     Modules:               ${LOAD_MODULE_PATH}"
@@ -1944,7 +1943,7 @@ echo "    SNMP:                  ${have_snmp}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}
-    Config file:           ${PROXY_CONFIG_FILE}
+    Configuration file:    ${PROXY_CONFIG_FILE}
     External scripts:      ${EXTERNAL_SCRIPTS_PATH}
     Modules:               ${LOAD_MODULE_PATH}"
 
@@ -1959,7 +1958,7 @@ echo "  Agent details:
     TLS:                   ${have_tls}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
     Libraries:             ${AGENT_LIBS} ${LIBS}
-    Config file:           ${AGENT_CONFIG_FILE}
+    Configuration file:    ${AGENT_CONFIG_FILE}
     Modules:               ${LOAD_MODULE_PATH}"
 
 fi

@@ -377,6 +377,10 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				}
 			});
 
+			if (fullscreen) {
+				url.setArgument('fullscreen', '1');
+			}
+
 			gotos.push({
 				label: t('Submap'),
 				url: url.getUrl()
@@ -562,42 +566,16 @@ function getMenuPopupRefresh(options) {
 	}];
 }
 
-function getMenuPopupDashboard(options) {
+function getMenuPopupDashboard(options, trigger_elmnt) {
 	jQuery.map(options.items, function(item, key) {
 		switch (key) {
 			case 'sharing':
 				if (!item.disabled) {
 					item.clickCallback = function () {
-						var	obj = jQuery(this),
-							url = new Curl('zabbix.php'),
-							error_message = t('Something went wrong. Please try again later!');
-						url.setArgument('action', 'dashboard.get');
+						var options = {'dashboardid': item.form_data.dashboardid};
+						PopUp('dashboard.share.edit', options, 'dashboard_share', trigger_elmnt);
 
-						jQuery.ajax({
-							data: {"dashboardid": item.form_data.dashboardid, 'editable': '1'},
-							type: 'GET',
-							url: url.getUrl(),
-							success: function(response) {
-								if (typeof response.data !== 'undefined') {
-									var form = jQuery('form[name="dashboard_sharing_form"]');
-
-									showDialogForm(form, {"title": t('Dashboard sharing'), "action_title": t('Update')},
-										response.data, jQuery('#dashbrd-actions')
-									);
-								}
-								else if (typeof response === 'string' && response.indexOf(t('Access denied')) !== -1) {
-									alert(t('You need permission to perform this action!'))
-								}
-								else {
-									alert(error_message);
-								}
-							},
-							error: function() {
-								alert(error_message);
-							}
-						});
-						// hide menu
-						obj.closest('.action-menu').menuPopup('close', null);
+						jQuery(this).closest('.action-menu').menuPopup('close', null);
 					}
 				}
 				break;
@@ -622,74 +600,6 @@ function getMenuPopupDashboard(options) {
 		return item;
 	});
 	return [{label: options.label, items: options.items}];
-}
-
-function showDialogForm(form, options, formData, trigger_elmnt) {
-	var oldFormParent = form.parent(),
-		errorBlockId = 'dialog-form-error-container';
-
-	// Trick to get outerWidth, outerHeight of "display:none" form.
-	form.css('visibility', 'hidden');
-	form.css('display', 'block');
-
-	if (typeof formData !== 'undefined' && typeof form.fillForm === 'function') {
-		form.fillForm(formData);
-	}
-
-	function removeErrorBlock() {
-		form.find('#' + errorBlockId).remove();
-	}
-
-	overlayDialogue({
-		'title': options.title,
-		'content': form,
-		'buttons': [
-			{
-				'title': options.action_title,
-				'focused': true,
-				'class': 'dialogue-widget-save',
-				'keepOpen': false,
-				'action': function() {
-					removeErrorBlock();
-					form.submit();
-
-					var errors = form.data('errors');
-
-					// output errors
-					if (typeof errors === 'object' && errors.length > 0) {
-						var errorBlock = makeErrorMessageBox(errors, errorBlockId);
-
-						form.prepend(errorBlock);
-
-						// If form has errors dialog overlay not be destroyed.
-						return false;
-					}
-
-					form.css('display', 'none');
-					form.css('visibility', 'hidden');
-					oldFormParent.append(form);
-
-					return true;
-				}
-			},
-			{
-				'title': t('Cancel'),
-				'class': 'btn-alt',
-				'cancel': true,
-				'action': function() {
-					removeErrorBlock();
-					// To not destroy form need to move it to old place.
-					form.css('display', 'none');
-					form.css('visibility', 'hidden');
-					oldFormParent.append(form);
-				}
-			}
-		],
-		'dialogueid': 'dashbrdShare'
-	}, trigger_elmnt);
-
-	form.css('visibility', 'visible');
-	overlayDialogueOnLoad(true);
 }
 
 /**

@@ -21,7 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageSearch extends CWebTest {
-
 	public function testPageSearch_FindZabbixServer() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestInputTypeWait('search', 'ЗАББИКС Сервер');
@@ -37,15 +36,33 @@ class testPageSearch extends CWebTest {
 		$this->zbxTestTextPresent(['Latest data', 'Triggers', 'Applications', 'Items', 'Triggers', 'Graphs', 'Problems']);
 	}
 
-	public function testPageSearch_FindNone() {
+	public function testPageSearch_FindNotExistingHost() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$this->zbxTestInputTypeWait('search', ' ');
+		$this->zbxTestInputTypeWait('search', 'Not existing host');
 		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Search');
-		$this->zbxTestCheckHeader('Search: Search pattern is empty');
+		$this->zbxTestCheckHeader('Search: Not existing host');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 		$this->zbxTestTextPresent('No data found.');
 		$this->zbxTestTextNotPresent('Zabbix server');
 	}
 
+	/**
+	 * Test if the global search form is not being submitted with empty search string.
+	 */
+	public function testPageSearch_FindEmptyString() {
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+
+		// Do not search if the search field is empty.
+		$this->zbxTestInputTypeWait('search', '');
+		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
+		$this->zbxTestCheckTitle('Dashboard');
+		$this->zbxTestCheckHeader('Dashboard');
+
+		// Do not search if search string consists only of whitespace characters.
+		$this->zbxTestInputTypeWait('search', '   ');
+		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
+		$this->zbxTestCheckTitle('Dashboard');
+		$this->zbxTestCheckHeader('Dashboard');
+	}
 }

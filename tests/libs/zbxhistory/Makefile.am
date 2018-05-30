@@ -1,3 +1,4 @@
+if SERVER
 noinst_PROGRAMS = zbx_history_get_values
 
 HISTORY_LIBS = \
@@ -35,3 +36,4 @@ zbx_history_get_values_CFLAGS = \
 	$(zbx_history_get_values_WRAP) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/tests 
+endif

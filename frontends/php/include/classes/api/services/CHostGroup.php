@@ -24,7 +24,7 @@
  */
 class CHostGroup extends CApiService {
 
-	protected $tableName = 'groups';
+	protected $tableName = 'hstgrp';
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['groupid', 'name'];
 
@@ -39,8 +39,8 @@ class CHostGroup extends CApiService {
 		$result = [];
 
 		$sqlParts = [
-			'select'	=> ['groups' => 'g.groupid'],
-			'from'		=> ['groups' => 'groups g'],
+			'select'	=> ['hstgrp' => 'g.groupid'],
+			'from'		=> ['hstgrp' => 'hstgrp g'],
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null
@@ -297,12 +297,12 @@ class CHostGroup extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
-			$this->dbFilter('groups g', $options, $sqlParts);
+			$this->dbFilter('hstgrp g', $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('groups g', $options, $sqlParts);
+			zbx_db_search('hstgrp g', $options, $sqlParts);
 		}
 
 		// limit
@@ -363,7 +363,7 @@ class CHostGroup extends CApiService {
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('groups', [
+			$db_parent_groups = DB::select('hstgrp', [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
 			]);
@@ -418,7 +418,7 @@ class CHostGroup extends CApiService {
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('groups', [
+			$db_parent_groups = DB::select('hstgrp', [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
 			]);
@@ -461,7 +461,7 @@ class CHostGroup extends CApiService {
 	public function create(array $groups) {
 		$this->validateCreate($groups);
 
-		$groupids = DB::insertBatch('groups', $groups);
+		$groupids = DB::insertBatch('hstgrp', $groups);
 
 		foreach ($groups as $index => &$group) {
 			$group['groupid'] = $groupids[$index];
@@ -497,7 +497,7 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		DB::update('groups', $upd_groups);
+		DB::update('hstgrp', $upd_groups);
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groups, $db_groups);
 
@@ -705,7 +705,7 @@ class CHostGroup extends CApiService {
 
 		DB::delete('operations', ['operationid' => $delOperationids]);
 
-		DB::delete('groups', ['groupid' => $groupids]);
+		DB::delete('hstgrp', ['groupid' => $groupids]);
 
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $db_groups);
 
@@ -720,7 +720,7 @@ class CHostGroup extends CApiService {
 	 * @throws APIException  if host group already exists.
 	 */
 	private function checkDuplicates(array $names) {
-		$db_groups = DB::select('groups', [
+		$db_groups = DB::select('hstgrp', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
 			'limit' => 1
@@ -744,7 +744,7 @@ class CHostGroup extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('groups', 'name')]
+			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -762,7 +762,7 @@ class CHostGroup extends CApiService {
 	protected function validateUpdate(array &$groups, array &$db_groups = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>		['type' => API_HG_NAME, 'length' => DB::getFieldLength('groups', 'name')]
+			'name' =>		['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

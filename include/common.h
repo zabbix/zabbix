@@ -1091,6 +1091,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
 char	*xml_escape_dyn(const char *data);
+void	xml_escape_xpath(char **data);
 
 int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
 		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
@@ -1313,6 +1314,8 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_NUMERIC	0x08000
 #define ZBX_TOKEN_JSON		0x10000
 #define ZBX_TOKEN_XML		0x20000
+#define ZBX_TOKEN_REGEXP	0x40000
+#define ZBX_TOKEN_XPATH		0x80000
 
 /* location of a substring */
 typedef struct
