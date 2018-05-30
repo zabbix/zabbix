@@ -13,6 +13,22 @@
 
 AC_DEFUN([LIBPTHREAD_TRY_LINK],
 [
+AC_TRY_LINK(
+[
+#include <pthread.h>
+],
+[
+	pthread_mutexattr_t	mta;
+	pthread_mutex_t		mutex;
+r
+	pthread_mutexattr_init(&mta);
+	pthread_mutex_init(&mutex, &mta);
+],
+found_libpthread="yes")
+])dnl
+
+AC_DEFUN([LIBPTHREAD_TRY_RUN],
+[
 AC_TRY_RUN(
 [
 #include <pthread.h>
@@ -45,7 +61,7 @@ int	main()
 	return 0;
 }
 ],
-found_libpthread="yes")
+found_libpthread_process_shared="yes")
 ])dnl
 
 AC_DEFUN([LIBPTHREAD_CHECK_CONFIG],
@@ -119,7 +135,9 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 		LIBS="$LIBS $LIBPTHREAD_LIBS"
 
 		found_libpthread="no"
+		found_libpthread_process_shared="no"
 		LIBPTHREAD_TRY_LINK([no])
+		LIBPTHREAD_TRY_RUN([no])
 
 		CFLAGS="$am_save_CFLAGS"
 		LDFLAGS="$am_save_LDFLAGS"
@@ -127,8 +145,9 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 	fi
 
 	if test "x$found_libpthread" = "xyes"; then
+		if test "x$found_libpthread_process_shared" = "xyes"; then
 		AC_DEFINE([HAVE_PTHREAD_PROCESS_SHARED], 1, [Define to 1 if you have the 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag (-lpthread)])
-		AC_MSG_RESULT(yes)
+		fi
 	else
 		LIBPTHREAD_CFLAGS=""
 		LIBPTHREAD_LDFLAGS=""
