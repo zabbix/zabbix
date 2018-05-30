@@ -42,7 +42,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'to' =>					'range_time'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -104,6 +104,14 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$dashboard = $this->dashboard;
 			unset($dashboard['widgets']);
 
+			$timeselector_options = [
+				'profileIdx' => 'web.dashbrd.filter',
+				'profileIdx2' => $this->dashboard['dashboardid'],
+				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+				'to' => $this->hasInput('to') ? $this->getInput('to') : null
+			];
+			updateTimeSelectorPeriod($timeselector_options);
+
 			$data = [
 				'dashboard' => $dashboard,
 				'fullscreen' => $fullscreen,
@@ -111,27 +119,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
 				'show_timeselector' => self::showTimeSelector($this->dashboard['widgets']),
-				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
+				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
+				'timeline' => getTimeSelectorPeriod($timeselector_options)
 			];
-
-			$timeline = getTimeSelectorPeriod([
-				'profileIdx' => 'web.dashbrd.filter',
-				'profileIdx2' => $this->dashboard['dashboardid'],
-				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-				'to' => $this->hasInput('to') ? $this->getInput('to') : null
-			]);
-
-			if ($this->hasInput('from') || $this->hasInput('to')) {
-				if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
-					$this->setResponse(new CControllerResponseData(['error' => reset($errors)]));
-
-					return;
-				}
-
-				updateTimeSelectorPeriod($timeline['profileIdx'], $timeline['profileIdx2'], $timeline['from'], $timeline['to']);
-			}
-
-			$data['timeline'] = $timeline;
 
 			$data['timeControlData'] = [
 				'mainObject' => 1,

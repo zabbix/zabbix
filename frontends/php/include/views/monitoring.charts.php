@@ -78,7 +78,6 @@ if (!empty($this->data['graphid'])) {
 			'graphid' => $data['graphid'],
 			'profileIdx' => $data['timeline']['profileIdx'],
 			'profileIdx2' => $data['timeline']['profileIdx2'],
-			'updateProfile' => false,
 			'from' => $data['timeline']['from'],
 			'to' => $data['timeline']['to']
 		]);

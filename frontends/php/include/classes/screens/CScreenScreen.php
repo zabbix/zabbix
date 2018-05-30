@@ -39,10 +39,9 @@ class CScreenScreen extends CScreenBase {
 			'mode' => ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) ? SCREEN_MODE_SLIDESHOW : SCREEN_MODE_PREVIEW,
 			'timestamp' => $this->timestamp,
 			'screen' => $screen,
-			'from' => $this->timeline['from'],
-			'to' => $this->timeline['to'],
 			'profileIdx' => $this->profileIdx,
-			'updateProfile' => false
+			'from' => $this->timeline['from'],
+			'to' => $this->timeline['to']
 		]);
 
 		return $this->getOutput($screenBuilder->show(), true);

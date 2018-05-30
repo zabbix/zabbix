@@ -414,6 +414,43 @@ function check_fields(&$fields, $show_messages = true, $add_messages_to_message_
 	return ($err == ZBX_VALID_OK);
 }
 
+/**
+ * Validate "from" and "to" parameters for allowed period.
+ *
+ * @param string|null from
+ * @param string|null to
+ */
+function validateTimeSelectorPeriod($from, $to) {
+	if ($from === null || $to == null) {
+		return;
+	}
+
+	$ts = [];
+	$range_time_parser = new CRangeTimeParser();
+
+	foreach (['from' => $from, 'to' => $to] as $field => $value) {
+		$range_time_parser->parse($value);
+		$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+	}
+
+	$period = $ts['to'] - $ts['from'] + 1;
+
+	if ($period < ZBX_MIN_PERIOD) {
+		error(_n('Minimum time period to display is %1$s minute.',
+			'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+		));
+
+		invalid_url();
+	}
+	elseif ($period > ZBX_MAX_PERIOD) {
+		error(_n('Maximum time period to display is %1$s day.',
+			'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+		));
+
+		invalid_url();
+	}
+}
+
 function validatePortNumberOrMacro($port) {
 	return (validatePortNumber($port) || validateUserMacro($port));
 }

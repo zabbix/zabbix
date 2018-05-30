@@ -50,6 +50,7 @@ $fields = [
 	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'), null]
 ];
 check_fields($fields);
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 /*
  * Permissions
@@ -79,9 +80,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Display
  */
 $data = [
-	'fullscreen' => $_REQUEST['fullscreen'],
-	'from' => getRequest('from'),
-	'to' => getRequest('to')
+	'fullscreen' => $_REQUEST['fullscreen']
 ];
 
 $options = [
@@ -121,17 +120,23 @@ else {
 		'screenids' => [$data['screen']['screenid']],
 		'editable' => true
 	]);
-	$data += [
+	$data['active_tab'] = CProfile::get('web.screens.filter.active', 1);
+
+	$timeselector_options = [
 		'profileIdx' => 'web.screens.filter',
-		'active_tab' => CProfile::get('web.screens.filter.active', 1)
+		'profileIdx2' => $data['screen']['screenid'],
+		'from' => getRequest('from'),
+		'to' => getRequest('to')
 	];
+	updateTimeSelectorPeriod($timeselector_options);
+
+	$data += $timeselector_options;
 }
 ob_end_flush();
 
 // render view
 $screenView = new CView('monitoring.screen', $data);
 $screenView->render();
-show_messages();
 $screenView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

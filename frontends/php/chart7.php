@@ -45,6 +45,7 @@ $fields = [
 if (!check_fields($fields)) {
 	exit();
 }
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $items = getRequest('items', []);
 CArrayHelper::sort($items, ['sortorder']);
@@ -87,7 +88,6 @@ foreach ($items as $item) {
 /*
  * Display
  */
-$errors = [];
 $timeline = getTimeSelectorPeriod([
 	'profileIdx' => getRequest('profileIdx'),
 	'profileIdx2' => getRequest('profileIdx2'),
@@ -95,32 +95,27 @@ $timeline = getTimeSelectorPeriod([
 	'to' => getRequest('to')
 ]);
 
-if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
-	show_error_message(reset($errors));
+$graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
+$graph->setHeader(getRequest('name', ''));
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
+
+if (!empty($_REQUEST['graph3d'])) {
+	$graph->switchPie3D();
 }
-else {
-	$graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
-	$graph->setHeader(getRequest('name', ''));
-	$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
-	$graph->setSTime($timeline['from_ts']);
 
-	if (!empty($_REQUEST['graph3d'])) {
-		$graph->switchPie3D();
-	}
-
-	if (getRequest('widget_view') === '1') {
-		$graph->draw_header = false;
-		$graph->with_vertical_padding = false;
-	}
-
-	$graph->showLegend(getRequest('legend', 0));
-	$graph->setWidth(getRequest('width', 400));
-	$graph->setHeight(getRequest('height', 300));
-
-	foreach ($items as $item) {
-		$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
-	}
-	$graph->draw();
+if (getRequest('widget_view') === '1') {
+	$graph->draw_header = false;
+	$graph->with_vertical_padding = false;
 }
+
+$graph->showLegend(getRequest('legend', 0));
+$graph->setWidth(getRequest('width', 400));
+$graph->setHeight(getRequest('height', 300));
+
+foreach ($items as $item) {
+	$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
+}
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

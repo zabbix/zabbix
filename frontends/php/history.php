@@ -56,6 +56,7 @@ $fields = [
 	'fullscreen' =>		[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'),	null]
 ];
 check_fields($fields);
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -115,6 +116,13 @@ $data = [
 if ($data['action'] != HISTORY_BATCH_GRAPH && is_array($itemids)) {
 	$data['profileIdx2'] = reset($itemids);
 }
+
+updateTimeSelectorPeriod([
+	'profileIdx' => $data['profileIdx'],
+	'profileIdx2' => $data['profileIdx2'],
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
+]);
 
 // render view
 $historyView = new CView('monitoring.history', $data);

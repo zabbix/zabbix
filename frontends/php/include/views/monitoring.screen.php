@@ -103,18 +103,17 @@ $widget->setControls((new CTag('nav', true, (new CList())
 $screenBuilder = new CScreenBuilder([
 	'screenid' => $data['screen']['screenid'],
 	'mode' => SCREEN_MODE_PREVIEW,
-	'profileIdx' => $data['profileIdx'],
-	'profileIdx2' => $data['screen']['screenid'],
 	'groupid' => getRequest('groupid'),
 	'hostid' => getRequest('hostid'),
+	'profileIdx' => $data['profileIdx'],
+	'profileIdx2' => $data['profileIdx2'],
 	'from' => $data['from'],
-	'to' => $data['to'],
-	'updateProfile' => ($data['from'] !== null && $data['to'] !== null)
+	'to' => $data['to']
 ]);
 
 $widget
 	->addItem((new CFilter())
-		->setProfile($data['profileIdx'], $data['screen']['screenid'])
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
 	)

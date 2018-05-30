@@ -41,6 +41,7 @@ $fields = [
 	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null]
 ];
 check_fields($fields);
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -62,101 +63,93 @@ elseif (hasRequest('filter_rst')) {
 /*
  * Display
  */
-$timeline = getTimeSelectorPeriod([
+$timeselector_options = [
 	'profileIdx' => 'web.auditacts.filter',
 	'profileIdx2' => 0,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
-]);
+];
+updateTimeSelectorPeriod($timeselector_options);
 
-if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
-	show_error_message(reset($errors));
+$data = [
+	'alias' => CProfile::get('web.auditacts.filter.alias', ''),
+	'users' => [],
+	'alerts' => [],
+	'paging' => null,
+	'timeline' => getTimeSelectorPeriod($timeselector_options),
+	'active_tab' => CProfile::get('web.auditacts.filter.active', 1)
+];
+
+$userid = null;
+
+if ($data['alias']) {
+	$data['users'] = API::User()->get([
+		'output' => ['userid', 'alias', 'name', 'surname'],
+		'filter' => ['alias' => $data['alias']],
+		'preservekeys' => true
+	]);
+
+	if ($data['users']) {
+		$user = reset($data['users']);
+
+		$userid = $user['userid'];
+	}
 }
-else {
-	if (hasRequest('from') || hasRequest('to')) {
-		updateTimeSelectorPeriod($timeline['profileIdx'], 0, $timeline['from'], $timeline['to']);
+
+if (!$data['alias'] || $data['users']) {
+	$config = select_config();
+
+	// fetch alerts for different objects and sources and combine them in a single stream
+	foreach (eventSourceObjects() as $eventSource) {
+		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get([
+			'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
+				'retries', 'error', 'alerttype'
+			],
+			'selectMediatypes' => ['mediatypeid', 'description', 'maxattempts'],
+			'userids' => $userid,
+			// API::Alert operates with 'open' time interval therefore before call have to alter 'from' and 'to' values.
+			'time_from' => $data['timeline']['from_ts'] - 1,
+			'time_till' => $data['timeline']['to_ts'] + 1,
+			'eventsource' => $eventSource['source'],
+			'eventobject' => $eventSource['object'],
+			'sortfield' => 'alertid',
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => $config['search_limit'] + 1
+		]));
 	}
 
-	$data = [
-		'alias' => CProfile::get('web.auditacts.filter.alias', ''),
-		'users' => [],
-		'alerts' => [],
-		'paging' => null,
-		'timeline' => $timeline,
-		'active_tab' => CProfile::get('web.auditacts.filter.active', 1)
-	];
+	CArrayHelper::sort($data['alerts'], [
+		['field' => 'alertid', 'order' => ZBX_SORT_DOWN]
+	]);
 
-	$userid = null;
+	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
-	if ($data['alias']) {
+	// paging
+	$data['paging'] = getPagingLine($data['alerts'], ZBX_SORT_DOWN, new CUrl('auditacts.php'));
+
+	// get users
+	if (!$data['alias']) {
 		$data['users'] = API::User()->get([
 			'output' => ['userid', 'alias', 'name', 'surname'],
-			'filter' => ['alias' => $data['alias']],
-			'preservekeys' => true
-		]);
-
-		if ($data['users']) {
-			$user = reset($data['users']);
-
-			$userid = $user['userid'];
-		}
-	}
-
-	if (!$data['alias'] || $data['users']) {
-		$config = select_config();
-
-		// fetch alerts for different objects and sources and combine them in a single stream
-		foreach (eventSourceObjects() as $eventSource) {
-			$data['alerts'] = array_merge($data['alerts'], API::Alert()->get([
-				'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
-					'retries', 'error', 'alerttype'
-				],
-				'selectMediatypes' => ['mediatypeid', 'description', 'maxattempts'],
-				'userids' => $userid,
-				// API::Alert operates with 'open' time interval therefore before call have to alter 'from' and 'to' values.
-				'time_from' => $data['timeline']['from_ts'] - 1,
-				'time_till' => $data['timeline']['to_ts'] + 1,
-				'eventsource' => $eventSource['source'],
-				'eventobject' => $eventSource['object'],
-				'sortfield' => 'alertid',
-				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => $config['search_limit'] + 1
-			]));
-		}
-
-		CArrayHelper::sort($data['alerts'], [
-			['field' => 'alertid', 'order' => ZBX_SORT_DOWN]
-		]);
-
-		$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
-
-		// paging
-		$data['paging'] = getPagingLine($data['alerts'], ZBX_SORT_DOWN, new CUrl('auditacts.php'));
-
-		// get users
-		if (!$data['alias']) {
-			$data['users'] = API::User()->get([
-				'output' => ['userid', 'alias', 'name', 'surname'],
-				'userids' => zbx_objectValues($data['alerts'], 'userid'),
-				'preservekeys' => true
-			]);
-		}
-	}
-
-	// get actions names
-	if ($data['alerts']) {
-		$data['actions'] = API::Action()->get([
-			'output' => ['actionid', 'name'],
-			'actionids' => array_unique(zbx_objectValues($data['alerts'], 'actionid')),
+			'userids' => zbx_objectValues($data['alerts'], 'userid'),
 			'preservekeys' => true
 		]);
 	}
-
-	// render view
-	$auditView = new CView('administration.auditacts.list', $data);
-	$auditView->render();
-	show_messages();
-	$auditView->show();
 }
+
+// get actions names
+if ($data['alerts']) {
+	$data['actions'] = API::Action()->get([
+		'output' => ['actionid', 'name'],
+		'actionids' => array_unique(zbx_objectValues($data['alerts'], 'actionid')),
+		'preservekeys' => true
+	]);
+}
+
+// render view
+$auditView = new CView('administration.auditacts.list', $data);
+$auditView->render();
+show_messages();
+$auditView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

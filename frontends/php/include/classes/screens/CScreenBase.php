@@ -110,11 +110,6 @@ class CScreenBase {
 	public $profileIdx2;
 
 	/**
-	 * @see CScreenBuilder::updateProfile
-	 */
-	public $updateProfile;
-
-	/**
 	 * Time control dom element id
 	 *
 	 * @var string
@@ -159,7 +154,6 @@ class CScreenBase {
 	 * @param int		$options['hostid']
 	 * @param string	$options['profileIdx']          Profile idx value.
 	 * @param int		$options['profileIdx2']         Profile idx2 value.
-	 * @param boolean	$options['updateProfile']       Should the profile updated with 'from' and 'to' values.
 	 * @param string	$options['from']                Start time of selected time period.
 	 * @param string	$options['to']                  End time of selected time period.
 	 * @param array		$options['timeline']
@@ -179,7 +173,6 @@ class CScreenBase {
 			'pageFile'			=> null,
 			'profileIdx'		=> '',
 			'profileIdx2'		=> null,
-			'updateProfile'		=> false,
 			'timeline'			=> null,
 			'dataId'			=> null,
 			'page'				=> 1
@@ -206,7 +199,6 @@ class CScreenBase {
 					'pageFile'			=> false,
 					'profileIdx'		=> false,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> false,
 					'timeline'			=> false,
 					'page'				=> false
 				];
@@ -222,7 +214,6 @@ class CScreenBase {
 					'pageFile'			=> false,
 					'profileIdx'		=> false,
 					'profileIdx2'		=> false,
-					'updateProfile'		=> false,
 					'timeline'			=> false,
 					'page'				=> false
 				];
@@ -238,7 +229,6 @@ class CScreenBase {
 					'pageFile'			=> false,
 					'profileIdx'		=> false,
 					'profileIdx2'		=> false,
-					'updateProfile'		=> false,
 					'timeline'			=> false,
 					'page'				=> true
 				];
@@ -254,7 +244,6 @@ class CScreenBase {
 					'pageFile'			=> false,
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> true,
 					'timeline'			=> true,
 					'page'				=> true
 				];
@@ -270,7 +259,6 @@ class CScreenBase {
 					'pageFile'			=> true,
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> true,
 					'timeline'			=> true,
 					'page'				=> true
 				];
@@ -286,7 +274,6 @@ class CScreenBase {
 					'pageFile'			=> true,
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> true,
 					'timeline'			=> true,
 					'page'				=> false
 				];

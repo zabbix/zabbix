@@ -156,7 +156,12 @@ class CControllerTimeSelectorUpdate extends CController {
 				break;
 		}
 
-		updateTimeSelectorPeriod($this->getInput('idx'), $this->getInput('idx2'), $value['from'], $value['to']);
+		updateTimeSelectorPeriod([
+			'profileIdx' => $this->getInput('idx'),
+			'profileIdx2' => $this->getInput('idx2'),
+			'from' => $value['from'],
+			'to' => $value['to']
+		]);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
 			'label' => relativeDateToText($value['from'], $value['to']),
@@ -178,29 +183,40 @@ class CControllerTimeSelectorUpdate extends CController {
 	 * @return bool
 	 */
 	protected function validateInputDateRange() {
-		$errors = [];
 		$this->data['error'] = [];
-		$from = $this->getInput('from');
-		$to = $this->getInput('to');
+		$ts = [];
 
-		if ($this->getInput('method') === 'rangeoffset'
-				&& $this->range_time_parser->parse($from) === CParser::PARSE_SUCCESS) {
-			$from = $this->range_time_parser->getDateTime(true)->getTimestamp() + $this->getInput('from_offset');
-			$from = (new DateTime())->setTimestamp($from)->format(ZBX_DATE_TIME);
-		}
+		foreach (['from', 'to'] as $field) {
+			$value = $this->getInput($field);
 
-		if ($this->getInput('method') === 'rangeoffset'
-				&& $this->range_time_parser->parse($to) === CParser::PARSE_SUCCESS) {
-			$to = $this->range_time_parser->getDateTime(false)->getTimestamp() - $this->getInput('to_offset');
-			$to = (new DateTime())->setTimestamp($to)->format(ZBX_DATE_TIME);
-		}
-
-		if (!validTimeSelectorPeriod($from, $to, $errors)) {
-			foreach ($errors as $key => $value) {
-				// Period error messages ('min_period', 'max_period') will be stored within key 'from'.
-				$key = ($key === 'to') ? $key : 'from';
-				$this->data['error'][$key] = $value;
+			if ($this->range_time_parser->parse($value) !== CParser::PARSE_SUCCESS) {
+				$this->data['error'][$field] = _('Invalid date.');
 			}
+			else {
+				$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			}
+		}
+
+		if ($this->data['error']) {
+			return false;
+		}
+
+		if ($this->getInput('method') === 'rangeoffset') {
+			$ts['from'] += $this->getInput('from_offset');
+			$ts['to'] -= $this->getInput('to_offset');
+		}
+
+		$period = $ts['to'] - $ts['from'] + 1;
+
+		if ($period < ZBX_MIN_PERIOD) {
+			$this->data['error']['from'] = _n('Minimum time period to display is %1$s minute.',
+				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+			);
+		}
+		elseif ($period > ZBX_MAX_PERIOD) {
+			$this->data['error']['from'] = _n('Maximum time period to display is %1$s day.',
+				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+			);
 		}
 
 		return !$this->data['error'];

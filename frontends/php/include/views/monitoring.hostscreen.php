@@ -70,14 +70,14 @@ else {
 		'screen' => $data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'hostid' => $data['hostid'],
-		'from' => $data['from'],
-		'to' => $data['to'],
 		'profileIdx' => $data['profileIdx'],
-		'profileIdx2' => $data['screen']['screenid']
+		'profileIdx2' => $data['profileIdx2'],
+		'from' => $data['from'],
+		'to' => $data['to']
 	]);
 
 	$filter
-		->setProfile($data['profileIdx'], $data['screen']['screenid'])
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
 

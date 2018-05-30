@@ -123,8 +123,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 			'to' => $this->timeline['to'],
 			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
-			'hostid' => $this->hostid,
-			'updateProfile' => false
+			'hostid' => $this->hostid
 		]);
 	}
 

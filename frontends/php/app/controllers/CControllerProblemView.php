@@ -65,7 +65,7 @@ class CControllerProblemView extends CController {
 			'to' =>						'range_time'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if ($ret && $this->hasInput('filter_inventory')) {
 			foreach ($this->getInput('filter_inventory') as $filter_inventory) {
@@ -317,14 +317,22 @@ class CControllerProblemView extends CController {
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable']
 			],
-			'profileIdx' => 'web.problem.filter',
 			'active_tab' => $active_tab
 		];
 
 		if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-			$data['from'] = $this->hasInput('from') ? $this->getInput('from') : null;
-			$data['to'] = $this->hasInput('to') ? $this->getInput('to') : null;
-			$data['updateProfile'] = ($data['from'] !== null && $data['to'] !== null);
+			$timeselector_options = [
+				'profileIdx' => 'web.problem.filter',
+				'profileIdx2' => 0,
+				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+				'to' => $this->hasInput('to') ? $this->getInput('to') : null
+			];
+			updateTimeSelectorPeriod($timeselector_options);
+
+			$data += $timeselector_options;
+		}
+		else {
+			$data['profileIdx'] = 'web.problem.filter';
 		}
 
 		$response = new CControllerResponseData($data);

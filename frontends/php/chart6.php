@@ -43,6 +43,7 @@ $fields = [
 if (!check_fields($fields)) {
 	exit();
 }
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 /*
  * Permissions
@@ -64,7 +65,6 @@ else {
 /*
  * Display
  */
-$errors = [];
 $timeline = getTimeSelectorPeriod([
 	'profileIdx' => getRequest('profileIdx'),
 	'profileIdx2' => getRequest('profileIdx2'),
@@ -72,66 +72,61 @@ $timeline = getTimeSelectorPeriod([
 	'to' => getRequest('to')
 ]);
 
-if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
-	show_error_message(reset($errors));
+$graph = new CPieGraphDraw($dbGraph['graphtype']);
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
+
+$width = getRequest('width', 0);
+if ($width <= 0) {
+	$width = $dbGraph['width'];
 }
-else {
-	$graph = new CPieGraphDraw($dbGraph['graphtype']);
-	$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
-	$graph->setSTime($timeline['from_ts']);
 
-	$width = getRequest('width', 0);
-	if ($width <= 0) {
-		$width = $dbGraph['width'];
-	}
-
-	$height = getRequest('height', 0);
-	if ($height <= 0) {
-		$height = $dbGraph['height'];
-	}
-
-	if (getRequest('widget_view') === '1') {
-		$graph->draw_header = false;
-		$graph->with_vertical_padding = false;
-	}
-
-	$graph->setWidth($width);
-	$graph->setHeight($height);
-
-	// array sorting
-	CArrayHelper::sort($dbGraph['gitems'], [
-		['field' => 'sortorder', 'order' => ZBX_SORT_UP]
-	]);
-
-	// get graph items
-	foreach ($dbGraph['gitems'] as $gItem) {
-		$graph->addItem(
-			$gItem['itemid'],
-			$gItem['calc_fnc'],
-			$gItem['color'],
-			$gItem['type']
-		);
-	}
-
-	$hostName = '';
-
-	foreach ($dbGraph['hosts'] as $gItemHost) {
-		if ($hostName === '') {
-			$hostName = $gItemHost['name'];
-		}
-		elseif ($hostName !== $gItemHost['name']) {
-			$hostName = '';
-			break;
-		}
-	}
-
-	$graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
-
-	if ($dbGraph['show_3d']) {
-		$graph->switchPie3D();
-	}
-	$graph->showLegend(getRequest('legend', $dbGraph['show_legend']));
-	$graph->draw();
+$height = getRequest('height', 0);
+if ($height <= 0) {
+	$height = $dbGraph['height'];
 }
+
+if (getRequest('widget_view') === '1') {
+	$graph->draw_header = false;
+	$graph->with_vertical_padding = false;
+}
+
+$graph->setWidth($width);
+$graph->setHeight($height);
+
+// array sorting
+CArrayHelper::sort($dbGraph['gitems'], [
+	['field' => 'sortorder', 'order' => ZBX_SORT_UP]
+]);
+
+// get graph items
+foreach ($dbGraph['gitems'] as $gItem) {
+	$graph->addItem(
+		$gItem['itemid'],
+		$gItem['calc_fnc'],
+		$gItem['color'],
+		$gItem['type']
+	);
+}
+
+$hostName = '';
+
+foreach ($dbGraph['hosts'] as $gItemHost) {
+	if ($hostName === '') {
+		$hostName = $gItemHost['name'];
+	}
+	elseif ($hostName !== $gItemHost['name']) {
+		$hostName = '';
+		break;
+	}
+}
+
+$graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
+
+if ($dbGraph['show_3d']) {
+	$graph->switchPie3D();
+}
+$graph->showLegend(getRequest('legend', $dbGraph['show_legend']));
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

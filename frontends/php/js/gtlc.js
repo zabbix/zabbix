@@ -726,9 +726,7 @@ var timeControl = {
 	 */
 	objectUpdate: function(data) {
 		if (timeControl.refreshPage) {
-			var url = new Curl(location.href);
-			url.setArgument('from', data.from);
-			url.setArgument('to', data.to);
+			var url = new Curl(location.href, false);
 			url.unsetArgument('output');
 
 			location.href = url.getUrl();

@@ -46,6 +46,7 @@ $fields = [
 	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS, IN('0,1'),	null]
 ];
 check_fields($fields);
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -59,9 +60,6 @@ $data = [
 	'hostid' => getRequest('hostid', 0),
 	'fullscreen' => getRequest('fullscreen', 0),
 	'screenid' => getRequest('screenid', CProfile::get('web.hostscreen.screenid', null)),
-	'from' => getRequest('from'),
-	'to' => getRequest('to'),
-	'profileIdx' => 'web.screens.filter',
 	'active_tab' => CProfile::get('web.screens.filter.active', 1)
 ];
 CProfile::update('web.hostscreen.screenid', $data['screenid'], PROFILE_TYPE_ID);
@@ -94,6 +92,18 @@ $data['screen'] = reset($data['screen']);
 // get host
 if (!empty($data['screen']['hostid'])) {
 	$data['host'] = get_host_by_hostid($data['screen']['hostid']);
+}
+
+if ($data['screen']) {
+	$timeselector_options = [
+		'profileIdx' => 'web.screens.filter',
+		'profileIdx2' => $data['screen']['screenid'],
+		'from' => getRequest('from'),
+		'to' => getRequest('to')
+	];
+	updateTimeSelectorPeriod($timeselector_options);
+
+	$data += $timeselector_options;
 }
 
 // render view

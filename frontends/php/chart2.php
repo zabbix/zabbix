@@ -44,6 +44,7 @@ $fields = [
 if (!check_fields($fields)) {
 	exit();
 }
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 /*
  * Permissions
@@ -75,106 +76,101 @@ $timeline = getTimeSelectorPeriod([
 	'to' => getRequest('to')
 ]);
 
-if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
-	show_error_message(reset($errors));
-}
-else {
-	CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
+CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
-	$graph = new CLineGraphDraw($dbGraph['graphtype']);
+$graph = new CLineGraphDraw($dbGraph['graphtype']);
+
+if (getRequest('widget_view') === '1') {
+	$graph->draw_header = false;
+	$graph->with_vertical_padding = false;
+}
+
+// array sorting
+CArrayHelper::sort($dbGraph['gitems'], [
+	['field' => 'sortorder', 'order' => ZBX_SORT_UP],
+	['field' => 'itemid', 'order' => ZBX_SORT_DOWN]
+]);
+
+$hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
+$items = zbx_toHash($dbGraph['items'], 'itemid');
+
+foreach ($dbGraph['gitems'] as $graph_item) {
+	$item = $items[$graph_item['itemid']];
+	$host = $hosts[$item['hostid']];
+
+	$graph->addItem($item + [
+		'host' => $host['host'],
+		'hostname' => $host['name'],
+		'color' => $graph_item['color'],
+		'drawtype' => $graph_item['drawtype'],
+		'yaxisside' => $graph_item['yaxisside'],
+		'calc_fnc' => $graph_item['calc_fnc']
+	]);
+}
+
+$hostName = '';
+
+foreach ($dbGraph['hosts'] as $gItemHost) {
+	if ($hostName === '') {
+		$hostName = $gItemHost['name'];
+	}
+	elseif ($hostName !== $gItemHost['name']) {
+		$hostName = '';
+		break;
+	}
+}
+
+$graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
+
+$width = getRequest('width', 0);
+if ($width <= 0) {
+	$width = $dbGraph['width'];
+}
+
+$height = getRequest('height', 0);
+if ($height <= 0) {
+	$height = $dbGraph['height'];
+}
+
+$graph->showLegend(getRequest('legend', $dbGraph['show_legend']));
+$graph->showWorkPeriod($dbGraph['show_work_period']);
+$graph->showTriggers($dbGraph['show_triggers']);
+$graph->setWidth($width);
+$graph->setHeight($height);
+$graph->setYMinAxisType($dbGraph['ymin_type']);
+$graph->setYMaxAxisType($dbGraph['ymax_type']);
+$graph->setYAxisMin($dbGraph['yaxismin']);
+$graph->setYAxisMax($dbGraph['yaxismax']);
+$graph->setYMinItemId($dbGraph['ymin_itemid']);
+$graph->setYMaxItemId($dbGraph['ymax_itemid']);
+$graph->setLeftPercentage($dbGraph['percent_left']);
+$graph->setRightPercentage($dbGraph['percent_right']);
+
+if (hasRequest('outer')) {
+	$graph->setOuter(getRequest('outer'));
+}
+
+$min_dimentions = $graph->getMinDimensions();
+if ($min_dimentions['width'] > $graph->getWidth()) {
+	$graph->setWidth($min_dimentions['width']);
+}
+if ($min_dimentions['height'] > $graph->getHeight()) {
+	$graph->setHeight($min_dimentions['height']);
+}
+
+if (getRequest('onlyHeight', '0') === '1') {
+	$graph->drawDimensions();
+	$height = $graph->getHeight();
 
 	if (getRequest('widget_view') === '1') {
-		$graph->draw_header = false;
-		$graph->with_vertical_padding = false;
+		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
 	}
-
-	// array sorting
-	CArrayHelper::sort($dbGraph['gitems'], [
-		['field' => 'sortorder', 'order' => ZBX_SORT_UP],
-		['field' => 'itemid', 'order' => ZBX_SORT_DOWN]
-	]);
-
-	$hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
-	$items = zbx_toHash($dbGraph['items'], 'itemid');
-
-	foreach ($dbGraph['gitems'] as $graph_item) {
-		$item = $items[$graph_item['itemid']];
-		$host = $hosts[$item['hostid']];
-
-		$graph->addItem($item + [
-			'host' => $host['host'],
-			'hostname' => $host['name'],
-			'color' => $graph_item['color'],
-			'drawtype' => $graph_item['drawtype'],
-			'yaxisside' => $graph_item['yaxisside'],
-			'calc_fnc' => $graph_item['calc_fnc']
-		]);
-	}
-
-	$hostName = '';
-
-	foreach ($dbGraph['hosts'] as $gItemHost) {
-		if ($hostName === '') {
-			$hostName = $gItemHost['name'];
-		}
-		elseif ($hostName !== $gItemHost['name']) {
-			$hostName = '';
-			break;
-		}
-	}
-
-	$graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
-	$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
-	$graph->setSTime($timeline['from_ts']);
-
-	$width = getRequest('width', 0);
-	if ($width <= 0) {
-		$width = $dbGraph['width'];
-	}
-
-	$height = getRequest('height', 0);
-	if ($height <= 0) {
-		$height = $dbGraph['height'];
-	}
-
-	$graph->showLegend(getRequest('legend', $dbGraph['show_legend']));
-	$graph->showWorkPeriod($dbGraph['show_work_period']);
-	$graph->showTriggers($dbGraph['show_triggers']);
-	$graph->setWidth($width);
-	$graph->setHeight($height);
-	$graph->setYMinAxisType($dbGraph['ymin_type']);
-	$graph->setYMaxAxisType($dbGraph['ymax_type']);
-	$graph->setYAxisMin($dbGraph['yaxismin']);
-	$graph->setYAxisMax($dbGraph['yaxismax']);
-	$graph->setYMinItemId($dbGraph['ymin_itemid']);
-	$graph->setYMaxItemId($dbGraph['ymax_itemid']);
-	$graph->setLeftPercentage($dbGraph['percent_left']);
-	$graph->setRightPercentage($dbGraph['percent_right']);
-
-	if (hasRequest('outer')) {
-		$graph->setOuter(getRequest('outer'));
-	}
-
-	$min_dimentions = $graph->getMinDimensions();
-	if ($min_dimentions['width'] > $graph->getWidth()) {
-		$graph->setWidth($min_dimentions['width']);
-	}
-	if ($min_dimentions['height'] > $graph->getHeight()) {
-		$graph->setHeight($min_dimentions['height']);
-	}
-
-	if (getRequest('onlyHeight', '0') === '1') {
-		$graph->drawDimensions();
-		$height = $graph->getHeight();
-
-		if (getRequest('widget_view') === '1') {
-			$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
-		}
-		header('X-ZBX-SBOX-HEIGHT: '.$height);
-	}
-	else {
-		$graph->draw();
-	}
+	header('X-ZBX-SBOX-HEIGHT: '.$height);
+}
+else {
+	$graph->draw();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

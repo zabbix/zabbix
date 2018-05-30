@@ -182,7 +182,6 @@ if ($data['itemids']) {
 		'itemids' => $data['itemids'],
 		'profileIdx' => $data['profileIdx'],
 		'profileIdx2' => $data['profileIdx2'],
-		'updateProfile' => ($data['from'] !== null && $data['to'] !== null),
 		'from' => $data['from'],
 		'to' => $data['to'],
 		'filter' => getRequest('filter'),

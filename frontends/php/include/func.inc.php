@@ -2526,63 +2526,19 @@ function makeUpdateIntervalFilter($field_name, $values) {
 }
 
 /**
- * Validate selected time: period, from and to.
- *
- * @param int $from     Period 'from', can be in relative or absolute time format.
- * @param int $to       Period 'to', can be in relative or absolute time format.
- * @param array $errors Array for validation error messages if any occurs.
- *
- * @return bool
- */
-function validTimeSelectorPeriod($from, $to, &$errors) {
-	$errors = [];
-	$range_time_parser = new CRangeTimeParser();
-
-	if ($range_time_parser->parse($from) !== CParser::PARSE_SUCCESS) {
-		$errors['from'] = _('Invalid date.');
-	}
-	else {
-		$ts_from = $range_time_parser->getDateTime(true)->getTimestamp();
-	}
-
-	if ($range_time_parser->parse($to) !== CParser::PARSE_SUCCESS) {
-		$errors['to'] = _('Invalid date.');
-	}
-	else {
-		$ts_to = $range_time_parser->getDateTime(false)->getTimestamp();
-	}
-
-	if ($errors) {
-		return false;
-	}
-
-	$period = $ts_to - $ts_from + 1;
-
-	if ($period < ZBX_MIN_PERIOD) {
-		$errors['min_period'] = _n('Minimum time period to display is %1$s minute.',
-			'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
-		);
-	}
-	elseif ($period > ZBX_MAX_PERIOD) {
-		$errors['max_period'] = _n('Maximum time period to display is %1$s day.',
-			'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
-		);
-	}
-
-	return !$errors;
-}
-
-/**
  * Update profile with new time selector range.
  *
- * @param string $idx   Profile 'idx' identifier.
- * @param int $idx2     Profile 'idx2' identifier.
- * @param string $from  New value for 'from', can be in relative or absolute time format.
- * @param string $to    New value for 'to', can be in relative or absolute time format.
+ * @param array       $options
+ * @param string      $options['profileIdx']
+ * @param int         $options['profileIdx2']
+ * @param string|null $options['from']
+ * @param string|null $options['to']
  */
-function updateTimeSelectorPeriod($idx, $idx2, $from, $to) {
-	CProfile::update($idx.'.from', $from, PROFILE_TYPE_STR, $idx2);
-	CProfile::update($idx.'.to', $to, PROFILE_TYPE_STR, $idx2);
+function updateTimeSelectorPeriod($options) {
+	if ($options['from'] !== null && $options['to'] !== null) {
+		CProfile::update($options['profileIdx'].'.from', $options['from'], PROFILE_TYPE_STR, $options['profileIdx2']);
+		CProfile::update($options['profileIdx'].'.to', $options['to'], PROFILE_TYPE_STR, $options['profileIdx2']);
+	}
 }
 
 /**
@@ -2594,23 +2550,20 @@ function updateTimeSelectorPeriod($idx, $idx2, $from, $to) {
  * @return array
  */
 function getTimeSelectorPeriod(array $period) {
-	$range_time_parser = new CRangeTimeParser();
-	$idx = array_key_exists('profileIdx', $period) ? $period['profileIdx'] : null;
-	$idx2 = array_key_exists('profileIdx2', $period) ? $period['profileIdx2'] : null;
+	$profileIdx = array_key_exists('profileIdx', $period) ? $period['profileIdx'] : null;
+	$profileIdx2 = array_key_exists('profileIdx2', $period) ? $period['profileIdx2'] : null;
 	$profile = array_filter($period);
 
-	if ($idx === null) {
+	if ($profileIdx === null) {
 		$profile['from'] = ZBX_PERIOD_DEFAULT_FROM;
 		$profile['to'] = ZBX_PERIOD_DEFAULT_TO;
 	}
-
-	if (!array_key_exists('from', $profile)) {
-		$profile['from'] = CProfile::get($idx.'.from', ZBX_PERIOD_DEFAULT_FROM, $idx2);
+	elseif (!array_key_exists('from', $profile) || !array_key_exists('to', $profile)) {
+		$profile['from'] = CProfile::get($profileIdx.'.from', ZBX_PERIOD_DEFAULT_FROM, $profileIdx2);
+		$profile['to'] = CProfile::get($profileIdx.'.to', ZBX_PERIOD_DEFAULT_TO, $profileIdx2);
 	}
 
-	if (!array_key_exists('to', $profile)) {
-		$profile['to'] = CProfile::get($idx.'.to', ZBX_PERIOD_DEFAULT_TO, $idx2);
-	}
+	$range_time_parser = new CRangeTimeParser();
 
 	$range_time_parser->parse($profile['from']);
 	$profile['from_ts'] = $range_time_parser->getDateTime(true)->getTimestamp();

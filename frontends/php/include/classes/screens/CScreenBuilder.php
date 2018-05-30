@@ -76,13 +76,6 @@ class CScreenBuilder {
 	public $profileIdx2;
 
 	/**
-	 * Is profile will be updated
-	 *
-	 * @var boolean
-	 */
-	public $updateProfile;
-
-	/**
 	 * Time control timeline
 	 *
 	 * @var array
@@ -100,7 +93,6 @@ class CScreenBuilder {
 	 * @param int		$options['hostid']
 	 * @param string	$options['profileIdx']      Profile idx value.
 	 * @param int		$options['profileIdx2']     Profile idx2 value.
-	 * @param boolean	$options['updateProfile']   Should the profile updated with 'from' and 'to' values.
 	 * @param string	$options['from']            Start time of selected time period.
 	 * @param string	$options['to']              End time of selected time period.
 	 * @param array		$options['screen']
@@ -143,7 +135,6 @@ class CScreenBuilder {
 		// calculate time
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
-		$this->updateProfile = array_key_exists('updateProfile', $options) ? $options['updateProfile'] : false;
 
 		$this->timeline = getTimeSelectorPeriod([
 			'profileIdx' => $this->profileIdx,
@@ -151,12 +142,6 @@ class CScreenBuilder {
 			'from' => array_key_exists('from', $options) ? $options['from'] : null,
 			'to' => array_key_exists('to', $options) ? $options['to'] : null
 		]);
-
-		if ($this->updateProfile) {
-			updateTimeSelectorPeriod($this->profileIdx, $this->profileIdx2, $this->timeline['from'],
-				$this->timeline['to']
-			);
-		}
 	}
 
 	/**
@@ -496,7 +481,6 @@ class CScreenBuilder {
 						'hostid' => $this->hostid,
 						'profileIdx' => $this->profileIdx,
 						'profileIdx2' => $this->profileIdx2,
-						'updateProfile' => $this->updateProfile,
 						'timeline' => $this->timeline,
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem

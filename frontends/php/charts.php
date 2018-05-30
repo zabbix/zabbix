@@ -44,6 +44,7 @@ $fields = [
 	'action' =>		[T_ZBX_STR,			O_OPT, P_SYS, IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'"'), null]
 ];
 check_fields($fields);
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 /*
  * Permissions
@@ -81,38 +82,30 @@ $pageFilter = new CPageFilter([
 /*
  * Display
  */
-$timeline = getTimeSelectorPeriod([
+$timeselector_options = [
 	'profileIdx' => 'web.graphs.filter',
 	'profileIdx2' => $pageFilter->graphid,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
-]);
+];
+updateTimeSelectorPeriod($timeselector_options);
 
-if (!validTimeSelectorPeriod($timeline['from'], $timeline['to'], $errors)) {
-	show_error_message(reset($errors));
-}
-else {
-	if (hasRequest('from') || hasRequest('to')) {
-		updateTimeSelectorPeriod($timeline['profileIdx'], $timeline['profileIdx2'], $timeline['from'], $timeline['to']);
-	}
+$data = [
+	'pageFilter' => $pageFilter,
+	'graphid' => $pageFilter->graphid,
+	'fullscreen' => $_REQUEST['fullscreen'],
+	'action' => getRequest('action', HISTORY_GRAPH),
+	'actions' => [
+		HISTORY_GRAPH => _('Graph'),
+		HISTORY_VALUES => _('Values')
+	],
+	'timeline' => getTimeSelectorPeriod($timeselector_options),
+	'active_tab' => CProfile::get('web.graphs.filter.active', 1)
+];
 
-	$data = [
-		'pageFilter' => $pageFilter,
-		'graphid' => $pageFilter->graphid,
-		'fullscreen' => $_REQUEST['fullscreen'],
-		'action' => getRequest('action', HISTORY_GRAPH),
-		'actions' => [
-			HISTORY_GRAPH => _('Graph'),
-			HISTORY_VALUES => _('Values')
-		],
-		'timeline' => $timeline,
-		'active_tab' => CProfile::get('web.graphs.filter.active', 1)
-	];
-
-	// render view
-	$chartsView = new CView('monitoring.charts', $data);
-	$chartsView->render();
-	$chartsView->show();
-}
+// render view
+$chartsView = new CView('monitoring.charts', $data);
+$chartsView->render();
+$chartsView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

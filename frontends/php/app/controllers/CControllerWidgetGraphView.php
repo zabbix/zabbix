@@ -113,8 +113,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'timeline' => $timeline,
 			'resourcetype' => $resource_type,
 			'profileIdx' => $profileIdx,
-			'profileIdx2' => $profileIdx2,
-			'updateProfile' => false
+			'profileIdx2' => $profileIdx2
 		];
 
 		// Replace graph item by particular host item if dynamic items are used.
