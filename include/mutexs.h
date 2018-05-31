@@ -79,7 +79,6 @@ zbx_rwlock_lock_type_t;
 #endif
 
 int	zbx_locks_create(char **error);
-#endif	/* _WINDOWS */
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 #define zbx_rwlock_wrlock(rwlock)		__zbx_rwlock_wrlock(__FILE__, __LINE__, rwlock)
@@ -99,6 +98,7 @@ void	zbx_locks_disable(void);
 #define zbx_rwlock_unlock(rwlock)		__zbx_mutex_unlock(__FILE__, __LINE__, rwlock)
 #define zbx_rwlock_destroy(rwlock)		zbx_mutex_destroy(rwlock)
 #endif
+#endif	/* _WINDOWS */
 
 #define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
 #define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
