@@ -1,10 +1,9 @@
-# LIBPCRE_CHECK_CONFIG ([DEFAULT-ACTION])
+# LIBPTHREAD_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 #
 # Checks for pthread.
 #
-# This macro #defines HAVE_PCREPOSIX_H if required header files are
-# found, and sets @LIBPCRE_LDFLAGS@ and @LIBPCRE_CFLAGS@ to the necessary
+# This macro sets @LIBPTHREAD_LDFLAGS@, @LIBPTHREAD_CFLAGS@ and @LIBPTHREAD_LIBS@ to the necessary
 # values.
 #
 # This macro is distributed in the hope that it will be useful,
