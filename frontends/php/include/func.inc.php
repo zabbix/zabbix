@@ -2542,8 +2542,8 @@ function updateTimeSelectorPeriod($options) {
 }
 
 /**
- * Get profile stored 'from' and 'to'. If any or both values does not exists in requested profile default value will be
- * returned. If profile is null then default values will be returned. Calculates from_ts, to_ts and refreshable values.
+ * Get profile stored 'from' and 'to'. If profileIdx is null then default values will be returned. Only when both fields
+ * not exist in $period array their value will be read from user profile. Calculates from_ts, to_ts.
  *
  * @param array $period   Array with period fields data: profileIdx, profileIdx2, from, to.
  *
