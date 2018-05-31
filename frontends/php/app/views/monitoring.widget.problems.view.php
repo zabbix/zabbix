@@ -170,25 +170,6 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	// Make action icons.
-	$action_icons = [
-		makeEventMessagesIcon(
-			$data['data']['actions']['messages']['data'][$problem['eventid']],
-			$data['data']['users']
-		),
-		makeEventSeverityChangesIcon(
-			$data['data']['actions']['severities']['data'][$problem['eventid']],
-			$data['data']['users'],
-			$data['config']
-		),
-		makeEventActionsIcon(
-			$data['data']['actions']['all_actions']['data'][$problem['eventid']],
-			$data['data']['users'],
-			$data['data']['mediatypes'],
-			$data['config']
-		)
-	];
-
 	if ($show_timeline) {
 		if ($last_clock != 0) {
 			CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
@@ -233,7 +214,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
 			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT),
-		$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : '',
+		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
+			$data['data']['users'], $data['config']
+		),
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }

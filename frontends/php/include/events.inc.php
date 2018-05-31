@@ -309,12 +309,10 @@ function make_small_eventlist($startEvent, $backurl) {
 		'severity_name_4' => $config['severity_name_4'],
 		'severity_name_5' => $config['severity_name_5']
 	];
-	$messages = getEventsMessages($events);
-	$severities = getEventsSeverityChanges($events, $triggers);
-	$actions = getEventsActions($events, $r_events);
+	$actions = getEventsActionsIconsData($events, $triggers, $r_events);
 	$users = API::User()->get([
 		'output' => ['alias', 'name', 'surname'],
-		'userids' => array_keys($messages['userids'] + $severities['userids'] + $actions['userids']),
+		'userids' => array_keys($actions['userids']),
 		'preservekeys' => true
 	]);
 	$mediatypes = API::Mediatype()->get([
@@ -356,13 +354,6 @@ function make_small_eventlist($startEvent, $backurl) {
 		 */
 		addTriggerValueStyle($cell_status, $value, $value_clock, $event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
-		// Make icons for actions column.
-		$action_icons = [
-			makeEventMessagesIcon($messages['data'][$event['eventid']], $users),
-			makeEventSeverityChangesIcon($severities['data'][$event['eventid']], $users, $severity_config),
-			makeEventActionsIcon($actions['data'][$event['eventid']], $users, $mediatypes, $severity_config)
-		];
-
 		// Create link to Problem update page.
 		$problem_update_url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'acknowledge.edit')
@@ -385,7 +376,7 @@ function make_small_eventlist($startEvent, $backurl) {
 			(new CLink($event['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
 				->addClass($event['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT),
-			$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : ''
+			makeEventActionsIcons($event['eventid'], $actions['data'], $mediatypes, $users, $severity_config)
 		]);
 	}
 

@@ -1357,6 +1357,35 @@ function eventType($type = null) {
 }
 
 /**
+ * Get data, required to create messages, severity changes, actions icon with popup with event actions.
+ *
+ * @param array  $events                    Array with event objects with acknowledges
+ * @param string $events[]['eventid']       Problem event id
+ * @param string $events[]['r_eventid']     OK event id
+ * @param int    $events[]['clock']         Time when event occurred
+ * @param array  $events[]['acknowledges']  Array with manual updates to problem
+ * @param array  $r_events                  (optional) Array with related recovery event data
+ * @param array  $r_events[]['clock']       Time, when recovery event was created
+ *
+ * @return array
+ */
+function getEventsActionsIconsData(array $events, array $triggers, array $r_events = []) {
+	$messages = getEventsMessages($events);
+	$severities = getEventsSeverityChanges($events, $triggers);
+	$actions = getEventsActions($events, $r_events);
+
+	return [
+		'data' => [
+			'messages' => $messages['data'],
+			'severities' => $severities['data'],
+			'actions' => $actions['data'],
+		],
+		'mediatypeids' => $actions['mediatypeids'],
+		'userids' => $messages['userids'] + $severities['userids'] + $actions['userids']
+	];
+}
+
+/**
  * Get data, required to create messages icon with popup with event messages.
  *
  * @param array  $events                                 Array with event objects with acknowledges
@@ -1694,6 +1723,38 @@ function getEventUpdates(array $event) {
 }
 
 /**
+ * Make icons (messages, severity changes, actions) for actions column.
+ *
+ * @param string $eventid                Id for event, for which icons are created.
+ * @param array  $actions['messages']    Messages icon data
+ * @param array  $actions['severities']  Severity change icon data
+ * @param array  $actions['actions']     Actions icon data
+ * @param array  $mediatypes             Mediatypes with maxattempts value and description
+ * @param array  $users                  User name, surname and alias
+ * @param array  $config                 Zabbix config
+ *
+ * @return array
+ */
+function makeEventActionsIcons($eventid, $actions, $mediatypes, $users, $config) {
+	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
+	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users, $config);
+	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $users, $mediatypes, $config);
+
+	$action_icons = [];
+	if ($messages_icon !== null) {
+		$action_icons[] = $messages_icon;
+	}
+	if ($severities_icon !== null) {
+		$action_icons[] = $severities_icon;
+	}
+	if ($actions_icon !== null) {
+		$action_icons[] = $actions_icon;
+	}
+
+	return $action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : '';
+}
+
+/**
  * Create icon with hintbox for event messages.
  *
  * @param array  $data
@@ -1713,22 +1774,17 @@ function makeEventMessagesIcon(array $data, array $users) {
 
 	for ($i = 0; $i < $total && $i < ZBX_WIDGET_ROWS; $i++) {
 		$message = $data['messages'][$i];
-		$row = [];
 
-		// Time
-		$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $message['clock']);
+		// Added in order to reuse makeActionTableUser()
+		$message['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
-		// User
-		$row[] = array_key_exists($message['userid'], $users)
-			? getUserFullname($users[$message['userid']])
-			: _('Inaccessible user');
-
-		// Message
-		$row[] = (mb_strlen($message['message']) > ZBX_EVENT_MESSAGE_MAX_LENGTH)
-			? mb_substr($message['message'], 0, ZBX_EVENT_MESSAGE_MAX_LENGTH).'...'
-			: $message['message'];
-
-		$table->addRow($row);
+		$table->addRow([
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $message['clock']),
+			makeActionTableUser($message, $users),
+			(mb_strlen($message['message']) > ZBX_EVENT_MESSAGE_MAX_LENGTH)
+				? mb_substr($message['message'], 0, ZBX_EVENT_MESSAGE_MAX_LENGTH).'...'
+				: $message['message']
+		]);
 	}
 
 	return $total
@@ -1772,22 +1828,19 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 
 	for ($i = 0; $i < $total && $i < ZBX_WIDGET_ROWS; $i++) {
 		$severity = $data['severities'][$i];
-		$row = [];
 
-		// Time
-		$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']);
-
-		// User
-		$row[] = array_key_exists($severity['userid'], $users)
-			? getUserFullname($users[$severity['userid']])
-			: _('Inaccessible user');
+		// Added in order to reuse makeActionTableUser()
+		$severity['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		// Severity changes
 		$old_severity_name = getSeverityName($severity['old_severity'], $config);
 		$new_severity_name = getSeverityName($severity['new_severity'], $config);
-		$row[] = $old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name;
 
-		$table->addRow($row);
+		$table->addRow([
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']),
+			makeActionTableUser($severity, $users),
+			$old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name
+		]);
 	}
 
 	// Select icon

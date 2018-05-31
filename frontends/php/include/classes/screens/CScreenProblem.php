@@ -588,10 +588,9 @@ class CScreenProblem extends CScreenBase {
 		}
 		unset($problem);
 
-		$data['actions']['messages'] = getEventsMessages($data['problems']);
-		$data['actions']['severities'] = getEventsSeverityChanges($data['problems'], $data['triggers']);
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
-		$data['actions']['all_actions'] = getEventsActions($data['problems']);
+		$actions = getEventsActionsIconsData($data['problems'], $data['triggers']);
+		$data['actions'] = $actions['data'];
 
 		$data['correlations'] = $correlationids
 			? API::Correlation()->get([
@@ -601,20 +600,19 @@ class CScreenProblem extends CScreenBase {
 			])
 			: [];
 
-		$userids = $userids + $data['actions']['messages']['userids'] + $data['actions']['severities']['userids']
-				+ $data['actions']['all_actions']['userids'];
+		$userids = $userids + $actions['userids'];
 		$data['users'] = $userids
 			? API::User()->get([
 				'output' => ['alias', 'name', 'surname'],
-				'userids' => array_keys($userids),
+				'userids' => array_keys($userids + $actions['userids']),
 				'preservekeys' => true
 			])
 			: [];
 
-		$data['mediatypes'] = $data['actions']['all_actions']['mediatypeids']
+		$data['mediatypes'] = $actions['mediatypeids']
 			? API::Mediatype()->get([
 				'output' => ['description', 'maxattempts'],
-				'mediatypeids' => array_keys($data['actions']['all_actions']['mediatypeids']),
+				'mediatypeids' => array_keys($actions['mediatypeids']),
 				'preservekeys' => true
 			])
 			: [];
@@ -989,25 +987,6 @@ class CScreenProblem extends CScreenBase {
 					->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT);
 
-				// Make action icons.
-				$action_icons = [
-					makeEventMessagesIcon(
-						$data['actions']['messages']['data'][$problem['eventid']],
-						$data['users']
-					),
-					makeEventSeverityChangesIcon(
-						$data['actions']['severities']['data'][$problem['eventid']],
-						$data['users'],
-						$this->config
-					),
-					makeEventActionsIcon(
-						$data['actions']['all_actions']['data'][$problem['eventid']],
-						$data['users'],
-						$data['mediatypes'],
-						$this->config
-					)
-				];
-
 				// Add table row.
 				$table->addRow(array_merge($row, [
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
@@ -1021,7 +1000,9 @@ class CScreenProblem extends CScreenBase {
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					$problem_update_link,
-					$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : '',
+					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'],
+						$this->config
+					),
 					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]), ($this->data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
 					? getSeverityFlhStyle($problem['severity'])

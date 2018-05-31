@@ -223,17 +223,13 @@ function getSystemStatusData(array $filter) {
 		]);
 
 		// actions
-		$messages = getEventsMessages($problems_data);
-		$severities = getEventsSeverityChanges($problems_data, $data['triggers']);
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
-		$actions = getEventsActions($problems_data);
+		$actions = getEventsActionsIconsData($problems_data, $data['triggers']);
 		$data['actions'] = [
-			'messages' => $messages['data'],
-			'severities' => $severities['data'],
 			'all_actions' => $actions['data'],
 			'users' => API::User()->get([
 				'output' => ['alias', 'name', 'surname'],
-				'userids' => array_keys($messages['userids'] + $severities['userids'] + $actions['userids']),
+				'userids' => array_keys($actions['userids']),
 				'preservekeys' => true
 			]),
 			'mediatypes' => API::Mediatype()->get([
@@ -575,12 +571,10 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'severity_name_4' => $config['severity_name_4'],
 		'severity_name_5' => $config['severity_name_5']
 	];
-	$messages = getEventsMessages($events);
-	$severities = getEventsSeverityChanges($events, $triggers);
-	$actions = getEventsActions($events);
+	$actions = getEventsActionsIconsData($events, $triggers);
 	$users = API::User()->get([
 		'output' => ['alias', 'name', 'surname'],
-		'userids' => array_keys($messages['userids'] + $severities['userids'] + $actions['userids']),
+		'userids' => array_keys($actions['userids']),
 		'preservekeys' => true
 	]);
 	$mediatypes = API::Mediatype()->get([
@@ -728,13 +722,6 @@ function make_latest_issues(array $filter = [], $backurl) {
 				->setArgument('filter_set', '1')
 		);
 
-		// Make icons for actions column.
-		$action_icons = [
-			makeEventMessagesIcon($messages['data'][$trigger['lastEvent']['eventid']], $users),
-			makeEventSeverityChangesIcon($severities['data'][$trigger['lastEvent']['eventid']], $users, $severity_config),
-			makeEventActionsIcon($actions['data'][$trigger['lastEvent']['eventid']], $users, $mediatypes, $severity_config)
-		];
-
 		$table->addRow([
 			(new CCol($host_list)),
 			$description,
@@ -742,7 +729,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			zbx_date2age($trigger['lastchange']),
 			makeInformationList($info_icons),
 			$ack,
-			$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : ''
+			makeEventActionsIcons($trigger['lastEvent']['eventid'], $actions['data'], $mediatypes, $users, $severity_config)
 		]);
 	}
 
@@ -810,28 +797,12 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT);
 
-		// Make icons for actions column.
-		$action_icons = [
-			makeEventMessagesIcon($actions['messages'][$problem['eventid']], $actions['users']),
-			makeEventSeverityChangesIcon(
-				$actions['severities'][$problem['eventid']],
-				$actions['users'],
-				$config
-			),
-			makeEventActionsIcon(
-				$actions['all_actions'][$problem['eventid']],
-				$actions['users'],
-				$actions['mediatypes'],
-				$config
-			)
-		];
-
 		$table->addRow([
 			implode(', ', $hosts),
 			getSeverityCell($problem['severity'], null, $problem['name']),
 			zbx_date2age($problem['clock']),
 			$ack,
-			$action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : '',
+			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'], $actions['users'], $config),
 			$tags[$problem['eventid']]
 		]);
 	}
