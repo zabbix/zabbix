@@ -516,6 +516,15 @@ output {
       max-width: 40px;
       margin: -2px 3px 0 0;
       padding: 2px 3px; }
+      @media screen and (min-width: 1200px) {
+        .list-table.compact-view td .tag {
+          max-width: 71px; } }
+      @media screen and (min-width: 1400px) {
+        .list-table.compact-view td .tag {
+          max-width: 102px; } }
+      @media screen and (min-width: 1600px) {
+        .list-table.compact-view td .tag {
+          max-width: 133px; } }
     .list-table.compact-view td .rel-container {
       display: inline; }
     .list-table.compact-view td .icon-wzrd-action {
@@ -532,6 +541,33 @@ output {
     vertical-align: bottom;
     border-bottom: 2px solid #dce2e5;
     text-align: left; }
+    .list-table thead th.column-tags-1 {
+      width: 75px; }
+    .list-table thead th.column-tags-2 {
+      width: 124px; }
+    .list-table thead th.column-tags-3 {
+      width: 173px; }
+    @media screen and (min-width: 1200px) {
+      .list-table thead th.column-tags-1 {
+        width: 106px; }
+      .list-table thead th.column-tags-2 {
+        width: 186px; }
+      .list-table thead th.column-tags-3 {
+        width: 266px; } }
+    @media screen and (min-width: 1400px) {
+      .list-table thead th.column-tags-1 {
+        width: 137px; }
+      .list-table thead th.column-tags-2 {
+        width: 248px; }
+      .list-table thead th.column-tags-3 {
+        width: 359px; } }
+    @media screen and (min-width: 1600px) {
+      .list-table thead th.column-tags-1 {
+        width: 168px; }
+      .list-table thead th.column-tags-2 {
+        width: 310px; }
+      .list-table thead th.column-tags-3 {
+        width: 452px; } }
     .list-table thead th .arrow-up {
       margin: 0 0 0 3px;
       border-bottom-color: #768d99; }
@@ -1562,6 +1598,12 @@ button {
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
+  .btn-search[disabled] {
+    background-color: transparent; }
+    .btn-search[disabled]:hover {
+      background-color: transparent;
+      opacity: 0.75;
+      filter: alpha(opacity=75); }
 
 .filter-trigger {
   position: relative;

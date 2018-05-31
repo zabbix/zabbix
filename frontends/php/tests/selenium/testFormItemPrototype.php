@@ -2717,6 +2717,34 @@ class testFormItemPrototype extends CWebTest {
 						['type' => 'Change per second']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Item prototype with preprocessing rule with LLD macro',
+					'key' => 'item-prototype-LLD-macro',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '{#DELIM}(.*)', 'output' => '\1'],
+						['type' => 'Trim', 'params' => '{#DELIM}'],
+						['type' => 'XML XPath', 'params' => 'number(/values/Item/value[../key=\'{#DELIM}\'])'],
+						['type' => 'JSON Path', 'params' => '$.data[\'{#KEY}\']'],
+						['type' => 'Custom multiplier', 'params' => '{#VALUE}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Item prototype with preprocessing rule with user macro',
+					'key' => 'item-prototype-user-macro',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '{$DELIM}(.*)', 'output' => '\1'],
+						['type' => 'Trim', 'params' => '{$DELIM}'],
+						['type' => 'XML XPath', 'params' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
+						['type' => 'JSON Path', 'params' => '$.data[\'{$KEY}\']'],
+						['type' => 'Custom multiplier', 'params' => '{$VALUE}']
+					]
+				]
 			]
 		];
 	}

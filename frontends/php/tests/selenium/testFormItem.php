@@ -2622,6 +2622,20 @@ class testFormItem extends CWebTest {
 						['type' => 'Change per second']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Item with preprocessing rule with user macro',
+					'key' => 'item-user-macro',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '{$DELIM}(.*)', 'output' => '\1'],
+						['type' => 'Trim', 'params' => '{$DELIM}'],
+						['type' => 'XML XPath', 'params' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
+						['type' => 'JSON Path', 'params' => '$.data[\'{$KEY}\']'],
+						['type' => 'Custom multiplier', 'params' => '{$VALUE}']
+					]
+				]
 			]
 		];
 	}
