@@ -23,6 +23,24 @@
 	window.flickerfreeScreen = {
 
 		screens: [],
+		responsiveness: 10000,
+
+		/**
+		 * Set or reset UI in progress state for element with id.
+		 *
+		 * @param {boolean} in_progress
+		 * @param {string}  id
+		 */
+		setElementProgressState: function(id, in_progress) {
+			var elm = $('#flickerfreescreen_'+id);
+
+			if (in_progress) {
+				elm.addClass('in-progress delayed-15s');
+			}
+			else {
+				elm.removeClass('in-progress delayed-15s');
+			}
+		},
 
 		add: function(screen) {
 			// switch off time control refreshing using full page refresh
@@ -234,7 +252,7 @@
 			else {
 				screen.isRefreshing = true;
 				screen.timestampResponsiveness = new CDate().getTime();
-				window.flickerfreeScreenShadow.start(id);
+				this.setElementProgressState(id, true);
 
 				var ajaxRequest = $.ajax({
 					url: ajaxUrl.getUrl(),
@@ -254,9 +272,7 @@
 							$('#flickerfreescreen_' + id).replaceWith(html);
 							$('main .msg-bad').insertBefore('main > :first-child');
 
-							window.flickerfreeScreenShadow.isShadowed(id, false);
-							window.flickerfreeScreenShadow.fadeSpeed(id, 0);
-							window.flickerfreeScreenShadow.validate(id);
+							window.flickerfree.setElementProgressState(id, false);
 						}
 						else if (!html.length) {
 							$('#flickerfreescreen_' + id).remove();
@@ -289,7 +305,7 @@
 				screen.error = 0;
 				screen.timestampResponsiveness = new CDate().getTime();
 
-				window.flickerfreeScreenShadow.start(id);
+				this.setElementProgressState(id, true);
 
 				var url = new Curl(screen.data.options.refresh);
 				url.setArgument('curtime', new CDate().getTime());
@@ -307,7 +323,7 @@
 					screen.data.update(data);
 					$(screen.data.container).attr('aria-label', data.aria_label);
 					screen.timestamp = screen.timestampActual;
-					window.flickerfreeScreenShadow.end(id);
+					window.flickerfreeScreen.setElementProgressState(id, false);
 				});
 			}
 		},
@@ -324,7 +340,7 @@
 				screen.error = 0;
 				screen.timestampResponsiveness = new CDate().getTime();
 
-				window.flickerfreeScreenShadow.start(id);
+				this.setElementProgressState(id, true);
 
 				$('img', '#flickerfreescreen_' + id).each(function() {
 					var domImg = $(this),
@@ -334,7 +350,7 @@
 
 					if (zbx_sbox && zbx_sbox.prevent_refresh) {
 						screen.isRefreshing = false;
-						window.flickerfreeScreenShadow.end(id);
+						window.flickerfreeScreen.setElementProgressState(id, false);
 						return;
 					}
 
@@ -363,14 +379,10 @@
 							}
 
 							screen.isRefreshing = false;
+							window.flickerfreeScreen.setElementProgressState(id, false);
 
 							if (request_start > screen.timestamp) {
 								screen.timestamp = request_start;
-
-								// Set opacity state.
-								if (window.flickerfreeScreenShadow.isShadowed(id)) {
-									img.fadeTo(0, 0.6);
-								}
 
 								domImg.replaceWith(img);
 
@@ -378,8 +390,6 @@
 								if (!empty(successAction)) {
 									successAction();
 								}
-
-								window.flickerfreeScreenShadow.end(id);
 							}
 
 							if (screen.isReRefreshRequire) {
@@ -476,8 +486,8 @@
 			var screen = this.screens[id],
 				time = new CDate().getTime();
 
-			if (screen.timestamp + window.flickerfreeScreenShadow.responsiveness < time
-					&& screen.timestampResponsiveness + window.flickerfreeScreenShadow.responsiveness < time) {
+			if (screen.timestamp + this.responsiveness < time
+					&& screen.timestampResponsiveness + this.responsiveness < time) {
 				// take of busy flags
 				screen.isRefreshing = false;
 				screen.isReRefreshRequire = false;
@@ -506,264 +516,6 @@
 					delete timeControl.objectList[id];
 				}
 			}
-
-			window.flickerfreeScreenShadow.cleanAll();
 		}
 	};
-
-	window.flickerfreeScreenShadow = {
-
-		timeout: 30000,
-		responsiveness: 10000,
-		timers: [],
-
-		start: function(id) {
-			if (empty(this.timers[id])) {
-				this.timers[id] = {};
-				this.timers[id].timeoutHandler = null;
-				this.timers[id].ready = false;
-				this.timers[id].isShadowed = false;
-				this.timers[id].fadeSpeed = 2000;
-				this.timers[id].inUpdate = false;
-			}
-
-			var timer = this.timers[id];
-
-			if (!timer.inUpdate) {
-				this.refresh(id);
-			}
-		},
-
-		refresh: function(id) {
-			var timer = this.timers[id];
-
-			timer.inUpdate = true;
-
-			clearTimeout(timer.timeoutHandler);
-			timer.timeoutHandler = window.setTimeout(
-				function() {
-					window.flickerfreeScreenShadow.validate(id);
-				},
-				this.timeout
-			);
-		},
-
-		end: function(id) {
-			var screen = window.flickerfreeScreen.screens[id];
-
-			if (typeof this.timers[id] !== 'undefined' && !empty(screen)
-					&& (screen.timestamp + this.timeout) >= screen.timestampActual
-			) {
-				var timer = this.timers[id];
-				timer.inUpdate = false;
-
-				clearTimeout(timer.timeoutHandler);
-				this.removeShadow(id);
-				this.fadeSpeed(id, 2000);
-			}
-		},
-
-		validate: function(id) {
-			var screen = window.flickerfreeScreen.screens[id];
-
-			if (!empty(screen) && (screen.timestamp + this.timeout) < screen.timestampActual) {
-				this.createShadow(id);
-				this.refresh(id);
-			}
-			else {
-				this.end(id);
-			}
-		},
-
-		createShadow: function(id) {
-			var timer = this.timers[id];
-
-			if (!empty(timer) && !timer.isShadowed) {
-				var obj = $('#flickerfreescreen_' + id),
-					item = window.flickerfreeScreenShadow.findScreenItem(obj);
-
-				if (empty(item)) {
-					return;
-				}
-
-				// don't show shadow if image not loaded first time with the page
-				if (item.prop('nodeName') == 'IMG' && !timer.ready && typeof item.get(0).complete === 'boolean') {
-					if (!item.get(0).complete) {
-						return;
-					}
-					else {
-						timer.ready = true;
-					}
-				}
-
-				// create shadow
-				if (obj.find('.shadow').length == 0) {
-					item.css({position: 'relative', zIndex: 2});
-
-					obj.append($('<div>', {'class': 'shadow'})
-						.html('&nbsp;')
-						.css({
-							top: item.position().top,
-							left: item.position().left,
-							width: item.width(),
-							height: item.height(),
-							position: 'absolute',
-							zIndex: 1
-						})
-					);
-
-					// fade screen
-					var itemNode = obj.find(item.prop('nodeName'));
-					if (!empty(itemNode)) {
-						itemNode = (itemNode.length > 0) ? $(itemNode[0]) : itemNode;
-						itemNode.fadeTo(timer.fadeSpeed, 0.6);
-					}
-
-					// show loading indicator..
-					obj.append($('<div>', {'class': 'preloader'})
-						.css({
-							width: '24px',
-							height: '24px',
-							position: 'absolute',
-							zIndex: 3,
-							top: item.position().top + Math.round(item.height() / 2) - 12,
-							left: item.position().left + Math.round(item.width() / 2) - 12
-						})
-					);
-
-					timer.isShadowed = true;
-				}
-			}
-		},
-
-		removeShadow: function(id) {
-			var timer = this.timers[id];
-
-			if (!empty(timer) && timer.isShadowed) {
-				var obj = $('#flickerfreescreen_' + id),
-					item = window.flickerfreeScreenShadow.findScreenItem(obj);
-				if (empty(item)) {
-					return;
-				}
-
-				obj.find('.preloader').remove();
-				obj.find('.shadow').remove();
-				obj.find(item.prop('nodeName')).fadeTo(0, 1);
-
-				timer.isShadowed = false;
-			}
-		},
-
-		moveShadows: function() {
-			$('.flickerfreescreen').each(function() {
-				var obj = $(this),
-					item = window.flickerfreeScreenShadow.findScreenItem(obj);
-
-				if (empty(item)) {
-					return;
-				}
-
-				// shadow
-				var shadows = obj.find('.shadow');
-
-				if (shadows.length > 0) {
-					shadows.css({
-						top: item.position().top,
-						left: item.position().left,
-						width: item.width(),
-						height: item.height()
-					});
-				}
-
-				// loading indicator
-				var preloader = obj.find('.preloader');
-
-				if (preloader.length > 0) {
-					preloader.css({
-						top: item.position().top + Math.round(item.height() / 2) - 12,
-						left: item.position().left + Math.round(item.width() / 2) - 12
-					});
-				}
-			});
-		},
-
-		findScreenItem: function(obj) {
-			var item = obj.children().eq(0),
-				tag;
-
-			if (!empty(item)) {
-				tag = item.prop('nodeName');
-
-				if (tag == 'MAP') {
-					item = obj.children().eq(1);
-					tag = item.prop('nodeName');
-				}
-
-				if (tag == 'DIV') {
-					var imgItem = item.find('img');
-
-					if (imgItem.length > 0) {
-						item = $(imgItem[0]);
-						tag = 'IMG';
-					}
-				}
-
-				if (tag == 'TABLE' || tag == 'DIV' || tag == 'IMG') {
-					return item;
-				}
-				else {
-					item = item.find('img');
-
-					return (item.length > 0) ? $(item[0]) : null;
-				}
-			}
-			else {
-				return null;
-			}
-		},
-
-		isShadowed: function(id, isShadowed) {
-			var timer = this.timers[id];
-
-			if (!empty(timer)) {
-				if (typeof isShadowed !== 'undefined') {
-					this.timers[id].isShadowed = isShadowed;
-				}
-
-				return this.timers[id].isShadowed;
-			}
-
-			return false;
-		},
-
-		fadeSpeed: function(id, fadeSpeed) {
-			var timer = this.timers[id];
-
-			if (!empty(timer)) {
-				if (typeof fadeSpeed !== 'undefined') {
-					this.timers[id].fadeSpeed = fadeSpeed;
-				}
-
-				return this.timers[id].fadeSpeed;
-			}
-
-			return 0;
-		},
-
-		cleanAll: function() {
-			for (var id in this.timers) {
-				var timer = this.timers[id];
-
-				if (!empty(timer.timeoutHandler)) {
-					clearTimeout(timer.timeoutHandler);
-				}
-			}
-
-			this.timers = [];
-		}
-	};
-
-	$(window).resize(function() {
-		window.flickerfreeScreenShadow.moveShadows();
-	});
 }(jQuery));
