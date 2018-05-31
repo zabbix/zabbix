@@ -119,7 +119,7 @@ function getGraphDims($graphid = null) {
 
 		$graphDims['yaxis'] = $yaxis;
 		$graphDims['graphtype'] = $graph['graphtype'];
-		$graphDims['graphHeight'] = $graph['height'];
+		$graphDims['graphHeight'] = (int) $graph['height'];
 	}
 
 	if ($yaxis == 2) {

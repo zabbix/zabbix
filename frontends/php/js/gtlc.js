@@ -359,7 +359,7 @@ jQuery(function ($){
 
 		offset.top += data.top;
 		if ((e.pageY < offset.top) || e.pageY > offset.top + data.height) {
-			return;
+			return cancelEvent(e);
 		}
 
 		noclick_area = $('<div/>').css({

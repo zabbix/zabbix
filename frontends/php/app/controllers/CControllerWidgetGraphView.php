@@ -59,8 +59,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
-		$width = $this->getInput('content_width', '100');
-		$height = $this->getInput('content_height', '100');
+		$width = (int) $this->getInput('content_width', 100);
+		$height = (int) $this->getInput('content_height', 100);
 
 		$dataid = 'graph_'.$uniqueid;
 		$containerid = 'graph_container_'.$uniqueid;
