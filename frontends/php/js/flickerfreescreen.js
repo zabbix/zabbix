@@ -364,7 +364,8 @@
 							css: {
 								position: 'absolute',
 								top: 0,
-								left: 0
+								left: 0,
+								zIndex: -1
 							}
 						})
 						.error(function() {
@@ -386,8 +387,9 @@
 									img.fadeTo(0, 0.6);
 								}
 
-								img.css({position: 'relative', zIndex: 2});
+								img.css({zIndex: 2});
 								domImg.remove();
+								img.css({position: 'relative', zIndex: 1});
 
 								// Callback function on success.
 								if (!empty(successAction)) {
