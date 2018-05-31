@@ -193,6 +193,16 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 	return status;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_threads_wait                                                 *
+ *                                                                            *
+ * Purpose: Waits until the "threads" are in the signalled state              *
+ *                                                                            *
+ * Parameters: "threads" handles                                              *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num)
 {
 	int		i;
