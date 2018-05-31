@@ -25,30 +25,53 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
  */
 class testPageEventCorrelation extends CWebTest {
 
+	/**
+	 * Get text of elements by xpath.
+	 *
+	 * @param string $xpath	xpath selector
+	 *
+	 * @return array
+	 */
+	private function getTextOfElements($xpath) {
+		$result = [];
+
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath($xpath));
+
+		foreach ($elements as $element) {
+			$result[] = $element->getText();
+		}
+
+		return $result;
+	}
+
+	private function getDbColumn($sql) {
+		$result = [];
+
+		foreach (DBfetchArray(DBSelect($sql)) as $row) {
+			$result[] = reset($row);
+		}
+
+		return $result;
+	}
+
 	public function testPageEventCorrelation_CheckLayout() {
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestCheckTitle('Event correlation rules');
 		$this->zbxTestCheckHeader('Event correlation');
-		// Check Create correlation button
+		// Check "Create correlation" button.
 		$this->zbxTestAssertElementText("//button[@id='form']", 'Create correlation');
 
-		// Check table headers
-		$headers = ['', 'Name', 'Conditions', 'Operations', 'Status'];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//thead/tr/th'));
-		foreach ($elements as $element) {
-			$get_headers[] = $element->getText();
-		}
-		$this->assertEquals($headers, $get_headers);
+		// Check table headers.
+		$this->assertEquals(['', 'Name', 'Conditions', 'Operations', 'Status'],
+				$this->getTextOfElements("//thead/tr/th")
+		);
 
 		// Check the correlation names in frontend
-		$correlations = DBfetchArray(DBSelect('SELECT name FROM correlation'));
-		foreach ($correlations as $correlation) {
-			$correlation_names[] = $correlation['name'];
-		}
-		$this->zbxTestTextPresent($correlation_names);
+		$corelations = $this->getDbColumn('SELECT name FROM correlation');
+		$this->zbxTestTextPresent($corelations);
 
 		// Check table footer to make sure that results are found
-		$i = DBcount('SELECT NULL FROM correlation');
+		$i = count($corelations);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$i.' of '.$i.' found');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');
@@ -64,12 +87,9 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $name);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
+
 		// Other correlation names are not displayed on frontend
-		$correlations = DBfetchArray(DBSelect('SELECT name FROM correlation WHERE name<>'.zbx_dbstr($name)));
-		foreach ($correlations as $correlation) {
-			$correlation_names[] = $correlation['name'];
-		}
-		$this->zbxTestTextNotPresent($correlation_names);
+		$this->zbxTestTextNotPresent($this->getDbColumn('SELECT name FROM correlation WHERE name<>'.zbx_dbstr($name)));
 	}
 
 	public function testPageEventCorrelation_FilterByEnabled() {
@@ -80,18 +100,18 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		// Get correlation names from UI after filtering
-		$correlations_from_ui = $this->getCorrelationNamesFromTable();
+		$correlations_from_ui = $this->getTextOfElements('//tbody/tr/td[2]/a');
+		sort($correlations_from_ui);
 
 		// Get enabled correlation names from DB
-		$sql = 'SELECT name FROM correlation WHERE status='.ZBX_CORRELATION_ENABLED.' ORDER BY name';
-		$correlations_from_db = DBfetchArray(DBSelect($sql));
-		foreach ($correlations_from_db as $correlation) {
-			$correlation_names[] = $correlation['name'];
-		}
+		$correlation_names = $this->getDbColumn('SELECT name FROM correlation WHERE status='.ZBX_CORRELATION_ENABLED
+				.' ORDER BY name'
+		);
+
 		// Compare result from DB and UI
 		$this->assertEquals($correlations_from_ui, $correlation_names);
 
-		$count = DBcount($sql);
+		$count = count($correlation_names);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$count.' of '.$count.' found');
 	}
 
@@ -103,18 +123,18 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		// Get correlation names from UI after filtering
-		$correlations_from_ui = $this->getCorrelationNamesFromTable();
+		$correlations_from_ui = $this->getTextOfElements('//tbody/tr/td[2]/a');
+		sort($correlations_from_ui);
 
 		// Get disabled correlation names from DB
-		$sql = 'SELECT name FROM correlation WHERE status='.ZBX_CORRELATION_DISABLED.' ORDER BY name';
-		$correlations_from_db = DBfetchArray(DBSelect($sql));
-		foreach ($correlations_from_db as $correlation) {
-			$correlation_names[] = $correlation['name'];
-		}
+		$correlation_names = $this->getDbColumn('SELECT name FROM correlation WHERE status='.ZBX_CORRELATION_DISABLED
+				.' ORDER BY name'
+		);
+
 		// Compare result from DB and UI
 		$this->assertEquals($correlations_from_ui, $correlation_names);
 
-		$count = DBcount($sql);
+		$count = count($correlation_names);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$count.' of '.$count.' found');
 	}
 
@@ -129,21 +149,8 @@ class testPageEventCorrelation extends CWebTest {
 
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementNotPresentXpath("//tr[@class='nothing-to-show']");
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
-	}
-
-	/**
-	 * Get correlation names from table in UI
-	 */
-	private function getCorrelationNamesFromTable() {
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//tbody/tr/td[2]/a'));
-		foreach ($elements as $element) {
-			$correlations[] = $element->getText();
-		}
-		sort($correlations);
-		return $correlations;
 	}
 
 	public static function getCorrelationData() {
@@ -172,18 +179,15 @@ class testPageEventCorrelation extends CWebTest {
 		// Enable or disable correlation by its link
 		$this->zbxTestClickXpathWait("//a[contains(@onclick,'correlationid[]=".$id['correlationid']."')]");
 
-		// Check enabled correlation message
-		if ($data['make_status']===ZBX_CORRELATION_ENABLED) {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation enabled');
-		}
-		// Check disabled correlation message
-		else {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation disabled');
-		}
+		// Check correlation message.
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', ($data['make_status'] === ZBX_CORRELATION_ENABLED)
+				? 'Correlation enabled' : 'Correlation disabled'
+		);
 
 		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
-						.' AND status ='.$data['make_status']));
+				.' AND status ='.$data['make_status'])
+		);
 	}
 
 	/**
@@ -194,22 +198,19 @@ class testPageEventCorrelation extends CWebTest {
 		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($data['name'])));
 		$this->zbxTestCheckboxSelect('g_correlationid_'.$id['correlationid']);
 
-		// Enable correlation
-		if ($data['make_status']===ZBX_CORRELATION_ENABLED) {
-			$this->zbxTestClickButton('correlation.massenable');
-			$this->zbxTestAcceptAlert();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation enabled');
-		}
-		// Disable correlation
-		else {
-			$this->zbxTestClickButton('correlation.massdisable');
-			$this->zbxTestAcceptAlert();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation disabled');
-		}
+		$this->zbxTestClickButton(($data['make_status'] === ZBX_CORRELATION_ENABLED)
+				? 'correlation.massenable' : 'correlation.massdisable'
+		);
+		$this->zbxTestAcceptAlert();
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', ($data['make_status'] === ZBX_CORRELATION_ENABLED)
+				? 'Correlation enabled' : 'Correlation disabled'
+		);
+
 		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
-						.' AND status ='.$data['make_status']));
+				.' AND status ='.$data['make_status'])
+		);
 	}
 
 	public function testPageEventCorrelation_DisableAll() {
@@ -254,5 +255,4 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation'));
 	}
-
 }
