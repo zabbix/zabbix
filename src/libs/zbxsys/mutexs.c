@@ -238,6 +238,7 @@ void	zbx_locks_disable(void)
 }
 #endif
 #endif	/* _WINDOWS */
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_mutex_create                                                 *
