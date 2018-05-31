@@ -149,7 +149,6 @@ if ($data['alerts']) {
 // render view
 $auditView = new CView('administration.auditacts.list', $data);
 $auditView->render();
-show_messages();
 $auditView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
