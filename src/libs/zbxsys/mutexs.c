@@ -172,63 +172,63 @@ int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error)
 	return SUCCEED;
 }
 
-void	__zbx_rwlock_wrlock(const char *filename, int line, const ZBX_RWLOCK *mutex)
+void	__zbx_rwlock_wrlock(const char *filename, int line, const ZBX_RWLOCK *rwlock)
 {
-	if (ZBX_RWLOCK_NULL == *mutex)
+	if (ZBX_RWLOCK_NULL == *rwlock)
 		return;
 
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_rwlock_wrlock(&shared_lock->rwlocks[*mutex]))
+	if (0 != pthread_rwlock_wrlock(&shared_lock->rwlocks[*rwlock]))
 	{
 		zbx_error("[file:'%s',line:%d] write lock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 }
 
-void	__zbx_rwlock_rdlock(const char *filename, int line, const ZBX_RWLOCK *mutex)
+void	__zbx_rwlock_rdlock(const char *filename, int line, const ZBX_RWLOCK *rwlock)
 {
-	if (ZBX_RWLOCK_NULL == *mutex)
+	if (ZBX_RWLOCK_NULL == *rwlock)
 		return;
 
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_rwlock_rdlock(&shared_lock->rwlocks[*mutex]))
+	if (0 != pthread_rwlock_rdlock(&shared_lock->rwlocks[*rwlock]))
 	{
 		zbx_error("[file:'%s',line:%d] read lock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 }
 
-void	__zbx_rwlock_unlock(const char *filename, int line, const ZBX_RWLOCK *mutex)
+void	__zbx_rwlock_unlock(const char *filename, int line, const ZBX_RWLOCK *rwlock)
 {
-	if (ZBX_RWLOCK_NULL == *mutex)
+	if (ZBX_RWLOCK_NULL == *rwlock)
 		return;
 
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_rwlock_unlock(&shared_lock->rwlocks[*mutex]))
+	if (0 != pthread_rwlock_unlock(&shared_lock->rwlocks[*rwlock]))
 	{
 		zbx_error("[file:'%s',line:%d] read write lock unlock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 }
 
-void	zbx_rwlock_destroy(ZBX_RWLOCK *mutex)
+void	zbx_rwlock_destroy(ZBX_RWLOCK *rwlock)
 {
-	if (ZBX_RWLOCK_NULL == *mutex)
+	if (ZBX_RWLOCK_NULL == *rwlock)
 		return;
 
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_mutex_destroy(&shared_lock->mutexes[*mutex]))
-		zbx_error("cannot remove semaphore %d: %s", *mutex, zbx_strerror(errno));
+	if (0 != pthread_mutex_destroy(&shared_lock->mutexes[*rwlock]))
+		zbx_error("cannot remove semaphore %d: %s", *rwlock, zbx_strerror(errno));
 
-	*mutex = ZBX_RWLOCK_NULL;
+	*rwlock = ZBX_RWLOCK_NULL;
 }
 
 void	zbx_locks_disable(void)
