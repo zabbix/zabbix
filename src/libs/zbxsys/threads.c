@@ -216,18 +216,7 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num)
 	for (i = 0; i < threads_num; i++)
 	{
 		if (threads[i])
-		{
-#if !defined(_WINDOWS)	/* do not hang if one of the child processes has unexpectedly hanged */
-			zbx_alarm_on(60);
-#endif
 			zbx_thread_wait(threads[i]);
-#if !defined(_WINDOWS)
-			if (SUCCEED == zbx_alarm_timed_out())
-				THIS_SHOULD_NEVER_HAPPEN;
-
-			zbx_alarm_off();
-#endif
-		}
 
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
 	}
