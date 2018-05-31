@@ -25,8 +25,9 @@ if (!empty($this->data['parent_discoveryid'])) {
 		->setControls(
 			(new CTag('nav', true,
 				(new CList())->addItem(new CRedirectButton(_('Create graph prototype'),
-					(new CUrl())
+					(new CUrl('graphs.php'))
 						->setArgument('form', 'create')
+						->setArgument('parent_discoveryid', $this->data['parent_discoveryid'])
 						->getUrl()
 				))
 			))->setAttribute('aria-label', _('Content controls'))
@@ -54,7 +55,11 @@ else {
 				),
 			(new CTag('nav', true, ($data['hostid'] == 0)
 				? (new CButton('form', _('Create graph (select host first)')))->setEnabled(false)
-				: new CRedirectButton(_('Create graph'), (new CUrl())->setArgument('form', 'create')->getUrl())
+				: new CRedirectButton(_('Create graph'), (new CUrl('graphs.php'))
+						->setArgument('hostid', $data['hostid'])
+						->setArgument('form', 'create')
+						->getUrl()
+					)
 			))
 				->setAttribute('aria-label', _('Content controls'))
 		]));

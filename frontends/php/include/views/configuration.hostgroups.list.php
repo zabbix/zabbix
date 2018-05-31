@@ -23,7 +23,7 @@ $widget = (new CWidget())
 	->setTitle(_('Host groups'))
 	->setControls((new CTag('nav', true, (new CList())
 			->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
-				? new CRedirectButton(_('Create host group'), (new CUrl())
+				? new CRedirectButton(_('Create host group'), (new CUrl('hostgroups.php'))
 						->setArgument('form', 'create')
 						->getUrl()
 					)

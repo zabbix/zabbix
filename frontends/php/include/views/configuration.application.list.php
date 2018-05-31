@@ -39,7 +39,7 @@ $widget = (new CWidget())
 			),
 		(new CTag('nav', true, ($data['hostid'] == 0)
 			? (new CButton('form', _('Create application (select host first)')))->setEnabled(false)
-			: new CRedirectButton(_('Create application'), (new CUrl())
+			: new CRedirectButton(_('Create application'), (new CUrl('applications.php'))
 					->setArgument('form', 'create')
 					->setArgument('groupid', $this->data['pageFilter']->groupid)
 					->setArgument('hostid', $this->data['pageFilter']->hostid)

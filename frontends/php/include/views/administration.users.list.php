@@ -39,7 +39,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true,
-			new CRedirectButton(_('Create user'), (new CUrl())
+			new CRedirectButton(_('Create user'), (new CUrl('users.php'))
 				->setArgument('form', 'create')
 				->getUrl()
 			)

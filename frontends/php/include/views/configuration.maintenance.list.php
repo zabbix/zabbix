@@ -31,7 +31,7 @@ $widget = (new CWidget())
 					$this->data['pageFilter']->getGroupsCB()
 				])
 			),
-		(new CTag('nav', true, new CRedirectButton(_('Create maintenance period'), (new CUrl())
+		(new CTag('nav', true, new CRedirectButton(_('Create maintenance period'), (new CUrl('maintenance.php'))
 			->removeArgument('maintenanceid')
 			->setArgument('groupid', $data['pageFilter']->groupid)
 			->setArgument('form', 'create')

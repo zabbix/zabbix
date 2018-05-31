@@ -27,7 +27,7 @@ $widget = (new CWidget())
 		(new CTag('nav', true,
 			(new CList())->addItem(
 				($data['hostid'] != 0)
-					? new CRedirectButton(_('Create item'), (new CUrl())
+					? new CRedirectButton(_('Create item'), (new CUrl('items.php'))
 							->setArgument('form', 'create')
 							->setArgument('hostid', $data['hostid'])
 							->getUrl()

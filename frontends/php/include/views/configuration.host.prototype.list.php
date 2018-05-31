@@ -24,8 +24,9 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create host prototype'),
-				(new CUrl())
+				(new CUrl('host_prototypes.php'))
 					->setArgument('form', 'create')
+					->setArgument('parent_discoveryid', $this->data['parent_discoveryid'])
 					->getUrl()
 			))
 		))->setAttribute('aria-label', _('Content controls'))

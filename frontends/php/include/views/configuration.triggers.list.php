@@ -71,7 +71,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, ($data['hostid'] != 0)
-			? new CRedirectButton(_('Create trigger'), (new CUrl())
+			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
 					->setArgument('groupid', $data['pageFilter']->groupid)
 					->setArgument('hostid', $data['pageFilter']->hostid)
 					->setArgument('form', 'create')

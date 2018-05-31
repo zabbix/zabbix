@@ -51,7 +51,7 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, ($this->data['pageFilter']->hostid > 0)
-			? new CRedirectButton(_('Create web scenario'), (new CUrl())
+			? new CRedirectButton(_('Create web scenario'), (new CUrl('httpconf.php'))
 					->setArgument('form', 'create')
 					->setArgument('groupid', $this->data['pageFilter']->groupid)
 					->setArgument('hostid', $this->data['pageFilter']->hostid)
