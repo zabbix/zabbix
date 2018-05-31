@@ -355,7 +355,8 @@ jQuery(function ($){
 		var offset = target.offset(),
 			left = data.left,
 			right = target.outerWidth() - data.right,
-			xpos = Math.min(Math.max(left, e.pageX - offset.left), right);
+			xpos = Math.min(Math.max(left, e.pageX - offset.left), right),
+			parent = target.parent();
 
 		offset.top += data.top;
 		if ((e.pageY < offset.top) || e.pageY > offset.top + data.height) {
@@ -365,11 +366,11 @@ jQuery(function ($){
 		noclick_area = $('<div/>').css({
 			position: 'absolute',
 			top: 0,
-			left: 0,
-			height: target.outerHeight() + 'px',
-			width: target.outerWidth() + 'px',
+			left: (parent.is('.center') ? target : parent).position().left,
+			height: target.height() + 'px',
+			width: target.width() + 'px',
 			overflow: 'hidden'
-		}).insertAfter(target);
+		}).insertAfter(parent);
 
 		selection = {
 			dom: $('<div class="graph-selection"/>').css({
