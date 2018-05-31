@@ -56,7 +56,7 @@
 			}
 		},
 
-		refresh: function(id, is_self_refresh) {
+		refresh: function(id) {
 			var screen = this.screens[id];
 
 			if (empty(screen.id)) {
@@ -82,7 +82,6 @@
 				},
 				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default';
 				ajax_url = new Curl('jsrpc.php'),
-				refresh = (!empty(is_self_refresh) || (screen.timeline && timeControl.isRefreshable(screen.timeline))),
 				self = this;
 
 			ajax_url.setArgument('type', 9); // PAGE_TYPE_TEXT
@@ -109,19 +108,17 @@
 				// SCREEN_RESOURCE_SIMPLE_GRAPH
 				case 0:
 				case 1:
-					if (refresh) {
-						self.refreshImg(id, function() {
-							$('a', '#flickerfreescreen_' + id).each(function() {
-									var obj = $(this),
-									url = new Curl(obj.attr('href'));
+					self.refreshImg(id, function() {
+						$('a', '#flickerfreescreen_' + id).each(function() {
+								var obj = $(this),
+								url = new Curl(obj.attr('href'));
 
-									url.setArgument('from', screen.timeline.from);
-									url.setArgument('to', screen.timeline.to);
+								url.setArgument('from', screen.timeline.from);
+								url.setArgument('to', screen.timeline.to);
 
-									obj.attr('href', url.getUrl());
-								});
+								obj.attr('href', url.getUrl());
 							});
-					}
+						});
 					break;
 
 				// SCREEN_RESOURCE_MAP
@@ -131,9 +128,7 @@
 
 				// SCREEN_RESOURCE_PLAIN_TEXT
 				case 3:
-					if (refresh) {
-						self.refreshHtml(id, ajax_url);
-					}
+					self.refreshHtml(id, ajax_url);
 					break;
 
 				// SCREEN_RESOURCE_CLOCK
@@ -143,44 +138,40 @@
 
 				// SCREEN_RESOURCE_HISTORY
 				case 17:
-					if (refresh) {
-						if (screen.data.action == 'showgraph') {
-							self.refreshImg(id);
-						}
-						else {
-							if ('itemids' in screen.data) {
-								$.each(screen.data.itemids, function (i, value) {
-									if (!empty(value)) {
-										ajax_url.setArgument('itemids[' + value + ']', value);
-									}
-								});
-							}
-							else {
-								ajax_url.setArgument('graphid', screen.data.graphid);
-							}
-
-							$.each({
-								'filter': screen.data.filter,
-								'filter_task': screen.data.filterTask,
-								'mark_color': screen.data.markColor,
-								'page': screen.data.page,
-								'action': screen.data.action
-							}, function (ajax_key, value) {
+					if (screen.data.action == 'showgraph') {
+						self.refreshImg(id);
+					}
+					else {
+						if ('itemids' in screen.data) {
+							$.each(screen.data.itemids, function (i, value) {
 								if (!empty(value)) {
-									ajax_url.setArgument(ajax_key, value);
+									ajax_url.setArgument('itemids[' + value + ']', value);
 								}
 							});
-
-							self.refreshHtml(id, ajax_url);
 						}
+						else {
+							ajax_url.setArgument('graphid', screen.data.graphid);
+						}
+
+						$.each({
+							'filter': screen.data.filter,
+							'filter_task': screen.data.filterTask,
+							'mark_color': screen.data.markColor,
+							'page': screen.data.page,
+							'action': screen.data.action
+						}, function (ajax_key, value) {
+							if (!empty(value)) {
+								ajax_url.setArgument(ajax_key, value);
+							}
+						});
+
+						self.refreshHtml(id, ajax_url);
 					}
 					break;
 
 				// SCREEN_RESOURCE_CHART
 				case 18:
-					if (refresh) {
-						self.refreshImg(id);
-					}
+					self.refreshImg(id);
 					break;
 
 				// SCREEN_RESOURCE_SCREEN
@@ -228,7 +219,7 @@
 
 					// restart refresh execution starting from Now
 					clearTimeout(screen.timeoutHandler);
-					this.refresh(id, true);
+					this.refresh(id);
 				}
 			}
 		},
@@ -281,7 +272,7 @@
 				$.when(ajaxRequest).always(function() {
 					if (screen.isReRefreshRequire) {
 						screen.isReRefreshRequire = false;
-						window.flickerfreeScreen.refresh(id, true);
+						window.flickerfreeScreen.refresh(id);
 					}
 				});
 			}
@@ -393,7 +384,7 @@
 
 							if (screen.isReRefreshRequire) {
 								screen.isReRefreshRequire = false;
-								window.flickerfreeScreen.refresh(id, true);
+								window.flickerfreeScreen.refresh(id);
 							}
 
 							if (on_dashboard) {
@@ -475,7 +466,7 @@
 				$.when(ajaxRequest).always(function() {
 					if (screen.isReRefreshRequire) {
 						screen.isReRefreshRequire = false;
-						window.flickerfreeScreen.refresh(id, true);
+						window.flickerfreeScreen.refresh(id);
 					}
 				});
 			}
@@ -492,7 +483,7 @@
 				screen.isReRefreshRequire = false;
 
 				// refresh anyway
-				window.flickerfreeScreen.refresh(id, true);
+				window.flickerfreeScreen.refresh(id);
 			}
 			else {
 				screen.isReRefreshRequire = true;

@@ -523,28 +523,13 @@ var timeControl = {
 					if (!obj.refresh) {
 						this.addImage(id);
 					}
-					else if (this.isRefreshable(obj.timeline)) {
+					else {
 						this.refreshImage(id);
 					}
 				}
 
 			}
 		}
-	},
-
-	/**
-	 * Returns is the supplied 'timeline' interval refreshable.
-	 *
-	 * @param {object} timeline
-	 * @param {int}    timeline.from_ts    Interval 'from' value as timestamp.
-	 * @param {int}    timeline.to_ts      Interval 'to' value as timestamp.
-	 */
-	isRefreshable: function(timeline) {
-		var timestamp = Math.floor((new Date()).getTime()/1000),
-			buffer = 300;
-
-		return (timeline.from_ts - buffer <= timestamp && timestamp <= timeline.to_ts + buffer)
-			|| (timeline.to.indexOf('/') == -1 && timeline.to.indexOf('now') != -1);
 	},
 
 	addImage: function(id) {
@@ -588,7 +573,7 @@ var timeControl = {
 			img = jQuery('#' + id),
 			zbx_sbox = img.data('zbx_sbox');
 
-		if (!this.isRefreshable(obj.timeline) || (zbx_sbox && zbx_sbox.prevent_refresh)) {
+		if (zbx_sbox && zbx_sbox.prevent_refresh) {
 			return;
 		}
 
