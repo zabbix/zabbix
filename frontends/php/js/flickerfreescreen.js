@@ -360,13 +360,7 @@
 							name: domImg.attr('name'),
 							border: domImg.attr('border'),
 							usemap: domImg.attr('usemap'),
-							alt: domImg.attr('alt'),
-							css: {
-								position: 'absolute',
-								top: 0,
-								left: 0,
-								zIndex: -1
-							}
+							alt: domImg.attr('alt')
 						})
 						.error(function() {
 							screen.error++;
@@ -387,9 +381,7 @@
 									img.fadeTo(0, 0.6);
 								}
 
-								img.css({zIndex: 2});
-								domImg.remove();
-								img.css({position: 'relative', zIndex: 1});
+								domImg.replaceWith(img);
 
 								// Callback function on success.
 								if (!empty(successAction)) {
@@ -422,13 +414,11 @@
 							zbx_sbox.height = parseInt(height, 10);
 							// 'src' should be added only here to trigger load event after new height is received.
 							img.data('zbx_sbox', zbx_sbox)
-								.attr('src', url.getUrl())
-								.insertBefore(domImg);
+								.attr('src', url.getUrl());
 						});
 
 					if (async === null) {
-						img.attr('src', url.getUrl())
-							.insertBefore(domImg);
+						img.attr('src', url.getUrl());
 					}
 				});
 			}

@@ -585,7 +585,7 @@ var timeControl = {
 	refreshImage: function(id) {
 		var obj = this.objectList[id],
 			url = new Curl(obj.src, false),
-			img = jQuery('#' + id).last(),
+			img = jQuery('#' + id),
 			zbx_sbox = img.data('zbx_sbox');
 
 		if (!this.isRefreshable(obj.timeline) || (zbx_sbox && zbx_sbox.prevent_refresh)) {
@@ -598,17 +598,10 @@ var timeControl = {
 
 		var clone = jQuery('<img/>', {
 				id: img.attr('id'),
-				'class': img.attr('class'),
-				css: {
-					position: 'absolute',
-					top: 0,
-					left: 0
-				}
+				'class': img.attr('class')
 			})
 			.on('load', function() {
-				jQuery('#' + id)
-					.first().css({position: 'relative'})
-					.siblings('img').remove();
+				img.replaceWith(clone);
 
 				// Update dashboard widget footer.
 				if (obj.onDashboard) {
@@ -631,13 +624,11 @@ var timeControl = {
 			: flickerfreeScreen.getImageSboxHeight(url, function (height) {
 				zbx_sbox.height = parseInt(height, 10);
 				clone.data('zbx_sbox', zbx_sbox)
-					.attr('src', url.getUrl())
-					.insertBefore(img);
+					.attr('src', url.getUrl());
 			});
 
 		if (async === null) {
-			clone.attr('src', url.getUrl())
-				.insertBefore(img);
+			clone.attr('src', url.getUrl());
 		}
 
 		// link
