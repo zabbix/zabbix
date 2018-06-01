@@ -26,7 +26,7 @@
 #define ZBX_MOCK_FORMAT_TIME		"%02d:%02d:%02d"
 #define ZBX_MOCK_FORMAT_DATETIME	ZBX_MOCK_FORMAT_DATE " " ZBX_MOCK_FORMAT_TIME
 #define ZBX_MOCK_FORMAT_NS		".%09d"
-#define ZBX_MOCK_FORMAT_TZ		" %c%02d:%02d"
+#define ZBX_MOCK_FORMAT_TZ		"%c%02d:%02d"
 
 #define ZBX_MOCK_TZ_MAX		7
 
@@ -275,7 +275,6 @@ static int	is_leap_year(int year)
  * Parameters: timestamp - [IN] the number of seconds since Epoch             *
  *             local     - [OUT] broken-down time representation              *
  *             tz_offset - [OUT] timezone offset in seconds                   *
- *             tz_sec - [IN] timezone offset in seconds                       *
  *                                                                            *
  * Return value: ZBX_MOCK_SUCCESS - the time was converted successfully       *
  *               ZBX_MOCK_INTERNAL_ERROR - invalid timestamp was specified    *
@@ -536,7 +535,7 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size
 
 	zbx_tz_format(tz_buf, sizeof(tz_buf), tz_sec);
 
-	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME "%s",
+	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME " %s",
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
 			tm.tm_hour, tm.tm_min, tm.tm_sec, tz_buf);
 
@@ -577,7 +576,7 @@ zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer,
 
 	zbx_tz_format(tz_buf, sizeof(tz_buf), tz_sec);
 
-	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_NS "%s",
+	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_NS " %s",
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
 			tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns, tz_buf);
 

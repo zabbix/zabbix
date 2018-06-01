@@ -275,4 +275,31 @@ out:
     # 2018-02-17 23:00:00 -03:00 local standard time instead
     - 2018-02-18 00:30:00 -03:00
     - 2018-02-18 10:30:00 -03:00
+---
+test case: Scheduling check around DST change back in the Moscow
+in:
+  item type: ZABBIX
+  delay: 0;h0,10,11,20m30
+  timezone: :Europe/Moscow
+  at: 1981-09-30 20:00:00 +04:00
+out:
+  checks:
+    - 1981-09-30 20:30:00 +04:00
+    # 1981-10-01 00:00:00 +04:00 clocks were turned backward 1 hour to
+    # 1981-10-01 23:00:00 +03:00 local standard time instead
+    - 1981-10-01 00:30:00 +03:00
+    - 1981-10-01 10:30:00 +03:00
+---
+test case: Scheduling check around DST change forward in the Moscow
+in:
+  item type: ZABBIX
+  delay: 0;h0,0m59;h10,20m30
+  timezone: :Europe/Moscow
+  at: 1981-03-31 20:00:00 +03:00
+out:
+  checks:
+    - 1981-03-31 20:30:00 +03:00
+    # 1981-04-01 00:00:00 +03:00 local standard time instead
+    # 1981-04-01 01:00:00 +04:00 clocks were turned forward 1 hour to
+    - 1981-04-01 10:30:00 +04:00
 ...
