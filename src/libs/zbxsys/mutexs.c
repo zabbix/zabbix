@@ -55,6 +55,19 @@ static int			shm_id, locks_disabled;
 	static unsigned char	mutexes;
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_locks_create                                                 *
+ *                                                                            *
+ * Purpose: if pthread mutexes and read-write locks can be shared between     *
+ *          processes then create them, otherwise fallback to System V        *
+ *          semaphore operations                                              *
+ *                                                                            *
+ * Parameters: error - dynamically allocated memory with error message.       *
+ *                                                                            *
+ * Return value: SUCCEED if mutexes successfully created, otherwise FAIL      *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_locks_create(char **error)
 {
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
@@ -158,6 +171,20 @@ int	zbx_locks_create(char **error)
 }
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_rwlock_create                                                *
+ *                                                                            *
+ * Purpose: read-write locks are created using zbx_locks_create() function    *
+ *          this is only to obtain handle                                     *
+ *                                                                            *
+ * Parameters:  mutex - handle of read-write lock                             *
+ *              name - name of read-write lock (index for nix system)         *
+ *              error - unused                                                *
+ *                                                                            *
+ * Return value: SUCCEED if mutexes successfully created, otherwise FAIL      *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error)
 {
 	ZBX_UNUSED(error);
@@ -166,6 +193,15 @@ int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_rwlock_wrlock                                              *
+ *                                                                            *
+ * Purpose: acquire write lock for read-write lock (exclusive access)         *
+ *                                                                            *
+ * Parameters: rwlock - handle of read-write lock                             *
+ *                                                                            *
+ ******************************************************************************/
 void	__zbx_rwlock_wrlock(const char *filename, int line, const ZBX_RWLOCK *rwlock)
 {
 	if (ZBX_RWLOCK_NULL == *rwlock)
@@ -181,6 +217,15 @@ void	__zbx_rwlock_wrlock(const char *filename, int line, const ZBX_RWLOCK *rwloc
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_rwlock_rdlock                                              *
+ *                                                                            *
+ * Purpose: acquire read lock for read-write lock (there can be many readers) *
+ *                                                                            *
+ * Parameters: rwlock - handle of read-write lock                             *
+ *                                                                            *
+ ******************************************************************************/
 void	__zbx_rwlock_rdlock(const char *filename, int line, const ZBX_RWLOCK *rwlock)
 {
 	if (ZBX_RWLOCK_NULL == *rwlock)
@@ -196,6 +241,15 @@ void	__zbx_rwlock_rdlock(const char *filename, int line, const ZBX_RWLOCK *rwloc
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_rwlock_unlock                                              *
+ *                                                                            *
+ * Purpose: unlock read-write lock                                            *
+ *                                                                            *
+ * Parameters: rwlock - handle of read-write lock                             *
+ *                                                                            *
+ ******************************************************************************/
 void	__zbx_rwlock_unlock(const char *filename, int line, const ZBX_RWLOCK *rwlock)
 {
 	if (ZBX_RWLOCK_NULL == *rwlock)
@@ -211,6 +265,17 @@ void	__zbx_rwlock_unlock(const char *filename, int line, const ZBX_RWLOCK *rwloc
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_rwlock_destroy                                               *
+ *                                                                            *
+ * Purpose: Destroy read-write lock                                           *
+ *                                                                            *
+ * Parameters: rwlock - handle of read-write lock                             *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+
 void	zbx_rwlock_destroy(ZBX_RWLOCK *rwlock)
 {
 	if (ZBX_RWLOCK_NULL == *rwlock)
@@ -219,12 +284,19 @@ void	zbx_rwlock_destroy(ZBX_RWLOCK *rwlock)
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_mutex_destroy(&shared_lock->mutexes[*rwlock]))
+	if (0 != pthread_rwlock_destroy(&shared_lock->mutexes[*rwlock]))
 		zbx_error("cannot remove semaphore %d: %s", *rwlock, zbx_strerror(errno));
 
 	*rwlock = ZBX_RWLOCK_NULL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_locks_disable                                                *
+ *                                                                            *
+ * Purpose:  disable locks                                                    *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_locks_disable(void)
 {
 	/* attempting to destroy a locked pthread mutex results in undefined behavior */
