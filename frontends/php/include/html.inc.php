@@ -876,18 +876,18 @@ function makeAdministrationGeneralMenu($selected) {
 }
 
 /**
- * Renders an icon list
+ * Renders an icon list.
  *
- * @param array $info_icons  The list of information icons
+ * @param array $info_icons  The list of information icons.
  *
- * @return CSpan
+ * @return CDiv|string
  */
 function makeInformationList($info_icons) {
 	return $info_icons ? (new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER) : '';
 }
 
 /**
- * Renders an information icon like green [i] with message
+ * Renders an information icon like green [i] with message.
  *
  * @param string $message
  *
