@@ -722,6 +722,13 @@ function make_latest_issues(array $filter = [], $backurl) {
 				->setArgument('filter_set', '1')
 		);
 
+		// actions
+		$action_icons = (array_key_exists('lastEvent', $trigger))
+			? makeEventActionsIcons($trigger['lastEvent']['eventid'], $actions['data'], $mediatypes, $users,
+				$severity_config
+			)
+			: '';
+
 		$table->addRow([
 			(new CCol($host_list)),
 			$description,
@@ -729,7 +736,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			zbx_date2age($trigger['lastchange']),
 			makeInformationList($info_icons),
 			$ack,
-			makeEventActionsIcons($trigger['lastEvent']['eventid'], $actions['data'], $mediatypes, $users, $severity_config)
+			$action_icons
 		]);
 	}
 
