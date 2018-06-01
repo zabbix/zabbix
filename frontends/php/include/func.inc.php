@@ -2545,32 +2545,32 @@ function updateTimeSelectorPeriod($options) {
  * Get profile stored 'from' and 'to'. If profileIdx is null then default values will be returned. Only when both fields
  * not exist in $period array their value will be read from user profile. Calculates from_ts, to_ts.
  *
- * @param array $period   Array with period fields data: profileIdx, profileIdx2, from, to.
+ * @param array $options  Array with period fields data: profileIdx, profileIdx2, from, to.
  *
  * @return array
  */
-function getTimeSelectorPeriod(array $period) {
-	$profileIdx = array_key_exists('profileIdx', $period) ? $period['profileIdx'] : null;
-	$profileIdx2 = array_key_exists('profileIdx2', $period) ? $period['profileIdx2'] : null;
-	$profile = array_filter($period);
+function getTimeSelectorPeriod(array $options) {
+	$profileIdx = array_key_exists('profileIdx', $options) ? $options['profileIdx'] : null;
+	$profileIdx2 = array_key_exists('profileIdx2', $options) ? $options['profileIdx2'] : null;
 
 	if ($profileIdx === null) {
-		$profile['from'] = ZBX_PERIOD_DEFAULT_FROM;
-		$profile['to'] = ZBX_PERIOD_DEFAULT_TO;
+		$options['from'] = ZBX_PERIOD_DEFAULT_FROM;
+		$options['to'] = ZBX_PERIOD_DEFAULT_TO;
 	}
-	elseif (!array_key_exists('from', $profile) || !array_key_exists('to', $profile)) {
-		$profile['from'] = CProfile::get($profileIdx.'.from', ZBX_PERIOD_DEFAULT_FROM, $profileIdx2);
-		$profile['to'] = CProfile::get($profileIdx.'.to', ZBX_PERIOD_DEFAULT_TO, $profileIdx2);
+	elseif (!array_key_exists('from', $options) || !array_key_exists('to', $options)
+			|| $options['from'] === null || $options['to'] === null) {
+		$options['from'] = CProfile::get($profileIdx.'.from', ZBX_PERIOD_DEFAULT_FROM, $profileIdx2);
+		$options['to'] = CProfile::get($profileIdx.'.to', ZBX_PERIOD_DEFAULT_TO, $profileIdx2);
 	}
 
 	$range_time_parser = new CRangeTimeParser();
 
-	$range_time_parser->parse($profile['from']);
-	$profile['from_ts'] = $range_time_parser->getDateTime(true)->getTimestamp();
-	$range_time_parser->parse($profile['to']);
-	$profile['to_ts'] = $range_time_parser->getDateTime(false)->getTimestamp();
+	$range_time_parser->parse($options['from']);
+	$options['from_ts'] = $range_time_parser->getDateTime(true)->getTimestamp();
+	$range_time_parser->parse($options['to']);
+	$options['to_ts'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
-	return $profile;
+	return $options;
 }
 
 /**
