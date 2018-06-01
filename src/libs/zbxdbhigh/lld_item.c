@@ -1045,12 +1045,6 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 						item_flags);
 			}
 
-			if (NULL == dependence)
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				return;
-			}
-
 			if (FAIL == zbx_vector_uint64_search(&processed_masterid, dependence->itemid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
