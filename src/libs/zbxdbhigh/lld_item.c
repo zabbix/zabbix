@@ -916,13 +916,14 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_item_dependence_create                                       *
+ * Function: lld_item_dependence_add                                          *
  *                                                                            *
- * Purpose: create a item dependence                                          *
+ * Purpose: add a new dependency                                              *
  *                                                                            *
- * Parameters: itemid        - [IN] item id                                   *
- *             master_itemid - [IN] master item id                            *
- *             item_flags    - [IN] item flags (ZBX_FLAG_DISCOVERY_*)         *
+ * Parameters: item_dependencies - [IN\OUT] list of dependencies              *
+ *             itemid            - [IN] item id                               *
+ *             master_itemid     - [IN] master item id                        *
+ *             item_flags        - [IN] item flags (ZBX_FLAG_DISCOVERY_*)     *
  *                                                                            *
  * Returns: item dependence                                                   *
  *                                                                            *
@@ -930,14 +931,16 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
  *           be freed by the caller.                                          *
  *                                                                            *
  ******************************************************************************/
-static zbx_item_dependence_t	*lld_item_dependence_create(zbx_uint64_t itemid, zbx_uint64_t master_itemid,
-				unsigned int item_flags)
+static zbx_item_dependence_t	*lld_item_dependence_add(zbx_vector_ptr_t *item_dependencies, zbx_uint64_t itemid,
+		zbx_uint64_t master_itemid, unsigned int item_flags)
 {
 	zbx_item_dependence_t	*dependence = (zbx_item_dependence_t *)zbx_malloc(NULL, sizeof(zbx_item_dependence_t));
 
 	dependence->itemid = itemid;
 	dependence->master_itemid = master_itemid;
 	dependence->item_flags = item_flags;
+
+	zbx_vector_ptr_append(item_dependencies, dependence);
 
 	return dependence;
 }
@@ -984,9 +987,8 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 
 		if (0 != item_prototype->master_itemid)
 		{
-			zbx_vector_ptr_append(item_dependencies, lld_item_dependence_create(item_prototype->itemid,
-					item_prototype->master_itemid, ZBX_FLAG_DISCOVERY_PROTOTYPE));
-
+			lld_item_dependence_add(item_dependencies, item_prototype->itemid,
+					item_prototype->master_itemid, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 			zbx_vector_uint64_append(&next_check_itemids, item_prototype->master_itemid);
 			zbx_vector_uint64_append(&next_check_masterids, item_prototype->master_itemid);
 		}
@@ -1039,8 +1041,8 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 
 			if (i == item_dependencies->values_num)
 			{
-				dependence = lld_item_dependence_create(itemid, master_itemid, item_flags);
-				zbx_vector_ptr_append(item_dependencies, dependence);
+				dependence = lld_item_dependence_add(item_dependencies, itemid, master_itemid,
+						item_flags);
 			}
 
 			if (NULL == dependence)
@@ -1458,9 +1460,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 			if (SUCCEED == lld_item_dependencies_check(item_prototype, item_dependencies))
 			{
-				zbx_vector_ptr_append(item_dependencies, lld_item_dependence_create(
-						item_prototype->itemid, item->master_itemid,
-						ZBX_FLAG_DISCOVERY_CREATED));
+				lld_item_dependence_add(item_dependencies, item_prototype->itemid, item->master_itemid,
+						ZBX_FLAG_DISCOVERY_CREATED);
 			}
 			else
 			{
