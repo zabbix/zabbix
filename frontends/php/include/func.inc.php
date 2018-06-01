@@ -2112,14 +2112,14 @@ function get_status() {
 	];
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-	$status['is_running'] = $server->isRunning(get_cookie('zbx_sessionid'));
+	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
 
 	if ($status['is_running'] === false) {
 		return $status;
 	}
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
-	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
+	$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
 	$status['has_status'] = (bool) $server_status;
 
 	if ($server_status === false) {

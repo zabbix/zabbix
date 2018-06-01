@@ -303,8 +303,8 @@ function check_field(&$fields, &$field, $checks) {
 		}
 		elseif ($flags & P_ACT) {
 			if (!isset($_REQUEST['sid'])
-					|| (isset($_COOKIE['zbx_sessionid'])
-							&& $_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'], 16, 16))) {
+					|| (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)
+							&& $_REQUEST['sid'] != substr($_COOKIE[ZBX_SESSION_NAME], 16, 16))) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}
