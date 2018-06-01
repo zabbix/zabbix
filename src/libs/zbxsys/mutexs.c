@@ -284,7 +284,7 @@ void	zbx_rwlock_destroy(ZBX_RWLOCK *rwlock)
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_rwlock_destroy(&shared_lock->mutexes[*rwlock]))
+	if (0 != pthread_rwlock_destroy(&shared_lock->rwlocks[*rwlock]))
 		zbx_error("cannot remove semaphore %d: %s", *rwlock, zbx_strerror(errno));
 
 	*rwlock = ZBX_RWLOCK_NULL;
