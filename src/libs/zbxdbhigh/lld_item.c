@@ -914,7 +914,6 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 		item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: lld_item_dependence_create                                       *
@@ -1109,7 +1108,7 @@ static int	lld_item_dependencies_count(const zbx_uint64_t itemid, const zbx_vect
 		if (dep->master_itemid != itemid)
 			continue;
 
-		/* check the number of dependent items */
+		/* check the limit of dependent items */
 		if (ZBX_FLAG_DISCOVERY_PROTOTYPE != dep->item_flags &&
 				ZBX_DEPENDENT_ITEM_MAX_COUNT <= ++(*dependencies_num))
 		{
@@ -1131,10 +1130,6 @@ static int	lld_item_dependencies_count(const zbx_uint64_t itemid, const zbx_vect
 
 		/* check if item was calculated in previous iterations */
 		if (FAIL != zbx_vector_uint64_search(processed_itemids, dep->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			continue;
-
-		/* non dependent item */
-		if (0 == dep->master_itemid)
 			continue;
 
 		if (SUCCEED != lld_item_dependencies_count(dep->itemid, dependencies, processed_itemids,
@@ -1461,6 +1456,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 			}
 
 			item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
+
 			if (SUCCEED == lld_item_dependencies_check(item_prototype, item_dependencies))
 			{
 				zbx_vector_ptr_append(item_dependencies, lld_item_dependence_create(
