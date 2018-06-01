@@ -312,6 +312,10 @@ static int	__zbx_zbx_db_execute(const char *fmt, ...)
 #else
 #	define zbx_db_select		__zbx_zbx_db_select
 #endif
+
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 1, 2)))
+#endif
 static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 {
 	va_list		args;
@@ -660,7 +664,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_FAIL == ret || ZBX_DB_DOWN == ret)
 		goto out;
 
-	result = zbx_db_select("%s", "select oid from pg_type where typname='bytea'");
+	result = zbx_db_select("select oid from pg_type where typname='bytea'");
 
 	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
 	{
@@ -682,7 +686,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK != ret)
 		goto out;
 
-	result = zbx_db_select("%s", "show standard_conforming_strings");
+	result = zbx_db_select("show standard_conforming_strings");
 
 	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
 	{
