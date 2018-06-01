@@ -1621,9 +1621,9 @@ function getSingleEventActions(array $event, array $r_events, array $alerts) {
 
 	// Add row for problem generation event.
 	$actions[] = [
-			'action_type' => ZBX_EVENT_HISTORY_PROBLEM_EVENT,
-			'clock' => $event['clock']
-		];
+		'action_type' => ZBX_EVENT_HISTORY_PROBLEM_EVENT,
+		'clock' => $event['clock']
+	];
 
 	// Add row for problem recovery event.
 	if (array_key_exists($event['r_eventid'], $r_events)) {
@@ -1724,7 +1724,7 @@ function getEventUpdates(array $event) {
  * @param array  $users                  User name, surname and alias.
  * @param array  $config                 Zabbix config.
  *
- * @return array
+ * @return CCol|string
  */
 function makeEventActionsIcons($eventid, $actions, $mediatypes, $users, $config) {
 	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
@@ -1754,7 +1754,7 @@ function makeEventActionsIcons($eventid, $actions, $mediatypes, $users, $config)
  * @param string $data['messages'][]['clock']    Message creation time.
  * @param array  $users                          User name, surname and alias.
  *
- * @return array
+ * @return CSpan|null
  */
 function makeEventMessagesIcon(array $data, array $users) {
 	$total = $data['count'];
@@ -1809,7 +1809,7 @@ function makeEventMessagesIcon(array $data, array $users) {
  * @param array  $users                                 User name, surname and alias.
  * @param array  $config                                Zabbix config.
  *
- * @return array
+ * @return CSpan|null
  */
 function makeEventSeverityChangesIcon(array $data, array $users, array $config) {
 	$total = $data['count'];
@@ -1960,7 +1960,7 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
  *
  * @param array  $data
  * @param array  $data['actions']                   Array with all actions sorted by clock.
- * @param string $data['actions'][]['action_type']  Type of action table entry (ZBX_EVENT_HISTORY_*).
+ * @param int    $data['actions'][]['action_type']  Type of action table entry (ZBX_EVENT_HISTORY_*).
  * @param string $data['actions'][]['clock']        Time, when action was performed.
  * @param string $data['actions'][]['message']      Message sent by alert, or written by manual update, or remote command text.
  * @param string $data['actions'][]['alerttype']    Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
@@ -1970,7 +1970,7 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
  * @param array  $mediatypes                        Mediatypes with maxattempts value.
  * @param array  $config                            Zabbix config.
  *
- * @return CTable
+ * @return CTableInfo
  */
 function makeEventDetailsActionsTable(array $data, array $users, array $mediatypes, array $config) {
 	$table = (new CTableInfo())->setHeader([
@@ -2056,12 +2056,12 @@ function makeActionTableUser(array $action, array $users) {
 /**
  * Creates username for message author or alert receiver. Also contains 'sendto' for message actions.
  *
- * @param array $action
- * @param array $action['action_type']  Type of event table action (ZBX_EVENT_HISTORY_*).
- * @param array $action['alerttype']    Type of alert.
- * @param array $action['userid']       ID of message author, or alert receiver.
- * @param array $action['sendto']       Receiver media address for automatic action.
- * @param array $users                  Array with user data - alias, name, surname.
+ * @param array  $action
+ * @param int    $action['action_type']  Type of event table action (ZBX_EVENT_HISTORY_*).
+ * @param string $action['alerttype']    Type of alert.
+ * @param array  $action['userid']       ID of message author, or alert receiver.
+ * @param array  $action['sendto']       Receiver media address for automatic action.
+ * @param array  $users                  Array with user data - alias, name, surname.
  *
  * @return string
  */
@@ -2149,10 +2149,10 @@ function makeActionTableIcon(array $action, array $config) {
 /**
  * Creates span with alert status text.
  *
- * @param array $action
- * @param array $action['action_type']  Type of event table action (ZBX_EVENT_HISTORY_*).
- * @param array $action['status']       Alert status.
- * @param array $action['alerttype']    Type of alert.
+ * @param array  $action
+ * @param int    $action['action_type']  Type of event table action (ZBX_EVENT_HISTORY_*).
+ * @param string $action['status']       Alert status.
+ * @param string $action['alerttype']    Type of alert.
  *
  * @return CSpan|string
  */
@@ -2190,8 +2190,8 @@ function makeActionTableStatus(array $action) {
  *
  * @param array  $action
  * @param int    $action['action_type']        Type of event table action (ZBX_EVENT_HISTORY_*).
- * @param int    $action['status']             Alert status.
- * @param int    $action['alerttype']          Type of alert.
+ * @param string $action['status']             Alert status.
+ * @param string $action['alerttype']          Type of alert.
  * @param string $action['mediatypeid']        ID for mediatype, where alert message was sent.
  * @param string $action['retries']            How many retries was done for pending alert message.
  * @param array  $mediatypes                   Array of media type data.
