@@ -147,8 +147,11 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 		if test "x$found_libpthread_process_shared" = "xyes"; then
 		AC_DEFINE([HAVE_PTHREAD_PROCESS_SHARED], 1, [Define to 1 if you have the 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag (-lpthread)])
 		AC_MSG_RESULT(yes)
+		else
+		AC_MSG_RESULT(no)
 		fi
 	else
+		AC_MSG_RESULT(no)
 		LIBPTHREAD_CFLAGS=""
 		LIBPTHREAD_LDFLAGS=""
 		LIBPTHREAD_LIBS=""
