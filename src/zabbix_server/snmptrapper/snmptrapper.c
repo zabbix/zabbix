@@ -63,7 +63,7 @@ static void	DBget_lastsize(void)
 static void	DBupdate_lastsize(void)
 {
 	DBbegin();
-	DBexecute("update globalvars set snmp_lastsize=" ZBX_FS_UI64, trap_lastsize);
+	DBexecute("update globalvars set snmp_lastsize=%lld", (long long int)trap_lastsize);
 	DBcommit();
 }
 
@@ -423,11 +423,11 @@ static int	read_traps(void)
 	int		nbytes = 0;
 	char		*error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:" ZBX_FS_I64, __function_name, trap_lastsize);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize: %lld", __function_name, (long long int)trap_lastsize);
 
 	if (-1 == lseek(trap_fd, trap_lastsize, SEEK_SET))
 	{
-		error = zbx_dsprintf(error, "cannot set position to " ZBX_FS_I64 " for \"%s\": %s", trap_lastsize,
+		error = zbx_dsprintf(error, "cannot set position to %lld for \"%s\": %s", (long long int)trap_lastsize,
 				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		delay_trap_logs(error, LOG_LEVEL_WARNING);
 		goto out;
