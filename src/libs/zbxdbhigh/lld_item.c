@@ -976,14 +976,13 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 	zbx_vector_uint64_create(&next_check_masterids);
 
 	/* collect the item id of prototypes for searching dependencies into database */
-
 	for (i = 0; i < item_prototypes->values_num; i++)
 	{
 		const zbx_lld_item_prototype_t	*item_prototype;
 
 		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[i];
 
-		if (0 < item_prototype->master_itemid)
+		if (0 != item_prototype->master_itemid)
 		{
 			zbx_vector_ptr_append(item_dependencies, lld_item_dependence_create(item_prototype->itemid,
 					item_prototype->master_itemid, ZBX_FLAG_DISCOVERY_PROTOTYPE));
@@ -994,7 +993,6 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 	}
 
 	/* search dependency in two directions (masteritem_id->itemid and itemid->masteritem_id) */
-
 	while (0 < next_check_itemids.values_num || 0 < next_check_masterids.values_num)
 	{
 		if (0 < next_check_itemids.values_num)
@@ -1057,11 +1055,13 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 				zbx_vector_uint64_append(&next_check_masterids, dependence->itemid);
 			}
 
-			if (NEXT_CHECK_BY_ITEM_IDS == check_type && 0 != dependence->master_itemid &&
-					FAIL == zbx_vector_uint64_search(&processed_itemid,
-					dependence->master_itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			if (NEXT_CHECK_BY_ITEM_IDS != check_type || 0 == dependence->master_itemid)
+				continue;
+
+			if (FAIL == zbx_vector_uint64_search(&processed_itemid, dependence->master_itemid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-					zbx_vector_uint64_append(&next_check_itemids, dependence->master_itemid);
+				zbx_vector_uint64_append(&next_check_itemids, dependence->master_itemid);
 			}
 		}
 		DBfree_result(result);
@@ -1085,11 +1085,11 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
  *                                                                            *
  * Purpose: recursively count the number of dependencies                      *
  *                                                                            *
- * Parameters: dependence        - [IN] dependence                            *
+ * Parameters: itemid            - [IN] item ID to be checked                 *
  *             dependencies      - [IN] item dependencies                     *
  *             processed_itemids - [IN\OUT] list of checked item ids          *
  *             dependencies_num  - [IN\OUT] number of dependencies            *
- *             depht_level       - [IN\OUT] depth level                       *
+ *             depth_level       - [IN\OUT] depth level                       *
  *                                                                            *
  * Returns: SUCCEED - the number of dependencies was successfully counted     *
  *          FAIL    - the limit of dependencies is reached                    *
@@ -1122,7 +1122,7 @@ static int	lld_item_dependencies_count(const zbx_uint64_t itemid, const zbx_vect
 
 			if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < ++(*depth_level))
 			{
-				/* API doesn't allow to configure dependencies deeper */
+				/* API shouldn't allow to create dependencies deeper */
 				THIS_SHOULD_NEVER_HAPPEN;
 				goto out;
 			}
@@ -1156,7 +1156,7 @@ out:
  *                                                                            *
  * Purpose: check the limits of dependent items                               *
  *                                                                            *
- * Parameters: itemid           - [IN] item ID to be checked for limit        *
+ * Parameters: item_prototype   - [IN] item prototype to be checked for limit *
  *             dependencies     - [IN] item dependencies                      *
  *                                                                            *
  * Returns: SUCCEED - the check was successful                                *
@@ -1204,18 +1204,17 @@ static int	lld_item_dependencies_check(const zbx_lld_item_prototype_t *item_prot
 		}
 		else if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < ++depth_level)
 		{
-			/* API doesn't allow to configure dependencies deeper than ZBX_DEPENDENT_ITEM_MAX_LEVELS */
+			/* API shouldn't allow to create dependencies deeper than ZBX_DEPENDENT_ITEM_MAX_LEVELS */
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto out;
 		}
 	}
 
 	depth_level = 0;
-
 	zbx_vector_uint64_create(&processed_itemids);
 
-	ret = lld_item_dependencies_count(top_dependence->itemid, dependencies, &processed_itemids,
-			&dependence_num, &depth_level);
+	ret = lld_item_dependencies_count(top_dependence->itemid, dependencies, &processed_itemids, &dependence_num,
+			&depth_level);
 
 	zbx_vector_uint64_destroy(&processed_itemids);
 out:
