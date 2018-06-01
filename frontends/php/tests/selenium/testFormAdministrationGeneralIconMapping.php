@@ -113,16 +113,15 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 					'error' => 'Global regular expression "regexpnotexist" does not exist.'
 				]
 			],
-			// TODO uncomment after ZBX-14409 will be modified
-//			[
-//				[
-//					'name' => 'Icon mapping add not existen global regular expression',
-//					'mappings' => [
-//						['expression' => '@']
-//					],
-//					'error' => 'Global regular expression "" does not exist.'
-//				]
-//			],
+			[
+				[
+					'name' => 'Icon mapping add not existen global regular expression',
+					'mappings' => [
+						['expression' => '@']
+					],
+					'error' => 'Global regular expression "" does not exist.'
+				]
+			],
 			[
 				[
 					'name' => 'Icon mapping without expressions',

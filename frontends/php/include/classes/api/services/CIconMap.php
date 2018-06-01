@@ -325,8 +325,8 @@ class CIconMap extends CApiService {
 		foreach ($iconmaps as $iconmap) {
 			if (array_key_exists('mappings', $iconmap)) {
 				foreach ($iconmap['mappings'] as $mapping) {
-					if ($mapping['expression'][0] == '@') {
-						$names[substr($mapping['expression'], 1)] = true;
+					if ($mapping['expression'][0] === '@') {
+						$names[mb_substr($mapping['expression'], 1)] = true;
 					}
 				}
 			}
