@@ -904,9 +904,9 @@ function makeInformationIcon($message) {
  * Renders an action icon.
  *
  * @param array  $icon_data
- * @param string $icon_data[icon]   Icon style.
- * @param string $icon_data[hint]   Hintbox content (optional).
- * @param int    $icon_data[num]    Number displayed over the icon (optional).
+ * @param string $icon_data[icon]  Icon style.
+ * @param array  $icon_data[hint]  Hintbox content (optional).
+ * @param int    $icon_data[num]   Number displayed over the icon (optional).
  *
  * @return CSpan
  */
