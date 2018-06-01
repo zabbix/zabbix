@@ -1329,8 +1329,6 @@ class CDiscoveryRule extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$rs = [];
-
 		if ($item_prototypes) {
 			$create_order = [];
 			$src_itemid_to_key = [];

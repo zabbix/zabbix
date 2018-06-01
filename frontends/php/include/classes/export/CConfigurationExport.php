@@ -434,8 +434,6 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
-		$template_itemids = [];
-
 		foreach ($items as $itemid => &$item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 				if (array_key_exists($item['master_itemid'], $items)) {
