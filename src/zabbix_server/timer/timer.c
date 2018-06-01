@@ -472,9 +472,9 @@ static int	process_maintenance(void)
 			" from maintenances m,maintenances_windows mw,timeperiods tp"
 			" where m.maintenanceid=mw.maintenanceid"
 				" and mw.timeperiodid=tp.timeperiodid"
-				" and m.active_since<=%d"
-				" and m.active_till>%d",
-			now, now);
+				" and m.active_since<=%ld"
+				" and m.active_till>%ld",
+			(long int)now, (long int)now);
 
 	while (NULL != (row = DBfetch(result)))
 	{
