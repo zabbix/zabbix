@@ -1568,6 +1568,11 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.18
+
+3.0.18rc1 was released as 3.0.18 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.18rc1
 
 Bug fixes:
