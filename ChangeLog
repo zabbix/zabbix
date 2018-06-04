@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha8
 
 New features:
+..F....... [ZBXNEXT-4312] reworked date picker; implemented keyboard interaction (miks)
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
