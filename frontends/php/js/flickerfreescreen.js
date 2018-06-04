@@ -272,7 +272,7 @@
 							$('#flickerfreescreen_' + id).replaceWith(html);
 							$('main .msg-bad').insertBefore('main > :first-child');
 
-							window.flickerfree.setElementProgressState(id, false);
+							window.flickerfreeScreen.setElementProgressState(id, false);
 						}
 						else if (!html.length) {
 							$('#flickerfreescreen_' + id).remove();
