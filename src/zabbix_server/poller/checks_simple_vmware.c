@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,8 +218,6 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		ret = SYSINFO_RET_OK;
 		goto out;
 	}
-
-
 
 	if (SUCCEED == is_uint64((char *)perfvalue->second, &value))
 	{

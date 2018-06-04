@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -471,24 +471,22 @@ class CCorrelation extends CApiService {
 	 */
 	public function delete(array $correlationids) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can delete correlations.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		if (!$correlationids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $correlationids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_correlations = $this->get([
-			'output' => ['correlationid'],
+			'output' => ['correlationid', 'name'],
 			'correlationids' => $correlationids,
 			'preservekeys' => true
 		]);
 
 		foreach ($correlationids as $correlationid) {
-			if (!is_int($correlationid) && !is_string($correlationid)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-			elseif (!array_key_exists($correlationid, $db_correlations)) {
+			if (!array_key_exists($correlationid, $db_correlations)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
@@ -496,6 +494,8 @@ class CCorrelation extends CApiService {
 		}
 
 		DB::delete('correlation', ['correlationid' => $correlationids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_CORRELATION, $db_correlations);
 
 		return ['correlationids' => $correlationids];
 	}
@@ -1201,7 +1201,7 @@ class CCorrelation extends CApiService {
 		if (!$parser->parse($correlation['filter']['formula'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect custom expression "%2$s" for correlation "%1$s": %3$s.',
-					$correlation['filter']['formula'], $correlation['name'], $parser->error
+					$correlation['name'], $correlation['filter']['formula'], $parser->error
 				)
 			);
 		}

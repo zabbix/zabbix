@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2017 Zabbix SIA
+-- Copyright (C) 2001-2018 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ FIELDS|userid|alias|name  |surname      |passwd                          |url|au
 ROW   |1     |Admin|Zabbix|Administrator|5fce1b3e34b520afeffb37ce08c7cd66|   |1        |0         |en_GB|30s    |3   |default|50           |
 ROW   |2     |guest|      |             |d41d8cd98f00b204e9800998ecf8427e|   |0        |15m       |en_GB|30s    |1   |default|50           |
 
-TABLE |groups
+TABLE |hstgrp
 FIELDS|groupid|name                       |internal|flags|
 ROW   |1      |Templates                  |0       |0    |
 ROW   |2      |Linux servers              |0       |0    |
@@ -66,10 +66,10 @@ ROW   |2 |8       |2     |
 ROW   |4 |7       |1     |
 
 TABLE |scripts
-FIELDS|scriptid|name                   |command                          |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|
-ROW   |1       |Ping                   |/bin/ping -c 3 {HOST.CONN}       |2          |NULL    |NULL   |           |            |0   |2         |
-ROW   |2       |Traceroute             |/usr/bin/traceroute {HOST.CONN}  |2          |NULL    |NULL   |           |            |0   |2         |
-ROW   |3       |Detect operating system|sudo /usr/bin/nmap -O {HOST.CONN}|2          |7       |NULL   |           |            |0   |2         |
+FIELDS|scriptid|name                   |command                                                       |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|
+ROW   |1       |Ping                   |ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac|2          |NULL    |NULL   |           |            |0   |2         |
+ROW   |2       |Traceroute             |/usr/bin/traceroute {HOST.CONN}                               |2          |NULL    |NULL   |           |            |0   |2         |
+ROW   |3       |Detect operating system|sudo /usr/bin/nmap -O {HOST.CONN}                             |2          |7       |NULL   |           |            |0   |2         |
 
 TABLE |actions
 FIELDS|actionid|name                                          |eventsource|evaltype|status|esc_period|def_shortdata                              |def_longdata                                                                                                                                                                                      |r_shortdata                                |r_longdata                                                                                                                                                                                                                    |formula|maintenance_mode|ack_shortdata               |ack_longdata                                                                                                                                                 |
@@ -128,11 +128,11 @@ FIELDS|configid|refresh_unsupported|work_period    |alert_usrgrpid|discovery_gro
 ROW   |1       |10m                |1-5,09:00-18:00|7             |5                |
 
 TABLE |graph_theme
-FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|colorpalette|
-ROW   |1           |blue-theme|FFFFFF         |FFFFFF    |CCD5D9   |ACBBC2       |ACBBC2         |1F2C33   |E33734        |429E47             |E33734              |EBEBEB          |1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4
-ROW   |2           |dark-theme|2B2B2B         |2B2B2B    |454545   |4F4F4F       |4F4F4F         |F2F2F2   |E45959        |59DB8F             |E45959              |333333          |199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4
-ROW   |3           |hc-light  |FFFFFF         |FFFFFF    |555555   |000000       |333333         |000000   |333333        |000000             |000000              |EBEBEB          |1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4
-ROW   |4           |hc-dark   |000000         |000000    |666666   |888888       |4F4F4F         |FFFFFF   |FFFFFF        |FFFFFF             |FFFFFF              |333333          |199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4
+FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|colorpalette                                                                                                                                      |
+ROW   |1           |blue-theme|FFFFFF         |FFFFFF    |CCD5D9   |ACBBC2       |ACBBC2         |1F2C33   |E33734        |429E47             |E33734              |EBEBEB          |1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4|
+ROW   |2           |dark-theme|2B2B2B         |2B2B2B    |454545   |4F4F4F       |4F4F4F         |F2F2F2   |E45959        |59DB8F             |E45959              |333333          |199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4|
+ROW   |3           |hc-light  |FFFFFF         |FFFFFF    |555555   |000000       |333333         |000000   |333333        |000000             |000000              |EBEBEB          |1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4|
+ROW   |4           |hc-dark   |000000         |000000    |666666   |888888       |4F4F4F         |FFFFFF   |FFFFFF        |FFFFFF             |FFFFFF              |333333          |199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4|
 
 TABLE |globalmacro
 FIELDS|globalmacroid|macro            |value |
@@ -164,14 +164,14 @@ FIELDS|dashboardid|name     |userid|private|
 ROW   |1          |Dashboard|1     |0      |
 
 TABLE |widget
-FIELDS|widgetid|dashboardid|type    |name|x|y|width|height|
-ROW   |1       |1          |favgrph |    |0|0|2    |3     |
-ROW   |2       |1          |favscr  |    |2|0|2    |3     |
-ROW   |3       |1          |favmap  |    |4|0|2    |3     |
-ROW   |4       |1          |problems|    |0|3|6    |6     |
-ROW   |5       |1          |webovr  |    |0|9|3    |4     |
-ROW   |6       |1          |dscvry  |    |3|9|3    |4     |
-ROW   |7       |1          |hoststat|    |6|0|6    |4     |
-ROW   |8       |1          |syssum  |    |6|4|6    |4     |
-ROW   |9       |1          |stszbx  |    |6|8|6    |5     |
+FIELDS|widgetid|dashboardid|type        |name|x|y|width|height|
+ROW   |1       |1          |favgraphs   |    |0|0|2    |3     |
+ROW   |2       |1          |favscreens  |    |2|0|2    |3     |
+ROW   |3       |1          |favmaps     |    |4|0|2    |3     |
+ROW   |4       |1          |problems    |    |0|3|6    |6     |
+ROW   |5       |1          |web         |    |0|9|3    |4     |
+ROW   |6       |1          |discovery   |    |3|9|3    |4     |
+ROW   |7       |1          |problemhosts|    |6|0|6    |4     |
+ROW   |8       |1          |problemsbysv|    |6|4|6    |4     |
+ROW   |9       |1          |systeminfo  |    |6|8|6    |5     |
 

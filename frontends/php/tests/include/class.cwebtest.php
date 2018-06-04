@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
+require_once dirname(__FILE__) . '/class.ctestdbhelper.php';
 require_once dirname(__FILE__).'/class.cexceptionhelper.php';
 
 define('TEST_GOOD', 0);
@@ -363,7 +364,41 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	 * @param string $id  ID of the multiselect.
 	 */
 	public function zbxTestClickButtonMultiselect($id) {
-		$this->zbxTestClickXpath("//div[@id='$id']/..//button");
+		$this->zbxTestClickXpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/../div[@class='multiselect-button']/button"
+		);
+	}
+
+	public function zbxTestMultiselectNew($id, $string) {
+		$this->webDriver->findElement(
+			WebDriverBy::xpath("//div[contains(@class, 'multiselect') and @id='$id']/input")
+		)
+			->clear()
+			->sendKeys($string);
+		$this->zbxTestClickXpathWait(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
+			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
+		);
+		$this->zbxTestMultiselectAssertSelected($id, $string.' (new)');
+	}
+
+	public function zbxTestMultiselectAssertSelected($id, $string) {
+		$this->zbxTestAssertVisibleXpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']"
+		);
+	}
+
+	public function zbxTestMultiselectRemove($id, $string) {
+		$this->zbxTestClickXpathWait(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']/..".
+			"/span[@class='subfilter-disable-btn']"
+		);
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
+			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']"
+		));
 	}
 
 	public function zbxTestInputType($id, $str) {
@@ -683,6 +718,103 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			return $this->webDriver->executeScript("return document.readyState;") == "complete";
 			}
 		);
+	}
+
+	/**
+	 * Find and click on button inside header 'Content controls' area having specific text.
+	 *
+	 * @param string $text  Button text label.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestContentControlButtonClickText($text) {
+		$this->webDriver->findElement(WebDriverBy::xpath(
+			"//div[contains(@class, 'header-title')]".
+				"//nav[@aria-label='Content controls']".
+					"//button[text()='{$text}']"
+		))->click();
+	}
+
+	/**
+	 * Find and click on button inside header 'Content controls' area having specific class name.
+	 *
+	 * @param string $class  Button text label.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestContentControlButtonClickClass($class) {
+		$this->webDriver->findElement(WebDriverBy::xpath(
+			"//div[contains(@class, 'header-title')]".
+				"//nav[@aria-label='Content controls']".
+					"//button[contains(@class, '{$class}')]"
+		))->click();
+	}
+
+	/**
+	 * Select option for select element inside 'Main filter' area.
+	 *
+	 * @param string $name   Select tag name attribute.
+	 * @param string $value  Option value to select.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestMainFilterDropdownSelect($name, $value) {
+		$this->webDriver->findElement(WebDriverBy::xpath(
+			"//div[contains(@class, 'header-title')]".
+				"//form[@aria-label='Main filter']".
+					"//select[@name='{$name}']".
+						"/option[@value='{$value}']"
+		))->click();
+	}
+
+	/**
+	 * Find and click on button inside header 'Content controls' area having specific text.
+	 *
+	 * @param string $text  Button text label.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestContentControlButtonClickTextWait($text) {
+		$xpath = "//div[contains(@class, 'header-title')]".
+					"//nav[@aria-label='Content controls']".
+						"//button[text()='{$text}']";
+
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
+	}
+
+	/**
+	 * Find and click on button inside header 'Content controls' area having specific class name.
+	 *
+	 * @param string $class  Button text label.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestContentControlButtonClickClassWait($class) {
+		$xpath = "//div[contains(@class, 'header-title')]".
+					"//nav[@aria-label='Content controls']".
+						"//button[contains(@class, '{$class}')]";
+
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
+	}
+
+	/**
+	 * Select option for select element inside 'Main filter' area.
+	 *
+	 * @param string $name   Select tag name attribute.
+	 * @param string $value  Option value to select.
+	 *
+	 * @throws NoSuchElementException
+	 */
+	public function zbxTestMainFilterDropdownSelectWait($name, $value) {
+		$xpath = "//div[contains(@class, 'header-title')]".
+					"//form[@aria-label='Main filter']".
+						"//select[@name='{$name}']".
+							"/option[@value='{$value}']";
+
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
 	}
 
 	/**

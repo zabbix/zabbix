@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,23 +146,17 @@ class CItemKey extends CParser {
 		$this->key = substr($data, $offset, $p - $offset);
 		$p2 = $p;
 
-		if (!$_18_simple_check) {
-			// Zapcat compatibility.
-			for (; isset($data[$p2]) && $data[$p2] == '['; $p = $p2) {
-				$_parameters = [
-					'type' => self::PARAM_ARRAY,
-					'raw' => '',
-					'pos' => $p2 - $offset,
-					'parameters' => []
-				];
-
-				if (!$this->parseKeyParameters($data, $p2, $_parameters['parameters'])) {
-					break;
-				}
-
+		if (!$_18_simple_check && isset($data[$p2]) && $data[$p2] == '[') {
+			$_parameters = [
+				'type' => self::PARAM_ARRAY,
+				'raw' => '',
+				'pos' => $p2 - $offset,
+				'parameters' => []
+			];
+			if ($this->parseKeyParameters($data, $p2, $_parameters['parameters'])) {
 				$_parameters['raw'] = substr($data, $p, $p2 - $p);
-
 				$this->parameters[] = $_parameters;
+				$p = $p2;
 			}
 		}
 
@@ -212,6 +206,12 @@ class CItemKey extends CParser {
 
 							if (!$this->parseKeyParameters($data, $_p, $_parameters['parameters'])) {
 								break 3;
+							}
+
+							foreach ($_parameters['parameters'] as $param) {
+								if ($param['type'] == self::PARAM_ARRAY) {
+									break 4;
+								}
 							}
 
 							$_parameters['raw'] = substr($data, $p, $_p - $p);

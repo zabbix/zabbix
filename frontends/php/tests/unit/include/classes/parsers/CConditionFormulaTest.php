@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,6 +40,17 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 			['A and (B and C)'],
 			['A and(B and C)'],
 			['(A and B)and C'],
+			['A and(not B and C)'],
+			['(  (   A    or   B   )   )   and    C'],
+			['A and not B'],
+			['not A and not B or C or not D and E'],
+			['(not A and not B) or C or (not D and E)'],
+			['(  (  not A  )  and   (   not B   )   )   or   C   or   (   (   (  not    D    and   E   ) ) )'],
+			['not (A and B)'],
+			['A and not(not B and C)'],
+			['A and not ( not B and C )'],
+			['A and not(not(not B and C))'],
+			['A and not ( not ( not B and C ) )']
 		];
 	}
 
@@ -70,6 +81,20 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 			['A andB'],
 			['AandB'],
 			['A and BandC'],
+			['A and (not B and A and not)'],
+			['A and (not B and A and not )'],
+			['A and (not B and A and NOT C  )'],
+			['A and (not B and A and not and not C)'],
+			['A and (not B and A and not not C)'],
+			['A andnot B'],
+			['A ornot B'],
+			['no A and B'],
+			['notA and B'],
+			['A not and B'],
+			['(A and B) not C'],
+			['(A and B)not C'],
+			['A AND B'],
+			['A and NOT B']
 		];
 	}
 
@@ -102,6 +127,16 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 				['value' => 'A', 'pos' => 0],
 				['value' => 'B', 'pos' => 6],
 				['value' => 'A', 'pos' => 11]
+			]],
+			['A and not B or C', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'B', 'pos' => 10],
+				['value' => 'C', 'pos' => 15]
+			]],
+			['A and NOT and B', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'NOT', 'pos' => 6],
+				['value' => 'B', 'pos' => 14]
 			]]
 		];
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,9 @@ foreach ($data['maps'] as $map) {
 	$table->addRow([
 		new CLink($map['label'], (new CUrl('zabbix.php'))
 			->setArgument('action', 'map.view')
-			->setArgument('sysmapid', $map['sysmapid'])),
+			->setArgument('sysmapid', $map['sysmapid'])
+			->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+		),
 		(new CButton())
 			->onClick("rm4favorites('sysmapid','".$map['sysmapid']."')")
 			->addClass(ZBX_STYLE_REMOVE_BTN)

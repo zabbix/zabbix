@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -435,7 +435,7 @@ class CHistoryManager {
 			];
 
 			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = 'Math.floor((params.width*(((long)doc[\'clock\'].value/1000+params.delta)%params.size))'.
+			$formula = 'Math.floor((params.width*((doc[\'clock\'].date.getMillis()/1000+params.delta)%params.size))'.
 					'/params.size)';
 
 			$script = [
@@ -546,10 +546,6 @@ class CHistoryManager {
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
 			}
 			else {
-				if (!$item['has_scheduling_intervals'] || $item['delay'] != 0) {
-					$item['delay'] = max($item['delay'], SEC_PER_HOUR);
-				}
-
 				$sql_select = 'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 			}
@@ -562,13 +558,6 @@ class CHistoryManager {
 					' AND clock<='.zbx_dbstr($time_to).
 				' GROUP BY '.$group_by
 			);
-
-			$sql = 'SELECT itemid,'.$sql_select.$sql_select_extra.',MAX(clock) AS clock'.
-				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-					' AND clock>='.zbx_dbstr($time_from).
-					' AND clock<='.zbx_dbstr($time_to).
-				' GROUP BY '.$group_by;
 
 			$data = [];
 			while (($row = DBfetch($result)) !== false) {
@@ -1042,7 +1031,7 @@ class CHistoryManager {
 
 		foreach ($indices as $type => $index) {
 			if (($url = self::getElasticsearchUrl($index)) !== null) {
-				$endponts[$type] = $url.$index.'/values/'.$action;
+				$endponts[$type] = $url.$index.'*/values/'.$action;
 			}
 		}
 

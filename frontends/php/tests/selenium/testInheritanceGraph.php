@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ class testInheritanceGraph extends CWebTest {
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'groupid');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'action_buttons');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

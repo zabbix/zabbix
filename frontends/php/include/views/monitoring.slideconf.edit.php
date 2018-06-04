@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ if (!$data['form_refresh']) {
 // create form
 $form = (new CForm())
 	->setName('slideForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('slides', $data['slides_without_delay'])
 	->addVar('current_user_userid', $data['current_user_userid'])
@@ -49,70 +50,57 @@ $slideshow_tab = (new CFormList());
 // Slide show owner multiselect.
 $multiselect_data = [
 	'name' => 'userid',
-	'selectedLimit' => 1,
-	'objectName' => 'users',
+	'object_name' => 'users',
+	'multiple' => false,
 	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
+	'data' => [],
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'users',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'userid',
 			'srcfld1' => 'userid',
-			'srcfld2' => 'fullname'
+			'srcfld2' => 'fullname',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'userid'
 		]
 	]
 ];
 
 $slideshow_ownerid = $data['slideshow']['userid'];
 
-// If slide show owner does not exist or is not allowed to display.
-if ($slideshow_ownerid === '' || $slideshow_ownerid && array_key_exists($slideshow_ownerid, $data['users'])) {
-	// Slide show owner data.
-	if ($slideshow_ownerid) {
-		$owner_data = [[
+if ($slideshow_ownerid !== '') {
+	$multiselect_data['data'][] = array_key_exists($slideshow_ownerid, $data['users'])
+		? [
 			'id' => $slideshow_ownerid,
 			'name' => getUserFullname($data['users'][$slideshow_ownerid])
-		]];
-	}
-	else {
-		$owner_data = [];
-	}
-
-	$multiselect_data['data'] = $owner_data;
-
-	// Append multiselect to slide show tab.
-	$slideshow_tab->addRow(_('Owner'),
-		(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+		]
+		: [
+			'id' => $slideshow_ownerid,
+			'name' => _('Inaccessible user'),
+			'inmaccessible' => true
+		];
 }
-else {
-	$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-	// Administrators can change slide show owner, but cannot see users from other groups.
-	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-		$slideshow_tab
-			->addRow(_('Owner'), $multiselect_userid)
-			->addRow('', _('Inaccessible user'), 'inaccessible_user');
-	}
-	else {
-		// For regular users and guests, only information message is displayed without multiselect.
-		$slideshow_tab->addRow(_('Owner'), [
-			(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
-			(new CSpan($multiselect_userid))
-				->addStyle('display: none;')
-				->setId('multiselect_userid_wrapper')
-		]);
-	}
-}
+// Append multiselect to slide show tab.
+$slideshow_tab->addRow(
+	(new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
+	(new CMultiSelect($multiselect_data))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 $slideshow_tab
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['slideshow']['name']))
+			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Default delay'),
-		(new CTextBox('delay', $data['slideshow']['delay']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	->addRow(
+		(new CLabel(_('Default delay'), 'delay'))->setAsteriskMark(),
+		(new CTextBox('delay', $data['slideshow']['delay']))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	);
 
 // append slide table
@@ -162,7 +150,7 @@ $addButtonColumn = (new CCol(
 					'srcfld1' => 'screenid',
 					'dstfrm' => $form->getName(),
 					'multiselect' => '1'
-				]).');'
+				]).', null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	))->setColSpan(5);
@@ -170,7 +158,8 @@ $addButtonColumn = (new CCol(
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
-$slideshow_tab->addRow(_('Slides'),
+$slideshow_tab->addRow(
+	(new CLabel(_('Slides'), $slideTable->getId()))->setAsteriskMark(),
 	(new CDiv($slideTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -192,7 +181,7 @@ $add_user_group_btn = ([(new CButton(null, _('Add')))
 			'srcfld2' => 'name',
 			'dstfrm' => $form->getName(),
 			'multiselect' => '1'
-		]).');'
+		]).', null, this);'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -230,7 +219,7 @@ $add_user_btn = ([(new CButton(null, _('Add')))
 			'srcfld2' => 'fullname',
 			'dstfrm' => $form->getName(),
 			'multiselect' => '1'
-		]).');'
+		]).', null, this);'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 

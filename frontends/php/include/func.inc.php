@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -293,14 +293,18 @@ function zbx_date2str($format, $value = null) {
 	return $prefix.$output;
 }
 
-// calculate and convert timestamp to string representation
-function zbx_date2age($startDate, $endDate = 0, $utime = false) {
-	if (!$utime) {
-		$startDate = date('U', $startDate);
-		$endDate = $endDate ? date('U', $endDate) : time();
-	}
+/**
+ * Calculates and converts timestamp to string represenation.
+ *
+ * @param int|string $start_date Start date timestamp.
+ * @param int|string $end_date   End date timestamp.
+ *
+ * @return string
+ */
+function zbx_date2age($start_date, $end_date = 0) {
+	$end_date = ($end_date != 0) ? $end_date : time();
 
-	return convertUnitsS(abs($endDate - $startDate));
+	return convertUnitsS($end_date - $start_date);
 }
 
 function zbxDateToTime($strdate) {
@@ -637,11 +641,11 @@ function convert_units($options = []) {
 	// any other unit
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
 			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
-		if (preg_match('/^\-?\d+\.\d+$/', $options['value'])) {
-			if (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
-				$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
-			}
-			$options['value'] = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $options['value']);
+		if (preg_match('/\.\d+$/', $options['value'])) {
+			$format = (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
+				? '%.'.ZBX_UNITS_ROUNDOFF_UPPER_LIMIT.'f'
+				: '%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f';
+			$options['value'] = sprintf($format, $options['value']);
 		}
 		$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $options['value']);
 		$options['value'] = rtrim($options['value'], '.');
@@ -1797,8 +1801,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 
 	if ($messages) {
 		if ($title !== null) {
-			$link_details = (new CSpan())
-				->addClass(ZBX_STYLE_LINK_ACTION)
+			$link_details = (new CLinkAction())
 				->addItem(_('Details'))
 				->addItem(' ') // space
 				->addItem((new CSpan())
@@ -1828,10 +1831,8 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
 	}
 
-	$msg_box = (new CDiv())->addClass($class)
-		->addItem($link_details) // Details link should be in front of title
-		->addItem($title)
-		->addItem($msg_details);
+	// Details link should be in front of title.
+	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))->addClass($class);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
@@ -1876,16 +1877,20 @@ function filter_messages(array $messages = []) {
 /**
  * Returns the message box when messages are present; null otherwise
  *
- * @global array $ZBX_MESSAGES
+ * @param  boolean	$good			Parameter passed to makeMessageBox to specify message box style.
+ * @param  string	$title			Message box title.
+ * @global array	$ZBX_MESSAGES
  *
  * @return CDiv|null
  */
-function getMessages()
+function getMessages($good = false, $title = null)
 {
 	global $ZBX_MESSAGES;
 
-	$message_box = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES)
-		? makeMessageBox(false, filter_messages($ZBX_MESSAGES))
+	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+
+	$message_box = ($title || $messages)
+		? makeMessageBox($good, $messages, $title)
 		: null;
 
 	$ZBX_MESSAGES = [];
@@ -2313,23 +2318,6 @@ function hasErrorMesssages() {
 	}
 
 	return false;
-}
-
-/**
- * Get all messages as array.
- *
- * @return array
- */
-function getMessagesAsArray() {
-	global $ZBX_MESSAGES;
-
-	$result = [];
-	if (isset($ZBX_MESSAGES)) {
-		foreach ($ZBX_MESSAGES as $message) {
-			$result[] = $message['message'];
-		}
-	}
-	return $result;
 }
 
 /**

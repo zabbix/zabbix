@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ const char	*zbx_alias_get(const char *orig)
 	size_t				buffer_offset = 0;
 	const char			*p = orig;
 
-	if (SUCCEED != parse_key((char **)&p) || '\0' != *p)
+	if (SUCCEED != parse_key(&p) || '\0' != *p)
 		return orig;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)

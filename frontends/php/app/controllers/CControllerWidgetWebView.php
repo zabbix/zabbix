@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class CControllerWidgetWebView extends CControllerWidget {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_WEB_OVERVIEW);
+		$this->setType(WIDGET_WEB);
 		$this->setValidationRules([
 			'name' => 'string',
 			'fullscreen' => 'in 0,1',

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ if ($data['screen']['templateid']) {
 // create form
 $form = (new CForm())
 	->setName('screenForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['screen']['templateid'] != 0) {
@@ -59,72 +60,60 @@ if (!$data['screen']['templateid']) {
 	// Screen owner multiselect.
 	$multiselect_data = [
 		'name' => 'userid',
-		'selectedLimit' => 1,
-		'objectName' => 'users',
+		'object_name' => 'users',
+		'multiple' => false,
 		'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
+		'data' => [],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'users',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'userid',
 				'srcfld1' => 'userid',
-				'srcfld2' => 'fullname'
+				'srcfld2' => 'fullname',
+				'dstfrm' => $form->getName(),
+				'dstfld1' => 'userid'
 			]
 		]
 	];
 
 	$screen_ownerid = $data['screen']['userid'];
 
-	// If screen owner does not exist or is not allowed to display.
-	if ($screen_ownerid === '' || $screen_ownerid && array_key_exists($screen_ownerid, $data['users'])) {
-		// Screen owner data.
-		if ($screen_ownerid) {
-			$owner_data = [[
+	if ($screen_ownerid !== '') {
+		$multiselect_data['data'][] = array_key_exists($screen_ownerid, $data['users'])
+			? [
 				'id' => $screen_ownerid,
 				'name' => getUserFullname($data['users'][$screen_ownerid])
-			]];
-		}
-		else {
-			$owner_data = [];
-		}
-
-		$multiselect_data['data'] = $owner_data;
-
-		// Append multiselect to screen tab.
-		$screen_tab->addRow(_('Owner'),
-			(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		);
+			]
+			: [
+				'id' => $screen_ownerid,
+				'name' => _('Inaccessible user'),
+				'inaccessible' => true
+			];
 	}
-	else {
-		$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-		// Administrators can change screen owner, but cannot see users from other groups.
-		if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-			$screen_tab->addRow(_('Owner'), $multiselect_userid)
-				->addRow('', _('Inaccessible user'), 'inaccessible_user');
-		}
-		else {
-			// For regular users and guests, only information message is displayed without multiselect.
-			$screen_tab->addRow(_('Owner'), [
-				(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
-				(new CSpan($multiselect_userid))
-					->addStyle('display: none;')
-					->setId('multiselect_userid_wrapper')
-			]);
-		}
-	}
+	// Append multiselect to screen tab.
+	$screen_tab->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
+		(new CMultiSelect($multiselect_data))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	);
 }
 
-$screen_tab->addRow(_('Name'),
+$screen_tab->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['screen']['name']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Columns'),
-		(new CNumericBox('hsize', $data['screen']['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Columns'), 'hsize'))->setAsteriskMark(),
+		(new CNumericBox('hsize', $data['screen']['hsize'], 3))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Rows'),
-		(new CNumericBox('vsize', $data['screen']['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Rows'), 'vsize'))->setAsteriskMark(),
+		(new CNumericBox('vsize', $data['screen']['vsize'], 3))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	);
 
 // append tab to form
@@ -143,7 +132,7 @@ if (!$data['screen']['templateid']) {
 				'srcfld2' => 'name',
 				'dstfrm' => $form->getName(),
 				'multiselect' => '1'
-			]).');'
+			]).', null, this);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -179,7 +168,7 @@ if (!$data['screen']['templateid']) {
 				'srcfld2' => 'fullname',
 				'dstfrm' => $form->getName(),
 				'multiselect' => '1'
-			]).');'
+			]).', null, this);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)]);
 

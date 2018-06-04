@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,8 +55,8 @@ class testFormApplication extends CWebTest {
 
 		// Open an application.
 		$this->zbxTestLogin('applications.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestDropdownSelectWait('hostid', 'Simple form test host');
+		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
+		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestClickLinkTextWait($name);
 
 		// Change application name if new name differs from existing name.
@@ -88,9 +88,9 @@ class testFormApplication extends CWebTest {
 
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestDropdownSelectWait('hostid', 'Simple form test host');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
+		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
+		$this->zbxTestContentControlButtonClickTextWait('Create application');
 
 		// Set application name and submit the form.
 		$this->zbxTestInputTypeWait('appname', $name);
@@ -111,9 +111,9 @@ class testFormApplication extends CWebTest {
 	public function testFormApplication_CheckValidation() {
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestDropdownSelectWait('hostid', 'Simple form test host');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
+		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
+		$this->zbxTestContentControlButtonClickTextWait('Create application');
 
 		// Check error message on posting the empty form.
 		$this->zbxTestClickWait('add');
@@ -147,7 +147,7 @@ class testFormApplication extends CWebTest {
 		for ($i = 0; $i < 3; $i++) {
 			$this->updateApplication(self::$application, self::$application.$suffix);
 
-			// Application name is also updated for the other test cases.
+			// Application name is also updated for the other test cases
 			self::$application .= $suffix;
 		}
 	}
@@ -161,8 +161,8 @@ class testFormApplication extends CWebTest {
 
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestDropdownSelectWait('hostid', 'Simple form test host');
+		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
+		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestClickLinkTextWait(self::$application);
 
 		// Change application name.
@@ -186,8 +186,8 @@ class testFormApplication extends CWebTest {
 
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestDropdownSelectWait('hostid', 'Simple form test host');
+		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
+		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestClickLinkTextWait($name);
 
 		// Clone the application, rename the clone and save it.
@@ -209,8 +209,8 @@ class testFormApplication extends CWebTest {
 
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestDropdownSelectWait('hostid', 'Simple form test host');
+		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
+		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestClickLinkTextWait($name);
 
 		// Delete an application.

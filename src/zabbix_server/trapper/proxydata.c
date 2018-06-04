@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,11 +33,11 @@ static ZBX_MUTEX	proxy_lock = ZBX_MUTEX_NULL;
 #define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(&proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(&proxy_lock)
 
-int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info)
+int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info)
 {
 	struct zbx_json		json;
 	zbx_vector_ptr_t	tasks;
-	int			ret;
+	int			ret, flags = ZBX_TCP_PROTOCOL;
 
 	zbx_vector_ptr_create(&tasks);
 
@@ -53,7 +53,10 @@ int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&json, &tasks);
 
-	if (SUCCEED == (ret = zbx_tcp_send(sock, json.buffer)))
+	if (0 != proxy->auto_compress)
+		flags |= ZBX_TCP_COMPRESS;
+
+	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), flags, 0)))
 	{
 		if (0 != tasks.values_num)
 			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_INPROGRESS);
@@ -102,9 +105,8 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	zbx_proxy_update_version(&proxy, jp);
-
-	update_proxy_lastaccess(proxy.hostid, time(NULL));
+	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
 	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
 	{
@@ -113,10 +115,17 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	zbx_send_proxy_data_respose(&proxy, sock, error);
+	zbx_send_proxy_data_response(&proxy, sock, error);
 out:
 	if (FAIL == ret)
-		zbx_send_response(sock, status, error, CONFIG_TIMEOUT);
+	{
+		int	flags = ZBX_TCP_PROTOCOL;
+
+		if (0 != (sock->protocol & ZBX_TCP_COMPRESS))
+			flags |= ZBX_TCP_COMPRESS;
+
+		zbx_send_response_ext(sock, status, error, NULL, flags, CONFIG_TIMEOUT);
+	}
 
 	zbx_free(error);
 
@@ -136,7 +145,7 @@ out:
  ******************************************************************************/
 static int	send_data_to_server(zbx_socket_t *sock, const char *data, char **error)
 {
-	if (SUCCEED != zbx_tcp_send_to(sock, data, CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_tcp_send_ext(sock, data, strlen(data), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, CONFIG_TIMEOUT))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		return FAIL;

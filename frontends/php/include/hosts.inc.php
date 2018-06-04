@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -478,7 +478,7 @@ function hostInterfaceTypeNumToName($type) {
 }
 
 function get_hostgroup_by_groupid($groupid) {
-	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.zbx_dbstr($groupid)));
+	$groups = DBfetch(DBselect('SELECT g.* FROM hstgrp g WHERE g.groupid='.zbx_dbstr($groupid)));
 
 	if ($groups) {
 		return $groups;
@@ -711,7 +711,7 @@ function getDeletableHostGroupIds(array $groupIds) {
 
 	$dbResult = DBselect(
 		'SELECT g.groupid'.
-		' FROM groups g'.
+		' FROM hstgrp g'.
 		' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
 			' AND '.dbConditionInt('g.groupid', $groupIds).
 			' AND NOT EXISTS ('.

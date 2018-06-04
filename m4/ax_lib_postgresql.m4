@@ -120,7 +120,7 @@ conn = PQsetdbLogin(NULL, NULL, NULL, NULL, NULL, NULL, NULL);
             unset _save_postgresql_libs
 
             if test "x$found_postgresql" = "xyes"; then
-                POSTGRESQL_VERSION=`$PG_CONFIG --version | sed -e 's#PostgreSQL ##'`
+                POSTGRESQL_VERSION=`$PG_CONFIG --version | cut -d' ' -f2`
             fi
         fi
     fi

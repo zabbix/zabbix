@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,8 @@ class CWidget {
 		$divs = [];
 
 		if ($this->title !== null) {
-			$divs[] = (new CDiv(new CTag('h1', true, $this->title)))->addClass(ZBX_STYLE_CELL);
+			$divs[] = (new CDiv((new CTag('h1', true, $this->title))->setId(ZBX_STYLE_PAGE_TITLE)))
+				->addClass(ZBX_STYLE_CELL);
 		}
 
 		if ($this->controls !== null) {

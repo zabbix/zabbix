@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,8 @@ void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_
 		goto out;
 	}
 
-	zbx_proxy_update_version(&proxy, jp);
+	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
 	if (SUCCEED != (ret = process_auto_registration(jp, proxy.hostid, ts, &error)))
 	{

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,16 +99,6 @@ class testUrlUserPermissions extends CWebTest {
 				'url' => 'history.php?action=showgraph&itemids[]=23296',
 				'title' =>	'History [refreshed every 30 sec.]',
 				'no_permissions_to_object' => true,
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'tr_status.php',
-				'title' =>	'Triggers [refreshed every 30 sec.]',
-				'header' =>	'Triggers',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -257,7 +247,7 @@ class testUrlUserPermissions extends CWebTest {
 			// Reports
 			[[
 				'url' => 'zabbix.php?action=report.status',
-				'title' =>	'Status of Zabbix',
+				'title' =>	'System information',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

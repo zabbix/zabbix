@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Images'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem(
-			(new CList())
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
 				->addItem(makeAdministrationGeneralMenu('adm.images.php'))
 				->addItem([
 					new CLabel(_('Type'), 'imagetype'),
@@ -39,7 +39,9 @@ $widget = (new CWidget())
 						? _('Create icon')
 						: _('Create background'))
 				)
-		)
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 if (!$data['images']) {

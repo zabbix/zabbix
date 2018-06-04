@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ if ($event['r_eventid'] != 0) {
 	}
 }
 
-// Filter out acknowledgment notification messages.
+// Filter out acknowledgement notification messages.
 $all_alerts = [&$alerts, &$r_alerts];
 
 foreach ($all_alerts as &$alerts_data) {
@@ -183,7 +183,12 @@ $eventTab = (new CTable())
 
 $eventWidget = (new CWidget())
 	->setTitle(_('Event details'))
-	->setControls((new CList())->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+		))
+		->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem($eventTab)
 	->show();
 

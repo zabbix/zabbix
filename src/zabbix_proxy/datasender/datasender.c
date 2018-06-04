@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,12 +59,12 @@ static int	proxy_data_sender(int *more, int now)
 {
 	const char		*__function_name = "proxy_data_sender";
 
-	static int		data_timestamp = 0, task_timestamp = 0;
+	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
 	zbx_socket_t		sock;
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_tasks;
-	int			ret = FAIL, availability_ts, history_records = 0, discovery_records = 0,
+	int			availability_ts, history_records = 0, discovery_records = 0,
 				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
@@ -79,7 +79,7 @@ static int	proxy_data_sender(int *more, int now)
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	if (CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp)
+	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp)
 	{
 		if (SUCCEED == get_host_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
@@ -102,7 +102,7 @@ static int	proxy_data_sender(int *more, int now)
 
 	zbx_vector_ptr_create(&tasks);
 
-	if (ZBX_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
+	if (SUCCEED == upload_state && ZBX_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
 	{
 		task_timestamp = now;
 
@@ -116,6 +116,9 @@ static int	proxy_data_sender(int *more, int now)
 
 		flags |= ZBX_DATASENDER_TASKS_REQUEST;
 	}
+
+	if (SUCCEED != upload_state)
+		flags |= ZBX_DATASENDER_TASKS_REQUEST;
 
 	if (0 != flags)
 	{
@@ -134,8 +137,9 @@ static int	proxy_data_sender(int *more, int now)
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts.ns);
 
-		if (SUCCEED != (ret = put_data_to_server(&sock, &j, &error)))
+		if (SUCCEED != (upload_state = put_data_to_server(&sock, &j, &error)))
 		{
+			*more = ZBX_PROXY_DATA_DONE;
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy data to server at \"%s\": %s",
 					sock.peer, error);
 			zbx_free(error);
@@ -188,7 +192,8 @@ static int	proxy_data_sender(int *more, int now)
 
 	zbx_json_free(&j);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __function_name,
+			zbx_result_string(upload_state), *more, flags);
 
 	return history_records + discovery_records + areg_records;
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ class CRadioButtonList extends CList {
 	private $enabled;
 	private $values;
 	private $modern;
+	private $autofocused;
 
 	public function __construct($name, $value) {
 		parent::__construct();
@@ -95,6 +96,10 @@ class CRadioButtonList extends CList {
 
 			if ($value['value'] === $this->value) {
 				$radio->setAttribute('checked', 'checked');
+
+				if ($this->autofocused) {
+					$radio->setAttribute('autofocus', 'autofocus');
+				}
 			}
 
 			if ($this->modern) {
@@ -106,6 +111,28 @@ class CRadioButtonList extends CList {
 			}
 		}
 
+		if ($this->getAttribute('aria-required') === 'true') {
+			$this->setAttribute('role', 'radiogroup');
+		}
+
 		return parent::toString($destroy);
+	}
+
+	/**
+	 * Overrides base method to correctly handle autofocus attribute for radio buttons.
+	 *
+	 * @param $name
+	 * @param $value
+	 *
+	 * @return CRadioButtonList
+	 */
+	public function setAttribute($name, $value) {
+		if ($name === 'autofocus') {
+			$this->autofocused = true;
+
+			return $this;
+		}
+
+		return parent::setAttribute($name, $value);
 	}
 }

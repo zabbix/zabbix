@@ -11,7 +11,8 @@ zabbix_get_LDADD = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a
+	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a
 
 zabbix_get_LDADD += @ZBXGET_LIBS@
 

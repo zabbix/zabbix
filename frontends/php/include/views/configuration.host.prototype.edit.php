@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ if (!isset($_REQUEST['form_refresh'])) {
 
 $frmHost = (new CForm())
 	->setName('hostPrototypeForm.')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $discoveryRule['itemid'])
 	->addVar('tls_accept', $parentHost['tls_accept']);
@@ -68,8 +69,9 @@ if (isset($hostPrototype['hostid'])) {
 $hostTB = (new CTextBox('host', $hostPrototype['host'], (bool) $hostPrototype['templateid']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 128)
+	->setAriaRequired()
 	->setAttribute('autofocus', 'autofocus');
-$hostList->addRow(_('Host name'), $hostTB);
+$hostList->addRow((new CLabel(_('Host name'), 'host'))->setAsteriskMark(), $hostTB);
 
 $name = ($hostPrototype['name'] != $hostPrototype['host']) ? $hostPrototype['name'] : '';
 $visiblenameTB = (new CTextBox('name', $name, (bool) $hostPrototype['templateid']))
@@ -191,28 +193,26 @@ foreach ($data['groups'] as $group) {
 		'name' => $group['name']
 	];
 }
-$groupList->addRow(_('Groups'),
+$groupList->addRow(
+	(new CLabel(_('Groups'), 'group_links[]'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'group_links[]',
-		'objectName' => 'hostGroup',
-		'objectOptions' => [
-			'editable' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-		],
-		'data' => $groups,
+		'object_name' => 'hostGroup',
 		'disabled' => (bool) $hostPrototype['templateid'],
+		'data' => $groups,
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'host_groups',
+				'srcfld1' => 'groupid',
 				'dstfrm' => $frmHost->getName(),
 				'dstfld1' => 'group_links_',
-				'srcfld1' => 'groupid',
-				'writeonly' => '1',
-				'multiselect' => '1',
-				'normal_only' => '1'
+				'editable' => true,
+				'normal_only' => true
 			]
 		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired()
 );
 
 // new group prototypes
@@ -262,7 +262,7 @@ if ($hostPrototype['templateid']) {
 	);
 }
 else {
-	$ignoreTemplates = [];
+	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
@@ -291,7 +291,7 @@ else {
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 
-		$ignoreTemplates[$template['templateid']] = $template['name'];
+		$disableids[] = $template['templateid'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
@@ -305,8 +305,7 @@ else {
 		->addRow([
 			(new CMultiSelect([
 				'name' => 'add_templates[]',
-				'objectName' => 'templates',
-				'ignored' => $ignoreTemplates,
+				'object_name' => 'templates',
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'templates',
@@ -314,8 +313,7 @@ else {
 						'srcfld2' => 'host',
 						'dstfrm' => $frmHost->getName(),
 						'dstfld1' => 'add_templates_',
-						'templated_hosts' => '1',
-						'multiselect' => '1'
+						'disableids' => $disableids
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

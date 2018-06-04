@@ -11,8 +11,8 @@
       <template>
          <template>Template Module Generic SNMPv1</template>
          <name>Template Module Generic SNMPv1</name>
-         <description>Template Module Generic version: 0.14
-MIBs used:
+         <description>Template Module Generic version: 0.14&#13;
+MIBs used:&#13;
 SNMPv2-MIB</description>
          <groups>
             <group>
@@ -56,7 +56,7 @@ SNMPv2-MIB</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
+               <description>MIB: SNMPv2-MIB&#13;
 The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -144,7 +144,7 @@ The time (in hundredths of a second) since the network management portion of the
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
+               <description>MIB: SNMPv2-MIB&#13;
 The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</description>
                <inventory_link>24</inventory_link>
                <applications>
@@ -186,7 +186,7 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
+               <description>MIB: SNMPv2-MIB&#13;
 The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</description>
                <inventory_link>23</inventory_link>
                <applications>
@@ -228,7 +228,7 @@ The textual identification of the contact person for this managed node, together
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
+               <description>MIB: SNMPv2-MIB&#13;
 The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</description>
                <inventory_link>0</inventory_link>
                <applications>
@@ -270,7 +270,7 @@ The vendor's authoritative identification of the network management subsystem co
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
+               <description>MIB: SNMPv2-MIB&#13;
 An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</description>
                <inventory_link>3</inventory_link>
                <applications>
@@ -312,9 +312,9 @@ An administratively-assigned name for this managed node.By convention, this is t
                <publickey/>
                <privatekey/>
                <port/>
-               <description>MIB: SNMPv2-MIB
-A textual description of the entity.  This value should
-include the full name and version identification of the system's hardware type, software operating-system, and
+               <description>MIB: SNMPv2-MIB&#13;
+A textual description of the entity.  This value should&#13;
+include the full name and version identification of the system's hardware type, software operating-system, and&#13;
 networking software.</description>
                <inventory_link>14</inventory_link>
                <applications>
@@ -400,7 +400,7 @@ networking software.</description>
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 The device uptime is less than 10 minutes</description>
          <type>0</type>
          <manual_close>1</manual_close>
@@ -423,7 +423,7 @@ The device uptime is less than 10 minutes</description>
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
 SNMP is not available for polling. Please check device connectivity and SNMP settings.</description>
          <type>0</type>
          <manual_close>0</manual_close>

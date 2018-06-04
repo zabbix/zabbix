@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -6,8 +6,9 @@ use warnings;
 use YAML::XS qw(LoadFile Dump);
 use Path::Tiny qw(path);
 use IPC::Run3 qw(run3);
-use Time::HiRes qw(clock);
+use Time::HiRes qw(time);
 use File::Basename qw(dirname);
+use Getopt::Long qw(GetOptions);
 
 use constant TEST_SUITE_ATTRIBUTES	=> ('name', 'tests', 'skipped', 'errors', 'failures', 'time');
 use constant TEST_CASE_ATTRIBUTES	=> ('name', 'assertions', 'time');
@@ -16,14 +17,15 @@ use constant TEST_CASE_HEADER_FORMAT	=> " %*s │ %-7s │ %s\n";
 use constant TEST_CASE_FORMAT		=> " %*d │ %-7s │ %s\n";
 use constant TEST_SUITE_HEADER_FORMAT	=> " %-*s │ %9s │ %7s │ %6s │ %8s │ %5s\n";
 use constant TEST_SUITE_FORMAT		=> " %-*s │ %9d │ %7d │ %6d │ %8d │ %5.2f\n";
+use constant TEST_SUITE_PATTERN		=> qr/^( [a-zA-Z0-9_:]+\b\D*)(\d+)(\D*)(\d+)(\D*)(\d+)(\D*)(\d+)(.*)$/;
 
 sub escape_xml_entity($)
 {
 	my $entity = shift;
 
+	$entity =~ s/&/&amp;/g;
 	$entity =~ s/</&lt;/g;
 	$entity =~ s/>/&gt;/g;
-	$entity =~ s/&/&amp;/g;
 
 	return $entity;
 }
@@ -44,7 +46,7 @@ sub launch($$$)
 	my $test_exec = shift;
 	my $test_data = shift;
 
-	my $start = clock();
+	my $start = time();
 
 	$test_suite->{'tests'}++;
 
@@ -52,6 +54,8 @@ sub launch($$$)
 		'name'		=> $test_data->{'test case'} // "N/A",
 		'assertions'	=> 0
 	};
+
+	utf8::encode($test_case->{'name'});
 
 	if (path($test_exec)->is_file)
 	{
@@ -81,12 +85,16 @@ sub launch($$$)
 		$test_suite->{'skipped'}++;
 	}
 
-	my $end = clock();
+	my $end = time();
 
 	$test_suite->{'time'} += $test_case->{'time'} = $end - $start;
 
 	push(@{$test_suite->{'testcases'}}, $test_case);
 }
+
+my $xml;
+
+die("Bad command-line arguments") unless(GetOptions(('xml:s' => \$xml)));
 
 my $iter = path(".")->iterator({
 	'recurse'		=> 1,
@@ -118,7 +126,7 @@ while (my $path = $iter->())
 	push(@test_suites, $test_suite);
 }
 
-if (-t STDOUT)
+unless (defined($xml))
 {
 	use Term::ANSIColor qw(:constants);
 
@@ -179,7 +187,7 @@ if (-t STDOUT)
 
 	foreach my $test_suite (@test_suites)
 	{
-		print(" " . $test_suite->{'name'} . "\n");
+		print(" " . BOLD . $test_suite->{'name'} . RESET . "\n");
 		$split_cases->("┬");
 
 		my $case_index = 0;
@@ -258,10 +266,14 @@ if (-t STDOUT)
 
 	foreach my $test_suite (@test_suites)
 	{
-		printf(TEST_SUITE_FORMAT, $longest_suite_name, $test_suite->{'name'}, $test_suite->{'tests'} -
+		sprintf(TEST_SUITE_FORMAT, $longest_suite_name, $test_suite->{'name'}, $test_suite->{'tests'} -
 				$test_suite->{'skipped'} - $test_suite->{'errors'} - $test_suite->{'failures'},
 				$test_suite->{'skipped'}, $test_suite->{'errors'}, $test_suite->{'failures'},
-				$test_suite->{'time'});
+				$test_suite->{'time'}) =~ TEST_SUITE_PATTERN;
+
+		print($1 . $2 . $3. ($4 eq "0" ? "0" : BRIGHT_YELLOW . BOLD . $4 . RESET) . $5 .
+				($6 eq "0" ? "0" : BRIGHT_MAGENTA . BOLD . $6 . RESET) . $7 .
+				($8 eq "0" ? "0" : BRIGHT_RED . BOLD . $8 . RESET) . $9 . "\n");
 
 		$succeeded += $test_suite->{'tests'} - $test_suite->{'skipped'} - $test_suite->{'errors'} -
 				$test_suite->{'failures'};
@@ -275,7 +287,11 @@ if (-t STDOUT)
 	printf(TEST_SUITE_HEADER_FORMAT, $longest_suite_name, "Test suite", "Succeeded", "Skipped", "Errors",
 			"Failures", "Time");
 	$split_suites->("┼");
-	printf(TEST_SUITE_FORMAT, $longest_suite_name, "Total:", $succeeded, $skipped, $errors, $failures, $time);
+	sprintf(TEST_SUITE_FORMAT, $longest_suite_name, "Total:", $succeeded, $skipped, $errors, $failures, $time) =~
+			TEST_SUITE_PATTERN;
+	print($1 . $2 . $3. ($4 eq "0" ? "0" : BRIGHT_YELLOW . BOLD . $4 . RESET) . $5 .
+			($6 eq "0" ? "0" : BRIGHT_MAGENTA . BOLD . $6 . RESET) . $7 .
+			($8 eq "0" ? "0" : BRIGHT_RED . BOLD . $8 . RESET) . $9 . "\n");
 	$split_suites->("┴");
 
 	exit();	# stop here, do not print XML
@@ -287,6 +303,8 @@ print("<testsuites>\n");
 foreach my $test_suite (@test_suites)
 {
 	print("  <testsuite");
+
+	$test_suite->{'name'} = $xml . "." . $test_suite->{'name'} unless ($xml eq "");
 
 	foreach my $attribute (TEST_SUITE_ATTRIBUTES)
 	{
@@ -347,3 +365,8 @@ foreach my $test_suite (@test_suites)
 }
 
 print("</testsuites>\n");
+
+foreach my $test_suite (@test_suites)
+{
+	exit(-1) unless ($test_suite->{'failures'} + $test_suite->{'errors'} == 0);
+}

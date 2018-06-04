@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,10 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
 void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type);
 void	zbx_history_record_clear(zbx_history_record_t *value, int value_type);
 
-void	zbx_history_value2str(char *buffer, size_t size, history_value_t *value, int value_type);
+int	zbx_history_record_compare_asc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
+int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
+
+void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *value, int value_type);
 
 /* In most cases zbx_history_record_vector_destroy() function should be used to free the  */
 /* value vector filled by zbx_vc_get_value* functions. This define simply better          */

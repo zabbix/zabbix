@@ -6,6 +6,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
@@ -26,4 +27,3 @@ zbx_json_path_open_SOURCES = \
 zbx_json_path_open_LDADD = $(JSON_LIBS)
 
 zbx_json_path_open_CFLAGS = -I@top_srcdir@/tests
-

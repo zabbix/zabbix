@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # Zabbix
-# Copyright (C) 2001-2017 Zabbix SIA
+# Copyright (C) 2001-2018 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -161,14 +161,17 @@ sub process_row
 			if ($output{'database'} eq 'mysql')
 			{
 				$_ =~ s/&eol;/\\r\\n/g;
+				$_ =~ s/&bsn;/\\n/g;
 			}
 			elsif ($output{'database'} eq 'oracle')
 			{
 				$_ =~ s/&eol;/' || chr(13) || chr(10) || '/g;
+				$_ =~ s/&bsn;/' || chr(10) || '/g;
 			}
 			else
 			{
 				$_ =~ s/&eol;/\x0D\x0A/g;
+				$_ =~ s/&bsn;/\x0A/g;
 			}
 
 			$values = "$values$modifier'$_'";
@@ -177,7 +180,14 @@ sub process_row
 
 	$values = "$values)";
 
-	print "$insert_into $fields values $values$output{'exec_cmd'}";
+	if ($output{'database'} eq 'oracle')
+	{
+		print "$insert_into $fields\nvalues $values$output{'exec_cmd'}";
+	}
+	else
+	{
+		print "$insert_into $fields values $values$output{'exec_cmd'}";
+	}
 }
 
 sub usage

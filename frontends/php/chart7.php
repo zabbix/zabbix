@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,8 +40,9 @@ $fields = [
 	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null],
 	'graphtype' =>		[T_ZBX_INT, O_OPT, null,	IN('2,3'),			null],
 	'graph3d' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null],
-	'legend' =>			[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null],
-	'items' =>			[T_ZBX_STR, O_OPT, null,	null,				null]
+	'legend' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null],
+	'items' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
+	'widget_view' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
 	exit();
@@ -105,6 +106,12 @@ $graph->setSTime($timeline['stime']);
 if (!empty($_REQUEST['graph3d'])) {
 	$graph->switchPie3D();
 }
+
+if (getRequest('widget_view') === '1') {
+	$graph->draw_header = false;
+	$graph->with_vertical_padding = false;
+}
+
 $graph->showLegend(getRequest('legend', 0));
 $graph->setWidth(getRequest('width', 400));
 $graph->setHeight(getRequest('height', 300));

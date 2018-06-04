@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,5 +22,5 @@
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 $widget = (new CWidget())
-	->setTitle(_('Status of Zabbix'))
+	->setTitle(_('System information'))
 	->addItem(make_status_of_zbx())->show();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,16 +57,34 @@ class CAudit {
 		];
 
 		switch ($resourcetype) {
+			case AUDIT_RESOURCE_ACTION:
+				$field_name_resourceid = 'actionid';
+				$field_name_resourcename = 'name';
+				$table_name = 'actions';
+				break;
+
 			case AUDIT_RESOURCE_APPLICATION:
 				$field_name_resourceid = 'applicationid';
 				$field_name_resourcename = 'name';
 				$table_name = 'applications';
 				break;
 
+			case AUDIT_RESOURCE_CORRELATION:
+				$field_name_resourceid = 'correlationid';
+				$field_name_resourcename = 'name';
+				$table_name = 'correlation';
+				break;
+
 			case AUDIT_RESOURCE_DASHBOARD:
 				$field_name_resourceid = 'dashboardid';
 				$field_name_resourcename = 'name';
 				$table_name = 'dashboard';
+				break;
+
+			case AUDIT_RESOURCE_DISCOVERY_RULE:
+				$field_name_resourceid = 'druleid';
+				$field_name_resourcename = 'name';
+				$table_name = 'drules';
 				break;
 
 			case AUDIT_RESOURCE_ICON_MAP:

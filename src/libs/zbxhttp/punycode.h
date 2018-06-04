@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,5 @@
 #define PUNYCODE_INITIAL_BIAS	72
 #define PUNYCODE_BIAS_LIMIT	(((PUNYCODE_BASE_MAX) * PUNYCODE_TMAX) / 2)
 #define PUNYCODE_MAX_UINT32	((uint32_t)-1)
-
-int	zbx_http_punycode_encode(const char *text, char **output);
 
 #endif

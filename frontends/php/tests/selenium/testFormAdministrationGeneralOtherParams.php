@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup config
+ */
 class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 	public static function allValues() {
@@ -29,7 +32,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 	public static function allGroups() {
 
-		return DBdata('SELECT name FROM groups ORDER BY groupid');
+		return DBdata('SELECT name FROM hstgrp ORDER BY groupid');
 	}
 
 	public static function AlertUsrgrpid() {
@@ -73,7 +76,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 
-		$sql = 'SELECT groupid FROM groups';
+		$sql = 'SELECT groupid FROM hstgrp';
 		$hgroups = DBfetchArray(DBselect($sql));
 		foreach ($hgroups as $group) {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']");

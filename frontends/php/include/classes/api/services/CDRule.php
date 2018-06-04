@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -768,72 +768,69 @@ class CDRule extends CApiService {
 	}
 
 	/**
-	 * Delete drules.
-	 *
-	 * @param array $dRuleIds
+	 * @param array $druleids
 	 *
 	 * @return array
 	 */
-	public function delete(array $dRuleIds) {
-		$this->validateDelete($dRuleIds);
-
-		$actionIds = [];
-		$conditionIds = [];
-
-		$dCheckIds = [];
-
-		$dbChecks = DBselect('SELECT dc.dcheckid FROM dchecks dc WHERE '.dbConditionInt('dc.druleid', $dRuleIds));
-
-		while ($dbCheck = DBfetch($dbChecks)) {
-			$dCheckIds[] = $dbCheck['dcheckid'];
+	public function delete(array $druleids) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $druleids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$dbConditions = DBselect(
-			'SELECT c.conditionid,c.actionid'.
-			' FROM conditions c'.
-			' WHERE (c.conditiontype='.CONDITION_TYPE_DRULE.' AND '.dbConditionString('c.value', $dRuleIds).')'.
-				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND '.dbConditionString('c.value', $dCheckIds).')'
-		);
+		$db_drules = $this->get([
+			'output' => ['druleid', 'name'],
+			'druleids' => $druleids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		while ($dbCondition = DBfetch($dbConditions)) {
-			$conditionIds[] = $dbCondition['conditionid'];
-			$actionIds[] = $dbCondition['actionid'];
-		}
-
-		if ($actionIds) {
-			DB::update('actions', [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => array_unique($actionIds)]
-			]);
-		}
-
-		if ($conditionIds) {
-			DB::delete('conditions', ['conditionid' => $conditionIds]);
-		}
-
-		$result = DB::delete('drules', ['druleid' => $dRuleIds]);
-		if ($result) {
-			foreach ($dRuleIds as $dRuleId) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$dRuleId.']');
+		foreach ($druleids as $druleid) {
+			if (!array_key_exists($druleid, $db_drules)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
-		return ['druleids' => $dRuleIds];
-	}
+		// Check if discovery rules are used in actions.
+		$db_actions = DBselect(
+			'SELECT a.name,c.value'.
+			' FROM actions a,conditions c'.
+			' WHERE a.actionid=c.actionid'.
+				' AND c.conditiontype='.CONDITION_TYPE_DRULE.
+				' AND '.dbConditionString('c.value', $druleids),
+			1
+		);
 
-	/**
-	 * Validates the input parameters for the delete() method.
-	 *
-	 * @throws APIException if the input is invalid
-	 *
-	 * @param array $druleIds
-	 */
-	protected function validateDelete(array $druleIds) {
-		if (!$druleIds) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		if ($db_action = DBfetch($db_actions)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" is used in "%2$s" action.',
+				$db_drules[$db_action['value']]['name'], $db_action['name']
+			));
 		}
 
-		$this->checkDrulePermissions($druleIds);
+		// Check if discovery checks are used in actions.
+		$db_actions = DBselect(
+			'SELECT a.name,dc.druleid'.
+			' FROM actions a,conditions c,dchecks dc'.
+			' WHERE a.actionid=c.actionid'.
+				' AND '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
+				' AND c.conditiontype='.CONDITION_TYPE_DCHECK.
+				' AND '.dbConditionString('dc.druleid', $druleids),
+			1
+		);
+
+		if ($db_action = DBfetch($db_actions)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" is used in "%2$s" action.',
+				$db_drules[$db_action['druleid']]['name'], $db_action['name']
+			));
+		}
+
+		DB::delete('drules', ['druleid' => $druleids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, $db_drules);
+
+		return ['druleids' => $druleids];
 	}
 
 	/**
@@ -938,30 +935,5 @@ class CDRule extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Checks if the current user has access to given discovery rules.
-	 *
-	 * @throws APIException if the user doesn't have write permissions for discovery rules.
-	 *
-	 * @param array $druleids
-	 */
-	protected function checkDrulePermissions(array $druleids) {
-		if ($druleids) {
-			$druleids = array_unique($druleids);
-
-			$count = $this->get([
-				'countOutput' => true,
-				'druleids' => $druleids,
-				'editable' => true
-			]);
-
-			if ($count != count($druleids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
 	}
 }

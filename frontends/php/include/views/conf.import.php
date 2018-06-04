@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,7 +103,12 @@ foreach ($titles as $key => $title) {
 
 // form list
 $form_list = (new CFormList())
-	->addRow(_('Import file'), (new CFile('import_file'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow((new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
+		(new CFile('import_file'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow(_('Rules'), new CDiv($rulesTable));
 
 // tab
@@ -116,8 +121,11 @@ $tab_view->setFooter(makeFormFooter(
 ));
 
 $form = (new CForm('post', null, 'multipart/form-data'))
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('backurl', $data['backurl'])
 	->addItem($tab_view);
 
 // widget
-return (new CWidget())->addItem($form);
+return (new CWidget())
+	->setTitle(_('Import'))
+	->addItem($form);

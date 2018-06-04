@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1944,8 +1944,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
-	time_now = time_stat;
-	time_connect = time_now;
+	time_connect = time_stat;
 
 	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = CONFIG_CONFSYNCER_FREQUENCY))
 		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;

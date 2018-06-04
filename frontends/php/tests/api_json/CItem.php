@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
+/**
+ * @backup items
+ */
 class API_JSON_Item extends CZabbixTest {
 	public static function inventory_links() {
 		$data = [];
@@ -41,41 +44,22 @@ class API_JSON_Item extends CZabbixTest {
 		return $data;
 	}
 
-	public function testCItem_backup() {
-		DBsave_tables('items');
-	}
-
 	/**
 	 * @dataProvider inventory_links
 	 */
 	public function testCItem_create_inventory_item($inventoryFieldNr, $successExpected) {
-		$debug = null;
+		$data = [
+			'name' => 'Item that populates field '.$inventoryFieldNr,
+			'key_' => 'key.test.pop.'.$inventoryFieldNr,
+			'hostid' => 10053,
+			'type' => 0,
+			'value_type' => 3,
+			'delay' => '30s',
+			'interfaceid' => 10021,
+			'inventory_link' => $inventoryFieldNr
+		];
 
 		// creating item
-		$result = $this->api_acall(
-			'item.create',
-			[
-				'name' => 'Item that populates field '.$inventoryFieldNr,
-				'key_' => 'key.test.pop.'.$inventoryFieldNr,
-				'hostid' => 10053,
-				'type' => 0,
-				'value_type' => 3,
-				'delay' => '30s',
-				'interfaceid' => 10021,
-				'inventory_link' => $inventoryFieldNr
-			],
-			$debug
-		);
-
-		if ($successExpected) {
-			$this->assertTrue(!array_key_exists('error', $result), 'Chuck Norris: Method returned an error. Result is: '.print_r($result, true)."\nDebug: ".print_r($debug, true));
-		}
-		else {
-			$this->assertTrue(array_key_exists('error', $result), 'Chuck Norris: I was expecting call to fail, but it did not. Result is: '.print_r($result, true)."\nDebug: ".print_r($debug, true));
-		}
-	}
-
-	public function testCItem_restore() {
-		DBrestore_tables('items');
+		$this->call('item.create', $data, ($successExpected ? null : true));
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1513,6 +1513,7 @@ static zbx_property_collection_iter	*zbx_property_collection_init(CURL *easyhand
 	iter = (zbx_property_collection_iter *)zbx_malloc(iter, sizeof(zbx_property_collection_iter));
 	iter->property_collector = property_collector;
 	iter->easyhandle = easyhandle;
+	iter->error = NULL;
 	iter->token = NULL;
 
 	if (CURLE_OK == (err = curl_easy_setopt(iter->easyhandle, opt = CURLOPT_POSTFIELDS, property_collection_query)))

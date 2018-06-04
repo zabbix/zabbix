@@ -1,7 +1,7 @@
 AC_DEFUN([AX_LIB_IBM_DB2],
 [
     AC_ARG_WITH([ibm-db2],
-        AC_HELP_STRING([--with-ibm-db2=@<:@ARG@:>@],
+        AC_HELP_STRING([--with-ibm-db2@<:@=ARG@:>@],
             [use IBM DB2 CLI from given sqllib directory (ARG=path); use /home/db2inst1/sqllib (ARG=yes); disable IBM DB2 support (ARG=no)]
         ),
         [
@@ -18,7 +18,7 @@ AC_DEFUN([AX_LIB_IBM_DB2],
         ]
     )
     AC_ARG_WITH([ibm-db2-include],
-        AC_HELP_STRING([--with-ibm-db2-include=@<:@DIR@:>@],
+        AC_HELP_STRING([--with-ibm-db2-include@<:@=DIR@:>@],
             [use IBM DB2 CLI headers from given path]
         ),
         [
@@ -29,7 +29,7 @@ AC_DEFUN([AX_LIB_IBM_DB2],
         ]
     )
     AC_ARG_WITH([ibm-db2-lib],
-        AC_HELP_STRING([--with-ibm-db2-lib=@<:@DIR@:>@],
+        AC_HELP_STRING([--with-ibm-db2-lib@<:@=DIR@:>@],
             [use IBM DB2 CLI libraries from given path]
         ),
         [

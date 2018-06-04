@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -273,7 +273,7 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
  *             value_type - [IN] the history value type                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_history_value2str(char *buffer, size_t size, history_value_t *value, int value_type)
+void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *value, int value_type)
 {
 	switch (value_type)
 	{
@@ -321,3 +321,54 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
 
 	zbx_vector_history_record_clear(vector);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_history_record_compare_asc_func                              *
+ *                                                                            *
+ * Purpose: compares two cache values by their timestamps                     *
+ *                                                                            *
+ * Parameters: d1   - [IN] the first value                                    *
+ *             d2   - [IN] the second value                                   *
+ *                                                                            *
+ * Return value:   <0 - the first value timestamp is less than second         *
+ *                 =0 - the first value timestamp is equal to the second      *
+ *                 >0 - the first value timestamp is greater than second      *
+ *                                                                            *
+ * Comments: This function is commonly used to sort value vector in ascending *
+ *           order.                                                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_history_record_compare_asc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+{
+	if (d1->timestamp.sec == d2->timestamp.sec)
+		return d1->timestamp.ns - d2->timestamp.ns;
+
+	return d1->timestamp.sec - d2->timestamp.sec;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_history_record_compare_desc_func                              *
+ *                                                                            *
+ * Purpose: compares two cache values by their timestamps                     *
+ *                                                                            *
+ * Parameters: d1   - [IN] the first value                                    *
+ *             d2   - [IN] the second value                                   *
+ *                                                                            *
+ * Return value:   >0 - the first value timestamp is less than second         *
+ *                 =0 - the first value timestamp is equal to the second      *
+ *                 <0 - the first value timestamp is greater than second      *
+ *                                                                            *
+ * Comments: This function is commonly used to sort value vector in descending*
+ *           order.                                                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+{
+	if (d1->timestamp.sec == d2->timestamp.sec)
+		return d2->timestamp.ns - d1->timestamp.ns;
+
+	return d2->timestamp.sec - d1->timestamp.sec;
+}
+

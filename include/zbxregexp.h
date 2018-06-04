@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,5 +53,6 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive);
 int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output);
+void 	zbx_regexp_escape(char **string);
 
 #endif /* ZABBIX_ZBXREGEXP_H */

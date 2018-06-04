@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,10 +25,6 @@ require_once dirname(__FILE__).'/../../include/triggers.inc.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 class CControllerPopupTriggerWizard extends CController {
-
-	protected function init() {
-		$this->disableSIDvalidation();
-	}
 
 	protected function checkInput() {
 		$fields = [
@@ -283,7 +279,10 @@ class CControllerPopupTriggerWizard extends CController {
 				'title' => _('Trigger'),
 				'options' => $page_options,
 				'keys' => $this->getInput('keys', []),
-				'expressions' => $exprs
+				'expressions' => $exprs,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
 			]));
 		}
 	}

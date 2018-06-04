@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,27 +22,20 @@
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class testAPIInfo extends CZabbixTest {
+	public function testAPIInfo_VersionWithAuth() {
+		$error = [
+			'code' => -32602,
+			'message' => 'Invalid params.',
+			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
+		];
 
-	public function testAPIInfo_VersionWithoutAuth() {
-		$result = $this->api_call('apiinfo.version', [], $debug);
-
-		$this->assertTrue(array_key_exists('result', $result));
-		$this->assertFalse(array_key_exists('error', $result));
-		$this->assertSame('4.0.0', $result['result']);
+		$this->call('apiinfo.version', [], $error);
 	}
 
-	public function testAPIInfo_VersionWithAuth() {
-		$result = $this->api_acall('apiinfo.version', [], $debug);
+	public function testAPIInfo_VersionWithoutAuth() {
+		$this->disableAuthorization();
+		$result = $this->call('apiinfo.version', []);
 
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertSame(
-			[
-				'code' => -32602,
-				'message' => 'Invalid params.',
-				'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
-			],
-			$result['error']
-		);
+		$this->assertSame('4.0.0', $result['result']);
 	}
 }

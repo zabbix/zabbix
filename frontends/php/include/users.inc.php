@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -264,6 +264,74 @@ function collapseHostGroupRights(array $groups_rights) {
 	CArrayHelper::sort($groups_rights, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
 	return $groups_rights;
+}
+
+/**
+ * Returns the sorted list of the unique tag filters.
+ *
+ * @param array  $tag_filters
+ *
+ * @return array
+ */
+function uniqTagFilters(array $tag_filters) {
+	CArrayHelper::sort($tag_filters, ['groupid', 'tag', 'value']);
+
+	$prev_tag_filter = null;
+
+	foreach ($tag_filters as $key => $tag_filter) {
+		if ($prev_tag_filter !== null && $prev_tag_filter['groupid'] == $tag_filter['groupid']
+				&& ($prev_tag_filter['tag'] === '' || $prev_tag_filter['tag'] === $tag_filter['tag'])
+				&& ($prev_tag_filter['value'] === '' || $prev_tag_filter['value'] === $tag_filter['value'])) {
+			unset($tag_filters[$key]);
+		}
+		else {
+			$prev_tag_filter = $tag_filter;
+		}
+	}
+
+	return $tag_filters;
+}
+
+/**
+ * Returns the sorted list of the unique tag filters and group names.
+ * The list will be enriched by group names. Tag filters with filled tags or values will be overwritten empty.
+ *
+ * @param array  $tag_filters
+ * @param string $tag_filters[]['groupid']
+ * @param string $tag_filters[]['tag']
+ * @param string $tag_filters[]['value']
+ *
+ * @return array
+ */
+function collapseTagFilters(array $tag_filters) {
+	$tag_filters = uniqTagFilters($tag_filters);
+
+	$groupids = [];
+
+	foreach ($tag_filters as $tag_filter) {
+		$groupids[$tag_filter['groupid']] = true;
+	}
+
+	if ($groupids) {
+		$groups = API::HostGroup()->get([
+			'output' => ['name'],
+			'groupids' => array_keys($groupids),
+			'preservekeys' => true
+		]);
+
+		foreach ($tag_filters as $key => $tag_filter) {
+			if (array_key_exists($tag_filter['groupid'], $groups)) {
+				$tag_filters[$key]['name'] = $groups[$tag_filter['groupid']]['name'];
+			}
+			else {
+				unset($tag_filters[$key]);
+			}
+		}
+
+		CArrayHelper::sort($tag_filters, ['name', 'tag', 'value']);
+	}
+
+	return $tag_filters;
 }
 
 /**

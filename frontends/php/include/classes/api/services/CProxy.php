@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -676,6 +676,11 @@ class CProxy extends CApiService {
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
 				$hostids = array_merge($hostids, zbx_objectValues($proxy['hosts'], 'hostid'));
 			}
+
+			// Propery 'auto_compress' is read-only.
+			if (array_key_exists('auto_compress', $proxy)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
 		}
 
 		if ($hostids) {
@@ -735,6 +740,11 @@ class CProxy extends CApiService {
 				if ($proxy['host'] !== $db_proxies[$proxy['proxyid']]['host']) {
 					$names[$proxy['host']] = true;
 				}
+			}
+
+			// Propery 'auto_compress' is read-only.
+			if (array_key_exists('auto_compress', $proxy)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
 

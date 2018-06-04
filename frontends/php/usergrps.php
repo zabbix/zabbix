@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/media.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 
@@ -35,41 +36,47 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	// group
-	'usrgrpid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
-	'group_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'selusrgrp' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'gname' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
-	'gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
-	'users_status' =>		[T_ZBX_INT, O_OPT, null,	IN([GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),	null],
-	'debug_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
-	'group_users' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'groups_rights' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'set_gui_access' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
+	'usrgrpid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
+	'group_groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'gname' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
+	'gui_access' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
+	'users_status' =>			[T_ZBX_INT, O_OPT, null,	IN([GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),	null],
+	'debug_mode' =>				[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
+	'userids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'groups_rights' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'set_gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
 	// actions
-	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.
-									'"usergroup.massenable","usergroup.massenabledebug","usergroup.set_gui_access"'
-								),
-								null
-							],
-	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'new_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'groupids' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'subgroups' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+									IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.
+										'"usergroup.massenable","usergroup.massenabledebug","usergroup.set_gui_access"'
+									),
+									null
+								],
+	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_permission' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'new_permission' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'groupids' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'subgroups' =>				[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag_filters' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'remove_tag_filter' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag_filter_groupids' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag' =>					[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'value' =>					[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'tag_filter_subgroups' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'add_tag_filter' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
 	// form
-	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
-	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		 null,	null],
+	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,		 null,	null],
 	// filter
-	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_name' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_users_status' =>[T_ZBX_INT, O_OPT, null,	IN([-1, GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),		null],
+	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_users_status' =>	[T_ZBX_INT, O_OPT, null,	IN([-1, GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),		null],
 	// sort and sortorder
-	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
-	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
+	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -81,8 +88,9 @@ $_REQUEST['debug_mode'] = getRequest('debug_mode', 0);
  */
 if (isset($_REQUEST['usrgrpid'])) {
 	$dbUserGroup = API::UserGroup()->get([
+		'output' => ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode'],
+		'selectTagFilters' => ['groupid', 'tag', 'value'],
 		'usrgrpids' => $_REQUEST['usrgrpid'],
-		'output' => API_OUTPUT_EXTEND
 	]);
 
 	if (!$dbUserGroup) {
@@ -115,8 +123,9 @@ if (hasRequest('add') || hasRequest('update')) {
 		'users_status' => getRequest('users_status'),
 		'gui_access' => getRequest('gui_access'),
 		'debug_mode' => getRequest('debug_mode'),
-		'userids' => getRequest('group_users', []),
-		'rights' => [],
+		'userids' => getRequest('userids', []),
+		'tag_filters' => getRequest('tag_filters', []),
+		'rights' => []
 	];
 
 	$groups_rights = applyHostGroupRights(getRequest('groups_rights', []));
@@ -251,9 +260,21 @@ if (hasRequest('form')) {
 		'users_status' => hasRequest('form_refresh') ? getRequest('users_status') : GROUP_STATUS_ENABLED,
 		'gui_access' => getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM),
 		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
-		'group_users' => hasRequest('form_refresh') ? getRequest('group_users', []) : [],
-		'form_refresh' => getRequest('form_refresh', 0)
+		'userids' => hasRequest('form_refresh') ? getRequest('userids', []) : [],
+		'form_refresh' => getRequest('form_refresh', 0),
+		'new_permission' => getRequest('new_permission', PERM_NONE),
+		'subgroups' => getRequest('subgroups', 0),
+		'tag' => getRequest('tag', ''),
+		'value' => getRequest('value', ''),
+		'tag_filter_subgroups' => getRequest('tag_filter_subgroups', 0)
 	];
+
+	$options = [
+		'output' => ['alias', 'name', 'surname'],
+		'preservekeys' => true
+	];
+
+	$users = [];
 
 	if ($data['usrgrpid'] != 0) {
 		// User group exists, but there might be no permissions set yet.
@@ -265,68 +286,142 @@ if (hasRequest('form')) {
 		$data['gui_access'] = getRequest('gui_access', $db_user_group['gui_access']);
 		$data['debug_mode'] = hasRequest('form_refresh') ? getRequest('debug_mode') : $db_user_group['debug_mode'];
 
-		if (!hasRequest('form_refresh')) {
-			$dbUsers = DBselect(
-				'SELECT ug.userid'.
-				' FROM users_groups ug'.
-				' WHERE ug.usrgrpid='.zbx_dbstr($data['usrgrpid'])
-			);
-
-			while ($dbUser = DBfetch($dbUsers)) {
-				$data['group_users'][] = $dbUser['userid'];
-			}
-		}
-	}
-
-	$data['groups_rights'] = hasRequest('form_refresh')
-		? getRequest('groups_rights', [])
-		: collapseHostGroupRights(getHostGroupsRights($data['usrgrpid'] == 0 ? [] : [$data['usrgrpid']]));
-
-	if (hasRequest('add_permission')) {
-		// Add new permission with submit().
-		if (hasRequest('subgroups')) {
-			$groupids = [];
-			$groupids_subgroupids = getRequest('groupids', []);
+		if (hasRequest('form_refresh')) {
+			$options['userids'] = $data['userids'];
 		}
 		else {
-			$groupids = getRequest('groupids', []);
-			$groupids_subgroupids = [];
+			$options['usrgrpids'] = $data['usrgrpid'];
 		}
 
-		$new_permission = getRequest('new_permission', PERM_NONE);
+		$users = API::User()->get($options);
 
-		$data['groups_rights'] = collapseHostGroupRights(
-			applyHostGroupRights($data['groups_rights'], $groupids, $groupids_subgroupids, $new_permission)
-		);
+		if (!hasRequest('form_refresh')) {
+			$data['userids'] = array_keys($users);
+		}
+	}
+	elseif (hasRequest('form_refresh')) {
+		$options['userids'] = $data['userids'];
+
+		$users = API::User()->get($options);
 	}
 
-	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
+	$data['users_ms'] = [];
 
-	// get users
-	if ($data['selected_usrgrp'] > 0) {
-		$sqlFrom = ',users_groups g';
-		$sqlWhere =
-			' WHERE '.dbConditionInt('u.userid', $data['group_users']).
-				' OR (u.userid=g.userid AND g.usrgrpid='.zbx_dbstr($data['selected_usrgrp']).')';
+	// Prepare data for multiselect. Skip silently deleted users.
+	foreach ($data['userids'] as $userid) {
+		if (!array_key_exists($userid, $users)) {
+			continue;
+		}
+
+		$data['users_ms'][] = [
+			'id' => $userid,
+			'name' => getUserFullname($users[$userid])
+		];
+	}
+	CArrayHelper::sort($data['users_ms'], ['name']);
+
+	if (hasRequest('form_refresh')) {
+		$data['groups_rights'] = getRequest('groups_rights', []);
+		$data['tag_filters'] = getRequest('tag_filters', []);
 	}
 	else {
-		$sqlFrom = '';
-		$sqlWhere = '';
+		$data['tag_filters'] = ($data['usrgrpid'] == 0) ? [] : $db_user_group['tag_filters'];
+		$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights(($data['usrgrpid'] == 0)
+			? []
+			: [$data['usrgrpid']]
+		));
 	}
 
-	$data['users'] = DBfetchArray(DBselect(
-		'SELECT DISTINCT u.userid,u.alias,u.name,u.surname'.
-		' FROM users u'.$sqlFrom.
-			$sqlWhere
-	));
-	order_result($data['users'], 'alias');
+	$permission_groupids = getRequest('groupids', []);
 
-	// get user groups
-	$data['usergroups'] = DBfetchArray(DBselect(
-		'SELECT ug.usrgrpid,ug.name FROM usrgrp ug'
-	));
+	if (hasRequest('add_permission')) {
+		if (!$permission_groupids) {
+			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
+		}
+		else {
+			// Add new permission with submit().
+			if ($data['subgroups'] == 1) {
+				$groupids = [];
+				$groupids_subgroupids = $permission_groupids;
+			}
+			else {
+				$groupids = $permission_groupids;
+				$groupids_subgroupids = [];
+			}
 
-	order_result($data['usergroups'], 'name');
+			$data['groups_rights'] = collapseHostGroupRights(
+				applyHostGroupRights($data['groups_rights'], $groupids, $groupids_subgroupids, $data['new_permission'])
+			);
+
+			$permission_groupids = [];
+			$data['new_permission'] = PERM_NONE;
+			$data['subgroups'] = 0;
+		}
+	}
+
+	if ($permission_groupids) {
+		$host_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $permission_groupids
+		]);
+		CArrayHelper::sort($host_groups, ['name']);
+
+		$data['permission_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+	}
+	else {
+		$data['permission_groups'] = [];
+	}
+
+	$tag_filter_groupids = getRequest('tag_filter_groupids', []);
+
+	if (hasRequest('add_tag_filter')) {
+		if (!$tag_filter_groupids) {
+			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
+		}
+		elseif ($data['value'] !== '' && $data['tag'] === '') {
+			show_error_message(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
+		}
+		else {
+			// Add new tag filter with submit().
+			if ($data['tag_filter_subgroups'] == 1) {
+				$tag_filter_groupids = getSubGroups($tag_filter_groupids);
+			}
+
+			foreach ($tag_filter_groupids as $groupid) {
+				$data['tag_filters'][] = [
+					'groupid' => $groupid,
+					'tag' => $data['tag'],
+					'value' => $data['value']
+				];
+			}
+
+			$tag_filter_groupids = [];
+			$data['tag'] = '';
+			$data['value'] = '';
+			$data['tag_filter_subgroups'] = 0;
+		}
+	}
+	elseif (hasRequest('remove_tag_filter')) {
+		$remove_tag_filter = getRequest('remove_tag_filter');
+		if (is_array($remove_tag_filter) && array_key_exists(key($remove_tag_filter), $data['tag_filters'])) {
+			unset($data['tag_filters'][key($remove_tag_filter)]);
+		}
+	}
+
+	$data['tag_filters'] = collapseTagFilters($data['tag_filters']);
+
+	if ($tag_filter_groupids) {
+		$host_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $tag_filter_groupids
+		]);
+		CArrayHelper::sort($host_groups, ['name']);
+
+		$data['tag_filter_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+	}
+	else {
+		$data['tag_filter_groups'] = [];
+	}
 
 	// render view
 	$view = new CView('administration.usergroups.edit', $data);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class testTriggerExpressions extends CWebTest {
 		$this->zbxTestLogin('triggers.php?form=update&hostid=10084&triggerid=13504');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestClickButtonText('Expression constructor');
-		$this->zbxTestClickWait('test_expression');
+		$this->zbxTestClickButtonText('Test');
 		$this->zbxTestLaunchOverlayDialog('Test');
 
 		// Type values in expression testing form

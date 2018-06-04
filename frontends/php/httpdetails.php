@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,12 +72,15 @@ $details_screen = CScreenBuilder::getScreen([
 
 (new CWidget())
 	->setTitle(_('Details of web scenario').': '.$http_test_name)
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
-			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
+				->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($details_screen->get())
 	->show();

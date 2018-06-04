@@ -1,3 +1,5 @@
+$theme_name: 'blue' !default;
+
 @import '_reset.scss';
 @import '_colors.scss';
 @import '_fonts.scss';
@@ -40,9 +42,9 @@ a {
 	}
 
 	&:focus {
-		position: relative;
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.5)
 	}
 
 	&:active {
@@ -79,10 +81,7 @@ svg a {
 .link-action {
 	border-bottom: 1px dotted;
 	cursor: pointer;
-
-	&:link {
-		@extend %link-action-style;
-	}
+	color: $font-color;
 
 	&:visited {
 		@extend %link-action-style;
@@ -90,10 +89,18 @@ svg a {
 
 	&:hover {
 		@extend %link-action-style;
+		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.35);
 	}
 
 	&:active {
 		@extend %link-action-style;
+	}
+
+	&:focus {
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.35);
+
 	}
 }
 
@@ -121,7 +128,8 @@ svg a {
 
 	&:focus {
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		outline: none;
+		border-bottom: 2px solid rgba($link-hover-color, 0.35);
 	}
 
 	&:active {
@@ -209,52 +217,23 @@ pre {
 	word-wrap: break-word;
 }
 
-:-ms-input-placeholder {
-	color: #6d6d6d !important;
-}
-
-// Main Navigation
-nav {
-	background-color: $main-subnav-bg-color;
-
-	a {
-
-		&:link {
-			@extend %no-border;
-		}
-
-		&:visited {
-			@extend %no-border;
-		}
-
-		&:hover {
-			@extend %no-border;
-		}
-
-		&:focus {
-			@extend %no-border;
-		}
-
-		&:active {
-			@extend %no-border;
-		}
-	}
-}
-
-.nav {
-	@extend nav;
-}
-
-%no-border {
-	border: none;
-}
-
 .top-nav-container {
+	background-color: $main-nav-bg-color;
 	height: 45px;
 	line-height: 45px;
-	padding: 0 10px 0 10px;
+	padding: 0 10px;
 	position: relative;
-	background-color: $main-nav-bg-color;
+}
+
+.top-nav a,
+.top-subnav a,
+.header-logo {
+	&:active,
+	&:hover,
+	&:link,
+	&:visited {
+		border: none;
+	}
 }
 
 .top-nav {
@@ -312,7 +291,7 @@ nav {
 
 		&:focus {
 			color: $link-main-nav-active-color;
-			background-color: $ui-hover-color;
+			background-color: $ui-hover-color !important;
 		}
 
 		&:active {
@@ -387,6 +366,12 @@ ul.top-nav-icons {
 		-webkit-transform-style: preserve-3d;
 	}
 
+	.top-nav-support {
+		background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
+		width: auto;
+		padding: 0 6px 0 17px;
+	}
+
 	form {
 		position: relative;
 	}
@@ -399,6 +384,13 @@ ul.top-nav-icons {
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
+
+		@media (max-width: 1050px) {
+			width: 130px;
+		}
+
+		transition: width 0.5s;
+		-webkit-transition: width 0.5s;
 
 		&:focus {
 			background-color: $form-bg-color;
@@ -413,11 +405,11 @@ ul.top-nav-icons {
 }
 
 .top-subnav-container {
+	background-color: $main-subnav-bg-color;
 	height: 30px;
 	line-height: 30px;
-	background-color: $main-subnav-bg-color;
-	position: relative;
 	padding: 0 10px;
+	position: relative;
 }
 
 .top-subnav {
@@ -451,18 +443,21 @@ ul.top-nav-icons {
 		color: $link-main-subnav-hover-color;
 	}
 
-	&:focus {
-		color: $link-main-subnav-active-color;
-	}
-
 	&:active {
 		color: $link-main-subnav-active-color;
 	}
 
-	&.selected {
+	&:focus {
+		border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
 		color: $link-main-subnav-active-color;
-		padding: 8px 0 4px 0;
+		outline: none;
+		padding-bottom: 4px;
+	}
+
+	&.selected {
 		border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
+		color: $link-main-subnav-active-color;
+		padding-bottom: 4px;
 	}
 }
 
@@ -534,6 +529,10 @@ ul.top-nav-icons {
 			position: relative;
 			padding: 0 0 0 10px;
 		}
+
+		ul li:first-child {
+			padding-left: 0;
+		}
 	}
 
 	.dashbrd-edit {
@@ -573,10 +572,6 @@ ul.top-nav-icons {
 // Article
 article {
 	padding: 10px 10px 0 10px;
-}
-
-.article {
-	@extend article;
 }
 
 // Object Group Navigation
@@ -638,8 +633,12 @@ footer {
 	color: $font-alt-color;
 }
 
-.footer {
-	@extend footer;
+main {
+	@extend article;
+}
+
+output {
+	display: block;
 }
 
 .logo {
@@ -654,6 +653,10 @@ footer {
 	float: left;
 	display: block;
 	margin: 10px 10px 0 0;
+
+	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, .35));
+	}
 }
 
 // Tables
@@ -662,6 +665,125 @@ footer {
 	background-color: $ui-bg-color;
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
+
+	&.compact-view {
+		tr {
+			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
+
+				@if $theme_name == 'blue' {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							color: $font-color;
+
+							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
+								color: $font-color;
+								border-bottom-color: rgba($font-color, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+							}
+
+							.tag {
+								background-color: rgba($font-color, 0.5);
+							}
+
+							button:focus {
+								box-shadow: 0 0 0 2px rgba($font-color, 0.5);
+							}
+						}
+					}
+				}
+
+				@if $theme_name == 'dark' {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							color: black;
+
+							sup, a, .problem-unack-fg, .problem-ack-fg, .ok-unack-fg, .ok-ack-fg {
+								color: black;
+								border-bottom-color: rgba(black, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+							}
+
+							button:focus {
+								box-shadow: 0 0 0 2px rgba(black, 0.5);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.link-action {
+			color: $font-color;
+
+			&.red {
+				color: $red;
+			}
+
+			&.orange {
+				color: $orange;
+			}
+
+			&.yellow {
+				color: $dark-yellow;
+			}
+
+			&.green {
+				color: $green;
+			}
+
+			&:hover {
+				color: $link-hover-color;
+			}
+
+			&:focus {
+				color: $link-hover-color;
+			}
+		}
+
+		td {
+			padding: 2px 5px 2px 5px;
+			border-bottom: none;
+			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
+			color: $font-color;
+
+			.tag {
+				max-width: 40px;
+				margin: -2px 3px 0 0;
+				padding: 2px 3px;
+
+				@media screen and (min-width: 1200px) {
+					max-width: 71px;
+				}
+
+				@media screen and (min-width: 1400px) {
+					max-width: 102px;
+				}
+
+				@media screen and (min-width: 1600px) {
+					max-width: 133px;
+				}
+			}
+
+			.rel-container {
+				display: inline;
+			}
+
+			.icon-wzrd-action {
+				margin: 2px 0 0 2px;
+				height: 12px;
+				min-height: 12px;
+				background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px;
+			}
+		}
+	}
 
 	thead th {
 		color: $font-alt-color;
@@ -672,6 +794,60 @@ footer {
 		vertical-align: bottom;
 		border-bottom: 2px solid darken($table-border-color, 5%);
 		text-align: left;
+
+		&.column-tags-1 {
+			width: 75px;
+		}
+
+		&.column-tags-2 {
+			width: 124px;
+		}
+
+		&.column-tags-3 {
+			width: 173px;
+		}
+
+		@media screen and (min-width: 1200px) {
+			&.column-tags-1 {
+				width: 106px;
+			}
+
+			&.column-tags-2 {
+				width: 186px;
+			}
+
+			&.column-tags-3 {
+				width: 266px;
+			}
+		}
+
+		@media screen and (min-width: 1400px) {
+			&.column-tags-1 {
+				width: 137px;
+			}
+
+			&.column-tags-2 {
+				width: 248px;
+			}
+
+			&.column-tags-3 {
+				width: 359px;
+			}
+		}
+
+		@media screen and (min-width: 1600px) {
+			&.column-tags-1 {
+				width: 168px;
+			}
+
+			&.column-tags-2 {
+				width: 310px;
+			}
+
+			&.column-tags-3 {
+				width: 452px;
+			}
+		}
 
 		.arrow-up {
 			margin: 0 0 0 3px;
@@ -791,6 +967,14 @@ footer {
 
 	a {
 		@extend %paging-btn;
+		&:focus {
+			.arrow-right {
+				border-left-color: $font-selected-color;
+			}
+			.arrow-left {
+				border-right-color: $font-selected-color;
+			}
+		}
 	}
 }
 
@@ -818,7 +1002,7 @@ footer {
 	margin-left: -1px;
 	padding: 3px 11px;
 	background-color: $btn-form-bg-color;
-	border: 1px solid $form-border-color;
+	border: 1px solid $form-border-color !important;
 	text-decoration: none;
 	color: $font-color;
 	outline: 0;
@@ -830,9 +1014,7 @@ footer {
 	}
 
 	&:focus {
-		color: $font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $form-border-focus-color;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 		z-index: 10;
 		position: relative;
 	}
@@ -854,7 +1036,6 @@ footer {
 
 	&.paging-selected {
 		color: $font-selected-color;
-		border-color: $ui-bg-selected-color;
 		background-color: $ui-bg-selected-color;
 		position: relative;
 		z-index: 1;
@@ -864,14 +1045,12 @@ footer {
 		}
 
 		&:focus {
-			background-color: darken($ui-bg-selected-color, 4%);
-			border-color: $form-border-focus-color;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 			position: relative;
 		}
 
 		&:active {
 			background-color: darken($ui-bg-selected-color, 4%);
-			border-color: $form-border-focus-color;
 			position: relative;
 		}
 	}
@@ -1107,19 +1286,36 @@ footer {
 	}
 }
 
+.subfilter,
 .subfilter-enabled {
 	display: inline-block;
-	position: relative;
 	height: 18px;
-	padding: 0 4px;
-	color: $font-selected-color;
+	position: relative;
+}
+
+.subfilter {
+	margin-right: 10px;
+}
+
+.subfilter-enabled {
 	background-color: $ui-bg-selected-color;
+	color: $font-selected-color;
+	padding: 0 4px;
 	@include border-radius(2px);
 
-	a {
+	.link-action {
 		color: $font-selected-color;
 		text-decoration: none;
-		cursor: default;
+
+		&:focus {
+			color: $font-selected-color;
+			border-bottom: 2px solid rgba($font-selected-color, 0.7);
+		}
+
+		&:hover {
+			color: $font-selected-color;
+			border-bottom: 1px solid rgba($font-selected-color, 0.7);
+		}
 	}
 
 	sup {
@@ -1194,6 +1390,17 @@ footer {
 		width: 100%;
 		padding-bottom: 2px;
 		min-height: 20px;
+	}
+
+	&.search-disabled {
+		input[type="text"] {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 0;
+			padding: 0;
+			margin: 0;
+		}
 	}
 
 	.multiselect-list {
@@ -1547,6 +1754,10 @@ footer {
 		}
 	}
 
+	.table-forms-td-right {
+		position: relative;
+	}
+
 	h4 {
 		margin-bottom: -5px;
 	}
@@ -1630,16 +1841,28 @@ footer {
 		display: inline-block;
 		margin: 0 -1px 0 0;
 
-		&:first-child label {
-			@include border-radius(2px 0 0 2px);
+		&:first-child{
+			@include border-radius(3px 0 0 3px);
+
+			label {
+				@include border-radius(2px 0 0 2px);
+			}
 		}
 
-		&:last-child label {
-			@include border-radius(0 2px 2px 0);
+		&:last-child {
+			@include border-radius(0 3px 3px 0);
+
+			label {
+				@include border-radius(0 2px 2px 0);
+			}
 		}
 
-		&:only-child label {
-			@include border-radius(2px);
+		&:only-child {
+			@include border-radius(3px);
+
+			label {
+				@include border-radius(2px);
+			}
 		}
 	}
 
@@ -1673,12 +1896,12 @@ footer {
 			}
 		}
 
-		&:focus + label {
-			border-color: $form-border-focus-color;
-			background-color: $btn-form-hover-color;
-			position: relative;
-			z-index: 2;
-		}
+			&:focus + label {
+				border-color: $form-border-focus-color;
+				background-color: $btn-form-hover-color;
+				position: relative;
+				z-index: 2;
+			}
 
 		&:checked + label {
 			color: $white;
@@ -1689,7 +1912,7 @@ footer {
 		}
 
 		&:checked:focus + label {
-			border-color: $form-border-focus-color;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 			position: relative;
 			z-index: 2;
 		}
@@ -1702,6 +1925,17 @@ footer {
 		&[disabled] + label {
 			@include transition(none);
 			@extend %form-disabled;
+		}
+	}
+}
+
+label {
+	&.form-label-asterisk {
+		&:before {
+			color: $form-label-asterisk-color;
+			display: inline-block;
+			content: '*';
+			margin-right: 0.3em;
 		}
 	}
 }
@@ -1999,6 +2233,7 @@ button {
 	&:focus {
 		@include box-shadow(0 0 0 2px rgba($blue, .35));
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
 	}
 
 	&:active {
@@ -2082,6 +2317,7 @@ button {
 }
 
 .btn-link {
+	position: relative;
 	background-color: $transparent;
 	border: none;
 	color: $link-color;
@@ -2097,6 +2333,12 @@ button {
 
 	&:focus {
 		@extend .btn-link;
+		outline: none;
+		margin-bottom: -2px !important;
+		border-bottom: 2px solid rgba($link-hover-color, 0.5);
+		-webkit-box-shadow: 0 0 0 0px !important;
+		-moz-box-shadow: 0 0 0 0px !important;
+		box-shadow: 0 0 0 0px !important;
 	}
 
 	&:active {
@@ -2136,6 +2378,15 @@ button {
 	&:focus {
 		@extend %btn-search-hover-focus;
 	}
+
+	&[disabled] {
+		background-color: $transparent;
+
+		&:hover {
+			background-color: $transparent;
+			@include opacity(0.75);
+		}
+	}
 }
 
 .filter-trigger {
@@ -2170,6 +2421,7 @@ button {
 
 $icon-btn: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
+	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -259px,
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
 	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
@@ -2188,15 +2440,15 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	widget-action: url(../img/icon-sprite.svg) no-repeat -4px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -39px -617px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -39px -580px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -6px -618px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -6px -654px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -6px -689px,
+	widget-edit: url(../img/icon-sprite.svg) no-repeat -42px -619px,
+	widget-delete: url(../img/icon-sprite.svg) no-repeat -42px -582px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -6px -546px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -6px -582px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -6px -474px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -6px -510px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -2211,9 +2463,24 @@ $icon-widget-btn: (
 	@extend %btn-dashbrd;
 }
 
+.btn-dashbrd-normal {
+	position: fixed;
+	right: 45px;
+	top: 5px;
+	z-index: 1010;
+	@include box-shadow(1px 1px 2px $action-shadow-color);
+	@include opacity(1);
+	@include transition(opacity 1s);
+
+	&.hidden {
+		@include opacity(0);
+	}
+}
+
 %btn-widget {
-	width: 30px;
-	height: 28px;
+	width: 24px;
+	height: 24px;
+	margin: 2px 2px 0 0;
 	@extend %btn-widget-defaults;
 }
 
@@ -2236,7 +2503,6 @@ $icon-widget-btn: (
 	}
 
 	&:focus {
-		@include box-shadow(none);
 		@extend %btn-widget-hover-active;
 	}
 
@@ -2343,7 +2609,7 @@ button[disabled] {
 		display: inline-block;
 
 		a {
-			@extend %no-border;
+			border: none;
 			padding: 8px 10px;
 			@include transition(background-color .2s ease-out);
 
@@ -2382,7 +2648,7 @@ button[disabled] {
 				cursor: default;
 				color: $btn-disabled-font-color;
 				background-color: $transparent;
-				@extend %no-border;
+				border: none;
 			}
 		}
 	}
@@ -3105,6 +3371,27 @@ $form-icon-btn: (
 	}
 }
 
+.dashbrd-widget-graph-link {
+	display: block;
+
+	&:link {
+		border: none;
+	}
+
+	&:focus {
+
+		&:after {
+			content: "";
+			background: rgba($blue, .35);
+			height: 2px;
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: -2px;
+		}
+	}
+}
+
 // Action Menus, Pop-up Menus
 .action-menu {
 	position: absolute;
@@ -3116,6 +3403,10 @@ $form-icon-btn: (
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+
+	&:focus {
+		outline: none;
+	}
 
 	li {
 		display: block;
@@ -3141,15 +3432,10 @@ $form-icon-btn: (
 		@extend %overflow-ellipsis;
 		@include transition(background-color .2s ease-out);
 
-		&:hover {
-			background-color: $action-hover-color;
-		}
-
-		&:focus {
-			background-color: $action-hover-color;
-		}
-
-		&:active {
+		&:hover,
+		&:focus,
+		&:active,
+		&.highlighted {
 			background-color: $action-hover-color;
 		}
 
@@ -3238,6 +3524,7 @@ $form-icon-btn: (
 		.overlay-dialogue-body {
 			overflow: auto;
 			overflow-x: hidden;
+			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
 			margin: 0 0 10px 0;
@@ -3254,7 +3541,7 @@ $form-icon-btn: (
 		& > .overlay-close-btn {
 			position: relative;
 			float: right;
-			top: -12px;
+			top: -13px;
 			right: -8px;
 		}
 	}
@@ -3282,10 +3569,6 @@ $form-icon-btn: (
 		border-top: 1px solid $table-border-color;
 	}
 
-	.table-forms-td-left {
-		text-align: left;
-	}
-
 	.table-forms-td-right {
 
 		td {
@@ -3311,22 +3594,43 @@ $form-icon-btn: (
 
 // Map widget back to parent button.
 .btn-back-map-container {
-
 	text-align: left;
 	position: absolute;
 	left: -1px;
+	max-width: 100%;
+
+	a {
+
+		&:focus,
+		&:hover {
+			outline: none;
+
+			.btn-back-map {
+				background-color: $btn-back-background-hover;
+				border: $btn-border-color solid 1px;
+
+				.btn-back-map-content {
+					display: inline-block;
+					line-height: 24px;
+					padding: 0 6px 0 0;
+					flex: auto;
+					@extend %overflow-ellipsis;
+				}
+			}
+		}
+	}
 
 	.btn-back-map {
-		margin-top: 10px;
-		border-radius: 0px 2px 2px 0px;
+		border: $ui-border-color solid 1px;
+		border-radius: 0 2px 2px 0;
 		background-color: $btn-back-map-background-color;
-		padding: 0px 0px 0px 0px;
-		display: inline-block;
+		color: $btn-back-text-color;
+		margin-top: 10px;
+		padding: 0;
+		display: flex;
 		height: 24px;
 		line-height: 24px;
 		vertical-align: middle;
-		border: $ui-border-color solid 1px;
-		color: $btn-back-text-color;
 		text-decoration: none;
 
 		.btn-back-map-content {
@@ -3336,21 +3640,11 @@ $form-icon-btn: (
 		.btn-back-map-icon {
 			margin-left: 5px;
 			display: inline-block;
+			flex: 1 0 auto;
 			width: 28px;
 			height: 24px;
 			vertical-align: middle;
 			background: url(../img/icon-sprite.svg) no-repeat -85px -691px;
-		}
-
-		&:hover {
-			background-color: $btn-back-background-hover;
-			border: $btn-border-color solid 1px;
-
-			.btn-back-map-content {
-				display: inline-block;
-				line-height: 24px;
-				padding: 0px 6px 0px 0px;
-			}
 		}
 	}
 }
@@ -3672,7 +3966,7 @@ $form-icon-btn: (
 .overlay-descr {
 	max-height: 150px;
 	overflow-y: auto;
-	padding: 0 11px 0 11px;
+	padding: 0;
 	margin: 5px 0;
 	background-color: $ui-bg-color;
 	@extend %webkit-scrollbar;
@@ -3680,7 +3974,8 @@ $form-icon-btn: (
 }
 
 .overlay-descr-url {
-	padding: 3px 11px 7px 11px;
+	padding: 3px 0 7px;
+	@extend %overflow-ellipsis;
 }
 
 %scroll-vert-shadow {
@@ -3711,6 +4006,9 @@ $form-icon-btn: (
 
 a.green {
 	@extend .green;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .red {
@@ -3719,6 +4017,9 @@ a.green {
 
 a.red {
 	@extend .red;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 select.red {
@@ -3738,6 +4039,9 @@ select {
 
 a.orange {
 	@extend .orange;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .yellow {
@@ -3746,6 +4050,9 @@ a.orange {
 
 a.yellow {
 	@extend .yellow;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .grey {
@@ -3754,6 +4061,9 @@ a.yellow {
 
 a.grey {
 	@extend .grey;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .blue {
@@ -3762,6 +4072,9 @@ a.grey {
 
 a.blue {
 	@extend .blue;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
 }
 
 .teal {
@@ -3770,6 +4083,42 @@ a.blue {
 
 a.teal {
 	@extend .teal;
+		&:hover, &:focus {
+			color: $link-hover-color;
+		}
+}
+
+a.link-action {
+	color: $font-color;
+
+	&.red {
+		color: $red;
+	}
+
+	&.orange {
+		color: $orange;
+	}
+
+	&.yellow {
+		color: $dark-yellow;
+	}
+
+	&.green {
+		color: $green;
+	}
+
+	&.grey {
+		color: $font-alt-color;
+	}
+
+	&:hover {
+		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+	}
+
+	&:focus {
+		color: $link-hover-color;
+	}
 }
 
 .progress-bar-container {
@@ -3777,15 +4126,14 @@ a.teal {
 	white-space: nowrap;
 	position: relative;
 
-	&:hover {
-
-		.progress-bar-label {
-			display: block;
-		}
-	}
-
 	a {
-		border: none;
+		border: none !important;
+
+		&:hover, &:focus {
+			.progress-bar-label {
+				display: block;
+			}
+		}
 	}
 }
 
@@ -3838,11 +4186,11 @@ a.teal {
 			@include border-radius(2px)
 		}
 
-		&:first-child:not(:only-child) {
+		&:first-of-type:not(:only-child) {
 			@include border-radius(2px 0 0 2px);
 		}
 
-		&:last-child:not(:only-child) {
+		&:last-of-type:not(:only-child) {
 			@include border-radius(0 2px 2px 0);
 		}
 	}
@@ -3882,6 +4230,18 @@ a.teal {
 	@extend %status;
 }
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border: 1px solid rgba($font-color, .2);
+	@extend %status;
+}
+
+.status-disabled-bg {
+	color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border: 1px solid rgba($font-color, .2);
+	@extend %status;
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
@@ -3909,6 +4269,10 @@ a.teal {
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
+
+	&:not(:last-of-type) {
+		border-right: none;
+	}
 }
 
 .green-bg {
@@ -3920,12 +4284,11 @@ a.teal {
 }
 
 .na-bg {
-	color: darken($alt-blue-grey,45%);
+	color: darken($alt-blue-grey, 45%);
 
-	input[type="radio"] {
-		&:checked + label {
-			@extend .na-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-blue-grey, 45%);
 	}
 }
 
@@ -3947,6 +4310,10 @@ td.na-bg {
 .normal-bg {
 	color: darken($alt-green,45%);
 	@extend .green-bg;
+
+	a.link-action {
+	color: darken($alt-green,45%);
+	}
 }
 
 .normal-bg.blink-hidden {
@@ -3958,12 +4325,11 @@ td.normal-bg {
 }
 
 .info-bg {
-	color: darken($alt-dark-blue,45%);
+	color: darken($alt-dark-blue, 45%);
 
-	input[type="radio"] {
-		&:checked + label {
-			@extend .info-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-dark-blue, 45%);
 	}
 }
 
@@ -3981,12 +4347,11 @@ td.info-bg {
 }
 
 .average-bg {
-	color: darken($alt-orange,45%);
+	color: darken($alt-orange, 45%);
 
-	input[type="radio"] {
-		&:checked + label {
-			@extend .average-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-orange, 45%);
 	}
 }
 
@@ -3999,12 +4364,11 @@ td.average-bg {
 }
 
 .warning-bg {
-	color: darken($alt-yellow,45%);
+	color: darken($alt-yellow, 45%);
 
-	input[type="radio"] {
-		&:checked + label {
-			@extend .warning-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-yellow, 45%);
 	}
 }
 
@@ -4022,12 +4386,11 @@ td.warning-bg {
 }
 
 .high-bg {
-	color: darken($alt-dark-orange,45%);
+	color: darken($alt-dark-orange, 45%);
 
-	input[type="radio"] {
-		&:checked + label {
-			@extend .high-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-dark-orange, 45%);
 	}
 }
 
@@ -4045,12 +4408,11 @@ td.high-bg {
 }
 
 .disaster-bg {
-	color: darken($alt-red,45%);
+	color: darken($alt-red, 45%);
 
-	input[type="radio"] {
-		&:checked + label {
-			@extend .disaster-bg;
-		}
+	a.link-action,
+	input[type="radio"]:checked + label {
+		color: darken($alt-red, 45%);
 	}
 }
 
@@ -4074,6 +4436,37 @@ td.disaster-bg {
 
 td.inactive-bg {
 	@extend .inactive-bg;
+}
+
+// Filter Checkboxes
+
+.table-forms-second-column {
+	display: inline-block;
+	width: 50%;
+	min-width: 200px;
+	text-align: right;
+
+	.second-column-label {
+		padding: 0 10px;
+	}
+}
+
+// Event status colors
+
+.problem-unack-fg {
+	color: $problem-unack-fg-color;
+}
+
+.problem-ack-fg {
+	color: $problem-ack-fg-color;
+}
+
+.ok-unack-fg {
+	color: $ok-unack-fg-color;
+}
+
+.ok-ack-fg {
+	color: $ok-ack-fg-color;
 }
 
 %found-bg {
@@ -4382,6 +4775,10 @@ td.inactive-bg {
 	background-color: $transparent !important;
 	@extend %close-icon;
 	@include border-radius(2px);
+
+	&:focus {
+	box-shadow: none;
+	}
 }
 
 .overlay-close-btn {
@@ -4465,6 +4862,14 @@ a.overlay-close-btn {
 
 	input[type="text"] {
 		padding-left: 25px;
+	}
+
+	&.disabled {
+		opacity: 1;
+
+		div {
+			background: $form-disabled-font-color !important;
+		}
 	}
 }
 
@@ -4622,6 +5027,10 @@ tr.cursor-move {
 	.icon-info {
 		margin-right: 10px;
 
+		&:only-of-type {
+			margin-right: 0;
+		}
+
 		&:last-child {
 			margin-right: 0;
 		}
@@ -4722,8 +5131,6 @@ svg {
 	max-height: 100%;
 	max-width: 100%;
 	display: flex;
-	align-items: center;
-	justify-content: center;
 }
 
 @supports (-ms-ime-align:auto) {
@@ -4810,7 +5217,7 @@ svg {
 			> .tree-row {
 				width: 100%;
 				min-width: 320px;
-				border-bottom: 1px solid $ui-border-color;
+				border-bottom: 1px solid $table-border-color;
 				padding: 8px 0;
 
 				&:hover {
@@ -4855,12 +5262,23 @@ svg {
 						border: 0px none;
 						opacity: 0.5;
 						float: left;
+
+						&::-moz-focus-inner {
+							padding: 0;
+						}
 					}
 					.edit-item-btn:hover,
 					.remove-item-btn:hover,
 					.import-items-btn:hover,
 					.add-child-btn:hover {
 						opacity: 1;
+					}
+					.edit-item-btn:focus,
+					.remove-item-btn:focus,
+					.import-items-btn:focus,
+					.add-child-btn:focus {
+						opacity: 1;
+						outline: none;
 					}
 					.add-child-btn {
 						background: url(../img/icon-sprite.svg) no-repeat -47px -551px;
@@ -4989,6 +5407,33 @@ svg {
 		}
 	}
 }
+
+::-webkit-input-placeholder {
+	color: $input-placeholder-color;
+}
+
+:-ms-input-placeholder {
+	color: $input-placeholder-color !important;
+}
+
+::-ms-input-placeholder {
+	color: $input-placeholder-color;
+}
+
+::-moz-placeholder {
+	color: $input-placeholder-color;
+	opacity: 1;
+}
+
+:-moz-placeholder {
+	color: $input-placeholder-color;
+}
+
+:placeholder-shown {
+	color: $input-placeholder-color;
+}
+
+@if $theme_name == 'dev' {
 
 /*doc
 ---
@@ -5882,3 +6327,4 @@ Widgets are used as containers to group any related information. Widget consists
 </div>
 ```
 */
+}

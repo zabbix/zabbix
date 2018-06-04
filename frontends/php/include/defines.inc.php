@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha2');
+define('ZABBIX_VERSION',		'4.0.0alpha8');
 define('ZABBIX_API_VERSION',	'4.0.0');
-define('ZABBIX_EXPORT_VERSION',	'3.4');
-define('ZABBIX_DB_VERSION',		3050028);
+define('ZABBIX_EXPORT_VERSION',	'4.0');
+define('ZABBIX_DB_VERSION',		3050101);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2017');
+define('ZABBIX_COPYRIGHT_TO',	'2018');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -95,10 +95,6 @@ define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 define('ZBX_ACK_STS_ANY',				1);
 define('ZBX_ACK_STS_WITH_UNACK',		2);
 define('ZBX_ACK_STS_WITH_LAST_UNACK',	3);
-
-define('EVENTS_OPTION_NOEVENT', 1);
-define('EVENTS_OPTION_ALL',		2);
-define('EVENTS_OPTION_NOT_ACK', 3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 
@@ -177,6 +173,12 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
 
+define('ZBX_TCP_HEADER_DATA',		"ZBXD");
+define('ZBX_TCP_HEADER_VERSION',	"\1");
+define('ZBX_TCP_HEADER',			ZBX_TCP_HEADER_DATA.ZBX_TCP_HEADER_VERSION);
+define('ZBX_TCP_HEADER_LEN',		5);
+define('ZBX_TCP_DATALEN_LEN',		8);
+
 define('AUDIT_ACTION_ADD',		0);
 define('AUDIT_ACTION_UPDATE',	1);
 define('AUDIT_ACTION_DELETE',	2);
@@ -214,6 +216,7 @@ define('AUDIT_RESOURCE_TEMPLATE',		30);
 define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
 define('AUDIT_RESOURCE_ICON_MAP',		32);
 define('AUDIT_RESOURCE_DASHBOARD',		33);
+define('AUDIT_RESOURCE_CORRELATION',	34);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -250,6 +253,7 @@ define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
 define('CONDITION_OPERATOR_REGEXP',		8);
+define('CONDITION_OPERATOR_NOT_REGEXP',	9);
 
 // correlation statuses
 define('ZBX_CORRELATION_ENABLED',		0);
@@ -281,6 +285,8 @@ define('HOST_STATUS_PROXY_PASSIVE',	6);
 define('HOST_ENCRYPTION_NONE',			1);
 define('HOST_ENCRYPTION_PSK',			2);
 define('HOST_ENCRYPTION_CERTIFICATE',	4);
+
+define('HOST_COMPRESSION_ON', 1);
 
 define('PSK_MIN_LEN',	32);
 
@@ -425,6 +431,7 @@ define('ITEM_TYPE_CALCULATED',		15);
 define('ITEM_TYPE_JMX',				16);
 define('ITEM_TYPE_SNMPTRAP',		17);
 define('ITEM_TYPE_DEPENDENT',		18);
+define('ITEM_TYPE_HTTPAGENT',		19);
 
 define('ZBX_DEPENDENT_ITEM_MAX_LEVELS',	3);
 define('ZBX_DEPENDENT_ITEM_MAX_COUNT',	999);
@@ -556,6 +563,9 @@ define('TRIGGER_SEVERITY_AVERAGE',			3);
 define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
+
+define('EVENT_CUSTOM_COLOR_DISABLED',	0);
+define('EVENT_CUSTOM_COLOR_ENABLED',	1);
 
 define('ALERT_STATUS_NOT_SENT', 0);
 define('ALERT_STATUS_SENT',		1);
@@ -730,7 +740,7 @@ define('VALIGN_BOTTOM',		2);
 define('STYLE_HORIZONTAL',	0);
 define('STYLE_VERTICAL',	1);
 
-// view style [Overview]
+// view style [Overview, Plaintext]
 define('STYLE_LEFT',	0);
 define('STYLE_TOP',		1);
 
@@ -807,13 +817,26 @@ define('HTTPTEST_AUTH_NTLM',	2);
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
 
-define('ZBX_HTTPFIELD_HEADER',	0);
+define('ZBX_HTTPFIELD_HEADER',		0);
 define('ZBX_HTTPFIELD_VARIABLE',	1);
 define('ZBX_HTTPFIELD_POST_FIELD',	2);
 define('ZBX_HTTPFIELD_QUERY_FIELD',	3);
 
 define('ZBX_POSTTYPE_RAW',	0);
 define('ZBX_POSTTYPE_FORM',	1);
+define('ZBX_POSTTYPE_JSON',	2);
+define('ZBX_POSTTYPE_XML',	3);
+
+define('HTTPCHECK_STORE_RAW',	0);
+define('HTTPCHECK_STORE_JSON',	1);
+
+define('HTTPCHECK_ALLOW_TRAPS_OFF',	0);
+define('HTTPCHECK_ALLOW_TRAPS_ON',	1);
+
+define('HTTPCHECK_REQUEST_GET',		0);
+define('HTTPCHECK_REQUEST_POST',	1);
+define('HTTPCHECK_REQUEST_PUT',		2);
+define('HTTPCHECK_REQUEST_HEAD',	3);
 
 define('HTTPSTEP_ITEM_TYPE_RSPCODE',	0);
 define('HTTPSTEP_ITEM_TYPE_TIME',		1);
@@ -821,17 +844,18 @@ define('HTTPSTEP_ITEM_TYPE_IN',			2);
 define('HTTPSTEP_ITEM_TYPE_LASTSTEP',	3);
 define('HTTPSTEP_ITEM_TYPE_LASTERROR',	4);
 
-define('HTTPTEST_STEP_RETRIEVE_MODE_CONTENT', 0);
-define('HTTPTEST_STEP_RETRIEVE_MODE_HEADERS', 1);
+define('HTTPTEST_STEP_RETRIEVE_MODE_CONTENT',	0);
+define('HTTPTEST_STEP_RETRIEVE_MODE_HEADERS',	1);
+define('HTTPTEST_STEP_RETRIEVE_MODE_BOTH',		2);
 
-define('HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF', 0);
-define('HTTPTEST_STEP_FOLLOW_REDIRECTS_ON', 1);
+define('HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF',	0);
+define('HTTPTEST_STEP_FOLLOW_REDIRECTS_ON',		1);
 
-define('HTTPTEST_VERIFY_PEER_OFF', 0);
-define('HTTPTEST_VERIFY_PEER_ON', 1);
+define('HTTPTEST_VERIFY_PEER_OFF',	0);
+define('HTTPTEST_VERIFY_PEER_ON',	1);
 
-define('HTTPTEST_VERIFY_HOST_OFF', 0);
-define('HTTPTEST_VERIFY_HOST_ON', 1);
+define('HTTPTEST_VERIFY_HOST_OFF',	0);
+define('HTTPTEST_VERIFY_HOST_ON',	1);
 
 define('EVENT_ACK_DISABLED',	'0');
 define('EVENT_ACK_ENABLED',		'1');
@@ -847,8 +871,10 @@ define('ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM',	0x01);
 
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
+define('ZBX_TM_TASK_CHECK_NOW',		6);
 
-define('ZBX_TM_STATUS_NEW', 1);
+define('ZBX_TM_STATUS_NEW',			1);
+define('ZBX_TM_STATUS_INPROGRESS',	2);
 
 define('EVENT_SOURCE_TRIGGERS',				0);
 define('EVENT_SOURCE_DISCOVERY',			1);
@@ -1112,7 +1138,8 @@ define('API_ALLOW_NULL',		0x04);
 define('API_NORMALIZE',			0x08);
 define('API_DEPRECATED',		0x10);
 define('API_ALLOW_USER_MACRO',	0x20);
-define('API_ALLOW_COUNT',	0x40);
+define('API_ALLOW_COUNT',		0x40);
+define('API_ALLOW_LLD_MACRO',	0x80);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
@@ -1174,24 +1201,24 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 
 // dashboard widgets
-define('WIDGET_DISCOVERY_STATUS',		'dscvry');
-define('WIDGET_FAVOURITE_GRAPHS',		'favgrph');
-define('WIDGET_FAVOURITE_MAPS',			'favmap');
-define('WIDGET_FAVOURITE_SCREENS',		'favscr');
-define('WIDGET_HOST_STATUS',			'hoststat');
-define('WIDGET_PROBLEMS',				'problems');
-define('WIDGET_SYSTEM_STATUS',			'syssum');
-define('WIDGET_WEB_OVERVIEW',			'webovr');
-define('WIDGET_ZABBIX_STATUS',			'stszbx');
-define('WIDGET_GRAPH',					'graph');
-define('WIDGET_CLOCK',					'clock');
-define('WIDGET_SYSMAP',					'sysmap');
-define('WIDGET_NAVIGATION_TREE',		'navigationtree');
-define('WIDGET_PLAIN_TEXT',				'plaintext');
-define('WIDGET_URL',					'url');
-define('WIDGET_ACTION_LOG',				'actlog');
-define('WIDGET_DATA_OVERVIEW',			'dataover');
-define('WIDGET_TRIG_OVERVIEW',			'trigover');
+define('WIDGET_ACTION_LOG',		'actionlog');
+define('WIDGET_CLOCK',			'clock');
+define('WIDGET_DATA_OVER',		'dataover');
+define('WIDGET_DISCOVERY',		'discovery');
+define('WIDGET_FAV_GRAPHS',		'favgraphs');
+define('WIDGET_FAV_MAPS',		'favmaps');
+define('WIDGET_FAV_SCREENS',	'favscreens');
+define('WIDGET_GRAPH',			'graph');
+define('WIDGET_MAP',			'map');
+define('WIDGET_NAV_TREE',		'navtree');
+define('WIDGET_PLAIN_TEXT',		'plaintext');
+define('WIDGET_PROBLEM_HOSTS',	'problemhosts');
+define('WIDGET_PROBLEMS',		'problems');
+define('WIDGET_PROBLEMS_BY_SV',	'problemsbysv');
+define('WIDGET_SYSTEM_INFO',	'systeminfo');
+define('WIDGET_TRIG_OVER',		'trigover');
+define('WIDGET_URL',			'url');
+define('WIDGET_WEB',			'web');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
@@ -1266,6 +1293,11 @@ define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
+// monitoring modes
+define('ZBX_MONITORED_BY_ANY', 0);
+define('ZBX_MONITORED_BY_SERVER', 1);
+define('ZBX_MONITORED_BY_PROXY', 2);
+
 // queue modes
 define('QUEUE_OVERVIEW', 0);
 define('QUEUE_OVERVIEW_BY_PROXY', 1);
@@ -1290,7 +1322,6 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
-define('ZBX_STYLE_ARTICLE', 'article');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_ARROW_DOWN', 'arrow-down');
 define('ZBX_STYLE_ARROW_LEFT', 'arrow-left');
@@ -1299,13 +1330,19 @@ define('ZBX_STYLE_ARROW_UP', 'arrow-up');
 define('ZBX_STYLE_BLUE', 'blue');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
+define('ZBX_STYLE_BTN_BACK_MAP', 'btn-back-map');
+define('ZBX_STYLE_BTN_BACK_MAP_CONTAINER', 'btn-back-map-container');
+define('ZBX_STYLE_BTN_BACK_MAP_CONTENT', 'btn-back-map-content');
+define('ZBX_STYLE_BTN_BACK_MAP_ICON', 'btn-back-map-icon');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
+define('ZBX_STYLE_BTN_DASHBRD_NORMAL', 'btn-dashbrd-normal');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
+define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
@@ -1335,29 +1372,44 @@ define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');
 define('ZBX_STYLE_CLOCK_HAND_SEC', 'clock-hand-sec');
 define('ZBX_STYLE_CLOCK_LINES', 'clock-lines');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
+define('ZBX_STYLE_COLUMN_TAGS_1', 'column-tags-1');
+define('ZBX_STYLE_COLUMN_TAGS_2', 'column-tags-2');
+define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
+define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER', 'dashbrd-grid-widget-container');
 define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DASHBRD_WIDGET_FOOT', 'dashbrd-widget-foot');
 define('ZBX_STYLE_DASHBRD_EDIT', 'dashbrd-edit');
+define('ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK', 'dashbrd-widget-graph-link');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
+define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
+define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
+define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
+define('ZBX_STYLE_OK_ACK_FG', 'ok-ack-fg');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
-define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
+define('ZBX_STYLE_FILTER_ACTIVE', 'filter-active');
 define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
+define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
+define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
-define('ZBX_STYLE_FILTER_ACTIVE', 'filter-active');
+define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
+define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
+define('ZBX_STYLE_FLH_HIGH_BG', 'flh-high-bg');
+define('ZBX_STYLE_FLH_INFO_BG', 'flh-info-bg');
+define('ZBX_STYLE_FLH_NA_BG', 'flh-na-bg');
+define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
-define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
@@ -1399,7 +1451,6 @@ define('ZBX_STYLE_MSG_BAD_GLOBAL', 'msg-bad-global');
 define('ZBX_STYLE_MSG_DETAILS', 'msg-details');
 define('ZBX_STYLE_MSG_DETAILS_BORDER', 'msg-details-border');
 define('ZBX_STYLE_NA_BG', 'na-bg');
-define('ZBX_STYLE_NAV', 'nav');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
 define('ZBX_STYLE_NOTIF_BODY', 'notif-body');
 define('ZBX_STYLE_NOTIF_INDIC', 'notif-indic');
@@ -1415,6 +1466,7 @@ define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
 define('ZBX_STYLE_PRELOADER', 'preloader');
+define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');
 define('ZBX_STYLE_PROGRESS_BAR_BG', 'progress-bar-bg');
 define('ZBX_STYLE_PROGRESS_BAR_CONTAINER', 'progress-bar-container');
 define('ZBX_STYLE_PROGRESS_BAR_LABEL', 'progress-bar-label');
@@ -1427,6 +1479,7 @@ define('ZBX_STYLE_RIGHT', 'right');
 define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_SCREEN_TABLE', 'screen-table');
 define('ZBX_STYLE_SEARCH', 'search');
+define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
 define('ZBX_STYLE_SELECTED', 'selected');
 define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
@@ -1441,16 +1494,25 @@ define('ZBX_STYLE_SIGNIN_CONTAINER', 'signin-container');
 define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
 define('ZBX_STYLE_SIGN_IN_TXT', 'sign-in-txt');
+define('ZBX_STYLE_STATUS_AVERAGE_BG', 'status-average-bg');
 define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
 define('ZBX_STYLE_STATUS_DARK_GREY', 'status-dark-grey');
+define('ZBX_STYLE_STATUS_DISABLED_BG', 'status-disabled-bg');
+define('ZBX_STYLE_STATUS_DISASTER_BG', 'status-disaster-bg');
 define('ZBX_STYLE_STATUS_GREEN', 'status-green');
 define('ZBX_STYLE_STATUS_GREY', 'status-grey');
+define('ZBX_STYLE_STATUS_HIGH_BG', 'status-high-bg');
+define('ZBX_STYLE_STATUS_INFO_BG', 'status-info-bg');
+define('ZBX_STYLE_STATUS_NA_BG', 'status-na-bg');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
+define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_SUBFILTER', 'subfilter');
 define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');
 define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
+define('ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN', 'table-forms-second-column');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
@@ -1473,6 +1535,7 @@ define('ZBX_STYLE_TOP_NAV_HELP', 'top-nav-help');
 define('ZBX_STYLE_TOP_NAV_ICONS', 'top-nav-icons');
 define('ZBX_STYLE_TOP_NAV_PROFILE', 'top-nav-profile');
 define('ZBX_STYLE_TOP_NAV_SIGNOUT', 'top-nav-signout');
+define('ZBX_STYLE_TOP_NAV_SUPPORT', 'top-nav-support');
 define('ZBX_STYLE_TOP_NAV_ZBBSHARE', 'top-nav-zbbshare');
 define('ZBX_STYLE_TOP_SUBNAV', 'top-subnav');
 define('ZBX_STYLE_TOP_SUBNAV_CONTAINER', 'top-subnav-container');
@@ -1482,6 +1545,7 @@ define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
+define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
@@ -1516,6 +1580,12 @@ if (function_exists('bcscale')) {
 
 // Maximum number of tags to display in events list.
 define('EVENTS_LIST_TAGS_COUNT', 3);
+
+// Number of tags to display in Problems widget and Monitoring > Problems.
+define('PROBLEMS_SHOW_TAGS_NONE', 0);
+define('PROBLEMS_SHOW_TAGS_1', 1);
+define('PROBLEMS_SHOW_TAGS_2', 2);
+define('PROBLEMS_SHOW_TAGS_3', 3);
 
 // HTTP headers
 /*

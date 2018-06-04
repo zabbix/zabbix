@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,20 +85,21 @@ foreach($inventoryFields as $inventoryField){
 	}
 }
 
-$controls = (new CList())
-	->addItem([
-		new CLabel(_('Group'), 'groupid'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$pageFilter->getGroupsCB()
-	])
-	->addItem([
-		new CLabel(_('Grouping by'), 'groupby'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$inventoryFieldsComboBox
-	]);
-
 $hostinvent_wdgt->setControls(
-	(new CForm('get'))->addItem($controls)
+	(new CForm('get'))
+		->setAttribute('aria-label', _('Main filter'))
+		->addItem((new CList())
+			->addItem([
+				new CLabel(_('Group'), 'groupid'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$pageFilter->getGroupsCB()
+			])
+			->addItem([
+				new CLabel(_('Grouping by'), 'groupby'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$inventoryFieldsComboBox
+			])
+		)
 );
 
 $table = (new CTableInfo())

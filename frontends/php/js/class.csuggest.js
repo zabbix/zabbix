@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 var LCL_SUGGESTS = [];
 
@@ -263,28 +264,31 @@ searchFocus: function(e){
 },
 
 keyPressed: function(e){
-	if(!e) e = window.event;
+	if (!e) {
+		e = window.event;
+	}
 	var key = e.keyCode;
 
-	switch(true){
-		case(key == 27):
+	switch (true) {
+		case (key == 27):
 			this.hlIndex = 0;
 			this.suggestCount = 0;
 			this.removeHighLight(e);
 			this.setNeedleByHighLight(e);
 			this.hideSuggests(e);
 			break;
-		case(key==13):
-			this.needleChange(e);
-			Event.stop(e);
-			this.selectSuggest(e);
+		case (key == 13):
+			if (this.dom.input.value.trim() !== '') {
+				this.needleChange(e);
+				this.selectSuggest(e);
+			}
 			break;
-		case(key == 37 || key == 39 || key == 9): // left, right, tab
+		case (key == 37 || key == 39 || key == 9): // left, right, tab
 			break;
-		case(key==38): // up
+		case (key == 38): // up
 			this.keyUp(e);
 			break;
-		case(key==40): // down
+		case (key == 40): // down
 			this.keyDown(e);
 			break;
 		default:

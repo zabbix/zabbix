@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,7 +150,10 @@ class CControllerPopupTestTriggerExpr extends CController {
 			'outline' => $outline,
 			'test' => array_key_exists('test_expression', $_REQUEST),
 			'message' => getMessages(),
-			'macros_data' => $this->macros_data
+			'macros_data' => $this->macros_data,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		]));
 	}
 }

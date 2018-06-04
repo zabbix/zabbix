@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ function select_config() {
 
 function setHostGroupInternal($groupid, $internal) {
 	return DBexecute(
-		'UPDATE groups'.
+		'UPDATE hstgrp'.
 		' SET internal='.zbx_dbstr($internal).
 		' WHERE '.dbConditionInt('groupid', [$groupid])
 	);
@@ -72,12 +72,6 @@ function update_config($config) {
 	}
 
 	$fields = [
-		'event_expire' => [
-			'min' => SEC_PER_DAY,
-			'max' => 25 * SEC_PER_YEAR,
-			'allow_zero' => false,
-			'message' => _('Invalid event expiry time: %1$s.')
-		],
 		'hk_events_trigger' => [
 			'min' => SEC_PER_DAY,
 			'max' => 25 * SEC_PER_YEAR,
@@ -251,12 +245,6 @@ function update_config($config) {
 		}
 		if (array_key_exists('event_ack_enable', $config)) {
 			$msg[] = _s('Event acknowledges "%1$s".', $config['event_ack_enable']);
-		}
-		if (array_key_exists('event_expire', $config)) {
-			$msg[] = _s('Show events not older than "%1$s".', $config['event_expire']);
-		}
-		if (array_key_exists('event_show_max', $config)) {
-			$msg[] = _s('Show events max "%1$s".', $config['event_show_max']);
 		}
 		if (array_key_exists('dropdown_first_entry', $config)) {
 			$msg[] = _s('Dropdown first entry "%1$s".', $config['dropdown_first_entry']);

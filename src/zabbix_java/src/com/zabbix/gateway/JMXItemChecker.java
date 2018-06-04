@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ class JMXItemChecker extends ItemChecker
 			password = request.optString(JSON_TAG_PASSWORD, null);
 
 			if (null != username && null == password || null == username && null != password)
-				throw new IllegalArgumentException("invalid username and password nullness combination");
+				throw new IllegalArgumentException("Both JMX endpoint username and password should be either present or empty");
 		}
 		catch (Exception e)
 		{
@@ -250,8 +250,9 @@ class JMXItemChecker extends ItemChecker
 			}
 			catch (Exception e)
 			{
-				Object[] logInfo = {name, attrInfo.getName(), e};
-				logger.trace("processing '{},{}' failed", logInfo);
+				Object[] logInfo = {name, attrInfo.getName(), ZabbixException.getRootCauseMessage(e)};
+				logger.warn("attribute processing '{},{}' failed: {}", logInfo);
+				logger.debug("error caused by", e);
 			}
 		}
 	}
@@ -287,7 +288,8 @@ class JMXItemChecker extends ItemChecker
 		}
 		catch (Exception e)
 		{
-			logger.trace("bean processing '{}' failed", name);
+			logger.warn("bean processing '{}' failed: {}", name, ZabbixException.getRootCauseMessage(e));
+			logger.debug("error caused by", e);
 		}
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,8 +155,8 @@ class CScreenActions extends CScreenBase {
 			}
 
 			$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $dbUsers))
-				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
-				: $alert['sendto'];
+				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
+				: zbx_nl2br($alert['sendto']);
 
 			$info_icons = [];
 			if ($alert['error'] !== '') {

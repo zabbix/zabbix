@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,6 +91,24 @@ void	__zbx_mock_assert_int_ne(const char *file, int line, const char *prefix_msg
 	_FAIL(file, line, prefix_msg, "Did not expect value \"%d\"", returned_value);
 }
 
+void	__zbx_mock_assert_double_eq(const char *file, double line, const char *prefix_msg, double expected_value,
+		double returned_value)
+{
+	if (ZBX_DOUBLE_EPSILON >= fabs(returned_value - expected_value))
+		return;
+
+	_FAIL(file, line, prefix_msg, "Expected value \"%f\" while got \"%f\"", expected_value, returned_value);
+}
+
+void	__zbx_mock_assert_double_ne(const char *file, double line, const char *prefix_msg, double expected_value,
+		double returned_value)
+{
+	if (ZBX_DOUBLE_EPSILON < fabs(returned_value - expected_value))
+		return;
+
+	_FAIL(file, line, prefix_msg, "Did not expect value \"%f\"", returned_value);
+}
+
 void	__zbx_mock_assert_result_eq(const char *file, int line, const char *prefix_msg, int expected_value,
 		int returned_value)
 {
@@ -127,6 +145,25 @@ void	__zbx_mock_assert_sysinfo_ret_ne(const char *file, int line, const char *pr
 		return;
 
 	_FAIL(file, line, prefix_msg, "Did not expect sysinfo result \"%s\"", zbx_sysinfo_ret_string(returned_value));
+}
+
+void	__zbx_mock_assert_ptr_eq(const char *file, int line, const char *prefix_msg, const void *expected_value,
+		const void *returned_value)
+{
+	if (returned_value == expected_value)
+		return;
+
+	_FAIL(file, line, prefix_msg, "Expected value \"0x%p\" while got \"0x%p\"", expected_value,
+			returned_value);
+}
+
+void	__zbx_mock_assert_ptr_ne(const char *file, int line, const char *prefix_msg, const void *expected_value,
+		const void *returned_value)
+{
+	if (returned_value != expected_value)
+		return;
+
+	_FAIL(file, line, prefix_msg, "Did not expect value \"0x%p\"", returned_value);
 }
 
 void	__zbx_mock_assert_timespec_eq(const char *file, int line, const char *prefix_msg,
@@ -194,4 +231,3 @@ void	__zbx_mock_assert_time_ne(const char *file, int line, const char *prefix_ms
 
 	_FAIL(file, line, prefix_msg, "Did not expect timestamp \"%s\"", returned_str);
 }
-

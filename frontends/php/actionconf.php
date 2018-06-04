@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -650,15 +650,6 @@ if (hasRequest('form')) {
 				$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
 			}
 		}
-	}
-
-	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-		$data['action']['filter']['conditions'] = [[
-			'formulaid' => 'A',
-			'conditiontype' => CONDITION_TYPE_MAINTENANCE,
-			'operator' => CONDITION_OPERATOR_NOT_IN,
-			'value' => ''
-		]];
 	}
 
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);

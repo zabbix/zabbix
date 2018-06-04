@@ -41,7 +41,9 @@ typedef enum
 	ZBX_MOCK_INTERNAL_ERROR,
 	ZBX_MOCK_INVALID_YAML_PATH,
 	ZBX_MOCK_NOT_A_TIMESTAMP,
-	ZBX_MOCK_NOT_ENOUGH_MEMORY
+	ZBX_MOCK_NOT_ENOUGH_MEMORY,
+	ZBX_MOCK_NOT_A_BINARY,
+	ZBX_MOCK_NOT_AN_UINT64
 }
 zbx_mock_error_t;
 
@@ -55,7 +57,9 @@ zbx_mock_error_t	zbx_mock_exit_code(int *status);
 zbx_mock_error_t	zbx_mock_object_member(zbx_mock_handle_t object, const char *name, zbx_mock_handle_t *member);
 zbx_mock_error_t	zbx_mock_vector_element(zbx_mock_handle_t vector, zbx_mock_handle_t *element);
 zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value);
+zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, size_t *length);
 zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter);
+zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value);
 
 /* date/time support */
 #define ZBX_MOCK_TIMESTAMP_MAX_LEN	37

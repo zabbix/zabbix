@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ class testFormScreen extends CWebTest {
 	 */
 	public function testFormScreen_Create($data) {
 		$this->zbxTestLogin('screenconf.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestClickButton('Create screen');
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 

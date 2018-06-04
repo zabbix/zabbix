@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,9 +116,11 @@ calendar.prototype = {
 		}
 		this.clndr_calendar.hide();
 		this.visible = 0;
+
+		removeFromOverlaysStack(this.id.toString());
 	},
 
-	clndrshow: function(top, left) {
+	clndrshow: function(top, left, trigger_elmnt) {
 		if (this.visible == 1) {
 			this.clndrhide();
 		}
@@ -136,6 +138,9 @@ calendar.prototype = {
 			}
 			this.clndr_calendar.show();
 			this.visible = 1;
+
+			overlayDialogueOnLoad(true, this.clndr_calendar);
+			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
 		}
 	},
 
