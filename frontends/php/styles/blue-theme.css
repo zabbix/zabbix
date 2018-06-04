@@ -184,9 +184,9 @@ pre, pre a, pre td, pre span {
   .top-nav li {
     display: block;
     float: left; }
-    .top-nav li.selected, .top-nav .calendar li.selected:hover, .calendar .top-nav li.selected:hover {
+    .top-nav li.selected {
       position: relative; }
-      .top-nav li.selected::after, .top-nav .calendar li.selected:hover::after, .calendar .top-nav li.selected:hover::after {
+      .top-nav li.selected::after {
         content: '';
         position: absolute;
         bottom: -1px;
@@ -200,7 +200,7 @@ pre, pre a, pre td, pre span {
         border-left: 9px solid transparent;
         border-right: 9px solid transparent;
         border-bottom: 9px solid #0a466a; }
-      .top-nav li.selected a, .top-nav .calendar li.selected:hover a, .calendar .top-nav li.selected:hover a, .top-nav li.selected a:hover {
+      .top-nav li.selected a, .top-nav li.selected a:hover {
         color: #1f2c33; }
   .top-nav a {
     padding: 15px 10px;
@@ -332,7 +332,7 @@ ul.top-nav-icons {
     color: white;
     outline: none;
     padding-bottom: 4px; }
-  .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+  .top-subnav a.selected {
     border-bottom: 4px solid #80c8f3;
     color: white;
     padding-bottom: 4px; }
@@ -433,7 +433,7 @@ article, main {
         padding: 2px 3px 1px 3px; }
     .object-group li .rel-container {
       margin: 0; }
-  .object-group .selected, .object-group .calendar .selected:hover, .calendar .object-group .selected:hover {
+  .object-group .selected {
     background-color: #fff;
     -webkit-box-shadow: inset 0 0 0 1px #dfe4e7;
     -moz-box-shadow: inset 0 0 0 1px #dfe4e7;
@@ -1019,7 +1019,7 @@ output {
   margin-bottom: 10px;
   line-height: 1em;
   height: 52px; }
-  .scrollbar .selected, .scrollbar .calendar .selected:hover, .calendar .scrollbar .selected:hover {
+  .scrollbar .selected {
     font-weight: bold; }
 
 .sublevel {
@@ -2562,9 +2562,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .calendar {
   width: 200px; }
-  .calendar .selected, .calendar .selected:hover {
-    background-color: #768d99;
-    color: #fff; }
+  .calendar .calendar-year.highlighted, .calendar .highlighted.calendar-month,
+  .calendar .calendar-month.highlighted {
+    background-color: #e8f5ff; }
+  .calendar .calendar-year:focus, .calendar .calendar-month:focus,
+  .calendar .calendar-month:focus {
+    outline: none; }
   .calendar table {
     width: 100%;
     margin: 5px 0; }
@@ -2574,13 +2577,28 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .calendar table tbody {
       text-align: center; }
       .calendar table tbody td {
-        padding: 4px;
         -webkit-transition: background-color 0.2s ease-out;
         -moz-transition: background-color 0.2s ease-out;
         transition: background-color 0.2s ease-out; }
+        .calendar table tbody td.selected {
+          background-color: #768d99;
+          color: #fff; }
+          .calendar table tbody td.selected:hover {
+            background-color: #6b8390; }
         .calendar table tbody td:hover {
           background-color: #e8f5ff;
           cursor: pointer; }
+        .calendar table tbody td.highlighted {
+          color: #fff;
+          background-color: #02659f;
+          border-color: #02659f;
+          cursor: pointer; }
+        .calendar table tbody td:focus {
+          outline: none; }
+        .calendar table tbody td span {
+          z-index: -1;
+          padding: 4px;
+          display: block; }
 
 .calendar-header {
   text-align: center; }
@@ -2590,11 +2608,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .calendar-year, .calendar-month {
   height: 24px;
-  line-height: 26px; }
+  line-height: 26px;
+  display: table;
+  width: 100%; }
   .calendar-year button:first-child, .calendar-month button:first-child {
     float: left; }
   .calendar-year button:last-child, .calendar-month button:last-child {
     float: right; }
+  .calendar-year button:hover, .calendar-month button:hover {
+    background-color: #e8f5ff;
+    cursor: pointer; }
 
 .calendar-time {
   text-align: center; }
@@ -3057,7 +3080,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
 .ok-ack-fg {
   color: #009900; }
 
-.list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .calendar .tree-item.selected:hover > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
+.list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
   background-color: #fcf7c2; }
 
 .msg-good {
