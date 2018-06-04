@@ -469,8 +469,19 @@ void	DBstatement_prepare(const char *sql);
 #	define DBexecute __zbx_DBexecute
 #	define DBexecute_once __zbx_DBexecute_once
 #endif
-int	__zbx_DBexecute(const char *fmt, ...);
-int	__zbx_DBexecute_once(const char *fmt, ...);
+int	__zbx_DBexecute(const char *fmt, ...)
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 1, 2)));
+#else
+	;
+#endif
+
+int	__zbx_DBexecute_once(const char *fmt, ...)
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 1, 2)));
+#else
+	;
+#endif
 
 #ifdef HAVE___VA_ARGS__
 #	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -479,8 +490,19 @@ int	__zbx_DBexecute_once(const char *fmt, ...);
 #	define DBselect_once	__zbx_DBselect_once
 #	define DBselect		__zbx_DBselect
 #endif
-DB_RESULT	__zbx_DBselect_once(const char *fmt, ...);
-DB_RESULT	__zbx_DBselect(const char *fmt, ...);
+DB_RESULT	__zbx_DBselect_once(const char *fmt, ...)
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 1, 2)));
+#else
+	;
+#endif
+
+DB_RESULT	__zbx_DBselect(const char *fmt, ...)
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 1, 2)));
+#else
+	;
+#endif
 
 DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
