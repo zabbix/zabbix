@@ -921,7 +921,7 @@ function makeActionIcon(array $icon_data) {
 	}
 
 	if (array_key_exists('hint', $icon_data)) {
-		$icon->setHint($icon_data['hint']);
+		$icon->setHint($icon_data['hint'], '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
 	}
 	elseif (array_key_exists('title', $icon_data)) {
 		$icon->setTitle($icon_data['title']);

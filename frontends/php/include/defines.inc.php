@@ -874,8 +874,6 @@ define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
 define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',		2);
 define('ZBX_EVENT_HISTORY_ALERT',				3);
 
-define('ZBX_EVENT_MESSAGE_MAX_LENGTH', 20);
-
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
 define('ZBX_TM_TASK_CHECK_NOW',		6);
@@ -1206,6 +1204,9 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 
 // overviews help
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
+
+// Maximum width for popups in Actions column for problems.
+define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 // dashboard widgets
 define('WIDGET_ACTION_LOG',		'actionlog');

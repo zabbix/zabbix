@@ -1770,9 +1770,7 @@ function makeEventMessagesIcon(array $data, array $users) {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $message['clock']),
 			makeActionTableUser($message, $users),
-			(mb_strlen($message['message']) > ZBX_EVENT_MESSAGE_MAX_LENGTH)
-				? mb_substr($message['message'], 0, ZBX_EVENT_MESSAGE_MAX_LENGTH).'...'
-				: $message['message']
+			zbx_nl2br($message['message'])
 		]);
 	}
 
@@ -1900,9 +1898,7 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
 		$message = '';
 		if ($action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE
 				&& ($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
-			$message = (mb_strlen($action['message']) > ZBX_EVENT_MESSAGE_MAX_LENGTH)
-				? mb_substr($action['message'], 0, ZBX_EVENT_MESSAGE_MAX_LENGTH).'...'
-				: $action['message'];
+			$message = zbx_nl2br($action['message']);
 		}
 		elseif ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT) {
 			if ($action['alerttype'] == ALERT_TYPE_COMMAND) {
@@ -1984,7 +1980,7 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 		}
 		elseif (($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_COMMAND)
 				|| $action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE) {
-			$message = $action['message'];
+			$message = zbx_nl2br($action['message']);
 		}
 
 		$table->addRow([
@@ -2023,7 +2019,7 @@ function makeEventHistoryTable(array $actions, array $users, array $config) {
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
 			makeActionTableIcon($action, $config),
-			$action['message']
+			zbx_nl2br($action['message'])
 		]);
 	}
 
