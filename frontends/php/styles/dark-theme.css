@@ -532,7 +532,8 @@ output {
     .list-table.compact-view .link-action:focus {
       color: #4796c4; }
   .list-table.compact-view td {
-    padding: 2px 5px 2px 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     border-bottom: none;
     box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1);
     color: #f2f2f2; }
@@ -2340,9 +2341,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .list-table tbody tr.nothing-to-show td:hover {
     background-color: #2b2b2b; }
 
-.dashbrd-grid-widget-content .list-table th, .dashbrd-grid-widget-content .list-table td, .dashbrd-widget .list-table th, .dashbrd-widget .list-table td, .overlay-dialogue .list-table th, .overlay-dialogue .list-table td {
-  padding-right: 10px;
+.dashbrd-grid-widget-content .list-table th:first-child, .dashbrd-grid-widget-content .list-table td:first-child, .dashbrd-widget .list-table th:first-child, .dashbrd-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
   padding-left: 10px; }
+.dashbrd-grid-widget-content .list-table th:last-child, .dashbrd-grid-widget-content .list-table td:last-child, .dashbrd-widget .list-table th:last-child, .dashbrd-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+  padding-right: 10px; }
 
 .dashbrd-widget-head {
   position: relative;

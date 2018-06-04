@@ -20,6 +20,7 @@ A.F.I..PS. [ZBXNEXT-4569] added support of MySQL 8.0 (gcalenko, vso)
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
+..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
 A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-14329] fixed error opening map's submap (ashubin)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
