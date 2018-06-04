@@ -5481,15 +5481,16 @@ svg {
 		background-image: url(../img/icon-sprite.svg);
 		background-repeat: no-repeat;
 	}
+}
 
-	&[data-count]::after {
-		position: absolute;
-		content: attr(data-count);
-		text-align: center;
-		margin-top: -1px;
-		font-size: 10px;
-		width: 18px;
-	}
+[data-count][class*='icon-']::after {
+	position: absolute;
+	content: attr(data-count);
+	text-align: center;
+	margin-top: -1px;
+	font-size: 9px;
+	letter-spacing: -0.25px;
+	width: 18px;
 }
 
 .icon-action-command::before {
