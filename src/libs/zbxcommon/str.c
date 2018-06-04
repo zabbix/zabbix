@@ -3922,7 +3922,7 @@ static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 		{
 			zbx_snprintf(error, max_error_len, "Incorrect function '%.*s' expression. "
 				"Check expression part starting from %.*s",
-				*par_l, expr, lpp_len, expr + lpp_offset);
+				(int)*par_l, expr, (int)lpp_len, expr + lpp_offset);
 		}
 
 		return FAIL;
