@@ -60,7 +60,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 				"Host: %s\r\n"
 				"Connection: close\r\n"
 				"\r\n",
-				'\0' == *path || '/' != *path ? "/" : "", path, host);
+				'/' != *path ? "/" : "", path, host);
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{

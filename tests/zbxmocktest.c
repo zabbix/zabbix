@@ -147,9 +147,10 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
-char	*CONFIG_SOCKET_PATH		= NULL;
-char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
-char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
+char	*CONFIG_SOCKET_PATH			= NULL;
+char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
+char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
+int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 const char	title_message[] = "mock_title_message";
 const char	*usage_message[] = {"mock_usage_message", NULL};

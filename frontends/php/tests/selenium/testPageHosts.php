@@ -32,7 +32,7 @@ class testPageHosts extends CWebTest {
 			' FROM hosts h'.
 				' LEFT JOIN hosts_groups hg'.
 					' ON hg.hostid=h.hostid'.
-				' LEFT JOIN groups g'.
+				' LEFT JOIN hstgrp g'.
 					' ON g.groupid=hg.groupid'.
 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 			" AND h.name NOT LIKE '%{#%'"
