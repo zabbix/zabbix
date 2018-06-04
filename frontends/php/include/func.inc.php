@@ -2650,5 +2650,5 @@ function relativeDateToText($from, $to) {
 		}
 	}
 
-	return $from.' - '.$to;
+	return $from.' – '.$to;
 }

@@ -70,19 +70,19 @@ class function_relativeDateToTextTest extends PHPUnit_Framework_TestCase {
 			['params' => ['now-5M', 'now'],				'expected' => 'Last 5 months'],
 			['params' => ['now-1y', 'now'],				'expected' => 'Last 1 year'],
 			['params' => ['now-3y', 'now'],				'expected' => 'Last 3 years'],
-			['params' => ['now+5m', 'now'],				'expected' => 'now+5m - now'],
-			['params' => ['now', 'now'],				'expected' => 'now - now'],
-			['params' => ['now/m', 'now/m'],			'expected' => 'now/m - now/m'],
-			['params' => ['now/h', 'now/h'],			'expected' => 'now/h - now/h'],
-			['params' => ['now', 'now/d'],				'expected' => 'now - now/d'],
-			['params' => ['now/d', 'now/w'],			'expected' => 'now/d - now/w'],
-			['params' => ['now/w', 'now/M'],			'expected' => 'now/w - now/M'],
-			['params' => ['now/M', 'now/y'],			'expected' => 'now/M - now/y'],
-			['params' => ['now/y', 'now/d'],			'expected' => 'now/y - now/d'],
-			['params' => ['now/d-3d', 'now/M-1M'],		'expected' => 'now/d-3d - now/M-1M'],
-			['params' => ['now-3d/d', 'now-2M/M'],		'expected' => 'now-3d/d - now-2M/M'],
-			['params' => ['now-3h/d', 'now'],			'expected' => 'now-3h/d - now'],
-			['params' => ['now-3w/M', 'now+1M/M'],		'expected' => 'now-3w/M - now+1M/M']
+			['params' => ['now+5m', 'now'],				'expected' => 'now+5m – now'],
+			['params' => ['now', 'now'],				'expected' => 'now – now'],
+			['params' => ['now/m', 'now/m'],			'expected' => 'now/m – now/m'],
+			['params' => ['now/h', 'now/h'],			'expected' => 'now/h – now/h'],
+			['params' => ['now', 'now/d'],				'expected' => 'now – now/d'],
+			['params' => ['now/d', 'now/w'],			'expected' => 'now/d – now/w'],
+			['params' => ['now/w', 'now/M'],			'expected' => 'now/w – now/M'],
+			['params' => ['now/M', 'now/y'],			'expected' => 'now/M – now/y'],
+			['params' => ['now/y', 'now/d'],			'expected' => 'now/y – now/d'],
+			['params' => ['now/d-3d', 'now/M-1M'],		'expected' => 'now/d-3d – now/M-1M'],
+			['params' => ['now-3d/d', 'now-2M/M'],		'expected' => 'now-3d/d – now-2M/M'],
+			['params' => ['now-3h/d', 'now'],			'expected' => 'now-3h/d – now'],
+			['params' => ['now-3w/M', 'now+1M/M'],		'expected' => 'now-3w/M – now+1M/M']
 		];
 	}
 
