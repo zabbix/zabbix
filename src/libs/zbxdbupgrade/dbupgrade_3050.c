@@ -1158,6 +1158,46 @@ static int	DBpatch_3050105(void)
 	return DBcreate_index("autoreg_host", "autoreg_host_1", "host", 0);
 }
 
+static int	DBpatch_3050106(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute("update profiles set value_int=2 where idx='web.problem.filter.evaltype' and value_int=1");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050107(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"update widget_field"
+		" set value_int=2"
+		" where name='evaltype'"
+			" and value_int=1"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='problems'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1266,5 +1306,7 @@ DBPATCH_ADD(3050102, 0, 1)
 DBPATCH_ADD(3050103, 0, 1)
 DBPATCH_ADD(3050104, 0, 1)
 DBPATCH_ADD(3050105, 0, 1)
+DBPATCH_ADD(3050106, 0, 1)
+DBPATCH_ADD(3050107, 0, 1)
 
 DBPATCH_END()
