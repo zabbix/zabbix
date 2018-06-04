@@ -1019,7 +1019,12 @@ void	zbx_strarr_free(char **arr);
 #else
 #	define zbx_setproctitle __zbx_zbx_setproctitle
 #endif
-void	__zbx_zbx_setproctitle(const char *fmt, ...);
+void	__zbx_zbx_setproctitle(const char *fmt, ...)
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 1, 2)));
+#else
+	;
+#endif
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
