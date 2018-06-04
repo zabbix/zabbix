@@ -3683,12 +3683,14 @@ $form-icon-btn: (
 .calendar {
 	width: 200px;
 
-	.selected {
-		background-color: $ui-bg-selected-color;
-		color: $white;
+	.calendar-year,
+	.calendar-month {
+		&.highlighted {
+			background-color: $action-hover-color;
+		}
 
-		&:hover {
-			@extend .selected
+		&:focus {
+			outline: none;
 		}
 	}
 
@@ -3705,12 +3707,35 @@ $form-icon-btn: (
 			text-align: center;
 
 			td {
-				padding: 4px;
 				@include transition(background-color .2s ease-out);
+
+				&.selected {
+					background-color: $ui-bg-selected-color;
+					color: $white;
+
+					&:hover {
+						background-color: darken($ui-bg-selected-color, 4%);
+					}
+				}
 
 				&:hover {
 					background-color: $action-hover-color;
 					cursor: pointer;
+				}
+
+				&.highlighted {
+					@include btn-hover-active($btn-font-color, $btn-bg-color);
+					cursor: pointer;
+				}
+
+				&:focus {
+					outline: none;
+				}
+
+				span {
+					z-index: -1;
+					padding: 4px;
+					display: block;
 				}
 			}
 		}
@@ -3729,6 +3754,8 @@ $form-icon-btn: (
 .calendar-year {
 	height: 24px;
 	line-height: 26px;
+	display: table;
+	width: 100%;
 
 	button:first-child {
 		float: left;
@@ -3736,6 +3763,11 @@ $form-icon-btn: (
 
 	button:last-child {
 		float: right;
+	}
+
+	button:hover {
+		background-color: $action-hover-color;
+		cursor: pointer;
 	}
 }
 
