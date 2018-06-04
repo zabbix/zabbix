@@ -404,8 +404,9 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandlerDragEnd(e) {
-		var from_offset = (selection.dom.position().left - selection.min) * selection.seconds_per_px,
-			to_offset = (selection.max - selection.dom.width() - selection.dom.position().left) * selection.seconds_per_px;
+		var left = Math.round(selection.dom.position().left),
+			from_offset = (left - selection.min) * selection.seconds_per_px,
+			to_offset = (selection.max - selection.dom.width() - left) * selection.seconds_per_px;
 
 		selection.dom.remove();
 		selection = null;
