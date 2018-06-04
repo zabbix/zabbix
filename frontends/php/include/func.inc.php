@@ -2542,8 +2542,8 @@ function updateTimeSelectorPeriod($options) {
 }
 
 /**
- * Get profile stored 'from' and 'to'. If profileIdx is null then default values will be returned. Only when both fields
- * not exist in $period array their value will be read from user profile. Calculates from_ts, to_ts.
+ * Get profile stored 'from' and 'to'. If profileIdx is null then default values will be returned. If one of fields
+ * not exist in $options array 'from' and 'to' value will be read from user profile. Calculates from_ts, to_ts.
  *
  * @param array $options  Array with period fields data: profileIdx, profileIdx2, from, to.
  *
@@ -2650,13 +2650,5 @@ function relativeDateToText($from, $to) {
 		}
 	}
 
-	$range_time_parser = new CRangeTimeParser();
-
-	$range_time_parser->parse($from);
-	$result = $range_time_parser->getDateTime(true)->format(ZBX_DATE_TIME).' - ';
-
-	$range_time_parser->parse($to);
-	$result .= $range_time_parser->getDateTime(false)->format(ZBX_DATE_TIME);
-
-	return $result;
+	return $from.' - '.$to;
 }

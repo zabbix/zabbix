@@ -70,19 +70,19 @@ class function_relativeDateToTextTest extends PHPUnit_Framework_TestCase {
 			['params' => ['now-5M', 'now'],				'expected' => 'Last 5 months'],
 			['params' => ['now-1y', 'now'],				'expected' => 'Last 1 year'],
 			['params' => ['now-3y', 'now'],				'expected' => 'Last 3 years'],
-			['params' => ['now+5m', 'now'],				'expected' => ['from_modifiers' => ['+5 minutes'], 'to_modifiers' => []]],
-			['params' => ['now', 'now'],				'expected' => ['from_modifiers' => [], 'to_modifiers' => []]],
-			['params' => ['now/m', 'now/m'],			'expected' => ['from' => 'Y-m-d H:i:00', 'to' => 'Y-m-d H:i:59']],
-			['params' => ['now/h', 'now/h'],			'expected' => ['from' => 'Y-m-d H:00:00', 'to' => 'Y-m-d H:59:59']],
-			['params' => ['now', 'now/d'],				'expected' => ['from_modifiers' => [], 'to_modifiers' => ['today +23 hours +59 minutes +59 seconds']]],
-			['params' => ['now/d', 'now/w'],			'expected' => ['from_modifiers' => ['today'], 'to_modifiers' => ['Sunday this week 23:59:59']]],
-			['params' => ['now/w', 'now/M'],			'expected' => ['from_modifiers' => ['Monday this week 00:00:00'], 'to_modifiers' => ['last day of this month 23:59:59']]],
-			['params' => ['now/M', 'now/y'],			'expected' => ['from_modifiers' => ['first day of this month 00:00:00'], 'to_modifiers' => ['last day of December this year 23:59:59']]],
-			['params' => ['now/y', 'now/d'],			'expected' => ['from_modifiers' => ['first day of January this year 00:00:00'], 'to_modifiers' => ['tomorrow', '-1 second']]],
-			['params' => ['now/d-3d', 'now/M-1M'],		'expected' => ['from_modifiers' => ['today', '-3 days'], 'to_modifiers' => ['last day of this month 23:59:59', '-1 month']]],
-			['params' => ['now-3d/d', 'now-2M/M'],		'expected' => ['from_modifiers' => ['-3 days', 'today'], 'to_modifiers' => ['last day of -2 months', 'tomorrow', '-1 second']]],
-			['params' => ['now-3h/d', 'now'],			'expected' => ['from_modifiers' => ['-3 hours', 'today'], 'to_modifiers' => []]],
-			['params' => ['now-3w/M', 'now+1M/M'],		'expected' => ['from_modifiers' => ['-3 weeks', 'first day of this month 00:00:00'], 'to_modifiers' => ['+1 month', 'last day of this month 23:59:59']]]
+			['params' => ['now+5m', 'now'],				'expected' => 'now+5m - now'],
+			['params' => ['now', 'now'],				'expected' => 'now - now'],
+			['params' => ['now/m', 'now/m'],			'expected' => 'now/m - now/m'],
+			['params' => ['now/h', 'now/h'],			'expected' => 'now/h - now/h'],
+			['params' => ['now', 'now/d'],				'expected' => 'now - now/d'],
+			['params' => ['now/d', 'now/w'],			'expected' => 'now/d - now/w'],
+			['params' => ['now/w', 'now/M'],			'expected' => 'now/w - now/M'],
+			['params' => ['now/M', 'now/y'],			'expected' => 'now/M - now/y'],
+			['params' => ['now/y', 'now/d'],			'expected' => 'now/y - now/d'],
+			['params' => ['now/d-3d', 'now/M-1M'],		'expected' => 'now/d-3d - now/M-1M'],
+			['params' => ['now-3d/d', 'now-2M/M'],		'expected' => 'now-3d/d - now-2M/M'],
+			['params' => ['now-3h/d', 'now'],			'expected' => 'now-3h/d - now'],
+			['params' => ['now-3w/M', 'now+1M/M'],		'expected' => 'now-3w/M - now+1M/M']
 		];
 	}
 
