@@ -3,6 +3,7 @@ Changes for 4.0.0alpha8
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha7
