@@ -3691,7 +3691,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					if (NULL != error)
 					{
 						zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
-								token.token.r - token.token.l + 1,
+								(int)(token.token.r - token.token.l + 1),
 								*data + token.token.l);
 					}
 
@@ -4117,7 +4117,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (NULL != error)
 			{
 				zbx_snprintf(error, maxerrlen, "Macro '%.*s' value is not numeric",
-						token.token.r - token.token.l + 1, *data + token.token.l);
+						(int)(token.token.r - token.token.l + 1), *data + token.token.l);
 			}
 		}
 
