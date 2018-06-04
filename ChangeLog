@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
+A.F.I..... [ZBXNEXT-4540] fixed problems filter with same tags not being joined with OR condition (Ivo, Sasha)
 ..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
 .......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
 
