@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
+..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
 .......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
 
 --------------------------------------------------------------------------------
@@ -20,7 +21,6 @@ A.F.I..PS. [ZBXNEXT-4569] added support of MySQL 8.0 (gcalenko, vso)
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
-..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
 A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-14329] fixed error opening map's submap (ashubin)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
