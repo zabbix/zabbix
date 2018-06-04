@@ -90,43 +90,6 @@ class function_relativeDateToTextTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider provider
 	 */
 	public function test($params, $expected) {
-		$result = call_user_func_array('relativeDateToText', $params);
-
-		if (is_array($expected)) {
-			for ($attempts = 0; $attempts < 2; $attempts++) {
-				$from_ts = new DateTime();
-				if (array_key_exists('from_modifiers', $expected)) {
-					foreach ($expected['from_modifiers'] as $from_modifier) {
-						$from_ts->modify($from_modifier);
-					}
-					$from_format = 'Y-m-d H:i:s';
-				}
-				else {
-					$from_format = $expected['from'];
-				}
-
-				$to_ts = new DateTime();
-				if (array_key_exists('to_modifiers', $expected)) {
-					foreach ($expected['to_modifiers'] as $to_modifier) {
-						$to_ts->modify($to_modifier);
-					}
-					$to_format = 'Y-m-d H:i:s';
-				}
-				else {
-					$to_format = $expected['to'];
-				}
-
-				$expected_result = $from_ts->format($from_format).' - '.$to_ts->format($to_format);
-
-				if ($expected_result === $result) {
-					break;
-				}
-			}
-
-			$this->assertSame($expected_result, $result);
-		}
-		else {
-			$this->assertSame($expected, $result);
-		}
+		$this->assertSame($expected, call_user_func_array('relativeDateToText', $params));
 	}
 }
