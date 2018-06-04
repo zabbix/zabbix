@@ -1,3 +1,12 @@
+Changes for 4.0.0alpha8
+
+New features:
+..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
+
+Bug fixes:
+.......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.0alpha7
 
 New features:
@@ -11,6 +20,7 @@ A.F.I..PS. [ZBXNEXT-4569] added support of MySQL 8.0 (gcalenko, vso)
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
+A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-14329] fixed error opening map's submap (ashubin)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
 ..F....... [ZBX-13783] dropped support for Zapcat-style and multi-level parameter arrays from item key validation in frontend (agriscenko)
@@ -317,11 +327,16 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.10
+
+3.4.10rc1 was released as 3.4.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.4.10rc1
 
-New features:
-
 Bug fixes:
+..F....... [ZBX-14414] fixed PHP 7.2 error message in the Monitoring->Latest data page (Sasha)
+A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
 ..F....... [ZBX-12359] fixed "Automatic icon selection" checkbox not working and displaying two icons at once in map constructor (Ivo)
 ........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
@@ -1559,9 +1574,12 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.18rc1
+Changes for 3.0.18
 
-New features:
+3.0.18rc1 was released as 3.0.18 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.18rc1
 
 Bug fixes:
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
@@ -3492,9 +3510,12 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
-Changes for 2.2.22rc1
+Changes for 2.2.22
 
-New features:
+2.2.22rc1 was released as 2.2.22 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.22rc1
 
 Bug fixes:
 ...G...... [ZBX-13781] fixed CRLF injection in Zabbix Agentd (MVekslers)
