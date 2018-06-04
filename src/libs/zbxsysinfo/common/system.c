@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "system.h"
 
 #ifdef _WINDOWS
 #	include "perfmon.h"
