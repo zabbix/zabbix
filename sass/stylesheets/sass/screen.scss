@@ -749,7 +749,8 @@ output {
 		}
 
 		td {
-			padding: 2px 5px 2px 5px;
+			padding-top: 2px;
+			padding-bottom: 2px;
 			border-bottom: none;
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
 			color: $font-color;
@@ -758,6 +759,18 @@ output {
 				max-width: 40px;
 				margin: -2px 3px 0 0;
 				padding: 2px 3px;
+
+				@media screen and (min-width: 1200px) {
+					max-width: 71px;
+				}
+
+				@media screen and (min-width: 1400px) {
+					max-width: 102px;
+				}
+
+				@media screen and (min-width: 1600px) {
+					max-width: 133px;
+				}
 			}
 
 			.rel-container {
@@ -782,6 +795,60 @@ output {
 		vertical-align: bottom;
 		border-bottom: 2px solid darken($table-border-color, 5%);
 		text-align: left;
+
+		&.column-tags-1 {
+			width: 75px;
+		}
+
+		&.column-tags-2 {
+			width: 124px;
+		}
+
+		&.column-tags-3 {
+			width: 173px;
+		}
+
+		@media screen and (min-width: 1200px) {
+			&.column-tags-1 {
+				width: 106px;
+			}
+
+			&.column-tags-2 {
+				width: 186px;
+			}
+
+			&.column-tags-3 {
+				width: 266px;
+			}
+		}
+
+		@media screen and (min-width: 1400px) {
+			&.column-tags-1 {
+				width: 137px;
+			}
+
+			&.column-tags-2 {
+				width: 248px;
+			}
+
+			&.column-tags-3 {
+				width: 359px;
+			}
+		}
+
+		@media screen and (min-width: 1600px) {
+			&.column-tags-1 {
+				width: 168px;
+			}
+
+			&.column-tags-2 {
+				width: 310px;
+			}
+
+			&.column-tags-3 {
+				width: 452px;
+			}
+		}
 
 		.arrow-up {
 			margin: 0 0 0 3px;
@@ -2312,6 +2379,15 @@ button {
 	&:focus {
 		@extend %btn-search-hover-focus;
 	}
+
+	&[disabled] {
+		background-color: $transparent;
+
+		&:hover {
+			background-color: $transparent;
+			@include opacity(0.75);
+		}
+	}
 }
 
 .filter-trigger {
@@ -3255,8 +3331,14 @@ $form-icon-btn: (
 }
 
 %dashbrd-widget-td {
-	padding-right: 10px;
-	padding-left: 10px;
+
+	&:first-child {
+		padding-left: 10px;
+	}
+
+	&:last-child {
+		padding-right: 10px;
+	}
 }
 
 .dashbrd-widget-head {
@@ -5142,7 +5224,7 @@ svg {
 			> .tree-row {
 				width: 100%;
 				min-width: 320px;
-				border-bottom: 1px solid $ui-border-color;
+				border-bottom: 1px solid $table-border-color;
 				padding: 8px 0;
 
 				&:hover {

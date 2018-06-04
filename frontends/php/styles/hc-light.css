@@ -502,7 +502,8 @@ output {
     .list-table.compact-view .link-action:focus {
       color: #000; }
   .list-table.compact-view td {
-    padding: 2px 5px 2px 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     border-bottom: none;
     box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
     color: #000; }
@@ -510,6 +511,15 @@ output {
       max-width: 40px;
       margin: -2px 3px 0 0;
       padding: 2px 3px; }
+      @media screen and (min-width: 1200px) {
+        .list-table.compact-view td .tag {
+          max-width: 71px; } }
+      @media screen and (min-width: 1400px) {
+        .list-table.compact-view td .tag {
+          max-width: 102px; } }
+      @media screen and (min-width: 1600px) {
+        .list-table.compact-view td .tag {
+          max-width: 133px; } }
     .list-table.compact-view td .rel-container {
       display: inline; }
     .list-table.compact-view td .icon-wzrd-action {
@@ -526,6 +536,33 @@ output {
     vertical-align: bottom;
     border-bottom: 2px solid #7b7b7b;
     text-align: left; }
+    .list-table thead th.column-tags-1 {
+      width: 75px; }
+    .list-table thead th.column-tags-2 {
+      width: 124px; }
+    .list-table thead th.column-tags-3 {
+      width: 173px; }
+    @media screen and (min-width: 1200px) {
+      .list-table thead th.column-tags-1 {
+        width: 106px; }
+      .list-table thead th.column-tags-2 {
+        width: 186px; }
+      .list-table thead th.column-tags-3 {
+        width: 266px; } }
+    @media screen and (min-width: 1400px) {
+      .list-table thead th.column-tags-1 {
+        width: 137px; }
+      .list-table thead th.column-tags-2 {
+        width: 248px; }
+      .list-table thead th.column-tags-3 {
+        width: 359px; } }
+    @media screen and (min-width: 1600px) {
+      .list-table thead th.column-tags-1 {
+        width: 168px; }
+      .list-table thead th.column-tags-2 {
+        width: 310px; }
+      .list-table thead th.column-tags-3 {
+        width: 452px; } }
     .list-table thead th .arrow-up {
       margin: 0 0 0 3px;
       border-bottom-color: #333; }
@@ -1556,6 +1593,12 @@ button {
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
+  .btn-search[disabled] {
+    background-color: transparent; }
+    .btn-search[disabled]:hover {
+      background-color: transparent;
+      opacity: 0.75;
+      filter: alpha(opacity=75); }
 
 .filter-trigger {
   position: relative;
@@ -2268,9 +2311,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .list-table tbody tr.nothing-to-show td:hover {
     background-color: #fff; }
 
-.dashbrd-grid-widget-content .list-table th, .dashbrd-grid-widget-content .list-table td, .dashbrd-widget .list-table th, .dashbrd-widget .list-table td, .overlay-dialogue .list-table th, .overlay-dialogue .list-table td {
-  padding-right: 10px;
+.dashbrd-grid-widget-content .list-table th:first-child, .dashbrd-grid-widget-content .list-table td:first-child, .dashbrd-widget .list-table th:first-child, .dashbrd-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
   padding-left: 10px; }
+.dashbrd-grid-widget-content .list-table th:last-child, .dashbrd-grid-widget-content .list-table td:last-child, .dashbrd-widget .list-table th:last-child, .dashbrd-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+  padding-right: 10px; }
 
 .dashbrd-widget-head {
   position: relative;
@@ -3643,7 +3687,7 @@ svg {
   .navtree .tree .tree-item > .tree-row {
     width: 100%;
     min-width: 320px;
-    border-bottom: 1px solid #9f9f9f;
+    border-bottom: 1px solid #888;
     padding: 8px 0; }
     .navtree .tree .tree-item > .tree-row:hover {
       background-color: #f4f4f4; }

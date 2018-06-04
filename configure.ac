@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.0alpha7])
+AC_INIT([Zabbix],[4.0.0alpha8])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1156,7 +1156,7 @@ AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
 AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
 
-AM_CONDITIONAL([ZBXCMOCKA], [test -d tests/])
+AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
@@ -1704,6 +1704,7 @@ dnl *****************************************************************
 AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/Makefile
 	tests/libs/Makefile
+	tests/libs/zbxcommon/Makefile
 	tests/libs/zbxconf/Makefile
 	tests/libs/zbxdbcache/Makefile
 	tests/libs/zbxdbhigh/Makefile
@@ -1713,7 +1714,6 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxsysinfo/linux/Makefile
 	tests/libs/zbxsysinfo/common/Makefile
 	tests/libs/zbxcommshigh/Makefile
-	tests/libs/zbxcommon/Makefile
 	tests/libs/zbxalgo/Makefile
 	)
 	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
@@ -1802,7 +1802,6 @@ AC_OUTPUT([
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
-	upgrades/Makefile
 	man/Makefile
 	])
 
@@ -1916,7 +1915,7 @@ echo "    Native Jabber:         ${have_jabber}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${SERVER_LDFLAGS} ${LDFLAGS}
     Libraries:             ${SERVER_LIBS} ${LIBS}
-    Config file:           ${SERVER_CONFIG_FILE}
+    Configuration file:    ${SERVER_CONFIG_FILE}
     External scripts:      ${EXTERNAL_SCRIPTS_PATH}
     Alert scripts:         ${ALERT_SCRIPTS_PATH}
     Modules:               ${LOAD_MODULE_PATH}"
@@ -1944,7 +1943,7 @@ echo "    SNMP:                  ${have_snmp}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}
-    Config file:           ${PROXY_CONFIG_FILE}
+    Configuration file:    ${PROXY_CONFIG_FILE}
     External scripts:      ${EXTERNAL_SCRIPTS_PATH}
     Modules:               ${LOAD_MODULE_PATH}"
 
@@ -1959,7 +1958,7 @@ echo "  Agent details:
     TLS:                   ${have_tls}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
     Libraries:             ${AGENT_LIBS} ${LIBS}
-    Config file:           ${AGENT_CONFIG_FILE}
+    Configuration file:    ${AGENT_CONFIG_FILE}
     Modules:               ${LOAD_MODULE_PATH}"
 
 fi

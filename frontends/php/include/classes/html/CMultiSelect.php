@@ -22,13 +22,6 @@
 class CMultiSelect extends CTag {
 
 	/**
-	 * Javascript event name that will be triggered after multiselect initialization
-	 *
-	 * @var string
-	 */
-	private $js_event_name = '';
-
-	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
 	 * @param bool  $options['multiple']       Allows multiple selections.
 	 * @param bool  $options['add_post_js']
@@ -42,7 +35,6 @@ class CMultiSelect extends CTag {
 
 		$this->addClass('multiselect');
 		$this->setId(zbx_formatDomId($options['name']));
-		$this->js_event_name = sprintf('multiselect_%s_init', $this->getId());
 
 		// Autocomplete url.
 		$url = new CUrl('jsrpc.php');
@@ -95,9 +87,6 @@ class CMultiSelect extends CTag {
 				}
 			}
 		}
-		if (array_key_exists('callPostEvent', $options) && $options['callPostEvent']) {
-			$params['postInitEvent'] = $this->getJsEventName();
-		}
 
 		$this->params = $params;
 
@@ -109,15 +98,6 @@ class CMultiSelect extends CTag {
 	public function setWidth($value) {
 		$this->addStyle('width: '.$value.'px;');
 		return $this;
-	}
-
-	/**
-	 * Get js event name
-	 *
-	 * @return string
-	 */
-	public function getJsEventName() {
-		return $this->js_event_name;
 	}
 
 	public function getPostJS() {
@@ -133,7 +113,7 @@ class CMultiSelect extends CTag {
 	 */
 	private function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'call_post_event', 'styles', 'popup'
+			'add_post_js', 'styles', 'popup'
 		];
 
 		foreach ($options as $field => $value) {
@@ -151,7 +131,6 @@ class CMultiSelect extends CTag {
 			'data' => 'data',
 			'add_new' => 'addNew',
 			'add_post_js' => 'add_post_js',
-			'call_post_event' => 'callPostEvent',
 			'styles' => 'styles'
 		];
 
