@@ -1,3 +1,13 @@
+Changes for 4.0.0alpha8
+
+New features:
+..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
+
+Bug fixes:
+..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
+.......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.0alpha7
 
 New features:
@@ -318,9 +328,12 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
-Changes for 3.4.10rc1
+Changes for 3.4.10
 
-New features:
+3.4.10rc1 was released as 3.4.10 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.4.10rc1
 
 Bug fixes:
 ..F....... [ZBX-14414] fixed PHP 7.2 error message in the Monitoring->Latest data page (Sasha)
@@ -1562,9 +1575,12 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.18rc1
+Changes for 3.0.18
 
-New features:
+3.0.18rc1 was released as 3.0.18 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.18rc1
 
 Bug fixes:
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
@@ -3495,9 +3511,12 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
-Changes for 2.2.22rc1
+Changes for 2.2.22
 
-New features:
+2.2.22rc1 was released as 2.2.22 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.22rc1
 
 Bug fixes:
 ...G...... [ZBX-13781] fixed CRLF injection in Zabbix Agentd (MVekslers)
