@@ -1589,6 +1589,7 @@ Changes for 3.0.19rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.18
