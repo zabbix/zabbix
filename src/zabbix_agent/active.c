@@ -46,10 +46,14 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 #endif
 
 #include "../libs/zbxcrypto/tls.h"
+#include "../libs/zbxalgo/vectorimpl.h"
 
-ZBX_THREAD_LOCAL static ZBX_ACTIVE_BUFFER	buffer;
-ZBX_THREAD_LOCAL static zbx_vector_ptr_t	active_metrics;
-ZBX_THREAD_LOCAL static zbx_vector_regexp_t	regexps;
+ZBX_VECTOR_DECL(active_metric, ZBX_ACTIVE_METRIC);
+ZBX_VECTOR_IMPL(active_metric, ZBX_ACTIVE_METRIC);
+
+ZBX_THREAD_LOCAL static ZBX_ACTIVE_BUFFER		buffer;
+ZBX_THREAD_LOCAL static zbx_vector_active_metric_t	active_metrics;
+ZBX_THREAD_LOCAL static zbx_vector_regexp_t		regexps;
 
 #ifdef _WINDOWS
 LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
@@ -103,7 +107,7 @@ static void	init_active_metrics(void)
 		buffer.first_error = 0;
 	}
 
-	zbx_vector_ptr_create(&active_metrics);
+	zbx_vector_active_metric_create(&active_metrics);
 	zbx_vector_regexp_create(&regexps);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -120,7 +124,6 @@ static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
 		zbx_free(metric->logfiles[i].filename);
 
 	zbx_free(metric->logfiles);
-	zbx_free(metric);
 }
 
 #ifdef _WINDOWS
@@ -133,8 +136,8 @@ static void	free_active_metrics(void)
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_regexp_destroy(&regexps);
 
-	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
-	zbx_vector_ptr_destroy(&active_metrics);
+	zbx_vector_active_metric_clear_type(&active_metrics, free_active_metric);
+	zbx_vector_active_metric_destroy(&active_metrics);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -157,7 +160,7 @@ static int	get_min_nextcheck(void)
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		const ZBX_ACTIVE_METRIC	*metric = (const ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		const ZBX_ACTIVE_METRIC	*metric = &active_metrics.values[i];
 
 		if (SUCCEED != metric_ready_to_process(metric))
 			continue;
@@ -177,7 +180,7 @@ static int	get_min_nextcheck(void)
 static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
 {
 	const char		*__function_name = "add_check";
-	ZBX_ACTIVE_METRIC	*metric;
+	ZBX_ACTIVE_METRIC	metric;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d",
@@ -185,89 +188,87 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		metric = active_metrics.values[i];
 
-		if (0 != strcmp(metric->key_orig, key_orig))
+		if (0 != strcmp(metric.key_orig, key_orig))
 			continue;
 
-		if (0 != strcmp(metric->key, key))
+		if (0 != strcmp(metric.key, key))
 		{
 			int	j;
 
-			zbx_free(metric->key);
-			metric->key = zbx_strdup(NULL, key);
-			metric->lastlogsize = lastlogsize;
-			metric->mtime = mtime;
-			metric->big_rec = 0;
-			metric->use_ino = 0;
-			metric->error_count = 0;
+			zbx_free(metric.key);
+			metric.key = zbx_strdup(NULL, key);
+			metric.lastlogsize = lastlogsize;
+			metric.mtime = mtime;
+			metric.big_rec = 0;
+			metric.use_ino = 0;
+			metric.error_count = 0;
 
-			for (j = 0; j < metric->logfiles_num; j++)
-				zbx_free(metric->logfiles[j].filename);
+			for (j = 0; j < metric.logfiles_num; j++)
+				zbx_free(metric.logfiles[j].filename);
 
-			zbx_free(metric->logfiles);
-			metric->logfiles_num = 0;
-			metric->start_time = 0.0;
-			metric->processed_bytes = 0;
+			zbx_free(metric.logfiles);
+			metric.logfiles_num = 0;
+			metric.start_time = 0.0;
+			metric.processed_bytes = 0;
 		}
 
 		/* replace metric */
-		if (metric->refresh != refresh)
+		if (metric.refresh != refresh)
 		{
-			metric->nextcheck = 0;
-			metric->refresh = refresh;
+			metric.nextcheck = 0;
+			metric.refresh = refresh;
 		}
 
-		if (ITEM_STATE_NOTSUPPORTED == metric->state)
+		if (ITEM_STATE_NOTSUPPORTED == metric.state)
 		{
 			/* Currently receiving list of active checks works as a signal to refresh unsupported */
 			/* items. Hopefully in the future this will be controlled by server (ZBXNEXT-2633). */
-			metric->refresh_unsupported = 1;
-			metric->start_time = 0.0;
-			metric->processed_bytes = 0;
+			metric.refresh_unsupported = 1;
+			metric.start_time = 0.0;
+			metric.processed_bytes = 0;
 		}
 
 		goto out;
 	}
 
-	metric = (ZBX_ACTIVE_METRIC *)zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
-
 	/* add new metric */
-	metric->key = zbx_strdup(NULL, key);
-	metric->key_orig = zbx_strdup(NULL, key_orig);
-	metric->refresh = refresh;
-	metric->nextcheck = 0;
-	metric->state = ITEM_STATE_NORMAL;
-	metric->refresh_unsupported = 0;
-	metric->lastlogsize = lastlogsize;
-	metric->mtime = mtime;
+	metric.key = zbx_strdup(NULL, key);
+	metric.key_orig = zbx_strdup(NULL, key_orig);
+	metric.refresh = refresh;
+	metric.nextcheck = 0;
+	metric.state = ITEM_STATE_NORMAL;
+	metric.refresh_unsupported = 0;
+	metric.lastlogsize = lastlogsize;
+	metric.mtime = mtime;
 	/* existing log[], log.count[] and eventlog[] data can be skipped */
-	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
-	metric->big_rec = 0;
-	metric->use_ino = 0;
-	metric->error_count = 0;
-	metric->logfiles_num = 0;
-	metric->logfiles = NULL;
-	metric->flags = ZBX_METRIC_FLAG_NEW;
+	metric.skip_old_data = (0 != metric.lastlogsize ? 0 : 1);
+	metric.big_rec = 0;
+	metric.use_ino = 0;
+	metric.error_count = 0;
+	metric.logfiles_num = 0;
+	metric.logfiles = NULL;
+	metric.flags = ZBX_METRIC_FLAG_NEW;
 
-	if ('l' == metric->key[0] && 'o' == metric->key[1] && 'g' == metric->key[2])
+	if ('l' == metric.key[0] && 'o' == metric.key[1] && 'g' == metric.key[2])
 	{
-		if ('[' == metric->key[3])					/* log[ */
-			metric->flags |= ZBX_METRIC_FLAG_LOG_LOG;
-		else if (0 == strncmp(metric->key + 3, "rt[", 3))		/* logrt[ */
-			metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT;
-		else if (0 == strncmp(metric->key + 3, ".count[", 7))		/* log.count[ */
-			metric->flags |= ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_COUNT;
-		else if (0 == strncmp(metric->key + 3, "rt.count[", 9))		/* logrt.count[ */
-			metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_COUNT;
+		if ('[' == metric.key[3])					/* log[ */
+			metric.flags |= ZBX_METRIC_FLAG_LOG_LOG;
+		else if (0 == strncmp(metric.key + 3, "rt[", 3))		/* logrt[ */
+			metric.flags |= ZBX_METRIC_FLAG_LOG_LOGRT;
+		else if (0 == strncmp(metric.key + 3, ".count[", 7))		/* log.count[ */
+			metric.flags |= ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_COUNT;
+		else if (0 == strncmp(metric.key + 3, "rt.count[", 9))		/* logrt.count[ */
+			metric.flags |= ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_COUNT;
 	}
-	else if (0 == strncmp(metric->key, "eventlog[", 9))
-		metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
+	else if (0 == strncmp(metric.key, "eventlog[", 9))
+		metric.flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
 
-	metric->start_time = 0.0;
-	metric->processed_bytes = 0;
+	metric.start_time = 0.0;
+	metric.processed_bytes = 0;
 
-	zbx_vector_ptr_append(&active_metrics, metric);
+	zbx_vector_active_metric_append(&active_metrics, metric);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -431,7 +432,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	{
 		int	found = 0;
 
-		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		metric = &active_metrics.values[i];
 
 		/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set to 'skip'. */
 		/* We need to keep their state, namely 'skip_old_data', in case the items become NOTSUPPORTED as */
@@ -455,8 +456,8 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 		if (0 == found)
 		{
-			zbx_vector_ptr_remove_noorder(&active_metrics, i);
 			free_active_metric(metric);
+			zbx_vector_active_metric_remove_noorder(&active_metrics, i);
 			i--;	/* consider the same index on the next run */
 		}
 	}
@@ -1914,7 +1915,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		int			mtime_last, mtime_sent;
 		ZBX_ACTIVE_METRIC	*metric;
 
-		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		metric = &active_metrics.values[i];
 
 		if (metric->nextcheck > now)
 			continue;
@@ -2015,7 +2016,7 @@ static void	update_schedule(int delta)
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		ZBX_ACTIVE_METRIC	*metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		ZBX_ACTIVE_METRIC	*metric = &active_metrics.values[i];
 		metric->nextcheck += delta;
 	}
 

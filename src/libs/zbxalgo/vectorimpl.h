@@ -266,8 +266,20 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 {														\
 	vector->values_num = 0;											\
+}														\
+														\
+void	zbx_vector_ ## __id ## _clear_type(zbx_vector_ ## __id ## _t *vector, zbx_clean_ ## __id ## _func_t clean_func)	\
+{														\
+	if (0 != vector->values_num)										\
+	{													\
+		int	index;											\
+														\
+		for (index = 0; index < vector->values_num; index++)						\
+			clean_func(&vector->values[index]);							\
+														\
+		vector->values_num = 0;										\
+	}													\
 }
-
 
 #define	ZBX_PTR_VECTOR_IMPL(__id, __type)									\
 														\
