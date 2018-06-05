@@ -1643,8 +1643,6 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **contents, char *
 	CURLcode	err;
 	int		ret = FAIL;
 
-	ZBX_UNUSED(service);
-
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VMWARE_CONTENTS)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
@@ -3429,8 +3427,6 @@ static int	vmware_service_get_clusters(CURL *easyhandle, char **clusters, char *
 	CURLcode	err;
 	int		ret = FAIL;
 
-	ZBX_UNUSED(service);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_CLUSTER)))
@@ -3504,8 +3500,6 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 	CURLoption	o;
 	CURLcode	err;
 	int		ret = FAIL;
-
-	ZBX_UNUSED(service);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __function_name, clusterid);
 
