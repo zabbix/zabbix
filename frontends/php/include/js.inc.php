@@ -118,17 +118,17 @@ function insert_show_color_picker_javascript() {
 		['891515','660A3B','370F69','24146D','131A5E','093578','044174','00484B','003930','144618','264E16','615911','B75F11','BF5300','AC3C00','8F2809','2E1D1A','1C252A'],
 		['5B0E0E','440727','250A46','180D49','0D113F','062350','002B4D','003032','002620','0D2F10','19340F','413B0B','7A3F0B','7F3700','732800','5F1B06','1F1311','13191C'],
 		['2D0707','220313','120523','0C0624','06081F','031128','001526','001819','00131D','061708','0C1A07','201D05','3D1F05','3F1B00','391400','2F0D03','0F0908','090C0E'],
-];
+	];
 
-foreach ($colors as $palette) {
-	$row = [];
-	foreach ($palette as $color) {
-	$row[] = (new CColorCell(null, $color))
-		->setTitle('#'.$color)
-		->onClick('set_color("'.$color.'");');
+	foreach ($colors as $palette) {
+		$row = [];
+		foreach ($palette as $color) {
+			$row[] = (new CColorCell(null, $color))
+				->setTitle('#'.$color)
+				->onClick('set_color("'.$color.'");');
+		}
+		$table[] = (new CDiv($row))->addClass(ZBX_STYLE_COLOR_PICKER);
 	}
-	$table[] = (new CDiv($row))->addClass(ZBX_STYLE_COLOR_PICKER);
-}
 
 	$cancel = (new CSimpleButton())
 		->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
@@ -138,7 +138,7 @@ foreach ($colors as $palette) {
 	insert_js('var color_picker = null,'."\n".
 		'curr_lbl = null,'."\n".
 		'curr_txt = null,'."\n".
-		'color_table = '.zbx_jsvalue(unpack_object($tmp))."\n");
+		'color_table = '.CJs::encodeJson(unpack_object($tmp))."\n");
 	zbx_add_post_js('create_color_picker();');
 }
 
