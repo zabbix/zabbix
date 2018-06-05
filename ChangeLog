@@ -8,6 +8,7 @@ Bug fixes:
 A.F.I..... [ZBXNEXT-4540] fixed problems filter with same tags not being joined with OR condition (Ivo, Sasha)
 ..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
 .......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
+.......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha7
@@ -335,6 +336,7 @@ Changes for 3.4.11rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.10
@@ -1590,6 +1592,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
+.......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.18
