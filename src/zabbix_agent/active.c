@@ -131,7 +131,7 @@ static void	free_active_metrics(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_regexp_destroy(&regexps);
 
 	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
 	zbx_vector_ptr_destroy(&active_metrics);
