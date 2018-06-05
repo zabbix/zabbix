@@ -565,7 +565,9 @@ var timeControl = {
 				img.attr('src', url.getUrl());
 			}
 
-			img.data('zbx_sbox', zbx_sbox);
+			if (obj.loadSBox == 1) {
+				img.data('zbx_sbox', zbx_sbox);
+			}
 		}
 	},
 
@@ -583,7 +585,8 @@ var timeControl = {
 		url.setArgument('from', obj.timeline.from);
 		url.setArgument('to', obj.timeline.to);
 
-		var clone = jQuery('<img/>', {
+		var container = jQuery('#' + obj.containerid),
+			clone = jQuery('<img/>', {
 				id: img.attr('id'),
 				'class': img.attr('class')
 			})
@@ -596,16 +599,6 @@ var timeControl = {
 				}
 			});
 
-		clone.data('zbx_sbox', jQuery.extend(zbx_sbox, {
-			left: obj.objDims.shiftXleft,
-			right: obj.objDims.shiftXright,
-			top: obj.objDims.shiftYtop,
-			from: obj.timeline.from,
-			from_ts: obj.timeline.from_ts,
-			to: obj.timeline.to,
-			to_ts: obj.timeline.to_ts
-		}));
-
 		var async = (obj.loadSBox == 0)
 			? null
 			: flickerfreeScreen.getImageSboxHeight(url, function (height) {
@@ -617,14 +610,25 @@ var timeControl = {
 		if (async === null) {
 			clone.attr('src', url.getUrl());
 		}
+		else {
+			clone.data('zbx_sbox', jQuery.extend(zbx_sbox, {
+				left: obj.objDims.shiftXleft,
+				right: obj.objDims.shiftXright,
+				top: obj.objDims.shiftYtop,
+				from: obj.timeline.from,
+				from_ts: obj.timeline.from_ts,
+				to: obj.timeline.to,
+				to_ts: obj.timeline.to_ts
+			}));
+		}
 
 		// link
-		var graphUrl = new Curl(jQuery('#' + obj.containerid).attr('href'), false);
+		var graphUrl = new Curl(container.attr('href'), false);
 		graphUrl.setArgument('width', obj.objDims.width);
 		graphUrl.setArgument('from', obj.timeline.from);
 		graphUrl.setArgument('to', obj.timeline.to);
 
-		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
+		container.attr('href', graphUrl.getUrl());
 	},
 
 	/**
