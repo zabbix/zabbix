@@ -41,8 +41,6 @@
 #	define ZBX_MUTEX_NULL		255
 #endif
 
-
-
 typedef enum
 {
 	ZBX_MUTEX_LOG = 0,
@@ -66,7 +64,6 @@ typedef enum
 zbx_mutex_lock_type_t;
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
-
 #	define ZBX_RWLOCK		pthread_rwlock_t *
 #	define ZBX_RWLOCK_NAME		zbx_rwlock_lock_type_t
 #	define ZBX_RWLOCK_NULL		NULL
