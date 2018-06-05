@@ -1059,16 +1059,16 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				$actions_performed = [];
-				if ($data['actions']['messages']['data'][$problem['eventid']]['count'] > 0) {
+				if ($data['actions']['messages'][$problem['eventid']]['count'] > 0) {
 					$actions_performed[] =
-							_('Messages').' ('.$data['actions']['messages']['data'][$problem['eventid']]['count'].')';
+							_('Messages').' ('.$data['actions']['messages'][$problem['eventid']]['count'].')';
 				}
-				if ($data['actions']['severities']['data'][$problem['eventid']]['count'] > 0) {
+				if ($data['actions']['severities'][$problem['eventid']]['count'] > 0) {
 					$actions_performed[] = _('Severity changes');
 				}
-				if ($data['actions']['all_actions']['data'][$problem['eventid']]['count'] > 0) {
+				if ($data['actions']['actions'][$problem['eventid']]['count'] > 0) {
 					$actions_performed[] =
-							_('Actions').' ('.$data['actions']['all_actions']['data'][$problem['eventid']]['count'].')';
+							_('Actions').' ('.$data['actions']['actions'][$problem['eventid']]['count'].')';
 				}
 
 				$csv[] = [
