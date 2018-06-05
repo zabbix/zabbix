@@ -31,9 +31,17 @@
 #	define ZBX_MUTEX_PERFSTAT	zbx_mutex_create_per_process_name(L"ZBX_MUTEX_PERFSTAT")
 
 #else	/* not _WINDOWS */
-
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+#	define ZBX_MUTEX		pthread_mutex_t *
+#	define ZBX_MUTEX_NAME		zbx_mutex_lock_type_t
+#	define ZBX_MUTEX_NULL		NULL
+#else
 #	define ZBX_MUTEX		zbx_mutex_lock_type_t
 #	define ZBX_MUTEX_NAME		zbx_mutex_lock_type_t
+#	define ZBX_MUTEX_NULL		255
+#endif
+
+
 
 typedef enum
 {
@@ -54,20 +62,19 @@ typedef enum
 	ZBX_MUTEX_CONFIG,
 #endif
 	ZBX_MUTEX_COUNT,
-	ZBX_MUTEX_NULL
 }
 zbx_mutex_lock_type_t;
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 
-#	define ZBX_RWLOCK		zbx_rwlock_lock_type_t
+#	define ZBX_RWLOCK		pthread_rwlock_t *
 #	define ZBX_RWLOCK_NAME		zbx_rwlock_lock_type_t
+#	define ZBX_RWLOCK_NULL		NULL
 
 typedef enum
 {
 	ZBX_RWLOCK_CONFIG = 0,
 	ZBX_RWLOCK_COUNT,
-	ZBX_RWLOCK_NULL
 }
 zbx_rwlock_lock_type_t;
 
@@ -85,10 +92,10 @@ int	zbx_locks_create(char **error);
 #define zbx_rwlock_rdlock(rwlock)		__zbx_rwlock_rdlock(__FILE__, __LINE__, rwlock)
 #define zbx_rwlock_unlock(rwlock)		__zbx_rwlock_unlock(__FILE__, __LINE__, rwlock)
 
-int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK name, char **error);
-void	__zbx_rwlock_wrlock(const char *filename, int line, const ZBX_RWLOCK_NAME *rwlock);
-void	__zbx_rwlock_rdlock(const char *filename, int line, const ZBX_RWLOCK_NAME *rwlock);
-void	__zbx_rwlock_unlock(const char *filename, int line, const ZBX_RWLOCK_NAME *rwlock);
+int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK_NAME name, char **error);
+void	__zbx_rwlock_wrlock(const char *filename, int line, ZBX_RWLOCK *rwlock);
+void	__zbx_rwlock_rdlock(const char *filename, int line, ZBX_RWLOCK *rwlock);
+void	__zbx_rwlock_unlock(const char *filename, int line, ZBX_RWLOCK *rwlock);
 void	zbx_rwlock_destroy(ZBX_RWLOCK *rwlock);
 void	zbx_locks_disable(void);
 #else
