@@ -131,7 +131,10 @@ $url = (new CUrl('chart3.php'))
 	->setArgument('profileIdx2', $graph_in->profileIdx2)
 	->getUrl();
 
-$graphs[] = (new CDiv((new CLink(null, $url))->setId('graph_in_container')))
+$graphs[] = (new CDiv((new CDiv())
+		->setId('graph_in_container')
+		->addClass(ZBX_STYLE_CENTER)
+	))
 	->addClass('flickerfreescreen')
 	->setId('flickerfreescreen_graph_in')
 	->setAttribute('data-timestamp', time());
@@ -170,7 +173,10 @@ $url = (new CUrl('chart3.php'))
 	->setArgument('profileIdx2', $graph_time->profileIdx2)
 	->getUrl();
 
-$graphs[] = (new CDiv((new CLink(null, $url))->setId('graph_time_container')))
+$graphs[] = (new CDiv(((new CDiv())
+		->setId('graph_time_container')
+		->addClass(ZBX_STYLE_CENTER)
+	)))
 	->addClass('flickerfreescreen')
 	->setId('flickerfreescreen_graph_time')
 	->setAttribute('data-timestamp', time());
