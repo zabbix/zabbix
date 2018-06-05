@@ -93,22 +93,18 @@ class testConfiguration extends CZabbixTest {
 	* @dataProvider export_fail_data
 	*/
 	public function testConfiguration_ExportFail($export, $expected_error) {
-		$result = $this->api_acall('configuration.export', $export, $debug);
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertSame($expected_error, $result['error']['data']);
+		$this->call('configuration.export', $export, $expected_error);
 	}
 
 	public static function export_string_ids() {
 		return [
-			[ 'groups' ],
-			[ 'hosts' ],
-			[ 'images' ],
-			[ 'maps' ],
-			[ 'screens' ],
-			[ 'templates' ],
-			[ 'valueMaps' ]
+			['groups'],
+			['hosts'],
+			['images'],
+			['maps'],
+			['screens'],
+			['templates'],
+			['valueMaps']
 		];
 	}
 
@@ -119,8 +115,7 @@ class testConfiguration extends CZabbixTest {
 		$formats = ['xml', 'json'];
 
 		foreach ($formats as $parameter){
-			$result = $this->api_acall(
-				'configuration.export',
+			$this->call('configuration.export',
 				[
 					'options' => [
 							$options => [
@@ -129,14 +124,8 @@ class testConfiguration extends CZabbixTest {
 					],
 					'format' => $parameter
 				],
-				$debug
+				'Invalid parameter "/options/'.$options.'/1": a number is expected.'
 			);
-
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$error = 'Invalid parameter "/options/'.$options.'/1": a number is expected.';
-			$this->assertSame($error, $result['error']['data']);
 		}
 	}
 
@@ -173,16 +162,10 @@ class testConfiguration extends CZabbixTest {
 		$formats = ['xml', 'json'];
 
 		foreach ($formats as $parameter){
-			$result = $this->api_acall(
-				'configuration.export',
-				[
-					'options' => $data,
-					'format' => $parameter
-				],
-				$debug);
-
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
+			$this->call('configuration.export', [
+				'options' => $data,
+				'format' => $parameter
+			]);
 		}
 	}
 
@@ -310,11 +293,7 @@ class testConfiguration extends CZabbixTest {
 	* @dataProvider import_fail_data
 	*/
 	public function testConfiguration_ImportFail($import, $expected_error) {
-		$result = $this->api_acall('configuration.import', $import, $debug);
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertSame($expected_error, $result['error']['data']);
+		$this->call('configuration.import', $import, $expected_error);
 	}
 
 	public static function import_rules_parametrs() {
@@ -337,12 +316,12 @@ class testConfiguration extends CZabbixTest {
 			[[
 				'parametr' => 'groups',
 				'expected' => ['createMissing'],
-				'unexpected' => [ 'deleteMissing', 'updateExisting']
+				'unexpected' => ['deleteMissing', 'updateExisting']
 			]],
 			[[
 				'parametr' => 'hosts',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'httptests',
@@ -352,7 +331,7 @@ class testConfiguration extends CZabbixTest {
 			[[
 				'parametr' => 'images',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'items',
@@ -362,22 +341,22 @@ class testConfiguration extends CZabbixTest {
 			[[
 				'parametr' => 'maps',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'screens',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'templateLinkage',
 				'expected' => ['createMissing'],
-				'unexpected' => [ 'deleteMissing', 'updateExisting']
+				'unexpected' => ['deleteMissing', 'updateExisting']
 			]],
 			[[
 				'parametr' => 'templates',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'templateScreens',
@@ -392,7 +371,7 @@ class testConfiguration extends CZabbixTest {
 			[[
 				'parametr' => 'valueMaps',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]]
 		];
 	}
@@ -402,8 +381,7 @@ class testConfiguration extends CZabbixTest {
 	*/
 	public function testConfiguration_ImportBooleanTypeAndUnexpectedParametrs($import) {
 		foreach ($import['expected'] as $expected) {
-		$result = $this->api_acall('configuration.import',
-				[
+			$this->call('configuration.import', [
 					'format' => 'json',
 					'rules' => [
 						$import['parametr'] => [
@@ -412,31 +390,22 @@ class testConfiguration extends CZabbixTest {
 					],
 					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
 				],
-				$debug);
-
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-			$expected_error = 'Invalid parameter "/rules/'.$import['parametr'].'/'.$expected.'": a boolean is expected.';
-			$this->assertSame($expected_error, $result['error']['data']);
+				'Invalid parameter "/rules/'.$import['parametr'].'/'.$expected.'": a boolean is expected.'
+			);
 		}
 
 		foreach ($import['unexpected'] as $unexpected) {
-			$result = $this->api_acall('configuration.import',
-					[
-						'format' => 'json',
-						'rules' => [
-							$import['parametr'] => [
-								$unexpected => true
-							]
-						],
-						'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
+			$this->call('configuration.import', [
+					'format' => 'json',
+					'rules' => [
+						$import['parametr'] => [
+							$unexpected => true
+						]
 					],
-				$debug);
-
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-			$expected_error = 'Invalid parameter "/rules/'.$import['parametr'].'": unexpected parameter "'.$unexpected.'".';
-			$this->assertSame($expected_error, $result['error']['data']);
+					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
+				],
+				'Invalid parameter "/rules/'.$import['parametr'].'": unexpected parameter "'.$unexpected.'".'
+			);
 		}
 	}
 
@@ -511,20 +480,17 @@ class testConfiguration extends CZabbixTest {
 	* @dataProvider import_source
 	*/
 	public function testConfiguration_ImportInvalidSource($data) {
-		$result = $this->api_acall('configuration.import',
-				[
-					'format' => $data['format'],
-					'rules' => [
-						'groups' => [
-							'createMissing' => true
-						]
-					],
-					'source' => $data['source']
+		$result = $this->call('configuration.import', [
+				'format' => $data['format'],
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
 				],
-				$debug);
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
+				'source' => $data['source']
+			],
+			true
+		);
 
 		// condition for different error message text
 		if (array_key_exists('error_contains', $data)) {
@@ -550,13 +516,13 @@ class testConfiguration extends CZabbixTest {
 									</group>
 								</groups>
 								</zabbix_export>',
-				'sql' => 'select * from groups where name=\'API host group xml import\''
+				'sql' => 'select * from hstgrp where name=\'API host group xml import\''
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import"}]}}',
-				'sql' => 'select * from groups where name=\'API host group json import\''
+				'sql' => 'select * from hstgrp where name=\'API host group json import\''
 			],
 			[
 				'format' => 'xml',
@@ -617,22 +583,18 @@ class testConfiguration extends CZabbixTest {
 	* @dataProvider import_create
 	*/
 	public function testConfiguration_ImportCreate($format, $parametr, $source, $sql) {
-		$result = $this->api_acall('configuration.import',
-				[
-					'format' => $format,
-					'rules' => [
-						$parametr => [
-							'createMissing' => true
-						]
-					],
-					'source' => $source
+		$result = $this->call('configuration.import', [
+				'format' => $format,
+				'rules' => [
+					$parametr => [
+						'createMissing' => true
+					]
 				],
-				$debug);
+				'source' => $source
+			]
+		);
 
-		$this->assertTrue(array_key_exists('result', $result));
-		$this->assertFalse(array_key_exists('error', $result));
 		$this->assertSame(true, $result['result']);
-
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -651,14 +613,14 @@ class testConfiguration extends CZabbixTest {
 									</group>
 								</groups>
 								</zabbix_export>',
-				'sql' => 'select * from groups where name=\'API host group xml import as non Super Admin\'',
+				'sql' => 'select * from hstgrp where name=\'API host group xml import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
-				'sql' => 'select * from groups where name=\'API host group json import as non Super Admin\'',
+				'sql' => 'select * from hstgrp where name=\'API host group json import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[
@@ -701,24 +663,20 @@ class testConfiguration extends CZabbixTest {
 		$users = ['zabbix-admin', 'zabbix-user'];
 
 		foreach ($users as $username) {
-			$result = $this->api_call_with_user('configuration.import',
-					['user' => $username, 'password' => 'zabbix'],
-					[
-						'format' => $format,
-						'rules' => [
-							$parametr => [
-								'createMissing' => true
-							]
-						],
-						'source' => $source
+			$this->authorize($username, 'zabbix');
+			$this->call('configuration.import', [
+					'format' => $format,
+					'rules' => [
+						$parametr => [
+							'createMissing' => true
+						]
 					],
-					$debug);
+					'source' => $source
+				],
+				$expected_error
+			);
+
+			$this->assertEquals(0, DBcount($sql));
 		}
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertEquals($expected_error, $result['error']['data']);
-
-		$this->assertEquals(0, DBcount($sql));
 	}
 }

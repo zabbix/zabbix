@@ -787,7 +787,7 @@
 		// Remove previous messages.
 		dashboardRemoveMessages();
 
-		url.setArgument('action', 'dashbrd.widget.update');
+		url.setArgument('action', 'dashboard.update');
 
 		$.each(data['widgets'], function(index, widget) {
 			var	ajax_widget = {};

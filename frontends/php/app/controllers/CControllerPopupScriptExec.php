@@ -58,7 +58,10 @@ class CControllerPopupScriptExec extends CController {
 			'title' => _('Scripts'),
 			'command' => '',
 			'message' => '',
-			'errors' => null
+			'errors' => null,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
 		$scripts = API::Script()->get([
