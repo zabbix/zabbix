@@ -33,12 +33,35 @@
 #else	/* not _WINDOWS */
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 #	define ZBX_MUTEX		pthread_mutex_t *
-#	define ZBX_MUTEX_NAME		zbx_mutex_lock_type_t
 #	define ZBX_MUTEX_NULL		NULL
+
+#	define ZBX_MUTEX_NAME		zbx_mutex_lock_type_t
+
+#	define ZBX_RWLOCK		pthread_rwlock_t *
+#	define ZBX_RWLOCK_NULL		NULL
+
+#	define ZBX_RWLOCK_NAME		zbx_rwlock_lock_type_t
+
+typedef enum
+{
+	ZBX_RWLOCK_CONFIG = 0,
+	ZBX_RWLOCK_COUNT,
+}
+zbx_rwlock_lock_type_t;
+
 #else
 #	define ZBX_MUTEX		zbx_mutex_lock_type_t
-#	define ZBX_MUTEX_NAME		zbx_mutex_lock_type_t
 #	define ZBX_MUTEX_NULL		255
+
+#	define ZBX_MUTEX_NAME		zbx_mutex_lock_type_t
+
+#	define ZBX_RWLOCK		zbx_mutex_lock_type_t
+#	define ZBX_RWLOCK_NULL		ZBX_MUTEX_NULL
+
+#	define ZBX_RWLOCK_NAME		zbx_mutex_lock_type_t
+
+#	define ZBX_RWLOCK_CONFIG	ZBX_MUTEX_CONFIG
+
 #endif
 
 typedef enum
@@ -62,25 +85,6 @@ typedef enum
 	ZBX_MUTEX_COUNT,
 }
 zbx_mutex_lock_type_t;
-
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-#	define ZBX_RWLOCK		pthread_rwlock_t *
-#	define ZBX_RWLOCK_NAME		zbx_rwlock_lock_type_t
-#	define ZBX_RWLOCK_NULL		NULL
-
-typedef enum
-{
-	ZBX_RWLOCK_CONFIG = 0,
-	ZBX_RWLOCK_COUNT,
-}
-zbx_rwlock_lock_type_t;
-
-#else
-#	define ZBX_RWLOCK		zbx_mutex_lock_type_t
-#	define ZBX_RWLOCK_NAME		zbx_mutex_lock_type_t
-#	define ZBX_RWLOCK_CONFIG	ZBX_MUTEX_CONFIG
-#	define ZBX_RWLOCK_NULL		ZBX_MUTEX_NULL
-#endif
 
 int	zbx_locks_create(char **error);
 
