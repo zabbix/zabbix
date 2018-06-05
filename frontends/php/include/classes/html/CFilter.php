@@ -374,8 +374,6 @@ class CFilter extends CDiv {
 			->addItem($this->form)
 			->setAttribute('aria-label', _('Filter'));
 
-		zbx_add_post_js($this->getJS());
-
-		return parent::toString($destroy);
+		return parent::toString($destroy).get_js($this->getJS());
 	}
 }
