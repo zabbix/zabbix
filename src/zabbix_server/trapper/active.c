@@ -435,12 +435,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
 
-	zbx_vector_ptr_t	regexps;
+	zbx_vector_regexp_t	regexps;
 	zbx_vector_str_t	names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_regexp_create(&regexps);
 	zbx_vector_str_create(&names);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
@@ -572,7 +572,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		for (i = 0; i < regexps.values_num; i++)
 		{
-			zbx_expression_t	*regexp = (zbx_expression_t *)regexps.values[i];
+			zbx_expression_t	*regexp = &regexps.values[i];
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, "name", regexp->name, ZBX_JSON_TYPE_STRING);
@@ -624,7 +624,7 @@ out:
 	zbx_vector_str_destroy(&names);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_regexp_destroy(&regexps);
 
 	zbx_free(host_metadata);
 

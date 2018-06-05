@@ -19,6 +19,10 @@
 
 #include "common.h"
 #include "zbxregexp.h"
+#include "log.h"
+#include "../zbxalgo/vectorimpl.h"
+
+ZBX_VECTOR_IMPL(regexp, zbx_expression_t);
 
 /******************************************************************************
  *                                                                            *
@@ -429,37 +433,34 @@ int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_
  * Parameters: expressions  - [IN] a vector of expression data pointers       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions)
+void	zbx_regexp_clean_expressions(zbx_vector_regexp_t *expressions)
 {
 	int	i;
 
 	for (i = 0; i < expressions->values_num; i++)
 	{
-		zbx_expression_t	*regexp = (zbx_expression_t *)expressions->values[i];
+		zbx_expression_t	*regexp = &expressions->values[i];
 
 		zbx_free(regexp->name);
 		zbx_free(regexp->expression);
-		zbx_free(regexp);
 	}
 
-	zbx_vector_ptr_clear(expressions);
+	zbx_vector_regexp_clear(expressions);
 }
 
-void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expression, int expression_type,
+void	add_regexp_ex(zbx_vector_regexp_t *regexps, const char *name, const char *expression, int expression_type,
 		char exp_delimiter, int case_sensitive)
 {
-	zbx_expression_t	*regexp;
+	zbx_expression_t	regexp;
 
-	regexp = (zbx_expression_t *)zbx_malloc(NULL, sizeof(zbx_expression_t));
+	regexp.name = zbx_strdup(NULL, name);
+	regexp.expression = zbx_strdup(NULL, expression);
 
-	regexp->name = zbx_strdup(NULL, name);
-	regexp->expression = zbx_strdup(NULL, expression);
+	regexp.expression_type = expression_type;
+	regexp.exp_delimiter = exp_delimiter;
+	regexp.case_sensitive = case_sensitive;
 
-	regexp->expression_type = expression_type;
-	regexp->exp_delimiter = exp_delimiter;
-	regexp->case_sensitive = case_sensitive;
-
-	zbx_vector_ptr_append(regexps, regexp);
+	zbx_vector_regexp_append(regexps, regexp);
 }
 
 /**********************************************************************************
@@ -638,7 +639,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *           the whole string is stored into 'output' variable.                   *
  *                                                                                *
  **********************************************************************************/
-int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+int	regexp_sub_ex(const zbx_vector_regexp_t *regexps, const char *string, const char *pattern,
 		int case_sensitive, const char *output_template, char **output)
 {
 	int	i, ret = FAIL;
@@ -662,7 +663,7 @@ int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const cha
 
 	for (i = 0; i < regexps->values_num; i++)	/* loop over global regexp subexpressions */
 	{
-		const zbx_expression_t	*regexp = (zbx_expression_t *)regexps->values[i];
+		const zbx_expression_t	*regexp = &regexps->values[i];
 
 		if (0 != strcmp(regexp->name, pattern))
 			continue;
@@ -737,7 +738,7 @@ out:
 	return ret;
 }
 
-int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)
+int	regexp_match_ex(const zbx_vector_regexp_t *regexps, const char *string, const char *pattern, int case_sensitive)
 {
 	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
 }

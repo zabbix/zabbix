@@ -9759,7 +9759,7 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num)
+void	DCget_expressions_by_names(zbx_vector_regexp_t *expressions, const char * const *names, int names_num)
 {
 	int			i, iname;
 	ZBX_DC_EXPRESSION	*expression;
@@ -9776,19 +9776,18 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
 			for (i = 0; i < regexp->expressionids.values_num; i++)
 			{
 				zbx_uint64_t		expressionid = regexp->expressionids.values[i];
-				zbx_expression_t	*rxp;
+				zbx_expression_t	rxp;
 
 				if (NULL == (expression = (ZBX_DC_EXPRESSION *)zbx_hashset_search(&config->expressions, &expressionid)))
 					continue;
 
-				rxp = (zbx_expression_t *)zbx_malloc(NULL, sizeof(zbx_expression_t));
-				rxp->name = zbx_strdup(NULL, regexp->name);
-				rxp->expression = zbx_strdup(NULL, expression->expression);
-				rxp->exp_delimiter = expression->delimiter;
-				rxp->case_sensitive = expression->case_sensitive;
-				rxp->expression_type = expression->type;
+				rxp.name = zbx_strdup(NULL, regexp->name);
+				rxp.expression = zbx_strdup(NULL, expression->expression);
+				rxp.exp_delimiter = expression->delimiter;
+				rxp.case_sensitive = expression->case_sensitive;
+				rxp.expression_type = expression->type;
 
-				zbx_vector_ptr_append(expressions, rxp);
+				zbx_vector_regexp_append(expressions, rxp);
 			}
 		}
 	}
@@ -9809,7 +9808,7 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
+void	DCget_expressions_by_name(zbx_vector_regexp_t *expressions, const char *name)
 {
 	DCget_expressions_by_names(expressions, &name, 1);
 }

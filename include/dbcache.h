@@ -24,6 +24,7 @@
 #include "comms.h"
 #include "sysinfo.h"
 #include "zbxalgo.h"
+#include "zbxregexp.h"
 
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
@@ -687,8 +688,8 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
 		zbx_vector_ptr_t *required_performance);
 
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
-void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
+void	DCget_expressions_by_names(zbx_vector_regexp_t *expressions, const char * const *names, int names_num);
+void	DCget_expressions_by_name(zbx_vector_regexp_t *expressions, const char *name);
 
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 

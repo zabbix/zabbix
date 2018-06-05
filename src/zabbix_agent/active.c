@@ -49,7 +49,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 ZBX_THREAD_LOCAL static ZBX_ACTIVE_BUFFER	buffer;
 ZBX_THREAD_LOCAL static zbx_vector_ptr_t	active_metrics;
-ZBX_THREAD_LOCAL static zbx_vector_ptr_t	regexps;
+ZBX_THREAD_LOCAL static zbx_vector_regexp_t	regexps;
 
 #ifdef _WINDOWS
 LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
@@ -104,7 +104,7 @@ static void	init_active_metrics(void)
 	}
 
 	zbx_vector_ptr_create(&active_metrics);
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_regexp_create(&regexps);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1086,7 +1086,7 @@ static int	global_regexp_exists(const char *name)
 
 	for (i = 0; i < regexps.values_num; i++)
 	{
-		zbx_expression_t	*regexp = (zbx_expression_t *)regexps.values[i];
+		zbx_expression_t	*regexp = &regexps.values[i];
 
 		if (0 == strcmp(regexp->name, name))
 			break;
