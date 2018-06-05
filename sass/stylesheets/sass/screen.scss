@@ -44,7 +44,7 @@ a {
 	&:focus {
 		color: $link-hover-color;
 		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, 0.5);
+		border-bottom: 2px solid rgba($link-hover-color, 0.5)
 	}
 
 	&:active {
@@ -366,6 +366,12 @@ ul.top-nav-icons {
 		-webkit-transform-style: preserve-3d;
 	}
 
+	.top-nav-support {
+		background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
+		width: auto;
+		padding: 0 6px 0 17px;
+	}
+
 	form {
 		position: relative;
 	}
@@ -378,6 +384,13 @@ ul.top-nav-icons {
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
+
+		@media (max-width: 1050px) {
+			width: 130px;
+		}
+
+		transition: width 0.5s;
+		-webkit-transition: width 0.5s;
 
 		&:focus {
 			background-color: $form-bg-color;
@@ -714,6 +727,14 @@ output {
 				color: $red;
 			}
 
+			&.orange {
+				color: $orange;
+			}
+
+			&.yellow {
+				color: $dark-yellow;
+			}
+
 			&.green {
 				color: $green;
 			}
@@ -728,7 +749,8 @@ output {
 		}
 
 		td {
-			padding: 2px 5px 2px 5px;
+			padding-top: 2px;
+			padding-bottom: 2px;
 			border-bottom: none;
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
 			color: $font-color;
@@ -737,6 +759,18 @@ output {
 				max-width: 40px;
 				margin: -2px 3px 0 0;
 				padding: 2px 3px;
+
+				@media screen and (min-width: 1200px) {
+					max-width: 71px;
+				}
+
+				@media screen and (min-width: 1400px) {
+					max-width: 102px;
+				}
+
+				@media screen and (min-width: 1600px) {
+					max-width: 133px;
+				}
 			}
 
 			.rel-container {
@@ -761,6 +795,60 @@ output {
 		vertical-align: bottom;
 		border-bottom: 2px solid darken($table-border-color, 5%);
 		text-align: left;
+
+		&.column-tags-1 {
+			width: 75px;
+		}
+
+		&.column-tags-2 {
+			width: 124px;
+		}
+
+		&.column-tags-3 {
+			width: 173px;
+		}
+
+		@media screen and (min-width: 1200px) {
+			&.column-tags-1 {
+				width: 106px;
+			}
+
+			&.column-tags-2 {
+				width: 186px;
+			}
+
+			&.column-tags-3 {
+				width: 266px;
+			}
+		}
+
+		@media screen and (min-width: 1400px) {
+			&.column-tags-1 {
+				width: 137px;
+			}
+
+			&.column-tags-2 {
+				width: 248px;
+			}
+
+			&.column-tags-3 {
+				width: 359px;
+			}
+		}
+
+		@media screen and (min-width: 1600px) {
+			&.column-tags-1 {
+				width: 168px;
+			}
+
+			&.column-tags-2 {
+				width: 310px;
+			}
+
+			&.column-tags-3 {
+				width: 452px;
+			}
+		}
 
 		.arrow-up {
 			margin: 0 0 0 3px;
@@ -1199,13 +1287,21 @@ output {
 	}
 }
 
+.subfilter,
 .subfilter-enabled {
 	display: inline-block;
-	position: relative;
 	height: 18px;
-	padding: 0 4px;
-	color: $font-selected-color;
+	position: relative;
+}
+
+.subfilter {
+	margin-right: 10px;
+}
+
+.subfilter-enabled {
 	background-color: $ui-bg-selected-color;
+	color: $font-selected-color;
+	padding: 0 4px;
 	@include border-radius(2px);
 
 	.link-action {
@@ -1746,16 +1842,28 @@ output {
 		display: inline-block;
 		margin: 0 -1px 0 0;
 
-		&:first-child label {
-			@include border-radius(2px 0 0 2px);
+		&:first-child{
+			@include border-radius(3px 0 0 3px);
+
+			label {
+				@include border-radius(2px 0 0 2px);
+			}
 		}
 
-		&:last-child label {
-			@include border-radius(0 2px 2px 0);
+		&:last-child {
+			@include border-radius(0 3px 3px 0);
+
+			label {
+				@include border-radius(0 2px 2px 0);
+			}
 		}
 
-		&:only-child label {
-			@include border-radius(2px);
+		&:only-child {
+			@include border-radius(3px);
+
+			label {
+				@include border-radius(2px);
+			}
 		}
 	}
 
@@ -2270,6 +2378,15 @@ button {
 
 	&:focus {
 		@extend %btn-search-hover-focus;
+	}
+
+	&[disabled] {
+		background-color: $transparent;
+
+		&:hover {
+			background-color: $transparent;
+			@include opacity(0.75);
+		}
 	}
 }
 
@@ -3214,8 +3331,14 @@ $form-icon-btn: (
 }
 
 %dashbrd-widget-td {
-	padding-right: 10px;
-	padding-left: 10px;
+
+	&:first-child {
+		padding-left: 10px;
+	}
+
+	&:last-child {
+		padding-right: 10px;
+	}
 }
 
 .dashbrd-widget-head {
@@ -3560,12 +3683,14 @@ $form-icon-btn: (
 .calendar {
 	width: 200px;
 
-	.selected {
-		background-color: $ui-bg-selected-color;
-		color: $white;
+	.calendar-year,
+	.calendar-month {
+		&.highlighted {
+			background-color: $action-hover-color;
+		}
 
-		&:hover {
-			@extend .selected
+		&:focus {
+			outline: none;
 		}
 	}
 
@@ -3582,12 +3707,35 @@ $form-icon-btn: (
 			text-align: center;
 
 			td {
-				padding: 4px;
 				@include transition(background-color .2s ease-out);
+
+				&.selected {
+					background-color: $ui-bg-selected-color;
+					color: $white;
+
+					&:hover {
+						background-color: darken($ui-bg-selected-color, 4%);
+					}
+				}
 
 				&:hover {
 					background-color: $action-hover-color;
 					cursor: pointer;
+				}
+
+				&.highlighted {
+					@include btn-hover-active($btn-font-color, $btn-bg-color);
+					cursor: pointer;
+				}
+
+				&:focus {
+					outline: none;
+				}
+
+				span {
+					z-index: -1;
+					padding: 4px;
+					display: block;
 				}
 			}
 		}
@@ -3606,6 +3754,8 @@ $form-icon-btn: (
 .calendar-year {
 	height: 24px;
 	line-height: 26px;
+	display: table;
+	width: 100%;
 
 	button:first-child {
 		float: left;
@@ -3613,6 +3763,11 @@ $form-icon-btn: (
 
 	button:last-child {
 		float: right;
+	}
+
+	button:hover {
+		background-color: $action-hover-color;
+		cursor: pointer;
 	}
 }
 
@@ -3979,12 +4134,20 @@ a.link-action {
 		color: $red;
 	}
 
+	&.orange {
+		color: $orange;
+	}
+
+	&.yellow {
+		color: $dark-yellow;
+	}
+
 	&.green {
 		color: $green;
 	}
 
-	&.orange {
-		color: $orange;
+	&.grey {
+		color: $font-alt-color;
 	}
 
 	&:hover {
@@ -5093,7 +5256,7 @@ svg {
 			> .tree-row {
 				width: 100%;
 				min-width: 320px;
-				border-bottom: 1px solid $ui-border-color;
+				border-bottom: 1px solid $table-border-color;
 				padding: 8px 0;
 
 				&:hover {

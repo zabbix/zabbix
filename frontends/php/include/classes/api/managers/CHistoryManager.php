@@ -1031,7 +1031,7 @@ class CHistoryManager {
 
 		foreach ($indices as $type => $index) {
 			if (($url = self::getElasticsearchUrl($index)) !== null) {
-				$endponts[$type] = $url.$index.'/values/'.$action;
+				$endponts[$type] = $url.$index.'*/values/'.$action;
 			}
 		}
 
