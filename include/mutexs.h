@@ -51,7 +51,6 @@ zbx_rwlock_lock_type_t;
 
 #else
 #	define ZBX_MUTEX		zbx_mutex_lock_type_t
-#	define ZBX_MUTEX_NULL		255
 
 #	define ZBX_MUTEX_NAME		zbx_mutex_lock_type_t
 
@@ -83,6 +82,9 @@ typedef enum
 	ZBX_MUTEX_CONFIG,
 #endif
 	ZBX_MUTEX_COUNT,
+#ifndef HAVE_PTHREAD_PROCESS_SHARED
+	ZBX_MUTEX_NULL = 255,
+#endif
 }
 zbx_mutex_lock_type_t;
 
