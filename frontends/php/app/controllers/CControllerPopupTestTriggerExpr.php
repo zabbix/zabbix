@@ -150,10 +150,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 			'outline' => $outline,
 			'test' => array_key_exists('test_expression', $_REQUEST),
 			'message' => getMessages(),
-			'macros_data' => $this->macros_data,
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
+			'macros_data' => $this->macros_data
 		]));
 	}
 }

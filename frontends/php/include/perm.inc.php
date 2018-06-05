@@ -261,7 +261,7 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm) {
 		$group_perm[$right['id']] = $right['permission'];
 	}
 
-	$dbHostGroups = DBselect('SELECT g.*,'.PERM_DENY.' AS permission FROM hstgrp g');
+	$dbHostGroups = DBselect('SELECT g.*,'.PERM_DENY.' AS permission FROM groups g');
 
 	while ($dbHostGroup = DBfetch($dbHostGroups)) {
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {

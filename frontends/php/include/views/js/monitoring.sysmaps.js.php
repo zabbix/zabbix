@@ -126,8 +126,7 @@ function getFontComboBox($name) {
 					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHostGroup',
-							'object_name' => 'hostGroup',
-							'multiple' => false
+							'objectName' => 'hostGroup'
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
 						'hostGroupSelectRow'
@@ -135,8 +134,7 @@ function getFontComboBox($name) {
 					->addRow((new CLabel(_('Host'), 'elementNameHost'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHost',
-							'object_name' => 'hosts',
-							'multiple' => false
+							'objectName' => 'hosts'
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
 						'hostSelectRow'
@@ -157,17 +155,21 @@ function getFontComboBox($name) {
 							new CVar('elementExpressionTrigger', ''),
 							(new CMultiSelect([
 								'name' => 'elementNameTriggers',
-								'object_name' => 'triggers',
+								'objectName' => 'triggers',
+								'objectOptions' => [
+									'editable' => true,
+									'real_hosts' => true
+								],
 								'popup' => [
 									'parameters' => [
-										'srctbl' => 'triggers',
-										'srcfld1' => 'triggerid',
 										'dstfrm' => 'selementForm',
 										'dstfld1' => 'elementNameTriggers',
-										'with_triggers' => true,
-										'editable' => true,
-										'noempty' => true,
-										'real_hosts' => true
+										'srctbl' => 'triggers',
+										'srcfld1' => 'triggerid',
+										'with_triggers' => '1',
+										'real_hosts' => '1',
+										'multiselect' => '1',
+										'noempty' => '1'
 									]
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

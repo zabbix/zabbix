@@ -21,9 +21,6 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-/**
- * @backup scripts
- */
 class testScripts extends CZabbixTest {
 
 	public static function script_create() {
@@ -33,6 +30,7 @@ class testScripts extends CZabbixTest {
 				'script' => [
 					'name' => 'API create script'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "command" is missing.'
 			],
 			[
@@ -40,6 +38,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'API create script',
 					'command' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
 			],
 			// Check script name.
@@ -47,6 +46,7 @@ class testScripts extends CZabbixTest {
 				'script' => [
 					'command' => 'reboot server'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
 			],
 			[
@@ -54,6 +54,7 @@ class testScripts extends CZabbixTest {
 					'name' => '',
 					'command' => 'reboot server'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
@@ -61,6 +62,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'API/Script/',
 					'command' => 'reboot server'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
 			],
 			[
@@ -68,6 +70,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'Ping',
 					'command' => 'reboot server'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Script "Ping" already exists.'
 			],
 			[
@@ -75,6 +78,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'Ping/test',
 					'command' => 'reboot server'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Script menu path "Ping/test" already used in script name "Ping".'
 			],
 			[
@@ -88,6 +92,7 @@ class testScripts extends CZabbixTest {
 						'command' => 'reboot server'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
 			],
 			[
@@ -101,6 +106,7 @@ class testScripts extends CZabbixTest {
 						'command' => 'reboot server'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Script menu path "test/test/test test" already used in script name "test".'
 			],
 			[
@@ -114,6 +120,7 @@ class testScripts extends CZabbixTest {
 						'command' => 'reboot server'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Script name "test" already used in menu path for script "test/test".'
 			],
 			// Check successfully creation of script.
@@ -124,6 +131,7 @@ class testScripts extends CZabbixTest {
 						'command' => 'reboot server 1'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -137,6 +145,7 @@ class testScripts extends CZabbixTest {
 						'command' => 'æų'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -145,12 +154,15 @@ class testScripts extends CZabbixTest {
 	/**
 	* @dataProvider script_create
 	*/
-	public function testScripts_Create($script, $expected_error) {
-		$result = $this->call('script.create', $script, $expected_error);
+	public function testScripts_Create($script, $success_expected, $expected_error) {
+		$result = $this->api_acall('script.create', $script, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['scriptids'] as $key => $id) {
-				$dbResultUser = DBSelect('select * from scripts where scriptid='.zbx_dbstr($id));
+				$dbResultUser = DBSelect('select * from scripts where scriptid='.$id);
 				$dbRowUser = DBFetch($dbResultUser);
 				$this->assertEquals($dbRowUser['name'], $script[$key]['name']);
 				$this->assertEquals($dbRowUser['command'], $script[$key]['command']);
@@ -163,6 +175,12 @@ class testScripts extends CZabbixTest {
 				$this->assertEquals($dbRowUser['execute_on'], 2);
 			}
 		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertSame($expected_error, $result['error']['data']);
+		}
 	}
 
 	public static function script_update() {
@@ -173,6 +191,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'API updated script',
 					'command' => 'reboot'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "scriptid" is missing.'
 			],
 			[
@@ -181,6 +200,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot',
 					'scriptid' => ''
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
 			],
 			[
@@ -189,6 +209,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot',
 					'scriptid' => 'abc'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
 			],
 			[
@@ -197,6 +218,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot',
 					'scriptid' => '1.1'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
 			],
 			[
@@ -205,6 +227,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot',
 					'scriptid' => '123456'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -218,6 +241,7 @@ class testScripts extends CZabbixTest {
 						'name' => 'Scripts with the same id 2'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (scriptid)=(6) already exists.'
 			],
 			// Check script command.
@@ -227,6 +251,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'API updated script',
 					'command' => ''
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
 			],
 			// Check script name.
@@ -236,6 +261,7 @@ class testScripts extends CZabbixTest {
 					'name' => '',
 					'command' => 'reboot server'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
@@ -244,6 +270,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'API/Update/',
 					'command' => 'reboot server'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
 			],
 			[
@@ -252,6 +279,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'Ping',
 					'command' => 'reboot server'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Script "Ping" already exists.'
 			],
 			[
@@ -260,6 +288,7 @@ class testScripts extends CZabbixTest {
 					'name' => 'Ping/test',
 					'command' => 'reboot server'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Script menu path "Ping/test" already used in script name "Ping".'
 			],
 			[
@@ -275,6 +304,7 @@ class testScripts extends CZabbixTest {
 						'command' => 'reboot server'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
 			],
 			[
@@ -288,6 +318,7 @@ class testScripts extends CZabbixTest {
 						'name' => 'test/test/test test',
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Script menu path "test/test/test test" already used in script name "test".'
 			],
 			[
@@ -301,6 +332,7 @@ class testScripts extends CZabbixTest {
 						'name' => 'test',
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Script name "test" already used in menu path for script "test/test".'
 			],
 			// Check successfully script update.
@@ -312,6 +344,7 @@ class testScripts extends CZabbixTest {
 						'command' => 'reboot server'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -327,6 +360,7 @@ class testScripts extends CZabbixTest {
 						'command' => 'reboot server 2'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -335,12 +369,15 @@ class testScripts extends CZabbixTest {
 	/**
 	* @dataProvider script_update
 	*/
-	public function testScripts_Update($scripts, $expected_error) {
-		$result = $this->call('script.update', $scripts, $expected_error);
+	public function testScripts_Update($scripts, $success_expected, $expected_error) {
+		$result = $this->api_acall('script.update', $scripts, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['scriptids'] as $key => $id) {
-				$dbResult = DBSelect('select * from scripts where scriptid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from scripts where scriptid='.$id);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $scripts[$key]['name']);
 				$this->assertEquals($dbRow['command'], $scripts[$key]['command']);
@@ -354,9 +391,14 @@ class testScripts extends CZabbixTest {
 			}
 		}
 		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+			$this->assertSame($expected_error, $result['error']['data']);
+
 			foreach ($scripts as $script) {
-				if (array_key_exists('name', $script) && $script['name'] !== 'Ping'){
-					$this->assertEquals(0, DBcount('select * from scripts where name='.zbx_dbstr($script['name'])));
+				if (array_key_exists('name', $script) && $script['name'] != 'Ping'){
+					$dbResult = "select * from scripts where name='".$script['name']."'";
+					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
 		}
@@ -371,6 +413,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'host_access' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/host_access": a number is expected.'
 			],
 			[
@@ -379,6 +422,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'host_access' => 'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/host_access": a number is expected.'
 			],
 			[
@@ -387,6 +431,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'host_access' => '0'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of 2, 3.'
 			],
 			[
@@ -395,6 +440,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'host_access' => '1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of 2, 3.'
 			],
 			// Check usrgrpid.
@@ -404,6 +450,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'usrgrpid' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -412,6 +459,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'usrgrpid' => 'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -420,6 +468,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'usrgrpid' => '1.1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -428,6 +477,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'usrgrpid' => '123456'
 				],
+				'success_expected' => false,
 				'expected_error' => 'User group with ID "123456" is not available.'
 			],
 			// Check groupid.
@@ -437,6 +487,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'groupid' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
 			],
 			[
@@ -445,6 +496,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'groupid' => 'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
 			],
 			[
@@ -453,6 +505,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'groupid' => '1.1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
 			],
 			[
@@ -461,6 +514,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'groupid' => '123456'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Host group with ID "123456" is not available.'
 			],
 			// Check type.
@@ -470,6 +524,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'type' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
 			],
 			[
@@ -478,6 +533,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'type' => 'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
 			],
 			[
@@ -486,6 +542,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'type' => '1.1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
 			],
 			[
@@ -494,6 +551,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'type' => '2'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1.'
 			],
 			// Check execute_on.
@@ -503,6 +561,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'execute_on' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/execute_on": a number is expected.'
 			],
 			[
@@ -511,6 +570,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'execute_on' => 'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/execute_on": a number is expected.'
 			],
 			[
@@ -519,6 +579,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'execute_on' => '1.1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/execute_on": a number is expected.'
 			],
 			[
@@ -527,6 +588,7 @@ class testScripts extends CZabbixTest {
 					'command' => 'reboot server',
 					'execute_on' => '3'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of 0, 1, 2.'
 			],
 			[
@@ -536,6 +598,7 @@ class testScripts extends CZabbixTest {
 					'type' => '1',
 					'execute_on' => '0'
 				],
+				'success_expected' => false,
 				'expected_error' => 'IPMI scripts can be executed only by server.'
 			],
 			// Check successfully creation and update with all properties.
@@ -551,6 +614,7 @@ class testScripts extends CZabbixTest {
 						'type' => '0',
 						'execute_on' => '0'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -559,7 +623,7 @@ class testScripts extends CZabbixTest {
 	/**
 	* @dataProvider script_properties
 	*/
-	public function testScripts_NotRequiredProperties($script, $expected_error) {
+	public function testScripts_NotRequiredProperties($script, $success_expected, $expected_error) {
 		$methods = ['script.create', 'script.update'];
 
 		foreach ($methods as $method) {
@@ -567,12 +631,13 @@ class testScripts extends CZabbixTest {
 				$script['scriptid'] = '6';
 				$script['name'] = 'Update '.$script['name'];
 			}
-			$result = $this->call($method, $script, $expected_error);
+			$result = $this->api_acall($method, $script, $debug);
 
-			if ($expected_error === null) {
-				$dbResult = DBSelect('select * from scripts where scriptid='.
-						zbx_dbstr($result['result']['scriptids'][0])
-				);
+			if ($success_expected) {
+				$this->assertTrue(array_key_exists('result', $result));
+				$this->assertFalse(array_key_exists('error', $result));
+
+				$dbResult = DBSelect('select * from scripts where scriptid='.$result['result']['scriptids'][0]);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $script['name']);
 				$this->assertEquals($dbRow['command'], $script['command']);
@@ -585,7 +650,12 @@ class testScripts extends CZabbixTest {
 				$this->assertEquals($dbRow['execute_on'], $script['execute_on']);
 			}
 			else {
-				$this->assertEquals(0, DBcount('select * from scripts where name='.zbx_dbstr($script['name'])));
+				$this->assertFalse(array_key_exists('result', $result));
+				$this->assertTrue(array_key_exists('error', $result));
+
+				$this->assertSame($expected_error, $result['error']['data']);
+				$dbResult = "select * from scripts where name='".$script['name']."'";
+				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
 	}
@@ -595,36 +665,44 @@ class testScripts extends CZabbixTest {
 			// Check script id.
 			[
 				'script' => [''],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'script' => ['abc'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'script' => ['1.1'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'script' => ['123456'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'script' => ['8', '8'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (8) already exists.'
 			],
 			// Check if deleted scripts used in actions.
 			[
 				'script' => ['11'],
+				'success_expected' => false,
 				'expected_error' => 'Cannot delete scripts. Script "API script in action" is used in action operation "API action with script".'
 			],
 			// Successfully delete scripts.
 			[
 				'script' => ['8'],
+				'success_expected' => true,
 				'expected_error' => null
 			],
-			[
+						[
 				'script' => ['9', '10'],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -633,13 +711,23 @@ class testScripts extends CZabbixTest {
 	/**
 	* @dataProvider script_delete
 	*/
-	public function testScripts_Delete($script, $expected_error) {
-		$result = $this->call('script.delete', $script, $expected_error);
+	public function testScripts_Delete($script, $success_expected, $expected_error) {
+		$result = $this->api_acall('script.delete', $script, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['scriptids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from scripts where scriptid='.zbx_dbstr($id)));
+				$dbResult = 'select * from scripts where scriptid='.$id;
+				$this->assertEquals(0, DBcount($dbResult));
 			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -650,91 +738,104 @@ class testScripts extends CZabbixTest {
 					'scriptid' => '1',
 					'hostid' => '10084',
 					'value' => 'test'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": unexpected parameter "value".'
 			],
 			// Check script id.
 			[
 				'script' => [
 					'hostid' => '10084'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": the parameter "scriptid" is missing.'
 			],
 			[
 				'script' => [
 					'scriptid' => '',
 					'hostid' => '10084'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/scriptid": a number is expected.'
 			],
 			[
 				'script' => [
 					'scriptid' => 'abc',
 					'hostid' => '10084'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/scriptid": a number is expected.'
 			],
 			[
 				'script' => [
 					'scriptid' => '1.1',
 					'hostid' => '10084'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/scriptid": a number is expected.'
 			],
 			[
 				'script' => [
 					'scriptid' => 'æų',
 					'hostid' => '10084'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/scriptid": a number is expected.'
 			],
 			[
 				'script' => [
 					'scriptid' => '123456',
 					'hostid' => '10084'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Check host id.
 			[
 				'script' => [
 					'scriptid' => '1'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": the parameter "hostid" is missing.'
 			],
 			[
 				'script' => [
 					'scriptid' => '1',
 					'hostid' => ''
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/hostid": a number is expected.'
 			],
 			[
 				'script' => [
 					'scriptid' => '1',
 					'hostid' => 'abc'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/hostid": a number is expected.'
 			],
 			[
 				'script' => [
 					'scriptid' => '1',
 					'hostid' => '1.1'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/hostid": a number is expected.'
 			],
 			[
 				'script' => [
 					'scriptid' => '1',
 					'hostid' => 'æų'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/hostid": a number is expected.'
 			],
 			[
 				'script' => [
 					'scriptid' => '1',
 					'hostid' => '123456'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Check script peremissions for host group. Host belongs to the host group that hasn't permission to execute current script
@@ -742,7 +843,8 @@ class testScripts extends CZabbixTest {
 				'script' => [
 					'scriptid' => '4',
 					'hostid' => '50009'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			]
 		];
@@ -751,11 +853,19 @@ class testScripts extends CZabbixTest {
 	/**
 	* @dataProvider script_execute
 	*/
-	public function testScripts_Execute($script, $expected_error) {
-		$result = $this->call('script.execute', $script, $expected_error);
+	public function testScripts_Execute($script, $success_expected, $expected_error) {
+		$result = $this->api_acall('script.execute', $script, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
 			$this->assertEquals('success', $result['result']['response']);
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -766,9 +876,9 @@ class testScripts extends CZabbixTest {
 				'method' => 'script.execute',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
-					'scriptid' => '12',
-					'hostid' => '50009'
-				],
+							'scriptid' => '12',
+							'hostid' => '50009'
+						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// User have permissions to script, but not to host (script can execute only on specific host group).
@@ -776,9 +886,9 @@ class testScripts extends CZabbixTest {
 				'method' => 'script.execute',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
-					'scriptid' => '13',
-					'hostid' => '10084'
-				],
+							'scriptid' => '13',
+							'hostid' => '10084'
+						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// User have deny permissions to host, but script required read permissions for the host.
@@ -786,9 +896,9 @@ class testScripts extends CZabbixTest {
 				'method' => 'script.execute',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
-					'scriptid' => '1',
-					'hostid' => '50014'
-				],
+							'scriptid' => '1',
+							'hostid' => '50014'
+						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Check zabbix admin permissions to create, update, delete and execute script.
@@ -796,18 +906,18 @@ class testScripts extends CZabbixTest {
 				'method' => 'script.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
-					'name' => 'API script create as zabbix admin',
-					'command' => 'reboot server 1'
-				],
+							'name' => 'API script create as zabbix admin',
+							'command' => 'reboot server 1'
+						],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
 			[
 				'method' => 'script.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
-					'scriptid' => '6',
-					'name' => 'API script update as zabbix admin',
-				],
+							'scriptid' => '6',
+							'name' => 'API script update as zabbix admin',
+						],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
 			[
@@ -820,9 +930,9 @@ class testScripts extends CZabbixTest {
 				'method' => 'script.execute',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
-					'scriptid' => '1',
-					'hostid' => '10084'
-				],
+							'scriptid' => '1',
+							'hostid' => '10084'
+						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Check zabbix user permissions to create, update, delete and execute script.
@@ -830,18 +940,18 @@ class testScripts extends CZabbixTest {
 				'method' => 'script.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'script' => [
-					'name' => 'API script create as zabbix user',
-					'command' => 'reboot server 1'
-				],
+							'name' => 'API script create as zabbix user',
+							'command' => 'reboot server 1'
+						],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
 			[
 				'method' => 'script.update',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'script' => [
-					'scriptid' => '6',
-					'name' => 'API script update as zabbix user',
-				],
+							'scriptid' => '6',
+							'name' => 'API script update as zabbix user',
+						],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
 			[
@@ -854,9 +964,9 @@ class testScripts extends CZabbixTest {
 				'method' => 'script.execute',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'script' => [
-					'scriptid' => '1',
-					'hostid' => '10084'
-				],
+							'scriptid' => '1',
+							'hostid' => '10084'
+						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			]
 		];
@@ -865,8 +975,12 @@ class testScripts extends CZabbixTest {
 	/**
 	* @dataProvider script_permissions
 	*/
-	public function testScripts_UserPermissions($method, $login, $params, $expected_error) {
-		$this->authorize($login['user'], $login['password']);
-		$this->call($method, $params, $expected_error);
+	public function testScripts_UserPermissions($method, $login, $user, $expected_error) {
+		$result = $this->api_call_with_user($method, $login, $user, $debug);
+
+		$this->assertFalse(array_key_exists('result', $result));
+		$this->assertTrue(array_key_exists('error', $result));
+
+		$this->assertEquals($expected_error, $result['error']['data']);
 	}
 }

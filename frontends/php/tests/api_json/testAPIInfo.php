@@ -22,20 +22,27 @@
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class testAPIInfo extends CZabbixTest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
-		];
-
-		$this->call('apiinfo.version', [], $error);
-	}
 
 	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
+		$result = $this->api_call('apiinfo.version', [], $debug);
 
+		$this->assertTrue(array_key_exists('result', $result));
+		$this->assertFalse(array_key_exists('error', $result));
 		$this->assertSame('4.0.0', $result['result']);
+	}
+
+	public function testAPIInfo_VersionWithAuth() {
+		$result = $this->api_acall('apiinfo.version', [], $debug);
+
+		$this->assertFalse(array_key_exists('result', $result));
+		$this->assertTrue(array_key_exists('error', $result));
+		$this->assertSame(
+			[
+				'code' => -32602,
+				'message' => 'Invalid params.',
+				'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
+			],
+			$result['error']
+		);
 	}
 }

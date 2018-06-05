@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-/**
- * @backup hosts
- */
 class testProxy extends CZabbixTest {
 
 	public static function proxy_delete() {
@@ -30,58 +27,65 @@ class testProxy extends CZabbixTest {
 			// Check proxy id validation.
 			[
 				'proxy' => [''],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'proxy' => ['abc'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'proxy' => ['1.1'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'proxy' => ['123456'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'proxy' => ['99000', '99000'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (99000) already exists.'
 			],
 			[
 				'proxy' => ['99000', 'abcd'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			// Check if proxy used in actions.
 			[
 				'proxy' => ['99003'],
+				'success_expected' => false,
 				'expected_error' => 'Proxy "Api active proxy in action" is used by action "API action with proxy".'
 			],
 			[
 				'proxy' => ['99000', '99003'],
+				'success_expected' => false,
 				'expected_error' => 'Proxy "Api active proxy in action" is used by action "API action with proxy".'
 			],
 			// Check if proxy used in host.
 			[
 				'proxy' => ['99004'],
+				'success_expected' => false,
 				'expected_error' => 'Host "API Host monitored with proxy" is monitored with proxy "Api active proxy with host".'
 			],
 			[
 				'proxy' => ['99000', '99004'],
+				'success_expected' => false,
 				'expected_error' => 'Host "API Host monitored with proxy" is monitored with proxy "Api active proxy with host".'
-			],
-			// Check if proxy used in discovery rule.
-			[
-				'proxy' => ['99006'],
-				'expected_error' => 'Proxy "Api active proxy for discovery" is used by discovery rule "API discovery rule for delete with proxy".'
 			],
 			// Successfully delete proxy.
 			[
 				'proxy' => ['99000'],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'proxy' => ['99001', '99002'],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -90,13 +94,24 @@ class testProxy extends CZabbixTest {
 	/**
 	* @dataProvider proxy_delete
 	*/
-	public function testProxy_Delete($proxy, $expected_error) {
-		$result = $this->call('proxy.delete', $proxy, $expected_error);
+	public function testProxy_Delete($proxy, $success_expected, $expected_error) {
+		$result = $this->api_acall('proxy.delete', $proxy, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['proxyids'] as $id) {
-				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE hostid='.zbx_dbstr($id)));
+				$dbResult = 'select * from hosts where hostid='.$id;
+				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
+		}
 	}
+
 }

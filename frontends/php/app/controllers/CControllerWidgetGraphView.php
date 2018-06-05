@@ -85,7 +85,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		}
 		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH && $fields['itemid']) {
 			$resource_type = SCREEN_RESOURCE_SIMPLE_GRAPH;
-			$resourceid = $fields['itemid'][0];
+			$resourceid = $fields['itemid'];
 			$graph_dims = getGraphDims();
 			$graph_dims['graphHeight'] = $height;
 			$graph_dims['width'] = $width;

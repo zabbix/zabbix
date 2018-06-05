@@ -83,12 +83,12 @@ class CWidgetField {
 				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
 				break;
 
-			case ZBX_WIDGET_FIELD_TYPE_ITEM:
 			case ZBX_WIDGET_FIELD_TYPE_GROUP:
 			case ZBX_WIDGET_FIELD_TYPE_HOST:
 				$this->validation_rules = ['type' => API_IDS];
 				break;
 
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
 			case ZBX_WIDGET_FIELD_TYPE_MAP:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 				$this->validation_rules = ['type' => API_ID];

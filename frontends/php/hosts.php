@@ -902,12 +902,20 @@ if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) &
 	order_result($data['proxies'], 'host');
 
 	// get templates data
-	$data['linkedTemplates'] = !empty($data['templates'])
-		? CArrayHelper::renameObjectsKeys(API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $data['templates']
-		]), ['templateid' => 'id'])
-		: [];
+	$data['linkedTemplates'] = null;
+	if (!empty($data['templates'])) {
+		$getLinkedTemplates = API::Template()->get([
+			'templateids' => $data['templates'],
+			'output' => ['templateid', 'name']
+		]);
+
+		foreach ($getLinkedTemplates as $getLinkedTemplate) {
+			$data['linkedTemplates'][] = [
+				'id' => $getLinkedTemplate['templateid'],
+				'name' => $getLinkedTemplate['name']
+			];
+		}
+	}
 
 	$hostView = new CView('configuration.host.massupdate', $data);
 }

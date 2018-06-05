@@ -279,10 +279,7 @@ class CControllerPopupTriggerWizard extends CController {
 				'title' => _('Trigger'),
 				'options' => $page_options,
 				'keys' => $this->getInput('keys', []),
-				'expressions' => $exprs,
-				'user' => [
-					'debug_mode' => $this->getDebugMode()
-				]
+				'expressions' => $exprs
 			]));
 		}
 	}

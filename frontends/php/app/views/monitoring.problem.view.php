@@ -95,14 +95,15 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Host groups'),
 			(new CMultiSelect([
 				'name' => 'filter_groupids[]',
-				'object_name' => 'hostGroup',
+				'objectName' => 'hostGroup',
 				'data' => $data['filter']['groups'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'host_groups',
-						'srcfld1' => 'groupid',
 						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_groupids_'
+						'dstfld1' => 'filter_groupids_',
+						'srcfld1' => 'groupid',
+						'multiselect' => '1'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -110,14 +111,16 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Hosts'),
 			(new CMultiSelect([
 				'name' => 'filter_hostids[]',
-				'object_name' => 'hosts',
+				'objectName' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'hosts',
-						'srcfld1' => 'hostid',
 						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_hostids_'
+						'dstfld1' => 'filter_hostids_',
+						'srcfld1' => 'hostid',
+						'real_hosts' => '1',
+						'multiselect' => '1'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -142,7 +145,10 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Triggers'),
 			(new CMultiSelect([
 				'name' => 'filter_triggerids[]',
-				'object_name' => 'triggers',
+				'objectName' => 'triggers',
+				'objectOptions' => [
+					'monitored' => true
+				],
 				'data' => $data['filter']['triggers'],
 				'popup' => [
 					'parameters' => [
@@ -150,9 +156,10 @@ if ($data['action'] == 'problem.view') {
 						'srcfld1' => 'triggerid',
 						'dstfrm' => 'zbx_filter',
 						'dstfld1' => 'filter_triggerids_',
-						'monitored_hosts' => true,
-						'with_monitored_triggers' => true,
-						'noempty' => true
+						'monitored_hosts' => '1',
+						'with_monitored_triggers' => '1',
+						'multiselect' => '1',
+						'noempty' => '1'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -221,8 +228,8 @@ if ($data['action'] == 'problem.view') {
 	$filter_tags_table->addRow(
 		(new CCol(
 			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
-				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+				->addValue(_('AND'), TAG_EVAL_TYPE_AND)
+				->addValue(_('OR'), TAG_EVAL_TYPE_OR)
 				->setModern(true)
 		))->setColSpan(4)
 	);

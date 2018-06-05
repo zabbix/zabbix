@@ -100,6 +100,11 @@ class CControllerDashboardWidgetEdit extends CController {
 
 				if ($id != 0) {
 					switch ($resource_type) {
+						case WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH:
+						case WIDGET_FIELD_SELECT_RES_ITEM:
+							$captions['simple'][$resource_type][$id] = _('Inaccessible item');
+							break;
+
 						case WIDGET_FIELD_SELECT_RES_SYSMAP:
 							$captions['simple'][$resource_type][$id] = _('Inaccessible map');
 							break;
@@ -118,6 +123,24 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 
 			switch ($resource_type) {
+				case WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH:
+				case WIDGET_FIELD_SELECT_RES_ITEM:
+					$items = API::Item()->get([
+						'output' => ['itemid', 'hostid', 'key_', 'name'],
+						'selectHosts' => ['name'],
+						'itemids' => array_keys($list),
+						'webitems' => true
+					]);
+
+					if ($items) {
+						$items = CMacrosResolverHelper::resolveItemNames($items);
+
+						foreach ($items as $key => $item) {
+							$list[$item['itemid']] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+						}
+					}
+					break;
+
 				case WIDGET_FIELD_SELECT_RES_SYSMAP:
 					$maps = API::Map()->get([
 						'sysmapids' => array_keys($list),
@@ -153,7 +176,6 @@ class CControllerDashboardWidgetEdit extends CController {
 		// Prepare data for CMultiSelect controls.
 		$groupids = [];
 		$hostids = [];
-		$itemids = [];
 
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldGroup) {
@@ -172,15 +194,6 @@ class CControllerDashboardWidgetEdit extends CController {
 				foreach ($field->getValue() as $hostid) {
 					$captions['ms']['hosts'][$field_name][$hostid] = ['id' => $hostid];
 					$hostids[$hostid][] = $field_name;
-				}
-			}
-			elseif ($field instanceof CWidgetFieldItem) {
-				$field_name = $field->getName();
-				$captions['ms']['items'][$field_name] = [];
-
-				foreach ($field->getValue() as $itemid) {
-					$captions['ms']['items'][$field_name][$itemid] = ['id' => $itemid];
-					$itemids[$itemid][] = $field_name;
 				}
 			}
 		}
@@ -214,32 +227,9 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 		}
 
-		if ($itemids) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'selectHosts' => ['name'],
-				'itemids' => array_keys($itemids),
-				'preservekeys' => true,
-				'webitems' => true
-			]);
-
-			$items = CMacrosResolverHelper::resolveItemNames($items);
-
-			foreach ($items as $itemid => $item) {
-				foreach ($itemids[$itemid] as $field_name) {
-					$captions['ms']['items'][$field_name][$itemid] = [
-						'id' => $itemid,
-						'name' => $item['name_expanded'],
-						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
-					];
-				}
-			}
-		}
-
 		$inaccessible_resources = [
 			'groups' => _('Inaccessible group'),
-			'hosts' => _('Inaccessible host'),
-			'items' => _('Inaccessible item')
+			'hosts' => _('Inaccessible host')
 		];
 
 		foreach ($captions['ms'] as $resource_type => &$fields_captions) {

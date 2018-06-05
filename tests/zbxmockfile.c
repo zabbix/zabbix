@@ -17,9 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#define fopen	__real_fopen
-#define fclose	__real_fclose
-#define fgets	__real_fgets
+/* make sure that __wrap_*() prototypes match unwrapped counterparts */
+
+#define fopen	__wrap_fopen
+#define fclose	__wrap_fclose
+#define fgets	__wrap_fgets
 #include <stdio.h>
 #undef fopen
 #undef fclose
@@ -30,43 +32,10 @@
 
 #include "common.h"
 
-#define ZBX_MOCK_MAX_FILES	16
-
-void	*mock_streams[ZBX_MOCK_MAX_FILES];
-
 struct zbx_mock_IO_FILE
 {
-	const char	*contents;
+	const char *contents;
 };
-
-static int	is_profiler_path(const char *path)
-{
-	size_t	len;
-
-	len = strlen(path);
-
-	if ((ZBX_CONST_STRLEN(".gcda") < len && 0 == strcmp(path + len - ZBX_CONST_STRLEN(".gcda"), ".gcda")) ||
-			(ZBX_CONST_STRLEN(".gcno") < len &&
-					0 == strcmp(path + len - ZBX_CONST_STRLEN(".gcno"), ".gcno")))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	is_mock_stream(FILE *stream)
-{
-	int	i;
-
-	for (i = 0; i < ZBX_MOCK_MAX_FILES && NULL != mock_streams[i]; i++)
-	{
-		if (stream == mock_streams[i])
-			return SUCCEED;
-	}
-
-	return FAIL;
-}
 
 FILE	*__wrap_fopen(const char *path, const char *mode)
 {
@@ -74,9 +43,6 @@ FILE	*__wrap_fopen(const char *path, const char *mode)
 	zbx_mock_handle_t	file_contents;
 	const char		*contents;
 	struct zbx_mock_IO_FILE	*file = NULL;
-
-	if (SUCCEED == is_profiler_path(path))
-		return __real_fopen(path, mode);
 
 	if (0 != strcmp(mode, "r"))
 	{
@@ -98,19 +64,8 @@ FILE	*__wrap_fopen(const char *path, const char *mode)
 	}
 	else
 	{
-		int	i;
-
-		for (i = 0; i < ZBX_MOCK_MAX_FILES && NULL != mock_streams[i]; i++)
-			;
-
-		if (i < ZBX_MOCK_MAX_FILES)
-		{
-			file = zbx_malloc(file, sizeof(struct zbx_mock_IO_FILE));
-			file->contents = contents;
-			mock_streams[i] = file;
-		}
-		else
-			errno = EMFILE;	/* The per-process limit on the number of open file descriptors has been reached */
+		file = zbx_malloc(file, sizeof(struct zbx_mock_IO_FILE));
+		file->contents = contents;
 	}
 
 	return (FILE *)file;
@@ -118,9 +73,6 @@ FILE	*__wrap_fopen(const char *path, const char *mode)
 
 int	__wrap_fclose(FILE *stream)
 {
-	if (SUCCEED != is_mock_stream(stream))
-		return __real_fclose(stream);
-
 	zbx_free(stream);
 	return 0;
 }
@@ -130,9 +82,6 @@ char	*__wrap_fgets(char *s, int size, FILE *stream)
 	struct zbx_mock_IO_FILE	*file = (struct zbx_mock_IO_FILE *)stream;
 	int			length;
 	const char		*newline;
-
-	if (SUCCEED != is_mock_stream(stream))
-		return __real_fgets(s, size, stream);
 
 	assert_non_null(s);
 	assert_true(0 < size);

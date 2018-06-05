@@ -21,9 +21,6 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-/**
- * @backup globalmacro
- */
 class testUserMacro extends CZabbixTest {
 
 	public static function globalmacro_create() {
@@ -35,6 +32,7 @@ class testUserMacro extends CZabbixTest {
 					'value' => 'test',
 					'hostid ' => '100084'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "hostid ".'
 			],
 			// Check macro.
@@ -42,6 +40,7 @@ class testUserMacro extends CZabbixTest {
 				'globalmacro' => [
 					'value' => 'test'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "macro" is missing.'
 			],
 			// Check existing macro
@@ -50,6 +49,7 @@ class testUserMacro extends CZabbixTest {
 					'macro' => '{$SNMP_COMMUNITY}',
 					'value' => 'test'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Macro "{$SNMP_COMMUNITY}" already exists.'
 			],
 			[
@@ -63,6 +63,7 @@ class testUserMacro extends CZabbixTest {
 					'value' => 'test'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (macro)=({$THESAMEMACRO}) already exists.'
 			],
 			// Check value
@@ -70,6 +71,7 @@ class testUserMacro extends CZabbixTest {
 				'globalmacro' => [
 					'macro' => '{$CHECKVALUE}'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "value" is missing.'
 			],
 			// Check successfully creation of global macro.
@@ -80,6 +82,7 @@ class testUserMacro extends CZabbixTest {
 						'value' => 'test'
 					],
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -89,6 +92,7 @@ class testUserMacro extends CZabbixTest {
 						'value' => 'test'
 					],
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -98,6 +102,7 @@ class testUserMacro extends CZabbixTest {
 						'value' => 'test'
 					],
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -111,6 +116,7 @@ class testUserMacro extends CZabbixTest {
 						'value' => 'æų'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -119,16 +125,25 @@ class testUserMacro extends CZabbixTest {
 	/**
 	* @dataProvider globalmacro_create
 	*/
-	public function testUserMacro_CreateGlobal($globalmacro, $expected_error) {
-		$result = $this->call('usermacro.createglobal', $globalmacro, $expected_error);
+	public function testUserMacro_CreateGlobal($globalmacro, $success_expected, $expected_error) {
+		$result = $this->api_acall('usermacro.createglobal', $globalmacro, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['globalmacroids'] as $key => $id) {
-				$dbResult = DBSelect('select * from globalmacro where globalmacroid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from globalmacro where globalmacroid='.$id);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['macro'], $globalmacro[$key]['macro']);
 				$this->assertEquals($dbRow['value'], $globalmacro[$key]['value']);
 			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertSame($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -242,9 +257,13 @@ class testUserMacro extends CZabbixTest {
 				$globalmacro['globalmacroid'] = '13';
 			}
 
-			$this->call($method, $globalmacro, $expected_error);
+			$result = $this->api_acall($method, $globalmacro, $debug);
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
 			if (array_key_exists('macro', $globalmacro)) {
-				$dbResult = 'select * from globalmacro where macro='.zbx_dbstr($globalmacro['macro']);
+				$dbResult = "select * from globalmacro where macro='".$globalmacro['macro']."'";
 				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
@@ -257,6 +276,7 @@ class testUserMacro extends CZabbixTest {
 				'globalmacro' => [[
 					'value' => 'test'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "globalmacroid" is missing.'
 			],
 			[
@@ -264,6 +284,7 @@ class testUserMacro extends CZabbixTest {
 					'globalmacroid' => '',
 					'value' => 'test'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/globalmacroid": a number is expected.'
 			],
 			[
@@ -271,6 +292,7 @@ class testUserMacro extends CZabbixTest {
 					'globalmacroid' => 'abc',
 					'value' => 'test'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/globalmacroid": a number is expected.'
 			],
 			[
@@ -278,6 +300,7 @@ class testUserMacro extends CZabbixTest {
 					'globalmacroid' => '123456',
 					'value' => 'test'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Check existing macro
@@ -286,6 +309,7 @@ class testUserMacro extends CZabbixTest {
 					'globalmacroid' => '13',
 					'macro' => '{$SNMP_COMMUNITY}'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Macro "{$SNMP_COMMUNITY}" already exists.'
 			],
 			[
@@ -299,6 +323,7 @@ class testUserMacro extends CZabbixTest {
 					'macro' => '{$THESAMEMACROID2}'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (globalmacroid)=(13) already exists.'
 			],
 			// Check successfully update of global macro.
@@ -310,6 +335,7 @@ class testUserMacro extends CZabbixTest {
 						'value' => 'updated'
 					],
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -325,6 +351,7 @@ class testUserMacro extends CZabbixTest {
 						'value' => 'updated2'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -333,21 +360,28 @@ class testUserMacro extends CZabbixTest {
 	/**
 	* @dataProvider globalmacro_update
 	*/
-	public function testUserMacro_UpdateGlobal($globalmacros, $expected_error) {
-		$result = $this->call('usermacro.updateglobal', $globalmacros, $expected_error);
+	public function testUserMacro_UpdateGlobal($globalmacros, $success_expected, $expected_error) {
+		$result = $this->api_acall('usermacro.updateglobal', $globalmacros, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['globalmacroids'] as $key => $id) {
-				$dbResult = DBSelect('select * from globalmacro where globalmacroid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from globalmacro where globalmacroid='.$id);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['macro'], $globalmacros[$key]['macro']);
 				$this->assertEquals($dbRow['value'], $globalmacros[$key]['value']);
 			}
 		}
 		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+			$this->assertSame($expected_error, $result['error']['data']);
+
 			foreach ($globalmacros as $globalmacro) {
 				if (array_key_exists('macro', $globalmacro) && $globalmacro['macro'] != '{$SNMP_COMMUNITY}') {
-					$dbResult = "select * from globalmacro where macro=".zbx_dbstr($globalmacro['macro']);
+					$dbResult = "select * from globalmacro where macro='".$globalmacro['macro']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
@@ -360,24 +394,28 @@ class testUserMacro extends CZabbixTest {
 				'globalmacro' => [
 					''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'globalmacro' => [
 					'123456'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'globalmacro' => [
 					'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'globalmacro' => [
 					'.'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
@@ -385,6 +423,7 @@ class testUserMacro extends CZabbixTest {
 					'15',
 					'123456'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -392,6 +431,7 @@ class testUserMacro extends CZabbixTest {
 					'15',
 					'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
@@ -399,6 +439,7 @@ class testUserMacro extends CZabbixTest {
 					'15',
 					''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
@@ -406,12 +447,14 @@ class testUserMacro extends CZabbixTest {
 					'15',
 					'15'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (15) already exists.'
 			],
 			[
 				'globalmacro' => [
 					'15'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -419,6 +462,7 @@ class testUserMacro extends CZabbixTest {
 					'16',
 					'17'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -427,14 +471,23 @@ class testUserMacro extends CZabbixTest {
 	/**
 	* @dataProvider globalmacro_delete
 	*/
-	public function testUserMacro_DeleteGlobal($globalmacro, $expected_error) {
-		$result = $this->call('usermacro.deleteglobal', $globalmacro, $expected_error);
+	public function testUserMacro_DeleteGlobal($globalmacro, $success_expected, $expected_error) {
+		$result = $this->api_acall('usermacro.deleteglobal', $globalmacro, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['globalmacroids'] as $id) {
-				$dbResult = 'select * from globalmacro where globalmacroid='.zbx_dbstr($id);
+				$dbResult = 'select * from globalmacro where globalmacroid='.$id;
 				$this->assertEquals(0, DBcount($dbResult));
 			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -522,7 +575,11 @@ class testUserMacro extends CZabbixTest {
 	* @dataProvider globalmacro_permissions
 	*/
 	public function testUserMacro_UserPermissionsGlobal($method, $user, $globalmacro, $expected_error) {
-		$this->authorize($user['user'], $user['password']);
-		$this->call($method, $globalmacro, $expected_error);
+		$result = $this->api_call_with_user($method, $user, $globalmacro, $debug);
+
+		$this->assertFalse(array_key_exists('result', $result));
+		$this->assertTrue(array_key_exists('error', $result));
+
+		$this->assertEquals($expected_error, $result['error']['data']);
 	}
 }

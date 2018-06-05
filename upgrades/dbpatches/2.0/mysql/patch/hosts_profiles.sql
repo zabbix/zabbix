@@ -1,0 +1,1 @@
+-- See host_inventory.sql

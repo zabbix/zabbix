@@ -580,26 +580,35 @@ $itemFormList
 // append applications to form list
 if ($this->data['displayApplications']) {
 	// replace applications
-	$app_to_replace = hasRequest('applications')
-		? CArrayHelper::renameObjectsKeys(API::Application()->get([
-			'output' => ['applicationid', 'name'],
-			'applicationids' => getRequest('applications')
-		]), ['applicationid' => 'id'])
-		: [];
+	$appToReplace = null;
+	if (hasRequest('applications')) {
+		$getApps = API::Application()->get([
+			'applicationids' => getRequest('applications'),
+			'output' => ['applicationid', 'name']
+		]);
+		foreach ($getApps as $getApp) {
+			$appToReplace[] = [
+				'id' => $getApp['applicationid'],
+				'name' => $getApp['name']
+			];
+		}
+	}
 
-	$replace_app = (new CDiv(
+	$replaceApp = (new CDiv(
 		(new CMultiSelect([
 			'name' => 'applications[]',
-			'object_name' => 'applications',
-			'data' => $app_to_replace,
+			'objectName' => 'applications',
+			'objectOptions' => ['hostid' => $this->data['hostid']],
+			'data' => $appToReplace,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'applications',
-					'srcfld1' => 'applicationid',
 					'dstfrm' => $itemForm->getName(),
 					'dstfld1' => 'applications_',
-					'hostid' => $data['hostid'],
-					'noempty' => true
+					'srcfld1' => 'applicationid',
+					'multiselect' => '1',
+					'noempty' => '1',
+					'hostid' => $this->data['hostid']
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -608,50 +617,56 @@ if ($this->data['displayApplications']) {
 	$itemFormList->addRow(
 		(new CVisibilityBox('visible[applications]', 'replaceApp', _('Original')))
 			->setLabel(_('Replace applications'))
-			->setChecked(isset($data['visible']['applications'])),
-		$replace_app
+			->setChecked(isset($this->data['visible']['applications'])),
+		$replaceApp
 	);
 
 	// add new or existing applications
-	$applications_to_add = [];
+	$appToAdd = null;
 	if (hasRequest('new_applications')) {
-		$applicationids = [];
-
 		foreach (getRequest('new_applications') as $newApplication) {
 			if (is_array($newApplication) && isset($newApplication['new'])) {
-				$applications_to_add[] = [
+				$appToAdd[] = [
 					'id' => $newApplication['new'],
 					'name' => $newApplication['new'].' ('._x('new', 'new element in multiselect').')',
 					'isNew' => true
 				];
 			}
 			else {
-				$applicationids[] = $newApplication;
+				$appToAddId[] = $newApplication;
 			}
 		}
 
-		$applications_to_add = array_merge($applications_to_add, $applicationids
-			? CArrayHelper::renameObjectsKeys(API::Application()->get([
-				'output' => ['applicationid', 'name'],
-				'applicationids' => $applicationids
-			]), ['applicationid' => 'id'])
-			: []);
+		if (isset($appToAddId)) {
+			$getApps = API::Application()->get([
+				'applicationids' => $appToAddId,
+				'output' => ['applicationid', 'name']
+			]);
+			foreach ($getApps as $getApp) {
+				$appToAdd[] = [
+					'id' => $getApp['applicationid'],
+					'name' => $getApp['name']
+				];
+			}
+		}
 	}
 
 	$newApp = (new CDiv(
 		(new CMultiSelect([
 			'name' => 'new_applications[]',
-			'object_name' => 'applications',
-			'add_new' => true,
-			'data' => $applications_to_add,
+			'objectName' => 'applications',
+			'objectOptions' => ['hostid' => $this->data['hostid']],
+			'data' => $appToAdd,
+			'addNew' => true,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'applications',
-					'srcfld1' => 'applicationid',
 					'dstfrm' => $itemForm->getName(),
 					'dstfld1' => 'new_applications_',
-					'hostid' => $data['hostid'],
-					'noempty' => true
+					'srcfld1' => 'applicationid',
+					'multiselect' => '1',
+					'noempty' => '1',
+					'hostid' => $this->data['hostid']
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -666,44 +681,32 @@ if ($this->data['displayApplications']) {
 }
 
 // Append master item select.
-if ($data['displayMasteritems']) {
-	$master_item = (new CDiv([
-		(new CMultiSelect([
-			'name' => 'master_itemid',
-			'object_name' => 'items',
-			'multiple' => false,
-			'data' => ($data['master_itemid'] != 0)
-				? [
-					[
-						'id' => $data['master_itemid'],
-						'prefix' => $data['master_hostname'].NAME_DELIMITER,
-						'name' => $data['master_itemname']
-					]
-				]
-				: [],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'dstfrm' => $itemForm->getName(),
-					'dstfld1' => 'master_itemid',
-					'hostid' => $data['hostid'],
-					'excludeids' => $data['itemids'],
-					'webitems' => true
-				]
-			]
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(true)
-	]))->setId('master_item');
+$master_item = (new CDiv([
+	(new CTextBox('master_itemname', $data['master_itemname'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid')),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CButton('button', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'master_itemname',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'dstfld2' => 'master_itemname',
+				'only_hostid' => $data['hostid'],
+				'excludeids' => $data['itemids']
+			]).', null, this);'
+		)
+]))->setId('master_item');
 
-	$itemFormList->addRow(
-		(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))
-			->setLabel(_('Master item'))
-			->setChecked(array_key_exists('master_itemid', $data['visible'])),
-		$master_item
-	);
-}
+$itemFormList->addRow(
+	(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))
+		->setLabel(_('Master item'))
+		->setChecked(isset($data['visible']['master_itemid'])),
+	$master_item
+);
 
 // append description to form list
 $itemFormList->addRow(

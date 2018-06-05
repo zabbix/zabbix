@@ -38,14 +38,15 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Host groups'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'object_name' => 'hostGroup',
-			'data' => $data['multiSelectHostGroupData'],
+			'objectName' => 'hostGroup',
+			'data' => $this->data['multiSelectHostGroupData'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
 					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'groupids_'
+					'dstfld1' => 'groupids_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -53,14 +54,16 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Hosts'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
-			'object_name' => 'hosts',
-			'data' => $data['multiSelectHostData'],
+			'objectName' => 'hosts',
+			'data' => $this->data['multiSelectHostData'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
 					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'hostids_'
+					'dstfld1' => 'hostids_',
+					'srcfld1' => 'hostid',
+					'real_hosts' => '1',
+					'multiselect' => '1'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

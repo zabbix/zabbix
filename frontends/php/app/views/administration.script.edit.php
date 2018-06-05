@@ -82,18 +82,18 @@ $scriptFormList
 	)
 	->addRow(null, (new CMultiSelect([
 		'name' => 'groupid',
-		'object_name' => 'hostGroup',
-		'multiple' => false,
+		'selectedLimit' => 1,
+		'objectName' => 'hostGroup',
 		'data' => $data['hostgroup'],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'host_groups',
-				'srcfld1' => 'groupid',
 				'dstfrm' => $scriptForm->getName(),
-				'dstfld1' => 'groupid'
+				'dstfld1' => 'groupid',
+				'srcfld1' => 'groupid'
 			]
-		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
+		]]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
 	->addRow((new CLabel(_('Required host permissions'), 'host_access')),
 		(new CRadioButtonList('host_access', (int) $data['host_access']))
 			->addValue(_('Read'), PERM_READ)

@@ -19,7 +19,6 @@
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
-#include "zbxmockdb.h"
 
 #include "common.h"
 #include "zbxalgo.h"
@@ -34,8 +33,6 @@ void	zbx_mock_test_entry(void **state)
 	int			i;
 
 	ZBX_UNUSED(state);
-
-	zbx_mockdb_init();
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("sql", &in_sql)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(in_sql, &sql)))
@@ -77,6 +74,4 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("There are more actual results (%d) than expected (%d).", i, actual_results.values_num);
 
 	zbx_vector_uint64_destroy(&actual_results);
-
-	zbx_mockdb_destroy();
 }

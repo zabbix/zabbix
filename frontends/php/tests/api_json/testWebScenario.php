@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-/**
- * @backup httptest
- */
 class testWebScenario extends CZabbixTest {
 
 	public static function httptest_create() {
@@ -33,6 +30,7 @@ class testWebScenario extends CZabbixTest {
 					'hostid' => '50009',
 					'httptestid' => '1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "httptestid".'
 			],
 			// Check web name.
@@ -40,6 +38,7 @@ class testWebScenario extends CZabbixTest {
 				'httptest' => [
 					'hostid' => '50009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
 			],
 			[
@@ -47,6 +46,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => '',
 					'hostid' => '50009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			// Check for duplicated web scenarios names.
@@ -62,6 +62,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Web scenario "Api web scenario" already exists.'
 			],
 			[
@@ -89,6 +90,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Web scenario "Api web scenario" already exists.'
 			],
 			[
@@ -116,6 +118,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (hostid, name)=(50009, Web scenario with two identical name) already exists.'
 			],
 			// Check web hostid.
@@ -123,6 +126,7 @@ class testWebScenario extends CZabbixTest {
 				'httptest' => [
 					'name' => 'Api create web without hostid'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "hostid" is missing.'
 			],
 			[
@@ -130,6 +134,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api create web with empty hostid',
 					'hostid' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/hostid": a number is expected.'
 			],
 			[
@@ -137,6 +142,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api create web with wrong hostid',
 					'hostid' => 'æų☺'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/hostid": a number is expected.'
 			],
 			[
@@ -144,6 +150,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api create web with wrong hostid',
 					'hostid' => '5000.9'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/hostid": a number is expected.'
 			],
 			[
@@ -158,6 +165,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -172,6 +180,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Check successfully create.
@@ -216,6 +225,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				]],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -250,6 +260,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				]],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -277,6 +288,7 @@ class testWebScenario extends CZabbixTest {
 					]
 				]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -285,22 +297,31 @@ class testWebScenario extends CZabbixTest {
 	/**
 	* @dataProvider httptest_create
 	*/
-	public function testWebScenario_Create($httptests, $expected_error) {
-		$result = $this->call('httptest.create', $httptests, $expected_error);
+	public function testWebScenario_Create($httptests, $success_expected, $expected_error) {
+		$result = $this->api_acall('httptest.create', $httptests, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['httptestids'] as $key => $id) {
-				$dbResultWeb = DBSelect('select * from httptest where httptestid='.zbx_dbstr($id));
+				$dbResultWeb = DBSelect('select * from httptest where httptestid='.$id);
 				$dbRowWeb = DBFetch($dbResultWeb);
 				$this->assertEquals($dbRowWeb['name'], $httptests[$key]['name']);
 				$this->assertEquals($dbRowWeb['hostid'], $httptests[$key]['hostid']);
-				$this->assertEquals(1, DBcount('select * from httpstep where httptestid='.zbx_dbstr($id)));
+				$dbResultStep = 'select * from httpstep where httptestid='.$id;
+				$this->assertEquals(1, DBcount($dbResultStep));
 			}
 		}
 		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+			$this->assertSame($expected_error, $result['error']['data']);
+
 			foreach ([$httptests] as $httptest) {
-				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+				if (array_key_exists('name', $httptest) && $httptest['name'] != 'Api web scenario'){
+					$dbResult = "select * from httptest where name='".$httptest['name']."'";
+					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
 		}
@@ -313,6 +334,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api update web scenario with unexpected parameter',
 					'hostid' => '50009',
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "hostid".'
 			],
 			// Check web scenario id.
@@ -320,6 +342,7 @@ class testWebScenario extends CZabbixTest {
 				'httptest' => [[
 					'name' => 'Api updated web scenario without id'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "httptestid" is missing.'
 			],
 			[
@@ -327,6 +350,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api updated web scenario with empty id',
 					'httptestid' => ''
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/httptestid": a number is expected.'
 			],
 			[
@@ -334,6 +358,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api updated web scenario with invalid id',
 					'httptestid' => 'abc'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/httptestid": a number is expected.'
 			],
 			[
@@ -341,6 +366,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api updated web scenario with invalid id',
 					'httptestid' => '1.1'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/httptestid": a number is expected.'
 			],
 			[
@@ -348,6 +374,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api updated web scenario with nonexistent id',
 					'httptestid' => '123456'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -361,6 +388,7 @@ class testWebScenario extends CZabbixTest {
 						'name' => 'Web scenarios the same id 2'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (httptestid)=(15001) already exists.'
 			],
 			// Check web scenario name.
@@ -369,6 +397,7 @@ class testWebScenario extends CZabbixTest {
 					'httptestid' => '15001',
 					'name' => '',
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
@@ -376,6 +405,7 @@ class testWebScenario extends CZabbixTest {
 					'httptestid' => '15001',
 					'name' => 'Api web scenario',
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Web scenario "Api web scenario" already exists.'
 			],
 			[
@@ -389,6 +419,7 @@ class testWebScenario extends CZabbixTest {
 						'name' => 'Web scenarios with the same name',
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (hostid, name)=(50009, Web scenarios with the same name) already exists.'
 			],
 			// Check successfully web scenario update.
@@ -399,6 +430,7 @@ class testWebScenario extends CZabbixTest {
 						'name' => 'Апи скрипт обнавлён утф-8',
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -412,6 +444,7 @@ class testWebScenario extends CZabbixTest {
 						'name' => 'Api updated two web scenario',
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -420,12 +453,15 @@ class testWebScenario extends CZabbixTest {
 	/**
 	* @dataProvider httptest_update
 	*/
-	public function testWebScenario_Update($httptests, $expected_error) {
-		$result = $this->call('httptest.update', $httptests, $expected_error);
+	public function testWebScenario_Update($httptests, $success_expected, $expected_error) {
+		$result = $this->api_acall('httptest.update', $httptests, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['httptestids'] as $key => $id) {
-				$dbResult = DBSelect('select * from httptest where httptestid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from httptest where httptestid='.$id);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $httptests[$key]['name']);
 				$this->assertEquals($dbRow['httptestid'], $httptests[$key]['httptestid']);
@@ -449,9 +485,14 @@ class testWebScenario extends CZabbixTest {
 			}
 		}
 		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+			$this->assertSame($expected_error, $result['error']['data']);
+
 			foreach ($httptests as $httptest) {
-				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+				if (array_key_exists('name', $httptest) && $httptest['name'] != 'Api web scenario'){
+					$dbResult = "select * from httptest where name='".$httptest['name']."'";
+					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
 		}
@@ -465,6 +506,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web scenario with readonly parametr',
 					'templateid' => '1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "templateid".'
 			],
 			// Check web name.
@@ -472,6 +514,7 @@ class testWebScenario extends CZabbixTest {
 				'httptest' => [
 					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			// Check web agent.
@@ -487,6 +530,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/agent": value is too long.'
 			],
 			// Check web applicationid.
@@ -495,6 +539,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with empty applicationid',
 					'applicationid' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
@@ -509,6 +554,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Application with applicationid "123456" does not exist.'
 			],
 			[
@@ -523,6 +569,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
@@ -537,6 +584,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
@@ -551,6 +599,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
@@ -565,6 +614,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'The web scenario application belongs to a different host than the web scenario host.'
 			],
 			[
@@ -579,6 +629,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot add a discovered application "API discovery application" to a web scenario.'
 			],
 			// Check web authentication.
@@ -587,6 +638,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with nonexistent authentication',
 					'authentication' => '3'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/authentication": value must be one of 0, 1, 2.'
 			],
 			[
@@ -594,6 +646,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with nonexistent authentication',
 					'authentication' => '-2'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/authentication": value must be one of 0, 1, 2.'
 			],
 			[
@@ -601,6 +654,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong authentication',
 					'authentication' => '☺'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/authentication": a number is expected.'
 			],
 			[
@@ -608,6 +662,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong authentication',
 					'authentication' => '0.1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/authentication": a number is expected.'
 			],
 			// Check web delay.
@@ -616,6 +671,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong delay',
 					'delay' => '-1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
 			],
 			[
@@ -623,6 +679,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong delay',
 					'delay' => '0'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 			],
 			[
@@ -630,6 +687,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong delay',
 					'delay' => '86401'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 			],
 			[
@@ -637,6 +695,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong delay',
 					'delay' => '☺'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
 			],
 			[
@@ -644,6 +703,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong delay',
 					'delay' => '1.5'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
 			],
 			// Check web headers.
@@ -652,6 +712,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong headers',
 					'headers' => '☺'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
 			],
 			[
@@ -664,6 +725,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
 			],
 			[
@@ -676,6 +738,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
 			],
 			[
@@ -688,6 +751,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/headers/1/name": value is too long.'
 			],
 			// Check web password used for basic HTTP authentication.
@@ -704,6 +768,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
 			],
 			[
@@ -720,6 +785,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
 			],
 			[
@@ -736,6 +802,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/http_password": value is too long.'
 			],
 			[
@@ -751,6 +818,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_password": should be empty.'
 			],
 			// Check web password used for NTLM  authentication.
@@ -767,6 +835,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
 			],
 			[
@@ -783,6 +852,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
 			],
 			[
@@ -799,6 +869,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/http_password": value is too long.'
 			],
 			// Check web user name used for basic HTTP authentication .
@@ -815,6 +886,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_user": should be empty.'
 			],
 			[
@@ -829,6 +901,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
 			],
 			[
@@ -844,6 +917,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
 			],
 			[
@@ -852,6 +926,7 @@ class testWebScenario extends CZabbixTest {
 					'authentication' => '1',
 					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/http_user": value is too long.'
 			],
 			// Check web user name used for NTLM authentication .
@@ -867,6 +942,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
 			],
 			[
@@ -882,6 +958,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
 			],
 			[
@@ -890,6 +967,7 @@ class testWebScenario extends CZabbixTest {
 					'authentication' => '2',
 					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/http_user": value is too long.'
 			],
 			// Check web proxy
@@ -898,6 +976,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with long http_proxy',
 					'http_proxy' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/http_proxy": value is too long.'
 			],
 			// Check web retries
@@ -906,6 +985,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with empty retries',
 					'retries' => '',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
 			],
 			[
@@ -913,6 +993,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong retries',
 					'retries' => '☺',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
 			],
 			[
@@ -920,6 +1001,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong retries',
 					'retries' => '1.5',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
 			],
 			[
@@ -927,6 +1009,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong retries',
 					'retries' => '1s',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
 			],
 			[
@@ -934,6 +1017,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong retries',
 					'retries' => '-5',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/retries": value must be one of 1-10.'
 			],
 			[
@@ -941,6 +1025,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong retries',
 					'retries' => '0',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/retries": value must be one of 1-10.'
 			],
 			[
@@ -948,6 +1033,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong retries',
 					'retries' => '11',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/retries": value must be one of 1-10.'
 			],
 			// Check web ssl_cert_file
@@ -956,6 +1042,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with long ssl_cert_file',
 					'ssl_cert_file' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": value is too long.'
 			],
 			// Check web ssl_key_file
@@ -964,6 +1051,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with long ssl_key_file',
 					'ssl_key_file' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value is too long.'
 			],
 			// Check web ssl_key_password
@@ -972,6 +1060,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with long ssl_key_password ',
 					'ssl_key_password' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/ssl_key_password": value is too long.'
 			],
 			// Check web status
@@ -980,6 +1069,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with empty status',
 					'status' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
 			],
 			[
@@ -987,6 +1077,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong status',
 					'status' => '☺'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
 			],
 			[
@@ -994,6 +1085,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong status',
 					'status' => '0.0'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
 			],
 			[
@@ -1001,6 +1093,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong status',
 					'status' => '2'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/status": value must be one of 0, 1.'
 			],
 			[
@@ -1008,6 +1101,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong status',
 					'status' => '-1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/status": value must be one of 0, 1.'
 			],
 			// Check web variables.
@@ -1016,6 +1110,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong variable',
 					'variables' => '☺'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 			],
 			[
@@ -1028,6 +1123,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 			],
 			[
@@ -1040,6 +1136,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 			],
 			[
@@ -1052,6 +1149,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 			],
 			[
@@ -1064,6 +1162,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": cannot be empty.'
 			],
 			[
@@ -1076,6 +1175,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": value is too long.'
 			],
 			[
@@ -1099,6 +1199,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/variables/2": value (name)=({duplicate name}) already exists.'
 			],
 			// Check web verify_host
@@ -1107,6 +1208,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with empty verify_host',
 					'verify_host' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
 			],
 			[
@@ -1114,6 +1216,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong verify_host',
 					'verify_host' => '☺',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
 			],
 			[
@@ -1121,6 +1224,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong verify_host',
 					'verify_host' => '-1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_host": value must be one of 0, 1.'
 			],
 			[
@@ -1128,6 +1232,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong verify_host',
 					'verify_host' => '1.5'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
 			],
 			[
@@ -1135,6 +1240,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong verify_host',
 					'verify_host' => '2'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_host": value must be one of 0, 1.'
 			],
 			// Check web verify_peer
@@ -1143,6 +1249,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with empty verify_peer',
 					'verify_peer' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
 			],
 			[
@@ -1150,6 +1257,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong verify_peer',
 					'verify_peer' => '☺',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
 			],
 			[
@@ -1157,6 +1265,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong verify_peer',
 					'verify_peer' => '-1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_peer": value must be one of 0, 1.'
 			],
 			[
@@ -1164,6 +1273,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong verify_peer',
 					'verify_peer' => '1.5'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
 			],
 			[
@@ -1171,6 +1281,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong verify_peer',
 					'verify_peer' => '2'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/verify_peer": value must be one of 0, 1.'
 			]
 		];
@@ -1179,7 +1290,7 @@ class testWebScenario extends CZabbixTest {
 	/**
 	* @dataProvider web_properties
 	*/
-	public function testWebScenario_NotRequiredProperties($httptests, $expected_error) {
+	public function testWebScenario_NotRequiredProperties($httptests, $success_expected, $expected_error) {
 		$methods = ['httptest.create', 'httptest.update'];
 
 		foreach ($methods as $method) {
@@ -1191,17 +1302,23 @@ class testWebScenario extends CZabbixTest {
 				$httptests['httptestid'] = '15001';
 				$httptests['name'] = 'Update '.$httptests['name'];
 			}
-			$result = $this->call($method, $httptests, $expected_error);
+			$result = $this->api_acall($method, $httptests, $debug);
 
-			if ($expected_error === null) {
-				$dbResult = DBSelect('select * from httptest where httptestid='.
-						zbx_dbstr($result['result']['httptestid'][0])
-				);
+			if ($success_expected) {
+				$this->assertTrue(array_key_exists('result', $result));
+				$this->assertFalse(array_key_exists('error', $result));
+
+				$dbResult = DBSelect('select * from httptest where httptestid='.$result['result']['httptestid'][0]);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $httptests['name']);
 			}
 			else {
-				$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
+				$this->assertFalse(array_key_exists('result', $result));
+				$this->assertTrue(array_key_exists('error', $result));
+
+				$this->assertSame($expected_error, $result['error']['data']);
+				$dbResult = "select * from httptest where name='".$httptests['name']."'";
+				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
 	}
@@ -1211,40 +1328,49 @@ class testWebScenario extends CZabbixTest {
 			// Check web scenario id.
 			[
 				'httptest' => [''],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'httptest' => ['abc'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'httptest' => ['1.1'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'httptest' => ['123456'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'httptest' => ['15003', '15003'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (15003) already exists.'
 			],
 			// Try to delet templated web scenario.
 			[
 				'httptest' => ['15007'],
+				'success_expected' => false,
 				'expected_error' => 'Cannot delete templated web scenario "Api templated web scenario".'
 			],
 			[
 				'httptest' => ['15007', '15003'],
+				'success_expected' => false,
 				'expected_error' => 'Cannot delete templated web scenario "Api templated web scenario".'
 			],
 			// Successfully delete web scenario.
 			[
 				'httptest' => ['15003'],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'httptest' => ['15004', '15005'],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -1253,13 +1379,23 @@ class testWebScenario extends CZabbixTest {
 	/**
 	* @dataProvider web_delete
 	*/
-	public function testWebScenario_Delete($httptests, $expected_error) {
-		$result = $this->call('httptest.delete', $httptests, $expected_error);
+	public function testWebScenario_Delete($httptests, $success_expected, $expected_error) {
+		$result = $this->api_acall('httptest.delete', $httptests, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['httptestids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from httptest where httptestid='.zbx_dbstr($id)));
+				$dbResult = 'select * from httptest where httptestid='.$id;
+				$this->assertEquals(0, DBcount($dbResult));
 			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -1280,6 +1416,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -1289,12 +1426,14 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'API update web as zabbix admin with read-write permissions',
 					'httptestid' => '15001'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'method' => 'httptest.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => ['15010'],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			// Zabbix admin have read permissions to host.
@@ -1312,6 +1451,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -1321,12 +1461,14 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'API update web as zabbix admin with read permissionss',
 					'httptestid' => '15008'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'method' => 'httptest.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => ['15008'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Zabbix admin have deny permissions to host.
@@ -1344,6 +1486,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -1353,12 +1496,14 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'API update web as zabbix admin with read permissionss',
 					'httptestid' => '15009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'method' => 'httptest.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => ['15009'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Zabbix admin have None permissions to host.
@@ -1376,6 +1521,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -1385,12 +1531,14 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'API update web as zabbix admin with none permissionss',
 					'httptestid' => '15006'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'method' => 'httptest.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => ['15006'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Zabbix user have read-write permissions to host.
@@ -1408,6 +1556,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -1417,12 +1566,14 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'API update web as zabbix user with read-write permissions',
 					'httptestid' => '15001'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'method' => 'httptest.delete',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => ['15011'],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			// Zabbix user have read permissions to host.
@@ -1440,6 +1591,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -1449,12 +1601,14 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'API update web as zabbix user with read permissionss',
 					'httptestid' => '15008'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'method' => 'httptest.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => ['15008'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Zabbix admin have deny permissions to host.
@@ -1472,6 +1626,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -1481,12 +1636,14 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'API update web as zabbix user with read permissionss',
 					'httptestid' => '15009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'method' => 'httptest.delete',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => ['15009'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Zabbix user have None permissions to host.
@@ -1504,6 +1661,7 @@ class testWebScenario extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -1513,12 +1671,14 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'API update web as zabbix user with none permissionss',
 					'httptestid' => '15006'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'method' => 'httptest.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => ['15006'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 		];
@@ -1527,8 +1687,18 @@ class testWebScenario extends CZabbixTest {
 	/**
 	* @dataProvider web_user_permissions
 	*/
-	public function testWebScenario_UserPermissions($method, $login, $user, $expected_error) {
-		$this->authorize($login['user'], $login['password']);
-		$this->call($method, $user, $expected_error);
+	public function testWebScenario_UserPermissions($method, $login, $user, $success_expected, $expected_error) {
+		$result = $this->api_call_with_user($method, $login, $user, $debug);
+
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
+		}
 	}
 }

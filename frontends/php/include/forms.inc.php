@@ -198,23 +198,24 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
 					)),
-				' ',
+				SPACE,
 				new CSup($element['count'])
-			]))
-				->addClass(ZBX_STYLE_SUBFILTER)
-				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
+			]))->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
 		// isn't activated
 		else {
 			// subfilter has 0 items
 			if ($element['count'] == 0) {
-				$output[] = (new CSpan([
-					(new CSpan($element['name']))->addClass(ZBX_STYLE_GREY),
-					' ',
-					new CSup($element['count'])
-				]))->addClass(ZBX_STYLE_SUBFILTER);
+				$output[] = (new CSpan($element['name']))->addClass(ZBX_STYLE_GREY);
+				$output[] = SPACE;
+				$output[] = new CSup($element['count']);
 			}
 			else {
+				// this level has no active subfilters
+				$nspan = $subfilter
+					? new CSup('+'.$element['count'])
+					: new CSup($element['count']);
+
 				$link = (new CLinkAction($element['name']))
 					->onClick(CHtml::encode(
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
@@ -225,14 +226,16 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 						');'
 					));
 
-				$output[] = (new CSpan([
-					$link,
-					' ',
-					new CSup(($subfilter ? '+' : '').$element['count'])
-				]))->addClass(ZBX_STYLE_SUBFILTER);
+				$output[] = $link;
+				$output[] = SPACE;
+				$output[] = $nspan;
 			}
 		}
+
+		$output[] = '&nbsp;&nbsp;&nbsp;';
 	}
+
+	array_pop($output);
 
 	return $output;
 }
@@ -323,26 +326,37 @@ function getItemFilterForm(&$items) {
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
 
 	// row 1
-	$group_filter = !empty($filter_groupId)
-		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupId
-		]), ['groupid' => 'id'])
-		: [];
+	$groupFilter = null;
+	if (!empty($filter_groupId)) {
+		$getHostInfo = API::HostGroup()->get([
+			'groupids' => $filter_groupId,
+			'output' => ['name']
+		]);
+		$getHostInfo = reset($getHostInfo);
+		if (!empty($getHostInfo)) {
+			$groupFilter[] = [
+				'id' => $getHostInfo['groupid'],
+				'name' => $getHostInfo['name']
+			];
+		}
+	}
 
 	$filterColumn1->addRow(_('Host group'),
 		(new CMultiSelect([
 			'name' => 'filter_groupid',
-			'object_name' => 'hostGroup',
-			'multiple' => false,
-			'data' => $group_filter,
+			'selectedLimit' => 1,
+			'objectName' => 'hostGroup',
+			'objectOptions' => [
+				'editable' => true
+			],
+			'data' => $groupFilter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'filter_groupid',
-					'editable' => true
+					'srcfld1' => 'groupid',
+					'writeonly' => '1'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -368,28 +382,39 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 2
-	$host_filter = !empty($filter_hostId)
-		? CArrayHelper::renameObjectsKeys(API::Host()->get([
-			'output' => ['hostid', 'name'],
+	$hostFilterData = null;
+	if (!empty($filter_hostId)) {
+		$getHostInfo = API::Host()->get([
 			'hostids' => $filter_hostId,
-			'templated_hosts' => true
-		]), ['hostid' => 'id'])
-		: [];
+			'templated_hosts' => true,
+			'output' => ['name']
+		]);
+		$getHostInfo = reset($getHostInfo);
+		if (!empty($getHostInfo)) {
+			$hostFilterData[] = [
+				'id' => $getHostInfo['hostid'],
+				'name' => $getHostInfo['name']
+			];
+		}
+	}
 
 	$filterColumn1->addRow(_('Host'),
 		(new CMultiSelect([
 			'name' => 'filter_hostid',
-			'object_name' => 'hosts',
-			'multiple' => false,
-			'data' => $host_filter,
+			'selectedLimit' => 1,
+			'objectName' => 'hosts',
+			'objectOptions' => [
+				'editable' => true,
+				'templated_hosts' => true
+			],
+			'data' => $hostFilterData,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_templates',
-					'srcfld1' => 'hostid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'filter_hostid',
-					'editable' => true,
-					'templated_hosts' => true
+					'srcfld1' => 'hostid',
+					'writeonly' => '1'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -966,6 +991,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'description' => getRequest('description', ''),
 		'key' => getRequest('key', ''),
 		'master_itemid' => getRequest('master_itemid', 0),
+		'master_itemname' => getRequest('master_itemname', ''),
 		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
@@ -1047,11 +1073,12 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// Dependent item initialization by master_itemid.
-	if (array_key_exists('master_item', $item)) {
+	if (!hasRequest('form_refresh') && array_key_exists('master_item', $item)) {
 		$expanded = CMacrosResolverHelper::resolveItemNames([$item['master_item']]);
 		$master_item = reset($expanded);
+		$data['type'] = ITEM_TYPE_DEPENDENT;
 		$data['master_itemid'] = $master_item['itemid'];
-		$data['master_itemname'] = $master_item['name_expanded'];
+		$data['master_itemname'] = $master_item['name_expanded'].NAME_DELIMITER.$master_item['key_'];
 		// Do not initialize item data if only master_item array was passed.
 		unset($item['master_item']);
 	}

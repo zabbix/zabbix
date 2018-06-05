@@ -162,14 +162,13 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		}
 	}
 
-	if (NULL == max_depth_str || '\0' == *max_depth_str || 0 == strcmp(max_depth_str, "-1"))
+	if (NULL == max_depth_str || '\0' == *max_depth_str)	/* <max_depth> default value */
 	{
-		*max_depth = TRAVERSAL_DEPTH_UNLIMITED; /* <max_depth> default value */
+		*max_depth = TRAVERSAL_DEPTH_UNLIMITED;
 	}
-	else if (SUCCEED != is_uint31(max_depth_str, max_depth))
+	else if (-1 > (*max_depth = atoi(max_depth_str)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid %s parameter.", (4 == depth_param ?
-						"fifth" : "sixth")));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return FAIL;
 	}
 

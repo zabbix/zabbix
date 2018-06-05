@@ -20,10 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-/**
- * @backup applications
- */
 class testApplication extends CZabbixTest {
+
 	public static function application_create() {
 		return [
 			[
@@ -32,6 +30,7 @@ class testApplication extends CZabbixTest {
 					'hostid' => '50009',
 					'flags' => '4'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
 			],
 			// Check application hostid.
@@ -39,6 +38,7 @@ class testApplication extends CZabbixTest {
 				'application' => [
 					'name' => 'application without hostid',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "hostid" is missing.'
 			],
 			[
@@ -46,6 +46,7 @@ class testApplication extends CZabbixTest {
 					'name' => 'application with empty hostid',
 					'hostid' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/hostid": a number is expected.'
 			],
 			[
@@ -53,6 +54,7 @@ class testApplication extends CZabbixTest {
 					'name' => 'application with not existing hostid',
 					'hostid' => '123456'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -60,6 +62,7 @@ class testApplication extends CZabbixTest {
 					'name' => 'hostid not number',
 					'hostid' => 'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/hostid": a number is expected.'
 			],
 			[
@@ -67,6 +70,7 @@ class testApplication extends CZabbixTest {
 					'name' => 'hostid not number',
 					'hostid' => '.'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/hostid": a number is expected.'
 			],
 			// Check application name.
@@ -74,6 +78,7 @@ class testApplication extends CZabbixTest {
 				'application' => [
 					'hostid' => '50009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
 			],
 			[
@@ -81,6 +86,7 @@ class testApplication extends CZabbixTest {
 					'name' => '',
 					'hostid' => '50009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
@@ -88,6 +94,7 @@ class testApplication extends CZabbixTest {
 					'name' => 'Suspendisse sagittis euismod consequat. Vivamus pretium, lectus vitae lacinia sodales, metus nisi viverra lectus, vel fermentum dui eros et est. Mauris vitae velit ac massa imperdiet molestie ut sed diam? Quisque vehicula nulla at mauris aliquam, nec condd',
 					'hostid' => '50009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			// Check name duplicates.
@@ -96,6 +103,7 @@ class testApplication extends CZabbixTest {
 					'name' => 'API application',
 					'hostid' => '50009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Application "API application" already exists.'
 			],
 			[
@@ -109,6 +117,7 @@ class testApplication extends CZabbixTest {
 						'hostid' => '50009'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Application "API application" already exists.'
 			],
 			[
@@ -116,6 +125,7 @@ class testApplication extends CZabbixTest {
 					'name' => 'API templated application',
 					'hostid' => '50009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Application "API templated application" already exists.'
 			],
 			[
@@ -123,6 +133,7 @@ class testApplication extends CZabbixTest {
 					'name' => 'API discovery application',
 					'hostid' => '50009'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Application "API discovery application" already exists.'
 			],
 			[
@@ -136,6 +147,7 @@ class testApplication extends CZabbixTest {
 						'hostid' => '50009'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (hostid, name)=(50009, Applications with two identical name) already exists.'
 			],
 			// Check successfully creation of application.
@@ -146,6 +158,7 @@ class testApplication extends CZabbixTest {
 						'hostid' => '50009'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -159,6 +172,7 @@ class testApplication extends CZabbixTest {
 						'hostid' => '50009'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -168,6 +182,7 @@ class testApplication extends CZabbixTest {
 						'hostid' => '10093'
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -176,17 +191,26 @@ class testApplication extends CZabbixTest {
 	/**
 	* @dataProvider application_create
 	*/
-	public function testApplication_Create($application, $expected_error) {
-		$result = $this->call('application.create', $application, $expected_error);
+	public function testApplication_Create($application, $success_expected, $expected_error) {
+		$result = $this->api_acall('application.create', $application, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['applicationids'] as $key => $id) {
-				$dbResult = DBSelect('select * from applications where applicationid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from applications where applicationid='.$id);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['hostid'], $application[$key]['hostid']);
 				$this->assertEquals($dbRow['name'], $application[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
 			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertSame($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -229,9 +253,12 @@ class testApplication extends CZabbixTest {
 	* @dataProvider application_template
 	*/
 	public function testApplication_CreateTemplated($template_application, $new_template_application, $host_application_id, $method) {
-		$result = $this->call($method, [$template_application]);
+		$result = $this->api_acall($method, [$template_application], $debug);
 
-		$dbResult = DBSelect('select * from applications where applicationid='.zbx_dbstr($result['result']['applicationids'][0]));
+		$this->assertTrue(array_key_exists('result', $result));
+		$this->assertFalse(array_key_exists('error', $result));
+
+		$dbResult = DBSelect('select * from applications where applicationid='.$result['result']['applicationids'][0]);
 		$dbRow = DBFetch($dbResult);
 		if (array_key_exists('hostid', $template_application)) {
 			$this->assertEquals($dbRow['hostid'], $template_application['hostid']);
@@ -239,13 +266,13 @@ class testApplication extends CZabbixTest {
 		$this->assertEquals($dbRow['name'], $template_application['name']);
 		$this->assertEquals($dbRow['flags'], 0);
 
-		$dbResultTemplate = DBSelect('select * from application_template where templateid='.zbx_dbstr($result['result']['applicationids'][0]));
+		$dbResultTemplate = DBSelect('select * from application_template where templateid='.$result['result']['applicationids'][0]);
 		$dbRowTemplate = DBFetch($dbResultTemplate);
 
 		if ($new_template_application) {
 			$this->assertEquals($dbRowTemplate['applicationid'], $result['result']['applicationids'][0]+1);
 
-			$dbResultHost = DBSelect('select * from applications where applicationid='.zbx_dbstr($result['result']['applicationids'][0]+1));
+			$dbResultHost = DBSelect('select * from applications where applicationid='.($result['result']['applicationids'][0]+1));
 			$dbRowHost = DBFetch($dbResultHost);
 			$this->assertEquals($dbRowHost['name'], $template_application['name']);
 			$this->assertEquals($dbRowHost['flags'], 0);
@@ -253,7 +280,7 @@ class testApplication extends CZabbixTest {
 		else {
 			$this->assertEquals($dbRowTemplate['applicationid'], $host_application_id);
 
-			$dbResultHost = DBSelect('select * from applications where applicationid='.zbx_dbstr($host_application_id));
+			$dbResultHost = DBSelect('select * from applications where applicationid='.$host_application_id);
 			$dbRowHost = DBFetch($dbResultHost);
 			$this->assertEquals($dbRowHost['name'], $template_application['name']);
 			$this->assertEquals($dbRowHost['flags'], 0);
@@ -270,6 +297,7 @@ class testApplication extends CZabbixTest {
 						'flags' => '4'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
 			],
 			// Check application id.
@@ -279,6 +307,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'without application id'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "applicationid" is missing.'
 			],
 			[
@@ -287,6 +316,7 @@ class testApplication extends CZabbixTest {
 						'applicationid' => ''
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
@@ -296,6 +326,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'application with not existing id'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -305,6 +336,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'id not number'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
@@ -314,6 +346,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'invalid application id'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
@@ -327,6 +360,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'update the same application id2'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (applicationid)=(367) already exists.'
 			],
 			// Check templated and discovered applications.
@@ -337,6 +371,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'Update templated application'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot update templated applications.'
 			],
 			[
@@ -346,6 +381,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'API discovery application update'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot update discovered application "API discovery application".'
 			],
 			// Check application name.
@@ -356,6 +392,7 @@ class testApplication extends CZabbixTest {
 						'name' => ''
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
@@ -365,6 +402,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'Suspendisse sagittis euismod consequat. Vivamus pretium, lectus vitae lacinia sodales, metus nisi viverra lectus, vel fermentum dui eros et est. Mauris vitae velit ac massa imperdiet molestie ut sed diam? Quisque vehicula nulla at mauris aliquam, nec condd'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			// Check name duplicates.
@@ -375,6 +413,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'API application'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Application "API application" already exists.'
 			],
 			[
@@ -388,6 +427,7 @@ class testApplication extends CZabbixTest {
 						'name' => 'update two the same application name'
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (hostid, name)=(50009, update two the same application name) already exists.'
 			],
 			// Check successfully update.
@@ -396,6 +436,7 @@ class testApplication extends CZabbixTest {
 					'applicationid' => '367',
 					'name' => '☺'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -403,6 +444,7 @@ class testApplication extends CZabbixTest {
 					'applicationid' => '368',
 					'name' => 'API template application updated'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -410,6 +452,7 @@ class testApplication extends CZabbixTest {
 					'applicationid' => '367',
 					'name' => 'УТФ-8 обновлённый'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -418,20 +461,27 @@ class testApplication extends CZabbixTest {
 	/**
 	* @dataProvider application_update
 	*/
-	public function testApplication_Update($applications, $expected_error) {
-		$result = $this->call('application.update', $applications, $expected_error);
+	public function testApplication_Update($applications, $success_expected, $expected_error) {
+		$result = $this->api_acall('application.update', $applications, $debug);
 
-		if ($expected_error === null) {
-			$dbResult = DBSelect('select * from applications where applicationid='.zbx_dbstr($result['result']['applicationids'][0]));
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
+			$dbResult = DBSelect('select * from applications where applicationid='.$result['result']['applicationids'][0]);
 			$dbRow = DBFetch($dbResult);
 			$this->assertEquals($dbRow['applicationid'], $applications['applicationid']);
 			$this->assertEquals($dbRow['name'], $applications['name']);
 			$this->assertEquals($dbRow['flags'], 0);
 		}
 		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
 			foreach ($applications as $application) {
 				if (array_key_exists('name', $application) && $application['name'] != 'API application'){
-					$dbResult = 'select * from applications where name='.zbx_dbstr($application['name']);
+					$dbResult = "select * from applications where name='".$application['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
@@ -444,24 +494,28 @@ class testApplication extends CZabbixTest {
 				'application' => [
 					''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'application' => [
 					'123456'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'application' => [
 					'abc'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'application' => [
 					'0.0'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
@@ -469,6 +523,7 @@ class testApplication extends CZabbixTest {
 					'371',
 					'123456'
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -476,6 +531,7 @@ class testApplication extends CZabbixTest {
 					'371',
 					'.'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
@@ -483,6 +539,7 @@ class testApplication extends CZabbixTest {
 					'371',
 					''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
@@ -490,24 +547,28 @@ class testApplication extends CZabbixTest {
 					'371',
 					'371'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (371) already exists.'
 			],
 			[
 				'application' => [
 					'370'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot delete templated application.'
 			],
 			[
 				'application' => [
 					'375'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot delete discovered application "API discovery application".'
 			],
 			[
 				'application' => [
 					'372'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -515,6 +576,7 @@ class testApplication extends CZabbixTest {
 					'373',
 					'374'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -523,14 +585,23 @@ class testApplication extends CZabbixTest {
 	/**
 	* @dataProvider application_delete
 	*/
-	public function testApplication_delete($application, $expected_error) {
-		$result = $this->call('application.delete', $application, $expected_error);
+	public function testApplication_delete($application, $success_expected, $expected_error) {
+		$result = $this->api_acall('application.delete', $application, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['applicationids'] as $id) {
-				$dbResult = 'select * from applications where applicationid='.zbx_dbstr($id);
+				$dbResult = 'select * from applications where applicationid='.$id;
 				$this->assertEquals(0, DBcount($dbResult));
 			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -542,7 +613,7 @@ class testApplication extends CZabbixTest {
 				],
 				'get_result' =>[
 				],
-				'expected_error' => true,
+				'success_expected' => false,
 			],
 			[
 				'application' => [
@@ -555,7 +626,7 @@ class testApplication extends CZabbixTest {
 					'flags' => '0',
 					'templateids'=> []
 				],
-				'expected_error' => false
+				'success_expected' => true
 			],
 			[
 				'application' => [
@@ -568,7 +639,7 @@ class testApplication extends CZabbixTest {
 					'flags' => '0',
 					'templateids'=> ['206']
 				],
-				'expected_error' => false
+				'success_expected' => true
 			]
 		];
 	}
@@ -576,10 +647,13 @@ class testApplication extends CZabbixTest {
 	/**
 	* @dataProvider application_get_data
 	*/
-	public function testApplication_get($application, $get_result, $expected_error) {
-		$result = $this->call('application.get', $application);
+	public function testApplication_get($application, $get_result, $success_expected) {
+		$result = $this->api_acall('application.get', $application, $debug);
 
-		if ($expected_error === false) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result'] as $name) {
 				$this->assertEquals($name['applicationid'], $get_result['applicationid']);
 				$this->assertEquals($name['hostid'], $get_result['hostid']);
@@ -589,6 +663,8 @@ class testApplication extends CZabbixTest {
 			}
 		}
 		else {
+			$this->assertTrue(array_key_exists('result', $result));
+
 			$this->assertEquals($result['result'], $get_result);
 		}
 	}
@@ -654,7 +730,11 @@ class testApplication extends CZabbixTest {
 	* @dataProvider application_user_permissions
 	*/
 	public function testApplication_UserPermissions($method, $user, $application, $expected_error) {
-		$this->authorize($user['user'], $user['password']);
-		$this->call($method, $application, $expected_error);
+		$result = $this->api_call_with_user($method, $user, $application, $debug);
+
+		$this->assertFalse(array_key_exists('result', $result));
+		$this->assertTrue(array_key_exists('error', $result));
+
+		$this->assertEquals($expected_error, $result['error']['data']);
 	}
 }

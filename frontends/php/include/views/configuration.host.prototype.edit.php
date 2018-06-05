@@ -197,17 +197,22 @@ $groupList->addRow(
 	(new CLabel(_('Groups'), 'group_links[]'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'group_links[]',
-		'object_name' => 'hostGroup',
-		'disabled' => (bool) $hostPrototype['templateid'],
+		'objectName' => 'hostGroup',
+		'objectOptions' => [
+			'editable' => true,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		],
 		'data' => $groups,
+		'disabled' => (bool) $hostPrototype['templateid'],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'host_groups',
-				'srcfld1' => 'groupid',
 				'dstfrm' => $frmHost->getName(),
 				'dstfld1' => 'group_links_',
-				'editable' => true,
-				'normal_only' => true
+				'srcfld1' => 'groupid',
+				'writeonly' => '1',
+				'multiselect' => '1',
+				'normal_only' => '1'
 			]
 		]
 	]))
@@ -262,7 +267,7 @@ if ($hostPrototype['templateid']) {
 	);
 }
 else {
-	$disableids = [];
+	$ignoreTemplates = [];
 
 	$linkedTemplateTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
@@ -291,7 +296,7 @@ else {
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 
-		$disableids[] = $template['templateid'];
+		$ignoreTemplates[$template['templateid']] = $template['name'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
@@ -305,7 +310,8 @@ else {
 		->addRow([
 			(new CMultiSelect([
 				'name' => 'add_templates[]',
-				'object_name' => 'templates',
+				'objectName' => 'templates',
+				'ignored' => $ignoreTemplates,
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'templates',
@@ -313,7 +319,8 @@ else {
 						'srcfld2' => 'host',
 						'dstfrm' => $frmHost->getName(),
 						'dstfld1' => 'add_templates_',
-						'disableids' => $disableids
+						'templated_hosts' => '1',
+						'multiselect' => '1'
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

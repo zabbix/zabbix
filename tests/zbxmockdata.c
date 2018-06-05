@@ -79,14 +79,11 @@ static const char	*zbx_yaml_error_string(yaml_error_type_t error)
 
 static int	zbx_yaml_scalar_cmp(const char *str, const yaml_node_t *node)
 {
-	size_t	len;
-
 	if (YAML_SCALAR_NODE != node->type)
 		fail_msg("Internal error: scalar comparison of nonscalar node.");
 
-	len = strlen(str);
-	ZBX_RETURN_IF_NOT_EQUAL(len, node->data.scalar.length);
-	return memcmp(str, node->data.scalar.value, len);
+	return strncmp(str, (const char *)node->data.scalar.value, node->data.scalar.length) ||
+			strlen(str) > node->data.scalar.length;
 }
 
 static int	zbx_yaml_scalar_ncmp(const char *str, size_t len, const yaml_node_t *node)
@@ -306,10 +303,6 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Provided handle is not a binary string.";
 		case ZBX_MOCK_NOT_AN_UINT64:
 			return "Provided handle is not an unsigned 64 bit integer handle.";
-		case ZBX_MOCK_NOT_A_TIMESTAMP:
-			return "Invalid timestamp format.";
-		case ZBX_MOCK_NOT_ENOUGH_MEMORY:
-			return "Not enough space in output buffer.";
 		default:
 			return "Unknown error.";
 	}
@@ -553,8 +546,11 @@ static zbx_mock_error_t	zbx_yaml_path_next(const char **pnext, const char **key,
 	/* process array index component */
 	if (0 != isdigit(*next))
 	{
-		for (pos = 1; 0 != isdigit(next[pos]); pos++)
+		for (pos = 0; 0 != isdigit(next[pos]); pos++)
 			;
+
+		if (0 == pos)
+			return ZBX_MOCK_INVALID_YAML_PATH;
 
 		*key = next;
 		*key_len = pos;

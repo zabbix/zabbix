@@ -633,27 +633,40 @@
 				'#new_ack_operation_opmessage_default_msg'
 		).trigger('change');
 
-		var remove_operationid = function() {
-			var operationid_RegExp = /^(operations|recovery_operations|ack_operations)\[\d+\]\[operationid\]$/;
-
-			jQuery('input[name^=operations], input[name^=recovery_operations], input[name^=ack_operations]')
-				.each(function() {
-					// Intentional usage of JS Prototype.
-					if ($(this).getAttribute('name').match(operationid_RegExp)) {
-						$(this).remove();
-					}
-				});
-		};
-
-		jQuery('#add').click(remove_operationid);
-
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
-				.attr({id: 'add', name: 'add'})
-				.click(remove_operationid);
+				.attr({id: 'add', name: 'add'});
+
+			// Remove operations IDs.
+			var operationid_RegExp = /operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=operations]').each(function() {
+				// Intentional usage of JS Prototype.
+				if ($(this).getAttribute('name').match(operationid_RegExp)) {
+					$(this).remove();
+				}
+			});
+
+			// Remove recovery operations IDs
+			var recovery_operationid_RegExp = /recovery_operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=recovery_operations]').each(function() {
+				// Intentional usage of JS Prototype.
+				if ($(this).getAttribute('name').match(recovery_operationid_RegExp)) {
+					$(this).remove();
+				}
+			});
+
+			// Remove acknowledgement operations IDs
+			var ack_operationid_RegExp = /ack_operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=ack_operations]').each(function() {
+				// Intentional usage of JS Prototype.
+				if ($(this).getAttribute('name').match(ack_operationid_RegExp)) {
+					$(this).remove();
+				}
+			});
+
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
 		});

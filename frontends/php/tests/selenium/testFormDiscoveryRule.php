@@ -890,7 +890,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -916,7 +916,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => 86401,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -929,7 +929,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '1w',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -942,7 +942,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '2d',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -955,7 +955,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '25h',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -968,7 +968,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '1441m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],

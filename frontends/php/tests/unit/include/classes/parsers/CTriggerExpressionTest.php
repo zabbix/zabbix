@@ -161,7 +161,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			['{host:key[こんにちは、世界].str(こんにちは、世界)}', null, true],
 
 			['{host:key[a,,"b",,[c,d,,"e",],,[f]].count(1,,"b",3)}', null, true],
-			['{host:key[a,,"b",,[[c,d,,"e"],[]],,[f]].count(1,,"b",3)}', null, false],
+			['{host:key[a,,"b",,[[c,d,,"e"],[]],,[f]].count(1,,"b",3)}', null, true],
 			['{host:key[a,,"b",,[c,d,,"e",,,[f]].count(1,,"b",3)}', null, false],
 			['{host:key[a,,"b",,[c,d,,"e",],,f]].count(1,,"b",3)}', null, false],
 

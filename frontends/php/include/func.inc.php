@@ -1878,19 +1878,16 @@ function filter_messages(array $messages = []) {
  * Returns the message box when messages are present; null otherwise
  *
  * @param  boolean	$good			Parameter passed to makeMessageBox to specify message box style.
- * @param  string	$title			Message box title.
  * @global array	$ZBX_MESSAGES
  *
  * @return CDiv|null
  */
-function getMessages($good = false, $title = null)
+function getMessages($good = false)
 {
 	global $ZBX_MESSAGES;
 
-	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
-
-	$message_box = ($title || $messages)
-		? makeMessageBox($good, $messages, $title)
+	$message_box = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES)
+		? makeMessageBox($good, filter_messages($ZBX_MESSAGES))
 		: null;
 
 	$ZBX_MESSAGES = [];
@@ -2318,6 +2315,23 @@ function hasErrorMesssages() {
 	}
 
 	return false;
+}
+
+/**
+ * Get all messages as array.
+ *
+ * @return array
+ */
+function getMessagesAsArray() {
+	global $ZBX_MESSAGES;
+
+	$result = [];
+	if (isset($ZBX_MESSAGES)) {
+		foreach ($ZBX_MESSAGES as $message) {
+			$result[] = $message['message'];
+		}
+	}
+	return $result;
 }
 
 /**

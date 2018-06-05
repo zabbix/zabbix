@@ -9,17 +9,11 @@ SUBDIRS = \
 
 sbin_PROGRAMS = zabbix_proxy
 
-noinst_LIBRARIES = libzbxproxy.a
-
-libzbxproxy_a_SOURCES = \
+zabbix_proxy_SOURCES = \
 	servercomms.c servercomms.h \
 	events.c \
-	preprocessing.c
-
-libzbxproxy_a_CFLAGS = \
-	-DZABBIX_DAEMON
-
-zabbix_proxy_SOURCES = proxy.c
+	preprocessing.c \
+	proxy.c
 
 if PROXY_IPCSERVICE
 LIBIPCSERVICE = $(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a
@@ -70,9 +64,12 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
-	libzbxproxy.a
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a 
+	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a
+
+if PROXY_IPCSERVICE
+zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a
+endif
 
 zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
 
@@ -85,6 +82,7 @@ zabbix_proxy_LDADD += @PROXY_LIBS@
 zabbix_proxy_LDFLAGS = @PROXY_LDFLAGS@
 
 zabbix_proxy_CFLAGS = \
+	-DZABBIX_DAEMON \
 	-DDEFAULT_SSL_CERT_LOCATION="\"@CURL_SSL_CERT_LOCATION@\"" \
 	-DDEFAULT_SSL_KEY_LOCATION="\"@CURL_SSL_KEY_LOCATION@\"" \
 	-DDEFAULT_CONFIG_FILE="\"@PROXY_CONFIG_FILE@\"" \
@@ -92,7 +90,7 @@ zabbix_proxy_CFLAGS = \
 	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\""
 
 install-data-hook:
-	$(MKDIR_P) "$(DESTDIR)@PROXY_CONFIG_FILE@.d"
-	$(MKDIR_P) "$(DESTDIR)@EXTERNAL_SCRIPTS_PATH@"
-	$(MKDIR_P) "$(DESTDIR)@LOAD_MODULE_PATH@"
-	test -f "$(DESTDIR)@PROXY_CONFIG_FILE@" || cp "../../conf/zabbix_proxy.conf" "$(DESTDIR)@PROXY_CONFIG_FILE@"
+	$(MKDIR_P) "@PROXY_CONFIG_FILE@.d"
+	$(MKDIR_P) "@EXTERNAL_SCRIPTS_PATH@"
+	$(MKDIR_P) "@LOAD_MODULE_PATH@"
+	test -f "@PROXY_CONFIG_FILE@" || cp "../../conf/zabbix_proxy.conf" "@PROXY_CONFIG_FILE@"

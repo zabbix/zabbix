@@ -780,7 +780,6 @@ class testFormWebStep extends CWebTest {
 		foreach($items as $item) {
 			foreach ($item as $field => $value) {
 				$input = $element->findElement(WebDriverBy::xpath('.//input[@data-type="'.$field.'"]'));
-				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath($context.'//input[@data-type="'.$field.'"]'));
 				$input->sendKeys($value);
 
 				// Fire onchange event.

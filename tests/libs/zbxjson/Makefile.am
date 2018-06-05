@@ -27,3 +27,4 @@ zbx_json_path_open_SOURCES = \
 zbx_json_path_open_LDADD = $(JSON_LIBS)
 
 zbx_json_path_open_CFLAGS = -I@top_srcdir@/tests
+

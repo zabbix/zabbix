@@ -80,14 +80,15 @@ if (!$this->data['is_profile']) {
 		(new CLabel(_('Groups'), 'user_groups[]'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'user_groups[]',
-			'object_name' => 'usersGroups',
+			'objectName' => 'usersGroups',
 			'data' => $user_groups,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'usrgrp',
-					'srcfld1' => 'usrgrpid',
 					'dstfrm' => $userForm->getName(),
-					'dstfld1' => 'user_groups_'
+					'dstfld1' => 'user_groups_',
+					'srcfld1' => 'usrgrpid',
+					'multiselect' => '1'
 				]
 			]
 		]))

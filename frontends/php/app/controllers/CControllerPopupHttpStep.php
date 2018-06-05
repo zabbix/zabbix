@@ -158,10 +158,7 @@ class CControllerPopupHttpStep extends CController {
 		else {
 			$data = [
 				'title' => _('Step of web scenario'),
-				'options' => $page_options,
-				'user' => [
-					'debug_mode' => $this->getDebugMode()
-				]
+				'options' => $page_options
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

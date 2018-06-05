@@ -83,16 +83,6 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				event->objectid);
 			break;
-		case EVENT_OBJECT_ZABBIX_ACTIVE:
-			sql = zbx_dsprintf(sql,
-					"select h.hostid"
-					" from hosts h,autoreg_host a"
-					" where h.host=a.host"
-						" and a.autoreg_hostid=" ZBX_FS_UI64
-						" and h.status in (%d,%d)",
-						event->objectid,
-					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
-			break;
 		default:
 			goto exit;
 	}
@@ -425,30 +415,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: is_discovery_or_auto_registration                                *
- *                                                                            *
- * Purpose: checks if the event is discovery or auto registration event       *
- *                                                                            *
- * Return value: SUCCEED - it's discovery or auto registration event          *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	is_discovery_or_auto_registration(const DB_EVENT *event)
-{
-	if (event->source == EVENT_SOURCE_DISCOVERY && (event->object == EVENT_OBJECT_DHOST ||
-			event->object == EVENT_OBJECT_DSERVICE))
-	{
-		return SUCCEED;
-	}
-
-	if (event->source == EVENT_SOURCE_AUTO_REGISTRATION && event->object == EVENT_OBJECT_ZABBIX_ACTIVE)
-		return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: op_host_add                                                      *
  *                                                                            *
  * Purpose: add discovered host                                               *
@@ -465,7 +431,10 @@ void	op_host_add(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
 		return;
 
 	add_discovered_host(event);
@@ -491,7 +460,10 @@ void	op_host_del(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
 		return;
 
 	if (0 == (hostid = select_discovered_host(event)))
@@ -524,7 +496,10 @@ void	op_host_enable(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -556,7 +531,10 @@ void	op_host_disable(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -593,8 +571,14 @@ void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
 		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE &&
+			event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	{
+		return;
+	}
 
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
@@ -623,7 +607,10 @@ void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -657,7 +644,10 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
 		return;
 
 	if (0 == (hostid = select_discovered_host(event)))
@@ -720,7 +710,10 @@ void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -755,7 +748,10 @@ void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == is_discovery_or_auto_registration(event))
+	if (event->source != EVENT_SOURCE_DISCOVERY)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
 		return;
 
 	if (0 == (hostid = select_discovered_host(event)))

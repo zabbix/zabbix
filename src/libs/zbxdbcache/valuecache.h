@@ -44,9 +44,9 @@
  *
  * Retrieving data
  *
- *   The history data is accessed with zbx_vc_get_values() and zbx_vc_get_value()
+ *   The history data is accessed with zbx_vc_get_value_range() and zbx_vc_get_value()
  *   functions. Afterwards the retrieved history data must be freed by the caller by using
- *   either zbx_history_record_vector_destroy() function (free the zbx_vc_get_values()
+ *   either zbx_history_record_vector_destroy() function (free the zbx_vc_get_value_range()
  *   call output) or zbx_history_record_clear() function (free the zbx_vc_get_value() call output).
  *
  * Locking
@@ -60,17 +60,9 @@
 #define ZBX_VC_MODE_NORMAL	0
 #define ZBX_VC_MODE_LOWMEM	1
 
-/* indicates that all values from database are cached */
-#define ZBX_ITEM_STATUS_CACHED_ALL	1
-
 /* the cache statistics */
 typedef struct
 {
-	/* Value cache misses are new values cached during request and hits are calculated by  */
-	/* subtracting misses from the total number of values returned (0 if the number of     */
-	/* returned values is less than misses.                                                */
-	/* When performing count based requests the number of cached values might be greater   */
-	/* than number of returned values. This can skew the hits/misses ratio towards misses. */
 	zbx_uint64_t	hits;
 	zbx_uint64_t	misses;
 
@@ -96,8 +88,8 @@ void	zbx_vc_enable(void);
 
 void	zbx_vc_disable(void);
 
-int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
-		int count, const zbx_timespec_t *ts);
+int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
+		int count, int timestamp);
 
 int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value);
 

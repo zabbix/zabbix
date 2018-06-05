@@ -60,42 +60,65 @@ if (!$data['screen']['templateid']) {
 	// Screen owner multiselect.
 	$multiselect_data = [
 		'name' => 'userid',
-		'object_name' => 'users',
-		'multiple' => false,
+		'selectedLimit' => 1,
+		'objectName' => 'users',
 		'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
-		'data' => [],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'users',
-				'srcfld1' => 'userid',
-				'srcfld2' => 'fullname',
 				'dstfrm' => $form->getName(),
-				'dstfld1' => 'userid'
+				'dstfld1' => 'userid',
+				'srcfld1' => 'userid',
+				'srcfld2' => 'fullname'
 			]
 		]
 	];
 
 	$screen_ownerid = $data['screen']['userid'];
 
-	if ($screen_ownerid !== '') {
-		$multiselect_data['data'][] = array_key_exists($screen_ownerid, $data['users'])
-			? [
+	// If screen owner does not exist or is not allowed to display.
+	if ($screen_ownerid === '' || $screen_ownerid && array_key_exists($screen_ownerid, $data['users'])) {
+		// Screen owner data.
+		if ($screen_ownerid) {
+			$owner_data = [[
 				'id' => $screen_ownerid,
 				'name' => getUserFullname($data['users'][$screen_ownerid])
-			]
-			: [
-				'id' => $screen_ownerid,
-				'name' => _('Inaccessible user'),
-				'inaccessible' => true
-			];
-	}
+			]];
+		}
+		else {
+			$owner_data = [];
+		}
 
-	// Append multiselect to screen tab.
-	$screen_tab->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
-		(new CMultiSelect($multiselect_data))
+		$multiselect_data['data'] = $owner_data;
+
+		// Append multiselect to screen tab.
+		$screen_tab->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
+			(new CMultiSelect($multiselect_data))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		);
+	}
+	else {
+		$multiselect_userid = (new CMultiSelect($multiselect_data))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	);
+			->setAriaRequired();
+
+		// Administrators can change screen owner, but cannot see users from other groups.
+		if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
+			$screen_tab
+				->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(), $multiselect_userid)
+				->addRow('', _('Inaccessible user'), 'inaccessible_user');
+		}
+		else {
+			// For regular users and guests, only information message is displayed without multiselect.
+			$screen_tab->addRow(_('Owner'), [
+				(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
+				(new CSpan($multiselect_userid))
+					->addStyle('display: none;')
+					->setId('multiselect_userid_wrapper')
+			]);
+		}
+	}
 }
 
 $screen_tab->addRow(

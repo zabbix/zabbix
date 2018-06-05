@@ -391,13 +391,6 @@ abstract class CTriggerGeneral extends CApiService {
 				'filter' => ['triggerid' => $triggerids],
 				'preservekeys' => true
 			]);
-
-			// Rename column 'name' to 'function'.
-			$function = reset($functions);
-			if ($function && array_key_exists('name', $function)) {
-				$functions = CArrayHelper::renameObjectsKeys($functions, ['name' => 'function']);
-			}
-
 			$relationMap = $this->createRelationMap($functions, 'triggerid', 'functionid');
 
 			$functions = $this->unsetExtraFields($functions, ['triggerid', 'functionid'], $options['selectFunctions']);
@@ -1148,7 +1141,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string     $triggers_functions[<tnum>][]['functionid'] [OUT]
 	 * @param null       $triggers_functions[<tnum>][]['triggerid']  [OUT] must be initialized before insertion into DB
 	 * @param string     $triggers_functions[<tnum>][]['itemid']     [OUT]
-	 * @param string     $triggers_functions[<tnum>][]['name']       [OUT]
+	 * @param string     $triggers_functions[<tnum>][]['function']   [OUT]
 	 * @param string     $triggers_functions[<tnum>][]['parameter']  [OUT]
 	 *
 	 * @throws APIException if error occurred
@@ -1385,7 +1378,7 @@ abstract class CTriggerGeneral extends CApiService {
 						'functionid' => null,
 						'triggerid' => null,
 						'itemid' => $key['itemid'],
-						'name' => $exprPart['functionName'],
+						'function' => $exprPart['functionName'],
 						'parameter' => $exprPart['functionParam']
 					];
 					$functions_num++;

@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-/**
- * @backup items
- */
 class testTaskCreate extends CZabbixTest {
 
 	public static function tasks() {
@@ -33,6 +30,7 @@ class testTaskCreate extends CZabbixTest {
 					'itemids' => ['40068'],
 					'flag' => true
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": unexpected parameter "flag".'
 			],
 			// Check type validation
@@ -40,6 +38,7 @@ class testTaskCreate extends CZabbixTest {
 				'task' => [
 					'itemids' => ['40068']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": the parameter "type" is missing.'
 			],
 			[
@@ -47,6 +46,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '',
 					'itemids' => ['40068']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/type": a number is expected.'
 			],
 			[
@@ -54,6 +54,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => 'æų',
 					'itemids' => ['40068']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/type": a number is expected.'
 			],
 			[
@@ -61,6 +62,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '1',
 					'itemids' => ['40068']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/type": value must be one of 6.'
 			],
 			// Check itemids validation
@@ -68,6 +70,7 @@ class testTaskCreate extends CZabbixTest {
 				'task' => [
 					'type' => '6'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": the parameter "itemids" is missing.'
 			],
 			[
@@ -75,6 +78,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/itemids": an array is expected.'
 			],
 			[
@@ -82,6 +86,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/itemids/1": a number is expected.'
 			],
 			[
@@ -89,6 +94,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['123456']
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// One itemid correct, one wrong
@@ -97,6 +103,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['40068', '']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/itemids/2": a number is expected.'
 			],
 			[
@@ -104,6 +111,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['40068', '123456']
 				],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Host disabled (check item, LLD rule)
@@ -112,6 +120,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['90002']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot send request: host is not monitored.'
 			],
 			[
@@ -119,6 +128,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['90003']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot send request: host is not monitored.'
 			],
 			[
@@ -126,6 +136,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['23287', '90002']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot send request: host is not monitored.'
 			],
 			// Item disabled
@@ -134,6 +145,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['90000']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot send request: item is disabled.'
 			],
 			[
@@ -141,6 +153,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['23287', '90000']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot send request: item is disabled.'
 			],
 			// LLD rule disabled
@@ -149,6 +162,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['90001']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot send request: discovery rule is disabled.'
 			],
 			[
@@ -156,6 +170,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['23287', '90001']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot send request: discovery rule is disabled.'
 			],
 			[
@@ -163,6 +178,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['23279', '90001']
 				],
+				'success_expected' => false,
 				'expected_error' => 'Cannot send request: discovery rule is disabled.'
 			],
 			// Success item check now
@@ -171,6 +187,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['90004']
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -178,6 +195,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['90004', '23287']
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			// Success LLD rule check now
@@ -186,6 +204,7 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['23279']
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -196,20 +215,27 @@ class testTaskCreate extends CZabbixTest {
 	 *
 	 * @dataProvider tasks
 	 */
-	public function testTaskCreate_CheckNow($task, $expected_error) {
-		$sqlTask = 'select NULL from task_check_now';
+	public function testTaskCreate_CheckNow($task, $success_expected, $expected_error) {
+		$sqlTask = "select NULL from task_check_now";
 		$oldHashTasks = DBhash($sqlTask);
 
-		$result = $this->call('task.create', $task, $expected_error);
+		$result = $this->api_acall('task.create', $task, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['taskids'] as $key => $id) {
-				$dbResult = DBSelect('select * from task_check_now where taskid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from task_check_now where taskid='.$id);
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['itemid'], $task['itemids'][$key]);
 			}
 		}
 		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertSame($expected_error, $result['error']['data']);
 			$this->assertEquals($oldHashTasks, DBhash($sqlTask));
 		}
 	}
@@ -286,15 +312,21 @@ class testTaskCreate extends CZabbixTest {
 		$oldHashTasks = DBhash($sqlTask);
 
 		// Change item/LLD rule type to not allowed for check now
-		$this->call($method, $object);
+		$resultItem = $this->api_acall($method, $object, $debug);
+		$this->assertTrue(array_key_exists('result', $resultItem));
+		$this->assertFalse(array_key_exists('error', $resultItem));
 
 		// Create task for check now
 		$task = [
 			'type' => '6',
 			'itemids' => [$object['itemid']],
 		];
+		$resultTask = $this->api_acall('task.create', $task, $debug);
 
-		$this->call('task.create', $task, $expected_error);
+		$this->assertFalse(array_key_exists('result', $resultTask));
+		$this->assertTrue(array_key_exists('error', $resultTask));
+
+		$this->assertSame($expected_error, $resultTask['error']['data']);
 		$this->assertEquals($oldHashTasks, DBhash($sqlTask));
 	}
 
@@ -344,9 +376,12 @@ class testTaskCreate extends CZabbixTest {
 		$sqlTask = "select NULL from task_check_now";
 		$oldHashTasks = DBhash($sqlTask);
 
-		$this->authorize($user['user'], $user['password']);
-		$this->call('task.create', $task, $expected_error);
+		$result = $this->api_call_with_user('task.create', $user, $task, $debug);
 
+		$this->assertFalse(array_key_exists('result', $result));
+		$this->assertTrue(array_key_exists('error', $result));
+
+		$this->assertEquals($expected_error, $result['error']['data']);
 		$this->assertEquals($oldHashTasks, DBhash($sqlTask));
 	}
 }

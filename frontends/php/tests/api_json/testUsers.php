@@ -21,10 +21,11 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-/**
- * @backup users
- */
 class testUsers extends CZabbixTest {
+
+	public function testUsers_backup() {
+		DBsave_tables('users');
+	}
 
 	public static function user_create() {
 		return [
@@ -33,6 +34,7 @@ class testUsers extends CZabbixTest {
 				'user' => [
 					'alias' => 'API user create without password'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "passwd" is missing.'
 			],
 			// Check user alias.
@@ -43,6 +45,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => 7]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "alias" is missing.'
 			],
 			[
@@ -53,6 +56,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => 7]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/alias": cannot be empty.'
 			],
 			[
@@ -63,6 +67,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => 7]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'User with alias "Admin" already exists.'
 			],
 			[
@@ -82,6 +87,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (alias)=(API create users with the same names) already exists.'
 			],
 			[
@@ -92,6 +98,7 @@ class testUsers extends CZabbixTest {
 						'usrgrpid' => 7
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/alias": value is too long.'
 			],
 			// Check user group.
@@ -100,6 +107,7 @@ class testUsers extends CZabbixTest {
 					'alias' => 'User without group parameter',
 					'passwd' => 'zabbix',
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "usrgrps" is missing.'
 			],
 			[
@@ -109,6 +117,7 @@ class testUsers extends CZabbixTest {
 					'usrgrps' => [
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
 			],
 			[
@@ -119,6 +128,7 @@ class testUsers extends CZabbixTest {
 						['userid' => '1']
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1": unexpected parameter "userid".'
 			],
 			[
@@ -129,6 +139,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '']
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -139,6 +150,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => 'abc']
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -149,6 +161,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '1.1']
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -159,6 +172,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '123456']
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'User group with ID "123456" is not available.'
 			],
 			[
@@ -170,6 +184,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '7']
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
 			// Check successfully creation of user.
@@ -183,6 +198,7 @@ class testUsers extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -195,6 +211,7 @@ class testUsers extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -207,6 +224,7 @@ class testUsers extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -225,6 +243,7 @@ class testUsers extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -233,12 +252,15 @@ class testUsers extends CZabbixTest {
 	/**
 	* @dataProvider user_create
 	*/
-	public function testUsers_Create($user, $expected_error) {
-		$result = $this->call('user.create', $user, $expected_error);
+	public function testUsers_Create($user, $success_expected, $expected_error) {
+		$result = $this->api_acall('user.create', $user, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['userids'] as $key => $id) {
-				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($id));
+				$dbResultUser = DBSelect('select * from users where userid='.$id);
 				$dbRowUser = DBFetch($dbResultUser);
 				$this->assertEquals($dbRowUser['alias'], $user[$key]['alias']);
 				$this->assertEquals($dbRowUser['passwd'], md5($user[$key]['passwd']));
@@ -252,9 +274,8 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
 
-				$this->assertEquals(1, DBcount('select * from users_groups where userid='.zbx_dbstr($id).
-						' and usrgrpid='.zbx_dbstr($user[$key]['usrgrps'][0]['usrgrpid']))
-				);
+				$dbResultGroup = "select * from users_groups where userid='".$id."' and usrgrpid=".$user[$key]['usrgrps'][0]['usrgrpid'];
+				$this->assertEquals(1, DBcount($dbResultGroup));
 
 				if (array_key_exists('user_medias', $user[$key])) {
 					$dbResultMedia = DBSelect('select * from media where userid='.$id);
@@ -271,6 +292,12 @@ class testUsers extends CZabbixTest {
 				}
 			}
 		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertSame($expected_error, $result['error']['data']);
+		}
 	}
 
 	/**
@@ -278,27 +305,32 @@ class testUsers extends CZabbixTest {
 	*/
 	public function testUsers_CreateUserWithMultipleEmails() {
 		$user = [
-			'alias' => 'API user create with multiple emails',
-			'passwd' => 'zabbix',
-			'usrgrps' => [
-				['usrgrpid' => 7]
-			],
-			'user_medias' => [
-				[
-					'mediatypeid' => '1',
-					'sendto' => ["api1@zabbix.com","Api test <api2@zabbix.com>","АПИ test ☺æų <api2@zabbix.com>"],
-				]
-			]
-		];
+					'alias' => 'API user create with multiple emails',
+					'passwd' => 'zabbix',
+					'usrgrps' => [
+						['usrgrpid' => 7]
+					],
+					'user_medias' => [
+						[
+							'mediatypeid' => '1',
+							'sendto' => ["api1@zabbix.com","Api test <api2@zabbix.com>","АПИ test ☺æų <api2@zabbix.com>"],
+						]
+					]
+				];
 
-		$result = $this->call('user.create', $user);
+		$result = $this->api_acall('user.create', $user, $debug);
+
+		$this->assertTrue(array_key_exists('result', $result));
+		$this->assertFalse(array_key_exists('error', $result));
+
 		$id = $result['result']['userids'][0];
-		$this->assertEquals(1, DBcount('select * from users where userid='.zbx_dbstr($id)));
+		$dbResultUser = 'select * from users where userid='.$id;
+		$this->assertEquals(1, DBcount($dbResultUser));
 
-		$dbResultMedia = DBSelect('select * from media where userid='.zbx_dbstr($id));
+		$dbResultMedia = DBSelect('select * from media where userid='.$id);
 		$dbRowMedia = DBFetch($dbResultMedia);
 		$diff = array_diff($user['user_medias'][0]['sendto'], explode("\n", $dbRowMedia['sendto']));
-		$this->assertEquals(0, count($diff));
+		$this->assertTrue(count($diff) === 0);
 	}
 
 	public static function user_update() {
@@ -308,6 +340,7 @@ class testUsers extends CZabbixTest {
 				'user' => [[
 					'alias' => 'API user update without userid'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "userid" is missing.'
 			],
 			[
@@ -315,6 +348,7 @@ class testUsers extends CZabbixTest {
 					'alias' => 'API user update with empty userid',
 					'userid' => ''
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
@@ -322,6 +356,7 @@ class testUsers extends CZabbixTest {
 					'alias' => 'API user update with nonexistent userid',
 					'userid' => '1.1'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
@@ -329,6 +364,7 @@ class testUsers extends CZabbixTest {
 					'alias' => 'API user update with nonexistent userid',
 					'userid' => 'abc'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
@@ -336,6 +372,7 @@ class testUsers extends CZabbixTest {
 					'alias' => 'API user update with nonexistent userid',
 					'userid' => '123456'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -349,6 +386,7 @@ class testUsers extends CZabbixTest {
 						'alias' => 'API update users with the same id2'
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (userid)=(9) already exists.'
 			],
 			// Check user password.
@@ -357,6 +395,7 @@ class testUsers extends CZabbixTest {
 					'userid' => '2',
 					'passwd' => 'zabbix'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
 			// Check user alias.
@@ -365,6 +404,7 @@ class testUsers extends CZabbixTest {
 					'userid' => '9',
 					'alias' => ''
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/alias": cannot be empty.'
 			],
 			[
@@ -372,6 +412,7 @@ class testUsers extends CZabbixTest {
 					'userid' => '2',
 					'alias' => 'Try rename guest'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Cannot rename guest user.'
 			],
 			[
@@ -379,6 +420,7 @@ class testUsers extends CZabbixTest {
 					'userid' => '9',
 					'alias' => 'Admin'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'User with alias "Admin" already exists.'
 			],
 			[
@@ -392,6 +434,7 @@ class testUsers extends CZabbixTest {
 						'alias' => 'API update users with the same alias'
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (alias)=(API update users with the same alias) already exists.'
 			],
 			[
@@ -399,6 +442,7 @@ class testUsers extends CZabbixTest {
 					'userid' => '9',
 					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/alias": value is too long.'
 			],
 			// Check user group.
@@ -409,6 +453,7 @@ class testUsers extends CZabbixTest {
 					'usrgrps' => [
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
 			],
 			[
@@ -419,6 +464,7 @@ class testUsers extends CZabbixTest {
 						['userid' => '1']
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1": unexpected parameter "userid".'
 			],
 			[
@@ -429,6 +475,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '']
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -439,6 +486,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => 'abc']
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -449,6 +497,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '1.1']
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
@@ -459,6 +508,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '123456']
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'User group with ID "123456" is not available.'
 			],
 			[
@@ -470,6 +520,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '7']
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
 			// Check user group, admin can't add himself to a disabled group or a group with disabled GUI access.
@@ -481,6 +532,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '12']
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
 			[
@@ -491,6 +543,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => '9']
 					]
 				]],
+				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
 			// Check user properties, super-admin user type.
@@ -500,6 +553,7 @@ class testUsers extends CZabbixTest {
 					'alias' => 'Try to change super-admin user type',
 					'type' => '2'
 				]],
+				'success_expected' => false,
 				'expected_error' => 'User cannot change their user type.'
 			],
 			// Successfully user update.
@@ -514,6 +568,7 @@ class testUsers extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -527,6 +582,7 @@ class testUsers extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -546,6 +602,7 @@ class testUsers extends CZabbixTest {
 						]
 					]
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -554,20 +611,22 @@ class testUsers extends CZabbixTest {
 	/**
 	* @dataProvider user_update
 	*/
-	public function testUsers_Update($users, $expected_error) {
+	public function testUsers_Update($users, $success_expected, $expected_error) {
 		foreach ($users as $user) {
-			if (array_key_exists('userid', $user) && filter_var($user['userid'], FILTER_VALIDATE_INT)
-					&& $expected_error !== null) {
-				$sqlUser = "select * from users where userid=".zbx_dbstr($user['userid']);
+			if (array_key_exists('userid', $user) && filter_var($user['userid'], FILTER_VALIDATE_INT) && !$success_expected){
+				$sqlUser = "select * from users where userid=".$user['userid'];
 				$oldHashUser = DBhash($sqlUser);
 			}
 		}
 
-		$result = $this->call('user.update', $users, $expected_error);
+		$result = $this->api_acall('user.update', $users, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['userids'] as $key => $id) {
-				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($id));
+				$dbResultUser = DBSelect('select * from users where userid='.$id);
 				$dbRowUser = DBFetch($dbResultUser);
 				$this->assertEquals($dbRowUser['alias'], $users[$key]['alias']);
 				$this->assertEquals($dbRowUser['passwd'], md5($users[$key]['passwd']));
@@ -581,12 +640,11 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
 
-				$this->assertEquals(1, DBcount('select * from users_groups where userid='.zbx_dbstr($id).
-						' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
-				);
+				$dbResultGroup = "select * from users_groups where userid='".$id."' and usrgrpid=".$users[$key]['usrgrps'][0]['usrgrpid'];
+				$this->assertEquals(1, DBcount($dbResultGroup));
 
 				if (array_key_exists('user_medias', $users[$key])) {
-					$dbResultMedia = DBSelect('select * from media where userid='.zbx_dbstr($id));
+					$dbResultMedia = DBSelect('select * from media where userid='.$id);
 					$dbRowMedia = DBFetch($dbResultMedia);
 					$this->assertEquals($dbRowMedia['mediatypeid'], $users[$key]['user_medias'][0]['mediatypeid']);
 					$this->assertEquals($dbRowMedia['sendto'], $users[$key]['user_medias'][0]['sendto']);
@@ -595,12 +653,16 @@ class testUsers extends CZabbixTest {
 					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
 				}
 				else {
-					$dbResultGroup = 'select * from media where userid='.zbx_dbstr($id);
+					$dbResultGroup = 'select * from media where userid='.$id;
 					$this->assertEquals(0, DBcount($dbResultGroup));
 				}
 			}
 		}
 		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+			$this->assertSame($expected_error, $result['error']['data']);
+
 			if (isset($oldHashUser)) {
 				$this->assertEquals($oldHashUser, DBhash($sqlUser));
 			}
@@ -619,6 +681,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => 7]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_clock".'
 			],
 			[
@@ -630,6 +693,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => 7]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_failed".'
 			],
 			[
@@ -641,6 +705,7 @@ class testUsers extends CZabbixTest {
 						['usrgrpid' => 7]
 					]
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_ip".'
 			],
 			// Check user properties, name and surname.
@@ -653,6 +718,7 @@ class testUsers extends CZabbixTest {
 					],
 					'name' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			[
@@ -664,6 +730,7 @@ class testUsers extends CZabbixTest {
 					],
 					'surname' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/surname": value is too long.'
 			],
 			// Check user properties, autologin.
@@ -676,6 +743,7 @@ class testUsers extends CZabbixTest {
 					],
 					'autologin' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/autologin": a number is expected.'
 			],
 			[
@@ -687,6 +755,7 @@ class testUsers extends CZabbixTest {
 					],
 					'autologin' => '2'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/autologin": value must be one of 0, 1.'
 			],
 			[
@@ -698,6 +767,7 @@ class testUsers extends CZabbixTest {
 					],
 					'autologin' => '-1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/autologin": value must be one of 0, 1.'
 			],
 			// Check user properties, autologout.
@@ -710,6 +780,7 @@ class testUsers extends CZabbixTest {
 					],
 					'autologout' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/autologout": cannot be empty.'
 			],
 			[
@@ -721,6 +792,7 @@ class testUsers extends CZabbixTest {
 					],
 					'autologout' => '86401'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 			],
 			[
@@ -732,6 +804,7 @@ class testUsers extends CZabbixTest {
 					],
 					'autologout' => '1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 			],
 			[
@@ -743,6 +816,7 @@ class testUsers extends CZabbixTest {
 					],
 					'autologout' => '89'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 			],
 			[
@@ -755,6 +829,7 @@ class testUsers extends CZabbixTest {
 					'autologout' => '90',
 					'autologin' => '1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Auto-login and auto-logout options cannot be enabled together.'
 			],
 			// Check user properties, lang.
@@ -767,6 +842,7 @@ class testUsers extends CZabbixTest {
 					],
 					'lang' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/lang": cannot be empty.'
 			],
 			[
@@ -778,6 +854,7 @@ class testUsers extends CZabbixTest {
 					],
 					'lang' => '123456'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/lang": value is too long.'
 			],
 			// Check user properties, theme.
@@ -790,6 +867,7 @@ class testUsers extends CZabbixTest {
 					],
 					'theme' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
 			],
 			[
@@ -801,6 +879,7 @@ class testUsers extends CZabbixTest {
 					],
 					'theme' => 'classic'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
 			],
 			[
@@ -812,6 +891,7 @@ class testUsers extends CZabbixTest {
 					],
 					'theme' => 'originalblue'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme, hc-light, hc-dark.'
 			],
 			// Check user properties, type.
@@ -824,6 +904,7 @@ class testUsers extends CZabbixTest {
 					],
 					'type' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
 			],
 			[
@@ -835,6 +916,7 @@ class testUsers extends CZabbixTest {
 					],
 					'type' => '0'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 2, 3.'
 			],
 			[
@@ -846,6 +928,7 @@ class testUsers extends CZabbixTest {
 					],
 					'type' => '1.1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
 			],
 			// Check user properties, refresh.
@@ -858,6 +941,7 @@ class testUsers extends CZabbixTest {
 					],
 					'refresh' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/refresh": cannot be empty.'
 			],
 			[
@@ -869,6 +953,7 @@ class testUsers extends CZabbixTest {
 					],
 					'refresh' => '3601'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 			],
 			[
@@ -880,6 +965,7 @@ class testUsers extends CZabbixTest {
 					],
 					'refresh' => '1.1'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 			],
 			// Check user properties, rows_per_page.
@@ -892,6 +978,7 @@ class testUsers extends CZabbixTest {
 					],
 					'rows_per_page' => ''
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/rows_per_page": a number is expected.'
 			],
 			[
@@ -903,6 +990,7 @@ class testUsers extends CZabbixTest {
 					],
 					'rows_per_page' => '0'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 			],
 			[
@@ -914,6 +1002,7 @@ class testUsers extends CZabbixTest {
 					],
 					'rows_per_page' => '1000000'
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 			],
 			// Check user media, mediatypeid.
@@ -926,6 +1015,7 @@ class testUsers extends CZabbixTest {
 					],
 					'user_medias' => [[ ]],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1": the parameter "mediatypeid" is missing.'
 			],
 			[
@@ -941,6 +1031,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/mediatypeid": a number is expected.'
 			],
 			[
@@ -956,6 +1047,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/mediatypeid": a number is expected.'
 			],
 			[
@@ -972,6 +1064,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Media type with ID "10" is not available.'
 			],
 			// Check user media, sendto.
@@ -988,6 +1081,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1": the parameter "sendto" is missing.'
 			],
 			[
@@ -1004,6 +1098,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
 			],
 			[
@@ -1020,6 +1115,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/sendto/1": a character string is expected.'
 			],
 			[
@@ -1036,6 +1132,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/sendto": cannot be empty.'
 			],
 			[
@@ -1052,6 +1149,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
 			],
 			[
@@ -1068,6 +1166,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
 			],
 			[
@@ -1084,6 +1183,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid email address for media type with ID "1".'
 			],
 			[
@@ -1100,6 +1200,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid email address for media type with ID "1".'
 			],
 			[
@@ -1116,6 +1217,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid email address for media type with ID "1".'
 			],
 			[
@@ -1132,6 +1234,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid email address for media type with ID "1".'
 			],
 			[
@@ -1148,6 +1251,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid email address for media type with ID "1".'
 			],
 			[
@@ -1164,6 +1268,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid email address for media type with ID "1".'
 			],
 			[
@@ -1180,6 +1285,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid email address for media type with ID "1".'
 			],
 			// Check user media, active.
@@ -1198,6 +1304,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": a number is expected.'
 			],
 			[
@@ -1215,6 +1322,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": a number is expected.'
 			],
 			[
@@ -1232,6 +1340,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": value must be one of 0, 1.'
 			],
 			// Check user media, severity.
@@ -1250,6 +1359,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": a number is expected.'
 			],
 			[
@@ -1267,6 +1377,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": value must be one of 0-63.'
 			],
 			// Check user media, period.
@@ -1285,6 +1396,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": cannot be empty.'
 			],
 			[
@@ -1302,6 +1414,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			[
@@ -1319,6 +1432,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			[
@@ -1336,6 +1450,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			[
@@ -1353,6 +1468,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			[
@@ -1370,6 +1486,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			[
@@ -1387,6 +1504,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			[
@@ -1404,6 +1522,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			[
@@ -1421,6 +1540,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			[
@@ -1438,6 +1558,7 @@ class testUsers extends CZabbixTest {
 						]
 					],
 				],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
 			// Successfully user update and create with all parameters.
@@ -1466,6 +1587,7 @@ class testUsers extends CZabbixTest {
 					'rows_per_page' => 25,
 					'url' => 'profile.php'
 				],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 		];
@@ -1474,7 +1596,7 @@ class testUsers extends CZabbixTest {
 	/**
 	* @dataProvider user_properties
 	*/
-	public function testUser_NotRequiredPropertiesAndMedias($user, $expected_error) {
+	public function testUser_NotRequiredPropertiesAndMedias($user, $success_expected, $expected_error) {
 		$methods = ['user.create', 'user.update'];
 
 		foreach ($methods as $method) {
@@ -1482,10 +1604,13 @@ class testUsers extends CZabbixTest {
 				$user['userid'] = '9';
 				$user['alias'] = 'updated-'.$user['alias'];
 			}
-			$result = $this->call($method, $user, $expected_error);
+			$result = $this->api_acall($method, $user, $debug);
 
-			if ($expected_error === null) {
-				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($result['result']['userids'][0]));
+			if ($success_expected) {
+				$this->assertTrue(array_key_exists('result', $result));
+				$this->assertFalse(array_key_exists('error', $result));
+
+				$dbResultUser = DBSelect('select * from users where userid='.$result['result']['userids'][0]);
 				$dbRowUser = DBFetch($dbResultUser);
 				$this->assertEquals($dbRowUser['alias'], $user['alias']);
 				$this->assertEquals($dbRowUser['passwd'], md5($user['passwd']));
@@ -1499,15 +1624,10 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowUser['theme'], $user['theme']);
 				$this->assertEquals($dbRowUser['url'], $user['url']);
 
-				$this->assertEquals(1, DBcount('select * from users_groups where userid='.
-						zbx_dbstr($result['result']['userids'][0]).' and usrgrpid='.
-						zbx_dbstr($user['usrgrps'][0]['usrgrpid']))
-				);
+				$dbResultGroup = "select * from users_groups where userid='".$result['result']['userids'][0]."' and usrgrpid=".$user['usrgrps'][0]['usrgrpid'];
+				$this->assertEquals(1, DBcount($dbResultGroup));
 
-				$dbResultMedia = DBSelect('select * from media where userid='.
-						zbx_dbstr($result['result']['userids'][0])
-				);
-
+				$dbResultMedia = DBSelect('select * from media where userid='.$result['result']['userids'][0]);
 				$dbRowMedia = DBFetch($dbResultMedia);
 				$this->assertEquals($dbRowMedia['mediatypeid'], $user['user_medias'][0]['mediatypeid']);
 				$this->assertEquals($dbRowMedia['sendto'], $user['user_medias'][0]['sendto']);
@@ -1516,7 +1636,12 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowMedia['period'], $user['user_medias'][0]['period']);
 			}
 			else {
-				$this->assertEquals(0, DBcount('select * from users where alias='.zbx_dbstr($user['alias'])));
+				$this->assertFalse(array_key_exists('result', $result));
+				$this->assertTrue(array_key_exists('error', $result));
+
+				$this->assertSame($expected_error, $result['error']['data']);
+				$dbResult = "select * from users where alias='".$user['alias']."'";
+				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
 	}
@@ -1526,61 +1651,74 @@ class testUsers extends CZabbixTest {
 			// Check user id.
 			[
 				'user' => [''],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'user' => ['abc'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'user' => ['1.1'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'user' => ['123456'],
+				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'user' => ['9', '9'],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (9) already exists.'
 			],
 			// Try delete himself.
 			[
 				'user' => ['1'],
+				'success_expected' => false,
 				'expected_error' => 'User is not allowed to delete himself.'
 			],
 			// Try delete internal user.
 			[
 				'user' => ['2'],
+				'success_expected' => false,
 				'expected_error' => 'Cannot delete Zabbix internal user "guest", try disabling that user.'
 			],
 			// Check if deleted users used in actions.
 			[
 				'user' => ['13'],
+				'success_expected' => false,
 				'expected_error' => 'User "api-user-action" is used in "API action with user" action.'
 			],
 			// Check if deleted users have a map.
 			[
 				'user' => ['14'],
+				'success_expected' => false,
 				'expected_error' => 'User "api-user-map" is map "API map" owner.'
 			],
 			// Check if deleted users have a screen.
 			[
 				'user' => ['15'],
+				'success_expected' => false,
 				'expected_error' => 'User "api-user-screen" is screen "API screen" owner.'
 			],
 			// Check if deleted users have a slide show.
 			[
 				'user' => ['16'],
+				'success_expected' => false,
 				'expected_error' => 'User "api-user-slideshow" is slide show "API slide show" owner.'
 			],
 			// Check successfully delete of user.
 			[
 				'user' => ['10'],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 						[
 				'user' => ['11', '12'],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -1589,13 +1727,23 @@ class testUsers extends CZabbixTest {
 	/**
 	* @dataProvider user_delete
 	*/
-	public function testUsers_Delete($user, $expected_error) {
-		$result = $this->call('user.delete', $user, $expected_error);
+	public function testUsers_Delete($user, $success_expected, $expected_error) {
+		$result = $this->api_acall('user.delete', $user, $debug);
 
-		if ($expected_error === null) {
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
 			foreach ($result['result']['userids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from users where userid='.zbx_dbstr($id)));
+				$dbResult = 'select * from users where userid='.$id;
+				$this->assertEquals(0, DBcount($dbResult));
 			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -1662,8 +1810,12 @@ class testUsers extends CZabbixTest {
 	* @dataProvider user_permissions
 	*/
 	public function testUsers_UserPermissions($method, $login, $user, $expected_error) {
-		$this->authorize($login['user'], $login['password']);
-		$this->call($method, $user, $expected_error);
+		$result = $this->api_call_with_user($method, $login, $user, $debug);
+
+		$this->assertFalse(array_key_exists('result', $result));
+		$this->assertTrue(array_key_exists('error', $result));
+
+		$this->assertEquals($expected_error, $result['error']['data']);
 	}
 
 	public static function auth_data() {
@@ -1693,20 +1845,42 @@ class testUsers extends CZabbixTest {
 	* @dataProvider auth_data
 	*/
 	public function testUsers_Session($data) {
-		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
+		$response = $this->do_post_request($data, $debug);
+		$decoded = json_decode($response, true);
+
+		$this->assertFalse(array_key_exists('result', $decoded));
+		$this->assertTrue(array_key_exists('error', $decoded));
+		$this->assertEquals('Session terminated, re-login, please.', $decoded['error']['data']);
 	}
 
 	public function testUsers_Logout() {
-		$this->authorize('Admin', 'zabbix');
+		$login = [
+			'jsonrpc' => '2.0',
+			'method' => 'user.login',
+			'params' => ['user' => 'Admin', 'password' => 'zabbix'],
+			'id' => '1'
+		];
+
+		$responseLogin = $this->do_post_request($login, $debug);
+		$decodedLogin = json_decode($responseLogin, true);
+
+		$this->assertFalse(array_key_exists('error', $decodedLogin));
+		$this->assertTrue(array_key_exists('result', $decodedLogin));
+		$auth=$decodedLogin['result'];
 
 		$logout = [
 			'jsonrpc' => '2.0',
 			'method' => 'user.logout',
 			'params' => [],
-			'auth' => $this->session,
+			'auth' => $auth,
 			'id' => '1'
 		];
-		$this->checkResult($this->callRaw($logout));
+
+		$responseLogout = $this->do_post_request($logout, $debug);
+		$decodedLogout = json_decode($responseLogout, true);
+
+		$this->assertFalse(array_key_exists('error', $decodedLogout));
+		$this->assertTrue(array_key_exists('result', $decodedLogout));
 
 		$data = [
 			'jsonrpc' => '2.0',
@@ -1716,10 +1890,16 @@ class testUsers extends CZabbixTest {
 					'userid' => '9',
 					'alias' => 'check authentication',
 				],
-			'auth' => $this->session,
+			'auth' => $auth,
 			'id' => '1'
 		];
-		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
+
+		$responseUpdate = $this->do_post_request($data, $debug);
+		$decodedUpdate = json_decode($responseUpdate, true);
+
+		$this->assertFalse(array_key_exists('result', $decodedUpdate));
+		$this->assertTrue(array_key_exists('error', $decodedUpdate));
+		$this->assertEquals('Session terminated, re-login, please.', $decodedUpdate['error']['data']);
 	}
 
 	public static function login_data() {
@@ -1729,63 +1909,72 @@ class testUsers extends CZabbixTest {
 					'user' => 'Admin',
 					'password' => 'zabbix',
 					'sessionid' => '123456',
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": unexpected parameter "sessionid".'
 			],
 			// Check login
 			[
 				'login' => [
 					'password' => 'zabbix'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": the parameter "user" is missing.'
 			],
 			[
 				'login' => [
 					'user' => '',
 					'password' => 'zabbix'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Login name or password is incorrect.'
 			],
 			[
 				'login' => [
 					'user' => 'Unknown user',
 					'password' => 'zabbix'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Login name or password is incorrect.'
 			],
 			[
 				'login' => [
 					'user' => '!@#$%^&\\\'\"""\;:',
 					'password' => 'zabbix'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Login name or password is incorrect.'
 			],
 			// Check password
 			[
 				'login' => [
 					'user' => 'Admin'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/": the parameter "password" is missing.'
 			],
 			[
 				'login' => [
 					'user' => 'Admin',
 					'password' => ''
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Login name or password is incorrect.'
 			],
 			[
 				'login' => [
 					'user' => 'Admin',
 					'password' => 'wrong password'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Login name or password is incorrect.'
 			],
 			[
 				'login' => [
 					'user' => 'Admin',
 					'password' => '!@#$%^&\\\'\"""\;:'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'Login name or password is incorrect.'
 			],
 			// Check disabled user.
@@ -1793,7 +1982,8 @@ class testUsers extends CZabbixTest {
 				'login' => [
 					'user' => 'api-user-action',
 					'password' => 'zabbix'
-				],
+					],
+				'success_expected' => false,
 				'expected_error' => 'No permissions for system access.'
 			],
 			// Successfully login.
@@ -1801,7 +1991,8 @@ class testUsers extends CZabbixTest {
 				'login' => [
 					'user' => 'Admin',
 					'password' => 'zabbix'
-				],
+					],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -1809,14 +2000,16 @@ class testUsers extends CZabbixTest {
 					'user' => 'Admin',
 					'password' => 'zabbix',
 					'userData' => true
-				],
+					],
+				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'login' => [
 					'user' => 'guest',
 					'password' => ''
-				],
+					],
+				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -1825,17 +2018,38 @@ class testUsers extends CZabbixTest {
 	/**
 	* @dataProvider login_data
 	*/
-	public function testUsers_Login($user, $expected_error) {
-		$this->disableAuthorization();
-		$this->call('user.login', $user, $expected_error);
+	public function testUsers_Login($user, $success_expected, $expected_error) {
+		$result = $this->api_call('user.login', $user, $debug);
+
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+			$this->assertEquals($expected_error, $result['error']['data']);
+		}
 	}
 
 	public function testUsers_LoginBlocked() {
-		$this->disableAuthorization();
 		for ($i = 1; $i <= 6; $i++) {
-			$result = $this->call('user.login', ['user' => 'Admin', 'password' => 'attempt '.$i], true);
+			$result = $this->api_call(
+				'user.login',
+					[
+						'user' => 'Admin',
+						'password' => 'attempt '.$i
+					],
+				$debug);
+
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
 		}
 
 		$this->assertRegExp('/Account is blocked for (2[5-9]|30) seconds./', $result['error']['data']);
+	}
+
+	public function testUsers_restore() {
+		DBrestore_tables('users');
 	}
 }

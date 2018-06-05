@@ -52,7 +52,7 @@ class CControllerProblemView extends CController {
 			'filter_age_state' =>		'in 1',
 			'filter_age' =>				'int32',
 			'filter_inventory' =>		'array',
-			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>			'array',
 			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
 			'filter_maintenance' =>		'in 1',
@@ -143,7 +143,7 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.inventory.field', $filter_inventory['fields'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.problem.filter.inventory.value', $filter_inventory['values'], PROFILE_TYPE_STR);
 
-			CProfile::update('web.problem.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+			CProfile::update('web.problem.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND),
 				PROFILE_TYPE_INT
 			);
 
@@ -295,7 +295,7 @@ class CControllerProblemView extends CController {
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
 				'inventory' => $filter_inventory,
-				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND),
 				'tags' => $filter_tags,
 				'show_tags' => CProfile::get('web.problem.filter.show_tags', PROBLEMS_SHOW_TAGS_3),
 				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),

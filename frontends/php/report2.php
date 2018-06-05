@@ -113,16 +113,6 @@ if (!hasRequest('filter_rst')) {
 	$_REQUEST['filter_timetill'] = getRequest('filter_timetill',
 		CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0)
 	);
-
-	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-		$_REQUEST['tpl_triggerid'] = getRequest('tpl_triggerid',
-			CProfile::get('web.avail_report.'.$availabilityReportMode.'.tpl_triggerid', 0)
-		);
-
-		$_REQUEST['hostgroupid'] = getRequest('hostgroupid',
-			CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostgroupid', 0)
-		);
-	}
 }
 
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', getRequest('filter_groupid', 0),
@@ -137,16 +127,6 @@ CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', getReq
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', getRequest('filter_hostid', 0),
 	PROFILE_TYPE_ID
 );
-
-if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-	CProfile::update('web.avail_report.'.$availabilityReportMode.'.tpl_triggerid', getRequest('tpl_triggerid', 0),
-		PROFILE_TYPE_ID
-	);
-
-	CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostgroupid', getRequest('hostgroupid', 0),
-		PROFILE_TYPE_ID
-	);
-}
 
 $config = select_config();
 
@@ -430,8 +410,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	}
 
 	// filter period
-	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince']));
-	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill']));
+	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince'], 'filter_timetill'));
+	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill'], 'filter_timesince'));
 
 	$filterForm->addColumn($filterColumn1);
 	$filterForm->addColumn($filterColumn2);

@@ -187,7 +187,7 @@ static zbx_oracle_column_type_t	zbx_oracle_column_type(unsigned char field_type)
 
 static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_SQL_NAME " ", field->name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s ", field->name);
 	DBfield_type_string(sql, sql_alloc, sql_offset, field);
 	if (NULL != field->default_value)
 	{
@@ -251,18 +251,6 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "\n)" ZBX_DB_TABLE_OPTIONS);
 }
 
-static void	DBrename_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
-		const char *new_name)
-{
-#ifdef HAVE_IBM_DB2
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename table " ZBX_FS_SQL_NAME " to " ZBX_FS_SQL_NAME,
-			table_name, new_name);
-#else
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table " ZBX_FS_SQL_NAME " rename to " ZBX_FS_SQL_NAME,
-			table_name, new_name);
-#endif
-}
-
 static void	DBdrop_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop table %s", table_name);
@@ -285,8 +273,7 @@ static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table " ZBX_FS_SQL_NAME ZBX_DB_ALTER_COLUMN " ",
-			table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
 #ifdef HAVE_MYSQL
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
@@ -334,21 +321,20 @@ static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table " ZBX_FS_SQL_NAME " add ", table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s add ", table_name);
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 }
 
 static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *field_name, const ZBX_FIELD *field)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table " ZBX_FS_SQL_NAME " ", table_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s ", table_name);
 
 #ifdef HAVE_MYSQL
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "change column " ZBX_FS_SQL_NAME " ", field_name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "change column %s ", field_name);
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 #else
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename column " ZBX_FS_SQL_NAME " to " ZBX_FS_SQL_NAME,
-			field_name, field->name);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename column %s to %s", field_name, field->name);
 #endif
 }
 
@@ -403,9 +389,8 @@ static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 		const char *table_name, int id, const ZBX_FIELD *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
-			"alter table " ZBX_FS_SQL_NAME " add constraint c_%s_%d foreign key (" ZBX_FS_SQL_NAME ")"
-					" references " ZBX_FS_SQL_NAME " (" ZBX_FS_SQL_NAME ")", table_name, table_name,
-					id, field->name, field->fk_table, field->fk_field);
+			"alter table %s add constraint c_%s_%d foreign key (%s) references %s (%s)",
+			table_name, table_name, id, field->name, field->fk_table, field->fk_field);
 	if (0 != (field->fk_flags & ZBX_FK_CASCADE_DELETE))
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " on delete cascade");
 }
@@ -440,22 +425,6 @@ int	DBcreate_table(const ZBX_TABLE *table)
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
-
-	zbx_free(sql);
-
-	return ret;
-}
-
-int	DBrename_table(const char *table_name, const char *new_name)
-{
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
-	int	ret = FAIL;
-
-	DBrename_table_sql(&sql, &sql_alloc, &sql_offset, table_name, new_name);
-
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = DBreorg_table(new_name);
 
 	zbx_free(sql);
 

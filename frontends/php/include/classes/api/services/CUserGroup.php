@@ -434,7 +434,7 @@ class CUserGroup extends CApiService {
 
 		$groupids = array_keys($groupids);
 
-		$db_groups = DB::select('hstgrp', [
+		$db_groups = DB::select('groups', [
 			'output' => [],
 			'groupids' => $groupids,
 			'preservekeys' => true

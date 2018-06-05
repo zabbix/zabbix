@@ -1,0 +1,2 @@
+ALTER TABLE usrgrp MODIFY usrgrpid DEFAULT NULL;
+ALTER TABLE usrgrp DROP COLUMN api_access;

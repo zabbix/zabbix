@@ -87,16 +87,18 @@ $templateList = (new CFormList('hostlist'))
 	->addRow((new CLabel(_('Groups'), 'groups[]'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'groups[]',
-			'object_name' => 'hostGroup',
-			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+			'objectName' => 'hostGroup',
+			'objectOptions' => ['editable' => true],
 			'data' => $data['groups_ms'],
+			'addNew' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
 					'dstfrm' => $frmHost->getName(),
 					'dstfld1' => 'groups_',
-					'editable' => true
+					'srcfld1' => 'groupid',
+					'writeonly' => '1',
+					'multiselect' => '1'
 				]
 			]
 		]))
@@ -337,7 +339,11 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // TEMPLATES{
 $tmplList = new CFormList();
 
-$disableids = [];
+$ignoredTemplates = [];
+
+if ($data['templateid'] != 0) {
+	$ignoredTemplates[$data['templateid']] = $data['dbTemplate']['host'];
+}
 
 $linkedTemplateTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
@@ -374,7 +380,7 @@ foreach ($data['linkedTemplates'] as $template) {
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], null, 'conditions_'.$template['templateid']);
 
-	$disableids[] = $template['templateid'];
+	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
 $tmplList->addRow(_('Linked templates'),
@@ -388,7 +394,8 @@ $newTemplateTable = (new CTable())
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'add_templates[]',
-			'object_name' => 'templates',
+			'objectName' => 'templates',
+			'ignored' => $ignoredTemplates,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -396,8 +403,9 @@ $newTemplateTable = (new CTable())
 					'srcfld2' => 'host',
 					'dstfrm' => $frmHost->getName(),
 					'dstfld1' => 'add_templates_',
-					'excludeids' => $data['templateid'] != 0 ? [$data['templateid']] : [],
-					'disableids' => $disableids
+					'templated_hosts' => '1',
+					'multiselect' => '1',
+					'templateid' => $data['templateid']
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

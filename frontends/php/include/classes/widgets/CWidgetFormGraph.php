@@ -41,12 +41,9 @@ class CWidgetFormGraph extends CWidgetForm {
 
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-			// Item multiselector with single value.
-			$field_item = (new CWidgetFieldItem('itemid', _('Item')))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false)
-				->setFilterParameter('numeric', true)
-				->setFilterParameter('with_simple_graph_items', true);
+			// item field
+			$field_item = (new CWidgetFieldSelectResource('itemid', _('Item'), WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH))
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);

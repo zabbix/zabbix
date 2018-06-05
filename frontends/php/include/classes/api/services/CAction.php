@@ -534,6 +534,12 @@ class CAction extends CApiService {
 			// Set default values for recovery operations and their messages.
 			if (array_key_exists('recovery_operations', $action)) {
 				foreach ($action['recovery_operations'] as &$operation) {
+					if (array_key_exists('operationid', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+							$operation['operationid'], 'operationid'
+						));
+					}
+
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 							|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
 						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
@@ -559,6 +565,12 @@ class CAction extends CApiService {
 			// Set default values for acknowledge operations and their messages.
 			if (array_key_exists('acknowledge_operations', $action)) {
 				foreach ($action['acknowledge_operations'] as &$operation) {
+					if (array_key_exists('operationid', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
+							$operation['operationid'], 'operationid'
+						));
+					}
+
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
 						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
@@ -1578,9 +1590,8 @@ class CAction extends CApiService {
 				],
 				EVENT_SOURCE_AUTO_REGISTRATION => [
 					OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_GROUP_ADD,
-					OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE,
-					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
-					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
+					OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_DISABLE,
+					OPERATION_TYPE_HOST_INVENTORY
 				],
 				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE]
 			],
@@ -2799,39 +2810,29 @@ class CAction extends CApiService {
 			if ((!array_key_exists('operations', $action) || !$action['operations'])
 					&& (!array_key_exists('recovery_operations', $action) || !$action['recovery_operations'])
 					&& (!array_key_exists('acknowledge_operations', $action) || !$action['acknowledge_operations'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action['name']));
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Action "%1$s" no operations defined.', $action['name'])
+				);
 			}
-
-			if (array_key_exists('operations', $action)) {
+			elseif (array_key_exists('operations', $action) && $action['operations']) {
 				foreach ($action['operations'] as $operation) {
-					if (array_key_exists('operationid', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
-					}
-
 					$operation['recovery'] = ACTION_OPERATION;
 					$operation['eventsource'] = $action['eventsource'];
 					$operations_to_validate[] = $operation;
 				}
 			}
 
-			if (array_key_exists('recovery_operations', $action)) {
-				foreach ($action['recovery_operations'] as $operation) {
-					if (array_key_exists('operationid', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
-					}
-
-					$operation['recovery'] = ACTION_RECOVERY_OPERATION;
-					$operation['eventsource'] = $action['eventsource'];
-					$operations_to_validate[] = $operation;
+			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']) {
+				foreach ($action['recovery_operations'] as $recovery_operation) {
+					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
+					$recovery_operation['eventsource'] = $action['eventsource'];
+					$operations_to_validate[] = $recovery_operation;
 				}
 			}
 
-			if (array_key_exists('acknowledge_operations', $action)) {
+			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
 				foreach ($action['acknowledge_operations'] as $operation) {
-					if (array_key_exists('operationid', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
-					}
-
 					$operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
 					$operation['eventsource'] = $action['eventsource'];
 					$operations_to_validate[] = $operation;

@@ -109,6 +109,14 @@ class CHistory extends CApiService {
 			$options['itemids'] = $itemids;
 		}
 
+		$items = API::Item()->get([
+			'itemids' => $options['itemids'],
+			'output' => ['itemid', 'value_type'],
+			'editable' => $options['editable'],
+			'preservekeys' => true,
+			'webitems' => true
+		]);
+
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getFromElasticsearch($options);

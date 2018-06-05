@@ -112,7 +112,7 @@ $hostScripts = [];
 $child_groups = [];
 
 // multiselect host groups
-$multiselect_hostgroup_data = [];
+$multiSelectHostGroupData = [];
 if ($filter['groupids'] !== null) {
 	$filterGroups = API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
@@ -122,7 +122,7 @@ if ($filter['groupids'] !== null) {
 
 	if ($filterGroups) {
 		foreach ($filterGroups as $group) {
-			$multiselect_hostgroup_data[] = [
+			$multiSelectHostGroupData[] = [
 				'id' => $group['groupid'],
 				'name' => $group['name']
 			];
@@ -300,7 +300,7 @@ if ($items) {
 }
 
 // multiselect hosts
-$multiselect_host_data = [];
+$multiSelectHostData = [];
 if ($filter['hostids']) {
 	$filterHosts = API::Host()->get([
 		'output' => ['hostid', 'name'],
@@ -308,7 +308,7 @@ if ($filter['hostids']) {
 	]);
 
 	foreach ($filterHosts as $host) {
-		$multiselect_host_data[] = [
+		$multiSelectHostData[] = [
 			'id' => $host['hostid'],
 			'name' => $host['name']
 		];
@@ -334,14 +334,15 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Host groups'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'object_name' => 'hostGroup',
-			'data' => $multiselect_hostgroup_data,
+			'objectName' => 'hostGroup',
+			'data' => $multiSelectHostGroupData,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'groupids_'
+					'dstfld1' => 'groupids_',
+					'srcfld1' => 'groupid',
+					'multiselect' => '1'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -349,14 +350,16 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Hosts'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
-			'object_name' => 'hosts',
-			'data' => $multiselect_host_data,
+			'objectName' => 'hosts',
+			'data' => $multiSelectHostData,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
 					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'hostids_'
+					'dstfld1' => 'hostids_',
+					'srcfld1' => 'hostid',
+					'real_hosts' => '1',
+					'multiselect' => '1'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
