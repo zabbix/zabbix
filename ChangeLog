@@ -339,6 +339,7 @@ Changes for 3.4.11rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
 .......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
 ...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
 ........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
