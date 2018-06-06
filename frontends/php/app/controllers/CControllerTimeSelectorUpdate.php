@@ -132,8 +132,8 @@ class CControllerTimeSelectorUpdate extends CController {
 				$ts['from'] -= $left_offset;
 				$ts['to'] += $right_offset;
 
-				if ($ts['to'] - $ts['from'] > ZBX_MAX_PERIOD) {
-					$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD;
+				if ($ts['to'] - $ts['from'] + 1 > ZBX_MAX_PERIOD) {
+					$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD + 1;
 				}
 
 				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
@@ -171,7 +171,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			'to' => $value['to'],
 			'to_ts' => $ts['to'],
 			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME),
-			'can_zoomout' => ($ts['to'] - $ts['from'] < ZBX_MAX_PERIOD),
+			'can_zoomout' => ($ts['to'] - $ts['from'] + 1 < ZBX_MAX_PERIOD),
 			'can_decrement' => ($ts['from'] > 0),
 			'can_increment' => ($ts['to'] < $ts['now'])
 		])]));

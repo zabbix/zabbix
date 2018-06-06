@@ -233,9 +233,17 @@ jQuery(function ($){
 			'to': (e.namespace === 'rangechange') ? data.to : request_data.to
 		};
 
-		if (e.namespace === 'rangeoffset') {
-			args.from_offset = data.from_offset;
-			args.to_offset = data.to_offset;
+		switch (e.namespace) {
+			case 'rangeoffset':
+				args.from_offset = data.from_offset;
+				args.to_offset = data.to_offset;
+				break;
+
+			case 'zoomout':
+				if (request_data.can_zoomout === false) {
+					return;
+				}
+				break;
 		}
 
 		endpoint.setArgument('method', e.namespace);
@@ -317,9 +325,25 @@ jQuery(function ($){
 	// Time selection box for graphs.
 	var selection = null,
 		anchor = null,
-		noclick_area = null;
+		noclick_area = null,
+		was_dragged = false,
+		prevent_click = false;
 
-	$(document).on('mousedown', 'img', selectionHandlerDragStart);
+	$(document).on('mousedown', 'img', selectionHandlerDragStart)
+		.on('dblclick', 'img', function(e) {
+			$.publish('timeselector.zoomout', {
+				from: element.from.val(),
+				to: element.to.val()
+			});
+
+			return cancelEvent(e);
+		})
+		.on('click', 'a', function(e) {
+			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
+			if ($(e.target).is('img') && prevent_click) {
+				return cancelEvent(e);
+			}
+		});
 
 	/**
 	 * Handle selection box drag start event.
@@ -337,6 +361,8 @@ jQuery(function ($){
 		if (typeof data.zbx_sbox === 'undefined') {
 			return;
 		}
+
+		was_dragged = false;
 
 		/**
 		 * @prop {object}  data
@@ -360,16 +386,19 @@ jQuery(function ($){
 
 		offset.top += data.top;
 		if ((e.pageY < offset.top) || e.pageY > offset.top + data.height) {
-			return cancelEvent(e);
+			prevent_click = false;
+			return;
 		}
 
+		prevent_click = true;
 		noclick_area = $('<div/>').css({
 			position: 'absolute',
 			top: 0,
 			left: (parent.is('.center') ? target : parent).position().left,
 			height: target.height() + 'px',
 			width: target.width() + 'px',
-			overflow: 'hidden'
+			overflow: 'hidden',
+			display: 'none'
 		}).insertAfter(parent);
 
 		selection = {
@@ -388,14 +417,10 @@ jQuery(function ($){
 		}
 
 		$(document)
-			.on('mouseup', selectionHandlerDragEnd)
-			.on('mousemove', selectionHandlerDrag)
-			.on('mouseup', function () {
-				data.prevent_refresh = false;
-				target.data('zbx_sbox', data.zbx_sbox);
-			});
+			.on('mouseup', {zbx_sbox: data, target: target}, selectionHandlerDragEnd)
+			.on('mousemove', selectionHandlerDrag);
 
-		return false;
+		return cancelEvent(e);
 	}
 
 	/**
@@ -406,7 +431,11 @@ jQuery(function ($){
 	function selectionHandlerDragEnd(e) {
 		var left = Math.floor(selection.dom.position().left),
 			from_offset = (left - selection.min) * selection.seconds_per_px,
-			to_offset = (selection.max - selection.dom.width() - left) * selection.seconds_per_px;
+			to_offset = (selection.max - selection.dom.width() - left) * selection.seconds_per_px
+			zbx_sbox = e.data.zbx_sbox;
+
+		zbx_sbox.prevent_refresh = false;
+		e.data.target.data('zbx_sbox', zbx_sbox);
 
 		selection.dom.remove();
 		selection = null;
@@ -417,12 +446,14 @@ jQuery(function ($){
 		noclick_area.remove();
 		noclick_area = null;
 
-		if (from_offset > 0 || to_offset > 0) {
+		if (was_dragged && (from_offset > 0 || to_offset > 0)) {
 			$.publish('timeselector.rangeoffset', {
 				from_offset: Math.ceil(from_offset),
 				to_offset: Math.ceil(to_offset)
 			});
 		}
+
+		return cancelEvent(e);
 	}
 
 	/**
@@ -436,6 +467,11 @@ jQuery(function ($){
 			seconds = Math.round(width * selection.seconds_per_px),
 			label = formatTimestamp(seconds, false, true)
 				+ (seconds < 60 ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+
+		if (!was_dragged) {
+			was_dragged = true;
+			noclick_area.show();
+		}
 
 		selection.dom.css({
 			left: Math.min(selection.base_x, x),
