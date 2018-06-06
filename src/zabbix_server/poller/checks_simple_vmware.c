@@ -156,6 +156,34 @@ out:
 	return cluster;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_get_counter_value_by_id                           *
+ *                                                                            *
+ * Purpose: gets vmware performance counter value by its identifier           *
+ *                                                                            *
+ * Parameters: service   - [IN] the vmware service                            *
+ *             type      - [IN] the performance entity type (HostSystem,      *
+ *                              VirtualMachine, Datastore)                    *
+ *             id        - [IN] the performance entity identifier             *
+ *             counterid - [IN] the performance counter identifier            *
+ *             instance  - [IN] the performance counter instance or "" for    *
+ *                              aggregate data                                *
+ *             coeff     - [IN] the coefficient to apply to the value         *
+ *             result    - [OUT] the output result                            *
+ *                                                                            *
+ * Return value: SYSINFO_RET_OK, result has value - performance counter value *
+ *                               was successfully retrieved                   *
+ *               SYSINFO_RET_OK, result has no value - performance counter    *
+ *                               was found without a value                    *
+ *               SYSINFO_RET_FAIL - otherwise, error message is set in result *
+ *                                                                            *
+ * Comments: There can be situation when performance counter is configured    *
+ *           to be read but the collector has not yet processed it. In this   *
+ *           case return SYSINFO_RET_OK with empty result so that it is       *
+ *           ignored by server rather than generating error.                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid, const char *instance, int coeff, AGENT_RESULT *result)
 {
@@ -232,6 +260,35 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_get_counter_value_by_path                         *
+ *                                                                            *
+ * Purpose: gets vmware performance counter value by the path                 *
+ *                                                                            *
+ * Parameters: service  - [IN] the vmware service                             *
+ *             type     - [IN] the performance entity type (HostSystem,       *
+ *                             VirtualMachine, Datastore)                     *
+ *             id       - [IN] the performance entity identifier              *
+ *             path     - [IN] the performance counter path                   *
+ *                             (<group>/<key>[<rollup type>])                 *
+ *             instance - [IN] the performance counter instance or "" for     *
+ *                             aggregate data                                 *
+ *             coeff    - [IN] the coefficient to apply to the value          *
+ *             result   - [OUT] the output result                             *
+ *                                                                            *
+ * Return value: SYSINFO_RET_OK, result has value - performance counter value *
+ *                               was successfully retrieved                   *
+ *               SYSINFO_RET_OK, result has no value - performance counter    *
+ *                               was found without a value                    *
+ *               SYSINFO_RET_FAIL - otherwise, error message is set in result *
+ *                                                                            *
+ * Comments: There can be situation when performance counter is configured    *
+ *           to be read but the collector has not yet processed it. In this   *
+ *           case return SYSINFO_RET_OK with empty result so that it is       *
+ *           ignored by server rather than generating error.                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *service, const char *type,
 		const char *id, const char *path, const char *instance, int coeff, AGENT_RESULT *result)
 {
@@ -1597,6 +1654,11 @@ out:
 int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
+#define		ZBX_DATASTORE_TOTAL			""
+#define		ZBX_DATASTORE_COUNTER_CAPACITY		0x01
+#define		ZBX_DATASTORE_COUNTER_USED		0x02
+#define		ZBX_DATASTORE_COUNTER_PROVISIONED	0x04
+
 	const char		*__function_name = "check_vcenter_hv_datastore_size";
 
 	char			*url, *param, *uuid, *name;
@@ -1604,6 +1666,8 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 	zbx_vmware_hv_t		*hv;
 	int			i, ret = SYSINFO_RET_FAIL, mode;
 	zbx_vmware_datastore_t	*datastore = NULL;
+	zbx_uint64_t		disk_used, disk_provisioned, disk_capacity;
+	unsigned int		flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1621,18 +1685,22 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "total"))
 	{
 		mode = ZBX_VMWARE_DATASTORE_SIZE_TOTAL;
+		flags = ZBX_DATASTORE_COUNTER_CAPACITY;
 	}
 	else if (0 == strcmp(param, "free"))
 	{
 		mode = ZBX_VMWARE_DATASTORE_SIZE_FREE;
+		flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
 	}
 	else if (0 == strcmp(param, "pfree"))
 	{
 		mode = ZBX_VMWARE_DATASTORE_SIZE_PFREE;
+		flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
 	}
 	else if (0 == strcmp(param, "uncommitted"))
 	{
 		mode = ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED;
+		flags = ZBX_DATASTORE_COUNTER_PROVISIONED | ZBX_DATASTORE_COUNTER_USED;
 	}
 	else
 	{
@@ -1664,49 +1732,55 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 		goto unlock;
 	}
 
+	if (0 != (flags & ZBX_DATASTORE_COUNTER_PROVISIONED))
+	{
+		ret = vmware_service_get_counter_value_by_path(service, "Datastore", datastore->id,
+				"disk/provisioned[latest]", ZBX_DATASTORE_TOTAL, ZBX_KIBIBYTE, result);
+
+		if (SYSINFO_RET_OK != ret || NULL == GET_UI64_RESULT(result))
+			goto unlock;
+
+		disk_provisioned = *GET_UI64_RESULT(result);
+		UNSET_UI64_RESULT(result);
+	}
+
+	if (0 != (flags & ZBX_DATASTORE_COUNTER_USED))
+	{
+		ret = vmware_service_get_counter_value_by_path(service, "Datastore", datastore->id,
+				"disk/used[latest]", ZBX_DATASTORE_TOTAL, ZBX_KIBIBYTE, result);
+
+		if (SYSINFO_RET_OK != ret || NULL == GET_UI64_RESULT(result))
+			goto unlock;
+
+		disk_used = *GET_UI64_RESULT(result);
+		UNSET_UI64_RESULT(result);
+	}
+
+	if (0 != (flags & ZBX_DATASTORE_COUNTER_CAPACITY))
+	{
+		ret = vmware_service_get_counter_value_by_path(service, "Datastore", datastore->id,
+				"disk/capacity[latest]", ZBX_DATASTORE_TOTAL, ZBX_KIBIBYTE, result);
+
+		if (SYSINFO_RET_OK != ret || NULL == GET_UI64_RESULT(result))
+			goto unlock;
+
+		disk_capacity = *GET_UI64_RESULT(result);
+		UNSET_UI64_RESULT(result);
+	}
+
 	switch (mode)
 	{
 		case ZBX_VMWARE_DATASTORE_SIZE_TOTAL:
-			if (ZBX_MAX_UINT64 == datastore->capacity)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is not available."));
-				goto unlock;
-			}
-			SET_UI64_RESULT(result, datastore->capacity);
+			SET_UI64_RESULT(result, disk_capacity);
 			break;
 		case ZBX_VMWARE_DATASTORE_SIZE_FREE:
-			if (ZBX_MAX_UINT64 == datastore->free_space)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"free space\" is not available."));
-				goto unlock;
-			}
-			SET_UI64_RESULT(result, datastore->free_space);
+			SET_UI64_RESULT(result, disk_capacity - disk_used);
 			break;
 		case ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED:
-			if (ZBX_MAX_UINT64 == datastore->uncommitted)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"uncommitted\" is not available."));
-				goto unlock;
-			}
-			SET_UI64_RESULT(result, datastore->uncommitted);
+			SET_UI64_RESULT(result, disk_provisioned - disk_used);
 			break;
 		case ZBX_VMWARE_DATASTORE_SIZE_PFREE:
-			if (ZBX_MAX_UINT64 == datastore->capacity)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is not available."));
-				goto unlock;
-			}
-			if (ZBX_MAX_UINT64 == datastore->free_space)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"free space\" is not available."));
-				goto unlock;
-			}
-			if (0 == datastore->capacity)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is zero."));
-				goto unlock;
-			}
-			SET_DBL_RESULT(result, (double)datastore->free_space / datastore->capacity * 100);
+			SET_DBL_RESULT(result, (double) (disk_capacity - disk_used) / disk_capacity * 100);
 			break;
 	}
 
@@ -1717,6 +1791,11 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
+
+#undef	ZBX_DATASTORE_COUNTER_PROVISIONED
+#undef	ZBX_DATASTORE_COUNTER_USED
+#undef	ZBX_DATASTORE_COUNTER_CAPACITY
+#undef	ZBX_DATASTORE_TOTAL
 }
 
 int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,

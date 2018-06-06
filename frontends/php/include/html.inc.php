@@ -756,16 +756,11 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  *
  * @param string      $name
  * @param int|array   $date unix timestamp/date array(Y,m,d,H,i)
- * @param string|null $relatedCalendar name of the calendar which must be closed when this calendar opens
  *
  * @return array
  */
-function createDateSelector($name, $date, $relatedCalendar = null) {
-	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
-		'_calendar"].clndr.clndrshow(pos.top, pos.left, this);';
-	if ($relatedCalendar) {
-		$onClick .= ' CLNDR["'.$relatedCalendar.'_calendar"].clndr.clndrhide();';
-	}
+function createDateSelector($name, $date) {
+	$onClick = 'dateSelectorOnClick(event, this, "'.$name.'_calendar");';
 
 	if (is_array($date)) {
 		$y = $date['y'];
