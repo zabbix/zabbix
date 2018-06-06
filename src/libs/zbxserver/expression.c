@@ -4522,7 +4522,7 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __function_name, ifuncs->num_data);
 }
 
-static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *unknown_msgs)
+static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_str_t *unknown_msgs)
 {
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
@@ -4598,7 +4598,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 					items[i].host.host, items[i].key_orig, func->function, func->parameter);
 
 			zbx_free(func->error);
-			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
+			zbx_vector_str_append(unknown_msgs, unknown_msg);
 			ret_unknown = 1;
 		}
 
@@ -4626,7 +4626,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 				zbx_free(func->error);
 			}
 
-			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
+			zbx_vector_str_append(unknown_msgs, unknown_msg);
 			ret_unknown = 1;
 		}
 
@@ -4785,7 +4785,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *unknown_msgs)
+static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_str_t *unknown_msgs)
 {
 	const char		*__function_name = "substitute_functions";
 
@@ -4841,7 +4841,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	DC_TRIGGER		*tr;
 	int			i;
 	double			expr_result;
-	zbx_vector_ptr_t	unknown_msgs;	    /* pointers to messages about origins of 'unknown' values */
+	zbx_vector_str_t	unknown_msgs;	    /* pointers to messages about origins of 'unknown' values */
 	char			err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, triggers->values_num);
@@ -4863,7 +4863,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 	/* Assumption: most often there will be no NOTSUPPORTED items and function errors. */
 	/* Therefore initialize error messages vector but do not reserve any space. */
-	zbx_vector_ptr_create(&unknown_msgs);
+	zbx_vector_str_create(&unknown_msgs);
 
 	substitute_functions(triggers, &unknown_msgs);
 
@@ -4926,8 +4926,8 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		tr->new_value = TRIGGER_VALUE_NONE;
 	}
 
-	zbx_vector_ptr_clear_ext(&unknown_msgs, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&unknown_msgs);
+	zbx_vector_str_clear_ext(&unknown_msgs, zbx_ptr_free);
+	zbx_vector_str_destroy(&unknown_msgs);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{

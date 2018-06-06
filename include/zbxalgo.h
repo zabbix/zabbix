@@ -350,7 +350,7 @@ unsigned int	zbx_isqrt32(unsigned int value);
 #define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
 
 int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
-		zbx_vector_ptr_t *unknown_msgs);
+		zbx_vector_str_t *unknown_msgs);
 
 /* forecasting */
 

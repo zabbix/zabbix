@@ -669,7 +669,7 @@ static double	evaluate_term1(int *unknown_idx)
  *                                                                            *
  ******************************************************************************/
 int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
-		zbx_vector_ptr_t *unknown_msgs)
+		zbx_vector_str_t *unknown_msgs)
 {
 	const char	*__function_name = "evaluate";
 	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
