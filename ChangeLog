@@ -1597,6 +1597,7 @@ Changes for 3.0.19rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
 ...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
 ........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
 .......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
