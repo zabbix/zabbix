@@ -5,6 +5,7 @@ New features:
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
+........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
 .......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 A.F.I..... [ZBXNEXT-4540] fixed problems filter with same tags not being joined with OR condition (Ivo, Sasha)
 ..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
@@ -336,6 +337,7 @@ Changes for 3.4.11rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
 .......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 
 --------------------------------------------------------------------------------
@@ -1591,6 +1593,7 @@ Changes for 3.0.19rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
 .......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 .......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
 
