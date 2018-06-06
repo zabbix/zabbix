@@ -85,18 +85,14 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
  *                                                                            *
  * Function: check_perm2system                                                *
  *                                                                            *
- * Purpose: Checking user permissions to access system.                       *
+ * Purpose: Check user permissions to access system                           *
  *                                                                            *
  * Parameters: userid - user ID                                               *
  *                                                                            *
- * Return value: SUCCEED - permission is positive, FAIL - otherwise           *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
+ * Return value: SUCCEED - access allowed, FAIL - otherwise                   *
  *                                                                            *
  ******************************************************************************/
-int	check_perm2system(zbx_uint64_t userid)
+static int	check_perm2system(zbx_uint64_t userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -144,10 +140,6 @@ static	int	get_user_type(zbx_uint64_t userid)
  *                                                                            *
  * Return value: PERM_DENY - if host or user not found,                       *
  *                   or permission otherwise                                  *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids)
@@ -443,13 +435,10 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, const char *subject, const char *message, const DB_EVENT *event,
 		const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, int macro_type)
-
 {
 	const char	*__function_name = "add_object_msg";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	userid;
-	char		*subject_dyn, *message_dyn;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -466,6 +455,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_t	userid;
+		char		*subject_dyn, *message_dyn;
+
 		ZBX_STR2UINT64(userid, row[0]);
 
 		/* exclude acknowledgement author from the recipient list */
@@ -1273,8 +1265,6 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operationid, unsigned char evaltype)

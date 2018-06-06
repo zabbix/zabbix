@@ -5,6 +5,7 @@ New features:
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
+.......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
 ...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
 ........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
 .......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
