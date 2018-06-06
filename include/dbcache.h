@@ -499,6 +499,8 @@ typedef struct
 }
 zbx_queue_item_t;
 
+ZBX_VECTOR_DECL(queue_item, zbx_queue_item_t);
+
 typedef union
 {
 	zbx_uint64_t	ui64;
@@ -673,8 +675,7 @@ int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timesp
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
-void	DCfree_item_queue(zbx_vector_ptr_t *queue);
-int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
+int	DCget_item_queue(zbx_vector_queue_item_t *queue, int from, int to);
 
 zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid);
 zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid);

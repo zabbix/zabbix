@@ -32,6 +32,7 @@
 #include "cfg.h"
 #include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+#include "../zbxalgo/vectorimpl.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
@@ -90,6 +91,7 @@ extern unsigned char	program_type;
 extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
+ZBX_VECTOR_IMPL(queue_item, zbx_queue_item_t);
 
 /******************************************************************************
  *                                                                            *
@@ -9170,23 +9172,6 @@ char	*DCexpression_expand_user_macros(const char *expression, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCfree_item_queue                                                *
- *                                                                            *
- * Purpose: frees the item queue data vector created by DCget_item_queue()    *
- *                                                                            *
- * Parameters: queue - [IN] the item queue data vector to free                *
- *                                                                            *
- ******************************************************************************/
-void	DCfree_item_queue(zbx_vector_ptr_t *queue)
-{
-	int	i;
-
-	for (i = 0; i < queue->values_num; i++)
-		zbx_free(queue->values[i]);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCget_item_queue                                                 *
  *                                                                            *
  * Purpose: retrieves vector of delayed items                                 *
@@ -9199,12 +9184,12 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
  * Return value: the number of delayed items                                  *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
+int	DCget_item_queue(zbx_vector_queue_item_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
 	int			now, nitems = 0, data_expected_from, delay;
-	zbx_queue_item_t	*queue_item;
+	zbx_queue_item_t	queue_item;
 
 	now = time(NULL);
 
@@ -9266,13 +9251,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 		if (NULL != queue)
 		{
-			queue_item = (zbx_queue_item_t *)zbx_malloc(NULL, sizeof(zbx_queue_item_t));
-			queue_item->itemid = dc_item->itemid;
-			queue_item->type = dc_item->type;
-			queue_item->nextcheck = dc_item->nextcheck;
-			queue_item->proxy_hostid = dc_host->proxy_hostid;
+			queue_item.itemid = dc_item->itemid;
+			queue_item.type = dc_item->type;
+			queue_item.nextcheck = dc_item->nextcheck;
+			queue_item.proxy_hostid = dc_host->proxy_hostid;
 
-			zbx_vector_ptr_append(queue, queue_item);
+			zbx_vector_queue_item_append(queue, queue_item);
 		}
 		nitems++;
 	}
