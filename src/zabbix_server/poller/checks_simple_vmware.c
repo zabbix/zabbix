@@ -586,7 +586,7 @@ out:
 }
 
 static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key, const DC_ITEM *item,
-		zbx_vector_ptr_t *add_results)
+		zbx_vector_agent_result_t *add_results)
 {
 	const char	*__function_name = "vmware_get_events";
 
@@ -598,25 +598,24 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 	for (i = events->values_num - 1; i >= 0; i--)
 	{
 		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
-		AGENT_RESULT			*add_result = NULL;
+		AGENT_RESULT			add_result;
 
 		if (event->key <= eventlog_last_key)
 			continue;
 
-		add_result = (AGENT_RESULT *)zbx_malloc(add_result, sizeof(AGENT_RESULT));
-		init_result(add_result);
+		init_result(&add_result);
 
-		if (SUCCEED == set_result_type(add_result, item->value_type, event->message))
+		if (SUCCEED == set_result_type(&add_result, item->value_type, event->message))
 		{
-			set_result_meta(add_result, event->key, 0);
+			set_result_meta(&add_result, event->key, 0);
 
 			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
-				add_result->log->logeventid = event->key;
-				add_result->log->timestamp = event->timestamp;
+				add_result.log->logeventid = event->key;
+				add_result.log->timestamp = event->timestamp;
 			}
 
-			zbx_vector_ptr_append(add_results, add_result);
+			zbx_vector_agent_result_append(add_results, add_result);
 		}
 	}
 
@@ -624,7 +623,7 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 }
 
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
-		zbx_vector_ptr_t *add_results)
+		zbx_vector_agent_result_t *add_results)
 {
 	const char		*__function_name = "check_vcenter_eventlog";
 

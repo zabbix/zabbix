@@ -337,10 +337,9 @@ out:
 static void	free_result_ptr(AGENT_RESULT *result)
 {
 	free_result(result);
-	zbx_free(result);
 }
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_agent_result_t *add_results)
 {
 	const char	*__function_name = "get_value";
 	int		res = FAIL;
@@ -501,14 +500,14 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck)
 {
-	const char		*__function_name = "get_values";
-	DC_ITEM			items[MAX_POLLER_ITEMS];
-	AGENT_RESULT		results[MAX_POLLER_ITEMS];
-	int			errcodes[MAX_POLLER_ITEMS];
-	zbx_timespec_t		timespec;
-	char			*port = NULL, error[ITEM_ERROR_LEN_MAX];
-	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
-	zbx_vector_ptr_t	add_results;
+	const char			*__function_name = "get_values";
+	DC_ITEM				items[MAX_POLLER_ITEMS];
+	AGENT_RESULT			results[MAX_POLLER_ITEMS];
+	int				errcodes[MAX_POLLER_ITEMS];
+	zbx_timespec_t			timespec;
+	char				*port = NULL, error[ITEM_ERROR_LEN_MAX];
+	int				i, num, last_available = HOST_AVAILABLE_UNKNOWN;
+	zbx_vector_agent_result_t	add_results;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -701,7 +700,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zbx_free(port);
 
-	zbx_vector_ptr_create(&add_results);
+	zbx_vector_agent_result_create(&add_results);
 
 	/* retrieve item values */
 	if (SUCCEED == is_snmp_type(items[0].type))
@@ -784,7 +783,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 				for (j = 0; j < add_results.values_num; j++)
 				{
-					AGENT_RESULT	*add_result = (AGENT_RESULT *)add_results.values[j];
+					AGENT_RESULT	*add_result = &add_results.values[j];
 
 					if (ISSET_MSG(add_result))
 					{
@@ -868,8 +867,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	}
 
 	zbx_preprocessor_flush();
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
-	zbx_vector_ptr_destroy(&add_results);
+	zbx_vector_agent_result_clear_type(&add_results, free_result_ptr);
+	zbx_vector_agent_result_destroy(&add_results);
 
 	DCconfig_clean_items(items, NULL, num);
 exit:

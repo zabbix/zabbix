@@ -21,6 +21,7 @@
 #include "checks_simple.h"
 #include "simple.h"
 #include "log.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 
 #include "zbxself.h"
 
@@ -109,6 +110,8 @@ static zbx_vmcheck_t	vmchecks[] =
 	{NULL, NULL}
 };
 
+ZBX_VECTOR_IMPL(agent_result, AGENT_RESULT);
+
 /******************************************************************************
  *                                                                            *
  * Function: get_vmware_function                                              *
@@ -141,7 +144,7 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 	return FAIL;
 }
 
-int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_agent_result_t *add_results)
 {
 	const char	*__function_name = "get_value_simple";
 
