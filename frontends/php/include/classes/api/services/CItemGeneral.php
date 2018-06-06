@@ -197,12 +197,6 @@ abstract class CItemGeneral extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($items as $item) {
-			if (!check_db_fields($itemDbFields, $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-		}
-
 		if ($update) {
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
 				'allowed' => ['itemid', 'status'],
@@ -252,6 +246,10 @@ abstract class CItemGeneral extends CApiService {
 			$item = $this->clearValues($item);
 
 			$fullItem = $items[$inum];
+
+			if (!check_db_fields($itemDbFields, $item)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
 
 			if ($update) {
 				$type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
