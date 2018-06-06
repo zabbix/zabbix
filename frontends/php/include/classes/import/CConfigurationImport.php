@@ -2483,9 +2483,11 @@ class CConfigurationImport {
 
 		// There are entities to resolve from database, resolve and cache them recursively.
 		if ($find_keys) {
-			// For existing items, 'referencer' should be initialized before 'addItemRef' method will be used.
-			// Registering reference when property 'itemRefs' is empty, will not allow first call of
-			// 'resolveValueMap' method update references to existing items.
+			/*
+			 * For existing items, 'referencer' should be initialized before 'addItemRef' method will be used.
+			 * Registering reference when property 'itemRefs' is empty, will not allow first call of 'resolveValueMap'
+			 * method update references to existing items.
+			 */
 			$this->referencer->initItemsReferences();
 
 			$options = [
@@ -2539,11 +2541,17 @@ class CConfigurationImport {
 				}
 
 				if ($find_ids) {
-					$resolved_entities = $data_provider->get([
+					$options = [
 						'output' => ['key_', 'type', 'hostid', 'master_itemid'],
 						'itemids' => $find_ids,
 						'preservekeys' => true
-					]);
+					];
+					$resolved_entities = API::Item()->get($options + ['webitems' => true]);
+
+					if ($data_provider instanceof CItemPrototype) {
+						$resolved_entities += API::ItemPrototype()->get($options);
+					}
+
 				}
 				else {
 					break;
