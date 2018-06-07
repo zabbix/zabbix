@@ -199,14 +199,14 @@ static char	const *vm_propmap[] = {
 };
 
 /* hypervisor hashset support */
-zbx_hash_t	vmware_hv_hash(const void *data)
+static zbx_hash_t	vmware_hv_hash(const void *data)
 {
 	zbx_vmware_hv_t	*hv = (zbx_vmware_hv_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(hv->uuid, strlen(hv->uuid), ZBX_DEFAULT_HASH_SEED);
 }
 
-int	vmware_hv_compare(const void *d1, const void *d2)
+static int	vmware_hv_compare(const void *d1, const void *d2)
 {
 	zbx_vmware_hv_t	*hv1 = (zbx_vmware_hv_t *)d1;
 	zbx_vmware_hv_t	*hv2 = (zbx_vmware_hv_t *)d2;
@@ -215,14 +215,14 @@ int	vmware_hv_compare(const void *d1, const void *d2)
 }
 
 /* virtual machine index support */
-zbx_hash_t	vmware_vm_hash(const void *data)
+static zbx_hash_t	vmware_vm_hash(const void *data)
 {
 	zbx_vmware_vm_index_t	*vmi = (zbx_vmware_vm_index_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(vmi->vm->uuid, strlen(vmi->vm->uuid), ZBX_DEFAULT_HASH_SEED);
 }
 
-int	vmware_vm_compare(const void *d1, const void *d2)
+static int	vmware_vm_compare(const void *d1, const void *d2)
 {
 	zbx_vmware_vm_index_t	*vmi1 = (zbx_vmware_vm_index_t *)d1;
 	zbx_vmware_vm_index_t	*vmi2 = (zbx_vmware_vm_index_t *)d2;
@@ -3134,7 +3134,7 @@ out:
 	return ret;
 }
 
-int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, const char *xml)
+static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, const char *xml)
 {
 	const char		*__function_name = "vmware_service_parse_event_data";
 
