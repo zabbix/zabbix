@@ -914,7 +914,7 @@ int	zbx_db_begin(void)
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "begin;");
 #elif defined(HAVE_SQLITE3)
-	zbx_mutex_lock(&sqlite_access);
+	zbx_mutex_lock(sqlite_access);
 	rc = zbx_db_execute("%s", "begin;");
 #endif
 
@@ -976,7 +976,7 @@ int	zbx_db_commit(void)
 	}
 
 #ifdef HAVE_SQLITE3
-	zbx_mutex_unlock(&sqlite_access);
+	zbx_mutex_unlock(sqlite_access);
 #endif
 
 	txn_level--;
@@ -1037,7 +1037,7 @@ int	zbx_db_rollback(void)
 		rc = OCI_handle_sql_error(ERR_Z3005, err, "rollback failed");
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
-	zbx_mutex_unlock(&sqlite_access);
+	zbx_mutex_unlock(sqlite_access);
 #endif
 
 	/* There is no way to recover from rollback errors, so there is no need to preserve transaction level / error. */
@@ -1488,7 +1488,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	PQclear(result);
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level)
-		zbx_mutex_lock(&sqlite_access);
+		zbx_mutex_lock(sqlite_access);
 
 lbl_exec:
 	if (SQLITE_OK != (err = sqlite3_exec(conn, sql, NULL, 0, &error)))
@@ -1519,7 +1519,7 @@ lbl_exec:
 		ret = sqlite3_changes(conn);
 
 	if (0 == txn_level)
-		zbx_mutex_unlock(&sqlite_access);
+		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
 	if (0 != CONFIG_LOG_SLOW_QUERIES)
@@ -1834,7 +1834,7 @@ error:
 		result->row_num = PQntuples(result->pg_result);
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level)
-		zbx_mutex_lock(&sqlite_access);
+		zbx_mutex_lock(sqlite_access);
 
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->curow = 0;
@@ -1865,7 +1865,7 @@ lbl_get_table:
 	}
 
 	if (0 == txn_level)
-		zbx_mutex_unlock(&sqlite_access);
+		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 	if (0 != CONFIG_LOG_SLOW_QUERIES)
 	{

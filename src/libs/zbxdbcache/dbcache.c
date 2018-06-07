@@ -41,12 +41,12 @@ static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
 static zbx_mem_info_t	*trend_mem = NULL;
 
-#define	LOCK_CACHE	zbx_mutex_lock(&cache_lock)
-#define	UNLOCK_CACHE	zbx_mutex_unlock(&cache_lock)
-#define	LOCK_TRENDS	zbx_mutex_lock(&trends_lock)
-#define	UNLOCK_TRENDS	zbx_mutex_unlock(&trends_lock)
-#define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
-#define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
+#define	LOCK_CACHE	zbx_mutex_lock(cache_lock)
+#define	UNLOCK_CACHE	zbx_mutex_unlock(cache_lock)
+#define	LOCK_TRENDS	zbx_mutex_lock(trends_lock)
+#define	UNLOCK_TRENDS	zbx_mutex_unlock(trends_lock)
+#define	LOCK_CACHE_IDS		zbx_mutex_lock(cache_ids_lock)
+#define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(cache_ids_lock)
 
 static zbx_mutex_t	cache_lock = ZBX_MUTEX_NULL;
 static zbx_mutex_t	trends_lock = ZBX_MUTEX_NULL;

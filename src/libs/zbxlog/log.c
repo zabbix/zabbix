@@ -35,8 +35,8 @@ static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
 static int		log_level = LOG_LEVEL_WARNING;
 
 #ifdef _WINDOWS
-#	define LOCK_LOG		zbx_mutex_lock(&log_access)
-#	define UNLOCK_LOG	zbx_mutex_unlock(&log_access)
+#	define LOCK_LOG		zbx_mutex_lock(log_access)
+#	define UNLOCK_LOG	zbx_mutex_unlock(log_access)
 #else
 #	define LOCK_LOG		lock_log()
 #	define UNLOCK_LOG	unlock_log()
@@ -243,12 +243,12 @@ static void	lock_log(void)
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
 
-	zbx_mutex_lock(&log_access);
+	zbx_mutex_lock(log_access);
 }
 
 static void	unlock_log(void)
 {
-	zbx_mutex_unlock(&log_access);
+	zbx_mutex_unlock(log_access);
 
 	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");

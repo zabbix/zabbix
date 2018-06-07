@@ -4791,7 +4791,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
  ******************************************************************************/
 void	zbx_vmware_lock(void)
 {
-	zbx_mutex_lock(&vmware_lock);
+	zbx_mutex_lock(vmware_lock);
 }
 
 /******************************************************************************
@@ -4803,7 +4803,7 @@ void	zbx_vmware_lock(void)
  ******************************************************************************/
 void	zbx_vmware_unlock(void)
 {
-	zbx_mutex_unlock(&vmware_lock);
+	zbx_mutex_unlock(vmware_lock);
 }
 
 /******************************************************************************

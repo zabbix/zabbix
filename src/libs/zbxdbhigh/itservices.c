@@ -23,8 +23,8 @@
 #include "log.h"
 #include "mutexs.h"
 
-#define LOCK_ITSERVICES		zbx_mutex_lock(&itservices_lock)
-#define UNLOCK_ITSERVICES	zbx_mutex_unlock(&itservices_lock)
+#define LOCK_ITSERVICES		zbx_mutex_lock(itservices_lock)
+#define UNLOCK_ITSERVICES	zbx_mutex_unlock(itservices_lock)
 
 static zbx_mutex_t	itservices_lock = ZBX_MUTEX_NULL;
 

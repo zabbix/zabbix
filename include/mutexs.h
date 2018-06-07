@@ -67,9 +67,9 @@ typedef pthread_mutex_t * zbx_mutex_t;
 typedef pthread_rwlock_t * zbx_rwlock_t;
 
 int	zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error);
-void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t *rwlock);
-void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t *rwlock);
-void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t *rwlock);
+void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t rwlock);
+void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t rwlock);
+void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t rwlock);
 void	zbx_rwlock_destroy(zbx_rwlock_t *rwlock);
 void	zbx_locks_disable(void);
 #else	/* fallback to semaphores if read-write locks and mutexes are not available */
@@ -113,8 +113,8 @@ int	zbx_locks_create(char **error);
 #	define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
 
 int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
-void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t *mutex);
-void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t *mutex);
+void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex);
+void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex);
 void	zbx_mutex_destroy(zbx_mutex_t *mutex);
 
 #ifdef _WINDOWS

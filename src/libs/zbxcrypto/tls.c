@@ -69,9 +69,9 @@ static zbx_mutex_t	*crypto_mutexes = NULL;
 static void	zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
 {
 	if (0 != (mode & CRYPTO_LOCK))
-		__zbx_mutex_lock(file, line, crypto_mutexes + n);
+		__zbx_mutex_lock(file, line, *(crypto_mutexes + n));
 	else
-		__zbx_mutex_unlock(file, line, crypto_mutexes + n);
+		__zbx_mutex_unlock(file, line, *(crypto_mutexes + n));
 }
 
 static void	zbx_openssl_thread_setup(void)

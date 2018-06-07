@@ -202,15 +202,15 @@ int	zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error
  * Parameters: rwlock - handle of read-write lock                             *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t *rwlock)
+void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t rwlock)
 {
-	if (ZBX_RWLOCK_NULL == *rwlock)
+	if (ZBX_RWLOCK_NULL == rwlock)
 		return;
 
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_rwlock_wrlock(*rwlock))
+	if (0 != pthread_rwlock_wrlock(rwlock))
 	{
 		zbx_error("[file:'%s',line:%d] write lock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
@@ -226,15 +226,15 @@ void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t *rwlock)
  * Parameters: rwlock - handle of read-write lock                             *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t *rwlock)
+void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t rwlock)
 {
-	if (ZBX_RWLOCK_NULL == *rwlock)
+	if (ZBX_RWLOCK_NULL == rwlock)
 		return;
 
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_rwlock_rdlock(*rwlock))
+	if (0 != pthread_rwlock_rdlock(rwlock))
 	{
 		zbx_error("[file:'%s',line:%d] read lock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
@@ -250,17 +250,17 @@ void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t *rwlock)
  * Parameters: rwlock - handle of read-write lock                             *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t *rwlock)
+void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t rwlock)
 {
-	if (ZBX_RWLOCK_NULL == *rwlock)
+	if (ZBX_RWLOCK_NULL == rwlock)
 		return;
 
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_rwlock_unlock(*rwlock))
+	if (0 != pthread_rwlock_unlock(rwlock))
 	{
-		zbx_error("[file:'%s',line:%d] read write lock unlock failed: %s", filename, line, zbx_strerror(errno));
+		zbx_error("[file:'%s',line:%d] read-write lock unlock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 }
@@ -351,7 +351,7 @@ int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t *mutex)
+void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 {
 #ifndef _WINDOWS
 #ifndef	HAVE_PTHREAD_PROCESS_SHARED
@@ -361,7 +361,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t *mutex)
 	DWORD   dwWaitResult;
 #endif
 
-	if (ZBX_MUTEX_NULL == *mutex)
+	if (ZBX_MUTEX_NULL == mutex)
 		return;
 
 #ifdef _WINDOWS
@@ -373,7 +373,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t *mutex)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	dwWaitResult = WaitForSingleObject(*mutex, INFINITE);
+	dwWaitResult = WaitForSingleObject(mutex, INFINITE);
 
 	switch (dwWaitResult)
 	{
@@ -392,13 +392,13 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t *mutex)
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_mutex_lock(*mutex))
+	if (0 != pthread_mutex_lock(mutex))
 	{
 		zbx_error("[file:'%s',line:%d] lock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 #else
-	sem_lock.sem_num = *mutex;
+	sem_lock.sem_num = mutex;
 	sem_lock.sem_op = -1;
 	sem_lock.sem_flg = SEM_UNDO;
 
@@ -425,7 +425,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t *mutex)
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t *mutex)
+void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
 {
 #ifndef _WINDOWS
 #ifndef	HAVE_PTHREAD_PROCESS_SHARED
@@ -433,11 +433,11 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t *mutex)
 #endif
 #endif
 
-	if (ZBX_MUTEX_NULL == *mutex)
+	if (ZBX_MUTEX_NULL == mutex)
 		return;
 
 #ifdef _WINDOWS
-	if (0 == ReleaseMutex(*mutex))
+	if (0 == ReleaseMutex(mutex))
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
@@ -448,13 +448,13 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t *mutex)
 	if (0 != locks_disabled)
 		return;
 
-	if (0 != pthread_mutex_unlock(*mutex))
+	if (0 != pthread_mutex_unlock(mutex))
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s", filename, line, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 #else
-	sem_unlock.sem_num = *mutex;
+	sem_unlock.sem_num = mutex;
 	sem_unlock.sem_op = 1;
 	sem_unlock.sem_flg = SEM_UNDO;
 

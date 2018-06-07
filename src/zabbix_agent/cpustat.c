@@ -32,8 +32,8 @@
 #endif
 
 #if !defined(_WINDOWS)
-#	define LOCK_CPUSTATS	zbx_mutex_lock(&cpustats_lock)
-#	define UNLOCK_CPUSTATS	zbx_mutex_unlock(&cpustats_lock)
+#	define LOCK_CPUSTATS	zbx_mutex_lock(cpustats_lock)
+#	define UNLOCK_CPUSTATS	zbx_mutex_unlock(cpustats_lock)
 static zbx_mutex_t	cpustats_lock = ZBX_MUTEX_NULL;
 #else
 #	define LOCK_CPUSTATS
