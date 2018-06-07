@@ -29,7 +29,6 @@
 typedef wchar_t * zbx_mutex_name_t;
 typedef HANDLE zbx_mutex_t;
 #else	/* not _WINDOWS */
-
 typedef enum
 {
 	ZBX_MUTEX_LOG = 0,
@@ -66,7 +65,6 @@ zbx_rwlock_name_t;
 
 typedef pthread_mutex_t * zbx_mutex_t;
 typedef pthread_rwlock_t * zbx_rwlock_t;
-
 
 void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t rwlock);
 void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t rwlock);
