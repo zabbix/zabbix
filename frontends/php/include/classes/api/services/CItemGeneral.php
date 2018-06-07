@@ -1680,6 +1680,8 @@ abstract class CItemGeneral extends CApiService {
 		foreach (array_keys($root_items) as $root_itemid) {
 			$dependency_level = 0;
 			$find_itemids = [$root_itemid => $dependency_level];
+			$find_itemprototypeids = [];
+
 			$items_count = array_key_exists($root_itemid, $items_created)
 				? $items_created[$root_itemid]
 				: 0;
@@ -1688,12 +1690,15 @@ abstract class CItemGeneral extends CApiService {
 			while (($find_itemids || (array_key_exists($root_itemid, $items_added)
 						&& array_key_exists($dependency_level, $items_added[$root_itemid])))
 						&& $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-				// If item was moved to another master item, do not count moved item (and its dependent items)
-				// in old master dependent items count calculation.
+				/*
+				 * If item was moved to another master item, do not count moved item (and its dependent items)
+				 * in old master dependent items count calculation.
+				 */
 				if (array_key_exists($root_itemid, $items_moved)) {
 					$ignoreids = array_intersect_key($find_itemids, $items_moved[$root_itemid]);
 					$find_itemids = array_diff_key($find_itemids, $ignoreids);
 				}
+
 				if (array_key_exists($root_itemid, $items_added)
 						&& array_key_exists($dependency_level, $items_added[$root_itemid])) {
 					$find_itemids += $items_added[$root_itemid][$dependency_level];
@@ -1706,12 +1711,12 @@ abstract class CItemGeneral extends CApiService {
 				];
 				$find_itemids = API::Item()->get($options);
 
-				if ($this instanceof CItemPrototype) {
-					$find_itemids += API::ItemPrototype()->get($options);
-				}
+				$find_itemprototypeids += API::ItemPrototype()->get($options);
+				$find_itemids += $find_itemprototypeids;
 
 				$find_itemids = array_diff_key($find_itemids, $counted_masters);
-				$items_count = $items_count + count($find_itemids);
+				$items_count = $items_count + count(array_diff_key($find_itemids, $find_itemprototypeids));
+
 				$counted_masters += $find_itemids;
 				++$dependency_level;
 
@@ -1720,7 +1725,7 @@ abstract class CItemGeneral extends CApiService {
 						'master_itemid', _('maximum dependent items count reached')
 					));
 				}
-			};
+			}
 
 			if (($find_itemids || (array_key_exists($root_itemid, $items_added)
 					&& array_key_exists($dependency_level, $items_added[$root_itemid])))
