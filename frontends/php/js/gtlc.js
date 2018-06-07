@@ -161,10 +161,10 @@ jQuery(function ($){
 			increment: data.can_increment,
 			zoomout: data.can_zoomout
 		}, function (elm, state) {
-			if (state) {
+			if (state === true) {
 				element[elm].removeAttr('disabled');
 			}
-			else {
+			else if (state === false) {
 				element[elm].attr('disabled', true);
 			}
 

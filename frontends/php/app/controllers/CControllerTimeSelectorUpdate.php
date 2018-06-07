@@ -59,12 +59,6 @@ class CControllerTimeSelectorUpdate extends CController {
 		}
 
 		if (!$ret) {
-			$this->data += [
-				'error' => [],
-				'can_zoomout' => false,
-				'can_decrement' => false,
-				'can_increment' => false
-			];
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($this->data)]));
 		}
 
