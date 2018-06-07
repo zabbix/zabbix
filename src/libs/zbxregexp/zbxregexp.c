@@ -774,3 +774,18 @@ int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const c
 {
 	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
 }
+
+int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps)
+{
+	int	i;
+
+	for (i = 0; i < regexps->values_num; i++)
+	{
+		const zbx_expression_t	*regexp = (const zbx_expression_t *)regexps->values[i];
+
+		if (0 == strcmp(regexp->name, name))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
