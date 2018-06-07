@@ -135,7 +135,7 @@ function getGraphDims($graphid = null) {
 		$graphDims['shiftXright'] = 85;
 	}
 
-	++$graphDims['graphHeight'];
+	$graphDims['graphHeight']++;
 
 	return $graphDims;
 }
