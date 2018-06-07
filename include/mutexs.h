@@ -73,7 +73,8 @@ void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t rwlock);
 void	zbx_rwlock_destroy(zbx_rwlock_t *rwlock);
 void	zbx_locks_disable(void);
 #else	/* fallback to semaphores if read-write locks and mutexes are not available */
-#	define ZBX_RWLOCK_NULL				ZBX_MUTEX_NULL
+#	define ZBX_RWLOCK_NULL				-1
+#	define ZBX_MUTEX_NULL				-1
 #	define ZBX_RWLOCK_CONFIG			ZBX_MUTEX_CONFIG
 
 #	define zbx_rwlock_create(rwlock, name, error)	zbx_mutex_create(rwlock, name, error)
@@ -98,8 +99,7 @@ typedef enum
 	ZBX_MUTEX_PROCSTAT,
 	ZBX_MUTEX_PROXY_HISTORY,
 	ZBX_MUTEX_CONFIG,
-	ZBX_MUTEX_COUNT,
-	ZBX_MUTEX_NULL = 255
+	ZBX_MUTEX_COUNT
 }
 zbx_mutex_name_t;
 
