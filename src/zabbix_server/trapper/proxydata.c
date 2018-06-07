@@ -28,7 +28,7 @@
 #include "mutexs.h"
 
 extern unsigned char	program_type;
-static ZBX_MUTEX	proxy_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 
 #define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(&proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(&proxy_lock)

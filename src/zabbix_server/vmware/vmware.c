@@ -79,7 +79,7 @@ extern char		*CONFIG_SOURCE_IP;
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
 
-static ZBX_MUTEX	vmware_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_mem_info_t	*vmware_mem = NULL;
 

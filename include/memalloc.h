@@ -39,7 +39,7 @@ typedef struct
 	/* Set this flag to 1 to allow execution in out of memory situations.     */
 	char		allow_oom;
 
-	ZBX_MUTEX	mem_lock;
+	zbx_mutex_t	mem_lock;
 	const char	*mem_descr;
 	const char	*mem_param;
 }

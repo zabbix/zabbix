@@ -43,7 +43,7 @@ extern char	*CONFIG_FILE;
  *                         must be freed by the caller.                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, ZBX_MUTEX_NAME mutex,
+int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, zbx_mutex_name_t mutex,
 		zbx_shm_copy_func_t copy_func, char **errmsg)
 {
 	const char	*__function_name = "zbx_dshm_create";

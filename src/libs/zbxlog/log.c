@@ -31,7 +31,7 @@ static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 
 static char		log_filename[MAX_STRING_LEN];
 static int		log_type = LOG_TYPE_UNDEFINED;
-static ZBX_MUTEX	log_access = ZBX_MUTEX_NULL;
+static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
 static int		log_level = LOG_LEVEL_WARNING;
 
 #ifdef _WINDOWS

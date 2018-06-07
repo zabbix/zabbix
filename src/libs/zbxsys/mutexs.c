@@ -185,7 +185,7 @@ int	zbx_locks_create(char **error)
  * Return value: SUCCEED if mutexes successfully created, otherwise FAIL      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK_NAME name, char **error)
+int	zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error)
 {
 	ZBX_UNUSED(error);
 	*rwlock = &shared_lock->rwlocks[name];
@@ -202,7 +202,7 @@ int	zbx_rwlock_create(ZBX_RWLOCK *rwlock, ZBX_RWLOCK_NAME name, char **error)
  * Parameters: rwlock - handle of read-write lock                             *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_rwlock_wrlock(const char *filename, int line, ZBX_RWLOCK *rwlock)
+void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t *rwlock)
 {
 	if (ZBX_RWLOCK_NULL == *rwlock)
 		return;
@@ -226,7 +226,7 @@ void	__zbx_rwlock_wrlock(const char *filename, int line, ZBX_RWLOCK *rwlock)
  * Parameters: rwlock - handle of read-write lock                             *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_rwlock_rdlock(const char *filename, int line, ZBX_RWLOCK *rwlock)
+void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t *rwlock)
 {
 	if (ZBX_RWLOCK_NULL == *rwlock)
 		return;
@@ -250,7 +250,7 @@ void	__zbx_rwlock_rdlock(const char *filename, int line, ZBX_RWLOCK *rwlock)
  * Parameters: rwlock - handle of read-write lock                             *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_rwlock_unlock(const char *filename, int line, ZBX_RWLOCK *rwlock)
+void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t *rwlock)
 {
 	if (ZBX_RWLOCK_NULL == *rwlock)
 		return;
@@ -276,7 +276,7 @@ void	__zbx_rwlock_unlock(const char *filename, int line, ZBX_RWLOCK *rwlock)
  *                                                                            *
  ******************************************************************************/
 
-void	zbx_rwlock_destroy(ZBX_RWLOCK *rwlock)
+void	zbx_rwlock_destroy(zbx_rwlock_t *rwlock)
 {
 	if (ZBX_RWLOCK_NULL == *rwlock)
 		return;
@@ -320,7 +320,7 @@ void	zbx_locks_disable(void)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
+int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
 {
 #ifdef _WINDOWS
 	if (NULL == (*mutex = CreateMutex(NULL, FALSE, name)))
@@ -351,7 +351,7 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
+void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t *mutex)
 {
 #ifndef _WINDOWS
 #ifndef	HAVE_PTHREAD_PROCESS_SHARED
@@ -425,7 +425,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
+void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t *mutex)
 {
 #ifndef _WINDOWS
 #ifndef	HAVE_PTHREAD_PROCESS_SHARED
@@ -481,7 +481,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_mutex_destroy(ZBX_MUTEX *mutex)
+void	zbx_mutex_destroy(zbx_mutex_t *mutex)
 {
 #ifdef _WINDOWS
 	if (ZBX_MUTEX_NULL == *mutex)
@@ -519,12 +519,12 @@ void	zbx_mutex_destroy(ZBX_MUTEX *mutex)
  *           otherwise the function calls exit()                              *
  *                                                                            *
  ******************************************************************************/
-ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
+zbx_mutex_name_t	zbx_mutex_create_per_process_name(const zbx_mutex_name_t prefix)
 {
-	ZBX_MUTEX_NAME	name = ZBX_MUTEX_NULL;
-	int		size;
-	wchar_t		*format = L"%s_PID_%lx";
-	DWORD		pid = GetCurrentProcessId();
+	zbx_mutex_name_t	name = ZBX_MUTEX_NULL;
+	int			size;
+	wchar_t			*format = L"%s_PID_%lx";
+	DWORD			pid = GetCurrentProcessId();
 
 	/* exit if the mutex name length exceed the maximum allowed */
 	size = _scwprintf(format, prefix, pid);

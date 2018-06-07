@@ -26,7 +26,7 @@
 #define LOCK_ITSERVICES		zbx_mutex_lock(&itservices_lock)
 #define UNLOCK_ITSERVICES	zbx_mutex_unlock(&itservices_lock)
 
-static ZBX_MUTEX	itservices_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	itservices_lock = ZBX_MUTEX_NULL;
 
 /* status update queue items */
 typedef struct

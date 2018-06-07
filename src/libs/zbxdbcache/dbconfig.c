@@ -84,7 +84,7 @@ static int	sync_in_progress = 0;
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
 static ZBX_DC_CONFIG	*config = NULL;
-static ZBX_RWLOCK	config_lock = ZBX_RWLOCK_NULL;
+static zbx_rwlock_t	config_lock = ZBX_RWLOCK_NULL;
 static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	program_type;
