@@ -1665,7 +1665,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 		num++;
 	}
 
-	host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num);
+	host_name_temp = zbx_dsprintf(host_name_temp, "%s_" ZBX_FS_UI64, host_name_sample, num);
 clean:
 	zbx_vector_uint64_destroy(&nums);
 
