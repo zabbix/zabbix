@@ -5011,6 +5011,13 @@ a.overlay-close-btn {
 .in-progress {
 	position: relative;
 
+	img {
+		user-select: none;
+		-ms-user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+	}
+
 	&:before {
 		z-index: 3;
 		content: '';

@@ -661,7 +661,6 @@ var timeControl = {
 				to: obj.timeline.to,
 				to_ts: obj.timeline.to_ts
 			}));
-			img.data('zbx_sbox', null);
 		}
 
 		// link

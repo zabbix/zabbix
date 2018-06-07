@@ -354,7 +354,6 @@
 						return;
 					}
 
-					domImg.data('zbx_sbox', null);
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
 					url.setArgument('from', screen.timeline.from);
 					url.setArgument('to', screen.timeline.to);
