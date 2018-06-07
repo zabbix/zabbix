@@ -103,8 +103,8 @@ typedef enum
 }
 zbx_mutex_name_t;
 
-typedef zbx_mutex_name_t zbx_mutex_t;
-typedef zbx_mutex_name_t zbx_rwlock_t;
+typedef int zbx_mutex_t;
+typedef int zbx_rwlock_t;
 typedef zbx_mutex_name_t zbx_rwlock_name_t;
 #endif
 int	zbx_locks_create(char **error);
