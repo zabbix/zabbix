@@ -89,7 +89,7 @@ function graph_item_calc_fnc2str($calc_fnc) {
 function getGraphDims($graphid = null) {
 	$graphDims = [];
 
-	$graphDims['shiftYtop'] = 35;
+	$graphDims['shiftYtop'] = CGraphDraw::DEFAULT_HEADER_PADDING_TOP;
 	if (is_null($graphid)) {
 		$graphDims['graphHeight'] = 200;
 		$graphDims['graphtype'] = 0;
@@ -134,6 +134,8 @@ function getGraphDims($graphid = null) {
 		$graphDims['shiftXleft'] = 30;
 		$graphDims['shiftXright'] = 85;
 	}
+
+	++$graphDims['graphHeight'];
 
 	return $graphDims;
 }

@@ -162,7 +162,7 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 
 if (getRequest('onlyHeight', '0') === '1') {
 	$graph->drawDimensions();
-	$height = $graph->getHeight();
+	$height = $graph->getHeight() + 1;
 
 	if (getRequest('widget_view') === '1') {
 		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;

@@ -100,7 +100,7 @@ $graphs = [];
 // dims
 $graph_dims = getGraphDims();
 $graph_dims['width'] = -50;
-$graph_dims['graphHeight'] = 150;
+$graph_dims['graphHeight'] = 151;
 
 /*
  * Graph in
