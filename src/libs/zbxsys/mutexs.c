@@ -143,7 +143,7 @@ int	zbx_locks_create(char **error)
 	union semun	semopts;
 	int		i;
 
-	if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT + ZBX_RWLOCK_COUNT, 0600)))
+	if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT, 0600)))
 	{
 		*error = zbx_dsprintf(*error, "cannot create semaphore set: %s", zbx_strerror(errno));
 		return FAIL;
@@ -152,7 +152,7 @@ int	zbx_locks_create(char **error)
 	/* set default semaphore value */
 
 	semopts.val = 1;
-	for (i = 0; i < ZBX_MUTEX_COUNT + ZBX_RWLOCK_COUNT; i++)
+	for (i = 0; ZBX_MUTEX_COUNT > i; i++)
 	{
 		if (-1 != semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
 			continue;
