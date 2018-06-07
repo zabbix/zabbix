@@ -588,7 +588,10 @@ var timeControl = {
 		url.setArgument('_', (new Date()).getTime().toString(34));
 
 		if (img.length == 0) {
-			img = jQuery('<img/>', {id: id}).appendTo(('#'+obj.containerid));
+			window.flickerfreeScreen.setElementProgressState(obj.id, true);
+			img = jQuery('<img/>', {id: id}).appendTo(('#'+obj.containerid)).on('load', function() {
+				window.flickerfreeScreen.setElementProgressState(obj.id, false);
+			});
 
 			var xhr = (obj.loadSBox == 0)
 				? null
@@ -617,6 +620,7 @@ var timeControl = {
 			return;
 		}
 
+		window.flickerfreeScreen.setElementProgressState(obj.id, true);
 		url.setArgument('_', (new Date()).getTime().toString(34));
 		url.setArgument('from', obj.timeline.from);
 		url.setArgument('to', obj.timeline.to);
@@ -628,6 +632,7 @@ var timeControl = {
 			})
 			.on('load', function() {
 				img.replaceWith(clone);
+				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 
 				// Update dashboard widget footer.
 				if (obj.onDashboard) {
@@ -656,6 +661,7 @@ var timeControl = {
 				to: obj.timeline.to,
 				to_ts: obj.timeline.to_ts
 			}));
+			img.data('zbx_sbox', null);
 		}
 
 		// link

@@ -354,6 +354,7 @@
 						return;
 					}
 
+					domImg.data('zbx_sbox', null);
 					url.setArgument('screenid', empty(screen.screenid) ? null : screen.screenid);
 					url.setArgument('from', screen.timeline.from);
 					url.setArgument('to', screen.timeline.to);
@@ -402,8 +403,7 @@
 							}
 						});
 
-					var zbx_sbox = domImg.data('zbx_sbox'),
-						async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
 							zbx_sbox.height = parseInt(height, 10);
 							// 'src' should be added only here to trigger load event after new height is received.
 							img.data('zbx_sbox', zbx_sbox)
