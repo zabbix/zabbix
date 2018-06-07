@@ -143,7 +143,7 @@ int	zbx_locks_create(char **error)
 	union semun	semopts;
 	int		i;
 
-	if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT, 0600)))
+	if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT + ZBX_RWLOCK_COUNT, 0600)))
 	{
 		*error = zbx_dsprintf(*error, "cannot create semaphore set: %s", zbx_strerror(errno));
 		return FAIL;
@@ -152,7 +152,7 @@ int	zbx_locks_create(char **error)
 	/* set default semaphore value */
 
 	semopts.val = 1;
-	for (i = 0; ZBX_MUTEX_COUNT > i; i++)
+	for (i = 0; ZBX_MUTEX_COUNT + ZBX_RWLOCK_COUNT > i; i++)
 	{
 		if (-1 != semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
 			continue;
@@ -170,15 +170,16 @@ int	zbx_locks_create(char **error)
 	return SUCCEED;
 }
 
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
 /******************************************************************************
  *                                                                            *
  * Function: zbx_rwlock_create                                                *
  *                                                                            *
  * Purpose: read-write locks are created using zbx_locks_create() function    *
- *          this is only to obtain handle                                     *
+ *          this is only to obtain handle, if read write locks are not        *
+ *          supported, then outputs numeric handle of mutex that can be used  *
+ *          with mutex handling functions                                     *
  *                                                                            *
- * Parameters:  mutex - handle of read-write lock                             *
+ * Parameters:  rwlock - read-write lock handle if supported, otherwise mutex *
  *              name - name of read-write lock (index for nix system)         *
  *              error - unused                                                *
  *                                                                            *
@@ -188,11 +189,15 @@ int	zbx_locks_create(char **error)
 int	zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error)
 {
 	ZBX_UNUSED(error);
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 	*rwlock = &shared_lock->rwlocks[name];
-
+#else
+	*rwlock = name + ZBX_MUTEX_COUNT;
+	mutexes++;
+#endif
 	return SUCCEED;
 }
-
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 /******************************************************************************
  *                                                                            *
  * Function: __zbx_rwlock_wrlock                                              *
