@@ -216,7 +216,7 @@ $map_tab->addRow(_('Problem display'),
 	])
 );
 
-$map_tab->addRow(_('Minimum trigger severity'),
+$map_tab->addRow(_('Minimum severity'),
 	new CSeverity(['name' => 'severity_min', 'value' => (int) $data['sysmap']['severity_min']])
 );
 

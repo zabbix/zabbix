@@ -796,7 +796,7 @@ function getImagesInfo($selement) {
  *
  * @param array $sysmap
  * @param int   $options
- * @param int   $options['severity_min'] Minimum trigger severity, default value is maximal (Disaster)
+ * @param int   $options['severity_min'] Minimum severity, default value is maximal (Disaster)
  *
  * @return array
  */

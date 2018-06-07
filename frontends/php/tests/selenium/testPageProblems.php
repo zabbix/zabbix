@@ -29,7 +29,7 @@ class testPageProblems extends CWebTest {
 
 		$this->assertTrue($this->zbxTestCheckboxSelected('filter_show_0'));
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem',
-			'Minimum trigger severity', 'Age less than', 'Host inventory', 'Tags', 'Show hosts in maintenance',
+			'Minimum severity', 'Age less than', 'Host inventory', 'Tags', 'Show hosts in maintenance',
 			'Show unacknowledged only',
 			'Severity', 'Time', 'Recovery time', 'Status', 'Host', 'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
 
@@ -46,7 +46,7 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestAssertNotVisibleId('filter_age_state');
 		$this->zbxTestAssertElementPresentId('scrollbar_cntr');
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem',
-			'Minimum trigger severity', 'Host inventory', 'Tags', 'Show hosts in maintenance',
+			'Minimum severity', 'Host inventory', 'Tags', 'Show hosts in maintenance',
 			'Show unacknowledged only',
 			'Severity', 'Time', 'Recovery time', 'Status', 'Host', 'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
 
