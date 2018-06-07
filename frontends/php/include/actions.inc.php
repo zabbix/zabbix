@@ -1575,7 +1575,7 @@ function getEventDetailsActions(array $event) {
 	// Get automatic actions (alerts).
 	$alerts = API::Alert()->get([
 		'output' => ['alerttype', 'clock', 'error', 'eventid', 'esc_step', 'mediatypeid', 'message', 'retries',
-			'sendto', 'status', 'subject', 'userid'
+			'sendto', 'status', 'subject', 'userid', 'p_eventid', 'acknowledgeid'
 		],
 		'eventids' => $alert_eventids
 	]);
@@ -1955,16 +1955,18 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
  * Get table with list of event actions for event details page.
  *
  * @param array  $data
- * @param array  $data['actions']                   Array with all actions sorted by clock.
- * @param int    $data['actions'][]['action_type']  Type of action table entry (ZBX_EVENT_HISTORY_*).
- * @param string $data['actions'][]['clock']        Time, when action was performed.
- * @param string $data['actions'][]['message']      Message sent by alert, or written by manual update, or remote command text.
- * @param string $data['actions'][]['alerttype']    Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
- * @param string $data['actions'][]['esc_step']     Alert escalation step (only for ZBX_EVENT_HISTORY_ALERT).
- * @param string $data['actions'][]['subject']      Message alert subject (only for ZBX_EVENT_HISTORY_ALERT).
- * @param array  $users                             User name, surname and alias.
- * @param array  $mediatypes                        Mediatypes with maxattempts value.
- * @param array  $config                            Zabbix config.
+ * @param array  $data['actions']                     Array with all actions sorted by clock.
+ * @param int    $data['actions'][]['action_type']    Type of action table entry (ZBX_EVENT_HISTORY_*).
+ * @param string $data['actions'][]['clock']          Time, when action was performed.
+ * @param string $data['actions'][]['message']        Message sent by alert, or written by manual update, or remote command text.
+ * @param string $data['actions'][]['alerttype']      Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ * @param string $data['actions'][]['esc_step']       Alert escalation step (only for ZBX_EVENT_HISTORY_ALERT).
+ * @param string $data['actions'][]['subject']        Message alert subject (only for ZBX_EVENT_HISTORY_ALERT).
+ * @param string $data['actions'][]['p_eventid']      Problem eventid that was reason for alert (only for ZBX_EVENT_HISTORY_ALERT).
+ * @param string $data['actions'][]['acknowledgeid']  Problem update action that was reason for alert (only for ZBX_EVENT_HISTORY_ALERT).
+ * @param array  $users                               User name, surname and alias.
+ * @param array  $mediatypes                          Mediatypes with maxattempts value.
+ * @param array  $config                              Zabbix config.
  *
  * @return CTableInfo
  */
@@ -1974,6 +1976,18 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 	]);
 
 	foreach ($data['actions'] as $action) {
+		$esc_step = '';
+		if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT
+				&& $action['p_eventid'] == 0
+				&& $action['acknowledgeid'] == 0
+		) {
+			/*
+			 * Escalation step should be displayed, only if alert is caused by problem event.
+			 * Escalation step should not be displayed, if alert is caused by resolve event, or by problem update.
+			 */
+			$esc_step = $action['esc_step'];
+		}
+
 		$message = '';
 		if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_MESSAGE) {
 			$message = [bold($action['subject']), BR(), BR(), zbx_nl2br($action['message'])];
@@ -1984,7 +1998,7 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 		}
 
 		$table->addRow([
-			($action['action_type'] == ZBX_EVENT_HISTORY_ALERT) ? $action['esc_step'] : '',
+			$esc_step,
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeEventDetailsTableUser($action, $users),
 			makeActionTableIcon($action, $config),
