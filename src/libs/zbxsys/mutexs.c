@@ -285,7 +285,7 @@ void	zbx_rwlock_destroy(ZBX_RWLOCK *rwlock)
 		return;
 
 	if (0 != pthread_rwlock_destroy(*rwlock))
-		zbx_error("cannot remove semaphore %d: %s", *rwlock, zbx_strerror(errno));
+		zbx_error("cannot remove read-write lock: %s", zbx_strerror(errno));
 
 	*rwlock = ZBX_RWLOCK_NULL;
 }
