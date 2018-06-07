@@ -778,7 +778,6 @@ static int	DBpatch_3050069(void)
 
 	return SUCCEED;
 }
-
 /* remove references to table that is about to be renamed, this is required on IBM DB2 */
 
 static int	DBpatch_3050070(void)
@@ -1082,6 +1081,123 @@ static int	DBpatch_3050100(void)
 #endif
 }
 
+static int	DBpatch_3050101(void)
+{
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == DBindex_exists("hstgrp", "groups_pkey"))
+		return SUCCEED;
+	return DBrename_index("hstgrp", "groups_pkey", "hstgrp_pkey", "groupid", 0);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050102(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
+
+	zbx_vector_uint64_create(&ids);
+
+	result = DBselect(
+			"select a.autoreg_hostid,a.proxy_hostid,h.proxy_hostid"
+			" from autoreg_host a"
+			" left join hosts h"
+				" on h.host=a.host");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	autoreg_proxy_hostid, host_proxy_hostid;
+
+		ZBX_DBROW2UINT64(autoreg_proxy_hostid, row[1]);
+		ZBX_DBROW2UINT64(host_proxy_hostid, row[2]);
+
+		if (autoreg_proxy_hostid != host_proxy_hostid)
+		{
+			zbx_uint64_t	id;
+
+			ZBX_STR2UINT64(id, row[0]);
+			zbx_vector_uint64_append(&ids, id);
+		}
+	}
+	DBfree_result(result);
+
+	if (0 != ids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from autoreg_host where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid", ids.values, ids.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
+}
+
+static int	DBpatch_3050103(void)
+{
+	return DBcreate_index("autoreg_host", "autoreg_host_2", "proxy_hostid", 0);
+}
+
+static int	DBpatch_3050104(void)
+{
+	return DBdrop_index("autoreg_host", "autoreg_host_1");
+}
+
+static int	DBpatch_3050105(void)
+{
+	return DBcreate_index("autoreg_host", "autoreg_host_1", "host", 0);
+}
+
+static int	DBpatch_3050106(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute("update profiles set value_int=2 where idx='web.problem.filter.evaltype' and value_int=1");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050107(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"update widget_field"
+		" set value_int=2"
+		" where name='evaltype'"
+			" and value_int=1"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='problems'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1185,5 +1301,12 @@ DBPATCH_ADD(3050097, 0, 1)
 DBPATCH_ADD(3050098, 0, 1)
 DBPATCH_ADD(3050099, 0, 1)
 DBPATCH_ADD(3050100, 0, 1)
+DBPATCH_ADD(3050101, 0, 1)
+DBPATCH_ADD(3050102, 0, 1)
+DBPATCH_ADD(3050103, 0, 1)
+DBPATCH_ADD(3050104, 0, 1)
+DBPATCH_ADD(3050105, 0, 1)
+DBPATCH_ADD(3050106, 0, 1)
+DBPATCH_ADD(3050107, 0, 1)
 
 DBPATCH_END()

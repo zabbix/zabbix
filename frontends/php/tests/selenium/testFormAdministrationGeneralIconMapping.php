@@ -113,15 +113,16 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 					'error' => 'Global regular expression "regexpnotexist" does not exist.'
 				]
 			],
-			[
-				[
-					'name' => 'Icon mapping add not existen global regular expression',
-					'mappings' => [
-						['expression' => '@']
-					],
-					'error' => 'Global regular expression "" does not exist.'
-				]
-			],
+			// TODO uncomment after ZBX-14409 will be modified
+//			[
+//				[
+//					'name' => 'Icon mapping add not existen global regular expression',
+//					'mappings' => [
+//						['expression' => '@']
+//					],
+//					'error' => 'Global regular expression "" does not exist.'
+//				]
+//			],
 			[
 				[
 					'name' => 'Icon mapping without expressions',
@@ -452,8 +453,10 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($update_icon, 'iconmap_name');
+		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('iconmap_name'));
 			$this->zbxTestInputType('iconmap_name', $data['name']);
 		}
 
@@ -548,6 +551,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	public function testFormAdministrationGeneralIconMapping_Update($data) {
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($data['old_name'], 'iconmap_name');
+		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeOverwrite('iconmap_name', $data['name']);
@@ -726,6 +730,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
 		$this->zbxTestClickWait('clone');
+		$this->zbxTestWaitForPageToLoad();
 
 		$this->zbxTestInputType('iconmap_name', $data['new_name']);
 		if (array_key_exists('mappings', $data)) {
@@ -825,7 +830,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	public function testFormAdministrationGeneralIconMapping_Clone($data) {
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($data['old_name'], 'iconmap_name');
-		$this->zbxTestClick('clone');
+		$this->zbxTestClickWait('clone');
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeOverwrite('iconmap_name', $data['name']);
 		}
@@ -958,7 +963,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	}
 
 	private function checkFormFields($data) {
-		$this->zbxTestDoubleClickLinkText($data['name'], 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($data['name']);
 		$this->zbxTestAssertElementValue('iconmap_name', $data['name']);
 		$this->zbxTestAssertElementValue('iconmap_mappings_0_expression', $data['mappings'][0]['expression']);
 		$this->zbxTestDropdownAssertSelected('iconmap[mappings][0][inventory_link]', $data['inventory']);

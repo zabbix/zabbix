@@ -377,6 +377,10 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				}
 			});
 
+			if (fullscreen) {
+				url.setArgument('fullscreen', '1');
+			}
+
 			gotos.push({
 				label: t('Submap'),
 				url: url.getUrl()

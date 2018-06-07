@@ -749,7 +749,8 @@ output {
 		}
 
 		td {
-			padding: 2px 5px 2px 5px;
+			padding-top: 2px;
+			padding-bottom: 2px;
 			border-bottom: none;
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
 			color: $font-color;
@@ -3330,8 +3331,14 @@ $form-icon-btn: (
 }
 
 %dashbrd-widget-td {
-	padding-right: 10px;
-	padding-left: 10px;
+
+	&:first-child {
+		padding-left: 10px;
+	}
+
+	&:last-child {
+		padding-right: 10px;
+	}
 }
 
 .dashbrd-widget-head {
@@ -3676,12 +3683,14 @@ $form-icon-btn: (
 .calendar {
 	width: 200px;
 
-	.selected {
-		background-color: $ui-bg-selected-color;
-		color: $white;
+	.calendar-year,
+	.calendar-month {
+		&.highlighted {
+			background-color: $action-hover-color;
+		}
 
-		&:hover {
-			@extend .selected
+		&:focus {
+			outline: none;
 		}
 	}
 
@@ -3698,12 +3707,35 @@ $form-icon-btn: (
 			text-align: center;
 
 			td {
-				padding: 4px;
 				@include transition(background-color .2s ease-out);
+
+				&.selected {
+					background-color: $ui-bg-selected-color;
+					color: $white;
+
+					&:hover {
+						background-color: darken($ui-bg-selected-color, 4%);
+					}
+				}
 
 				&:hover {
 					background-color: $action-hover-color;
 					cursor: pointer;
+				}
+
+				&.highlighted {
+					@include btn-hover-active($btn-font-color, $btn-bg-color);
+					cursor: pointer;
+				}
+
+				&:focus {
+					outline: none;
+				}
+
+				span {
+					z-index: -1;
+					padding: 4px;
+					display: block;
 				}
 			}
 		}
@@ -3722,6 +3754,8 @@ $form-icon-btn: (
 .calendar-year {
 	height: 24px;
 	line-height: 26px;
+	display: table;
+	width: 100%;
 
 	button:first-child {
 		float: left;
@@ -3729,6 +3763,11 @@ $form-icon-btn: (
 
 	button:last-child {
 		float: right;
+	}
+
+	button:hover {
+		background-color: $action-hover-color;
+		cursor: pointer;
 	}
 }
 

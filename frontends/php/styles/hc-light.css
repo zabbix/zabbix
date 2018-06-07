@@ -189,9 +189,9 @@ pre, pre a, pre td, pre span {
   .top-nav li {
     display: block;
     float: left; }
-    .top-nav li.selected, .top-nav .calendar li.selected:hover, .calendar .top-nav li.selected:hover {
+    .top-nav li.selected {
       position: relative; }
-      .top-nav li.selected::after, .top-nav .calendar li.selected:hover::after, .calendar .top-nav li.selected:hover::after {
+      .top-nav li.selected::after {
         content: '';
         position: absolute;
         bottom: -1px;
@@ -205,7 +205,7 @@ pre, pre a, pre td, pre span {
         border-left: 9px solid transparent;
         border-right: 9px solid transparent;
         border-bottom: 9px solid #000; }
-      .top-nav li.selected a, .top-nav .calendar li.selected:hover a, .calendar .top-nav li.selected:hover a, .top-nav li.selected a:hover {
+      .top-nav li.selected a, .top-nav li.selected a:hover {
         color: black; }
   .top-nav a {
     padding: 15px 10px;
@@ -337,7 +337,7 @@ ul.top-nav-icons {
     color: white;
     outline: none;
     padding-bottom: 4px; }
-  .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+  .top-subnav a.selected {
     border-bottom: 4px solid gray;
     color: white;
     padding-bottom: 4px; }
@@ -438,7 +438,7 @@ article, main {
         padding: 2px 3px 1px 3px; }
     .object-group li .rel-container {
       margin: 0; }
-  .object-group .selected, .object-group .calendar .selected:hover, .calendar .object-group .selected:hover {
+  .object-group .selected {
     background-color: #fff;
     -webkit-box-shadow: inset 0 0 0 1px #9f9f9f;
     -moz-box-shadow: inset 0 0 0 1px #9f9f9f;
@@ -502,7 +502,8 @@ output {
     .list-table.compact-view .link-action:focus {
       color: #000; }
   .list-table.compact-view td {
-    padding: 2px 5px 2px 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     border-bottom: none;
     box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
     color: #000; }
@@ -1012,7 +1013,7 @@ output {
   margin-bottom: 10px;
   line-height: 1em;
   height: 52px; }
-  .scrollbar .selected, .scrollbar .calendar .selected:hover, .calendar .scrollbar .selected:hover {
+  .scrollbar .selected {
     font-weight: bold; }
 
 .sublevel {
@@ -2310,9 +2311,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .list-table tbody tr.nothing-to-show td:hover {
     background-color: #fff; }
 
-.dashbrd-grid-widget-content .list-table th, .dashbrd-grid-widget-content .list-table td, .dashbrd-widget .list-table th, .dashbrd-widget .list-table td, .overlay-dialogue .list-table th, .overlay-dialogue .list-table td {
-  padding-right: 10px;
+.dashbrd-grid-widget-content .list-table th:first-child, .dashbrd-grid-widget-content .list-table td:first-child, .dashbrd-widget .list-table th:first-child, .dashbrd-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
   padding-left: 10px; }
+.dashbrd-grid-widget-content .list-table th:last-child, .dashbrd-grid-widget-content .list-table td:last-child, .dashbrd-widget .list-table th:last-child, .dashbrd-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+  padding-right: 10px; }
 
 .dashbrd-widget-head {
   position: relative;
@@ -2554,9 +2556,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .calendar {
   width: 200px; }
-  .calendar .selected, .calendar .selected:hover {
-    background-color: #333;
-    color: #fff; }
+  .calendar .calendar-year.highlighted, .calendar .highlighted.calendar-month,
+  .calendar .calendar-month.highlighted {
+    background-color: #f4f4f4; }
+  .calendar .calendar-year:focus, .calendar .calendar-month:focus,
+  .calendar .calendar-month:focus {
+    outline: none; }
   .calendar table {
     width: 100%;
     margin: 5px 0; }
@@ -2566,13 +2571,28 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .calendar table tbody {
       text-align: center; }
       .calendar table tbody td {
-        padding: 4px;
         -webkit-transition: background-color 0.2s ease-out;
         -moz-transition: background-color 0.2s ease-out;
         transition: background-color 0.2s ease-out; }
+        .calendar table tbody td.selected {
+          background-color: #333;
+          color: #fff; }
+          .calendar table tbody td.selected:hover {
+            background-color: #292929; }
         .calendar table tbody td:hover {
           background-color: #f4f4f4;
           cursor: pointer; }
+        .calendar table tbody td.highlighted {
+          color: #fff;
+          background-color: #484848;
+          border-color: #484848;
+          cursor: pointer; }
+        .calendar table tbody td:focus {
+          outline: none; }
+        .calendar table tbody td span {
+          z-index: -1;
+          padding: 4px;
+          display: block; }
 
 .calendar-header {
   text-align: center; }
@@ -2582,11 +2602,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .calendar-year, .calendar-month {
   height: 24px;
-  line-height: 26px; }
+  line-height: 26px;
+  display: table;
+  width: 100%; }
   .calendar-year button:first-child, .calendar-month button:first-child {
     float: left; }
   .calendar-year button:last-child, .calendar-month button:last-child {
     float: right; }
+  .calendar-year button:hover, .calendar-month button:hover {
+    background-color: #f4f4f4;
+    cursor: pointer; }
 
 .calendar-time {
   text-align: center; }
@@ -3049,7 +3074,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
 .ok-ack-fg {
   color: #009900; }
 
-.list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .calendar .tree-item.selected:hover > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
+.list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
   background-color: #f4f4f4; }
 
 .msg-good {
@@ -4035,7 +4060,7 @@ a.link-action {
   -moz-transition: box-shadow 0.2s ease-out;
   transition: box-shadow 0.2s ease-out; }
 
-.top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+.top-subnav a.selected {
   font-weight: bold;
   border-bottom: 4px solid #fff; }
 .top-subnav a:focus {
@@ -4076,7 +4101,7 @@ ul.top-nav-icons a:focus {
 .filter-trigger .arrow-down {
   border-top-color: #FFF !important; }
 
-.top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+.top-subnav a.selected {
   font-weight: bold; }
 
 .disabled {
