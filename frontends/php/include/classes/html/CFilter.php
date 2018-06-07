@@ -266,7 +266,7 @@ class CFilter extends CDiv {
 			(new CDiv([
 				(new CDiv([
 					new CList([
-						new CLabel(_('From'), 'from'), new CTextBox('from', $from),
+						new CLabel(_('From'), 'from'), (new CTextBox('', $from))->setId('from'),
 						(new CButton('from_calendar'))->addClass(ZBX_STYLE_ICON_CAL)
 					]),
 					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
@@ -274,7 +274,7 @@ class CFilter extends CDiv {
 						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
 						->addStyle('display: none'),
 					new CList([
-						new CLabel(_('To'), 'to'), new CTextBox('to', $to),
+						new CLabel(_('To'), 'to'), (new CTextBox('', $to))->setId('to'),
 						(new CButton('to_calendar'))->addClass(ZBX_STYLE_ICON_CAL)
 					]),
 					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
@@ -321,7 +321,7 @@ class CFilter extends CDiv {
 			CJs::encodeJson($this->tabs_options).
 		').show().find(".multiselect");'.
 
-		'if (multiselects.length) {'.
+		'if (multiselects.length && multiselects.multiSelect) {'.
 			'multiselects.multiSelect("resize");'.
 		'}';
 

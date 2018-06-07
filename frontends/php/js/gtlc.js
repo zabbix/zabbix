@@ -48,8 +48,8 @@ jQuery(function ($){
 		xhr = null,
 		endpoint = new Curl('zabbix.php'),
 		element = {
-			from: container.find('[name=from]'),
-			to: container.find('[name=to]'),
+			from: container.find('#from'),
+			to: container.find('#to'),
 			from_clndr: container.find('[name=from_calendar]'),
 			to_clndr: container.find('[name=to_calendar]'),
 			apply: container.find('[name=apply]'),
