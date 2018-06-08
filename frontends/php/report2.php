@@ -425,8 +425,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	}
 
 	// filter period
-	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince'], 'filter_timetill'));
-	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill'], 'filter_timesince'));
+	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince']));
+	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill']));
 
 	$reportWidget->addItem(
 		(new CFilter())
