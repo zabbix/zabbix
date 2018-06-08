@@ -1539,7 +1539,11 @@ abstract class CItemGeneral extends CApiService {
 					'preservekeys' => true
 				];
 
-				$db_masters = API::Item()->get($options + ['webitems' => true]);
+				// Allow to select web items. And for item prototypes select only normal items (no LLD).
+				$db_masters = API::Item()->get($options
+					+ ['webitems' => true]
+					+ (($this instanceof CItemPrototype) ? ['filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]] : [])
+				);
 
 				if ($this instanceof CItemPrototype) {
 					$db_master_prototypes = API::ItemPrototype()->get($options + ['selectDiscoveryRule' => ['itemid']]);

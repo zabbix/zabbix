@@ -403,7 +403,8 @@ if (!$readonly) {
 				'dstfld2' => 'master_itemname',
 				'only_hostid' => $data['hostid'],
 				'excludeids' => [$data['itemid']],
-				'with_webitems' => 1
+				'with_webitems' => 1,
+				'normal_only' => 1
 			]).', null, this);'
 		);
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
