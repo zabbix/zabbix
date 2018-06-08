@@ -1089,7 +1089,13 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 #	define zbx_dsprintf __zbx_zbx_dsprintf
 #	define zbx_strdcatf __zbx_zbx_strdcatf
 #endif
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 2, 3)));
+#else
+	;
+#endif
+
 char	*zbx_strdcat(char *dest, const char *src);
 char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
