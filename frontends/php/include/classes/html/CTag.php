@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,6 +44,13 @@ class CTag extends CObject {
 	 * @var int
 	 */
 	protected $attrEncStrategy = self::ENC_ALL;
+
+	/**
+	 * Hint element for the current CTag.
+	 *
+	 * @var CSpan
+	 */
+	protected $hint = null;
 
 	public function __construct($tagname, $paired = false, $body = null) {
 		parent::__construct();
@@ -90,6 +97,11 @@ class CTag extends CObject {
 		$res = $this->startToString();
 		$res .= $this->bodyToString();
 		$res .= $this->endToString();
+
+		if ($this->hint !== null) {
+			$res .= $this->hint->toString();
+		}
+
 		if ($destroy) {
 			$this->destroy();
 		}
@@ -169,20 +181,20 @@ class CTag extends CObject {
 	 * @return CTag
 	 */
 	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
-		$this->addItem(
-			(new CSpan(
-				(new CSpan($text))->addClass('hint-box')
-			))->setAttribute('style', 'display: none;')
-		);
+		$this->hint = (new CDiv($text))
+			->addClass('hint-box')
+			->setAttribute('style', 'display: none;');
 
-		$this->onMouseover(
-			'hintBox.HintWrapper(event, this, "'.$span_class.'", "'.$styles.'");'
-		);
+		$this->setAttribute('data-hintbox', '1');
 
+		if ($span_class !== '') {
+			$this->setAttribute('data-hintbox-class', $span_class);
+		}
+		if ($styles !== '') {
+			$this->setAttribute('data-hintbox-style', $styles);
+		}
 		if ($freeze_on_click) {
-			$this->onClick(
-				'hintBox.showStaticHint(event, this, "'.$span_class.'", false, "'.$styles.'");'
-			);
+			$this->setAttribute('data-hintbox-static', '1');
 		}
 
 		return $this;
@@ -262,6 +274,17 @@ class CTag extends CObject {
 	}
 
 	/**
+	 * Remove ID attribute from tag.
+	 *
+	 * @return CTag
+	 */
+	public function removeId() {
+		$this->removeAttribute('id');
+
+		return $this;
+	}
+
+	/**
 	 * Sanitizes a string according to the given strategy before outputting it to the browser.
 	 *
 	 * @param string	$value
@@ -293,5 +316,23 @@ class CTag extends CObject {
 	 */
 	public function getEncStrategy() {
 		return $this->encStrategy;
+	}
+
+	/**
+	 * Set or reset element 'aria-required' attribute.
+	 *
+	 * @param bool $is_required  Define aria-required attribute for element.
+	 *
+	 * @return CObject
+	 */
+	public function setAriaRequired($is_required = true) {
+		if ($is_required) {
+			$this->setAttribute('aria-required', 'true');
+		}
+		else {
+			$this->removeAttribute('aria-required');
+		}
+
+		return $this;
 	}
 }

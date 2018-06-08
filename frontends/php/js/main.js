@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ var MMenu = {
 
 	mouseOver: function(show_label) {
 		clearTimeout(this.timeout_reset);
-		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 10);
+		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
 		PageRefresh.restart();
 	},
 
@@ -403,12 +403,12 @@ var jqBlink = {
 			// changing visibility state
 			jQuery.each(objects, function() {
 				if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
-					jQuery(this).toggleClass(jQuery(this).data('toggleClass'));
+					jQuery(this)[jqBlink.shown ? 'removeClass' : 'addClass'](jQuery(this).data('toggleClass'));
 				}
 				else {
 					jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
 				}
-			})
+			});
 
 			// reversing the value of indicator attribute
 			this.shown = !this.shown;
@@ -453,8 +453,59 @@ var jqBlink = {
  */
 var hintBox = {
 
+	/**
+	 * Initialize hint box event handlers.
+	 * Event 'remove' is triggered on widget update by updateWidgetContent() and widget remove by deleteWidget().
+	 */
+	bindEvents: function () {
+		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
+			var target = jQuery(this);
+
+			switch (e.type) {
+				case 'mouseenter' :
+					hintBox.showHint(e, this, target.next('.hint-box').html(), target.data('hintbox-class'), false,
+						target.data('hintbox-style')
+					);
+					break;
+
+				case 'mouseleave' :
+					hintBox.hideHint(e, this);
+					break;
+
+				case 'remove' :
+					hintBox.deleteHint(this);
+					break;
+
+				case 'keydown' :
+					if (e.which == 13 && target.data('hintbox-static') == 1) {
+						var offset = target.offset(),
+							w = jQuery(window);
+						// Emulate click on left middle point of link.
+						e.clientX = offset.left - w.scrollLeft();
+						e.clientY = offset.top - w.scrollTop() + (target.height() / 2);
+						e.preventDefault();
+
+						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
+							target.data('hintbox-style')
+						);
+					}
+
+					break;
+
+				case 'click' :
+					if (target.data('hintbox-static') == 1) {
+						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
+							target.data('hintbox-style')
+						);
+					}
+					break;
+			}
+		});
+	},
+
 	createBox: function(e, target, hintText, className, isStatic, styles) {
-		var box = jQuery('<div></div>').addClass('overlay-dialogue');
+		var hintboxid = hintBox.getUniqueId(),
+			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue');
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
@@ -482,6 +533,9 @@ var hintBox = {
 		}
 
 		if (isStatic) {
+			target.hintboxid = hintboxid;
+			addToOverlaysStack(hintboxid, target, 'hintbox');
+
 			var close_link = jQuery('<button>', {
 					'class': 'overlay-close-btn'}
 				)
@@ -496,35 +550,13 @@ var hintBox = {
 		return box;
 	},
 
-	HintWrapper: function(e, target, className, styles) {
-		target.isStatic = false;
-
-		var	hintText = jQuery('.hint-box', target).html();
-
-		jQuery(target).on('mouseenter', function(e, d) {
-			if (d) {
-				e = d;
-			}
-			hintBox.showHint(e, target, hintText, className, false, styles);
-
-		}).on('mouseleave', function(e) {
-			hintBox.hideHint(e, target);
-
-		}).on('remove', function(e) {
-			hintBox.deleteHint(target);
-		});
-
-		jQuery(target).removeAttr('onmouseover');
-		jQuery(target).trigger('mouseenter', e);
-	},
-
 	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = jQuery('.hint-box', target).html();
+				hintText = jQuery(target).next('.hint-box').html();
 			}
 
 			target.isStatic = true;
@@ -546,6 +578,10 @@ var hintBox = {
 		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic, styles);
 		hintBox.positionHint(e, target);
 		target.hintBoxItem.show();
+
+		if (target.isStatic) {
+			overlayDialogueOnLoad(true, target.hintBoxItem);
+		}
 	},
 
 	positionHint: function(e, target) {
@@ -628,6 +664,10 @@ var hintBox = {
 	},
 
 	deleteHint: function(target) {
+		if (typeof target.hintboxid !== 'undefined') {
+			removeFromOverlaysStack(target.hintboxid);
+		}
+
 		if (target.hintBoxItem) {
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
@@ -636,6 +676,15 @@ var hintBox = {
 				delete target.isStatic;
 			}
 		}
+	},
+
+	getUniqueId: function() {
+		var hintboxid = Math.random().toString(36).substring(7);
+		while (jQuery('[data-hintboxid="' + hintboxid + '"]').length) {
+			hintboxid = Math.random().toString(36).substring(7);
+		}
+
+		return hintboxid;
 	}
 };
 
@@ -652,9 +701,11 @@ function hide_color_picker() {
 	color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
 	curr_lbl = null;
 	curr_txt = null;
+
+	removeFromOverlaysStack('color_picker');
 }
 
-function show_color_picker(id) {
+function show_color_picker(id, event) {
 	if (!color_picker) {
 		return;
 	}
@@ -670,6 +721,9 @@ function show_color_picker(id) {
 	color_picker.style.left = (color_picker.x + 20) + 'px';
 	color_picker.style.top = color_picker.y + 'px';
 	color_picker.style.display = 'block';
+
+	addToOverlaysStack('color_picker', event.target, 'color_picker');
+	overlayDialogueOnLoad(true, color_picker);
 }
 
 function create_color_picker() {
@@ -853,14 +907,14 @@ function getConditionFormula(conditions, evalType) {
 		case 1:
 			conditionOperator = 'and';
 			groupOperator = conditionOperator;
-
 			break;
+
 		// or
 		case 2:
 			conditionOperator = 'or';
 			groupOperator = conditionOperator;
-
 			break;
+
 		// and/or
 		default:
 			conditionOperator = 'or';
@@ -868,15 +922,17 @@ function getConditionFormula(conditions, evalType) {
 	}
 
 	var groupedFormulas = [];
+
 	for (var i = 0; i < conditions.length; i++) {
 		if (typeof conditions[i] === 'undefined') {
 			continue;
 		}
 
 		var groupedConditions = [];
+
 		groupedConditions.push(conditions[i].id);
 
-		// search for other conditions of the same type
+		// Search for other conditions of the same type.
 		for (var n = i + 1; n < conditions.length; n++) {
 			if (typeof conditions[n] !== 'undefined' && conditions[i].type == conditions[n].type) {
 				groupedConditions.push(conditions[n].id);
@@ -884,7 +940,7 @@ function getConditionFormula(conditions, evalType) {
 			}
 		}
 
-		// join conditions of the same type
+		// Join conditions of the same type.
 		if (groupedConditions.length > 1) {
 			groupedFormulas.push('(' + groupedConditions.join(' ' + conditionOperator + ' ') + ')');
 		}
@@ -895,7 +951,7 @@ function getConditionFormula(conditions, evalType) {
 
 	var formula = groupedFormulas.join(' ' + groupOperator + ' ');
 
-	// strip parentheses if there's only one condition group
+	// Strip parentheses if there's only one condition group.
 	if (groupedFormulas.length == 1) {
 		formula = formula.substr(1, formula.length - 2);
 	}
@@ -916,7 +972,6 @@ function getConditionFormula(conditions, evalType) {
 	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - rowremove.dynamicRows 	- after removing a row (triggered before tableupdate.dynamicRows)
 	 * - tableupdate.dynamicRows 	- after adding or removing a row
 	 *
 	 * @param options
@@ -984,7 +1039,6 @@ function getConditionFormula(conditions, evalType) {
 	function removeRow(table, row, options) {
 		row.remove();
 
-		table.trigger('rowremove.dynamicRows', options);
 		table.trigger('tableupdate.dynamicRows', options);
 	}
 }(jQuery));

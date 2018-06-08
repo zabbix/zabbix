@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,22 +21,31 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Templates'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem(
-			(new CList())
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
 				->addItem([
 					new CLabel(_('Group'), 'groupid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$data['pageFilter']->getGroupsCB()
 				])
-				->addItem(new CSubmit('form', _('Create template')))
+			),
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('Create template'),
+				(new CUrl())
+					->removeArgument('templateid')
+					->setArgument('groupid', $data['pageFilter']->groupid)
+					->setArgument('form', 'create')
+					->getUrl()
+				))
 				->addItem(
-					(new CButton('form', _('Import')))
-						->onClick('redirect("conf.import.php?rules_preset=template")')
+					(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=template")')
 				)
-		)
-	)
+		))->setAttribute('aria-label', _('Content controls'))
+	]))
 	->addItem((new CFilter('web.templates.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),
 			(new CTextBox('filter_name', $data['filter']['name']))

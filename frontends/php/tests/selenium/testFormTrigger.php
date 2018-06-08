@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,7 +192,7 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		}
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
@@ -233,15 +233,14 @@ class testFormTrigger extends CWebTest {
 				$this->zbxTestAssertAttribute("//textarea[@id='expression']", 'readonly');
 			}
 
-			$this->zbxTestAssertVisibleId('insert');
-			$this->zbxTestAssertElementText("//button[@id='insert']", 'Add');
+			$this->zbxTestAssertVisibleXpath("//button[@name='insert']");
+			$this->zbxTestAssertElementText("//button[@name='insert']", 'Add');
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertAttribute("//button[@id='insert']", 'disabled');
+				$this->zbxTestAssertAttribute("//button[@name='insert']", 'disabled');
 			}
 
 			$this->zbxTestAssertElementNotPresentXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression')]");
 			$this->zbxTestAssertElementNotPresentId('insert_macro');
-			$this->zbxTestAssertElementNotPresentId('exp_list');
 		}
 		else {
 			$this->zbxTestTextPresent('Expression');
@@ -258,10 +257,10 @@ class testFormTrigger extends CWebTest {
 				$this->zbxTestAssertElementNotPresentXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression')]");
 			}
 
-			$this->zbxTestAssertVisibleId('insert');
-			$this->zbxTestAssertElementText("//button[@id='insert']", 'Edit');
+			$this->zbxTestAssertVisibleXpath("//button[@name='insert']");
+			$this->zbxTestAssertElementText("//button[@name='insert']", 'Edit');
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertElementPresentXpath("//button[@id='insert'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//button[@name='insert'][@disabled]");
 			}
 
 			$this->zbxTestAssertVisibleId('insert_macro');
@@ -276,7 +275,6 @@ class testFormTrigger extends CWebTest {
 			else {
 				$this->zbxTestTextPresent(['Expression', 'Info', 'Close expression constructor']);
 			}
-			$this->zbxTestAssertVisibleId('exp_list');
 			$this->zbxTestTextPresent('Close expression constructor');
 		}
 
@@ -774,7 +772,7 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -868,10 +866,10 @@ class testFormTrigger extends CWebTest {
 						}
 					}
 					if (isset($constructor['elementError'])) {
-						$this->zbxTestAssertElementPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
+						$this->zbxTestAssertElementPresentXpath('//span[@class="icon-info status-red"]');
 					}
 					else {
-						$this->zbxTestAssertElementNotPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
+						$this->zbxTestAssertElementNotPresentXpath('//span[@class="icon-info status-red"]');
 					}
 				}
 			}

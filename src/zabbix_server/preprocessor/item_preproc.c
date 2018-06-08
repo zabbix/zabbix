@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -196,7 +196,9 @@ static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *valu
 {
 	char	*err = NULL;
 
-	if (SUCCEED == item_preproc_multiplier_variant(value_type, value, params, &err))
+	if (FAIL == is_double(params))
+		err = zbx_dsprintf(NULL, "a numerical value is expected");
+	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, params, &err))
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
@@ -433,6 +435,8 @@ static void	unescape_trim_params(const char *in, char *out)
 				case 't':
 					*out = '\t';
 					break;
+				default:
+					*out = *(--in);
 			}
 		}
 		else
@@ -799,9 +803,9 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
  ******************************************************************************/
 static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	struct	zbx_json_parse	jp, jp_out;
-	char	*data = NULL;
-	size_t	data_alloc = 0;
+	struct zbx_json_parse	jp, jp_out;
+	char			*data = NULL;
+	size_t			data_alloc = 0;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -848,7 +852,7 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: item_preproc_xpath_op                                             *
+ * Function: item_preproc_xpath_op                                            *
  *                                                                            *
  * Purpose: execute xpath query                                               *
  *                                                                            *
@@ -873,7 +877,7 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlErrorPtr	pErr;
-	xmlBufferPtr	xmlBuf;
+	xmlBufferPtr	xmlBufferLocal;
 	int		ret = FAIL, i;
 	char		buffer[32], *ptr;
 
@@ -901,19 +905,19 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 	switch (xpathObj->type)
 	{
 		case XPATH_NODESET:
-			xmlBuf = xmlBufferCreate();
+			xmlBufferLocal = xmlBufferCreate();
 
 			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 			{
 				nodeset = xpathObj->nodesetval;
 				for (i = 0; i < nodeset->nodeNr; i++)
-					xmlNodeDump(xmlBuf, doc, nodeset->nodeTab[i], 0, 0);
+					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
 			}
 
 			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBuf->content));
+			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
 
-			xmlBufferFree(xmlBuf);
+			xmlBufferFree(xmlBufferLocal);
 			ret = SUCCEED;
 			break;
 		case XPATH_STRING:
@@ -960,7 +964,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: item_preproc_xpath_op                                             *
+ * Function: item_preproc_xpath                                               *
  *                                                                            *
  * Purpose: execute xpath query                                               *
  *                                                                            *

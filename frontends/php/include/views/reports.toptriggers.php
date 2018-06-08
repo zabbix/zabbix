@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,15 +38,14 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Host groups'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
-			'data' => $this->data['multiSelectHostGroupData'],
+			'object_name' => 'hostGroup',
+			'data' => $data['multiSelectHostGroupData'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'groupids_',
 					'srcfld1' => 'groupid',
-					'multiselect' => '1'
+					'dstfrm' => $filterForm->getName(),
+					'dstfld1' => 'groupids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -54,16 +53,14 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Hosts'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
-			'objectName' => 'hosts',
-			'data' => $this->data['multiSelectHostData'],
+			'object_name' => 'hosts',
+			'data' => $data['multiSelectHostData'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
-					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'hostids_',
 					'srcfld1' => 'hostid',
-					'real_hosts' => '1',
-					'multiselect' => '1'
+					'dstfrm' => $filterForm->getName(),
+					'dstfld1' => 'hostids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -118,16 +115,14 @@ $table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), 
 foreach ($this->data['triggers'] as $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
 
-	$hostName = (new CSpan($trigger['hosts'][0]['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]))
-		->addClass(ZBX_STYLE_LINK_ACTION);
+	$hostName = (new CLinkAction($trigger['hosts'][0]['name']))
+		->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 	if ($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
 	}
 
-	$triggerDescription = (new CSpan($trigger['description']))
-		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
-		->addClass(ZBX_STYLE_LINK_ACTION);
+	$triggerDescription = (new CLinkAction($trigger['description']))
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, null, ['show_description' => false]));
 
 	$table->addRow([
 		$hostName,

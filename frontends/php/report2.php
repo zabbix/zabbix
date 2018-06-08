@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,6 +113,16 @@ if (!hasRequest('filter_rst')) {
 	$_REQUEST['filter_timetill'] = getRequest('filter_timetill',
 		CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0)
 	);
+
+	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		$_REQUEST['tpl_triggerid'] = getRequest('tpl_triggerid',
+			CProfile::get('web.avail_report.'.$availabilityReportMode.'.tpl_triggerid', 0)
+		);
+
+		$_REQUEST['hostgroupid'] = getRequest('hostgroupid',
+			CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostgroupid', 0)
+		);
+	}
 }
 
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', getRequest('filter_groupid', 0),
@@ -127,6 +137,16 @@ CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', getReq
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', getRequest('filter_hostid', 0),
 	PROFILE_TYPE_ID
 );
+
+if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+	CProfile::update('web.avail_report.'.$availabilityReportMode.'.tpl_triggerid', getRequest('tpl_triggerid', 0),
+		PROFILE_TYPE_ID
+	);
+
+	CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostgroupid', getRequest('hostgroupid', 0),
+		PROFILE_TYPE_ID
+	);
+}
 
 $config = select_config();
 
@@ -160,10 +180,12 @@ if ($triggerData) {
 	$triggerData['hostid'] = $host['hostid'];
 	$triggerData['hostname'] = $host['name'];
 
-	$reportWidget->setControls(
+	$reportWidget->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))
 			->addItem($triggerData['description'])
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 	$table = (new CTableInfo())
@@ -174,17 +196,18 @@ if ($triggerData) {
 		->show();
 }
 elseif (isset($_REQUEST['filter_hostid'])) {
-	$headerForm = (new CForm('get'))->addItem((new CList())
-		->addItem([
-			new CLabel(_('Mode'), 'mode'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			new CComboBox('mode', $availabilityReportMode, 'submit()', [
-				AVAILABILITY_REPORT_BY_HOST => _('By host'),
-				AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
+	$reportWidget->setControls((new CForm('get'))
+		->setAttribute('aria-label', _('Main filter'))
+		->addItem((new CList())
+			->addItem([
+				new CLabel(_('Mode'), 'mode'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				new CComboBox('mode', $availabilityReportMode, 'submit()', [
+					AVAILABILITY_REPORT_BY_HOST => _('By host'),
+					AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
+				])
 			])
-		])
-	);
-	$reportWidget->setControls($headerForm);
+	));
 
 	$triggerOptions = [
 		'output' => ['triggerid', 'description', 'expression', 'value'],
@@ -200,7 +223,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	 * Filter
 	 */
 	$filterForm = (new CFilter('web.avail_report.filter.state'))
-		->addVar('config', $availabilityReportMode)
+		->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
 		->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']))
 		->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
 
@@ -407,8 +430,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	}
 
 	// filter period
-	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince'], 'filter_timetill'));
-	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill'], 'filter_timesince'));
+	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince']));
+	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill']));
 
 	$filterForm->addColumn($filterColumn1);
 	$filterForm->addColumn($filterColumn2);

@@ -15,6 +15,7 @@ libzbxpoller_a_SOURCES = \
 	checks_telnet.c checks_telnet.h \
 	checks_java.c checks_java.h \
 	checks_calculated.c checks_calculated.h \
+	checks_http.c checks_http.h \
 	poller.c poller.h
 
 libzbxpoller_a_CFLAGS = -I@top_srcdir@/src/libs/zbxsysinfo/simple -I@top_srcdir@/src/libs/zbxdbcache @SNMP_CFLAGS@ @SSH2_CFLAGS@

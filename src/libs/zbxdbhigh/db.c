@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1324,12 +1324,14 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		/* delete from vector if already exist in hosts table */
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select host"
-				" from hosts"
-				" where proxy_hostid=" ZBX_FS_UI64
+				"select h.host,a.host_metadata"
+				" from hosts h"
+				" left join autoreg_host a"
+					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
+				" where h.proxy_hostid=" ZBX_FS_UI64
 					" and",
 				proxy_hostid);
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
 				(const char **)hosts.values, hosts.values_num);
 
 		result = DBselect("%s", sql);
@@ -1340,12 +1342,16 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 			{
 				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
-				if (0 == strcmp(autoreg_host->host, row[0]))
-				{
-					zbx_vector_ptr_remove(autoreg_hosts, i);
-					autoreg_host_free(autoreg_host);
+				if (0 != strcmp(autoreg_host->host, row[0]))
+					continue;
+
+				if (SUCCEED == DBis_null(row[1]) || 0 != strcmp(autoreg_host->host_metadata, row[1]))
 					break;
-				}
+
+				zbx_vector_ptr_remove(autoreg_hosts, i);
+				autoreg_host_free(autoreg_host);
+
+				break;
 			}
 
 		}
@@ -1363,9 +1369,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select autoreg_hostid,host"
 				" from autoreg_host"
-				" where proxy_hostid%s"
-					" and",
-				DBsql_id_cmp(proxy_hostid));
+				" where");
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
 				(const char **)hosts.values, hosts.values_num);
 
@@ -1459,9 +1463,11 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 					" set listen_ip='%s',"
 						"listen_dns='%s',"
 						"listen_port=%hu,"
-						"host_metadata='%s'"
+						"host_metadata='%s',"
+						"proxy_hostid=%s"
 					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
-				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->autoreg_hostid);
+				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, DBsql_id_ins(proxy_hostid),
+				autoreg_host->autoreg_hostid);
 
 			zbx_free(host_metadata_esc);
 			zbx_free(dns_esc);
@@ -1488,6 +1494,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 	}
 
 	zbx_process_events(NULL, NULL);
+	zbx_clean_events();
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1908,6 +1915,65 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+#ifndef HAVE_SQLITE3
+int	DBindex_exists(const char *table_name, const char *index_name)
+{
+	char		*table_name_esc, *index_name_esc;
+#if defined(HAVE_POSTGRESQL)
+	char		*table_schema_esc;
+#endif
+	DB_RESULT	result;
+	int		ret;
+
+	table_name_esc = DBdyn_escape_string(table_name);
+	index_name_esc = DBdyn_escape_string(index_name);
+
+#if defined(HAVE_IBM_DB2)
+	result = DBselect(
+			"select 1"
+			" from syscat.indexes"
+			" where tabschema=user"
+				" and lower(tabname)='%s'"
+				" and lower(indname)='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_MYSQL)
+	result = DBselect(
+			"show index from %s"
+			" where key_name='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_ORACLE)
+	result = DBselect(
+			"select 1"
+			" from user_indexes"
+			" where lower(table_name)='%s'"
+				" and lower(index_name)='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+				"public" : CONFIG_DBSCHEMA);
+
+	result = DBselect(
+			"select 1"
+			" from pg_indexes"
+			" where tablename='%s'"
+				" and indexname='%s'"
+				" and schemaname='%s'",
+			table_name_esc, index_name_esc, table_schema_esc);
+
+	zbx_free(table_schema_esc);
+#endif
+
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	zbx_free(table_name_esc);
+	zbx_free(index_name_esc);
+
+	return ret;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *

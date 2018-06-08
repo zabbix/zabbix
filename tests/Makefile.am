@@ -12,9 +12,19 @@ libzbxmocktest_a_SOURCES = \
 
 libzbxmockdata_a_SOURCES = \
 	zbxmockdb.c \
+	zbxmockdb.h \
 	zbxmockdir.c \
 	zbxmockexit.c \
 	zbxmockfile.c \
 	zbxmockstat.c \
 	zbxmockdata.c \
-	zbxmockdata.h
+	zbxmockdata.h \
+	zbxmockassert.c \
+	zbxmockassert.h \
+	zbxmockutil.c \
+	zbxmockutil.h \
+	zbxmocktime.c \
+	zbxmockhelper.c \
+	zbxmockhelper.h \
+	zbxmockcomm.c \
+	zbxmocklog.c

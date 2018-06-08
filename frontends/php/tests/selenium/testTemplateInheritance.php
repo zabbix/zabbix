@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,6 @@ class testTemplateInheritance extends CWebTest {
 				'testInheritance',
 				'key-item-inheritance',
 				[
-					'Created: Item "testInheritance" on "Inheritance test template".',
 					'Item "key-item-inheritance" already exists on "Template inheritance test host", inherited from '.
 					'another template.'
 				]
@@ -109,7 +108,7 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestClickLinkTextWait($template);
 		$this->zbxTestClickLinkTextWait('Items');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create item');
 
 		$this->zbxTestInputTypeWait('name', $itemName);
 		$this->zbxTestInputType('key', $keyName);
@@ -205,7 +204,7 @@ class testTemplateInheritance extends CWebTest {
 		// create a trigger
 		$this->zbxTestClickLinkTextWait($this->templateName);
 		$this->zbxTestClickLinkTextWait('Triggers');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 		$this->zbxTestInputTypeWait('description', 'Test LLD trigger1');
 		$this->zbxTestInputType('expression', '{Inheritance test template:key-item-inheritance-test.last(0)}=0');
@@ -247,7 +246,7 @@ class testTemplateInheritance extends CWebTest {
 		// create a graph
 		$this->zbxTestClickLinkTextWait($this->templateName);
 		$this->zbxTestClickLinkTextWait('Graphs');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create graph');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD graph1');
 		$this->zbxTestInputType('width', '950');
@@ -305,7 +304,7 @@ class testTemplateInheritance extends CWebTest {
 		// create an LLD rule
 		$this->zbxTestClickLinkTextWait($this->templateName);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD');
 		$this->zbxTestInputType('key', 'test-lld');
@@ -354,7 +353,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
 		$this->zbxTestClickLinkTextWait('Item prototypes');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD item');
 		$this->zbxTestInputType('key', 'test-lld-item');
@@ -415,9 +414,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 
-		$this->zbxTestInputTypeWait('description', 'Test LLD trigger');
+		$this->zbxTestInputTypeByXpath("//input[@name='description']", 'Test LLD trigger');
 		$this->zbxTestInputType('expression', '{Inheritance test template:item-discovery-prototype.last(0)}=0');
 		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
@@ -445,7 +444,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestAssertElementText("//a[text()='Test LLD trigger']/parent::td", "$this->templateName: Test LLD trigger");
 		$this->zbxTestClickLinkTextWait('Test LLD trigger');
 
-		$this->zbxTestAssertElementValue('description', 'Test LLD trigger');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('description'));
+		$getName = $this->zbxTestGetValue("//input[@name='description']");
+		$this->assertEquals($getName, 'Test LLD trigger');
 		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:item-discovery-prototype.last(0)}=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
@@ -470,7 +471,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
 		$this->zbxTestClickLinkTextWait('Graph prototypes');
 		$this->zbxTestCheckHeader('Graph prototypes');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create graph prototype');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD graph');
 		$this->zbxTestInputTypeOverwrite('width', '950');

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ class CWidgetField {
 
 	const FLAG_ACKNOWLEDGES = 0x01;
 	const FLAG_NOT_EMPTY = 0x02;
+	const FLAG_LABEL_ASTERISK = 0x04;
 
 	protected	$name;
 	protected	$label;
@@ -82,12 +83,12 @@ class CWidgetField {
 				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
 				break;
 
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
 			case ZBX_WIDGET_FIELD_TYPE_GROUP:
 			case ZBX_WIDGET_FIELD_TYPE_HOST:
 				$this->validation_rules = ['type' => API_IDS];
 				break;
 
-			case ZBX_WIDGET_FIELD_TYPE_ITEM:
 			case ZBX_WIDGET_FIELD_TYPE_MAP:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 				$this->validation_rules = ['type' => API_ID];

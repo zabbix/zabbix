@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts);
 void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts);
 
-int	zbx_send_proxy_data_respose(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info);
+int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info);
 
 int	init_proxy_history_lock(char **error);
 void	free_proxy_history_lock(void);

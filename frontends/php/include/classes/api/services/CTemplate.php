@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -401,6 +401,11 @@ class CTemplate extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "host" is mandatory.'));
 			}
 
+			// Property 'auto_compress' is not supported for templates.
+			if (array_key_exists('auto_compress', $template)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
+
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $template['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Incorrect characters used for template name "%1$s".',
@@ -522,6 +527,11 @@ class CTemplate extends CHostGeneral {
 		foreach ($templates as $template) {
 			if (!isset($dbTemplates[$template['templateid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			}
+
+			// Property 'auto_compress' is not supported for templates.
+			if (array_key_exists('auto_compress', $template)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
 	}

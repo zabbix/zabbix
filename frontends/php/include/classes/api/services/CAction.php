@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,7 +189,7 @@ class CAction extends CApiService {
 
 			$sqlParts['from']['opmessage'] = 'opmessage om';
 			$sqlParts['from']['operations_media'] = 'operations omed';
-			$sqlParts['where'][] = dbConditionInt('om.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionId('om.mediatypeid', $options['mediatypeids']);
 			$sqlParts['where']['aomed'] = 'a.actionid=omed.actionid';
 			$sqlParts['where']['oom'] = 'omed.operationid=om.operationid';
 		}
@@ -534,12 +534,6 @@ class CAction extends CApiService {
 			// Set default values for recovery operations and their messages.
 			if (array_key_exists('recovery_operations', $action)) {
 				foreach ($action['recovery_operations'] as &$operation) {
-					if (array_key_exists('operationid', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-							$operation['operationid'], 'operationid'
-						));
-					}
-
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 							|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
 						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
@@ -565,12 +559,6 @@ class CAction extends CApiService {
 			// Set default values for acknowledge operations and their messages.
 			if (array_key_exists('acknowledge_operations', $action)) {
 				foreach ($action['acknowledge_operations'] as &$operation) {
-					if (array_key_exists('operationid', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-							$operation['operationid'], 'operationid'
-						));
-					}
-
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
 						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
@@ -847,7 +835,14 @@ class CAction extends CApiService {
 					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
 						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$db_opmessage = $db_ack_operations[$ack_operation['operationid']]['opmessage'];
+							$db_opmessage = array_key_exists('opmessage', $db_ack_operations[$ack_operation['operationid']])
+								? $db_ack_operations[$ack_operation['operationid']]['opmessage']
+								: [
+									'default_msg'	=> 0,
+									'mediatypeid'	=> 0,
+									'subject'		=> ACTION_DEFAULT_SUBJ_ACKNOWLEDGE,
+									'message'		=> ACTION_DEFAULT_MSG_ACKNOWLEDGE
+								];
 							$default_msg = array_key_exists('default_msg', $opmessage)
 								? $opmessage['default_msg']
 								: $db_opmessage['default_msg'];
@@ -1523,32 +1518,34 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Delete actions.
-	 *
 	 * @param array $actionids
 	 *
 	 * @return array
 	 */
 	public function delete(array $actionids) {
-		if (empty($actionids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $actionids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$delActions = $this->get([
+		$db_actions = $this->get([
+			'output' => ['actionid', 'name'],
 			'actionids' => $actionids,
 			'editable' => true,
-			'output' => ['actionid'],
 			'preservekeys' => true
 		]);
+
 		foreach ($actionids as $actionid) {
-			if (isset($delActions[$actionid])) {
-				continue;
+			if (!array_key_exists($actionid, $db_actions)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		DB::delete('actions', ['actionid' => $actionids]);
-		DB::delete('alerts', ['actionid' => $actionids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, $db_actions);
 
 		return ['actionids' => $actionids];
 	}
@@ -1581,8 +1578,9 @@ class CAction extends CApiService {
 				],
 				EVENT_SOURCE_AUTO_REGISTRATION => [
 					OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_GROUP_ADD,
-					OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_DISABLE,
-					OPERATION_TYPE_HOST_INVENTORY
+					OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE,
+					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
+					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
 				],
 				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE]
 			],
@@ -2040,7 +2038,7 @@ class CAction extends CApiService {
 
 			foreach ($ack_operations as $ack_operation) {
 				$actionid = $ack_operation['actionid'];
-				unset($ack_operation['actionid']);
+				unset($ack_operation['actionid'], $ack_operation['recovery']);
 				$result[$actionid]['acknowledgeOperations'][] = $ack_operation;
 			}
 		}
@@ -2076,6 +2074,8 @@ class CAction extends CApiService {
 			$opinventory = [];
 
 			foreach ($operations as $operationid => $operation) {
+				unset($operations[$operationid]['recovery']);
+
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$opmessage[] = $operationid;
@@ -2294,6 +2294,8 @@ class CAction extends CApiService {
 			$op_recovery_message = [];
 
 			foreach ($recovery_operations as $recovery_operationid => $recovery_operation) {
+				unset($recovery_operations[$recovery_operationid]['recovery']);
+
 				switch ($recovery_operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$opmessage[] = $recovery_operationid;
@@ -2569,9 +2571,10 @@ class CAction extends CApiService {
 			}
 		}
 
-		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'actionid' ,'operationtype'],
+		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'operationtype'],
 			$ack_options
 		);
+
 		return $ack_operations;
 	}
 
@@ -2796,29 +2799,39 @@ class CAction extends CApiService {
 			if ((!array_key_exists('operations', $action) || !$action['operations'])
 					&& (!array_key_exists('recovery_operations', $action) || !$action['recovery_operations'])
 					&& (!array_key_exists('acknowledge_operations', $action) || !$action['acknowledge_operations'])) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s('Action "%1$s" no operations defined.', $action['name'])
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action['name']));
 			}
-			elseif (array_key_exists('operations', $action) && $action['operations']) {
+
+			if (array_key_exists('operations', $action)) {
 				foreach ($action['operations'] as $operation) {
+					if (array_key_exists('operationid', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
+					}
+
 					$operation['recovery'] = ACTION_OPERATION;
 					$operation['eventsource'] = $action['eventsource'];
 					$operations_to_validate[] = $operation;
 				}
 			}
 
-			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']) {
-				foreach ($action['recovery_operations'] as $recovery_operation) {
-					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
-					$recovery_operation['eventsource'] = $action['eventsource'];
-					$operations_to_validate[] = $recovery_operation;
+			if (array_key_exists('recovery_operations', $action)) {
+				foreach ($action['recovery_operations'] as $operation) {
+					if (array_key_exists('operationid', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
+					}
+
+					$operation['recovery'] = ACTION_RECOVERY_OPERATION;
+					$operation['eventsource'] = $action['eventsource'];
+					$operations_to_validate[] = $operation;
 				}
 			}
 
-			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
+			if (array_key_exists('acknowledge_operations', $action)) {
 				foreach ($action['acknowledge_operations'] as $operation) {
+					if (array_key_exists('operationid', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
+					}
+
 					$operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
 					$operation['eventsource'] = $action['eventsource'];
 					$operations_to_validate[] = $operation;

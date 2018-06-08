@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,10 @@
 #include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"
+#include "checks_http.h"
 #include "../../libs/zbxcrypto/tls.h"
+#include "zbxjson.h"
+#include "zbxhttp.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -392,6 +395,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
 			break;
+		case ITEM_TYPE_HTTPAGENT:
+#ifdef HAVE_LIBCURL
+			res = get_value_http(item, result);
+#else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTP agent checks was not compiled in."));
+			res = CONFIG_ERROR;
+#endif
+			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
 			res = CONFIG_ERROR;
@@ -408,6 +419,68 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
+}
+
+static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
+{
+	struct zbx_json_parse	jp_array, jp_object;
+	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN];
+	const char		*member, *element = NULL;
+	size_t			alloc_len, offset;
+
+	if ('\0' == *item->query_fields_orig)
+	{
+		ZBX_STRDUP(*query_fields, item->query_fields_orig);
+		return SUCCEED;
+	}
+
+	if (SUCCEED != zbx_json_open(item->query_fields_orig, &jp_array))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
+		return FAIL;
+	}
+
+	if (NULL == (element = zbx_json_next(&jp_array, element)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: array is empty");
+		return FAIL;
+	}
+
+	do
+	{
+		char	*data = NULL;
+
+		if (SUCCEED != zbx_json_brackets_open(element, &jp_object) ||
+				NULL == (member = zbx_json_pair_next(&jp_object, NULL, name, sizeof(name))) ||
+				NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
+			return FAIL;
+		}
+
+		if (NULL == *query_fields && NULL == strchr(item->url, '?'))
+			zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '?');
+		else
+			zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '&');
+
+		data = zbx_strdup(data, name);
+		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
+				MACRO_TYPE_HTTP_RAW, NULL, 0);
+		zbx_http_url_encode(data, &data);
+		zbx_strcpy_alloc(query_fields, &alloc_len, &offset, data);
+		zbx_chrcpy_alloc(query_fields, &alloc_len, &offset, '=');
+
+		data = zbx_strdup(data, value);
+		substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, &data,
+				MACRO_TYPE_HTTP_RAW, NULL, 0);
+		zbx_http_url_encode(data, &data);
+		zbx_strcpy_alloc(query_fields, &alloc_len, &offset, data);
+
+		free(data);
+	}
+	while (NULL != (element = zbx_json_next(&jp_array, element)));
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -553,6 +626,76 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, &items[i].jmx_endpoint, MACRO_TYPE_JMX_ENDPOINT, NULL, 0);
 				break;
+			case ITEM_TYPE_HTTPAGENT:
+				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
+				ZBX_STRDUP(items[i].url, items[i].url_orig);
+				ZBX_STRDUP(items[i].status_codes, items[i].status_codes_orig);
+				ZBX_STRDUP(items[i].http_proxy, items[i].http_proxy_orig);
+				ZBX_STRDUP(items[i].ssl_cert_file, items[i].ssl_cert_file_orig);
+				ZBX_STRDUP(items[i].ssl_key_file, items[i].ssl_key_file_orig);
+				ZBX_STRDUP(items[i].ssl_key_password, items[i].ssl_key_password_orig);
+				ZBX_STRDUP(items[i].username, items[i].username_orig);
+				ZBX_STRDUP(items[i].password, items[i].password_orig);
+
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].url, MACRO_TYPE_HTTP_RAW, NULL, 0);
+
+				if (SUCCEED != zbx_http_punycode_encode_url(&items[i].url))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Cannot encode URL into punycode"));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
+				if (FAIL == parse_query_fields(&items[i], &items[i].query_fields))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
+				switch (items[i].post_type)
+				{
+					case ZBX_POSTTYPE_XML:
+						if (SUCCEED != substitute_macros_xml(&items[i].posts, &items[i], NULL,
+								error, sizeof(error)))
+						{
+							SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
+							errcodes[i] = CONFIG_ERROR;
+							continue;
+						}
+						break;
+					case ZBX_POSTTYPE_JSON:
+						substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host,
+								&items[i], NULL, NULL, &items[i].posts,
+								MACRO_TYPE_HTTP_JSON, NULL, 0);
+						break;
+					default:
+						substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host,
+								&items[i], NULL, NULL, &items[i].posts,
+								MACRO_TYPE_HTTP_RAW, NULL, 0);
+						break;
+				}
+
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].headers, MACRO_TYPE_HTTP_RAW, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, NULL, &items[i].status_codes, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, NULL, &items[i].http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].ssl_cert_file, MACRO_TYPE_HTTP_RAW, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i], NULL,
+						NULL, &items[i].ssl_key_file, MACRO_TYPE_HTTP_RAW, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, &items[i].ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
+				break;
 		}
 	}
 
@@ -629,8 +772,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			if (0 == add_results.values_num)
 			{
 				items[i].state = ITEM_STATE_NORMAL;
-				zbx_preprocess_item_value(items[i].itemid, items[i].flags, &results[i], &timespec,
-						items[i].state, NULL);
+				zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+						&results[i], &timespec, items[i].state, NULL);
 			}
 			else
 			{
@@ -646,14 +789,16 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					if (ISSET_MSG(add_result))
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
-						zbx_preprocess_item_value(items[i].itemid, items[i].flags, NULL,
-								&ts_tmp, items[i].state, add_result->msg);
+						zbx_preprocess_item_value(items[i].itemid, items[i].value_type,
+								items[i].flags, NULL, &ts_tmp, items[i].state,
+								add_result->msg);
 					}
 					else
 					{
 						items[i].state = ITEM_STATE_NORMAL;
-						zbx_preprocess_item_value(items[i].itemid, items[i].flags, add_result,
-								&ts_tmp, items[i].state, NULL);
+						zbx_preprocess_item_value(items[i].itemid, items[i].value_type,
+								items[i].flags, add_result, &ts_tmp, items[i].state,
+								NULL);
 					}
 
 					/* ensure that every log item value timestamp is unique */
@@ -668,8 +813,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(items[i].itemid, items[i].flags, NULL, &timespec, items[i].state,
-					results[i].msg);
+			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
+					items[i].state, results[i].msg);
 		}
 
 		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &errcodes[i], 1, poller_type,
@@ -689,6 +834,18 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_SNMPv2c:
 				zbx_free(items[i].snmp_community);
 				zbx_free(items[i].snmp_oid);
+				break;
+			case ITEM_TYPE_HTTPAGENT:
+				zbx_free(items[i].timeout);
+				zbx_free(items[i].url);
+				zbx_free(items[i].query_fields);
+				zbx_free(items[i].status_codes);
+				zbx_free(items[i].http_proxy);
+				zbx_free(items[i].ssl_cert_file);
+				zbx_free(items[i].ssl_key_file);
+				zbx_free(items[i].ssl_key_password);
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
 				break;
 			case ITEM_TYPE_SSH:
 				zbx_free(items[i].publickey);

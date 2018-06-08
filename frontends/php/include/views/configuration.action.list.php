@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,21 +21,24 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Actions'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Event source'), 'eventsource'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('eventsource', $data['eventsource'], 'submit()', [
-					EVENT_SOURCE_TRIGGERS => _('Triggers'),
-					EVENT_SOURCE_DISCOVERY => _('Discovery'),
-					EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
-					EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
+	->setControls((new CTag('nav', true,
+		(new CForm('get'))
+			->cleanItems()
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Event source'), 'eventsource'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('eventsource', $data['eventsource'], 'submit()', [
+						EVENT_SOURCE_TRIGGERS => _('Triggers'),
+						EVENT_SOURCE_DISCOVERY => _('Discovery'),
+						EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
+						EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
+					])
 				])
-			])
-			->addItem(new CSubmit('form', _('Create action')))
-		)
+				->addItem(new CSubmit('form', _('Create action')))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter('web.actionconf.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -644,7 +644,7 @@ static int	sql_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int st
 	if (0 == count)
 		return db_read_values_by_time(itemid, hist->value_type, values, end - start, end);
 
-	if (start == end)
+	if (0 == start)
 		return db_read_values_by_count(itemid, hist->value_type, values, count, end);
 
 	return db_read_values_by_time_and_count(itemid, hist->value_type, values, end - start, count, end);

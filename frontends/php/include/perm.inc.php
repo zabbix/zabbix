@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,7 +261,7 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm) {
 		$group_perm[$right['id']] = $right['permission'];
 	}
 
-	$dbHostGroups = DBselect('SELECT g.*,'.PERM_DENY.' AS permission FROM groups g');
+	$dbHostGroups = DBselect('SELECT g.*,'.PERM_DENY.' AS permission FROM hstgrp g');
 
 	while ($dbHostGroup = DBfetch($dbHostGroups)) {
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {

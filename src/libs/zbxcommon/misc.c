@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -947,6 +947,29 @@ static int	flexible_interval_parse(zbx_flexible_interval_t *interval, const char
 
 /******************************************************************************
  *                                                                            *
+ * Function: calculate_dayofweek                                              *
+ *                                                                            *
+ * Purpose: calculates day of week                                            *
+ *                                                                            *
+ * Parameters: year - [IN] the year (>1752)                                   *
+ *             mon  - [IN] the month (1-12)                                   *
+ *             mday - [IN] the month day (1-31)                               *
+ *                                                                            *
+ * Return value: The day of week: 1 - Monday, 2 - Tuesday, ...                *
+ *                                                                            *
+ ******************************************************************************/
+static int	calculate_dayofweek(int year, int mon, int mday)
+{
+	static int	mon_table[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+
+	if (mon < 3)
+		year--;
+
+	return (year + year / 4 - year / 100 + year / 400 + mon_table[mon - 1] + mday - 1) % 7 + 1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: scheduler_filter_free                                            *
  *                                                                            *
  * Purpose: frees scheduler interval filter                                   *
@@ -1312,7 +1335,7 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
 	if (NULL == interval->wdays)
 		return SUCCEED;
 
-	value_now = value_next = (0 == tm->tm_wday ? 7 : tm->tm_wday);
+	value_now = value_next = calculate_dayofweek(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 
 	/* get the nearest week day from the current week day*/
 	if (SUCCEED != scheduler_get_nearest_filter_value(interval->wdays, &value_next))
@@ -1333,7 +1356,7 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
 	tm->tm_mday += value_next - value_now;
 
 	/* check if the resulting month day is valid */
-	return (-1 != mktime(tm) ? SUCCEED : FAIL);
+	return (tm->tm_mday <= zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1) ? SUCCEED : FAIL);
 }
 
 /******************************************************************************
@@ -1351,18 +1374,13 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
  ******************************************************************************/
 static int	scheduler_validate_wday_filter(const zbx_scheduler_interval_t *interval, struct tm *tm)
 {
-	time_t				nextcheck;
 	const zbx_scheduler_filter_t	*filter;
 	int				value;
 
 	if (NULL == interval->wdays)
 		return SUCCEED;
 
-	/* mktime will aso set correct wday value */
-	if (-1 == (nextcheck = mktime(tm)))
-		return FAIL;
-
-	value = (0 == tm->tm_wday ? 7 : tm->tm_wday);
+	value = calculate_dayofweek(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 
 	/* check if the value match week day filter */
 	for (filter = interval->wdays; NULL != filter; filter = filter->next)
@@ -1401,9 +1419,14 @@ static int	scheduler_validate_wday_filter(const zbx_scheduler_interval_t *interv
  ******************************************************************************/
 static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval, struct tm *tm)
 {
+	int	tmp;
+
 	/* first check if the provided tm structure has valid date format */
-	if (-1 == mktime(tm))
+	if (FAIL == zbx_utc_time(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
+			&tmp))
+	{
 		return FAIL;
+	}
 
 	if (NULL == interval->mdays)
 		return scheduler_get_wday_nextcheck(interval, tm);
@@ -1411,13 +1434,17 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 	/* iterate through month days until week day filter matches or we have ran out of month days */
 	while (SUCCEED == scheduler_get_nearest_filter_value(interval->mdays, &tm->tm_mday))
 	{
+		/* check if the date is still valid - we haven't ran out of month days */
+		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
+			break;
+
 		if (SUCCEED == scheduler_validate_wday_filter(interval, tm))
 			return SUCCEED;
 
 		tm->tm_mday++;
 
 		/* check if the date is still valid - we haven't ran out of month days */
-		if (-1 == mktime(tm))
+		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
 			break;
 	}
 
@@ -1612,10 +1639,94 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
 
 /******************************************************************************
  *                                                                            *
+ * Function: scheduler_find_dst_change                                        *
+ *                                                                            *
+ * Purpose: finds daylight saving change time inside specified time period    *
+ *                                                                            *
+ * Parameters: time_start - [IN] the time period start                        *
+ *             time_end   - [IN] the the time period end                      *
+ *                                                                            *
+ * Return Value: Time when the daylight saving changes should occur.          *
+ *                                                                            *
+ * Comments: The calculated time is cached and reused if it first the         *
+ *           specified period.                                                *
+ *                                                                            *
+ ******************************************************************************/
+static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
+{
+	static time_t	time_dst = 0;
+	struct tm	*tm;
+	time_t		time_mid;
+	int		start, end, mid, dst_start;
+
+	if (time_dst < time_start || time_dst > time_end)
+	{
+		/* assume that daylight saving will change only on 0 seconds */
+		start = time_start / 60;
+		end = time_end / 60;
+
+		tm = localtime(&time_start);
+		dst_start = tm->tm_isdst;
+
+		while (end > start + 1)
+		{
+			mid = (start + end) / 2;
+			time_mid = mid * 60;
+
+			tm = localtime(&time_mid);
+
+			if (tm->tm_isdst == dst_start)
+				start = mid;
+			else
+				end = mid;
+		}
+
+		time_dst = end * 60;
+	}
+
+	return time_dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_tm_inc                                                 *
+ *                                                                            *
+ * Purpose: increment struct tm value by one second                           *
+ *                                                                            *
+ * Parameters: tm - [IN/OUT] the tm structure to increment                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_tm_inc(struct tm *tm)
+{
+	if (60 > ++tm->tm_sec)
+		return;
+
+	tm->tm_sec = 0;
+	if (60 > ++tm->tm_min)
+		return;
+
+	tm->tm_min = 0;
+	if (24 > ++tm->tm_hour)
+		return;
+
+	tm->tm_hour = 0;
+	if (zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1) >= ++tm->tm_mday)
+		return;
+
+	tm->tm_mday = 1;
+	if (12 > ++tm->tm_mon)
+		return;
+
+	tm->tm_mon = 0;
+	tm->tm_year++;
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: scheduler_get_nextcheck                                          *
  *                                                                            *
- * Purpose: applies second filter to the specified time/day calculating the   *
- *          next scheduled check                                              *
+ * Purpose: finds the next timestamp satisfying one of intervals.             *
  *                                                                            *
  * Parameters: interval - [IN] the scheduler interval                         *
  *             now      - [IN] the current timestamp                          *
@@ -1625,22 +1736,44 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
  ******************************************************************************/
 static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t now)
 {
-	struct tm	tm_start, tm;
+	struct tm	tm_start, tm, tm_dst;
 	time_t		nextcheck = 0, current_nextcheck;
 
 	tm_start = *(localtime(&now));
-	tm_start.tm_isdst = -1;
 
 	for (; NULL != interval; interval = interval->next)
 	{
 		tm = tm_start;
 
-		scheduler_apply_day_filter(interval, &tm);
-		scheduler_apply_hour_filter(interval, &tm);
-		scheduler_apply_minute_filter(interval, &tm);
-		scheduler_apply_second_filter(interval, &tm);
+		do
+		{
+			scheduler_tm_inc(&tm);
+			scheduler_apply_day_filter(interval, &tm);
+			scheduler_apply_hour_filter(interval, &tm);
+			scheduler_apply_minute_filter(interval, &tm);
+			scheduler_apply_second_filter(interval, &tm);
 
-		current_nextcheck = mktime(&tm);
+			tm.tm_isdst = tm_start.tm_isdst;
+		}
+		while (-1 == (current_nextcheck = mktime(&tm)));
+
+		tm_dst = *(localtime(&current_nextcheck));
+		if (tm_dst.tm_isdst != tm_start.tm_isdst)
+		{
+			int	dst = tm_dst.tm_isdst;
+			time_t	time_dst;
+
+			time_dst = scheduler_find_dst_change(now, current_nextcheck);
+			tm_dst = *localtime(&time_dst);
+
+			scheduler_apply_day_filter(interval, &tm_dst);
+			scheduler_apply_hour_filter(interval, &tm_dst);
+			scheduler_apply_minute_filter(interval, &tm_dst);
+			scheduler_apply_second_filter(interval, &tm_dst);
+
+			tm_dst.tm_isdst = dst;
+			current_nextcheck = mktime(&tm_dst);
+		}
 
 		if (0 == nextcheck || current_nextcheck < nextcheck)
 			nextcheck = current_nextcheck;
@@ -1811,7 +1944,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 		/* first try to parse out and calculate scheduled intervals */
 		if (NULL != custom_intervals)
-			scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, now + 1);
+			scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, now);
 
 		/* Try to find the nearest 'nextcheck' value with condition */
 		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
@@ -2235,7 +2368,7 @@ int	int_in_list(char *list, int value)
 
 int	zbx_double_compare(double a, double b)
 {
-	return fabs(a - b) < ZBX_DOUBLE_EPSILON ? SUCCEED : FAIL;
+	return fabs(a - b) <= ZBX_DOUBLE_EPSILON ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2659,10 +2792,15 @@ int	is_boolean(const char *str, zbx_uint64_t *value)
 		strscpy(tmp, str);
 		zbx_strlower(tmp);
 
-		if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available", tmp, ',')))
+		if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp, ',')))
+		{
 			*value = 1;
-		else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable", tmp, ',')))
+		}
+		else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable,err,slave",
+				tmp, ',')))
+		{
 			*value = 0;
+		}
 	}
 
 	return res;
@@ -3216,6 +3354,7 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
+		case ITEM_TYPE_HTTPAGENT:
 			return INTERFACE_TYPE_ANY;
 		default:
 			return INTERFACE_TYPE_UNKNOWN;

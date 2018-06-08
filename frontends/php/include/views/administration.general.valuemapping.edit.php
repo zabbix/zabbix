@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,21 +23,30 @@ include('include/views/js/administration.general.valuemapping.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Value mapping'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm())->addVar('form', $data['form']);
+$form = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addVar('form', $data['form']);
 
 if ($data['valuemapid'] != 0) {
 	$form->addVar('valuemapid', $data['valuemapid']);
 }
 
 $form_list = (new CFormList())
-	->addRow(_('Name'),
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	);
 
@@ -51,7 +60,8 @@ foreach ($data['mappings'] as $i => $mapping) {
 		(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'&rArr;',
 		(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
 		(new CButton('mappings['.$i.'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
@@ -68,7 +78,8 @@ $table->addRow([
 	))->setColSpan(4)
 ]);
 
-$form_list->addRow(_('Mappings'),
+$form_list->addRow(
+	(new CLabel(_('Mappings'), $table->getId()))->setAsteriskMark(),
 	(new CDiv($table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

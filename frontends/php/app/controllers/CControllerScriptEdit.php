@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class CControllerScriptEdit extends CController {
 			'command' =>				'db scripts.command',
 			'commandipmi' =>			'db scripts.command',
 			'description' =>			'db scripts.description',
-			'host_access' =>			'db scripts.host_access |in 2,3',
+			'host_access' =>			'db scripts.host_access |in '.PERM_READ.','.PERM_READ_WRITE,
 			'groupid' =>				'db scripts.groupid',
 			'usrgrpid' =>				'db scripts.usrgrpid',
 			'hgstype' =>				'                        in 0,1',
@@ -80,7 +80,7 @@ class CControllerScriptEdit extends CController {
 			'description' => '',
 			'usrgrpid' => 0,
 			'groupid' => 0,
-			'host_access' => 0,
+			'host_access' => PERM_READ,
 			'confirmation' => '',
 			'enable_confirmation' => 0,
 			'hgstype' => 0

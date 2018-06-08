@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,10 +26,11 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_DISCOVERY_STATUS);
+		$this->setType(WIDGET_DISCOVERY);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -68,6 +69,7 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'drules' => $drules,
 			'error' => $error,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

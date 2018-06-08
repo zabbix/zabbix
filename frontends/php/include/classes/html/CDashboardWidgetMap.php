@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -220,14 +220,14 @@ class CDashboardWidgetMap extends CDiv {
 
 			if ($this->previous_map) {
 				$go_back_div = (new CDiv())
-					->addClass('btn-back-map-container')
+					->addClass(ZBX_STYLE_BTN_BACK_MAP_CONTAINER)
 					->addItem(
 						(new CLink(
 							(new CSpan())
-								->addClass('btn-back-map')
-								->addItem((new CDiv())->addClass('btn-back-map-icon'))
+								->addClass(ZBX_STYLE_BTN_BACK_MAP)
+								->addItem((new CDiv())->addClass(ZBX_STYLE_BTN_BACK_MAP_ICON))
 								->addItem((new CDiv())
-									->addClass('btn-back-map-content')
+									->addClass(ZBX_STYLE_BTN_BACK_MAP_CONTENT)
 									->addItem(_s('Go back to %1$s', $this->previous_map['name']))
 								),
 								'javascript: navigateToSubmap('.$this->previous_map['sysmapid'].', "'.

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,17 +20,21 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Slide shows'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
+	->setControls((new CTag('nav', true,
+		(new CForm('get'))
+			->cleanItems()
 			->addItem(
-				new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
-					'screens.php' => _('Screens'),
-					'slides.php' => _('Slide shows')
-				])
+				(new CList())
+					->addItem(
+						new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
+							'screens.php' => _('Screens'),
+							'slides.php' => _('Slide shows')
+						])
+					)
+					->addItem(new CSubmit('form', _('Create slide show')))
 			)
-			->addItem(new CSubmit('form', _('Create slide show')))
-		)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 // filter

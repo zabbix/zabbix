@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -735,7 +735,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			// Selecting functions.
 			$result = DBselect(
-				'SELECT f.functionid,f.itemid,f.function,f.parameter'.
+				'SELECT f.functionid,f.itemid,f.name,f.parameter'.
 				' FROM functions f'.
 				' WHERE '.dbConditionInt('f.functionid', $functionids)
 			);
@@ -747,6 +747,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			while ($row = DBfetch($result)) {
 				$itemids[$row['itemid']] = true;
+				$row['function'] = $row['name'];
+				unset($row['name']);
 
 				$functions['{'.$row['functionid'].'}'] = $row;
 				unset($functions['{'.$row['functionid'].'}']['functionid']);
@@ -1796,22 +1798,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 
+				// Get all function ids from expression and link host data against position in expression.
+				preg_match_all('/\{([0-9]+)\}/', $selement['elements'][0]['elementExpressionTrigger'], $matches);
+
 				$hostsByNr = [];
 
-				// Get all function ids from expression and link host data against position in expression.
-				if (array_key_exists('elementExpressionTrigger', $selement['elements'][0])) {
-					preg_match_all('/\{([0-9]+)\}/', $selement['elements'][0]['elementExpressionTrigger'], $matches);
-
-					foreach ($matches[1] as $i => $functionid) {
-						if (isset($hostsByFunctionId[$functionid])) {
-							$hostsByNr[$i + 1] = $hostsByFunctionId[$functionid];
-						}
+				foreach ($matches[1] as $i => $functionid) {
+					if (isset($hostsByFunctionId[$functionid])) {
+						$hostsByNr[$i + 1] = $hostsByFunctionId[$functionid];
 					}
+				}
 
-					// For macro without numeric index.
-					if (isset($hostsByNr[1])) {
-						$hostsByNr[''] = $hostsByNr[1];
-					}
+				// For macro without numeric index.
+				if (isset($hostsByNr[1])) {
+					$hostsByNr[''] = $hostsByNr[1];
 				}
 			}
 

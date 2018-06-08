@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
- * @backup groups
+ * @backup hstgrp
  */
 class testFormHostGroup extends CWebTest {
 	private $hostGroup = 'Test Group';
@@ -30,35 +30,21 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestLogin('hostgroups.php?form=Create+host+group');
 		$this->zbxTestCheckTitle('Configuration of host groups');
 		$this->zbxTestCheckHeader('Host groups');
-		$this->zbxTestTextPresent(['Group name', 'Hosts', 'Hosts in', 'Other hosts | Group']);
+		$this->zbxTestTextPresent(['Group name']);
 
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
 
-		$this->zbxTestAssertElementPresentId('twb_groupid');
-
-		$this->zbxTestAssertElementPresentId('hosts_left');
-		$this->zbxTestAssertAttribute("//select[@id='hosts_left']", 'size', 25);
-		$this->zbxTestAssertAttribute("//select[@id='hosts_left']", 'style', 'width: 280px;');
-
-		$this->zbxTestAssertElementPresentId('add');
-		$this->zbxTestAssertElementPresentId('remove');
-
-		$this->zbxTestAssertElementPresentId('hosts_right');
-		$this->zbxTestAssertAttribute("//select[@id='hosts_right']", 'size', 25);
-		$this->zbxTestAssertAttribute("//select[@id='hosts_right']", 'style', 'width: 280px;');
-
 		$this->zbxTestAssertElementPresentXpath("//button[@id='add' and @type='submit']");
 		$this->zbxTestAssertElementNotPresentId('clone');
 		$this->zbxTestAssertElementNotPresentId('delete');
 		$this->zbxTestAssertElementPresentId('cancel');
-
 	}
 
 	public function testFormHostGroup_CreateEmpty() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
@@ -67,19 +53,19 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_Create() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestInputTypeWait('name', $this->hostGroup);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group added');
 
-		$sql = "SELECT * FROM groups WHERE name='$this->hostGroup'";
+		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup'";
 		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHostGroup_CreateDuplicate() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestInputTypeWait('name', $this->hostGroup);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -99,7 +85,7 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_UpdateDuplicate() {
 		$hostGroup = DBfetch(DBselect(
-			'SELECT name FROM groups'.
+			'SELECT name FROM hstgrp'.
 			' WHERE name<>'.zbx_dbstr($this->hostGroup), 1
 		));
 
@@ -120,7 +106,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 
-		$sql = "SELECT * FROM groups WHERE name='$this->hostGroup ". 2 ."'";
+		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -132,7 +118,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group deleted');
 
-		$sql = "SELECT * FROM groups WHERE name='$this->hostGroup ". 2 ."'";
+		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
 		$this->assertEquals(0, DBcount($sql));
 	}
 }

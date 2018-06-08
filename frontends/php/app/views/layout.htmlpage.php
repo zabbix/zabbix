@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ function local_generateHeader($data) {
 		echo $pageMenu->getOutput();
 	}
 
-	echo '<div class="'.ZBX_STYLE_ARTICLE.'">';
+	echo '<main>';
 
 	// should be replaced with addPostJS() at some point
 	zbx_add_post_js('initMessages({});');
@@ -131,7 +131,7 @@ function local_generateFooter($fullscreen) {
 			'debug_mode' => CWebUser::$data['debug_mode']
 		]
 	]);
-	echo $pageFooter->getOutput();
+	echo '</main>'.$pageFooter->getOutput();
 }
 
 function local_showMessage() {
@@ -159,9 +159,7 @@ local_showMessage();
 echo $data['javascript']['pre'];
 echo $data['main_block'];
 echo $data['javascript']['post'];
-
 local_generateFooter($data['fullscreen']);
-
 show_messages();
 
 echo '</body></html>';

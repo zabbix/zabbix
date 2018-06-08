@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,14 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
-		->addItem((new CList())->addItem(new CSubmit('form', _('Create host prototype'))))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(new CRedirectButton(_('Create host prototype'),
+				(new CUrl())
+					->setArgument('form', 'create')
+					->getUrl()
+			))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(
 		get_header_host_table('hosts', $this->data['discovery_rule']['hostid'], $this->data['parent_discoveryid'])
@@ -153,10 +157,10 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Enable selected host prototypes?')
+				'confirm' => _('Create hosts from selected prototypes as enabled?')
 			],
 			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Disable selected host prototypes?')
+				'confirm' => _('Create hosts from selected prototypes as disabled?')
 			],
 			'hostprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected host prototypes?')

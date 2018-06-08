@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1344,7 +1344,7 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
 			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
-			condition->value, condition->value2);
+			ZBX_NULL2STR(condition->value), ZBX_NULL2STR(condition->value2));
 
 	switch (event->source)
 	{
@@ -1396,7 +1396,7 @@ static int	check_action_conditions(zbx_action_eval_t *action)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, action->actionid);
 
-	if (action->evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
+	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		expression = zbx_strdup(expression, action->formula);
 
 	for (i = 0; i < action->conditions.values_num; i++)
@@ -1463,7 +1463,7 @@ static int	check_action_conditions(zbx_action_eval_t *action)
 		}
 	}
 
-	if (action->evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
+	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 	{
 		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
@@ -1984,16 +1984,16 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 /******************************************************************************
  *                                                                            *
- * Function: process_actions_by_acknowledgments                               *
+ * Function: process_actions_by_acknowledgements                              *
  *                                                                            *
- * Purpose: process actions for each acknowledgment in the array              *
+ * Purpose: process actions for each acknowledgement in the array             *
  *                                                                            *
  * Parameters: event_ack        - [IN] vector for eventid/ackid pairs         *
  *                                                                            *
  ******************************************************************************/
-int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
+int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 {
-	const char		*__function_name = "process_actions_by_acknowledgments";
+	const char		*__function_name = "process_actions_by_acknowledgements";
 
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];

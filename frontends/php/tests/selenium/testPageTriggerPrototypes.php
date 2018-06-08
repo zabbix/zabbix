@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,12 +60,12 @@ class testPageTriggerPrototypes extends CWebTest {
 				'Severity',
 				'Name',
 				'Expression',
-				'Status'
+				'Create enabled'
 			]
 		);
 		$this->zbxTestTextNotPresent('Info');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent(['Enable', 'Disable', 'Mass update', 'Delete']);
+		$this->zbxTestTextPresent(['Create disabled', 'Mass update', 'Delete']);
 	}
 
 	/**

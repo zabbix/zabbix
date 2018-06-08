@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@ typedef struct
 ZBX_PERF_STAT_DATA;
 
 static ZBX_PERF_STAT_DATA	ppsd;
-static ZBX_MUTEX		perfstat_access = ZBX_MUTEX_NULL;
+static zbx_mutex_t		perfstat_access = ZBX_MUTEX_NULL;
 
-#define LOCK_PERFCOUNTERS	zbx_mutex_lock(&perfstat_access)
-#define UNLOCK_PERFCOUNTERS	zbx_mutex_unlock(&perfstat_access)
+#define LOCK_PERFCOUNTERS	zbx_mutex_lock(perfstat_access)
+#define UNLOCK_PERFCOUNTERS	zbx_mutex_unlock(perfstat_access)
 
 static int	perf_collector_started(void)
 {

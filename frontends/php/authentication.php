@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,6 +83,26 @@ foreach ($config as $field => $value) {
 	}
 }
 
+/**
+ * Select users with exclusive GUI access of internal authentication.
+ * Sessions created by these users will be excluded from the list of sessions updated as ZBX_SESSION_PASSIVE.
+ */
+if ($isAuthenticationTypeChanged) {
+	$internal_auth_user_groups = API::UserGroup()->get([
+		'output' => [],
+		'filter' => [
+			'gui_access' => GROUP_GUI_ACCESS_INTERNAL
+		],
+		'preservekeys' => true
+	]);
+
+	$internal_auth_users = API::User()->get([
+		'output' => [],
+		'usrgrpids' => array_keys($internal_auth_user_groups),
+		'preservekeys' => true
+	]);
+}
+
 /*
  * Actions
  */
@@ -98,10 +118,13 @@ if ($config['authentication_type'] == ZBX_AUTH_INTERNAL) {
 		if ($result) {
 			// reset all sessions
 			if ($isAuthenticationTypeChanged) {
-				$result &= DBexecute(
+				$query =
 					'UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.
-					' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid'])
-				);
+					' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid']);
+				if ($internal_auth_users) {
+					$query .= ' AND '.dbConditionInt('userid', array_keys($internal_auth_users), true);
+				}
+				$result &= DBexecute($query);
 			}
 
 			$isAuthenticationTypeChanged = false;
@@ -160,10 +183,13 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 
 					// reset all sessions
 					if ($isAuthenticationTypeChanged) {
-						$result &= DBexecute(
+						$query =
 							'UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.
-							' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid'])
-						);
+							' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid']);
+						if ($internal_auth_users) {
+							$query .= ' AND '.dbConditionInt('userid', array_keys($internal_auth_users), true);
+						}
+						$result &= DBexecute($query);
 					}
 
 					$isAuthenticationTypeChanged = false;
@@ -208,10 +234,13 @@ elseif ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 		if ($result) {
 			// reset all sessions
 			if ($isAuthenticationTypeChanged) {
-				$result &= DBexecute(
+				$query =
 					'UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.
-					' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid'])
-				);
+					' WHERE sessionid<>'.zbx_dbstr(CWebUser::$data['sessionid']);
+				if ($internal_auth_users) {
+					$query .= ' AND '.dbConditionInt('userid', array_keys($internal_auth_users), true);
+				}
+				$result &= DBexecute($query);
 			}
 
 			$isAuthenticationTypeChanged = false;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 
 /**
- * A parser for reference macros like \1-\9.
+ * A parser for reference macros like \0-\9.
  */
 class CReplacementParser extends CParser {
 
@@ -41,7 +41,7 @@ class CReplacementParser extends CParser {
 		}
 		$p++;
 
-		if (!isset($source[$p]) || $source[$p] < '1' || $source[$p] > '9') {
+		if (!isset($source[$p]) || !ctype_digit($source[$p])) {
 			return CParser::PARSE_FAIL;
 		}
 		$p++;

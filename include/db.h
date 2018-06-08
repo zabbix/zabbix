@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,12 +140,32 @@ struct	_DC_TRIGGER;
 #define ITEM_PRIVATEKEY_LEN_MAX		(ITEM_PRIVATEKEY_LEN + 1)
 #define ITEM_JMX_ENDPOINT_LEN		255
 #define ITEM_JMX_ENDPOINT_LEN_MAX	(ITEM_JMX_ENDPOINT_LEN + 1)
+#define ITEM_TIMEOUT_LEN		255
+#define ITEM_TIMEOUT_LEN_MAX		(ITEM_TIMEOUT_LEN + 1)
+#define ITEM_URL_LEN			2048
+#define ITEM_URL_LEN_MAX		(ITEM_URL_LEN + 1)
+#define ITEM_QUERY_FIELDS_LEN		2048
+#define ITEM_QUERY_FIELDS_LEN_MAX	(ITEM_QUERY_FIELDS_LEN + 1)
+#define ITEM_STATUS_CODES_LEN		255
+#define ITEM_STATUS_CODES_LEN_MAX	(ITEM_STATUS_CODES_LEN + 1)
+#define ITEM_HTTP_PROXY_LEN		255
+#define ITEM_HTTP_PROXY_LEN_MAX		(ITEM_HTTP_PROXY_LEN + 1)
+#define ITEM_SSL_KEY_PASSWORD_LEN	64
+#define ITEM_SSL_KEY_PASSWORD_LEN_MAX	(ITEM_SSL_KEY_PASSWORD_LEN + 1)
+#define ITEM_SSL_CERT_FILE_LEN		255
+#define ITEM_SSL_CERT_FILE_LEN_MAX	(ITEM_SSL_CERT_FILE_LEN + 1)
+#define ITEM_SSL_KEY_FILE_LEN		255
+#define ITEM_SSL_KEY_FILE_LEN_MAX	(ITEM_SSL_KEY_FILE_LEN + 1)
 #if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
 #	define ITEM_PARAM_LEN		2048
 #	define ITEM_DESCRIPTION_LEN	2048
+#	define ITEM_POSTS_LEN		2048
+#	define ITEM_HEADERS_LEN		2048
 #else
 #	define ITEM_PARAM_LEN		65535
 #	define ITEM_DESCRIPTION_LEN	65535
+#	define ITEM_POSTS_LEN		65535
+#	define ITEM_HEADERS_LEN		65535
 #endif
 
 #define HISTORY_STR_VALUE_LEN		255
@@ -547,8 +567,8 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
 
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error);
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids, char **error);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
@@ -600,6 +620,9 @@ int	DBtxn_ongoing(void);
 
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
+#ifndef HAVE_SQLITE3
+int	DBindex_exists(const char *table_name, const char *index_name);
+#endif
 
 int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
@@ -715,5 +738,25 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 		zbx_vector_uint64_t *r_eventids);
 
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
+
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	unsigned char	compress;
+	int		version;
+	int		lastaccess;
+
+#define ZBX_FLAGS_PROXY_DIFF_UNSET				0x0000
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			0x0001
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			0x0002
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			0x0004
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION | 	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
+	zbx_uint64_t	flags;
+}
+zbx_proxy_diff_t;
 
 #endif

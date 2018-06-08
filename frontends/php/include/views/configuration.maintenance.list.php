@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,16 +20,25 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Maintenance periods'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-			->addItem(new CSubmit('form', _('Create maintenance period')))
-		))
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
+				])
+			),
+		(new CTag('nav', true, new CRedirectButton(_('Create maintenance period'), (new CUrl())
+			->removeArgument('maintenanceid')
+			->setArgument('groupid', $data['pageFilter']->groupid)
+			->setArgument('form', 'create')
+			->getUrl()
+		)))
+			->setAttribute('aria-label', _('Content controls'))
+	]))
 	->addItem((new CFilter('web.maintenance.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name'),
 			(new CTextBox('filter_name', $data['filter']['name']))

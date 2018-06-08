@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,44 +18,61 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$icons = (new CList())
+$user_navigation = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
 		(new CForm('get', 'search.php'))
+			->cleanItems()
 			->addItem([
 				(new CTextBox('search', '', false, 255))
 					->setAttribute('autocomplete', 'off')
 					->addClass(ZBX_STYLE_SEARCH),
-				(new CSubmitButton(SPACE))->addClass(ZBX_STYLE_BTN_SEARCH)
+				(new CSubmitButton(''))
+					->setEnabled(false)
+					->addClass(ZBX_STYLE_BTN_SEARCH)
 			])
+			->setAttribute('role', 'search')
+	);
+$user_menu = (new CList())
+	->setAttribute('role', 'navigation')
+	->setAttribute('aria-label', _('User menu'))
+	->addItem((new CListItem(
+			(new CLink('Support', 'https://www.zabbix.com/support/'))
+				->addClass(ZBX_STYLE_TOP_NAV_SUPPORT)
+				->setAttribute('target', '_blank')
+				->setTitle(_('Zabbix Technical Support'))
+		))->addStyle('padding-left:0')
+	)
+	->addItem((new CListItem(
+			(new CLink('Share', 'https://share.zabbix.com/'))
+				->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
+				->setAttribute('target', '_blank')
+				->setTitle(_('Zabbix Share'))
+		))
 	)
 	->addItem(
-		(new CLink('Share', 'https://share.zabbix.com/'))
-			->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
-			->setAttribute('target', '_blank')
-			->setTitle(_('Zabbix Share'))
-	)
-	->addItem(
-		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.4/'))
+		(new CLink(SPACE, 'http://www.zabbix.com/documentation/4.0/'))
 			->addClass(ZBX_STYLE_TOP_NAV_HELP)
 			->setAttribute('target', '_blank')
 			->setTitle(_('Help'))
 	);
 
 if (!$data['user']['is_guest']) {
-	$icons->addItem(
+	$user_menu->addItem(
 		(new CLink(SPACE, 'profile.php'))
 			->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
 			->setTitle(getUserFullname($data['user']))
 	);
 }
 
-$icons->addItem(
+$user_menu->addItem(
 	(new CLink(SPACE, 'index.php?reconnect=1'))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setTitle(_('Sign out'))
 		->addSID()
 );
+
+$user_navigation->addItem($user_menu);
 
 // 1st level menu
 $top_menu = (new CDiv())
@@ -64,13 +81,15 @@ $top_menu = (new CDiv())
 			->addClass(ZBX_STYLE_HEADER_LOGO)
 	)
 	->addItem(
-		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
+		(new CTag('nav', true, (new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)))
+			->setAttribute('aria-label', _('Main navigation'))
 	)
-	->addItem($icons)
+	->addItem($user_navigation)
 	->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
 	->setId('mmenu');
 
-$sub_menu_div = (new CDiv())
+$sub_menu_div = (new CTag('nav', true))
+	->setAttribute('aria-label', _('Sub navigation'))
 	->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER)
 	->onMouseover('javascript: MMenu.submenu_mouseOver();')
 	->onMouseout('javascript: MMenu.mouseOut();');
@@ -116,12 +135,9 @@ if ($data['server_name'] !== '') {
 }
 
 (new CTag('header', true))
-	->setAttribute('role', 'banner')
 	->addItem(
 		(new CDiv())
 			->addItem($top_menu)
 			->addItem($sub_menu_div)
-			->addClass(ZBX_STYLE_NAV)
-			->setAttribute('role', 'navigation')
 	)
 	->show();

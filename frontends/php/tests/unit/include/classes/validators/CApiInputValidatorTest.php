@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1683,6 +1683,36 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_TIME_UNIT],
 				'{$MACRO}',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a time unit is expected.'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_LLD_MACRO | API_ALLOW_USER_MACRO],
+				'{#MACRO}',
+				'/1/time_unit',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO}',
+				'/1/time_unit',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '1:100'],
+				'101s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": value must be one of 1-100.'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '1:100'],
+				'100s',
+				'/1/time_unit',
+				'100s'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'{#MACRO}',
 				'/1/time_unit',
 				'Invalid parameter "/1/time_unit": a time unit is expected.'
 			],

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,8 +62,6 @@
 #include "../zabbix_server/ipmi/ipmi_poller.h"
 #endif
 
-#define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_proxy.conf"
-
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
@@ -100,6 +98,14 @@ const char	*help_message[] = {
 	"",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
+	"",
+	"Some configuration parameter default locations:",
+	"  ExternalScripts                \"" DEFAULT_EXTERNAL_SCRIPTS_PATH "\"",
+#ifdef HAVE_LIBCURL
+	"  SSLCertLocation                \"" DEFAULT_SSL_CERT_LOCATION "\"",
+	"  SSLKeyLocation                 \"" DEFAULT_SSL_KEY_LOCATION "\"",
+#endif
+	"  LoadModulePath                 \"" DEFAULT_LOAD_MODULE_PATH "\"",
 	NULL	/* end of text */
 };
 
@@ -186,6 +192,7 @@ zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -202,6 +209,7 @@ char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
+char	*CONFIG_EXPORT_DIR		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -251,8 +259,9 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
-char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
-char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
+char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
+char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
+int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -426,16 +435,16 @@ static void	zbx_set_defaults(void)
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 #endif
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
 
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
-		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
 #ifdef HAVE_LIBCURL
 	if (NULL == CONFIG_SSL_CERT_LOCATION)
-		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DATADIR "/zabbix/ssl/certs");
+		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DEFAULT_SSL_CERT_LOCATION);
 
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
-		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
+		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
 #endif
 	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
 		CONFIG_HEARTBEAT_FORKS = 0;
@@ -870,6 +879,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
+	if (SUCCEED != zbx_locks_create(&error))
+	{
+		zbx_error("cannot create locks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
 	{
 		zbx_error("cannot open log:%s", error);
@@ -1143,30 +1159,13 @@ void	zbx_on_exit(void)
 
 	if (NULL != threads)
 	{
-		int		i;
-		sigset_t	set;
-
-		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
-		sigemptyset(&set);
-		sigaddset(&set, SIGCHLD);
-		sigprocmask(SIG_BLOCK, &set, NULL);
-
-		for (i = 0; i < threads_num; i++)
-		{
-			if (threads[i])
-			{
-				kill(threads[i], SIGTERM);
-				threads[i] = ZBX_THREAD_HANDLE_NULL;
-			}
-		}
-
+		zbx_threads_wait(threads, threads_num);	/* wait for all child processes to exit */
 		zbx_free(threads);
 	}
-
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_disable();
+#endif
 	free_metrics();
-
-	zbx_sleep(2);	/* wait for all child processes to exit */
-
 #ifdef HAVE_OPENIPMI
 	zbx_ipc_service_free_env();
 #endif

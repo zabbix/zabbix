@@ -25,6 +25,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcomms}.c{..\..\..\src\libs\zbxcomms}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxcompress}.c{..\..\..\src\libs\zbxcompress}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxconf}.c{..\..\..\src\libs\zbxconf}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
@@ -65,9 +68,6 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(CC) $? /Fo"$@" $(CPPFLAGS)
 
 {..\..\..\src\libs\zbxwin32}.c{..\..\..\src\libs\zbxwin32}.o:
-	$(CC) $? /Fo"$@" $(CFLAGS)
-
-{..\..\..\src\libs\zbxself}.c{..\..\..\src\libs\zbxself}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {$(PROJECTDIR)}.c{$(PROJECTDIR)}.o:

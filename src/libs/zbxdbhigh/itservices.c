@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@
 #include "log.h"
 #include "mutexs.h"
 
-#define LOCK_ITSERVICES		zbx_mutex_lock(&itservices_lock)
-#define UNLOCK_ITSERVICES	zbx_mutex_unlock(&itservices_lock)
+#define LOCK_ITSERVICES		zbx_mutex_lock(itservices_lock)
+#define UNLOCK_ITSERVICES	zbx_mutex_unlock(itservices_lock)
 
-static ZBX_MUTEX	itservices_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	itservices_lock = ZBX_MUTEX_NULL;
 
 /* status update queue items */
 typedef struct

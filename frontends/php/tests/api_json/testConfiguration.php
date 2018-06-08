@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,22 +93,18 @@ class testConfiguration extends CZabbixTest {
 	* @dataProvider export_fail_data
 	*/
 	public function testConfiguration_ExportFail($export, $expected_error) {
-		$result = $this->api_acall('configuration.export', $export, $debug);
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertSame($expected_error, $result['error']['data']);
+		$this->call('configuration.export', $export, $expected_error);
 	}
 
 	public static function export_string_ids() {
 		return [
-			[ 'groups' ],
-			[ 'hosts' ],
-			[ 'images' ],
-			[ 'maps' ],
-			[ 'screens' ],
-			[ 'templates' ],
-			[ 'valueMaps' ]
+			['groups'],
+			['hosts'],
+			['images'],
+			['maps'],
+			['screens'],
+			['templates'],
+			['valueMaps']
 		];
 	}
 
@@ -119,8 +115,7 @@ class testConfiguration extends CZabbixTest {
 		$formats = ['xml', 'json'];
 
 		foreach ($formats as $parameter){
-			$result = $this->api_acall(
-				'configuration.export',
+			$this->call('configuration.export',
 				[
 					'options' => [
 							$options => [
@@ -129,14 +124,8 @@ class testConfiguration extends CZabbixTest {
 					],
 					'format' => $parameter
 				],
-				$debug
+				'Invalid parameter "/options/'.$options.'/1": a number is expected.'
 			);
-
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$error = 'Invalid parameter "/options/'.$options.'/1": a number is expected.';
-			$this->assertSame($error, $result['error']['data']);
 		}
 	}
 
@@ -173,16 +162,10 @@ class testConfiguration extends CZabbixTest {
 		$formats = ['xml', 'json'];
 
 		foreach ($formats as $parameter){
-			$result = $this->api_acall(
-				'configuration.export',
-				[
-					'options' => $data,
-					'format' => $parameter
-				],
-				$debug);
-
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
+			$this->call('configuration.export', [
+				'options' => $data,
+				'format' => $parameter
+			]);
 		}
 	}
 
@@ -310,11 +293,7 @@ class testConfiguration extends CZabbixTest {
 	* @dataProvider import_fail_data
 	*/
 	public function testConfiguration_ImportFail($import, $expected_error) {
-		$result = $this->api_acall('configuration.import', $import, $debug);
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertSame($expected_error, $result['error']['data']);
+		$this->call('configuration.import', $import, $expected_error);
 	}
 
 	public static function import_rules_parametrs() {
@@ -337,12 +316,12 @@ class testConfiguration extends CZabbixTest {
 			[[
 				'parametr' => 'groups',
 				'expected' => ['createMissing'],
-				'unexpected' => [ 'deleteMissing', 'updateExisting']
+				'unexpected' => ['deleteMissing', 'updateExisting']
 			]],
 			[[
 				'parametr' => 'hosts',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'httptests',
@@ -352,7 +331,7 @@ class testConfiguration extends CZabbixTest {
 			[[
 				'parametr' => 'images',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'items',
@@ -362,22 +341,22 @@ class testConfiguration extends CZabbixTest {
 			[[
 				'parametr' => 'maps',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'screens',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'templateLinkage',
 				'expected' => ['createMissing'],
-				'unexpected' => [ 'deleteMissing', 'updateExisting']
+				'unexpected' => ['deleteMissing', 'updateExisting']
 			]],
 			[[
 				'parametr' => 'templates',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parametr' => 'templateScreens',
@@ -392,7 +371,7 @@ class testConfiguration extends CZabbixTest {
 			[[
 				'parametr' => 'valueMaps',
 				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => [ 'deleteMissing']
+				'unexpected' => ['deleteMissing']
 			]]
 		];
 	}
@@ -402,8 +381,7 @@ class testConfiguration extends CZabbixTest {
 	*/
 	public function testConfiguration_ImportBooleanTypeAndUnexpectedParametrs($import) {
 		foreach ($import['expected'] as $expected) {
-		$result = $this->api_acall('configuration.import',
-				[
+			$this->call('configuration.import', [
 					'format' => 'json',
 					'rules' => [
 						$import['parametr'] => [
@@ -412,124 +390,115 @@ class testConfiguration extends CZabbixTest {
 					],
 					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
 				],
-				$debug);
-
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-			$expected_error = 'Invalid parameter "/rules/'.$import['parametr'].'/'.$expected.'": a boolean is expected.';
-			$this->assertSame($expected_error, $result['error']['data']);
+				'Invalid parameter "/rules/'.$import['parametr'].'/'.$expected.'": a boolean is expected.'
+			);
 		}
 
 		foreach ($import['unexpected'] as $unexpected) {
-			$result = $this->api_acall('configuration.import',
-					[
-						'format' => 'json',
-						'rules' => [
-							$import['parametr'] => [
-								$unexpected => true
-							]
-						],
-						'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
+			$this->call('configuration.import', [
+					'format' => 'json',
+					'rules' => [
+						$import['parametr'] => [
+							$unexpected => true
+						]
 					],
-				$debug);
-
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-			$expected_error = 'Invalid parameter "/rules/'.$import['parametr'].'": unexpected parameter "'.$unexpected.'".';
-			$this->assertSame($expected_error, $result['error']['data']);
+					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
+				],
+				'Invalid parameter "/rules/'.$import['parametr'].'": unexpected parameter "'.$unexpected.'".'
+			);
 		}
 	}
 
 	public static function import_source() {
 		return [
-			[
+			[[
 				'format' => 'xml',
 				'source' => '' ,
 				'error' => 'Cannot read XML: XML is empty.'
-			],
-			[
+			]],
+			[[
 				'format' => 'xml',
 				'source' => 'test' ,
 				'error' => 'Cannot read XML: (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
-			],
-			[
+			]],
+			[[
 				'format' => 'xml',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 							<zabbix_export><date>2016-12-09T07:12:45Z</date></zabbix_export>',
 				'error' => 'Invalid tag "/zabbix_export": the tag "version" is missing.'
-			],
-			[
+			]],
+			[[
 				'format' => 'xml',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 							<zabbix_export><version></version><date>2016-12-09T07:12:45Z</date></zabbix_export>' ,
 				'error' => 'Invalid tag "/zabbix_export/version": unsupported version number.'
-			],
-			[
+			]],
+			[[
 				'format' => 'xml',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 							<zabbix_export><version>3.2</version><date>2016-12-09T07:12:45Z</date>' ,
-				// TODO: different error message on jenkins
-				// 'error' => 'Cannot read XML: (77) Premature end of data in tag zabbix_export line 2 [Line: 2 | Column: 78].'
-				'error' => 'Cannot read XML: (77) Premature end of data in tag zabbix_export line 2 [Line: 2 | Column: 58].'
-			],
-			[
+				// can be different error message text
+				'error_contains' => 'Cannot read XML:'
+			]],
+			[[
 				'format' => 'json',
 				'source' => '' ,
-				// TODO: different error message on jenkins
-				// 'error' => 'Cannot read JSON: Syntax error.'
-				'error' => 'Cannot read JSON: No error.'
-			],
-			[
+				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: No error.'
+				'error_contains' => 'Cannot read JSON: '
+			]],
+			[[
 				'format' => 'json',
 				'source' => 'test' ,
-				// TODO: different error message on jenkins
-				// 'error' => 'Cannot read JSON: Syntax error.'
-				'error' => 'Cannot read JSON: boolean expected.'
-			],
-			[
+				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: boolean expected.'
+				'error_contains' => 'Cannot read JSON: '
+			]],
+			[[
 				'format' => 'json',
 				'source' => '{"zabbix_export":{"date":"2016-12-09T07:29:55Z"}}' ,
 				'error' => 'Invalid tag "/zabbix_export": the tag "version" is missing.'
-			],
-			[
+			]],
+			[[
 				'format' => 'json',
 				'source' => '{"zabbix_export":{"version":"","date":"2016-12-09T07:29:55Z"}}' ,
 				'error' => 'Invalid tag "/zabbix_export/version": unsupported version number.'
-			],
-			[
+			]],
+			[[
 				'format' => 'json',
 				'source' => '{"export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}' ,
 				'error' => 'Invalid tag "/": unexpected tag "export".'
-			],
-			[
+			]],
+			[[
 				'format' => 'json',
 				'source' => '{"export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}' ,
-				// TODO: different error message on jenkins
-				// 'error' => 'Cannot read JSON: Syntax error.'
-				'error' => 'Cannot read JSON: unexpected end of data.'
-			],
+				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: unexpected end of data.'
+				'error_contains' => 'Cannot read JSON: '
+			]]
 		];
 	}
 
 	/**
 	* @dataProvider import_source
 	*/
-	public function testConfiguration_ImportInvalidSource($format, $source, $error) {
-		$result = $this->api_acall('configuration.import',
-				[
-					'format' => $format,
-					'rules' => [
-						'groups' => [
-							'createMissing' => true
-						]
-					],
-					'source' => $source
+	public function testConfiguration_ImportInvalidSource($data) {
+		$result = $this->call('configuration.import', [
+				'format' => $data['format'],
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
 				],
-				$debug);
+				'source' => $data['source']
+			],
+			true
+		);
 
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertSame($error, $result['error']['data']);
+		// condition for different error message text
+		if (array_key_exists('error_contains', $data)) {
+			$this->assertContains($data['error_contains'], $result['error']['data']);
+		}
+		else {
+			$this->assertSame($data['error'], $result['error']['data']);
+		}
 	}
 
 	public static function import_create() {
@@ -547,13 +516,13 @@ class testConfiguration extends CZabbixTest {
 									</group>
 								</groups>
 								</zabbix_export>',
-				'sql' => 'select * from groups where name=\'API host group xml import\''
+				'sql' => 'select * from hstgrp where name=\'API host group xml import\''
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import"}]}}',
-				'sql' => 'select * from groups where name=\'API host group json import\''
+				'sql' => 'select * from hstgrp where name=\'API host group json import\''
 			],
 			[
 				'format' => 'xml',
@@ -614,22 +583,18 @@ class testConfiguration extends CZabbixTest {
 	* @dataProvider import_create
 	*/
 	public function testConfiguration_ImportCreate($format, $parametr, $source, $sql) {
-		$result = $this->api_acall('configuration.import',
-				[
-					'format' => $format,
-					'rules' => [
-						$parametr => [
-							'createMissing' => true
-						]
-					],
-					'source' => $source
+		$result = $this->call('configuration.import', [
+				'format' => $format,
+				'rules' => [
+					$parametr => [
+						'createMissing' => true
+					]
 				],
-				$debug);
+				'source' => $source
+			]
+		);
 
-		$this->assertTrue(array_key_exists('result', $result));
-		$this->assertFalse(array_key_exists('error', $result));
 		$this->assertSame(true, $result['result']);
-
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -648,14 +613,14 @@ class testConfiguration extends CZabbixTest {
 									</group>
 								</groups>
 								</zabbix_export>',
-				'sql' => 'select * from groups where name=\'API host group xml import as non Super Admin\'',
+				'sql' => 'select * from hstgrp where name=\'API host group xml import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[
 				'format' => 'json',
 				'parametr' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
-				'sql' => 'select * from groups where name=\'API host group json import as non Super Admin\'',
+				'sql' => 'select * from hstgrp where name=\'API host group json import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[
@@ -698,24 +663,20 @@ class testConfiguration extends CZabbixTest {
 		$users = ['zabbix-admin', 'zabbix-user'];
 
 		foreach ($users as $username) {
-			$result = $this->api_call_with_user('configuration.import',
-					['user' => $username, 'password' => 'zabbix'],
-					[
-						'format' => $format,
-						'rules' => [
-							$parametr => [
-								'createMissing' => true
-							]
-						],
-						'source' => $source
+			$this->authorize($username, 'zabbix');
+			$this->call('configuration.import', [
+					'format' => $format,
+					'rules' => [
+						$parametr => [
+							'createMissing' => true
+						]
 					],
-					$debug);
+					'source' => $source
+				],
+				$expected_error
+			);
+
+			$this->assertEquals(0, DBcount($sql));
 		}
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-		$this->assertEquals($expected_error, $result['error']['data']);
-
-		$this->assertEquals(0, DBcount($sql));
 	}
 }

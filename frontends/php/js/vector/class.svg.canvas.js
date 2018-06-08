@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,8 @@ function SVGCanvas(options, shadowBuffer) {
 			'viewBox': '0 0 ' + options.width + ' ' + options.height,
 			'width': '100%',
 			'height': '100%',
-			'style': 'max-width: ' + options.width + 'px; max-height: ' + options.height + 'px;'
+			'style': 'max-width: ' + options.width + 'px; max-height: ' + options.height + 'px;',
+			'preserveAspectRatio': 'xMinYMin meet'
 		}
 		: {
 			'width': options.width,

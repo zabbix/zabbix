@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -854,7 +854,7 @@ class CPageFilter {
 			$options['action'] = 'javascript: submit();';
 		}
 
-		$comboBox = new CComboBox($name, $selectedId, $options['action']);
+		$comboBox = (new CComboBox($name, $selectedId, $options['action']))->removeId();
 
 		natcasesort($items);
 

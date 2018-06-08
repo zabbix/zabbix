@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ if (!empty($this->data['hostid'])) {
 $httpForm = (new CForm())
 	->setName('httpForm')
 	->setId('httpForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('steps', $this->data['steps'])
@@ -42,7 +43,7 @@ if (!empty($this->data['httptestid'])) {
 /*
  * Scenario tab
  */
-$httpFormList = new CFormList('httpFormList');
+$httpFormList = new CFormList();
 
 // Parent http tests
 if (!empty($this->data['templates'])) {
@@ -51,11 +52,12 @@ if (!empty($this->data['templates'])) {
 
 // Name
 $nameTextBox = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAriaRequired();
 if (!$this->data['templated']) {
 	$nameTextBox->setAttribute('autofocus', 'autofocus');
 }
-$httpFormList->addRow(_('Name'), $nameTextBox);
+$httpFormList->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), $nameTextBox);
 
 // Application
 if ($this->data['application_list']) {
@@ -75,11 +77,16 @@ $httpFormList
 			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 	)
-	->addRow(_('Update interval'),
-		(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	->addRow((new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
+		(new CTextBox('delay', $data['delay']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Attempts'),
-		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow(
+		(new CLabel(_('Attempts'), 'retries'))->setAsteriskMark(),
+		(new CNumericBox('retries', $this->data['retries'], 2))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
 $agentComboBox = new CComboBox('agent', $this->data['agent']);
@@ -149,13 +156,15 @@ $httpAuthenticationFormList->addRow(_('HTTP authentication'),
 );
 
 $httpAuthenticationFormList
-	->addRow(_('User'),
+	->addRow((new CLabel(_('User'), 'http_user'))->setAsteriskMark(),
 		(new CTextBox('http_user', $this->data['http_user'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(_('Password'),
+	->addRow((new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
 		(new CTextBox('http_password', $this->data['http_password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
@@ -178,7 +187,7 @@ $httpAuthenticationFormList
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
-$stepsTable = (new CTable())
+$steps_table = (new CTable())
 	->setId('httpStepTable')
 	->setHeader([
 		(new CColHeader())->setWidth('15'),
@@ -237,7 +246,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 			->setAttribute('remove_step', $stepid);
 	}
 
-	$stepsTable->addRow(
+	$steps_table->addRow(
 		(new CRow([
 			$dragHandler,
 			$numSpan,
@@ -254,15 +263,17 @@ foreach ($this->data['steps'] as $stepid => $step) {
 }
 
 if (!$this->data['templated']) {
-	$stepsTable->addRow(
+	$steps_table->addRow(
 		(new CCol(
 			(new CButton('add_step', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 		))->setColSpan(8)
 	);
 }
 
-$httpStepFormList->addRow(_('Steps'),
-	(new CDiv($stepsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+$httpStepFormList->addRow((new CLabel(_('Steps'), $steps_table->getId()))->setAsteriskMark(),
+	(new CDiv($steps_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAriaRequired()
 );
 
 // append tabs to form

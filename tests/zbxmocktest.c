@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
@@ -78,6 +77,7 @@ zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * 0;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * 0;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * 0;
+zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -94,6 +94,7 @@ char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
+char	*CONFIG_EXPORT_DIR		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -145,15 +146,16 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
-char	*CONFIG_SOCKET_PATH		= NULL;
-char	*CONFIG_HISTORY_STORAGE_URL	= NULL;
-char	*CONFIG_HISTORY_STORAGE_OPTS	= NULL;
+char	*CONFIG_SOCKET_PATH			= NULL;
+char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
+char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
+int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
-const char	title_message[] = "";
-const char	*usage_message[] = {NULL};
-const char	*help_message[] = {NULL};
-const char	*progname = NULL;
-const char	syslog_app_name[] = "";
+const char	title_message[] = "mock_title_message";
+const char	*usage_message[] = {"mock_usage_message", NULL};
+const char	*help_message[] = {"mock_help_message", NULL};
+const char	*progname = "mock_progname";
+const char	syslog_app_name[] = "mock_syslog_app_name";
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;

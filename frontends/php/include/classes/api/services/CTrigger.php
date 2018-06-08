@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,6 +104,7 @@ class CTrigger extends CTriggerGeneral {
 			'selectDiscoveryRule'			=> null,
 			'selectLastEvent'				=> null,
 			'selectTags'					=> null,
+			'selectTriggerDiscovery'		=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -219,7 +220,7 @@ class CTrigger extends CTriggerGeneral {
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = dbConditionString('f.function', $options['functions']);
+			$sqlParts['where'][] = dbConditionString('f.name', $options['functions']);
 		}
 
 		// monitored
@@ -376,7 +377,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['groups'] = 'groups g';
+			$sqlParts['from']['hstgrp'] = 'hstgrp g';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
@@ -1206,6 +1207,10 @@ class CTrigger extends CTriggerGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		if (!$result) {
+			return $result;
+		}
+
 		$triggerids = array_keys($result);
 
 		// adding trigger dependencies
@@ -1331,6 +1336,34 @@ class CTrigger extends CTriggerGeneral {
 				// find max 'ns' for each trigger and that will be the 'lastEvent'
 				$maxNs = max(array_keys($events));
 				$result[$triggerId]['lastEvent'] = $events[$maxNs];
+			}
+		}
+
+		// adding trigger discovery
+		if ($options['selectTriggerDiscovery'] !== null && $options['selectTriggerDiscovery'] !== API_OUTPUT_COUNT) {
+			foreach ($result as &$trigger) {
+				$trigger['triggerDiscovery'] = [];
+			}
+			unset($trigger);
+
+			$sql_select = ['triggerid'];
+			foreach (['parent_triggerid'] as $field) {
+				if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
+					$sql_select[] = $field;
+				}
+			}
+
+			$trigger_discoveries = DBselect(
+				'SELECT '.implode(',', $sql_select).
+				' FROM trigger_discovery'.
+				' WHERE '.dbConditionInt('triggerid', $triggerids)
+			);
+
+			while ($trigger_discovery = DBfetch($trigger_discoveries)) {
+				$triggerid = $trigger_discovery['triggerid'];
+				unset($trigger_discovery['triggerid']);
+
+				$result[$triggerid]['triggerDiscovery'] = $trigger_discovery;
 			}
 		}
 

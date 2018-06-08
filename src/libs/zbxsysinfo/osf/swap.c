@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
 static void	get_swapinfo(double *total, double *fr)
 {
-	register int cnt, i, page_size;
+	int	cnt, i, page_size;
 /* Support for >2Gb */
-/*	register int t, f;*/
+/*	int t, f;*/
 	double	t, f;
 	struct swaptable *swt;
 	struct swapent *ste;

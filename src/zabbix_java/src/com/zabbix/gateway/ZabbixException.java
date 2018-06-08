@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,5 +41,24 @@ class ZabbixException extends Exception
 	ZabbixException(Throwable cause)
 	{
 		super(cause);
+	}
+
+	static Throwable getRootCause(Throwable e)
+	{
+		Throwable cause = null;
+		Throwable result = e;
+
+		while ((null != (cause = result.getCause())) && (result != cause))
+			result = cause;
+
+		return result;
+	}
+	
+	static String getRootCauseMessage(Throwable e)
+	{
+		if (e != null)
+			return getRootCause(e).getMessage();
+
+		return null;
 	}
 }

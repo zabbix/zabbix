@@ -407,7 +407,8 @@
 				'class': 'multiselect',
 				css: {
 					width: '<?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px'
-				}
+				},
+				'aria-required': 'true'
 			});
 
 			opCmdTarget.parent().append(opCmdTargetObject);
@@ -632,40 +633,27 @@
 				'#new_ack_operation_opmessage_default_msg'
 		).trigger('change');
 
+		var remove_operationid = function() {
+			var operationid_RegExp = /^(operations|recovery_operations|ack_operations)\[\d+\]\[operationid\]$/;
+
+			jQuery('input[name^=operations], input[name^=recovery_operations], input[name^=ack_operations]')
+				.each(function() {
+					// Intentional usage of JS Prototype.
+					if ($(this).getAttribute('name').match(operationid_RegExp)) {
+						$(this).remove();
+					}
+				});
+		};
+
+		jQuery('#add').click(remove_operationid);
+
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
-				.attr({id: 'add', name: 'add'});
-
-			// Remove operations IDs.
-			var operationid_RegExp = /operations\[\d+\]\[operationid\]/;
-			jQuery('input[name^=operations]').each(function() {
-				// Intentional usage of JS Prototype.
-				if ($(this).getAttribute('name').match(operationid_RegExp)) {
-					$(this).remove();
-				}
-			});
-
-			// Remove recovery operations IDs
-			var recovery_operationid_RegExp = /recovery_operations\[\d+\]\[operationid\]/;
-			jQuery('input[name^=recovery_operations]').each(function() {
-				// Intentional usage of JS Prototype.
-				if ($(this).getAttribute('name').match(recovery_operationid_RegExp)) {
-					$(this).remove();
-				}
-			});
-
-			// Remove acknowledgment operations IDs
-			var ack_operationid_RegExp = /ack_operations\[\d+\]\[operationid\]/;
-			jQuery('input[name^=ack_operations]').each(function() {
-				// Intentional usage of JS Prototype.
-				if ($(this).getAttribute('name').match(ack_operationid_RegExp)) {
-					$(this).remove();
-				}
-			});
-
+				.attr({id: 'add', name: 'add'})
+				.click(remove_operationid);
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
 		});
@@ -679,7 +667,7 @@
 		showOpTypeForm(<?= ACTION_RECOVERY_OPERATION ?>);
 		showOpTypeForm(<?= ACTION_ACKNOWLEDGE_OPERATION ?>);
 
-		jQuery('#select_operation_opcommand_script').click(function() {
+		jQuery('#select_operation_opcommand_script').click(function(event) {
 			PopUp('popup.generic', {
 				srctbl: 'scripts',
 				srcfld1: 'scriptid',
@@ -687,10 +675,10 @@
 				dstfrm: 'action.edit',
 				dstfld1: 'new_operation_opcommand_scriptid',
 				dstfld2: 'new_operation_opcommand_script'
+			}, null, event.target);
 			});
-		});
 
-		jQuery('#select_recovery_operation_opcommand_script').click(function() {
+		jQuery('#select_recovery_operation_opcommand_script').click(function(event) {
 			PopUp('popup.generic', {
 				srctbl: 'scripts',
 				srcfld1: 'scriptid',
@@ -698,10 +686,10 @@
 				dstfrm: 'action.edit',
 				dstfld1: 'new_recovery_operation_opcommand_scriptid',
 				dstfld2: 'new_recovery_operation_opcommand_script'
+			}, null, event.target);
 			});
-		});
 
-		jQuery('#select_ack_operation_opcommand_script').click(function() {
+		jQuery('#select_ack_operation_opcommand_script').click(function(event) {
 			PopUp('popup.generic', {
 				srctbl: 'scripts',
 				srcfld1: 'scriptid',
@@ -709,8 +697,8 @@
 				dstfrm: 'action.edit',
 				dstfld1: 'new_ack_operation_opcommand_scriptid',
 				dstfld2: 'new_ack_operation_opcommand_script'
+			}, null, event.target);
 			});
-		});
 
 		processTypeOfCalculation();
 		processOperationTypeOfCalculation();

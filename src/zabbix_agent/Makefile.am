@@ -6,7 +6,9 @@ EXTRA_DIST = \
 
 sbin_PROGRAMS = zabbix_agentd
 
-zabbix_agentd_SOURCES = \
+noinst_LIBRARIES = libzbxagent.a
+
+libzbxagent_a_SOURCES = \
 	active.c active.h \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
@@ -15,10 +17,15 @@ zabbix_agentd_SOURCES = \
 	logfiles.c logfiles.h \
 	zbxconf.c zbxconf.h \
 	listener.c listener.h \
-	procstat.c procstat.h \
-	zabbix_agentd.c
+	procstat.c procstat.h
+
+libzbxagent_a_CFLAGS = \
+	-DZABBIX_DAEMON
+
+zabbix_agentd_SOURCES = zabbix_agentd.c
 
 zabbix_agentd_LDADD = \
+	libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
@@ -36,8 +43,8 @@ zabbix_agentd_LDADD = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
-	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxself/libzbxself.a
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
 
 zabbix_agentd_LDADD += @AGENT_LIBS@
 
@@ -45,14 +52,10 @@ zabbix_agentd_LDFLAGS = @AGENT_LDFLAGS@
 
 zabbix_agentd_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DLIBDIR="\"@libdir@\""
-
-AGENTD_CONFIG = zabbix_agentd.conf
-INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG).d
-MODULES_DIR = $(DESTDIR)@libdir@
+	-DDEFAULT_CONFIG_FILE="\"@AGENT_CONFIG_FILE@\"" \
+	-DDEFAULT_LOAD_MODULE_PATH="\"@LOAD_MODULE_PATH@\""
 
 install-data-hook:
-	$(MKDIR_P) "$(INCLUDE_DIR)"
-	$(MKDIR_P) "$(MODULES_DIR)"
-	test -f "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)" || cp "../../conf/$(AGENTD_CONFIG)" "$(DESTDIR)@sysconfdir@"
+	$(MKDIR_P) "$(DESTDIR)@AGENT_CONFIG_FILE@.d"
+	$(MKDIR_P) "$(DESTDIR)@LOAD_MODULE_PATH@"
+	test -f "$(DESTDIR)@AGENT_CONFIG_FILE@" || cp "../../conf/zabbix_agentd.conf" "$(DESTDIR)@AGENT_CONFIG_FILE@"

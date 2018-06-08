@@ -11,8 +11,8 @@
       <template>
          <template>Template Module EtherLike-MIB SNMPv1</template>
          <name>Template Module EtherLike-MIB SNMPv1</name>
-         <description>Template EtherLike-MIB (duplex control only) version: 0.14
-MIBs used:
+         <description>Template EtherLike-MIB (duplex control only) version: 0.14&#13;
+MIBs used:&#13;
 EtherLike-MIB</description>
          <groups>
             <group>
@@ -99,30 +99,30 @@ EtherLike-MIB</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: EtherLike-MIB
-The current mode of operation of the MAC
-entity.  'unknown' indicates that the current
-duplex mode could not be determined.
-
-Management control of the duplex mode is
-accomplished through the MAU MIB.  When
-an interface does not support autonegotiation,
-or when autonegotiation is not enabled, the
-duplex mode is controlled using
-ifMauDefaultType.  When autonegotiation is
-supported and enabled, duplex mode is controlled
-using ifMauAutoNegAdvertisedBits.  In either
-case, the currently operating duplex mode is
-reflected both in this object and in ifMauType.
-
-Note that this object provides redundant
-information with ifMauType.  Normally, redundant
-objects are discouraged.  However, in this
-instance, it allows a management application to
-determine the duplex status of an interface
-without having to know every possible value of
-ifMauType.  This was felt to be sufficiently
-valuable to justify the redundancy.
+                     <description>MIB: EtherLike-MIB&#13;
+The current mode of operation of the MAC&#13;
+entity.  'unknown' indicates that the current&#13;
+duplex mode could not be determined.&#13;
+&#13;
+Management control of the duplex mode is&#13;
+accomplished through the MAU MIB.  When&#13;
+an interface does not support autonegotiation,&#13;
+or when autonegotiation is not enabled, the&#13;
+duplex mode is controlled using&#13;
+ifMauDefaultType.  When autonegotiation is&#13;
+supported and enabled, duplex mode is controlled&#13;
+using ifMauAutoNegAdvertisedBits.  In either&#13;
+case, the currently operating duplex mode is&#13;
+reflected both in this object and in ifMauType.&#13;
+&#13;
+Note that this object provides redundant&#13;
+information with ifMauType.  Normally, redundant&#13;
+objects are discouraged.  However, in this&#13;
+instance, it allows a management application to&#13;
+determine the duplex status of an interface&#13;
+without having to know every possible value of&#13;
+ifMauType.  This was felt to be sufficiently&#13;
+valuable to justify the redundancy.&#13;
 Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
@@ -151,7 +151,7 @@ Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.</description>
                      <url/>
                      <status>0</status>
                      <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
 Please check autonegotiation settings and cabling</description>
                      <type>0</type>
                      <manual_close>1</manual_close>

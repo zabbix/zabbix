@@ -4,7 +4,7 @@
 	<!-- Get, run and delete script for generating new Zabbix image on Docker Hub -->
 		<exec executable="svn" failonerror="on">
 			<arg line="co"/>
-			<arg line="svn://192.168.3.4/docker/"/>
+			<arg line="svn://svn.zabbix.lan/docker/"/>
 			<arg line="--depth=empty"/>
 		</exec>
 		<exec dir="./docker" executable="svn" failonerror="on">

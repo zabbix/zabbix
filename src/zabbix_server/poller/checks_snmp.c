@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -683,6 +683,10 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 	else if (0 == strncmp(buffer, "OID: ", 5))
 	{
 		strval_dyn = zbx_strdup(strval_dyn, buffer + 5);
+	}
+	else if (0 == strncmp(buffer, "BITS: ", 6))
+	{
+		strval_dyn = zbx_strdup(strval_dyn, buffer + 6);
 	}
 	else
 	{

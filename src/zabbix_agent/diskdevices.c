@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
 #include "log.h"
 #include "mutexs.h"
 
-extern ZBX_MUTEX		diskstats_lock;
-#define LOCK_DISKSTATS		zbx_mutex_lock(&diskstats_lock)
-#define UNLOCK_DISKSTATS	zbx_mutex_unlock(&diskstats_lock)
+extern zbx_mutex_t		diskstats_lock;
+#define LOCK_DISKSTATS		zbx_mutex_lock(diskstats_lock)
+#define UNLOCK_DISKSTATS	zbx_mutex_unlock(diskstats_lock)
 
 static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_uint64_t *dstat)
 {

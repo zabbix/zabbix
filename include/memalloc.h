@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ typedef struct
 	/* Set this flag to 1 to allow execution in out of memory situations.     */
 	char		allow_oom;
 
-	ZBX_MUTEX	mem_lock;
 	const char	*mem_descr;
 	const char	*mem_param;
 }

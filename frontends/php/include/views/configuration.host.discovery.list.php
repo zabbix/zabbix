@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addVar('hostid', $this->data['hostid'])
-		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(new CRedirectButton(_('Create discovery rule'),
+				(new CUrl())
+					->setArgument('form', 'create')
+					->getUrl()
+			))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
@@ -160,6 +165,7 @@ $discoveryForm->addItem([
 			'discoveryrule.massdisable' => ['name' => _('Disable'),
 				'confirm' =>_('Disable selected discovery rules?')
 			],
+			'discoveryrule.masscheck_now' => ['name' => _('Check now')],
 			'discoveryrule.massdelete' => ['name' => _('Delete'),
 				'confirm' =>_('Delete selected discovery rules?')
 			]

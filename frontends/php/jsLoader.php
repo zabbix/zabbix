@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,6 @@ $availableJScripts = [
 	'class.cookie.js' => '',
 	'class.cscreen.js' => '',
 	'class.csuggest.js' => '',
-	'class.cswitcher.js' => '',
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
 	'class.rpc.js' => '',
@@ -113,6 +112,7 @@ $tranStrings = [
 		'Delete' => _('Delete'),
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
+		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'Add a new widget' => _('Add a new widget')
 	],
 	'functions.js' => [
@@ -121,6 +121,7 @@ $tranStrings = [
 		'Execution confirmation' => _('Execution confirmation')
 	],
 	'class.calendar.js' => [
+		'S_Calendar' => _('Calendar'),
 		'S_JANUARY' => _('January'),
 		'S_FEBRUARY' => _('February'),
 		'S_MARCH' => _('March'),
@@ -133,16 +134,20 @@ $tranStrings = [
 		'S_OCTOBER' => _('October'),
 		'S_NOVEMBER' => _('November'),
 		'S_DECEMBER' => _('December'),
+		'S_MONDAY' => _('Monday'),
+		'S_TUESDAY' => _('Tuesday'),
+		'S_WEDNESDAY' => _('Wednesday'),
+		'S_THURSDAY' => _('Thursday'),
+		'S_FRIDAY' => _('Friday'),
+		'S_SATURDAY' => _('Saturday'),
+		'S_SUNDAY' => _('Sunday'),
 		'S_MONDAY_SHORT_BIG' => _x('M', 'Monday short'),
 		'S_TUESDAY_SHORT_BIG' => _x('T', 'Tuesday short'),
 		'S_WEDNESDAY_SHORT_BIG' => _x('W', 'Wednesday short'),
 		'S_THURSDAY_SHORT_BIG' => _x('T', 'Thursday short'),
 		'S_FRIDAY_SHORT_BIG' => _x('F', 'Friday short'),
 		'S_SATURDAY_SHORT_BIG' => _x('S', 'Saturday short'),
-		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short'),
-		'S_NOW' => _('Now'),
-		'S_DONE' => _('Done'),
-		'S_TIME' => _('Time')
+		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short')
 	],
 	'class.cmap.js' => [
 		'S_ON' => _('On'),
@@ -157,7 +162,7 @@ $tranStrings = [
 		'S_DEFAULT' => _('Default'),
 		'S_PLEASE_SELECT_TWO_ELEMENTS' => _('Please select two elements'),
 		'S_DOT' => _('Dot'),
-		'S_TWO_ELEMENTS_SHOULD_BE_SELECTED' => _('Two elements should be selected'),
+		'S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED' => _('Two map elements should be selected'),
 		'S_DELETE_SELECTED_ELEMENTS_Q' => _('Delete selected elements?'),
 		'S_DELETE_SELECTED_SHAPES_Q' => _('Delete selected shapes?'),
 		'S_BRING_TO_FRONT' => _('Bring to front'),
@@ -205,6 +210,7 @@ $tranStrings = [
 		'Create trigger' => _('Create trigger'),
 		'Dashboard sharing' => _('Dashboard sharing'),
 		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
+		'Description' => _('Description'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Edit trigger' => _('Edit trigger'),
 		'Insert expression' => _('Insert expression'),
@@ -225,10 +231,8 @@ $tranStrings = [
 		'Refresh interval' => _('Refresh interval'),
 		'Refresh interval multiplier' => _('Refresh interval multiplier'),
 		'Scripts' => _('Scripts'),
-		'Something went wrong. Please try again later!' => _('Something went wrong. Please try again later!'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
-		'Triggers' => _('Triggers'),
 		'Update' => _('Update'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),

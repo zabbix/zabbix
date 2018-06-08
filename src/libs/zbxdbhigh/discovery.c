@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "db.h"
 #include "log.h"
 #include "events.h"
+#include "discovery.h"
 
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {
@@ -327,12 +328,26 @@ static void	discovery_update_dservice_value(zbx_uint64_t dserviceid, const char 
 
 /******************************************************************************
  *                                                                            *
+ * Function: discovery_update_dhost                                           *
+ *                                                                            *
+ * Purpose: update discovered host details                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	discovery_update_dhost(const DB_DHOST *dhost)
+{
+	DBexecute("update dhosts set status=%d,lastup=%d,lastdown=%d where dhostid=" ZBX_FS_UI64,
+			dhost->status, dhost->lastup, dhost->lastdown, dhost->dhostid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: discovery_update_service_status                                  *
  *                                                                            *
  * Purpose: process and update the new service status                         *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_update_service_status(const DB_DSERVICE *dservice, int status, const char *value, int now)
+static void	discovery_update_service_status(DB_DHOST *dhost, const DB_DSERVICE *dservice, int service_status,
+		const char *value, int now)
 {
 	const char	*__function_name = "discovery_update_service_status";
 
@@ -343,13 +358,27 @@ static void	discovery_update_service_status(const DB_DSERVICE *dservice, int sta
 	ts.sec = now;
 	ts.ns = 0;
 
-	if (DOBJECT_STATUS_UP == status)
+	if (DOBJECT_STATUS_UP == service_status)
 	{
 		if (DOBJECT_STATUS_DOWN == dservice->status || 0 == dservice->lastup)
 		{
-			discovery_update_dservice(dservice->dserviceid, status, now, 0, value);
+			discovery_update_dservice(dservice->dserviceid, service_status, now, 0, value);
 			zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts,
 					DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+
+			if (DOBJECT_STATUS_DOWN == dhost->status)
+			{
+				/* Service went UP, but host status is DOWN. Update host status. */
+
+				dhost->status = DOBJECT_STATUS_UP;
+				dhost->lastup = now;
+				dhost->lastdown = 0;
+
+				discovery_update_dhost(dhost);
+				zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
+						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
+						NULL);
+			}
 		}
 		else if (0 != strcmp(dservice->value, value))
 		{
@@ -360,30 +389,20 @@ static void	discovery_update_service_status(const DB_DSERVICE *dservice, int sta
 	{
 		if (DOBJECT_STATUS_UP == dservice->status || 0 == dservice->lastdown)
 		{
-			discovery_update_dservice(dservice->dserviceid, status, 0, now, dservice->value);
+			discovery_update_dservice(dservice->dserviceid, service_status, 0, now, dservice->value);
 			zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts,
 					DOBJECT_STATUS_LOST, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+
+			/* service went DOWN, no need to update host status here as other services may be UP */
 		}
 	}
-	zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts, status,
+	zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts, service_status,
 			NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 
 	zbx_process_events(NULL, NULL);
+	zbx_clean_events();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: discovery_update_dhost                                           *
- *                                                                            *
- * Purpose: update discovered host details                                    *
- *                                                                            *
- ******************************************************************************/
-static void	discovery_update_dhost(DB_DHOST *dhost)
-{
-	DBexecute("update dhosts set status=%d,lastup=%d,lastdown=%d where dhostid=" ZBX_FS_UI64,
-			dhost->status, dhost->lastup, dhost->lastdown, dhost->dhostid);
 }
 
 /******************************************************************************
@@ -431,6 +450,7 @@ static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
 			NULL, 0, NULL, 0, NULL);
 
 	zbx_process_events(NULL, NULL);
+	zbx_clean_events();
 }
 
 /******************************************************************************
@@ -485,7 +505,7 @@ void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *
 
 	/* service was not registered because we do not add down service */
 	if (0 != dservice.dserviceid)
-		discovery_update_service_status(&dservice, status, value, now);
+		discovery_update_service_status(dhost, &dservice, status, value, now);
 
 	zbx_free(dservice.value);
 

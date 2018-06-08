@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,10 +43,6 @@ $fields = [
 		_('Max count of elements to show inside table cell')
 	],
 	'event_ack_enable'			=> [T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable event acknowledgement')],
-	'event_expire'				=> [T_ZBX_STR, O_OPT, null, null, 'isset({update})', _('Show events not older than')],
-	'event_show_max'			=> [T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), 'isset({update})',
-		_('Max count of events per trigger to show')
-	],
 	'server_check_interval'		=> [T_ZBX_INT, O_OPT, null, IN(SERVER_CHECK_INTERVAL), null,
 		_('Show warning if Zabbix server is down')
 	],
@@ -68,8 +64,6 @@ if (hasRequest('update')) {
 		'search_limit' => getRequest('search_limit'),
 		'max_in_table' => getRequest('max_in_table'),
 		'event_ack_enable' => getRequest('event_ack_enable', 0),
-		'event_expire' => getRequest('event_expire'),
-		'event_show_max' => getRequest('event_show_max'),
 		'server_check_interval' => getRequest('server_check_interval', 0)
 	]);
 	$result = DBend($result);
@@ -90,8 +84,6 @@ if (hasRequest('form_refresh')) {
 		'search_limit' => getRequest('search_limit', $config['search_limit']),
 		'max_in_table' => getRequest('max_in_table', $config['max_in_table']),
 		'event_ack_enable' => getRequest('event_ack_enable', 0),
-		'event_expire' => getRequest('event_expire', $config['event_expire']),
-		'event_show_max' => getRequest('event_show_max', $config['event_show_max']),
 		'server_check_interval' => getRequest('server_check_interval', 0)
 	];
 }
@@ -103,8 +95,6 @@ else {
 		'search_limit' => $config['search_limit'],
 		'max_in_table' => $config['max_in_table'],
 		'event_ack_enable' => $config['event_ack_enable'],
-		'event_expire' => $config['event_expire'],
-		'event_show_max' => $config['event_show_max'],
 		'server_check_interval' => $config['server_check_interval']
 	];
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include "stats.h"
 #include "log.h"
 #include "zbxconf.h"
-#include "zbxself.h"
 
 #ifndef _WINDOWS
 #	include "diskdevices.h"
@@ -46,7 +45,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 static int		shm_id;
 int 			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
-ZBX_MUTEX		diskstats_lock = ZBX_MUTEX_NULL;
+zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
 #endif
 
 /******************************************************************************

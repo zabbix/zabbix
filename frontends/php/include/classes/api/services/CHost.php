@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
 
-			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionId('h.proxy_hostid', $options['proxyids']);
 		}
 
 		// templateids
@@ -795,6 +795,11 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Host "%1$s" cannot be without host group.', $host['host'])
 			);
+		}
+
+		// Property 'auto_compress' is not supported for hosts.
+		if (array_key_exists('auto_compress', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 		}
 
 		/*
@@ -1570,6 +1575,11 @@ class CHost extends CHostGeneral {
 				);
 			}
 
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
+
 			// Validate "host" field.
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1732,6 +1742,11 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Wrong fields for host "%1$s".', array_key_exists('host', $host) ? $host['host'] : '')
 				);
+			}
+
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
 			// Validate host permissions.

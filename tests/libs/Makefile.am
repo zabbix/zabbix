@@ -1,5 +1,13 @@
 SUBDIRS = \
+	zbxcommon \
 	zbxconf \
+	zbxdbcache \
 	zbxdbhigh \
-	zbxsysinfo
+	zbxhistory \
+	zbxjson \
+	zbxsysinfo \
+	zbxcommshigh \
+	zbxcommon \
+	zbxalgo
+	
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ extern char	*CONFIG_FILE;
  *                         must be freed by the caller.                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, ZBX_MUTEX_NAME mutex,
+int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, zbx_mutex_name_t mutex,
 		zbx_shm_copy_func_t copy_func, char **errmsg)
 {
 	const char	*__function_name = "zbx_dshm_create";
@@ -124,7 +124,7 @@ out:
  ******************************************************************************/
 void	zbx_dshm_lock(zbx_dshm_t *shm)
 {
-	zbx_mutex_lock(&shm->lock);
+	zbx_mutex_lock(shm->lock);
 }
 
 /******************************************************************************
@@ -134,7 +134,7 @@ void	zbx_dshm_lock(zbx_dshm_t *shm)
  ******************************************************************************/
 void	zbx_dshm_unlock(zbx_dshm_t *shm)
 {
-	zbx_mutex_unlock(&shm->lock);
+	zbx_mutex_unlock(shm->lock);
 }
 
 /******************************************************************************

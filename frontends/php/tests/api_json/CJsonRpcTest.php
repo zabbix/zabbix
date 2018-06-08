@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,42 +23,13 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 require_once dirname(__FILE__).'/../../include/classes/json/CJson.php';
 
 class CJsonRpcTest extends CZabbixTest {
-
-	/**
-	 * User authentication token.
-	 *
-	 * @var string
-	 */
-	protected $auth;
-
-	/**
-	 * Authenticate and set user authentication token.
-	 */
-	public function setUp() {
-		parent::setUp();
-
-		$data = [
-			'jsonrpc' => '2.0',
-			'method' => 'user.login',
-			'params' => ['user' => 'Admin', 'password' => 'zabbix'],
-			'id' => '0'
-		];
-
-		$debug = null;
-
-		$this->auth = (new CJson)->decode(
-			$this->do_post_request($data, $debug),
-			true
-		)['result'];
-	}
-
 	/**
 	 * Provides valid requests for JSON RPC.
 	 */
 	public function validRequestProvider() {
 		return [
-			['item.get', '{"itemids":[]}', 1],
-			['host.get', '{"hostids":[]}', 1]
+			['item.get', ['itemids' => []]],
+			['host.get', ['hostids' => []]]
 		];
 	}
 
@@ -68,18 +39,10 @@ class CJsonRpcTest extends CZabbixTest {
 	 * @dataProvider validRequestProvider
 	 *
 	 * @param string $method
-	 * @param string $params
-	 * @param string $id
+	 * @param array $params
 	 */
-	public function testValidRequest($method, $params, $id) {
-		$data = '{"jsonrpc": "2.0", "method": "'.$method.'", "auth": "'.$this->auth.'", "params": '.$params.', "id": '.
-			$id.'}';
-
-		$debug = null;
-		$response = $this->api_call_raw($data, $debug);
-
-		$this->assertInternalType('array', $response);
-		$this->assertArrayHasKey('result', $response);
+	public function testValidRequest($method, $params) {
+		$this->call($method, $params);
 	}
 
 	/**
@@ -88,10 +51,9 @@ class CJsonRpcTest extends CZabbixTest {
 	public function validRequestsBatchProvider() {
 		return [
 			[
-				// First batch.
 				[
-					['method' => 'item.get', 'params' => '{"itemids":[]}', 'id' => 1],
-					['method' => 'host.get', 'params' => '{"hostids":[]}', 'id' => 2]
+					['method' => 'item.get', 'params' => '{"itemids":[]}'],
+					['method' => 'host.get', 'params' => '{"hostids":[]}']
 				]
 			]
 		];
@@ -105,13 +67,14 @@ class CJsonRpcTest extends CZabbixTest {
 	 * @param array $batch
 	 */
 	public function testValidRequestsBatch($batch) {
+		$this->authorize('Admin', 'zabbix');
 		$length = count($batch);
 		$i = 1;
 
 		$data = '[';
 		foreach ($batch as $attrs) {
-			$data .= '{"jsonrpc": "2.0", "method": "'.$attrs['method'].'", "auth": "'.$this->auth.'", "params": '.
-				$attrs['params'].', "id": '.$attrs['id'].'}';
+			$data .= '{"jsonrpc": "2.0", "method": "'.$attrs['method'].'", "auth": "'.$this->session.'", "params": '.
+				$attrs['params'].', "id": '.($this->request_id++).'}';
 
 			if ($i < $length) {
 				$data .= ', ';
@@ -121,8 +84,7 @@ class CJsonRpcTest extends CZabbixTest {
 		}
 		$data .= ']';
 
-		$debug = null;
-		$response_array = $this->api_call_raw($data, $debug);
+		$response_array = $this->callRaw($data);
 
 		$this->assertInternalType('array', $response_array);
 		$this->assertEquals($length, count($response_array));
@@ -154,11 +116,7 @@ class CJsonRpcTest extends CZabbixTest {
 	 * @param string $data
 	 */
 	public function testInvalidRequest($data) {
-		$response = $this->api_call_raw($data, $debug);
-
-		$this->assertArrayHasKey('error', $response);
-		$this->assertArrayHasKey('code', $response['error']);
-		$this->assertEquals(-32600, $response['error']['code']);
+		$this->checkResult($this->callRaw($data), -32600);
 	}
 
 	/**
@@ -180,15 +138,13 @@ class CJsonRpcTest extends CZabbixTest {
 	 * @param string $data
 	 */
 	public function testInvalidRequestsBatch($data) {
-		$response_array = $this->api_call_raw($data, $debug);
+		$response_array = $this->callRaw($data);
 
 		$this->assertInternalType('array', $response_array);
 		$this->assertNotEmpty($response_array);
 
 		foreach ($response_array as $response) {
-			$this->assertArrayHasKey('error', $response);
-			$this->assertArrayHasKey('code', $response['error']);
-			$this->assertEquals(-32600, $response['error']['code']);
+			$this->checkResult($response, -32600);
 		}
 	}
 }

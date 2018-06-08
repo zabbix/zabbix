@@ -7,4 +7,4 @@ libzbxserver_a_SOURCES = \
 	expression.c \
 	macrofunc.c macrofunc.h
 
-libzbxserver_a_CFLAGS = -I@top_srcdir@/src/libs/zbxdbcache
+libzbxserver_a_CFLAGS = -I@top_srcdir@/src/libs/zbxdbcache @LIBXML2_CFLAGS@

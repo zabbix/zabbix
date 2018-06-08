@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,36 +27,41 @@ $widget = (new CWidget())->setTitle(_('Scripts'));
 $scriptForm = (new CForm())
 	->setId('scriptForm')
 	->setName('scripts')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
 $scriptFormList = (new CFormList())
-	->addRow(_('Name'),
+	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
+			->setAttribute('placeholder', _('<sub-menu/sub-menu/...>script'))
+			->setAriaRequired()
 	)
-	->addRow(_('Type'),
+	->addRow((new CLabel(_('Type'), 'type')),
 		(new CRadioButtonList('type', (int) $data['type']))
 			->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
 			->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
 			->setModern(true)
 	)
-	->addRow(_('Execute on'),
+	->addRow((new CLabel(_('Execute on'), 'execute_on')),
 		(new CRadioButtonList('execute_on', (int) $data['execute_on']))
 			->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 			->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
 			->setModern(true)
 	)
-	->addRow(_('Commands'),
+	->addRow((new CLabel(_('Commands'), 'command'))->setAsteriskMark(),
 		(new CTextArea('command', $data['command']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxLength(255)
+			->setAriaRequired()
 	)
-	->addRow(_('Command'),
-		(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->addRow((new CLabel(_('Command'), 'commandipmi'))->setAsteriskMark(),
+		(new CTextBox('commandipmi', $data['commandipmi']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -77,19 +82,19 @@ $scriptFormList
 	)
 	->addRow(null, (new CMultiSelect([
 		'name' => 'groupid',
-		'selectedLimit' => 1,
-		'objectName' => 'hostGroup',
+		'object_name' => 'hostGroup',
+		'multiple' => false,
 		'data' => $data['hostgroup'],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'host_groups',
+				'srcfld1' => 'groupid',
 				'dstfrm' => $scriptForm->getName(),
-				'dstfld1' => 'groupid',
-				'srcfld1' => 'groupid'
+				'dstfld1' => 'groupid'
 			]
-		]]))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
-	->addRow(_('Required host permissions'),
+		]
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection')
+	->addRow((new CLabel(_('Required host permissions'), 'host_access')),
 		(new CRadioButtonList('host_access', (int) $data['host_access']))
 			->addValue(_('Read'), PERM_READ)
 			->addValue(_('Write'), PERM_READ_WRITE)
@@ -99,8 +104,7 @@ $scriptFormList
 		(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'] == 1)
 	);
 
-$confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
-$scriptFormList->addRow($confirmationLabel, [
+$scriptFormList->addRow(new CLabel(_('Confirmation text'), 'confirmation'), [
 	(new CTextBox('confirmation', $data['confirmation']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	SPACE,
 	(new CButton('testConfirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,14 +49,6 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				$this->srcfld2 = 'name';
 				break;
 
-			case WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH:
-			case WIDGET_FIELD_SELECT_RES_ITEM:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
-				$this->srctbl = 'items';
-				$this->srcfld1 = 'itemid';
-				$this->srcfld2 = 'name';
-				break;
-
 			case WIDGET_FIELD_SELECT_RES_GRAPH:
 				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
 				$this->srctbl = 'graphs';
@@ -84,21 +76,9 @@ class CWidgetFieldSelectResource extends CWidgetField {
 			'dstfrm' => $dstfrm
 		];
 
-		switch ($this->getResourceType()) {
-			case WIDGET_FIELD_SELECT_RES_ITEM:
-				$popup_options['real_hosts'] = '1';
-				break;
-
-			case WIDGET_FIELD_SELECT_RES_GRAPH:
-				$popup_options['real_hosts'] = '1';
-				$popup_options['with_graphs'] = '1';
-				break;
-
-			case WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH:
-				$popup_options['numeric'] = '1';
-				$popup_options['real_hosts'] = '1';
-				$popup_options['with_simple_graph_items'] = '1';
-				break;
+		if ($this->resource_type == WIDGET_FIELD_SELECT_RES_GRAPH) {
+			$popup_options['real_hosts'] = '1';
+			$popup_options['with_graphs'] = '1';
 		}
 
 		return $popup_options;

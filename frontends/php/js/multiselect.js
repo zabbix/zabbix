@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,7 +150,9 @@ jQuery(function($) {
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]		(optional)
-	 * @param array  options['ignored']				preload ignored {id: name} (optional)
+	 * @param bool   options['data'][inaccessible]	(optional)
+	 * @param bool   options['data'][disabled]		(optional)
+	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
@@ -183,7 +185,8 @@ jQuery(function($) {
 				'Select': 'Select'
 			},
 			data: [],
-			ignored: {},
+			only_hostid: 0,
+			excludeids: [],
 			addNew: false,
 			defaultValue: null,
 			disabled: false,
@@ -219,8 +222,7 @@ jQuery(function($) {
 					isMoreMatchesFound: false,
 					isAvailableOpened: false,
 					selected: {},
-					available: {},
-					ignored: empty(options.ignored) ? {} : options.ignored
+					available: {}
 				}
 			};
 
@@ -271,7 +273,7 @@ jQuery(function($) {
 					}
 
 					if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
-						setReadonly(obj);
+						setSearchFieldVisibility(false, obj, options);
 						return false;
 					}
 
@@ -300,19 +302,19 @@ jQuery(function($) {
 										}
 
 										values.isAjaxLoaded = false;
+										var request_data = {
+											search: values.search,
+											limit: getLimit(values, options)
+										}
 
 										jqxhr = $.ajax({
 											url: options.url + '&curtime=' + new CDate().getTime(),
 											type: 'GET',
 											dataType: 'json',
 											cache: false,
-											data: {
-												search: values.search,
-												limit: getLimit(values, options)
-											},
+											data: request_data,
 											success: function(data) {
 												values.isAjaxLoaded = true;
-
 												loadAvailable(data.result, obj, values, options);
 											}
 										});
@@ -352,9 +354,13 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									var prev = selected.prev();
+									var prev = selected.prev(),
+										id = selected.data('id'),
+										item = values.selected[id];
 
-									removeSelected(selected.data('id'), obj, values, options);
+									if (typeof(item.disabled) === 'undefined' || !item.disabled) {
+										removeSelected(id, obj, values, options);
+									}
 
 									if (prev.length > 0) {
 										prev.addClass('selected');
@@ -378,15 +384,19 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									var next = selected.next();
+									var next = selected.next(),
+										id = selected.data('id'),
+										item = values.selected[id];
 
-									removeSelected(selected.data('id'), obj, values, options);
+									if (typeof(item.disabled) === 'undefined' || !item.disabled) {
+										removeSelected(id, obj, values, options);
 
-									if (next.length > 0) {
-										next.addClass('selected');
-									}
-									else {
-										$('.selected li:last-child', obj).addClass('selected');
+										if (next.length > 0) {
+											next.addClass('selected');
+										}
+										else {
+											$('.selected li:last-child', obj).addClass('selected');
+										}
 									}
 								}
 
@@ -416,10 +426,13 @@ jQuery(function($) {
 
 						case KEY.ARROW_RIGHT:
 							if ($('.selected li.selected', obj).length > 0) {
-								var next = $('.selected li.selected', obj).removeClass('selected').next();
+								var next = $('.selected li.selected', obj).removeClass('selected').next('li');
 
 								if (next.length > 0) {
 									next.addClass('selected');
+								}
+								else if (getSearchFieldVisibility(obj) == false) {
+									$('.selected li:first-child', obj).addClass('selected');
 								}
 							}
 							break;
@@ -490,14 +503,20 @@ jQuery(function($) {
 					}
 				})
 				.focusin(function() {
-					if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-						$(obj).addClass('active');
+					$(obj).addClass('active');
+
+					if (getSearchFieldVisibility(obj) == false) {
+						$('.selected li:first-child', obj).addClass('selected');
 					}
 				})
 				.focusout(function() {
-					$(obj).removeClass('active');
+					$(obj).removeClass('active').find('li.selected').removeClass('selected');
 					cleanSearchInput(obj);
 				});
+				if (obj.attr('aria-required')) {
+					input.attr('aria-required', obj.attr('aria-required'));
+					obj.removeAttr('aria-required');
+				}
 				obj.append(input);
 			}
 
@@ -533,12 +552,8 @@ jQuery(function($) {
 			if (options.popup.parameters != null) {
 				var popup_options = options.popup.parameters;
 
-				if (options.ignored) {
-					var excludeids = [];
-					$.each(options.ignored, function(i, value) {
-						excludeids.push(i);
-					});
-					popup_options['excludeids'] = excludeids;
+				if (typeof popup_options['only_hostid'] !== 'undefined') {
+					options.only_hostid = popup_options['only_hostid'];
 				}
 
 				var popupButton = $('<button>', {
@@ -551,18 +566,14 @@ jQuery(function($) {
 					popupButton.attr('disabled', true);
 				}
 				else {
-					popupButton.click(function() {
-						return PopUp('popup.generic', popup_options);
+					popupButton.click(function(event) {
+						return PopUp('popup.generic', popup_options, null, event.target);
 					});
 				}
 
 				obj.parent().append($('<div>', {
 					'class': 'multiselect-button'
 				}).append(popupButton));
-			}
-
-			if ('postInitEvent' in options) {
-				jQuery(document).trigger(options.postInitEvent);
 			}
 		});
 	};
@@ -652,7 +663,7 @@ jQuery(function($) {
 				if (options.limit != 0 && objectLength(values.available) < options.limit) {
 					if (typeof values.available[item.id] === 'undefined'
 							&& typeof values.selected[item.id] === 'undefined'
-							&& typeof values.ignored[item.id] === 'undefined') {
+							&& options.excludeids.indexOf(item.id) === -1) {
 						values.available[item.id] = item;
 					}
 				}
@@ -686,8 +697,10 @@ jQuery(function($) {
 					values.isAvailableOpened = false;
 				});
 
-			$.each(values.available, function(i, item) {
-				addAvailable(item, obj, values, options);
+			$.each(data, function (i, item) {
+				if (typeof values.available[item.id] !== 'undefined') {
+					addAvailable(item, obj, values, options);
+				}
 			});
 		}
 
@@ -712,7 +725,8 @@ jQuery(function($) {
 			removeDefaultValue(obj, options);
 			values.selected[item.id] = item;
 
-			var prefix = (typeof item.prefix === 'undefined') ? '' : item.prefix;
+			var prefix = (typeof item.prefix === 'undefined') ? '' : item.prefix,
+				item_disabled = (typeof(item.disabled) !== 'undefined' && item.disabled);
 
 			// add hidden input
 			obj.append($('<input>', {
@@ -727,7 +741,7 @@ jQuery(function($) {
 				'class': 'subfilter-disable-btn'
 			});
 
-			if (!options.disabled) {
+			if (!options.disabled && !item_disabled) {
 				close_btn.click(function() {
 					removeSelected(item.id, obj, values, options);
 				});
@@ -749,13 +763,17 @@ jQuery(function($) {
 				li.addClass('inaccessible');
 			}
 
+			if (item_disabled) {
+				li.addClass('disabled');
+			}
+
 			$('.selected ul', obj).append(li);
 
 			resizeSelectedText(li, obj);
 
 			// set readonly
 			if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
-				setReadonly(obj);
+				setSearchFieldVisibility(false, obj, options);
 			}
 		}
 	}
@@ -777,7 +795,8 @@ jQuery(function($) {
 		cleanLastSearch(obj);
 
 		if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-			$('input[type="text"]', obj).css({'display': ''}).focus();
+			setSearchFieldVisibility(true, obj, options);
+			$('input[type="text"]', obj).focus();
 		}
 	}
 
@@ -964,33 +983,33 @@ jQuery(function($) {
 		}
 	}
 
-	function setReadonly(obj) {
-		$('input[type="text"]', obj).css({'display': 'none'});
-		$(obj).removeClass('active');
+	function setSearchFieldVisibility(visible, container, options) {
+		if (visible) {
+			container.removeClass('search-disabled')
+				.find('input[type="text"]')
+				.attr({
+					placeholder: options.labels['type here to search'],
+					readonly: false
+				});
+		}
+		else {
+			container.addClass('search-disabled')
+				.find('input[type="text"]')
+				.attr({
+					placeholder: '',
+					readonly: true
+				});
+		}
+	}
+
+	function getSearchFieldVisibility(container) {
+		return container.not('.search-disabled').length > 0;
 	}
 
 	function getLimit(values, options) {
 		return (options.limit != 0)
-			? options.limit + countMatches(values.selected, values.search) + countMatches(values.ignored, values.search) + 1
+			? options.limit + objectLength(values.selected) + options.excludeids.length + 1
 			: null;
-	}
-
-	function countMatches(data, search) {
-		var count = 0;
-
-		if (empty(data)) {
-			return count;
-		}
-
-		for (var id in data) {
-			var name = (typeof(data[id]) == 'object') ? data[id].name : data[id];
-
-			if (name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
-				count++;
-			}
-		}
-
-		return count;
 	}
 
 	function objectLength(obj) {

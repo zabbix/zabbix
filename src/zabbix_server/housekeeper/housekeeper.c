@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,9 @@ typedef struct
 {
 	/* target table name */
 	const char	*table;
+
+	/* ID field name, required to select IDs of records that must be deleted */
+	char	*field_name;
 
 	/* Optional filter, must be empty string if not used. Only the records matching */
 	/* filter are subject to housekeeping procedures.                               */
@@ -593,10 +596,9 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		keep_from, deleted = 0;
-	int		rc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' filter:'%s' min_clock:%d now:%d",
-			__function_name, rule->table, rule->filter, rule->min_clock, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
+			__function_name, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
 
 	/* initialize min_clock with the oldest record timestamp from database */
 	if (0 == rule->min_clock)
@@ -616,13 +618,59 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	keep_from = now - *rule->phistory;
 	if (keep_from > rule->min_clock)
 	{
+		char			buffer[MAX_STRING_LEN];
+		char			*sql = NULL;
+		size_t			sql_alloc = 0, sql_offset = 0;
+		zbx_vector_uint64_t	ids;
+		int			ret;
+
+		zbx_vector_uint64_create(&ids);
+
 		rule->min_clock = MIN(keep_from, rule->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
-		rc = DBexecute("delete from %s where clock<%d%s%s", rule->table, rule->min_clock,
-				('\0' != *rule->filter ? " and " : ""), rule->filter);
+		zbx_snprintf(buffer, sizeof(buffer),
+			"select %s"
+			" from %s"
+			" where clock<%d%s%s"
+			" order by %s",
+			rule->field_name, rule->table, rule->min_clock, '\0' != *rule->filter ? " and " : "",
+			rule->filter, rule->field_name);
 
-		if (ZBX_DB_OK <= rc)
-			deleted = rc;
+		while (1)
+		{
+			/* Select IDs of records that must be deleted, this allows to avoid locking for every   */
+			/* record the search encounters when using delete statement, thus eliminates deadlocks. */
+			if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
+				result = DBselect("%s", buffer);
+			else
+				result = DBselectN(buffer, CONFIG_MAX_HOUSEKEEPER_DELETE);
+
+			while (NULL != (row = DBfetch(result)))
+			{
+				zbx_uint64_t	id;
+
+				ZBX_STR2UINT64(id, row[0]);
+				zbx_vector_uint64_append(&ids, id);
+			}
+			DBfree_result(result);
+
+			if (0 == ids.values_num)
+				break;
+
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", rule->table);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, rule->field_name, ids.values,
+					ids.values_num);
+
+			if (ZBX_DB_OK > (ret = DBexecute("%s", sql)))
+				break;
+
+			deleted += ret;
+			zbx_vector_uint64_clear(&ids);
+		}
+
+		zbx_free(sql);
+		zbx_vector_uint64_destroy(&ids);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
@@ -669,9 +717,10 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 #elif defined(HAVE_POSTGRESQL)
 		return DBexecute(
 				"delete from %s"
-				" where ctid = any(array(select ctid from %s"
+				" where %s and ctid = any(array(select ctid from %s"
 					" where %s limit %d))",
 				tablename,
+				filter,
 				tablename,
 				filter,
 				limit);
@@ -689,7 +738,7 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_problem_cleanup                                              *
+ * Function: hk_problem_cleanup                                               *
  *                                                                            *
  * Purpose: perform problem table cleanup                                     *
  *                                                                            *
@@ -867,7 +916,12 @@ static int	housekeeping_sessions(int now)
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.sessions_mode)
 	{
-		rc = DBexecute("delete from sessions where lastaccess<%d", now - cfg.hk.sessions);
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "lastaccess<%d", now - cfg.hk.sessions);
+		rc = DBdelete_from_table("sessions", sql, CONFIG_MAX_HOUSEKEEPER_DELETE);
+		zbx_free(sql);
 
 		if (ZBX_DB_OK <= rc)
 			deleted = rc;
@@ -880,7 +934,7 @@ static int	housekeeping_sessions(int now)
 
 static int	housekeeping_services(int now)
 {
-	static zbx_hk_rule_t	rule = {"service_alarms", "", 0, &cfg.hk.services};
+	static zbx_hk_rule_t	rule = {"service_alarms", "servicealarmid", "", 0, &cfg.hk.services};
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.services_mode)
 		return housekeeping_process_rule(now, &rule);
@@ -890,7 +944,7 @@ static int	housekeeping_services(int now)
 
 static int	housekeeping_audit(int now)
 {
-	static zbx_hk_rule_t	rule = {"auditlog", "", 0, &cfg.hk.audit};
+	static zbx_hk_rule_t	rule = {"auditlog", "auditid", "", 0, &cfg.hk.audit};
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.audit_mode)
 		return housekeeping_process_rule(now, &rule);
@@ -900,34 +954,33 @@ static int	housekeeping_audit(int now)
 
 static int	housekeeping_events(int now)
 {
-	static zbx_hk_rule_t 	rules[] = {
-		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
+#define ZBX_HK_EVENT_RULE	" and not exists (select null from problem where events.eventid=problem.eventid)" \
+				" and not exists (select null from problem where events.eventid=problem.r_eventid)"
+
+	static zbx_hk_rule_t	rules[] = {
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_trigger},
-		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_trigger},
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
-		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
-		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
-			" and not exists (select null from problem where events.eventid=problem.eventid"
-			" or events.eventid=problem.r_eventid)", 0, &cfg.hk.events_internal},
-		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
-		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
-		{"events", "events.source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
 		{NULL}
 	};
 
-	int			deleted = 0;
-	zbx_hk_rule_t		*rule;
+	int		deleted = 0;
+	zbx_hk_rule_t	*rule;
 
 	if (ZBX_HK_OPTION_ENABLED != cfg.hk.events_mode)
 		return 0;
@@ -936,6 +989,7 @@ static int	housekeeping_events(int now)
 		deleted += housekeeping_process_rule(now, rule);
 
 	return deleted;
+#undef ZBX_HK_EVENT_RULE
 }
 
 static int	housekeeping_problems(int now)

@@ -104,6 +104,10 @@ AC_DEFUN([AX_LIB_MYSQL],
 
                         MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"
                 ;;
+                    -R*)
+
+                        MYSQL_LDFLAGS="${MYSQL_LDFLAGS} -Wl,$i"
+                ;;
                     -l*)
 
                         _lib_name="`echo "$i" | cut -b3-`"

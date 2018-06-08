@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,7 +171,10 @@ class CControllerPopupMedia extends CController {
 				'options' => $page_options,
 				'db_mediatypes' => $db_mediatypes,
 				'mediatypes' => $mediatypes,
-				'severities' => $this->severities
+				'severities' => $this->severities,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

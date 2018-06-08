@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #ifdef _AIX
 
-#define XINTFRAC	((double)_system_configuration.Xint / (double)_system_configuration.Xfrac)
+#define XINTFRAC	((double)_system_configuration.Xint / _system_configuration.Xfrac)
 
 static int		last_clock = 0;
 /* --- kthr --- */
@@ -134,19 +134,19 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 	else if (now > last_clock)
 	{
 		/* --- kthr --- */
-		vmstat->kthr_r = (double)(cpustats.runque - last_runque) / (double)(now - last_clock);
-		vmstat->kthr_b = (double)(cpustats.swpque - last_swpque) / (double)(now - last_clock);
+		vmstat->kthr_r = (double)(cpustats.runque - last_runque) / (now - last_clock);
+		vmstat->kthr_b = (double)(cpustats.swpque - last_swpque) / (now - last_clock);
 		/* --- page --- */
-		vmstat->fi = (double)(memstats.pgins - last_pgins) / (double)(now - last_clock);
-		vmstat->fo = (double)(memstats.pgouts - last_pgouts) / (double)(now - last_clock);
-		vmstat->pi = (double)(memstats.pgspins - last_pgspins) / (double)(now - last_clock);
-		vmstat->po = (double)(memstats.pgspouts - last_pgspouts) / (double)(now - last_clock);
-		vmstat->fr = (double)(memstats.cycles - last_cycles) / (double)(now - last_clock);
-		vmstat->sr = (double)(memstats.scans - last_scans) / (double)(now - last_clock);
+		vmstat->fi = (double)(memstats.pgins - last_pgins) / (now - last_clock);
+		vmstat->fo = (double)(memstats.pgouts - last_pgouts) / (now - last_clock);
+		vmstat->pi = (double)(memstats.pgspins - last_pgspins) / (now - last_clock);
+		vmstat->po = (double)(memstats.pgspouts - last_pgspouts) / (now - last_clock);
+		vmstat->fr = (double)(memstats.cycles - last_cycles) / (now - last_clock);
+		vmstat->sr = (double)(memstats.scans - last_scans) / (now - last_clock);
 		/* -- faults -- */
-		vmstat->in = (double)(cpustats.devintrs - last_devintrs) / (double)(now - last_clock);
-		vmstat->sy = (double)(cpustats.syscall - last_syscall) / (double)(now - last_clock);
-		vmstat->cs = (double)(cpustats.pswitch - last_pswitch) / (double)(now - last_clock);
+		vmstat->in = (double)(cpustats.devintrs - last_devintrs) / (now - last_clock);
+		vmstat->sy = (double)(cpustats.syscall - last_syscall) / (now - last_clock);
+		vmstat->cs = (double)(cpustats.pswitch - last_pswitch) / (now - last_clock);
 
 #ifdef _AIXVERSION_530
 		/* --- cpu ---- */
@@ -192,7 +192,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 #endif	/* HAVE_AIXOSLEVEL_530006 */
 
 		dtimebase = lparstats.timebase_last - last_timebase_last;
-		vmstat->ent = (double)lparstats.entitled_proc_capacity / 100.0;
+		vmstat->ent = lparstats.entitled_proc_capacity / 100.0;
 
 		if (lparstats.type.b.shared_enabled)
 		{
@@ -207,48 +207,48 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			/* distribute unused purr in wait and idle proportionally to logical wait and idle */
 			if (0 != dlcpu_wa + dlcpu_id)
 			{
-				dpcpu_wa += unused_purr * ((double)dlcpu_wa / (double)(dlcpu_wa + dlcpu_id));
-				dpcpu_id += unused_purr * ((double)dlcpu_id / (double)(dlcpu_wa + dlcpu_id));
+				dpcpu_wa += unused_purr * ((double)dlcpu_wa / (dlcpu_wa + dlcpu_id));
+				dpcpu_id += unused_purr * ((double)dlcpu_id / (dlcpu_wa + dlcpu_id));
 			}
 
 			pcputime = entitled_purr;
 		}
 
 		/* Physical Processor Utilization */
-		vmstat->cpu_us = (double)dpcpu_us * 100.0 / (double)pcputime;
-		vmstat->cpu_sy = (double)dpcpu_sy * 100.0 / (double)pcputime;
-		vmstat->cpu_id = (double)dpcpu_id * 100.0 / (double)pcputime;
-		vmstat->cpu_wa = (double)dpcpu_wa * 100.0 / (double)pcputime;
+		vmstat->cpu_us = dpcpu_us * 100.0 / pcputime;
+		vmstat->cpu_sy = dpcpu_sy * 100.0 / pcputime;
+		vmstat->cpu_id = dpcpu_id * 100.0 / pcputime;
+		vmstat->cpu_wa = dpcpu_wa * 100.0 / pcputime;
 
 		if (lparstats.type.b.shared_enabled)
 		{
 			/* Physical Processor Consumed */
-			vmstat->cpu_pc = (double)delta_purr / (double)dtimebase;
+			vmstat->cpu_pc = (double)delta_purr / dtimebase;
 
 			/* Percentage of Entitlement Consumed */
-			vmstat->cpu_ec = (double)(vmstat->cpu_pc / vmstat->ent) * 100.0;
+			vmstat->cpu_ec = (vmstat->cpu_pc / vmstat->ent) * 100.0;
 
 			/* Logical Processor Utilization */
-			vmstat->cpu_lbusy = (double)(dlcpu_us + dlcpu_sy) * 100.0 / (double)lcputime;
+			vmstat->cpu_lbusy = (dlcpu_us + dlcpu_sy) * 100.0 / lcputime;
 
 			if (lparstats.type.b.pool_util_authority)
 			{
 				/* Available Pool Processor (app) */
-				vmstat->cpu_app = (double)(lparstats.pool_idle_time - last_pool_idle_time) / (XINTFRAC * (double)dtimebase);
+				vmstat->cpu_app = (lparstats.pool_idle_time - last_pool_idle_time) / (XINTFRAC * dtimebase);
 			}
 		}
 #else	/* not _AIXVERSION_530 */
 
 		/* Physical Processor Utilization */
-		vmstat->cpu_us = (double)dlcpu_us * 100.0 / (double)lcputime;
-		vmstat->cpu_sy = (double)dlcpu_sy * 100.0 / (double)lcputime;
-		vmstat->cpu_id = (double)dlcpu_id * 100.0 / (double)lcputime;
-		vmstat->cpu_wa = (double)dlcpu_wa * 100.0 / (double)lcputime;
+		vmstat->cpu_us = dlcpu_us * 100.0 / lcputime;
+		vmstat->cpu_sy = dlcpu_sy * 100.0 / lcputime;
+		vmstat->cpu_id = dlcpu_id * 100.0 / lcputime;
+		vmstat->cpu_wa = dlcpu_wa * 100.0 / lcputime;
 
 #endif	/* _AIXVERSION_530 */
 		/* --- disk --- */
 		vmstat->disk_bps = 512 * ((diskstats.wblks - last_wblks) + (diskstats.rblks - last_rblks)) / (now - last_clock);
-		vmstat->disk_tps = (double)(diskstats.xfers - last_xfers) / (double)(now - last_clock);
+		vmstat->disk_tps = (double)(diskstats.xfers - last_xfers) / (now - last_clock);
 
 		/* -- memory -- */
 #ifdef HAVE_AIXOSLEVEL_520004
