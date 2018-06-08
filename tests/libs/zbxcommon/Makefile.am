@@ -126,6 +126,10 @@ calculate_item_nextcheck_SOURCES = \
 calculate_item_nextcheck_LDADD = \
 	$(COMMON_LIB_FILES)
 
+calculate_item_nextcheck_LDADD += @SERVER_LIBS@
+
+calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
+
 calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
