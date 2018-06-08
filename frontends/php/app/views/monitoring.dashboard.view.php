@@ -165,7 +165,7 @@ else {
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 
 		if ($data['kioskmode']) {
-			$timeline->addStyle('display: none;');
+			$timeline = (new CDiv($timeline))->addStyle('display: none;');
 		}
 	}
 
