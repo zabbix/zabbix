@@ -6,8 +6,7 @@ SUBDIRS = \
 	src \
 	database \
 	man \
-	misc \
-	upgrades
+	misc
 
 EXTRA_DIST = \
 	bin \

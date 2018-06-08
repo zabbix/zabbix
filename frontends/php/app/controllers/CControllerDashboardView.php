@@ -35,7 +35,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'kioskmode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'source_dashboardid' =>	'db dashboard.dashboardid',
-			'groupid' =>			'db groups.groupid',
+			'groupid' =>			'db hstgrp.groupid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
 			'period' =>				'int32',

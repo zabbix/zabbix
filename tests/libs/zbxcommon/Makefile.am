@@ -2,7 +2,8 @@ if SERVER
 SERVER_tests = \
 	zbx_function_find \
 	parse_key \
-	replace_key_params_dyn
+	replace_key_params_dyn \
+	calculate_item_nextcheck
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -117,5 +118,14 @@ replace_key_params_dyn_LDADD += @SERVER_LIBS@
 replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@
 
 replace_key_params_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+calculate_item_nextcheck_SOURCES = \
+	calculate_item_nextcheck.c \
+	$(COMMON_SRC_FILES)
+
+calculate_item_nextcheck_LDADD = \
+	$(COMMON_LIB_FILES)
+
+calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

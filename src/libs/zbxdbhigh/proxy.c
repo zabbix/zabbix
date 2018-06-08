@@ -494,7 +494,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 					" and r.status=%d",
 				proxy_hostid, DRULE_STATUS_MONITORED);
 	}
-	else if (0 == strcmp(table->table, "groups"))
+	else if (0 == strcmp(table->table, "hstgrp"))
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",config r where t.groupid=r.discovery_groupid");
 	}
@@ -684,7 +684,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"dchecks",
 		"regexps",
 		"expressions",
-		"groups",
+		"hstgrp",
 		"config",
 		"httptest",
 		"httptestitem",

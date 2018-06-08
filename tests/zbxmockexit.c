@@ -24,6 +24,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
+#include "common.h"
+
 void	__wrap_exit(int status)
 {
 	zbx_mock_error_t	error;
