@@ -18,12 +18,20 @@ zbx_jsonpath_next_SOURCES = \
 
 zbx_jsonpath_next_LDADD = $(JSON_LIBS)
 
+if SERVER
+zbx_jsonpath_next_LDADD += @SERVER_LIBS@
+endif
+
 zbx_jsonpath_next_CFLAGS = -I@top_srcdir@/tests
 
 zbx_json_path_open_SOURCES = \
 	zbx_json_path_open.c \
 	../../zbxmocktest.h
 
-zbx_json_path_open_LDADD = $(JSON_LIBS)
+zbx_json_path_open_LDADD = $(JSON_LIBS) @SERVER_LIBS@
+
+if SERVER
+zbx_json_path_open_LDADD += @SERVER_LIBS@
+endif
 
 zbx_json_path_open_CFLAGS = -I@top_srcdir@/tests

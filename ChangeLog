@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha8
 
 New features:
+...GI..PS. [ZBXNEXT-4577] improved performance of Zabbix server by replacing semaphores to pthread mutexes and read-write locks (vso, wiper)
 ..F....... [ZBXNEXT-4312] reworked date picker; implemented keyboard interaction (miks)
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
