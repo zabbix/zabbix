@@ -448,7 +448,8 @@ class CScreenProblem extends CScreenBase {
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'eventids' => $eventids
+			'eventids' => $eventids,
+			'preservekeys' => true
 		];
 		if ($config['event_ack_enable']) {
 			$options['select_acknowledges'] = ['userid', 'clock', 'message', 'action'];
@@ -506,7 +507,8 @@ class CScreenProblem extends CScreenBase {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
-			'recent' => true
+			'recent' => true,
+			'preservekeys' => true
 		];
 		if ($config['event_ack_enable']) {
 			$options['selectAcknowledges'] = ['userid', 'clock', 'message', 'action'];
@@ -578,27 +580,31 @@ class CScreenProblem extends CScreenBase {
 		$correlationids = [];
 		$userids = [];
 
-		foreach ($problems_data as $problem_data) {
-			$problem = &$data['problems'][$problem_data['eventid']];
+		foreach ($data['problems'] as $eventid => &$problem) {
+			if (array_key_exists($eventid, $problems_data)) {
+				$problem_data = $problems_data[$eventid];
 
-			$problem['r_eventid'] = $problem_data['r_eventid'];
-			$problem['r_clock'] = $problem_data['r_clock'];
-			if ($config['event_ack_enable']) {
-				$problem['acknowledges'] = $problem_data['acknowledges'];
-			}
-			$problem['tags'] = $problem_data['tags'];
-			$problem['correlationid'] = $problem_data['correlationid'];
-			$problem['userid'] = $problem_data['userid'];
+				$problem['r_eventid'] = $problem_data['r_eventid'];
+				$problem['r_clock'] = $problem_data['r_clock'];
+				if ($config['event_ack_enable']) {
+					$problem['acknowledges'] = $problem_data['acknowledges'];
+				}
+				$problem['tags'] = $problem_data['tags'];
+				$problem['correlationid'] = $problem_data['correlationid'];
+				$problem['userid'] = $problem_data['userid'];
 
-			if ($problem['correlationid'] != 0) {
-				$correlationids[$problem['correlationid']] = true;
+				if ($problem['correlationid'] != 0) {
+					$correlationids[$problem['correlationid']] = true;
+				}
+				if ($problem['userid'] != 0) {
+					$userids[$problem['userid']] = true;
+				}
 			}
-			if ($problem['userid'] != 0) {
-				$userids[$problem['userid']] = true;
+			else {
+				unset($data['problems'][$eventid]);
 			}
-
-			unset($problem);
 		}
+		unset($problem);
 
 		$data['correlations'] = $correlationids
 			? API::Correlation()->get([
@@ -782,8 +788,19 @@ class CScreenProblem extends CScreenBase {
 					$tags_header = null;
 				}
 				else {
-					$tags_width = 26 + 49 * $this->data['filter']['show_tags'];
-					$tags_header = (new CColHeader(_('Tags')))->addStyle('width: '.$tags_width.'px;');
+					$tags_header = (new CColHeader(_('Tags')));
+
+					switch ($this->data['filter']['show_tags']) {
+						case PROBLEMS_SHOW_TAGS_1:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
+							break;
+						case PROBLEMS_SHOW_TAGS_2:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
+							break;
+						case PROBLEMS_SHOW_TAGS_3:
+							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
+							break;
+					}
 				}
 
 				$table = (new CTableInfo())
@@ -796,9 +813,9 @@ class CScreenProblem extends CScreenBase {
 						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
 						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 30%;'),
+							->addStyle('width: 35%;'),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 70%;'),
+							->addStyle('width: 65%;'),
 						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
 						$this->config['event_ack_enable'] ? (new CColHeader(_('Ack')))->addStyle('width: 36px;') : null,
 						(new CColHeader(_('Actions')))->addStyle('width: 59px;'),

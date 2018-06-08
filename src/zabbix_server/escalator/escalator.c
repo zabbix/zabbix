@@ -85,18 +85,14 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
  *                                                                            *
  * Function: check_perm2system                                                *
  *                                                                            *
- * Purpose: Checking user permissions to access system.                       *
+ * Purpose: Check user permissions to access system                           *
  *                                                                            *
  * Parameters: userid - user ID                                               *
  *                                                                            *
- * Return value: SUCCEED - permission is positive, FAIL - otherwise           *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
+ * Return value: SUCCEED - access allowed, FAIL - otherwise                   *
  *                                                                            *
  ******************************************************************************/
-int	check_perm2system(zbx_uint64_t userid)
+static int	check_perm2system(zbx_uint64_t userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -144,10 +140,6 @@ static	int	get_user_type(zbx_uint64_t userid)
  *                                                                            *
  * Return value: PERM_DENY - if host or user not found,                       *
  *                   or permission otherwise                                  *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids)
@@ -443,13 +435,10 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, const char *subject, const char *message, const DB_EVENT *event,
 		const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, int macro_type)
-
 {
 	const char	*__function_name = "add_object_msg";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	userid;
-	char		*subject_dyn, *message_dyn;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -466,6 +455,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_t	userid;
+		char		*subject_dyn, *message_dyn;
+
 		ZBX_STR2UINT64(userid, row[0]);
 
 		/* exclude acknowledgement author from the recipient list */
@@ -709,7 +701,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	}
 
 	now = (int)time(NULL);
-	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, NULL == command ? "" : command);
+	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(command));
 
 	if (NULL == r_event)
 	{
@@ -1051,6 +1043,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 			}
 		}
+		else
+			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
 
 		alertid = DBget_maxid("alerts");
 
@@ -1118,9 +1112,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		now, severity, priority, medias_num = 0, status, res;
-	char		error[MAX_STRING_LEN], *period = NULL;
-	const char	*perror;
+	int		now, priority, have_alerts = 0, res;
 	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1130,23 +1122,21 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	if (0 == mediatypeid)
 	{
 		result = DBselect(
-				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status"
+				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status,m.active"
 				" from media m,media_type mt"
 				" where m.mediatypeid=mt.mediatypeid"
-					" and m.active=%d"
 					" and m.userid=" ZBX_FS_UI64,
-				MEDIA_STATUS_ACTIVE, userid);
+				userid);
 	}
 	else
 	{
 		result = DBselect(
-				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status"
+				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status,m.active"
 				" from media m,media_type mt"
 				" where m.mediatypeid=mt.mediatypeid"
-					" and m.active=%d"
 					" and m.userid=" ZBX_FS_UI64
 					" and m.mediatypeid=" ZBX_FS_UI64,
-				MEDIA_STATUS_ACTIVE, userid, mediatypeid);
+				userid, mediatypeid);
 	}
 
 	mediatypeid = 0;
@@ -1154,13 +1144,24 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int		severity, status;
+		const char	*perror;
+		char		*period = NULL;
+
 		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity = atoi(row[2]);
 		period = zbx_strdup(period, row[3]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
 				MACRO_TYPE_COMMON, NULL, 0);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "severity:%d, media severity:%d, period:'%s'", priority, severity, period);
+		zabbix_log(LOG_LEVEL_DEBUG, "severity:%d, media severity:%d, period:'%s', userid:" ZBX_FS_UI64,
+				priority, severity, period, userid);
+
+		if (MEDIA_STATUS_DISABLED == atoi(row[5]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (user media disabled)");
+			continue;
+		}
 
 		if (((1 << priority) & severity) == 0)
 		{
@@ -1186,11 +1187,12 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		else
 		{
 			status = ALERT_STATUS_FAILED;
-			perror = "Media type disabled";
+			perror = "Media type disabled.";
 		}
 
-		if (0 == medias_num++)
+		if (0 == have_alerts)
 		{
+			have_alerts = 1;
 			zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid",
 					"clock", "mediatypeid", "sendto", "subject", "message", "status", "error",
 					"esc_step", "alerttype", "acknowledgeid",
@@ -1210,14 +1212,16 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 					(int)ALERT_TYPE_MESSAGE, ackid);
 		}
 
+		zbx_free(period);
 	}
 
 	DBfree_result(result);
-	zbx_free(period);
 
 	if (0 == mediatypeid)
 	{
-		medias_num++;
+		char	error[MAX_STRING_LEN];
+
+		have_alerts = 1;
 
 		zbx_snprintf(error, sizeof(error), "No media defined for user.");
 
@@ -1239,7 +1243,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		}
 	}
 
-	if (0 != medias_num)
+	if (0 != have_alerts)
 	{
 		zbx_db_insert_autoincrement(&db_insert, "alertid");
 		zbx_db_insert_execute(&db_insert);
@@ -1261,8 +1265,6 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operationid, unsigned char evaltype)

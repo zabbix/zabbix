@@ -498,7 +498,7 @@ static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select functionid,triggerid,itemid,function,parameter"
+				"select functionid,triggerid,itemid,name,parameter"
 				" from functions"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
@@ -2423,7 +2423,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		functionid = DBget_maxid_num("functions", new_functions);
 
 		zbx_db_insert_prepare(&db_insert_tfunctions, "functions", "functionid", "itemid", "triggerid",
-				"function", "parameter", NULL);
+				"name", "parameter", NULL);
 	}
 
 	if (0 != new_dependencies)
