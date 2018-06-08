@@ -1356,6 +1356,7 @@ class CDiscoveryRule extends CItemGeneral {
 					'output' => ['itemid'],
 					'itemids' => array_keys($unresolved_master_itemids),
 					'webitems' => true,
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 					'preservekeys' => true
 				]);
 
@@ -1416,17 +1417,6 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				$item_prototype = $item_prototypes[$key];
-
-				if ($item_prototype['templateid']) {
-					$item_prototype = get_same_item_for_host($item_prototype, $dstHost['hostid']);
-
-					if (!$item_prototype) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
-					}
-					$itemkey_to_id[$srcItem['key_']] = $item_prototype['itemid'];
-					continue;
-				}
-
 				$item_prototype['ruleid'] = $dstDiscovery['itemid'];
 				$item_prototype['hostid'] = $dstDiscovery['hostid'];
 
