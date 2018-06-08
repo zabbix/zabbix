@@ -583,7 +583,7 @@ class CConfigurationExport {
 		$unresolved_master_itemids = [];
 
 		// Gather all master item IDs.
-		foreach ($item_prototypes as $itemid => $item_prototype) {
+		foreach ($item_prototypes as $item_prototype) {
 			if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
 				$unresolved_master_itemids[$item_prototype['master_itemid']] = true;
 			}
@@ -596,28 +596,15 @@ class CConfigurationExport {
 			}
 		}
 
+		// Some leftover regular, non-lld and web items.
 		if ($unresolved_master_itemids) {
 			$master_items = API::Item()->get([
 				'output' => ['itemid', 'key_'],
 				'itemids' => array_keys($unresolved_master_itemids),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 				'webitems' => true,
 				'preservekeys' => true
 			]);
-
-			foreach ($master_items as $master_item) {
-				if (array_key_exists($master_item['itemid'], $unresolved_master_itemids)) {
-					unset($unresolved_master_itemids[$master_item['itemid']]);
-				}
-			}
-
-			// If still there are IDs left, there's nothing more we can do.
-			if ($unresolved_master_itemids) {
-				reset($unresolved_master_itemids);
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _s('Item "%1$s" does not exist or you have no access to this item',
-						key($unresolved_master_itemids)
-				)));
-			}
 		}
 
 		$valuemapids = [];
