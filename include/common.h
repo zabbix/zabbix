@@ -1097,7 +1097,13 @@ char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
 #endif
 
 char	*zbx_strdcat(char *dest, const char *src);
-char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
+
+char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 2, 3)));
+#else
+	;
+#endif
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
