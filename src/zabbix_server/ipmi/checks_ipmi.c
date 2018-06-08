@@ -573,7 +573,7 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fail: %s", __function_name, zbx_strerror(err));
 
-		h->err = zbx_dsprintf(h->err, "error 0x%x while reading threshold sensor", err);
+		h->err = zbx_dsprintf(h->err, "error 0x%x while reading threshold sensor", (unsigned int)err);
 		h->ret = NETWORK_ERROR;
 		goto out;
 	}
@@ -682,7 +682,8 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 
 	if (0 != err)
 	{
-		h->err = zbx_dsprintf(h->err, "error 0x%x while reading a discrete sensor %s@[%s]:%d", err,
+		h->err = zbx_dsprintf(h->err, "error 0x%x while reading a discrete sensor %s@[%s]:%d",
+				(unsigned int)err,
 				zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip,
 				h->port);
 		h->ret = NOTSUPPORTED;
@@ -790,7 +791,8 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 				/* do not use pointer to sensor here - the sensor may have disappeared during */
 				/* ipmi_sensor_get_reading(), as domain might be closed due to communication failure */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-						" ipmi_sensor_get_reading() return error: 0x%x", id_str, ret);
+						" ipmi_sensor_get_reading() return error: 0x%x", id_str,
+						(unsigned int)ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
@@ -828,7 +830,8 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 				/* do not use pointer to sensor here - the sensor may have disappeared during */
 				/* ipmi_sensor_get_states(), as domain might be closed due to communication failure */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-						" ipmi_sensor_get_states() return error: 0x%x", id_str, ret);
+						" ipmi_sensor_get_states() return error: 0x%x", id_str,
+						(unsigned int)ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
@@ -865,7 +868,7 @@ static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *va
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fail: %s", __function_name, zbx_strerror(err));
 
-		h->err = zbx_dsprintf(h->err, "error 0x%x while reading control", err);
+		h->err = zbx_dsprintf(h->err, "error 0x%x while reading control", (unsigned int)err);
 		h->ret = NETWORK_ERROR;
 		goto out;
 	}
@@ -919,7 +922,7 @@ static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *c
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fail: %s", __function_name, zbx_strerror(err));
 
-		h->err = zbx_dsprintf(h->err, "error 0x%x while set control", err);
+		h->err = zbx_dsprintf(h->err, "error 0x%x while set control", (unsigned int)err);
 		h->ret = NETWORK_ERROR;
 		h->done = 1;
 		return;
@@ -969,7 +972,7 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, const zbx_ipmi_control_t *
 		/* do not use pointer to control here - the control may have disappeared during */
 		/* ipmi_control_get_val(), as domain might be closed due to communication failure */
 		h->err = zbx_dsprintf(h->err, "Cannot read control %s. ipmi_control_get_val() return error: 0x%x",
-				control_name, ret);
+				control_name, (unsigned int)ret);
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -1016,7 +1019,7 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 		/* do not use pointer to control here - the control may have disappeared during */
 		/* ipmi_control_set_val(), as domain might be closed due to communication failure */
 		h->err = zbx_dsprintf(h->err, "Cannot set control %s. ipmi_control_set_val() return error: 0x%x",
-				control_name, ret);
+				control_name, (unsigned int)ret);
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -1335,7 +1338,7 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d."
 				" ipmi_ip_setup_con() returned error 0x%x",
-				h->ip, h->port, ret);
+				h->ip, h->port, (unsigned int)ret);
 		h->ret = NETWORK_ERROR;
 		goto out;
 	}
@@ -1344,7 +1347,7 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d."
 				" start_con() returned error 0x%x",
-				h->ip, h->port, ret);
+				h->ip, h->port, (unsigned int)ret);
 		h->ret = NETWORK_ERROR;
 		goto out;
 	}
