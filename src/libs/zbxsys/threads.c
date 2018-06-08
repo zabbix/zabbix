@@ -91,6 +91,11 @@ static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 		zbx_thread_exit(EXIT_SUCCESS);
 	}
 }
+
+void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
+{
+	_endthreadex(SUCCEED);
+}
 #endif
 
 /******************************************************************************
