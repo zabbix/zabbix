@@ -2435,7 +2435,7 @@ cancel_warning:
 			if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_STATUS))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstatus=%d", separator,
-						diff->status);
+						(int)diff->status);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where escalationid=" ZBX_FS_UI64 ";\n",
