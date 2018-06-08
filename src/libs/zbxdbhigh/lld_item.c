@@ -1127,7 +1127,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	if (SUCCEED == ret && (ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
 			ITEM_TYPE_SNMPv3 == item_prototype->type))
 	{
-		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, err, sizeof(err));
 	}
 	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 
