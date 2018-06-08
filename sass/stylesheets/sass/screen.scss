@@ -777,6 +777,10 @@ output {
 					margin: 0;
 					line-height: 14px;
 				}
+
+				&:last-of-type {
+					margin-right: 0;
+				}
 			}
 
 			.rel-container {
@@ -970,6 +974,8 @@ output {
 		padding: 6px 5px;
 		position: relative;
 		border-bottom: 1px solid $table-border-color;
+		line-height: 18px;
+		vertical-align: top;
 	}
 
 	.vertical_rotation_inner {
@@ -5487,7 +5493,7 @@ svg {
 	position: absolute;
 	content: attr(data-count);
 	text-align: center;
-	margin-top: -1px;
+	margin-top: -2px;
 	font-size: 9px;
 	letter-spacing: -0.25px;
 	width: 18px;
