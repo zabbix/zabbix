@@ -362,8 +362,8 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 
 			if (0 == hm[i].host_maintenance_from)
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",maintenance_from=%d",
-						hm[i].maintenance_from);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",maintenance_from=%ld",
+						(long int)hm[i].maintenance_from);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64,
