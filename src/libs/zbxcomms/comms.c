@@ -67,6 +67,10 @@ const char	*zbx_socket_strerror(void)
 #else
 #	define zbx_set_socket_strerror __zbx_zbx_set_socket_strerror
 #endif
+
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 1, 2)))
+#endif
 static void	__zbx_zbx_set_socket_strerror(const char *fmt, ...)
 {
 	va_list args;
@@ -1711,8 +1715,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 				if (out_size != reserved)
 				{
 					zbx_free(out);
-					zbx_set_socket_strerror("size of uncompressed data is less than expected",
-							zbx_compress_strerror());
+					zbx_set_socket_strerror("size of uncompressed data is less than expected");
 					nbytes = ZBX_PROTO_ERROR;
 					goto out;
 				}
