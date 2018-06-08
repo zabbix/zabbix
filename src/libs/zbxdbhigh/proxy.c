@@ -3066,8 +3066,8 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/*just for logging time from json*/
-	get_client_timediff(jp, ts);
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		get_client_timediff(jp, ts);
 
 	sec = zbx_time();
 
@@ -3399,7 +3399,8 @@ int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	get_client_timediff(jp, ts);
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		get_client_timediff(jp, ts);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
@@ -3552,7 +3553,8 @@ int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_host
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	get_client_timediff(jp, ts);
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		get_client_timediff(jp, ts);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
@@ -3812,8 +3814,8 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/*just for logging time from json*/
-	get_client_timediff(jp, ts);
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		get_client_timediff(jp, ts);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
@@ -3843,7 +3845,6 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		process_tasks_contents(&jp_data);
 
 	zbx_free(error_step);
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
