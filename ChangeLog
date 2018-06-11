@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha8
 
 New features:
+..F.I..... [ZBXNEXT-4044] changed default values of 'Display OK triggers for' and 'On status change triggers blink for' (viktors)
 ..F....... [ZBXNEXT-4361] implemented new time range selector for graphs (Andzs, ashubin, gcalenko, Sasha)
 ...GI..PS. [ZBXNEXT-4577] improved performance of Zabbix server by replacing semaphores to pthread mutexes and read-write locks (vso, wiper)
 ..F....... [ZBXNEXT-4312] reworked date picker; implemented keyboard interaction (miks)

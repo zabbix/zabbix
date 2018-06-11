@@ -1220,6 +1220,20 @@ static int	DBpatch_3050108(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050109(void)
+{
+	const ZBX_FIELD	field = {"ok_period", "5m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3050110(void)
+{
+	const ZBX_FIELD	field = {"blink_period", "2m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1331,5 +1345,7 @@ DBPATCH_ADD(3050105, 0, 1)
 DBPATCH_ADD(3050106, 0, 1)
 DBPATCH_ADD(3050107, 0, 1)
 DBPATCH_ADD(3050108, 0, 1)
+DBPATCH_ADD(3050109, 0, 1)
+DBPATCH_ADD(3050110, 0, 1)
 
 DBPATCH_END()
